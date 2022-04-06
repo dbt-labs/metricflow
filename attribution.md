@@ -5,11 +5,11 @@ We're grateful to be part of the open source community, and to be able to build 
 
 ---
 
-# 3rd-Party Software for [git@github.com:transform-data/metricflow-staging.git]()
+# 3rd-Party Software for [git@github.com:transform-data/metricflow.git]()
 
 
 
-The following 3rd-party software packages may be used by or distributed with **git@github.com:transform-data/metricflow-staging.git**.  Any information relevant to third-party vendors listed below are collected using common, reasonable means.
+The following 3rd-party software packages may be used by or distributed with **git@github.com:transform-data/metricflow.git**.  Any information relevant to third-party vendors listed below are collected using common, reasonable means.
 
 
 Date generated | Revision ID
