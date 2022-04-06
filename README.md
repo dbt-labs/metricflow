@@ -85,15 +85,11 @@ For reference, the tutorial steps are below:
 
 ### Additional Resources
 
-Website: https://transform.co/metricflow
-
-Documentation: https://docs.transform.co/docs/overview/metricflow-overview
-
-Slack Community: https://community.transform.co/metricflow-signup
-
-Main repository: https://github.com/transform-data/metricflow
-
-Changelog: [CHANGELOG.md](CHANGELOG.md)
+- [Website](https://transform.co/metricflow)
+- [Documentation](https://docs.transform.co/docs/overview/metricflow-overview)
+- [Slack Community](https://community.transform.co/metricflow-signup)
+- [MetricFlow Git Repository](https://github.com/transform-data/metricflow)
+- [CHANGELOG.md](CHANGELOG.md)
 
 ## Install MetricFlow
 
