@@ -9,10 +9,10 @@ MetricFlow is a computational framework for building and maintaining consistent 
 
 MetricFlow provides a set of abstractions that help you construct complicated logic and dynamically generate queries to handle:
 
-- Complex metric types such as ratio, expression, and cumulative.
-- Multi-hop joins between fact and dimension sources.
-- Metric aggregation to different time granularities.
-- And, so much more.
+- Complex metric types such as ratio, expression, and cumulative
+- Multi-hop joins between fact and dimension sources
+- Metric aggregation to different time granularities
+- And so much more
 
 As a developer, you can also use MetricFlow's interfaces to construct APIs for integrations to bring metrics into downstream tools in your data stack.
 
