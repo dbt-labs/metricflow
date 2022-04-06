@@ -53,11 +53,9 @@ If you’re new to MetricFlow, we suggest that you review our [Getting Started](
 
 Install MetricFlow:
 
-If you do not have postgres on your machine, first install postgres with homebrew:
-
-```
-brew install postgresql
-```
+If you do not have postgres on your machine, first install Postgres:
+- Postgres provides [pre-built packages for download and installation](https://www.postgresql.org/download/)
+- Mac users might prefer to use Homebrew: `brew install postgresql`
 
 Then, proceed with regular install as follows:
 
