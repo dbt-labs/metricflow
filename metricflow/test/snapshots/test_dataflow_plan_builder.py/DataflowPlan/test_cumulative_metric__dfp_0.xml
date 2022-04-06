@@ -1,0 +1,38 @@
+<DataflowPlan>
+    <WriteToResultDataframeNode>
+        <!-- description = Write to Dataframe -->
+        <!-- node_id = wrd_0 -->
+        <ComputeMetricsNode>
+            <!-- description = Compute Metrics via Expressions -->
+            <!-- node_id = cm_0 -->
+            <!-- metric_spec = MetricSpec(element_name='trailing_2_months_revenue') -->
+            <AggregateMeasuresNode>
+                <!-- description = Aggregate Measures -->
+                <!-- node_id = am_0 -->
+                <JoinOverTimeRangeNode>
+                    <!-- description = Join Self Over Time Range -->
+                    <!-- node_id = jotr_0 -->
+                    <FilterElementsNode>
+                        <!-- description =                     -->
+                        <!--   Pass Only Elements:             -->
+                        <!--     ['txn_revenue', 'ds__month']  -->
+                        <!-- node_id = pfe_0 -->
+                        <!-- include_spec = MeasureSpec(element_name='txn_revenue') -->
+                        <!-- include_spec =                                 -->
+                        <!--   {'class': 'TimeDimensionSpec',               -->
+                        <!--    'element_name': 'ds',                       -->
+                        <!--    'identifier_links': (),                     -->
+                        <!--    'time_granularity': TimeGranularity.MONTH}  -->
+                        <ReadSqlSourceNode>
+                            <!-- description =                                                                   -->
+                            <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='revenue'))  -->
+                            <!-- node_id = rss_5 -->
+                            <!-- data_set =                                                            -->
+                            <!--   DataSourceDataSet(DataSourceReference(data_source_name='revenue'))  -->
+                        </ReadSqlSourceNode>
+                    </FilterElementsNode>
+                </JoinOverTimeRangeNode>
+            </AggregateMeasuresNode>
+        </ComputeMetricsNode>
+    </WriteToResultDataframeNode>
+</DataflowPlan>

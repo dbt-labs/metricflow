@@ -1,0 +1,22 @@
+---
+data_source:
+  name: listings_extended_source
+  description: listings_extended_source
+  owners:
+    - support@transformdata.io
+
+  sql_table: $dim_listings_extended_table
+
+  dimensions:
+    - name: listing_creation_ds
+      type: time
+      type_params:
+        time_format: YYYY-MM-DD
+        time_granularity: day
+
+  identifiers:
+    - name: listing_id
+      type: primary
+
+  mutability:
+    type: immutable

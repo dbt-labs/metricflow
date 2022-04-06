@@ -1,0 +1,36 @@
+<ExecutionPlan>
+    <SelectSqlQueryToDataFrameTask>
+        <!-- description = Run a query and write the results to a data frame -->
+        <!-- node_id = rsq_0 -->
+        <!-- sql_query =                                                                    -->
+        <!--   -- Join Standard Outputs                                                     -->
+        <!--   -- Pass Only Elements:                                                       -->
+        <!--   --   ['bookings', 'is_instant', 'listing__country_latest']                   -->
+        <!--   -- Aggregate Measures                                                        -->
+        <!--   -- Compute Metrics via Expressions                                           -->
+        <!--   SELECT                                                                       -->
+        <!--     SUM(subq_1.bookings) AS bookings                                           -->
+        <!--     , subq_1.is_instant AS is_instant                                          -->
+        <!--     , listings_latest_src_10003.country AS listing__country_latest             -->
+        <!--   FROM (                                                                       -->
+        <!--     -- Read Elements From Data Source 'bookings_source'                        -->
+        <!--     -- Pass Only Elements:                                                     -->
+        <!--     --   ['bookings', 'is_instant', 'listing']                                 -->
+        <!--     SELECT                                                                     -->
+        <!--       1 AS bookings                                                            -->
+        <!--       , is_instant                                                             -->
+        <!--       , listing_id AS listing                                                  -->
+        <!--     FROM (                                                                     -->
+        <!--       -- User Defined SQL Query                                                -->
+        <!--       SELECT * FROM ***************************.fct_bookings                   -->
+        <!--     ) bookings_source_src_10000                                                -->
+        <!--   ) subq_1                                                                     -->
+        <!--   LEFT OUTER JOIN                                                              -->
+        <!--     ***************************.dim_listings_latest listings_latest_src_10003  -->
+        <!--   ON                                                                           -->
+        <!--     subq_1.listing = listings_latest_src_10003.listing_id                      -->
+        <!--   GROUP BY                                                                     -->
+        <!--     is_instant                                                                 -->
+        <!--     , listing__country_latest                                                  -->
+    </SelectSqlQueryToDataFrameTask>
+</ExecutionPlan>

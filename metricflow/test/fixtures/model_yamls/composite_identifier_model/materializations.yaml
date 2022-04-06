@@ -1,0 +1,25 @@
+---
+materialization:
+  name: messages_mat
+  description: messages_mat
+  owners:
+    - support@transformdata.io
+  metrics:
+    - messages
+  dimensions:
+    - ds
+    - user_team
+    - user_team__country
+
+---
+materialization:
+  name: messages_with_user_team_and_team
+  description: messages_with_user_team_and_team
+  owners:
+    - support@transformdata.io
+  metrics:
+    - messages
+  dimensions:
+    - ds
+    - user_team
+    - team_id

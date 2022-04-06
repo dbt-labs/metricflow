@@ -1,0 +1,340 @@
+---
+integration_test:
+  name: query_granularity_for_sum_day
+  description: Query a sum metric by time granularities.
+  model: EXTENDED_DATE_MODEL
+  required_features: ["DATE_TRUNC"]
+  metrics: ["bookings"]
+  group_bys: ["ds__day"]
+  check_query: |
+    SELECT
+      SUM(booking) AS bookings
+      , {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS ds
+    FROM {{ source_schema }}.fct_bookings_extended
+    GROUP BY
+      ds
+---
+integration_test:
+  name: query_granularity_for_sum_week
+  description: Query a sum metric by time granularities.
+  model: EXTENDED_DATE_MODEL
+  required_features: ["DATE_TRUNC"]
+  metrics: ["bookings"]
+  group_bys: ["ds__week"]
+  check_query: |
+    SELECT
+      SUM(booking) AS bookings
+      , {{ render_date_trunc("ds", TimeGranularity.WEEK) }} AS ds__week
+    FROM {{ source_schema }}.fct_bookings_extended
+    GROUP BY
+      ds__week
+---
+integration_test:
+  name: query_granularity_for_sum_month
+  description: Query a sum metric by time granularities.
+  model: EXTENDED_DATE_MODEL
+  required_features: ["DATE_TRUNC"]
+  metrics: ["bookings"]
+  group_bys: ["ds__month"]
+  check_query: |
+    SELECT
+      SUM(booking) AS bookings
+      , {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS ds__month
+    FROM {{ source_schema }}.fct_bookings_extended
+    GROUP BY
+      ds__month
+---
+integration_test:
+  name: query_granularity_for_sum_quarter
+  description: Query a sum metric by time granularities.
+  model: EXTENDED_DATE_MODEL
+  required_features: ["DATE_TRUNC"]
+  metrics: ["bookings"]
+  group_bys: ["ds__quarter"]
+  check_query: |
+    SELECT
+      SUM(booking) AS bookings
+      , {{ render_date_trunc("ds", TimeGranularity.QUARTER) }} AS ds__quarter
+    FROM {{ source_schema }}.fct_bookings_extended
+    GROUP BY
+      ds__quarter
+---
+integration_test:
+  name: query_granularity_for_sum_year
+  description: Query a sum metric by time granularities.
+  model: EXTENDED_DATE_MODEL
+  required_features: ["DATE_TRUNC"]
+  metrics: ["bookings"]
+  group_bys: ["ds__year"]
+  check_query: |
+    SELECT
+      SUM(booking) AS bookings
+      , {{ render_date_trunc("ds", TimeGranularity.YEAR) }} AS ds__year
+    FROM {{ source_schema }}.fct_bookings_extended
+    GROUP BY
+      ds__year
+---
+integration_test:
+  name: query_granularity_for_count_distinct_day
+  description: Query a count distinct metric by time granularities.
+  model: EXTENDED_DATE_MODEL
+  required_features: ["DATE_TRUNC"]
+  metrics: ["unique_listings_booked"]
+  group_bys: ["ds__day"]
+  check_query: |
+    SELECT
+      COUNT(DISTINCT listing_id) AS unique_listings_booked
+      , {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS ds
+    FROM {{ source_schema }}.fct_bookings_extended
+    GROUP BY
+      ds
+---
+integration_test:
+  name: query_granularity_for_count_distinct_week
+  description: Query a count distinct metric by time granularities.
+  model: EXTENDED_DATE_MODEL
+  required_features: ["DATE_TRUNC"]
+  metrics: ["unique_listings_booked"]
+  group_bys: ["ds__week"]
+  check_query: |
+    SELECT
+      COUNT(DISTINCT listing_id) AS unique_listings_booked
+      , {{ render_date_trunc("ds", TimeGranularity.WEEK) }} AS ds__week
+    FROM {{ source_schema }}.fct_bookings_extended
+    GROUP BY
+      ds__week
+---
+integration_test:
+  name: query_granularity_for_count_distinct_month
+  description: Query a count distinct metric by time granularities.
+  model: EXTENDED_DATE_MODEL
+  required_features: ["DATE_TRUNC"]
+  metrics: ["unique_listings_booked"]
+  group_bys: ["ds__month"]
+  check_query: |
+    SELECT
+      COUNT(DISTINCT listing_id) AS unique_listings_booked
+      , {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS ds__month
+    FROM {{ source_schema }}.fct_bookings_extended
+    GROUP BY
+      ds__month
+---
+integration_test:
+  name: query_granularity_for_count_distinct_quarter
+  description: Query a count distinct metric by time granularities.
+  model: EXTENDED_DATE_MODEL
+  required_features: ["DATE_TRUNC"]
+  metrics: ["unique_listings_booked"]
+  group_bys: ["ds__quarter"]
+  check_query: |
+    SELECT
+      COUNT(DISTINCT listing_id) AS unique_listings_booked
+      , {{ render_date_trunc("ds", TimeGranularity.QUARTER) }} AS ds__quarter
+    FROM {{ source_schema }}.fct_bookings_extended
+    GROUP BY
+      ds__quarter
+---
+integration_test:
+  name: query_granularity_for_count_distinct_year
+  description: Query a count distinct metric by time granularities.
+  model: EXTENDED_DATE_MODEL
+  required_features: ["DATE_TRUNC"]
+  metrics: ["unique_listings_booked"]
+  group_bys: ["ds__year"]
+  check_query: |
+    SELECT
+      COUNT(DISTINCT listing_id) AS unique_listings_booked
+      , {{ render_date_trunc("ds", TimeGranularity.YEAR) }} AS ds__year
+    FROM {{ source_schema }}.fct_bookings_extended
+    GROUP BY
+      ds__year
+---
+integration_test:
+  name: query_granularity_for_joined_dundered_dimension_day
+  description: Query a count distinct metric by time granularities.
+  model: EXTENDED_DATE_MODEL
+  required_features: ["DATE_TRUNC"]
+  metrics: ["bookings"]
+  group_bys: ["listing_id__listing_creation_ds__day"]
+  check_query: |
+    SELECT
+      SUM(booking) AS bookings
+      , {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS listing_id__listing_creation_ds
+    FROM {{ source_schema }}.fct_bookings_extended b
+    JOIN {{ source_schema }}.dim_listings_extended l
+    ON b.listing_id = l.listing_id
+    GROUP BY
+      listing_id__listing_creation_ds
+---
+integration_test:
+  name: query_granularity_for_joined_dundered_dimension_month
+  description: Query a count distinct metric by time granularities.
+  model: EXTENDED_DATE_MODEL
+  required_features: ["DATE_TRUNC"]
+  metrics: ["bookings"]
+  group_bys: ["listing_id__listing_creation_ds__month"]
+  check_query: |
+    SELECT
+      SUM(booking) AS bookings
+      , {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS listing_id__listing_creation_ds__month
+    FROM {{ source_schema }}.fct_bookings_extended b
+    JOIN {{ source_schema }}.dim_listings_extended l
+    ON b.listing_id = l.listing_id
+    GROUP BY
+      listing_id__listing_creation_ds__month
+---
+integration_test:
+  name: query_granularity_from_sql_query
+  description: Query a metric from a sql query by time granularities.
+  model: EXTENDED_DATE_MODEL
+  required_features: ["DATE_TRUNC"]
+  metrics: ["bookings_from_sql_query"]
+  group_bys: ["ds__week"]
+  check_query: |
+    SELECT
+      SUM(booking) AS bookings_from_sql_query
+      , {{ render_date_trunc("ds", TimeGranularity.WEEK) }} AS ds__week
+    FROM {{ source_schema }}.fct_bookings_extended
+    GROUP BY
+      ds__week
+---
+integration_test:
+  name: metric_with_non_day_granularity_expected_boundary
+  description: Query a metric at a time granularity on expected date boundaries
+  model: EXTENDED_DATE_MODEL
+  metrics: ["bookings_monthly"]
+  group_bys: ["ds"]
+  time_constraint: ["2020-01-01", "2020-02-29"]
+  check_query: |
+    SELECT
+      SUM(bookings_monthly) AS bookings_monthly
+      , ds as ds__month
+    FROM {{ source_schema }}.fct_bookings_extended_monthly
+    WHERE {{ render_time_constraint("ds", "2020-01-01", "2020-02-29") }}
+    GROUP BY
+      ds__month
+---
+integration_test:
+  name: metric_with_non_day_granularity_on_non_boundaries
+  description: Query a metric at a time granularity on non  date boundaries
+  model: EXTENDED_DATE_MODEL
+  metrics: ["bookings_monthly"]
+  group_bys: ["ds"]
+  time_constraint: ["2020-01-15", "2020-02-15"]
+  check_query: |
+    SELECT
+      SUM(bookings_monthly) AS bookings_monthly
+      , ds as ds__month
+    FROM {{ source_schema }}.fct_bookings_extended_monthly
+    WHERE {{ render_time_constraint("ds", "2020-01-01", "2020-02-29") }}
+    GROUP BY
+      ds__month
+---
+integration_test:
+  name: weekly_metric_on_non_boundaries
+  description: Query a metric from a sql query by time granularities.
+  model: EXTENDED_DATE_MODEL
+  required_features: ["DATE_TRUNC"]
+  metrics: ["bookings"]
+  group_bys: ["ds__week"]
+  time_constraint: ["2020-01-15", "2020-01-22"]
+  check_query: |
+    SELECT
+      SUM(booking) AS bookings
+      , {{ render_date_trunc("ds", TimeGranularity.WEEK) }} AS ds__week
+    FROM {{ source_schema }}.fct_bookings_extended
+    WHERE {{ render_time_constraint("ds", "2020-01-13", "2020-01-26") }}
+    GROUP BY
+      ds__week
+---
+integration_test:
+  name: daily_metric_with_monthly_time_dimension
+  description: Query a metric with a month-granularity time dimensions.
+  model: EXTENDED_DATE_MODEL
+  required_features: ["DATE_TRUNC"]
+  metrics: ["bookings"]
+  group_bys: ["ds__month"]
+  time_constraint: ["2020-01-01", "2020-01-02"]
+  check_query: |
+    SELECT
+      SUM(booking) AS bookings
+      , {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS ds__month
+    FROM {{ source_schema }}.fct_bookings_extended
+    WHERE {{ render_time_constraint("ds", "2020-01-01", "2020-01-31") }}
+    GROUP BY
+      ds__month
+---
+integration_test:
+  name: metrics_with_different_time_granularities
+  description: Query two metrics with different time granularities.
+  model: EXTENDED_DATE_MODEL
+  required_features: ["FULL_OUTER_JOIN", "DATE_TRUNC"]
+  metrics: ["bookings_monthly", "bookings"]
+  group_bys: ["ds"]
+  time_constraint: ["2020-01-01", "2020-02-29"]
+  check_query: |
+    SELECT
+      SUM(bookings_monthly) as bookings_monthly
+      , SUM(bookings) as bookings
+      , ds__month
+    FROM (
+      SELECT
+        a.bookings_monthly
+        , b.bookings
+        , COALESCE(a.ds, b.ds) AS ds__month
+      FROM (
+        SELECT
+          SUM(bookings_monthly) AS bookings_monthly
+          , ds
+        FROM {{ source_schema }}.fct_bookings_extended_monthly
+        WHERE
+          {{ render_time_constraint("ds", "2020-01-01", "2020-02-29") }}
+        GROUP BY ds
+      ) a
+      FULL OUTER JOIN (
+        SELECT
+          SUM(booking) AS bookings
+          , {{ render_date_trunc("ds", TimeGranularity.MONTH) }}  AS ds
+        FROM {{ source_schema }}.fct_bookings_extended
+        WHERE
+          {{ render_time_constraint("ds", "2020-01-01", "2020-02-29") }}
+        GROUP BY {{ render_date_trunc("ds", TimeGranularity.MONTH) }}
+      ) b
+      ON a.ds = b.ds
+      ) c
+    GROUP BY
+      ds__month
+---
+integration_test:
+  name: metrics_with_different_time_granularities_and_no_time_dim
+  description: Query two metrics with different time granularities, but without a time dimension.
+  model: EXTENDED_DATE_MODEL
+  required_features: ["FULL_OUTER_JOIN"]
+  metrics: ["bookings_monthly", "bookings"]
+  group_bys: ["is_instant"]
+  time_constraint: ["2020-01-15", "2020-02-15"]
+  check_query: |
+    SELECT
+      SUM(bookings_monthly) AS bookings_monthly
+      , SUM(bookings) AS bookings
+      , a.is_instant AS is_instant
+    FROM (
+      SELECT
+        SUM(bookings_monthly) AS bookings_monthly
+        , is_instant
+      FROM {{ source_schema }}.fct_bookings_extended_monthly
+      WHERE
+        {{ render_time_constraint("ds", "2020-01-01", "2020-02-29") }}
+      GROUP BY is_instant
+    ) a
+    FULL OUTER JOIN (
+      SELECT
+        SUM(booking) AS bookings
+        , is_instant
+      FROM {{ source_schema }}.fct_bookings_extended
+      WHERE
+        {{ render_time_constraint("ds", "2020-01-01", "2020-02-29") }}
+      GROUP BY is_instant
+    ) b
+    ON a.is_instant = b.is_instant
+    GROUP BY a.is_instant

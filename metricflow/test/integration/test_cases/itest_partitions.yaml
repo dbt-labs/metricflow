@@ -1,0 +1,89 @@
+---
+integration_test:
+  name: partition_rollup
+  description: Tests grouping by a partition column.
+  model: SIMPLE_MODEL
+  metrics: ["identity_verifications"]
+  group_bys: ["ds_partitioned", "verification_type"]
+  check_query: |
+    SELECT
+      SUM(1) AS identity_verifications
+      , verification_type
+      , ds_partitioned
+    FROM {{ source_schema }}.fct_id_verifications
+    GROUP BY
+      verification_type
+      , ds_partitioned
+---
+integration_test:
+  name: partitioned_join
+  description: Tests joining by a partition column.
+  model: SIMPLE_MODEL
+  metrics: ["identity_verifications"]
+  group_bys: ["user__home_state"]
+  check_query: |
+    SELECT
+      SUM(1) AS identity_verifications
+      , dim.home_state AS user__home_state
+    FROM {{ source_schema }}.fct_id_verifications fct
+    JOIN {{ source_schema }}.dim_users dim
+      ON fct.user_id = dim.user_id
+        AND fct.ds_partitioned = dim.ds_partitioned
+    GROUP BY
+      dim.home_state
+---
+integration_test:
+  name: partitioned_join_groupby_partition
+  description: Tests joining and grouping by a partition column.
+  model: SIMPLE_MODEL
+  metrics: ["identity_verifications"]
+  group_bys: ["ds_partitioned", "user__home_state"]
+  check_query: |
+    SELECT
+      SUM(1) AS identity_verifications
+      , fct.ds_partitioned AS ds_partitioned
+      , dim.home_state AS user__home_state
+    FROM {{ source_schema }}.fct_id_verifications fct
+    JOIN {{ source_schema }}.dim_users dim
+      ON fct.user_id = dim.user_id
+        AND fct.ds_partitioned = dim.ds_partitioned
+    GROUP BY
+      fct.ds_partitioned
+      , dim.home_state
+---
+integration_test:
+  name: partitioned_fct_nonpartitioned_dim
+  description: Tests joining to a nonpartitioned table.
+  model: SIMPLE_MODEL
+  metrics: ["identity_verifications"]
+  group_bys: ["user__home_state_latest"]
+  check_query: |
+    SELECT
+      SUM(1) AS identity_verifications
+      , dim.home_state_latest AS user__home_state_latest
+    FROM {{ source_schema }}.fct_id_verifications fct
+    JOIN {{ source_schema }}.dim_users_latest dim
+      ON fct.user_id = dim.user_id
+    GROUP BY
+      dim.home_state_latest
+---
+integration_test:
+  name: constraint_with_partitions
+  description: Tests a time constraint on a partitioned column
+  model: SIMPLE_MODEL
+  metrics: ["identity_verifications"]
+  group_bys: ["ds_partitioned", "user__home_state"]
+  time_constraint: ["2020-01-01", "2020-01-01"]
+  check_query: |
+    SELECT
+      SUM(1) AS identity_verifications
+      , fct.ds_partitioned AS ds_partitioned
+      , dim.home_state AS user__home_state
+    FROM {{ source_schema }}.fct_id_verifications fct
+    JOIN {{ source_schema }}.dim_users dim
+      ON fct.user_id = dim.user_id
+        AND fct.ds_partitioned = dim.ds_partitioned
+        WHERE {{ render_time_constraint("fct.ds_partitioned", "2020-01-01", "2020-01-01") }}
+    GROUP BY
+      fct.ds_partitioned
+      , dim.home_state

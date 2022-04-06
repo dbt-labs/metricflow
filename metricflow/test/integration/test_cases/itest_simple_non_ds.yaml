@@ -1,0 +1,22 @@
+---
+integration_test:
+  name: simple_query_non_ds
+  description: Tests selecting a metric and dimensions in ds-less model
+  model: SIMPLE_MODEL_NON_DS
+  metrics: ["bookings"]
+  group_bys: ["is_instant", "listing__country_latest", "dt"]
+  time_constraint: ["2020-01-01", "2020-01-01"]
+  check_query: |
+    SELECT
+      SUM(1) AS bookings
+      , b.is_instant
+      , l.country AS listing__country_latest
+      , b.dt AS dt
+    FROM {{ source_schema }}.fct_bookings_dt b
+    JOIN {{ source_schema }}.dim_listings_latest l
+      ON b.listing_id = l.listing_id
+    WHERE {{ render_time_constraint("dt", "2020-01-01", "2020-01-01") }}
+    GROUP BY
+      b.is_instant
+      , b.dt
+      , l.country

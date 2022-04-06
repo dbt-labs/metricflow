@@ -1,0 +1,48 @@
+---
+integration_test:
+  name: multiple_foreign_keys_guest
+  description: Query a metric and the first of two foreign identifiers in the measure data source.
+  model: SIMPLE_MODEL
+  metrics: ["bookings"]
+  group_bys: ["guest"]
+  check_query: |
+    SELECT
+      SUM(1) AS bookings
+      , guest_id AS guest
+    FROM {{ source_schema }}.fct_bookings
+    GROUP BY
+      guest_id
+---
+integration_test:
+  name: multiple_foreign_keys_host
+  description: Query a metric and the second of two foreign identifiers in the measure data source.
+  model: SIMPLE_MODEL
+  metrics: ["bookings"]
+  group_bys: ["host"]
+  check_query: |
+    SELECT
+      SUM(1) AS bookings
+      , host_id AS host
+    FROM {{ source_schema }}.fct_bookings
+    GROUP BY
+      host_id
+---
+integration_test:
+  name: multiple_foreign_keys_host_and_guest
+  description: Query a metric and both foreign identifiers in the measure data source.
+  model: SIMPLE_MODEL
+  metrics: ["bookings"]
+  group_bys: ["host", "guest"]
+  order_bys: ["host", "guest"]
+  check_query: |
+    SELECT
+      SUM(1) AS bookings
+      , guest_id AS guest
+      , host_id AS host
+    FROM {{ source_schema }}.fct_bookings
+    GROUP BY
+      host_id
+      , guest_id
+    ORDER BY
+      host_id
+      , guest_id

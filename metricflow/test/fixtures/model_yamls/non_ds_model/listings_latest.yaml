@@ -1,0 +1,39 @@
+---
+data_source:
+  name: listings_latest
+  description: listings_latest
+  owners:
+    - support@transformdata.io
+
+  sql_table: $dim_listings_latest_table
+
+  measures:
+    - name: listings
+      expr: 1
+      agg: sum
+
+  dimensions:
+    - name: dt
+      type: time
+      expr: created_at
+      type_params:
+        is_primary: True
+        time_format: YYYY-MM-DD
+        time_granularity: day
+    - name: created_at
+      type: time
+      type_params:
+        time_format: YYYY-MM-DD
+        time_granularity: day
+    - name: country_latest
+      type: categorical
+      expr: country
+
+  identifiers:
+    - name: listing
+      type: primary
+      expr: listing_id
+
+
+  mutability:
+    type: immutable

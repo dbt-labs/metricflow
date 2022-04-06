@@ -1,0 +1,128 @@
+---
+integration_test:
+  name: multiple_dimensions
+  description: Query one metric with multiple dimensions from different sources.
+  model: SIMPLE_MODEL
+  metrics: ["views"]
+  group_bys: ["user__home_state_latest", "listing__is_lux_latest"]
+  check_query: |
+    SELECT
+      SUM(1) AS views
+      , u.home_state_latest AS user__home_state_latest
+      , l.is_lux AS listing__is_lux_latest
+    FROM {{ source_schema }}.fct_views v
+    JOIN {{ source_schema }}.dim_listings_latest l
+      ON l.listing_id = v.listing_id
+    JOIN {{ source_schema }}.dim_users_latest u
+      ON u.user_id = v.user_id
+    GROUP BY
+      u.home_state_latest
+      , l.is_lux
+---
+integration_test:
+  name: groupby_local_identifier
+  description: Query a metric and group by a local identifier.
+  model: SIMPLE_MODEL
+  metrics: ["booking_value"]
+  group_bys: ["listing"]
+  check_query: |
+    SELECT
+      SUM(booking_value) AS booking_value
+      , listing_id AS listing
+    FROM {{ source_schema }}.fct_bookings
+    GROUP BY
+      listing_id
+---
+integration_test:
+  name: groupby_local_identifier_and_dim
+  description: Query a metric and group by a local identifier and local dimension.
+  model: SIMPLE_MODEL
+  metrics: ["booking_value"]
+  group_bys: ["listing", "ds"]
+  check_query: |
+    SELECT
+      SUM(booking_value) AS booking_value
+      , ds
+      , listing_id AS listing
+    FROM {{ source_schema }}.fct_bookings
+    GROUP BY
+      listing_id
+      , ds
+---
+integration_test:
+  name: groupby_local_identifier_and_remote_dimension
+  description: Query a metric and group by a local identifier and non local dimension.
+  model: SIMPLE_MODEL
+  metrics: ["views"]
+  group_bys: ["user__home_state_latest", "listing"]
+  check_query: |
+    SELECT
+      SUM(1) AS views
+      , u.home_state_latest AS user__home_state_latest
+      , v.listing_id AS listing
+    FROM {{ source_schema }}.fct_views v
+    JOIN {{ source_schema }}.dim_listings_latest l
+      ON l.listing_id = v.listing_id
+    JOIN {{ source_schema }}.dim_users_latest u
+      ON u.user_id = v.user_id
+    GROUP BY
+      v.listing_id
+      , u.home_state_latest
+---
+integration_test:
+  name: local_partition_dimension
+  description: Query a metric and group by a partition dimension both in dundered and non dundered forms.
+  model: SIMPLE_MODEL
+  metrics: ["identity_verifications"]
+  group_bys: ["ds", "verification__ds"]
+  check_query: |
+    SELECT
+      SUM(1) AS identity_verifications
+      , ds AS verification__ds
+      , ds
+    FROM {{ source_schema }}.fct_id_verifications
+    GROUP BY
+      ds
+---
+integration_test:
+  name: local_partition_dimension_with_other_dims
+  description: Query a metric and group by a partition dimension both in dundered and non dundered forms.
+  model: SIMPLE_MODEL
+  metrics: ["identity_verifications"]
+  group_bys: ["ds", "user__home_state"]
+  check_query: |
+    SELECT
+      SUM(1) AS identity_verifications
+      , u.home_state AS user__home_state
+      , v.ds
+    FROM {{ source_schema }}.fct_id_verifications v
+    JOIN {{ source_schema }}.dim_users u
+      ON u.user_id = v.user_id
+      AND u.ds = v.ds
+    GROUP BY
+      v.ds
+      , u.home_state
+
+# ---
+# integration_test:
+#   name: joined_dundered_partition_dim
+#   description: Query a metric and group by a partition dimension both in dundered and non dundered forms.
+#   model: SIMPLE_MODEL
+#   metrics: ["identity_verifications"]
+#   group_bys: ["user__ds_partitioned", "user__home_state"]
+#   order_bys: ["user__ds_partitioned", "user__home_state"]
+#   check_query: |
+#     SELECT
+#       SUM(1) AS identity_verifications
+#       , u.home_state AS user__home_state
+#       , v.ds AS user__ds_partitioned
+#     FROM {{ source_schema }}.fct_id_verifications v
+#     JOIN {{ source_schema }}.dim_users u
+#        ON u.user_id = v.user_id
+#        AND u.ds = v.ds
+#     GROUP BY
+#       v.ds
+#       , u.home_state
+#     ORDER BY
+#       v.ds
+#       , u.home_state

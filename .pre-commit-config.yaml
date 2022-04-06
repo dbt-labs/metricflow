@@ -1,0 +1,21 @@
+repos:
+  - repo: https://github.com/psf/black
+    rev: 22.3.0
+    hooks:
+    -   id: black
+        verbose: true
+  - repo: https://gitlab.com/pycqa/flake8
+    rev: 3.8.3
+    hooks:
+      - id: flake8
+        additional_dependencies: [flake8-docstrings==1.5.0]
+        verbose: true
+
+  - repo: https://github.com/pre-commit/mirrors-mypy # configured via mypy.ini
+    rev: v0.931
+    hooks:  # passing args: [] ensures we do not silently ignore imports (default) and instead explicitly configure in mypy.ini
+      - id: mypy
+        name: mypy_metricflow
+        args: [--ignore-missing-imports, --show-error-codes]
+        verbose: true
+        additional_dependencies: [sqlalchemy,sqlalchemy2-stubs,types-flask,types-requests,types-PyYAML,types-jinja2,types-attrs,types-tabulate,pytest, python-dateutil, types-python-dateutil]

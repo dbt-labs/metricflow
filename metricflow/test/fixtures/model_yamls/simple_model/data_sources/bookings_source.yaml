@@ -1,0 +1,67 @@
+---
+data_source:
+  name: bookings_source
+  description: bookings_source
+  owners:
+    - support@transformdata.io
+
+  sql_query: |
+    -- User Defined SQL Query
+    SELECT * FROM $bookings_source_table
+
+  measures:
+    - name: bookings
+      expr: "1"
+      agg: sum
+    - name: instant_bookings
+      expr: is_instant
+      agg: sum_boolean
+    - name: booking_value
+      agg: sum
+    - name: max_booking_value
+      agg: max
+      expr: booking_value
+    - name: min_booking_value
+      agg: min
+      expr: booking_value
+    - name: bookers
+      expr: guest_id
+      agg: count_distinct
+    - name: average_booking_value
+      expr: booking_value
+      agg: average
+
+  dimensions:
+    - name: is_instant
+      type: categorical
+    - name: ds
+      type: time
+      type_params:
+        is_primary: True
+        time_granularity: day
+    - name: ds_partitioned
+      type: time
+      is_partition: true
+      type_params:
+        time_granularity: day
+
+  identifiers:
+    - name: listing
+      type: foreign
+      expr: listing_id
+    - name: guest
+      type: foreign
+      expr: guest_id
+      entity: user
+    - name: host
+      type: foreign
+      expr: host_id
+      entity: user
+    - name: create_a_cycle_in_the_join_graph
+      type: primary
+      expr: guest_id
+
+  mutability:
+    type: full_mutation
+    type_params:
+      update_cron: 0 1 * * *

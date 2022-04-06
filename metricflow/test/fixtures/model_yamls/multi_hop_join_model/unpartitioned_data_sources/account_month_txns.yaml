@@ -1,0 +1,30 @@
+---
+data_source:
+  name: account_month_txns
+  description: account_month_txns
+  owners:
+    - support@transformdata.io
+
+  sql_table: $account_month_txns
+
+  measures:
+    - name: txn_count
+      agg: sum
+      create_metric: true
+
+  dimensions:
+    - name: ds
+      type: time
+      type_params:
+        is_primary: true
+        time_format: YYYY-MM-DD
+        time_granularity: day
+    - name: account_month
+      type: categorical
+
+  identifiers:
+    - name: account_id
+      type: primary
+
+  mutability:
+    type: immutable

@@ -1,0 +1,41 @@
+name: MetricFlow Unit Tests (CI)
+on:
+  pull_request:
+    # run these jobs when a PR is opened, edited, reopened, or updated (synchronize)
+    # edited = title, body, or the base branch of the PR is modified
+    # synchronize = commit(s) pushed to the pull request
+    types:
+      - opened
+      - edited
+      - reopened
+      - synchronize
+    paths:
+      - "metricflow/**"
+jobs:
+  metricflow-unit-tests:
+    name: MetricFlow Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check-out the repo
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ${{ env.pythonLocation }}
+            ~/.cache/pypoetry
+          key: ${{ env.pythonLocation }}-${{ hashFiles('poetry.lock') }}
+
+      - name: Install Poetry
+        run: pip install poetry && poetry config virtualenvs.create false
+
+      - name: Install Metricflow
+        run: poetry install
+
+      - name: Run MetricFlow Unit tests suites
+        run: pytest metricflow/test

@@ -1,0 +1,26 @@
+--- 
+data_source:
+  name: third_hop_table
+  description: third_hop_table
+  owners:
+    - support@transformdata.io
+
+  sql_table: $third_hop_table
+
+  dimensions:
+    - name: ds_partitioned
+      type: time
+      type_params:
+        is_primary: false
+        time_format: YYYY-MM-DD
+        time_granularity: day
+      is_partition: true
+    - name: value
+      type: categorical
+
+  identifiers:
+    - name: customer_third_hop_id
+      type: primary
+
+  mutability:
+    type: immutable

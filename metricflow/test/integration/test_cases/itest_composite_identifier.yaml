@@ -1,0 +1,159 @@
+---
+integration_test:
+  name: composite_key
+  description: Query a metric using a composite key and match it to a table grouped by those two identifiers.
+  model: COMPOSITE_IDENTIFIER_MODEL
+  metrics: ["messages"]
+  group_bys: ["user_team"]
+  check_query: |
+    SELECT
+      SUM(1) AS messages
+      , team_id AS user_team___team_id
+      , user_id AS user_team___user_id
+    FROM {{ source_schema }}.fct_messages
+    GROUP BY
+      team_id
+      , user_id
+---
+integration_test:
+  name: composite_key_order
+  description: Query a metric using a composite key and and sort by those two identifiers.
+  model: COMPOSITE_IDENTIFIER_MODEL
+  metrics: ["messages"]
+  group_bys: ["user_team"]
+  order_bys: ["user_team"]
+  check_order: true
+  check_query: |
+    SELECT
+      SUM(1) AS messages
+      , team_id AS user_team___team_id
+      , user_id AS user_team___user_id
+    FROM {{ source_schema }}.fct_messages
+    GROUP BY
+      team_id
+      , user_id
+    ORDER BY
+      team_id
+      , user_id
+---
+integration_test:
+  name: composite_key_join
+  description: Query a metric and join to a dimension using a composite key. Match this output to a table grouped by those two identifiers and joined to another table.
+  model: COMPOSITE_IDENTIFIER_MODEL
+  metrics: ["messages"]
+  group_bys: ["user_team", "user_team__country"]
+  order_bys: ["user_team", "user_team__country"]
+  check_query: |
+    SELECT
+      SUM(1) AS messages
+      , u.country as user_team__country
+      , m.team_id AS user_team___team_id
+      , m.user_id AS user_team___user_id
+    FROM {{ source_schema }}.fct_messages m
+    JOIN {{ source_schema }}.fct_users u
+      ON m.team_id = u.team_id
+      AND m.user_id = u.id
+    GROUP BY
+      m.team_id
+      , u.country
+      , m.user_id
+---
+integration_test:
+  name: composite_key_join_ds
+  description: Query a metric and join to a dimension using a composite key and group by day. Match this output to a table grouped by those two identifiers and joined to another table and grouped by date.
+  model: COMPOSITE_IDENTIFIER_MODEL
+  metrics: ["messages"]
+  group_bys: ["ds", "user_team", "user_team__country"]
+  check_query: |
+    SELECT
+      SUM(1) AS messages
+      , u.country as user_team__country
+      , m.ds as ds
+      , m.team_id AS user_team___team_id
+      , m.user_id AS user_team___user_id
+    FROM {{ source_schema }}.fct_messages m
+    JOIN {{ source_schema }}.fct_users u
+      ON m.team_id = u.team_id
+      AND m.user_id = u.id
+    GROUP BY
+      m.team_id
+      , m.ds
+      , u.country
+      , m.user_id
+---
+integration_test:
+  name: composite_and_ds
+  description: Query a metric and join using a composite key and grouping by date. Match this output to a table grouped by those two identifiers and joined to another table.
+  model: COMPOSITE_IDENTIFIER_MODEL
+  metrics: ["messages"]
+  group_bys: ["ds", "user_team"]
+  check_query: |
+    SELECT
+      SUM(1) AS messages
+      , m.ds as ds
+      , m.team_id AS user_team___team_id
+      , m.user_id AS user_team___user_id
+    FROM {{ source_schema }}.fct_messages m
+    JOIN {{ source_schema }}.fct_users u
+      ON m.team_id = u.team_id
+      AND m.user_id = u.id
+    GROUP BY
+      m.team_id
+      , m.ds
+      , m.user_id
+---
+integration_test:
+  name: composite_key_with_multihop
+  description: Query a metric and join using a composite key across two tables. Match this output to a table grouped by those two identifiers and joined to another table.
+  model: COMPOSITE_IDENTIFIER_MODEL
+  metrics: ["messages"]
+  group_bys: ["user_team__user_id__user_element"]
+  check_query: |
+    SELECT
+      SUM(1) AS messages
+      , fum.user_element as user_team__user_id__user_element
+    FROM {{ source_schema }}.fct_messages m
+    JOIN {{ source_schema }}.fct_users fu
+      ON m.team_id = fu.team_id
+      AND m.user_id = fu.id
+    JOIN {{ source_schema }}.fct_users_more fum
+      ON fum.id = fu.id
+    GROUP BY
+      fum.user_element
+---
+integration_test:
+  name: composite_key_with_the_same_sub_identifiers
+  description: Query a metric and join using a composite key across two tables. Match this output to a table grouped by those two identifiers and joined to another table.
+  model: COMPOSITE_IDENTIFIER_MODEL
+  metrics: ["messages"]
+  group_bys: ["user_team__user_composite_ident_2__user_element"]
+  check_query: |
+    SELECT
+      SUM(1) AS messages
+      , fum.user_element as user_team__user_composite_ident_2__user_element
+    FROM {{ source_schema }}.fct_messages m
+    JOIN {{ source_schema }}.fct_users fu
+      ON m.team_id = fu.team_id
+      AND m.user_id = fu.id
+    JOIN {{ source_schema }}.fct_users_more fum
+      ON fum.id = fu.id
+    GROUP BY
+      fum.user_element
+---
+integration_test:
+  name: composite_key_and_identifier
+  description: Query a metric with a composite key and one of the identifiers to ensure that we render each columb, avoiding ambiguous column names.
+  model: COMPOSITE_IDENTIFIER_MODEL
+  metrics: ["messages"]
+  group_bys: ["user_team", "user_id"]
+  check_query: |
+    SELECT
+      SUM(1) AS messages
+      , user_id AS user_id
+      , team_id AS user_team___team_id
+      , user_id AS user_team___user_id
+    FROM {{ source_schema }}.fct_messages
+    GROUP BY
+      user_team___team_id
+      , user_team___user_id
+      , user_id

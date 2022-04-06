@@ -1,0 +1,26 @@
+---
+data_source:
+  name: more_users_source
+  description: more_users_source
+  owners:
+    - support@transformdata.io
+
+  sql_table: $fct_users_more_table
+
+
+  dimensions:
+    - name: user_element
+      type: categorical
+
+  identifiers:
+    - name: user_id
+      expr: id
+      type: primary
+    - name: user_composite_ident_2
+      type: unique
+      identifiers:
+        - name: ident_2
+        - ref: user_id
+
+  mutability:
+    type: immutable

@@ -1,0 +1,23 @@
+--- 
+data_source:
+  name: bridge_table
+  description: bridge_table
+  owners:
+    - support@transformdata.io
+
+  sql_table: $bridge_table
+
+  dimensions:
+    - name: extra_dim
+      type: categorical
+
+  identifiers:
+    - name: account_id
+      type: primary
+    - name: customer_id
+      type: foreign
+
+  mutability:
+    type: immutable
+
+

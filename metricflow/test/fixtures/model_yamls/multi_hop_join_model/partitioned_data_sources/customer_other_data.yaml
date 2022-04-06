@@ -1,0 +1,28 @@
+---
+data_source:
+  name: customer_other_data
+  description: customer_other_data
+  owners:
+    - support@transformdata.io
+
+  sql_table: $customer_other_data
+
+  dimensions:
+    - name: ds_partitioned
+      type: time
+      type_params:
+        is_primary: false
+        time_format: YYYY-MM-DD
+        time_granularity: day
+      is_partition: true
+    - name: country
+      type: categorical
+
+  identifiers:
+    - name: customer_id
+      type: primary
+    - name: customer_third_hop_id
+      type: unique
+
+  mutability:
+    type: immutable

@@ -1,0 +1,164 @@
+data_source: 
+  name: transactions 
+  description: |
+    Each row represents one transaction. There
+    will be a new row for any cancellations or alterations. 
+    There is a transaction, order, and customer id for 
+    every transaction. There is only one transaction id per 
+    transaction, but there can be many rows per order id and 
+    customer id. The `ds` or date is reflected in UTC.
+  owners: 
+    - support@transformdata.io
+  identifiers:
+    - name: transaction
+      type: primary
+      expr: id_transaction
+    - name: customer
+      type: foreign
+      expr: id_customer
+    - name: id_order
+      type: foreign
+    - name: customer_order
+      type: foreign
+      identifiers:
+        - ref: customer
+        - name: id_order
+  measures:
+    - name: transaction_amount_usd
+      description: The total USD value of the transaction.
+      agg: SUM
+      create_metric: true
+    - name: transactions
+      description: The total number of transactions.
+      expr: "1"
+      agg: SUM
+      create_metric: true
+    - name: quick_buy_amount_usd
+      description: The total USD value of the transactions that were 
+                   purchased using the "quick buy" button.
+      expr: CASE WHEN transaction_type_name = 'quick-buy' THEN transaction_amount_usd ELSE 0 END
+      agg: SUM
+      create_metric: true
+    - name: quick_buy_transactions
+      description: The total transactions bought as quick buy.
+      expr: CASE WHEN transaction_type_name = 'quick-buy' THEN TRUE ELSE FALSE END
+      agg: SUM_BOOLEAN
+      create_metric: true
+    - name: cancellations_usd
+      description: The total USD value of the transactions that were 
+                   cancelled.
+      expr: CASE WHEN transaction_type_name = 'cancellation' THEN transaction_amount_usd ELSE 0 END
+      agg: SUM
+    - name: alterations_usd
+      description: The total USD value of the transactions that were 
+                   altered.
+      expr: CASE WHEN transaction_type_name = 'alteration' THEN transaction_amount_usd ELSE 0 END
+      agg: SUM
+    - name: transacting_customers
+      description: The distinct count of customers transacting on any given day.
+      expr: id_customer
+      agg: COUNT_DISTINCT
+  dimensions:
+    - name: ds
+      type: time
+      type_params:
+        is_primary: True
+        time_granularity: day
+    - name: is_large
+      type: categorical
+      expr: CASE WHEN transaction_amount_usd >= 30 THEN TRUE ELSE FALSE END
+    - name: quick_buy_transaction
+      type: categorical
+      expr: |
+        CASE 
+          WHEN transaction_type_name = 'quick-buy' THEN 'Quick Buy'
+          ELSE 'Not Quick Buy' 
+        END
+
+  sql_table: $transactions_table
+  mutability:
+    type: immutable
+
+---
+metric: 
+  name: cancellations 
+  owners: 
+    - support@transformdata.io
+  type: measure_proxy 
+  type_params:
+    measure: cancellations_usd
+---
+metric:
+  name: cancellation_rate
+  owners:
+    - support@transformdata.io
+  type: ratio
+  type_params:
+    numerator: cancellations_usd
+    denominator: transaction_amount_usd
+---
+metric:
+  name: revenue_usd
+  owners:
+    - support@transformdata.io
+  type: expr 
+  type_params:
+    expr: transaction_amount_usd - cancellations_usd + alterations_usd
+    measures:
+      - transaction_amount_usd
+      - cancellations_usd
+      - alterations_usd
+---
+metric:
+  name: cancellations_mx
+  owners:
+    - support@transformdata.io
+  type: measure_proxy 
+  type_params:
+    measure: cancellations_usd
+  constraint: |
+    customer__country = 'MX'
+---
+metric:
+  name: transaction_usd_na
+  owners:
+    - support@transformdata.io
+  type: measure_proxy 
+  type_params:
+    measure: transaction_amount_usd
+  constraint: |
+    customer__country__region = 'NA'
+---
+metric:
+  name: transaction_usd_l7d_mx
+  owners:
+    - support@transformdata.io
+  type: cumulative 
+  type_params:
+    measures:
+      - transaction_amount_usd
+    window: 7 days
+  constraint: |
+    customer__country = 'MX'
+---
+metric: 
+  name: transaction_usd_mtd
+  owners: 
+    - support@transformdata.io
+  type: cumulative
+  type_params:
+    measures:
+      - transaction_amount_usd
+    grain_to_date: month
+---
+metric:
+  name: transaction_usd_na_l7d
+  owners:
+    - support@transformdata.io
+  type: cumulative 
+  type_params:
+    measures: 
+      - transaction_amount_usd
+    window: 7 days
+  constraint: |
+    customer__country__region = 'NA'

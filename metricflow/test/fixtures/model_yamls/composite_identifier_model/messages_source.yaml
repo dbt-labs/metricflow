@@ -1,0 +1,36 @@
+---
+data_source:
+  name: messages_source
+  description: messages_source
+  owners:
+    - support@transformdata.io
+
+  sql_table: $fct_messages_table
+
+  measures:
+    - name: messages
+      expr: 1
+      agg: sum
+      create_metric: true
+
+  dimensions:
+    - name: ds
+      type: time
+      type_params:
+        is_primary: True
+        time_format: YYYY-MM-DD
+        time_granularity: day
+    - name: team_id
+      type: categorical
+
+  identifiers:
+    - name: user_id
+      type: unique
+    - name: user_team
+      type: foreign
+      identifiers:
+        - name: team_id
+        - name: user_id
+
+  mutability:
+    type: immutable

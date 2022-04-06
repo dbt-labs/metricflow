@@ -1,0 +1,71 @@
+---
+integration_test:
+  name: order_desc
+  description: Tests descending order.
+  model: SIMPLE_MODEL
+  metrics: ["booking_value"]
+  group_bys: ["ds"]
+  order_bys: ["-booking_value"]
+  check_query: |
+    SELECT
+      SUM(booking_value) AS booking_value
+      , ds
+    FROM {{ source_schema }}.fct_bookings
+    GROUP BY
+      ds
+    ORDER BY
+      booking_value DESC
+---
+integration_test:
+  name: order_asc
+  description: Tests ascending order.
+  model: SIMPLE_MODEL
+  metrics: ["booking_value"]
+  group_bys: ["ds"]
+  order_bys: ["booking_value"]
+  check_query: |
+    SELECT
+      SUM(booking_value) AS booking_value
+      , ds
+    FROM {{ source_schema }}.fct_bookings
+    GROUP BY
+      ds
+    ORDER BY
+      booking_value
+---
+integration_test:
+  name: order_limit
+  description: Tests order with a limit.
+  model: SIMPLE_MODEL
+  metrics: ["booking_value"]
+  group_bys: ["ds"]
+  order_bys: ["booking_value"]
+  limit: 2
+  check_query: |
+    SELECT
+      SUM(booking_value) AS booking_value
+      , ds
+    FROM {{ source_schema }}.fct_bookings
+    GROUP BY
+      ds
+    ORDER BY
+      booking_value
+    LIMIT 2
+---
+integration_test:
+  name: order_desc_with_granularity
+  description: Tests order with a date granularity.
+  model: SIMPLE_MODEL
+  required_features: ["DATE_TRUNC"]
+  metrics: ["booking_value"]
+  group_bys: ["ds__month"]
+  order_bys: ["-ds__month"]
+  check_query: |
+    SELECT
+      SUM(booking_value) AS booking_value
+      , {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS ds__month
+    FROM {{ source_schema }}.fct_bookings
+    GROUP BY
+      ds__month
+    ORDER BY
+      booking_value DESC

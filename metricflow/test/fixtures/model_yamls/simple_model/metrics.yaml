@@ -1,0 +1,302 @@
+---
+metric:
+  name: "bookings"
+  description: "bookings metric"
+  owners:
+      - bobby@transformdata.io
+  type: measure_proxy
+  type_params:
+      measures:
+          - bookings
+---
+metric:
+    name: "average_booking_value"
+    description: "average booking value metric"
+    owners:
+        - bobby@transformdata.io
+    type: measure_proxy
+    type_params:
+        measures:
+            - average_booking_value
+---
+metric:
+  name: "instant_bookings"
+  description: "instant bookings"
+  owners:
+    - bobby@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+      - instant_bookings
+---
+metric:
+  name: "booking_value"
+  description: "booking value"
+  owners:
+    - bobby@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+      - booking_value
+---
+metric:
+  name: "instant_booking_value"
+  description: "booking value of instant bookings"
+  owners:
+    - support@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+      - booking_value
+  constraint: |
+    is_instant
+---
+metric:
+  name: "average_instant_booking_value"
+  description: "average booking value of instant bookings"
+  owners:
+    - support@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+      - average_booking_value
+  constraint: |
+    is_instant
+---
+metric:
+  name: "booking_value_for_non_null_listing_id"
+  description: "booking value of instant bookings"
+  owners:
+    - support@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+      - booking_value
+  constraint: |
+    listing IS NOT NULL
+---
+metric:
+  name: "bookers"
+  description: "bookers"
+  owners:
+    - bobby@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+      - bookers
+---
+metric:
+  name: "views"
+  description: "views"
+  owners:
+    - bobby@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+      - views
+---
+metric:
+  name: "listings"
+  description: "listings"
+  owners:
+    - bobby@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+      - listings
+---
+metric:
+  name: "lux_listings"
+  description: "lux_listings"
+  owners:
+    - support@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+      - listings
+  constraint: |
+    is_lux_latest
+---
+metric:
+  name: "smallest_listing"
+  description: "smallest listing"
+  owners:
+   - support@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+     - smallest_listing
+---
+metric:
+  name: "largest_listing"
+  description: "largest listing"
+  owners:
+   - support@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+     - largest_listing
+---
+metric:
+  name: "identity_verifications"
+  description: "identity_verifications"
+  owners:
+    - bobby@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+      - identity_verifications
+---
+metric:
+  name: "revenue"
+  description: "revenue"
+  owners:
+    - bobby@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+      - txn_revenue
+---
+metric:
+  name: "trailing_2_months_revenue"
+  description: "trailing_2_months_revenue"
+  owners:
+    - bobby@transformdata.io
+  type: cumulative
+  type_params:
+    measures:
+      - txn_revenue
+    window: 2 month
+---
+metric:
+  name: "revenue_all_time"
+  description: "revenue_all_time"
+  owners:
+    - bobby@transformdata.io
+  type: cumulative
+  type_params:
+    measures:
+      - txn_revenue
+---
+metric:
+  name: "every_two_days_bookers" # because the bookings test data only spans 3 days
+  description: "every_two_days_bookers"
+  owners:
+    - bobby@transformdata.io
+  type: cumulative
+  type_params:
+    measures:
+      - bookers
+    window: 2 days
+---
+metric:
+  name: "revenue_mtd"
+  description: "revenue mtd"
+  owners:
+    - bobby@transformdata.io
+  type: cumulative
+  locked_metadata:
+    value_format: '$$,.2f' # we need to double dollars here since string template reserves dollar sign.
+  type_params:
+    measures:
+      - txn_revenue
+    grain_to_date: month
+---
+metric:
+  name: non_lux_test_listings
+  description: Listings where the lux listing ID is not from a test.
+  owners:
+    - support@transformdata.io
+  type: measure_proxy
+  constraint:
+    lux_or_normal_listing != 'LUX_TEST_ID'
+  locked_metadata:
+    value_format: ''
+  type_params:
+    measures:
+      - listings
+---
+metric:
+  name: booking_fees
+  description: Booking value multiplied by constant - simple expr metric test
+  owners:
+   - support@transformdata.io
+  type: expr
+  type_params:
+    expr: "booking_value * 0.05"
+    measures:
+     - booking_value
+---
+metric:
+  name: booking_fees_per_booker
+  description: booking_fees divided by bookers - single source multi measure expr test
+  owners:
+   - support@transformdata.io
+  type: expr
+  type_params:
+    expr: "booking_value * 0.05 / bookers"
+    measures:
+     - booking_value
+     - bookers
+---
+metric:
+  name: views_times_booking_value
+  description: Booking_value multiplied by views - expr metric test
+  owners:
+   - support@transformdata.io
+  type: expr
+  locked_metadata:
+    value_format: ',d'
+  type_params:
+    expr: "booking_value * views"
+    measures:
+     - booking_value
+     - views
+---
+metric:
+  name: bookings_per_booker
+  description: bookings divided by bookers - single data source ratio metric test
+  owners:
+   - support@transformdata.io
+  type: ratio
+  type_params:
+    numerator: bookings
+    denominator: bookers
+  locked_metadata:
+    value_format: ',.2f'
+---
+metric:
+  name: bookings_per_view
+  description: Bookings divided by views - ratio metric test
+  owners:
+   - support@transformdata.io
+  type: ratio
+  type_params:
+    numerator: bookings
+    denominator: views
+  locked_metadata:
+    value_format: ',.2f'
+---
+metric:
+  name: bookings_per_listing
+  description: Bookings divided by listings - ratio with primary identifier test
+  owners:
+   - support@transformdata.io
+  type: ratio
+  locked_metadata:
+    value_format: '.2%'
+  type_params:
+    numerator: bookings
+    denominator: listings
+---
+metric:
+  name: bookings_per_dollar
+  description: Number of bookings per dollar of value
+  owners:
+   - support@transformdata.io
+  type: ratio
+  locked_metadata:
+    value_format: '.2%'
+  type_params:
+    numerator: bookings
+    denominator: booking_value

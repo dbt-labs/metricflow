@@ -1,0 +1,31 @@
+---
+integration_test:
+  name: one_hop_dundered_identifier
+  description: Query a dimension from a different data source. Should match a left joined table query.
+  model: SIMPLE_MODEL
+  metrics: ["bookings"]
+  group_bys: ["listing__lux_listing"]
+  check_query: |
+    SELECT
+      SUM(1) AS bookings
+      , b.lux_listing_id AS listing__lux_listing
+    FROM {{ source_schema }}.fct_bookings a
+    LEFT OUTER JOIN {{ source_schema }}.dim_lux_listing_id_mapping b
+       ON a.listing_id = b.listing_id
+    GROUP BY b.lux_listing_id
+---
+integration_test:
+  name: one_hop_dundered_composite_identifier
+  description: Query a dimension from a different data source joined using a composite identifier.
+  model: COMPOSITE_IDENTIFIER_MODEL
+  metrics: ["messages"]
+  group_bys: ["user_team__user_id"]
+  check_query: |
+    SELECT
+      SUM(1) AS messages
+      , b.id AS user_team__user_id
+    FROM {{ source_schema }}.fct_messages a
+    LEFT OUTER JOIN {{ source_schema }}.fct_users b
+       ON a.team_id = b.team_id
+       AND a.user_id = b.id
+    GROUP BY b.id

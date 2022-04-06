@@ -1,0 +1,15 @@
+data_source:
+  name: countries
+  description: Regions mapped to countries.
+  owners:
+    - support@transformdata.io
+  identifiers:
+    - name: country
+      type: primary
+  dimensions:
+    - name: region
+      description: The region associated with the country.
+      type: categorical
+  sql_table: $countries_table
+  mutability:
+    type: immutable

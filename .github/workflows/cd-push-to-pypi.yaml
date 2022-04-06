@@ -1,0 +1,26 @@
+name: Publish Metricflow Release
+on:
+  workflow_dispatch:
+  push:
+    tags:        
+      - '*'
+
+jobs:
+  poetry-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+
+      - name: Install Poetry
+        run: pip install poetry && poetry config virtualenvs.create false
+
+      - name: Install dependencies
+        run: make install
+
+      - name: Poetry Publish
+        run: poetry build && poetry publish -u transform_data -p ${{ secrets.PYPI_PASSWORD }} 

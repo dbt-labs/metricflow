@@ -1,0 +1,40 @@
+---
+data_source:
+  name: users_source
+  description: users_source
+  owners:
+    - support@transformdata.io
+
+  sql_table: $fct_users_table
+
+
+  dimensions:
+    - name: ds
+      expr: created_at
+      type: time
+      type_params:
+        is_primary: True
+        time_format: YYYY-MM-DD
+        time_granularity: day
+    - name: team_id
+      type: categorical
+    - name: country
+      type: categorical
+
+  identifiers:
+    - name: user_id
+      expr: id
+      type: unique
+    - name: user_composite_ident_2
+      type: unique
+      identifiers:
+        - name: ident_2
+        - ref: user_id
+    - name: user_team
+      type: primary
+      identifiers:
+        - name: team_id
+        - ref: user_id
+
+  mutability:
+    type: immutable

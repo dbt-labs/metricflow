@@ -1,0 +1,141 @@
+---
+integration_test:
+  name: multihop_join
+  description: Tests a query with a basic multi-hop join
+  model: UNPARTITIONED_MULTI_HOP_JOIN_MODEL
+  metrics: ["txn_count"]
+  group_bys: ["account_id__customer_id__customer_name"]
+  check_query: |
+    SELECT
+        ct.customer_name as account_id__customer_id__customer_name
+        , SUM(am.txn_count) as txn_count
+    FROM {{ source_schema }}.bridge_table bt
+    JOIN {{ source_schema }}.customer_table ct
+      ON ct.customer_id = bt.customer_id
+    JOIN {{ source_schema }}.account_month_txns am
+      ON bt.account_id = am.account_id
+    GROUP BY
+      ct.customer_name
+---
+integration_test:
+  name: multihop_join_two_dims_different_sources
+  description: Tests a query requesting mulitple multi-hop join dims that dont come from the same data source
+  model: UNPARTITIONED_MULTI_HOP_JOIN_MODEL
+  metrics: ["txn_count"]
+  group_bys: ["account_id__customer_id__customer_name", "account_id__customer_id__country"]
+  check_query: |
+    SELECT
+      dim_src0.customer_name as account_id__customer_id__customer_name
+      , dim_src1.country as account_id__customer_id__country
+      , SUM(am.txn_count) as txn_count
+    FROM {{ source_schema }}.account_month_txns am
+    LEFT OUTER JOIN (
+      SELECT *
+      FROM {{ source_schema }}.bridge_table bt
+      LEFT OUTER JOIN {{ source_schema }}.customer_table ct
+      ON bt.customer_id = ct.customer_id
+    ) dim_src0
+    ON am.account_id = dim_src0.account_id
+    LEFT OUTER JOIN  (
+      SELECT *
+      FROM {{ source_schema }}.bridge_table bt
+      LEFT OUTER JOIN {{ source_schema }}.customer_other_data cot
+    ON bt.customer_id = cot.customer_id
+    ) dim_src1
+    ON am.account_id = dim_src1.account_id
+    GROUP BY
+      dim_src0.customer_name
+      , dim_src1.country
+---
+integration_test:
+  name: multihop_join_two_dims_same_source
+  description: Tests a query requesting mulitple multi-hop join dims from the same source
+  model: UNPARTITIONED_MULTI_HOP_JOIN_MODEL
+  metrics: ["txn_count"]
+  group_bys: ["account_id__customer_id__customer_name", "account_id__customer_id__customer_atomic_weight"]
+  check_query: |
+    SELECT
+      ct.customer_name as account_id__customer_id__customer_name
+      , ct.customer_atomic_weight as account_id__customer_id__customer_atomic_weight
+      , SUM(am.txn_count) as txn_count
+    FROM {{ source_schema }}.bridge_table bt
+    JOIN {{ source_schema }}.customer_table ct
+      ON ct.customer_id = bt.customer_id
+    JOIN {{ source_schema }}.account_month_txns am
+      ON bt.account_id = am.account_id
+    GROUP BY
+      ct.customer_name
+      , ct.customer_atomic_weight
+---
+integration_test:
+  name: mixed_length_joins
+  description: Tests a query with multihop and single hop join dimensions
+  model: UNPARTITIONED_MULTI_HOP_JOIN_MODEL
+  metrics: ["txn_count"]
+  group_bys: ["account_id__customer_id__customer_name", "account_id__customer_id__country", "account_id__extra_dim"]
+  check_query: |
+    SELECT
+      dim_src0.customer_name as account_id__customer_id__customer_name
+      , dim_src0.extra_dim as account_id__extra_dim
+      , dim_src1.country as account_id__customer_id__country
+      , SUM(am.txn_count) as txn_count
+    FROM {{ source_schema }}.account_month_txns am
+    LEFT OUTER JOIN (
+      SELECT *
+      FROM {{ source_schema }}.bridge_table bt
+      LEFT OUTER JOIN {{ source_schema }}.customer_table ct
+      ON bt.customer_id = ct.customer_id
+    ) dim_src0
+    ON am.account_id = dim_src0.account_id
+    LEFT OUTER JOIN  (
+      SELECT *
+      FROM {{ source_schema }}.bridge_table bt
+      LEFT OUTER JOIN {{ source_schema }}.customer_other_data cot
+    ON bt.customer_id = cot.customer_id
+    ) dim_src1
+    ON am.account_id = dim_src1.account_id
+    GROUP BY
+      dim_src0.customer_name
+      , dim_src1.country
+      , dim_src0.extra_dim
+---
+integration_test:
+  name: multihop_join_partitioned
+  description: Tests a multihop join using the date-partitioned multihop model
+  model: PARTITIONED_MULTI_HOP_JOIN_MODEL
+  metrics: ["txn_count"]
+  group_bys: ["account_id__customer_id__customer_name"]
+  check_query: |
+    SELECT
+        SUM(am.txn_count) as txn_count
+        , ct.customer_name as account_id__customer_id__customer_name
+    FROM {{ source_schema }}.account_month_txns am
+    LEFT JOIN {{ source_schema }}.bridge_table bt
+      ON am.account_id = bt.account_id
+      AND am.ds_partitioned = bt.ds_partitioned
+    LEFT JOIN {{ source_schema }}.customer_table ct
+      ON ct.customer_id = bt.customer_id
+      AND ct.ds_partitioned = bt.ds_partitioned
+    GROUP BY
+      ct.customer_name
+# metricflow doesn't currently support > 2-hop joins
+#---
+#integration_test:
+#  name: multihop_join_3_hops
+#  description: Tests a query with multihop and single hop join dimensions
+#  model: UNPARTITIONED_MULTI_HOP_JOIN_MODEL
+#  metrics: ["txn_count"]
+#  group_bys: ["account_id__customer_id__customer_third_hop_id__value"]
+#  check_query: |
+#    SELECT
+#        tht.value as account_id__customer_id__customer_third_hop_id__value
+#        , SUM(am.txn_count) as txn_count
+#    FROM {{ source_schema }}.bridge_table bt
+#    JOIN {{ source_schema }}.customer_other_data cot
+#      ON cot.customer_id = bt.customer_id
+#    JOIN {{ source_schema }}.third_hop_table tht
+#      ON cot.customer_third_hop_id = tht.customer_third_hop_id
+#    JOIN {{ source_schema }}.account_month_txns am
+#      ON bt.account_id = am.account_id
+#    GROUP BY
+#      tht.value

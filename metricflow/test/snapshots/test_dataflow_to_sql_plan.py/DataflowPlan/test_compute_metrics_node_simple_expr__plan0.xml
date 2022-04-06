@@ -1,0 +1,66 @@
+<DataflowPlan>
+    <WriteToResultDataframeNode>
+        <!-- description = Write to Dataframe -->
+        <!-- node_id = wrd_0 -->
+        <ComputeMetricsNode>
+            <!-- description = Compute Metrics via Expressions -->
+            <!-- node_id = cm_0 -->
+            <!-- metric_spec = MetricSpec(element_name='booking_fees') -->
+            <AggregateMeasuresNode>
+                <!-- description = Aggregate Measures -->
+                <!-- node_id = am_0 -->
+                <JoinToBaseOutputNode>
+                    <!-- description = Join Standard Outputs -->
+                    <!-- node_id = jso_0 -->
+                    <!-- join0_for_node_id_pfe_1 =                                     -->
+                    <!--   {'class': 'JoinDescription',                                -->
+                    <!--    'join_node': FilterElementsNode(node_id=pfe_1),            -->
+                    <!--    'join_on_identifier': {'class': 'LinklessIdentifierSpec',  -->
+                    <!--                           'element_name': 'listing',          -->
+                    <!--                           'identifier_links': ()},            -->
+                    <!--    'join_on_partition_dimensions': (),                        -->
+                    <!--    'join_on_partition_time_dimensions': ()}                   -->
+                    <FilterElementsNode>
+                        <!-- description =                     -->
+                        <!--   Pass Only Elements:             -->
+                        <!--     ['booking_value', 'listing']  -->
+                        <!-- node_id = pfe_0 -->
+                        <!-- include_spec = MeasureSpec(element_name='booking_value') -->
+                        <!-- include_spec =                         -->
+                        <!--   {'class': 'LinklessIdentifierSpec',  -->
+                        <!--    'element_name': 'listing',          -->
+                        <!--    'identifier_links': ()}             -->
+                        <ReadSqlSourceNode>
+                            <!-- description =                                                                           -->
+                            <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                            <!-- node_id = rss_10000 -->
+                            <!-- data_set =                                                                    -->
+                            <!--   DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                        </ReadSqlSourceNode>
+                    </FilterElementsNode>
+                    <FilterElementsNode>
+                        <!-- description =                      -->
+                        <!--   Pass Only Elements:              -->
+                        <!--     ['listing', 'country_latest']  -->
+                        <!-- node_id = pfe_1 -->
+                        <!-- include_spec =                         -->
+                        <!--   {'class': 'LinklessIdentifierSpec',  -->
+                        <!--    'element_name': 'listing',          -->
+                        <!--    'identifier_links': ()}             -->
+                        <!-- include_spec =                        -->
+                        <!--   {'class': 'DimensionSpec',          -->
+                        <!--    'element_name': 'country_latest',  -->
+                        <!--    'identifier_links': ()}            -->
+                        <ReadSqlSourceNode>
+                            <!-- description =                                                                           -->
+                            <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='listings_latest'))  -->
+                            <!-- node_id = rss_10003 -->
+                            <!-- data_set =                                                                    -->
+                            <!--   DataSourceDataSet(DataSourceReference(data_source_name='listings_latest'))  -->
+                        </ReadSqlSourceNode>
+                    </FilterElementsNode>
+                </JoinToBaseOutputNode>
+            </AggregateMeasuresNode>
+        </ComputeMetricsNode>
+    </WriteToResultDataframeNode>
+</DataflowPlan>

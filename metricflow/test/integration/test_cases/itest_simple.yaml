@@ -1,0 +1,152 @@
+---
+integration_test:
+  name: simple_query
+  description: Tests selecting a metric and an associated local dimension.
+  model: SIMPLE_MODEL
+  metrics: ["booking_value"]
+  group_bys: ["is_instant"]
+  check_query: |
+    SELECT
+      SUM(booking_value) AS booking_value
+      , is_instant
+    FROM {{ source_schema }}.fct_bookings
+    GROUP BY
+      is_instant
+---
+integration_test:
+  name: simple_query_without_dates_available
+  description: Tests selecting a metric and the time dimension with a time constraint.
+  model: SIMPLE_MODEL
+  metrics: ["booking_value"]
+  group_bys: ["ds"]
+  time_constraint: ["1900-01-01", "1900-01-01"]
+  allow_empty: True
+  check_query: |
+    SELECT
+      SUM(booking_value) AS booking_value
+      , ds
+    FROM {{ source_schema }}.fct_bookings
+    GROUP BY
+      ds
+    limit 0
+---
+integration_test:
+  name: simple_query_with_time_constraint
+  description: Tests selecting a metric and the time dimension with a time constraint.
+  model: SIMPLE_MODEL
+  metrics: ["booking_value"]
+  group_bys: ["ds"]
+  time_constraint: ["2020-01-01", "2020-01-01"]
+  check_query: |
+    SELECT
+      SUM(booking_value) AS booking_value
+      , ds
+    FROM {{ source_schema }}.fct_bookings
+    WHERE {{ render_time_constraint("ds", "2020-01-01", "2020-01-01") }}
+    GROUP BY
+      ds
+---
+integration_test:
+  name: simple_query_with_joined_dimension_on_unique_id
+  description: Query a metric with a joined dimension where the join key is a unique identifier.
+  model: SIMPLE_MODEL
+  metrics: ["listings"]
+  group_bys: ["user__company_name"]
+  check_query: |
+    SELECT
+      SUM(1) AS listings
+      , b.company_name AS user__company_name
+    FROM {{ source_schema }}.dim_listings_latest a
+    LEFT OUTER JOIN {{ source_schema }}.dim_companies b
+    ON a.user_id = b.user_id
+    GROUP BY
+      2
+---
+integration_test:
+  name: simple_constrained_query
+  description: Tests simple constrained query.
+  model: SIMPLE_MODEL
+  metrics: ["booking_value"]
+  group_bys: ["is_instant"]
+  where_constraint: "is_instant"
+  check_query: |
+    SELECT
+      SUM(booking_value) AS booking_value
+      , is_instant
+    FROM {{ source_schema }}.fct_bookings
+    WHERE
+      is_instant
+    GROUP BY
+      is_instant
+---
+integration_test:
+  name: ordered_query
+  description: Tests an ordered query.
+  model: SIMPLE_MODEL
+  metrics: ["booking_value"]
+  group_bys: ["is_instant"]
+  check_query: |
+    SELECT
+      SUM(booking_value) AS booking_value
+      , is_instant
+    FROM {{ source_schema }}.fct_bookings
+    GROUP BY
+      is_instant
+    ORDER BY
+      booking_value DESC
+---
+integration_test:
+  name: query_with_multiple_metrics_ordered_by_metric
+  description: Tests query with multiple metrics ordered by metric.
+  model: SIMPLE_MODEL
+  required_features: ["FULL_OUTER_JOIN"]
+  metrics: ["bookings", "booking_value"]
+  group_bys: ["ds"]
+  order_bys: ["-booking_value"]
+  check_query: |
+    SELECT
+      SUM(1) AS bookings
+      , SUM(booking_value) AS booking_value
+      , ds
+    FROM {{ source_schema }}.fct_bookings
+    GROUP BY
+      ds
+    ORDER BY
+      booking_value DESC
+---
+integration_test:
+  name: query_with_multiple_metrics_ordered_by_dimension
+  description: Tests query with multiple metrics ordered by dimension.
+  model: SIMPLE_MODEL
+  required_features: ["FULL_OUTER_JOIN"]
+  metrics: ["bookings", "booking_value"]
+  group_bys: ["ds"]
+  order_bys: ["-ds"]
+  check_query: |
+    SELECT
+      SUM(1) AS bookings
+      , SUM(booking_value) AS booking_value
+      , ds
+    FROM {{ source_schema }}.fct_bookings
+    GROUP BY
+      ds
+    ORDER BY
+      booking_value DESC
+---
+integration_test:
+  name: query_with_join
+  description: Tests query with a join.
+  model: SIMPLE_MODEL
+  metrics: ["booking_value"]
+  group_bys: ["is_instant", "listing__country_latest"]
+  check_query: |
+    SELECT
+      SUM(b.booking_value) AS booking_value
+      , b.is_instant
+      , l.country AS listing__country_latest
+    FROM {{ source_schema }}.fct_bookings b
+    JOIN {{ source_schema }}.dim_listings_latest l
+      ON b.listing_id = l.listing_id
+    GROUP BY
+      b.is_instant
+      , l.country

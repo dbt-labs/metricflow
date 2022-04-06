@@ -1,0 +1,20 @@
+---
+data_source:
+  name: listings_source
+  description: listings_source
+  owners:
+    - support@transformdata.io
+
+  sql_table: $dim_listings_for_joins_table
+
+  dimensions:
+    - name: country
+      type: categorical
+
+  identifiers:
+    - name: listing
+      type: primary
+      expr: listing_id
+
+  mutability:
+    type: immutable

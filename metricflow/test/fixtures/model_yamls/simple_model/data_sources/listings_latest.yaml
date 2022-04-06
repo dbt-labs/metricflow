@@ -1,0 +1,53 @@
+---
+data_source:
+  name: listings_latest
+  description: listings_latest
+  owners:
+    - support@transformdata.io
+
+  sql_table: $listings_latest_table
+
+  measures:
+    - name: listings
+      expr: 1
+      agg: sum
+    - name: largest_listing
+      expr: capacity
+      agg: max
+    - name: smallest_listing
+      expr: capacity
+      agg: min
+
+  dimensions:
+    - name: ds
+      type: time
+      expr: created_at
+      type_params:
+        is_primary: True
+        time_format: YYYY-MM-DD
+        time_granularity: day
+    - name: created_at
+      type: time
+      type_params:
+        time_format: YYYY-MM-DD
+        time_granularity: day
+    - name: country_latest
+      type: categorical
+      expr: country
+    - name: is_lux_latest
+      type: categorical
+      expr: is_lux
+    - name: capacity_latest
+      type: categorical
+      expr: capacity
+
+  identifiers:
+    - name: listing
+      type: primary
+      expr: listing_id
+    - name: user
+      type: foreign
+      expr: user_id
+
+  mutability:
+    type: immutable

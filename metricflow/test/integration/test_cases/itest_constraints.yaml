@@ -1,0 +1,126 @@
+---
+integration_test:
+  name: test_overlapping_constraint_dimensions
+  description: Query a metric with a constraint that was requested as a dimension
+  model: SIMPLE_MODEL
+  metrics: ["booking_value"]
+  group_bys: ["ds","is_instant"]
+  where_constraint: "is_instant"
+  check_query: |
+    SELECT  SUM(booking_value) AS booking_value
+      , is_instant
+      , ds
+    FROM  {{ source_schema }}.fct_bookings
+    WHERE is_instant
+      GROUP BY
+      ds
+      , is_instant
+---
+integration_test:
+  name: test_constraint_non_requested_dimensions
+  description: Query a metric with a constraint that was not requested as a dimension
+  model: SIMPLE_MODEL
+  metrics: ["booking_value"]
+  group_bys: ["ds"]
+  where_constraint: "is_instant"
+  check_query: |
+    SELECT SUM(booking_value) AS booking_value
+      , ds
+    FROM  {{ source_schema }}.fct_bookings
+    WHERE is_instant
+    GROUP BY  ds
+      , is_instant
+---
+integration_test:
+  name: test_query_with_constraint_on_joined_dimension
+  description: Query a metric with a constraint that was not requested as a dimension and is joined from another data source
+  model: SIMPLE_MODEL
+  metrics: ["booking_value"]
+  group_bys: ["is_instant"]
+  where_constraint: "listing__country_latest = 'us'"
+  check_query: |
+    SELECT SUM(booking_value) AS booking_value
+      , is_instant
+    FROM  {{ source_schema }}.fct_bookings b
+    JOIN  {{ source_schema }}.dim_listings_latest l ON b.listing_id = l.listing_id
+    WHERE l.country = 'us'
+    GROUP BY  is_instant
+---
+integration_test:
+  name: test_time_constraint
+  description: Test a time constraint.
+  model: SIMPLE_MODEL
+  metrics: ["booking_value"]
+  group_bys: ["ds"]
+  time_constraint: ["2020-01-01", "2020-01-01"]
+  check_query: |
+    SELECT  SUM(booking_value) AS booking_value
+      , ds
+    FROM  {{ source_schema }}.fct_bookings b
+    WHERE ds = '2020-01-01'
+    GROUP BY 
+      ds
+
+---
+integration_test:
+  name: test_time_constraint_with_addition_dimension
+  description: Test a time constraint with another dimension.
+  model: SIMPLE_MODEL
+  metrics: ["booking_value"]
+  group_bys: ["ds"]
+  where_constraint: "is_instant"
+  time_constraint: ["2020-01-01", "2020-01-01"]
+  check_query: |
+    SELECT  SUM(booking_value) AS booking_value
+      , ds
+    FROM  {{ source_schema }}.fct_bookings b
+    WHERE is_instant 
+      and ds = '2020-01-01'
+    GROUP BY ds
+---
+integration_test:
+  name: test_bool_dim
+  description: Test a time constraint with a boolean
+  model: SIMPLE_MODEL
+  metrics: ["booking_value"]
+  group_bys: ["ds","is_instant"]
+  where_constraint: "is_instant"
+  check_query: |
+    SELECT  SUM(booking_value) AS booking_value
+      , is_instant
+      , ds
+    FROM  {{ source_schema }}.fct_bookings b
+    WHERE is_instant 
+    GROUP BY ds
+      ,is_instant
+---
+integration_test:
+  name: test_int_dim
+  description: Test a time constraint with an integer
+  model: SIMPLE_MODEL
+  metrics: ["booking_value"]
+  group_bys: ["ds"]
+  where_constraint: "listing__capacity_latest >= 4"
+  check_query: |
+    SELECT  SUM(b.booking_value) AS booking_value
+      , b.ds
+    FROM  {{ source_schema }}.fct_bookings b
+    JOIN  {{ source_schema }}.dim_listings_latest l ON b.listing_id = l.listing_id
+    WHERE l.capacity >= 4
+    GROUP BY  b.ds
+
+---
+integration_test:
+  name: test_time_constraint_on_time_dimension_with_an_expression
+  description: Test a time constraint with an expr dimensions
+  model: SIMPLE_MODEL
+  metrics: ["listings"]
+  group_bys: ["ds"]
+  time_constraint: ["2020-01-01", "2020-01-02"]
+  check_query: |
+    SELECT  SUM(1) AS listings
+      , created_at as ds
+    FROM  {{source_schema}}.dim_listings_latest l
+    WHERE {{ render_time_constraint("created_at", "2020-01-01", "2021-01-01") }}
+    GROUP BY  created_at
+

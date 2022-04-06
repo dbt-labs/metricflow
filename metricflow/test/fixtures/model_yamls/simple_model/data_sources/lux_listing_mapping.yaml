@@ -1,0 +1,20 @@
+---
+data_source:
+  name: lux_listing_mapping
+  description: lux_listing_mapping
+  owners:
+    - support@transformdata.io
+
+  sql_table: $dim_lux_listing_id_mapping_table
+
+  identifiers:
+    - name: listing
+      type: primary
+      expr: listing_id
+    - name: lux_listing
+      type: foreign
+      expr: lux_listing_id
+
+
+  mutability:
+    type: immutable

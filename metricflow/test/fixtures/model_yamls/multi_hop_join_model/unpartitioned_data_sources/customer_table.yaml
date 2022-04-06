@@ -1,0 +1,21 @@
+--- 
+data_source:
+  name: customer_table
+  description: customer_table
+  owners:
+    - support@transformdata.io
+
+  sql_table: $customer_table
+
+  dimensions:
+    - name: customer_name
+      type: categorical
+    - name: customer_atomic_weight
+      type: categorical
+
+  identifiers:
+    - name: customer_id
+      type: primary
+
+  mutability:
+    type: immutable
