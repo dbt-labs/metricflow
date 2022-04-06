@@ -53,6 +53,14 @@ If you’re new to MetricFlow, we suggest that you review our [Getting Started](
 
 Install MetricFlow:
 
+If you do not have postgres on your machine, first install postgres with homebrew:
+
+```
+brew install postgresql
+```
+
+Then, proceed with regular install as follows:
+
 ```
 pip install metricflow
 mf setup
