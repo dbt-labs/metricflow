@@ -1,2 +1,2 @@
-__version__ = "1.0"
+__version__ = "0.91.9"
 PACKAGE_NAME = "metricflow"
