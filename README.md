@@ -9,9 +9,10 @@ MetricFlow is a computational framework for building and maintaining consistent 
 
 MetricFlow provides a set of abstractions that help you construct complicated logic and dynamically generate queries to handle:
 
-* Complex metric types such as ratio, expression, and cumulative.
-* Multi-hop joins between fact and dimension sources.
-* Metric aggregation to different time granularities.
+- Complex metric types such as ratio, expression, and cumulative.
+- Multi-hop joins between fact and dimension sources.
+- Metric aggregation to different time granularities.
+- And, so much more.
 
 As a developer, you can also use MetricFlow's interfaces to construct APIs for integrations to bring metrics into downstream tools in your data stack.
 
@@ -38,13 +39,51 @@ Key features of MetricFlow include:
 - **Accessible interfaces**: Construct APIs and SDKs so you can pull metric datasets into downstream applications.
   - _React Components_ to build embedded analytics
   - _Airflow Operators_ to schedule API requests and pre-construction of metrics
-  - _GraphQL interface_ for the end-user to build their own interfaces for metrics
+  - _GraphQL interface_ for end-users to build their own interfaces for metrics
 
-## Documentation and Getting Started
+## Resources
 
-MetricFlow documentation can be found on the [Transform Documentation site](https://docs.transform.co/docs/overview/metricflow-overview). If you’re new to MetricFlow, we suggest that you review our [Getting Started](https://docs.transform.co/docs/metricflow/getting-started) section and [tutorial](https://docs.transform.co/docs/metricflow/metricflow-tutorial)
+### Documentation
 
-Additional resources:
+MetricFlow documentation can be found on the [Transform Documentation site](https://docs.transform.co/docs/overview/metricflow-overview).
+
+### Getting Started
+
+If you’re new to MetricFlow, we suggest that you review our [Getting Started](https://docs.transform.co/docs/metricflow/getting-started) section and [tutorial](https://docs.transform.co/docs/metricflow/metricflow-tutorial). To get started you can run the following commands:
+
+Install MetricFlow:
+
+```
+pip install metricflow
+mf setup
+# Now you can connect your datawarehouse by modifying the parameters in {$HOME}/.metricflow/config.yml
+mf health-checks # confirm your datawarehouse connection is working
+```
+
+Run the tutorial:
+
+```
+mf tutorial # optionally add `--skip-ds` if you have already confirmed your datawarehouse connection works
+```
+
+For reference, the tutorial steps are below:
+
+```
+🤓 Please run the following steps,
+
+    1. In '{$HOME}/.metricflow/config.yml', `model_path` should be '{$HOME}/.metricflow/sample_models'.
+    2. Try validating your data model: `mf validate-configs`
+    3. Check out your metrics: `mf list-metrics`
+    4. Query your first metric: `mf query --metrics transactions --dimensions ds --order ds`
+    5. Show the SQL MetricFlow generates: `mf query --metrics transactions --dimensions ds --order ds --explain`
+    6. Add another dimension: `mf query --metrics transactions --dimensions ds,customer__country --order ds`
+    7. Add a higher date granularity: `mf query --metrics transactions --dimensions ds__week --order ds__week`
+    8. Try a more complicated query: `mf query --metrics transactions,transaction_usd_na,transaction_usd_na_l7d --dimensions ds,is_large --order ds --where "ds between '2022-04-04' and '2022-06-02'"`
+    9. For more ways to interact with the sample models, go to ‘https://docs.transform.co/docs/metricflow/metricflow-tutorial’.
+    10. Once you’re done, run `mf tutorial --skip-dw --drop-tables` to drop the sample tables.
+```
+
+### Additional Resources
 
 Website: https://transform.co/metricflow
 
