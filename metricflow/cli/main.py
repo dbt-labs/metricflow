@@ -108,9 +108,9 @@ def setup(cfg: CLIContext, restart: bool) -> None:
             f"""\
             💻 A template config file has {'' if to_create else 'already '}been created in {abs_path}.
 
-              1. Fill it out with the relevant details
-              2. run `mf health-checks` to validate the Data Warehouse connection
-              3. run `mf validate-configs` to validate the Model configurations
+              1. Fill it out with the relevant details.
+              2. Run `mf health-checks` to validate the Data Warehouse connection.
+              3. Run `mf validate-configs` to validate the Model configurations.
             """
         )
     )
@@ -126,17 +126,21 @@ def setup(cfg: CLIContext, restart: bool) -> None:
 def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool, drop_tables: bool) -> None:
     """Run user through a tutorial."""
 
+    # This text is also located in the projects top-level README.md
     help_msg = textwrap.dedent(
         """\
         🤓 Please run the following steps,
 
-          1. In '{$HOME}/.metricflow/config.yml', `model_path` should be '{$HOME}/.metricflow/sample_models'
-          2. `mf validate-configs` to validate the models
-          3. `mf list-metrics` to check out all your sweet metrics!
-          4. `mf query --metrics transaction_usd_na_l7d --dimensions ds --order ds` to access your first metric!
-          4. `mf query --metrics transaction_usd_na_l7d --dimensions ds --order ds --explain` to how the query is constructed.
-          5. For more ways to interact with the sample models, go to 'https://docs.transform.co/docs/metricflow/metricflow-tutorial' for more commands to run.
-          6. Once you're done, run `mf tutorial --skip-dw --drop-tables` to drop the sample tables.
+            1. In '{$HOME}/.metricflow/config.yml', `model_path` should be '{$HOME}/.metricflow/sample_models'.
+            2. Try validating your data model: `mf validate-configs`
+            3. Check out your metrics: `mf list-metrics`
+            4. Query your first metric: `mf query --metrics transactions --dimensions ds --order ds`
+            5. Show the SQL MetricFlow generates: `mf query --metrics transactions --dimensions ds --order ds --explain`
+            6. Add another dimension: `mf query --metrics transactions --dimensions ds,customer__country --order ds`
+            7. Add a higher date granularity: `mf query --metrics transactions --dimensions ds__week --order ds__week`
+            8. Try a more complicated query: `mf query --metrics transactions,transaction_usd_na,transaction_usd_na_l7d --dimensions ds,is_large --order ds --where "ds between '2022-03-20' and '2022-04-01'"`
+            9. For more ways to interact with the sample models, go to ‘https://docs.transform.co/docs/metricflow/metricflow-tutorial’.
+            10. Once you’re done, run `mf tutorial --skip-dw --drop-tables` to drop the sample tables.
         """
     )
 
