@@ -6,11 +6,8 @@ on:
     # synchronize = commit(s) pushed to the pull request
     types:
       - opened
-      - edited
       - reopened
       - synchronize
-    paths:
-      - "metricflow/**"
 jobs:
   metricflow-unit-tests:
     name: MetricFlow Unit Tests
