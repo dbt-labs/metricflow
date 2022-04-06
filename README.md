@@ -69,7 +69,7 @@ mf health-checks # confirm your datawarehouse connection is working
 Run the tutorial:
 
 ```
-mf tutorial # optionally add `--skip-ds` if you have already confirmed your datawarehouse connection works
+mf tutorial # optionally add `--skip-dw` if you have already confirmed your datawarehouse connection works
 ```
 
 For reference, the tutorial steps are below:
