@@ -53,6 +53,12 @@ If you’re new to MetricFlow, we suggest that you review our [Getting Started](
 
 Install MetricFlow:
 
+If you do not have postgres on your machine, first install Postgres:
+- Postgres provides [pre-built packages for download and installation](https://www.postgresql.org/download/)
+- Mac users might prefer to use Homebrew: `brew install postgresql`
+
+Then, proceed with regular install as follows:
+
 ```
 pip install metricflow
 mf setup
@@ -63,7 +69,7 @@ mf health-checks # confirm your datawarehouse connection is working
 Run the tutorial:
 
 ```
-mf tutorial # optionally add `--skip-ds` if you have already confirmed your datawarehouse connection works
+mf tutorial # optionally add `--skip-dw` if you have already confirmed your datawarehouse connection works
 ```
 
 For reference, the tutorial steps are below:
