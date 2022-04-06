@@ -78,7 +78,7 @@ For reference, the tutorial steps are below:
     5. Show the SQL MetricFlow generates: `mf query --metrics transactions --dimensions ds --order ds --explain`
     6. Add another dimension: `mf query --metrics transactions --dimensions ds,customer__country --order ds`
     7. Add a higher date granularity: `mf query --metrics transactions --dimensions ds__week --order ds__week`
-    8. Try a more complicated query: `mf query --metrics transactions,transaction_usd_na,transaction_usd_na_l7d --dimensions ds,is_large --order ds --where "ds between '2022-04-04' and '2022-06-02'"`
+    8. Try a more complicated query: `mf query --metrics transactions,transaction_usd_na,transaction_usd_na_l7d --dimensions ds,is_large --order ds --where "ds between '2022-03-20' and '2022-04-01'"`
     9. For more ways to interact with the sample models, go to ‘https://docs.transform.co/docs/metricflow/metricflow-tutorial’.
     10. Once you’re done, run `mf tutorial --skip-dw --drop-tables` to drop the sample tables.
 ```
