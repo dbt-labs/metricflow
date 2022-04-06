@@ -8,6 +8,7 @@ on:
 jobs:
   poetry-publish:
     runs-on: ubuntu-latest
+    environment: Pypi Publish
     steps:
       - uses: actions/checkout@v2
 
