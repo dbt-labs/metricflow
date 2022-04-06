@@ -22,6 +22,12 @@ MetricFlow itself acts as a semantic layer, compiling the semantic information d
 
 ### Install MetricFlow
 
+If you do not have postgres on your machine, first install Postgres:
+- Postgres provides [pre-built packages for download and installation](https://www.postgresql.org/download/)
+- Mac users might prefer to use Homebrew: `brew install postgresql`
+
+Then, proceed with the regular installation as follows:
+
 MetricFlow can be installed from PyPi for use as a Python library with the following command:
 
 `> pip install metricflow`
