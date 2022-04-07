@@ -119,7 +119,7 @@ This project will be a place where people can easily contribute high-quality upd
 
 You might wish to read our [code of conduct](http://community.transform.co/metricflow-signup) and <LINK> engineering practices </LINK> before diving in.
 
-To get started on direct contributions, head on over to our [contributor guide](CONTRIBUTING.md)
+To get started on direct contributions, head on over to our [contributor guide](CONTRIBUTING.md).
 
 ## License
 
