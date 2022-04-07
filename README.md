@@ -126,3 +126,6 @@ To get started on direct contributions, head on over to our [contributor guide](
 MetricFlow is open source software. The project relies on several licenses including AGPL-3.0-or-later and Apache (specified at folder level).
 
 MetricFlow is built by [Transform](https://transform.co/), the company behind the first metrics store.
+
+
+ ignore this trying to test something
