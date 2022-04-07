@@ -62,30 +62,32 @@ MF_SNOWFLAKE_KEYS = [
 # Click Options
 def query_options(function: Callable) -> Callable:
     """Common options for a query"""
-    function = click.option(
+    function = separated_by_comma_option(
         "--order",
+        help_msg='Metrics or dimensions to order by ("-" prefix for DESC). For example: --order -ds or --order ds,-revenue',
         required=False,
-        multiple=True,
-        help='Metrics or dimensions to order by ("-" in front of a column means descending). For example: --order -ds',
     )(function)
-
     function = click.option(
         "--limit",
-        required=False,
         type=str,
         help="Limit the number of rows out using an int or leave blank for no limit. For example: --limit 100",
         callback=lambda ctx, param, value: validate_limit(value),
     )(function)
-
     function = click.option(
         "--where",
-        required=False,
         type=str,
         default=None,
         help='SQL-like where statement provided as a string. For example: --where "revenue > 100"',
     )(function)
-
     function = start_end_time_options(function)
+    function = separated_by_comma_option(
+        "--dimensions",
+        help_msg="Dimensions to group by: syntax is --dimensions ds or for multiple dimensions --dimensions ds,org",
+    )(function)
+    function = separated_by_comma_option(
+        "--metrics",
+        help_msg="Metrics to query for: syntax is --metrics bookings or for multiple metrics --metrics bookings,messages",
+    )(function)
     return function
 
 
@@ -93,7 +95,6 @@ def start_end_time_options(function: Callable) -> Callable:
     """Options for start_time and end_time."""
     function = click.option(
         "--start-time",
-        required=False,
         type=str,
         default=None,
         help="Optional iso8601 timestamp to constraint the start time of the data (inclusive)",
@@ -102,7 +103,6 @@ def start_end_time_options(function: Callable) -> Callable:
 
     function = click.option(
         "--end-time",
-        required=False,
         type=str,
         default=None,
         help="Optional iso8601 timestamp to constraint the end time of the data (inclusive)",
@@ -111,13 +111,13 @@ def start_end_time_options(function: Callable) -> Callable:
     return function
 
 
-def separated_by_comma_option(option_name: str, help_msg: str = "") -> Callable:
+def separated_by_comma_option(option_name: str, help_msg: str = "", required=True) -> Callable:
     """Parse input containing a string separated by commma to a List."""
 
     def wraps(function: Callable) -> Callable:
         function = click.option(
             option_name,
-            required=True,
+            required=required,
             help=help_msg,
             callback=lambda ctx, param, value: parse_comma_separated_inputs(value),
         )(function)
@@ -147,8 +147,10 @@ def valid_datetime(dt_str: str) -> bool:
     return True
 
 
-def parse_comma_separated_inputs(value: str) -> List[str]:  # noqa: D
+def parse_comma_separated_inputs(value: Optional[str]) -> Optional[List[str]]:  # noqa: D
     # If comma exist, explode this into a list and return
+    if value is None:
+        return None
     if "," in value:
         return [i.strip() for i in value.split(",")]
 

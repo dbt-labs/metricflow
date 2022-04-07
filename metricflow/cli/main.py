@@ -192,13 +192,6 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
 
 
 @cli.command()
-@separated_by_comma_option(
-    "--metrics",
-    "Metrics to query for: syntax is --metrics bookings or for multiple metrics --metrics bookings,messages",
-)
-@separated_by_comma_option(
-    "--dimensions", "Dimensions to group by: syntax is --dimensions ds or for multiple dimensions --dimensions ds,org"
-)
 @query_options
 @click.option(
     "--as-table",
