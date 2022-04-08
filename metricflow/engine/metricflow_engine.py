@@ -152,7 +152,7 @@ class AbstractMetricFlowEngine(ABC):
         self,
         mf_request: MetricFlowQueryRequest,
     ) -> MetricFlowExplainResult:
-        """Similar to explain, but does not run the query."""
+        """Similar to query - returns the query that would have been executed."""
         pass
 
     @abstractmethod
@@ -212,7 +212,9 @@ class AbstractMetricFlowEngine(ABC):
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
     ) -> SqlTable:
-        """Builds materilization. Can be very expensive if a large time range is provided.
+        """Builds a table containing metrics and dimensions from a materialization definition.
+
+        This can be very expensive if a large time range is provided.
 
         Args:
             materialization_name: Name of materialization
@@ -226,7 +228,7 @@ class AbstractMetricFlowEngine(ABC):
 
     @abstractmethod
     def drop_materialization(self, materialization_name: str) -> bool:
-        """Performs a drop materialization.
+        """Drops the table associated with a materialization definition.
 
         Args:
             materialization_name: Name of materialization to drop.

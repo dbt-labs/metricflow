@@ -49,7 +49,7 @@ logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True)
 class DimensionConversionResult:
-    """Helper class for returning the results of converting dimension from a data source."""
+    """Helper class for returning the results of converting dimensions from a data source."""
 
     dimension_instances: Sequence[DimensionInstance]
     time_dimension_instances: Sequence[TimeDimensionInstance]
@@ -57,7 +57,13 @@ class DimensionConversionResult:
 
 
 class DataSourceToDataSetConverter:
-    """Converts a data source in the old MQL model to the data set that can be used with the dataflow plan builder."""
+    """Converts a data source in the model to a data set that can be used with the dataflow plan builder.
+
+    Identifier links generally refer to the identifiers used to join the measure source to the dimension source. For
+    example, the dimension name "user_id__device_id__platform" has identifier links "user_id" and "device_id" and would
+    mean that the measure source was joined by "user_id" to an intermediate source, and then it was joined by
+    "device_id" to the source containing the "platform" dimension.
+    """
 
     # Regex for inferring whether an expression for an element is a column reference.
     _SQL_IDENTIFIER_REGEX = re.compile("^[a-zA-Z_][a-zA-Z_0-9]*$")
@@ -71,7 +77,7 @@ class DataSourceToDataSetConverter:
         dimension: Dimension,
         identifier_links: Tuple[LinklessIdentifierSpec, ...],
     ) -> DimensionInstance:
-        """Create a dimension instance from the old MQL dimension type."""
+        """Create a dimension instance from the dimension object in the model."""
         dimension_spec = DimensionSpec(
             element_name=dimension.name.element_name,
             identifier_links=identifier_links,
@@ -96,7 +102,7 @@ class DataSourceToDataSetConverter:
         identifier_links: Tuple[LinklessIdentifierSpec, ...],
         time_granularity: Optional[TimeGranularity] = None,
     ) -> TimeDimensionInstance:
-        """Create a time dimension instance from the old MQL dimension type."""
+        """Create a time dimension instance from the dimension object from a data source in the model."""
         time_dimension_spec = TimeDimensionSpec(
             element_name=time_dimension.name.element_name,
             identifier_links=identifier_links,
@@ -122,7 +128,7 @@ class DataSourceToDataSetConverter:
         identifier: Identifier,
         identifier_links: Tuple[LinklessIdentifierSpec, ...],
     ) -> IdentifierInstance:
-        """Create a dimension instance from the old MQL dimension type."""
+        """Create an identifier instance from the identifier object from a data sourcein the model."""
         identifier_spec = IdentifierSpec(
             element_name=identifier.name.element_name,
             identifier_links=identifier_links,
@@ -373,7 +379,7 @@ class DataSourceToDataSetConverter:
         )
 
     def create_sql_source_data_set(self, data_source: DataSource) -> DataSourceDataSet:
-        """Create an SQL source data set from the old MQL configured data sources."""
+        """Create an SQL source data set from a data source in the model."""
 
         # Gather all instances and columns from all data sources.
         all_measure_instances: List[MeasureInstance] = []
