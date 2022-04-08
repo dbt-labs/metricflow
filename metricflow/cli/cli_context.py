@@ -102,6 +102,7 @@ class CLIContext:
                     password=password,
                     database=database,
                     url_query_params={"warehouse": warehouse},
+                    client_session_keep_alive=False,
                 )
             elif dialect == SupportedSqlEngine.REDSHIFT.name:
                 host = not_empty(self.config.get_config_value(CONFIG_DWH_HOST), CONFIG_DWH_HOST, url)

@@ -57,6 +57,9 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
     data sources would constantly be primed because the table names didn't match).
     """
 
+    DEFAULT_LOGIN_TIMEOUT = 60
+    DEFAULT_CLIENT_SESSION_KEEP_ALIVE = True
+
     @staticmethod
     def _parse_url_query_params(url: str) -> Dict[str, str]:
         """Gets the warehouse from the query parameters in the URL, throwing an exception if not set properly."""
@@ -114,7 +117,8 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
         password: str,
         host: str,
         url_query_params: Dict[str, str],
-        login_timeout: int = 60,
+        login_timeout: int = DEFAULT_LOGIN_TIMEOUT,
+        client_session_keep_alive: bool = DEFAULT_CLIENT_SESSION_KEEP_ALIVE,
     ) -> None:
         self._connection_url = SqlAlchemySqlClient.build_engine_url(
             dialect=SqlDialect.SNOWFLAKE.value,
@@ -124,24 +128,22 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
             database=database,
             query=url_query_params,
         )
-        self._login_timeout = login_timeout
         self._engine_lock = threading.Lock()
-        super().__init__(engine=self._create_engine())
+        super().__init__(
+            engine=self._create_engine(login_timeout=login_timeout, client_session_keep_alive=client_session_keep_alive)
+        )
 
-    def __del__(self) -> None:
-        """Dispose of the Snowflake connection when the object is deleted.
-
-        Note: If you're experiencing hanging, it may be that the connection has not been closed.
-        """
-        self.close()
-
-    def _create_engine(self) -> sqlalchemy.engine.Engine:  # noqa: D
+    def _create_engine(
+        self,
+        login_timeout: int = DEFAULT_LOGIN_TIMEOUT,
+        client_session_keep_alive: bool = DEFAULT_CLIENT_SESSION_KEEP_ALIVE,
+    ) -> sqlalchemy.engine.Engine:  # noqa: D
         return sqlalchemy.create_engine(
             self._connection_url,
             pool_size=10,
             max_overflow=10,
             pool_pre_ping=False,
-            connect_args={"client_session_keep_alive": True, "login_timeout": self._login_timeout},
+            connect_args={"client_session_keep_alive": client_session_keep_alive, "login_timeout": login_timeout},
         )
 
     @property
