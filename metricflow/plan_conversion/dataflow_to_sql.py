@@ -363,6 +363,11 @@ def _make_time_spine_data_set(
     time_spine_table_alias: str,
     time_range_constraint: Optional[TimeRangeConstraint] = None,
 ) -> SqlDataSet:
+    """Make a time spine data set, which contains all date values like '2020-01-01', '2020-01-02'...
+
+    This is useful in computing cumulative metrics. This will need to be updated to support granularities finer than a
+    day.
+    """
     time_spine_instance = (
         TimeDimensionInstance(
             defined_from=primary_time_dimension_instance.defined_from,
