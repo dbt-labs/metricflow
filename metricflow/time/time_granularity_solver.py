@@ -81,7 +81,7 @@ class TimeGranularitySolver:
                     for measure in data_source.measures:
                         self._local_time_dimension_granularities[
                             LocalTimeDimensionGranularityKey(
-                                measure_reference=MeasureReference(element_name=measure.name),
+                                measure_reference=MeasureReference(element_name=measure.name.element_name),
                                 local_time_dimension_reference=TimeDimensionReference(
                                     element_name=dimension.name.element_name
                                 ),
@@ -94,7 +94,7 @@ class TimeGranularitySolver:
         metric_reference_to_measure_references: Dict[MetricModelReference, List[MeasureReference]] = {}
         for metric in model.metrics:
             metric_reference_to_measure_references[MetricModelReference(metric_name=metric.name)] = [
-                MeasureReference(element_name=measure) for measure in metric.measure_names
+                MeasureReference(element_name=measure.element_name) for measure in metric.measure_names
             ]
 
         return metric_reference_to_measure_references
