@@ -80,7 +80,7 @@ class RewritableSqlClauses:
 
 
 class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
-    """Visits the SQL query plan to simplify sub-queries. On each visit, return a simplfied node.
+    """Visits the SQL query plan to simplify sub-queries. On each visit, return a simplified node.
 
     Unlike SqlSubQueryReducerVisitor, this will re-write expressions to realize more reductions.
     """
@@ -193,7 +193,7 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
         """Returns true if the given node can be reduced with the parent node.
 
         Reducing this node means eliminating the SELECT of this node and merging it with the parent SELECT. This
-        checks for the cases where we are able to reduce
+        checks for the cases where we are able to reduce.
         """
 
         # If this node has multiple parents (i.e. a join) that are complex, then this can't be collapsed.
@@ -266,7 +266,7 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
         ) > 0 and not SqlRewritingSubQueryReducerVisitor._select_columns_are_column_references(node.select_columns):
             return False
 
-        # If the parent select node contains string columns, and this has a group by don't reduce as string columns
+        # If the parent select node contains string columns, and this has a GROUP BY, don't reduce as string columns
         # can have special meanings in a GROUP BY. For example,
         #
         # SELECT
@@ -528,7 +528,7 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
             return node_with_reduced_parents
 
         # Note that just because this node can't be reduced doesn't mean the parent node can't. In this example, the
-        # othermost query can't be reduced because there is a join, but sub-query d can be.
+        # outer query can't be reduced because there is a join, but sub-query d can be.
         #
         # SELECT a.bookings, b.listing__country
         # FROM (
@@ -558,7 +558,7 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
         #     ORDER by b.baz
         #     LIMIT 1
 
-        # The order by in the parent doesn't matter since the order by in this node will "overwrite" the order in the
+        # The ORDER BY in the parent doesn't matter since the order by in this node will "overwrite" the order in the
         # parent as long as the parent has no limits.
         column_replacements = SqlRewritingSubQueryReducerVisitor._get_column_replacements(
             parent_node=parent_select_node,
@@ -701,7 +701,7 @@ class SqlGroupByRewritingVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
 
 
 class SqlRewritingSubQueryReducer(SqlQueryPlanOptimizer):
-    """Simplify queries by eliminating sub-queries when possible with rewrites of expressions.
+    """Simplify queries by eliminating sub-queries when possible by rewriting expressions.
 
      Expressions in the SELECT, GROUP BY, and WHERE are can be rewritten.
 
