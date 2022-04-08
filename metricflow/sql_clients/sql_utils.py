@@ -1,6 +1,6 @@
 from typing import List, Any, Optional, Set
 
-import ciso8601  # type: ignore
+import dateutil.parser
 import pandas as pd
 from sqlalchemy.engine import make_url
 
@@ -29,7 +29,7 @@ def make_df(  # type: ignore [misc]
                 if column in time_columns:
                     # ts_suffix = " 00:00:00" if ":" not in row[i] else ""
                     # ts_input = row[i] + ts_suffix
-                    new_row.append(ciso8601.parse_datetime(row[i]))
+                    new_row.append(dateutil.parser.parse(row[i]))
 
                 else:
                     new_row.append(row[i])
