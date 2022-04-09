@@ -88,7 +88,7 @@ class CLIContext:
                 if not pathlib.Path(path_to_creds).exists:
                     raise ValueError(f"`{path_to_creds}` does not contain the BigQuery credential file.")
                 with open(path_to_creds, "r") as cred_file:
-                    creds = cred_file.readline()
+                    creds = cred_file.read()
                 self._sql_client = BigQuerySqlClient(password=creds)
             elif dialect == SupportedSqlEngine.SNOWFLAKE.name:
                 host = not_empty(self.config.get_config_value(CONFIG_DWH_HOST), CONFIG_DWH_HOST, url)
