@@ -61,7 +61,7 @@ class ModelValidator:
         return ModelBuildResult(model=model_copy, issues=tuple(issues))
 
     @staticmethod
-    def checked_validations(model: UserConfiguredModel) -> UserConfiguredModel:  # chTODO: remember checked_build
+    def checked_validations(model: UserConfiguredModel) -> UserConfiguredModel:
         """Similar to validate(), but throws an exception if validation fails."""
         model_copy = copy.deepcopy(model)
         build_result = ModelValidator.validate_model(model_copy)
