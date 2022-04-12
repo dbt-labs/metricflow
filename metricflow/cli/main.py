@@ -8,11 +8,12 @@ import textwrap
 import time
 
 from halo import Halo
+from importlib.metadata import version as pkg_version
 from packaging.version import parse
 from typing import List, Optional
 from update_checker import UpdateChecker
 
-from metricflow.cli import PACKAGE_NAME, __version__
+from metricflow.cli import PACKAGE_NAME
 from metricflow.cli.config_builder import YamlTemplateBuilder
 from metricflow.cli.constants import DEFAULT_RESULT_DECIMAL_PLACES, MAX_LIST_OBJECT_ELEMENTS
 from metricflow.cli.cli_context import CLIContext
@@ -48,7 +49,7 @@ def cli(cfg: CLIContext, verbose: bool) -> None:  # noqa: D
     cfg.verbose = verbose
 
     checker = UpdateChecker()
-    result = checker.check(PACKAGE_NAME, __version__)
+    result = checker.check(PACKAGE_NAME, pkg_version(PACKAGE_NAME))
     # result is None when an update was not found or a failure occurred
     if result:
         click.secho(
@@ -65,7 +66,7 @@ def cli(cfg: CLIContext, verbose: bool) -> None:  # noqa: D
 @cli.command()
 def version() -> None:
     """Print the current version of the MetricFlow CLI."""
-    click.echo(__version__)
+    click.echo(pkg_version(PACKAGE_NAME))
 
 
 @cli.command()

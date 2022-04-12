@@ -10,6 +10,7 @@ from metricflow.cli.main import (
     materialize,
     query,
     validate_configs,
+    version,
 )
 from metricflow.model.model_validator import ModelValidator
 from metricflow.model.validations.validator_helpers import (
@@ -83,4 +84,11 @@ def test_validate_configs(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
         resp = cli_runner.run(validate_configs)
 
     assert "future_error" in resp.output
+    assert resp.exit_code == 0
+
+
+def test_version(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
+    resp = cli_runner.run(version)
+
+    assert resp.output
     assert resp.exit_code == 0
