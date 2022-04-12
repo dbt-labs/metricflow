@@ -16,6 +16,7 @@ from metricflow.specs import (
     LinklessIdentifierSpec,
     DEFAULT_TIME_GRANULARITY,
     TimeDimensionReference,
+    MeasureReference,
 )
 from metricflow.model.objects.metric import MetricType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
@@ -34,13 +35,6 @@ class PartialTimeDimensionSpec:
 
     element_name: str
     identifier_links: Tuple[LinklessIdentifierSpec, ...]
-
-
-@dataclass(frozen=True)
-class MeasureReference:
-    """Refers to a measure where we don't know other attributes."""
-
-    element_name: str
 
 
 @dataclass(frozen=True)
