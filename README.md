@@ -32,15 +32,21 @@ Then, proceed with the regular installation as follows:
 
 MetricFlow can be installed from PyPi for use as a Python library with the following command:
 
-`pip install metricflow`
+```
+pip install metricflow
+```
 
 Once installed, MetricFlow can be setup and connected to a data warehouse by following the instructions after issuing the command:
 
-`mf setup`
+```
+mf setup
+```
 
 To see what MetricFlow can do without custom configurations, start the tutorial by running:
 
-`mf tutorial`
+```
+mf tutorial
+```
 
 To get up and running with your own metrics, you should rely on MetricFlow’s documentation available at [MetricFlow docs](https://docs.transform.co/docs/metricflow/guides/introduction).
 
