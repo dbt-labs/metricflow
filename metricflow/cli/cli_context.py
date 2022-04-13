@@ -4,7 +4,7 @@ import pathlib
 from logging.handlers import TimedRotatingFileHandler
 from typing import Dict, Optional
 
-from metricflow.cli.exceptions import SqlClientException, MetricFlowInitException, ModelCreationException
+from metricflow.errors.errors import SqlClientCreationException, MetricFlowInitException, ModelCreationException
 from metricflow.cli.time_source import ServerTimeSource
 from metricflow.configuration.config_handler import ConfigHandler
 from metricflow.configuration.constants import (
@@ -119,7 +119,7 @@ class CLIContext:
                     f"Invalid dialect `{dialect}`, must be one of `bigquery`, `snowflake`, `redshift` in {url}"
                 )
         except Exception as e:
-            raise SqlClientException from e
+            raise SqlClientCreationException from e
 
     @property
     def sql_client(self) -> SqlClient:  # noqa: D
@@ -133,8 +133,8 @@ class CLIContext:
         """Execute the DB health checks."""
         try:
             return self.sql_client.health_checks(self.mf_system_schema)
-        except Exception:
-            raise SqlClientException
+        except Exception as e:
+            raise SqlClientCreationException from e
 
     def _initialize_metricflow_engine(self) -> None:
         """Initialize the MetricFlowEngine."""
