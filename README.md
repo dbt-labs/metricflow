@@ -32,6 +32,12 @@ If you would like to visualize metric dataflow plans via CLI, install Graphviz:
 - Graphviz provides [pre-built packages for download and installation](https://www.graphviz.org/download/)
 - Mac users might prefer to use Homebrew: `brew install graphviz`
 
+The visualizations are in an early state of development, but look similar to:
+
+<p align="center">
+<img src="assets/example_plan.svg" height="500"/>
+<br /><br />
+</p>
 
 Then, proceed with the regular installation as follows:
 
@@ -78,6 +84,7 @@ For reference, the tutorial steps are below:
     8.  Add another dimension: `mf query --metrics transactions --dimensions ds,customer__country --order ds`
     9.  Add a higher date granularity: `mf query --metrics transactions --dimensions ds__week --order ds__week`
     10. Try a more complicated query: `mf query --metrics transactions,transaction_usd_na,transaction_usd_na_l7d --dimensions ds,is_large --order ds --start-time 2022-03-20 --end-time 2022-04-01`
+        * You can also add `--explain --display-plans` to the above command.
     11. For more ways to interact with the sample models, go to ‘https://docs.transform.co/docs/metricflow/metricflow-tutorial’.
     12. Once you’re done, run `mf tutorial --skip-dw --drop-tables` to drop the sample tables.
 ```

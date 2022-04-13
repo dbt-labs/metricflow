@@ -145,6 +145,7 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
             8.  Add another dimension: `mf query --metrics transactions --dimensions ds,customer__country --order ds`
             9.  Add a higher date granularity: `mf query --metrics transactions --dimensions ds__week --order ds__week`
             10. Try a more complicated query: `mf query --metrics transactions,transaction_usd_na,transaction_usd_na_l7d --dimensions ds,is_large --order ds --start-time 2022-03-20 --end-time 2022-04-01`
+                * You can also add `--explain --display-plans`.
             11. For more ways to interact with the sample models, go to ‘https://docs.transform.co/docs/metricflow/metricflow-tutorial’.
             12. Once you’re done, run `mf tutorial --skip-dw --drop-tables` to drop the sample tables.
         """
@@ -222,7 +223,6 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
     "--display-plans",
     is_flag=True,
     required=False,
-    default=False,
     help="Display plans (e.g. metric dataflow) in the browser",
 )
 @click.option(
@@ -297,6 +297,7 @@ def query(
         click.echo(sql)
         if display_plans:
             svg_path = display_dag_as_svg(explain_result.dataflow_plan, cfg.config.dir_path)
+            click.echo("")
             click.echo(f"Plan SVG saved to: {svg_path}")
         exit()
 
