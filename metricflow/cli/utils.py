@@ -111,7 +111,7 @@ def start_end_time_options(function: Callable) -> Callable:
     return function
 
 
-def separated_by_comma_option(option_name: str, help_msg: str = "", required=True) -> Callable:
+def separated_by_comma_option(option_name: str, help_msg: str = "", required: bool = True) -> Callable:
     """Parse input containing a string separated by commma to a List."""
 
     def wraps(function: Callable) -> Callable:
