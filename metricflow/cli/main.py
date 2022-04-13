@@ -133,16 +133,20 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
         """\
         🤓 Please run the following steps,
 
-            1. In '{$HOME}/.metricflow/config.yml', `model_path` should be '{$HOME}/.metricflow/sample_models'.
-            2. Try validating your data model: `mf validate-configs`
-            3. Check out your metrics: `mf list-metrics`
-            4. Query your first metric: `mf query --metrics transactions --dimensions ds --order ds`
-            5. Show the SQL MetricFlow generates: `mf query --metrics transactions --dimensions ds --order ds --explain`
-            6. Add another dimension: `mf query --metrics transactions --dimensions ds,customer__country --order ds`
-            7. Add a higher date granularity: `mf query --metrics transactions --dimensions ds__week --order ds__week`
-            8. Try a more complicated query: `mf query --metrics transactions,transaction_usd_na,transaction_usd_na_l7d --dimensions ds,is_large --order ds --start-time 2022-03-20 --end-time 2022-04-01`
-            9. For more ways to interact with the sample models, go to ‘https://docs.transform.co/docs/metricflow/metricflow-tutorial’.
-            10. Once you’re done, run `mf tutorial --skip-dw --drop-tables` to drop the sample tables.
+            1.  In '{$HOME}/.metricflow/config.yml', `model_path` should be '{$HOME}/.metricflow/sample_models'.
+            2.  Try validating your data model: `mf validate-configs`
+            3.  Check out your metrics: `mf list-metrics`
+            4.  Check out dimensions for your metric `mf list-dimensions --metric-names transactions`
+            5.  Query your first metric: `mf query --metrics transactions --dimensions ds --order ds`
+            6.  Show the SQL MetricFlow generates: `mf query --metrics transactions --dimensions ds --order ds --explain`
+            7.  Visualize the plan: `mf query --metrics transactions --dimensions ds --order ds --explain -- display-plans`
+                * This only works if you have graphviz installed - see README.
+                * Aesthetic improvements to the visualization are TBD.
+            8.  Add another dimension: `mf query --metrics transactions --dimensions ds,customer__country --order ds`
+            9.  Add a higher date granularity: `mf query --metrics transactions --dimensions ds__week --order ds__week`
+            10. Try a more complicated query: `mf query --metrics transactions,transaction_usd_na,transaction_usd_na_l7d --dimensions ds,is_large --order ds --start-time 2022-03-20 --end-time 2022-04-01`
+            11. For more ways to interact with the sample models, go to ‘https://docs.transform.co/docs/metricflow/metricflow-tutorial’.
+            12. Once you’re done, run `mf tutorial --skip-dw --drop-tables` to drop the sample tables.
         """
     )
 
