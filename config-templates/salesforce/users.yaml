@@ -21,4 +21,3 @@ data_source:
       expr: created_date
     - name: full_name
       type: categorical
-    
