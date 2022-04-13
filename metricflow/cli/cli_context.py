@@ -1,5 +1,4 @@
 import logging
-import pathlib
 
 from logging.handlers import TimedRotatingFileHandler
 from typing import Dict, Optional
@@ -8,25 +7,15 @@ from metricflow.errors.errors import SqlClientCreationException, MetricFlowInitE
 from metricflow.cli.time_source import ServerTimeSource
 from metricflow.configuration.config_handler import ConfigHandler
 from metricflow.configuration.constants import (
-    CONFIG_DWH_DB,
-    CONFIG_DWH_DIALECT,
-    CONFIG_DWH_HOST,
-    CONFIG_DWH_PASSWORD,
-    CONFIG_DWH_PORT,
     CONFIG_DWH_SCHEMA,
-    CONFIG_DWH_USER,
-    CONFIG_DWH_WAREHOUSE,
 )
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.engine.utils import build_user_configured_model_from_config
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
-from metricflow.protocols.sql_client import SqlClient, SupportedSqlEngine
-from metricflow.sql_clients.common_client import not_empty
-from metricflow.sql_clients.big_query import BigQuerySqlClient
-from metricflow.sql_clients.redshift import RedshiftSqlClient
-from metricflow.sql_clients.snowflake import SnowflakeSqlClient
+from metricflow.protocols.sql_client import SqlClient
+from metricflow.sql_clients.sql_utils import make_sql_client_from_config
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 
 logger = logging.getLogger(__name__)
@@ -77,46 +66,7 @@ class CLIContext:
     def __initialize_sql_client(self) -> None:
         """Initializes the SqlClient given the credentials."""
         try:
-            dialect = self.config.get_value(CONFIG_DWH_DIALECT).upper()
-            url = f"file://{self.config.file_path}"
-            if dialect == SupportedSqlEngine.BIGQUERY.name:
-                path_to_creds = not_empty(self.config.get_value(CONFIG_DWH_PASSWORD), CONFIG_DWH_PASSWORD, url)
-                if not pathlib.Path(path_to_creds).exists:
-                    raise ValueError(f"`{path_to_creds}` does not contain the BigQuery credential file.")
-                with open(path_to_creds, "r") as cred_file:
-                    creds = cred_file.read()
-                self._sql_client = BigQuerySqlClient(password=creds)
-            elif dialect == SupportedSqlEngine.SNOWFLAKE.name:
-                host = not_empty(self.config.get_value(CONFIG_DWH_HOST), CONFIG_DWH_HOST, url)
-                user = not_empty(self.config.get_value(CONFIG_DWH_USER), CONFIG_DWH_USER, url)
-                password = self.config.get_value(CONFIG_DWH_PASSWORD)
-                database = not_empty(self.config.get_value(CONFIG_DWH_DB), CONFIG_DWH_DB, url)
-                warehouse = not_empty(self.config.get_value(CONFIG_DWH_WAREHOUSE), CONFIG_DWH_WAREHOUSE, url)
-                self._sql_client = SnowflakeSqlClient(
-                    host=host,
-                    username=user,
-                    password=password,
-                    database=database,
-                    url_query_params={"warehouse": warehouse},
-                    client_session_keep_alive=False,
-                )
-            elif dialect == SupportedSqlEngine.REDSHIFT.name:
-                host = not_empty(self.config.get_value(CONFIG_DWH_HOST), CONFIG_DWH_HOST, url)
-                port = int(self.config.get_value(CONFIG_DWH_PORT))
-                user = not_empty(self.config.get_value(CONFIG_DWH_USER), CONFIG_DWH_USER, url)
-                password = self.config.get_value(CONFIG_DWH_PASSWORD)
-                database = not_empty(self.config.get_value(CONFIG_DWH_DB), CONFIG_DWH_DB, url)
-                self._sql_client = RedshiftSqlClient(
-                    host=host,
-                    port=port,
-                    username=user,
-                    password=password,
-                    database=database,
-                )
-            else:
-                raise ValueError(
-                    f"Invalid dialect `{dialect}`, must be one of `bigquery`, `snowflake`, `redshift` in {url}"
-                )
+            self._sql_client = make_sql_client_from_config(self.config)
         except Exception as e:
             raise SqlClientCreationException from e
 

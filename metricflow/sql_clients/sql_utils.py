@@ -1,12 +1,23 @@
-from typing import List, Any, Optional, Set
-
 import dateutil.parser
 import pandas as pd
-from sqlalchemy.engine import make_url
+import pathlib
 
-from metricflow.protocols.sql_client import SqlClient
+from sqlalchemy.engine import make_url
+from typing import List, Any, Optional, Set
+
+from metricflow.configuration.constants import (
+    CONFIG_DWH_DB,
+    CONFIG_DWH_DIALECT,
+    CONFIG_DWH_HOST,
+    CONFIG_DWH_PASSWORD,
+    CONFIG_DWH_PORT,
+    CONFIG_DWH_USER,
+    CONFIG_DWH_WAREHOUSE,
+)
+from metricflow.configuration.yaml_handler import YamlFileHandler
+from metricflow.protocols.sql_client import SqlClient, SupportedSqlEngine
 from metricflow.sql_clients.big_query import BigQuerySqlClient
-from metricflow.sql_clients.common_client import SqlDialect
+from metricflow.sql_clients.common_client import not_empty, SqlDialect
 from metricflow.sql_clients.redshift import RedshiftSqlClient
 from metricflow.sql_clients.snowflake import SnowflakeSqlClient
 from metricflow.sql_clients.sqlite import SqliteSqlClient
@@ -58,3 +69,46 @@ def make_sql_client(url: str, password: str) -> SqlClient:  # noqa: D
         return SqliteSqlClient.from_connection_details(url, password)
     else:
         raise ValueError(f"Unknown dialect: `{dialect}` in URL {url}")
+
+
+def make_sql_client_from_config(handler: YamlFileHandler) -> SqlClient:
+    """Construct a SqlClient given a yaml file config."""
+
+    dialect = handler.get_value(CONFIG_DWH_DIALECT).upper()
+    url = f"file://{handler.yaml_file_path}"
+    if dialect == SupportedSqlEngine.BIGQUERY.name:
+        path_to_creds = not_empty(handler.get_value(CONFIG_DWH_PASSWORD), CONFIG_DWH_PASSWORD, url)
+        if not pathlib.Path(path_to_creds).exists:
+            raise ValueError(f"`{path_to_creds}` does not contain the BigQuery credential file.")
+        with open(path_to_creds, "r") as cred_file:
+            creds = cred_file.read()
+        return BigQuerySqlClient(password=creds)
+    elif dialect == SupportedSqlEngine.SNOWFLAKE.name:
+        host = not_empty(handler.get_value(CONFIG_DWH_HOST), CONFIG_DWH_HOST, url)
+        user = not_empty(handler.get_value(CONFIG_DWH_USER), CONFIG_DWH_USER, url)
+        password = handler.get_value(CONFIG_DWH_PASSWORD)
+        database = not_empty(handler.get_value(CONFIG_DWH_DB), CONFIG_DWH_DB, url)
+        warehouse = not_empty(handler.get_value(CONFIG_DWH_WAREHOUSE), CONFIG_DWH_WAREHOUSE, url)
+        return SnowflakeSqlClient(
+            host=host,
+            username=user,
+            password=password,
+            database=database,
+            url_query_params={"warehouse": warehouse},
+            client_session_keep_alive=False,
+        )
+    elif dialect == SupportedSqlEngine.REDSHIFT.name:
+        host = not_empty(handler.get_value(CONFIG_DWH_HOST), CONFIG_DWH_HOST, url)
+        port = int(handler.get_value(CONFIG_DWH_PORT))
+        user = not_empty(handler.get_value(CONFIG_DWH_USER), CONFIG_DWH_USER, url)
+        password = handler.get_value(CONFIG_DWH_PASSWORD)
+        database = not_empty(handler.get_value(CONFIG_DWH_DB), CONFIG_DWH_DB, url)
+        return RedshiftSqlClient(
+            host=host,
+            port=port,
+            username=user,
+            password=password,
+            database=database,
+        )
+    else:
+        raise ValueError(f"Invalid dialect `{dialect}`, must be one of `bigquery`, `snowflake`, `redshift` in {url}")
