@@ -11,7 +11,6 @@ data_source:
     - name: listing_creation_ds
       type: time
       type_params:
-        time_format: YYYY-MM-DD
         time_granularity: day
 
   identifiers:

@@ -64,7 +64,6 @@ def test_metric_no_time_dim_dim_only_source() -> None:  # noqa:D
                             type=DimensionType.TIME,
                             type_params=DimensionTypeParams(
                                 is_primary=True,
-                                time_format="YYYY-MM-DD",
                                 time_granularity=TimeGranularity.DAY,
                             ),
                         ),
@@ -133,7 +132,6 @@ def test_metric_multiple_primary_time_dims() -> None:  # noqa:D
                                 name=dim_reference,
                                 type=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
-                                    time_format="YYYY-MM-DD",
                                     time_granularity=TimeGranularity.DAY,
                                 ),
                             ),
@@ -141,7 +139,6 @@ def test_metric_multiple_primary_time_dims() -> None:  # noqa:D
                                 name=dim2_reference,
                                 type=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
-                                    time_format="YYYY-MM-DD",
                                     time_granularity=TimeGranularity.DAY,
                                 ),
                             ),
@@ -177,7 +174,6 @@ def test_generated_metrics_only() -> None:  # noqa:D
                 type=DimensionType.TIME,
                 type_params=DimensionTypeParams(
                     is_primary=True,
-                    time_format="YYYY-MM-DD",
                     time_granularity=TimeGranularity.DAY,
                 ),
             ),

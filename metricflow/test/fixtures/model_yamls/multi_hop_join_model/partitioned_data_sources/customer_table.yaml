@@ -16,7 +16,6 @@ data_source:
       type: time
       type_params:
         is_primary: false
-        time_format: YYYY-MM-DD
         time_granularity: day
       is_partition: true
 

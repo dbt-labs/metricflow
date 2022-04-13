@@ -24,12 +24,10 @@ data_source:
       expr: created_at
       type_params:
         is_primary: True
-        time_format: YYYY-MM-DD
         time_granularity: day
     - name: created_at
       type: time
       type_params:
-        time_format: YYYY-MM-DD
         time_granularity: day
     - name: country_latest
       type: categorical

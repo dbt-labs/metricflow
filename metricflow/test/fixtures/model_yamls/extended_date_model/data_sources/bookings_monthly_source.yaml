@@ -17,7 +17,6 @@ data_source:
       type: time
       type_params:
         is_primary: True
-        time_format: YYYY-MM-DD
         time_granularity: month
     - name: is_instant
       type: categorical

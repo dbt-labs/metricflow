@@ -20,7 +20,6 @@ data_source:
       expr: created_at
       type_params:
         is_primary: True
-        time_format: YYYY-MM-DD
         time_granularity: day
 
   identifiers:
