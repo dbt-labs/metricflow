@@ -3,17 +3,13 @@ data_source:
   owners:
     - support@transformdata.io
   sql_table: salesforce.opportunity ### Update to your opportunities schema.table
-  mutability:
-    type: full_mutation
-    type_params:
-      update_cron: 0 10 * * *
   identifiers:
-    - name: opportunity_id
+    - name: opportunity
       type: primary
       expr: id
-    - name: owner_id
+    - name: owner
       type: foreign
-      expr: owner_id
+      expr: owner
     - name: account_id
       type: foreign
   dimensions:
@@ -21,14 +17,11 @@ data_source:
       type: time
       type_params:
         is_primary: True
-        time_format: YYYY-MM-DD
         time_granularity: day
-      expr: created_date::date
+      expr: CAST(created_date as DATETIME)
     - name: close_date
       type: time
       type_params:
-        is_primary: False
-        time_format: YYYY-MM-DD
         time_granularity: day
     - name: lead_source
       type: categorical
@@ -44,42 +37,25 @@ data_source:
     - name: opps
       agg: count_distinct
       expr: id
+      create_metric: true
     - name: closed_opps
       agg: count_distinct
       expr: case when is_closed = true then id else null end
+      description: Counts distinct opportunities that have been closed.
       create_metric: True
     - name: won_opps
       agg: count_distinct
       expr: case when is_won = true then id else null end
+      create_metric: True
     - name: lost_opps
       agg: count_distinct
       expr: case when is_won = false and is_closed = true then id else null end
+      create_metric: True
     - name: amount
       expr: amount_usd
       agg: sum
     
 
----
-metric:
-  name: opps_created
-  type: measure_proxy
-  type_params:
-    measures:
-      - opps
----
-metric:
-  name: closed_opps
-  type: measure_proxy
-  type_params:
-    measures:
-      - closed_opps
----
-metric:
-  name: lost_opps
-  type: measure_proxy
-  type_params:
-    measures:
-      - lost_opps
 ---
 metric:
   name: closed_won_opps
@@ -110,8 +86,4 @@ metric:
   type_params:
     numerator: won_opps
     denominator: closed_opps
-
-
-
-    
     

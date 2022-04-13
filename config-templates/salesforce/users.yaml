@@ -3,12 +3,8 @@ data_source:
   owners:
     - jordan@transformdata.io
   sql_table: salesforce.user ### Update to your users schema.table
-  mutability:
-    type: full_mutation
-    type_params:
-      update_cron: 0 10 * * *
   identifiers:
-    - name: owner_id
+    - name: owner
       type: primary
       expr: id
   dimensions:
