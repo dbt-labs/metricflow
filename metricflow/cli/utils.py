@@ -180,7 +180,7 @@ def exception_handler(func: Callable[..., Any]) -> Callable[..., Any]:  # type: 
 
             if isinstance(args[0], CLIContext):
                 cli_context: CLIContext = args[0]
-                click.echo(f"\nERROR: {str(e)} - Log file: {cli_context.config.log_file_path}")
+                click.echo(f"\nERROR: {str(e)}\nLog file: {cli_context.config.log_file_path}")
             else:
                 if not isinstance(args[0], CLIContext):
                     logger.error(
