@@ -1,0 +1,24 @@
+data_source:
+  name: salesforce_account
+  owners:
+    - support@transformdata.io
+  sql_table: SALESFORCE.account ### Update to your account schema.table
+  mutability:
+    type: full_mutation
+    type_params:
+      update_cron: 0 10 * * *
+  identifiers:
+    - name: account_id
+      type: primary
+      expr: id
+    - name: owner_id
+      type: foreign
+  dimensions:
+    - name: is_deleted
+      type: categorical
+    - name: name
+      type: categorical
+    - name: type
+      type: categorical
+    - name: annual_revenue
+      type: categorical

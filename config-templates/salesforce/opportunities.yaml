@@ -1,0 +1,117 @@
+data_source:
+  name: salesforce_oppportunities
+  owners:
+    - support@transformdata.io
+  sql_table: salesforce.opportunity ### Update to your opportunities schema.table
+  mutability:
+    type: full_mutation
+    type_params:
+      update_cron: 0 10 * * *
+  identifiers:
+    - name: opportunity_id
+      type: primary
+      expr: id
+    - name: owner_id
+      type: foreign
+      expr: owner_id
+    - name: account_id
+      type: foreign
+  dimensions:
+    - name: ds
+      type: time
+      type_params:
+        is_primary: True
+        time_format: YYYY-MM-DD
+        time_granularity: day
+      expr: created_date::date
+    - name: close_date
+      type: time
+      type_params:
+        is_primary: False
+        time_format: YYYY-MM-DD
+        time_granularity: day
+    - name: lead_source
+      type: categorical
+    - name: campaign_name
+      type: categorical
+    - name: name
+      type: categorical
+    - name: stage_name
+      type: categorical
+    - name: is_closed
+      type: categorical
+  measures:
+    - name: opps
+      agg: count_distinct
+      expr: id
+    - name: closed_opps
+      agg: count_distinct
+      expr: case when is_closed = true then id else null end
+      create_metric: True
+    - name: won_opps
+      agg: count_distinct
+      expr: case when is_won = true then id else null end
+    - name: lost_opps
+      agg: count_distinct
+      expr: case when is_won = false and is_closed = true then id else null end
+    - name: amount
+      expr: amount_usd
+      agg: sum
+    
+
+---
+metric:
+  name: opps_created
+  type: measure_proxy
+  type_params:
+    measures:
+      - opps
+---
+metric:
+  name: closed_opps
+  type: measure_proxy
+  type_params:
+    measures:
+      - closed_opps
+---
+metric:
+  name: lost_opps
+  type: measure_proxy
+  type_params:
+    measures:
+      - lost_opps
+---
+metric:
+  name: closed_won_opps
+  owners:
+    - support@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+      - opps
+  constraint: |
+    stage_name = '6 - Closed Won' 
+  # change to 6 - Closed Won your stage name
+---
+metric:
+  name: closed_won_amount
+  owners:
+    - support@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+      - amount
+  constraint: |
+    stage_name = '6 - Closed Won'
+---
+metric: 
+  name: win_rate
+  type: ratio
+  type_params:
+    numerator: won_opps
+    denominator: closed_opps
+
+
+
+    
+    

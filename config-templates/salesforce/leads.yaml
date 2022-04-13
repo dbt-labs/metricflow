@@ -1,0 +1,71 @@
+data_source:
+  name: salesforce_lead
+  owners:
+    - support@transformdata.io
+  sql_table: salesforce.lead ### Update to your leads schema.table
+  mutability:
+    type: full_mutation
+    type_params:
+      update_cron: 0 10 * * *
+  identifiers:
+    - name: lead_id
+      type: primary
+      expr: id
+    - name: account_id
+      type: foreign
+      expr: converted_account_id
+    - name: opportunity_id
+      type: foreign
+      expr: converted_opportunity_id
+    - name: contact_id
+      type: foreign
+      expr: converted_contact_id
+    - name: owner_id
+      type: foreign
+  dimensions:
+    - name: ds
+      type: time
+      type_params:
+        is_primary: true
+        time_granularity: day
+      expr: created_date
+    - name: converted_date
+      type: time
+      type_params:
+        is_primary: false
+        time_granularity: day 
+    - name: is_deleted
+      type: categorical
+    - name: name
+      type: categorical
+    - name: company
+      type: categorical
+    - name: lead_source
+      type: categorical
+    - name: is_converted
+      type: categorical
+  measures:
+    - name: leads
+      agg: count_distinct
+      expr: id
+    - name: converted_leads
+      agg: count_distinct
+      expr: case when is_converted = true then id else null end
+---
+metric:
+  name: leads_created
+  type: measure_proxy
+  owners:
+    - support@transformdata.io
+  type_params:
+    measures:
+      - leads
+---
+metric:
+  name: leads_converted
+  type: measure_proxy
+  owners:
+    - support@transformdata.io
+  type_params:
+    measures:
+      - converted_leads
