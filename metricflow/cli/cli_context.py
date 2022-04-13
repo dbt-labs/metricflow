@@ -3,7 +3,7 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 from typing import Dict, Optional
 
-from metricflow.errors.errors import SqlClientCreationException, MetricFlowInitException, ModelCreationException
+from metricflow.errors.errors import SqlClientCreationException, MetricFlowInitException
 from metricflow.cli.time_source import ServerTimeSource
 from metricflow.configuration.config_handler import ConfigHandler
 from metricflow.configuration.constants import (
@@ -108,16 +108,7 @@ class CLIContext:
 
     def _build_semantic_model(self) -> None:
         """Get the path to the models and create a corresponding SemanticModel."""
-        self._build_user_configured_model()
-        assert self._user_configured_model
-        self._semantic_model = SemanticModel(self._user_configured_model)
-
-    def _build_user_configured_model(self) -> None:
-        """Build the UserConfiguredModel given the config yaml file."""
-        try:
-            self._user_configured_model = build_user_configured_model_from_config(self.config)
-        except Exception as e:
-            raise ModelCreationException from e
+        self._semantic_model = SemanticModel(self.user_configured_model)
 
     @property
     def semantic_model(self) -> SemanticModel:  # noqa: D
@@ -129,6 +120,6 @@ class CLIContext:
     @property
     def user_configured_model(self) -> UserConfiguredModel:  # noqa: D
         if self._user_configured_model is None:
-            self._build_user_configured_model()
+            self._user_configured_model = build_user_configured_model_from_config(self.config)
         assert self._user_configured_model is not None
         return self._user_configured_model
