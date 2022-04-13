@@ -42,7 +42,7 @@ from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
-from metricflow.test.dataflow_plan_to_svg import display_graph_as_svg
+from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.test.plan_utils import assert_plan_snapshot_text_equal
 from metricflow.test.sql.compare_sql_plan import assert_rendered_sql_from_plan_equal
@@ -102,7 +102,7 @@ def convert_and_check(
         optimization_level=SqlQueryOptimizationLevel.O0,
     )
 
-    display_graph_as_svg(
+    display_graph_if_requested(
         request=request,
         mf_test_session_state=mf_test_session_state,
         dag_graph=sql_query_plan,
@@ -129,7 +129,7 @@ def convert_and_check(
         optimization_level=SqlQueryOptimizationLevel.O4,
     )
 
-    display_graph_as_svg(
+    display_graph_if_requested(
         request=request,
         mf_test_session_state=mf_test_session_state,
         dag_graph=sql_query_plan,
@@ -478,7 +478,7 @@ def test_compute_metrics_node_simple_expr(
         plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
     )
 
-    display_graph_as_svg(
+    display_graph_if_requested(
         request=request,
         mf_test_session_state=mf_test_session_state,
         dag_graph=dataflow_plan,

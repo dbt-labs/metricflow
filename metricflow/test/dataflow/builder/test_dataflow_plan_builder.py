@@ -22,7 +22,7 @@ from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
-from metricflow.test.dataflow_plan_to_svg import display_graph_as_svg
+from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
 from metricflow.test.plan_utils import assert_plan_snapshot_text_equal
 
 logger = logging.getLogger(__name__)
@@ -53,7 +53,7 @@ def test_simple_plan(  # noqa: D
         plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
     )
 
-    display_graph_as_svg(
+    display_graph_if_requested(
         request=request,
         mf_test_session_state=mf_test_session_state,
         dag_graph=dataflow_plan,
@@ -89,7 +89,7 @@ def test_joined_plan(  # noqa: D
         plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
     )
 
-    display_graph_as_svg(
+    display_graph_if_requested(
         request=request,
         mf_test_session_state=mf_test_session_state,
         dag_graph=dataflow_plan,
@@ -134,7 +134,7 @@ def test_order_by_plan(  # noqa: D
         plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
     )
 
-    display_graph_as_svg(
+    display_graph_if_requested(
         request=request,
         mf_test_session_state=mf_test_session_state,
         dag_graph=dataflow_plan,
@@ -167,7 +167,7 @@ def test_limit_rows_plan(  # noqa: D
         plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
     )
 
-    display_graph_as_svg(
+    display_graph_if_requested(
         request=request,
         mf_test_session_state=mf_test_session_state,
         dag_graph=dataflow_plan,
@@ -205,7 +205,7 @@ def test_multiple_metrics_plan(  # noqa: D
         plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
     )
 
-    display_graph_as_svg(
+    display_graph_if_requested(
         request=request,
         mf_test_session_state=mf_test_session_state,
         dag_graph=dataflow_plan,
@@ -243,7 +243,7 @@ def test_expr_metrics_plan(
         plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
     )
 
-    display_graph_as_svg(
+    display_graph_if_requested(
         request=request,
         mf_test_session_state=mf_test_session_state,
         dag_graph=dataflow_plan,
@@ -281,7 +281,7 @@ def test_single_data_source_ratio_metrics_plan(
         plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
     )
 
-    display_graph_as_svg(
+    display_graph_if_requested(
         request=request,
         mf_test_session_state=mf_test_session_state,
         dag_graph=dataflow_plan,
@@ -319,7 +319,7 @@ def test_multi_data_source_ratio_metrics_plan(
         plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
     )
 
-    display_graph_as_svg(
+    display_graph_if_requested(
         request=request,
         mf_test_session_state=mf_test_session_state,
         dag_graph=dataflow_plan,
@@ -354,7 +354,7 @@ def test_multihop_join_plan(  # noqa: D
         plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
     )
 
-    display_graph_as_svg(
+    display_graph_if_requested(
         request=request,
         mf_test_session_state=mf_test_session_state,
         dag_graph=dataflow_plan,
@@ -399,7 +399,7 @@ def test_where_constrained_plan(  # noqa: D
         plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
     )
 
-    display_graph_as_svg(
+    display_graph_if_requested(
         request=request,
         mf_test_session_state=mf_test_session_state,
         dag_graph=dataflow_plan,
@@ -444,7 +444,7 @@ def test_where_constrained_plan_time_dimension(  # noqa: D
         plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
     )
 
-    display_graph_as_svg(
+    display_graph_if_requested(
         request=request,
         mf_test_session_state=mf_test_session_state,
         dag_graph=dataflow_plan,
@@ -489,7 +489,7 @@ def test_where_constrained_with_common_linkable_plan(  # noqa: D
         plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
     )
 
-    display_graph_as_svg(
+    display_graph_if_requested(
         request=request,
         mf_test_session_state=mf_test_session_state,
         dag_graph=dataflow_plan,
@@ -545,7 +545,7 @@ def test_cumulative_metric(  # noqa: D
         plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
     )
 
-    display_graph_as_svg(
+    display_graph_if_requested(
         request=request,
         mf_test_session_state=mf_test_session_state,
         dag_graph=dataflow_plan,
@@ -574,7 +574,7 @@ def test_distinct_values_plan(  # noqa: D
         plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
     )
 
-    display_graph_as_svg(
+    display_graph_if_requested(
         request=request,
         mf_test_session_state=mf_test_session_state,
         dag_graph=dataflow_plan,

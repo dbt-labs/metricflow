@@ -34,6 +34,7 @@ from metricflow.engine.metricflow_engine import MetricFlowQueryRequest, MetricFl
 from metricflow.model.model_validator import ModelValidator
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
+from metricflow.test.dataflow_plan_to_svg import display_dag_as_svg
 
 pass_config = click.make_pass_decorator(CLIContext, ensure=True)
 _telemetry_reporter = TelemetryReporter(report_levels_higher_or_equal_to=TelemetryLevel.USAGE)
@@ -132,16 +133,21 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
         """\
         🤓 Please run the following steps,
 
-            1. In '{$HOME}/.metricflow/config.yml', `model_path` should be '{$HOME}/.metricflow/sample_models'.
-            2. Try validating your data model: `mf validate-configs`
-            3. Check out your metrics: `mf list-metrics`
-            4. Query your first metric: `mf query --metrics transactions --dimensions ds --order ds`
-            5. Show the SQL MetricFlow generates: `mf query --metrics transactions --dimensions ds --order ds --explain`
-            6. Add another dimension: `mf query --metrics transactions --dimensions ds,customer__country --order ds`
-            7. Add a higher date granularity: `mf query --metrics transactions --dimensions ds__week --order ds__week`
-            8. Try a more complicated query: `mf query --metrics transactions,transaction_usd_na,transaction_usd_na_l7d --dimensions ds,is_large --order ds --start-time 2022-03-20 --end-time 2022-04-01`
-            9. For more ways to interact with the sample models, go to ‘https://docs.transform.co/docs/metricflow/metricflow-tutorial’.
-            10. Once you’re done, run `mf tutorial --skip-dw --drop-tables` to drop the sample tables.
+            1.  In '{$HOME}/.metricflow/config.yml', `model_path` should be '{$HOME}/.metricflow/sample_models'.
+            2.  Try validating your data model: `mf validate-configs`
+            3.  Check out your metrics: `mf list-metrics`
+            4.  Check out dimensions for your metric `mf list-dimensions --metric-names transactions`
+            5.  Query your first metric: `mf query --metrics transactions --dimensions ds --order ds`
+            6.  Show the SQL MetricFlow generates: `mf query --metrics transactions --dimensions ds --order ds --explain`
+            7.  Visualize the plan: `mf query --metrics transactions --dimensions ds --order ds --explain -- display-plans`
+                * This only works if you have graphviz installed - see README.
+                * Aesthetic improvements to the visualization are TBD.
+            8.  Add another dimension: `mf query --metrics transactions --dimensions ds,customer__country --order ds`
+            9.  Add a higher date granularity: `mf query --metrics transactions --dimensions ds__week --order ds__week`
+            10. Try a more complicated query: `mf query --metrics transactions,transaction_usd_na,transaction_usd_na_l7d --dimensions ds,is_large --order ds --start-time 2022-03-20 --end-time 2022-04-01`
+                * You can also add `--explain --display-plans`.
+            11. For more ways to interact with the sample models, go to ‘https://docs.transform.co/docs/metricflow/metricflow-tutorial’.
+            12. Once you’re done, run `mf tutorial --skip-dw --drop-tables` to drop the sample tables.
         """
     )
 
@@ -214,6 +220,12 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
     help="In the query output, show the query that was executed against the data warehouse",
 )
 @click.option(
+    "--display-plans",
+    is_flag=True,
+    required=False,
+    help="Display plans (e.g. metric dataflow) in the browser",
+)
+@click.option(
     "--decimals",
     required=False,
     default=2,
@@ -234,6 +246,7 @@ def query(
     as_table: Optional[str] = None,
     csv: Optional[click.utils.LazyFile] = None,
     explain: bool = False,
+    display_plans: bool = False,
     decimals: int = DEFAULT_RESULT_DECIMAL_PLACES,
 ) -> None:
     """Create a new query with MetricFlow and assembles a MetricFlowQueryResult."""
@@ -282,6 +295,10 @@ def query(
         )
         click.echo("")
         click.echo(sql)
+        if display_plans:
+            svg_path = display_dag_as_svg(explain_result.dataflow_plan, cfg.config.dir_path)
+            click.echo("")
+            click.echo(f"Plan SVG saved to: {svg_path}")
         exit()
 
     assert query_result
@@ -300,6 +317,10 @@ def query(
                 click.echo(df.to_markdown(index=False, floatfmt=f".{decimals}f"))
             else:
                 click.echo(df.to_string(index=False, float_format=lambda x: format(x, f".{decimals}f")))
+
+        if display_plans:
+            svg_path = display_dag_as_svg(query_result.dataflow_plan, cfg.config.dir_path)
+            click.echo(f"Plan SVG saved to: {svg_path}")
 
 
 @cli.command()

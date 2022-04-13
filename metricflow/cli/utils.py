@@ -111,7 +111,7 @@ def start_end_time_options(function: Callable) -> Callable:
     return function
 
 
-def separated_by_comma_option(option_name: str, help_msg: str = "", required=True) -> Callable:
+def separated_by_comma_option(option_name: str, help_msg: str = "", required: bool = True) -> Callable:
     """Parse input containing a string separated by commma to a List."""
 
     def wraps(function: Callable) -> Callable:
@@ -180,7 +180,7 @@ def exception_handler(func: Callable[..., Any]) -> Callable[..., Any]:  # type: 
 
             if isinstance(args[0], CLIContext):
                 cli_context: CLIContext = args[0]
-                click.echo(f"\nERROR: {str(e)} - Log file: {cli_context.config.log_file_path}")
+                click.echo(f"\nERROR: {str(e)}\nLog file: {cli_context.config.log_file_path}")
             else:
                 if not isinstance(args[0], CLIContext):
                     logger.error(
