@@ -6,9 +6,7 @@ from typing import Dict, Optional
 from metricflow.errors.errors import SqlClientCreationException, MetricFlowInitException
 from metricflow.cli.time_source import ServerTimeSource
 from metricflow.configuration.config_handler import ConfigHandler
-from metricflow.configuration.constants import (
-    CONFIG_DWH_SCHEMA,
-)
+from metricflow.configuration.constants import CONFIG_DWH_SCHEMA
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.engine.utils import build_user_configured_model_from_config
 from metricflow.model.semantic_model import SemanticModel
