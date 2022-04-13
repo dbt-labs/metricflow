@@ -1,6 +1,5 @@
 import logging
 import os
-import tempfile
 from typing import TypeVar
 
 import graphviz
@@ -35,7 +34,7 @@ def display_graph_if_requested(
     request: FixtureRequest,
     dag_graph: DagGraphT,
 ) -> None:
-    """Create and display the plan as an SVG, if configured to do so."""
+    """Create and display the plan as an SVG, if requested to do so."""
 
     if not mf_test_session_state.display_plans:
         return
@@ -55,11 +54,15 @@ def display_graph_if_requested(
     mf_test_session_state.plans_displayed += 1
 
 
-def display_dag_as_svg(dag_graph: DagGraphT) -> None:
-    """Create and display the plan as an SVG in the browser."""
-    with tempfile.TemporaryDirectory() as temp_dir:
-        random_file_path = os.path.join(temp_dir, f"dag_{random_id()}")
-        _render_via_graphviz(dag_graph=dag_graph, file_path_without_svg_suffix=random_file_path)
+def display_dag_as_svg(dag_graph: DagGraphT, mf_config_dir: str) -> str:
+    """Create and display the plan as an SVG in the browser.
+
+    Returns the path where the SVG file was created within "mf_config_dir".
+    """
+    svg_dir = os.path.join(mf_config_dir, "generated_svg")
+    random_file_path = os.path.join(svg_dir, f"dag_{random_id()}")
+    _render_via_graphviz(dag_graph=dag_graph, file_path_without_svg_suffix=random_file_path)
+    return random_file_path + ".svg"
 
 
 def _render_via_graphviz(dag_graph: DagGraphT, file_path_without_svg_suffix: str) -> None:
