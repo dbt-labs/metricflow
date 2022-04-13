@@ -1,13 +1,13 @@
 import logging
-import os
 import pathlib
+
 from logging.handlers import TimedRotatingFileHandler
-
-import yaml
-
 from typing import Dict, Optional
 
-from metricflow.cli.constants import (
+from metricflow.cli.exceptions import SqlClientException, MetricFlowInitException, ModelCreationException
+from metricflow.cli.time_source import ServerTimeSource
+from metricflow.configuration.config_handler import ConfigHandler
+from metricflow.configuration.constants import (
     CONFIG_DWH_DB,
     CONFIG_DWH_DIALECT,
     CONFIG_DWH_HOST,
@@ -17,10 +17,7 @@ from metricflow.cli.constants import (
     CONFIG_DWH_USER,
     CONFIG_DWH_WAREHOUSE,
     CONFIG_MODEL_PATH,
-    CONFIG_PATH_KEY,
 )
-from metricflow.cli.exceptions import SqlClientException, MetricFlowInitException, ModelCreationException
-from metricflow.cli.time_source import ServerTimeSource
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.model.parsing.dir_to_model import parse_directory_of_yaml_files_to_model
 from metricflow.model.semantic_model import SemanticModel
@@ -74,28 +71,28 @@ class CLIContext:
     @property
     def mf_system_schema(self) -> str:  # noqa: D
         if self._mf_system_schema is None:
-            self._mf_system_schema = self.config.get_config_value(CONFIG_DWH_SCHEMA)
+            self._mf_system_schema = self.config.get_value(CONFIG_DWH_SCHEMA)
         assert self._mf_system_schema
         return self._mf_system_schema
 
     def __initialize_sql_client(self) -> None:
         """Initializes the SqlClient given the credentials."""
         try:
-            dialect = self.config.get_config_value(CONFIG_DWH_DIALECT).upper()
+            dialect = self.config.get_value(CONFIG_DWH_DIALECT).upper()
             url = f"file://{self.config.file_path}"
             if dialect == SupportedSqlEngine.BIGQUERY.name:
-                path_to_creds = not_empty(self.config.get_config_value(CONFIG_DWH_PASSWORD), CONFIG_DWH_PASSWORD, url)
+                path_to_creds = not_empty(self.config.get_value(CONFIG_DWH_PASSWORD), CONFIG_DWH_PASSWORD, url)
                 if not pathlib.Path(path_to_creds).exists:
                     raise ValueError(f"`{path_to_creds}` does not contain the BigQuery credential file.")
                 with open(path_to_creds, "r") as cred_file:
                     creds = cred_file.read()
                 self._sql_client = BigQuerySqlClient(password=creds)
             elif dialect == SupportedSqlEngine.SNOWFLAKE.name:
-                host = not_empty(self.config.get_config_value(CONFIG_DWH_HOST), CONFIG_DWH_HOST, url)
-                user = not_empty(self.config.get_config_value(CONFIG_DWH_USER), CONFIG_DWH_USER, url)
-                password = self.config.get_config_value(CONFIG_DWH_PASSWORD)
-                database = not_empty(self.config.get_config_value(CONFIG_DWH_DB), CONFIG_DWH_DB, url)
-                warehouse = not_empty(self.config.get_config_value(CONFIG_DWH_WAREHOUSE), CONFIG_DWH_WAREHOUSE, url)
+                host = not_empty(self.config.get_value(CONFIG_DWH_HOST), CONFIG_DWH_HOST, url)
+                user = not_empty(self.config.get_value(CONFIG_DWH_USER), CONFIG_DWH_USER, url)
+                password = self.config.get_value(CONFIG_DWH_PASSWORD)
+                database = not_empty(self.config.get_value(CONFIG_DWH_DB), CONFIG_DWH_DB, url)
+                warehouse = not_empty(self.config.get_value(CONFIG_DWH_WAREHOUSE), CONFIG_DWH_WAREHOUSE, url)
                 self._sql_client = SnowflakeSqlClient(
                     host=host,
                     username=user,
@@ -105,11 +102,11 @@ class CLIContext:
                     client_session_keep_alive=False,
                 )
             elif dialect == SupportedSqlEngine.REDSHIFT.name:
-                host = not_empty(self.config.get_config_value(CONFIG_DWH_HOST), CONFIG_DWH_HOST, url)
-                port = int(self.config.get_config_value(CONFIG_DWH_PORT))
-                user = not_empty(self.config.get_config_value(CONFIG_DWH_USER), CONFIG_DWH_USER, url)
-                password = self.config.get_config_value(CONFIG_DWH_PASSWORD)
-                database = not_empty(self.config.get_config_value(CONFIG_DWH_DB), CONFIG_DWH_DB, url)
+                host = not_empty(self.config.get_value(CONFIG_DWH_HOST), CONFIG_DWH_HOST, url)
+                port = int(self.config.get_value(CONFIG_DWH_PORT))
+                user = not_empty(self.config.get_value(CONFIG_DWH_USER), CONFIG_DWH_USER, url)
+                password = self.config.get_value(CONFIG_DWH_PASSWORD)
+                database = not_empty(self.config.get_value(CONFIG_DWH_DB), CONFIG_DWH_DB, url)
                 self._sql_client = RedshiftSqlClient(
                     host=host,
                     port=port,
@@ -168,7 +165,7 @@ class CLIContext:
 
     def _build_user_configured_model(self) -> None:
         """Get the path to the models and create a corresponding SemanticModel."""
-        path_to_models = self.config.get_config_value(CONFIG_MODEL_PATH)
+        path_to_models = self.config.get_value(CONFIG_MODEL_PATH)
         try:
             model = parse_directory_of_yaml_files_to_model(path_to_models).model
             assert model is not None
@@ -189,45 +186,3 @@ class CLIContext:
             self._build_user_configured_model()
         assert self._user_configured_model is not None
         return self._user_configured_model
-
-
-class ConfigHandler:
-    """Class to handle all config file retrieval/insertion actions."""
-
-    def __init__(self) -> None:  # noqa: D
-        # Create config directory if not exist
-        if not os.path.exists(self.dir_path):
-            dir_path = pathlib.Path(self.dir_path)
-            dir_path.mkdir(parents=True)
-
-    @property
-    def dir_path(self) -> str:
-        """Retrieve MetricFlow config directory from $MF_CONFIG_DIR, default config dir is ~/.metricflow"""
-        config_dir_env = os.getenv(CONFIG_PATH_KEY)
-        return config_dir_env if config_dir_env else f"{str(pathlib.Path.home())}/.metricflow"
-
-    @property
-    def file_path(self) -> str:
-        """Config file can be found at <config_dir>/config.yml"""
-        return os.path.join(self.dir_path, "config.yml")
-
-    def get_config_value(self, key: str) -> str:
-        """Attempt to get a corresponding value from the config file. Throw an error if not exists or None."""
-        config_file = open(self.file_path, "r")
-
-        config = yaml.load(config_file, Loader=yaml.Loader)
-        if key not in config:
-            raise KeyError(f"Key '{key}' is missing in the configuration file '{self.file_path}'")
-
-        value = config[key]
-        if value is None:
-            raise ValueError(f"Value for key '{key}' cannot be none in the configuration file '{self.file_path}")
-        return value
-
-    @property
-    def log_file_path(self) -> str:
-        """Returns the name of the log file where all logging messages are stored."""
-        log_dir_elements = [self.dir_path, "logs"]
-        log_dir = os.path.join(*log_dir_elements)
-        os.makedirs(log_dir, exist_ok=True)
-        return os.path.join(*(log_dir_elements + ["metricflow_cli.log"]))

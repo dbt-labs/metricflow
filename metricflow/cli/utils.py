@@ -9,8 +9,8 @@ import click
 from dateutil.parser import parse
 
 from metricflow.cli.cli_context import CLIContext
-from metricflow.cli.config_builder import ConfigKey
-from metricflow.cli.constants import (
+from metricflow.configuration.config_builder import ConfigKey
+from metricflow.configuration.constants import (
     CONFIG_DWH_DB,
     CONFIG_DWH_DIALECT,
     CONFIG_DWH_HOST,
