@@ -3,6 +3,8 @@ data_source:
   owners:
     - support@transformdata.io
   sql_table: SALESFORCE.account ### Update to your account schema.table
+  mutability:
+    type: immutable
   identifiers:
     - name: account
       type: primary
@@ -18,4 +20,3 @@ data_source:
       type: categorical
     - name: annual_revenue
       type: categorical
-      

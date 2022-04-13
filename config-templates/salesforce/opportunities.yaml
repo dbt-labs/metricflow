@@ -3,6 +3,8 @@ data_source:
   owners:
     - support@transformdata.io
   sql_table: salesforce.opportunity ### Update to your opportunities schema.table
+  mutability:
+    type: immutable
   identifiers:
     - name: opportunity
       type: primary
@@ -10,7 +12,7 @@ data_source:
     - name: owner
       type: foreign
       expr: owner
-    - name: account_id
+    - name: account
       type: foreign
   dimensions:
     - name: ds
@@ -86,4 +88,3 @@ metric:
   type_params:
     numerator: won_opps
     denominator: closed_opps
-    

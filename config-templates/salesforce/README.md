@@ -5,11 +5,10 @@ The config files are based on tables loaded into your data warehouse using Fivet
 
 ## Steps to test
 
-1. Add thes configs to your metricflow model directory (this shoud be the same directory you specified in model_path during setup)
-2. Update the sql_table parameter to point to your salesforce tables. i.e salesforce.opportunity --> my_salesforce_schmea.my_opportunity_table
+1. Add these configs to your MetricFlow model directory (this should be the same directory you specified in `model_path` during setup)
+2. Update the `sql_table` parameter to point to your Salesforce tables. i.e salesforce.opportunity --> my_salesforce_schmea.my_opportunity_table
 3. Run `mf validate-configs` to run validation on the configs. 
 4. Test some of the metrics included in the configs by running the following commands
     * `mf query --metrics opps_created --dimensions ds`
     * `mf query --metrics closed_won_opps --dimensions ds --dimensions owner_id__full_name`
     * `mf query --metrics converted_leads --dimension ds --dimensions lead_source`
-

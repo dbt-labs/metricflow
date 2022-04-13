@@ -3,6 +3,8 @@ data_source:
   owners:
     - support@transformdata.io
   sql_table: salesforce.lead ### Update to your leads schema.table
+  mutability: 
+    type: immutable
   identifiers:
     - name: lead
       type: primary
@@ -13,10 +15,10 @@ data_source:
     - name: opportunity
       type: foreign
       expr: converted_opportunity
-    - name: contact_id
+    - name: contact
       type: foreign
       expr: converted_contact
-    - name: owner_id
+    - name: owner
       type: foreign
   dimensions:
     - name: ds
@@ -48,4 +50,3 @@ data_source:
       agg: count_distinct
       expr: case when is_converted = true then id else null end
       create_metric: true
-      
