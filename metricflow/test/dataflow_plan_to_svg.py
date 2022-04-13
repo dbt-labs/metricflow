@@ -1,11 +1,13 @@
 import logging
 import os
+import tempfile
 from typing import TypeVar
 
 import graphviz
 from _pytest.fixtures import FixtureRequest
 
 from metricflow.dag.mf_dag import DagNode, MetricFlowDag
+from metricflow.object_utils import random_id
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.plan_utils import snapshot_path_prefix
 
@@ -37,26 +39,33 @@ def display_graph_if_requested(
 
     if not mf_test_session_state.display_plans:
         return
+
     plan_svg_output_path_prefix = snapshot_path_prefix(
         request=request, snapshot_group=dag_graph.__class__.__name__, snapshot_id=dag_graph.dag_id
     )
 
-    dot = graphviz.Digraph(comment=dag_graph.dag_id, node_attr={"shape": "box", "fontname": "Courier"})
-    dot.format = "svg"
-
-    # Not quite correct if there are shared nodes.
-    for sink_node in dag_graph.sink_nodes:
-        add_nodes_to_digraph(sink_node, dot)
-
     # Create parent directory since it might not exist
     os.makedirs(os.path.dirname(plan_svg_output_path_prefix), exist_ok=True)
 
-    dot.format = "svg"
-
     if mf_test_session_state.plans_displayed >= mf_test_session_state.max_plans_displayed:
         raise RuntimeError(
-            f"Can't display plan - hit limit of " f"{mf_test_session_state.max_plans_displayed} plans displayed."
+            f"Can't display plan - hit limit of {mf_test_session_state.max_plans_displayed} plans displayed."
         )
-    # Don't use the .svg extension since it will add it.
-    dot.render(plan_svg_output_path_prefix, view=mf_test_session_state.display_plans, format="svg", cleanup=True)
+    _render_via_graphviz(dag_graph=dag_graph, file_path_without_svg_suffix=plan_svg_output_path_prefix)
     mf_test_session_state.plans_displayed += 1
+
+
+def display_dag_as_svg(dag_graph: DagGraphT) -> None:
+    """Create and display the plan as an SVG in the browser."""
+    with tempfile.TemporaryDirectory() as temp_dir:
+        random_file_path = os.path.join(temp_dir, f"dag_{random_id()}")
+        _render_via_graphviz(dag_graph=dag_graph, file_path_without_svg_suffix=random_file_path)
+
+
+def _render_via_graphviz(dag_graph: DagGraphT, file_path_without_svg_suffix: str) -> None:
+    dot = graphviz.Digraph(comment=dag_graph.dag_id, node_attr={"shape": "box", "fontname": "Courier"})
+    # Not quite correct if there are shared nodes.
+    for sink_node in dag_graph.sink_nodes:
+        add_nodes_to_digraph(sink_node, dot)
+    dot.format = "svg"
+    dot.render(file_path_without_svg_suffix, view=True, format="svg", cleanup=True)
