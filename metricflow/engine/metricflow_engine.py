@@ -262,7 +262,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             system_schema=system_schema,
         )
 
-    def __init__(  # noqa: D
+    def __init__(
         self,
         semantic_model: SemanticModel,
         sql_client: SqlClient,
@@ -271,6 +271,15 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         column_association_resolver: Optional[ColumnAssociationResolver] = None,
         time_spine_source: Optional[TimeSpineSource] = None,
     ) -> None:
+        """Initializer for MetricFlowEngine
+
+        For direct calls to construct MetricFlowEngine, do not pass the following parameters,
+        - time_source
+        - column_association_resolver
+        - time_spine_source
+        These parameters are mainly there to be overridden during tests.
+        """
+
         self._semantic_model = semantic_model
         self._sql_client = sql_client
         self._column_association_resolver = column_association_resolver or (
