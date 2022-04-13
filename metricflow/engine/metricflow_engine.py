@@ -11,15 +11,20 @@ import pandas as pd
 
 from metricflow.cli.models import Dimension, Metric
 from metricflow.cli.models import Materialization
+from metricflow.configuration.constants import CONFIG_DWH_SCHEMA
+from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan import DataflowPlan
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
+from metricflow.engine.time_source import ServerTimeSource
+from metricflow.engine.utils import build_user_configured_model_from_config
 from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
 from metricflow.execution.execution_plan_to_text import execution_plan_to_text
 from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.object_utils import pformat_big_objects, random_id
+from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_execution import DataflowToExecutionPlanConverter
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.time_spine import TimeSpineSource
@@ -31,6 +36,7 @@ from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLev
 from metricflow.time.time_source import TimeSource
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.errors.errors import ExecutionException, MaterializationNotFoundError
+from metricflow.sql_clients.sql_utils import make_sql_client_from_config
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
 
@@ -244,25 +250,39 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
     _LOGGING_INDENT = "   "
 
+    @staticmethod
+    def from_config(handler: YamlFileHandler) -> MetricFlowEngine:
+        """Initialize MetricFlowEngine via yaml config file."""
+        sql_client = make_sql_client_from_config(handler)
+        semantic_model = SemanticModel(build_user_configured_model_from_config(handler))
+        system_schema = handler.get_value(CONFIG_DWH_SCHEMA)
+        return MetricFlowEngine(
+            semantic_model=semantic_model,
+            sql_client=sql_client,
+            system_schema=system_schema,
+        )
+
     def __init__(  # noqa: D
         self,
         semantic_model: SemanticModel,
         sql_client: SqlClient,
-        column_association_resolver: ColumnAssociationResolver,
-        time_source: TimeSource,
-        time_spine_source: TimeSpineSource,
         system_schema: str,
+        time_source: TimeSource = ServerTimeSource(),
+        column_association_resolver: Optional[ColumnAssociationResolver] = None,
+        time_spine_source: Optional[TimeSpineSource] = None,
     ) -> None:
         self._semantic_model = semantic_model
         self._sql_client = sql_client
-        self._column_association_resolver = column_association_resolver
+        self._column_association_resolver = column_association_resolver or (
+            DefaultColumnAssociationResolver(semantic_model)
+        )
         self._time_source = time_source
-        self._time_spine_source = time_spine_source
+        self._time_spine_source = time_spine_source or TimeSpineSource(sql_client, schema_name=system_schema)
+
         self._schema = system_schema
 
         self._source_data_sets: List[DataSourceDataSet] = []
-        self._column_association_resolver = column_association_resolver
-        converter = DataSourceToDataSetConverter(column_association_resolver=column_association_resolver)
+        converter = DataSourceToDataSetConverter(column_association_resolver=self._column_association_resolver)
         for data_source in self._semantic_model.user_configured_model.data_sources:
             data_set = converter.create_sql_source_data_set(data_source)
             self._source_data_sets.append(data_set)
@@ -276,12 +296,12 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             data_sets=self._source_data_sets,
             semantic_model=self._semantic_model,
             primary_time_dimension_reference=self._primary_time_dimension_reference,
-            time_spine_source=time_spine_source,
+            time_spine_source=self._time_spine_source,
         )
         self._to_sql_query_plan_converter = DataflowToSqlQueryPlanConverter[DataSourceDataSet](
             column_association_resolver=self._column_association_resolver,
             semantic_model=self._semantic_model,
-            time_spine_source=time_spine_source,
+            time_spine_source=self._time_spine_source,
         )
         self._to_execution_plan_converter = DataflowToExecutionPlanConverter(
             sql_plan_converter=self._to_sql_query_plan_converter,
