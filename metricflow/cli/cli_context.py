@@ -16,10 +16,9 @@ from metricflow.configuration.constants import (
     CONFIG_DWH_SCHEMA,
     CONFIG_DWH_USER,
     CONFIG_DWH_WAREHOUSE,
-    CONFIG_MODEL_PATH,
 )
 from metricflow.engine.metricflow_engine import MetricFlowEngine
-from metricflow.model.parsing.dir_to_model import parse_directory_of_yaml_files_to_model
+from metricflow.engine.utils import build_user_configured_model_from_config
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
@@ -164,14 +163,11 @@ class CLIContext:
         self._semantic_model = SemanticModel(self._user_configured_model)
 
     def _build_user_configured_model(self) -> None:
-        """Get the path to the models and create a corresponding SemanticModel."""
-        path_to_models = self.config.get_value(CONFIG_MODEL_PATH)
+        """Build the UserConfiguredModel given the config yaml file."""
         try:
-            model = parse_directory_of_yaml_files_to_model(path_to_models).model
-            assert model is not None
+            self._user_configured_model = build_user_configured_model_from_config(self.config)
         except Exception as e:
             raise ModelCreationException from e
-        self._user_configured_model = model
 
     @property
     def semantic_model(self) -> SemanticModel:  # noqa: D
