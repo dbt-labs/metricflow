@@ -27,7 +27,6 @@ def test_inconsistent_elements() -> None:  # noqa:D
                                 name=dim_reference,
                                 type_=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
-                                    time_format="YYYY-MM-DD",
                                     time_granularity=TimeGranularity.DAY,
                                 ),
                             )

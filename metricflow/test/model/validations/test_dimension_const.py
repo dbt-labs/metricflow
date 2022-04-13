@@ -29,7 +29,6 @@ def test_incompatible_dimension_type() -> None:  # noqa:D
                                 type=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
                                     is_primary=True,
-                                    time_format="YYYY-MM-DD",
                                     time_granularity=TimeGranularity.DAY,
                                 ),
                             )
@@ -73,7 +72,6 @@ def test_multiple_primary_time_dimensions() -> None:  # noqa:D
                                 type=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
                                     is_primary=True,
-                                    time_format="YYYY-MM-DD",
                                     time_granularity=TimeGranularity.DAY,
                                 ),
                             )
@@ -89,7 +87,6 @@ def test_multiple_primary_time_dimensions() -> None:  # noqa:D
                                 type=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
                                     is_primary=True,
-                                    time_format="YYYY-MM-DD",
                                     time_granularity=TimeGranularity.DAY,
                                 ),
                             )
@@ -127,7 +124,6 @@ def test_incompatible_dimension_is_partition() -> None:  # noqa:D
                                 is_partition=True,
                                 type_params=DimensionTypeParams(
                                     is_primary=True,
-                                    time_format="YYYY-MM-DD",
                                     time_granularity=TimeGranularity.DAY,
                                 ),
                             )
@@ -143,7 +139,6 @@ def test_incompatible_dimension_is_partition() -> None:  # noqa:D
                                 type=DimensionType.TIME,
                                 is_partition=False,
                                 type_params=DimensionTypeParams(
-                                    time_format="YYYY-MM-DD",
                                     time_granularity=TimeGranularity.DAY,
                                 ),
                             )

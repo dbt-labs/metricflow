@@ -14,7 +14,6 @@ data_source:
       type: time
       type_params:
         is_primary: True
-        time_format: YYYY-MM-DD
         time_granularity: day
     - name: team_id
       type: categorical

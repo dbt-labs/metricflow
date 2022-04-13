@@ -19,7 +19,6 @@ def test_data_source_invalid_sql() -> None:  # noqa:D
                     name=dimension_reference,
                     type=DimensionType.TIME,
                     type_params=DimensionTypeParams(
-                        time_format="YYYY-MM-DD",
                         time_granularity=TimeGranularity.DAY,
                     ),
                 )

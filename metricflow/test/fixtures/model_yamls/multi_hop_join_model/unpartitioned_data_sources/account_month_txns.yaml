@@ -17,7 +17,6 @@ data_source:
       type: time
       type_params:
         is_primary: true
-        time_format: YYYY-MM-DD
         time_granularity: day
     - name: account_month
       type: categorical
