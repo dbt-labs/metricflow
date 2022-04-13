@@ -28,7 +28,7 @@ def add_nodes_to_digraph(node: DagNodeT, dot: graphviz.Digraph) -> None:
 DagGraphT = TypeVar("DagGraphT", bound=MetricFlowDag)
 
 
-def display_graph_as_svg(
+def display_graph_if_requested(
     mf_test_session_state: MetricFlowTestSessionState,
     request: FixtureRequest,
     dag_graph: DagGraphT,
