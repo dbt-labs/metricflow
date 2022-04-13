@@ -14,7 +14,6 @@ from typing import List, Optional
 from update_checker import UpdateChecker
 
 from metricflow.cli import PACKAGE_NAME
-from metricflow.cli.config_builder import YamlTemplateBuilder
 from metricflow.cli.constants import DEFAULT_RESULT_DECIMAL_PLACES, MAX_LIST_OBJECT_ELEMENTS
 from metricflow.cli.cli_context import CLIContext
 from metricflow.cli.tutorial import create_sample_data, gen_sample_model_configs, remove_sample_tables
@@ -29,6 +28,7 @@ from metricflow.cli.utils import (
     separated_by_comma_option,
     start_end_time_options,
 )
+from metricflow.configuration.config_builder import YamlTemplateBuilder
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest, MetricFlowExplainResult, MetricFlowQueryResult
 from metricflow.model.model_validator import ModelValidator
