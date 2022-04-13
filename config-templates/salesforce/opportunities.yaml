@@ -110,8 +110,3 @@ metric:
   type_params:
     numerator: won_opps
     denominator: closed_opps
-
-
-
-    
-    
