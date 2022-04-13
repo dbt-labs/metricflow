@@ -108,10 +108,6 @@ Key features of MetricFlow include:
 - **Command Line Interface (CLI)**: Pull data into a local context for testing and development workflows.
 - **Python Library**: Pull metrics into local Python environments such as Jupyter or other analytical interfaces.
 - **Materializations:** Define a set of metrics and a set of dimensions that you want to materialize to the data warehouse. This enables rapid construction of denormalized datasets back to the warehouse.
-- **Accessible interfaces**: Construct APIs and SDKs so you can pull metric datasets into downstream applications.
-  - _React Components_ to build embedded analytics
-  - _Airflow Operators_ to schedule API requests and pre-construction of metrics
-  - _GraphQL interface_ for end-users to build their own interfaces for metrics
 
 ## Contributing and Code of Conduct
 
