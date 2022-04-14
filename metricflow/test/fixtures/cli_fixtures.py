@@ -9,7 +9,7 @@ from click.testing import CliRunner, Result
 from typing import List, Optional, Sequence
 
 from metricflow.cli.cli_context import CLIContext
-from metricflow.cli.models import Dimension, Materialization, Metric
+from metricflow.engine.models import Dimension, Materialization, Metric
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest, MetricFlowQueryResult
 

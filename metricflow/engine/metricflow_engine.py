@@ -9,14 +9,13 @@ from typing import Optional, List, Sequence
 
 import pandas as pd
 
-from metricflow.cli.models import Dimension, Metric
-from metricflow.cli.models import Materialization
 from metricflow.configuration.constants import CONFIG_DWH_SCHEMA
 from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan import DataflowPlan
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
+from metricflow.engine.models import Dimension, Materialization, Metric
 from metricflow.engine.time_source import ServerTimeSource
 from metricflow.engine.utils import build_user_configured_model_from_config
 from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
