@@ -4,16 +4,11 @@ from logging.handlers import TimedRotatingFileHandler
 from typing import Dict, Optional
 
 from metricflow.errors.errors import SqlClientCreationException, MetricFlowInitException
-from metricflow.cli.time_source import ServerTimeSource
 from metricflow.configuration.config_handler import ConfigHandler
-from metricflow.configuration.constants import (
-    CONFIG_DWH_SCHEMA,
-)
+from metricflow.configuration.constants import CONFIG_DWH_SCHEMA
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.engine.utils import build_user_configured_model_from_config
 from metricflow.model.semantic_model import SemanticModel
-from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
-from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql_clients.sql_utils import make_sql_client_from_config
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
@@ -88,14 +83,7 @@ class CLIContext:
     def _initialize_metricflow_engine(self) -> None:
         """Initialize the MetricFlowEngine."""
         try:
-            self._mf = MetricFlowEngine(
-                semantic_model=self.semantic_model,
-                sql_client=self.sql_client,
-                column_association_resolver=DefaultColumnAssociationResolver(self.semantic_model),
-                time_source=ServerTimeSource(),
-                time_spine_source=TimeSpineSource(self.sql_client, schema_name=self.mf_system_schema),
-                system_schema=self.mf_system_schema,
-            )
+            self._mf = MetricFlowEngine.from_config(self.config)
         except Exception as e:
             raise MetricFlowInitException from e
 
