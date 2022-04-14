@@ -134,19 +134,10 @@ def convert_to_datetime(datetime_str: Optional[str]) -> Optional[dt.datetime]:
     if datetime_str is None:
         return None
 
-    if not valid_datetime(datetime_str):
-        raise click.BadParameter("must be valid iso8601 timestamp")
-
-    return dt.datetime.fromisoformat(datetime_str)
-
-
-def valid_datetime(dt_str: str) -> bool:
-    """Returns true if string is valid iso8601 timestamp, false otherwise"""
     try:
-        parse(dt_str)
+        return parse(datetime_str)
     except Exception:
-        return False
-    return True
+        raise click.BadParameter("must be valid iso8601 timestamp")
 
 
 def parse_comma_separated_inputs(value: Optional[str]) -> Optional[List[str]]:  # noqa: D

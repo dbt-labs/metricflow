@@ -86,7 +86,7 @@ class MetricFlowQueryRequest:
         limit: Optional[int] = None,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
-        where_constraint: str = None,
+        where_constraint: Optional[str] = None,
         order_by_names: Optional[Sequence[str]] = None,
         output_table: Optional[str] = None,
         sql_optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4,
@@ -208,7 +208,11 @@ class AbstractMetricFlowEngine(ABC):
 
     @abstractmethod
     def list_materializations(self) -> List[Materialization]:
-        """Retrieves a list of materialization names."""
+        """Retrieves a list of materialization names.
+
+        Returns:
+            A list of Materialization objects containing metadata.
+        """
         pass
 
     @abstractmethod
