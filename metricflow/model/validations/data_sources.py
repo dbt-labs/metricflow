@@ -1,20 +1,19 @@
 import logging
 from collections import defaultdict
-from typing import List, Optional, Dict, Sequence
+from typing import List, Dict
 
 from metricflow.model.objects.data_source import DataSource
-from metricflow.model.objects.elements.dimension import Dimension, DimensionType
-from metricflow.specs import MeasureReference
-from metricflow.time.time_constants import SUPPORTED_GRANULARITIES
+from metricflow.model.objects.elements.dimension import DimensionType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
     ModelValidationRule,
     ValidationIssue,
     ValidationIssueType,
     ValidationError,
-    ValidationFatal,
     validate_safely,
 )
+from metricflow.specs import MeasureReference
+from metricflow.time.time_constants import SUPPORTED_GRANULARITIES
 
 logger = logging.getLogger(__name__)
 
@@ -56,30 +55,13 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
         issues: List[ValidationIssueType] = []
 
-        primary_time_dimension_name = None
         for data_source in model.data_sources:
-            dimensions: Optional[Sequence[Dimension]] = data_source.dimensions
-            for dimension in dimensions or []:
-                if (
-                    dimension.type == DimensionType.TIME
-                    and dimension.type_params is not None
-                    and dimension.type_params.is_primary is True
-                ):
-                    primary_time_dimension_name = dimension.name
-
-        for data_source in model.data_sources:
-            issues.extend(
-                DataSourceTimeDimensionWarningsRule._validate_data_source(
-                    data_source=data_source, primary_time_dimension_name=primary_time_dimension_name
-                )
-            )
+            issues.extend(DataSourceTimeDimensionWarningsRule._validate_data_source(data_source=data_source))
         return issues
 
     @staticmethod
     @validate_safely(whats_being_done="checking validity of the data source's time dimensions")
-    def _validate_data_source(
-        data_source: DataSource, primary_time_dimension_name: Optional[str] = None
-    ) -> List[ValidationIssueType]:
+    def _validate_data_source(data_source: DataSource) -> List[ValidationIssueType]:
         primary_time_present = False
         issues: List[ValidationIssueType] = []
 
@@ -93,16 +75,6 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
                     continue
                 elif dim.type_params.is_primary:
                     primary_time_present = True
-                    if primary_time_dimension_name and dim.name != primary_time_dimension_name:
-                        issues.append(
-                            ValidationFatal(
-                                model_object_reference=model_object_reference,
-                                message=f"In data source {data_source.name}, "
-                                f"found primary time dimension with name: {dim.name}, "
-                                f"another primary time dimension with name: {primary_time_dimension_name} "
-                                f"was already found in model.",
-                            )
-                        )
                 elif dim.type_params.time_granularity:
                     if dim.type_params.time_granularity not in SUPPORTED_GRANULARITIES:
                         issues.append(
