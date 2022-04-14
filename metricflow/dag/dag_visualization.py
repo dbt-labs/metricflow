@@ -31,11 +31,17 @@ def display_dag_as_svg(dag_graph: DagGraphT, mf_config_dir: str) -> str:
     """
     svg_dir = os.path.join(mf_config_dir, "generated_svg")
     random_file_path = os.path.join(svg_dir, f"dag_{random_id()}")
-    _render_via_graphviz(dag_graph=dag_graph, file_path_without_svg_suffix=random_file_path)
+    render_via_graphviz(dag_graph=dag_graph, file_path_without_svg_suffix=random_file_path)
     return random_file_path + ".svg"
 
 
-def _render_via_graphviz(dag_graph: DagGraphT, file_path_without_svg_suffix: str) -> None:
+def render_via_graphviz(dag_graph: DagGraphT, file_path_without_svg_suffix: str) -> None:
+    """Render the DAG using graphviz.
+
+    Args:
+        dag_graph: The DAG to render.
+        file_path_without_svg_suffix: Path to the SVG file that should be created, without ".svg" suffix.
+    """
     dot = graphviz.Digraph(comment=dag_graph.dag_id, node_attr={"shape": "box", "fontname": "Courier"})
     # Not quite correct if there are shared nodes.
     for sink_node in dag_graph.sink_nodes:

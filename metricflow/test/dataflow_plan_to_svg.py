@@ -2,7 +2,7 @@ import os
 
 from _pytest.fixtures import FixtureRequest
 
-from metricflow.dag.dag_visualization import DagGraphT, _render_via_graphviz
+from metricflow.dag.dag_visualization import DagGraphT, render_via_graphviz
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.plan_utils import snapshot_path_prefix
 
@@ -28,5 +28,5 @@ def display_graph_if_requested(
         raise RuntimeError(
             f"Can't display plan - hit limit of {mf_test_session_state.max_plans_displayed} plans displayed."
         )
-    _render_via_graphviz(dag_graph=dag_graph, file_path_without_svg_suffix=plan_svg_output_path_prefix)
+    render_via_graphviz(dag_graph=dag_graph, file_path_without_svg_suffix=plan_svg_output_path_prefix)
     mf_test_session_state.plans_displayed += 1
