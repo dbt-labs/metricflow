@@ -34,7 +34,7 @@ from metricflow.engine.metricflow_engine import MetricFlowQueryRequest, MetricFl
 from metricflow.model.model_validator import ModelValidator
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
-from metricflow.test.dataflow_plan_to_svg import display_dag_as_svg
+from metricflow.dag.dag_visualization import display_dag_as_svg
 
 pass_config = click.make_pass_decorator(CLIContext, ensure=True)
 _telemetry_reporter = TelemetryReporter(report_levels_higher_or_equal_to=TelemetryLevel.USAGE)
