@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 from metricflow.configuration.config_handler import ConfigHandler
 from metricflow.configuration.constants import CONFIG_DWH_SCHEMA
@@ -12,7 +12,6 @@ from metricflow.engine.metricflow_engine import (
 from metricflow.engine.models import Dimension, Materialization, Metric
 from metricflow.engine.utils import build_user_configured_model_from_config, convert_to_datetime
 from metricflow.model.model_validator import ModelValidator
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.validations.validator_helpers import ValidationIssueType
 from metricflow.protocols.sql_client import SqlClient
@@ -20,8 +19,8 @@ from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLev
 from metricflow.sql_clients.sql_utils import make_sql_client_from_config
 
 
-class MetricFlowSimpleAPI:
-    """Simple MetricFlow Python Interface."""
+class MetricFlowClient:
+    """MetricFlow Python Interface."""
 
     def __init__(
         self,
@@ -31,26 +30,15 @@ class MetricFlowSimpleAPI:
     ):
         """If parameters not passed, build via config."""
         handler = ConfigHandler()
-        self._sql_client = sql_client or make_sql_client_from_config(handler)
-        self._system_schema = system_schema or handler.get_value(CONFIG_DWH_SCHEMA)
-        self._semantic_model = semantic_model or SemanticModel(build_user_configured_model_from_config(handler))
-        self._mf = MetricFlowEngine(
-            semantic_model=self._semantic_model,
-            sql_client=self._sql_client,
-            system_schema=self._system_schema,
+        self.sql_client = sql_client or make_sql_client_from_config(handler)
+        self.system_schema = system_schema or handler.get_value(CONFIG_DWH_SCHEMA)
+        self.semantic_model = semantic_model or SemanticModel(build_user_configured_model_from_config(handler))
+        self.user_configured_model = self.semantic_model.user_configured_model
+        self.engine = MetricFlowEngine(
+            semantic_model=self.semantic_model,
+            sql_client=self.sql_client,
+            system_schema=self.system_schema,
         )
-
-    @property
-    def user_configured_model(self) -> UserConfiguredModel:  # noqa: D
-        return self._semantic_model.user_configured_model
-
-    @property
-    def mf_engine(self) -> MetricFlowEngine:  # noqa: D
-        return self._mf
-
-    @property
-    def system_schema(self) -> str:  # noqa: D
-        return self._system_schema
 
     def _create_mf_request(
         self,
@@ -119,7 +107,7 @@ class MetricFlowSimpleAPI:
             as_table=as_table,
             sql_optimization_level=sql_optimization_level,
         )
-        return self.mf_engine.query(mf_request=mf_request)
+        return self.engine.query(mf_request=mf_request)
 
     def explain(
         self,
@@ -160,7 +148,7 @@ class MetricFlowSimpleAPI:
             as_table=as_table,
             sql_optimization_level=sql_optimization_level,
         )
-        return self.mf_engine.explain(mf_request=mf_request)
+        return self.engine.explain(mf_request=mf_request)
 
     def list_metrics(self) -> Dict[str, Metric]:
         """Retrieves a list of metric names.
@@ -168,7 +156,7 @@ class MetricFlowSimpleAPI:
         Returns:
             A dictionary with metric names as the key and the corresponding Metric object as the value.
         """
-        return {m.name: m for m in self.mf_engine.list_metrics()}
+        return {m.name: m for m in self.engine.list_metrics()}
 
     def list_dimensions(self, metric_names: List[str]) -> List[Dimension]:
         """Retrieves a list of all common dimensions for metric_names.
@@ -182,7 +170,7 @@ class MetricFlowSimpleAPI:
         Returns:
             A list of Dimension objects containing metadata.
         """
-        return self.mf_engine.simple_dimensions_for_metrics(metric_names=metric_names)
+        return self.engine.simple_dimensions_for_metrics(metric_names=metric_names)
 
     def list_materializations(self) -> List[Materialization]:
         """Retrieves a list of materialization names.
@@ -190,7 +178,7 @@ class MetricFlowSimpleAPI:
         Returns:
             A list of Materialization objects containing metadata.
         """
-        return self.mf_engine.list_materializations()
+        return self.engine.list_materializations()
 
     def get_dimension_values(
         self, metric_name: str, dimension_name: str, start_time: Optional[str] = None, end_time: Optional[str] = None
@@ -208,7 +196,7 @@ class MetricFlowSimpleAPI:
         """
         parsed_start_time = convert_to_datetime(start_time)
         parsed_end_time = convert_to_datetime(end_time)
-        return self.mf_engine.get_dimension_values(
+        return self.engine.get_dimension_values(
             metric_name=metric_name,
             get_group_by_values=dimension_name,
             time_constraint_start=parsed_start_time,
@@ -232,7 +220,7 @@ class MetricFlowSimpleAPI:
         """
         parsed_start_time = convert_to_datetime(start_time)
         parsed_end_time = convert_to_datetime(end_time)
-        return self.mf_engine.materialize(
+        return self.engine.materialize(
             materialization_name=materialization_name,
             time_constraint_start=parsed_start_time,
             time_constraint_end=parsed_end_time,
@@ -247,13 +235,12 @@ class MetricFlowSimpleAPI:
         Returns:
             True if a table has been drop, False if table doesn't exist.
         """
-        return self.mf_engine.drop_materialization(materialization_name=materialization_name)
+        return self.engine.drop_materialization(materialization_name=materialization_name)
 
-    def validate_configs(self) -> List[ValidationIssueType]:
+    def validate_configs(self) -> Optional[Tuple[ValidationIssueType, ...]]:
         """Validate a model according to configured rules.
 
         Returns:
-            List of validation issues with the model provided.
+            Tuple of validation issues with the model provided.
         """
-        issues = ModelValidator.validate_model(self.user_configured_model).issues
-        return [issue for issue in issues] if issues is not None else []
+        return ModelValidator.validate_model(self.user_configured_model).issues

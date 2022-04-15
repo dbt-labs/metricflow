@@ -1,1 +1,1 @@
-from metricflow.api.simple_api import MetricFlowSimpleAPI  # noqa: D
+from metricflow.api.metricflow_client import MetricFlowClient  # noqa: D
