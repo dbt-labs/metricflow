@@ -98,7 +98,7 @@ class FunctionEndEvent(TelemetryEvent, FrozenBaseModel):
 class TelemetryPayload(FrozenBaseModel):
     """Payload that can be easily serialized to JSON."""
 
-    session_id: str
+    client_id: str
     function_start_events: Tuple[FunctionStartEvent, ...] = ()
     function_end_events: Tuple[FunctionEndEvent, ...] = ()
     payload_schema: str = EVENT_SCHEMA

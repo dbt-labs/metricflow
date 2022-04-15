@@ -26,29 +26,29 @@ class TelemetryReporter:
     """Reports telemetry for improving product experience"""
 
     # Session ID to use when requesting a non-uniquely identifiable ID.
-    FULLY_ANONYMOUS_SESSION_ID = "anonymous"
+    FULLY_ANONYMOUS_CLIENT_ID = "anonymous"
 
     def __init__(self, report_levels_higher_or_equal_to: TelemetryLevel, fully_anonymous: bool = False) -> None:
-        """If fully_anonymous is set, use a session_id that is not unique."""
+        """If fully_anonymous is set, use a client_id that is not unique."""
         self._report_levels_higher_or_equal_to = report_levels_higher_or_equal_to
         self._fully_anonymous = fully_anonymous
 
         if fully_anonymous:
-            self._session_id = TelemetryReporter.FULLY_ANONYMOUS_SESSION_ID
+            self._client_id = TelemetryReporter.FULLY_ANONYMOUS_CLIENT_ID
         else:
-            self._session_id = TelemetryReporter._create_session_id()
+            self._client_id = TelemetryReporter._create_client_id()
 
         # For testing
         self._test_handler = ToMemoryTelemetryHandler()
         self._handlers: List[TelemetryHandler] = []
 
     @staticmethod
-    def _create_session_id() -> str:
+    def _create_client_id() -> str:
         """Creates an identifier for the current user based on their current environment.
 
         More specifically, this function creates a SHA-256 hash based on the system platform, release, and MAC address.
 
-        The created session ID is not guaranteed to be unique by user.
+        The created client ID is not guaranteed to be unique by user.
         """
         # getnode() returns the MAC.
         id_str = "_".join([sys.platform, platform.release(), str(uuid.getnode())])
@@ -82,7 +82,7 @@ class TelemetryReporter:
         if TelemetryLevel.USAGE >= self._report_levels_higher_or_equal_to:
             for handler in self._handlers:
                 handler.log(
-                    session_id=self._session_id,
+                    client_id=self._client_id,
                     function_start_event=FunctionStartEvent.create(
                         event_time=datetime.datetime.now(),
                         level_name=TelemetryLevel.USAGE.name,
@@ -101,7 +101,7 @@ class TelemetryReporter:
         ):
             for handler in self._handlers:
                 handler.log(
-                    session_id=self._session_id,
+                    client_id=self._client_id,
                     function_end_event=FunctionEndEvent.create(
                         event_time=datetime.datetime.now(),
                         level_name=TelemetryLevel.USAGE.name if not exception_trace else TelemetryLevel.EXCEPTION.name,
