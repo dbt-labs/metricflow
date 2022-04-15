@@ -1,7 +1,7 @@
 import os
 import yaml
 
-from typing import Dict
+from typing import Dict, Optional
 
 
 class YamlFileHandler:
@@ -29,6 +29,13 @@ class YamlFileHandler:
         if value is None:
             raise ValueError(f"Value for key '{key}' cannot be None in the yaml file '{self.yaml_file_path}")
         return value
+
+    def get_value_safe(self, key: str) -> Optional[str]:
+        """Attempts to get a value from the yaml file, but return None instead of throwing an exception."""
+        try:
+            return self.get_value(key)
+        except Exception:
+            return None
 
     def set_value(self, key: str, value: str) -> None:
         """Sets a value to a given key in yaml file."""

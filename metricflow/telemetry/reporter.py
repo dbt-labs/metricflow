@@ -2,6 +2,7 @@ import datetime
 import functools
 import logging
 import platform
+import os
 import sys
 import time
 import traceback
@@ -10,6 +11,8 @@ from hashlib import sha256
 from typing import Callable, Optional, Any
 from typing import List
 
+from metricflow.configuration.config_handler import ConfigHandler
+from metricflow.configuration.constants import CONFIG_EMAIL
 from metricflow.object_utils import random_id
 from metricflow.telemetry.handlers.handlers import (
     ToMemoryTelemetryHandler,
@@ -27,14 +30,18 @@ class TelemetryReporter:
 
     # Session ID to use when requesting a non-uniquely identifiable ID.
     FULLY_ANONYMOUS_CLIENT_ID = "anonymous"
+    ENV_EMAIL_OVERRIDE = "METRICFLOW_EMAIL"
 
     def __init__(self, report_levels_higher_or_equal_to: TelemetryLevel, fully_anonymous: bool = False) -> None:
         """If fully_anonymous is set, use a client_id that is not unique."""
         self._report_levels_higher_or_equal_to = report_levels_higher_or_equal_to
         self._fully_anonymous = fully_anonymous
+        self._email = os.getenv(TelemetryReporter.ENV_EMAIL_OVERRIDE) or ConfigHandler().get_value_safe(CONFIG_EMAIL)
 
         if fully_anonymous:
             self._client_id = TelemetryReporter.FULLY_ANONYMOUS_CLIENT_ID
+        elif self._email:
+            self._client_id = self._email
         else:
             self._client_id = TelemetryReporter._create_client_id()
 
