@@ -30,7 +30,7 @@ class TelemetryReporter:
 
     # Session ID to use when requesting a non-uniquely identifiable ID.
     FULLY_ANONYMOUS_CLIENT_ID = "anonymous"
-    ENV_EMAIL_OVERRIDE = "METRICFLOW_EMAIL"
+    ENV_EMAIL_OVERRIDE = "METRICFLOW_CLIENT_EMAIL"
 
     def __init__(self, report_levels_higher_or_equal_to: TelemetryLevel, fully_anonymous: bool = False) -> None:
         """If fully_anonymous is set, use a client_id that is not unique."""

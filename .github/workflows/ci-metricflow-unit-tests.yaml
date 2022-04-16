@@ -37,4 +37,4 @@ jobs:
       - name: Run MetricFlow Unit tests suites
         run: pytest metricflow/test
         env:
-          METRICFLOW_EMAIL: ci-tester@gmail.com
+          METRICFLOW_CLIENT_EMAIL: ci-tester@gmail.com
