@@ -385,7 +385,6 @@ class ChangeMeasureAggregationState(InstanceSetTransform[InstanceSet]):
             MeasureInstance(
                 associated_columns=x.associated_columns,
                 defined_from=x.defined_from,
-                source_time_dimension_reference=x.source_time_dimension_reference,
                 aggregation_state=self._aggregation_state_changes[x.aggregation_state],
                 spec=MeasureSpec(
                     element_name=x.spec.element_name,
@@ -449,7 +448,6 @@ class ChangeAssociatedColumns(InstanceSetTransform[InstanceSet]):
                     ),
                     spec=input_measure_instance.spec,
                     defined_from=input_measure_instance.defined_from,
-                    source_time_dimension_reference=input_measure_instance.source_time_dimension_reference,
                     aggregation_state=input_measure_instance.aggregation_state,
                 )
             )

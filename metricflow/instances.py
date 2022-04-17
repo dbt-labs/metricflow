@@ -4,11 +4,12 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import List, Optional, TypeVar, Generic, Sequence, Tuple
+from typing import List, TypeVar, Generic, Sequence, Tuple
 
 from pydantic.generics import GenericModel
 
 from metricflow.column_assoc import ColumnAssociation
+from metricflow.model.objects.utils import FrozenBaseModel
 from metricflow.specs import (
     MeasureSpec,
     DimensionSpec,
@@ -16,10 +17,8 @@ from metricflow.specs import (
     MetricSpec,
     InstanceSpec,
     TimeDimensionSpec,
-    TimeDimensionReference,
     InstanceSpecSet,
 )
-from metricflow.model.objects.utils import FrozenBaseModel
 
 
 class ModelReference(FrozenBaseModel):
@@ -109,7 +108,6 @@ class AggregationState(Enum):
 
 class MeasureInstance(MdoInstance[MeasureSpec], DataSourceElementInstance):  # noqa: D
     aggregation_state: AggregationState
-    source_time_dimension_reference: Optional[TimeDimensionReference] = None
 
 
 class DimensionInstance(MdoInstance[DimensionSpec], DataSourceElementInstance):  # noqa: D
