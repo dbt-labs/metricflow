@@ -10,7 +10,6 @@ from typing import List, TypeVar, Generic, Optional, Sequence, Tuple, Union
 import jinja2
 
 from metricflow.constraints.time_constraint import TimeRangeConstraint
-from metricflow.dag.mf_dag import DagNode, DisplayedProperty, MetricFlowDag, NodeId
 from metricflow.dag.id_generation import (
     DATAFLOW_NODE_AGGREGATE_MEASURES_ID_PREFIX,
     DATAFLOW_NODE_COMPUTE_METRICS_ID_PREFIX,
@@ -24,13 +23,16 @@ from metricflow.dag.id_generation import (
     DATAFLOW_NODE_WRITE_TO_RESULT_DATAFRAME_ID_PREFIX,
     DATAFLOW_NODE_COMBINE_METRICS_ID_PREFIX,
     DATAFLOW_NODE_CONSTRAIN_TIME_RANGE_ID_PREFIX,
+    DATAFLOW_NODE_SET_MEASURE_AGGREGATION_TIME,
 )
+from metricflow.dag.mf_dag import DagNode, DisplayedProperty, MetricFlowDag, NodeId
 from metricflow.dataflow.builder.partitions import (
     PartitionDimensionJoinDescription,
     PartitionTimeDimensionJoinDescription,
 )
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.dataset import DataSet
+from metricflow.model.objects.metric import CumulativeMetricWindow
 from metricflow.object_utils import pformat_big_objects
 from metricflow.specs import (
     OrderBySpec,
@@ -40,9 +42,8 @@ from metricflow.specs import (
     TimeDimensionReference,
     SpecWhereClauseConstraint,
 )
-from metricflow.visitor import Visitable, VisitorOutputT
-from metricflow.model.objects.metric import CumulativeMetricWindow
 from metricflow.time.time_granularity import TimeGranularity
+from metricflow.visitor import Visitable, VisitorOutputT
 
 # The type of data set that is flowing out of the source nodes
 SourceDataSetT = TypeVar("SourceDataSetT", bound=DataSet)
@@ -142,6 +143,12 @@ class DataflowPlanNodeVisitor(Generic[SourceDataSetT, VisitorOutputT], ABC):
 
     @abstractmethod
     def visit_join_over_time_range_node(self, node: JoinOverTimeRangeNode[SourceDataSetT]) -> VisitorOutputT:  # noqa: D
+        pass
+
+    @abstractmethod
+    def visit_plot_time_dimension_transform_node(  # noqa: D
+        self, node: PlotTimeDimensionTransformNode[SourceDataSetT]
+    ) -> VisitorOutputT:
         pass
 
 
@@ -507,6 +514,53 @@ class OrderByLimitNode(Generic[SourceDataSetT], ComputedMetricsOutput[SourceData
         return self._parent_node
 
 
+class PlotTimeDimensionTransformNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
+    """A node transforms the input data set so that it contains the plot time dimension and relevant measures.
+
+    The plot time dimension is used later to aggregate all measures in the data set.
+
+    Input: a data set containing measures along with the associated aggregation time dimension.
+
+    Output: a data set similar to the input data set, but includes the configured aggregation time dimension as the plot
+    time dimension and only contains measures that are defined to use it.
+    """
+
+    def __init__(  # noqa: D
+        self,
+        parent_node: BaseOutput[SourceDataSetT],
+        aggregation_time_dimension_reference: TimeDimensionReference,
+    ) -> None:
+        self._aggregation_time_dimension_reference = aggregation_time_dimension_reference
+        self._parent_node = parent_node
+        super().__init__(node_id=self.create_unique_id(), parent_nodes=[parent_node])
+
+    @classmethod
+    def id_prefix(cls) -> str:  # noqa: D
+        return DATAFLOW_NODE_SET_MEASURE_AGGREGATION_TIME
+
+    @property
+    def aggregation_time_dimension_reference(self) -> TimeDimensionReference:
+        """The time dimension that measures in the input should be aggregated to."""
+        return self._aggregation_time_dimension_reference
+
+    def accept(self, visitor: DataflowPlanNodeVisitor[SourceDataSetT, VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+        return visitor.visit_plot_time_dimension_transform_node(self)
+
+    @property
+    def description(self) -> str:  # noqa: D
+        return f"Plot by Time Dimension '{self.aggregation_time_dimension_reference.element_name}'" ""
+
+    @property
+    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
+        return super().displayed_properties + [
+            DisplayedProperty("aggregation_time_dimension", self.aggregation_time_dimension_reference.element_name)
+        ]
+
+    @property
+    def parent_node(self) -> BaseOutput[SourceDataSetT]:  # noqa: D
+        return self._parent_node
+
+
 class SinkNodeVisitor(Generic[SourceDataSetT, VisitorOutputT], ABC):
     """Similar to DataflowPlanNodeVisitor, but only for sink nodes."""
 
@@ -767,3 +821,8 @@ class DataflowPlan(Generic[SourceDataSetT], MetricFlowDag[SinkOutput[SourceDataS
     @property
     def sink_output_nodes(self) -> List[SinkOutput[SourceDataSetT]]:  # noqa: D
         return self._sink_output_nodes
+
+    @property
+    def sink_output_node(self) -> SinkOutput[SourceDataSetT]:  # noqa: D
+        assert len(self._sink_output_nodes) == 1
+        return self._sink_output_nodes[0]

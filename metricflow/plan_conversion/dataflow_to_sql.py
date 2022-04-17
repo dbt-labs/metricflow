@@ -26,7 +26,9 @@ from metricflow.dataflow.dataflow_plan import (
     ConstrainTimeRangeNode,
     WriteToResultTableNode,
     JoinOverTimeRangeNode,
+    PlotTimeDimensionTransformNode,
 )
+from metricflow.dataset.dataset import DataSet
 from metricflow.instances import (
     AggregationState,
     InstanceSet,
@@ -1315,3 +1317,88 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             sql_select_node = optimizer.optimize(sql_select_node)
 
         return SqlQueryPlan(plan_id=sql_query_plan_id, render_node=sql_select_node)
+
+    def visit_plot_time_dimension_transform_node(  # noqa: D
+        self, node: PlotTimeDimensionTransformNode[SqlDataSetT]
+    ) -> SqlDataSet:
+        input_data_set: SqlDataSet = node.parent_node.accept(self)
+
+        # Find which measures have an aggregation time dimension that is the same as the one specified in the node.
+        # Only these measures will be in the output data set.
+        output_measure_instances = []
+        for measure_instance in input_data_set.instance_set.measure_instances:
+            measure = self._data_source_semantics.get_measure(measure_instance.spec.as_reference)
+            if measure.agg_time_dimension == node.aggregation_time_dimension_reference:
+                output_measure_instances.append(measure_instance)
+
+        if len(output_measure_instances) == 0:
+            raise RuntimeError(
+                f"No measure instances in the input source match the aggregation time dimension "
+                f"{node.aggregation_time_dimension_reference}. Check if the dataflow plan was constructed correctly."
+            )
+
+        # Find time dimension instances that refer to the same dimension as the one specified in the node.
+        matching_time_dimension_instances = []
+        for time_dimension_instance in input_data_set.instance_set.time_dimension_instances:
+            # The specification for the time dimension to use for aggregation is the local one.
+            if (
+                len(time_dimension_instance.spec.identifier_links) == 0
+                and time_dimension_instance.spec.reference == node.aggregation_time_dimension_reference
+            ):
+                matching_time_dimension_instances.append(time_dimension_instance)
+
+        output_time_dimension_instances: List[TimeDimensionInstance] = []
+        output_time_dimension_instances.extend(input_data_set.instance_set.time_dimension_instances)
+        output_column_to_input_column: OrderedDict[str, str] = OrderedDict()
+
+        # For those matching time dimension instances, create the analog plot time dimension instances for the output.
+        for matching_time_dimension_instance in matching_time_dimension_instances:
+            plot_time_dimension_spec = DataSet.plot_time_dimension_spec(
+                matching_time_dimension_instance.spec.time_granularity
+            )
+            plot_time_dimension_column_association = self._column_association_resolver.resolve_time_dimension_spec(
+                plot_time_dimension_spec
+            )
+            output_time_dimension_instances.append(
+                TimeDimensionInstance(
+                    defined_from=matching_time_dimension_instance.defined_from,
+                    associated_columns=(
+                        self._column_association_resolver.resolve_time_dimension_spec(plot_time_dimension_spec),
+                    ),
+                    spec=plot_time_dimension_spec,
+                )
+            )
+            output_column_to_input_column[
+                plot_time_dimension_column_association.column_name
+            ] = matching_time_dimension_instance.associated_column.column_name
+        output_instance_set = InstanceSet(
+            measure_instances=tuple(output_measure_instances),
+            dimension_instances=input_data_set.instance_set.dimension_instances,
+            time_dimension_instances=tuple(output_time_dimension_instances),
+            identifier_instances=input_data_set.instance_set.identifier_instances,
+            metric_instances=input_data_set.instance_set.metric_instances,
+        )
+        output_instance_set = ChangeAssociatedColumns(self._column_association_resolver).transform(output_instance_set)
+
+        from_data_set_alias = self._next_unique_table_alias()
+
+        return SqlDataSet(
+            instance_set=output_instance_set,
+            sql_select_node=SqlSelectStatementNode(
+                description=node.description,
+                # This creates select expressions for all columns referenced in the instance set.
+                select_columns=CreateSelectColumnsForInstances(
+                    column_resolver=self._column_association_resolver,
+                    table_alias=from_data_set_alias,
+                    output_to_input_column_mapping=output_column_to_input_column,
+                )
+                .transform(output_instance_set)
+                .as_tuple(),
+                from_source=input_data_set.sql_select_node,
+                from_source_alias=from_data_set_alias,
+                joins_descs=(),
+                group_bys=(),
+                where=None,
+                order_bys=(),
+            ),
+        )

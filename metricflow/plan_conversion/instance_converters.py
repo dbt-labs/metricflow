@@ -18,6 +18,7 @@ from metricflow.instances import (
     InstanceSetTransform,
     TimeDimensionInstance,
 )
+from metricflow.model.semantics.semantic_containers import DataSourceSemantics
 from metricflow.object_utils import assert_exactly_one_arg_set
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.specs import (
@@ -36,7 +37,6 @@ from metricflow.sql.sql_exprs import (
     SqlFunctionExpression,
 )
 from metricflow.sql.sql_plan import SqlSelectColumn
-from metricflow.model.semantics.semantic_containers import DataSourceSemantics
 
 logger = logging.getLogger(__name__)
 
@@ -48,9 +48,22 @@ class CreateSelectColumnsForInstances(InstanceSetTransform[SelectColumnSet]):
     come from the given table alias.
     """
 
-    def __init__(self, table_alias: str, column_resolver: ColumnAssociationResolver) -> None:  # noqa: D
+    def __init__(
+        self,
+        table_alias: str,
+        column_resolver: ColumnAssociationResolver,
+        output_to_input_column_mapping: Optional[OrderedDict[str, str]] = None,
+    ) -> None:  # noqa: D
+        """Constructor.
+
+        Args:
+            table_alias: the table alias to select columns from
+            column_resolver: resolver to name columns.
+            output_to_input_column_mapping: if specified, use these columns in the input for the given output columns.
+        """
         self._table_alias = table_alias
         self._column_resolver = column_resolver
+        self._output_to_input_column_mapping = output_to_input_column_mapping or OrderedDict()
 
     def transform(self, instance_set: InstanceSet) -> SelectColumnSet:  # noqa: D
         metric_cols = list(
@@ -112,13 +125,20 @@ class CreateSelectColumnsForInstances(InstanceSetTransform[SelectColumnSet]):
             f"{expected_column_associations} -- {existing_column_associations}"
         )
 
-        return [
-            SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(SqlColumnReference(self._table_alias, mapped_names[0])),
-                column_alias=expected_name,
+        select_columns = []
+        for expected_name, mapped_cols in column_matches.items():
+            input_column_name = mapped_cols[0]
+            output_column_name = expected_name
+
+            if output_column_name in self._output_to_input_column_mapping:
+                input_column_name = self._output_to_input_column_mapping[output_column_name]
+            select_columns.append(
+                SqlSelectColumn(
+                    expr=SqlColumnReferenceExpression(SqlColumnReference(self._table_alias, input_column_name)),
+                    column_alias=output_column_name,
+                )
             )
-            for expected_name, mapped_names in column_matches.items()
-        ]
+        return select_columns
 
 
 class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances):
@@ -148,7 +168,7 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
         new_column_name_for_aggregated_measure = new_column_association_for_aggregated_measure.column_name
 
         # Figure out the aggregation function for the measure.
-        measure = self._data_source_semantics.get_measure(measure_instance.spec)
+        measure = self._data_source_semantics.get_measure(measure_instance.spec.as_reference)
         aggregation_type = measure.agg
 
         expression_to_get_measure = SqlColumnReferenceExpression(
