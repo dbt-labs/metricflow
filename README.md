@@ -24,23 +24,6 @@ MetricFlow itself acts as a semantic layer, compiling the semantic information d
 
 ### Install MetricFlow
 
-If you do not have postgres on your machine, first install Postgres:
-- Postgres provides [pre-built packages for download and installation](https://www.postgresql.org/download/)
-- Mac users might prefer to use Homebrew: `brew install postgresql`
-
-If you would like to visualize metric dataflow plans via CLI, install Graphviz:
-- Graphviz provides [pre-built packages for download and installation](https://www.graphviz.org/download/)
-- Mac users might prefer to use Homebrew: `brew install graphviz`
-
-The visualizations are in an early state of development, but look similar to:
-
-<p align="center">
-<img src="assets/example_plan.svg" height="500"/>
-<br /><br />
-</p>
-
-Then, proceed with the regular installation as follows:
-
 MetricFlow can be installed from PyPi for use as a Python library with the following command:
 
 ```
@@ -60,6 +43,23 @@ mf tutorial
 ```
 
 To get up and running with your own metrics, you should rely on MetricFlow’s documentation available at [MetricFlow docs](https://docs.transform.co/docs/metricflow/guides/introduction).
+
+
+If you would like to run MetricFlow on a local dataset (rather than on a cloud data warehouse) and Postgres is not installed, install Postgres:
+- Postgres provides [pre-built packages for download and installation](https://www.postgresql.org/download/)
+- Mac users might prefer to use Homebrew: `brew install postgresql`
+
+If you would like to visualize metric dataflow plans via CLI, install Graphviz:
+- Graphviz provides [pre-built packages for download and installation](https://www.graphviz.org/download/)
+- Mac users might prefer to use Homebrew: `brew install graphviz`
+
+The visualizations are in an early state of development, but look similar to:
+
+<p align="center">
+<img src="assets/example_plan.svg" height="500"/>
+<br /><br />
+</p>
+
 
 ### Tutorial
 
