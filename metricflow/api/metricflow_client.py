@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Dict, List, Optional, Tuple
 
 from metricflow.configuration.config_handler import ConfigHandler
@@ -12,6 +14,7 @@ from metricflow.engine.metricflow_engine import (
 from metricflow.engine.models import Dimension, Materialization, Metric
 from metricflow.engine.utils import build_user_configured_model_from_config, convert_to_datetime
 from metricflow.model.model_validator import ModelValidator
+from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.validations.validator_helpers import ValidationIssueType
 from metricflow.protocols.sql_client import SqlClient
@@ -22,18 +25,37 @@ from metricflow.sql_clients.sql_utils import make_sql_client_from_config
 class MetricFlowClient:
     """MetricFlow Python Interface."""
 
+    @staticmethod
+    def from_config() -> MetricFlowClient:
+        """Builds a MetricFlowClient via config yaml file."""
+        handler = ConfigHandler()
+        sql_client = make_sql_client_from_config(handler)
+        user_configured_model = build_user_configured_model_from_config(handler)
+        schema = handler.get_value(CONFIG_DWH_SCHEMA)
+
+        return MetricFlowClient(
+            sql_client=sql_client,
+            user_configured_model=user_configured_model,
+            system_schema=schema,
+        )
+
     def __init__(
         self,
-        sql_client: Optional[SqlClient] = None,
-        semantic_model: Optional[SemanticModel] = None,
-        system_schema: Optional[str] = None,
+        sql_client: SqlClient,
+        user_configured_model: UserConfiguredModel,
+        system_schema: str,
     ):
-        """If parameters not passed, build via config."""
-        handler = ConfigHandler()
-        self.sql_client = sql_client or make_sql_client_from_config(handler)
-        self.system_schema = system_schema or handler.get_value(CONFIG_DWH_SCHEMA)
-        self.semantic_model = semantic_model or SemanticModel(build_user_configured_model_from_config(handler))
-        self.user_configured_model = self.semantic_model.user_configured_model
+        """Initializer for MetricFlowClient.
+
+        Args:
+            sql_client: Client that is connected to your data warehouse.
+            user_configured_model: Model containing all the information about your metric configs.
+            system_schema: schema of where MF system tables are stored.
+        """
+        self.sql_client = sql_client
+        self.user_configured_model = user_configured_model
+        self.system_schema = system_schema
+        self.semantic_model = SemanticModel(self.user_configured_model)
         self.engine = MetricFlowEngine(
             semantic_model=self.semantic_model,
             sql_client=self.sql_client,
