@@ -37,6 +37,7 @@ from metricflow.time.time_source import TimeSource
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.errors.errors import ExecutionException, MaterializationNotFoundError
 from metricflow.sql_clients.sql_utils import make_sql_client_from_config
+from metricflow.sql_clients.common_client import not_empty
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
 
@@ -255,7 +256,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         """Initialize MetricFlowEngine via yaml config file."""
         sql_client = make_sql_client_from_config(handler)
         semantic_model = SemanticModel(build_user_configured_model_from_config(handler))
-        system_schema = handler.get_value(CONFIG_DWH_SCHEMA)
+        system_schema = not_empty(handler.get_value(CONFIG_DWH_SCHEMA), CONFIG_DWH_SCHEMA, handler.url)
         return MetricFlowEngine(
             semantic_model=semantic_model,
             sql_client=sql_client,

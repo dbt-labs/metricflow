@@ -15,23 +15,23 @@ class TelemetryHandler(ABC):
     """Base class to record telemetry to some destination."""
 
     @abstractmethod
-    def _write_log(self, session_id: str, payload: PayloadType) -> None:
+    def _write_log(self, client_id: str, payload: PayloadType) -> None:
         """Subclasses should implement this to log a serialized version of the payload."""
         pass
 
     def log(
         self,
-        session_id: str,
+        client_id: str,
         function_start_event: Optional[FunctionStartEvent] = None,
         function_end_event: Optional[FunctionEndEvent] = None,
     ) -> bool:
         """Log an event to telemetry."""
         payload = TelemetryPayload(
-            session_id=session_id,
+            client_id=client_id,
             function_start_events=(function_start_event,) if function_start_event else (),
             function_end_events=(function_end_event,) if function_end_event else (),
         )
-        self._write_log(session_id, payload.dict())
+        self._write_log(client_id, payload.dict())
         return True
 
 
@@ -53,7 +53,7 @@ class RudderstackTelemetryHandler(TelemetryHandler):
             write_key=write_key, host=data_plane_url, debug=False, on_error=None, send=True, sync_mode=False
         )
 
-    def _write_log(self, session_id: str, payload: PayloadType) -> None:  # noqa: D
+    def _write_log(self, client_id: str, payload: PayloadType) -> None:  # noqa: D
         """Write log to rudderstack.
 
         Added context to handle the error, but seems odd.
@@ -65,7 +65,7 @@ class RudderstackTelemetryHandler(TelemetryHandler):
         """
         context: PayloadType = {"traits": {}}
         self._rudderstack_client.track(
-            anonymous_id=session_id,
+            anonymous_id=client_id,
             event=RudderstackTelemetryHandler.RUDDERSTACK_EVENT_NAME,
             timestamp=datetime.now(),
             properties=payload,
@@ -79,7 +79,7 @@ class ToMemoryTelemetryHandler(TelemetryHandler):
     def __init__(self) -> None:  # noqa: D
         self._payloads: List[TelemetryPayload] = []
 
-    def _write_log(self, session_id: str, payload: PayloadType) -> None:  # noqa: D
+    def _write_log(self, client_id: str, payload: PayloadType) -> None:  # noqa: D
         pass
 
     @property
@@ -88,13 +88,13 @@ class ToMemoryTelemetryHandler(TelemetryHandler):
 
     def log(
         self,
-        session_id: str,
+        client_id: str,
         function_start_event: Optional[FunctionStartEvent] = None,
         function_end_event: Optional[FunctionEndEvent] = None,
     ) -> bool:
         """Log an event to telemetry"""
         payload = TelemetryPayload(
-            session_id=session_id,
+            client_id=client_id,
             function_start_events=(function_start_event,) if function_start_event else (),
             function_end_events=(function_end_event,) if function_end_event else (),
         )

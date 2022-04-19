@@ -19,6 +19,7 @@ from metricflow.configuration.constants import (
     CONFIG_DWH_SCHEMA,
     CONFIG_DWH_USER,
     CONFIG_DWH_WAREHOUSE,
+    CONFIG_EMAIL,
     CONFIG_MODEL_PATH,
 )
 from metricflow.model.validations.validator_helpers import ValidationIssueLevel
@@ -27,6 +28,7 @@ logger = logging.getLogger(__name__)
 
 # MetricFlow config keys
 MF_CONFIG_KEYS = [
+    ConfigKey(key=CONFIG_EMAIL, comment="Optional"),
     ConfigKey(
         key=CONFIG_MODEL_PATH,
         value=f"{pathlib.Path.home()}/.metricflow/sample_models",

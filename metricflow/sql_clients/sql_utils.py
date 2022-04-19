@@ -74,8 +74,8 @@ def make_sql_client(url: str, password: str) -> SqlClient:  # noqa: D
 def make_sql_client_from_config(handler: YamlFileHandler) -> SqlClient:
     """Construct a SqlClient given a yaml file config."""
 
-    dialect = handler.get_value(CONFIG_DWH_DIALECT).upper()
-    url = f"file://{handler.yaml_file_path}"
+    url = handler.url
+    dialect = not_empty(handler.get_value(CONFIG_DWH_DIALECT), CONFIG_DWH_DIALECT, url).upper()
     if dialect == SupportedSqlEngine.BIGQUERY.name:
         path_to_creds = not_empty(handler.get_value(CONFIG_DWH_PASSWORD), CONFIG_DWH_PASSWORD, url)
         if not pathlib.Path(path_to_creds).exists:
@@ -86,7 +86,7 @@ def make_sql_client_from_config(handler: YamlFileHandler) -> SqlClient:
     elif dialect == SupportedSqlEngine.SNOWFLAKE.name:
         host = not_empty(handler.get_value(CONFIG_DWH_HOST), CONFIG_DWH_HOST, url)
         user = not_empty(handler.get_value(CONFIG_DWH_USER), CONFIG_DWH_USER, url)
-        password = handler.get_value(CONFIG_DWH_PASSWORD)
+        password = not_empty(handler.get_value(CONFIG_DWH_PASSWORD), CONFIG_DWH_PASSWORD, url)
         database = not_empty(handler.get_value(CONFIG_DWH_DB), CONFIG_DWH_DB, url)
         warehouse = not_empty(handler.get_value(CONFIG_DWH_WAREHOUSE), CONFIG_DWH_WAREHOUSE, url)
         return SnowflakeSqlClient(
@@ -99,9 +99,9 @@ def make_sql_client_from_config(handler: YamlFileHandler) -> SqlClient:
         )
     elif dialect == SupportedSqlEngine.REDSHIFT.name:
         host = not_empty(handler.get_value(CONFIG_DWH_HOST), CONFIG_DWH_HOST, url)
-        port = int(handler.get_value(CONFIG_DWH_PORT))
+        port = int(not_empty(handler.get_value(CONFIG_DWH_PORT), CONFIG_DWH_PORT, url))
         user = not_empty(handler.get_value(CONFIG_DWH_USER), CONFIG_DWH_USER, url)
-        password = handler.get_value(CONFIG_DWH_PASSWORD)
+        password = not_empty(handler.get_value(CONFIG_DWH_PASSWORD), CONFIG_DWH_PASSWORD, url)
         database = not_empty(handler.get_value(CONFIG_DWH_DB), CONFIG_DWH_DB, url)
         return RedshiftSqlClient(
             host=host,
