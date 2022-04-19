@@ -24,11 +24,11 @@ from metricflow.sql_clients.sql_utils import make_sql_client_from_config
 
 
 class MetricFlowClient:
-    """MetricFlow Python Interface."""
+    """MetricFlow Python client for running basic queries and other standard commands."""
 
     @staticmethod
     def from_config() -> MetricFlowClient:
-        """Builds a MetricFlowClient via config yaml file."""
+        """Builds a MetricFlowClient via config yaml file stored in the designated config location."""
         handler = ConfigHandler()
         sql_client = make_sql_client_from_config(handler)
         user_configured_model = build_user_configured_model_from_config(handler)
