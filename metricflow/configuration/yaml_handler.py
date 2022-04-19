@@ -18,24 +18,10 @@ class YamlFileHandler:
                 content = yaml.load(f, Loader=yaml.SafeLoader) or {}
         return content
 
-    def get_value(self, key: str) -> str:
+    def get_value(self, key: str) -> Optional[str]:
         """Attempts to get a corresponding value from the yaml file. Throw an error if not exists or None."""
         content = self._load_yaml()
-
-        if key not in content:
-            raise KeyError(f"Key '{key}' is missing in the yaml file '{self.yaml_file_path}'")
-
-        value = content[key]
-        if value is None:
-            raise ValueError(f"Value for key '{key}' cannot be None in the yaml file '{self.yaml_file_path}")
-        return value
-
-    def get_value_safe(self, key: str) -> Optional[str]:
-        """Attempts to get a value from the yaml file, but return None instead of throwing an exception."""
-        try:
-            return self.get_value(key)
-        except Exception:
-            return None
+        return content.get(key)
 
     def set_value(self, key: str, value: str) -> None:
         """Sets a value to a given key in yaml file."""
@@ -52,3 +38,8 @@ class YamlFileHandler:
         del content[key]
         with open(self.yaml_file_path, "w") as f:
             yaml.dump(content, f)
+
+    @property
+    def url(self) -> str:
+        """Returns the file url of this handler."""
+        return f"file:/{self.yaml_file_path}"

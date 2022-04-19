@@ -36,7 +36,7 @@ class TelemetryReporter:
         """If fully_anonymous is set, use a client_id that is not unique."""
         self._report_levels_higher_or_equal_to = report_levels_higher_or_equal_to
         self._fully_anonymous = fully_anonymous
-        self._email = os.getenv(TelemetryReporter.ENV_EMAIL_OVERRIDE) or ConfigHandler().get_value_safe(CONFIG_EMAIL)
+        self._email = os.getenv(TelemetryReporter.ENV_EMAIL_OVERRIDE) or ConfigHandler().get_value(CONFIG_EMAIL)
 
         if fully_anonymous:
             self._client_id = TelemetryReporter.FULLY_ANONYMOUS_CLIENT_ID
