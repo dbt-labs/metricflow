@@ -13,7 +13,6 @@ from metricflow.specs import (
     MeasureReference,
     DimensionReference,
     IdentifierReference,
-    IdentifierSpec,
     DimensionSpec,
     LinklessIdentifierSpec,
 )
@@ -112,8 +111,8 @@ class DimensionAndIdentifierNameValidator:
 
     def _is_identifier_valid_for_measure(self, measure_reference: MeasureReference, identifier_name: str) -> bool:
         assert measure_reference in self._measures_to_identifiers
-        identifier_spec = IdentifierSpec.parse(identifier_name)
-        return identifier_spec in self._measures_to_identifiers[measure_reference]
+        identifier_ref = IdentifierReference.parse(identifier_name)
+        return identifier_ref in self._measures_to_identifiers[measure_reference]
 
     def is_dimension_valid_for_measure(self, measure_reference: MeasureReference, dimension_name: str) -> bool:
         """Return true iff the given measure and dimension could be queried together."""
