@@ -1,0 +1,20 @@
+data_source:
+  name: salesforce_users
+  owners:
+    - support@transformdata.io
+  sql_table: salesforce.user ### Update to your users schema.table
+  mutability:
+    type: immutable
+  identifiers:
+    - name: owner
+      type: primary
+      expr: id
+  dimensions:
+    - name: ds
+      type: time
+      type_params:
+        is_primary: True
+        time_granularity: day
+      expr: created_date
+    - name: full_name
+      type: categorical

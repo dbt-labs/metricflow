@@ -1,0 +1,22 @@
+data_source:
+  name: salesforce_account
+  owners:
+    - support@transformdata.io
+  sql_table: SALESFORCE.account ### Update to your account schema.table
+  mutability:
+    type: immutable
+  identifiers:
+    - name: account
+      type: primary
+      expr: id
+    - name: owner
+      type: foreign
+  dimensions:
+    - name: is_deleted
+      type: categorical
+    - name: name
+      type: categorical
+    - name: type
+      type: categorical
+    - name: annual_revenue
+      type: categorical
