@@ -19,6 +19,7 @@ from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.validations.validator_helpers import ValidationIssueType
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
+from metricflow.sql_clients.common_client import not_empty
 from metricflow.sql_clients.sql_utils import make_sql_client_from_config
 
 
@@ -31,7 +32,7 @@ class MetricFlowClient:
         handler = ConfigHandler()
         sql_client = make_sql_client_from_config(handler)
         user_configured_model = build_user_configured_model_from_config(handler)
-        schema = handler.get_value(CONFIG_DWH_SCHEMA)
+        schema = not_empty(handler.get_value(CONFIG_DWH_SCHEMA), CONFIG_DWH_SCHEMA, handler.url)
 
         return MetricFlowClient(
             sql_client=sql_client,
