@@ -12,6 +12,7 @@ from metricflow.model.validations.data_sources import (
 from metricflow.model.validations.dimension_const import DimensionConsistencyRule
 from metricflow.model.validations.element_const import ElementConsistencyRule
 from metricflow.model.validations.identifiers import IdentifierConfigRule, OnePrimaryIdentifierPerDataSourceRule
+from metricflow.model.validations.materializations import ValidMaterializationRule
 from metricflow.model.validations.metrics import MetricMeasuresRule, CumulativeMetricRule
 from metricflow.model.validations.non_empty import NonEmptyRule
 from metricflow.model.validations.unique_valid_name import UniqueAndValidNameRule
@@ -40,6 +41,7 @@ class ModelValidator:
         CumulativeMetricRule(),
         NonEmptyRule(),
         UniqueAndValidNameRule(),
+        ValidMaterializationRule(),
     ]
 
     @staticmethod
@@ -61,7 +63,7 @@ class ModelValidator:
         return ModelBuildResult(model=model_copy, issues=tuple(issues))
 
     @staticmethod
-    def checked_validations(model: UserConfiguredModel) -> UserConfiguredModel:
+    def checked_validations(model: UserConfiguredModel) -> UserConfiguredModel:  # chTODO: remember checked_build
         """Similar to validate(), but throws an exception if validation fails."""
         model_copy = copy.deepcopy(model)
         build_result = ModelValidator.validate_model(model_copy)
