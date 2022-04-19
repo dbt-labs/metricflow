@@ -1,3 +1,8 @@
+import datetime as dt
+
+from dateutil.parser import parse
+from typing import Optional
+
 from metricflow.configuration.constants import CONFIG_MODEL_PATH
 from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.errors.errors import ModelCreationException
@@ -15,3 +20,14 @@ def build_user_configured_model_from_config(handler: YamlFileHandler) -> UserCon
         return model
     except Exception as e:
         raise ModelCreationException from e
+
+
+def convert_to_datetime(datetime_str: Optional[str]) -> Optional[dt.datetime]:
+    """Callback to convert string to datetime given as an iso8601 timestamp."""
+    if datetime_str is None:
+        return None
+
+    try:
+        return parse(datetime_str)
+    except Exception:
+        raise ValueError(f"'{datetime_str}' is not a valid iso8601 timestamp")
