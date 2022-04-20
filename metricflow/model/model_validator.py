@@ -4,7 +4,6 @@ from typing import List
 
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.parsing.dir_to_model import ModelBuildResult
-from metricflow.model.validations.common_identifiers import CommonIdentifiersRule
 from metricflow.model.validations.data_sources import (
     DataSourceMeasuresUniqueRule,
     DataSourceTimeDimensionWarningsRule,
@@ -30,7 +29,6 @@ class ModelValidator:
     """A Validator that acts on UserConfiguredModel"""
 
     VALIDATION_RULES: List[ModelValidationRule] = [
-        CommonIdentifiersRule(),
         DataSourceMeasuresUniqueRule(),
         DataSourceTimeDimensionWarningsRule(),
         DimensionConsistencyRule(),
