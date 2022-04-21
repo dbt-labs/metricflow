@@ -10,7 +10,11 @@ from metricflow.model.validations.data_sources import (
 )
 from metricflow.model.validations.dimension_const import DimensionConsistencyRule
 from metricflow.model.validations.element_const import ElementConsistencyRule
-from metricflow.model.validations.identifiers import IdentifierConfigRule, OnePrimaryIdentifierPerDataSourceRule
+from metricflow.model.validations.identifiers import (
+    IdentifierConfigRule,
+    OnePrimaryIdentifierPerDataSourceRule,
+    IdentifierConsistencyRule,
+)
 from metricflow.model.validations.materializations import ValidMaterializationRule
 from metricflow.model.validations.metrics import MetricMeasuresRule, CumulativeMetricRule
 from metricflow.model.validations.non_empty import NonEmptyRule
@@ -34,6 +38,7 @@ class ModelValidator:
         DimensionConsistencyRule(),
         ElementConsistencyRule(),
         IdentifierConfigRule(),
+        IdentifierConsistencyRule(),
         OnePrimaryIdentifierPerDataSourceRule(),
         MetricMeasuresRule(),
         CumulativeMetricRule(),
