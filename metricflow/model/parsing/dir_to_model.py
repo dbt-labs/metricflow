@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 class ModelBuildResult:  # noqa: D
     model: Optional[UserConfiguredModel] = None
     # Issues found in the model.
-    issues: Optional[Tuple[ValidationIssueType, ...]] = None
+    issues: Tuple[ValidationIssueType, ...] = tuple()
 
 
 def parse_directory_of_yaml_files_to_model(
