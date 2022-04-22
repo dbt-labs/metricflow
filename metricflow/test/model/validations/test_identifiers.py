@@ -69,7 +69,6 @@ def test_invalid_composite_identifiers() -> None:  # noqa:D
                                 type=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
                                     is_primary=True,
-                                    time_format="YYYY-MM-DD",
                                     time_granularity=TimeGranularity.DAY,
                                 ),
                             )
@@ -119,7 +118,6 @@ def test_composite_identifiers_nonexistent_ref() -> None:  # noqa:D
                                 type=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
                                     is_primary=True,
-                                    time_format="YYYY-MM-DD",
                                     time_granularity=TimeGranularity.DAY,
                                 ),
                             )
@@ -170,7 +168,6 @@ def test_composite_identifiers_ref_and_name() -> None:  # noqa:D
                                 type=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
                                     is_primary=True,
-                                    time_format="YYYY-MM-DD",
                                     time_granularity=TimeGranularity.DAY,
                                 ),
                             )
