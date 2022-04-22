@@ -2,7 +2,7 @@ import logging
 from collections import OrderedDict
 from dataclasses import dataclass
 from datetime import date
-from typing import List, MutableSet, Tuple, Sequence
+from typing import List, MutableSet, Tuple, Sequence, Dict
 
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.elements.identifier import Identifier, IdentifierType, CompositeSubIdentifier
@@ -166,7 +166,7 @@ class IdentifierConsistencyRule(ModelValidationRule):
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
         issues: List[ValidationIssueType] = []
         # The expected sub identifiers that an identifier has.
-        identifier_to_sub_identifiers: OrderedDict[str, Tuple[str, ...]] = OrderedDict()
+        identifier_to_sub_identifiers: OrderedDict[str, Dict[str, Tuple[str, ...]]] = OrderedDict()
         # The identifiers that have different sub-identifiers in different data sources.
         identifiers_with_inconsistent_sub_identifiers = []
 
@@ -179,14 +179,17 @@ class IdentifierConsistencyRule(ModelValidationRule):
 
                 identifier_reference = sub_identifier_context.identifier_reference
                 if identifier_reference.element_name not in identifier_to_sub_identifiers:
-                    identifier_to_sub_identifiers[
-                        identifier_reference.element_name
-                    ] = sub_identifier_context.sub_identifier_names
+                    identifier_to_sub_identifiers[identifier_reference.element_name] = {
+                        data_source.name: sub_identifier_context.sub_identifier_names
+                    }
 
                 elif (
-                    identifier_to_sub_identifiers[identifier_reference.element_name]
-                    != sub_identifier_context.sub_identifier_names
+                    sub_identifier_context.sub_identifier_names
+                    not in identifier_to_sub_identifiers[identifier_reference.element_name].values()
                 ):
+                    identifier_to_sub_identifiers[identifier_reference.element_name][
+                        data_source.name
+                    ] = sub_identifier_context.sub_identifier_names
                     identifiers_with_inconsistent_sub_identifiers.append(identifier_reference)
 
         for identifier_reference in identifiers_with_inconsistent_sub_identifiers:
@@ -200,8 +203,9 @@ class IdentifierConsistencyRule(ModelValidationRule):
                             ),
                             message=(
                                 f"Identifier '{identifier_reference.element_name}' does not have consistent sub-identifiers "
-                                f"throughout the model. In data source '{identifier_context.data_source_name}', "
-                                f"it has sub-identifiers {list(identifier_context.sub_identifier_names)}."
+                                f"throughout the model: {identifier_to_sub_identifiers[identifier_reference.element_name]}. "
+                                f"Specifically, in data source '{identifier_context.data_source_name}', "
+                                f"it has conflicting sub-identifiers {list(identifier_context.sub_identifier_names)}."
                             ),
                         )
                     )
