@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.93.0] - 2022-04-27
+
+### Added
+- Simple Developer API for interacting with MetricFlow engine based on a local config file for Warehouse credentials (@williamdee)
+- Config validation for Materialization structs (@lebca)
+- Config templates for useful metrics sourced from Salesforce data, for use by end users of MetricFlow (@JStein77)
+
+
 ## [0.92.1] - 2022-04-13
 
 ### Added

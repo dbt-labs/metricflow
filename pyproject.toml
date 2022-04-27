@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "metricflow"
-version = "0.92.1"
+version = "0.93.0"
 description = ""
 authors = ["Transform <hello@transformdata.io>"]
 
