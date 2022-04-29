@@ -4,6 +4,7 @@ import re
 
 from typing import Callable
 
+from metricflow.object_utils import flatten_nested_sequence
 from metricflow.model.model_validator import ModelValidator
 from metricflow.model.objects.data_source import DataSource, Mutability, MutabilityType
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
@@ -196,3 +197,42 @@ def test_composite_identifiers_ref_and_name() -> None:  # noqa:D
                 materializations=[],
             )
         )
+
+
+def test_mismatched_identifier(simple_model__pre_transforms: UserConfiguredModel) -> None:  # noqa: D
+    """Testing two mismatched identifiers in two data sources
+
+    Add two identifiers with mismatched sub-identifiers to two data sources in the model
+    Ensure that our composite identifiers rule catches this incompatibility
+    """
+    model = copy.deepcopy(simple_model__pre_transforms)
+
+    bookings_source, _ = find_data_source_with(
+        model=model,
+        function=lambda data_source: data_source.name == "bookings_source",
+    )
+    listings_latest, _ = find_data_source_with(
+        model=model,
+        function=lambda data_source: data_source.name == "listings_latest",
+    )
+
+    identifier_bookings = Identifier(
+        name=IdentifierReference(element_name="composite_identifier"),
+        type=IdentifierType.FOREIGN,
+        identifiers=[CompositeSubIdentifier(ref="sub_identifier1")],
+    )
+    bookings_source.identifiers = flatten_nested_sequence([bookings_source.identifiers, [identifier_bookings]])
+
+    identifier_listings = Identifier(
+        name=IdentifierReference(element_name="composite_identifier"),
+        type=IdentifierType.FOREIGN,
+        identifiers=[CompositeSubIdentifier(ref="sub_identifier2")],
+    )
+    listings_latest.identifiers = flatten_nested_sequence([listings_latest.identifiers, [identifier_listings]])
+
+    build = ModelValidator.validate_model(model)
+
+    expected_error_message_fragment = "does not have consistent sub-identifiers"
+    error_count = len([issue for issue in build.issues if re.search(expected_error_message_fragment, issue.message)])
+
+    assert error_count == 1
