@@ -235,4 +235,4 @@ def test_mismatched_identifier(simple_model__pre_transforms: UserConfiguredModel
     expected_error_message_fragment = "does not have consistent sub-identifiers"
     error_count = len([issue for issue in build.issues if re.search(expected_error_message_fragment, issue.message)])
 
-    assert error_count == 2
+    assert error_count == 1
