@@ -86,6 +86,16 @@ metric:
       - bookers
 ---
 metric:
+  name: "booking_payments"
+  description: "Booking payments."
+  owners:
+    - support@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+      - booking_payments
+---
+metric:
   name: "views"
   description: "views"
   owners:
