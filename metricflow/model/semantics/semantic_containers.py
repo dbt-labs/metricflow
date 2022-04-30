@@ -158,6 +158,8 @@ class DataSourceSemantics:
 
         self._configured_data_source_container = configured_data_source_container
 
+        self._measure_to_aggregation_time_dimension: Dict[MeasureReference, TimeDimensionReference] = {}
+
         # Add semantic tracking for data sources from configured_data_source_container
         for data_source in self._configured_data_source_container.values():
             assert isinstance(data_source, DataSource)
@@ -170,7 +172,7 @@ class DataSourceSemantics:
     def add_configured_data_source(self, data_source: DataSource) -> None:
         """Dont use this unless you mean it (ie in tests). The configured data sources are supposed to be static"""
         self._configured_data_source_container._put(data_source)
-        self.add_data_source(data_source)
+        self._add_data_source(data_source)
 
     def get_linkable_element_references(self) -> List[LinkableElementReference]:  # noqa: D
         return list(self._linkable_reference_index.keys())
@@ -284,7 +286,7 @@ class DataSourceSemantics:
     def get_by_reference(self, data_source_reference: DataSourceReference) -> Optional[DataSource]:  # noqa: D
         return self.get(data_source_reference.data_source_name)
 
-    def add_data_source(
+    def _add_data_source(
         self,
         data_source: DataSource,
         fail_on_error: bool = True,
@@ -323,26 +325,27 @@ class DataSourceSemantics:
 
         self._data_source_names.add(data_source.name)
 
-        for elem in data_source.elements:
-            if elem.name not in self._element_types:
-                self._element_types[elem.name] = type(elem)
+        for element in data_source.elements:
+            if element.name not in self._element_types:
+                self._element_types[element.name] = type(element)
 
-        for meas in data_source.measures:
-            self._measure_aggs[meas.name] = meas.agg
-            self._measure_index[meas.name].append(data_source)
-        for dim in data_source.dimensions:
-            self._linkable_reference_index[dim.name].append(data_source)
-            self._dimension_index[dim.name].append(data_source)
-        for ident in data_source.identifiers:
-            self._identifier_ref_to_entity[ident.name] = ident.entity
-            self._entity_index[ident.entity].append(data_source)
-            self._linkable_reference_index[ident.name].append(data_source)
+        for measure in data_source.measures:
+            self._measure_aggs[measure.name] = measure.agg
+            self._measure_index[measure.name].append(data_source)
+            self._measure_to_aggregation_time_dimension[measure.name] = measure.checked_agg_time_dimension
+        for dimension in data_source.dimensions:
+            self._linkable_reference_index[dimension.name].append(data_source)
+            self._dimension_index[dimension.name].append(data_source)
+        for identifier in data_source.identifiers:
+            self._identifier_ref_to_entity[identifier.name] = identifier.entity
+            self._entity_index[identifier.entity].append(data_source)
+            self._linkable_reference_index[identifier.name].append(data_source)
 
         dsource_partition = data_source.partition
         # Add links to other data sources based on the names and types of identifiers available.
-        for ident in data_source.identifiers:
+        for identifier in data_source.identifiers:
             # We only need to consider other data sources with the same identifier.
-            for other in self._entity_index[ident.entity]:
+            for other in self._entity_index[identifier.entity]:
                 if other.name == data_source.name:
                     continue
 
@@ -356,25 +359,25 @@ class DataSourceSemantics:
 
                 for other_ident in other.identifiers:
                     # TODO: Replace with entity check when entities are supported.
-                    if other_ident.name != ident.name:
+                    if other_ident.name != identifier.name:
                         continue
 
                     # add edge data_source -> other "other is joinable to data_source"
-                    join_type = JOIN_TYPE_MAPPING.get((ident.type, other_ident.type), None)
+                    join_type = JOIN_TYPE_MAPPING.get((identifier.type, other_ident.type), None)
                     if join_type:
                         self._data_source_links.add_edge(
                             from_key=data_source.name,
                             to_key=other.name,
                             value=JoinLink(
                                 join_type=join_type,
-                                via_from=ident,
+                                via_from=identifier,
                                 via_to=other_ident,
                                 partitions=tuple([str(p) for p in partitions]),
                             ),
                         )
 
                     # add edge other -> data_source "data_source is joinable to other"
-                    reversed_join_type = JOIN_TYPE_MAPPING.get((other_ident.type, ident.type), None)
+                    reversed_join_type = JOIN_TYPE_MAPPING.get((other_ident.type, identifier.type), None)
                     if reversed_join_type:
                         self._data_source_links.add_edge(
                             from_key=other.name,
@@ -382,7 +385,7 @@ class DataSourceSemantics:
                             value=JoinLink(
                                 join_type=reversed_join_type,
                                 via_from=other_ident,
-                                via_to=ident,
+                                via_to=identifier,
                                 partitions=tuple([str(p) for p in partitions]),
                             ),
                         )
@@ -400,3 +403,21 @@ class DataSourceSemantics:
     def data_source_references(self) -> Sequence[DataSourceReference]:  # noqa: D
         data_source_names_sorted = sorted(self._data_source_names)
         return tuple(DataSourceReference(data_source_name=x) for x in data_source_names_sorted)
+
+    def get_measure_aggregation_time_dimension(self, measure: MeasureReference) -> TimeDimensionReference:
+        """Return the aggregation time dimension associated with a measure."""
+        if measure not in self._measure_to_aggregation_time_dimension:
+            raise RuntimeError(f"Measure {measure} is not known")
+        return self._measure_to_aggregation_time_dimension[measure]
+
+    def get_aggregation_time_dimensions(
+        self, data_source_reference: DataSourceReference
+    ) -> Sequence[TimeDimensionReference]:
+        """Return all time dimensions used for measure aggregation in a data source."""
+        data_source = self.get_by_reference(data_source_reference)
+        assert data_source, f"Data Source {data_source_reference} is not known"
+        aggregation_time_dimension_references = []
+        for measure in data_source.measures:
+            if measure.checked_agg_time_dimension not in aggregation_time_dimension_references:
+                aggregation_time_dimension_references.append(measure.checked_agg_time_dimension)
+        return aggregation_time_dimension_references

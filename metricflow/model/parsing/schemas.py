@@ -134,6 +134,10 @@ measure_schema = {
             "pattern": TRANSFORM_OBJECT_NAME_PATTERN,
         },
         "agg": {"enum": aggregation_type_values},
+        "agg_time_dimension": {
+            "type": "string",
+            "pattern": TRANSFORM_OBJECT_NAME_PATTERN,
+        },
         "expr": {"type": ["string", "integer", "boolean"]},
         "create_metric": {"type": "boolean"},
         "create_metric_display_name": {"type": "string"},
