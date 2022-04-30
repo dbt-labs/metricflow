@@ -2,6 +2,7 @@ import copy
 import logging
 
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from metricflow.model.transformations.agg_time_dimension import SetMeasureAggregationTimeDimensionRule
 from metricflow.model.transformations.boolean_measure import BooleanMeasureAggregationRule
 from metricflow.model.transformations.identifiers import CompositeIdentifierExpressionRule
 from metricflow.model.transformations.names import LowerCaseNamesRule
@@ -18,16 +19,16 @@ class ModelTransformer:
 
     @staticmethod
     def pre_validation_transform_model(model: UserConfiguredModel) -> UserConfiguredModel:
-        """Transform a model according to configured rules."""
+        """Transform a model according to configured rules before validations are run."""
         model_copy = copy.deepcopy(model)
-        for transform_rule in (LowerCaseNamesRule(),):
+        for transform_rule in (LowerCaseNamesRule(), SetMeasureAggregationTimeDimensionRule()):
             model_copy = transform_rule.transform_model(model_copy)
 
         return model_copy
 
     @staticmethod
     def post_validation_transform_model(model: UserConfiguredModel) -> UserConfiguredModel:
-        """Transform a model according to configured rules."""
+        """Transform a model according to configured rules after validations are run."""
         model_copy = copy.deepcopy(model)
         for transform_rule in (
             CreateProxyMeasureRule(),
