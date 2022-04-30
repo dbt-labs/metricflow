@@ -37,27 +37,37 @@ def create_simple_model_tables(mf_test_session_state: MetricFlowTestSessionState
         # While datetime columns can be used here, somewhere there is a conversion to a string when testing
         # with sqlite, so when you read the datetime column, it comes out as a string.
         # Columns for reference
-        # ["guest_id", "host_id", "listing_id", "booking_value", "is_instant", DEFAULT_DS, "ds_partitioned"]
-        ("u0004114", "u0003141", "l3141592", 742.42, False, "2020-01-01", "2020-01-01"),
-        ("u0004114", "u0003141", "l3141592", 441.14, True, "2020-01-01", "2020-01-01"),
-        ("u0003141", "u0003154", "l2718281", 499.99, True, "2020-01-01", "2020-01-01"),
-        ("u0003154", "u0003141", "l2718281", 719.89, False, "2020-01-01", "2020-01-01"),
-        ("u0004114", "u0003141", "l3141592", 319.85, True, "2020-01-01", "2020-01-01"),
-        ("u0004114", "u0003141", "l2718281", 442.42, True, "2020-01-02", "2020-01-02"),
-        ("u0004114", "u0003141", "l2718281", 241.14, True, "2020-01-02", "2020-01-02"),
-        ("u0004114", "u0003141", "l3141592", 799.99, False, "2020-01-02", "2020-01-02"),
-        ("u0005432", "u0003452", "l2718281", 319.85, True, "2020-01-02", "2020-01-02"),
-        ("u0003452", "u0005432", "l3141592", 519.89, False, "2020-01-02", "2020-01-02"),
-        ("u0003452", "u0004114", "l5948301", 332.23, False, "2020-01-02", "2020-01-02"),
-        ("u0003452", "u0004114", "l5948301", 0.0, False, "2020-01-03", "2020-01-03"),
+        # ["guest_id", "host_id", "listing_id", "booking_value", "is_instant", "ds", "ds_partitioned",
+        #  "booking_paid_at"]
+        ("u0004114", "u0003141", "l3141592", 742.42, False, "2020-01-01", "2020-01-01", "2020-01-02"),
+        ("u0004114", "u0003141", "l3141592", 441.14, True, "2020-01-01", "2020-01-01", "2020-01-02"),
+        ("u0003141", "u0003154", "l2718281", 499.99, True, "2020-01-01", "2020-01-01", "2020-01-02"),
+        ("u0003154", "u0003141", "l2718281", 719.89, False, "2020-01-01", "2020-01-01", "2020-01-02"),
+        ("u0004114", "u0003141", "l3141592", 319.85, True, "2020-01-01", "2020-01-01", "2020-01-02"),
+        ("u0004114", "u0003141", "l2718281", 442.42, True, "2020-01-02", "2020-01-02", "2020-01-03"),
+        ("u0004114", "u0003141", "l2718281", 241.14, True, "2020-01-02", "2020-01-02", "2020-01-03"),
+        ("u0004114", "u0003141", "l3141592", 799.99, False, "2020-01-02", "2020-01-02", "2020-01-03"),
+        ("u0005432", "u0003452", "l2718281", 319.85, True, "2020-01-02", "2020-01-02", "2020-01-03"),
+        ("u0003452", "u0005432", "l3141592", 519.89, False, "2020-01-02", "2020-01-02", "2020-01-03"),
+        ("u0003452", "u0004114", "l5948301", 332.23, False, "2020-01-02", "2020-01-02", "2020-01-03"),
+        ("u0003452", "u0004114", "l5948301", 0.0, False, "2020-01-03", "2020-01-03", "2020-01-04"),
     ]
     create_table(
         sql_client=sql_client,
         sql_table=SqlTable(schema_name=schema, table_name="fct_bookings"),
         df=make_df(
             sql_client=sql_client,
-            columns=["guest_id", "host_id", "listing_id", "booking_value", "is_instant", DEFAULT_DS, "ds_partitioned"],
-            time_columns={DEFAULT_DS, "ds_partitioned"},
+            columns=[
+                "guest_id",
+                "host_id",
+                "listing_id",
+                "booking_value",
+                "is_instant",
+                DEFAULT_DS,
+                "ds_partitioned",
+                "booking_paid_at",
+            ],
+            time_columns={DEFAULT_DS, "ds_partitioned", "booking_paid_at"},
             data=data,
         ),
     )
@@ -69,7 +79,16 @@ def create_simple_model_tables(mf_test_session_state: MetricFlowTestSessionState
         sql_table=SqlTable(schema_name=schema, table_name="fct_bookings_dt"),
         df=make_df(
             sql_client=sql_client,
-            columns=["guest_id", "host_id", "listing_id", "booking_value", "is_instant", "dt", "dt_partitioned"],
+            columns=[
+                "guest_id",
+                "host_id",
+                "listing_id",
+                "booking_value",
+                "is_instant",
+                "dt",
+                "dt_partitioned",
+                "booking_paid_at",
+            ],
             time_columns={"dt", "dt_partitioned"},
             data=data,
         ),
