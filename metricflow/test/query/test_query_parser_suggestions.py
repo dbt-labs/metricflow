@@ -6,19 +6,10 @@ import textwrap
 
 import pytest
 
-from metricflow.model.semantic_model import SemanticModel
-from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.errors.errors import UnableToSatisfyQueryError
+from metricflow.query.query_parser import MetricFlowQueryParser
 
 logger = logging.getLogger(__name__)
-
-
-@pytest.fixture(scope="class")
-def query_parser(simple_semantic_model: SemanticModel) -> MetricFlowQueryParser:  # noqa: D
-    return MetricFlowQueryParser(
-        model=simple_semantic_model,
-        primary_time_dimension_reference=simple_semantic_model.data_source_semantics.primary_time_dimension_reference,
-    )
 
 
 def test_nonexistent_metric(query_parser: MetricFlowQueryParser) -> None:  # noqa: D
@@ -35,8 +26,8 @@ def test_nonexistent_metric(query_parser: MetricFlowQueryParser) -> None:  # noq
                  'booking_fees',
                  'booking_value',
                  'instant_bookings',
-                 'bookings_per_view',
-                 'bookers']
+                 'booking_payments',
+                 'max_booking_value']
             """
         ).rstrip()
         == str(exception_info.value)
