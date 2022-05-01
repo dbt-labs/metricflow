@@ -2,23 +2,23 @@
 SELECT
   subq_8.bookings AS bookings
   , subq_9.booking_payments AS booking_payments
-  , COALESCE(subq_8.__ts, subq_9.__ts) AS __ts
+  , COALESCE(subq_8._ts, subq_9._ts) AS _ts
 FROM (
   -- Compute Metrics via Expressions
   SELECT
     subq_3.bookings
-    , subq_3.__ts
+    , subq_3._ts
   FROM (
     -- Aggregate Measures
     SELECT
       SUM(subq_2.bookings) AS bookings
-      , subq_2.__ts
+      , subq_2._ts
     FROM (
       -- Pass Only Elements:
-      --   ['bookings', '__ts']
+      --   ['bookings', '_ts']
       SELECT
         subq_1.bookings
-        , subq_1.__ts
+        , subq_1._ts
       FROM (
         -- Plot by Time Dimension 'ds'
         SELECT
@@ -61,11 +61,11 @@ FROM (
           , subq_0.create_a_cycle_in_the_join_graph__booking_paid_at__month
           , subq_0.create_a_cycle_in_the_join_graph__booking_paid_at__quarter
           , subq_0.create_a_cycle_in_the_join_graph__booking_paid_at__year
-          , subq_0.ds AS __ts
-          , subq_0.ds__week AS __ts__week
-          , subq_0.ds__month AS __ts__month
-          , subq_0.ds__quarter AS __ts__quarter
-          , subq_0.ds__year AS __ts__year
+          , subq_0.ds AS _ts
+          , subq_0.ds__week AS _ts__week
+          , subq_0.ds__month AS _ts__month
+          , subq_0.ds__quarter AS _ts__quarter
+          , subq_0.ds__year AS _ts__year
           , subq_0.listing
           , subq_0.guest
           , subq_0.host
@@ -131,25 +131,25 @@ FROM (
       ) subq_1
     ) subq_2
     GROUP BY
-      subq_2.__ts
+      subq_2._ts
   ) subq_3
 ) subq_8
 FULL OUTER JOIN (
   -- Compute Metrics via Expressions
   SELECT
     subq_7.booking_payments
-    , subq_7.__ts
+    , subq_7._ts
   FROM (
     -- Aggregate Measures
     SELECT
       SUM(subq_6.booking_payments) AS booking_payments
-      , subq_6.__ts
+      , subq_6._ts
     FROM (
       -- Pass Only Elements:
-      --   ['booking_payments', '__ts']
+      --   ['booking_payments', '_ts']
       SELECT
         subq_5.booking_payments
-        , subq_5.__ts
+        , subq_5._ts
       FROM (
         -- Plot by Time Dimension 'booking_paid_at'
         SELECT
@@ -186,11 +186,11 @@ FULL OUTER JOIN (
           , subq_4.create_a_cycle_in_the_join_graph__booking_paid_at__month
           , subq_4.create_a_cycle_in_the_join_graph__booking_paid_at__quarter
           , subq_4.create_a_cycle_in_the_join_graph__booking_paid_at__year
-          , subq_4.booking_paid_at AS __ts
-          , subq_4.booking_paid_at__week AS __ts__week
-          , subq_4.booking_paid_at__month AS __ts__month
-          , subq_4.booking_paid_at__quarter AS __ts__quarter
-          , subq_4.booking_paid_at__year AS __ts__year
+          , subq_4.booking_paid_at AS _ts
+          , subq_4.booking_paid_at__week AS _ts__week
+          , subq_4.booking_paid_at__month AS _ts__month
+          , subq_4.booking_paid_at__quarter AS _ts__quarter
+          , subq_4.booking_paid_at__year AS _ts__year
           , subq_4.listing
           , subq_4.guest
           , subq_4.host
@@ -256,8 +256,8 @@ FULL OUTER JOIN (
       ) subq_5
     ) subq_6
     GROUP BY
-      subq_6.__ts
+      subq_6._ts
   ) subq_7
 ) subq_9
 ON
-  subq_8.__ts = subq_9.__ts
+  subq_8._ts = subq_9._ts
