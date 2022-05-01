@@ -3,14 +3,13 @@ from _pytest.fixtures import FixtureRequest
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan import PlotTimeDimensionTransformNode
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
-from metricflow.dataset.dataset import DataSet
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.specs import TimeDimensionReference, MetricFlowQuerySpec, MetricSpec, TimeDimensionSpec
+from metricflow.specs import TimeDimensionReference, MetricFlowQuerySpec, MetricSpec
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.plan_conversion.test_dataflow_to_sql_plan import convert_and_check
-from metricflow.time.time_granularity import TimeGranularity
+from metricflow.test.time.plot_time_dimension import PTD_SPEC_DAY
 
 
 def test_plot_time_dimension_transform_node_using_primary_time(  # noqa: D
@@ -72,13 +71,7 @@ def test_simple_query_with_plot_time_dimension(
                 MetricSpec(element_name="booking_payments"),
             ),
             dimension_specs=(),
-            time_dimension_specs=(
-                TimeDimensionSpec(
-                    element_name=DataSet.plot_time_dimension_name(),
-                    identifier_links=(),
-                    time_granularity=TimeGranularity.DAY,
-                ),
-            ),
+            time_dimension_specs=PTD_SPEC_DAY,
         )
     )
 
