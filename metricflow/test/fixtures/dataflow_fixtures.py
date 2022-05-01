@@ -8,7 +8,6 @@ from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.specs import TimeDimensionReference
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.fixtures.sql_client_fixtures import sql_client  # noqa: F401, F403
@@ -24,9 +23,6 @@ def composite_dataflow_plan_builder(  # noqa: D
     return DataflowPlanBuilder(
         source_nodes=consistent_id_object_repository.composite_model_source_nodes,
         semantic_model=composite_identifier_semantic_model,
-        primary_time_dimension_reference=TimeDimensionReference(
-            element_name="ds",
-        ),
         cost_function=DefaultCostFunction[DataSourceDataSet](),
         time_spine_source=time_spine_source,
     )
@@ -45,9 +41,6 @@ def dataflow_plan_builder(  # noqa: D
     return DataflowPlanBuilder(
         source_nodes=consistent_id_object_repository.simple_model_source_nodes,
         semantic_model=simple_semantic_model,
-        primary_time_dimension_reference=TimeDimensionReference(
-            element_name="ds",
-        ),
         cost_function=DefaultCostFunction[DataSourceDataSet](),
         time_spine_source=time_spine_source,
     )
@@ -63,9 +56,6 @@ def multihop_dataflow_plan_builder(  # noqa: D
     return DataflowPlanBuilder(
         source_nodes=consistent_id_object_repository.multihop_model_source_nodes,
         semantic_model=multi_hop_join_semantic_model,
-        primary_time_dimension_reference=TimeDimensionReference(
-            element_name="ds",
-        ),
         cost_function=DefaultCostFunction[DataSourceDataSet](),
         time_spine_source=time_spine_source,
     )

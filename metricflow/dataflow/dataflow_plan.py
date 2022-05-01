@@ -274,7 +274,7 @@ class JoinOverTimeRangeNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT])
     def __init__(
         self,
         parent_node: BaseOutput[SourceDataSetT],
-        primary_time_dimension_reference: TimeDimensionReference,
+        plot_time_dimension_reference: TimeDimensionReference,
         window: Optional[CumulativeMetricWindow],
         grain_to_date: Optional[TimeGranularity],
         node_id: Optional[NodeId] = None,
@@ -284,7 +284,7 @@ class JoinOverTimeRangeNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT])
 
         Args:
             parent_node: node with standard output
-            primary_time_dimension_reference: primary time dimension reference
+            plot_time_dimension_reference: plot time dimension reference
             window: time window to join over
             grain_to_date: indicates time range should start from the beginning of this time granularity (eg month to day)
             node_id: Override the node ID with this value
@@ -293,7 +293,7 @@ class JoinOverTimeRangeNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT])
         self._parent_node = parent_node
         self._grain_to_date = grain_to_date
         self._window = window
-        self._primary_time_dimension_reference = primary_time_dimension_reference
+        self._plot_time_dimension_reference = plot_time_dimension_reference
         self.time_range_constraint = time_range_constraint
 
         # Doing a list comprehension throws a type error, so doing it this way.
@@ -308,8 +308,8 @@ class JoinOverTimeRangeNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT])
         return visitor.visit_join_over_time_range_node(self)
 
     @property
-    def primary_time_dimension_reference(self) -> TimeDimensionReference:  # noqa: D
-        return self._primary_time_dimension_reference
+    def plot_time_dimension_reference(self) -> TimeDimensionReference:  # noqa: D
+        return self._plot_time_dimension_reference
 
     @property
     def grain_to_date(self) -> Optional[TimeGranularity]:  # noqa: D

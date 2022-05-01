@@ -11,6 +11,7 @@ from metricflow.dataflow.builder.node_evaluator import (
     JoinLinkableInstancesRecipe,
 )
 from metricflow.dataflow.builder.partitions import PartitionTimeDimensionJoinDescription
+from metricflow.dataset.dataset import DataSet
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
@@ -74,7 +75,7 @@ def make_multihop_node_evaluator(
     nodes_available_for_joins = node_processor.remove_unnecessary_nodes(
         desired_linkable_specs=desired_linkable_specs,
         nodes=consistent_id_object_repository.multihop_model_source_nodes,
-        primary_time_dimension_reference=multihop_semantic_model.data_source_semantics.primary_time_dimension_reference,
+        plot_time_dimension_reference=DataSet.plot_time_dimension_reference(),
     )
 
     nodes_available_for_joins = node_processor.add_multi_hop_joins(
