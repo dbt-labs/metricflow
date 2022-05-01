@@ -4,11 +4,12 @@ import logging
 import os
 from collections import OrderedDict
 from dataclasses import dataclass
-from typing import List, Dict
+from typing import List, Dict, Sequence
 
 import pytest
 
-from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode
+from metricflow.dataflow.builder.source_node import SourceNodeBuilder
+from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, BaseOutput
 from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
@@ -22,7 +23,7 @@ from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 logger = logging.getLogger(__name__)
 
 
-def _dataset_to_read_nodes(
+def _data_set_to_read_nodes(
     data_sets: OrderedDict[str, DataSourceDataSet]
 ) -> OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]]:
     """Return a mapping from the name of the data source to the dataflow plan node that reads from it."""
@@ -34,17 +35,26 @@ def _dataset_to_read_nodes(
     return return_dict
 
 
+def _data_set_to_source_nodes(
+    semantic_model: SemanticModel, data_sets: OrderedDict[str, DataSourceDataSet]
+) -> Sequence[BaseOutput[DataSourceDataSet]]:
+    source_node_builder = SourceNodeBuilder(semantic_model)
+    return source_node_builder.create_from_data_sets(list(data_sets.values()))
+
+
 @dataclass(frozen=True)
 class ConsistentIdObjectRepository:
     """Stores all objects that should have consistent IDs in tests."""
 
     simple_model_data_sets: OrderedDict[str, DataSourceDataSet]
     simple_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]]
+    simple_model_source_nodes: Sequence[BaseOutput[DataSourceDataSet]]
 
     multihop_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]]
+    multihop_model_source_nodes: Sequence[BaseOutput[DataSourceDataSet]]
 
-    composite_model_data_sets: OrderedDict[str, DataSourceDataSet]
     composite_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]]
+    composite_model_source_nodes: Sequence[BaseOutput[DataSourceDataSet]]
 
 
 @pytest.fixture(scope="session")
@@ -66,10 +76,14 @@ def consistent_id_object_repository(
 
         return ConsistentIdObjectRepository(
             simple_model_data_sets=sm_data_sets,
-            simple_model_read_nodes=_dataset_to_read_nodes(sm_data_sets),
-            multihop_model_read_nodes=_dataset_to_read_nodes(multihop_data_sets),
-            composite_model_data_sets=composite_data_sets,
-            composite_model_read_nodes=_dataset_to_read_nodes(composite_data_sets),
+            simple_model_read_nodes=_data_set_to_read_nodes(sm_data_sets),
+            simple_model_source_nodes=_data_set_to_source_nodes(simple_semantic_model, sm_data_sets),
+            multihop_model_read_nodes=_data_set_to_read_nodes(multihop_data_sets),
+            multihop_model_source_nodes=_data_set_to_source_nodes(multi_hop_join_semantic_model, multihop_data_sets),
+            composite_model_read_nodes=_data_set_to_read_nodes(composite_data_sets),
+            composite_model_source_nodes=_data_set_to_source_nodes(
+                composite_identifier_semantic_model, composite_data_sets
+            ),
         )
 
 
