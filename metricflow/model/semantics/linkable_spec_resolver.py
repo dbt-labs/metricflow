@@ -21,7 +21,6 @@ from metricflow.specs import (
     TimeDimensionSpec,
     IdentifierSpec,
     MetricSpec,
-    TimeDimensionReference,
 )
 from metricflow.time.time_granularity import TimeGranularity
 
@@ -35,9 +34,6 @@ class LinkableElementProperties(Enum):
     throughout the related classes.
     """
 
-    # A primary time dimension that is accessed by a primary identifier within the data source. e.g. in the test data
-    # source "listings_latest", an example is "listing__ds"
-    LOCAL_LINKED_PRIMARY_TIME = "local_linked_primary_time"
     # A local element as per above definition.
     LOCAL = "local"
     # A local dimension that is prefixed with a local primary identifier.
@@ -57,7 +53,6 @@ class LinkableElementProperties(Enum):
     def all_properties() -> FrozenSet[LinkableElementProperties]:  # noqa: D
         return frozenset(
             {
-                LinkableElementProperties.LOCAL_LINKED_PRIMARY_TIME,
                 LinkableElementProperties.LOCAL,
                 LinkableElementProperties.LOCAL_LINKED,
                 LinkableElementProperties.JOINED,
@@ -418,18 +413,15 @@ class ValidLinkableSpecResolver:
     def __init__(
         self,
         user_configured_model: UserConfiguredModel,
-        primary_time_dimension_reference: TimeDimensionReference,
         max_identifier_links: int,
     ) -> None:
         """Constructor.
 
         Args:
             user_configured_model: the model to use.
-            primary_time_dimension_reference: the primary time dimension in the model.
             max_identifier_links: the maximum number of joins to do when computing valid elements.
         """
         self._user_configured_model = user_configured_model
-        self._primary_time_dimension_reference = primary_time_dimension_reference
         self._data_sources = self._user_configured_model.data_sources
 
         assert max_identifier_links >= 0
@@ -511,10 +503,6 @@ class ValidLinkableSpecResolver:
             if identifier.type == IdentifierType.PRIMARY:
                 for linkable_dimension in linkable_dimensions:
                     properties = {LinkableElementProperties.LOCAL, LinkableElementProperties.LOCAL_LINKED}
-
-                    if linkable_dimension.element_name == self._primary_time_dimension_reference.element_name:
-                        properties.add(LinkableElementProperties.LOCAL_LINKED_PRIMARY_TIME)
-
                     additional_linkable_dimensions.append(
                         LinkableDimension(
                             element_name=linkable_dimension.element_name,
