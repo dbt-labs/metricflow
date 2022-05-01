@@ -7,6 +7,9 @@ from dataclasses import dataclass
 from typing import Tuple, List, Dict, Sequence, Set, Optional
 
 from metricflow.constraints.time_constraint import TimeRangeConstraint
+from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
+from metricflow.dataflow.dataflow_plan import BaseOutput
+from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.instances import MetricModelReference
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.query.query_exceptions import InvalidQueryException
@@ -20,7 +23,6 @@ from metricflow.specs import (
 )
 from metricflow.model.objects.metric import MetricType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.objects.elements.dimension import DimensionType
 from metricflow.time.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
@@ -56,7 +58,12 @@ class TimeGranularitySolver:
     granularity of MONTH, throw an exception if ds__day is in the requested dimensions.
     """
 
-    def __init__(self, semantic_model: SemanticModel) -> None:  # noqa: D
+    def __init__(  # noqa: D
+        self,
+        semantic_model: SemanticModel,
+        source_nodes: Sequence[BaseOutput[DataSourceDataSet]],
+        node_output_resolver: DataflowPlanNodeOutputDataSetResolver[DataSourceDataSet],
+    ) -> None:
         self._semantic_model = semantic_model
         self._metric_reference_to_measure_reference = TimeGranularitySolver._measures_for_metric(
             self._semantic_model.user_configured_model
@@ -66,21 +73,18 @@ class TimeGranularitySolver:
             LocalTimeDimensionGranularityKey, Set[TimeGranularity]
         ] = defaultdict(set)
 
-        for data_source in self._semantic_model.user_configured_model.data_sources:
-            for dimension in data_source.dimensions:
-                if dimension.type == DimensionType.TIME:
-                    config_granularity = dimension.type_params.time_granularity if dimension.type_params else None
-                    time_granularity = config_granularity if config_granularity else DEFAULT_TIME_GRANULARITY
-
-                    for measure in data_source.measures:
+        for source_node in source_nodes:
+            output_data_set = node_output_resolver.get_output_data_set(source_node)
+            for time_dimension_instance in output_data_set.instance_set.time_dimension_instances:
+                time_dimension_spec = time_dimension_instance.spec
+                if len(time_dimension_spec.identifier_links) == 0:
+                    for measure_instance in output_data_set.instance_set.measure_instances:
                         self._local_time_dimension_granularities[
                             LocalTimeDimensionGranularityKey(
-                                measure_reference=MeasureReference(element_name=measure.name.element_name),
-                                local_time_dimension_reference=TimeDimensionReference(
-                                    element_name=dimension.name.element_name
-                                ),
+                                measure_reference=measure_instance.spec.as_reference,
+                                local_time_dimension_reference=time_dimension_spec.reference,
                             )
-                        ].add(time_granularity)
+                        ].add(time_dimension_spec.time_granularity)
 
     @staticmethod
     def _measures_for_metric(model: UserConfiguredModel) -> Dict[MetricModelReference, List[MeasureReference]]:
@@ -119,20 +123,15 @@ class TimeGranularitySolver:
                     measure_reference=measure_reference,
                     local_time_dimension_reference=local_time_dimension_reference,
                 )
-                time_granularities = self._local_time_dimension_granularities[key]
+                valid_time_granularities_for_measure = self._local_time_dimension_granularities[key]
 
-                if len(time_granularities) == 0:
+                if len(valid_time_granularities_for_measure) == 0:
                     raise InvalidQueryException(
                         f"Local dimension {local_time_dimension_reference} does not exist for measure "
                         f"'{measure_reference}' of metric '{metric_spec}"
                     )
 
-                if len(time_granularities) > 1:
-                    raise NotImplementedError(
-                        "Time granularities not supported for local time dimensions for measures defined in "
-                        "multiple data sources. metric: '{metric_name} measure: '{measure_name} "
-                    )
-                all_time_granularities.add(next(iter(time_granularities)))
+                all_time_granularities.add(min(valid_time_granularities_for_measure))
 
         return min(all_time_granularities), max(all_time_granularities)
 
@@ -174,7 +173,7 @@ class TimeGranularitySolver:
         self,
         metric_specs: Sequence[MetricSpec],
         partial_time_dimension_specs: Sequence[PartialTimeDimensionSpec],
-        primary_time_dimension_reference: TimeDimensionReference,
+        plot_time_dimension_reference: TimeDimensionReference,
         time_granularity: Optional[TimeGranularity] = None,
     ) -> Dict[PartialTimeDimensionSpec, TimeDimensionSpec]:
         """Figure out the lowest granularity possible for the partially specified time dimension specs.
@@ -193,12 +192,12 @@ class TimeGranularitySolver:
                 )
 
                 if (
-                    partial_time_dimension_spec.element_name == primary_time_dimension_reference.element_name
+                    partial_time_dimension_spec.element_name == plot_time_dimension_reference.element_name
                     and time_granularity
                 ):
                     if time_granularity < min_time_granularity_for_querying:
                         raise RequestTimeGranularityException(
-                            f"Can't use time granularity for time dimension '{primary_time_dimension_reference} since "
+                            f"Can't use time granularity for time dimension '{plot_time_dimension_reference} since "
                             f"the minimum granularity is {min_time_granularity_for_querying}"
                         )
                     replacement_dict[partial_time_dimension_spec] = TimeDimensionSpec(
