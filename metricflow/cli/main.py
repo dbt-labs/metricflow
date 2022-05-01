@@ -139,7 +139,7 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
             4.  Check out dimensions for your metric `mf list-dimensions --metric-names transactions`
             5.  Query your first metric: `mf query --metrics transactions --dimensions ds --order ds`
             6.  Show the SQL MetricFlow generates: `mf query --metrics transactions --dimensions ds --order ds --explain`
-            7.  Visualize the plan: `mf query --metrics transactions --dimensions ds --order ds --explain -- display-plans`
+            7.  Visualize the plan: `mf query --metrics transactions --dimensions ds --order ds --explain --display-plans`
                 * This only works if you have graphviz installed - see README.
                 * Aesthetic improvements to the visualization are TBD.
             8.  Add another dimension: `mf query --metrics transactions --dimensions ds,customer__country --order ds`
