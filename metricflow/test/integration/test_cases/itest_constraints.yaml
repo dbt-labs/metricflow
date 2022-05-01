@@ -4,12 +4,12 @@ integration_test:
   description: Query a metric with a constraint that was requested as a dimension
   model: SIMPLE_MODEL
   metrics: ["booking_value"]
-  group_bys: ["ds","is_instant"]
+  group_bys: ["_ts","is_instant"]
   where_constraint: "is_instant"
   check_query: |
     SELECT  SUM(booking_value) AS booking_value
       , is_instant
-      , ds
+      , ds AS _ts
     FROM  {{ source_schema }}.fct_bookings
     WHERE is_instant
       GROUP BY
@@ -21,11 +21,11 @@ integration_test:
   description: Query a metric with a constraint that was not requested as a dimension
   model: SIMPLE_MODEL
   metrics: ["booking_value"]
-  group_bys: ["ds"]
+  group_bys: ["_ts"]
   where_constraint: "is_instant"
   check_query: |
     SELECT SUM(booking_value) AS booking_value
-      , ds
+      , ds AS _ts
     FROM  {{ source_schema }}.fct_bookings
     WHERE is_instant
     GROUP BY  ds
@@ -51,11 +51,11 @@ integration_test:
   description: Test a time constraint.
   model: SIMPLE_MODEL
   metrics: ["booking_value"]
-  group_bys: ["ds"]
+  group_bys: ["_ts"]
   time_constraint: ["2020-01-01", "2020-01-01"]
   check_query: |
     SELECT  SUM(booking_value) AS booking_value
-      , ds
+      , ds AS _ts
     FROM  {{ source_schema }}.fct_bookings b
     WHERE ds = '2020-01-01'
     GROUP BY 
@@ -67,12 +67,12 @@ integration_test:
   description: Test a time constraint with another dimension.
   model: SIMPLE_MODEL
   metrics: ["booking_value"]
-  group_bys: ["ds"]
+  group_bys: ["_ts"]
   where_constraint: "is_instant"
   time_constraint: ["2020-01-01", "2020-01-01"]
   check_query: |
     SELECT  SUM(booking_value) AS booking_value
-      , ds
+      , ds AS _ts
     FROM  {{ source_schema }}.fct_bookings b
     WHERE is_instant 
       and ds = '2020-01-01'
@@ -83,12 +83,12 @@ integration_test:
   description: Test a time constraint with a boolean
   model: SIMPLE_MODEL
   metrics: ["booking_value"]
-  group_bys: ["ds","is_instant"]
+  group_bys: ["_ts","is_instant"]
   where_constraint: "is_instant"
   check_query: |
     SELECT  SUM(booking_value) AS booking_value
       , is_instant
-      , ds
+      , ds AS _ts
     FROM  {{ source_schema }}.fct_bookings b
     WHERE is_instant 
     GROUP BY ds
@@ -99,11 +99,11 @@ integration_test:
   description: Test a time constraint with an integer
   model: SIMPLE_MODEL
   metrics: ["booking_value"]
-  group_bys: ["ds"]
+  group_bys: ["_ts"]
   where_constraint: "listing__capacity_latest >= 4"
   check_query: |
     SELECT  SUM(b.booking_value) AS booking_value
-      , b.ds
+      , b.ds AS _ts
     FROM  {{ source_schema }}.fct_bookings b
     JOIN  {{ source_schema }}.dim_listings_latest l ON b.listing_id = l.listing_id
     WHERE l.capacity >= 4
@@ -115,11 +115,11 @@ integration_test:
   description: Test a time constraint with an expr dimensions
   model: SIMPLE_MODEL
   metrics: ["listings"]
-  group_bys: ["ds"]
+  group_bys: ["_ts"]
   time_constraint: ["2020-01-01", "2020-01-02"]
   check_query: |
     SELECT  SUM(1) AS listings
-      , created_at as ds
+      , created_at AS _ts
     FROM  {{source_schema}}.dim_listings_latest l
     WHERE {{ render_time_constraint("created_at", "2020-01-01", "2021-01-01") }}
     GROUP BY  created_at

@@ -4,11 +4,11 @@ integration_test:
   description: Test for expr metric
   model: SIMPLE_MODEL
   metrics: ["booking_fees"]
-  group_bys: ["ds"]
+  group_bys: ["_ts"]
   check_query: |
     SELECT
       SUM(booking_value) * 0.05 AS booking_fees
-      , ds
+      , ds AS _ts
     FROM {{ source_schema }}.fct_bookings
     GROUP BY ds;
 ---
@@ -17,11 +17,11 @@ integration_test:
   description: Tests querying an expression metric sourced from multiple measures, but one data source
   model: SIMPLE_MODEL
   metrics: ["booking_fees_per_booker"]
-  group_bys: ["ds"]
+  group_bys: ["_ts"]
   check_query: |
     SELECT
       SUM(booking_value) * 0.05 / COUNT(DISTINCT guest_id) AS booking_fees_per_booker
-      , ds
+      , ds AS _ts
     FROM {{ source_schema }}.fct_bookings
     GROUP BY ds;
 ---
@@ -30,38 +30,38 @@ integration_test:
   description: Tests querying an expression metric sourced from multiple measures, but one data source
   model: SIMPLE_MODEL
   metrics: ["views_times_booking_value"]
-  group_bys: ["ds"]
+  group_bys: ["_ts"]
   check_query: |
     SELECT
       booking_value * views AS views_times_booking_value
-      , b.ds
+      , b.ds AS _ts
     FROM (
       SELECT
         SUM(booking_value) AS booking_value
         , ds
       FROM {{source_schema}}.fct_bookings
       GROUP BY ds
-        ) b
-        JOIN (
-          SELECT
-            SUM(1) AS views
-            , ds
-          FROM {{ source_schema }}.fct_views
-          GROUP BY ds
-        ) v
-        ON b.ds = v.ds
+    ) b
+    JOIN (
+      SELECT
+        SUM(1) AS views
+        , ds
+      FROM {{ source_schema }}.fct_views
+      GROUP BY ds
+    ) v
+    ON b.ds = v.ds
 ---
 integration_test:
   name: constrained_metric
   description: Test a metric with a constraint
   model: SIMPLE_MODEL
   metrics: ["instant_booking_value"]
-  group_bys: ["ds"]
+  group_bys: ["_ts"]
   where_constraint: "is_instant"
   check_query: |
     SELECT
       SUM(booking_value) AS instant_booking_value
-      , ds
+      , ds AS _ts
     FROM {{ source_schema }}.fct_bookings
     WHERE is_instant
     GROUP BY ds
@@ -72,12 +72,12 @@ integration_test:
   model: SIMPLE_MODEL
   required_features: ["FULL_OUTER_JOIN"]
   metrics: ["booking_value", "instant_booking_value"]
-  group_bys: ["ds"]
+  group_bys: ["_ts"]
   check_query: |
     SELECT
       booking_value
       , instant_booking_value
-      , a.ds AS ds
+      , a.ds AS _ts
     FROM (
       SELECT
         SUM(booking_value) AS booking_value
@@ -101,9 +101,9 @@ integration_test:
   model: SIMPLE_MODEL
   required_features: ["FULL_OUTER_JOIN"]
   metrics: ["instant_booking_value", "views"]
-  group_bys: ["ds"]
+  group_bys: ["_ts"]
   check_query: |
-    SELECT instant_booking_value, views, a.ds AS ds
+    SELECT instant_booking_value, views, a.ds AS _ts
     FROM (
       SELECT
         SUM(booking_value) AS instant_booking_value
@@ -126,11 +126,11 @@ integration_test:
   description: Query a metric with a an identifier constraint.
   model: SIMPLE_MODEL
   metrics: ["booking_value_for_non_null_listing_id"]
-  group_bys: ["ds"]
+  group_bys: ["_ts"]
   check_query: |
     SELECT
       SUM(booking_value) AS booking_value_for_non_null_listing_id
-      , ds
+      , ds AS _ts
     FROM {{ source_schema }}.fct_bookings
     WHERE listing_id IS NOT NULL
     GROUP BY ds
@@ -157,12 +157,12 @@ integration_test:
   description: Test metric constrained by metrics definition and a user input
   model: SIMPLE_MODEL
   metrics: ["instant_booking_value"]
-  group_bys: ["ds"]
+  group_bys: ["_ts"]
   where_constraint: "listing__is_lux_latest"
   check_query: |
     SELECT
       SUM(b.booking_value) AS instant_booking_value
-      , b.ds
+      , b.ds AS _ts
     FROM {{ source_schema }}.fct_bookings b
     JOIN {{ source_schema }}.dim_listings_latest l
       ON l.listing_id = b.listing_id
@@ -177,50 +177,62 @@ integration_test:
   model: SIMPLE_MODEL
   required_features: ["FULL_OUTER_JOIN"]
   metrics: ["booking_value", "instant_booking_value"]
-  group_bys: ["ds"]
+  group_bys: ["_ts"]
   check_query: |
     SELECT
-      SUM(CASE WHEN is_instant THEN booking_value ELSE 0 END) AS instant_booking_value
-      , SUM(booking_value) AS booking_value
-      , ds
-    FROM {{ source_schema }}.fct_bookings
-    GROUP BY ds
-
-
-# ---
-# integration_test:
-#   name: min_measure_proxy
-#   description: Test measure_proxy metric with a min.
-#   model: SIMPLE_MODEL
-#   metrics: ["min_booking_value"]
-#   group_bys: []
-#   check_query: |
-#     SELECT
-#       min(booking_value) AS min_booking_value
-#     FROM {{ source_schema }}.fct_bookings
-# ---
-# integration_test:
-#   name: max_measure_proxy
-#   description: Test measure_proxy metric with a max.
-#   model: SIMPLE_MODEL
-#   metrics: ["max_booking_value"]
-#   group_bys: []
-#   check_query: |
-#     SELECT
-#       max(booking_value) AS max_booking_value
-#     FROM {{ source_schema }}.fct_bookings
+      a.booking_value
+      , b.instant_booking_value
+      , COALESCE(a.ds, b.ds) AS _ts
+    FROM (
+      SELECT
+        SUM(booking_value) AS booking_value
+        , ds
+      FROM {{ source_schema }}.fct_bookings
+      GROUP BY ds
+    ) a
+    FULL OUTER JOIN (
+      SELECT
+        SUM(booking_value) AS instant_booking_value
+        , ds
+      FROM {{ source_schema }}.fct_bookings
+      WHERE is_instant
+      GROUP BY ds
+    ) b
+    ON a.ds = b.ds
+---
+integration_test:
+ name: min_measure_proxy
+ description: Test measure_proxy metric with a min.
+ model: SIMPLE_MODEL
+ metrics: ["min_booking_value"]
+ group_bys: []
+ check_query: |
+   SELECT
+     min(booking_value) AS min_booking_value
+   FROM {{ source_schema }}.fct_bookings
+---
+integration_test:
+ name: max_measure_proxy
+ description: Test measure_proxy metric with a max.
+ model: SIMPLE_MODEL
+ metrics: ["max_booking_value"]
+ group_bys: []
+ check_query: |
+   SELECT
+     max(booking_value) AS max_booking_value
+   FROM {{ source_schema }}.fct_bookings
 ---
 integration_test:
   name: count_distinct
   description: Test count_distinct metric.
   model: SIMPLE_MODEL
   metrics: ["bookers"]
-  group_bys: ["ds", "is_instant"]
+  group_bys: ["_ts", "is_instant"]
   check_query: |
     SELECT
       COUNT(DISTINCT guest_id) AS bookers
       , is_instant
-      , ds
+      , ds AS _ts
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       is_instant
@@ -231,12 +243,12 @@ integration_test:
   description: Test count_distinct metric with a constraint.
   model: SIMPLE_MODEL
   metrics: ["bookers"]
-  group_bys: ["ds"]
+  group_bys: ["_ts"]
   where_constraint: "is_instant"
   check_query: |
     SELECT
       COUNT(DISTINCT guest_id) AS bookers
-      , ds
+      , ds AS _ts
     FROM {{ source_schema }}.fct_bookings
     where is_instant
     GROUP BY
@@ -247,11 +259,11 @@ integration_test:
   description: Test ratio metric from a single data source.
   model: SIMPLE_MODEL
   metrics: ["bookings_per_booker"]
-  group_bys: ["ds"]
+  group_bys: ["_ts"]
   check_query: |
     SELECT
       CAST(SUM(1) AS {{ double_data_type_name }}) / COUNT(DISTINCT guest_id) AS bookings_per_booker
-      , ds
+      , ds AS _ts
     FROM {{ source_schema }}.fct_bookings
     GROUP BY ds
 ---
@@ -260,11 +272,11 @@ integration_test:
   description: Test ratio metric from multiple data source.
   model: SIMPLE_MODEL
   metrics: ["bookings_per_view"]
-  group_bys: ["ds"]
+  group_bys: ["_ts"]
   check_query: |
     SELECT
       CAST(bookings AS {{ double_data_type_name }}) / NULLIF(views, 0) AS bookings_per_view
-      , groupby_8cbdaa28.ds
+      , groupby_8cbdaa28.ds AS _ts
     FROM (
       SELECT
         COUNT(*) AS bookings
@@ -289,12 +301,12 @@ integration_test:
   description: Test ratio metric with a sort.
   model: SIMPLE_MODEL
   metrics: ["bookings_per_booker"]
-  group_bys: ["ds"]
-  order_bys: ["ds"]
+  group_bys: ["_ts"]
+  order_bys: ["_ts"]
   check_query: |
     SELECT
       CAST(SUM(1) AS {{ double_data_type_name }}) / COUNT(DISTINCT guest_id) AS bookings_per_booker
-      , ds
+      , ds AS _ts
     FROM {{ source_schema }}.fct_bookings
     GROUP BY ds
     ORDER BY ds
@@ -304,12 +316,12 @@ integration_test:
   description: Test ratio metric with a zero in the denominator.
   model: SIMPLE_MODEL
   metrics: ["bookings_per_dollar"]
-  group_bys: ["ds"]
+  group_bys: ["_ts"]
   time_constraint: ["2020-01-03", "2020-01-03"]
   check_query: |
     SELECT
       CAST(bookings AS {{ double_data_type_name }}) / NULLIF(booking_value, 0) AS bookings_per_dollar
-      , bookings_source.ds
+      , bookings_source.ds AS _ts
     FROM (
       SELECT
         SUM(1) AS bookings
@@ -326,11 +338,11 @@ integration_test:
   description: Test ratio metric from a single data source.
   model: SIMPLE_MODEL
   metrics: ["bookings_per_listing"]
-  group_bys: ["ds"]
+  group_bys: ["_ts"]
   check_query: |
     SELECT
       CAST(bookings AS {{ double_data_type_name }}) / NULLIF(listings, 0) AS bookings_per_listing
-      , groupby_8cbdaa28.ds
+      , groupby_8cbdaa28.ds AS _ts
     FROM (
       SELECT
         COUNT(*) AS bookings
@@ -356,12 +368,12 @@ integration_test:
   model: SIMPLE_MODEL
   required_features: ["FULL_OUTER_JOIN"]
   metrics: ["bookings", "views"]
-  group_bys: ["ds"]
+  group_bys: ["_ts"]
   check_query: |
     SELECT
       views
       , bookings
-      , COALESCE(a.ds, b.ds) AS ds
+      , COALESCE(a.ds, b.ds) AS _ts
     FROM (
         SELECT
           SUM(1) AS views
@@ -385,12 +397,12 @@ integration_test:
   model: SIMPLE_MODEL
   required_features: ["FULL_OUTER_JOIN"]
   metrics: ["bookings", "bookings_per_view"]
-  group_bys: ["ds"]
+  group_bys: ["_ts"]
   check_query: |
     SELECT
       bookings,
       CAST(bookings AS {{ double_data_type_name }}) / NULLIF(views, 0) AS bookings_per_view
-      , COALESCE(a.ds, b.ds) AS ds
+      , COALESCE(a.ds, b.ds) AS _ts
     FROM (
       SELECT
         COUNT(*) AS bookings
@@ -417,13 +429,13 @@ integration_test:
   model: SIMPLE_MODEL
   required_features: ["FULL_OUTER_JOIN"]
   metrics: ["bookings", "bookings_per_booker", "booking_value",]
-  group_bys: ["ds"]
+  group_bys: ["_ts"]
   check_query: |
     SELECT
       SUM(1) AS bookings
       , CAST(SUM(1) AS {{ double_data_type_name }}) / COUNT(DISTINCT guest_id) AS bookings_per_booker
       , SUM(booking_value) AS booking_value
-      , ds
+      , ds AS _ts
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds
