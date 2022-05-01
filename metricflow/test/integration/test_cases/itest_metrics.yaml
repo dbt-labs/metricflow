@@ -173,18 +173,34 @@ integration_test:
 ---
 integration_test:
   name: same_measure_constrained_metric
-  description: Test metric with local dimensions
+  description: |
+    Query metrics based on the same measure, but where one is constrained. Uses a FULL OUTER JOIN in the check query to
+    produce NULL values correctly.
   model: SIMPLE_MODEL
   required_features: ["FULL_OUTER_JOIN"]
   metrics: ["booking_value", "instant_booking_value"]
   group_bys: ["ds"]
   check_query: |
     SELECT
-      SUM(CASE WHEN is_instant THEN booking_value ELSE 0 END) AS instant_booking_value
-      , SUM(booking_value) AS booking_value
-      , ds
-    FROM {{ source_schema }}.fct_bookings
-    GROUP BY ds
+      a.booking_value
+      , b.instant_booking_value
+      , COALESCE(a.ds, b.ds) AS ds
+    FROM (
+      SELECT
+        SUM(booking_value) AS booking_value
+        , ds
+      FROM {{ source_schema }}.fct_bookings
+      GROUP BY ds
+    ) a
+    FULL OUTER JOIN (
+      SELECT
+        SUM(booking_value) AS instant_booking_value
+        , ds
+      FROM {{ source_schema }}.fct_bookings
+      WHERE is_instant
+      GROUP BY ds
+    ) b
+    ON a.ds = b.ds
 
 
 # ---
