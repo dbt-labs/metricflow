@@ -13,7 +13,7 @@
         <!-- col2 =                                                                   -->
         <!--   {'class': 'SqlSelectColumn',                                           -->
         <!--    'expr': SqlFunctionExpression(node_id=fnc_2, sql_function=COALESCE),  -->
-        <!--    'column_alias': '__ts'}                                               -->
+        <!--    'column_alias': '_ts'}                                                -->
         <!-- from_source = SqlSelectStatementNode(node_id=ss_9) -->
         <!-- join_0 =                                                    -->
         <!--   {'class': 'SqlJoinDescription',                           -->
@@ -32,7 +32,7 @@
             <!-- col1 =                                                    -->
             <!--   {'class': 'SqlSelectColumn',                            -->
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_262),  -->
-            <!--    'column_alias': '__ts'}                                -->
+            <!--    'column_alias': '_ts'}                                 -->
             <!-- from_source = SqlSelectStatementNode(node_id=ss_8) -->
             <!-- where = None -->
             <SqlSelectStatementNode>
@@ -45,17 +45,17 @@
                 <!-- col1 =                                                    -->
                 <!--   {'class': 'SqlSelectColumn',                            -->
                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_261),  -->
-                <!--    'column_alias': '__ts'}                                -->
+                <!--    'column_alias': '_ts'}                                 -->
                 <!-- from_source = SqlSelectStatementNode(node_id=ss_7) -->
                 <!-- group_by0 =                                               -->
                 <!--   {'class': 'SqlSelectColumn',                            -->
                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_261),  -->
-                <!--    'column_alias': '__ts'}                                -->
+                <!--    'column_alias': '_ts'}                                 -->
                 <!-- where = None -->
                 <SqlSelectStatementNode>
-                    <!-- description =             -->
-                    <!--   Pass Only Elements:     -->
-                    <!--     ['bookings', '__ts']  -->
+                    <!-- description =            -->
+                    <!--   Pass Only Elements:    -->
+                    <!--     ['bookings', '_ts']  -->
                     <!-- node_id = ss_7 -->
                     <!-- col0 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
@@ -64,7 +64,7 @@
                     <!-- col1 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_259),  -->
-                    <!--    'column_alias': '__ts'}                                -->
+                    <!--    'column_alias': '_ts'}                                 -->
                     <!-- from_source = SqlSelectStatementNode(node_id=ss_6) -->
                     <!-- where = None -->
                     <SqlSelectStatementNode>
@@ -229,23 +229,23 @@
                         <!-- col39 =                                                   -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_246),  -->
-                        <!--    'column_alias': '__ts'}                                -->
+                        <!--    'column_alias': '_ts'}                                 -->
                         <!-- col40 =                                                   -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_247),  -->
-                        <!--    'column_alias': '__ts__week'}                          -->
+                        <!--    'column_alias': '_ts__week'}                           -->
                         <!-- col41 =                                                   -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_248),  -->
-                        <!--    'column_alias': '__ts__month'}                         -->
+                        <!--    'column_alias': '_ts__month'}                          -->
                         <!-- col42 =                                                   -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_249),  -->
-                        <!--    'column_alias': '__ts__quarter'}                       -->
+                        <!--    'column_alias': '_ts__quarter'}                        -->
                         <!-- col43 =                                                   -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_250),  -->
-                        <!--    'column_alias': '__ts__year'}                          -->
+                        <!--    'column_alias': '_ts__year'}                           -->
                         <!-- col44 =                                                   -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_251),  -->
@@ -488,7 +488,7 @@
             <!-- col1 =                                                    -->
             <!--   {'class': 'SqlSelectColumn',                            -->
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_313),  -->
-            <!--    'column_alias': '__ts'}                                -->
+            <!--    'column_alias': '_ts'}                                 -->
             <!-- from_source = SqlSelectStatementNode(node_id=ss_12) -->
             <!-- where = None -->
             <SqlSelectStatementNode>
@@ -501,17 +501,17 @@
                 <!-- col1 =                                                    -->
                 <!--   {'class': 'SqlSelectColumn',                            -->
                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_312),  -->
-                <!--    'column_alias': '__ts'}                                -->
+                <!--    'column_alias': '_ts'}                                 -->
                 <!-- from_source = SqlSelectStatementNode(node_id=ss_11) -->
                 <!-- group_by0 =                                               -->
                 <!--   {'class': 'SqlSelectColumn',                            -->
                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_312),  -->
-                <!--    'column_alias': '__ts'}                                -->
+                <!--    'column_alias': '_ts'}                                 -->
                 <!-- where = None -->
                 <SqlSelectStatementNode>
-                    <!-- description =                     -->
-                    <!--   Pass Only Elements:             -->
-                    <!--     ['booking_payments', '__ts']  -->
+                    <!-- description =                    -->
+                    <!--   Pass Only Elements:            -->
+                    <!--     ['booking_payments', '_ts']  -->
                     <!-- node_id = ss_11 -->
                     <!-- col0 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
@@ -520,7 +520,7 @@
                     <!-- col1 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_310),  -->
-                    <!--    'column_alias': '__ts'}                                -->
+                    <!--    'column_alias': '_ts'}                                 -->
                     <!-- from_source = SqlSelectStatementNode(node_id=ss_10) -->
                     <!-- where = None -->
                     <SqlSelectStatementNode>
@@ -661,23 +661,23 @@
                         <!-- col33 =                                                   -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_297),  -->
-                        <!--    'column_alias': '__ts'}                                -->
+                        <!--    'column_alias': '_ts'}                                 -->
                         <!-- col34 =                                                   -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_298),  -->
-                        <!--    'column_alias': '__ts__week'}                          -->
+                        <!--    'column_alias': '_ts__week'}                           -->
                         <!-- col35 =                                                   -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_299),  -->
-                        <!--    'column_alias': '__ts__month'}                         -->
+                        <!--    'column_alias': '_ts__month'}                          -->
                         <!-- col36 =                                                   -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_300),  -->
-                        <!--    'column_alias': '__ts__quarter'}                       -->
+                        <!--    'column_alias': '_ts__quarter'}                        -->
                         <!-- col37 =                                                   -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_301),  -->
-                        <!--    'column_alias': '__ts__year'}                          -->
+                        <!--    'column_alias': '_ts__year'}                           -->
                         <!-- col38 =                                                   -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_302),  -->

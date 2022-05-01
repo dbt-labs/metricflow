@@ -71,7 +71,7 @@ def test_simple_query_with_plot_time_dimension(
                 MetricSpec(element_name="booking_payments"),
             ),
             dimension_specs=(),
-            time_dimension_specs=PTD_SPEC_DAY,
+            time_dimension_specs=(PTD_SPEC_DAY,),
         )
     )
 
