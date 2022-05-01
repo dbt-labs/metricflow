@@ -5,13 +5,13 @@ integration_test:
   model: SIMPLE_MODEL
   required_features: ["DATE_TRUNC"]
   metrics: ["trailing_2_months_revenue"]
-  group_bys: ["ds"]
-  order_bys: ["ds"]
+  group_bys: ["_ts"]
+  order_bys: ["_ts"]
   time_constraint: ["2020-01-05", "2021-01-04"]
   check_query: |
     SELECT
       SUM(b.txn_revenue) as trailing_2_months_revenue
-      , a.ds
+      , a.ds AS _ts
     FROM (
       SELECT ds
       FROM {{ mf_time_spine_source }}
@@ -20,7 +20,7 @@ integration_test:
     INNER JOIN (
       SELECT
         revenue as txn_revenue
-        , created_at as ds
+        , created_at AS ds
       FROM {{ source_schema }}.fct_revenue
     ) b
     ON b.ds <= a.ds AND b.ds > {{ render_date_sub("a", "ds", 2, TimeGranularity.MONTH) }}
@@ -34,14 +34,14 @@ integration_test:
   model: SIMPLE_MODEL
   required_features: ["DATE_TRUNC"]
   metrics: ["trailing_2_months_revenue"]
-  group_bys: ["ds", "user__home_state_latest"]
-  order_bys: ["ds", "user__home_state_latest"]
+  group_bys: ["_ts", "user__home_state_latest"]
+  order_bys: ["_ts", "user__home_state_latest"]
   time_constraint: ["2020-01-05", "2021-01-04"]
   check_query: |
     SELECT
       SUM(revenue) as trailing_2_months_revenue
       , b.user__home_state_latest as user__home_state_latest
-      , a.ds as ds
+      , a.ds AS _ts
     FROM (
       SELECT ds
       FROM {{ mf_time_spine_source }}
@@ -51,7 +51,7 @@ integration_test:
       SELECT
         m.revenue as revenue
         , u.home_state_latest as user__home_state_latest
-        , m.created_at as ds
+        , m.created_at AS ds
       FROM {{ source_schema }}.fct_revenue m
       INNER JOIN {{ source_schema }}.dim_users_latest u
       ON m.user_id = u.user_id
@@ -67,13 +67,13 @@ integration_test:
   description: Query a cumulative metric that aggregates revenue for all time in the past by ds.
   model: SIMPLE_MODEL
   metrics: ["revenue_all_time"]
-  group_bys: ["ds"]
-  order_bys: ["ds"]
+  group_bys: ["_ts"]
+  order_bys: ["_ts"]
   time_constraint: ["2020-01-01", "2021-01-05"]
   check_query: |
     SELECT
       SUM(revenue) AS revenue_all_time
-      , a.ds AS ds
+      , a.ds AS _ts
     FROM (
       SELECT ds
       FROM {{ mf_time_spine_source }}
@@ -107,11 +107,11 @@ integration_test:
   model: SIMPLE_MODEL
   required_features: ["FULL_OUTER_JOIN"]
   metrics: ["revenue_all_time", "trailing_2_months_revenue"]
-  group_bys: ["ds"]
-  order_bys: ["ds"]
+  group_bys: ["_ts"]
+  order_bys: ["_ts"]
   time_constraint: ["2019-12-31", "2021-01-05"]
   check_query: |
-    SELECT revenue_all_time, trailing_2_months_revenue, a.ds AS ds
+    SELECT revenue_all_time, trailing_2_months_revenue, a.ds AS _ts
     FROM (
         SELECT
           SUM(revenue) as revenue_all_time
@@ -119,7 +119,7 @@ integration_test:
         FROM (
             SELECT
                 b.revenue as revenue
-                , a.ds as ds
+                , a.ds AS ds
             FROM (
               SELECT ds
               FROM {{ mf_time_spine_source }}
@@ -147,7 +147,7 @@ integration_test:
         INNER JOIN (
             SELECT
               revenue as txn_revenue
-              , created_at as ds
+              , created_at AS ds
             FROM {{ source_schema }}.fct_revenue
         ) b
         ON b.ds <= a.ds AND b.ds > {{ render_date_sub("a", "ds", 2, TimeGranularity.MONTH) }}
@@ -163,13 +163,13 @@ integration_test:
   model: SIMPLE_MODEL
   required_features: ["DATE_TRUNC"]
   metrics: ["trailing_2_months_revenue"]
-  group_bys: ["ds__day"]
-  order_bys: ["ds__day"]
+  group_bys: ["_ts__day"]
+  order_bys: ["_ts__day"]
   time_constraint: ["2020-01-05", "2021-01-04"]
   check_query: |
     SELECT
       SUM(b.txn_revenue) as trailing_2_months_revenue
-      , a.ds
+      , a.ds AS _ts
     FROM (
       SELECT ds
       FROM {{ mf_time_spine_source }}
@@ -178,7 +178,7 @@ integration_test:
     INNER JOIN (
       SELECT
         revenue as txn_revenue
-        , created_at as ds
+        , created_at AS ds
       FROM {{ source_schema }}.fct_revenue
     ) b
     ON b.ds <= a.ds AND b.ds > {{ render_date_sub("a", "ds", 2, TimeGranularity.MONTH) }}
@@ -191,13 +191,13 @@ integration_test:
   description: Query a cumulative metric that aggregates revenue for all time in the past for a limit time interval.
   model: SIMPLE_MODEL
   metrics: ["revenue_all_time"]
-  group_bys: ["ds"]
-  order_bys: ["ds"]
+  group_bys: ["_ts"]
+  order_bys: ["_ts"]
   time_constraint: ["2021-01-05", "2021-01-05"]
   check_query: |
     SELECT
       SUM(revenue) AS revenue_all_time
-      , a.ds AS ds
+      , a.ds AS _ts
     FROM (
       SELECT ds
       FROM {{ mf_time_spine_source }}
@@ -219,13 +219,13 @@ integration_test:
   description: Query a cumulative metric with a non-additive measure.
   model: SIMPLE_MODEL
   metrics: ["every_two_days_bookers"]
-  group_bys: ["ds"]
-  order_bys: ["ds"]
+  group_bys: ["_ts"]
+  order_bys: ["_ts"]
   time_constraint: ["2019-12-31", "2020-01-04"]
   check_query: |
     SELECT
       COUNT (DISTINCT(b.guest_id)) as every_two_days_bookers
-      , a.ds
+      , a.ds AS _ts
     FROM (
       SELECT ds
       FROM {{ mf_time_spine_source }}
@@ -249,13 +249,13 @@ integration_test:
   description: Query a cumulative metric with a non-additive measure and a limited time range.
   model: SIMPLE_MODEL
   metrics: ["every_two_days_bookers"]
-  group_bys: ["ds"]
-  order_bys: ["ds"]
+  group_bys: ["_ts"]
+  order_bys: ["_ts"]
   time_constraint: ["2020-01-04", "2020-01-04"]
   check_query: |
     SELECT
       COUNT (DISTINCT(b.guest_id)) as every_two_days_bookers
-      , a.ds
+      , a.ds AS _ts
     FROM (
       SELECT ds
       FROM {{ mf_time_spine_source }}
@@ -278,13 +278,13 @@ integration_test:
   model: SIMPLE_MODEL
   required_features: [DATE_TRUNC]
   metrics: ["revenue_mtd"]
-  group_bys: ["ds"]
-  order_bys: ["ds"]
+  group_bys: ["_ts"]
+  order_bys: ["_ts"]
   time_constraint: ["2020-01-01", "2021-01-05"]
   check_query: |
     SELECT
       SUM(b.txn_revenue) as revenue_mtd
-      , a.ds
+      , a.ds AS _ts
     FROM (
       SELECT ds
       FROM {{ mf_time_spine_source }}
@@ -293,7 +293,7 @@ integration_test:
     INNER JOIN (
         SELECT
           revenue as txn_revenue
-          , created_at as ds
+          , created_at AS ds
         FROM {{ source_schema }}.fct_revenue
     ) b
     ON b.ds <= a.ds AND b.ds >= {{ render_date_trunc("a.ds", TimeGranularity.MONTH) }}
@@ -307,13 +307,13 @@ integration_test:
   description: Query a cumulative metric that aggregates revenue for all time in the past by ds__day.
   model: SIMPLE_MODEL
   metrics: ["revenue_all_time"]
-  group_bys: ["ds__day"]
-  order_bys: ["ds__day"]
+  group_bys: ["_ts__day"]
+  order_bys: ["_ts__day"]
   time_constraint: ["2020-01-01", "2021-01-05"]
   check_query: |
     SELECT
       SUM(revenue) AS revenue_all_time
-      , a.ds AS ds
+      , a.ds AS _ts
     FROM (
       SELECT ds
       FROM {{ mf_time_spine_source }}

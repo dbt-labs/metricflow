@@ -40,6 +40,26 @@ metric:
       - booking_value
 ---
 metric:
+  name: "max_booking_value"
+  description: "max booking value"
+  owners:
+    - support@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+      - max_booking_value
+---
+metric:
+  name: "min_booking_value"
+  description: "min booking value"
+  owners:
+    - support@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+      - min_booking_value
+---
+metric:
   name: "instant_booking_value"
   description: "booking value of instant bookings"
   owners:
