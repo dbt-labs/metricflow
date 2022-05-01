@@ -12,6 +12,7 @@ import pandas as pd
 from metricflow.configuration.constants import CONFIG_DWH_SCHEMA
 from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
+from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import DataflowPlan
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
@@ -306,8 +307,11 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             self._semantic_model.data_source_semantics.primary_time_dimension_reference
         )
 
+        source_node_builder = SourceNodeBuilder(self._semantic_model)
+        source_nodes = source_node_builder.create_from_data_sets(self._source_data_sets)
+
         self._dataflow_plan_builder = DataflowPlanBuilder(
-            data_sets=self._source_data_sets,
+            source_nodes=source_nodes,
             semantic_model=self._semantic_model,
             primary_time_dimension_reference=self._primary_time_dimension_reference,
             time_spine_source=self._time_spine_source,

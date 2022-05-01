@@ -29,7 +29,6 @@ from metricflow.dataflow.dataflow_plan import (
     JoinOverTimeRangeNode,
     JoinToBaseOutputNode,
     OrderByLimitNode,
-    ReadSqlSourceNode,
     WhereConstraintNode,
     WriteToResultDataframeNode,
     WriteToResultTableNode,
@@ -87,18 +86,17 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
 
     def __init__(  # noqa: D
         self,
-        data_sets: List[SqlDataSetT],
+        source_nodes: Sequence[BaseOutput[SqlDataSetT]],
         semantic_model: SemanticModel,
         time_spine_source: TimeSpineSource,
         primary_time_dimension_reference: TimeDimensionReference,
         cost_function: DataflowPlanNodeCostFunction = DefaultCostFunction[SqlDataSetT](),
     ) -> None:
-        self._data_sets = data_sets
         self._data_source_semantics = semantic_model.data_source_semantics
         self._metric_semantics = semantic_model.metric_semantics
         self._primary_time_dimension_reference = primary_time_dimension_reference
         self._cost_function = cost_function
-        self._source_nodes = [ReadSqlSourceNode[SqlDataSetT](x) for x in self._data_sets]
+        self._source_nodes = source_nodes
         self._node_data_set_resolver = DataflowPlanNodeOutputDataSetResolver[SqlDataSetT](
             column_association_resolver=DefaultColumnAssociationResolver(semantic_model),
             semantic_model=semantic_model,
