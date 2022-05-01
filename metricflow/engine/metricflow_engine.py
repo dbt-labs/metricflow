@@ -12,6 +12,7 @@ import pandas as pd
 from metricflow.configuration.constants import CONFIG_DWH_SCHEMA
 from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
+from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import DataflowPlan
 from metricflow.dataflow.sql_table import SqlTable
@@ -303,17 +304,18 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             self._source_data_sets.append(data_set)
             logger.info(f"Created source dataset from data source '{data_source.name}'")
 
-        self._primary_time_dimension_reference = (
-            self._semantic_model.data_source_semantics.primary_time_dimension_reference
-        )
-
         source_node_builder = SourceNodeBuilder(self._semantic_model)
         source_nodes = source_node_builder.create_from_data_sets(self._source_data_sets)
 
-        self._dataflow_plan_builder = DataflowPlanBuilder(
+        node_output_resolver = DataflowPlanNodeOutputDataSetResolver[DataSourceDataSet](
+            column_association_resolver=DefaultColumnAssociationResolver(semantic_model),
+            semantic_model=semantic_model,
+            time_spine_source=self._time_spine_source,
+        )
+
+        self._dataflow_plan_builder = DataflowPlanBuilder[DataSourceDataSet](
             source_nodes=source_nodes,
             semantic_model=self._semantic_model,
-            primary_time_dimension_reference=self._primary_time_dimension_reference,
             time_spine_source=self._time_spine_source,
         )
         self._to_sql_query_plan_converter = DataflowToSqlQueryPlanConverter[DataSourceDataSet](
@@ -321,7 +323,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             semantic_model=self._semantic_model,
             time_spine_source=self._time_spine_source,
         )
-        self._to_execution_plan_converter = DataflowToExecutionPlanConverter(
+        self._to_execution_plan_converter = DataflowToExecutionPlanConverter[DataSourceDataSet](
             sql_plan_converter=self._to_sql_query_plan_converter,
             sql_plan_renderer=self._sql_client.sql_engine_attributes.sql_query_plan_renderer,
             sql_client=sql_client,
@@ -330,7 +332,8 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
         self._query_parser = MetricFlowQueryParser(
             model=self._semantic_model,
-            primary_time_dimension_reference=self._primary_time_dimension_reference,
+            source_nodes=source_nodes,
+            node_output_resolver=node_output_resolver,
         )
 
     def _get_materialization_by_name(self, materialization_name: str) -> Optional[Materialization]:

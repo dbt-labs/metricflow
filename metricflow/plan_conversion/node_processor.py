@@ -53,7 +53,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
     def add_time_range_constraint(
         self,
         source_nodes: Sequence[BaseOutput[SqlDataSetT]],
-        primary_time_dimension_name: str,
+        plot_time_dimension_reference: TimeDimensionReference,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
     ) -> Sequence[BaseOutput[SqlDataSetT]]:
         """Adds a time range constraint node to the input nodes."""
@@ -66,7 +66,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                 constrain_time = False
                 for time_dimension_instance in node_output_data_set.instance_set.time_dimension_instances:
                     if (
-                        time_dimension_instance.spec.element_name == primary_time_dimension_name
+                        time_dimension_instance.spec.reference == plot_time_dimension_reference
                         and len(time_dimension_instance.spec.identifier_links) == 0
                     ):
                         constrain_time = True
@@ -172,7 +172,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
         self,
         desired_linkable_specs: Sequence[LinkableInstanceSpec],
         nodes: Sequence[BaseOutput[SqlDataSetT]],
-        primary_time_dimension_reference: TimeDimensionReference,
+        plot_time_dimension_reference: TimeDimensionReference,
     ) -> Sequence[BaseOutput[SqlDataSetT]]:
         """Filters out many of the nodes that can't possibly be useful for joins to obtain the desired linkable specs.
 
@@ -183,21 +183,21 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
             {y.element_name for x in desired_linkable_specs for y in x.identifier_links}
         )
 
-        # The primary time dimension is used everywhere, so don't count it unless specifically desired in linkable spec
+        # The plot time dimension is used everywhere, so don't count it unless specifically desired in linkable spec
         # that has identifier links.
-        primary_time_dimension_used_in_linked_spec = any(
+        plot_time_dimension_used_in_linked_spec = any(
             [
                 len(linkable_spec.identifier_links) > 0
-                and linkable_spec.element_name == primary_time_dimension_reference.element_name
+                and linkable_spec.element_name == plot_time_dimension_reference.element_name
                 for linkable_spec in desired_linkable_specs
             ]
         )
 
         if (
-            primary_time_dimension_reference.element_name in relevant_element_names
-            and not primary_time_dimension_used_in_linked_spec
+            plot_time_dimension_reference.element_name in relevant_element_names
+            and not plot_time_dimension_used_in_linked_spec
         ):
-            relevant_element_names.remove(primary_time_dimension_reference.element_name)
+            relevant_element_names.remove(plot_time_dimension_reference.element_name)
 
         logger.info(f"Relevant names are: {relevant_element_names}")
 
