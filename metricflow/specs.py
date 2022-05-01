@@ -211,6 +211,10 @@ class DimensionSpec(LinkableInstanceSpec, ParseableField):  # noqa: D
             element_name=parsed_name.element_name,
         )
 
+    @property
+    def reference(self) -> DimensionReference:  # noqa: D
+        return DimensionReference(element_name=self.element_name)
+
 
 DimensionSpec.update_forward_refs()
 

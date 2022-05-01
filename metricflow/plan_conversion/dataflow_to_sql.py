@@ -65,7 +65,6 @@ from metricflow.protocols.sql_client import SqlEngineAttributes, SupportedSqlEng
 from metricflow.specs import (
     ColumnAssociationResolver,
     MetricSpec,
-    TimeDimensionReference,
     TimeDimensionSpec,
     MeasureSpec,
 )
@@ -359,8 +358,8 @@ def _make_time_range_comparison_expr(
 
 
 def _make_time_spine_data_set(
-    primary_time_dimension_instance: TimeDimensionInstance,
-    primary_time_dimension_column_name: str,
+    plot_time_dimension_instance: TimeDimensionInstance,
+    plot_time_dimension_column_name: str,
     time_spine_source: TimeSpineSource,
     time_spine_table_alias: str,
     time_range_constraint: Optional[TimeRangeConstraint] = None,
@@ -372,14 +371,14 @@ def _make_time_spine_data_set(
     """
     time_spine_instance = (
         TimeDimensionInstance(
-            defined_from=primary_time_dimension_instance.defined_from,
+            defined_from=plot_time_dimension_instance.defined_from,
             associated_columns=(
                 ColumnAssociation(
-                    column_name=primary_time_dimension_column_name,
+                    column_name=plot_time_dimension_column_name,
                     column_correlation_key=SingleColumnCorrelationKey(),
                 ),
             ),
-            spec=primary_time_dimension_instance.spec,
+            spec=plot_time_dimension_instance.spec,
         ),
     )
     time_spine_instance_set = InstanceSet(
@@ -388,7 +387,7 @@ def _make_time_spine_data_set(
     description = "Date Spine"
 
     # If the requested granularity is the same as the granularity of the spine, do a direct select.
-    if primary_time_dimension_instance.spec.time_granularity == time_spine_source.time_column_granularity:
+    if plot_time_dimension_instance.spec.time_granularity == time_spine_source.time_column_granularity:
         return SqlDataSet(
             instance_set=time_spine_instance_set,
             sql_select_node=SqlSelectStatementNode(
@@ -402,7 +401,7 @@ def _make_time_spine_data_set(
                                 column_name=time_spine_source.time_column_name,
                             ),
                         ),
-                        column_alias=primary_time_dimension_column_name,
+                        column_alias=plot_time_dimension_column_name,
                     ),
                 ),
                 from_source=SqlTableFromClauseNode(sql_table=time_spine_source.spine_table),
@@ -424,7 +423,7 @@ def _make_time_spine_data_set(
         select_columns = (
             SqlSelectColumn(
                 expr=SqlDateTruncExpression(
-                    time_granularity=primary_time_dimension_instance.spec.time_granularity,
+                    time_granularity=plot_time_dimension_instance.spec.time_granularity,
                     arg=SqlColumnReferenceExpression(
                         SqlColumnReference(
                             table_alias=time_spine_table_alias,
@@ -432,7 +431,7 @@ def _make_time_spine_data_set(
                         ),
                     ),
                 ),
-                column_alias=primary_time_dimension_column_name,
+                column_alias=plot_time_dimension_column_name,
             ),
         )
         return SqlDataSet(
@@ -479,19 +478,6 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         self._data_source_semantics = semantic_model.data_source_semantics
         self._time_spine_source = time_spine_source
 
-        # Find the name of the primary time dimension in the model.
-        # TODO: DataSourceSemantics or similar should handle this.
-        primary_time_dimension_name: Optional[str] = None
-        for dimension_reference in self._data_source_semantics.get_dimension_references():
-            dimension = self._data_source_semantics.get_linkable(dimension_reference)
-            if dimension.is_primary_time:
-                primary_time_dimension_name = dimension.name.element_name
-
-        if not primary_time_dimension_name:
-            raise RuntimeError("No primary time dimension found in data sources.")
-
-        self._primary_time_dimension_reference = TimeDimensionReference(element_name=primary_time_dimension_name)
-
     @property
     def column_association_resolver(self) -> ColumnAssociationResolver:  # noqa: D
         return self._column_association_resolver
@@ -516,38 +502,38 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
         sql_join_descs: List[SqlJoinDescription] = []
 
-        primary_time_dimension_spec: Optional[TimeDimensionSpec] = None
-        primary_time_dimension_instance: Optional[TimeDimensionInstance] = None
+        plot_time_dimension_spec: Optional[TimeDimensionSpec] = None
+        plot_time_dimension_instance: Optional[TimeDimensionInstance] = None
         for instance in input_data_set.instance_set.time_dimension_instances:
             if (
-                instance.spec.element_name == node.primary_time_dimension_reference.element_name
+                instance.spec.element_name == node.plot_time_dimension_reference.element_name
                 and len(instance.spec.identifier_links) == 0
             ):
-                primary_time_dimension_instance = instance
-                primary_time_dimension_spec = instance.spec
+                plot_time_dimension_instance = instance
+                plot_time_dimension_spec = instance.spec
                 break
 
-        # if primary_time_dimension isn't present in the parent node its because it wasn't requested
+        # If the plot time dimension isn't present in the parent node it's because it wasn't requested
         # and therefore we don't need the time range join because we can just let the metric sum over all time
-        if primary_time_dimension_spec is None:
+        if plot_time_dimension_spec is None:
             return input_data_set
 
         input_data_set_identifier_column_association = input_data_set.column_association_for_time_dimension(
-            primary_time_dimension_spec
+            plot_time_dimension_spec
         )
         input_data_set_identifier_col = input_data_set_identifier_column_association.column_name
 
         time_spine_data_set_alias = self._next_unique_table_alias()
 
-        primary_time_dimension_column_name = self.column_association_resolver.resolve_time_dimension_spec(
-            primary_time_dimension_spec
+        plot_time_dimension_column_name = self.column_association_resolver.resolve_time_dimension_spec(
+            plot_time_dimension_spec
         ).column_name
 
-        # assemble dataset with primary_time_dimension to join
-        assert primary_time_dimension_instance
+        # assemble dataset with plot_time_dimension to join
+        assert plot_time_dimension_instance
         time_spine_data_set = _make_time_spine_data_set(
-            primary_time_dimension_instance=primary_time_dimension_instance,
-            primary_time_dimension_column_name=primary_time_dimension_column_name,
+            plot_time_dimension_instance=plot_time_dimension_instance,
+            plot_time_dimension_column_name=plot_time_dimension_column_name,
             time_spine_source=self._time_spine_source,
             time_spine_table_alias=self._next_unique_table_alias(),
             time_range_constraint=node.time_range_constraint,
@@ -556,15 +542,15 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
         # Figure out which columns in the "right" data set correspond to the time dimension that we want to join on.
         time_spine_data_set_column_associations = time_spine_data_set.column_association_for_time_dimension(
-            primary_time_dimension_spec
+            plot_time_dimension_spec
         )
         time_spine_data_set_time_dimension_col = time_spine_data_set_column_associations.column_name
 
         # Build an expression like "a.ds <= b.ds AND a.ds >= b.ds - <window>
         # If no window is present we join across all time -> "a.ds <= b.ds"
-        constrain_primary_time_column_condition_both: Optional[SqlExpressionNode] = None
+        constrain_plot_time_column_condition_both: Optional[SqlExpressionNode] = None
         if node.window is not None:
-            constrain_primary_time_column_condition_both = _make_cumulative_metric_join_condition(
+            constrain_plot_time_column_condition_both = _make_cumulative_metric_join_condition(
                 input_data_set_alias,
                 input_data_set_identifier_col,
                 time_spine_data_set_alias,
@@ -572,7 +558,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 node.window,
             )
         elif node.grain_to_date is not None:
-            constrain_primary_time_column_condition_both = _make_grain_to_date_cumulative_metric_join_condition(
+            constrain_plot_time_column_condition_both = _make_grain_to_date_cumulative_metric_join_condition(
                 input_data_set_alias,
                 input_data_set_identifier_col,
                 time_spine_data_set_alias,
@@ -580,7 +566,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 node.grain_to_date,
             )
         elif node.window is None:  # `window is None` for clarity (could be else since we have window and !window)
-            constrain_primary_time_column_condition_both = _make_cumulative_metric_join_condition(
+            constrain_plot_time_column_condition_both = _make_cumulative_metric_join_condition(
                 input_data_set_alias,
                 input_data_set_identifier_col,
                 time_spine_data_set_alias,
@@ -592,7 +578,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             SqlJoinDescription(
                 right_source=input_data_set.sql_select_node,
                 right_source_alias=input_data_set_alias,
-                on_condition=constrain_primary_time_column_condition_both,
+                on_condition=constrain_plot_time_column_condition_both,
                 join_type=SqlJoinType.INNER,
             )
         )
@@ -602,13 +588,13 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             dimension_instances=input_data_set.instance_set.dimension_instances,
             identifier_instances=input_data_set.instance_set.identifier_instances,
             metric_instances=input_data_set.instance_set.metric_instances,
-            # we omit the primary time dimension from the right side of the self-join because we need to use
-            # the primary time dimension from the right side
+            # we omit the plot time dimension from the right side of the self-join because we need to use
+            # the plot time dimension from the right side
             time_dimension_instances=tuple(
                 [
                     time_dimension_instance
                     for time_dimension_instance in input_data_set.instance_set.time_dimension_instances
-                    if time_dimension_instance.spec != primary_time_dimension_spec
+                    if time_dimension_instance.spec != plot_time_dimension_spec
                 ]
             ),
         )
@@ -1241,10 +1227,10 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         from_data_set: SqlDataSet = node.parent_node.accept(self)
         from_data_set_alias = self._next_unique_table_alias()
 
-        time_dimension_instances_for_primary_time = [
+        time_dimension_instances_for_plot_time = [
             time_dimension_instance
             for time_dimension_instance in from_data_set.instance_set.time_dimension_instances
-            if time_dimension_instance.spec.element_name == self._primary_time_dimension_reference.element_name
+            if time_dimension_instance.spec.element_name == DataSet.plot_time_dimension_name()
         ]
 
         # Use the smallest time granularity to build the comparison since that's what was used in the data source
@@ -1254,23 +1240,19 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         #
         # not DATE_TRUNC('month', ds) >= '2020-01-01' AND DATE_TRUNC('month', ds <= '2020-02-01')
         def sort_function_for_time_granularity(instance: TimeDimensionInstance) -> int:
-            if not instance.spec.time_granularity:
-                # TODO: TimeDimensionSpec.time_granularity will not be optional later, so this will be fixed.
-                return 100
-            else:
-                return instance.spec.time_granularity.to_int()
+            return instance.spec.time_granularity.to_int()
 
-        time_dimension_instances_for_primary_time.sort(key=sort_function_for_time_granularity)
+        time_dimension_instances_for_plot_time.sort(key=sort_function_for_time_granularity)
         assert (
-            len(time_dimension_instances_for_primary_time) > 0
-        ), "No primary time dimensions found in the input data set for this node"
+            len(time_dimension_instances_for_plot_time) > 0
+        ), "No plot time dimensions found in the input data set for this node"
 
-        time_dimension_instance_for_primary_time = time_dimension_instances_for_primary_time[0]
+        time_dimension_instance_for_plot_time = time_dimension_instances_for_plot_time[0]
 
         # Build an expression like "ds >= CAST('2020-01-01' AS TIMESTAMP) AND ds <= CAST('2020-01-02' AS TIMESTAMP)"
-        constrain_primary_time_column_condition = _make_time_range_comparison_expr(
+        constrain_plot_time_column_condition = _make_time_range_comparison_expr(
             table_alias=from_data_set_alias,
-            column_alias=time_dimension_instance_for_primary_time.associated_column.column_name,
+            column_alias=time_dimension_instance_for_plot_time.associated_column.column_name,
             time_range_constraint=node.time_range_constraint,
         )
 
@@ -1290,7 +1272,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 from_source_alias=from_data_set_alias,
                 joins_descs=(),
                 group_bys=(),
-                where=constrain_primary_time_column_condition,
+                where=constrain_plot_time_column_condition,
                 order_bys=(),
             ),
         )

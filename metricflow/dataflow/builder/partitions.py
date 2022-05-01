@@ -4,14 +4,14 @@ from collections import OrderedDict
 from dataclasses import dataclass
 from typing import Tuple, Sequence, List
 
+from metricflow.dataset.dataset import DataSet
+from metricflow.model.semantics.semantic_containers import DataSourceSemantics
 from metricflow.specs import (
     DimensionSpec,
     TimeDimensionSpec,
     InstanceSpecSet,
     PartitionSpecSet,
-    DimensionReference,
 )
-from metricflow.model.semantics.semantic_containers import DataSourceSemantics
 
 
 @dataclass(frozen=True)
@@ -41,16 +41,13 @@ class PartitionJoinResolver:
         partition_dimension_specs = tuple(
             x
             for x in spec_set.dimension_specs
-            if self._data_source_semantics.get_dimension(
-                dimension_reference=DimensionReference(element_name=x.element_name)
-            ).is_partition
+            if self._data_source_semantics.get_dimension(dimension_reference=x.reference).is_partition
         )
         partition_time_dimension_specs = tuple(
             x
             for x in spec_set.time_dimension_specs
-            if self._data_source_semantics.get_dimension(
-                dimension_reference=DimensionReference(element_name=x.element_name)
-            ).is_partition
+            if x.reference != DataSet.plot_time_dimension_reference()
+            and self._data_source_semantics.get_dimension(dimension_reference=x.reference).is_partition
         )
 
         return PartitionSpecSet(
