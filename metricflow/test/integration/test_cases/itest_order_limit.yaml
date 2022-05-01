@@ -4,12 +4,13 @@ integration_test:
   description: Tests descending order.
   model: SIMPLE_MODEL
   metrics: ["booking_value"]
-  group_bys: ["ds"]
+  group_bys: ["_ts"]
   order_bys: ["-booking_value"]
+  check_order: true
   check_query: |
     SELECT
       SUM(booking_value) AS booking_value
-      , ds
+      , ds AS _ts
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds
@@ -21,12 +22,13 @@ integration_test:
   description: Tests ascending order.
   model: SIMPLE_MODEL
   metrics: ["booking_value"]
-  group_bys: ["ds"]
+  group_bys: ["_ts"]
   order_bys: ["booking_value"]
+  check_order: true
   check_query: |
     SELECT
       SUM(booking_value) AS booking_value
-      , ds
+      , ds AS _ts
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds
@@ -38,13 +40,14 @@ integration_test:
   description: Tests order with a limit.
   model: SIMPLE_MODEL
   metrics: ["booking_value"]
-  group_bys: ["ds"]
+  group_bys: ["_ts"]
   order_bys: ["booking_value"]
   limit: 2
+  check_order: true
   check_query: |
     SELECT
       SUM(booking_value) AS booking_value
-      , ds
+      , ds AS _ts
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds
@@ -58,14 +61,15 @@ integration_test:
   model: SIMPLE_MODEL
   required_features: ["DATE_TRUNC"]
   metrics: ["booking_value"]
-  group_bys: ["ds__month"]
-  order_bys: ["-ds__month"]
+  group_bys: ["_ts__month"]
+  order_bys: ["-_ts__month"]
+  check_order: true
   check_query: |
     SELECT
       SUM(booking_value) AS booking_value
-      , {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS ds__month
+      , {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS _ts__month
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
-      ds__month
+      _ts__month
     ORDER BY
-      booking_value DESC
+      _ts__month DESC

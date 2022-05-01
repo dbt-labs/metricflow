@@ -4,11 +4,11 @@ integration_test:
   description: Tests MAX aggregation.
   model: SIMPLE_MODEL
   metrics: ["largest_listing"]
-  group_bys: ["ds"]
+  group_bys: ["_ts"]
   check_query: |
     SELECT
       MAX(capacity) as largest_listing
-      , created_at as ds
+      , created_at AS _ts
     FROM {{ source_schema }}.dim_listings_latest
     GROUP BY
       2
@@ -18,11 +18,11 @@ integration_test:
   description: Tests MIN aggregation.
   model: SIMPLE_MODEL
   metrics: ["smallest_listing"]
-  group_bys: ["ds"]
+  group_bys: ["_ts"]
   check_query: |
     SELECT
       MIN(capacity) as smallest_listing
-      , created_at as ds
+      , created_at AS _ts
       FROM {{ source_schema }}.dim_listings_latest
       GROUP BY
         2
@@ -32,11 +32,11 @@ integration_test:
   description: Tests SUM aggregation.
   model: SIMPLE_MODEL
   metrics: ["listings"]
-  group_bys: ["ds"]
+  group_bys: ["_ts"]
   check_query: |
     SELECT
       SUM(1) as listings
-      , created_at as ds
+      , created_at AS _ts
       FROM {{ source_schema }}.dim_listings_latest
       GROUP BY
         2
@@ -46,11 +46,11 @@ integration_test:
   description: Tests COUNT_DISTINCT aggregation.
   model: SIMPLE_MODEL
   metrics: ["bookers"]
-  group_bys: ["ds"]
+  group_bys: ["_ts"]
   check_query: |
     SELECT
       COUNT(DISTINCT guest_id) as bookers
-      , ds
+      , ds AS _ts
       FROM {{ source_schema }}.fct_bookings
       GROUP BY
         2
@@ -60,11 +60,11 @@ integration_test:
   description: Tests AVG aggregation.
   model: SIMPLE_MODEL
   metrics: ["average_booking_value"]
-  group_bys: ["ds"]
+  group_bys: ["_ts"]
   check_query: |
     SELECT
       AVG(CAST(booking_value AS {{ double_data_type_name }})) as average_booking_value
-      , ds
+      , ds AS _ts
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds
@@ -74,11 +74,11 @@ integration_test:
   description: Tests BOOLEAN/SUM_BOOLEAN aggregation.
   model: SIMPLE_MODEL
   metrics: ["instant_bookings"]
-  group_bys: ["ds"]
+  group_bys: ["_ts"]
   check_query: |
     SELECT
       SUM(CASE WHEN is_instant THEN 1 ELSE 0 END) AS instant_bookings
-      , ds
+      , ds AS _ts
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds
