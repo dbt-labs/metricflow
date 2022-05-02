@@ -439,3 +439,49 @@ integration_test:
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds
+---
+integration_test:
+  name: metric_with_aggregation_time_dimension_specified.
+  description: |
+    Tests a query for a metric based on a measure that has the aggregation time dimension specified.
+  model: SIMPLE_MODEL
+  metrics: ["booking_payments"]
+  group_bys: ["_ts"]
+  check_query: |
+    SELECT
+      SUM(booking_value) AS booking_payments
+      , booking_paid_at AS _ts
+    FROM {{ source_schema }}.fct_bookings
+    GROUP BY
+      booking_paid_at
+---
+integration_test:
+  name: metrics_with_different_aggregation_time_dimensions
+  description: |
+    Tests querying multiple metrics based on different aggregation time dimensions
+  model: SIMPLE_MODEL
+  required_features: ["FULL_OUTER_JOIN"]
+  metrics: ["booking_value", "booking_payments"]
+  group_bys: ["_ts"]
+  check_query: |
+    SELECT
+      booking_value
+      , booking_payments
+      , COALESCE(a._ts, b._ts) AS _ts
+    FROM (
+      SELECT
+        SUM(booking_value) AS booking_value
+        , ds AS _ts
+      FROM {{ source_schema }}.fct_bookings
+      GROUP BY
+        ds
+    ) a
+    FULL OUTER JOIN (
+      SELECT
+        SUM(booking_value) AS booking_payments
+        , booking_paid_at AS _ts
+      FROM {{ source_schema }}.fct_bookings
+      GROUP BY
+        booking_paid_at
+    ) b
+    ON a._ts = b._ts
