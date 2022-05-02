@@ -109,7 +109,6 @@ celerybeat.pid
 .venv
 env/
 venv/
-metricflow-contrib/
 ENV/
 env.bak/
 venv.bak/
