@@ -11,6 +11,7 @@ from dateutil.parser import parse
 from metricflow.cli.cli_context import CLIContext
 from metricflow.configuration.config_builder import ConfigKey
 from metricflow.configuration.constants import (
+    CONFIG_DWH_CREDS_PATH,
     CONFIG_DWH_DB,
     CONFIG_DWH_DIALECT,
     CONFIG_DWH_HOST,
@@ -38,7 +39,7 @@ MF_CONFIG_KEYS = [
 ]
 # BigQuery config keys
 MF_BIGQUERY_KEYS = [
-    ConfigKey(key=CONFIG_DWH_PASSWORD, comment="Provide the path to the BigQuery credential file"),
+    ConfigKey(key=CONFIG_DWH_CREDS_PATH, comment="Provide the path to the BigQuery credential file"),
     ConfigKey(key=CONFIG_DWH_DIALECT, value="bigquery", comment="Dialect (one of BigQuery, Snowflake, Redshift)"),
 ]
 # Redshift config keys

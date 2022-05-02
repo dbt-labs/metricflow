@@ -6,6 +6,7 @@ from sqlalchemy.engine import make_url
 from typing import List, Any, Optional, Set
 
 from metricflow.configuration.constants import (
+    CONFIG_DWH_CREDS_PATH,
     CONFIG_DWH_DB,
     CONFIG_DWH_DIALECT,
     CONFIG_DWH_HOST,
@@ -77,7 +78,7 @@ def make_sql_client_from_config(handler: YamlFileHandler) -> SqlClient:
     url = handler.url
     dialect = not_empty(handler.get_value(CONFIG_DWH_DIALECT), CONFIG_DWH_DIALECT, url).upper()
     if dialect == SupportedSqlEngine.BIGQUERY.name:
-        path_to_creds = not_empty(handler.get_value(CONFIG_DWH_PASSWORD), CONFIG_DWH_PASSWORD, url)
+        path_to_creds = not_empty(handler.get_value(CONFIG_DWH_CREDS_PATH), CONFIG_DWH_CREDS_PATH, url)
         if not pathlib.Path(path_to_creds).exists:
             raise ValueError(f"`{path_to_creds}` does not contain the BigQuery credential file.")
         with open(path_to_creds, "r") as cred_file:
