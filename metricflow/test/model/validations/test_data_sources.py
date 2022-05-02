@@ -17,7 +17,7 @@ def test_data_source_invalid_sql() -> None:  # noqa:D
             sql_query="SELECT foo FROM bar;",
             dimensions=[
                 Dimension(
-                    name=dimension_reference,
+                    name=dimension_reference.element_name,
                     type=DimensionType.TIME,
                     type_params=DimensionTypeParams(
                         time_granularity=TimeGranularity.DAY,

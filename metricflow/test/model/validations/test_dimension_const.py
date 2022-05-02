@@ -22,10 +22,10 @@ def test_incompatible_dimension_type() -> None:  # noqa:D
                     data_source_with_guaranteed_meta(
                         name="dim1",
                         sql_query=f"SELECT {dim_reference.element_name}, {measure_reference.element_name} FROM bar",
-                        measures=[Measure(name=measure_reference, agg=AggregationType.SUM)],
+                        measures=[Measure(name=measure_reference.element_name, agg=AggregationType.SUM)],
                         dimensions=[
                             Dimension(
-                                name=dim_reference,
+                                name=dim_reference.element_name,
                                 type=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
                                     is_primary=True,
@@ -38,7 +38,7 @@ def test_incompatible_dimension_type() -> None:  # noqa:D
                     data_source_with_guaranteed_meta(
                         name="categoricaldim",
                         sql_query="SELECT foo FROM bar",
-                        dimensions=[Dimension(name=dim_reference, type=DimensionType.CATEGORICAL)],
+                        dimensions=[Dimension(name=dim_reference.element_name, type=DimensionType.CATEGORICAL)],
                         mutability=Mutability(type=MutabilityType.IMMUTABLE),
                     ),
                 ],
@@ -53,7 +53,6 @@ def test_incompatible_dimension_type() -> None:  # noqa:D
             )
         )
 
-
 def test_incompatible_dimension_is_partition() -> None:  # noqa:D
     with pytest.raises(ModelValidationException, match=r"conflicting is_partition attribute for dimension"):
         dim_ref1 = DimensionReference(element_name="dim1")
@@ -64,10 +63,10 @@ def test_incompatible_dimension_is_partition() -> None:  # noqa:D
                     data_source_with_guaranteed_meta(
                         name="dim1",
                         sql_query=f"SELECT {dim_ref1.element_name}, {measure_reference.element_name} FROM bar",
-                        measures=[Measure(name=measure_reference, agg=AggregationType.SUM)],
+                        measures=[Measure(name=measure_reference.element_name, agg=AggregationType.SUM)],
                         dimensions=[
                             Dimension(
-                                name=dim_ref1,
+                                name=dim_ref1.element_name,
                                 type=DimensionType.TIME,
                                 is_partition=True,
                                 type_params=DimensionTypeParams(
@@ -83,7 +82,7 @@ def test_incompatible_dimension_is_partition() -> None:  # noqa:D
                         sql_query="SELECT foo1 FROM bar",
                         dimensions=[
                             Dimension(
-                                name=dim_ref1,
+                                name=dim_ref1.element_name,
                                 type=DimensionType.TIME,
                                 is_partition=False,
                                 type_params=DimensionTypeParams(
@@ -120,14 +119,14 @@ def test_multiple_primary_time_dimensions() -> None:  # noqa:D
                         sql_query=f"SELECT ds, {measure_reference.element_name} FROM bar",
                         measures=[
                             Measure(
-                                name=measure_reference,
+                                name=measure_reference.element_name,
                                 agg=AggregationType.SUM,
                                 agg_time_dimension=TimeDimensionReference(element_name="ds"),
                             )
                         ],
                         dimensions=[
                             Dimension(
-                                name=dimension_reference,
+                                name=dimension_reference.element_name,
                                 type=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
                                     is_primary=True,
@@ -135,7 +134,7 @@ def test_multiple_primary_time_dimensions() -> None:  # noqa:D
                                 ),
                             ),
                             Dimension(
-                                name=dimension_reference2,
+                                name=dimension_reference2.element_name,
                                 type=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
                                     is_primary=True,

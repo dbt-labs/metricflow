@@ -184,7 +184,7 @@ class DataSourceToDataSetConverter:
         select_columns = []
         for measure in measures or []:
             measure_spec = MeasureSpec(
-                element_name=measure.name.element_name,
+                element_name=measure.reference.element_name,
             )
             measure_instance = MeasureInstance(
                 associated_columns=measure_spec.column_associations(self._column_association_resolver),
@@ -193,7 +193,7 @@ class DataSourceToDataSetConverter:
                 defined_from=(
                     DataSourceElementReference(
                         data_source_name=data_source_name,
-                        element_name=measure.name.element_name,
+                        element_name=measure.reference.element_name,
                     ),
                 ),
                 aggregation_state=AggregationState.NON_AGGREGATED,
@@ -203,7 +203,7 @@ class DataSourceToDataSetConverter:
                 SqlSelectColumn(
                     expr=DataSourceToDataSetConverter._make_element_sql_expr(
                         table_alias=table_alias,
-                        element_name=measure.name.element_name,
+                        element_name=measure.reference.element_name,
                         element_expr=measure.expr,
                     ),
                     column_alias=measure_instance.associated_column.column_name,

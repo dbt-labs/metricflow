@@ -86,7 +86,7 @@ class ElementConsistencyRule(ModelValidationRule):
         for data_source in model.data_sources:
             if data_source.measures:
                 for measure in data_source.measures:
-                    element_types[measure.name.element_name] = ModelObjectType.MEASURE
+                    element_types[measure.reference.element_name] = ModelObjectType.MEASURE
             if data_source.dimensions:
                 for dimension in data_source.dimensions:
                     element_types[dimension.name.element_name] = ModelObjectType.DIMENSION
@@ -112,7 +112,7 @@ class ElementConsistencyRule(ModelValidationRule):
         Returns:
             A list of validation issues found with elements of data sources for the model
         """
-        measure_name_tuples = [(x.name, ModelObjectType.MEASURE) for x in data_source.measures or []]
+        measure_name_tuples = [(x.reference, ModelObjectType.MEASURE) for x in data_source.measures or []]
         dimension_name_tuples = [(x.name, ModelObjectType.DIMENSION) for x in data_source.dimensions or []]
         identifier_name_tuples = [(x.name, ModelObjectType.IDENTIFIER) for x in data_source.identifiers or []]
         issues = []

@@ -24,7 +24,7 @@ class LowerCaseNamesRule(ModelTransformRule):
         """Lowercases the names of data source elements."""
         if data_source.measures:
             for measure in data_source.measures:
-                measure.name = MeasureReference(element_name=measure.name.element_name.lower())
+                measure.reference = MeasureReference(element_name=measure.reference.element_name.lower())
         if data_source.identifiers:
             for identifier in data_source.identifiers:
                 identifier.name = IdentifierReference(element_name=identifier.name.element_name.lower())

@@ -84,7 +84,7 @@ def test_get_elements(new_data_source_semantics: DataSourceSemantics) -> None:  
         )
     for measure_reference in new_data_source_semantics.measure_references:
         measure_reference = MeasureReference(element_name=measure_reference.element_name)
-        assert new_data_source_semantics.get_measure(measure_reference=measure_reference).name == measure_reference
+        assert new_data_source_semantics.get_measure(measure_reference=measure_reference).reference == measure_reference
 
 
 def test_get_data_sources_for_measure(new_data_source_semantics: DataSourceSemantics) -> None:  # noqa: D
