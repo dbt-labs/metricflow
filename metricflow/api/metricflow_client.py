@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import logging
+
 from typing import Dict, List, Optional, Tuple
 
 from metricflow.configuration.config_handler import ConfigHandler
 from metricflow.configuration.constants import CONFIG_DWH_SCHEMA
+from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.engine.metricflow_engine import (
     MetricFlowEngine,
@@ -22,14 +25,23 @@ from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLev
 from metricflow.sql_clients.common_client import not_empty
 from metricflow.sql_clients.sql_utils import make_sql_client_from_config
 
+logger = logging.getLogger(__name__)
+
 
 class MetricFlowClient:
     """MetricFlow Python client for running basic queries and other standard commands."""
 
     @staticmethod
-    def from_config() -> MetricFlowClient:
-        """Builds a MetricFlowClient via config yaml file stored in the designated config location."""
-        handler = ConfigHandler()
+    def from_config(config_file_path: Optional[str] = None) -> MetricFlowClient:
+        """Builds a MetricFlowClient via config yaml file.
+
+        If config_file_path is not passed, it will use the default config location.
+        """
+        if config_file_path is not None:
+            handler = YamlFileHandler(yaml_file_path=config_file_path)
+        else:
+            handler = ConfigHandler()
+        logger.debug(f"Constructing a MetricFlowClient with the config in {handler.yaml_file_path}")
         sql_client = make_sql_client_from_config(handler)
         user_configured_model = build_user_configured_model_from_config(handler)
         schema = not_empty(handler.get_value(CONFIG_DWH_SCHEMA), CONFIG_DWH_SCHEMA, handler.url)
