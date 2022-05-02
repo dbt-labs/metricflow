@@ -17,6 +17,7 @@ from metricflow.configuration.constants import (
     CONFIG_DWH_HOST,
     CONFIG_DWH_PASSWORD,
     CONFIG_DWH_PORT,
+    CONFIG_DWH_PROJECT_ID,
     CONFIG_DWH_SCHEMA,
     CONFIG_DWH_USER,
     CONFIG_DWH_WAREHOUSE,
@@ -39,7 +40,12 @@ MF_CONFIG_KEYS = [
 ]
 # BigQuery config keys
 MF_BIGQUERY_KEYS = [
-    ConfigKey(key=CONFIG_DWH_CREDS_PATH, comment="Provide the path to the BigQuery credential file"),
+    ConfigKey(
+        key=CONFIG_DWH_CREDS_PATH, comment="Provide the path to the BigQuery credential file, ignore to use ADC auth"
+    ),
+    ConfigKey(
+        key=CONFIG_DWH_PROJECT_ID, comment="Provide the GCP Project ID, ignore if using service account credentials"
+    ),
     ConfigKey(key=CONFIG_DWH_DIALECT, value="bigquery", comment="Dialect (one of BigQuery, Snowflake, Redshift)"),
 ]
 # Redshift config keys
