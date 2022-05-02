@@ -53,7 +53,7 @@ class MetricMeasuresRule(ModelValidationRule):
         valid_measure_names = []
         for data_source in model.data_sources:
             for measure in data_source.measures:
-                valid_measure_names.append(measure.name.element_name)
+                valid_measure_names.append(measure.reference.element_name)
 
         for metric in model.metrics or []:
             issues += MetricMeasuresRule._validate_metric_measure_references(

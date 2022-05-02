@@ -22,15 +22,15 @@ def test_metric_missing_measure() -> None:  # noqa:D
             UserConfiguredModel(
                 data_sources=[
                     DataSource(
-                        name="sum_measure",
+                        reference="sum_measure",
                         sql_query="SELECT foo FROM bar",
-                        measures=[Measure(name=measure_reference, agg=AggregationType.SUM)],
+                        measures=[Measure(reference=measure_reference, agg=AggregationType.SUM)],
                         mutability=Mutability(type=MutabilityType.IMMUTABLE),
                     )
                 ],
                 metrics=[
                     Metric(
-                        name="metric_with_nonexistent_measure",
+                        reference="metric_with_nonexistent_measure",
                         type=MetricType.MEASURE_PROXY,
                         type_params=MetricTypeParams(measures=[measure2_reference]),
                     )
@@ -47,22 +47,26 @@ def test_metric_no_time_dim_dim_only_source() -> None:  # noqa:D
         UserConfiguredModel(
             data_sources=[
                 DataSource(
-                    name="sum_measure",
+                    reference="sum_measure",
                     sql_query="SELECT foo, country FROM bar",
                     measures=[],
-                    dimensions=[Dimension(name=dim_reference, type=DimensionType.CATEGORICAL)],
+                    dimensions=[Dimension(reference=dim_reference, type=DimensionType.CATEGORICAL)],
                     mutability=Mutability(type=MutabilityType.IMMUTABLE),
                 ),
                 DataSource(
-                    name="sum_measure2",
+                    reference="sum_measure2",
                     sql_query="SELECT foo, country FROM bar",
                     measures=[
-                        Measure(name=measure_reference, agg=AggregationType.SUM, agg_time_dimension=dim2_reference)
+                        Measure(
+                            name=measure_reference.element_name,
+                            agg=AggregationType.SUM,
+                            agg_time_dimension=dim2_reference
+                        )
                     ],
                     dimensions=[
-                        Dimension(name=dim_reference, type=DimensionType.CATEGORICAL),
+                        Dimension(reference=dim_reference, type=DimensionType.CATEGORICAL),
                         Dimension(
-                            name=dim2_reference,
+                            reference=dim2_reference,
                             type=DimensionType.TIME,
                             type_params=DimensionTypeParams(
                                 is_primary=True,
@@ -75,7 +79,7 @@ def test_metric_no_time_dim_dim_only_source() -> None:  # noqa:D
             ],
             metrics=[
                 Metric(
-                    name="metric_with_no_time_dim",
+                    reference="metric_with_no_time_dim",
                     type=MetricType.MEASURE_PROXY,
                     type_params=MetricTypeParams(measures=[measure_reference]),
                 )
@@ -93,12 +97,12 @@ def test_metric_no_time_dim() -> None:  # noqa:D
             UserConfiguredModel(
                 data_sources=[
                     DataSource(
-                        name="sum_measure",
+                        reference="sum_measure",
                         sql_query="SELECT foo, country FROM bar",
-                        measures=[Measure(name=measure_reference, agg=AggregationType.SUM)],
+                        measures=[Measure(reference=measure_reference, agg=AggregationType.SUM)],
                         dimensions=[
                             Dimension(
-                                name=dim_reference,
+                                reference=dim_reference,
                                 type=DimensionType.CATEGORICAL,
                             )
                         ],
@@ -107,7 +111,7 @@ def test_metric_no_time_dim() -> None:  # noqa:D
                 ],
                 metrics=[
                     Metric(
-                        name="metric_with_no_time_dim",
+                        reference="metric_with_no_time_dim",
                         type=MetricType.MEASURE_PROXY,
                         type_params=MetricTypeParams(measures=[measure_reference]),
                     )
@@ -126,19 +130,19 @@ def test_metric_multiple_primary_time_dims() -> None:  # noqa:D
             UserConfiguredModel(
                 data_sources=[
                     DataSource(
-                        name="sum_measure",
+                        reference="sum_measure",
                         sql_query="SELECT foo, date_created, date_deleted FROM bar",
-                        measures=[Measure(name=measure_reference, agg=AggregationType.SUM)],
+                        measures=[Measure(reference=measure_reference, agg=AggregationType.SUM)],
                         dimensions=[
                             Dimension(
-                                name=dim_reference,
+                                reference=dim_reference,
                                 type=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
                                     time_granularity=TimeGranularity.DAY,
                                 ),
                             ),
                             Dimension(
-                                name=dim2_reference,
+                                reference=dim2_reference,
                                 type=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
                                     time_granularity=TimeGranularity.DAY,
@@ -150,7 +154,7 @@ def test_metric_multiple_primary_time_dims() -> None:  # noqa:D
                 ],
                 metrics=[
                     Metric(
-                        name="foo",
+                        reference="foo",
                         type=MetricType.MEASURE_PROXY,
                         type_params=MetricTypeParams(measures=[measure_reference]),
                     )
@@ -166,13 +170,13 @@ def test_generated_metrics_only() -> None:  # noqa:D
     measure_reference = MeasureReference(element_name="measure")
     identifier_reference = IdentifierReference(element_name="primary")
     data_source = DataSource(
-        name="dim1",
+        reference="dim1",
         sql_query=f"SELECT {dim_reference.element_name}, {measure_reference.element_name} FROM bar",
-        measures=[Measure(name=measure_reference, agg=AggregationType.SUM, agg_time_dimension=dim2_reference)],
+        measures=[Measure(name=measure_reference.element_name, agg=AggregationType.SUM, agg_time_dimension=dim2_reference)],
         dimensions=[
-            Dimension(name=dim_reference, type=DimensionType.CATEGORICAL),
+            Dimension(reference=dim_reference, type=DimensionType.CATEGORICAL),
             Dimension(
-                name=dim2_reference,
+                reference=dim2_reference,
                 type=DimensionType.TIME,
                 type_params=DimensionTypeParams(
                     is_primary=True,
@@ -182,7 +186,7 @@ def test_generated_metrics_only() -> None:  # noqa:D
         ],
         mutability=Mutability(type=MutabilityType.IMMUTABLE),
         identifiers=[
-            Identifier(name=identifier_reference, type=IdentifierType.PRIMARY),
+            Identifier(reference=identifier_reference, type=IdentifierType.PRIMARY),
         ],
     )
     data_source.measures[0].create_metric = True

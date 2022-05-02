@@ -81,7 +81,7 @@ class ElementConsistencyRule(ModelValidationRule):
         for data_source in model.data_sources:
             if data_source.measures:
                 for measure in data_source.measures:
-                    element_types[measure.name.element_name] = ModelObjectType.MEASURE
+                    element_types[measure.reference.element_name] = ModelObjectType.MEASURE
             if data_source.dimensions:
                 for dimension in data_source.dimensions:
                     element_types[dimension.name.element_name] = ModelObjectType.DIMENSION
@@ -103,7 +103,7 @@ class ElementConsistencyRule(ModelValidationRule):
         :param data_source: the data source to check
         :param add_to_dict: if the given element does not exist in the dictionary, whether to add it.
         """
-        measure_name_tuples = [(x.name, ModelObjectType.MEASURE) for x in data_source.measures or []]
+        measure_name_tuples = [(x.reference, ModelObjectType.MEASURE) for x in data_source.measures or []]
         dimension_name_tuples = [(x.name, ModelObjectType.DIMENSION) for x in data_source.dimensions or []]
         identifier_name_tuples = [(x.name, ModelObjectType.IDENTIFIER) for x in data_source.identifiers or []]
         issues = []

@@ -66,7 +66,7 @@ class DimensionAndIdentifierNameValidator:
         # Values are (name of identifier, IdentifierType value)
         self._measure_to_associated_identifier_keys: Dict[MeasureReference, List[IdentifierKey]] = defaultdict(list)
         for data_source in model.data_sources:
-            measure_references = [x.name for x in data_source.measures]
+            measure_references = [x.reference for x in data_source.measures]
             # List of identifiers and their types in the data source
             identifier_keys: List[IdentifierKey] = []
             for identifier in data_source.identifiers:
@@ -90,20 +90,20 @@ class DimensionAndIdentifierNameValidator:
         for data_source in model.data_sources:
             local_dimension_references = [dimension.name for dimension in data_source.dimensions]
             for measure in data_source.measures:
-                self._measure_to_local_dimension[measure.name].extend(local_dimension_references)
+                self._measure_to_local_dimension[measure.reference].extend(local_dimension_references)
 
         # Populate the list of identifiers for each measure
         self._measures_to_identifiers: Dict[MeasureReference, List[IdentifierReference]] = defaultdict(list)
         for data_source in model.data_sources:
             identifier_references = [identifier.name for identifier in data_source.identifiers]
             for measure in data_source.measures:
-                self._measures_to_identifiers[measure.name].extend(identifier_references)
+                self._measures_to_identifiers[measure.reference].extend(identifier_references)
 
         # Populate the name of the element to the type
         self._element_name_to_type: Dict[str, ModelObjectType] = {}
         for data_source in model.data_sources:
             for measure in data_source.measures:
-                self._element_name_to_type[measure.name.element_name] = ModelObjectType.MEASURE
+                self._element_name_to_type[measure.reference.element_name] = ModelObjectType.MEASURE
             for dimension in data_source.dimensions:
                 self._element_name_to_type[dimension.name.element_name] = ModelObjectType.DIMENSION
             for identifier in data_source.identifiers:

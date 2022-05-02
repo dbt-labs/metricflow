@@ -19,12 +19,12 @@ def test_incompatible_dimension_type() -> None:  # noqa:D
             UserConfiguredModel(
                 data_sources=[
                     DataSource(
-                        name="dim1",
+                        reference="dim1",
                         sql_query=f"SELECT {dim_reference.element_name}, {measure_reference.element_name} FROM bar",
-                        measures=[Measure(name=measure_reference, agg=AggregationType.SUM)],
+                        measures=[Measure(reference=measure_reference, agg=AggregationType.SUM)],
                         dimensions=[
                             Dimension(
-                                name=dim_reference,
+                                reference=dim_reference,
                                 type=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
                                     is_primary=True,
@@ -35,15 +35,15 @@ def test_incompatible_dimension_type() -> None:  # noqa:D
                         mutability=Mutability(type=MutabilityType.IMMUTABLE),
                     ),
                     DataSource(
-                        name="categoricaldim",
+                        reference="categoricaldim",
                         sql_query="SELECT foo FROM bar",
-                        dimensions=[Dimension(name=dim_reference, type=DimensionType.CATEGORICAL)],
+                        dimensions=[Dimension(reference=dim_reference, type=DimensionType.CATEGORICAL)],
                         mutability=Mutability(type=MutabilityType.IMMUTABLE),
                     ),
                 ],
                 metrics=[
                     Metric(
-                        name=measure_reference.element_name,
+                        reference=measure_reference.element_name,
                         type=MetricType.MEASURE_PROXY,
                         type_params=MetricTypeParams(measures=[measure_reference]),
                     )
@@ -51,7 +51,6 @@ def test_incompatible_dimension_type() -> None:  # noqa:D
                 materializations=[],
             )
         )
-
 
 def test_incompatible_dimension_is_partition() -> None:  # noqa:D
     with pytest.raises(ModelValidationException, match=r"conflicting is_partition attribute for dimension"):
@@ -61,12 +60,12 @@ def test_incompatible_dimension_is_partition() -> None:  # noqa:D
             UserConfiguredModel(
                 data_sources=[
                     DataSource(
-                        name="dim1",
+                        reference="dim1",
                         sql_query=f"SELECT {dim_ref1.element_name}, {measure_reference.element_name} FROM bar",
-                        measures=[Measure(name=measure_reference, agg=AggregationType.SUM)],
+                        measures=[Measure(reference=measure_reference, agg=AggregationType.SUM)],
                         dimensions=[
                             Dimension(
-                                name=dim_ref1,
+                                reference=dim_ref1,
                                 type=DimensionType.TIME,
                                 is_partition=True,
                                 type_params=DimensionTypeParams(
@@ -78,11 +77,11 @@ def test_incompatible_dimension_is_partition() -> None:  # noqa:D
                         mutability=Mutability(type=MutabilityType.IMMUTABLE),
                     ),
                     DataSource(
-                        name="dim2",
+                        reference="dim2",
                         sql_query="SELECT foo1 FROM bar",
                         dimensions=[
                             Dimension(
-                                name=dim_ref1,
+                                reference=dim_ref1,
                                 type=DimensionType.TIME,
                                 is_partition=False,
                                 type_params=DimensionTypeParams(
@@ -95,7 +94,7 @@ def test_incompatible_dimension_is_partition() -> None:  # noqa:D
                 ],
                 metrics=[
                     Metric(
-                        name=measure_reference.element_name,
+                        reference=measure_reference.element_name,
                         type=MetricType.MEASURE_PROXY,
                         type_params=MetricTypeParams(measures=[measure_reference]),
                     )

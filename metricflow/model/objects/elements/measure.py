@@ -46,9 +46,9 @@ class AggregationType(ExtendedEnum):
 class Measure(HashableBaseModel, ParseableObject):
     """Describes a measure"""
 
+    name: str
     agg: AggregationType
     create_metric: Optional[bool]
-    name: MeasureReference
     expr: Optional[str] = None
 
     # Defines the time dimension to aggregate this measure by. If not specified, it means to use the primary time
@@ -62,3 +62,8 @@ class Measure(HashableBaseModel, ParseableObject):
             self.agg_time_dimension
         ), f"Aggregation time dimension for {self.name} should have been set during model transformation"
         return self.agg_time_dimension
+
+    @property
+    def reference(self) -> MeasureReference:  # noqa: D
+        return MeasureReference(element_name=self.name)
+

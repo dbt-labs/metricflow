@@ -20,11 +20,11 @@ def test_inconsistent_elements() -> None:  # noqa:D
             UserConfiguredModel(
                 data_sources=[
                     DataSource(
-                        name="s1",
+                        reference="s1",
                         sql_query="SELECT foo FROM bar",
                         dimensions=[
                             Dimension(
-                                name=dim_reference,
+                                reference=dim_reference,
                                 type_=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
                                     time_granularity=TimeGranularity.DAY,
@@ -34,15 +34,15 @@ def test_inconsistent_elements() -> None:  # noqa:D
                         mutability=Mutability(type=MutabilityType.IMMUTABLE),
                     ),
                     DataSource(
-                        name="s2",
+                        reference="s2",
                         sql_query="SELECT foo FROM bar",
-                        measures=[Measure(name=measure_reference, agg=AggregationType.SUM)],
+                        measures=[Measure(reference=measure_reference, agg=AggregationType.SUM)],
                         mutability=Mutability(type=MutabilityType.IMMUTABLE),
                     ),
                 ],
                 metrics=[
                     Metric(
-                        name=measure_reference.element_name,
+                        reference=measure_reference.element_name,
                         type=MetricType.MEASURE_PROXY,
                         type_params=MetricTypeParams(measures=[measure_reference]),
                     )

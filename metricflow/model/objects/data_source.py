@@ -88,11 +88,11 @@ class DataSource(HashableBaseModel, ParseableObject):
 
     @property
     def measure_names(self) -> List[MeasureReference]:  # noqa: D
-        return [i.name for i in self.measures]
+        return [i.reference for i in self.measures]
 
     def get_measure(self, measure_name: MeasureReference) -> Measure:  # noqa: D
         for measure in self.measures:
-            if measure.name == measure_name:
+            if measure.reference == measure_name:
                 return measure
 
         raise ValueError(f"No dimension with name ({measure_name}) in data source with name ({self.name})")

@@ -450,7 +450,7 @@ class ValidLinkableSpecResolver:
     def _get_data_source_for_measure(self, measure_reference: MeasureReference) -> DataSource:  # noqa: D
         data_sources_where_measure_was_found = []
         for data_source in self._data_sources:
-            if any([x.name.element_name == measure_reference.element_name for x in data_source.measures]):
+            if any([x.reference.element_name == measure_reference.element_name for x in data_source.measures]):
                 data_sources_where_measure_was_found.append(data_source)
 
         if len(data_sources_where_measure_was_found) == 0:

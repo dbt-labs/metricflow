@@ -59,7 +59,7 @@ def test_list_metrics(mf_client: MetricFlowClient) -> None:  # noqa: D
 
     metric_name, metric_obj = next(iter(metrics.items()))
 
-    assert metric_name == metric_obj.name
+    assert metric_name == metric_obj.reference
     assert isinstance(metric_obj, Metric)
 
     assert metric_obj.dimensions

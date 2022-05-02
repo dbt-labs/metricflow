@@ -78,7 +78,7 @@ class MetricTypeParams(HashableBaseModel, ParseableObject):
 class Metric(HashableBaseModel, ParseableObject):
     """Describes a metric"""
 
-    name: str
+    reference: str
     type: MetricType
     type_params: MetricTypeParams
     constraint: Optional[WhereClauseConstraint]
