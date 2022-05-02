@@ -42,13 +42,13 @@ class DataSourceMeasuresUniqueRule(ModelValidationRule):
                                 if data_source.metadata
                                 else None,
                                 data_source_name=data_source.name,
-                                measure_name=measure.name.element_name,
+                                measure_name=measure.reference.element_name,
                             ),
                             message=f"Found measure with name {measure.name} in multiple data sources with names "
-                            f"({measure_names_to_data_sources[measure.name]})",
+                            f"({measure_names_to_data_sources[measure.reference]})",
                         )
                     )
-                measure_names_to_data_sources[measure.name].append(data_source.name)
+                measure_names_to_data_sources[measure.reference].append(data_source.name)
 
         return issues
 

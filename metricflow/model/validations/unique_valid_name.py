@@ -66,7 +66,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
             for measure in data_source.measures:
                 element_info_tuples.append(
                     (
-                        measure.name,
+                        measure.reference,
                         "measure",
                         MeasureContext(
                             file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
@@ -74,7 +74,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
                             if data_source.metadata
                             else None,
                             data_source_name=data_source.name,
-                            measure_name=measure.name.element_name,
+                            measure_name=measure.reference.element_name,
                         ),
                     )
                 )

@@ -22,7 +22,7 @@ class IdentifierType(ExtendedEnum):
 class CompositeSubIdentifier(HashableBaseModel, ParseableObject):
     """CompositeSubIdentifiers either describe or reference the identifiers that comprise a composite identifier"""
 
-    name: Optional[IdentifierReference]
+    reference: Optional[IdentifierReference]
     expr: Optional[str]
     ref: Optional[str]
 
