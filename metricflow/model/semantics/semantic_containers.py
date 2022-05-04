@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from collections import defaultdict
 from copy import deepcopy
-from typing import Dict, List, Set, Type, Optional, Sequence, Tuple
+from typing import Dict, List, Set, Type, Optional, Sequence, Tuple, FrozenSet
 
 from metricflow.errors.errors import (
     DuplicateMetricError,
@@ -34,7 +34,6 @@ from metricflow.specs import (
     IdentifierReference,
     MetricSpec,
     TimeDimensionReference,
-    LinkableSpecSet,
 )
 
 logger = logging.getLogger(__name__)
@@ -65,40 +64,16 @@ class MetricSemantics:  # noqa: D
     def element_specs_for_metrics(
         self,
         metric_specs: List[MetricSpec],
-        local_only: bool = False,
-        dimensions_only: bool = False,
-        exclude_multi_hop: bool = False,
-        exclude_derived_time_granularities: bool = True,
-        exclude_local_linked_primary_time: bool = True,
+        with_any_property: FrozenSet[LinkableElementProperties] = LinkableElementProperties.all_properties(),
+        without_any_property: FrozenSet[LinkableElementProperties] = frozenset(),
     ) -> List[LinkableInstanceSpec]:
         """Dimensions common to all metrics requested (intersection)"""
-        without_any_property = set()
-
-        if exclude_local_linked_primary_time:
-            without_any_property.add(LinkableElementProperties.LOCAL_LINKED_PRIMARY_TIME)
-
-        if exclude_derived_time_granularities:
-            without_any_property.add(LinkableElementProperties.DERIVED_TIME_GRANULARITY)
-
-        if local_only:
-            with_any_property = frozenset({LinkableElementProperties.LOCAL})
-        else:
-            with_any_property = LinkableElementProperties.all_properties()
-
-        if exclude_multi_hop:
-            without_any_property.add(LinkableElementProperties.MULTI_HOP)
 
         all_linkable_specs = self._linkable_spec_resolver.get_linkable_elements_for_metrics(
             metric_specs=metric_specs,
             with_any_of=with_any_property,
-            without_any_of=frozenset(without_any_property),
+            without_any_of=without_any_property,
         ).as_spec_set
-
-        if dimensions_only:
-            all_linkable_specs = LinkableSpecSet(
-                dimension_specs=all_linkable_specs.dimension_specs,
-                time_dimension_specs=all_linkable_specs.time_dimension_specs,
-            )
 
         return sorted(all_linkable_specs.as_tuple, key=lambda x: x.qualified_name)
 

@@ -40,12 +40,16 @@ class LinkableElementProperties(Enum):
     LOCAL_LINKED_PRIMARY_TIME = "local_linked_primary_time"
     # A local element as per above definition.
     LOCAL = "local"
+    # A local dimension that is prefixed with a local primary identifier.
+    LOCAL_LINKED = "local_linked"
     # An element that was joined to the measure data source by an identifier.
     JOINED = "joined"
     # An element that was joined to the measure data source by joining multiple data sources.
     MULTI_HOP = "multi_hop"
     # A time dimension that is a version of a time dimension in a data source, but at a different granularity.
     DERIVED_TIME_GRANULARITY = "derived_time_granularity"
+    # Refers to an identifier, not a dimension.
+    IDENTIFIER = "identifier"
     # After an intersection operation.
     INTERSECTED = "intersected"
 
@@ -55,6 +59,7 @@ class LinkableElementProperties(Enum):
             {
                 LinkableElementProperties.LOCAL_LINKED_PRIMARY_TIME,
                 LinkableElementProperties.LOCAL,
+                LinkableElementProperties.LOCAL_LINKED,
                 LinkableElementProperties.JOINED,
                 LinkableElementProperties.MULTI_HOP,
                 LinkableElementProperties.DERIVED_TIME_GRANULARITY,
@@ -322,6 +327,7 @@ def _generate_linkable_time_dimensions(
         properties = set(with_properties)
         if time_granularity != defined_time_granularity:
             properties.add(LinkableElementProperties.DERIVED_TIME_GRANULARITY)
+
         linkable_dimensions.append(
             LinkableDimension(
                 element_name=dimension.name.element_name,
@@ -385,7 +391,7 @@ class DataSourceJoinPath:
                     LinkableIdentifier(
                         element_name=identifier.name.element_name,
                         identifier_links=identifier_links,
-                        properties=with_properties,
+                        properties=with_properties.union({LinkableElementProperties.IDENTIFIER}),
                     )
                 )
 
@@ -504,7 +510,7 @@ class ValidLinkableSpecResolver:
             # "listing__country_latest" for the "listings" metric.
             if identifier.type == IdentifierType.PRIMARY:
                 for linkable_dimension in linkable_dimensions:
-                    properties = {LinkableElementProperties.LOCAL}
+                    properties = {LinkableElementProperties.LOCAL, LinkableElementProperties.LOCAL_LINKED}
 
                     if linkable_dimension.element_name == self._primary_time_dimension_reference.element_name:
                         properties.add(LinkableElementProperties.LOCAL_LINKED_PRIMARY_TIME)
@@ -514,7 +520,7 @@ class ValidLinkableSpecResolver:
                             element_name=linkable_dimension.element_name,
                             identifier_links=(identifier.name.element_name,),
                             time_granularity=linkable_dimension.time_granularity,
-                            properties=linkable_dimension.properties,
+                            properties=frozenset(linkable_dimension.properties.union(properties)),
                         )
                     )
 

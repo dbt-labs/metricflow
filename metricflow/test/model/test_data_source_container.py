@@ -1,9 +1,14 @@
+import logging
+
 import pytest
 
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantics.data_source_container import PydanticDataSourceContainer
+from metricflow.model.semantics.linkable_spec_resolver import LinkableElementProperties
 from metricflow.model.semantics.semantic_containers import DataSourceSemantics, MetricSemantics
 from metricflow.specs import DimensionReference, MetricSpec, MeasureReference
+
+logger = logging.getLogger(__name__)
 
 
 @pytest.fixture
@@ -99,9 +104,15 @@ def test_dimension_is_partitioned(new_data_source_semantics: DataSourceSemantics
     assert new_data_source_semantics.dimension_is_partitioned(DimensionReference(element_name="ds")) is False
 
 
-def test_elements_for_measure(new_metric_semantics: MetricSemantics) -> None:  # noqa: D
+def test_elements_for_metric(new_metric_semantics: MetricSemantics) -> None:  # noqa: D
     assert set(
-        [x.qualified_name for x in new_metric_semantics.element_specs_for_metrics([MetricSpec(element_name="views")])]
+        [
+            x.qualified_name
+            for x in new_metric_semantics.element_specs_for_metrics(
+                [MetricSpec(element_name="views")],
+                without_any_property=frozenset({LinkableElementProperties.DERIVED_TIME_GRANULARITY}),
+            )
+        ]
     ) == {
         "create_a_cycle_in_the_join_graph",
         "create_a_cycle_in_the_join_graph__guest",
@@ -140,15 +151,36 @@ def test_elements_for_measure(new_metric_semantics: MetricSemantics) -> None:  #
         "user__home_state_latest",
     }
 
-    assert set(
-        [
-            x.qualified_name
-            for x in new_metric_semantics.element_specs_for_metrics([MetricSpec(element_name="views")], local_only=True)
-        ]
-    ) == {
+    local_specs = new_metric_semantics.element_specs_for_metrics(
+        metric_specs=[MetricSpec(element_name="views")],
+        with_any_property=frozenset({LinkableElementProperties.LOCAL}),
+        without_any_property=frozenset({LinkableElementProperties.DERIVED_TIME_GRANULARITY}),
+    )
+    assert set([x.qualified_name for x in local_specs]) == {
         "create_a_cycle_in_the_join_graph",
         "ds",
         "ds_partitioned",
         "listing",
         "user",
+    }
+
+
+def test_local_linked_elements_for_metric(new_metric_semantics: MetricSemantics) -> None:  # noqa: D
+    result = set(
+        [
+            x.qualified_name
+            for x in new_metric_semantics.element_specs_for_metrics(
+                [MetricSpec(element_name="listings")],
+                with_any_property=frozenset({LinkableElementProperties.LOCAL_LINKED}),
+                without_any_property=frozenset({LinkableElementProperties.DERIVED_TIME_GRANULARITY}),
+            )
+        ]
+    )
+
+    assert result == {
+        "listing__created_at",
+        "listing__country_latest",
+        "listing__is_lux_latest",
+        "listing__ds",
+        "listing__capacity_latest",
     }
