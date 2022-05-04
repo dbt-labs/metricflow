@@ -237,13 +237,7 @@ class MetricFlowQueryParser:
         if len(invalid_group_bys) > 0:
             valid_group_by_names_for_metrics = sorted(
                 x.qualified_name
-                for x in self._metric_semantics.element_specs_for_metrics(
-                    metric_specs=list(metric_specs),
-                    local_only=False,
-                    dimensions_only=False,
-                    exclude_multi_hop=False,
-                    exclude_derived_time_granularities=False,
-                )
+                for x in self._metric_semantics.element_specs_for_metrics(metric_specs=list(metric_specs))
             )
             # Create suggestions for invalid dimensions in case the user made a typo.
             suggestion_sections = {}
@@ -631,13 +625,7 @@ class MetricFlowQueryParser:
         """Checks that each requested linkable instance can be retrieved for the given metric"""
         invalid_linkable_specs: List[LinkableInstanceSpec] = []
         # TODO: distinguish between dimensions that invalid via typo vs ambiguous join path
-        valid_linkable_specs = self._metric_semantics.element_specs_for_metrics(
-            metric_specs=list(metric_specs),
-            local_only=False,
-            dimensions_only=False,
-            exclude_multi_hop=False,
-            exclude_derived_time_granularities=False,
-        )
+        valid_linkable_specs = self._metric_semantics.element_specs_for_metrics(metric_specs=list(metric_specs))
 
         for dimension_spec in dimension_specs:
             if dimension_spec not in valid_linkable_specs:

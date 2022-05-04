@@ -22,6 +22,7 @@ from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
 from metricflow.execution.execution_plan_to_text import execution_plan_to_text
 from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.model.semantic_model import SemanticModel
+from metricflow.model.semantics.linkable_spec_resolver import LinkableElementProperties
 from metricflow.object_utils import pformat_big_objects, random_id
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_execution import DataflowToExecutionPlanConverter
@@ -443,9 +444,13 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             Dimension(name=dim.qualified_name)
             for dim in self._semantic_model.metric_semantics.element_specs_for_metrics(
                 metric_specs=[MetricSpec(element_name=mname) for mname in metric_names],
-                dimensions_only=True,
-                exclude_derived_time_granularities=True,
-                exclude_local_linked_primary_time=True,
+                without_any_property=frozenset(
+                    {
+                        LinkableElementProperties.IDENTIFIER,
+                        LinkableElementProperties.DERIVED_TIME_GRANULARITY,
+                        LinkableElementProperties.LOCAL_LINKED,
+                    }
+                ),
             )
         ]
 
