@@ -302,9 +302,9 @@ class DataSourceSemantics:
             )
 
         for measure in data_source.measures:
-            if measure.name in self._measure_aggs and self._measure_aggs[measure.name] != measure.agg:
+            if measure.ref in self._measure_aggs and self._measure_aggs[measure.ref] != measure.agg:
                 errors.append(
-                    f"conflicting aggregation (agg) for measure `{measure.name}` registered as `{self._measure_aggs[measure.name]}`; "
+                    f"conflicting aggregation (agg) for measure `{measure.ref}` registered as `{self._measure_aggs[measure.ref]}`; "
                     f"Got `{measure.agg}"
                 )
 
@@ -328,8 +328,8 @@ class DataSourceSemantics:
                 self._element_types[elem.ref] = type(elem)
 
         for meas in data_source.measures:
-            self._measure_aggs[meas.name] = meas.agg
-            self._measure_index[meas.name].append(data_source)
+            self._measure_aggs[meas.ref] = meas.agg
+            self._measure_index[meas.ref].append(data_source)
         for dim in data_source.dimensions:
             self._linkable_reference_index[dim.ref].append(data_source)
             self._dimension_index[dim.ref].append(data_source)

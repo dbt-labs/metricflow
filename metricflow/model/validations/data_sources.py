@@ -32,18 +32,18 @@ class DataSourceMeasuresUniqueRule(ModelValidationRule):
         measure_names_to_data_sources: Dict[MeasureReference, List] = defaultdict(list)
         for data_source in model.data_sources:
             for measure in data_source.measures:
-                if measure.name in measure_names_to_data_sources:
+                if measure.ref in measure_names_to_data_sources:
                     model_object_reference = ValidationIssue.make_object_reference(
-                        data_source_name=data_source.name, measure_name=measure.name.element_name
+                        data_source_name=data_source.name, measure_name=measure.ref.element_name
                     )
                     issues.append(
                         ValidationError(
                             model_object_reference=model_object_reference,
-                            message=f"Found measure with name {measure.name} in multiple data sources with names "
-                            f"({measure_names_to_data_sources[measure.name]})",
+                            message=f"Found measure with name {measure.ref} in multiple data sources with names "
+                            f"({measure_names_to_data_sources[measure.ref]})",
                         )
                     )
-                measure_names_to_data_sources[measure.name].append(data_source.name)
+                measure_names_to_data_sources[measure.ref].append(data_source.name)
 
         return issues
 

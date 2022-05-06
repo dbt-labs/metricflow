@@ -119,7 +119,7 @@ def test_cross_element_names(simple_model__pre_transforms: UserConfiguredModel) 
         and len(_categorical_dimensions(data_source=data_source)) > 0,
     )
 
-    measure_reference = usable_ds.measures[0].name
+    measure_reference = usable_ds.measures[0].ref
     # If the matching dimension is a time dimension we can accidentally create two primary time dimensions, and then
     # the validation will throw a different error and fail the test
     dimension_reference = _categorical_dimensions(data_source=usable_ds)[0].ref
@@ -167,7 +167,7 @@ def test_duplicate_measure_name(simple_model__pre_transforms: UserConfiguredMode
 
     with pytest.raises(
         ModelValidationException,
-        match=rf"can't use name `{duplicated_measure.name.element_name}` for a measure when it was already used for a measure",
+        match=rf"can't use name `{duplicated_measure.ref.element_name}` for a measure when it was already used for a measure",
     ):
         ModelValidator.checked_validations(model)
 

@@ -75,7 +75,7 @@ class TimeGranularitySolver:
                     for measure in data_source.measures:
                         self._local_time_dimension_granularities[
                             LocalTimeDimensionGranularityKey(
-                                measure_reference=MeasureReference(element_name=measure.name.element_name),
+                                measure_reference=MeasureReference(element_name=measure.ref.element_name),
                                 local_time_dimension_reference=TimeDimensionReference(
                                     element_name=dimension.ref.element_name
                                 ),
