@@ -502,7 +502,7 @@ class ValidLinkableSpecResolver:
                 LinkableIdentifier(
                     element_name=identifier.name.element_name,
                     identifier_links=(),
-                    properties=frozenset({LinkableElementProperties.LOCAL}),
+                    properties=frozenset({LinkableElementProperties.LOCAL, LinkableElementProperties.IDENTIFIER}),
                 )
             )
             # If a data source has a primary identifier, we allow users to query using the dundered syntax, even though
