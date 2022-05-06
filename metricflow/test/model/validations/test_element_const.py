@@ -24,7 +24,7 @@ def test_inconsistent_elements() -> None:  # noqa:D
                         sql_query="SELECT foo FROM bar",
                         dimensions=[
                             Dimension(
-                                name=dim_reference,
+                                ref=dim_reference,
                                 type_=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
                                     time_granularity=TimeGranularity.DAY,
@@ -36,7 +36,7 @@ def test_inconsistent_elements() -> None:  # noqa:D
                     DataSource(
                         name="s2",
                         sql_query="SELECT foo FROM bar",
-                        measures=[Measure(name=measure_reference, agg=AggregationType.SUM)],
+                        measures=[Measure(ref=measure_reference, agg=AggregationType.SUM)],
                         mutability=Mutability(type=MutabilityType.IMMUTABLE),
                     ),
                 ],

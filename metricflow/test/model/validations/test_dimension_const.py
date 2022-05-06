@@ -22,10 +22,10 @@ def test_incompatible_dimension_type() -> None:  # noqa:D
                     DataSource(
                         name="dim1",
                         sql_query=f"SELECT {dim_reference.element_name}, {measure_reference.element_name} FROM bar",
-                        measures=[Measure(name=measure_reference, agg=AggregationType.SUM)],
+                        measures=[Measure(ref=measure_reference, agg=AggregationType.SUM)],
                         dimensions=[
                             Dimension(
-                                name=dim_reference,
+                                ref=dim_reference,
                                 type=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
                                     is_primary=True,
@@ -38,7 +38,7 @@ def test_incompatible_dimension_type() -> None:  # noqa:D
                     DataSource(
                         name="categoricaldim",
                         sql_query="SELECT foo FROM bar",
-                        dimensions=[Dimension(name=dim_reference, type=DimensionType.CATEGORICAL)],
+                        dimensions=[Dimension(ref=dim_reference, type=DimensionType.CATEGORICAL)],
                         mutability=Mutability(type=MutabilityType.IMMUTABLE),
                     ),
                 ],
@@ -65,10 +65,10 @@ def test_multiple_primary_time_dimensions() -> None:  # noqa:D
                     DataSource(
                         name="dim1",
                         sql_query=f"SELECT ds, {measure_reference.element_name} FROM bar",
-                        measures=[Measure(name=measure_reference, agg=AggregationType.SUM)],
+                        measures=[Measure(ref=measure_reference, agg=AggregationType.SUM)],
                         dimensions=[
                             Dimension(
-                                name=dimension_reference,
+                                ref=dimension_reference,
                                 type=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
                                     is_primary=True,
@@ -83,7 +83,7 @@ def test_multiple_primary_time_dimensions() -> None:  # noqa:D
                         sql_query="SELECT foo1 FROM bar",
                         dimensions=[
                             Dimension(
-                                name=dimension_reference2,
+                                ref=dimension_reference2,
                                 type=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
                                     is_primary=True,
@@ -116,10 +116,10 @@ def test_incompatible_dimension_is_partition() -> None:  # noqa:D
                     DataSource(
                         name="dim1",
                         sql_query=f"SELECT {dim_ref1.element_name}, {measure_reference.element_name} FROM bar",
-                        measures=[Measure(name=measure_reference, agg=AggregationType.SUM)],
+                        measures=[Measure(ref=measure_reference, agg=AggregationType.SUM)],
                         dimensions=[
                             Dimension(
-                                name=dim_ref1,
+                                ref=dim_ref1,
                                 type=DimensionType.TIME,
                                 is_partition=True,
                                 type_params=DimensionTypeParams(
@@ -135,7 +135,7 @@ def test_incompatible_dimension_is_partition() -> None:  # noqa:D
                         sql_query="SELECT foo1 FROM bar",
                         dimensions=[
                             Dimension(
-                                name=dim_ref1,
+                                ref=dim_ref1,
                                 type=DimensionType.TIME,
                                 is_partition=False,
                                 type_params=DimensionTypeParams(

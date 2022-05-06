@@ -62,10 +62,10 @@ def test_invalid_composite_identifiers() -> None:  # noqa:D
                     DataSource(
                         name="dim1",
                         sql_query=f"SELECT {dim_reference.element_name}, {measure_reference.element_name}, thorium_id FROM bar",
-                        measures=[Measure(name=measure_reference, agg=AggregationType.SUM)],
+                        measures=[Measure(ref=measure_reference, agg=AggregationType.SUM)],
                         dimensions=[
                             Dimension(
-                                name=dim_reference,
+                                ref=dim_reference,
                                 type=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
                                     is_primary=True,
@@ -74,12 +74,12 @@ def test_invalid_composite_identifiers() -> None:  # noqa:D
                             )
                         ],
                         identifiers=[
-                            Identifier(name=identifier_reference, type=IdentifierType.PRIMARY, expr="thorium_id"),
+                            Identifier(ref=identifier_reference, type=IdentifierType.PRIMARY, expr="thorium_id"),
                             Identifier(
-                                name=foreign_identifier_reference,
+                                ref=foreign_identifier_reference,
                                 type=IdentifierType.FOREIGN,
                                 identifiers=[
-                                    CompositeSubIdentifier(name=identifier_reference, expr="not_thorium_id"),
+                                    CompositeSubIdentifier(ref=identifier_reference, expr="not_thorium_id"),
                                 ],
                             ),
                         ],
@@ -111,10 +111,10 @@ def test_composite_identifiers_nonexistent_ref() -> None:  # noqa:D
                     DataSource(
                         name="dim1",
                         sql_query=f"SELECT {dim_reference.element_name}, {measure_reference.element_name}, thorium_id FROM bar",
-                        measures=[Measure(name=measure_reference, agg=AggregationType.SUM)],
+                        measures=[Measure(ref=measure_reference, agg=AggregationType.SUM)],
                         dimensions=[
                             Dimension(
-                                name=dim_reference,
+                                ref=dim_reference,
                                 type=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
                                     is_primary=True,
@@ -123,12 +123,12 @@ def test_composite_identifiers_nonexistent_ref() -> None:  # noqa:D
                             )
                         ],
                         identifiers=[
-                            Identifier(name=identifier_reference, type=IdentifierType.PRIMARY, expr="thorium_id"),
+                            Identifier(ref=identifier_reference, type=IdentifierType.PRIMARY, expr="thorium_id"),
                             Identifier(
-                                name=foreign_identifier_reference,
+                                ref=foreign_identifier_reference,
                                 type=IdentifierType.FOREIGN,
                                 identifiers=[
-                                    CompositeSubIdentifier(ref="ident_that_doesnt_exist"),
+                                    CompositeSubIdentifier(name="ident_that_doesnt_exist"),
                                 ],
                             ),
                         ],
@@ -161,10 +161,10 @@ def test_composite_identifiers_ref_and_name() -> None:  # noqa:D
                     DataSource(
                         name="dim1",
                         sql_query=f"SELECT {dim_reference.element_name}, {measure_reference.element_name}, thorium_id FROM bar",
-                        measures=[Measure(name=measure_reference, agg=AggregationType.SUM)],
+                        measures=[Measure(ref=measure_reference, agg=AggregationType.SUM)],
                         dimensions=[
                             Dimension(
-                                name=dim_reference,
+                                ref=dim_reference,
                                 type=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
                                     is_primary=True,
@@ -173,13 +173,13 @@ def test_composite_identifiers_ref_and_name() -> None:  # noqa:D
                             )
                         ],
                         identifiers=[
-                            Identifier(name=identifier_reference, type=IdentifierType.PRIMARY, expr="thorium_id"),
+                            Identifier(ref=identifier_reference, type=IdentifierType.PRIMARY, expr="thorium_id"),
                             Identifier(
-                                name=foreign_identifier_reference,
+                                ref=foreign_identifier_reference,
                                 type=IdentifierType.FOREIGN,
                                 identifiers=[
                                     CompositeSubIdentifier(
-                                        ref="ident_that_doesnt_exist", name=foreign_identifier2_reference
+                                        name="ident_that_doesnt_exist", ref=foreign_identifier2_reference
                                     ),
                                 ],
                             ),
@@ -217,16 +217,16 @@ def test_mismatched_identifier(simple_model__pre_transforms: UserConfiguredModel
     )
 
     identifier_bookings = Identifier(
-        name=IdentifierReference(element_name="composite_identifier"),
+        ref=IdentifierReference(element_name="composite_identifier"),
         type=IdentifierType.FOREIGN,
-        identifiers=[CompositeSubIdentifier(ref="sub_identifier1")],
+        identifiers=[CompositeSubIdentifier(name="sub_identifier1")],
     )
     bookings_source.identifiers = flatten_nested_sequence([bookings_source.identifiers, [identifier_bookings]])
 
     identifier_listings = Identifier(
-        name=IdentifierReference(element_name="composite_identifier"),
+        ref=IdentifierReference(element_name="composite_identifier"),
         type=IdentifierType.FOREIGN,
-        identifiers=[CompositeSubIdentifier(ref="sub_identifier2")],
+        identifiers=[CompositeSubIdentifier(name="sub_identifier2")],
     )
     listings_latest.identifiers = flatten_nested_sequence([listings_latest.identifiers, [identifier_listings]])
 
