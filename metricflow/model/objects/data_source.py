@@ -72,51 +72,51 @@ class DataSource(HashableBaseModel, ParseableObject):
         return res
 
     @property
-    def element_names(self) -> List[LinkableElementReference]:  # noqa: D chtodo: ref
+    def element_refs(self) -> List[LinkableElementReference]:  # noqa: D chtodo: ref
         return [n.ref for n in self.elements]
 
     @property
-    def identifier_names(self) -> List[LinkableElementReference]:  # noqa: D chtodo: ref
+    def identifier_refs(self) -> List[LinkableElementReference]:  # noqa: D chtodo: ref
         return [i.ref for i in self.identifiers]
 
     @property
-    def dimension_names(self) -> List[LinkableElementReference]:  # noqa: D chtodo: ref
+    def dimension_refs(self) -> List[LinkableElementReference]:  # noqa: D chtodo: ref
         return [i.ref for i in self.dimensions]
 
     @property
-    def measure_names(self) -> List[MeasureReference]:  # noqa: D
+    def measure_refs(self) -> List[MeasureReference]:  # noqa: D
         return [i.ref for i in self.measures]
 
-    def get_measure(self, measure_name: MeasureReference) -> Measure:  # noqa: D
+    def get_measure(self, measure_ref: MeasureReference) -> Measure:  # noqa: D
         for measure in self.measures:
-            if measure.ref == measure_name:
+            if measure.ref == measure_ref:
                 return measure
 
-        raise ValueError(f"No dimension with name ({measure_name}) in data source with name ({self.name})")
+        raise ValueError(f"No dimension with name ({measure_ref.element_name}) in data source with name ({self.name})")
 
-    def get_element(self, name: LinkableElementReference) -> Element:  # noqa: D chtodo: ref
+    def get_element(self, ref: LinkableElementReference) -> Element:  # noqa: D chtodo: ref
         for dim in self.dimensions:
-            if dim.ref == name:
+            if dim.ref == ref:
                 return dim
         for ident in self.identifiers:
-            if ident.ref == name:
+            if ident.ref == ref:
                 return ident
 
-        raise ValueError(f"No dimension with name ({name}) in data source with name ({self.name})")
+        raise ValueError(f"No dimension with name ({ref.element_name}) in data source with name ({self.name})")
 
-    def get_dimension(self, dimension_name: LinkableElementReference) -> Dimension:  # noqa: D chtodo: ref
+    def get_dimension(self, dimension_ref: LinkableElementReference) -> Dimension:  # noqa: D chtodo: ref
         for dim in self.dimensions:
-            if dim.ref == dimension_name:
+            if dim.ref == dimension_ref:
                 return dim
 
-        raise ValueError(f"No dimension with name ({dimension_name}) in data source with name ({self.name})")
+        raise ValueError(f"No dimension with name ({dimension_ref.element_name}) in data source with name ({self.name})")
 
-    def get_identifier(self, identifier_name: LinkableElementReference) -> Identifier:  # noqa: D chtodo: ref
+    def get_identifier(self, identifier_ref: LinkableElementReference) -> Identifier:  # noqa: D chtodo: ref
         for ident in self.identifiers:
-            if ident.ref == identifier_name:
+            if ident.ref == identifier_ref:
                 return ident
 
-        raise ValueError(f"No identifier with name ({identifier_name}) in data source with name ({self.name})")
+        raise ValueError(f"No identifier with name ({identifier_ref.element_name}) in data source with name ({self.name})")
 
     @property
     def partitions(self) -> List[Dimension]:  # noqa: D
