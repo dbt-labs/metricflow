@@ -48,17 +48,17 @@ class IdentifierConfigRule(ModelValidationRule):
                             ValidationError(
                                 model_object_reference=ValidationIssue.make_object_reference(
                                     data_source_name=data_source.name,
-                                    identifier_name=ident.name.element_name,
+                                    identifier_name=ident.ref.element_name,
                                 ),
                                 message=f"Both ref and name/expr set in sub identifier of identifier "
-                                f"({ident.name.element_name}), please set one",
+                                f"({ident.ref.element_name}), please set one",
                             )
                         )
-                    elif sub_id.ref is not None and sub_id.ref not in [i.name for i in data_source.identifiers]:
+                    elif sub_id.ref is not None and sub_id.ref not in [i.ref for i in data_source.identifiers]:
                         issues.append(
                             ValidationError(
                                 model_object_reference=ValidationIssue.make_object_reference(
-                                    data_source_name=data_source.name, identifier_name=ident.name.element_name
+                                    data_source_name=data_source.name, identifier_name=ident.ref.element_name
                                 ),
                                 message=f"Identifier ref must reference an existing identifier by name. "
                                 f"No identifier in this data source has name: {sub_id.ref}",
@@ -68,20 +68,20 @@ class IdentifierConfigRule(ModelValidationRule):
                         issues.append(
                             ValidationError(
                                 model_object_reference=ValidationIssue.make_object_reference(
-                                    data_source_name=data_source.name, identifier_name=ident.name.element_name
+                                    data_source_name=data_source.name, identifier_name=ident.ref.element_name
                                 ),
                                 message=f"Must provide either name or ref for sub identifier of identifier "
-                                f"with name: {ident.name.element_name}",
+                                f"with name: {ident.ref.element_name}",
                             )
                         )
 
                     if sub_id.name:
                         for i in data_source.identifiers:
-                            if i.name == sub_id.name and i.expr != sub_id.expr:
+                            if i.ref == sub_id.name and i.expr != sub_id.expr:
                                 issues.append(
                                     ValidationError(
                                         model_object_reference=ValidationIssue.make_object_reference(
-                                            data_source_name=data_source.name, identifier_name=ident.name.element_name
+                                            data_source_name=data_source.name, identifier_name=ident.ref.element_name
                                         ),
                                         message=f"If sub identifier has same name ({sub_id.name.element_name}) "
                                         f"as an existing Identifier they must have the same expr",
@@ -101,7 +101,7 @@ class OnePrimaryIdentifierPerDataSourceRule(ModelValidationRule):
         primary_identifier_names: MutableSet[str] = set()
         for identifier in data_source.identifiers or []:
             if identifier.type == IdentifierType.PRIMARY:
-                primary_identifier_names.add(identifier.name.element_name)
+                primary_identifier_names.add(identifier.ref.element_name)
 
         if len(primary_identifier_names) > 1:
             return [
@@ -157,7 +157,7 @@ class IdentifierConsistencyRule(ModelValidationRule):
             contexts.append(
                 SubIdentifierContext(
                     data_source_name=data_source.name,
-                    identifier_reference=identifier.name,
+                    identifier_reference=identifier.ref,
                     sub_identifier_names=tuple(IdentifierConsistencyRule._get_sub_identifier_names(identifier)),
                 )
             )

@@ -17,7 +17,7 @@ def test_lonely_identifier_raises_issue(simple_model__pre_transforms: UserConfig
 
     func: Callable[[DataSource], bool] = lambda data_source: len(data_source.identifiers) > 0
     data_source_with_identifiers, _ = find_data_source_with(model, func)
-    data_source_with_identifiers.identifiers[0].name = IdentifierSpec.parse(lonely_identifier_name)
+    data_source_with_identifiers.identifiers[0].ref = IdentifierSpec.parse(lonely_identifier_name)
     build = ModelValidator.validate_model(model)
 
     found_warning = False

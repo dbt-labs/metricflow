@@ -30,7 +30,7 @@ class CompositeSubIdentifier(HashableBaseModel, ParseableObject):
 class Identifier(HashableBaseModel, Element, ParseableObject):
     """Describes a identifier"""
 
-    name: IdentifierReference
+    ref: IdentifierReference
     type: IdentifierType
     role: Optional[str]
     entity: Optional[str]
@@ -57,7 +57,7 @@ class Identifier(HashableBaseModel, Element, ParseableObject):
             expr=expr,
         )
         if self.entity is None:
-            self.entity = self.name.element_name
+            self.entity = self.ref.element_name
 
     @property
     def is_primary_time(self) -> bool:  # noqa: D

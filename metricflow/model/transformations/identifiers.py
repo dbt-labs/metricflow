@@ -25,9 +25,9 @@ class CompositeIdentifierExpressionRule(ModelTransformRule):
                         continue
 
                     for identifier in data_source.identifiers:
-                        if sub_identifier.ref == identifier.name.element_name:
+                        if sub_identifier.ref == identifier.ref.element_name:
                             sub_identifier.ref = None
-                            sub_identifier.name = identifier.name
+                            sub_identifier.name = identifier.ref
                             sub_identifier.expr = identifier.expr
                             break
 

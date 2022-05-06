@@ -87,7 +87,7 @@ class ElementConsistencyRule(ModelValidationRule):
                     element_types[dimension.ref.element_name] = ModelObjectType.DIMENSION
             if data_source.identifiers:
                 for identifier in data_source.identifiers:
-                    element_types[identifier.name.element_name] = ModelObjectType.IDENTIFIER
+                    element_types[identifier.ref.element_name] = ModelObjectType.IDENTIFIER
         return element_types
 
     @staticmethod
@@ -105,7 +105,7 @@ class ElementConsistencyRule(ModelValidationRule):
         """
         measure_name_tuples = [(x.name, ModelObjectType.MEASURE) for x in data_source.measures or []]
         dimension_name_tuples = [(x.ref, ModelObjectType.DIMENSION) for x in data_source.dimensions or []]
-        identifier_name_tuples = [(x.name, ModelObjectType.IDENTIFIER) for x in data_source.identifiers or []]
+        identifier_name_tuples = [(x.ref, ModelObjectType.IDENTIFIER) for x in data_source.identifiers or []]
         issues = []
         for element_name, element_type in measure_name_tuples + dimension_name_tuples + identifier_name_tuples:
             issues += ElementConsistencyRule._check_element_type(

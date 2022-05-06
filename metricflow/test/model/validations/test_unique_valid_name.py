@@ -130,8 +130,8 @@ def test_cross_element_names(simple_model__pre_transforms: UserConfiguredModel) 
 
     # We update the matching categorical dimension by reference for convenience
     ds_measure_x_dimension.get_dimension(dimension_reference).ref = measure_reference
-    ds_measure_x_identifier.identifiers[1].name = measure_reference
-    ds_dimension_x_identifier.identifiers[1].name = dimension_reference
+    ds_measure_x_identifier.identifiers[1].ref = measure_reference
+    ds_dimension_x_identifier.identifiers[1].ref = dimension_reference
 
     model.data_sources[usable_ds_index] = ds_measure_x_dimension
     with pytest.raises(
@@ -202,7 +202,7 @@ def test_duplicate_identifier_name(simple_model__pre_transforms: UserConfiguredM
 
     with pytest.raises(
         ModelValidationException,
-        match=rf"can't use name `{duplicated_identifier.name.element_name}` for a identifier when it was already used for a identifier",
+        match=rf"can't use name `{duplicated_identifier.ref.element_name}` for a identifier when it was already used for a identifier",
     ):
         ModelValidator.checked_validations(model)
 

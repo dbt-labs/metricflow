@@ -334,9 +334,9 @@ class DataSourceSemantics:
             self._linkable_reference_index[dim.ref].append(data_source)
             self._dimension_index[dim.ref].append(data_source)
         for ident in data_source.identifiers:
-            self._identifier_ref_to_entity[ident.name] = ident.entity
+            self._identifier_ref_to_entity[ident.ref] = ident.entity
             self._entity_index[ident.entity].append(data_source)
-            self._linkable_reference_index[ident.name].append(data_source)
+            self._linkable_reference_index[ident.ref].append(data_source)
 
         dsource_partition = data_source.partition
         # Add links to other data sources based on the names and types of identifiers available.
@@ -356,7 +356,7 @@ class DataSourceSemantics:
 
                 for other_ident in other.identifiers:
                     # TODO: Replace with entity check when entities are supported.
-                    if other_ident.name != ident.name:
+                    if other_ident.ref != ident.ref:
                         continue
 
                     # add edge data_source -> other "other is joinable to data_source"

@@ -130,7 +130,7 @@ class DataSourceToDataSetConverter:
     ) -> IdentifierInstance:
         """Create an identifier instance from the identifier object from a data sourcein the model."""
         identifier_spec = IdentifierSpec(
-            element_name=identifier.name.element_name,
+            element_name=identifier.ref.element_name,
             identifier_links=identifier_links,
         )
         column_associations = identifier_spec.column_associations(self._column_association_resolver)
@@ -141,7 +141,7 @@ class DataSourceToDataSetConverter:
             defined_from=(
                 DataSourceElementReference(
                     data_source_name=data_source_name,
-                    element_name=identifier.name.element_name,
+                    element_name=identifier.ref.element_name,
                 ),
             ),
         )
@@ -312,7 +312,7 @@ class DataSourceToDataSetConverter:
             # identifier.
             if (
                 len(identifier_links) == 1
-                and LinklessIdentifierSpec.from_element_name(identifier.name.element_name) == identifier_links[0]
+                and LinklessIdentifierSpec.from_element_name(identifier.ref.element_name) == identifier_links[0]
             ):
                 continue
 
@@ -350,7 +350,7 @@ class DataSourceToDataSetConverter:
                     SqlSelectColumn(
                         expr=DataSourceToDataSetConverter._make_element_sql_expr(
                             table_alias=table_alias,
-                            element_name=identifier.name.element_name,
+                            element_name=identifier.ref.element_name,
                             element_expr=identifier.expr,
                         ),
                         column_alias=identifier_instance.associated_column.column_name,
@@ -410,7 +410,7 @@ class DataSourceToDataSetConverter:
         for identifier in data_source.identifiers:
             if identifier.type in (IdentifierType.PRIMARY, IdentifierType.UNIQUE):
                 possible_identifier_links.append(
-                    (LinklessIdentifierSpec.from_element_name(element_name=identifier.name.element_name),)
+                    (LinklessIdentifierSpec.from_element_name(element_name=identifier.ref.element_name),)
                 )
 
         # Handle dimensions

@@ -76,8 +76,8 @@ class DataSource(HashableBaseModel, ParseableObject):
         return [n.ref for n in self.elements]
 
     @property
-    def identifier_names(self) -> List[LinkableElementReference]:  # noqa: D
-        return [i.name for i in self.identifiers]
+    def identifier_names(self) -> List[LinkableElementReference]:  # noqa: D chtodo: ref
+        return [i.ref for i in self.identifiers]
 
     @property
     def dimension_names(self) -> List[LinkableElementReference]:  # noqa: D chtodo: ref
@@ -99,7 +99,7 @@ class DataSource(HashableBaseModel, ParseableObject):
             if dim.ref == name:
                 return dim
         for ident in self.identifiers:
-            if ident.name == name:
+            if ident.ref == name:
                 return ident
 
         raise ValueError(f"No dimension with name ({name}) in data source with name ({self.name})")
@@ -111,9 +111,9 @@ class DataSource(HashableBaseModel, ParseableObject):
 
         raise ValueError(f"No dimension with name ({dimension_name}) in data source with name ({self.name})")
 
-    def get_identifier(self, identifier_name: LinkableElementReference) -> Identifier:  # noqa: D
+    def get_identifier(self, identifier_name: LinkableElementReference) -> Identifier:  # noqa: D chtodo: ref
         for ident in self.identifiers:
-            if ident.name == identifier_name:
+            if ident.ref == identifier_name:
                 return ident
 
         raise ValueError(f"No identifier with name ({identifier_name}) in data source with name ({self.name})")

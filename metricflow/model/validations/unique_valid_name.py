@@ -66,7 +66,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
                 name_and_type_tuples.append((measure.name, "measure"))
         if data_source.identifiers:
             for identifier in data_source.identifiers:
-                name_and_type_tuples.append((identifier.name, "identifier"))
+                name_and_type_tuples.append((identifier.ref, "identifier"))
         if data_source.dimensions:
             for dimension in data_source.dimensions:
                 name_and_type_tuples.append((dimension.ref, "dimension"))

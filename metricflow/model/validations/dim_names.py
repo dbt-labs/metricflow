@@ -58,7 +58,7 @@ class DimensionAndIdentifierNameValidator:
             dimension_names = [x.ref.element_name for x in data_source.dimensions]
             identifier: Identifier
             for identifier in data_source.identifiers:
-                identifier_key = IdentifierKey(identifier.name.element_name, identifier.type)
+                identifier_key = IdentifierKey(identifier.ref.element_name, identifier.type)
                 self._identifier_key_to_dimension_names[identifier_key].extend(dimension_names)
 
         # Map the measure to the identifier name / type present in the data source where the measure is defined.
@@ -70,7 +70,7 @@ class DimensionAndIdentifierNameValidator:
             # List of identifiers and their types in the data source
             identifier_keys: List[IdentifierKey] = []
             for identifier in data_source.identifiers:
-                identifier_keys.append(IdentifierKey(identifier.name.element_name, identifier.type))
+                identifier_keys.append(IdentifierKey(identifier.ref.element_name, identifier.type))
             for measure_reference in measure_references:
                 self._measure_to_associated_identifier_keys[measure_reference].extend(identifier_keys)
 
@@ -95,7 +95,7 @@ class DimensionAndIdentifierNameValidator:
         # Populate the list of identifiers for each measure
         self._measures_to_identifiers: Dict[MeasureReference, List[IdentifierReference]] = defaultdict(list)
         for data_source in model.data_sources:
-            identifier_references = [identifier.name for identifier in data_source.identifiers]
+            identifier_references = [identifier.ref for identifier in data_source.identifiers]
             for measure in data_source.measures:
                 self._measures_to_identifiers[measure.name].extend(identifier_references)
 
@@ -107,7 +107,7 @@ class DimensionAndIdentifierNameValidator:
             for dimension in data_source.dimensions:
                 self._element_name_to_type[dimension.ref.element_name] = ModelObjectType.DIMENSION
             for identifier in data_source.identifiers:
-                self._element_name_to_type[identifier.name.element_name] = ModelObjectType.IDENTIFIER
+                self._element_name_to_type[identifier.ref.element_name] = ModelObjectType.IDENTIFIER
 
     def _is_identifier_valid_for_measure(self, measure_reference: MeasureReference, identifier_name: str) -> bool:
         assert measure_reference in self._measures_to_identifiers

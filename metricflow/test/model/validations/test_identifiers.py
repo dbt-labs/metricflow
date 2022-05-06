@@ -30,7 +30,7 @@ def test_data_source_cant_have_more_than_one_primary_identifier(
     identifier_names = set()
     for identifier in multiple_identifier_data_source.identifiers:
         identifier.type = IdentifierType.PRIMARY
-        identifier_names.add(identifier.name)
+        identifier_names.add(identifier.ref)
 
     build = ModelValidator.validate_model(model)
 

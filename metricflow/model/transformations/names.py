@@ -27,7 +27,7 @@ class LowerCaseNamesRule(ModelTransformRule):
                 measure.name = MeasureReference(element_name=measure.name.element_name.lower())
         if data_source.identifiers:
             for identifier in data_source.identifiers:
-                identifier.name = IdentifierReference(element_name=identifier.name.element_name.lower())
+                identifier.ref = IdentifierReference(element_name=identifier.ref.element_name.lower())
         if data_source.dimensions:
             for dimension in data_source.dimensions:
                 dimension.ref = DimensionReference(element_name=dimension.ref.element_name.lower())

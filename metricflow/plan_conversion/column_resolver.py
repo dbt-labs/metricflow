@@ -70,7 +70,7 @@ class DefaultColumnAssociationResolver(ColumnAssociationResolver):
         sub_id_specs = []
         for data_source in self._semantic_model.user_configured_model.data_sources:
             for identifier in data_source.identifiers:
-                if identifier.name.element_name == identifier_spec.element_name:
+                if identifier.ref.element_name == identifier_spec.element_name:
                     sub_id_specs = [sub_id.name for sub_id in identifier.identifiers]
                     break
 
