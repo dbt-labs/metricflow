@@ -72,7 +72,7 @@ def snapshot_path_prefix(
     .../snapshots/test_file.py/DataflowPlan/test_name__plan1.xml
     .../snapshots/test_file.py/DataflowPlan/test_name__plan1.svg
     """
-    test_name = request.node.name
+    test_name = request.node.name  # chtodo: maybe ref
     snapshot_file_name = test_name + "__" + snapshot_id
     path_items: List[str] = []
 

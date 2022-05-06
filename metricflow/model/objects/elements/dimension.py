@@ -34,7 +34,7 @@ class DimensionTypeParams(HashableBaseModel, ParseableObject):
 class Dimension(HashableBaseModel, Element, ParseableObject):
     """Describes a dimension"""
 
-    name: DimensionReference
+    ref: DimensionReference
     type: DimensionType
     is_partition: bool = False
     type_params: Optional[DimensionTypeParams]

@@ -330,7 +330,7 @@ def _generate_linkable_time_dimensions(
 
         linkable_dimensions.append(
             LinkableDimension(
-                element_name=dimension.name.element_name,
+                element_name=dimension.ref.element_name,
                 identifier_links=identifier_links,
                 time_granularity=time_granularity,
                 properties=frozenset(properties),
@@ -368,7 +368,7 @@ class DataSourceJoinPath:
             if dimension_type == DimensionType.CATEGORICAL:
                 linkable_dimensions.append(
                     LinkableDimension(
-                        element_name=dimension.name.element_name,
+                        element_name=dimension.ref.element_name,
                         identifier_links=identifier_links,
                         properties=with_properties,
                     )
@@ -480,7 +480,7 @@ class ValidLinkableSpecResolver:
             if dimension_type == DimensionType.CATEGORICAL:
                 linkable_dimensions.append(
                     LinkableDimension(
-                        element_name=dimension.name.element_name,
+                        element_name=dimension.ref.element_name,
                         identifier_links=(),
                         properties=frozenset({LinkableElementProperties.LOCAL}),
                     )

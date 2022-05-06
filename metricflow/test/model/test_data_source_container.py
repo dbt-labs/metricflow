@@ -78,7 +78,7 @@ def test_get_names(new_data_source_semantics: DataSourceSemantics) -> None:  # n
 def test_get_elements(new_data_source_semantics: DataSourceSemantics) -> None:  # noqa: D
     for dimension_reference in new_data_source_semantics.get_dimension_references():
         assert (
-            new_data_source_semantics.get_dimension(dimension_reference=dimension_reference).name == dimension_reference
+                new_data_source_semantics.get_dimension(dimension_reference=dimension_reference).ref == dimension_reference
         )
     for measure_reference in new_data_source_semantics.measure_references:
         measure_reference = MeasureReference(element_name=measure_reference.element_name)

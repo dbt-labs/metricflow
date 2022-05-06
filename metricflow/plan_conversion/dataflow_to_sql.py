@@ -483,7 +483,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         for dimension_reference in self._data_source_semantics.get_dimension_references():
             dimension = self._data_source_semantics.get_linkable(dimension_reference)
             if dimension.is_primary_time:
-                primary_time_dimension_name = dimension.name.element_name
+                primary_time_dimension_name = dimension.ref.element_name
 
         if not primary_time_dimension_name:
             raise RuntimeError("No primary time dimension found in data sources.")

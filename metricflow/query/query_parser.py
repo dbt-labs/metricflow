@@ -88,9 +88,9 @@ class MetricFlowQueryParser:
         for linkable_name in self._data_source_semantics.get_linkable_element_references():
             linkable = self._data_source_semantics.get_linkable(linkable_name)
             if linkable.type == DimensionType.CATEGORICAL:
-                self._known_dimension_element_references.append(linkable.name)
+                self._known_dimension_element_references.append(linkable.ref)
             elif linkable.type == DimensionType.TIME:
-                self._known_time_dimension_element_references.append(linkable.name)
+                self._known_time_dimension_element_references.append(linkable.ref)
             elif (
                 linkable.type == IdentifierType.FOREIGN
                 or linkable.type == IdentifierType.PRIMARY

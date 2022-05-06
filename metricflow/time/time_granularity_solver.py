@@ -77,7 +77,7 @@ class TimeGranularitySolver:
                             LocalTimeDimensionGranularityKey(
                                 measure_reference=MeasureReference(element_name=measure.name.element_name),
                                 local_time_dimension_reference=TimeDimensionReference(
-                                    element_name=dimension.name.element_name
+                                    element_name=dimension.ref.element_name
                                 ),
                             )
                         ].add(time_granularity)

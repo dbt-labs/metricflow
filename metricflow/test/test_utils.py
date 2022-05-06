@@ -28,7 +28,7 @@ def should_skip_multi_threaded(
     if not sql_client.sql_engine_attributes.multi_threading_supported:
         logger.warning(
             f"Multi-threading is not supported with {sql_client.__class__.__name__}, so should skip "
-            f"{request.node.fspath}::{request.node.name}`"
+            f"{request.node.fspath}::{request.node.name}`"  # chtodo: maybe ref
         )
         return True
 

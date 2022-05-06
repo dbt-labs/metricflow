@@ -55,7 +55,7 @@ class DimensionAndIdentifierNameValidator:
         self._identifier_key_to_dimension_names: Dict[IdentifierKey, List[str]] = defaultdict(list)
         data_source: DataSource
         for data_source in model.data_sources:
-            dimension_names = [x.name.element_name for x in data_source.dimensions]
+            dimension_names = [x.ref.element_name for x in data_source.dimensions]
             identifier: Identifier
             for identifier in data_source.identifiers:
                 identifier_key = IdentifierKey(identifier.name.element_name, identifier.type)
@@ -88,7 +88,7 @@ class DimensionAndIdentifierNameValidator:
         # Populate the list of local dimension for each measure
         self._measure_to_local_dimension: Dict[MeasureReference, List[DimensionReference]] = defaultdict(list)
         for data_source in model.data_sources:
-            local_dimension_references = [dimension.name for dimension in data_source.dimensions]
+            local_dimension_references = [dimension.ref for dimension in data_source.dimensions]
             for measure in data_source.measures:
                 self._measure_to_local_dimension[measure.name].extend(local_dimension_references)
 
@@ -105,7 +105,7 @@ class DimensionAndIdentifierNameValidator:
             for measure in data_source.measures:
                 self._element_name_to_type[measure.name.element_name] = ModelObjectType.MEASURE
             for dimension in data_source.dimensions:
-                self._element_name_to_type[dimension.name.element_name] = ModelObjectType.DIMENSION
+                self._element_name_to_type[dimension.ref.element_name] = ModelObjectType.DIMENSION
             for identifier in data_source.identifiers:
                 self._element_name_to_type[identifier.name.element_name] = ModelObjectType.IDENTIFIER
 

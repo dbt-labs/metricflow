@@ -72,16 +72,16 @@ class DataSource(HashableBaseModel, ParseableObject):
         return res
 
     @property
-    def element_names(self) -> List[LinkableElementReference]:  # noqa: D
-        return [n.name for n in self.elements]
+    def element_names(self) -> List[LinkableElementReference]:  # noqa: D chtodo: ref
+        return [n.ref for n in self.elements]
 
     @property
     def identifier_names(self) -> List[LinkableElementReference]:  # noqa: D
         return [i.name for i in self.identifiers]
 
     @property
-    def dimension_names(self) -> List[LinkableElementReference]:  # noqa: D
-        return [i.name for i in self.dimensions]
+    def dimension_names(self) -> List[LinkableElementReference]:  # noqa: D chtodo: ref
+        return [i.ref for i in self.dimensions]
 
     @property
     def measure_names(self) -> List[MeasureReference]:  # noqa: D
@@ -94,9 +94,9 @@ class DataSource(HashableBaseModel, ParseableObject):
 
         raise ValueError(f"No dimension with name ({measure_name}) in data source with name ({self.name})")
 
-    def get_element(self, name: LinkableElementReference) -> Element:  # noqa: D
+    def get_element(self, name: LinkableElementReference) -> Element:  # noqa: D chtodo: ref
         for dim in self.dimensions:
-            if dim.name == name:
+            if dim.ref == name:
                 return dim
         for ident in self.identifiers:
             if ident.name == name:
@@ -104,9 +104,9 @@ class DataSource(HashableBaseModel, ParseableObject):
 
         raise ValueError(f"No dimension with name ({name}) in data source with name ({self.name})")
 
-    def get_dimension(self, dimension_name: LinkableElementReference) -> Dimension:  # noqa: D
+    def get_dimension(self, dimension_name: LinkableElementReference) -> Dimension:  # noqa: D chtodo: ref
         for dim in self.dimensions:
-            if dim.name == dimension_name:
+            if dim.ref == dimension_name:
                 return dim
 
         raise ValueError(f"No dimension with name ({dimension_name}) in data source with name ({self.name})")

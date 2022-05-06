@@ -30,7 +30,7 @@ class LowerCaseNamesRule(ModelTransformRule):
                 identifier.name = IdentifierReference(element_name=identifier.name.element_name.lower())
         if data_source.dimensions:
             for dimension in data_source.dimensions:
-                dimension.name = DimensionReference(element_name=dimension.name.element_name.lower())
+                dimension.ref = DimensionReference(element_name=dimension.ref.element_name.lower())
 
     @staticmethod
     def _lowercase_top_level_objects(model: UserConfiguredModel) -> None:

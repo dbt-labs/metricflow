@@ -239,7 +239,7 @@ class DataSourceSemantics:
         res = []
         for name, links in self._data_source_links.adj(data_source_name).items():
             for link in links:
-                if link.via_from.name.element_name == identifier_spec.element_name:
+                if link.via_from.ref.element_name == identifier_spec.element_name:
                     res.append(name)
                     break
 
@@ -261,7 +261,7 @@ class DataSourceSemantics:
     def get_data_source_element(self, ref: DataSourceElementReference) -> Optional[Element]:  # Noqa: d
         data_source = self[ref.data_source_name]
         for elem in data_source.elements:
-            if elem.name.element_name == ref.element_name:
+            if elem.ref.element_name == ref.element_name:
                 return elem
 
         return None
@@ -324,15 +324,15 @@ class DataSourceSemantics:
         self._data_source_names.add(data_source.name)
 
         for elem in data_source.elements:
-            if elem.name not in self._element_types:
-                self._element_types[elem.name] = type(elem)
+            if elem.ref not in self._element_types:
+                self._element_types[elem.ref] = type(elem)
 
         for meas in data_source.measures:
             self._measure_aggs[meas.name] = meas.agg
             self._measure_index[meas.name].append(data_source)
         for dim in data_source.dimensions:
-            self._linkable_reference_index[dim.name].append(data_source)
-            self._dimension_index[dim.name].append(data_source)
+            self._linkable_reference_index[dim.ref].append(data_source)
+            self._dimension_index[dim.ref].append(data_source)
         for ident in data_source.identifiers:
             self._identifier_ref_to_entity[ident.name] = ident.entity
             self._entity_index[ident.entity].append(data_source)
@@ -349,10 +349,10 @@ class DataSourceSemantics:
                 # handle whether or not this join is partitioned
                 partitions: List[DimensionReference] = list()
                 other_partition = other.partition
-                if dsource_partition and other_partition and dsource_partition.name != other_partition.name:
+                if dsource_partition and other_partition and dsource_partition.ref != other_partition.ref:
                     continue
                 if dsource_partition and other_partition:
-                    partitions.append(dsource_partition.name)
+                    partitions.append(dsource_partition.ref)
 
                 for other_ident in other.identifiers:
                     # TODO: Replace with entity check when entities are supported.
@@ -393,7 +393,7 @@ class DataSourceSemantics:
         for data_source in self._configured_data_source_container.values():
             for dimension in data_source.dimensions:
                 if dimension.type == DimensionType.TIME and dimension.type_params and dimension.type_params.is_primary:
-                    return TimeDimensionReference(element_name=dimension.name.element_name)
+                    return TimeDimensionReference(element_name=dimension.ref.element_name)
         raise RuntimeError("No primary time dimension found in the model")
 
     @property

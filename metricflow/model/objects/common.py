@@ -35,7 +35,7 @@ class Version(HashableBaseModel):  # noqa: D
 
 
 class Element:  # noqa: D
-    name: LinkableElementReference
+    ref: LinkableElementReference
     expr: Optional[str]
     type: ExtendedEnum
 

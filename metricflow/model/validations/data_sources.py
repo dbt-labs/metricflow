@@ -65,7 +65,7 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
                     and dimension.type_params is not None
                     and dimension.type_params.is_primary is True
                 ):
-                    primary_time_dimension_name = dimension.name
+                    primary_time_dimension_name = dimension.ref
 
         for data_source in model.data_sources:
             issues.extend(
@@ -85,7 +85,7 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
 
         for dim in data_source.dimensions:
             model_object_reference = ValidationIssue.make_object_reference(
-                data_source_name=data_source.name, dimension_name=dim.name.element_name
+                data_source_name=data_source.name, dimension_name=dim.ref.element_name
             )
 
             if dim.type == DimensionType.TIME:
@@ -93,12 +93,12 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
                     continue
                 elif dim.type_params.is_primary:
                     primary_time_present = True
-                    if primary_time_dimension_name and dim.name != primary_time_dimension_name:
+                    if primary_time_dimension_name and dim.ref != primary_time_dimension_name:
                         issues.append(
                             ValidationFatal(
                                 model_object_reference=model_object_reference,
                                 message=f"In data source {data_source.name}, "
-                                f"found primary time dimension with name: {dim.name}, "
+                                f"found primary time dimension with name: {dim.ref}, "
                                 f"another primary time dimension with name: {primary_time_dimension_name} "
                                 f"was already found in model.",
                             )
@@ -108,7 +108,7 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
                         issues.append(
                             ValidationError(
                                 model_object_reference=model_object_reference,
-                                message=f"Unsupported time granularity in time dimension with name: {dim.name}, "
+                                message=f"Unsupported time granularity in time dimension with name: {dim.ref}, "
                                 f"Please use {[s.value for s in SUPPORTED_GRANULARITIES]}",
                             )
                         )

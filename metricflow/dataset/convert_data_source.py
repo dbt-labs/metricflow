@@ -79,7 +79,7 @@ class DataSourceToDataSetConverter:
     ) -> DimensionInstance:
         """Create a dimension instance from the dimension object in the model."""
         dimension_spec = DimensionSpec(
-            element_name=dimension.name.element_name,
+            element_name=dimension.ref.element_name,
             identifier_links=identifier_links,
         )
         column_associations = dimension_spec.column_associations(self._column_association_resolver)
@@ -90,7 +90,7 @@ class DataSourceToDataSetConverter:
             defined_from=(
                 DataSourceElementReference(
                     data_source_name=data_source_name,
-                    element_name=dimension.name.element_name,
+                    element_name=dimension.ref.element_name,
                 ),
             ),
         )
@@ -104,7 +104,7 @@ class DataSourceToDataSetConverter:
     ) -> TimeDimensionInstance:
         """Create a time dimension instance from the dimension object from a data source in the model."""
         time_dimension_spec = TimeDimensionSpec(
-            element_name=time_dimension.name.element_name,
+            element_name=time_dimension.ref.element_name,
             identifier_links=identifier_links,
             time_granularity=time_granularity,
         )
@@ -117,7 +117,7 @@ class DataSourceToDataSetConverter:
             defined_from=(
                 DataSourceElementReference(
                     data_source_name=data_source_name,
-                    element_name=time_dimension.name.element_name,
+                    element_name=time_dimension.ref.element_name,
                 ),
             ),
         )
@@ -235,7 +235,7 @@ class DataSourceToDataSetConverter:
                     SqlSelectColumn(
                         expr=DataSourceToDataSetConverter._make_element_sql_expr(
                             table_alias=table_alias,
-                            element_name=dimension.name.element_name,
+                            element_name=dimension.ref.element_name,
                             element_expr=dimension.expr,
                         ),
                         column_alias=dimension_instance.associated_column.column_name,
@@ -258,7 +258,7 @@ class DataSourceToDataSetConverter:
                     SqlSelectColumn(
                         expr=DataSourceToDataSetConverter._make_element_sql_expr(
                             table_alias=table_alias,
-                            element_name=dimension.name.element_name,
+                            element_name=dimension.ref.element_name,
                             element_expr=dimension.expr,
                         ),
                         column_alias=time_dimension_instance.associated_column.column_name,
@@ -282,7 +282,7 @@ class DataSourceToDataSetConverter:
                                     time_granularity=time_granularity,
                                     arg=DataSourceToDataSetConverter._make_element_sql_expr(
                                         table_alias=table_alias,
-                                        element_name=dimension.name.element_name,
+                                        element_name=dimension.ref.element_name,
                                         element_expr=dimension.expr,
                                     ),
                                 ),
@@ -373,7 +373,7 @@ class DataSourceToDataSetConverter:
         ), f"Primary time dimension missing time granularity: {primary_time_dimension}"
 
         return TimeDimensionSpec(
-            element_name=primary_time_dimension.name.element_name,
+            element_name=primary_time_dimension.ref.element_name,
             identifier_links=(),
             time_granularity=primary_time_dimension.type_params.time_granularity,
         )
