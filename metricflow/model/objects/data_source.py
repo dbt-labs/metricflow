@@ -109,14 +109,18 @@ class DataSource(HashableBaseModel, ParseableObject):
             if dim.ref == dimension_ref:
                 return dim
 
-        raise ValueError(f"No dimension with name ({dimension_ref.element_name}) in data source with name ({self.name})")
+        raise ValueError(
+            f"No dimension with name ({dimension_ref.element_name}) in data source with name ({self.name})"
+        )
 
     def get_identifier(self, identifier_ref: LinkableElementReference) -> Identifier:  # noqa: D chtodo: ref
         for ident in self.identifiers:
             if ident.ref == identifier_ref:
                 return ident
 
-        raise ValueError(f"No identifier with name ({identifier_ref.element_name}) in data source with name ({self.name})")
+        raise ValueError(
+            f"No identifier with name ({identifier_ref.element_name}) in data source with name ({self.name})"
+        )
 
     @property
     def partitions(self) -> List[Dimension]:  # noqa: D
