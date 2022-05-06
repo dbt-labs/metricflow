@@ -1,0 +1,121 @@
+name: MetricFlow SQL Engine Tests
+
+on:
+  schedule:
+    - cron: '0 12 * * *' # run once per day
+  pull_request:
+    types: [ labeled ]
+
+jobs:
+  snowflake-tests:
+    environment: DW_INTEGRATION_TESTS
+    if: ${{ github.event.action != 'labeled' || github.event.label.name == 'run_mf_sql_engine_tests' }}
+    name: Snowflake Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check-out the repo
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ${{ env.pythonLocation }}
+            ~/.cache/pypoetry
+          key: ${{ env.pythonLocation }}-${{ hashFiles('metricflow/poetry.lock') }}
+
+      - name: Install Poetry
+        run: pip install poetry && poetry config virtualenvs.create false
+
+      - name: Install Deps
+        run: cd metricflow && poetry install
+
+      - name: Run MetricFlow unit tests with Snowflake configs
+        run: pytest metricflow/test/integration
+        env:
+          MF_SQL_ENGINE_URL: ${{ secrets.MF_SNOWFLAKE_URL }}
+          MF_SQL_ENGINE_PASSWORD: ${{ secrets.MF_SNOWFLAKE_PWD }}
+
+  redshift-tests:
+    environment: DW_INTEGRATION_TESTS
+    name: Redshift Tests
+    if: ${{ github.event.action != 'labeled' || github.event.label.name == 'run_mf_sql_engine_tests' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check-out the repo
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ${{ env.pythonLocation }}
+            ~/.cache/pypoetry
+          key: ${{ env.pythonLocation }}-${{ hashFiles('metricflow/poetry.lock') }}
+
+      - name: Install Poetry
+        run: pip install poetry && poetry config virtualenvs.create false
+
+      - name: Install Deps
+        run: cd metricflow && poetry install
+
+      - name: Run MetricFlow unit tests with Redshift configs
+        run: pytest metricflow/test/integration
+        env:
+          MF_SQL_ENGINE_URL: ${{ secrets.MF_REDSHIFT_URL }}
+          MF_SQL_ENGINE_PASSWORD: ${{ secrets.MF_REDSHIFT_PWD }}
+
+  bigquery-tests:
+    environment: DW_INTEGRATION_TESTS
+    name: BigQuery Tests
+    if: ${{ github.event.action != 'labeled' || github.event.label.name == 'run_mf_sql_engine_tests' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check-out the repo
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ${{ env.pythonLocation }}
+            ~/.cache/pypoetry
+          key: ${{ env.pythonLocation }}-${{ hashFiles('metricflow/poetry.lock') }}
+
+      - name: Install Poetry
+        run: pip install poetry && poetry config virtualenvs.create false
+
+      - name: Install Deps
+        run: cd metricflow && poetry install
+
+      - name: Run MetricFlow unit tests with BigQuery configs
+        run: pytest metricflow/test/integration
+        env:
+          MF_SQL_ENGINE_URL: ${{ secrets.MF_BIGQUERY_URL }}
+          MF_SQL_ENGINE_PASSWORD: ${{ secrets.MF_BIGQUERY_PWD }}
+
+  slack-failure:
+    environment: DW_INTEGRATION_TESTS
+    needs: [ snowflake-tests, redshift-tests, bigquery-tests]
+    if: ${{ github.event_name != 'pull_request' && failure() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Slack Failure
+        uses: kpritam/slack-job-status-action@v1
+        with:
+          job-status: Failure
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+          channel: ${{ secrets.MF_BUG_SINK }}
