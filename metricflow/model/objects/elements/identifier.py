@@ -22,9 +22,9 @@ class IdentifierType(ExtendedEnum):
 class CompositeSubIdentifier(HashableBaseModel, ParseableObject):
     """CompositeSubIdentifiers either describe or reference the identifiers that comprise a composite identifier"""
 
-    name: Optional[IdentifierReference]
+    ref: Optional[IdentifierReference]
     expr: Optional[str]
-    ref: Optional[str]
+    name: Optional[str]
 
 
 class Identifier(HashableBaseModel, Element, ParseableObject):
@@ -39,7 +39,7 @@ class Identifier(HashableBaseModel, Element, ParseableObject):
 
     def __init__(  # type: ignore
         self,
-        name: IdentifierReference,
+        ref: IdentifierReference,
         type: IdentifierType,
         role: Optional[str] = None,
         entity: Optional[str] = None,
@@ -49,7 +49,7 @@ class Identifier(HashableBaseModel, Element, ParseableObject):
     ) -> None:
         """Normal pydantic initializer except we set entity to name"""
         super().__init__(
-            name=name,
+            ref=ref,
             type=type,
             role=role,
             entity=entity,

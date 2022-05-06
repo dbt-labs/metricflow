@@ -42,7 +42,7 @@ class IdentifierConfigRule(ModelValidationRule):
         for ident in data_source.identifiers:
             if ident.identifiers:
                 for sub_id in ident.identifiers:
-                    if sub_id.ref and (sub_id.name or sub_id.expr):
+                    if sub_id.name and (sub_id.ref or sub_id.expr):
                         logger.warning(f"Identifier with error is: {ident}")
                         issues.append(
                             ValidationError(
@@ -54,17 +54,17 @@ class IdentifierConfigRule(ModelValidationRule):
                                 f"({ident.ref.element_name}), please set one",
                             )
                         )
-                    elif sub_id.ref is not None and sub_id.ref not in [i.ref for i in data_source.identifiers]:
+                    elif sub_id.name is not None and sub_id.name not in [i.ref for i in data_source.identifiers]:
                         issues.append(
                             ValidationError(
                                 model_object_reference=ValidationIssue.make_object_reference(
                                     data_source_name=data_source.name, identifier_name=ident.ref.element_name
                                 ),
                                 message=f"Identifier ref must reference an existing identifier by name. "
-                                f"No identifier in this data source has name: {sub_id.ref}",
+                                f"No identifier in this data source has name: {sub_id.name}",
                             )
                         )
-                    elif not sub_id.ref and not sub_id.name:
+                    elif not sub_id.name and not sub_id.ref:
                         issues.append(
                             ValidationError(
                                 model_object_reference=ValidationIssue.make_object_reference(
@@ -75,15 +75,15 @@ class IdentifierConfigRule(ModelValidationRule):
                             )
                         )
 
-                    if sub_id.name:
+                    if sub_id.ref:
                         for i in data_source.identifiers:
-                            if i.ref == sub_id.name and i.expr != sub_id.expr:
+                            if i.ref == sub_id.ref and i.expr != sub_id.expr:
                                 issues.append(
                                     ValidationError(
                                         model_object_reference=ValidationIssue.make_object_reference(
                                             data_source_name=data_source.name, identifier_name=ident.ref.element_name
                                         ),
-                                        message=f"If sub identifier has same name ({sub_id.name.element_name}) "
+                                        message=f"If sub identifier has same name ({sub_id.ref.element_name}) "
                                         f"as an existing Identifier they must have the same expr",
                                     )
                                 )
@@ -144,10 +144,10 @@ class IdentifierConsistencyRule(ModelValidationRule):
         sub_identifier_names = []
         sub_identifier: CompositeSubIdentifier
         for sub_identifier in identifier.identifiers or []:
-            if sub_identifier.name:
-                sub_identifier_names.append(sub_identifier.name.element_name)
-            elif sub_identifier.ref:
-                sub_identifier_names.append(sub_identifier.ref)
+            if sub_identifier.ref:
+                sub_identifier_names.append(sub_identifier.ref.element_name)
+            elif sub_identifier.name:
+                sub_identifier_names.append(sub_identifier.name)
         return sub_identifier_names
 
     @staticmethod

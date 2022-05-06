@@ -71,7 +71,7 @@ class DefaultColumnAssociationResolver(ColumnAssociationResolver):
         for data_source in self._semantic_model.user_configured_model.data_sources:
             for identifier in data_source.identifiers:
                 if identifier.ref.element_name == identifier_spec.element_name:
-                    sub_id_specs = [sub_id.name for sub_id in identifier.identifiers]
+                    sub_id_specs = [sub_id.ref for sub_id in identifier.identifiers]
                     break
 
         # composite identifier case

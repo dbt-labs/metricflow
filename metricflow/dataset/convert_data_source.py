@@ -330,9 +330,9 @@ class DataSourceToDataSetConverter:
 
                     expr = sub_id.expr
                     if expr is None:
-                        assert sub_id.name is not None
-                        expr = sub_id.name.element_name
-                    sub_id_name = sub_id.ref or sub_id.name
+                        assert sub_id.ref is not None
+                        expr = sub_id.ref.element_name
+                    sub_id_name = sub_id.name or sub_id.ref
                     assert sub_id_name, f"Sub-identifier {sub_id} must have 'name' or 'ref' defined"
 
                     select_columns.append(
