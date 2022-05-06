@@ -86,7 +86,7 @@ class MetricFlowClient:
         order: Optional[List[str]] = None,
         as_table: Optional[str] = None,
         sql_optimization_level: int = 4,
-    ):
+    ) -> MetricFlowQueryRequest:
         """Build MetricFlowQueryRequest given common query parameters."""
         parsed_optimization_level = SqlQueryOptimizationLevel(f"O{sql_optimization_level}")
         parsed_start_time = convert_to_datetime(start_time)
