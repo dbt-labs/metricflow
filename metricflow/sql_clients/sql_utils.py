@@ -6,11 +6,13 @@ from sqlalchemy.engine import make_url
 from typing import List, Any, Optional, Set
 
 from metricflow.configuration.constants import (
+    CONFIG_DWH_CREDS_PATH,
     CONFIG_DWH_DB,
     CONFIG_DWH_DIALECT,
     CONFIG_DWH_HOST,
     CONFIG_DWH_PASSWORD,
     CONFIG_DWH_PORT,
+    CONFIG_DWH_PROJECT_ID,
     CONFIG_DWH_USER,
     CONFIG_DWH_WAREHOUSE,
 )
@@ -77,12 +79,20 @@ def make_sql_client_from_config(handler: YamlFileHandler) -> SqlClient:
     url = handler.url
     dialect = not_empty(handler.get_value(CONFIG_DWH_DIALECT), CONFIG_DWH_DIALECT, url).upper()
     if dialect == SupportedSqlEngine.BIGQUERY.name:
-        path_to_creds = not_empty(handler.get_value(CONFIG_DWH_PASSWORD), CONFIG_DWH_PASSWORD, url)
-        if not pathlib.Path(path_to_creds).exists:
-            raise ValueError(f"`{path_to_creds}` does not contain the BigQuery credential file.")
-        with open(path_to_creds, "r") as cred_file:
-            creds = cred_file.read()
-        return BigQuerySqlClient(password=creds)
+        path_to_creds = handler.get_value(CONFIG_DWH_CREDS_PATH)
+        project_id = handler.get_value(CONFIG_DWH_PROJECT_ID) or ""
+        creds = None
+
+        if not any([path_to_creds, project_id]):
+            raise ValueError(f"One of `{CONFIG_DWH_CREDS_PATH}` or `{CONFIG_DWH_PROJECT_ID}` should be filled.")
+
+        if path_to_creds:
+            # Load json credential (Only for service accounts auth)
+            if not pathlib.Path(path_to_creds).exists:
+                raise ValueError(f"`{path_to_creds}` does not exist.")
+            with open(path_to_creds, "r") as cred_file:
+                creds = cred_file.read()
+        return BigQuerySqlClient(project_id=project_id, password=creds)
     elif dialect == SupportedSqlEngine.SNOWFLAKE.name:
         host = not_empty(handler.get_value(CONFIG_DWH_HOST), CONFIG_DWH_HOST, url)
         user = not_empty(handler.get_value(CONFIG_DWH_USER), CONFIG_DWH_USER, url)

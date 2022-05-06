@@ -51,19 +51,37 @@ class BigQuerySqlClient(SqlAlchemySqlClient):
 
         return BigQuerySqlClient(password=password)
 
-    def __init__(self, password: str, query_string: str = "") -> None:
+    def __init__(self, project_id: str = "", password: Optional[str] = None, query_string: str = "") -> None:
         """Creates a new BigQueryDBClient and tags it for tracing as big query."""
         # Without pool_pre_ping, it's possible for timed-out connections to be returned to the client and cause errors.
         # However, this can cause increase latency for slow engines.
         self._password = password
-        super().__init__(engine=BigQuerySqlClient._create_bq_engine(query_string=query_string, password=password))
+        super().__init__(
+            engine=BigQuerySqlClient._create_bq_engine(
+                query_string=query_string, project_id=project_id, password=password
+            )
+        )
 
     @staticmethod
-    def _create_bq_engine(query_string: str, password: str) -> sqlalchemy.engine.Engine:
-        """Create the connection engine in SqlAlchemy to connect to BQ"""
+    def _create_bq_engine(
+        query_string: str, project_id: str = "", password: Optional[str] = None
+    ) -> sqlalchemy.engine.Engine:
+        """Create the connection engine in SqlAlchemy to connect to BQ
+
+        There are 2 methods of creating the BigQuery Engine,
+        1. Using a service account JSON credential which will load into the credentials_info (Recommended for production use).
+        2. Using ADC (Application Default Credentials) which allows a user to run `gcloud auth application-default login` to auth.
+           This method would pass None to credentials_info and it will aggregate the credentials via,
+           - Google's decision tree (https://google.aip.dev/auth/4110)
+
+        Args:
+            query_string: Additional query params to pass to engine construction.
+            project_id: Project ID listed on the GCP platform.
+            password: String representation of keyfile.json.
+        """
         return sqlalchemy.create_engine(
-            f"{SqlDialect.BIGQUERY.value}://" + "/?" + query_string,
-            credentials_info=json.loads(password),  # "password := string representation of keyfile.json",
+            f"{SqlDialect.BIGQUERY.value}://{project_id}" + "/?" + query_string,
+            credentials_info=json.loads(password) if password is not None else None,
             pool_size=10,
             max_overflow=10,
             pool_pre_ping=True,
