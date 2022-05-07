@@ -1,7 +1,7 @@
 from _pytest.fixtures import FixtureRequest
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.dataflow.dataflow_plan import PlotTimeDimensionTransformNode
+from metricflow.dataflow.dataflow_plan import MetricTimeDimensionTransformNode
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
@@ -9,10 +9,10 @@ from metricflow.specs import TimeDimensionReference, MetricFlowQuerySpec, Metric
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.plan_conversion.test_dataflow_to_sql_plan import convert_and_check
-from metricflow.test.time.plot_time_dimension import PTD_SPEC_DAY
+from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY
 
 
-def test_plot_time_dimension_transform_node_using_primary_time(  # noqa: D
+def test_metric_time_dimension_transform_node_using_primary_time(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
@@ -21,7 +21,7 @@ def test_plot_time_dimension_transform_node_using_primary_time(  # noqa: D
 ) -> None:
     """Tests converting a PlotTimeDimensionTransform node using the primary time dimension to SQL."""
     source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
-    plot_time_dimension_transform_node = PlotTimeDimensionTransformNode(
+    plot_time_dimension_transform_node = MetricTimeDimensionTransformNode(
         parent_node=source_node, aggregation_time_dimension_reference=TimeDimensionReference(element_name="ds")
     )
     convert_and_check(
@@ -33,7 +33,7 @@ def test_plot_time_dimension_transform_node_using_primary_time(  # noqa: D
     )
 
 
-def test_plot_time_dimension_transform_node_using_non_primary_time(  # noqa: D
+def test_metric_time_dimension_transform_node_using_non_primary_time(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
@@ -42,7 +42,7 @@ def test_plot_time_dimension_transform_node_using_non_primary_time(  # noqa: D
 ) -> None:
     """Tests converting a PlotTimeDimensionTransform node using a non-primary time dimension to SQL."""
     source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
-    plot_time_dimension_transform_node = PlotTimeDimensionTransformNode(
+    plot_time_dimension_transform_node = MetricTimeDimensionTransformNode(
         parent_node=source_node,
         aggregation_time_dimension_reference=TimeDimensionReference(element_name="booking_paid_at"),
     )
@@ -55,7 +55,7 @@ def test_plot_time_dimension_transform_node_using_non_primary_time(  # noqa: D
     )
 
 
-def test_simple_query_with_plot_time_dimension(
+def test_simple_query_with_metric_time_dimension(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
@@ -71,7 +71,7 @@ def test_simple_query_with_plot_time_dimension(
                 MetricSpec(element_name="booking_payments"),
             ),
             dimension_specs=(),
-            time_dimension_specs=(PTD_SPEC_DAY,),
+            time_dimension_specs=(MTD_SPEC_DAY,),
         )
     )
 
