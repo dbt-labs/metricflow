@@ -2,9 +2,8 @@ from __future__ import annotations
 
 from typing import Optional
 
-from metricflow.model.objects.common import Element
 from metricflow.model.objects.utils import ParseableObject, HashableBaseModel
-from metricflow.specs import DimensionReference
+from metricflow.specs import DimensionReference, TimeDimensionReference
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.object_utils import ExtendedEnum
 
@@ -31,10 +30,10 @@ class DimensionTypeParams(HashableBaseModel, ParseableObject):
     time_granularity: TimeGranularity
 
 
-class Dimension(HashableBaseModel, Element, ParseableObject):
+class Dimension(HashableBaseModel, ParseableObject):
     """Describes a dimension"""
 
-    name: DimensionReference
+    name: str
     type: DimensionType
     is_partition: bool = False
     type_params: Optional[DimensionTypeParams]
@@ -46,3 +45,12 @@ class Dimension(HashableBaseModel, Element, ParseableObject):
             return self.type_params.is_primary
 
         return False
+
+    @property
+    def reference(self) -> DimensionReference:  # noqa: D
+        return DimensionReference(element_name=self.name)
+
+    @property
+    def time_dimension_reference(self) -> TimeDimensionReference:  # noqa: D
+        assert self.type == DimensionType.TIME, f"Got type as {self.type} instead of {DimensionType.TIME}"
+        return TimeDimensionReference(element_name=self.name)

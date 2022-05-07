@@ -13,7 +13,7 @@ from metricflow.time.time_granularity import TimeGranularity
 
 def test_incompatible_dimension_type() -> None:  # noqa:D
     with pytest.raises(ModelValidationException, match=r"type conflict for dimension"):
-        dim_reference = DimensionReference(element_name="dim")
+        dim_name = "dim"
         measure_name = "measure"
         model_validator = ModelValidator()
         model_validator.checked_validations(
@@ -21,11 +21,11 @@ def test_incompatible_dimension_type() -> None:  # noqa:D
                 data_sources=[
                     DataSource(
                         name="dim1",
-                        sql_query=f"SELECT {dim_reference.element_name}, {measure_name} FROM bar",
+                        sql_query=f"SELECT {dim_name}, {measure_name} FROM bar",
                         measures=[Measure(name=measure_name, agg=AggregationType.SUM)],
                         dimensions=[
                             Dimension(
-                                name=dim_reference,
+                                name=dim_name,
                                 type=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
                                     is_primary=True,
@@ -38,7 +38,7 @@ def test_incompatible_dimension_type() -> None:  # noqa:D
                     DataSource(
                         name="categoricaldim",
                         sql_query="SELECT foo FROM bar",
-                        dimensions=[Dimension(name=dim_reference, type=DimensionType.CATEGORICAL)],
+                        dimensions=[Dimension(name=dim_name, type=DimensionType.CATEGORICAL)],
                         mutability=Mutability(type=MutabilityType.IMMUTABLE),
                     ),
                 ],
@@ -56,7 +56,7 @@ def test_incompatible_dimension_type() -> None:  # noqa:D
 
 def test_incompatible_dimension_is_partition() -> None:  # noqa:D
     with pytest.raises(ModelValidationException, match=r"conflicting is_partition attribute for dimension"):
-        dim_ref1 = DimensionReference(element_name="dim1")
+        dim_name = "dim1"
         measure_name = "measure"
         model_validator = ModelValidator()
         model_validator.checked_validations(
@@ -64,11 +64,11 @@ def test_incompatible_dimension_is_partition() -> None:  # noqa:D
                 data_sources=[
                     DataSource(
                         name="dim1",
-                        sql_query=f"SELECT {dim_ref1.element_name}, {measure_name} FROM bar",
+                        sql_query=f"SELECT {dim_name}, {measure_name} FROM bar",
                         measures=[Measure(name=measure_name, agg=AggregationType.SUM)],
                         dimensions=[
                             Dimension(
-                                name=dim_ref1,
+                                name=dim_name,
                                 type=DimensionType.TIME,
                                 is_partition=True,
                                 type_params=DimensionTypeParams(
@@ -84,7 +84,7 @@ def test_incompatible_dimension_is_partition() -> None:  # noqa:D
                         sql_query="SELECT foo1 FROM bar",
                         dimensions=[
                             Dimension(
-                                name=dim_ref1,
+                                name=dim_name,
                                 type=DimensionType.TIME,
                                 is_partition=False,
                                 type_params=DimensionTypeParams(
@@ -128,7 +128,7 @@ def test_multiple_primary_time_dimensions() -> None:  # noqa:D
                         ],
                         dimensions=[
                             Dimension(
-                                name=dimension_reference,
+                                name=dimension_reference.element_name,
                                 type=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
                                     is_primary=True,
@@ -136,7 +136,7 @@ def test_multiple_primary_time_dimensions() -> None:  # noqa:D
                                 ),
                             ),
                             Dimension(
-                                name=dimension_reference2,
+                                name=dimension_reference2.element_name,
                                 type=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
                                     is_primary=True,

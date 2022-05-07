@@ -66,4 +66,3 @@ class Measure(HashableBaseModel, ParseableObject):
     @property
     def reference(self) -> MeasureReference:  # noqa: D
         return MeasureReference(element_name=self.name)
-

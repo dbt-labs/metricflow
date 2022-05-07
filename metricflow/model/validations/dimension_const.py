@@ -60,25 +60,25 @@ class DimensionConsistencyRule(ModelValidationRule):
         """
         issues: List[ValidationIssueType] = []
         obj_ref = ValidationIssue.make_object_reference(
-            data_source_name=data_source_name, dimension_name=dimension.name.element_name
+            data_source_name=data_source_name, dimension_name=dimension.reference.element_name
         )
 
         if dimension.type == DimensionType.TIME:
-            if dimension.name not in time_dims_to_granularity and dimension.type_params:
-                time_dims_to_granularity[dimension.name] = dimension.type_params.time_granularity
+            if dimension.reference not in time_dims_to_granularity and dimension.type_params:
+                time_dims_to_granularity[dimension.reference] = dimension.type_params.time_granularity
 
                 # The primary time dimension can be of different time granularities, so don't check for it.
                 if (
                     dimension.type_params is not None
                     and not dimension.type_params.is_primary
-                    and dimension.type_params.time_granularity != time_dims_to_granularity[dimension.name]
+                    and dimension.type_params.time_granularity != time_dims_to_granularity[dimension.reference]
                 ):
-                    expected_granularity = time_dims_to_granularity[dimension.name]
+                    expected_granularity = time_dims_to_granularity[dimension.reference]
                     issues.append(
                         ValidationError(
                             model_object_reference=obj_ref,
                             message=f"Time granularity must be the same for time dimensions with the same name. "
-                            f"Problematic dimension: {dimension.name.element_name} in data source with name: "
+                            f"Problematic dimension: {dimension.reference.element_name} in data source with name: "
                             f"`{data_source_name}`. Expected granularity is {expected_granularity.name}.",
                         )
                     )
@@ -105,12 +105,12 @@ class DimensionConsistencyRule(ModelValidationRule):
         issues: List[ValidationIssueType] = []
 
         for dimension in data_source.dimensions:
-            dimension_invariant = dimension_to_invariant.get(dimension.name)
+            dimension_invariant = dimension_to_invariant.get(dimension.reference)
 
             if dimension_invariant is None:
                 if update_invariant_dict:
                     dimension_invariant = DimensionInvariants(dimension.type, dimension.is_partition or False)
-                    dimension_to_invariant[dimension.name] = dimension_invariant
+                    dimension_to_invariant[dimension.reference] = dimension_invariant
                     continue
                 # TODO: Can't check for unknown dimensions easily as the name follows <id>__<name> format.
                 # e.g. user__created_at
@@ -120,13 +120,13 @@ class DimensionConsistencyRule(ModelValidationRule):
             is_partition = dimension.is_partition or False
 
             model_object_reference = ValidationIssue.make_object_reference(
-                data_source_name=data_source.name, dimension_name=dimension.name.element_name
+                data_source_name=data_source.name, dimension_name=dimension.reference.element_name
             )
             if dimension_invariant.type != dimension.type:
                 issues.append(
                     ValidationError(
                         model_object_reference=model_object_reference,
-                        message=f"In data source `{data_source.name}`, type conflict for dimension `{dimension.name}` "
+                        message=f"In data source `{data_source.name}`, type conflict for dimension `{dimension.reference}` "
                         f"- already in model as type `{dimension_invariant.type}` but got `{dimension.type}`",
                     )
                 )
@@ -135,7 +135,7 @@ class DimensionConsistencyRule(ModelValidationRule):
                     ValidationError(
                         model_object_reference=model_object_reference,
                         message=f"In data source `{data_source.name}, conflicting is_partition attribute for dimension "
-                        f"`{dimension.name}` - already in model"
+                        f"`{dimension.reference}` - already in model"
                         f" with is_partition as `{dimension_invariant.is_partition}` but got "
                         f"`{is_partition}``",
                     )

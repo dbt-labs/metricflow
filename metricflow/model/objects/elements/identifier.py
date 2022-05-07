@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from typing import Optional, List, Dict, Any
 
-from metricflow.model.objects.common import Element
 from metricflow.model.objects.utils import ParseableObject, HashableBaseModel
 from metricflow.object_utils import ExtendedEnum
-from metricflow.specs import IdentifierReference
+from metricflow.specs import IdentifierReference, CompositeSubIdentifierReference
 
 
 class IdentifierType(ExtendedEnum):
@@ -22,15 +21,19 @@ class IdentifierType(ExtendedEnum):
 class CompositeSubIdentifier(HashableBaseModel, ParseableObject):
     """CompositeSubIdentifiers either describe or reference the identifiers that comprise a composite identifier"""
 
-    name: Optional[IdentifierReference]
+    name: Optional[str]
     expr: Optional[str]
     ref: Optional[str]
 
+    @property
+    def reference(self) -> CompositeSubIdentifierReference:  # noqa: D
+        return CompositeSubIdentifierReference(element_name=self.name)
 
-class Identifier(HashableBaseModel, Element, ParseableObject):
+
+class Identifier(HashableBaseModel, ParseableObject):
     """Describes a identifier"""
 
-    name: IdentifierReference
+    name: str
     type: IdentifierType
     role: Optional[str]
     entity: Optional[str]
@@ -39,15 +42,18 @@ class Identifier(HashableBaseModel, Element, ParseableObject):
 
     def __init__(  # type: ignore
         self,
-        name: IdentifierReference,
+        name: str,
         type: IdentifierType,
         role: Optional[str] = None,
         entity: Optional[str] = None,
-        identifiers: List[CompositeSubIdentifier] = [],
+        identifiers: Optional[List[CompositeSubIdentifier]] = None,
         expr: Optional[str] = None,
         **kwargs: Dict[str, Any],  # the parser may instantiate objects with additional fields (eg __parsing_context__)
     ) -> None:
         """Normal pydantic initializer except we set entity to name"""
+
+        identifiers = identifiers or []
+
         super().__init__(
             name=name,
             type=type,
@@ -57,7 +63,7 @@ class Identifier(HashableBaseModel, Element, ParseableObject):
             expr=expr,
         )
         if self.entity is None:
-            self.entity = self.name.element_name
+            self.entity = self.reference.element_name
 
     @property
     def is_primary_time(self) -> bool:  # noqa: D
@@ -66,3 +72,7 @@ class Identifier(HashableBaseModel, Element, ParseableObject):
     @property
     def is_composite(self) -> bool:  # noqa: D
         return self.identifiers is not None and len(self.identifiers) > 0
+
+    @property
+    def reference(self) -> IdentifierReference:  # noqa: D
+        return IdentifierReference(element_name=self.name)

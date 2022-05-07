@@ -68,7 +68,7 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
 
         for dim in data_source.dimensions:
             model_object_reference = ValidationIssue.make_object_reference(
-                data_source_name=data_source.name, dimension_name=dim.name.element_name
+                data_source_name=data_source.name, dimension_name=dim.reference.element_name
             )
 
             if dim.type == DimensionType.TIME:
@@ -81,7 +81,7 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
                         issues.append(
                             ValidationError(
                                 model_object_reference=model_object_reference,
-                                message=f"Unsupported time granularity in time dimension with name: {dim.name}, "
+                                message=f"Unsupported time granularity in time dimension with name: {dim.reference}, "
                                 f"Please use {[s.value for s in SUPPORTED_GRANULARITIES]}",
                             )
                         )

@@ -22,10 +22,10 @@ class CommonIdentifiersRule(ModelValidationRule):
         identifiers_to_data_sources: Dict[IdentifierReference, Set[str]] = {}
         for data_source in data_sources or []:
             for identifier in data_source.identifiers or []:
-                if identifier.name in identifiers_to_data_sources:
-                    identifiers_to_data_sources[identifier.name].add(data_source.name)
+                if identifier.reference in identifiers_to_data_sources:
+                    identifiers_to_data_sources[identifier.reference].add(data_source.name)
                 else:
-                    identifiers_to_data_sources[identifier.name] = {data_source.name}
+                    identifiers_to_data_sources[identifier.reference] = {data_source.name}
         return identifiers_to_data_sources
 
     @staticmethod
@@ -39,15 +39,15 @@ class CommonIdentifiersRule(ModelValidationRule):
         # If the identifier is the dict and if the set of data sources minus this data source is empty,
         # then we warn the user that their identifier will be unused in joins
         if (
-            identifier.name in identifiers_to_data_sources
-            and len(identifiers_to_data_sources[identifier.name].difference({data_source.name})) == 0
+            identifier.reference in identifiers_to_data_sources
+            and len(identifiers_to_data_sources[identifier.reference].difference({data_source.name})) == 0
         ):
             issues.append(
                 ValidationWarning(
                     model_object_reference=ValidationIssue.make_object_reference(
-                        data_source_name=data_source.name, identifier_name=identifier.name.element_name
+                        data_source_name=data_source.name, identifier_name=identifier.reference.element_name
                     ),
-                    message=f"Identifier `{identifier.name.element_name}` "
+                    message=f"Identifier `{identifier.reference.element_name}` "
                     f"only found in one data source `{data_source.name}` "
                     f"which means it will be unused in joins.",
                 )

@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from collections import defaultdict
 from copy import deepcopy
-from typing import Dict, List, Set, Type, Optional, Sequence, Tuple, FrozenSet
+from typing import Dict, List, Set, Optional, Sequence, Tuple, FrozenSet
 
 from metricflow.errors.errors import (
     DuplicateMetricError,
@@ -12,10 +12,9 @@ from metricflow.errors.errors import (
     InvalidDataSourceError,
 )
 from metricflow.instances import DataSourceReference, DataSourceElementReference
-from metricflow.model.graph import MultiDiGraph
-from metricflow.model.objects.common import Element
 from metricflow.model.objects.data_source import DataSource, DataSourceOrigin
 from metricflow.model.objects.elements.dimension import Dimension
+from metricflow.model.objects.elements.identifier import Identifier
 from metricflow.model.objects.elements.measure import Measure, AggregationType
 from metricflow.model.objects.metric import Metric, MetricType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
@@ -24,7 +23,6 @@ from metricflow.model.semantics.linkable_spec_resolver import (
     ValidLinkableSpecResolver,
     LinkableElementProperties,
 )
-from metricflow.model.semantics.links_new import JoinLink, JOIN_TYPE_MAPPING
 from metricflow.specs import (
     LinkableInstanceSpec,
     LinkableElementReference,
@@ -140,7 +138,6 @@ class DataSourceSemantics:
         configured_data_source_container: PydanticDataSourceContainer,
     ) -> None:
         self._model = model
-        self._element_types: Dict[LinkableElementReference, Type[Element]] = {}
         self._measure_index: Dict[MeasureReference, List[DataSource]] = defaultdict(list)
         self._measure_aggs: Dict[
             MeasureReference, AggregationType
@@ -149,10 +146,6 @@ class DataSourceSemantics:
         self._linkable_reference_index: Dict[LinkableElementReference, List[DataSource]] = defaultdict(list)
         self._entity_index: Dict[Optional[str], List[DataSource]] = defaultdict(list)
         self._identifier_ref_to_entity: Dict[IdentifierReference, Optional[str]] = {}
-        # Graph where nodes are DataSource names and edges are Join objects that represent all valid
-        # joins possible between the nodes (data sources)
-        self._data_source_links = MultiDiGraph[str, JoinLink]()
-
         self._data_source_names: Set[str] = set()
 
         self._configured_data_source_container = configured_data_source_container
@@ -163,43 +156,13 @@ class DataSourceSemantics:
             assert isinstance(data_source, DataSource)
             self.add_configured_data_source(data_source)
 
-    @property
-    def data_sources(self) -> Sequence[DataSource]:  # noqa: D
-        return self._model.data_sources
-
     def add_configured_data_source(self, data_source: DataSource) -> None:
         """Dont use this unless you mean it (ie in tests). The configured data sources are supposed to be static"""
         self._configured_data_source_container._put(data_source)
         self._add_data_source(data_source)
 
-    def get_linkable_element_references(self) -> List[LinkableElementReference]:  # noqa: D
-        return list(self._linkable_reference_index.keys())
-
     def get_dimension_references(self) -> List[DimensionReference]:  # noqa: D
         return list(self._dimension_index.keys())
-
-    def get_linkable(  # noqa: D
-        self,
-        linkable_name: LinkableElementReference,
-        origin: Optional[DataSourceOrigin] = None,
-        use_identifier_dundered_name: bool = False,
-    ) -> Element:
-        """Retrieves a full linkable element object by name
-
-        use_identifier_dundered_name returns the Dimension with the identifier-dundered name (if the requested linkable element
-        has an identifier-dunder) otherwise the identifier is stripped from the name
-        """
-        for dimension_source in self._linkable_reference_index[linkable_name]:
-            if origin and dimension_source.origin != origin:
-                continue
-            linkable_element = dimension_source.get_element(linkable_name)
-            # find the data source that has the requested linkable_element by the requested identifier
-
-            return deepcopy(linkable_element)
-
-        raise ValueError(
-            f"Could not find dimension with name ({linkable_name.element_name}) in configured data sources"
-        )
 
     def get_dimension(
         self, dimension_reference: DimensionReference, origin: Optional[DataSourceOrigin] = None
@@ -232,22 +195,6 @@ class DataSourceSemantics:
     def get_identifier_references(self) -> List[IdentifierReference]:  # noqa: D
         return list(self._identifier_ref_to_entity.keys())
 
-    def _get_joinable_data_sources_by_identifier(
-        self, data_source_name: str, identifier_spec: LinkableInstanceSpec
-    ) -> List[str]:
-        """Returns list of data sources that can be joined to `data_source_name` via `identifier_spec`"""
-        res = []
-        for name, links in self._data_source_links.adj(data_source_name).items():
-            for link in links:
-                if link.via_from.name.element_name == identifier_spec.element_name:
-                    res.append(name)
-                    break
-
-        return res
-
-    def _get_joinable_data_sources(self, data_source_name: str) -> Dict[str, List[JoinLink]]:  # noqa: D
-        return self._data_source_links.adj(data_source_name)
-
     # DSC interface
     def get_data_sources_for_measure(self, measure_reference: MeasureReference) -> List[DataSource]:  # noqa: D
         return self._measure_index[measure_reference]
@@ -255,23 +202,16 @@ class DataSourceSemantics:
     def dimension_is_partitioned(self, dimension_reference: DimensionReference) -> bool:  # noqa: D
         return self.get_dimension(dimension_reference).is_partition
 
-    def keys(self) -> List[str]:  # noqa: D
-        return list(self._data_source_names)
+    def get_identifier_in_data_source(self, ref: DataSourceElementReference) -> Optional[Identifier]:  # Noqa: d
+        data_source = self.get(ref.data_source_name)
+        if not data_source:
+            return None
 
-    def get_data_source_element(self, ref: DataSourceElementReference) -> Optional[Element]:  # Noqa: d
-        data_source = self[ref.data_source_name]
-        for elem in data_source.elements:
-            if elem.name.element_name == ref.element_name:
-                return elem
+        for identifier in data_source.identifiers:
+            if identifier.reference.element_name == ref.element_name:
+                return identifier
 
         return None
-
-    def __getitem__(self, item: str) -> DataSource:  # noqa: D
-        res = self.get(item)
-        if res:
-            return res
-
-        raise ValueError(f"Cannot find data source with name ({item})")
 
     def get(self, data_source_name: str) -> Optional[DataSource]:  # noqa: D
         if data_source_name in self._configured_data_source_container:
@@ -290,22 +230,17 @@ class DataSourceSemantics:
         fail_on_error: bool = True,
         logging_context: str = "",
     ) -> None:
-        """Add data source semantic information, validating consistency with existing data sources and establishing links"""
+        """Add data source semantic information, validating consistency with existing data sources."""
         errors = []
 
         if data_source.name in self._data_source_names:
             errors.append(f"name {data_source.name} already registered - please ensure data source names are unique")
 
-        if data_source.origin is DataSourceOrigin.DERIVED:
-            raise ValueError(
-                f"Cannot add derived data source (with name: {data_source.name}) to New DataSourceSemantics... for now"
-            )
-
         for measure in data_source.measures:
             if measure.reference in self._measure_aggs and self._measure_aggs[measure.reference] != measure.agg:
                 errors.append(
-                    f"conflicting aggregation (agg) for measure `{measure.reference}` registered as `{self._measure_aggs[measure.reference]}`; "
-                    f"Got `{measure.agg}"
+                    f"conflicting aggregation (agg) for measure `{measure.reference}` registered as "
+                    f"`{self._measure_aggs[measure.reference]}`; Got `{measure.agg}"
                 )
 
         if errors:
@@ -323,10 +258,6 @@ class DataSourceSemantics:
 
         self._data_source_names.add(data_source.name)
 
-        for element in data_source.elements:
-            if element.name not in self._element_types:
-                self._element_types[element.name] = type(element)
-
         self._data_source_to_aggregation_time_dimensions[data_source.reference] = []
 
         for measure in data_source.measures:
@@ -339,65 +270,14 @@ class DataSourceSemantics:
                 self._data_source_to_aggregation_time_dimensions[data_source.reference].append(
                     measure.checked_agg_time_dimension
                 )
-        for dimension in data_source.dimensions:
-            self._linkable_reference_index[dimension.name].append(data_source)
-            self._dimension_index[dimension.name].append(data_source)
-        for identifier in data_source.identifiers:
-            self._identifier_ref_to_entity[identifier.name] = identifier.entity
-            self._entity_index[identifier.entity].append(data_source)
-            self._linkable_reference_index[identifier.name].append(data_source)
+        for dim in data_source.dimensions:
+            self._linkable_reference_index[dim.reference].append(data_source)
+            self._dimension_index[dim.reference].append(data_source)
+        for ident in data_source.identifiers:
+            self._identifier_ref_to_entity[ident.reference] = ident.entity
+            self._entity_index[ident.entity].append(data_source)
+            self._linkable_reference_index[ident.reference].append(data_source)
 
-
-        dsource_partition = data_source.partition
-        # Add links to other data sources based on the names and types of identifiers available.
-        for identifier in data_source.identifiers:
-            # We only need to consider other data sources with the same identifier.
-            for other in self._entity_index[identifier.entity]:
-                if other.name == data_source.name:
-                    continue
-
-                # handle whether or not this join is partitioned
-                partitions: List[DimensionReference] = list()
-                other_partition = other.partition
-                if dsource_partition and other_partition and dsource_partition.name != other_partition.name:
-                    continue
-                if dsource_partition and other_partition:
-                    partitions.append(dsource_partition.name)
-
-                for other_ident in other.identifiers:
-                    # TODO: Replace with entity check when entities are supported.
-                    if other_ident.name != identifier.name:
-                        continue
-
-                    # add edge data_source -> other "other is joinable to data_source"
-                    join_type = JOIN_TYPE_MAPPING.get((identifier.type, other_ident.type), None)
-                    if join_type:
-                        self._data_source_links.add_edge(
-                            from_key=data_source.name,
-                            to_key=other.name,
-                            value=JoinLink(
-                                join_type=join_type,
-                                via_from=identifier,
-                                via_to=other_ident,
-                                partitions=tuple([str(p) for p in partitions]),
-                            ),
-                        )
-
-                    # add edge other -> data_source "data_source is joinable to other"
-                    reversed_join_type = JOIN_TYPE_MAPPING.get((other_ident.type, identifier.type), None)
-                    if reversed_join_type:
-                        self._data_source_links.add_edge(
-                            from_key=other.name,
-                            to_key=data_source.name,
-                            value=JoinLink(
-                                join_type=reversed_join_type,
-                                via_from=other_ident,
-                                via_to=identifier,
-                                partitions=tuple([str(p) for p in partitions]),
-                            ),
-                        )
-
-    @property
     def data_source_references(self) -> Sequence[DataSourceReference]:  # noqa: D
         data_source_names_sorted = sorted(self._data_source_names)
         return tuple(DataSourceReference(data_source_name=x) for x in data_source_names_sorted)
