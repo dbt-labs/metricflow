@@ -99,7 +99,7 @@ class MetricSemantics:  # noqa: D
         metric_spec = MetricSpec(element_name=metric.name)
         if metric_spec in self._metrics:
             raise DuplicateMetricError(f"Metric `{metric.name}` has already been registered")
-        for measure_reference in metric.measure_names:
+        for measure_reference in metric.measure_references:
             if measure_reference not in self._data_source_semantics.measure_references:
                 raise NonExistentMeasureError(
                     f"Metric `{metric.name}` references measure `{measure_reference}` which has not been registered"
@@ -120,7 +120,7 @@ class MetricSemantics:  # noqa: D
             MeasureSpec(
                 element_name=x.element_name,
             )
-            for x in metric.measure_names
+            for x in metric.measure_references
         )
 
     def contains_cumulative_metric(self, metric_specs: Sequence[MetricSpec]) -> bool:
@@ -239,7 +239,7 @@ class DataSourceSemantics:
         res = []
         for name, links in self._data_source_links.adj(data_source_name).items():
             for link in links:
-                if link.via_from.reference.element_name == identifier_spec.element_name:
+                if link.via_from.name.element_name == identifier_spec.element_name:
                     res.append(name)
                     break
 

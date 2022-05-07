@@ -92,7 +92,7 @@ class TimeGranularitySolver:
         metric_reference_to_measure_references: Dict[MetricModelReference, List[MeasureReference]] = {}
         for metric in model.metrics:
             metric_reference_to_measure_references[MetricModelReference(metric_name=metric.name)] = [
-                MeasureReference(element_name=measure.element_name) for measure in metric.measure_names
+                MeasureReference(element_name=measure.element_name) for measure in metric.measure_references
             ]
 
         return metric_reference_to_measure_references

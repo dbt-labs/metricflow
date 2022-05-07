@@ -441,7 +441,7 @@ class ValidLinkableSpecResolver:
         start_time = time.time()
         for metric in self._user_configured_model.metrics:
             linkable_sets_for_measure = []
-            for measure in metric.measure_names:
+            for measure in metric.measure_references:
                 linkable_sets_for_measure.append(self._get_linkable_element_set_for_measure(measure))
 
             self._metric_to_linkable_element_sets[metric.name] = linkable_sets_for_measure

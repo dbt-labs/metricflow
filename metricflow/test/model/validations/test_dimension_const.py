@@ -7,7 +7,7 @@ from metricflow.model.objects.elements.measure import Measure, AggregationType
 from metricflow.model.objects.metric import MetricType, MetricTypeParams, Metric
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import ModelValidationException
-from metricflow.specs import MeasureReference, DimensionReference, TimeDimensionReference
+from metricflow.specs import DimensionReference, TimeDimensionReference, MeasureReference
 from metricflow.test.model.validations.helpers import data_source_with_guaranteed_meta, metric_with_guaranteed_meta
 from metricflow.time.time_granularity import TimeGranularity
 
@@ -15,14 +15,15 @@ from metricflow.time.time_granularity import TimeGranularity
 def test_incompatible_dimension_type() -> None:  # noqa:D
     with pytest.raises(ModelValidationException, match=r"type conflict for dimension"):
         dim_reference = DimensionReference(element_name="dim")
-        measure_reference = MeasureReference(element_name="measure")
-        ModelValidator().checked_validations(
+        measure_name = "measure"
+        model_validator = ModelValidator()
+        model_validator.checked_validations(
             UserConfiguredModel(
                 data_sources=[
                     data_source_with_guaranteed_meta(
                         name="dim1",
-                        sql_query=f"SELECT {dim_reference.element_name}, {measure_reference.element_name} FROM bar",
-                        measures=[Measure(name=measure_reference.element_name, agg=AggregationType.SUM)],
+                        sql_query=f"SELECT {dim_reference.element_name}, {measure_name} FROM bar",
+                        measures=[Measure(name=measure_name, agg=AggregationType.SUM)],
                         dimensions=[
                             Dimension(
                                 name=dim_reference.element_name,
@@ -44,26 +45,28 @@ def test_incompatible_dimension_type() -> None:  # noqa:D
                 ],
                 metrics=[
                     metric_with_guaranteed_meta(
-                        name=measure_reference.element_name,
+                        name=measure_name,
                         type=MetricType.MEASURE_PROXY,
-                        type_params=MetricTypeParams(measures=[measure_reference]),
+                        type_params=MetricTypeParams(measures=[measure_name]),
                     )
                 ],
                 materializations=[],
             )
         )
 
+
 def test_incompatible_dimension_is_partition() -> None:  # noqa:D
     with pytest.raises(ModelValidationException, match=r"conflicting is_partition attribute for dimension"):
         dim_ref1 = DimensionReference(element_name="dim1")
-        measure_reference = MeasureReference(element_name="measure")
-        ModelValidator().checked_validations(
+        measure_name = "measure"
+        model_validator = ModelValidator()
+        model_validator.checked_validations(
             UserConfiguredModel(
                 data_sources=[
                     data_source_with_guaranteed_meta(
                         name="dim1",
-                        sql_query=f"SELECT {dim_ref1.element_name}, {measure_reference.element_name} FROM bar",
-                        measures=[Measure(name=measure_reference.element_name, agg=AggregationType.SUM)],
+                        sql_query=f"SELECT {dim_ref1.element_name}, {measure_name} FROM bar",
+                        measures=[Measure(name=measure_name, agg=AggregationType.SUM)],
                         dimensions=[
                             Dimension(
                                 name=dim_ref1.element_name,
@@ -95,9 +98,9 @@ def test_incompatible_dimension_is_partition() -> None:  # noqa:D
                 ],
                 metrics=[
                     metric_with_guaranteed_meta(
-                        name=measure_reference.element_name,
+                        name=measure_name,
                         type=MetricType.MEASURE_PROXY,
-                        type_params=MetricTypeParams(measures=[measure_reference]),
+                        type_params=MetricTypeParams(measures=[measure_name]),
                     )
                 ],
                 materializations=[],
@@ -149,7 +152,7 @@ def test_multiple_primary_time_dimensions() -> None:  # noqa:D
                     Metric(
                         name=measure_reference.element_name,
                         type=MetricType.MEASURE_PROXY,
-                        type_params=MetricTypeParams(measures=[measure_reference]),
+                        type_params=MetricTypeParams(measures=[measure_reference.element_name]),
                     )
                 ],
                 materializations=[],

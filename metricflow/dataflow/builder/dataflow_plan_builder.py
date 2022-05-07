@@ -142,7 +142,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 MeasureSpec(
                     element_name=x.element_name,
                 )
-                for x in metric.measure_names
+                for x in metric.measure_references
             )
 
             logger.info(
