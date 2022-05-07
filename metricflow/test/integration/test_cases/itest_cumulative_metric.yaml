@@ -5,13 +5,13 @@ integration_test:
   model: SIMPLE_MODEL
   required_features: ["DATE_TRUNC"]
   metrics: ["trailing_2_months_revenue"]
-  group_bys: ["_ts"]
-  order_bys: ["_ts"]
+  group_bys: ["metric_time"]
+  order_bys: ["metric_time"]
   time_constraint: ["2020-01-05", "2021-01-04"]
   check_query: |
     SELECT
       SUM(b.txn_revenue) as trailing_2_months_revenue
-      , a.ds AS _ts
+      , a.ds AS metric_time
     FROM (
       SELECT ds
       FROM {{ mf_time_spine_source }}
@@ -34,14 +34,14 @@ integration_test:
   model: SIMPLE_MODEL
   required_features: ["DATE_TRUNC"]
   metrics: ["trailing_2_months_revenue"]
-  group_bys: ["_ts", "user__home_state_latest"]
-  order_bys: ["_ts", "user__home_state_latest"]
+  group_bys: ["metric_time", "user__home_state_latest"]
+  order_bys: ["metric_time", "user__home_state_latest"]
   time_constraint: ["2020-01-05", "2021-01-04"]
   check_query: |
     SELECT
       SUM(revenue) as trailing_2_months_revenue
       , b.user__home_state_latest as user__home_state_latest
-      , a.ds AS _ts
+      , a.ds AS metric_time
     FROM (
       SELECT ds
       FROM {{ mf_time_spine_source }}
@@ -67,13 +67,13 @@ integration_test:
   description: Query a cumulative metric that aggregates revenue for all time in the past by ds.
   model: SIMPLE_MODEL
   metrics: ["revenue_all_time"]
-  group_bys: ["_ts"]
-  order_bys: ["_ts"]
+  group_bys: ["metric_time"]
+  order_bys: ["metric_time"]
   time_constraint: ["2020-01-01", "2021-01-05"]
   check_query: |
     SELECT
       SUM(revenue) AS revenue_all_time
-      , a.ds AS _ts
+      , a.ds AS metric_time
     FROM (
       SELECT ds
       FROM {{ mf_time_spine_source }}
@@ -107,11 +107,11 @@ integration_test:
   model: SIMPLE_MODEL
   required_features: ["FULL_OUTER_JOIN"]
   metrics: ["revenue_all_time", "trailing_2_months_revenue"]
-  group_bys: ["_ts"]
-  order_bys: ["_ts"]
+  group_bys: ["metric_time"]
+  order_bys: ["metric_time"]
   time_constraint: ["2019-12-31", "2021-01-05"]
   check_query: |
-    SELECT revenue_all_time, trailing_2_months_revenue, a.ds AS _ts
+    SELECT revenue_all_time, trailing_2_months_revenue, a.ds AS metric_time
     FROM (
         SELECT
           SUM(revenue) as revenue_all_time
@@ -163,13 +163,13 @@ integration_test:
   model: SIMPLE_MODEL
   required_features: ["DATE_TRUNC"]
   metrics: ["trailing_2_months_revenue"]
-  group_bys: ["_ts__day"]
-  order_bys: ["_ts__day"]
+  group_bys: ["metric_time__day"]
+  order_bys: ["metric_time__day"]
   time_constraint: ["2020-01-05", "2021-01-04"]
   check_query: |
     SELECT
       SUM(b.txn_revenue) as trailing_2_months_revenue
-      , a.ds AS _ts
+      , a.ds AS metric_time
     FROM (
       SELECT ds
       FROM {{ mf_time_spine_source }}
@@ -191,13 +191,13 @@ integration_test:
   description: Query a cumulative metric that aggregates revenue for all time in the past for a limit time interval.
   model: SIMPLE_MODEL
   metrics: ["revenue_all_time"]
-  group_bys: ["_ts"]
-  order_bys: ["_ts"]
+  group_bys: ["metric_time"]
+  order_bys: ["metric_time"]
   time_constraint: ["2021-01-05", "2021-01-05"]
   check_query: |
     SELECT
       SUM(revenue) AS revenue_all_time
-      , a.ds AS _ts
+      , a.ds AS metric_time
     FROM (
       SELECT ds
       FROM {{ mf_time_spine_source }}
@@ -219,13 +219,13 @@ integration_test:
   description: Query a cumulative metric with a non-additive measure.
   model: SIMPLE_MODEL
   metrics: ["every_two_days_bookers"]
-  group_bys: ["_ts"]
-  order_bys: ["_ts"]
+  group_bys: ["metric_time"]
+  order_bys: ["metric_time"]
   time_constraint: ["2019-12-31", "2020-01-04"]
   check_query: |
     SELECT
       COUNT (DISTINCT(b.guest_id)) as every_two_days_bookers
-      , a.ds AS _ts
+      , a.ds AS metric_time
     FROM (
       SELECT ds
       FROM {{ mf_time_spine_source }}
@@ -249,13 +249,13 @@ integration_test:
   description: Query a cumulative metric with a non-additive measure and a limited time range.
   model: SIMPLE_MODEL
   metrics: ["every_two_days_bookers"]
-  group_bys: ["_ts"]
-  order_bys: ["_ts"]
+  group_bys: ["metric_time"]
+  order_bys: ["metric_time"]
   time_constraint: ["2020-01-04", "2020-01-04"]
   check_query: |
     SELECT
       COUNT (DISTINCT(b.guest_id)) as every_two_days_bookers
-      , a.ds AS _ts
+      , a.ds AS metric_time
     FROM (
       SELECT ds
       FROM {{ mf_time_spine_source }}
@@ -278,13 +278,13 @@ integration_test:
   model: SIMPLE_MODEL
   required_features: [DATE_TRUNC]
   metrics: ["revenue_mtd"]
-  group_bys: ["_ts"]
-  order_bys: ["_ts"]
+  group_bys: ["metric_time"]
+  order_bys: ["metric_time"]
   time_constraint: ["2020-01-01", "2021-01-05"]
   check_query: |
     SELECT
       SUM(b.txn_revenue) as revenue_mtd
-      , a.ds AS _ts
+      , a.ds AS metric_time
     FROM (
       SELECT ds
       FROM {{ mf_time_spine_source }}
@@ -307,13 +307,13 @@ integration_test:
   description: Query a cumulative metric that aggregates revenue for all time in the past by ds__day.
   model: SIMPLE_MODEL
   metrics: ["revenue_all_time"]
-  group_bys: ["_ts__day"]
-  order_bys: ["_ts__day"]
+  group_bys: ["metric_time__day"]
+  order_bys: ["metric_time__day"]
   time_constraint: ["2020-01-01", "2021-01-05"]
   check_query: |
     SELECT
       SUM(revenue) AS revenue_all_time
-      , a.ds AS _ts
+      , a.ds AS metric_time
     FROM (
       SELECT ds
       FROM {{ mf_time_spine_source }}

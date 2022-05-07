@@ -24,7 +24,7 @@ def test_identifier(simple_model__pre_transforms: UserConfiguredModel) -> None: 
                         materialization_with_guaranteed_meta(
                             name="foobar",
                             metrics=["bookings"],
-                            dimensions=["_ts", "listing"],
+                            dimensions=["metric_time", "listing"],
                         )
                     ],
                 )
@@ -44,7 +44,7 @@ def test_invalid_metric_name(simple_model__pre_transforms: UserConfiguredModel) 
                         materialization_with_guaranteed_meta(
                             name="foobar",
                             metrics=["invalid_bookings"],
-                            dimensions=["_ts"],
+                            dimensions=["metric_time"],
                         )
                     ],
                 )
@@ -64,7 +64,7 @@ def test_invalid_dimension_name(simple_model__pre_transforms: UserConfiguredMode
                         materialization_with_guaranteed_meta(
                             name="foobar",
                             metrics=["bookings"],
-                            dimensions=["_ts", "invalid_dimension_name"],
+                            dimensions=["metric_time", "invalid_dimension_name"],
                         )
                     ],
                 )
@@ -105,7 +105,7 @@ def test_valid_time_granularity(simple_model__pre_transforms: UserConfiguredMode
                         materialization_with_guaranteed_meta(
                             name="materialization_test_case",
                             metrics=["bookings"],
-                            dimensions=["_ts__day"],
+                            dimensions=["metric_time__day"],
                         )
                     ],
                 )
@@ -125,7 +125,7 @@ def test_invalid_time_granularity(simple_model__pre_transforms: UserConfiguredMo
                         materialization_with_guaranteed_meta(
                             name="materialization_test_case",
                             metrics=["revenue"],
-                            dimensions=["_ts__hour"],
+                            dimensions=["metric_time__hour"],
                         )
                     ],
                 )

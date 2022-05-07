@@ -63,12 +63,12 @@ integration_test:
   description: Query a metric and join to a dimension using a composite key and group by day. Match this output to a table grouped by those two identifiers and joined to another table and grouped by date.
   model: COMPOSITE_IDENTIFIER_MODEL
   metrics: ["messages"]
-  group_bys: ["_ts", "user_team", "user_team__country"]
+  group_bys: ["metric_time", "user_team", "user_team__country"]
   check_query: |
     SELECT
       SUM(1) AS messages
       , u.country as user_team__country
-      , m.ds AS _ts
+      , m.ds AS metric_time
       , m.team_id AS user_team___team_id
       , m.user_id AS user_team___user_id
     FROM {{ source_schema }}.fct_messages m
@@ -86,11 +86,11 @@ integration_test:
   description: Query a metric and join using a composite key and grouping by date. Match this output to a table grouped by those two identifiers and joined to another table.
   model: COMPOSITE_IDENTIFIER_MODEL
   metrics: ["messages"]
-  group_bys: ["_ts", "user_team"]
+  group_bys: ["metric_time", "user_team"]
   check_query: |
     SELECT
       SUM(1) AS messages
-      , m.ds AS _ts
+      , m.ds AS metric_time
       , m.team_id AS user_team___team_id
       , m.user_id AS user_team___user_id
     FROM {{ source_schema }}.fct_messages m
