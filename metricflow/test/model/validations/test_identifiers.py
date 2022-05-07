@@ -52,7 +52,7 @@ def test_data_source_cant_have_more_than_one_primary_identifier(
 def test_invalid_composite_identifiers() -> None:  # noqa:D
     with pytest.raises(ModelValidationException, match=r"If sub identifier has same name"):
         dim_reference = DimensionReference(element_name="time")
-        measure_reference = MeasureReference(element_name="foo")
+        measure_name = "foo"
         measure2_reference = MeasureReference(element_name="metric_with_no_time_dim")
         identifier_reference = IdentifierReference(element_name="thorium")
         foreign_identifier_reference = IdentifierReference(element_name="composite_thorium")
@@ -60,12 +60,12 @@ def test_invalid_composite_identifiers() -> None:  # noqa:D
             UserConfiguredModel(
                 data_sources=[
                     DataSource(
-                        reference="dim1",
-                        sql_query=f"SELECT {dim_reference.element_name}, {measure_reference.element_name}, thorium_id FROM bar",
-                        measures=[Measure(reference=measure_reference, agg=AggregationType.SUM)],
+                        name="dim1",
+                        sql_query=f"SELECT {dim_reference.element_name}, {measure_name}, thorium_id FROM bar",
+                        measures=[Measure(name=measure_name, agg=AggregationType.SUM)],
                         dimensions=[
                             Dimension(
-                                reference=dim_reference,
+                                name=dim_reference,
                                 type=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
                                     is_primary=True,
@@ -74,12 +74,12 @@ def test_invalid_composite_identifiers() -> None:  # noqa:D
                             )
                         ],
                         identifiers=[
-                            Identifier(reference=identifier_reference, type=IdentifierType.PRIMARY, expr="thorium_id"),
+                            Identifier(name=identifier_reference, type=IdentifierType.PRIMARY, expr="thorium_id"),
                             Identifier(
-                                reference=foreign_identifier_reference,
+                                name=foreign_identifier_reference,
                                 type=IdentifierType.FOREIGN,
                                 identifiers=[
-                                    CompositeSubIdentifier(reference=identifier_reference, expr="not_thorium_id"),
+                                    CompositeSubIdentifier(name=identifier_reference, expr="not_thorium_id"),
                                 ],
                             ),
                         ],
@@ -88,9 +88,9 @@ def test_invalid_composite_identifiers() -> None:  # noqa:D
                 ],
                 metrics=[
                     Metric(
-                        reference=measure2_reference.element_name,
+                        name=measure2_reference.element_name,
                         type=MetricType.MEASURE_PROXY,
-                        type_params=MetricTypeParams(measures=[measure_reference]),
+                        type_params=MetricTypeParams(measures=[measure_name]),
                     )
                 ],
                 materializations=[],
@@ -101,7 +101,7 @@ def test_invalid_composite_identifiers() -> None:  # noqa:D
 def test_composite_identifiers_nonexistent_ref() -> None:  # noqa:D
     with pytest.raises(ModelValidationException, match=r"Identifier ref must reference an existing identifier by name"):
         dim_reference = DimensionReference(element_name="time")
-        measure_reference = MeasureReference(element_name="foo")
+        measure_name = "foo"
         measure2_reference = MeasureReference(element_name="metric_with_no_time_dim")
         identifier_reference = IdentifierReference(element_name="thorium")
         foreign_identifier_reference = IdentifierReference(element_name="composite_thorium")
@@ -109,12 +109,12 @@ def test_composite_identifiers_nonexistent_ref() -> None:  # noqa:D
             UserConfiguredModel(
                 data_sources=[
                     DataSource(
-                        reference="dim1",
-                        sql_query=f"SELECT {dim_reference.element_name}, {measure_reference.element_name}, thorium_id FROM bar",
-                        measures=[Measure(reference=measure_reference, agg=AggregationType.SUM)],
+                        name="dim1",
+                        sql_query=f"SELECT {dim_reference.element_name}, {measure_name}, thorium_id FROM bar",
+                        measures=[Measure(name=measure_name, agg=AggregationType.SUM)],
                         dimensions=[
                             Dimension(
-                                reference=dim_reference,
+                                name=dim_reference,
                                 type=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
                                     is_primary=True,
@@ -123,9 +123,9 @@ def test_composite_identifiers_nonexistent_ref() -> None:  # noqa:D
                             )
                         ],
                         identifiers=[
-                            Identifier(reference=identifier_reference, type=IdentifierType.PRIMARY, expr="thorium_id"),
+                            Identifier(name=identifier_reference, type=IdentifierType.PRIMARY, expr="thorium_id"),
                             Identifier(
-                                reference=foreign_identifier_reference,
+                                name=foreign_identifier_reference,
                                 type=IdentifierType.FOREIGN,
                                 identifiers=[
                                     CompositeSubIdentifier(ref="ident_that_doesnt_exist"),
@@ -137,9 +137,9 @@ def test_composite_identifiers_nonexistent_ref() -> None:  # noqa:D
                 ],
                 metrics=[
                     Metric(
-                        reference=measure2_reference.element_name,
+                        name=measure2_reference.element_name,
                         type=MetricType.MEASURE_PROXY,
-                        type_params=MetricTypeParams(measures=[measure_reference]),
+                        type_params=MetricTypeParams(measures=[measure_name]),
                     )
                 ],
                 materializations=[],
@@ -150,7 +150,7 @@ def test_composite_identifiers_nonexistent_ref() -> None:  # noqa:D
 def test_composite_identifiers_ref_and_name() -> None:  # noqa:D
     with pytest.raises(ModelValidationException, match=r"Both ref and name/expr set in sub identifier of identifier"):
         dim_reference = DimensionReference(element_name="time")
-        measure_reference = MeasureReference(element_name="foo")
+        measure_name = "foo"
         measure2_reference = MeasureReference(element_name="metric_with_no_time_dim")
         identifier_reference = IdentifierReference(element_name="thorium")
         foreign_identifier_reference = IdentifierReference(element_name="composite_thorium")
@@ -159,12 +159,12 @@ def test_composite_identifiers_ref_and_name() -> None:  # noqa:D
             UserConfiguredModel(
                 data_sources=[
                     DataSource(
-                        reference="dim1",
-                        sql_query=f"SELECT {dim_reference.element_name}, {measure_reference.element_name}, thorium_id FROM bar",
-                        measures=[Measure(reference=measure_reference, agg=AggregationType.SUM)],
+                        name="dim1",
+                        sql_query=f"SELECT {dim_reference.element_name}, {measure_name}, thorium_id FROM bar",
+                        measures=[Measure(name=measure_name, agg=AggregationType.SUM)],
                         dimensions=[
                             Dimension(
-                                reference=dim_reference,
+                                name=dim_reference,
                                 type=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
                                     is_primary=True,
@@ -173,13 +173,13 @@ def test_composite_identifiers_ref_and_name() -> None:  # noqa:D
                             )
                         ],
                         identifiers=[
-                            Identifier(reference=identifier_reference, type=IdentifierType.PRIMARY, expr="thorium_id"),
+                            Identifier(name=identifier_reference, type=IdentifierType.PRIMARY, expr="thorium_id"),
                             Identifier(
-                                reference=foreign_identifier_reference,
+                                name=foreign_identifier_reference,
                                 type=IdentifierType.FOREIGN,
                                 identifiers=[
                                     CompositeSubIdentifier(
-                                        ref="ident_that_doesnt_exist", reference=foreign_identifier2_reference
+                                        ref="ident_that_doesnt_exist", name=foreign_identifier2_reference
                                     ),
                                 ],
                             ),
@@ -189,9 +189,9 @@ def test_composite_identifiers_ref_and_name() -> None:  # noqa:D
                 ],
                 metrics=[
                     Metric(
-                        reference=measure2_reference.element_name,
+                        name=measure2_reference.element_name,
                         type=MetricType.MEASURE_PROXY,
-                        type_params=MetricTypeParams(measures=[measure_reference]),
+                        type_params=MetricTypeParams(measures=[measure_name]),
                     )
                 ],
                 materializations=[],
@@ -217,14 +217,14 @@ def test_mismatched_identifier(simple_model__pre_transforms: UserConfiguredModel
     )
 
     identifier_bookings = Identifier(
-        reference=IdentifierReference(element_name="composite_identifier"),
+        name=IdentifierReference(element_name="composite_identifier"),
         type=IdentifierType.FOREIGN,
         identifiers=[CompositeSubIdentifier(ref="sub_identifier1")],
     )
     bookings_source.identifiers = flatten_nested_sequence([bookings_source.identifiers, [identifier_bookings]])
 
     identifier_listings = Identifier(
-        reference=IdentifierReference(element_name="composite_identifier"),
+        name=IdentifierReference(element_name="composite_identifier"),
         type=IdentifierType.FOREIGN,
         identifiers=[CompositeSubIdentifier(ref="sub_identifier2")],
     )

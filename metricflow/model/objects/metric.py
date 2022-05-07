@@ -66,26 +66,34 @@ class CumulativeMetricWindow(HashableBaseModel, ParseableField):
 class MetricTypeParams(HashableBaseModel, ParseableObject):
     """Type params add additional context to certain metric types (the context depends on the metric type)"""
 
-    measure: Optional[MeasureReference]
-    measures: Optional[List[MeasureReference]]
-    numerator: Optional[MeasureReference]
-    denominator: Optional[MeasureReference]
+    measure: Optional[str]
+    measures: Optional[List[str]]
+    numerator: Optional[str]
+    denominator: Optional[str]
     expr: Optional[str]
     window: Optional[CumulativeMetricWindow]
     grain_to_date: Optional[TimeGranularity]
+
+    @property
+    def numerator_measure_reference(self) -> Optional[MeasureReference]:  # noqa: D
+        return MeasureReference(element_name=self.numerator) if self.numerator else None
+
+    @property
+    def denominator_measure_reference(self) -> Optional[MeasureReference]:  # noqa: D
+        return MeasureReference(element_name=self.denominator) if self.denominator else None
 
 
 class Metric(HashableBaseModel, ParseableObject):
     """Describes a metric"""
 
-    reference: str
+    name: str
     type: MetricType
     type_params: MetricTypeParams
     constraint: Optional[WhereClauseConstraint]
     metadata: Optional[Metadata]
 
     @property
-    def measure_names(self) -> List[MeasureReference]:  # noqa: D
+    def measure_references(self) -> List[MeasureReference]:  # noqa: D
         tp = self.type_params
         res = tp.measures or []
         if tp.measure:
@@ -95,7 +103,7 @@ class Metric(HashableBaseModel, ParseableObject):
         if tp.denominator:
             res.append(tp.denominator)
 
-        return res
+        return [MeasureReference(element_name=x) for x in res]
 
     @property
     def definition_hash(self) -> str:  # noqa: D
@@ -104,7 +112,7 @@ class Metric(HashableBaseModel, ParseableObject):
             values.append(self.constraint.where)
             if self.constraint.linkable_names:
                 values.extend(self.constraint.linkable_names)
-        values.extend([m.element_name for m in self.measure_names])
+        values.extend([m.element_name for m in self.measure_references])
 
         hash_builder = sha1()
         for s in values:

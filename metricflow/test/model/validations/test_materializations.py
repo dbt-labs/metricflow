@@ -22,7 +22,7 @@ def test_identifier(simple_model__pre_transforms: UserConfiguredModel) -> None: 
                     simple_model__pre_transforms,
                     [
                         Materialization(
-                            reference="foobar",
+                            name="foobar",
                             metrics=["bookings"],
                             dimensions=["metric_time", "listing"],
                         )
@@ -42,7 +42,7 @@ def test_invalid_metric_name(simple_model__pre_transforms: UserConfiguredModel) 
                     simple_model__pre_transforms,
                     [
                         Materialization(
-                            reference="foobar",
+                            name="foobar",
                             metrics=["invalid_bookings"],
                             dimensions=["metric_time"],
                         )
@@ -62,7 +62,7 @@ def test_invalid_dimension_name(simple_model__pre_transforms: UserConfiguredMode
                     simple_model__pre_transforms,
                     [
                         Materialization(
-                            reference="foobar",
+                            name="foobar",
                             metrics=["bookings"],
                             dimensions=["metric_time", "invalid_dimension_name"],
                         )
@@ -83,7 +83,7 @@ def test_missing_primary_time_dimension(simple_model__pre_transforms: UserConfig
                     simple_model__pre_transforms,
                     [
                         Materialization(
-                            reference="foobar",
+                            name="foobar",
                             metrics=["bookings"],
                             dimensions=["is_instant"],
                         )
@@ -103,7 +103,7 @@ def test_valid_time_granularity(simple_model__pre_transforms: UserConfiguredMode
                     simple_model__pre_transforms,
                     [
                         Materialization(
-                            reference="materialization_test_case",
+                            name="materialization_test_case",
                             metrics=["bookings"],
                             dimensions=["metric_time__day"],
                         )
@@ -123,7 +123,7 @@ def test_invalid_time_granularity(simple_model__pre_transforms: UserConfiguredMo
                     simple_model__pre_transforms,
                     [
                         Materialization(
-                            reference="materialization_test_case",
+                            name="materialization_test_case",
                             metrics=["revenue"],
                             dimensions=["metric_time__hour"],
                         )

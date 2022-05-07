@@ -42,9 +42,9 @@ class CreateProxyMeasureRule(ModelTransformRule):
                 if add_metric is True:
                     model.metrics.append(
                         Metric(
-                            reference=measure.reference.element_name,
+                            name=measure.name,
                             type=MetricType.MEASURE_PROXY,
-                            type_params=MetricTypeParams(measures=[measure.reference], expr=measure.reference.element_name),
+                            type_params=MetricTypeParams(measures=[measure.name], expr=measure.name),
                         )
                     )
 

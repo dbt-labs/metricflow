@@ -35,13 +35,13 @@ class MetricMeasuresRule(ModelValidationRule):
                 measures_in_metric.append(metric.type_params.denominator)
 
         for measure_in_metric in measures_in_metric:
-            if measure_in_metric.element_name not in valid_measure_names:
+            if measure_in_metric not in valid_measure_names:
                 issues.append(
                     ValidationFatal(
                         model_object_reference=ValidationIssue.make_object_reference(
                             metric_name=metric.name,
                         ),
-                        message=f"Invalid measure {measure_in_metric.element_name} in metric {metric.name}",
+                        message=f"Invalid measure {measure_in_metric} in metric {metric.name}",
                     )
                 )
         return issues

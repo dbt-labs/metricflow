@@ -40,7 +40,7 @@ class MaterializationDestination(HashableBaseModel, ParseableObject):
 class Materialization(HashableBaseModel, ParseableObject):
     """Describes a materialization"""
 
-    reference: str
+    name: str
     metrics: List[str]
     dimensions: List[str]
     destinations: Optional[List[MaterializationDestination]]
