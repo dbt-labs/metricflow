@@ -910,8 +910,8 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
             metric_expr: Optional[SqlExpressionNode] = None
             if metric.type is MetricType.RATIO:
-                numerator = metric.type_params.numerator
-                denominator = metric.type_params.denominator
+                numerator = metric.type_params.numerator_measure_reference
+                denominator = metric.type_params.denominator_measure_reference
                 assert (
                     numerator is not None and denominator is not None
                 ), "Missing numerator or denominator for ratio metric, this should have been caught in validation!"
@@ -937,12 +937,12 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                     ),
                 )
             elif metric.type is MetricType.MEASURE_PROXY:
-                if len(metric.measure_names) > 0:
+                if len(metric.measure_references) > 0:
                     assert (
-                        len(metric.measure_names) == 1
+                        len(metric.measure_references) == 1
                     ), "Measure proxy metrics should always source from exactly 1 measure."
                     expr = self._column_association_resolver.resolve_measure_spec(
-                        MeasureSpec(element_name=metric.measure_names[0].element_name)
+                        MeasureSpec(element_name=metric.measure_references[0].element_name)
                     ).column_name
                 else:
                     expr = metric.name
@@ -954,9 +954,11 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                     )
                 )
             elif metric.type is MetricType.CUMULATIVE:
-                assert len(metric.measure_names) == 1, "Cumulative metrics should always source from exactly 1 measure."
+                assert (
+                    len(metric.measure_references) == 1
+                ), "Cumulative metrics should always source from exactly 1 measure."
                 expr = self._column_association_resolver.resolve_measure_spec(
-                    MeasureSpec(element_name=metric.measure_names[0].element_name)
+                    MeasureSpec(element_name=metric.measure_references[0].element_name)
                 ).column_name
                 metric_expr = SqlColumnReferenceExpression(
                     SqlColumnReference(
