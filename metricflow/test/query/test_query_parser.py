@@ -14,7 +14,7 @@ from metricflow.specs import (
     OutputColumnNameOverride,
 )
 from metricflow.test.test_utils import as_datetime
-from metricflow.test.time.plot_time_dimension import PTD
+from metricflow.test.time.metric_time_dimension import MTD
 from metricflow.time.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
@@ -22,18 +22,18 @@ logger = logging.getLogger(__name__)
 
 def test_query_parser(query_parser: MetricFlowQueryParser) -> None:  # noqa: D
     query_spec = query_parser.parse_and_validate_query(
-        metric_names=["bookings"], group_by_names=["is_instant", "listing", PTD], order=[PTD, "-bookings"]
+        metric_names=["bookings"], group_by_names=["is_instant", "listing", MTD], order=[MTD, "-bookings"]
     )
 
     assert query_spec.metric_specs == (MetricSpec(element_name="bookings"),)
     assert query_spec.dimension_specs == (DimensionSpec(element_name="is_instant", identifier_links=()),)
     assert query_spec.time_dimension_specs == (
-        TimeDimensionSpec(element_name=PTD, identifier_links=(), time_granularity=TimeGranularity.DAY),
+        TimeDimensionSpec(element_name=MTD, identifier_links=(), time_granularity=TimeGranularity.DAY),
     )
     assert query_spec.identifier_specs == (IdentifierSpec(element_name="listing", identifier_links=()),)
     assert query_spec.order_by_specs == (
         OrderBySpec(
-            item=TimeDimensionSpec(element_name=PTD, identifier_links=(), time_granularity=TimeGranularity.DAY),
+            item=TimeDimensionSpec(element_name=MTD, identifier_links=(), time_granularity=TimeGranularity.DAY),
             descending=False,
         ),
         OrderBySpec(
@@ -52,25 +52,25 @@ def test_order_by_granularity_conversion(query_parser: MetricFlowQueryParser) ->
 
     # "bookings" has a granularity of DAY, "revenue" has a granularity of MONTH
     query_spec = query_parser.parse_and_validate_query(
-        metric_names=["bookings", "revenue"], group_by_names=[PTD], order=[f"-{PTD}"]
+        metric_names=["bookings", "revenue"], group_by_names=[MTD], order=[f"-{MTD}"]
     )
 
     # The lowest common granularity is MONTH, so we expect the PTD in the order by to have that granularity.
     assert (
         OrderBySpec(
-            item=TimeDimensionSpec(element_name=PTD, identifier_links=(), time_granularity=TimeGranularity.DAY),
+            item=TimeDimensionSpec(element_name=MTD, identifier_links=(), time_granularity=TimeGranularity.DAY),
             descending=True,
         ),
     ) == query_spec.order_by_specs
 
 
 def test_order_by_granularity_no_conversion(query_parser: MetricFlowQueryParser) -> None:  # noqa: D
-    query_spec = query_parser.parse_and_validate_query(metric_names=["bookings"], group_by_names=[PTD], order=[PTD])
+    query_spec = query_parser.parse_and_validate_query(metric_names=["bookings"], group_by_names=[MTD], order=[MTD])
 
     # The only granularity is DAY, so we expect the PTD in the order by to have that granularity.
     assert (
         OrderBySpec(
-            item=TimeDimensionSpec(element_name=PTD, identifier_links=(), time_granularity=TimeGranularity.DAY),
+            item=TimeDimensionSpec(element_name=MTD, identifier_links=(), time_granularity=TimeGranularity.DAY),
             descending=False,
         ),
     ) == query_spec.order_by_specs
@@ -82,7 +82,7 @@ def test_time_range_constraint_conversion(query_parser: MetricFlowQueryParser) -
     # "bookings" has a granularity of DAY, "revenue" has a granularity of MONTH
     query_spec = query_parser.parse_and_validate_query(
         metric_names=["bookings", "revenue"],
-        group_by_names=[PTD],
+        group_by_names=[MTD],
         time_constraint_start=as_datetime("2020-01-15"),
         time_constraint_end=as_datetime("2020-02-15"),
     )
@@ -101,7 +101,7 @@ def test_column_override(query_parser: MetricFlowQueryParser) -> None:
     # "revenue" has a granularity of MONTH
     query_spec = query_parser.parse_and_validate_query(
         metric_names=["revenue"],
-        group_by_names=[PTD],
+        group_by_names=[MTD],
         time_constraint_start=as_datetime("2020-01-15"),
         time_constraint_end=as_datetime("2020-02-15"),
     )
@@ -109,11 +109,11 @@ def test_column_override(query_parser: MetricFlowQueryParser) -> None:
     assert (
         OutputColumnNameOverride(
             time_dimension_spec=TimeDimensionSpec(
-                element_name=PTD,
+                element_name=MTD,
                 identifier_links=(),
                 time_granularity=TimeGranularity.DAY,
             ),
-            output_column_name=PTD,
+            output_column_name=MTD,
         ),
     ) == query_spec.output_column_name_overrides
 
@@ -124,7 +124,7 @@ def test_parse_and_validate_where_constraint_dims(query_parser: MetricFlowQueryP
     with pytest.raises(UnableToSatisfyQueryError):
         query_parser.parse_and_validate_query(
             metric_names=["bookings"],
-            group_by_names=[PTD],
+            group_by_names=[MTD],
             time_constraint_start=as_datetime("2020-01-15"),
             time_constraint_end=as_datetime("2020-02-15"),
             where_constraint_str="WHERE invalid_dim = '1'",
@@ -132,7 +132,7 @@ def test_parse_and_validate_where_constraint_dims(query_parser: MetricFlowQueryP
 
     query_spec = query_parser.parse_and_validate_query(
         metric_names=["bookings"],
-        group_by_names=[PTD],
+        group_by_names=[MTD],
         time_constraint_start=as_datetime("2020-01-15"),
         time_constraint_end=as_datetime("2020-02-15"),
         where_constraint_str="WHERE is_instant = '1'",
@@ -147,7 +147,7 @@ def test_parse_and_validate_metric_constraint_dims(query_parser: MetricFlowQuery
     with pytest.raises(UnableToSatisfyQueryError):
         query_parser.parse_and_validate_query(
             metric_names=["metric_with_invalid_constraint"],
-            group_by_names=[PTD],
+            group_by_names=[MTD],
             time_constraint_start=as_datetime("2020-01-15"),
             time_constraint_end=as_datetime("2020-02-15"),
         )

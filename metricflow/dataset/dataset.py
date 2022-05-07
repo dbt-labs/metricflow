@@ -23,25 +23,24 @@ class DataSet:
         return self._instance_set
 
     @staticmethod
-    def plot_time_dimension_reference() -> TimeDimensionReference:
+    def metric_time_dimension_reference() -> TimeDimensionReference:
         """Returns a special reference that means 'the aggregation time dimension for all measures in the data set'
 
-        Or to put in another way, if measures were plotted together on a graph, this is the name of the time dimension
-        for the x-axis.
+        Or to put in another way, if metrics for those measures were plotted together on a graph, this is the name of
+        the time dimension for the x-axis.
         """
-        # TODO: Added underscores for ease of search + replace once we settle on a final name.
         return TimeDimensionReference(element_name="_ts")
 
     @staticmethod
-    def plot_time_dimension_name() -> str:
-        """See plot_time_dimension_reference(), but in name form for use in queries."""
-        return DataSet.plot_time_dimension_reference().element_name
+    def metric_time_dimension_name() -> str:
+        """See metric_time_dimension_reference(), but in name form for use in queries."""
+        return DataSet.metric_time_dimension_reference().element_name
 
     @staticmethod
-    def plot_time_dimension_spec(time_granularity: TimeGranularity) -> TimeDimensionSpec:
-        """Spec that corresponds to DataSet.plot_time_dimension_reference"""
+    def metic_time_dimension_spec(time_granularity: TimeGranularity) -> TimeDimensionSpec:
+        """Spec that corresponds to DataSet.metric_time_dimension_reference"""
         return TimeDimensionSpec(
-            element_name=DataSet.plot_time_dimension_reference().element_name,
+            element_name=DataSet.metric_time_dimension_reference().element_name,
             identifier_links=(),
             time_granularity=time_granularity,
         )

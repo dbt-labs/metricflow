@@ -146,8 +146,8 @@ class DataflowPlanNodeVisitor(Generic[SourceDataSetT, VisitorOutputT], ABC):
         pass
 
     @abstractmethod
-    def visit_plot_time_dimension_transform_node(  # noqa: D
-        self, node: PlotTimeDimensionTransformNode[SourceDataSetT]
+    def visit_metric_time_dimension_transform_node(  # noqa: D
+        self, node: MetricTimeDimensionTransformNode[SourceDataSetT]
     ) -> VisitorOutputT:
         pass
 
@@ -274,7 +274,7 @@ class JoinOverTimeRangeNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT])
     def __init__(
         self,
         parent_node: BaseOutput[SourceDataSetT],
-        plot_time_dimension_reference: TimeDimensionReference,
+        metric_time_dimension_reference: TimeDimensionReference,
         window: Optional[CumulativeMetricWindow],
         grain_to_date: Optional[TimeGranularity],
         node_id: Optional[NodeId] = None,
@@ -284,7 +284,7 @@ class JoinOverTimeRangeNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT])
 
         Args:
             parent_node: node with standard output
-            plot_time_dimension_reference: plot time dimension reference
+            metric_time_dimension_reference: plot time dimension reference
             window: time window to join over
             grain_to_date: indicates time range should start from the beginning of this time granularity (eg month to day)
             node_id: Override the node ID with this value
@@ -293,7 +293,7 @@ class JoinOverTimeRangeNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT])
         self._parent_node = parent_node
         self._grain_to_date = grain_to_date
         self._window = window
-        self._plot_time_dimension_reference = plot_time_dimension_reference
+        self._metric_time_dimension_reference = metric_time_dimension_reference
         self.time_range_constraint = time_range_constraint
 
         # Doing a list comprehension throws a type error, so doing it this way.
@@ -308,8 +308,8 @@ class JoinOverTimeRangeNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT])
         return visitor.visit_join_over_time_range_node(self)
 
     @property
-    def plot_time_dimension_reference(self) -> TimeDimensionReference:  # noqa: D
-        return self._plot_time_dimension_reference
+    def metric_time_dimension_reference(self) -> TimeDimensionReference:  # noqa: D
+        return self._metric_time_dimension_reference
 
     @property
     def grain_to_date(self) -> Optional[TimeGranularity]:  # noqa: D
@@ -514,15 +514,15 @@ class OrderByLimitNode(Generic[SourceDataSetT], ComputedMetricsOutput[SourceData
         return self._parent_node
 
 
-class PlotTimeDimensionTransformNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
-    """A node transforms the input data set so that it contains the plot time dimension and relevant measures.
+class MetricTimeDimensionTransformNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
+    """A node transforms the input data set so that it contains the metric time dimension and relevant measures.
 
-    The plot time dimension is used later to aggregate all measures in the data set.
+    The metric time dimension is used later to aggregate all measures in the data set.
 
     Input: a data set containing measures along with the associated aggregation time dimension.
 
-    Output: a data set similar to the input data set, but includes the configured aggregation time dimension as the plot
-    time dimension and only contains measures that are defined to use it.
+    Output: a data set similar to the input data set, but includes the configured aggregation time dimension as the
+    metric time dimension and only contains measures that are defined to use it.
     """
 
     def __init__(  # noqa: D
@@ -544,7 +544,7 @@ class PlotTimeDimensionTransformNode(Generic[SourceDataSetT], BaseOutput[SourceD
         return self._aggregation_time_dimension_reference
 
     def accept(self, visitor: DataflowPlanNodeVisitor[SourceDataSetT, VisitorOutputT]) -> VisitorOutputT:  # noqa: D
-        return visitor.visit_plot_time_dimension_transform_node(self)
+        return visitor.visit_metric_time_dimension_transform_node(self)
 
     @property
     def description(self) -> str:  # noqa: D

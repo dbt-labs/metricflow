@@ -1,6 +1,6 @@
 from typing import Sequence, List
 
-from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, PlotTimeDimensionTransformNode, BaseOutput
+from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, MetricTimeDimensionTransformNode, BaseOutput
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.model.semantic_model import SemanticModel
 
@@ -25,7 +25,7 @@ class SourceNodeBuilder:
             else:
                 for time_dimension_reference in aggregation_time_dimensions:
                     source_nodes.append(
-                        PlotTimeDimensionTransformNode[DataSourceDataSet](
+                        MetricTimeDimensionTransformNode[DataSourceDataSet](
                             parent_node=read_node,
                             aggregation_time_dimension_reference=time_dimension_reference,
                         )

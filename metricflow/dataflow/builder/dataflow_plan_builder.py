@@ -96,7 +96,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
     ) -> None:
         self._data_source_semantics = semantic_model.data_source_semantics
         self._metric_semantics = semantic_model.metric_semantics
-        self._plot_time_dimension_reference = DataSet.plot_time_dimension_reference()
+        self._metric_time_dimension_reference = DataSet.metric_time_dimension_reference()
         self._cost_function = cost_function
         self._source_nodes = source_nodes
         self._node_data_set_resolver = (
@@ -348,14 +348,14 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         if time_range_constraint:
             potential_measure_nodes = node_processor.add_time_range_constraint(
                 source_nodes=potential_measure_nodes,
-                plot_time_dimension_reference=self._plot_time_dimension_reference,
+                plot_time_dimension_reference=self._metric_time_dimension_reference,
                 time_range_constraint=time_range_constraint,
             )
 
         nodes_available_for_joins = node_processor.remove_unnecessary_nodes(
             desired_linkable_specs=linkable_specs,
             nodes=source_nodes,
-            plot_time_dimension_reference=self._plot_time_dimension_reference,
+            plot_time_dimension_reference=self._metric_time_dimension_reference,
         )
         logger.info(
             f"After removing unnecessary nodes, there are {len(nodes_available_for_joins)} nodes available for joins"
@@ -568,7 +568,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         cumulative_window: Optional[CumulativeMetricWindow] = None,
         cumulative_grain_to_date: Optional[TimeGranularity] = None,
     ) -> BaseOutput[SqlDataSetT]:
-        plot_time_dimension_requested = self._plot_time_dimension_reference.element_name in [
+        plot_time_dimension_requested = self._metric_time_dimension_reference.element_name in [
             linkable_spec.element_name for linkable_spec in queried_linkable_specs.as_tuple
         ]
         cumulative_metric_adjusted_time_constraint: Optional[TimeRangeConstraint] = None
@@ -628,7 +628,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         if cumulative:
             time_range_node = JoinOverTimeRangeNode(
                 parent_node=filtered_measure_source_node,
-                plot_time_dimension_reference=self._plot_time_dimension_reference,
+                metric_time_dimension_reference=self._metric_time_dimension_reference,
                 window=cumulative_window,
                 grain_to_date=cumulative_grain_to_date,
                 time_range_constraint=time_range_constraint,

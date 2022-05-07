@@ -71,28 +71,28 @@ class ValidMaterializationRule(ModelValidationRule):
             )
 
         # Primary dimension checks
-        contained_plot_time_dimension_names: List[str] = []
+        contained_metric_time_dimension_names: List[str] = []
         for mat_dimension_or_identifier_name in materialization.dimensions:
             structured_spec = StructuredLinkableSpecName.from_name(mat_dimension_or_identifier_name)
-            if structured_spec.element_name == DataSet.plot_time_dimension_name():
-                contained_plot_time_dimension_names.append(mat_dimension_or_identifier_name)
+            if structured_spec.element_name == DataSet.metric_time_dimension_name():
+                contained_metric_time_dimension_names.append(mat_dimension_or_identifier_name)
 
-        if len(contained_plot_time_dimension_names) == 0:
+        if len(contained_metric_time_dimension_names) == 0:
             issues.append(
                 # Leaving as a warning to avoid model validation failures during the transition
                 ValidationFutureError(
                     context=context,
-                    message=f"Plot time dimension {DataSet.plot_time_dimension_name()} not listed"
+                    message=f"Metric time dimension {DataSet.metric_time_dimension_name()} not listed"
                     f" as a dimension in materialization {materialization.name}",
                     error_date=datetime.date(2022, 8, 1)
                 )
             )
 
-        if len(contained_plot_time_dimension_names) > 1:
+        if len(contained_metric_time_dimension_names) > 1:
             issues.append(
                 ValidationError(
                     context=context,
-                    message=f"Multiple plot time dimensions {contained_plot_time_dimension_names} listed in "
+                    message=f"Multiple metric time dimensions {contained_metric_time_dimension_names} listed in "
                     f"materialization {materialization.name}",
                 )
             )
