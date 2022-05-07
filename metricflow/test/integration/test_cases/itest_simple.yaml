@@ -18,13 +18,13 @@ integration_test:
   description: Tests selecting a metric and the time dimension with a time constraint.
   model: SIMPLE_MODEL
   metrics: ["booking_value"]
-  group_bys: ["_ts"]
+  group_bys: ["metric_time"]
   time_constraint: ["1900-01-01", "1900-01-01"]
   allow_empty: True
   check_query: |
     SELECT
       SUM(booking_value) AS booking_value
-      , ds AS _ts
+      , ds AS metric_time
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds
@@ -35,12 +35,12 @@ integration_test:
   description: Tests selecting a metric and the time dimension with a time constraint.
   model: SIMPLE_MODEL
   metrics: ["booking_value"]
-  group_bys: ["_ts"]
+  group_bys: ["metric_time"]
   time_constraint: ["2020-01-01", "2020-01-01"]
   check_query: |
     SELECT
       SUM(booking_value) AS booking_value
-      , ds AS _ts
+      , ds AS metric_time
     FROM {{ source_schema }}.fct_bookings
     WHERE {{ render_time_constraint("ds", "2020-01-01", "2020-01-01") }}
     GROUP BY
@@ -101,13 +101,13 @@ integration_test:
   model: SIMPLE_MODEL
   required_features: ["FULL_OUTER_JOIN"]
   metrics: ["bookings", "booking_value"]
-  group_bys: ["_ts"]
+  group_bys: ["metric_time"]
   order_bys: ["-booking_value"]
   check_query: |
     SELECT
       SUM(1) AS bookings
       , SUM(booking_value) AS booking_value
-      , ds AS _ts
+      , ds AS metric_time
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds
@@ -120,13 +120,13 @@ integration_test:
   model: SIMPLE_MODEL
   required_features: ["FULL_OUTER_JOIN"]
   metrics: ["bookings", "booking_value"]
-  group_bys: ["_ts"]
-  order_bys: ["-_ts"]
+  group_bys: ["metric_time"]
+  order_bys: ["-metric_time"]
   check_query: |
     SELECT
       SUM(1) AS bookings
       , SUM(booking_value) AS booking_value
-      , ds AS _ts
+      , ds AS metric_time
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds
