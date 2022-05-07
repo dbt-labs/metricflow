@@ -17,7 +17,7 @@ from metricflow.dataflow.dataflow_plan import (
     OrderByLimitNode,
     ConstrainTimeRangeNode,
     BaseOutput,
-    PlotTimeDimensionTransformNode,
+    MetricTimeDimensionTransformNode,
 )
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.model.semantic_model import SemanticModel
@@ -729,7 +729,7 @@ def test_constrain_time_range_node(
             TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.DAY),
         ],
     )
-    plot_time_node = PlotTimeDimensionTransformNode(
+    plot_time_node = MetricTimeDimensionTransformNode(
         parent_node=filtered_measure_node,
         aggregation_time_dimension_reference=TimeDimensionReference(element_name="ds"),
     )

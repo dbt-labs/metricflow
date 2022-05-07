@@ -26,7 +26,7 @@ from metricflow.dataflow.dataflow_plan import (
     ConstrainTimeRangeNode,
     WriteToResultTableNode,
     JoinOverTimeRangeNode,
-    PlotTimeDimensionTransformNode,
+    MetricTimeDimensionTransformNode,
 )
 from metricflow.dataset.dataset import DataSet
 from metricflow.instances import (
@@ -506,7 +506,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         plot_time_dimension_instance: Optional[TimeDimensionInstance] = None
         for instance in input_data_set.instance_set.time_dimension_instances:
             if (
-                instance.spec.element_name == node.plot_time_dimension_reference.element_name
+                instance.spec.element_name == node.metric_time_dimension_reference.element_name
                 and len(instance.spec.identifier_links) == 0
             ):
                 plot_time_dimension_instance = instance
@@ -1230,7 +1230,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         time_dimension_instances_for_plot_time = [
             time_dimension_instance
             for time_dimension_instance in from_data_set.instance_set.time_dimension_instances
-            if time_dimension_instance.spec.element_name == DataSet.plot_time_dimension_name()
+            if time_dimension_instance.spec.element_name == DataSet.metric_time_dimension_name()
         ]
 
         # Use the smallest time granularity to build the comparison since that's what was used in the data source
@@ -1300,8 +1300,8 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
         return SqlQueryPlan(plan_id=sql_query_plan_id, render_node=sql_select_node)
 
-    def visit_plot_time_dimension_transform_node(  # noqa: D
-        self, node: PlotTimeDimensionTransformNode[SqlDataSetT]
+    def visit_metric_time_dimension_transform_node(  # noqa: D
+        self, node: MetricTimeDimensionTransformNode[SqlDataSetT]
     ) -> SqlDataSet:
         input_data_set: SqlDataSet = node.parent_node.accept(self)
 
@@ -1335,7 +1335,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
         # For those matching time dimension instances, create the analog plot time dimension instances for the output.
         for matching_time_dimension_instance in matching_time_dimension_instances:
-            plot_time_dimension_spec = DataSet.plot_time_dimension_spec(
+            plot_time_dimension_spec = DataSet.metic_time_dimension_spec(
                 matching_time_dimension_instance.spec.time_granularity
             )
             plot_time_dimension_column_association = self._column_association_resolver.resolve_time_dimension_spec(

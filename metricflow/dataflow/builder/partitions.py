@@ -46,7 +46,7 @@ class PartitionJoinResolver:
         partition_time_dimension_specs = tuple(
             x
             for x in spec_set.time_dimension_specs
-            if x.reference != DataSet.plot_time_dimension_reference()
+            if x.reference != DataSet.metric_time_dimension_reference()
             and self._data_source_semantics.get_dimension(dimension_reference=x.reference).is_partition
         )
 
