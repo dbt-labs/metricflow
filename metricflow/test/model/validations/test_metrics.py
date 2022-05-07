@@ -8,10 +8,10 @@ from metricflow.model.objects.elements.measure import Measure, AggregationType
 from metricflow.model.objects.metric import MetricType, MetricTypeParams
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import ModelValidationException
-from metricflow.specs import MeasureReference, DimensionReference, IdentifierReference
+from metricflow.specs import MeasureReference, DimensionReference, IdentifierReference, TimeDimensionReference
+from metricflow.test.fixtures.table_fixtures import DEFAULT_DS
 from metricflow.test.model.validations.helpers import data_source_with_guaranteed_meta, metric_with_guaranteed_meta
 from metricflow.time.time_granularity import TimeGranularity
-from metricflow.test.fixtures.table_fixtures import DEFAULT_DS
 
 
 @pytest.mark.skip("TODO: Will convert to validation rule")
@@ -42,7 +42,7 @@ def test_metric_missing_measure() -> None:  # noqa:D
 
 def test_metric_no_time_dim_dim_only_source() -> None:  # noqa:D
     dim_reference = DimensionReference(element_name="country")
-    dim2_reference = DimensionReference(element_name="ename")
+    dim2_reference = TimeDimensionReference(element_name="ename")
     measure_reference = MeasureReference(element_name="foo")
     ModelValidator().checked_validations(
         UserConfiguredModel(
@@ -57,7 +57,9 @@ def test_metric_no_time_dim_dim_only_source() -> None:  # noqa:D
                 data_source_with_guaranteed_meta(
                     name="sum_measure2",
                     sql_query="SELECT foo, country FROM bar",
-                    measures=[Measure(name=measure_reference, agg=AggregationType.SUM)],
+                    measures=[
+                        Measure(name=measure_reference, agg=AggregationType.SUM, agg_time_dimension=dim2_reference)
+                    ],
                     dimensions=[
                         Dimension(name=dim_reference, type=DimensionType.CATEGORICAL),
                         Dimension(
@@ -161,13 +163,13 @@ def test_metric_multiple_primary_time_dims() -> None:  # noqa:D
 
 def test_generated_metrics_only() -> None:  # noqa:D
     dim_reference = DimensionReference(element_name="dim")
-    dim2_reference = DimensionReference(element_name=DEFAULT_DS)
+    dim2_reference = TimeDimensionReference(element_name=DEFAULT_DS)
     measure_reference = MeasureReference(element_name="measure")
     identifier_reference = IdentifierReference(element_name="primary")
     data_source = data_source_with_guaranteed_meta(
         name="dim1",
         sql_query=f"SELECT {dim_reference.element_name}, {measure_reference.element_name} FROM bar",
-        measures=[Measure(name=measure_reference, agg=AggregationType.SUM)],
+        measures=[Measure(name=measure_reference, agg=AggregationType.SUM, agg_time_dimension=dim2_reference)],
         dimensions=[
             Dimension(name=dim_reference, type=DimensionType.CATEGORICAL),
             Dimension(
