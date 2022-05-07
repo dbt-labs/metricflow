@@ -29,7 +29,7 @@ from metricflow.object_utils import pformat_big_objects, random_id
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_execution import DataflowToExecutionPlanConverter
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
-from metricflow.plan_conversion.time_spine import TimeSpineSource
+from metricflow.plan_conversion.time_spine import TimeSpineSource, TimeSpineTableBuilder
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.specs import ColumnAssociationResolver
@@ -293,7 +293,10 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             DefaultColumnAssociationResolver(semantic_model)
         )
         self._time_source = time_source
-        self._time_spine_source = time_spine_source or TimeSpineSource(sql_client, schema_name=system_schema)
+        self._time_spine_source = time_spine_source or TimeSpineSource(schema_name=system_schema)
+        self._time_spine_table_builder = TimeSpineTableBuilder(
+            time_spine_source=self._time_spine_source, sql_client=self._sql_client
+        )
 
         self._schema = system_schema
 
@@ -393,7 +396,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         logger.info(f"Query spec is:\n{pformat_big_objects(query_spec)}")
 
         if self._semantic_model.metric_semantics.contains_cumulative_metric(query_spec.metric_specs):
-            self._time_spine_source.create_if_necessary()
+            self._time_spine_table_builder.create_if_necessary()
             time_constraint_updated = False
             if not mf_query_request.time_constraint_start:
                 time_constraint_start = self._time_source.get_time() - datetime.timedelta(days=365)
