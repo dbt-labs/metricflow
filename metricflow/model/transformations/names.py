@@ -3,7 +3,6 @@ import logging
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.transformations.transform_rule import ModelTransformRule
-from metricflow.specs import IdentifierReference, DimensionReference
 
 logger = logging.getLogger(__name__)
 
@@ -27,10 +26,10 @@ class LowerCaseNamesRule(ModelTransformRule):
                 measure.name = measure.name.lower()
         if data_source.identifiers:
             for identifier in data_source.identifiers:
-                identifier.name = IdentifierReference(element_name=identifier.name.element_name.lower())
+                identifier.name = identifier.name.lower()
         if data_source.dimensions:
             for dimension in data_source.dimensions:
-                dimension.name = DimensionReference(element_name=dimension.name.element_name.lower())
+                dimension.name = dimension.name.lower()
 
     @staticmethod
     def _lowercase_top_level_objects(model: UserConfiguredModel) -> None:

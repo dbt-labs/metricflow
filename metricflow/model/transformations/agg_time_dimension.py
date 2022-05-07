@@ -17,7 +17,7 @@ class SetMeasureAggregationTimeDimensionRule(ModelTransformRule):
     def _find_primary_time_dimension(data_source: DataSource) -> Optional[TimeDimensionReference]:
         for dimension in data_source.dimensions:
             if dimension.type == DimensionType.TIME and dimension.type_params and dimension.type_params.is_primary:
-                return TimeDimensionReference(element_name=dimension.name.element_name)
+                return dimension.time_dimension_reference
         return None
 
     @staticmethod

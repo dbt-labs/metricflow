@@ -122,16 +122,16 @@ def test_cross_element_names(simple_model__pre_transforms: UserConfiguredModel) 
     measure_reference = usable_ds.measures[0].reference
     # If the matching dimension is a time dimension we can accidentally create two primary time dimensions, and then
     # the validation will throw a different error and fail the test
-    dimension_reference = _categorical_dimensions(data_source=usable_ds)[0].name
+    dimension_reference = _categorical_dimensions(data_source=usable_ds)[0].reference
 
     ds_measure_x_dimension = copy.deepcopy(usable_ds)
     ds_measure_x_identifier = copy.deepcopy(usable_ds)
     ds_dimension_x_identifier = copy.deepcopy(usable_ds)
 
     # We update the matching categorical dimension by reference for convenience
-    ds_measure_x_dimension.get_dimension(dimension_reference).name = measure_reference
-    ds_measure_x_identifier.identifiers[1].name = measure_reference
-    ds_dimension_x_identifier.identifiers[1].name = dimension_reference
+    ds_measure_x_dimension.get_dimension(dimension_reference).name = measure_reference.element_name
+    ds_measure_x_identifier.identifiers[1].name = measure_reference.element_name
+    ds_dimension_x_identifier.identifiers[1].name = dimension_reference.element_name
 
     model.data_sources[usable_ds_index] = ds_measure_x_dimension
     with pytest.raises(
@@ -184,7 +184,7 @@ def test_duplicate_dimension_name(simple_model__pre_transforms: UserConfiguredMo
 
     with pytest.raises(
         ModelValidationException,
-        match=rf"can't use name `{duplicated_dimension.name.element_name}` for a "
+        match=rf"can't use name `{duplicated_dimension.reference.element_name}` for a "
         rf"dimension when it was already used for a dimension",
     ):
         ModelValidator().checked_validations(model)
@@ -202,7 +202,7 @@ def test_duplicate_identifier_name(simple_model__pre_transforms: UserConfiguredM
 
     with pytest.raises(
         ModelValidationException,
-        match=rf"can't use name `{duplicated_identifier.name.element_name}` for a identifier when it was already used for a identifier",
+        match=rf"can't use name `{duplicated_identifier.reference.element_name}` for a identifier when it was already used for a identifier",
     ):
         ModelValidator().checked_validations(model)
 

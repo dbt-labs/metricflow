@@ -8,7 +8,8 @@ from metricflow.model.objects.elements.measure import Measure, AggregationType
 from metricflow.model.objects.metric import MetricType, MetricTypeParams
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import ModelValidationException
-from metricflow.specs import DimensionReference, IdentifierReference, TimeDimensionReference
+from metricflow.specs import DimensionReference, IdentifierReference
+from metricflow.specs import TimeDimensionReference
 from metricflow.test.fixtures.table_fixtures import DEFAULT_DS
 from metricflow.test.model.validations.helpers import data_source_with_guaranteed_meta, metric_with_guaranteed_meta
 from metricflow.time.time_granularity import TimeGranularity
@@ -42,8 +43,8 @@ def test_metric_missing_measure() -> None:  # noqa:D
 
 
 def test_metric_no_time_dim_dim_only_source() -> None:  # noqa:D
-    dim_reference = DimensionReference(element_name="country")
-    dim2_reference = TimeDimensionReference(element_name="ename")
+    dim_name = "country"
+    dim2_name = "ename"
     measure_name = "foo"
     model_validator = ModelValidator()
     model_validator.checked_validations(
@@ -53,7 +54,7 @@ def test_metric_no_time_dim_dim_only_source() -> None:  # noqa:D
                     name="sum_measure",
                     sql_query="SELECT foo, country FROM bar",
                     measures=[],
-                    dimensions=[Dimension(name=dim_reference, type=DimensionType.CATEGORICAL)],
+                    dimensions=[Dimension(name=dim_name, type=DimensionType.CATEGORICAL)],
                     mutability=Mutability(type=MutabilityType.IMMUTABLE),
                 ),
                 data_source_with_guaranteed_meta(
@@ -63,13 +64,13 @@ def test_metric_no_time_dim_dim_only_source() -> None:  # noqa:D
                         Measure(
                             name=measure_name,
                             agg=AggregationType.SUM,
-                            agg_time_dimension=dim2_reference
+                            agg_time_dimension=TimeDimensionReference(element_name=dim2_name),
                         )
                     ],
                     dimensions=[
-                        Dimension(name=dim_reference.element_name, type=DimensionType.CATEGORICAL),
+                        Dimension(name=dim_name, type=DimensionType.CATEGORICAL),
                         Dimension(
-                            name=dim2_reference.element_name,
+                            name=dim2_name,
                             type=DimensionType.TIME,
                             type_params=DimensionTypeParams(
                                 is_primary=True,
@@ -94,7 +95,7 @@ def test_metric_no_time_dim_dim_only_source() -> None:  # noqa:D
 
 def test_metric_no_time_dim() -> None:  # noqa:D
     with pytest.raises(ModelValidationException):
-        dim_reference = DimensionReference(element_name="country")
+        dim_name = "country"
         measure_name = "foo"
         model_validator = ModelValidator()
         model_validator.checked_validations(
@@ -106,7 +107,7 @@ def test_metric_no_time_dim() -> None:  # noqa:D
                         measures=[Measure(name=measure_name, agg=AggregationType.SUM)],
                         dimensions=[
                             Dimension(
-                                name=dim_reference.element_name,
+                                name=dim_name,
                                 type=DimensionType.CATEGORICAL,
                             )
                         ],
@@ -127,8 +128,8 @@ def test_metric_no_time_dim() -> None:  # noqa:D
 
 def test_metric_multiple_primary_time_dims() -> None:  # noqa:D
     with pytest.raises(ModelValidationException):
-        dim_reference = DimensionReference(element_name="date_created")
-        dim2_reference = DimensionReference(element_name="date_deleted")
+        dim_name = "date_created"
+        dim2_name = "date_deleted"
         measure_name = "foo"
         model_validator = ModelValidator()
         model_validator.checked_validations(
@@ -140,14 +141,14 @@ def test_metric_multiple_primary_time_dims() -> None:  # noqa:D
                         measures=[Measure(name=measure_name, agg=AggregationType.SUM)],
                         dimensions=[
                             Dimension(
-                                name=dim_reference,
+                                name=dim_name,
                                 type=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
                                     time_granularity=TimeGranularity.DAY,
                                 ),
                             ),
                             Dimension(
-                                name=dim2_reference,
+                                name=dim2_name,
                                 type=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
                                     time_granularity=TimeGranularity.DAY,
@@ -192,7 +193,7 @@ def test_generated_metrics_only() -> None:  # noqa:D
         ],
         mutability=Mutability(type=MutabilityType.IMMUTABLE),
         identifiers=[
-            Identifier(name=identifier_reference, type=IdentifierType.PRIMARY),
+            Identifier(name=identifier_reference.element_name, type=IdentifierType.PRIMARY),
         ],
     )
     data_source.measures[0].create_metric = True
