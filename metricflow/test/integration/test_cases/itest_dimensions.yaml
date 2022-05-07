@@ -38,11 +38,11 @@ integration_test:
   description: Query a metric and group by a local identifier and local dimension.
   model: SIMPLE_MODEL
   metrics: ["booking_value"]
-  group_bys: ["listing", "_ts"]
+  group_bys: ["listing", "metric_time"]
   check_query: |
     SELECT
       SUM(booking_value) AS booking_value
-      , ds AS _ts
+      , ds AS metric_time
       , listing_id AS listing
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
@@ -89,12 +89,12 @@ integration_test:
   description: Query a metric and group by a partition dimension both in dundered and non dundered forms.
   model: SIMPLE_MODEL
   metrics: ["identity_verifications"]
-  group_bys: ["_ts", "user__home_state"]
+  group_bys: ["metric_time", "user__home_state"]
   check_query: |
     SELECT
       SUM(1) AS identity_verifications
       , u.home_state AS user__home_state
-      , v.ds AS _ts
+      , v.ds AS metric_time
     FROM {{ source_schema }}.fct_id_verifications v
     JOIN {{ source_schema }}.dim_users u
       ON u.user_id = v.user_id
