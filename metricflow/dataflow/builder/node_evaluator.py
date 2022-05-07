@@ -157,7 +157,12 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
 
                 if identifier_instance is None:
                     raise RuntimeError(f"Could not find identifier instance with name ({identifier_spec_in_node})")
-                ident = self._data_source_semantics.get_data_source_element(identifier_instance.defined_from[0])
+
+                assert (
+                    len(identifier_instance.defined_from) == 1
+                ), f"Did not get exactly 1 defined_from in {identifier_instance}"
+
+                ident = self._data_source_semantics.get_identifier_in_data_source(identifier_instance.defined_from[0])
                 if ident is None:
                     raise RuntimeError(f"Invalid DataSourceElementReference {identifier_instance.defined_from[0]}")
                 if ident.type not in (IdentifierType.PRIMARY, IdentifierType.UNIQUE):

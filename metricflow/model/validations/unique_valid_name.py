@@ -82,7 +82,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
             for identifier in data_source.identifiers:
                 element_info_tuples.append(
                     (
-                        identifier.name,
+                        identifier.reference,
                         "identifier",
                         IdentifierContext(
                             file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
@@ -90,7 +90,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
                             if data_source.metadata
                             else None,
                             data_source_name=data_source.name,
-                            identifier_name=identifier.name.element_name,
+                            identifier_name=identifier.name,
                         ),
                     )
                 )
@@ -98,7 +98,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
             for dimension in data_source.dimensions:
                 element_info_tuples.append(
                     (
-                        dimension.name,
+                        dimension.reference,
                         "dimension",
                         DimensionContext(
                             file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
@@ -106,11 +106,10 @@ class UniqueAndValidNameRule(ModelValidationRule):
                             if data_source.metadata
                             else None,
                             data_source_name=data_source.name,
-                            dimension_name=dimension.name.element_name,
+                            dimension_name=dimension.name,
                         ),
                     )
                 )
-
         name_to_type: Dict[ElementReference, str] = {}
 
         for name, _type, context in element_info_tuples:

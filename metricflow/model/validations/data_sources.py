@@ -77,7 +77,7 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
                 file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
                 line_number=data_source.metadata.file_slice.start_line_number if data_source.metadata else None,
                 data_source_name=data_source.name,
-                dimension_name=dim.name.element_name,
+                dimension_name=dim.name,
             )
 
             if dim.type == DimensionType.TIME:

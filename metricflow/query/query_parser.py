@@ -17,7 +17,6 @@ from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.model.objects.constraints.where import WhereClauseConstraint
 from metricflow.model.objects.elements.dimension import DimensionType
-from metricflow.model.objects.elements.identifier import IdentifierType
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.semantics.semantic_containers import DataSourceSemantics
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
@@ -89,20 +88,14 @@ class MetricFlowQueryParser:
 
         self._known_time_dimension_element_references = [DataSet.metric_time_dimension_reference()]
         self._known_dimension_element_references = []
-        for linkable_name in self._data_source_semantics.get_linkable_element_references():
-            linkable = self._data_source_semantics.get_linkable(linkable_name)
-            if linkable.type == DimensionType.CATEGORICAL:
-                self._known_dimension_element_references.append(linkable.name)
-            elif linkable.type == DimensionType.TIME:
-                self._known_time_dimension_element_references.append(linkable.name)
-            elif (
-                linkable.type == IdentifierType.FOREIGN
-                or linkable.type == IdentifierType.PRIMARY
-                or linkable.type == IdentifierType.UNIQUE
-            ):
-                pass
+        for dimension_reference in self._data_source_semantics.get_dimension_references():
+            dimension = self._data_source_semantics.get_dimension(dimension_reference)
+            if dimension.type == DimensionType.CATEGORICAL:
+                self._known_dimension_element_references.append(dimension_reference)
+            elif dimension.type == DimensionType.TIME:
+                self._known_time_dimension_element_references.append(dimension_reference)
             else:
-                raise RuntimeError(f"Unhandled linkable type: {linkable.type}")
+                raise RuntimeError(f"Unhandled linkable type: {dimension.type}")
 
         self._known_metric_names = set(self._metric_semantics.metric_names)
         self._metric_time_dimension_reference = DataSet.metric_time_dimension_reference()

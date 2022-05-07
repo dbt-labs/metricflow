@@ -325,7 +325,7 @@ def _generate_linkable_time_dimensions(
 
         linkable_dimensions.append(
             LinkableDimension(
-                element_name=dimension.name.element_name,
+                element_name=dimension.reference.element_name,
                 identifier_links=identifier_links,
                 time_granularity=time_granularity,
                 properties=frozenset(properties),
@@ -363,7 +363,7 @@ class DataSourceJoinPath:
             if dimension_type == DimensionType.CATEGORICAL:
                 linkable_dimensions.append(
                     LinkableDimension(
-                        element_name=dimension.name.element_name,
+                        element_name=dimension.reference.element_name,
                         identifier_links=identifier_links,
                         properties=with_properties,
                     )
@@ -381,10 +381,10 @@ class DataSourceJoinPath:
 
         for identifier in data_source.identifiers:
             # Avoid creating "booking_id__booking_id"
-            if identifier.name.element_name != identifier_links[-1]:
+            if identifier.reference.element_name != identifier_links[-1]:
                 linkable_identifiers.append(
                     LinkableIdentifier(
-                        element_name=identifier.name.element_name,
+                        element_name=identifier.reference.element_name,
                         identifier_links=identifier_links,
                         properties=with_properties.union({LinkableElementProperties.IDENTIFIER}),
                     )
@@ -434,7 +434,7 @@ class ValidLinkableSpecResolver:
         for data_source in self._data_sources:
             for identifier in data_source.identifiers:
                 if identifier.type in (IdentifierType.PRIMARY, IdentifierType.UNIQUE):
-                    self._identifier_to_data_source[identifier.name.element_name].append(data_source)
+                    self._identifier_to_data_source[identifier.reference.element_name].append(data_source)
 
         self._metric_to_linkable_element_sets: Dict[str, List[LinkableElementSet]] = {}
 
@@ -472,7 +472,7 @@ class ValidLinkableSpecResolver:
             if dimension_type == DimensionType.CATEGORICAL:
                 linkable_dimensions.append(
                     LinkableDimension(
-                        element_name=dimension.name.element_name,
+                        element_name=dimension.reference.element_name,
                         identifier_links=(),
                         properties=frozenset({LinkableElementProperties.LOCAL}),
                     )
@@ -492,7 +492,7 @@ class ValidLinkableSpecResolver:
         for identifier in data_source.identifiers:
             linkable_identifiers.append(
                 LinkableIdentifier(
-                    element_name=identifier.name.element_name,
+                    element_name=identifier.reference.element_name,
                     identifier_links=(),
                     properties=frozenset({LinkableElementProperties.LOCAL, LinkableElementProperties.IDENTIFIER}),
                 )
@@ -506,7 +506,7 @@ class ValidLinkableSpecResolver:
                     additional_linkable_dimensions.append(
                         LinkableDimension(
                             element_name=linkable_dimension.element_name,
-                            identifier_links=(identifier.name.element_name,),
+                            identifier_links=(identifier.reference.element_name,),
                             time_granularity=linkable_dimension.time_granularity,
                             properties=frozenset(linkable_dimension.properties.union(properties)),
                         )
@@ -534,7 +534,7 @@ class ValidLinkableSpecResolver:
 
         # Create 1-hop elements
         for identifier in measure_data_source.identifiers:
-            data_sources = self._get_data_sources_with_joinable_identifier(identifier.name.element_name)
+            data_sources = self._get_data_sources_with_joinable_identifier(identifier.reference.element_name)
             for data_source in data_sources:
                 if data_source.name == measure_data_source.name:
                     continue
@@ -542,7 +542,7 @@ class ValidLinkableSpecResolver:
                     DataSourceJoinPath(
                         path_elements=(
                             DataSourceJoinPathElement(
-                                data_source=data_source, join_on_identifier=identifier.name.element_name
+                                data_source=data_source, join_on_identifier=identifier.reference.element_name
                             ),
                         )
                     )
@@ -608,7 +608,7 @@ class ValidLinkableSpecResolver:
         new_join_paths = []
 
         for identifier in data_source.identifiers:
-            identifier_name = identifier.name.element_name
+            identifier_name = identifier.reference.element_name
 
             if identifier_name in set(x.join_on_identifier for x in current_join_path.path_elements):
                 continue

@@ -295,6 +295,10 @@ class IdentifierReference(LinkableElementReference):  # noqa: D
     pass
 
 
+class CompositeSubIdentifierReference(ElementReference):  # noqa: D
+    pass
+
+
 class TimeDimensionReference(DimensionReference):  # noqa: D
     pass
 
