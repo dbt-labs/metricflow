@@ -11,4 +11,4 @@ class UserConfiguredModel(HashableBaseModel):
 
     data_sources: List[DataSource]
     metrics: List[Metric]
-    materializations: List[Materialization]
+    materializations: List[Materialization] = []

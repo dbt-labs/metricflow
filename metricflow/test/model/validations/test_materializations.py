@@ -24,7 +24,7 @@ def test_identifier(simple_model__pre_transforms: UserConfiguredModel) -> None: 
                         Materialization(
                             name="foobar",
                             metrics=["bookings"],
-                            dimensions=["ds", "listing"],
+                            dimensions=["_ts", "listing"],
                         )
                     ],
                 )
@@ -44,7 +44,7 @@ def test_invalid_metric_name(simple_model__pre_transforms: UserConfiguredModel) 
                         Materialization(
                             name="foobar",
                             metrics=["invalid_bookings"],
-                            dimensions=["ds"],
+                            dimensions=["_ts"],
                         )
                     ],
                 )
@@ -64,7 +64,7 @@ def test_invalid_dimension_name(simple_model__pre_transforms: UserConfiguredMode
                         Materialization(
                             name="foobar",
                             metrics=["bookings"],
-                            dimensions=["ds", "invalid_dimension_name"],
+                            dimensions=["_ts", "invalid_dimension_name"],
                         )
                     ],
                 )
@@ -105,7 +105,7 @@ def test_valid_time_granularity(simple_model__pre_transforms: UserConfiguredMode
                         Materialization(
                             name="materialization_test_case",
                             metrics=["bookings"],
-                            dimensions=["ds__day"],
+                            dimensions=["_ts__day"],
                         )
                     ],
                 )
@@ -125,7 +125,7 @@ def test_invalid_time_granularity(simple_model__pre_transforms: UserConfiguredMo
                         Materialization(
                             name="materialization_test_case",
                             metrics=["revenue"],
-                            dimensions=["ds__hour"],
+                            dimensions=["_ts__hour"],
                         )
                     ],
                 )
