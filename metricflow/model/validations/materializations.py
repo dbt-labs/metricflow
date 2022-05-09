@@ -1,21 +1,22 @@
+import datetime
 import logging
 from typing import List
 
-from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.model.objects.materialization import Materialization
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.semantics.data_source_container import PydanticDataSourceContainer
 from metricflow.model.semantics.semantic_containers import DataSourceSemantics
-from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
-from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.model.validations.validator_helpers import (
     ModelValidationRule,
     ValidationIssue,
     ValidationError,
     ValidationIssueType,
     validate_safely,
+    ValidationFutureError,
 )
+from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
+from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.specs import TimeDimensionReference
 
 logger = logging.getLogger(__name__)
@@ -53,13 +54,15 @@ class ValidMaterializationRule(ModelValidationRule):
                 metric_names=materialization.metrics,
                 group_by_names=materialization.dimensions,
             )
-        except UnableToSatisfyQueryError as err:
+        # TODO: Using broad exception clause until the query validation returns a list of errors.
+        except Exception as err:
             issues.append(
-                ValidationError(
+                ValidationFutureError(
                     model_object_reference=ValidationIssue.make_object_reference(
                         materialization_name=materialization.name
                     ),
                     message=str(err),
+                    error_date=datetime.date(2022, 5, 23),
                 )
             )
 
