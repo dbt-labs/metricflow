@@ -1,3 +1,4 @@
+import datetime
 import logging
 from typing import List
 
@@ -12,7 +13,7 @@ from metricflow.model.validations.validator_helpers import (
     ValidationError,
     ValidationIssueType,
     validate_safely,
-    ValidationIssueLevel,
+    ValidationFutureError,
 )
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.query.query_parser import MetricFlowQueryParser
@@ -56,12 +57,12 @@ class ValidMaterializationRule(ModelValidationRule):
         # TODO: Using broad exception clause until the query validation returns a list of errors.
         except Exception as err:
             issues.append(
-                ValidationIssue(
-                    level=ValidationIssueLevel.WARNING,
+                ValidationFutureError(
                     model_object_reference=ValidationIssue.make_object_reference(
                         materialization_name=materialization.name
                     ),
                     message=str(err),
+                    error_date=datetime.date(2022, 5, 23),
                 )
             )
 
