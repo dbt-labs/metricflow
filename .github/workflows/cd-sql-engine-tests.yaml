@@ -1,12 +1,12 @@
 name: MetricFlow SQL Engine Tests
 
 on:
-  schedule:
-    - cron: '0 12 * * *' # run once per day
-  pull_request:
-    types: [ labeled ]
-  pull_request_target:
-      types: [opened, synchronize, reopened]
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "metricflow/**"
 
 
 jobs:
