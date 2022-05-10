@@ -58,5 +58,7 @@ class Measure(HashableBaseModel, ParseableObject):
     @property
     def checked_agg_time_dimension(self) -> TimeDimensionReference:
         """Returns the aggregation time dimension, throwing an exception if it's not set."""
-        assert self.agg_time_dimension, f"Aggregation time dimension for {self.name} should have been set."
+        assert (
+            self.agg_time_dimension
+        ), f"Aggregation time dimension for {self.name} should have been set during model transformation"
         return self.agg_time_dimension

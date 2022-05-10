@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from typing import List, Optional, Sequence
 
-from metricflow.model.objects.common import Element, Metadata
+from metricflow.instances import DataSourceReference
+from metricflow.model.objects.common import Element
+from metricflow.model.objects.common import Metadata
 from metricflow.model.objects.elements.dimension import Dimension
 from metricflow.model.objects.elements.identifier import Identifier
 from metricflow.model.objects.elements.measure import Measure
@@ -131,3 +133,7 @@ class DataSource(HashableBaseModel, ParseableObject):
         if len(partitions) > 1:
             raise ValueError(f"too many partitions for data source {self.name}")
         return partitions[0]
+
+    @property
+    def reference(self) -> DataSourceReference:  # noqa: D
+        return DataSourceReference(data_source_name=self.name)
