@@ -74,7 +74,12 @@ def parse_directory_of_yaml_files_to_model(
     return ModelBuildResult(model=model)
 
 
-def parse_yaml_files_to_model(files: List[YamlFile]) -> UserConfiguredModel:
+def parse_yaml_files_to_model(
+    files: List[YamlFile],
+    data_source_class: Type[DataSource] = DataSource,
+    metric_class: Type[Metric] = Metric,
+    materialization_class: Type[Materialization] = Materialization,
+) -> UserConfiguredModel:
     """Builds UserConfiguredModel from list of config files (as strings).
 
     Persistent storage connection may be passed to write parsed objects=
@@ -85,15 +90,20 @@ def parse_yaml_files_to_model(files: List[YamlFile]) -> UserConfiguredModel:
     data_sources = []
     metrics = []
     materializations: List[Materialization] = []
-    valid_object_classes = [DataSource.__name__, Metric.__name__, Materialization.__name__]
+    valid_object_classes = [data_source_class.__name__, metric_class.__name__, materialization_class.__name__]
     for config_file in files:
-        objects = parse_config_yaml(config_file)  # parse config file
+        objects = parse_config_yaml(  # parse config file
+            config_file,
+            data_source_class=data_source_class,
+            metric_class=metric_class,
+            materialization_class=materialization_class,
+        )
         for obj in objects:
-            if isinstance(obj, DataSource):
+            if isinstance(obj, data_source_class):
                 data_sources.append(obj)
-            elif isinstance(obj, Metric):
+            elif isinstance(obj, metric_class):
                 metrics.append(obj)
-            elif isinstance(obj, Materialization):
+            elif isinstance(obj, materialization_class):
                 materializations.append(obj)
             else:
                 raise ParsingException(
@@ -110,6 +120,9 @@ def parse_yaml_files_to_model(files: List[YamlFile]) -> UserConfiguredModel:
 
 def parse_config_yaml(
     config_yaml: YamlFile,
+    data_source_class: Type[DataSource] = DataSource,
+    metric_class: Type[Metric] = Metric,
+    materialization_class: Type[Materialization] = Materialization,
 ) -> List[Union[DataSource, Metric, Materialization]]:
     """Parses transform config file passed as string - Returns list of model objects"""
     results: List[Union[DataSource, Metric, Materialization]] = []
@@ -174,11 +187,13 @@ def parse_config_yaml(
             document_type = next(iter(config_document.keys()))
             object_cfg = config_document[document_type]
             if document_type == METRIC_TYPE:
-                results.append(parse(Metric, ctx, object_cfg, config_yaml.file_path, config_yaml.contents))
+                results.append(parse(metric_class, ctx, object_cfg, config_yaml.file_path, config_yaml.contents))
             elif document_type == DATA_SOURCE_TYPE:
-                results.append(parse(DataSource, ctx, object_cfg, config_yaml.file_path, config_yaml.contents))
+                results.append(parse(data_source_class, ctx, object_cfg, config_yaml.file_path, config_yaml.contents))
             elif document_type == MATERIALIZATION_TYPE:
-                results.append(parse(Materialization, ctx, object_cfg, config_yaml.file_path, config_yaml.contents))
+                results.append(
+                    parse(materialization_class, ctx, object_cfg, config_yaml.file_path, config_yaml.contents)
+                )
             else:
                 errors.append(
                     str(
