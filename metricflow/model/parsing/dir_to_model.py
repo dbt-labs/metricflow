@@ -186,14 +186,13 @@ def parse_config_yaml(
             # retrieve last top-level key as type
             document_type = next(iter(config_document.keys()))
             object_cfg = config_document[document_type]
+            yaml_contents_by_line = config_yaml.contents.splitlines()
             if document_type == METRIC_TYPE:
-                results.append(parse(metric_class, ctx, object_cfg, config_yaml.file_path, config_yaml.contents))
+                results.append(parse(metric_class, object_cfg, config_yaml.file_path, yaml_contents_by_line))
             elif document_type == DATA_SOURCE_TYPE:
-                results.append(parse(data_source_class, ctx, object_cfg, config_yaml.file_path, config_yaml.contents))
+                results.append(parse(data_source_class, object_cfg, config_yaml.file_path, yaml_contents_by_line))
             elif document_type == MATERIALIZATION_TYPE:
-                results.append(
-                    parse(materialization_class, ctx, object_cfg, config_yaml.file_path, config_yaml.contents)
-                )
+                results.append(parse(materialization_class, object_cfg, config_yaml.file_path, yaml_contents_by_line))
             else:
                 errors.append(
                     str(
@@ -237,19 +236,20 @@ def parse_config_yaml(
 
 def parse(  # type: ignore[misc]
     _type: Type[Union[DataSource, Metric, Materialization]],
-    ctx: ParsingContext,
     yaml_dict: Dict[str, Any],
     filename: str,
-    contents: str,
+    contents_by_line: List[str],
 ) -> Any:
     """Parses a model object from (jsonschema-validated) yaml into python object"""
 
-    #  Only - add MdoMetadata
+    # Add Metadata
+    ctx = yaml_dict.pop(PARSING_CONTEXT_KEY)
+    ctx.filename = filename
     yaml_dict["metadata"] = {
         "repo_file_path": filename,
         "file_slice": {
             "filename": ctx.filename,
-            "content": contents,
+            "content": "\n".join(contents_by_line[max(0, ctx.start_line - 1) : ctx.end_line]),
             "start_line_number": ctx.start_line,
             "end_line_number": ctx.end_line,
         },
@@ -263,10 +263,10 @@ def parse(  # type: ignore[misc]
                 if isinstance(yaml_dict[field_name], list):
                     objects = []
                     for obj in yaml_dict[field_name]:
-                        objects.append(parse(field_value.type_, ctx, obj, filename, contents))  # type: ignore
+                        objects.append(parse(field_value.type_, obj, filename, contents_by_line))  # type: ignore
                     yaml_dict[field_name] = objects
                 else:
-                    yaml_dict[field_name] = parse(field_value.type_, ctx, yaml_dict[field_name], filename, contents)  # type: ignore
+                    yaml_dict[field_name] = parse(field_value.type_, yaml_dict[field_name], filename, contents_by_line)  # type: ignore
             elif issubclass(field_value.type_, ParseableField):
                 if isinstance(yaml_dict[field_name], list):
                     objects = []
