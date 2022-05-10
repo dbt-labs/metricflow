@@ -16,7 +16,7 @@ class IdentifierType(ExtendedEnum):
     UNIQUE = "unique"
 
     # for identifiers that are only rendered, not joined on (used when rendering composite identifiers)
-    # RENDER_ONLY = "render_only" # DEPRECATED ? we shouldnt need in the new world?
+    # RENDER_ONLY = "render_only" # DEPRECATED ? we shouldn't need in the new world?
 
 
 class CompositeSubIdentifier(HashableBaseModel, ParseableObject):
