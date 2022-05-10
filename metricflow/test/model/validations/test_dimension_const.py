@@ -103,3 +103,48 @@ def test_incompatible_dimension_is_partition() -> None:  # noqa:D
                 materializations=[],
             )
         )
+
+
+def test_multiple_primary_time_dimensions() -> None:  # noqa:D
+    with pytest.raises(ModelValidationException, match=r"one of many defined as primary"):
+        dimension_reference = DimensionReference(element_name="ds")
+        dimension_reference2 = DimensionReference(element_name="not_ds")
+        measure_reference = MeasureReference(element_name="measure")
+        ModelValidator.checked_validations(
+            UserConfiguredModel(
+                data_sources=[
+                    DataSource(
+                        name="dim1",
+                        sql_query=f"SELECT ds, {measure_reference.element_name} FROM bar",
+                        measures=[Measure(name=measure_reference, agg=AggregationType.SUM)],
+                        dimensions=[
+                            Dimension(
+                                name=dimension_reference,
+                                type=DimensionType.TIME,
+                                type_params=DimensionTypeParams(
+                                    is_primary=True,
+                                    time_granularity=TimeGranularity.DAY,
+                                ),
+                            ),
+                            Dimension(
+                                name=dimension_reference2,
+                                type=DimensionType.TIME,
+                                type_params=DimensionTypeParams(
+                                    is_primary=True,
+                                    time_granularity=TimeGranularity.DAY,
+                                ),
+                            ),
+                        ],
+                        mutability=Mutability(type=MutabilityType.IMMUTABLE),
+                    ),
+                ],
+                metrics=[
+                    Metric(
+                        name=measure_reference.element_name,
+                        type=MetricType.MEASURE_PROXY,
+                        type_params=MetricTypeParams(measures=[measure_reference]),
+                    )
+                ],
+                materializations=[],
+            )
+        )

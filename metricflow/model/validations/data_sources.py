@@ -62,8 +62,9 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
     @staticmethod
     @validate_safely(whats_being_done="checking validity of the data source's time dimensions")
     def _validate_data_source(data_source: DataSource) -> List[ValidationIssueType]:
-        primary_time_present = False
         issues: List[ValidationIssueType] = []
+
+        primary_time_dimensions = []
 
         for dim in data_source.dimensions:
             model_object_reference = ValidationIssue.make_object_reference(
@@ -74,7 +75,7 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
                 if dim.type_params is None:
                     continue
                 elif dim.type_params.is_primary:
-                    primary_time_present = True
+                    primary_time_dimensions.append(dim)
                 elif dim.type_params.time_granularity:
                     if dim.type_params.time_granularity not in SUPPORTED_GRANULARITIES:
                         issues.append(
@@ -85,12 +86,26 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
                             )
                         )
 
-        if not primary_time_present and len(data_source.measures) > 0:
+        if len(primary_time_dimensions) == 0 and len(data_source.measures) > 0:
             issues.append(
                 ValidationError(
                     model_object_reference=ValidationIssue.make_object_reference(data_source_name=data_source.name),
                     message=f"No primary time dimension in data source with name ({data_source.name}). Please add one",
                 )
             )
+
+        if len(primary_time_dimensions) > 1:
+            for primary_time_dimension in primary_time_dimensions:
+                model_object_reference = ValidationIssue.make_object_reference(
+                    data_source_name=data_source.name, dimension_name=primary_time_dimension.name.element_name
+                )
+                issues.append(
+                    ValidationError(
+                        model_object_reference=model_object_reference,
+                        message=f"In data source {data_source.name}, "
+                        f"Primary time dimension with name: {primary_time_dimension.name} "
+                        f"is one of many defined as primary.",
+                    )
+                )
 
         return issues
