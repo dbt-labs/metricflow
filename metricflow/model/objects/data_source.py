@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import List, Optional, Sequence
 
-from metricflow.model.objects.common import Element
+from metricflow.model.objects.common import Element, Metadata
 from metricflow.model.objects.elements.dimension import Dimension
 from metricflow.model.objects.elements.identifier import Identifier
 from metricflow.model.objects.elements.measure import Measure
@@ -62,6 +62,7 @@ class DataSource(HashableBaseModel, ParseableObject):
     mutability: Mutability
 
     origin: DataSourceOrigin = DataSourceOrigin.SOURCE
+    metadata: Metadata
 
     @property
     def elements(self) -> List[Element]:  # noqa: D
