@@ -62,7 +62,7 @@ class DataSource(HashableBaseModel, ParseableObject):
     mutability: Mutability
 
     origin: DataSourceOrigin = DataSourceOrigin.SOURCE
-    metadata: Metadata
+    metadata: Optional[Metadata]
 
     @property
     def elements(self) -> List[Element]:  # noqa: D

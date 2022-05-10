@@ -51,4 +51,4 @@ class Measure(HashableBaseModel, ParseableObject):
     create_metric: Optional[bool]
     name: MeasureReference
     expr: Optional[str] = None
-    metadata: Metadata
+    metadata: Optional[Metadata]

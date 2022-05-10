@@ -45,4 +45,4 @@ class Materialization(HashableBaseModel, ParseableObject):
     dimensions: List[str]
     destinations: Optional[List[MaterializationDestination]]
     destination_table: Optional[SqlTable]
-    metadata: Metadata
+    metadata: Optional[Metadata]

@@ -82,7 +82,7 @@ class Metric(HashableBaseModel, ParseableObject):
     type: MetricType
     type_params: MetricTypeParams
     constraint: Optional[WhereClauseConstraint]
-    metadata: Metadata
+    metadata: Optional[Metadata]
 
     @property
     def measure_names(self) -> List[MeasureReference]:  # noqa: D
