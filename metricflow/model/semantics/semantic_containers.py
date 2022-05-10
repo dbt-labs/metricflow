@@ -156,8 +156,7 @@ class DataSourceSemantics:
         self._data_source_names: Set[str] = set()
 
         self._configured_data_source_container = configured_data_source_container
-
-        self._measure_to_aggregation_time_dimension: Dict[MeasureReference, TimeDimensionReference] = {}
+        self._data_source_to_aggregation_time_dimensions: Dict[DataSourceReference, List[TimeDimensionReference]] = {}
 
         # Add semantic tracking for data sources from configured_data_source_container
         for data_source in self._configured_data_source_container.values():
@@ -328,10 +327,18 @@ class DataSourceSemantics:
             if element.name not in self._element_types:
                 self._element_types[element.name] = type(element)
 
+        self._data_source_to_aggregation_time_dimensions[data_source.reference] = []
+
         for measure in data_source.measures:
             self._measure_aggs[measure.name] = measure.agg
             self._measure_index[measure.name].append(data_source)
-            self._measure_to_aggregation_time_dimension[measure.name] = measure.checked_agg_time_dimension
+            if (
+                measure.checked_agg_time_dimension
+                not in self._data_source_to_aggregation_time_dimensions[data_source.reference]
+            ):
+                self._data_source_to_aggregation_time_dimensions[data_source.reference].append(
+                    measure.checked_agg_time_dimension
+                )
         for dimension in data_source.dimensions:
             self._linkable_reference_index[dimension.name].append(data_source)
             self._dimension_index[dimension.name].append(data_source)
@@ -394,20 +401,11 @@ class DataSourceSemantics:
         data_source_names_sorted = sorted(self._data_source_names)
         return tuple(DataSourceReference(data_source_name=x) for x in data_source_names_sorted)
 
-    def get_measure_aggregation_time_dimension(self, measure: MeasureReference) -> TimeDimensionReference:
-        """Return the aggregation time dimension associated with a measure."""
-        if measure not in self._measure_to_aggregation_time_dimension:
-            raise RuntimeError(f"Measure {measure} is not known")
-        return self._measure_to_aggregation_time_dimension[measure]
-
     def get_aggregation_time_dimensions(
         self, data_source_reference: DataSourceReference
     ) -> Sequence[TimeDimensionReference]:
         """Return all time dimensions used for measure aggregation in a data source."""
-        data_source = self.get_by_reference(data_source_reference)
-        assert data_source, f"Data Source {data_source_reference} is not known"
-        aggregation_time_dimension_references = []
-        for measure in data_source.measures:
-            if measure.checked_agg_time_dimension not in aggregation_time_dimension_references:
-                aggregation_time_dimension_references.append(measure.checked_agg_time_dimension)
-        return aggregation_time_dimension_references
+        assert (
+            data_source_reference in self._data_source_to_aggregation_time_dimensions
+        ), f"Data Source {data_source_reference} is not known"
+        return self._data_source_to_aggregation_time_dimensions[data_source_reference]
