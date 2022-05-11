@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import List, Optional
 
 from metricflow.dataflow.sql_table import SqlTable
+from metricflow.model.objects.common import Metadata
 from metricflow.model.objects.utils import ParseableObject, HashableBaseModel
 from metricflow.object_utils import ExtendedEnum
 
@@ -44,3 +45,4 @@ class Materialization(HashableBaseModel, ParseableObject):
     dimensions: List[str]
     destinations: Optional[List[MaterializationDestination]]
     destination_table: Optional[SqlTable]
+    metadata: Optional[Metadata]

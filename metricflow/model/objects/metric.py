@@ -4,6 +4,7 @@ from hashlib import sha1
 from typing import List, Optional
 
 from metricflow.errors.errors import ParsingException
+from metricflow.model.objects.common import Metadata
 from metricflow.model.objects.constraints.where import WhereClauseConstraint
 from metricflow.model.objects.utils import ParseableObject, ParseableField, HashableBaseModel
 from metricflow.object_utils import ExtendedEnum
@@ -81,6 +82,7 @@ class Metric(HashableBaseModel, ParseableObject):
     type: MetricType
     type_params: MetricTypeParams
     constraint: Optional[WhereClauseConstraint]
+    metadata: Optional[Metadata]
 
     @property
     def measure_names(self) -> List[MeasureReference]:  # noqa: D
