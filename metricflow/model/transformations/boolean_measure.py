@@ -16,15 +16,15 @@ class BooleanMeasureAggregationRule(ModelTransformRule):
             for measure in data_source.measures:
                 if measure.agg == AggregationType.BOOLEAN:
                     logger.warning(
-                        f"In data source {data_source.name}, measure `{measure.reference}` is configured as "
-                        f"aggregation type `boolean`, which has been deprecated. Please use `sum_boolean` "
-                        f"instead."
+                        f"In data source {data_source.name}, measure `{measure.reference.element_name}` "
+                        f"is configured as aggregation type `boolean`, which has been deprecated. Please use "
+                        f"`sum_boolean` instead."
                     )
                 if measure.agg == AggregationType.BOOLEAN or measure.agg == AggregationType.SUM_BOOLEAN:
                     if measure.expr:
                         measure.expr = f"CASE WHEN {measure.expr} THEN 1 ELSE 0 END"
                     else:
-                        measure.expr = f"CASE WHEN {measure.reference} THEN 1 ELSE 0 END"
+                        measure.expr = f"CASE WHEN {measure.name} THEN 1 ELSE 0 END"
 
                     measure.agg = AggregationType.SUM
 
