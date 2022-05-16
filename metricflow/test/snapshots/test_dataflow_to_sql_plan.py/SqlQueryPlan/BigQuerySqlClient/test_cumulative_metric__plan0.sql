@@ -1,31 +1,33 @@
 -- Compute Metrics via Expressions
 SELECT
-  subq_5.txn_revenue AS trailing_2_months_revenue
-  , subq_5.ds__month
+  subq_4.txn_revenue AS trailing_2_months_revenue
+  , subq_4.ds__month
 FROM (
   -- Aggregate Measures
   SELECT
-    SUM(subq_4.txn_revenue) AS txn_revenue
-    , subq_4.ds__month
+    SUM(subq_3.txn_revenue) AS txn_revenue
+    , subq_3.ds__month
   FROM (
-    -- Join Self Over Time Range
+    -- Pass Only Elements:
+    --   ['txn_revenue', 'ds__month']
     SELECT
-      subq_1.txn_revenue AS txn_revenue
-      , subq_2.ds__month AS ds__month
+      subq_1.txn_revenue
+      , subq_1.ds__month
     FROM (
-      -- Date Spine
-      SELECT
-        DATE_TRUNC(subq_3.ds, month) AS ds__month
-      FROM ***************************.mf_time_spine subq_3
-      GROUP BY
-        DATE_TRUNC(subq_3.ds, month)
-    ) subq_2
-    INNER JOIN (
-      -- Pass Only Elements:
-      --   ['txn_revenue', 'ds__month']
+      -- Metric Time Dimension 'ds'
       SELECT
         subq_0.txn_revenue
+        , subq_0.ds
+        , subq_0.ds__week
         , subq_0.ds__month
+        , subq_0.ds__quarter
+        , subq_0.ds__year
+        , subq_0.ds AS metric_time
+        , subq_0.ds__week AS metric_time__week
+        , subq_0.ds__month AS metric_time__month
+        , subq_0.ds__quarter AS metric_time__quarter
+        , subq_0.ds__year AS metric_time__year
+        , subq_0.user
       FROM (
         -- Read Elements From Data Source 'revenue'
         SELECT
@@ -42,13 +44,7 @@ FROM (
         ) revenue_src_10005
       ) subq_0
     ) subq_1
-    ON
-      (
-        subq_1.ds__month <= subq_2.ds__month
-      ) AND (
-        subq_1.ds__month > DATE_SUB(CAST(subq_2.ds__month AS DATETIME), INTERVAL 2 month)
-      )
-  ) subq_4
+  ) subq_3
   GROUP BY
-    subq_4.ds__month
-) subq_5
+    subq_3.ds__month
+) subq_4

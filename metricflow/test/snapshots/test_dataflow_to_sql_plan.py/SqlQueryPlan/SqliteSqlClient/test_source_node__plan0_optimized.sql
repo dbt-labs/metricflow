@@ -7,6 +7,7 @@ SELECT
   , booking_value AS min_booking_value
   , guest_id AS bookers
   , booking_value AS average_booking_value
+  , booking_value AS booking_payments
   , is_instant
   , ds
   , '__DATE_TRUNC_NOT_SUPPORTED__' AS ds__week
@@ -18,6 +19,11 @@ SELECT
   , '__DATE_TRUNC_NOT_SUPPORTED__' AS ds_partitioned__month
   , '__DATE_TRUNC_NOT_SUPPORTED__' AS ds_partitioned__quarter
   , '__DATE_TRUNC_NOT_SUPPORTED__' AS ds_partitioned__year
+  , booking_paid_at
+  , '__DATE_TRUNC_NOT_SUPPORTED__' AS booking_paid_at__week
+  , '__DATE_TRUNC_NOT_SUPPORTED__' AS booking_paid_at__month
+  , '__DATE_TRUNC_NOT_SUPPORTED__' AS booking_paid_at__quarter
+  , '__DATE_TRUNC_NOT_SUPPORTED__' AS booking_paid_at__year
   , is_instant AS create_a_cycle_in_the_join_graph__is_instant
   , ds AS create_a_cycle_in_the_join_graph__ds
   , '__DATE_TRUNC_NOT_SUPPORTED__' AS create_a_cycle_in_the_join_graph__ds__week
@@ -29,6 +35,11 @@ SELECT
   , '__DATE_TRUNC_NOT_SUPPORTED__' AS create_a_cycle_in_the_join_graph__ds_partitioned__month
   , '__DATE_TRUNC_NOT_SUPPORTED__' AS create_a_cycle_in_the_join_graph__ds_partitioned__quarter
   , '__DATE_TRUNC_NOT_SUPPORTED__' AS create_a_cycle_in_the_join_graph__ds_partitioned__year
+  , booking_paid_at AS create_a_cycle_in_the_join_graph__booking_paid_at
+  , '__DATE_TRUNC_NOT_SUPPORTED__' AS create_a_cycle_in_the_join_graph__booking_paid_at__week
+  , '__DATE_TRUNC_NOT_SUPPORTED__' AS create_a_cycle_in_the_join_graph__booking_paid_at__month
+  , '__DATE_TRUNC_NOT_SUPPORTED__' AS create_a_cycle_in_the_join_graph__booking_paid_at__quarter
+  , '__DATE_TRUNC_NOT_SUPPORTED__' AS create_a_cycle_in_the_join_graph__booking_paid_at__year
   , listing_id AS listing
   , guest_id AS guest
   , host_id AS host

@@ -1,147 +1,245 @@
 <SqlQueryPlan>
     <SqlSelectStatementNode>
         <!-- description = Compute Metrics via Expressions -->
-        <!-- node_id = ss_2 -->
-        <!-- col0 =                                                  -->
-        <!--   {'class': 'SqlSelectColumn',                          -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_8),  -->
-        <!--    'column_alias': 'messages'}                          -->
-        <!-- col1 =                                                  -->
-        <!--   {'class': 'SqlSelectColumn',                          -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_6),  -->
-        <!--    'column_alias': 'user_team___team_id'}               -->
-        <!-- col2 =                                                  -->
-        <!--   {'class': 'SqlSelectColumn',                          -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_7),  -->
-        <!--    'column_alias': 'user_team___user_id'}               -->
-        <!-- from_source = SqlSelectStatementNode(node_id=ss_1) -->
+        <!-- node_id = ss_4 -->
+        <!-- col0 =                                                   -->
+        <!--   {'class': 'SqlSelectColumn',                           -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_54),  -->
+        <!--    'column_alias': 'messages'}                           -->
+        <!-- col1 =                                                   -->
+        <!--   {'class': 'SqlSelectColumn',                           -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_52),  -->
+        <!--    'column_alias': 'user_team___team_id'}                -->
+        <!-- col2 =                                                   -->
+        <!--   {'class': 'SqlSelectColumn',                           -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_53),  -->
+        <!--    'column_alias': 'user_team___user_id'}                -->
+        <!-- from_source = SqlSelectStatementNode(node_id=ss_3) -->
         <!-- where = None -->
         <SqlSelectStatementNode>
             <!-- description = Aggregate Measures -->
-            <!-- node_id = ss_1 -->
+            <!-- node_id = ss_3 -->
             <!-- col0 =                                                              -->
             <!--   {'class': 'SqlSelectColumn',                                      -->
             <!--    'expr': SqlFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
             <!--    'column_alias': 'messages'}                                      -->
-            <!-- col1 =                                                  -->
-            <!--   {'class': 'SqlSelectColumn',                          -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_4),  -->
-            <!--    'column_alias': 'user_team___team_id'}               -->
-            <!-- col2 =                                                  -->
-            <!--   {'class': 'SqlSelectColumn',                          -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_5),  -->
-            <!--    'column_alias': 'user_team___user_id'}               -->
-            <!-- from_source = SqlSelectStatementNode(node_id=ss_0) -->
-            <!-- group_by0 =                                             -->
-            <!--   {'class': 'SqlSelectColumn',                          -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_4),  -->
-            <!--    'column_alias': 'user_team___team_id'}               -->
-            <!-- group_by1 =                                             -->
-            <!--   {'class': 'SqlSelectColumn',                          -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_5),  -->
-            <!--    'column_alias': 'user_team___user_id'}               -->
+            <!-- col1 =                                                   -->
+            <!--   {'class': 'SqlSelectColumn',                           -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_50),  -->
+            <!--    'column_alias': 'user_team___team_id'}                -->
+            <!-- col2 =                                                   -->
+            <!--   {'class': 'SqlSelectColumn',                           -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_51),  -->
+            <!--    'column_alias': 'user_team___user_id'}                -->
+            <!-- from_source = SqlSelectStatementNode(node_id=ss_2) -->
+            <!-- group_by0 =                                              -->
+            <!--   {'class': 'SqlSelectColumn',                           -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_50),  -->
+            <!--    'column_alias': 'user_team___team_id'}                -->
+            <!-- group_by1 =                                              -->
+            <!--   {'class': 'SqlSelectColumn',                           -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_51),  -->
+            <!--    'column_alias': 'user_team___user_id'}                -->
             <!-- where = None -->
             <SqlSelectStatementNode>
                 <!-- description =                  -->
                 <!--   Pass Only Elements:          -->
                 <!--     ['messages', 'user_team']  -->
-                <!-- node_id = ss_0 -->
-                <!-- col0 =                                                  -->
-                <!--   {'class': 'SqlSelectColumn',                          -->
-                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_0),  -->
-                <!--    'column_alias': 'messages'}                          -->
-                <!-- col1 =                                                  -->
-                <!--   {'class': 'SqlSelectColumn',                          -->
-                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_1),  -->
-                <!--    'column_alias': 'user_team___team_id'}               -->
-                <!-- col2 =                                                  -->
-                <!--   {'class': 'SqlSelectColumn',                          -->
-                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_2),  -->
-                <!--    'column_alias': 'user_team___user_id'}               -->
-                <!-- from_source = SqlSelectStatementNode(node_id=ss_10014) -->
+                <!-- node_id = ss_2 -->
+                <!-- col0 =                                                   -->
+                <!--   {'class': 'SqlSelectColumn',                           -->
+                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_46),  -->
+                <!--    'column_alias': 'messages'}                           -->
+                <!-- col1 =                                                   -->
+                <!--   {'class': 'SqlSelectColumn',                           -->
+                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_47),  -->
+                <!--    'column_alias': 'user_team___team_id'}                -->
+                <!-- col2 =                                                   -->
+                <!--   {'class': 'SqlSelectColumn',                           -->
+                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_48),  -->
+                <!--    'column_alias': 'user_team___user_id'}                -->
+                <!-- from_source = SqlSelectStatementNode(node_id=ss_1) -->
                 <!-- where = None -->
                 <SqlSelectStatementNode>
-                    <!-- description = Read Elements From Data Source 'messages_source' -->
-                    <!-- node_id = ss_10014 -->
-                    <!-- col0 =                                                         -->
-                    <!--   {'class': 'SqlSelectColumn',                                 -->
-                    <!--    'expr': SqlStringExpression(node_id=str_10005 sql_expr=1),  -->
-                    <!--    'column_alias': 'messages'}                                 -->
-                    <!-- col1 =                                                      -->
-                    <!--   {'class': 'SqlSelectColumn',                              -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10267),  -->
-                    <!--    'column_alias': 'ds'}                                    -->
-                    <!-- col2 =                                                -->
-                    <!--   {'class': 'SqlSelectColumn',                        -->
-                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10152),  -->
-                    <!--    'column_alias': 'ds__week'}                        -->
-                    <!-- col3 =                                                -->
-                    <!--   {'class': 'SqlSelectColumn',                        -->
-                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10153),  -->
-                    <!--    'column_alias': 'ds__month'}                       -->
-                    <!-- col4 =                                                -->
-                    <!--   {'class': 'SqlSelectColumn',                        -->
-                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10154),  -->
-                    <!--    'column_alias': 'ds__quarter'}                     -->
-                    <!-- col5 =                                                -->
-                    <!--   {'class': 'SqlSelectColumn',                        -->
-                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10155),  -->
-                    <!--    'column_alias': 'ds__year'}                        -->
-                    <!-- col6 =                                                      -->
-                    <!--   {'class': 'SqlSelectColumn',                              -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10272),  -->
-                    <!--    'column_alias': 'team_id'}                               -->
-                    <!-- col7 =                                                      -->
-                    <!--   {'class': 'SqlSelectColumn',                              -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10273),  -->
-                    <!--    'column_alias': 'user_id__ds'}                           -->
-                    <!-- col8 =                                                -->
-                    <!--   {'class': 'SqlSelectColumn',                        -->
-                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10156),  -->
-                    <!--    'column_alias': 'user_id__ds__week'}               -->
-                    <!-- col9 =                                                -->
-                    <!--   {'class': 'SqlSelectColumn',                        -->
-                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10157),  -->
-                    <!--    'column_alias': 'user_id__ds__month'}              -->
-                    <!-- col10 =                                               -->
-                    <!--   {'class': 'SqlSelectColumn',                        -->
-                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10158),  -->
-                    <!--    'column_alias': 'user_id__ds__quarter'}            -->
-                    <!-- col11 =                                               -->
-                    <!--   {'class': 'SqlSelectColumn',                        -->
-                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10159),  -->
-                    <!--    'column_alias': 'user_id__ds__year'}               -->
-                    <!-- col12 =                                                     -->
-                    <!--   {'class': 'SqlSelectColumn',                              -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10278),  -->
-                    <!--    'column_alias': 'user_id__team_id'}                      -->
-                    <!-- col13 =                                                     -->
-                    <!--   {'class': 'SqlSelectColumn',                              -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10279),  -->
-                    <!--    'column_alias': 'user_id'}                               -->
-                    <!-- col14 =                                                     -->
-                    <!--   {'class': 'SqlSelectColumn',                              -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10280),  -->
-                    <!--    'column_alias': 'user_team___team_id'}                   -->
-                    <!-- col15 =                                                     -->
-                    <!--   {'class': 'SqlSelectColumn',                              -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10281),  -->
-                    <!--    'column_alias': 'user_team___user_id'}                   -->
-                    <!-- col16 =                                                     -->
-                    <!--   {'class': 'SqlSelectColumn',                              -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10282),  -->
-                    <!--    'column_alias': 'user_id__user_team___team_id'}          -->
-                    <!-- col17 =                                                     -->
-                    <!--   {'class': 'SqlSelectColumn',                              -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10283),  -->
-                    <!--    'column_alias': 'user_id__user_team___user_id'}          -->
-                    <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10011) -->
+                    <!-- description = Metric Time Dimension 'ds' -->
+                    <!-- node_id = ss_1 -->
+                    <!-- col0 =                                                   -->
+                    <!--   {'class': 'SqlSelectColumn',                           -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_23),  -->
+                    <!--    'column_alias': 'messages'}                           -->
+                    <!-- col1 =                                                   -->
+                    <!--   {'class': 'SqlSelectColumn',                           -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_24),  -->
+                    <!--    'column_alias': 'team_id'}                            -->
+                    <!-- col2 =                                                   -->
+                    <!--   {'class': 'SqlSelectColumn',                           -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_25),  -->
+                    <!--    'column_alias': 'user_id__team_id'}                   -->
+                    <!-- col3 =                                                   -->
+                    <!--   {'class': 'SqlSelectColumn',                           -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_26),  -->
+                    <!--    'column_alias': 'ds'}                                 -->
+                    <!-- col4 =                                                   -->
+                    <!--   {'class': 'SqlSelectColumn',                           -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_27),  -->
+                    <!--    'column_alias': 'ds__week'}                           -->
+                    <!-- col5 =                                                   -->
+                    <!--   {'class': 'SqlSelectColumn',                           -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_28),  -->
+                    <!--    'column_alias': 'ds__month'}                          -->
+                    <!-- col6 =                                                   -->
+                    <!--   {'class': 'SqlSelectColumn',                           -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_29),  -->
+                    <!--    'column_alias': 'ds__quarter'}                        -->
+                    <!-- col7 =                                                   -->
+                    <!--   {'class': 'SqlSelectColumn',                           -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_30),  -->
+                    <!--    'column_alias': 'ds__year'}                           -->
+                    <!-- col8 =                                                   -->
+                    <!--   {'class': 'SqlSelectColumn',                           -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_31),  -->
+                    <!--    'column_alias': 'user_id__ds'}                        -->
+                    <!-- col9 =                                                   -->
+                    <!--   {'class': 'SqlSelectColumn',                           -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_32),  -->
+                    <!--    'column_alias': 'user_id__ds__week'}                  -->
+                    <!-- col10 =                                                  -->
+                    <!--   {'class': 'SqlSelectColumn',                           -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_33),  -->
+                    <!--    'column_alias': 'user_id__ds__month'}                 -->
+                    <!-- col11 =                                                  -->
+                    <!--   {'class': 'SqlSelectColumn',                           -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_34),  -->
+                    <!--    'column_alias': 'user_id__ds__quarter'}               -->
+                    <!-- col12 =                                                  -->
+                    <!--   {'class': 'SqlSelectColumn',                           -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_35),  -->
+                    <!--    'column_alias': 'user_id__ds__year'}                  -->
+                    <!-- col13 =                                                  -->
+                    <!--   {'class': 'SqlSelectColumn',                           -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_36),  -->
+                    <!--    'column_alias': 'metric_time'}                        -->
+                    <!-- col14 =                                                  -->
+                    <!--   {'class': 'SqlSelectColumn',                           -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_37),  -->
+                    <!--    'column_alias': 'metric_time__week'}                  -->
+                    <!-- col15 =                                                  -->
+                    <!--   {'class': 'SqlSelectColumn',                           -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_38),  -->
+                    <!--    'column_alias': 'metric_time__month'}                 -->
+                    <!-- col16 =                                                  -->
+                    <!--   {'class': 'SqlSelectColumn',                           -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_39),  -->
+                    <!--    'column_alias': 'metric_time__quarter'}               -->
+                    <!-- col17 =                                                  -->
+                    <!--   {'class': 'SqlSelectColumn',                           -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_40),  -->
+                    <!--    'column_alias': 'metric_time__year'}                  -->
+                    <!-- col18 =                                                  -->
+                    <!--   {'class': 'SqlSelectColumn',                           -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_41),  -->
+                    <!--    'column_alias': 'user_id'}                            -->
+                    <!-- col19 =                                                  -->
+                    <!--   {'class': 'SqlSelectColumn',                           -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_42),  -->
+                    <!--    'column_alias': 'user_team___team_id'}                -->
+                    <!-- col20 =                                                  -->
+                    <!--   {'class': 'SqlSelectColumn',                           -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_43),  -->
+                    <!--    'column_alias': 'user_team___user_id'}                -->
+                    <!-- col21 =                                                  -->
+                    <!--   {'class': 'SqlSelectColumn',                           -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_44),  -->
+                    <!--    'column_alias': 'user_id__user_team___team_id'}       -->
+                    <!-- col22 =                                                  -->
+                    <!--   {'class': 'SqlSelectColumn',                           -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_45),  -->
+                    <!--    'column_alias': 'user_id__user_team___user_id'}       -->
+                    <!-- from_source = SqlSelectStatementNode(node_id=ss_10014) -->
                     <!-- where = None -->
-                    <SqlTableFromClauseNode>
-                        <!-- description = Read from ***************************.fct_messages -->
-                        <!-- node_id = tfc_10011 -->
-                        <!-- table_id = ***************************.fct_messages -->
-                    </SqlTableFromClauseNode>
+                    <SqlSelectStatementNode>
+                        <!-- description = Read Elements From Data Source 'messages_source' -->
+                        <!-- node_id = ss_10014 -->
+                        <!-- col0 =                                                         -->
+                        <!--   {'class': 'SqlSelectColumn',                                 -->
+                        <!--    'expr': SqlStringExpression(node_id=str_10005 sql_expr=1),  -->
+                        <!--    'column_alias': 'messages'}                                 -->
+                        <!-- col1 =                                                      -->
+                        <!--   {'class': 'SqlSelectColumn',                              -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10278),  -->
+                        <!--    'column_alias': 'ds'}                                    -->
+                        <!-- col2 =                                                -->
+                        <!--   {'class': 'SqlSelectColumn',                        -->
+                        <!--    'expr': SqlDateTruncExpression(node_id=dt_10160),  -->
+                        <!--    'column_alias': 'ds__week'}                        -->
+                        <!-- col3 =                                                -->
+                        <!--   {'class': 'SqlSelectColumn',                        -->
+                        <!--    'expr': SqlDateTruncExpression(node_id=dt_10161),  -->
+                        <!--    'column_alias': 'ds__month'}                       -->
+                        <!-- col4 =                                                -->
+                        <!--   {'class': 'SqlSelectColumn',                        -->
+                        <!--    'expr': SqlDateTruncExpression(node_id=dt_10162),  -->
+                        <!--    'column_alias': 'ds__quarter'}                     -->
+                        <!-- col5 =                                                -->
+                        <!--   {'class': 'SqlSelectColumn',                        -->
+                        <!--    'expr': SqlDateTruncExpression(node_id=dt_10163),  -->
+                        <!--    'column_alias': 'ds__year'}                        -->
+                        <!-- col6 =                                                      -->
+                        <!--   {'class': 'SqlSelectColumn',                              -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10283),  -->
+                        <!--    'column_alias': 'team_id'}                               -->
+                        <!-- col7 =                                                      -->
+                        <!--   {'class': 'SqlSelectColumn',                              -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10284),  -->
+                        <!--    'column_alias': 'user_id__ds'}                           -->
+                        <!-- col8 =                                                -->
+                        <!--   {'class': 'SqlSelectColumn',                        -->
+                        <!--    'expr': SqlDateTruncExpression(node_id=dt_10164),  -->
+                        <!--    'column_alias': 'user_id__ds__week'}               -->
+                        <!-- col9 =                                                -->
+                        <!--   {'class': 'SqlSelectColumn',                        -->
+                        <!--    'expr': SqlDateTruncExpression(node_id=dt_10165),  -->
+                        <!--    'column_alias': 'user_id__ds__month'}              -->
+                        <!-- col10 =                                               -->
+                        <!--   {'class': 'SqlSelectColumn',                        -->
+                        <!--    'expr': SqlDateTruncExpression(node_id=dt_10166),  -->
+                        <!--    'column_alias': 'user_id__ds__quarter'}            -->
+                        <!-- col11 =                                               -->
+                        <!--   {'class': 'SqlSelectColumn',                        -->
+                        <!--    'expr': SqlDateTruncExpression(node_id=dt_10167),  -->
+                        <!--    'column_alias': 'user_id__ds__year'}               -->
+                        <!-- col12 =                                                     -->
+                        <!--   {'class': 'SqlSelectColumn',                              -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10289),  -->
+                        <!--    'column_alias': 'user_id__team_id'}                      -->
+                        <!-- col13 =                                                     -->
+                        <!--   {'class': 'SqlSelectColumn',                              -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10290),  -->
+                        <!--    'column_alias': 'user_id'}                               -->
+                        <!-- col14 =                                                     -->
+                        <!--   {'class': 'SqlSelectColumn',                              -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10291),  -->
+                        <!--    'column_alias': 'user_team___team_id'}                   -->
+                        <!-- col15 =                                                     -->
+                        <!--   {'class': 'SqlSelectColumn',                              -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10292),  -->
+                        <!--    'column_alias': 'user_team___user_id'}                   -->
+                        <!-- col16 =                                                     -->
+                        <!--   {'class': 'SqlSelectColumn',                              -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10293),  -->
+                        <!--    'column_alias': 'user_id__user_team___team_id'}          -->
+                        <!-- col17 =                                                     -->
+                        <!--   {'class': 'SqlSelectColumn',                              -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10294),  -->
+                        <!--    'column_alias': 'user_id__user_team___user_id'}          -->
+                        <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10011) -->
+                        <!-- where = None -->
+                        <SqlTableFromClauseNode>
+                            <!-- description = Read from ***************************.fct_messages -->
+                            <!-- node_id = tfc_10011 -->
+                            <!-- table_id = ***************************.fct_messages -->
+                        </SqlTableFromClauseNode>
+                    </SqlSelectStatementNode>
                 </SqlSelectStatementNode>
             </SqlSelectStatementNode>
         </SqlSelectStatementNode>
