@@ -33,12 +33,12 @@ class DataSourceMeasuresUniqueRule(ModelValidationRule):
             for measure in data_source.measures:
                 if measure.reference in measure_names_to_data_sources:
                     model_object_reference = ValidationIssue.make_object_reference(
-                        data_source_name=data_source.name, measure_name=measure.reference.element_name
+                        data_source_name=data_source.name, measure_name=measure.name
                     )
                     issues.append(
                         ValidationError(
                             model_object_reference=model_object_reference,
-                            message=f"Found measure with name {measure.reference} in multiple data sources with names "
+                            message=f"Found measure with name {measure.name} in multiple data sources with names "
                             f"({measure_names_to_data_sources[measure.reference]})",
                         )
                     )
@@ -81,7 +81,7 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
                         issues.append(
                             ValidationError(
                                 model_object_reference=model_object_reference,
-                                message=f"Unsupported time granularity in time dimension with name: {dim.reference}, "
+                                message=f"Unsupported time granularity in time dimension with name: {dim.name}, "
                                 f"Please use {[s.value for s in SUPPORTED_GRANULARITIES]}",
                             )
                         )

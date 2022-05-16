@@ -6,26 +6,25 @@ from metricflow.model.objects.elements.dimension import Dimension, DimensionType
 from metricflow.model.objects.elements.measure import Measure, AggregationType
 from metricflow.model.objects.metric import Metric, MetricType, MetricTypeParams
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
-from metricflow.specs import MeasureReference, DimensionReference
-from metricflow.time.time_granularity import TimeGranularity
 from metricflow.model.validations.validator_helpers import ModelValidationException
+from metricflow.time.time_granularity import TimeGranularity
 
 
 @pytest.mark.skip("TODO: Will convert to validation rule")
 def test_inconsistent_elements() -> None:  # noqa:D
-    dim_reference = DimensionReference(element_name="ename")
-    measure_reference = MeasureReference(element_name="ename")
+    dim_name = "ename"
+    measure_name = "ename"
     with pytest.raises(ModelValidationException):
         ModelValidator().checked_validations(
             UserConfiguredModel(
                 data_sources=[
                     DataSource(
-                        reference="s1",
+                        name="s1",
                         sql_query="SELECT foo FROM bar",
                         dimensions=[
                             Dimension(
-                                reference=dim_reference,
-                                type_=DimensionType.TIME,
+                                name=dim_name,
+                                type=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
                                     time_granularity=TimeGranularity.DAY,
                                 ),
@@ -34,17 +33,17 @@ def test_inconsistent_elements() -> None:  # noqa:D
                         mutability=Mutability(type=MutabilityType.IMMUTABLE),
                     ),
                     DataSource(
-                        reference="s2",
+                        name="s2",
                         sql_query="SELECT foo FROM bar",
-                        measures=[Measure(reference=measure_reference, agg=AggregationType.SUM)],
+                        measures=[Measure(name=measure_name, agg=AggregationType.SUM)],
                         mutability=Mutability(type=MutabilityType.IMMUTABLE),
                     ),
                 ],
                 metrics=[
                     Metric(
-                        reference=measure_reference.element_name,
+                        name=measure_name,
                         type=MetricType.MEASURE_PROXY,
-                        type_params=MetricTypeParams(measures=[measure_reference]),
+                        type_params=MetricTypeParams(measures=[measure_name]),
                     )
                 ],
                 materializations=[],
