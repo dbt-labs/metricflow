@@ -729,13 +729,13 @@ def test_constrain_time_range_node(
             TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.DAY),
         ],
     )
-    plot_time_node = MetricTimeDimensionTransformNode(
+    metric_time_node = MetricTimeDimensionTransformNode(
         parent_node=filtered_measure_node,
         aggregation_time_dimension_reference=TimeDimensionReference(element_name="ds"),
     )
 
     constrain_time_node = ConstrainTimeRangeNode[DataSourceDataSet](
-        parent_node=plot_time_node,
+        parent_node=metric_time_node,
         time_range_constraint=TimeRangeConstraint(
             start_time=as_datetime("2020-01-01"),
             end_time=as_datetime("2020-01-02"),

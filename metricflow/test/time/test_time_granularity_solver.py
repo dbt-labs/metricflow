@@ -111,7 +111,7 @@ def test_granularity_solution_for_day_metric(time_granularity_solver: TimeGranul
     assert time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
         metric_specs=[MetricSpec(element_name="bookings")],
         partial_time_dimension_specs=[PARTIAL_PTD_SPEC],
-        plot_time_dimension_reference=MTD_REFERENCE,
+        metric_time_dimension_reference=MTD_REFERENCE,
     ) == {
         PARTIAL_PTD_SPEC: MTD_SPEC_DAY,
     }
@@ -121,7 +121,7 @@ def test_granularity_solution_for_month_metric(time_granularity_solver: TimeGran
     assert time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
         metric_specs=[MetricSpec(element_name="bookings_monthly")],
         partial_time_dimension_specs=[PARTIAL_PTD_SPEC],
-        plot_time_dimension_reference=MTD_REFERENCE,
+        metric_time_dimension_reference=MTD_REFERENCE,
     ) == {
         PARTIAL_PTD_SPEC: MTD_SPEC_MONTH,
     }
@@ -133,7 +133,7 @@ def test_granularity_solution_for_day_and_month_metrics(  # noqa: D
     assert time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
         metric_specs=[MetricSpec(element_name="bookings"), MetricSpec(element_name="bookings_monthly")],
         partial_time_dimension_specs=[PARTIAL_PTD_SPEC],
-        plot_time_dimension_reference=MTD_REFERENCE,
+        metric_time_dimension_reference=MTD_REFERENCE,
     ) == {PARTIAL_PTD_SPEC: MTD_SPEC_MONTH}
 
 
@@ -143,7 +143,7 @@ def test_time_granularity_parameter(  # noqa: D
     assert time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
         metric_specs=[MetricSpec(element_name="bookings"), MetricSpec(element_name="bookings_monthly")],
         partial_time_dimension_specs=[PARTIAL_PTD_SPEC],
-        plot_time_dimension_reference=MTD_REFERENCE,
+        metric_time_dimension_reference=MTD_REFERENCE,
         time_granularity=TimeGranularity.YEAR,
     ) == {PARTIAL_PTD_SPEC: MTD_SPEC_YEAR}
 
@@ -155,7 +155,7 @@ def test_invalid_time_granularity_parameter(  # noqa: D
         time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
             metric_specs=[MetricSpec(element_name="bookings"), MetricSpec(element_name="bookings_monthly")],
             partial_time_dimension_specs=[PARTIAL_PTD_SPEC],
-            plot_time_dimension_reference=MTD_REFERENCE,
+            metric_time_dimension_reference=MTD_REFERENCE,
             time_granularity=TimeGranularity.DAY,
         )
 
