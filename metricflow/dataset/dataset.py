@@ -37,7 +37,7 @@ class DataSet:
         return DataSet.metric_time_dimension_reference().element_name
 
     @staticmethod
-    def metic_time_dimension_spec(time_granularity: TimeGranularity) -> TimeDimensionSpec:
+    def metric_time_dimension_spec(time_granularity: TimeGranularity) -> TimeDimensionSpec:
         """Spec that corresponds to DataSet.metric_time_dimension_reference"""
         return TimeDimensionSpec(
             element_name=DataSet.metric_time_dimension_reference().element_name,

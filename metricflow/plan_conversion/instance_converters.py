@@ -53,8 +53,8 @@ class CreateSelectColumnsForInstances(InstanceSetTransform[SelectColumnSet]):
         table_alias: str,
         column_resolver: ColumnAssociationResolver,
         output_to_input_column_mapping: Optional[OrderedDict[str, str]] = None,
-    ) -> None:  # noqa: D
-        """Constructor.
+    ) -> None:
+        """Initializer.
 
         Args:
             table_alias: the table alias to select columns from
