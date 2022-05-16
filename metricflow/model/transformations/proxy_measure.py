@@ -27,14 +27,14 @@ class CreateProxyMeasureRule(ModelTransformRule):
 
                 add_metric = True
                 for metric in model.metrics:
-                    if metric.name == measure.reference:
+                    if metric.name == measure.name:
                         if metric.type != MetricType.MEASURE_PROXY:
                             raise ModelTransformError(
-                                f"Cannot have metric with the same name as a measure ({measure.reference}) that is not a "
+                                f"Cannot have metric with the same name as a measure ({measure.name}) that is not a "
                                 f"proxy for that measure"
                             )
                         logger.warning(
-                            f"Metric already exists with name ({measure.reference}). *Not* adding measure proxy metric for "
+                            f"Metric already exists with name ({measure.name}). *Not* adding measure proxy metric for "
                             f"that measure"
                         )
                         add_metric = False

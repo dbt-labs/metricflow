@@ -239,7 +239,7 @@ class DataSourceSemantics:
         for measure in data_source.measures:
             if measure.reference in self._measure_aggs and self._measure_aggs[measure.reference] != measure.agg:
                 errors.append(
-                    f"conflicting aggregation (agg) for measure `{measure.reference}` registered as "
+                    f"conflicting aggregation (agg) for measure `{measure.reference.element_name}` registered as "
                     f"`{self._measure_aggs[measure.reference]}`; Got `{measure.agg}"
                 )
 
