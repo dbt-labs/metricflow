@@ -75,7 +75,7 @@ def make_multihop_node_evaluator(
     nodes_available_for_joins = node_processor.remove_unnecessary_nodes(
         desired_linkable_specs=desired_linkable_specs,
         nodes=consistent_id_object_repository.multihop_model_source_nodes,
-        plot_time_dimension_reference=DataSet.metric_time_dimension_reference(),
+        metric_time_dimension_reference=DataSet.metric_time_dimension_reference(),
     )
 
     nodes_available_for_joins = node_processor.add_multi_hop_joins(

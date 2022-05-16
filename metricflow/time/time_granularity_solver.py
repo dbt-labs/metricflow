@@ -173,7 +173,7 @@ class TimeGranularitySolver:
         self,
         metric_specs: Sequence[MetricSpec],
         partial_time_dimension_specs: Sequence[PartialTimeDimensionSpec],
-        plot_time_dimension_reference: TimeDimensionReference,
+        metric_time_dimension_reference: TimeDimensionReference,
         time_granularity: Optional[TimeGranularity] = None,
     ) -> Dict[PartialTimeDimensionSpec, TimeDimensionSpec]:
         """Figure out the lowest granularity possible for the partially specified time dimension specs.
@@ -192,12 +192,12 @@ class TimeGranularitySolver:
                 )
 
                 if (
-                    partial_time_dimension_spec.element_name == plot_time_dimension_reference.element_name
+                    partial_time_dimension_spec.element_name == metric_time_dimension_reference.element_name
                     and time_granularity
                 ):
                     if time_granularity < min_time_granularity_for_querying:
                         raise RequestTimeGranularityException(
-                            f"Can't use time granularity for time dimension '{plot_time_dimension_reference} since "
+                            f"Can't use time granularity for time dimension '{metric_time_dimension_reference} since "
                             f"the minimum granularity is {min_time_granularity_for_querying}"
                         )
                     replacement_dict[partial_time_dimension_spec] = TimeDimensionSpec(
