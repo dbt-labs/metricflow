@@ -331,7 +331,7 @@ class MetricFlowQueryParser:
             self._time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
                 metric_specs=metric_specs,
                 partial_time_dimension_specs=requested_linkable_specs.partial_time_dimension_specs,
-                plot_time_dimension_reference=self._metric_time_dimension_reference,
+                metric_time_dimension_reference=self._metric_time_dimension_reference,
                 time_granularity=time_granularity,
             )
         )
@@ -490,7 +490,7 @@ class MetricFlowQueryParser:
             ):
                 return partial_time_dimension_spec_to_replace, replace_with_time_dimension_spec
 
-        raise RuntimeError(f"Replacement for plot time dimension '{self._metric_time_dimension_reference}' not found")
+        raise RuntimeError(f"Replacement for metric time dimension '{self._metric_time_dimension_reference}' not found")
 
     def _metric_time_dimension_specified_without_granularity(
         self, partial_time_dimension_specs: Sequence[PartialTimeDimensionSpec]
@@ -515,7 +515,7 @@ class MetricFlowQueryParser:
     def _find_smallest_metric_time_dimension_spec_granularity(
         self, time_dimension_specs: Sequence[TimeDimensionSpec]
     ) -> Optional[TimeGranularity]:
-        plot_time_dimension_specs: List[TimeDimensionSpec] = [
+        metric_time_dimension_specs: List[TimeDimensionSpec] = [
             x
             for x in time_dimension_specs
             if (
@@ -525,9 +525,9 @@ class MetricFlowQueryParser:
             )
         ]
 
-        plot_time_dimension_specs.sort(key=lambda x: x.time_granularity.to_int())
-        if len(plot_time_dimension_specs) > 0:
-            return plot_time_dimension_specs[0].time_granularity
+        metric_time_dimension_specs.sort(key=lambda x: x.time_granularity.to_int())
+        if len(metric_time_dimension_specs) > 0:
+            return metric_time_dimension_specs[0].time_granularity
         else:
             return None
 

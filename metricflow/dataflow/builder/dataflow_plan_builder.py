@@ -348,14 +348,14 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         if time_range_constraint:
             potential_measure_nodes = node_processor.add_time_range_constraint(
                 source_nodes=potential_measure_nodes,
-                plot_time_dimension_reference=self._metric_time_dimension_reference,
+                metric_time_dimension_reference=self._metric_time_dimension_reference,
                 time_range_constraint=time_range_constraint,
             )
 
         nodes_available_for_joins = node_processor.remove_unnecessary_nodes(
             desired_linkable_specs=linkable_specs,
             nodes=source_nodes,
-            plot_time_dimension_reference=self._metric_time_dimension_reference,
+            metric_time_dimension_reference=self._metric_time_dimension_reference,
         )
         logger.info(
             f"After removing unnecessary nodes, there are {len(nodes_available_for_joins)} nodes available for joins"
@@ -568,7 +568,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         cumulative_window: Optional[CumulativeMetricWindow] = None,
         cumulative_grain_to_date: Optional[TimeGranularity] = None,
     ) -> BaseOutput[SqlDataSetT]:
-        plot_time_dimension_requested = self._metric_time_dimension_reference.element_name in [
+        metric_time_dimension_requested = self._metric_time_dimension_reference.element_name in [
             linkable_spec.element_name for linkable_spec in queried_linkable_specs.as_tuple
         ]
         cumulative_metric_adjusted_time_constraint: Optional[TimeRangeConstraint] = None
@@ -692,7 +692,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         if (
             cumulative_metric_adjusted_time_constraint is not None
             and time_range_constraint is not None
-            and plot_time_dimension_requested
+            and metric_time_dimension_requested
         ):
             cumulative_metric_constrained_node = ConstrainTimeRangeNode(
                 unaggregated_measure_node, time_range_constraint
