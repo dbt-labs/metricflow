@@ -7,7 +7,7 @@ from metricflow.model.objects.elements.measure import Measure, AggregationType
 from metricflow.model.objects.metric import MetricType, MetricTypeParams, Metric
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import ModelValidationException
-from metricflow.specs import DimensionReference, TimeDimensionReference, MeasureReference
+from metricflow.specs import DimensionReference, MeasureReference, TimeDimensionReference
 from metricflow.test.model.validations.helpers import data_source_with_guaranteed_meta, metric_with_guaranteed_meta
 from metricflow.time.time_granularity import TimeGranularity
 
@@ -110,7 +110,7 @@ def test_incompatible_dimension_is_partition() -> None:  # noqa:D
 
 def test_multiple_primary_time_dimensions() -> None:  # noqa:D
     with pytest.raises(ModelValidationException, match=r"one of many defined as primary"):
-        dimension_reference = DimensionReference(element_name="ds")
+        dimension_reference = TimeDimensionReference(element_name="ds")
         dimension_reference2 = DimensionReference(element_name="not_ds")
         measure_reference = MeasureReference(element_name="measure")
         model_validator = ModelValidator()
@@ -124,7 +124,7 @@ def test_multiple_primary_time_dimensions() -> None:  # noqa:D
                             Measure(
                                 name=measure_reference.element_name,
                                 agg=AggregationType.SUM,
-                                agg_time_dimension=TimeDimensionReference(element_name="ds"),
+                                agg_time_dimension=dimension_reference,
                             )
                         ],
                         dimensions=[
