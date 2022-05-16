@@ -97,7 +97,7 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
         if len(primary_time_dimensions) > 1:
             for primary_time_dimension in primary_time_dimensions:
                 model_object_reference = ValidationIssue.make_object_reference(
-                    data_source_name=data_source.name, dimension_name=primary_time_dimension.name.element_name
+                    data_source_name=data_source.name, dimension_name=primary_time_dimension.name
                 )
                 issues.append(
                     ValidationError(
