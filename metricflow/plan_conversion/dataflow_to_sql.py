@@ -1300,9 +1300,16 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
         return SqlQueryPlan(plan_id=sql_query_plan_id, render_node=sql_select_node)
 
-    def visit_metric_time_dimension_transform_node(  # noqa: D
+    def visit_metric_time_dimension_transform_node(
         self, node: MetricTimeDimensionTransformNode[SqlDataSetT]
     ) -> SqlDataSet:
+        """Implement the behavior of the MetricTimeDimensionTransformNode.
+
+        This node will create an output data set that is similar to the input data set, but the measure instances it
+        contains is a subset of the input data set. Only measure instances that have an aggregation time dimension
+        matching the one defined in the node will be passed. In addition, an additional time dimension instance for
+        "metric time" will be included. See DataSet.metric_time_dimension_reference().
+        """
         input_data_set: SqlDataSet = node.parent_node.accept(self)
 
         # Find which measures have an aggregation time dimension that is the same as the one specified in the node.
@@ -1335,23 +1342,23 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
         # For those matching time dimension instances, create the analog plot time dimension instances for the output.
         for matching_time_dimension_instance in matching_time_dimension_instances:
-            plot_time_dimension_spec = DataSet.metic_time_dimension_spec(
+            metric_time_dimension_spec = DataSet.metric_time_dimension_spec(
                 matching_time_dimension_instance.spec.time_granularity
             )
-            plot_time_dimension_column_association = self._column_association_resolver.resolve_time_dimension_spec(
-                plot_time_dimension_spec
+            metric_time_dimension_column_association = self._column_association_resolver.resolve_time_dimension_spec(
+                metric_time_dimension_spec
             )
             output_time_dimension_instances.append(
                 TimeDimensionInstance(
                     defined_from=matching_time_dimension_instance.defined_from,
                     associated_columns=(
-                        self._column_association_resolver.resolve_time_dimension_spec(plot_time_dimension_spec),
+                        self._column_association_resolver.resolve_time_dimension_spec(metric_time_dimension_spec),
                     ),
-                    spec=plot_time_dimension_spec,
+                    spec=metric_time_dimension_spec,
                 )
             )
             output_column_to_input_column[
-                plot_time_dimension_column_association.column_name
+                metric_time_dimension_column_association.column_name
             ] = matching_time_dimension_instance.associated_column.column_name
         output_instance_set = InstanceSet(
             measure_instances=tuple(output_measure_instances),

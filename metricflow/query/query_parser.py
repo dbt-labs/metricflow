@@ -644,6 +644,8 @@ class MetricFlowQueryParser:
         for time_dimension_spec in time_dimension_specs:
             if (
                 time_dimension_spec not in valid_linkable_specs
+                # Because the metric time dimension is a virtual dimension that's not in the model, it won't be included
+                # in valid_linkable_specs.
                 and time_dimension_spec.reference != DataSet.metric_time_dimension_reference()
             ):
                 invalid_linkable_specs.append(time_dimension_spec)

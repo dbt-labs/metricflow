@@ -6,7 +6,12 @@ from metricflow.model.semantic_model import SemanticModel
 
 
 class SourceNodeBuilder:
-    """Helps build source nodes to use in the dataflow plan builder."""
+    """Helps build source nodes to use in the dataflow plan builder.
+
+    The current use case is for creating a set of input nodes from a data set to support multiple aggregation time
+    dimensions. Each data set is converted into k DataFlowPlan nodes, one per distinct aggregation time dimension used
+    in the definition of a measure.
+    """
 
     def __init__(self, semantic_model: SemanticModel) -> None:  # noqa: D
         self._semantic_model = semantic_model

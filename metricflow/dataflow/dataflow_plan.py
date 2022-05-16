@@ -284,7 +284,8 @@ class JoinOverTimeRangeNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT])
 
         Args:
             parent_node: node with standard output
-            metric_time_dimension_reference: plot time dimension reference
+            metric_time_dimension_reference: the name of the virtual time dimension used in queries to refer to the time
+            dimension that each measure should be aggregated by.
             window: time window to join over
             grain_to_date: indicates time range should start from the beginning of this time granularity (eg month to day)
             node_id: Override the node ID with this value
@@ -548,7 +549,7 @@ class MetricTimeDimensionTransformNode(Generic[SourceDataSetT], BaseOutput[Sourc
 
     @property
     def description(self) -> str:  # noqa: D
-        return f"Plot by Time Dimension '{self.aggregation_time_dimension_reference.element_name}'" ""
+        return f"Metric Time Dimension '{self.aggregation_time_dimension_reference.element_name}'" ""
 
     @property
     def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
