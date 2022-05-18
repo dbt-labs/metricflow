@@ -55,13 +55,12 @@ class ModelValidator:
         """
         self._rules = rules
 
-    @staticmethod
-    def validate_model(model: UserConfiguredModel) -> ModelBuildResult:
+    def validate_model(self, model: UserConfiguredModel) -> ModelBuildResult:
         """Validate a model according to configured rules."""
         model_copy = copy.deepcopy(model)
 
         issues: List[ValidationIssueType] = []
-        for validation_rule in ModelValidator.DEFAULT_RULES:
+        for validation_rule in self._rules:
             issues.extend(validation_rule.validate_model(model_copy))
             # If there are any fatal errors, stop the validation process.
             if any([x.level == ValidationIssueLevel.FATAL for x in issues]):
@@ -73,11 +72,10 @@ class ModelValidator:
 
         return ModelBuildResult(model=model_copy, issues=tuple(issues))
 
-    @staticmethod
-    def checked_validations(model: UserConfiguredModel) -> UserConfiguredModel:  # chTODO: remember checked_build
+    def checked_validations(self, model: UserConfiguredModel) -> UserConfiguredModel:  # chTODO: remember checked_build
         """Similar to validate(), but throws an exception if validation fails."""
         model_copy = copy.deepcopy(model)
-        build_result = ModelValidator.validate_model(model_copy)
+        build_result = self.validate_model(model_copy)
         if build_result.issues is not None:
             if any(
                 [
