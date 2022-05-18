@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 class ModelValidator:
     """A Validator that acts on UserConfiguredModel"""
 
-    VALIDATION_RULES: List[ModelValidationRule] = [
+    DEFAULT_RULES: List[ModelValidationRule] = [
         DataSourceMeasuresUniqueRule(),
         DataSourceTimeDimensionWarningsRule(),
         DimensionConsistencyRule(),
@@ -47,13 +47,21 @@ class ModelValidator:
         ValidMaterializationRule(),
     ]
 
+    def __init__(self, rules: List[ModelValidationRule] = DEFAULT_RULES) -> None:
+        """Constructor.
+
+        Args:
+            rules: List of validation rules to run. Defaults to DEFAULT_RULES
+        """
+        self._rules = rules
+
     @staticmethod
     def validate_model(model: UserConfiguredModel) -> ModelBuildResult:
         """Validate a model according to configured rules."""
         model_copy = copy.deepcopy(model)
 
         issues: List[ValidationIssueType] = []
-        for validation_rule in ModelValidator.VALIDATION_RULES:
+        for validation_rule in ModelValidator.DEFAULT_RULES:
             issues.extend(validation_rule.validate_model(model_copy))
             # If there are any fatal errors, stop the validation process.
             if any([x.level == ValidationIssueLevel.FATAL for x in issues]):
