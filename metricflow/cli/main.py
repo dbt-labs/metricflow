@@ -587,7 +587,7 @@ def validate_configs(cfg: CLIContext) -> None:
     user_model = cfg.user_configured_model
 
     # Model validation
-    build_result = ModelValidator.validate_model(user_model)
+    build_result = ModelValidator().validate_model(user_model)
 
     if build_result.issues is None:
         click.echo("✅ Validation completed! No issues were found.")

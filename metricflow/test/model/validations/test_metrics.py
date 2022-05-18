@@ -18,7 +18,7 @@ def test_metric_missing_measure() -> None:  # noqa:D
     with pytest.raises(ModelValidationException):
         measure_reference = MeasureReference(element_name="my_measure")
         measure2_reference = MeasureReference(element_name="nonexistent_measure")
-        ModelValidator.checked_validations(
+        ModelValidator().checked_validations(
             UserConfiguredModel(
                 data_sources=[
                     DataSource(
@@ -43,7 +43,7 @@ def test_metric_no_time_dim_dim_only_source() -> None:  # noqa:D
     dim_reference = DimensionReference(element_name="country")
     dim2_reference = DimensionReference(element_name="ename")
     measure_reference = MeasureReference(element_name="foo")
-    ModelValidator.checked_validations(
+    ModelValidator().checked_validations(
         UserConfiguredModel(
             data_sources=[
                 DataSource(
@@ -87,7 +87,7 @@ def test_metric_no_time_dim() -> None:  # noqa:D
     with pytest.raises(ModelValidationException):
         dim_reference = DimensionReference(element_name="country")
         measure_reference = MeasureReference(element_name="foo")
-        ModelValidator.checked_validations(
+        ModelValidator().checked_validations(
             UserConfiguredModel(
                 data_sources=[
                     DataSource(
@@ -120,7 +120,7 @@ def test_metric_multiple_primary_time_dims() -> None:  # noqa:D
         dim_reference = DimensionReference(element_name="date_created")
         dim2_reference = DimensionReference(element_name="date_deleted")
         measure_reference = MeasureReference(element_name="foo")
-        ModelValidator.checked_validations(
+        ModelValidator().checked_validations(
             UserConfiguredModel(
                 data_sources=[
                     DataSource(
@@ -185,7 +185,7 @@ def test_generated_metrics_only() -> None:  # noqa:D
     )
     data_source.measures[0].create_metric = True
 
-    ModelValidator.checked_validations(
+    ModelValidator().checked_validations(
         UserConfiguredModel(
             data_sources=[data_source],
             metrics=[],

@@ -16,7 +16,7 @@ def test_inconsistent_elements() -> None:  # noqa:D
     dim_reference = DimensionReference(element_name="ename")
     measure_reference = MeasureReference(element_name="ename")
     with pytest.raises(ModelValidationException):
-        ModelValidator.checked_validations(
+        ModelValidator().checked_validations(
             UserConfiguredModel(
                 data_sources=[
                     DataSource(

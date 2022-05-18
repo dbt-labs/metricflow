@@ -278,4 +278,4 @@ class MetricFlowClient:
         Returns:
             Tuple of validation issues with the model provided.
         """
-        return ModelValidator.validate_model(self.user_configured_model).issues
+        return ModelValidator().validate_model(self.user_configured_model).issues

@@ -16,7 +16,7 @@ def test_incompatible_dimension_type() -> None:  # noqa:D
     with pytest.raises(ModelValidationException, match=r"type conflict for dimension"):
         dim_reference = DimensionReference(element_name="dim")
         measure_reference = MeasureReference(element_name="measure")
-        ModelValidator.checked_validations(
+        ModelValidator().checked_validations(
             UserConfiguredModel(
                 data_sources=[
                     DataSource(
@@ -59,7 +59,7 @@ def test_multiple_primary_time_dimensions() -> None:  # noqa:D
         dimension_reference = DimensionReference(element_name=DEFAULT_DS)
         dimension_reference2 = DimensionReference(element_name="not_ds")
         measure_reference = MeasureReference(element_name="measure")
-        ModelValidator.checked_validations(
+        ModelValidator().checked_validations(
             UserConfiguredModel(
                 data_sources=[
                     DataSource(
@@ -110,7 +110,7 @@ def test_incompatible_dimension_is_partition() -> None:  # noqa:D
     with pytest.raises(ModelValidationException, match=r"conflicting is_partition attribute for dimension"):
         dim_ref1 = DimensionReference(element_name="dim1")
         measure_reference = MeasureReference(element_name="measure")
-        ModelValidator.checked_validations(
+        ModelValidator().checked_validations(
             UserConfiguredModel(
                 data_sources=[
                     DataSource(
