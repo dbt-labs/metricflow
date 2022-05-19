@@ -1,6 +1,6 @@
 import copy
 import logging
-from typing import List
+from typing import List, Sequence
 
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.parsing.dir_to_model import ModelBuildResult
@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 class ModelValidator:
     """A Validator that acts on UserConfiguredModel"""
 
-    DEFAULT_RULES: List[ModelValidationRule] = [
+    DEFAULT_RULES = (
         DataSourceMeasuresUniqueRule(),
         DataSourceTimeDimensionWarningsRule(),
         DimensionConsistencyRule(),
@@ -45,9 +45,9 @@ class ModelValidator:
         NonEmptyRule(),
         UniqueAndValidNameRule(),
         ValidMaterializationRule(),
-    ]
+    )
 
-    def __init__(self, rules: List[ModelValidationRule] = DEFAULT_RULES) -> None:
+    def __init__(self, rules: Sequence[ModelValidationRule] = DEFAULT_RULES) -> None:
         """Constructor.
 
         Args:
