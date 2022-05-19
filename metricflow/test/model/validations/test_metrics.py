@@ -64,7 +64,7 @@ def test_metric_no_time_dim_dim_only_source() -> None:  # noqa:D
                         Measure(
                             name=measure_name,
                             agg=AggregationType.SUM,
-                            agg_time_dimension=TimeDimensionReference(element_name=dim2_name),
+                            agg_time_dimension=dim2_name,
                         )
                     ],
                     dimensions=[
@@ -179,7 +179,7 @@ def test_generated_metrics_only() -> None:  # noqa:D
     data_source = data_source_with_guaranteed_meta(
         name="dim1",
         sql_query=f"SELECT {dim_reference.element_name}, {measure_name} FROM bar",
-        measures=[Measure(name=measure_name, agg=AggregationType.SUM, agg_time_dimension=dim2_reference)],
+        measures=[Measure(name=measure_name, agg=AggregationType.SUM, agg_time_dimension=dim2_reference.element_name)],
         dimensions=[
             Dimension(name=dim_reference.element_name, type=DimensionType.CATEGORICAL),
             Dimension(

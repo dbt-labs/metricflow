@@ -112,9 +112,9 @@ class ElementConsistencyRule(ModelValidationRule):
         Returns:
             A list of validation issues found with elements of data sources for the model
         """
-        measure_name_tuples = [(x.reference, ModelObjectType.MEASURE) for x in data_source.measures or []]
-        dimension_name_tuples = [(x.reference, ModelObjectType.DIMENSION) for x in data_source.dimensions or []]
-        identifier_name_tuples = [(x.reference, ModelObjectType.IDENTIFIER) for x in data_source.identifiers or []]
+        measure_name_tuples = [(x.name, ModelObjectType.MEASURE) for x in data_source.measures or []]
+        dimension_name_tuples = [(x.name, ModelObjectType.DIMENSION) for x in data_source.dimensions or []]
+        identifier_name_tuples = [(x.name, ModelObjectType.IDENTIFIER) for x in data_source.identifiers or []]
         issues = []
         for element_name, element_type in measure_name_tuples + dimension_name_tuples + identifier_name_tuples:
             issues += ElementConsistencyRule._check_element_type(

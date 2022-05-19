@@ -27,6 +27,7 @@ class CompositeSubIdentifier(HashableBaseModel, ParseableObject):
 
     @property
     def reference(self) -> CompositeSubIdentifierReference:  # noqa: D
+        assert self.name, f"The element name should have been set during model transformation. Got {self}"
         return CompositeSubIdentifierReference(element_name=self.name)
 
 

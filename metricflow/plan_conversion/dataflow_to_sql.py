@@ -1319,7 +1319,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         output_measure_instances = []
         for measure_instance in input_data_set.instance_set.measure_instances:
             measure = self._data_source_semantics.get_measure(measure_instance.spec.as_reference)
-            if measure.agg_time_dimension == node.aggregation_time_dimension_reference:
+            if measure.checked_agg_time_dimension == node.aggregation_time_dimension_reference:
                 output_measure_instances.append(measure_instance)
 
         if len(output_measure_instances) == 0:
