@@ -53,7 +53,7 @@ class Measure(HashableBaseModel, ParseableObject):
 
     # Defines the time dimension to aggregate this measure by. If not specified, it means to use the primary time
     # dimension in the data source.
-    agg_time_dimension: Optional[TimeDimensionReference] = None
+    agg_time_dimension: Optional[str] = None
 
     @property
     def checked_agg_time_dimension(self) -> TimeDimensionReference:
@@ -61,7 +61,7 @@ class Measure(HashableBaseModel, ParseableObject):
         assert (
             self.agg_time_dimension
         ), f"Aggregation time dimension for {self.name} should have been set during model transformation"
-        return self.agg_time_dimension
+        return TimeDimensionReference(element_name=self.agg_time_dimension)
 
     @property
     def reference(self) -> MeasureReference:  # noqa: D

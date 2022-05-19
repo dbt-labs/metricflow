@@ -8,7 +8,6 @@ from metricflow.model.objects.elements.measure import Measure, AggregationType
 from metricflow.model.objects.metric import Metric, MetricType, MetricTypeParams
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import ModelValidationException
-from metricflow.specs import TimeDimensionReference
 from metricflow.time.time_granularity import TimeGranularity
 
 
@@ -61,7 +60,7 @@ def test_metric_no_time_dim_dim_only_source() -> None:  # noqa:D
                         Measure(
                             name=measure_name,
                             agg=AggregationType.SUM,
-                            agg_time_dimension=TimeDimensionReference(element_name=dim2_name),
+                            agg_time_dimension=dim2_name,
                         )
                     ],
                     dimensions=[
@@ -179,7 +178,7 @@ def test_generated_metrics_only() -> None:  # noqa:D
             Measure(
                 name=measure_name,
                 agg=AggregationType.SUM,
-                agg_time_dimension=TimeDimensionReference(element_name=dim2_name),
+                agg_time_dimension=dim2_name,
             )
         ],
         dimensions=[

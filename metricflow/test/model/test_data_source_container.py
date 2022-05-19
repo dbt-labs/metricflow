@@ -6,7 +6,7 @@ from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantics.data_source_container import PydanticDataSourceContainer
 from metricflow.model.semantics.linkable_spec_resolver import LinkableElementProperties
 from metricflow.model.semantics.semantic_containers import DataSourceSemantics, MetricSemantics
-from metricflow.specs import DimensionReference, MetricSpec, MeasureReference
+from metricflow.specs import MetricSpec, MeasureReference
 
 logger = logging.getLogger(__name__)
 
@@ -100,11 +100,6 @@ def test_get_data_sources_for_measure(new_data_source_semantics: DataSourceSeman
     listings_sources = new_data_source_semantics.get_data_sources_for_measure(MeasureReference(element_name="listings"))
     assert len(listings_sources) == 1
     assert listings_sources[0].name == "listings_latest"
-
-
-def test_dimension_is_partitioned(new_data_source_semantics: DataSourceSemantics) -> None:  # noqa: D
-    assert new_data_source_semantics.dimension_is_partitioned(DimensionReference(element_name="ds_partitioned")) is True
-    assert new_data_source_semantics.dimension_is_partitioned(DimensionReference(element_name="ds")) is False
 
 
 def test_elements_for_metric(new_metric_semantics: MetricSemantics) -> None:  # noqa: D

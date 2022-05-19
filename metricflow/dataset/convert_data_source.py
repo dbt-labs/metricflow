@@ -188,7 +188,6 @@ class DataSourceToDataSetConverter:
             )
             measure_instance = MeasureInstance(
                 associated_columns=measure_spec.column_associations(self._column_association_resolver),
-                source_time_dimension_reference=measure_time_dimension_spec.reference,
                 spec=measure_spec,
                 defined_from=(
                     DataSourceElementReference(

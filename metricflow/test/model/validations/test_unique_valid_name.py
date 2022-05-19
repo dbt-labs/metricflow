@@ -136,21 +136,30 @@ def test_cross_element_names(simple_model__pre_transforms: UserConfiguredModel) 
     model.data_sources[usable_ds_index] = ds_measure_x_dimension
     with pytest.raises(
         ModelValidationException,
-        match=rf"can't use name `{measure_reference.element_name}` for a dimension when it was already used for a measure",
+        match=(
+            f"element `{measure_reference.element_name}` is of type ModelObjectType.MEASURE, but it was previously "
+            f"used earlier in the model as ModelObjectType.DIMENSION"
+        ),
     ):
         ModelValidator().checked_validations(model)
 
     model.data_sources[usable_ds_index] = ds_measure_x_identifier
     with pytest.raises(
         ModelValidationException,
-        match=rf"can't use name `{measure_reference.element_name}` for a identifier when it was already used for a measure",
+        match=(
+            f"element `{measure_reference.element_name}` is of type ModelObjectType.MEASURE, but it was previously "
+            f"used earlier in the model as ModelObjectType.IDENTIFIER"
+        ),
     ):
         ModelValidator().checked_validations(model)
 
     model.data_sources[usable_ds_index] = ds_dimension_x_identifier
     with pytest.raises(
         ModelValidationException,
-        match=rf"can't use name `{dimension_reference.element_name}` for a dimension when it was already used for a identifier",
+        match=(
+            f"element `{dimension_reference.element_name}` is of type ModelObjectType.DIMENSION, but it was previously "
+            f"used earlier in the model as ModelObjectType.IDENTIFIER"
+        ),
     ):
         ModelValidator().checked_validations(model)
 
