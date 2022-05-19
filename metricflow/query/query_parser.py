@@ -36,6 +36,7 @@ from metricflow.specs import (
     OutputColumnNameOverride,
     SpecWhereClauseConstraint,
     LinkableSpecSet,
+    TimeDimensionReference,
 )
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.time.time_granularity_solver import (
@@ -93,7 +94,7 @@ class MetricFlowQueryParser:
             if dimension.type == DimensionType.CATEGORICAL:
                 self._known_dimension_element_references.append(dimension_reference)
             elif dimension.type == DimensionType.TIME:
-                self._known_time_dimension_element_references.append(dimension_reference)
+                self._known_time_dimension_element_references.append(dimension_reference.time_dimension_reference)
             else:
                 raise RuntimeError(f"Unhandled linkable type: {dimension.type}")
 
@@ -569,7 +570,7 @@ class MetricFlowQueryParser:
                 LinklessIdentifierSpec.from_element_name(x) for x in structured_name.identifier_link_names
             )
             # Create the spec based on the type of element referenced.
-            if DimensionReference(element_name=element_name) in self._known_time_dimension_element_references:
+            if TimeDimensionReference(element_name=element_name) in self._known_time_dimension_element_references:
                 if structured_name.time_granularity:
                     time_dimension_specs.append(
                         TimeDimensionSpec(
@@ -694,7 +695,7 @@ class MetricFlowQueryParser:
                     )
                 )
             elif (
-                DimensionReference(element_name=parsed_name.element_name)
+                TimeDimensionReference(element_name=parsed_name.element_name)
                 in self._known_time_dimension_element_references
             ):
                 identifier_links = tuple(

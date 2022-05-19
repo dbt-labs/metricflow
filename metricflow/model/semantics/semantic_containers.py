@@ -180,6 +180,26 @@ class DataSourceSemantics:
             f"Could not find dimension with name ({dimension_reference.element_name}) in configured data sources"
         )
 
+    def get_time_dimension(self, time_dimension_reference: TimeDimensionReference) -> Dimension:
+        """Retrieves a full dimension object by name"""
+        dimension_reference = time_dimension_reference.dimension_reference()
+
+        logger.info(f"Dimension reference is {dimension_reference}")
+        for key in self._dimension_index.keys():
+            logger.error(f"Key is {key}")
+
+        if dimension_reference not in self._dimension_index:
+            raise ValueError(
+                f"Could not find dimension with name ({dimension_reference.element_name}) in configured data sources"
+            )
+
+        for dimension_source in self._dimension_index[dimension_reference]:
+            dimension = dimension_source.get_dimension(dimension_reference)
+            # TODO: Unclear if the deepcopy is necessary.
+            return deepcopy(dimension)
+
+        assert False, f"{time_dimension_reference} should have been in the dimension index"
+
     @property
     def measure_references(self) -> List[MeasureReference]:  # noqa: D
         return list(self._measure_index.keys())
@@ -198,9 +218,6 @@ class DataSourceSemantics:
     # DSC interface
     def get_data_sources_for_measure(self, measure_reference: MeasureReference) -> List[DataSource]:  # noqa: D
         return self._measure_index[measure_reference]
-
-    def dimension_is_partitioned(self, dimension_reference: DimensionReference) -> bool:  # noqa: D
-        return self.get_dimension(dimension_reference).is_partition
 
     def get_identifier_in_data_source(self, ref: DataSourceElementReference) -> Optional[Identifier]:  # Noqa: d
         data_source = self.get(ref.data_source_name)

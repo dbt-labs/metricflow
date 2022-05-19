@@ -33,6 +33,6 @@ class SetMeasureAggregationTimeDimensionRule(ModelTransformRule):
 
             for measure in data_source.measures:
                 if not measure.agg_time_dimension:
-                    measure.agg_time_dimension = primary_time_dimension_reference
+                    measure.agg_time_dimension = primary_time_dimension_reference.element_name
 
         return model

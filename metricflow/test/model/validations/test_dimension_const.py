@@ -124,7 +124,7 @@ def test_multiple_primary_time_dimensions() -> None:  # noqa:D
                             Measure(
                                 name=measure_reference.element_name,
                                 agg=AggregationType.SUM,
-                                agg_time_dimension=dimension_reference,
+                                agg_time_dimension=dimension_reference.element_name,
                             )
                         ],
                         dimensions=[
