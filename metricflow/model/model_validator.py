@@ -53,6 +53,11 @@ class ModelValidator:
         Args:
             rules: List of validation rules to run. Defaults to DEFAULT_RULES
         """
+
+        # Raises an error if 'rules' is an empty sequence or None
+        if not rules:
+            raise ValueError("ModelValidator 'rules' must be a sequence with at least one ModelValidationRule.")
+
         self._rules = rules
 
     def validate_model(self, model: UserConfiguredModel) -> ModelBuildResult:
