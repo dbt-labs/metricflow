@@ -10,7 +10,7 @@ from metricflow.test.test_utils import find_data_source_with
 def test_measures_only_exist_in_one_data_source(simple_model__pre_transforms: UserConfiguredModel) -> None:  # noqa: D
     model = copy.deepcopy(simple_model__pre_transforms)
 
-    build = ModelValidator.validate_model(model)
+    build = ModelValidator().validate_model(model)
     duplicate_measure_message = "Found measure with name .* in multiple data sources with names"
     found_issue = False
 
@@ -33,7 +33,7 @@ def test_measures_only_exist_in_one_data_source(simple_model__pre_transforms: Us
     measure = first_data_source.measures[0]
     second_data_source.measures = list(flatten_nested_sequence([second_data_source.measures, [measure]]))
 
-    build = ModelValidator.validate_model(model)
+    build = ModelValidator().validate_model(model)
 
     if build.issues is not None:
         for issue in build.issues:

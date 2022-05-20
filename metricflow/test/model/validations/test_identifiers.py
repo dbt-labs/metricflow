@@ -32,7 +32,7 @@ def test_data_source_cant_have_more_than_one_primary_identifier(
         identifier.type = IdentifierType.PRIMARY
         identifier_names.add(identifier.name)
 
-    build = ModelValidator.validate_model(model)
+    build = ModelValidator().validate_model(model)
 
     future_issue = (
         f"Data sources can have only one primary identifier. The data source"
@@ -56,7 +56,7 @@ def test_invalid_composite_identifiers() -> None:  # noqa:D
         measure2_reference = MeasureReference(element_name="metric_with_no_time_dim")
         identifier_reference = IdentifierReference(element_name="thorium")
         foreign_identifier_reference = IdentifierReference(element_name="composite_thorium")
-        ModelValidator.checked_validations(
+        ModelValidator().checked_validations(
             UserConfiguredModel(
                 data_sources=[
                     DataSource(
@@ -105,7 +105,7 @@ def test_composite_identifiers_nonexistent_ref() -> None:  # noqa:D
         measure2_reference = MeasureReference(element_name="metric_with_no_time_dim")
         identifier_reference = IdentifierReference(element_name="thorium")
         foreign_identifier_reference = IdentifierReference(element_name="composite_thorium")
-        ModelValidator.checked_validations(
+        ModelValidator().checked_validations(
             UserConfiguredModel(
                 data_sources=[
                     DataSource(
@@ -155,7 +155,7 @@ def test_composite_identifiers_ref_and_name() -> None:  # noqa:D
         identifier_reference = IdentifierReference(element_name="thorium")
         foreign_identifier_reference = IdentifierReference(element_name="composite_thorium")
         foreign_identifier2_reference = IdentifierReference(element_name="shouldnt_have_both")
-        ModelValidator.checked_validations(
+        ModelValidator().checked_validations(
             UserConfiguredModel(
                 data_sources=[
                     DataSource(
@@ -230,7 +230,7 @@ def test_mismatched_identifier(simple_model__pre_transforms: UserConfiguredModel
     )
     listings_latest.identifiers = flatten_nested_sequence([listings_latest.identifiers, [identifier_listings]])
 
-    build = ModelValidator.validate_model(model)
+    build = ModelValidator().validate_model(model)
 
     expected_error_message_fragment = "does not have consistent sub-identifiers"
     error_count = len([issue for issue in build.issues if re.search(expected_error_message_fragment, issue.message)])
