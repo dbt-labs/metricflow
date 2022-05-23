@@ -31,6 +31,7 @@ class Identifier(HashableBaseModel, Element, ParseableObject):
     """Describes a identifier"""
 
     name: IdentifierReference
+    description: Optional[str]
     type: IdentifierType
     role: Optional[str]
     entity: Optional[str]

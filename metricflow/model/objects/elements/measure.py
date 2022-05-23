@@ -48,6 +48,7 @@ class Measure(HashableBaseModel, ParseableObject):
     """Describes a measure"""
 
     agg: AggregationType
+    description: Optional[str]
     create_metric: Optional[bool]
     name: MeasureReference
     expr: Optional[str] = None
