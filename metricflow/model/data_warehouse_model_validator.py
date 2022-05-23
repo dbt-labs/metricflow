@@ -26,12 +26,12 @@ class DataWarehouseModelValidator:
         # TODO: Asyncio implementation
         for task in tasks:
             try:
-                self._sql_client.query(stmt=task.query_string)
+                self._sql_client.dry_run(stmt=task.query_string)
             except Exception as e:
                 issues.append(
                     ValidationError(
                         model_object_reference=task.object_ref,
-                        message=task.error_message + f"\nRecieved following error from data warehouse: {e}",
+                        message=task.error_message + f"\nRecieved following error from data warehouse:\n{e}",
                     )
                 )
         return issues
