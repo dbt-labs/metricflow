@@ -31,6 +31,7 @@ from metricflow.cli.utils import (
 from metricflow.configuration.config_builder import YamlTemplateBuilder
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest, MetricFlowExplainResult, MetricFlowQueryResult
+from metricflow.model.data_warehouse_model_validator import DataWarehouseModelValidator
 from metricflow.model.model_validator import ModelValidator
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
@@ -595,6 +596,21 @@ def validate_configs(cfg: CLIContext) -> None:
         for issue in build_result.issues:
             header = build_validation_header_msg(issue.level)
             click.echo(f"• {header}: {issue.message}")
+        return
+
+    dw_validator = DataWarehouseModelValidator(sql_client=cfg.sql_client)
+
+    spinner = Halo(text="Validating data source elements of model against data warehouse...", spinner="dots")
+    spinner.start()
+    issues = dw_validator.validate_data_sources(model=user_model)
+    if len(issues) == 0:
+        spinner.succeed("🎉 Finished validating data source elements of model against data warehouse, no issues found")
+    else:
+        spinner.fail("Issues found when validating data source elements of model against data warehouse")
+
+    for issue in issues:
+        header = build_validation_header_msg(issue.level)
+        click.echo(f"• {header}: {issue.as_readable_str()}")
 
 
 if __name__ == "__main__":
