@@ -4,6 +4,7 @@ from typing import List, Sequence
 
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.parsing.dir_to_model import ModelBuildResult
+from metricflow.model.validations.agg_time_dimension import AggregationTimeDimensionRule
 from metricflow.model.validations.data_sources import (
     DataSourceMeasuresUniqueRule,
     DataSourceTimeDimensionWarningsRule,
@@ -45,6 +46,7 @@ class ModelValidator:
         NonEmptyRule(),
         UniqueAndValidNameRule(),
         ValidMaterializationRule(),
+        AggregationTimeDimensionRule(),
     )
 
     def __init__(self, rules: Sequence[ModelValidationRule] = DEFAULT_RULES) -> None:
