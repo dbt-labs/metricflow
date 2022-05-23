@@ -74,12 +74,12 @@ integration_test:
   description: Query a metric and group by a partition dimension both in dundered and non dundered forms.
   model: SIMPLE_MODEL
   metrics: ["identity_verifications"]
-  group_bys: ["ds", "verification__ds"]
+  group_bys: ["metric_time", "verification__ds"]
   check_query: |
     SELECT
       SUM(1) AS identity_verifications
+      , ds AS metric_time
       , ds AS verification__ds
-      , ds
     FROM {{ source_schema }}.fct_id_verifications
     GROUP BY
       ds

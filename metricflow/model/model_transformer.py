@@ -22,7 +22,7 @@ class ModelTransformer:
 
     DEFAULT_PRE_VALIDATION_RULES: Sequence[ModelTransformRule] = (
         LowerCaseNamesRule(),
-        SetMeasureAggregationTimeDimensionRule()
+        SetMeasureAggregationTimeDimensionRule(),
     )
 
     DEFAULT_POST_VALIDATION_RULES: Sequence[ModelTransformRule] = (

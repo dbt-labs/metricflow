@@ -109,12 +109,15 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
 
         if len(primary_time_dimensions) > 1:
             for primary_time_dimension in primary_time_dimensions:
-                model_object_reference = ValidationIssue.make_object_reference(
-                    data_source_name=data_source.name, dimension_name=primary_time_dimension.name.element_name
-                )
                 issues.append(
                     ValidationError(
-                        model_object_reference=model_object_reference,
+                        context=DataSourceContext(
+                            file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
+                            line_number=data_source.metadata.file_slice.start_line_number
+                            if data_source.metadata
+                            else None,
+                            data_source_name=data_source.name,
+                        ),
                         message=f"In data source {data_source.name}, "
                         f"Primary time dimension with name: {primary_time_dimension.name} "
                         f"is one of many defined as primary.",
