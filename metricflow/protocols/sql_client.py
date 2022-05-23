@@ -87,6 +87,15 @@ class SqlClient(Protocol):
         raise NotImplementedError
 
     @abstractmethod
+    def dry_run(
+        self,
+        stmt: str,
+        sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
+    ) -> None:
+        """Base dry_run method"""
+        raise NotImplementedError
+
+    @abstractmethod
     def table_exists(self, sql_table: SqlTable) -> bool:
         """Determines whether or not the given table exists in the data warehouse"""
         raise NotImplementedError

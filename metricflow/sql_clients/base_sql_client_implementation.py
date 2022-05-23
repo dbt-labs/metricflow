@@ -106,6 +106,28 @@ class BaseSqlClientImplementation(ABC, SqlClient):
         logger.info(f"Finished running the query in {stop - start:.2f}s")
         return None
 
+    def dry_run(
+        self,
+        stmt: str,
+        sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
+    ) -> None:
+        """Dry run statement; checks that the 'stmt' is queryable. Returns None. Raises an exception if the 'stmt' isn't queryable.
+
+        :param stmt str:  - The SQL query statement to dry run.
+        :param sql_bind_parameters SqlQueryExecutionParameters: - The parameter replacement mapping for filling in
+        concrete values for SQL query parameters.
+        """
+        start = time.time()
+        logger.info(
+            f"Running dry_run of:"
+            f"\n\n{textwrap.indent(stmt, prefix=BaseSqlClientImplementation.INDENT)}\n"
+            + (f"\nwith parameters: {dict(sql_bind_parameters.param_dict)}" if sql_bind_parameters.param_dict else "")
+        )
+        results = self._engine_specific_dry_run_implementation(stmt, sql_bind_parameters)
+        stop = time.time()
+        logger.info(f"Finished running the dry_run in {stop - start:.2f}s")
+        return results
+
     @property
     @abstractmethod
     def sql_engine_attributes(self) -> SqlEngineAttributes:
@@ -123,6 +145,11 @@ class BaseSqlClientImplementation(ABC, SqlClient):
     @abstractmethod
     def _engine_specific_execute_implementation(self, stmt: str, bind_params: SqlBindParameters) -> None:
         """Sub-classes should implement this to execute a statement that doesn't return results."""
+        pass
+
+    @abstractmethod
+    def _engine_specific_dry_run_implementation(self, stmt: str, bind_params: SqlBindParameters) -> None:
+        """Sub-classes should implement this to check a query will run successfully without actually running the query"""
         pass
 
     @abstractmethod
