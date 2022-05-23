@@ -1,4 +1,6 @@
 import pytest
+
+from metricflow.dataset.dataset import DataSet
 from metricflow.model.model_validator import ModelValidator
 from metricflow.model.objects.materialization import Materialization
 from metricflow.model.validations.materializations import ValidMaterializationRule
@@ -13,7 +15,7 @@ def test_can_configure_model_validator_rules(simple_model__pre_transforms: UserC
             Materialization(
                 name="foobar",
                 metrics=["invalid_bookings"],
-                dimensions=["ds"],
+                dimensions=[DataSet.metric_time_dimension_name()],
             )
         ],
     )
