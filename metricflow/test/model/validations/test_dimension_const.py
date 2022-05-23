@@ -1,13 +1,13 @@
 import pytest
 
 from metricflow.model.model_validator import ModelValidator
-from metricflow.model.objects.data_source import Mutability, MutabilityType
+from metricflow.model.objects.data_source import Mutability, MutabilityType, DataSource
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from metricflow.model.objects.elements.measure import Measure, AggregationType
-from metricflow.model.objects.metric import MetricType, MetricTypeParams
+from metricflow.model.objects.metric import MetricType, MetricTypeParams, Metric
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import ModelValidationException
-from metricflow.specs import MeasureReference, DimensionReference
+from metricflow.specs import MeasureReference, DimensionReference, TimeDimensionReference
 from metricflow.test.model.validations.helpers import data_source_with_guaranteed_meta, metric_with_guaranteed_meta
 from metricflow.time.time_granularity import TimeGranularity
 
@@ -111,13 +111,20 @@ def test_multiple_primary_time_dimensions() -> None:  # noqa:D
         dimension_reference = DimensionReference(element_name="ds")
         dimension_reference2 = DimensionReference(element_name="not_ds")
         measure_reference = MeasureReference(element_name="measure")
-        ModelValidator.checked_validations(
-            UserConfiguredModel(
+        model_validator = ModelValidator()
+        model_validator.checked_validations(
+            model=UserConfiguredModel(
                 data_sources=[
                     DataSource(
                         name="dim1",
                         sql_query=f"SELECT ds, {measure_reference.element_name} FROM bar",
-                        measures=[Measure(name=measure_reference, agg=AggregationType.SUM)],
+                        measures=[
+                            Measure(
+                                name=measure_reference,
+                                agg=AggregationType.SUM,
+                                agg_time_dimension=TimeDimensionReference(element_name="ds"),
+                            )
+                        ],
                         dimensions=[
                             Dimension(
                                 name=dimension_reference,

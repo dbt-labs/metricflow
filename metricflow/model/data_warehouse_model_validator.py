@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from math import floor
 from time import perf_counter
 from typing import List, Optional
 
+from math import floor
+
+from metricflow.dataset.dataset import DataSet
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,
     DimensionContext,
@@ -166,13 +167,10 @@ class DataWarehouseTaskBuilder:
     @staticmethod
     def gen_metric_tasks(model: UserConfiguredModel, mf_engine: MetricFlowEngine) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the metrics of the model"""
-        primary_time_dim = SemanticModel(
-            user_configured_model=model
-        ).data_source_semantics.primary_time_dimension_reference
         tasks: List[DataWarehouseValidationTask] = []
         for metric in model.metrics:
             mf_query = MetricFlowQueryRequest.create_with_random_request_id(
-                metric_names=[metric.name], group_by_names=[primary_time_dim.element_name]
+                metric_names=[metric.name], group_by_names=[DataSet.metric_time_dimension_name()]
             )
             explain_result: MetricFlowExplainResult = mf_engine.explain(mf_request=mf_query)
             tasks.append(
