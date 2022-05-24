@@ -584,10 +584,13 @@ def _print_issues(issues: Sequence[ValidationIssue]) -> None:  # noqa: D
 
 
 @cli.command()
+@click.option(
+    "--dw-timeout", required=False, type=int, help="Optional timeout for data warehouse validation steps. Default None."
+)
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-def validate_configs(cfg: CLIContext) -> None:
+def validate_configs(cfg: CLIContext, dw_timeout: Optional[int] = None) -> None:
     """Perform validations against the defined model configurations."""
     cfg.verbose = True
 
@@ -618,7 +621,7 @@ def validate_configs(cfg: CLIContext) -> None:
 
     spinner = Halo(text="Validating data source elements of model against data warehouse...", spinner="dots")
     spinner.start()
-    dw_issues = dw_validator.validate_data_sources(model=user_model)
+    dw_issues = dw_validator.validate_data_sources(model=user_model, timeout=dw_timeout)
     dw_errors = [
         issue for issue in dw_issues if issue.level in (ValidationIssueLevel.ERROR, ValidationIssueLevel.FATAL)
     ]
