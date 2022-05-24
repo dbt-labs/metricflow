@@ -1,11 +1,13 @@
 from collections import OrderedDict
 from dataclasses import dataclass, field
-from typing import List, OrderedDict as ODType
+from time import perf_counter
+from typing import List, Optional, OrderedDict as ODType
 
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.validations.validator_helpers import ValidationError, ValidationIssue
+from metricflow.model.validations.validator_helpers import ValidationError, ValidationIssue, ValidationWarning
 from metricflow.protocols.sql_client import SqlClient
+
 
 @dataclass
 class DataWarehouseValidationTask:
@@ -72,11 +74,29 @@ class DataWarehouseModelValidator:
     def __init__(self, sql_client: SqlClient) -> None:  # noqa: D
         self._sql_client = sql_client
 
-    def run_tasks(self, tasks: List[DataWarehouseValidationTask]) -> List[ValidationIssue]:
-        """Runs the list of tasks as queries agains the data warehouse, returning any found issues"""
+    def run_tasks(
+        self, tasks: List[DataWarehouseValidationTask], timeout: Optional[int] = None
+    ) -> List[ValidationIssue]:
+        """Runs the list of tasks as queries agains the data warehouse, returning any found issues
+
+        :param tasks List[DataWarehouseValidationTask]: A list of tasks to run
+        :param timeout int: An optional timeout. Default is None. When the timeout is hit, function will return early.
+        """
+
+        # Used for keeping track if we go past the max time
+        start_time = perf_counter()
+
         issues: List[ValidationIssue] = []
         # TODO: Asyncio implementation
-        for task in tasks:
+        for index, task in enumerate(tasks):
+            if timeout is not None and perf_counter() - start_time > timeout:
+                issues.append(
+                    ValidationWarning(
+                        model_object_reference=OrderedDict(),
+                        message=f"Hit timeout before completing all tasks. Completed {index}/{len(tasks)} tasks.",
+                    )
+                )
+                break
             try:
                 self._sql_client.dry_run(stmt=task.query_string)
             except Exception as e:
@@ -88,7 +108,11 @@ class DataWarehouseModelValidator:
                 )
         return issues
 
-    def validate_data_sources(self, model: UserConfiguredModel) -> List[ValidationIssue]:
-        """Generates a list of tasks for validating the data sources of the model and then runs them"""
+    def validate_data_sources(self, model: UserConfiguredModel, timeout: Optional[int] = None) -> List[ValidationIssue]:
+        """Generates a list of tasks for validating the data sources of the model and then runs them
+
+        :param model UserConfiguredModel: Model which to run data warehouse validations on
+        :param timeout int: An optional timeout. Default is None. When the timeout is hit, function will return early.
+        """
         tasks = DataWarehouseTaskBuilder.gen_data_source_tasks(model=model)
-        return self.run_tasks(tasks=tasks)
+        return self.run_tasks(tasks=tasks, timeout=timeout)
