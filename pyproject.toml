@@ -37,6 +37,7 @@ click = "^7.1.2"
 "ruamel.yaml" = "^0.17.21"
 python-Levenshtein = "^0.12.2"
 rudder-sdk-python = "^1.0.3"
+yamllint = "^1.26.3"
 
 [tool.poetry.dev-dependencies]
 pytest-mock = "^3.7.0"
