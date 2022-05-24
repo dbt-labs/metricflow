@@ -600,6 +600,9 @@ def validate_configs(cfg: CLIContext, dw_timeout: Optional[int] = None, skip_dw:
     """Perform validations against the defined model configurations."""
     cfg.verbose = True
 
+    build_spinner = Halo(text="Building model from configs", spinner="dots")
+    build_spinner.start()
+
     # Structural validation, this will throw error if there's an issue.
     user_model = cfg.user_configured_model
 
@@ -612,7 +615,7 @@ def validate_configs(cfg: CLIContext, dw_timeout: Optional[int] = None, skip_dw:
         if issue.level in (ValidationIssueLevel.ERROR, ValidationIssueLevel.FATAL)
     ]
     if not build_errors:
-        click.echo("✅ Validation completed! No issues were found.")
+        build_spinner.succeed("🎉 Successfully build model from configs")
         build_warnings = [
             issue
             for issue in build_result.issues
@@ -620,20 +623,22 @@ def validate_configs(cfg: CLIContext, dw_timeout: Optional[int] = None, skip_dw:
         ]
         _print_issues(build_warnings)
     else:
+        build_spinner.fail("Errors found when building model from configs")
         _print_issues(build_result.issues)
         return
 
     if not skip_dw:
         dw_validator = DataWarehouseModelValidator(sql_client=cfg.sql_client)
 
-        spinner = Halo(text="Validating data source elements of model against data warehouse...", spinner="dots")
-        spinner.start()
+        dw_spinner = Halo(text="Validating data source elements of model against data warehouse...", spinner="dots")
+        dw_spinner.start()
+
         dw_issues = dw_validator.validate_data_sources(model=user_model, timeout=dw_timeout)
         dw_errors = [
             issue for issue in dw_issues if issue.level in (ValidationIssueLevel.ERROR, ValidationIssueLevel.FATAL)
         ]
         if not dw_errors:
-            spinner.succeed(
+            dw_spinner.succeed(
                 "🎉 Finished validating data source elements of model against data warehouse, no issues found"
             )
             dw_warnings = [
@@ -643,7 +648,7 @@ def validate_configs(cfg: CLIContext, dw_timeout: Optional[int] = None, skip_dw:
             ]
             _print_issues(dw_warnings)
         else:
-            spinner.fail("Issues found when validating data source elements of model against data warehouse")
+            dw_spinner.fail("Issues found when validating data source elements of model against data warehouse")
             _print_issues(dw_issues)
 
 
