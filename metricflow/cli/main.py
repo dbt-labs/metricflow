@@ -10,7 +10,7 @@ import time
 from halo import Halo
 from importlib.metadata import version as pkg_version
 from packaging.version import parse
-from typing import List, Optional
+from typing import List, Optional, Sequence
 from update_checker import UpdateChecker
 
 from metricflow.cli import PACKAGE_NAME
@@ -33,6 +33,7 @@ from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest, MetricFlowExplainResult, MetricFlowQueryResult
 from metricflow.model.data_warehouse_model_validator import DataWarehouseModelValidator
 from metricflow.model.model_validator import ModelValidator
+from metricflow.model.validations.validator_helpers import ValidationIssue, ValidationIssueLevel
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
 from metricflow.dag.dag_visualization import display_dag_as_svg
@@ -576,6 +577,12 @@ def drop_materialization(cfg: CLIContext, materialization_name: str) -> None:
         spinner.warn(f"Materialized table for `{materialization_name}` did not exist, no table was dropped")
 
 
+def _print_issues(issues: Sequence[ValidationIssue]) -> None:  # noqa: D
+    for issue in issues:
+        header = build_validation_header_msg(issue.level)
+        click.echo(f"• {header}: {issue.message}")
+
+
 @cli.command()
 @pass_config
 @exception_handler
@@ -590,27 +597,42 @@ def validate_configs(cfg: CLIContext) -> None:
     # Model validation
     build_result = ModelValidator().validate_model(user_model)
 
-    if not build_result.issues:
+    build_errors = [
+        issue
+        for issue in build_result.issues
+        if issue.level in (ValidationIssueLevel.ERROR, ValidationIssueLevel.FATAL)
+    ]
+    if not build_errors:
         click.echo("✅ Validation completed! No issues were found.")
+        build_warnings = [
+            issue
+            for issue in build_result.issues
+            if issue.level in (ValidationIssueLevel.FUTURE_ERROR, ValidationIssueLevel.WARNING)
+        ]
+        _print_issues(build_warnings)
     else:
-        for issue in build_result.issues:
-            header = build_validation_header_msg(issue.level)
-            click.echo(f"• {header}: {issue.message}")
+        _print_issues(build_result.issues)
         return
 
     dw_validator = DataWarehouseModelValidator(sql_client=cfg.sql_client)
 
     spinner = Halo(text="Validating data source elements of model against data warehouse...", spinner="dots")
     spinner.start()
-    issues = dw_validator.validate_data_sources(model=user_model)
-    if len(issues) == 0:
+    dw_issues = dw_validator.validate_data_sources(model=user_model)
+    dw_errors = [
+        issue for issue in dw_issues if issue.level in (ValidationIssueLevel.ERROR, ValidationIssueLevel.FATAL)
+    ]
+    if not dw_errors:
         spinner.succeed("🎉 Finished validating data source elements of model against data warehouse, no issues found")
+        dw_warnings = [
+            issue
+            for issue in dw_issues
+            if issue.level in (ValidationIssueLevel.FUTURE_ERROR, ValidationIssueLevel.WARNING)
+        ]
+        _print_issues(dw_warnings)
     else:
         spinner.fail("Issues found when validating data source elements of model against data warehouse")
-
-    for issue in issues:
-        header = build_validation_header_msg(issue.level)
-        click.echo(f"• {header}: {issue.as_readable_str()}")
+        _print_issues(dw_issues)
 
 
 if __name__ == "__main__":
