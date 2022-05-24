@@ -583,6 +583,12 @@ def _print_issues(issues: Sequence[ValidationIssue]) -> None:  # noqa: D
         click.echo(f"• {header}: {issue.message}")
 
 
+def _filter_issues(
+    issues: Sequence[ValidationIssue], inlcude_levels: List[ValidationIssueLevel]
+) -> List[ValidationIssue]:  # noqa: D
+    return [issue for issue in issues if issue.level in inlcude_levels]
+
+
 @cli.command()
 @click.option(
     "--dw-timeout", required=False, type=int, help="Optional timeout for data warehouse validation steps. Default None."
@@ -609,18 +615,12 @@ def validate_configs(cfg: CLIContext, dw_timeout: Optional[int] = None, skip_dw:
     # Model validation
     build_result = ModelValidator().validate_model(user_model)
 
-    build_errors = [
-        issue
-        for issue in build_result.issues
-        if issue.level in (ValidationIssueLevel.ERROR, ValidationIssueLevel.FATAL)
-    ]
+    build_errors = _filter_issues(build_result.issues, [ValidationIssueLevel.ERROR, ValidationIssueLevel.FATAL])
     if not build_errors:
         build_spinner.succeed("🎉 Successfully build model from configs")
-        build_warnings = [
-            issue
-            for issue in build_result.issues
-            if issue.level in (ValidationIssueLevel.FUTURE_ERROR, ValidationIssueLevel.WARNING)
-        ]
+        build_warnings = _filter_issues(
+            build_result.issues, [ValidationIssueLevel.FUTURE_ERROR, ValidationIssueLevel.WARNING]
+        )
         _print_issues(build_warnings)
     else:
         build_spinner.fail("Errors found when building model from configs")
@@ -634,18 +634,12 @@ def validate_configs(cfg: CLIContext, dw_timeout: Optional[int] = None, skip_dw:
         dw_spinner.start()
 
         dw_issues = dw_validator.validate_data_sources(model=user_model, timeout=dw_timeout)
-        dw_errors = [
-            issue for issue in dw_issues if issue.level in (ValidationIssueLevel.ERROR, ValidationIssueLevel.FATAL)
-        ]
+        dw_errors = _filter_issues(dw_issues, [ValidationIssueLevel.ERROR, ValidationIssueLevel.FATAL])
         if not dw_errors:
             dw_spinner.succeed(
                 "🎉 Finished validating data source elements of model against data warehouse, no issues found"
             )
-            dw_warnings = [
-                issue
-                for issue in dw_issues
-                if issue.level in (ValidationIssueLevel.FUTURE_ERROR, ValidationIssueLevel.WARNING)
-            ]
+            dw_warnings = _filter_issues(dw_issues, [ValidationIssueLevel.FUTURE_ERROR, ValidationIssueLevel.WARNING])
             _print_issues(dw_warnings)
         else:
             dw_spinner.fail("Issues found when validating data source elements of model against data warehouse")
