@@ -30,7 +30,22 @@ class DataWarehouseTaskBuilder:
         return DataWarehouseTaskBuilder.WRAPPED_COL_TEMPLATE.format(column=col, unique_id=id)
 
     @staticmethod
-    def _gen_query(data_source: DataSource, columns: List[str] = ["true"]) -> str:  # noqa: D
+    def _gen_query(data_source: DataSource, columns: List[str] = ["true"]) -> str:
+        """Generates a basic sql query to select parts of them model definition
+
+        Generates a basic sql query for verifying the model's definition with
+        the data warehouse. For example if a data source with an sql_table
+        value of 'table1' and no partition was passed in no columns list the
+        query generated would be "SELECT (true) as col1 FROM table1". If a the
+        data source had a partition, say on the dimension 'dim1' then the query
+        would be "SELECT (true) as col1 FROM table1 WHERE dim1 IS NOT NULL".
+        And if in addition columns ["dim2", "dim3"] were passed in then the
+        query would be "SELECT (dim2) as col1, (dim3) as col2 FROM table1 WHERE
+        dim1 IS NOT NULL".
+
+        :param data_source DataSource: The data source to gen the query for
+        :param columns List[str]: Column strings to select
+        """
         data_source_str = data_source.sql_table if data_source.sql_table else f"({data_source.sql_query})"
 
         wrapped_cols = [DataWarehouseTaskBuilder._wrap_col(col, index) for index, col in enumerate(columns)]
