@@ -4,7 +4,7 @@ from typing import List, Optional
 import yaml
 from yamllint import config, linter
 
-from metricflow.model.validations.validator_helpers import ValidationIssue, ValidationError
+from metricflow.model.validations.validator_helpers import ValidationIssue, ValidationIssueLevel
 
 WARNING = "warning"
 ERROR = "error"
@@ -49,8 +49,10 @@ class ConfigLinter:  # noqa: D
         issues: List[ValidationIssue] = []
         with open(file_path) as f:
             for problem in linter.run(f, self._config):
+                level = ValidationIssueLevel.ERROR if problem.level == ERROR else ValidationIssueLevel.WARNING
                 issues.append(
-                    ValidationError(
+                    ValidationIssue(
+                        level=level,
                         model_object_reference=OrderedDict(),
                         message=f"In file {file_name} on line {problem.line} found issue with yaml spec:\n{problem.desc}",
                     )
