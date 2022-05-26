@@ -192,11 +192,11 @@ def parse_config_yaml(
             object_cfg[PARSING_CONTEXT_KEY].filename = config_yaml.file_path
 
             if document_type == METRIC_TYPE:
-                results.append(parse(metric_class, object_cfg, yaml_contents_by_line))
+                results.append(parse(metric_class, object_cfg, config_yaml.file_path, yaml_contents_by_line))
             elif document_type == DATA_SOURCE_TYPE:
-                results.append(parse(data_source_class, object_cfg, yaml_contents_by_line))
+                results.append(parse(data_source_class, object_cfg, config_yaml.file_path, yaml_contents_by_line))
             elif document_type == MATERIALIZATION_TYPE:
-                results.append(parse(materialization_class, object_cfg, yaml_contents_by_line))
+                results.append(parse(materialization_class, object_cfg, config_yaml.file_path, yaml_contents_by_line))
             else:
                 errors.append(
                     str(
@@ -241,13 +241,13 @@ def parse_config_yaml(
 def parse(  # type: ignore[misc]
     _type: Type[Union[DataSource, Metric, Materialization]],
     yaml_dict: Dict[str, Any],
+    filepath: str,
     contents_by_line: List[str],
 ) -> Any:
     """Parses a model object from (jsonschema-validated) yaml into python object"""
 
     # Add Metadata
     ctx = yaml_dict.pop(PARSING_CONTEXT_KEY)
-    filepath = ctx.filename
     filename = os.path.split(filepath)[-1]
     yaml_dict["metadata"] = {
         "repo_file_path": filepath,
@@ -267,10 +267,10 @@ def parse(  # type: ignore[misc]
                 if isinstance(yaml_dict[field_name], list):
                     objects = []
                     for obj in yaml_dict[field_name]:
-                        objects.append(parse(field_value.type_, obj, contents_by_line))  # type: ignore
+                        objects.append(parse(field_value.type_, obj, filepath, contents_by_line))  # type: ignore
                     yaml_dict[field_name] = objects
                 else:
-                    yaml_dict[field_name] = parse(field_value.type_, yaml_dict[field_name], contents_by_line)  # type: ignore
+                    yaml_dict[field_name] = parse(field_value.type_, yaml_dict[field_name], filepath, contents_by_line)  # type: ignore
             elif issubclass(field_value.type_, ParseableField):
                 if isinstance(yaml_dict[field_name], list):
                     objects = []
