@@ -22,12 +22,25 @@ class DataWarehouseTaskBuilder:
     """Task builder for standard data warehouse validation tasks"""
 
     QUERY_TEMPLATE = "SELECT {columns_select} FROM {data_source}"
-    PARTITION_TEMPLATE = " WHERE {partition_col} IS NOT NULL"
+    WHERE_TEMPLATE = " WHERE {where_filters}"
+    PARTITION_COL_TEMPLATE = "{partition} IS NOT NULL"
     WRAPPED_COL_TEMPLATE = "({column}) AS col{unique_id}"
 
     @staticmethod
     def _wrap_col(col: str, id: int) -> str:  # noqa: D
         return DataWarehouseTaskBuilder.WRAPPED_COL_TEMPLATE.format(column=col, unique_id=id)
+
+    @staticmethod
+    def _where_clause_from_partitions(data_source: DataSource) -> str:
+        """Takes the partitions for a data source and genrates a WHERE clause based on their definintions"""
+        if not data_source.partitions:
+            return ""
+
+        where_stmts: List[str] = []
+        for partition in data_source.partitions:
+            element = f"({partition.expr})" if partition.expr else partition.name.element_name
+            where_stmts.append(DataWarehouseTaskBuilder.PARTITION_COL_TEMPLATE.format(partition=element))
+        return DataWarehouseTaskBuilder.WHERE_TEMPLATE.format(where_filters=" AND ".join(where_stmts))
 
     @staticmethod
     def _gen_query(data_source: DataSource, columns: List[str] = ["true"]) -> str:
@@ -54,18 +67,7 @@ class DataWarehouseTaskBuilder:
         query = DataWarehouseTaskBuilder.QUERY_TEMPLATE.format(
             data_source=data_source_str, columns_select=columns_select
         )
-
-        # If the data source has a partition, we need to include it in the
-        # query. This is because some data warehouses require the partition as
-        # part of the query for any table that has a partition defined
-        if data_source.partition:
-            partition_col = (
-                f"({data_source.partition.expr})"
-                if data_source.partition.expr
-                else data_source.partition.name.element_name
-            )
-            query += DataWarehouseTaskBuilder.PARTITION_TEMPLATE.format(partition_col=partition_col)
-
+        query += DataWarehouseTaskBuilder._where_clause_from_partitions(data_source=data_source)
         return query
 
     @staticmethod
