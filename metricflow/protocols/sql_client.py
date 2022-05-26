@@ -137,6 +137,11 @@ class SqlClient(Protocol):
         """Close the connections / engines used by this client."""
         raise NotImplementedError
 
+    @abstractmethod
+    def cancel_submitted_queries(self) -> None:  # noqa: D
+        """Cancel queries submitted through this client (that may be still running) with best-effort."""
+        raise NotImplementedError
+
 
 class SqlEngineAttributes(Protocol):
     """Base interface for SQL engine-specific attributes and features
@@ -160,6 +165,7 @@ class SqlEngineAttributes(Protocol):
     multi_threading_supported: ClassVar[bool]
     timestamp_type_supported: ClassVar[bool]
     timestamp_to_string_comparison_supported: ClassVar[bool]
+    cancel_submitted_queries_supported: ClassVar[bool]
 
     # SQL Dialect replacement strings
     double_data_type_name: ClassVar[str]

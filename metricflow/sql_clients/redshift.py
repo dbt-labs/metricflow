@@ -12,7 +12,7 @@ from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
 logger = logging.getLogger(__name__)
 
 
-class RedshiftEngineAttributes:
+class RedshiftEngineAttributes(SqlEngineAttributes):
     """Engine-specific attributes for the Redshift query engine
 
     This is an implementation of the SqlEngineAttributes protocol for Redshift
@@ -27,6 +27,8 @@ class RedshiftEngineAttributes:
     multi_threading_supported: ClassVar[bool] = True
     timestamp_type_supported: ClassVar[bool] = True
     timestamp_to_string_comparison_supported: ClassVar[bool] = True
+    # Cancelling should be possible, but not yet implemented.
+    cancel_submitted_queries_supported: ClassVar[bool] = False
 
     # SQL Dialect replacement strings
     double_data_type_name: ClassVar[str] = "DOUBLE PRECISION"
@@ -84,3 +86,6 @@ class RedshiftSqlClient(SqlAlchemySqlClient):
     def sql_engine_attributes(self) -> SqlEngineAttributes:
         """Collection of attributes and features specific to the Snowflake SQL engine"""
         return RedshiftEngineAttributes()
+
+    def cancel_submitted_queries(self) -> None:  # noqa: D
+        raise NotImplementedError

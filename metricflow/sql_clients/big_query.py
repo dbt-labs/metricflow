@@ -28,6 +28,8 @@ class BigQueryEngineAttributes:
     multi_threading_supported: ClassVar[bool] = True
     timestamp_type_supported: ClassVar[bool] = True
     timestamp_to_string_comparison_supported: ClassVar[bool] = False
+    # Cancelling should be possible, but not yet implemented.
+    cancel_submitted_queries_supported: ClassVar[bool] = False
 
     # SQL Dialect replacement strings
     double_data_type_name: ClassVar[str] = "FLOAT64"
@@ -107,3 +109,6 @@ class BigQuerySqlClient(SqlAlchemySqlClient):
             insp = sqlalchemy.inspection.inspect(conn)
             schema_dot_tables = insp.get_table_names(schema=schema_name)
             return [x.replace(schema_name + ".", "") for x in schema_dot_tables]
+
+    def cancel_submitted_queries(self) -> None:  # noqa: D
+        raise NotImplementedError
