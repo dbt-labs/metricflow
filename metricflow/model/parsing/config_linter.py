@@ -2,7 +2,7 @@ import os
 from collections import OrderedDict
 from typing import List, Optional
 import yaml
-from yamllint import config, linter
+from yamllint import config, linter, rules
 
 from metricflow.model.validations.validator_helpers import ValidationIssue, ValidationIssueLevel
 
@@ -17,27 +17,27 @@ class ConfigLinter:  # noqa: D
     DEFAULT_CONFIG = {
         "yaml-files": ["*.yaml", "*.yml"],
         "rules": {
-            "braces": DISABLE,
-            "brackets": DISABLE,
-            "colons": DISABLE,
-            "commas": DISABLE,
-            "comments": DISABLE,
-            "comments-indentation": {LEVEL: ERROR},
-            "document-start": {LEVEL: WARNING},
-            "document-end": DISABLE,
-            "empty-lines": DISABLE,
-            "empty-values": {LEVEL: ERROR},
-            "hyphens": DISABLE,
-            "indentation": {LEVEL: ERROR},
-            "key-duplicates": {LEVEL: ERROR},
-            "key-ordering": DISABLE,
-            "line-length": DISABLE,
-            "new-line-at-end-of-file": DISABLE,
-            "new-lines": DISABLE,
-            "octal-values": {LEVEL: WARNING},
-            "quoted-strings": DISABLE,
-            "trailing-spaces": {LEVEL: WARNING},
-            "truthy": DISABLE,
+            rules.braces.ID: DISABLE,
+            rules.brackets.ID: DISABLE,
+            rules.colons.ID: DISABLE,
+            rules.commas.ID: DISABLE,
+            rules.comments.ID: DISABLE,
+            rules.comments_indentation.ID: {LEVEL: ERROR},
+            rules.document_start.ID: {LEVEL: WARNING},
+            rules.document_end.ID: DISABLE,
+            rules.empty_lines.ID: DISABLE,
+            rules.empty_values.ID: {LEVEL: ERROR},
+            rules.hyphens.ID: DISABLE,
+            rules.indentation.ID: {LEVEL: ERROR},
+            rules.key_duplicates.ID: {LEVEL: ERROR},
+            rules.key_ordering.ID: DISABLE,
+            rules.line_length.ID: DISABLE,
+            rules.new_line_at_end_of_file.ID: DISABLE,
+            rules.new_lines.ID: DISABLE,
+            rules.octal_values.ID: {LEVEL: WARNING},
+            rules.quoted_strings.ID: DISABLE,
+            rules.trailing_spaces.ID: {LEVEL: WARNING},
+            rules.truthy.ID: DISABLE,
         },
     }
 
