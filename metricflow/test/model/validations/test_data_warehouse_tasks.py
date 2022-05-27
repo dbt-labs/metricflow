@@ -66,3 +66,37 @@ def test_task_runner(sql_client: SqlClient) -> None:  # noqa: D
     assert len(issues) == 1
     assert issues[0].level == ValidationIssueLevel.ERROR
     assert err_msg_bad in issues[0].message
+
+
+def test_validate_data_sources(sql_client: SqlClient) -> None:  # noqa: D
+    model = UserConfiguredModel(
+        data_sources=[
+            DataSource(
+                name="test_data_source",
+                sql_query="SELECT 'foo' as foo",
+                dimensions=[],
+                mutability=Mutability(type=MutabilityType.IMMUTABLE),
+            ),
+        ],
+        metrics=[],
+        materializations=[],
+    )
+
+    dw_validator = DataWarehouseModelValidator(sql_client=sql_client)
+
+    issues = dw_validator.validate_data_sources(model)
+    assert len(issues) == 0
+
+    model.data_sources.append(
+        DataSource(
+            name="test_data_source2",
+            sql_table="doesnt_exist",
+            dimensions=[],
+            mutability=Mutability(type=MutabilityType.IMMUTABLE),
+        )
+    )
+
+    issues = dw_validator.validate_data_sources(model)
+    assert len(issues) == 1
+    assert issues[0].level == ValidationIssueLevel.ERROR
+    assert "Unable to access data source `test_data_source2`" in issues[0].message
