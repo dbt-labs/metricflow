@@ -10,7 +10,7 @@ import time
 from halo import Halo
 from importlib.metadata import version as pkg_version
 from packaging.version import parse
-from typing import List, Optional
+from typing import List, Optional, Sequence
 from update_checker import UpdateChecker
 
 from metricflow.cli import PACKAGE_NAME
@@ -31,7 +31,9 @@ from metricflow.cli.utils import (
 from metricflow.configuration.config_builder import YamlTemplateBuilder
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest, MetricFlowExplainResult, MetricFlowQueryResult
+from metricflow.model.data_warehouse_model_validator import DataWarehouseModelValidator
 from metricflow.model.model_validator import ModelValidator
+from metricflow.model.validations.validator_helpers import ValidationIssue, ValidationIssueLevel
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
 from metricflow.dag.dag_visualization import display_dag_as_svg
@@ -575,13 +577,37 @@ def drop_materialization(cfg: CLIContext, materialization_name: str) -> None:
         spinner.warn(f"Materialized table for `{materialization_name}` did not exist, no table was dropped")
 
 
+def _print_issues(issues: Sequence[ValidationIssue]) -> None:  # noqa: D
+    for issue in issues:
+        header = build_validation_header_msg(issue.level)
+        click.echo(f"• {header}: {issue.message}")
+
+
+def _filter_issues(
+    issues: Sequence[ValidationIssue], inlcude_levels: List[ValidationIssueLevel]
+) -> List[ValidationIssue]:  # noqa: D
+    return [issue for issue in issues if issue.level in inlcude_levels]
+
+
 @cli.command()
+@click.option(
+    "--dw-timeout", required=False, type=int, help="Optional timeout for data warehouse validation steps. Default None."
+)
+@click.option(
+    "--skip-dw",
+    is_flag=True,
+    default=False,
+    help="If specified, skips the data warehouse validations",
+)
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-def validate_configs(cfg: CLIContext) -> None:
+def validate_configs(cfg: CLIContext, dw_timeout: Optional[int] = None, skip_dw: bool = False) -> None:
     """Perform validations against the defined model configurations."""
     cfg.verbose = True
+
+    build_spinner = Halo(text="Building model from configs", spinner="dots")
+    build_spinner.start()
 
     # Structural validation, this will throw error if there's an issue.
     user_model = cfg.user_configured_model
@@ -589,12 +615,35 @@ def validate_configs(cfg: CLIContext) -> None:
     # Model validation
     build_result = ModelValidator().validate_model(user_model)
 
-    if not build_result.issues:
-        click.echo("✅ Validation completed! No issues were found.")
+    build_errors = _filter_issues(build_result.issues, [ValidationIssueLevel.ERROR, ValidationIssueLevel.FATAL])
+    if not build_errors:
+        build_spinner.succeed("🎉 Successfully build model from configs")
+        build_warnings = _filter_issues(
+            build_result.issues, [ValidationIssueLevel.FUTURE_ERROR, ValidationIssueLevel.WARNING]
+        )
+        _print_issues(build_warnings)
     else:
-        for issue in build_result.issues:
-            header = build_validation_header_msg(issue.level)
-            click.echo(f"• {header}: {issue.message}")
+        build_spinner.fail("Errors found when building model from configs")
+        _print_issues(build_result.issues)
+        return
+
+    if not skip_dw:
+        dw_validator = DataWarehouseModelValidator(sql_client=cfg.sql_client)
+
+        dw_spinner = Halo(text="Validating data source elements of model against data warehouse...", spinner="dots")
+        dw_spinner.start()
+
+        dw_issues = dw_validator.validate_data_sources(model=user_model, timeout=dw_timeout)
+        dw_errors = _filter_issues(dw_issues, [ValidationIssueLevel.ERROR, ValidationIssueLevel.FATAL])
+        if not dw_errors:
+            dw_spinner.succeed(
+                "🎉 Finished validating data source elements of model against data warehouse, no issues found"
+            )
+            dw_warnings = _filter_issues(dw_issues, [ValidationIssueLevel.FUTURE_ERROR, ValidationIssueLevel.WARNING])
+            _print_issues(dw_warnings)
+        else:
+            dw_spinner.fail("Issues found when validating data source elements of model against data warehouse")
+            _print_issues(dw_issues)
 
 
 if __name__ == "__main__":

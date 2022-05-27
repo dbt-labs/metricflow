@@ -1,5 +1,6 @@
 from datetime import datetime
 from unittest.mock import patch, MagicMock
+from metricflow.cli.cli_context import CLIContext
 
 from metricflow.cli.main import (
     drop_materialization,
@@ -12,6 +13,7 @@ from metricflow.cli.main import (
     validate_configs,
     version,
 )
+from metricflow.model.data_warehouse_model_validator import DataWarehouseModelValidator
 from metricflow.model.model_validator import ModelValidator
 from metricflow.model.validations.validator_helpers import (
     ValidationError,
@@ -84,6 +86,35 @@ def test_validate_configs(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
         resp = cli_runner.run(validate_configs)
 
     assert "future_error" in resp.output
+    assert resp.exit_code == 0
+
+
+def test_validate_configs_data_warehouse_validations(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
+    mocked_build_result_no_issues = MagicMock(issues=())
+    dw_validation_issues = [
+        ValidationError(None, "Data Warehouse Error"),  # type: ignore
+    ]
+
+    with patch.object(ModelValidator, "validate_model", return_value=mocked_build_result_no_issues):
+        with patch.object(CLIContext, "sql_client", return_value=None):  # type: ignore
+            with patch.object(DataWarehouseModelValidator, "validate_data_sources", return_value=dw_validation_issues):
+                resp = cli_runner.run(validate_configs)
+
+    assert "Data Warehouse Error" in resp.output
+    assert resp.exit_code == 0
+
+
+def test_validate_configs_skip_data_warehouse_validations(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
+    mocked_build_result_no_issues = MagicMock(issues=())
+    dw_validation_issues = [
+        ValidationError(None, "Data Warehouse Error"),  # type: ignore
+    ]
+
+    with patch.object(ModelValidator, "validate_model", return_value=mocked_build_result_no_issues):
+        with patch.object(DataWarehouseModelValidator, "validate_data_sources", return_value=dw_validation_issues):
+            resp = cli_runner.run(validate_configs, args=["--skip-dw"])
+
+    assert "Data Warehouse Error" not in resp.output
     assert resp.exit_code == 0
 
 

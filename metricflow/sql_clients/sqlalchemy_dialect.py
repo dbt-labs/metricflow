@@ -96,6 +96,11 @@ class SqlAlchemySqlClient(BaseSqlClientImplementation, ABC):
         with self.engine_connection(self._engine) as conn:
             conn.execute(sqlalchemy.text(stmt), bind_params.param_dict)
 
+    def _engine_specific_dry_run_implementation(self, stmt: str, bind_params: SqlBindParameters) -> None:  # noqa: D
+        with self.engine_connection(self._engine) as conn:
+            s = "EXPLAIN " + stmt
+            conn.execute(sqlalchemy.text(s), bind_params.param_dict)
+
     def create_table_from_dataframe(  # noqa: D
         self, sql_table: SqlTable, df: pd.DataFrame, chunk_size: Optional[int] = None
     ) -> None:

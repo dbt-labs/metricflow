@@ -1,6 +1,8 @@
 from collections import OrderedDict
 from typing import Set, Union
 
+from sqlalchemy.exc import OperationalError
+
 import pandas as pd
 import pytest
 
@@ -113,3 +115,16 @@ def example_df() -> pd.DataFrame:
 
 def test_health_checks(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D
     sql_client.health_checks(schema_name=mf_test_session_state.mf_source_schema)
+
+
+def test_dry_run(sql_client: SqlClient) -> None:  # noqa: D
+    stmt = "SELECT 'foo' as foo"
+    # would raise an exception if something was bad
+    sql_client.dry_run(stmt)
+
+
+def test_dry_run_of_bad_query_raises_exception(sql_client: SqlClient) -> None:  # noqa: D
+    bad_stmt = "SELECT bad_col FROM doesnt_exit"
+    # Tests that a bad query raises an exception, also tests that EXPLAIN gets prepended to the stmt
+    with pytest.raises(OperationalError, match=rf"EXPLAIN {bad_stmt}"):
+        sql_client.dry_run(bad_stmt)

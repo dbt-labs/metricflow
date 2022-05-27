@@ -8,6 +8,7 @@ import sqlalchemy
 from metricflow.protocols.sql_client import SupportedSqlEngine, SqlEngineAttributes
 from metricflow.sql.render.big_query import BigQuerySqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
+from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.common_client import SqlDialect
 from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
 
@@ -56,11 +57,20 @@ class BigQuerySqlClient(SqlAlchemySqlClient):
         # Without pool_pre_ping, it's possible for timed-out connections to be returned to the client and cause errors.
         # However, this can cause increase latency for slow engines.
         self._password = password
+        self._project_id = project_id
         super().__init__(
             engine=BigQuerySqlClient._create_bq_engine(
                 query_string=query_string, project_id=project_id, password=password
             )
         )
+
+    def _engine_specific_dry_run_implementation(self, stmt: str, bind_params: SqlBindParameters) -> None:
+        """Overrides base `_engine_specific_dry_run_implementation` function for BigQuery specifics"""
+        _engine = self._create_bq_engine(
+            query_string="dry_run=true", project_id=self._project_id, password=self._password
+        )
+        with _engine.connect() as conn:
+            conn.execute(sqlalchemy.text(stmt), bind_params.param_dict)
 
     @staticmethod
     def _create_bq_engine(
