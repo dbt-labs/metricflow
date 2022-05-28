@@ -66,7 +66,7 @@ class FileSlice(HashableBaseModel):  # noqa: D
 class YamlConfigFile(HashableBaseModel):  # noqa: D
     filepath: str
     contents: str
-    url: str
+    url: Optional[str]
 
 
 class SourceContext(HashableBaseModel):  # noqa: D

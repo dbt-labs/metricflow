@@ -1,7 +1,6 @@
 import textwrap
 from typing import Dict, Optional
 
-from metricflow.model.parsing.yaml_file import YamlFile
 from metricflow.model.parsing.yaml_loader import ParsingContext
 
 
@@ -56,10 +55,10 @@ class ConstraintParseException(Exception):  # noqa: D
 
 class ParsingException(Exception):  # noqa: D
     def __init__(  # noqa: D
-        self, message: str, ctx: Optional[ParsingContext] = None, config_yaml: Optional[YamlFile] = None
+        self, message: str, ctx: Optional[ParsingContext] = None, config_filepath: Optional[str] = None
     ) -> None:
-        if config_yaml:
-            message = f"Failed to parse YAML file '{config_yaml.file_path}' - {message}"
+        if config_filepath:
+            message = f"Failed to parse YAML file '{config_filepath}' - {message}"
         if ctx:
             message = f"{message}\nContext: {str(ctx)}"
         super().__init__(message)

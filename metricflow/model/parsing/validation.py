@@ -4,7 +4,7 @@ import yaml
 from jsonschema import exceptions
 
 from metricflow.errors.errors import ParsingException
-from metricflow.model.parsing.yaml_file import YamlFile
+from metricflow.model.objects.common import YamlConfigFile
 from metricflow.model.parsing.schemas_internal import (
     metric_validator,
     data_source_validator,
@@ -20,7 +20,7 @@ DOCUMENT_TYPES = [METRIC_TYPE, DATA_SOURCE_TYPE, MATERIALIZATION_TYPE]
 logger = logging.getLogger(__name__)
 
 
-def validate_config_structure(config_yaml: YamlFile) -> None:  # noqa: D
+def validate_config_structure(config_yaml: YamlConfigFile) -> None:  # noqa: D
     """Validates config shape against jsonschema
 
     catches ValidationError and raise one exception at the end so
@@ -37,7 +37,7 @@ def validate_config_structure(config_yaml: YamlFile) -> None:  # noqa: D
                 str(
                     ParsingException(
                         f"Document is not a dict. Got `{type(config_document)}`: {config_document}",
-                        config_yaml=config_yaml,
+                        config_filepath=config_yaml.filepath,
                     )
                 )
             )
@@ -55,7 +55,7 @@ def validate_config_structure(config_yaml: YamlFile) -> None:  # noqa: D
                 else:
                     raise ParsingException(
                         f"Invalid document type '{document_type}'. Valid document types are: {DOCUMENT_TYPES}",
-                        config_yaml=config_yaml,
+                        config_filepath=config_yaml.filepath,
                     )
             except exceptions.ValidationError as e:
                 errors.append(f"{e}")

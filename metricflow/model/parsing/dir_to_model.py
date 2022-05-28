@@ -12,7 +12,7 @@ from yaml.scanner import ScannerError
 
 from metricflow.errors.errors import ParsingException
 from metricflow.model.model_transformer import ModelTransformer
-from metricflow.model.objects.common import Version
+from metricflow.model.objects.common import Version, YamlConfigFile
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.materialization import Materialization
 from metricflow.model.objects.metric import Metric
@@ -26,7 +26,6 @@ from metricflow.model.parsing.validation import (
     MATERIALIZATION_TYPE,
     DOCUMENT_TYPES,
 )
-from metricflow.model.parsing.yaml_file import YamlFile
 from metricflow.model.parsing.yaml_loader import ParsingContext, SafeLineLoader, PARSING_CONTEXT_KEY
 from metricflow.model.validations.validator_helpers import ValidationIssueType
 
@@ -61,7 +60,7 @@ def parse_directory_of_yaml_files_to_model(
             with open(file_path) as f:
                 contents = Template(f.read()).substitute(template_mapping)
                 yaml_config_files.append(
-                    YamlFile(file_path=file_path, contents=contents),
+                    YamlConfigFile(filepath=file_path, contents=contents),
                 )
     model = parse_yaml_files_to_model(yaml_config_files)
 
@@ -75,7 +74,7 @@ def parse_directory_of_yaml_files_to_model(
 
 
 def parse_yaml_files_to_model(
-    files: List[YamlFile],
+    files: List[YamlConfigFile],
     data_source_class: Type[DataSource] = DataSource,
     metric_class: Type[Metric] = Metric,
     materialization_class: Type[Materialization] = Materialization,
@@ -108,7 +107,7 @@ def parse_yaml_files_to_model(
             else:
                 raise ParsingException(
                     f"Unexpected model object {obj.__name__}. Expected {valid_object_classes}.",
-                    config_yaml=config_file,
+                    config_filepath=config_file.filepath,
                 )
 
     return UserConfiguredModel(
@@ -119,14 +118,14 @@ def parse_yaml_files_to_model(
 
 
 def parse_config_yaml(
-    config_yaml: YamlFile,
+    config_yaml: YamlConfigFile,
     data_source_class: Type[DataSource] = DataSource,
     metric_class: Type[Metric] = Metric,
     materialization_class: Type[Materialization] = Materialization,
 ) -> List[Union[DataSource, Metric, Materialization]]:
     """Parses transform config file passed as string - Returns list of model objects"""
     results: List[Union[DataSource, Metric, Materialization]] = []
-    filename: str = os.path.split(config_yaml.file_path)[-1]
+    filename: str = os.path.split(config_yaml.filepath)[-1]
     ctx: Optional[ParsingContext] = None
     errors = []
     try:
@@ -143,7 +142,7 @@ def parse_config_yaml(
                     str(
                         ParsingException(
                             f"YAML must be a dict. Got `{type(config_document)}`.",
-                            config_yaml=config_yaml,
+                            config_filepath=config_yaml.filepath,
                         )
                     )
                 )
@@ -166,7 +165,8 @@ def parse_config_yaml(
                     errors.append(
                         str(
                             ParsingException(
-                                f"Unsupported version {version} in config document.", config_yaml=config_yaml
+                                f"Unsupported version {version} in config document.",
+                                config_filepath=config_yaml.filepath,
                             )
                         )
                     )
@@ -177,7 +177,7 @@ def parse_config_yaml(
                         ParsingException(
                             f"Document should have one type of key, but has {keys}.",
                             ctx=ctx,
-                            config_yaml=config_yaml,
+                            config_filepath=config_yaml.filepath,
                         )
                     )
                 )
@@ -189,21 +189,21 @@ def parse_config_yaml(
             yaml_contents_by_line = config_yaml.contents.splitlines()
 
             # Add filepath to the object context
-            object_cfg[PARSING_CONTEXT_KEY].filename = config_yaml.file_path
+            object_cfg[PARSING_CONTEXT_KEY].filename = config_yaml.filepath
 
             if document_type == METRIC_TYPE:
-                results.append(parse(metric_class, object_cfg, config_yaml.file_path, yaml_contents_by_line))
+                results.append(parse(metric_class, object_cfg, config_yaml.filepath, yaml_contents_by_line))
             elif document_type == DATA_SOURCE_TYPE:
-                results.append(parse(data_source_class, object_cfg, config_yaml.file_path, yaml_contents_by_line))
+                results.append(parse(data_source_class, object_cfg, config_yaml.filepath, yaml_contents_by_line))
             elif document_type == MATERIALIZATION_TYPE:
-                results.append(parse(materialization_class, object_cfg, config_yaml.file_path, yaml_contents_by_line))
+                results.append(parse(materialization_class, object_cfg, config_yaml.filepath, yaml_contents_by_line))
             else:
                 errors.append(
                     str(
                         ParsingException(
                             message=f"Invalid document type: {document_type}. Expected {DOCUMENT_TYPES}.",
                             ctx=ctx,
-                            config_yaml=config_yaml,
+                            config_filepath=config_yaml.filepath,
                         )
                     )
                 )
@@ -218,13 +218,13 @@ def parse_config_yaml(
         raise ParsingException(
             message=f"YAML file did not conform to metric spec.\nError: {e}",
             ctx=ctx,
-            config_yaml=config_yaml,
+            config_filepath=config_yaml.filepath,
         ) from e
     except ScannerError as e:
         raise ParsingException(
             message=str(e),
             ctx=ctx,
-            config_yaml=config_yaml,
+            config_filepath=config_yaml.filepath,
         ) from e
     except ParsingException:
         raise
@@ -232,7 +232,7 @@ def parse_config_yaml(
         raise ParsingException(
             message=str(e),
             ctx=ctx,
-            config_yaml=config_yaml,
+            config_filepath=config_yaml.filepath,
         ) from e
 
     return results
