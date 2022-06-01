@@ -18,6 +18,7 @@ from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.specs import MeasureReference
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.plan_utils import assert_snapshot_text_equal, make_schema_replacement_function
 from metricflow.test.test_utils import as_datetime
 from metricflow.test.time.configurable_time_source import ConfigurableTimeSource
 
@@ -95,3 +96,71 @@ def test_validate_data_sources(  # noqa: D
     assert len(issues) == 1
     assert issues[0].level == ValidationIssueLevel.ERROR
     assert "Unable to access data source `test_data_source2`" in issues[0].message
+
+
+def test_build_metric_tasks(  # noqa: D
+    request: pytest.FixtureRequest,
+    data_warehouse_validation_model: UserConfiguredModel,
+    mf_engine: MetricFlowEngine,
+    mf_test_session_state: MetricFlowTestSessionState,
+) -> None:
+    tasks = DataWarehouseTaskBuilder.gen_metric_tasks(model=data_warehouse_validation_model, mf_engine=mf_engine)
+    assert len(tasks) == 1
+    assert_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        group_id="data_warehouse_validation_model",
+        snapshot_id="query0",
+        snapshot_text=tasks[0].query_string,
+        snapshot_file_extension=".sql",
+        incomparable_strings_replacement_function=make_schema_replacement_function(
+            system_schema=mf_test_session_state.mf_system_schema, source_schema=mf_test_session_state.mf_source_schema
+        ),
+    )
+
+
+def test_validate_metrics(  # noqa: D
+    data_warehouse_validation_model: UserConfiguredModel,
+    sql_client: SqlClient,
+    mf_engine: MetricFlowEngine,
+    time_spine_source: TimeSpineSource,
+    mf_test_session_state: MetricFlowTestSessionState,
+) -> None:
+    model = deepcopy(data_warehouse_validation_model)
+    dw_validator = DataWarehouseModelValidator(sql_client=sql_client, mf_engine=mf_engine)
+
+    issues = dw_validator.validate_metrics(model)
+    assert len(issues) == 0
+
+    # Update model to have a new measure which creates a new metric by proxy
+    new_measures = list(model.data_sources[0].measures)
+    new_measures.append(
+        Measure(
+            name=MeasureReference(element_name="count_cats"),
+            agg=AggregationType.SUM,
+            expr="is_cat",  # doesn't exist as column
+            create_metric=True,
+        )
+    )
+    model.data_sources[0].measures = new_measures
+    model.metrics = []
+    model = ModelTransformer.pre_validation_transform_model(model)
+    model = ModelTransformer.post_validation_transform_model(model)
+
+    # Get new metric flow engine which has the context of the updated model
+    semantic_model = SemanticModel(model)
+    new_engine = MetricFlowEngine(
+        semantic_model=semantic_model,
+        sql_client=sql_client,
+        column_association_resolver=DefaultColumnAssociationResolver(semantic_model=semantic_model),
+        time_source=ConfigurableTimeSource(as_datetime("2020-01-01")),
+        time_spine_source=time_spine_source,
+        system_schema=mf_test_session_state.mf_system_schema,
+    )
+
+    # Validate new metric created by proxy causes an issue (because the column used doesn't exist)
+    dw_validator = DataWarehouseModelValidator(sql_client=sql_client, mf_engine=new_engine)
+    issues = dw_validator.validate_metrics(model)
+    assert len(issues) == 1
+    assert issues[0].level == ValidationIssueLevel.ERROR
+    assert "Unable to query metric `count_cats`" in issues[0].message
