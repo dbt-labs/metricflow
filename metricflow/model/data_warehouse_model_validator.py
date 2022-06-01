@@ -2,6 +2,7 @@ from collections import OrderedDict
 from dataclasses import dataclass, field
 from time import perf_counter
 from typing import List, Optional, OrderedDict as ODType
+from metricflow.engine.metricflow_engine import MetricFlowEngine
 
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
@@ -94,8 +95,9 @@ class DataWarehouseModelValidator:
     them (assuming the model has passed these validations before use).
     """
 
-    def __init__(self, sql_client: SqlClient) -> None:  # noqa: D
+    def __init__(self, sql_client: SqlClient, mf_engine: MetricFlowEngine) -> None:  # noqa: D
         self._sql_client = sql_client
+        self._mf_engine = mf_engine
 
     def run_tasks(
         self, tasks: List[DataWarehouseValidationTask], timeout: Optional[int] = None

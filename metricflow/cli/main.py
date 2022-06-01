@@ -628,7 +628,7 @@ def validate_configs(cfg: CLIContext, dw_timeout: Optional[int] = None, skip_dw:
         return
 
     if not skip_dw:
-        dw_validator = DataWarehouseModelValidator(sql_client=cfg.sql_client)
+        dw_validator = DataWarehouseModelValidator(sql_client=cfg.sql_client, mf_engine=cfg.mf)
 
         dw_spinner = Halo(text="Validating data source elements of model against data warehouse...", spinner="dots")
         dw_spinner.start()
