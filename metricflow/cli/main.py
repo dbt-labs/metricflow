@@ -645,6 +645,19 @@ def validate_configs(cfg: CLIContext, dw_timeout: Optional[int] = None, skip_dw:
             dw_spinner.fail("Issues found when validating data source elements of model against data warehouse")
             _print_issues(dw_issues)
 
+        dw_spinner = Halo(text="Validating metric elements of model against data warehouse...", spinner="dots")
+        dw_spinner.start()
+
+        dw_issues = dw_validator.validate_metrics(model=user_model, timeout=dw_timeout)
+        dw_errors = _filter_issues(dw_issues, [ValidationIssueLevel.ERROR, ValidationIssueLevel.FATAL])
+        if not dw_errors:
+            dw_spinner.succeed("🎉 Finished validating metric elements of model against data warehouse, no issues found")
+            dw_warnings = _filter_issues(dw_issues, [ValidationIssueLevel.FUTURE_ERROR, ValidationIssueLevel.WARNING])
+            _print_issues(dw_warnings)
+        else:
+            dw_spinner.fail("Issues found when validating metric elements of model against data warehouse")
+            _print_issues(dw_issues)
+
 
 if __name__ == "__main__":
     cli()
