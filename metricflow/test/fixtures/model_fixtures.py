@@ -249,3 +249,15 @@ def extended_date_semantic_model(mf_test_session_state: MetricFlowTestSessionSta
     )
     assert model_build_result.model
     return SemanticModel(model_build_result.model)
+
+
+@pytest.fixture(scope="session")
+def data_warehouse_validation_model(template_mapping: Dict[str, str]) -> UserConfiguredModel:
+    """Model used for data warehouse validation tests"""
+
+    model_build_result = parse_directory_of_yaml_files_to_model(
+        os.path.join(os.path.dirname(__file__), "model_yamls/data_warehouse_validation_model"),
+        template_mapping=template_mapping,
+    )
+    assert model_build_result.model
+    return model_build_result.model
