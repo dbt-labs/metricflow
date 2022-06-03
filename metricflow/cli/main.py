@@ -34,9 +34,11 @@ from metricflow.cli.utils import (
 from metricflow.configuration.config_builder import YamlTemplateBuilder
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest, MetricFlowExplainResult, MetricFlowQueryResult
+from metricflow.engine.utils import path_to_models
 from metricflow.model.data_warehouse_model_validator import DataWarehouseModelValidator
 from metricflow.model.model_validator import ModelValidator
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from metricflow.model.parsing.config_linter import ConfigLinter
 from metricflow.model.validations.validator_helpers import ValidationIssue, ValidationIssueLevel
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
@@ -668,6 +670,19 @@ def _data_warehouse_validations_runner(
 def validate_configs(cfg: CLIContext, dw_timeout: Optional[int] = None, skip_dw: bool = False) -> None:
     """Perform validations against the defined model configurations."""
     cfg.verbose = True
+
+    lint_spinner = Halo(text="Checking for yaml lint struture issues", spinner="dots")
+    lint_spinner.start()
+
+    lint_issues = ConfigLinter().lint_dir(path_to_models(handler=cfg.config))
+    lint_errors = _filter_issues(lint_issues, [ValidationIssueLevel.ERROR, ValidationIssueLevel.FATAL])
+    if not lint_errors:
+        lint_spinner.succeed("🎉 Successfully linted config yaml files")
+        _print_issues(lint_issues)
+    else:
+        lint_spinner.fail("Breaking issues found in config yaml files")
+        _print_issues(lint_issues)
+        return
 
     build_spinner = Halo(text="Building model from configs", spinner="dots")
     build_spinner.start()
