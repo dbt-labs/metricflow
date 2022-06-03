@@ -11,6 +11,7 @@ from metricflow.model.data_warehouse_model_validator import (
 )
 from metricflow.model.model_transformer import ModelTransformer
 from metricflow.model.objects.data_source import DataSource, Mutability, MutabilityType
+from metricflow.model.objects.elements.dimension import Dimension, DimensionType
 from metricflow.model.objects.elements.measure import AggregationType, Measure
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
@@ -18,7 +19,7 @@ from metricflow.model.validations.validator_helpers import ValidationIssueLevel
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.specs import MeasureReference
+from metricflow.specs import DimensionReference, MeasureReference
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.plan_utils import assert_snapshot_text_equal, make_schema_replacement_function
 from metricflow.test.test_utils import as_datetime
@@ -104,6 +105,54 @@ def test_validate_data_sources(  # noqa: D
     assert len(issues) == 1
     assert issues[0].level == ValidationIssueLevel.ERROR
     assert "Unable to access data source `test_data_source2`" in issues[0].message
+
+
+def test_build_dimension_tasks(  # noqa: D
+    data_warehouse_validation_model: UserConfiguredModel, mf_test_session_state: MetricFlowTestSessionState
+) -> None:
+    tasks = DataWarehouseTaskBuilder.gen_dimension_tasks(model=data_warehouse_validation_model)
+    assert len(tasks) == 1  # on data source query with all dimensions
+    assert len(tasks[0].on_fail_subtasks) == 2  # a sub task for each dimension on the data source
+    assert (
+        f"SELECT (ds) AS col0, (is_dog) AS col1 FROM (SELECT * FROM {mf_test_session_state.mf_source_schema}.fct_animals) WHERE is_dog IS NOT NULL"
+        == tasks[0].query_string
+    )
+    assert (
+        f"SELECT (ds) AS col0 FROM (SELECT * FROM {mf_test_session_state.mf_source_schema}.fct_animals) WHERE is_dog IS NOT NULL"
+        == tasks[0].on_fail_subtasks[0].query_string
+    )
+    assert (
+        f"SELECT (is_dog) AS col0 FROM (SELECT * FROM {mf_test_session_state.mf_source_schema}.fct_animals) WHERE is_dog IS NOT NULL"
+        == tasks[0].on_fail_subtasks[1].query_string
+    )
+
+
+def test_validate_dimensions(  # noqa: D
+    data_warehouse_validation_model: UserConfiguredModel, sql_client: SqlClient, mf_engine: MetricFlowEngine
+) -> None:
+    model = deepcopy(data_warehouse_validation_model)
+
+    dw_validator = DataWarehouseModelValidator(sql_client=sql_client, mf_engine=mf_engine)
+
+    issues = dw_validator.validate_dimensions(model)
+    assert len(issues) == 0
+
+    dimensions = list(model.data_sources[0].dimensions)
+    dimensions.append(Dimension(name=DimensionReference(element_name="doesnt_exist"), type=DimensionType.CATEGORICAL))
+    model.data_sources[0].dimensions = dimensions
+
+    issues = dw_validator.validate_dimensions(model)
+    # One isssue is created for the short circuit query failure, and another is
+    # created for the sub task checking the specific dimension
+    assert len(issues) == 2
+    assert (
+        f"Failed to query dimensions in data warehouse for data source `{model.data_sources[0].name}`"
+        in issues[0].message
+    )
+    assert (
+        f"Unable to query `doesnt_exist` in data warehouse for dimension `doesnt_exist` on data source `{model.data_sources[0].name}`"
+        in issues[1].message
+    )
 
 
 def test_build_metric_tasks(  # noqa: D
