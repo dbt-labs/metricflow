@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 from dataclasses import dataclass, field
+from math import floor
 from time import perf_counter
 from typing import List, Optional, OrderedDict as ODType
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
@@ -20,6 +23,7 @@ class DataWarehouseValidationTask:
     error_message: str
     object_ref: ODType = field(default_factory=lambda: OrderedDict())
     query_params: SqlBindParameters = field(default_factory=lambda: SqlBindParameters())
+    on_fail_subtasks: List[DataWarehouseValidationTask] = field(default_factory=lambda: [])
 
 
 class DataWarehouseTaskBuilder:
@@ -156,6 +160,10 @@ class DataWarehouseModelValidator:
                         message=task.error_message + f"\nRecieved following error from data warehouse:\n{e}",
                     )
                 )
+                if task.on_fail_subtasks:
+                    sub_task_timeout = floor(timeout - (perf_counter() - start_time)) if timeout else None
+                    issues += self.run_tasks(tasks=task.on_fail_subtasks, timeout=sub_task_timeout)
+
         return issues
 
     def validate_data_sources(self, model: UserConfiguredModel, timeout: Optional[int] = None) -> List[ValidationIssue]:
