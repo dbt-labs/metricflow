@@ -93,6 +93,51 @@ class DataWarehouseTaskBuilder:
         return tasks
 
     @staticmethod
+    def gen_dimension_tasks(model: UserConfiguredModel) -> List[DataWarehouseValidationTask]:
+        """Generates a list of tasks for validating the dimensions of the model
+
+        The high level tasks returned are "short cut" queries which try to
+        query all the dimensions for a given data source. If that query fails,
+        one or more of the dimensions is incorrectly specified. Thus if the
+        query fails, there are subtasks which query the individual dimensions
+        on the data source to identify which have issues.
+        """
+
+        tasks: List[DataWarehouseValidationTask] = []
+        for data_source in model.data_sources:
+            # generate the subtasks
+            data_source_tasks: List[DataWarehouseValidationTask] = []
+            data_source_columns: List[str] = []
+            for dimension in data_source.dimensions:
+                dim_to_query = dimension.expr if dimension.expr is not None else dimension.name.element_name
+                data_source_columns.append(dim_to_query)
+
+                data_source_tasks.append(
+                    DataWarehouseValidationTask(
+                        query_string=DataWarehouseTaskBuilder._gen_query(
+                            data_source=data_source, columns=[dim_to_query]
+                        ),
+                        object_ref=ValidationIssue.make_object_reference(
+                            data_source_name=data_source.name, dimension_name=dimension.name.element_name
+                        ),
+                        error_message=f"Unable to query `{dim_to_query}` in data warehouse for dimension `{dimension.name.element_name}` on data source `{data_source.name}`.",
+                    )
+                )
+
+            # generate the shortcut tasks with sub tasks
+            tasks.append(
+                DataWarehouseValidationTask(
+                    query_string=DataWarehouseTaskBuilder._gen_query(
+                        data_source=data_source, columns=data_source_columns
+                    ),
+                    object_ref=ValidationIssue.make_object_reference(data_source_name=data_source.name),
+                    error_message=f"Failed to query dimensions in data warehouse for data source `{data_source.name}`",
+                    on_fail_subtasks=data_source_tasks,
+                )
+            )
+        return tasks
+
+    @staticmethod
     def gen_metric_tasks(model: UserConfiguredModel, mf_engine: MetricFlowEngine) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the metrics of the model"""
         primary_time_dim = SemanticModel(
@@ -173,6 +218,19 @@ class DataWarehouseModelValidator:
         :param timeout int: An optional timeout. Default is None. When the timeout is hit, function will return early.
         """
         tasks = DataWarehouseTaskBuilder.gen_data_source_tasks(model=model)
+        return self.run_tasks(tasks=tasks, timeout=timeout)
+
+    def validate_dimensions(self, model: UserConfiguredModel, timeout: Optional[int] = None) -> List[ValidationIssue]:
+        """Generates a list of tasks for validating the dimensions of the model and then runs them
+
+        Args:
+            model: Model which to run data warehouse validations on
+            timeout: An optional timeout. Default is None. When the timeout is hit, function will return early.
+
+        Returns:
+            A list of validation issues. If there are no validation issues, an empty list is returned.
+        """
+        tasks = DataWarehouseTaskBuilder.gen_dimension_tasks(model=model)
         return self.run_tasks(tasks=tasks, timeout=timeout)
 
     def validate_metrics(self, model: UserConfiguredModel, timeout: Optional[int] = None) -> List[ValidationIssue]:
