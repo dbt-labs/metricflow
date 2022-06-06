@@ -1,8 +1,6 @@
 from collections import OrderedDict
 from typing import Set, Union
 
-from sqlalchemy.exc import OperationalError
-
 import pandas as pd
 import pytest
 
@@ -117,14 +115,19 @@ def test_health_checks(mf_test_session_state: MetricFlowTestSessionState, sql_cl
     sql_client.health_checks(schema_name=mf_test_session_state.mf_source_schema)
 
 
-def test_dry_run(sql_client: SqlClient) -> None:  # noqa: D
-    stmt = "SELECT 'foo' as foo"
-    # would raise an exception if something was bad
+def test_dry_run(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D
+    test_table = SqlTable(schema_name=mf_test_session_state.mf_source_schema, table_name=_random_table())
+
+    stmt = f"CREATE TABLE {test_table.sql} AS SELECT 1 AS foo"
     sql_client.dry_run(stmt)
+    assert not sql_client.table_exists(
+        test_table
+    ), f"Table {test_table.sql} should not exist if the CREATE TABLE was a dry run."
 
 
 def test_dry_run_of_bad_query_raises_exception(sql_client: SqlClient) -> None:  # noqa: D
-    bad_stmt = "SELECT bad_col FROM doesnt_exit"
-    # Tests that a bad query raises an exception, also tests that EXPLAIN gets prepended to the stmt
-    with pytest.raises(OperationalError, match=rf"EXPLAIN {bad_stmt}"):
+    bad_stmt = "SELECT bad_col"
+    # Tests that a bad query raises an exception. Different engines may raise different exceptions e.g.
+    # ProgrammingError, OperationalError, google.api_core.exceptions.BadRequest, etc.
+    with pytest.raises(Exception, match=r"bad_col"):
         sql_client.dry_run(bad_stmt)
