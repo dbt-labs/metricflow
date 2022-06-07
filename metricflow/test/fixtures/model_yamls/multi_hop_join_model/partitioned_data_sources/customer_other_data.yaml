@@ -8,12 +8,6 @@ data_source:
   sql_table: $customer_other_data
 
   dimensions:
-    - name: ds_partitioned
-      type: time
-      type_params:
-        is_primary: false
-        time_granularity: day
-      is_partition: true
     - name: country
       type: categorical
 
