@@ -1,3 +1,6 @@
+import logging
+import signal
+
 import click
 import datetime as dt
 import jinja2
@@ -38,6 +41,8 @@ from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
 from metricflow.dag.dag_visualization import display_dag_as_svg
 
+logger = logging.getLogger(__name__)
+
 pass_config = click.make_pass_decorator(CLIContext, ensure=True)
 _telemetry_reporter = TelemetryReporter(report_levels_higher_or_equal_to=TelemetryLevel.USAGE)
 _telemetry_reporter.add_python_log_handler()
@@ -62,8 +67,30 @@ def cli(cfg: CLIContext, verbose: bool) -> None:  # noqa: D
         )
 
         click.echo(
-            f"💡 Please update to version {result.available_version}, released {result.release_date} by running:\n\t$ pip install --upgrade {PACKAGE_NAME}",
+            f"💡 Please update to version {result.available_version}, released {result.release_date} by running:\n"
+            f"\t$ pip install --upgrade {PACKAGE_NAME}",
         )
+
+    # Cancel queries submitted to the DW if the user precess CTRL + c / process is terminated.
+    # Note: docs unclear on the type for the 'frame' argument.
+    def exit_signal_handler(signal_type: int, frame) -> None:  # type: ignore
+        if signal_type == signal.SIGINT:
+            click.echo("Got SIGINT")
+        elif signal_type == signal.SIGTERM:
+            click.echo("Got SIGTERM")
+        else:
+            # Shouldn't happen since this should ony be registered for SIGINT / SIGTERM.
+            click.echo(f"Got signal {signal_type}")
+
+        if (
+            signal_type in (signal.SIGINT, signal.SIGTERM)
+            and cfg.sql_client.sql_engine_attributes.cancel_submitted_queries_supported
+        ):
+            logger.info("Cancelling submitted queries")
+            cfg.sql_client.cancel_submitted_queries()
+
+    signal.signal(signal.SIGINT, exit_signal_handler)
+    signal.signal(signal.SIGTERM, exit_signal_handler)
 
 
 @cli.command()

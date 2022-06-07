@@ -1,16 +1,21 @@
+import logging
+import threading
 from collections import OrderedDict
 from typing import Set, Union
 
 import pandas as pd
 import pytest
+from sqlalchemy.exc import ProgrammingError
 
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.object_utils import random_id
-from metricflow.protocols.sql_client import SqlClient
+from metricflow.object_utils import random_id, assert_values_exhausted
+from metricflow.protocols.sql_client import SqlClient, SupportedSqlEngine
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.sql_utils import make_df
 from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+
+logger = logging.getLogger(__name__)
 
 
 def _random_table() -> str:
@@ -131,3 +136,58 @@ def test_dry_run_of_bad_query_raises_exception(sql_client: SqlClient) -> None:  
     # ProgrammingError, OperationalError, google.api_core.exceptions.BadRequest, etc.
     with pytest.raises(Exception, match=r"bad_col"):
         sql_client.dry_run(bad_stmt)
+
+
+def _issue_sleep_query(sql_client: SqlClient, sleep_time: int) -> None:
+    """Issue a query that sleeps for a given number of seconds"""
+    engine_type = sql_client.sql_engine_attributes.sql_engine_type
+    if engine_type == SupportedSqlEngine.SNOWFLAKE:
+        sql_client.execute(f"CALL system$wait({sleep_time}, 'SECONDS')")
+    elif engine_type in (
+        SupportedSqlEngine.SQLITE,
+        SupportedSqlEngine.BIGQUERY,
+        SupportedSqlEngine.REDSHIFT,
+    ):
+        raise RuntimeError(f"Sleep yet not supported with {engine_type}")
+
+    assert_values_exhausted(engine_type)
+
+
+def _supports_sleep_query(sql_client: SqlClient) -> bool:
+    """Returns true if the given SQL client is supported by _issue_sleep_query()"""
+    engine_type = sql_client.sql_engine_attributes.sql_engine_type
+    if engine_type == SupportedSqlEngine.SNOWFLAKE:
+        return True
+    elif engine_type in (
+        SupportedSqlEngine.SQLITE,
+        SupportedSqlEngine.BIGQUERY,
+        SupportedSqlEngine.REDSHIFT,
+    ):
+        return False
+
+    assert_values_exhausted(engine_type)
+
+
+def test_cancel_submitted_queries(  # noqa: D
+    mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient
+) -> None:
+    if not sql_client.sql_engine_attributes.cancel_submitted_queries_supported:
+        pytest.skip(
+            f"Cancelling queries not yet supported with {sql_client.sql_engine_attributes.sql_engine_type.name}"
+        )
+
+    if not _supports_sleep_query(sql_client):
+        pytest.skip(f"Sleep queries not yet supported with {sql_client.sql_engine_attributes.sql_engine_type.name}")
+
+    # Submit a 5s sleep query, but then cancel it after 0.5s.
+    def cancel_submitted_queries() -> None:
+        try:
+            sql_client.cancel_submitted_queries()
+        except Exception:
+            logger.exception("Got an exception while trying to cancel submitted queries.")
+
+    timer_task = threading.Timer(0.5, cancel_submitted_queries)
+    timer_task.start()
+    with pytest.raises(ProgrammingError):
+        if sql_client.sql_engine_attributes.sql_engine_type == SupportedSqlEngine.SNOWFLAKE:
+            _issue_sleep_query(sql_client, 5)

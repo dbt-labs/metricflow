@@ -13,7 +13,7 @@ from metricflow.sql_clients.common_client import SqlDialect
 from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
 
 
-class SQLiteEngineAttributes:
+class SQLiteEngineAttributes(SqlEngineAttributes):
     """Engine-specific attributes for the SQLite query engine
 
     This is an implementation of the SqlEngineAttributes protocol for SQLite
@@ -28,6 +28,8 @@ class SQLiteEngineAttributes:
     multi_threading_supported: ClassVar[bool] = False
     timestamp_type_supported: ClassVar[bool] = False
     timestamp_to_string_comparison_supported: ClassVar[bool] = False
+    sleep_supported: ClassVar[bool] = False
+    cancel_submitted_queries_supported: ClassVar[bool] = False
 
     # SQL Dialect replacement strings
     double_data_type_name: ClassVar[str] = "DOUBLE"
@@ -105,3 +107,6 @@ class SqliteSqlClient(SqlAlchemySqlClient):
 
     def drop_schema(self, schema_name: str, cascade: bool = True) -> None:  # noqa: D
         logger.info(f"Not dropping schema '{schema_name}' since this SQLite DB is ephemeral")
+
+    def cancel_submitted_queries(self) -> None:  # noqa: D
+        raise NotImplementedError

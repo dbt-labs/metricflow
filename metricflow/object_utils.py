@@ -150,7 +150,7 @@ def random_id() -> str:
     return "".join(random.choices(filtered_alphabet, k=8))
 
 
-def assert_values_exhausted(value: NoReturn) -> NoReturn:
+def assert_values_exhausted(value: Enum) -> NoReturn:
     """Helper method to allow MyPy to guarantee an exhaustive switch through an enumeration or literal
 
     See https://mypy.readthedocs.io/en/stable/literal_types.html#exhaustiveness-checks

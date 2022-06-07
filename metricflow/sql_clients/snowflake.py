@@ -4,7 +4,7 @@ import logging
 import threading
 import urllib.parse
 from contextlib import contextmanager
-from typing import ClassVar, Optional, Dict, Iterator, List, Tuple, Any
+from typing import ClassVar, Optional, Dict, Iterator, List, Tuple, Any, Set
 
 import pandas as pd
 import sqlalchemy
@@ -18,7 +18,7 @@ from metricflow.sql_clients.common_client import SqlDialect, not_empty
 from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
 
 
-class SnowflakeEngineAttributes:
+class SnowflakeEngineAttributes(SqlEngineAttributes):
     """Engine-specific attributes for the Snowflake query engine
 
     This is an implementation of the SqlEngineAttributes protocol for Snowflake
@@ -33,6 +33,7 @@ class SnowflakeEngineAttributes:
     multi_threading_supported: ClassVar[bool] = True
     timestamp_type_supported: ClassVar[bool] = True
     timestamp_to_string_comparison_supported: ClassVar[bool] = True
+    cancel_submitted_queries_supported: ClassVar[bool] = True
 
     # SQL Dialect replacement strings
     double_data_type_name: ClassVar[str] = "DOUBLE"
@@ -129,6 +130,8 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
             query=url_query_params,
         )
         self._engine_lock = threading.Lock()
+        self._known_sessions_ids_lock = threading.Lock()
+        self._known_session_ids: Set[int] = set()
         super().__init__(
             engine=self._create_engine(login_timeout=login_timeout, client_session_keep_alive=client_session_keep_alive)
         )
@@ -160,13 +163,21 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
         options construct, which the DBClient could read in at initialization and use here (for example).
         At this time we hard-code the ISO standard.
         """
-        conn = engine.connect()
-        try:
+
+        with super().engine_connection(self._engine) as conn:
             # WEEK_START 1 means Monday.
             conn.execute("ALTER SESSION SET WEEK_START = 1;")
+            results = conn.execute("SELECT CURRENT_SESSION()")
+            sessions = []
+            for row in results:
+                sessions.append(row[0])
+            assert len(sessions) == 1
+            session = sessions[0]
+            with self._known_sessions_ids_lock:
+                self._known_session_ids.add(session)
             yield conn
-        finally:
-            conn.close()
+            with self._known_sessions_ids_lock:
+                self._known_session_ids.remove(session)
 
     def _query(  # noqa: D
         self,
@@ -221,3 +232,10 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
         """Snowflake will hang pytest if this is not done."""
         with self._engine_lock:
             self._engine.dispose()
+
+    def cancel_submitted_queries(self) -> None:  # noqa: D
+        with super().engine_connection(self._engine) as conn:
+            with self._known_sessions_ids_lock:
+                for session_id in self._known_session_ids:
+                    logger.info(f"Cancelling queries associated with session id: {session_id}")
+                    conn.execute(f"SELECT SYSTEM$cancel_all_queries({session_id})")
