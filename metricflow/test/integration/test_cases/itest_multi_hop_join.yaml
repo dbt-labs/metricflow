@@ -118,24 +118,3 @@ integration_test:
       AND ct.ds_partitioned = bt.ds_partitioned
     GROUP BY
       ct.customer_name
-# metricflow doesn't currently support > 2-hop joins
-#---
-#integration_test:
-#  name: multihop_join_3_hops
-#  description: Tests a query with multihop and single hop join dimensions
-#  model: UNPARTITIONED_MULTI_HOP_JOIN_MODEL
-#  metrics: ["txn_count"]
-#  group_bys: ["account_id__customer_id__customer_third_hop_id__value"]
-#  check_query: |
-#    SELECT
-#        tht.value as account_id__customer_id__customer_third_hop_id__value
-#        , SUM(am.txn_count) as txn_count
-#    FROM {{ source_schema }}.bridge_table bt
-#    JOIN {{ source_schema }}.customer_other_data cot
-#      ON cot.customer_id = bt.customer_id
-#    JOIN {{ source_schema }}.third_hop_table tht
-#      ON cot.customer_third_hop_id = tht.customer_third_hop_id
-#    JOIN {{ source_schema }}.account_month_txns am
-#      ON bt.account_id = am.account_id
-#    GROUP BY
-#      tht.value
