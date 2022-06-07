@@ -53,15 +53,23 @@ def parse_directory_of_yaml_files_to_model(
     yaml_config_files = []
 
     for root, dirs, files in os.walk(directory):
+        # Skip hidden directories. os.walk() supports mutation of dirs to skip directories.
+        dirs[:] = [d for d in dirs if not d.startswith(".")]
+
         for file in files:
             if not (file.endswith(".yaml") or file.endswith(".yml")):
                 continue
+            # Skip hidden files
+            if file.startswith("."):
+                continue
+
             file_path = os.path.join(root, file)
             with open(file_path) as f:
                 contents = Template(f.read()).substitute(template_mapping)
                 yaml_config_files.append(
                     YamlConfigFile(filepath=file_path, contents=contents),
                 )
+
     model = parse_yaml_files_to_model(yaml_config_files)
 
     if apply_pre_transformations:
