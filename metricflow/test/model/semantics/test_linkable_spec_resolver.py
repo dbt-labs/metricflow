@@ -181,6 +181,11 @@ def test_multi_hop_property(multi_hop_join_semantic_model: SemanticModel) -> Non
             "account_id__customer_id__customer_atomic_weight",
             "account_id__customer_id__customer_name",
             "account_id__customer_id__customer_third_hop_id",
+            "account_id__customer_id__ds_partitioned",
+            "account_id__customer_id__ds_partitioned__month",
+            "account_id__customer_id__ds_partitioned__quarter",
+            "account_id__customer_id__ds_partitioned__week",
+            "account_id__customer_id__ds_partitioned__year",
         ],
     )
 
