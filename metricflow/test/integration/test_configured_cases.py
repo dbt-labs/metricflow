@@ -112,9 +112,10 @@ class CheckQueryHelpers:
         return self._sql_client.sql_engine_attributes.double_data_type_name
 
 
-def filter_not_supported_features(  # noqa: D
+def filter_not_supported_features(
     sql_client: SqlClient, required_features: Tuple[RequiredDwEngineFeatures, ...]
 ) -> Sequence[RequiredDwEngineFeatures]:
+    """Given a list of required features, return a list of features not supported by the given SQLClient."""
     not_supported_features: List[RequiredDwEngineFeatures] = []
     for required_feature in required_features:
         if required_feature is RequiredDwEngineFeatures.DATE_TRUNC:
@@ -155,8 +156,7 @@ def test_case(
 
     missing_required_features = filter_not_supported_features(sql_client, case.required_features)
     if missing_required_features:
-        logger.info(f"Skipping test '{name}' since the DW does not support {missing_required_features}")
-        return
+        pytest.skip(f"DW does not support {missing_required_features}")
 
     semantic_model: Optional[SemanticModel] = None
     if case.model is IntegrationTestModel.SIMPLE_MODEL:
