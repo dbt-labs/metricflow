@@ -23,7 +23,7 @@ class ConfigLinter:  # noqa: D
             rules.commas.ID: DISABLE,
             rules.comments.ID: DISABLE,
             rules.comments_indentation.ID: {LEVEL: ERROR},
-            rules.document_start.ID: {LEVEL: WARNING},
+            rules.document_start.ID: DISABLE,  # TODO: Turn on as warning once warnings are less noisy in cli
             rules.document_end.ID: DISABLE,
             rules.empty_lines.ID: DISABLE,
             rules.empty_values.ID: {LEVEL: ERROR},
@@ -34,9 +34,9 @@ class ConfigLinter:  # noqa: D
             rules.line_length.ID: DISABLE,
             rules.new_line_at_end_of_file.ID: DISABLE,
             rules.new_lines.ID: DISABLE,
-            rules.octal_values.ID: {LEVEL: WARNING},
+            rules.octal_values.ID: DISABLE,  # TODO: Turn on as warning once warnings are less noisy in cli
             rules.quoted_strings.ID: DISABLE,
-            rules.trailing_spaces.ID: {LEVEL: WARNING},
+            rules.trailing_spaces.ID: DISABLE,  # TODO: Turn on as warning once warnings are less noisy in cli
             rules.truthy.ID: DISABLE,
         },
     }
