@@ -1,6 +1,5 @@
 import datetime
 import logging
-import os
 from typing import List, Optional, Tuple, Sequence
 
 import jinja2
@@ -27,9 +26,9 @@ from metricflow.time.time_granularity import TimeGranularity
 from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.integration.configured_test_case import (
-    ConfiguredIntegrationTestCaseRepository,
     IntegrationTestModel,
     RequiredDwEngineFeatures,
+    CONFIGURED_INTEGRATION_TESTS_REPOSITORY,
 )
 from metricflow.test.test_utils import as_datetime
 from metricflow.test.time.configurable_time_source import (
@@ -37,10 +36,6 @@ from metricflow.test.time.configurable_time_source import (
 )
 
 logger = logging.getLogger(__name__)
-
-_integration_test_case_repository = ConfiguredIntegrationTestCaseRepository(
-    os.path.join(os.path.dirname(__file__), "test_cases"),
-)
 
 
 class CheckQueryHelpers:
@@ -131,7 +126,7 @@ def filter_not_supported_features(
 
 @pytest.mark.parametrize(
     "name",
-    _integration_test_case_repository.get_all_test_case_names(),
+    CONFIGURED_INTEGRATION_TESTS_REPOSITORY.all_test_case_names,
     ids=lambda name: f"name={name}",
 )
 def test_case(
@@ -151,7 +146,7 @@ def test_case(
     time_spine_source: TimeSpineSource,
 ) -> None:
     """Runs all integration tests configured in the test case YAML directory."""
-    case = _integration_test_case_repository.get_test_case(name)
+    case = CONFIGURED_INTEGRATION_TESTS_REPOSITORY.get_test_case(name)
     logger.info(f"Running integration test case: '{case.name}' from file '{case.file_path}'")
 
     missing_required_features = filter_not_supported_features(sql_client, case.required_features)
