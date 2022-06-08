@@ -1,10 +1,8 @@
+import pathlib
+from typing import Any, List, Optional, Set
+
 import dateutil.parser
 import pandas as pd
-import pathlib
-
-from sqlalchemy.engine import make_url
-from typing import List, Any, Optional, Set
-
 from metricflow.configuration.constants import (
     CONFIG_DWH_CREDS_PATH,
     CONFIG_DWH_DB,
@@ -19,10 +17,12 @@ from metricflow.configuration.constants import (
 from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.protocols.sql_client import SqlClient, SupportedSqlEngine
 from metricflow.sql_clients.big_query import BigQuerySqlClient
-from metricflow.sql_clients.common_client import not_empty, SqlDialect
+from metricflow.sql_clients.common_client import SqlDialect, not_empty
+from metricflow.sql_clients.postgres import PostgresSqlClient
 from metricflow.sql_clients.redshift import RedshiftSqlClient
 from metricflow.sql_clients.snowflake import SnowflakeSqlClient
 from metricflow.sql_clients.sqlite import SqliteSqlClient
+from sqlalchemy.engine import make_url
 
 
 def make_df(  # type: ignore [misc]
@@ -67,6 +67,8 @@ def make_sql_client(url: str, password: str) -> SqlClient:  # noqa: D
         return SnowflakeSqlClient.from_connection_details(url, password)
     elif dialect == SqlDialect.BIGQUERY:
         return BigQuerySqlClient.from_connection_details(url, password)
+    elif dialect == SqlDialect.POSTGRESQL:
+        return PostgresSqlClient.from_connection_details(url, password)
     elif dialect == SqlDialect.SQLITE:
         return SqliteSqlClient.from_connection_details(url, password)
     else:

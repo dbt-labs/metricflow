@@ -1,7 +1,4 @@
-from metricflow.sql.render.expr_renderer import (
-    DefaultSqlExpressionRenderer,
-    SqlExpressionRenderer,
-)
+from metricflow.sql.render.expr_renderer import DefaultSqlExpressionRenderer, SqlExpressionRenderer
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 
 
