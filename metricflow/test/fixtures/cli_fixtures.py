@@ -12,6 +12,11 @@ from metricflow.cli.cli_context import CLIContext
 from metricflow.engine.models import Dimension, Materialization, Metric
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest, MetricFlowQueryResult
+from metricflow.model.objects.data_source import DataSource, Mutability, MutabilityType
+from metricflow.model.objects.elements.dimension import Dimension as DimensionObj, DimensionType, DimensionTypeParams
+from metricflow.model.objects.metric import Metric as MetricObj
+from metricflow.specs import DimensionReference
+from metricflow.time.time_granularity import TimeGranularity
 
 
 class MockMetricFlowEngine:
@@ -70,7 +75,31 @@ class MockSemanticModel:
 class MockUserConfiguredModel:
     """Mock UserConfiguredModel class as only integration is needed to be tested."""
 
-    pass
+    @property
+    def data_sources(self) -> List[DataSource]:  # noqa: D
+        return [
+            DataSource(
+                name="animals",
+                sql_query="SELECT true as foo, '2022-06-01' as ds",
+                measures=[],
+                dimensions=[
+                    DimensionObj(
+                        name=DimensionReference(element_name="ds"),
+                        type=DimensionType.TIME,
+                        type_params=DimensionTypeParams(
+                            is_primary=True,
+                            time_granularity=TimeGranularity.DAY,
+                        ),
+                    ),
+                    DimensionObj(name=DimensionReference(element_name="foo"), type=DimensionType.CATEGORICAL),
+                ],
+                mutability=Mutability(type=MutabilityType.IMMUTABLE),
+            )
+        ]
+
+    @property
+    def metrics(self) -> List[MetricObj]:  # noqa: D
+        return []
 
 
 class MetricFlowCliRunner(CliRunner):

@@ -13,7 +13,7 @@ import time
 from halo import Halo
 from importlib.metadata import version as pkg_version
 from packaging.version import parse
-from typing import List, Optional, Sequence
+from typing import Callable, List, Optional, Sequence
 from update_checker import UpdateChecker
 
 from metricflow.cli import PACKAGE_NAME
@@ -36,6 +36,7 @@ from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest, MetricFlowExplainResult, MetricFlowQueryResult
 from metricflow.model.data_warehouse_model_validator import DataWarehouseModelValidator
 from metricflow.model.model_validator import ModelValidator
+from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import ValidationIssue, ValidationIssueLevel
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
@@ -616,6 +617,41 @@ def _filter_issues(
     return [issue for issue in issues if issue.level in inlcude_levels]
 
 
+def _run_dw_validations(
+    validation_func: Callable[..., List[ValidationIssue]],
+    validation_type: str,
+    model: UserConfiguredModel,
+    timeout: Optional[int],
+) -> List[ValidationIssue]:
+    """Helper handles the calling of data warehouse issue generating functions"""
+
+    spinner = Halo(text=f"Validating {validation_type} against data warehouse...", spinner="dots")
+    spinner.start()
+
+    issues = validation_func(model, timeout)
+    if issues is not None and len(issues) == 0:
+        spinner.succeed(f"🎉 Finished validating {validation_type} against data warehouse, no errors found")
+    else:
+        spinner.fail(f"Issues found when validating {validation_type} against data warehouse")
+    return issues
+
+
+def _data_warehouse_validations_runner(
+    dw_validator: DataWarehouseModelValidator, model: UserConfiguredModel, timeout: Optional[int]
+) -> None:
+    """Helper which calls the individual data warehouse validations to run and prints collected issues"""
+
+    issues: List[ValidationIssue] = []
+    issues += _run_dw_validations(
+        dw_validator.validate_data_sources, model=model, validation_type="data sources", timeout=timeout
+    )
+    issues += _run_dw_validations(
+        dw_validator.validate_metrics, model=model, validation_type="metrics", timeout=timeout
+    )
+
+    _print_issues(issues)
+
+
 @cli.command()
 @click.option(
     "--dw-timeout", required=False, type=int, help="Optional timeout for data warehouse validation steps. Default None."
@@ -655,22 +691,8 @@ def validate_configs(cfg: CLIContext, dw_timeout: Optional[int] = None, skip_dw:
         return
 
     if not skip_dw:
-        dw_validator = DataWarehouseModelValidator(sql_client=cfg.sql_client)
-
-        dw_spinner = Halo(text="Validating data source elements of model against data warehouse...", spinner="dots")
-        dw_spinner.start()
-
-        dw_issues = dw_validator.validate_data_sources(model=user_model, timeout=dw_timeout)
-        dw_errors = _filter_issues(dw_issues, [ValidationIssueLevel.ERROR, ValidationIssueLevel.FATAL])
-        if not dw_errors:
-            dw_spinner.succeed(
-                "🎉 Finished validating data source elements of model against data warehouse, no issues found"
-            )
-            dw_warnings = _filter_issues(dw_issues, [ValidationIssueLevel.FUTURE_ERROR, ValidationIssueLevel.WARNING])
-            _print_issues(dw_warnings)
-        else:
-            dw_spinner.fail("Issues found when validating data source elements of model against data warehouse")
-            _print_issues(dw_issues)
+        dw_validator = DataWarehouseModelValidator(sql_client=cfg.sql_client, mf_engine=cfg.mf)
+        _data_warehouse_validations_runner(dw_validator=dw_validator, model=user_model, timeout=dw_timeout)
 
 
 if __name__ == "__main__":

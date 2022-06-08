@@ -2,11 +2,14 @@ from collections import OrderedDict
 from dataclasses import dataclass, field
 from time import perf_counter
 from typing import List, Optional, OrderedDict as ODType
+from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
 
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.validations.validator_helpers import ValidationError, ValidationIssue, ValidationWarning
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.sql.sql_bind_parameters import SqlBindParameters
 
 
 @dataclass
@@ -16,6 +19,7 @@ class DataWarehouseValidationTask:
     query_string: str
     error_message: str
     object_ref: ODType = field(default_factory=lambda: OrderedDict())
+    query_params: SqlBindParameters = field(default_factory=lambda: SqlBindParameters())
 
 
 class DataWarehouseTaskBuilder:
@@ -84,6 +88,28 @@ class DataWarehouseTaskBuilder:
             )
         return tasks
 
+    @staticmethod
+    def gen_metric_tasks(model: UserConfiguredModel, mf_engine: MetricFlowEngine) -> List[DataWarehouseValidationTask]:
+        """Generates a list of tasks for validating the metrics of the model"""
+        primary_time_dim = SemanticModel(
+            user_configured_model=model
+        ).data_source_semantics.primary_time_dimension_reference
+        tasks: List[DataWarehouseValidationTask] = []
+        for metric in model.metrics:
+            mf_query = MetricFlowQueryRequest.create_with_random_request_id(
+                metric_names=[metric.name], group_by_names=[primary_time_dim.element_name]
+            )
+            explain_result: MetricFlowExplainResult = mf_engine.explain(mf_request=mf_query)
+            tasks.append(
+                DataWarehouseValidationTask(
+                    query_string=explain_result.rendered_sql.sql_query,
+                    query_params=explain_result.rendered_sql.bind_parameters,
+                    object_ref=ValidationIssue.make_object_reference(metric_name=metric.name),
+                    error_message=f"Unable to query metric `{metric.name}`.",
+                )
+            )
+        return tasks
+
 
 class DataWarehouseModelValidator:
     """A Validator for checking specific tasks for the model against the Data Warehouse
@@ -94,8 +120,9 @@ class DataWarehouseModelValidator:
     them (assuming the model has passed these validations before use).
     """
 
-    def __init__(self, sql_client: SqlClient) -> None:  # noqa: D
+    def __init__(self, sql_client: SqlClient, mf_engine: MetricFlowEngine) -> None:  # noqa: D
         self._sql_client = sql_client
+        self._mf_engine = mf_engine
 
     def run_tasks(
         self, tasks: List[DataWarehouseValidationTask], timeout: Optional[int] = None
@@ -121,7 +148,7 @@ class DataWarehouseModelValidator:
                 )
                 break
             try:
-                self._sql_client.dry_run(stmt=task.query_string)
+                self._sql_client.dry_run(stmt=task.query_string, sql_bind_parameters=task.query_params)
             except Exception as e:
                 issues.append(
                     ValidationError(
@@ -138,4 +165,18 @@ class DataWarehouseModelValidator:
         :param timeout int: An optional timeout. Default is None. When the timeout is hit, function will return early.
         """
         tasks = DataWarehouseTaskBuilder.gen_data_source_tasks(model=model)
+        return self.run_tasks(tasks=tasks, timeout=timeout)
+
+    def validate_metrics(self, model: UserConfiguredModel, timeout: Optional[int] = None) -> List[ValidationIssue]:
+        """Generates a list of tasks for validating the metrics of the model and then runs them
+
+        Args:
+            model: Model which to run data warehouse validations on
+            timeout: An optional timeout. Default is None. When the timeout is hit, function will return early.
+
+        Returns:
+            A list of validation issues. If there are no validation issues, an empty list is returned.
+        """
+
+        tasks = DataWarehouseTaskBuilder.gen_metric_tasks(model=model, mf_engine=self._mf_engine)
         return self.run_tasks(tasks=tasks, timeout=timeout)
