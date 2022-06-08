@@ -4,11 +4,10 @@ from abc import abstractmethod
 from enum import Enum
 from typing import ClassVar, Dict, Optional, Protocol
 
-from pandas import DataFrame
-
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
+from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from pandas import DataFrame
 
 
 class SupportedSqlEngine(Enum):
@@ -16,6 +15,7 @@ class SupportedSqlEngine(Enum):
 
     BIGQUERY = "BigQuery"
     REDSHIFT = "Redshift"
+    POSTGRES = "Postgres"
     SNOWFLAKE = "Snowflake"
     SQLITE = "SQLite"
 

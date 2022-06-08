@@ -5,15 +5,14 @@ from typing import Set, Union
 
 import pandas as pd
 import pytest
-from sqlalchemy.exc import ProgrammingError
-
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.object_utils import random_id, assert_values_exhausted
+from metricflow.object_utils import assert_values_exhausted, random_id
 from metricflow.protocols.sql_client import SqlClient, SupportedSqlEngine
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.sql_utils import make_df
 from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from sqlalchemy.exc import ProgrammingError
 
 logger = logging.getLogger(__name__)
 
@@ -98,7 +97,7 @@ def test_table_exists(mf_test_session_state: MetricFlowTestSessionState, sql_cli
 
 
 def test_percent_signs_in_query(sql_client: SqlClient) -> None:  # noqa: D
-    stmt = "SELECT foo FROM ( SELECT 'abba' AS foo ) WHERE foo LIKE '%a'"
+    stmt = "SELECT foo FROM ( SELECT 'abba' AS foo ) source0 WHERE foo LIKE '%a'"
     sql_client.query(stmt)
     df = sql_client.query(stmt)
     _check_1col(df, col="foo", vals={"abba"})

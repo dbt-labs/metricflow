@@ -2,7 +2,6 @@ from copy import deepcopy
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.model.data_warehouse_model_validator import (
     DataWarehouseModelValidator,
@@ -51,7 +50,7 @@ def test_build_data_source_tasks(
     assert len(tasks) == len(data_warehouse_validation_model.data_sources)
     assert (
         tasks[0].query_string
-        == f"SELECT (true) AS col0 FROM (SELECT * FROM {mf_test_session_state.mf_source_schema}.fct_animals) "
+        == f"SELECT (true) AS col0 FROM (SELECT * FROM {mf_test_session_state.mf_source_schema}.fct_animals) AS source0 "
         f"WHERE is_dog IS NOT NULL"
     )
 
@@ -114,15 +113,15 @@ def test_build_dimension_tasks(  # noqa: D
     assert len(tasks) == 1  # on data source query with all dimensions
     assert len(tasks[0].on_fail_subtasks) == 2  # a sub task for each dimension on the data source
     assert (
-        f"SELECT (ds) AS col0, (is_dog) AS col1 FROM (SELECT * FROM {mf_test_session_state.mf_source_schema}.fct_animals) WHERE is_dog IS NOT NULL"
+        f"SELECT (ds) AS col0, (is_dog) AS col1 FROM (SELECT * FROM {mf_test_session_state.mf_source_schema}.fct_animals) AS source0 WHERE is_dog IS NOT NULL"
         == tasks[0].query_string
     )
     assert (
-        f"SELECT (ds) AS col0 FROM (SELECT * FROM {mf_test_session_state.mf_source_schema}.fct_animals) WHERE is_dog IS NOT NULL"
+        f"SELECT (ds) AS col0 FROM (SELECT * FROM {mf_test_session_state.mf_source_schema}.fct_animals) AS source0 WHERE is_dog IS NOT NULL"
         == tasks[0].on_fail_subtasks[0].query_string
     )
     assert (
-        f"SELECT (is_dog) AS col0 FROM (SELECT * FROM {mf_test_session_state.mf_source_schema}.fct_animals) WHERE is_dog IS NOT NULL"
+        f"SELECT (is_dog) AS col0 FROM (SELECT * FROM {mf_test_session_state.mf_source_schema}.fct_animals) AS source0 WHERE is_dog IS NOT NULL"
         == tasks[0].on_fail_subtasks[1].query_string
     )
 

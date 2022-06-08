@@ -8,7 +8,6 @@ class SqlDialect(ExtendedEnum):
 
     REDSHIFT = "redshift"
     POSTGRESQL = "postgresql"
-    POSTGRES = "postgres"
     MYSQL = "mysql"
     SNOWFLAKE = "snowflake"
     SQLITE = "sqlite"

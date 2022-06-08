@@ -4,9 +4,10 @@ from collections import OrderedDict
 from dataclasses import dataclass, field
 from math import floor
 from time import perf_counter
-from typing import List, Optional, OrderedDict as ODType
-from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
+from typing import List, Optional
+from typing import OrderedDict as ODType
 
+from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
@@ -29,7 +30,7 @@ class DataWarehouseValidationTask:
 class DataWarehouseTaskBuilder:
     """Task builder for standard data warehouse validation tasks"""
 
-    QUERY_TEMPLATE = "SELECT {columns_select} FROM {data_source}"
+    QUERY_TEMPLATE = "SELECT {columns_select} FROM {data_source} AS source{unique_id}"
     WHERE_TEMPLATE = " WHERE {where_filters}"
     PARTITION_COL_TEMPLATE = "{partition} IS NOT NULL"
     WRAPPED_COL_TEMPLATE = "({column}) AS col{unique_id}"
@@ -51,21 +52,22 @@ class DataWarehouseTaskBuilder:
         return DataWarehouseTaskBuilder.WHERE_TEMPLATE.format(where_filters=" AND ".join(where_stmts))
 
     @staticmethod
-    def _gen_query(data_source: DataSource, columns: List[str] = ["true"]) -> str:
+    def _gen_query(data_source: DataSource, id: int, columns: List[str] = ["true"]) -> str:
         """Generates a basic sql query to select parts of them model definition
 
         Generates a basic sql query for verifying the model's definition with
         the data warehouse. For example if a data source with an sql_table
         value of 'table1' and no partition was passed in no columns list the
-        query generated would be "SELECT (true) as col1 FROM table1". If a the
+        query generated would be "SELECT (true) as col1 FROM table1 AS source0". If a the
         data source had a partition, say on the dimension 'dim1' then the query
-        would be "SELECT (true) as col1 FROM table1 WHERE dim1 IS NOT NULL".
+        would be "SELECT (true) as col1 FROM table1 AS source0 WHERE dim1 IS NOT NULL".
         And if in addition columns ["dim2", "dim3"] were passed in then the
-        query would be "SELECT (dim2) as col1, (dim3) as col2 FROM table1 WHERE
+        query would be "SELECT (dim2) as col1, (dim3) as col2 FROM table1 AS source0 WHERE
         dim1 IS NOT NULL".
 
         Args:
             data_source: The data source to generate the query for
+            id: A unique id used to alias the table reference
             columns: Column strings to select
         Returns:
             A string representing the query for the passed in arguments.
@@ -76,7 +78,7 @@ class DataWarehouseTaskBuilder:
         columns_select = ", ".join(wrapped_cols)
 
         query = DataWarehouseTaskBuilder.QUERY_TEMPLATE.format(
-            data_source=data_source_str, columns_select=columns_select
+            data_source=data_source_str, columns_select=columns_select, unique_id=id
         )
         query += DataWarehouseTaskBuilder._where_clause_from_partitions(data_source=data_source)
         return query
@@ -85,10 +87,10 @@ class DataWarehouseTaskBuilder:
     def gen_data_source_tasks(model: UserConfiguredModel) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the data sources of the model"""
         tasks: List[DataWarehouseValidationTask] = []
-        for data_source in model.data_sources:
+        for index, data_source in enumerate(model.data_sources):
             tasks.append(
                 DataWarehouseValidationTask(
-                    query_string=DataWarehouseTaskBuilder._gen_query(data_source=data_source),
+                    query_string=DataWarehouseTaskBuilder._gen_query(data_source=data_source, id=index),
                     object_ref=ValidationIssue.make_object_reference(data_source_name=data_source.name),
                     error_message=f"Unable to access data source `{data_source.name}` in data warehouse",
                 )
@@ -107,7 +109,7 @@ class DataWarehouseTaskBuilder:
         """
 
         tasks: List[DataWarehouseValidationTask] = []
-        for data_source in model.data_sources:
+        for index, data_source in enumerate(model.data_sources):
             # generate the subtasks
             data_source_tasks: List[DataWarehouseValidationTask] = []
             data_source_columns: List[str] = []
@@ -118,7 +120,7 @@ class DataWarehouseTaskBuilder:
                 data_source_tasks.append(
                     DataWarehouseValidationTask(
                         query_string=DataWarehouseTaskBuilder._gen_query(
-                            data_source=data_source, columns=[dim_to_query]
+                            data_source=data_source, id=index, columns=[dim_to_query]
                         ),
                         object_ref=ValidationIssue.make_object_reference(
                             data_source_name=data_source.name, dimension_name=dimension.name.element_name
@@ -131,7 +133,9 @@ class DataWarehouseTaskBuilder:
             tasks.append(
                 DataWarehouseValidationTask(
                     query_string=DataWarehouseTaskBuilder._gen_query(
-                        data_source=data_source, columns=data_source_columns
+                        data_source=data_source,
+                        id=index,
+                        columns=data_source_columns,
                     ),
                     object_ref=ValidationIssue.make_object_reference(data_source_name=data_source.name),
                     error_message=f"Failed to query dimensions in data warehouse for data source `{data_source.name}`",
