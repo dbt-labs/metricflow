@@ -8,12 +8,6 @@ data_source:
   sql_table: $third_hop_table
 
   dimensions:
-    - name: ds_partitioned
-      type: time
-      type_params:
-        is_primary: false
-        time_granularity: day
-      is_partition: true
     - name: value
       type: categorical
 
