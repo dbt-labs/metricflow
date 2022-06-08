@@ -143,7 +143,8 @@ class ConfiguredIntegrationTestCaseRepository:
 
         return sorted(test_case_file_paths)
 
-    def get_all_test_case_names(self) -> Sequence[str]:
+    @property
+    def all_test_case_names(self) -> Sequence[str]:
         """Return test case names as specified in the YAML files."""
         return tuple(self._test_cases.keys())
 
@@ -152,3 +153,8 @@ class ConfiguredIntegrationTestCaseRepository:
         if test_case_name not in self._test_cases:
             raise ValueError(f"Unknown test case: {test_case_name}")
         return self._test_cases[test_case_name]
+
+
+CONFIGURED_INTEGRATION_TESTS_REPOSITORY = ConfiguredIntegrationTestCaseRepository(
+    os.path.join(os.path.dirname(__file__), "test_cases"),
+)
