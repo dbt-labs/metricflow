@@ -19,6 +19,9 @@ Welcome to the MetricFlow developer community, we're thrilled to have you aboard
         - Mac users might prefer to use Homebrew: `brew install postgresql`
     - SQLite:
         - You likely have this installed already, but if it is missing [SQLite provides pre-built packages for download and installation](https://www.sqlite.org/download.html)
+    - Docker:
+        - This is only required if you are developing with Postgres.
+        - Follow the [instructions from Docker](https://docs.docker.com/get-docker/)
 3. [Create a fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) of the [MetricFlow repo](https://github.com/transform-data/metricflow) and [clone it locally](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository). 
 4. Activate a [Python virtual environment](https://docs.python.org/3/library/venv.html). While this is not required, it is *strongly* encouraged.
     - We provide `make venv` and `make remove_venv` helpers for creating/deleting standard Python virtual envs. You may pass `VENV_NAME=your_custom_name` to override the default `venv` location.
@@ -56,6 +59,7 @@ You're ready to start! Note all `make` and `poetry` commands should be run from 
         - `export MF_SQL_ENGINE_URL=<YOUR_WAREHOUSE_CONNECTION_URL>`
         - `export MF_SQL_ENGINE_PASSWORD=<YOUR_WAREHOUSE_PASSWORD>`
     - Run `make test` to execute the entire test suite against the target engine.
+    - By default, without `MF_SQL_ENGINE_URL` and `MF_SQL_ENGINE_PASSWORD` set, your tests will run against SQLite. 
 4. Run the linters with `make lint` at any time, but especially before submitting a PR. We use:
     - `Black` for formatting
     - `Flake8` for general Python linting
