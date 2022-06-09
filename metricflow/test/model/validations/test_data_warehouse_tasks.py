@@ -1,5 +1,8 @@
 from copy import deepcopy
+
 import pytest
+from _pytest.fixtures import FixtureRequest
+
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.model.data_warehouse_model_validator import (
     DataWarehouseModelValidator,
@@ -7,7 +10,6 @@ from metricflow.model.data_warehouse_model_validator import (
     DataWarehouseValidationTask,
 )
 from metricflow.model.model_transformer import ModelTransformer
-
 from metricflow.model.objects.data_source import DataSource, Mutability, MutabilityType
 from metricflow.model.objects.elements.measure import AggregationType, Measure
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
@@ -41,12 +43,15 @@ def mf_engine(  # noqa: D
     )
 
 
-def test_build_data_source_tasks(data_warehouse_validation_model: UserConfiguredModel) -> None:  # noqa:D
+def test_build_data_source_tasks(
+    mf_test_session_state: MetricFlowTestSessionState, data_warehouse_validation_model: UserConfiguredModel
+) -> None:  # noqa:D
     tasks = DataWarehouseTaskBuilder.gen_data_source_tasks(model=data_warehouse_validation_model)
     assert len(tasks) == len(data_warehouse_validation_model.data_sources)
     assert (
         tasks[0].query_string
-        == "SELECT (true) AS col0 FROM (SELECT true AS is_dog, '2022-06-01' AS ds) WHERE is_dog IS NOT NULL"
+        == f"SELECT (true) AS col0 FROM (SELECT * FROM {mf_test_session_state.mf_source_schema}.fct_animals) "
+        f"WHERE is_dog IS NOT NULL"
     )
 
 
@@ -74,7 +79,10 @@ def test_task_runner(sql_client: SqlClient, mf_engine: MetricFlowEngine) -> None
 
 
 def test_validate_data_sources(  # noqa: D
-    data_warehouse_validation_model: UserConfiguredModel, sql_client: SqlClient, mf_engine: MetricFlowEngine
+    data_warehouse_validation_model: UserConfiguredModel,
+    create_data_warehouse_validation_model_tables: bool,
+    sql_client: SqlClient,
+    mf_engine: MetricFlowEngine,
 ) -> None:
     model = deepcopy(data_warehouse_validation_model)
 
@@ -99,8 +107,9 @@ def test_validate_data_sources(  # noqa: D
 
 
 def test_build_metric_tasks(  # noqa: D
-    request: pytest.FixtureRequest,
+    request: FixtureRequest,
     data_warehouse_validation_model: UserConfiguredModel,
+    sql_client: SqlClient,
     mf_engine: MetricFlowEngine,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
@@ -116,6 +125,7 @@ def test_build_metric_tasks(  # noqa: D
         incomparable_strings_replacement_function=make_schema_replacement_function(
             system_schema=mf_test_session_state.mf_system_schema, source_schema=mf_test_session_state.mf_source_schema
         ),
+        additional_sub_directories_for_snapshots=(sql_client.__class__.__name__,),
     )
 
 

@@ -134,6 +134,7 @@ def template_mapping(mf_test_session_state: MetricFlowTestSessionState) -> Dict[
         "osmium_table": f"{schema}.osmium",
         "dysprosium_table": f"{schema}.dysprosium",
         "dim_companies_table": f"{schema}.dim_companies",
+        "source_schema": schema,
     }
 
 
