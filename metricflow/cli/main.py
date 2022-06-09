@@ -646,6 +646,9 @@ def _data_warehouse_validations_runner(
         dw_validator.validate_data_sources, model=model, validation_type="data sources", timeout=timeout
     )
     issues += _run_dw_validations(
+        dw_validator.validate_dimensions, model=model, validation_type="dimensions", timeout=timeout
+    )
+    issues += _run_dw_validations(
         dw_validator.validate_metrics, model=model, validation_type="metrics", timeout=timeout
     )
 
