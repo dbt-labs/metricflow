@@ -5,7 +5,7 @@ data_source:
   owners:
     - support@transformdata.io
 
-  sql_query: "SELECT true AS is_dog, '2022-06-01' AS ds"
+  sql_query: "SELECT * FROM $source_schema.fct_animals"
 
   dimensions:
     - name: ds
@@ -19,7 +19,7 @@ data_source:
   measures:
     - name: count_dogs
       agg: sum
-      expr: is_dog
+      expr: 1
       create_metric: True
   mutability:
     type: immutable

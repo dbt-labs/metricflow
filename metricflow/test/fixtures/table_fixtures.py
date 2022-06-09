@@ -488,3 +488,27 @@ def create_extended_date_model_tables(mf_test_session_state: MetricFlowTestSessi
     )
 
     return True
+
+
+@pytest.fixture(scope="session")
+def create_data_warehouse_validation_model_tables(
+    mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient
+) -> bool:
+    """Creates tables with example source data for testing."""
+    schema = mf_test_session_state.mf_source_schema
+
+    data = [
+        (True, "2022-06-01"),
+    ]
+    create_table(
+        sql_client=sql_client,
+        sql_table=SqlTable(schema_name=schema, table_name="fct_animals"),
+        df=make_df(
+            sql_client=sql_client,
+            columns=["is_dog", DEFAULT_DS],
+            time_columns={DEFAULT_DS},
+            data=data,
+        ),
+    )
+
+    return True

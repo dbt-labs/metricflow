@@ -618,7 +618,7 @@ def _filter_issues(
 
 
 def _run_dw_validations(
-    validation_func: Callable[..., List[ValidationIssue]],
+    validation_func: Callable[[UserConfiguredModel, Optional[int]], List[ValidationIssue]],
     validation_type: str,
     model: UserConfiguredModel,
     timeout: Optional[int],
