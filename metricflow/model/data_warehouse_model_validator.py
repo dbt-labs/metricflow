@@ -64,8 +64,11 @@ class DataWarehouseTaskBuilder:
         query would be "SELECT (dim2) as col1, (dim3) as col2 FROM table1 WHERE
         dim1 IS NOT NULL".
 
-        :param data_source DataSource: The data source to gen the query for
-        :param columns List[str]: Column strings to select
+        Args:
+            data_source: The data source to generate the query for
+            columns: Column strings to select
+        Returns:
+            A string representing the query for the passed in arguments.
         """
         data_source_str = data_source.sql_table if data_source.sql_table else f"({data_source.sql_query})"
 
@@ -178,8 +181,12 @@ class DataWarehouseModelValidator:
     ) -> List[ValidationIssue]:
         """Runs the list of tasks as queries agains the data warehouse, returning any found issues
 
-        :param tasks List[DataWarehouseValidationTask]: A list of tasks to run
-        :param timeout int: An optional timeout. Default is None. When the timeout is hit, function will return early.
+        Args:
+            tasks: A list of tasks to run against the data warehouse
+            timeout: An optional timeout. Default is None. When the timeout is hit, function will return early.
+
+        Returns:
+            A list of validation issues discovered when running the passed in tasks against the data warehosue
         """
 
         # Used for keeping track if we go past the max time
@@ -214,8 +221,12 @@ class DataWarehouseModelValidator:
     def validate_data_sources(self, model: UserConfiguredModel, timeout: Optional[int] = None) -> List[ValidationIssue]:
         """Generates a list of tasks for validating the data sources of the model and then runs them
 
-        :param model UserConfiguredModel: Model which to run data warehouse validations on
-        :param timeout int: An optional timeout. Default is None. When the timeout is hit, function will return early.
+        Args:
+            model: Model which to run data warehouse validations on
+            timeout: An optional timeout. Default is None. When the timeout is hit, function will return early.
+
+        Returns:
+            A list of validation issues discovered when running the passed in tasks against the data warehosue
         """
         tasks = DataWarehouseTaskBuilder.gen_data_source_tasks(model=model)
         return self.run_tasks(tasks=tasks, timeout=timeout)

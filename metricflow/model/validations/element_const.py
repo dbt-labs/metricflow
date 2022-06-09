@@ -99,9 +99,13 @@ class ElementConsistencyRule(ModelValidationRule):
     ) -> List[ValidationIssueType]:  # noqa: D
         """Check if the elements in the data source matches the expected type.
 
-        :param model: UserConfiguredModel to check
-        :param data_source: the data source to check
-        :param add_to_dict: if the given element does not exist in the dictionary, whether to add it.
+        Args:
+            model: UserConfiguredModel to check
+            data_source: the data source to check
+            add_to_dict: if the given element does not exist in the dictionary, whether to add it.
+
+        Returns:
+            A list of validation issues found with elements of data sources for the model
         """
         measure_name_tuples = [(x.name, ModelObjectType.MEASURE) for x in data_source.measures or []]
         dimension_name_tuples = [(x.name, ModelObjectType.DIMENSION) for x in data_source.dimensions or []]
