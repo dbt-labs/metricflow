@@ -46,10 +46,10 @@ class SqlClient(Protocol):
     ) -> None:
         """Method for creating a table from the provided select query
 
-        :param SqlTable sql_table: - the SqlTable metadata of the table to create
-        :param str select_query: - the query to use to populate the table
-        :param SqlBindParameters sql_bind_parameters: map of values to substitute in to
-        parameterized sql query strings
+        Args:
+            sql_table: The SqlTable metadata of the table to create
+            select_query: The query to use to populate the table
+            sql_bind_parameters: Map of values to substitute in to parameterized sql query strings
         """
         raise NotImplementedError
 
@@ -62,9 +62,10 @@ class SqlClient(Protocol):
     ) -> None:
         """Creates a table and populates it with the contents of the dataframe
 
-        :param SqlTable sql_table: - The SqlTable metadata of the table to create
-        :param DataFrame df: - the Pandas DataFrame with the contents of the target table
-        :param Optional[int] chunk_size: - the number of rows to write per query
+        Args:
+            sql_table: The SqlTable metadata of the table to create
+            df: The Pandas DataFrame with the contents of the target table
+            chunk_size: The number of rows to write per query
         """
         raise NotImplementedError
 

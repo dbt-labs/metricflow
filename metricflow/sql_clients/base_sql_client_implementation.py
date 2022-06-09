@@ -73,9 +73,10 @@ class BaseSqlClientImplementation(ABC, SqlClient):
     ) -> pd.DataFrame:
         """Query statement; result expected to be data which will be returned as a DataFrame
 
-        :param stmt str:  - The SQL query statement to run. This should produce output via a SELECT
-        :param sql_bind_parameters SqlQueryExecutionParameters: - The parameter replacement mapping for filling in
-        concrete values for SQL query parameters.
+        Args:
+            stmt: The SQL query statement to run. This should produce output via a SELECT
+            sql_bind_parameters: The parameter replacement mapping for filling in
+                concrete values for SQL query parameters.
         """
         start = time.time()
         logger.info(
@@ -113,9 +114,10 @@ class BaseSqlClientImplementation(ABC, SqlClient):
     ) -> None:
         """Dry run statement; checks that the 'stmt' is queryable. Returns None. Raises an exception if the 'stmt' isn't queryable.
 
-        :param stmt str:  - The SQL query statement to dry run.
-        :param sql_bind_parameters SqlQueryExecutionParameters: - The parameter replacement mapping for filling in
-        concrete values for SQL query parameters.
+        Args:
+            stmt: The SQL query statement to dry run.
+            sql_bind_parameters: The parameter replacement mapping for filling in
+                concrete values for SQL query parameters.
         """
         start = time.time()
         logger.info(
