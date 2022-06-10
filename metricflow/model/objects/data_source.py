@@ -7,7 +7,7 @@ from metricflow.model.objects.common import Metadata
 from metricflow.model.objects.elements.dimension import Dimension
 from metricflow.model.objects.elements.identifier import Identifier
 from metricflow.model.objects.elements.measure import Measure
-from metricflow.model.objects.utils import ParseableObject, HashableBaseModel
+from metricflow.model.objects.base import ParseableObject, HashableBaseModel
 from metricflow.object_utils import ExtendedEnum
 from metricflow.specs import LinkableElementReference, MeasureReference
 

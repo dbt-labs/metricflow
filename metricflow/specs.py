@@ -18,7 +18,7 @@ from typing import List, Optional, Sequence, Tuple, TypeVar, Generic
 from metricflow.column_assoc import ColumnAssociation
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.time.time_granularity import TimeGranularity
-from metricflow.model.objects.utils import ParseableField, FrozenBaseModel
+from metricflow.model.objects.base import ParseableField, FrozenBaseModel
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 

@@ -10,7 +10,7 @@ from dataclasses import is_dataclass, fields
 from enum import Enum
 from typing import Sequence, TypeVar, Tuple, NoReturn, Type, Any, List
 
-from metricflow.model.objects.utils import HashableBaseModel
+from metricflow.model.objects.base import HashableBaseModel
 
 logger = logging.getLogger(__name__)
 

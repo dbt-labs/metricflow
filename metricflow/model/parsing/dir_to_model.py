@@ -16,7 +16,7 @@ from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.materialization import Materialization
 from metricflow.model.objects.metric import Metric
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.objects.utils import ParseableObject, ParseableField
+from metricflow.model.objects.base import ParseableObject, ParseableField
 from metricflow.model.parsing.validation import (
     validate_config_structure,
     VERSION_KEY,

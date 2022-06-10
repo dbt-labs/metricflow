@@ -9,7 +9,7 @@ from typing import List, TypeVar, Generic, Sequence, Tuple
 from pydantic.generics import GenericModel
 
 from metricflow.column_assoc import ColumnAssociation
-from metricflow.model.objects.utils import FrozenBaseModel
+from metricflow.model.objects.base import FrozenBaseModel
 from metricflow.specs import (
     MeasureSpec,
     DimensionSpec,

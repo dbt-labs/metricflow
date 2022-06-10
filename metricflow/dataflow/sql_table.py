@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Optional
 
-from metricflow.model.objects.utils import FrozenBaseModel, ParseableField
+from metricflow.model.objects.base import FrozenBaseModel, ParseableField
 
 
 class SqlTable(FrozenBaseModel, ParseableField):

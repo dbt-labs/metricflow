@@ -6,7 +6,7 @@ from typing import List, Optional
 from metricflow.errors.errors import ParsingException
 from metricflow.model.objects.common import Metadata
 from metricflow.model.objects.constraints.where import WhereClauseConstraint
-from metricflow.model.objects.utils import ParseableObject, ParseableField, HashableBaseModel
+from metricflow.model.objects.base import ParseableObject, ParseableField, HashableBaseModel
 from metricflow.object_utils import ExtendedEnum
 from metricflow.specs import MeasureReference
 from metricflow.time.time_granularity import TimeGranularity
