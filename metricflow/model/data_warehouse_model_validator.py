@@ -73,6 +73,7 @@ class DataWarehouseTaskBuilder:
         data_source_str = data_source.sql_table if data_source.sql_table else f"({data_source.sql_query})"
 
         wrapped_cols = [DataWarehouseTaskBuilder._wrap_col(col, index) for index, col in enumerate(columns)]
+
         columns_select = ", ".join(wrapped_cols)
 
         query = DataWarehouseTaskBuilder.QUERY_TEMPLATE.format(
