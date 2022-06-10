@@ -14,6 +14,7 @@ class SupportedSqlEngine(Enum):
     """Enumeration of DB engines currently supported by MetricFlow"""
 
     BIGQUERY = "BigQuery"
+    DUCKDB = "DuckDB"
     REDSHIFT = "Redshift"
     POSTGRES = "Postgres"
     SNOWFLAKE = "Snowflake"
