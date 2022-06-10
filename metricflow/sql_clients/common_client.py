@@ -6,6 +6,7 @@ from metricflow.object_utils import ExtendedEnum
 class SqlDialect(ExtendedEnum):
     """All SQL dialects that MQL currently supports. Value of enum is used in URLs as the dialect."""
 
+    DUCKDB = "duckdb"
     REDSHIFT = "redshift"
     POSTGRESQL = "postgresql"
     MYSQL = "mysql"

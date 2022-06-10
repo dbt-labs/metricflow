@@ -18,6 +18,7 @@ from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.protocols.sql_client import SqlClient, SupportedSqlEngine
 from metricflow.sql_clients.big_query import BigQuerySqlClient
 from metricflow.sql_clients.common_client import SqlDialect, not_empty
+from metricflow.sql_clients.duckdb import DuckDbSqlClient
 from metricflow.sql_clients.postgres import PostgresSqlClient
 from metricflow.sql_clients.redshift import RedshiftSqlClient
 from metricflow.sql_clients.snowflake import SnowflakeSqlClient
@@ -71,6 +72,8 @@ def make_sql_client(url: str, password: str) -> SqlClient:  # noqa: D
         return PostgresSqlClient.from_connection_details(url, password)
     elif dialect == SqlDialect.SQLITE:
         return SqliteSqlClient.from_connection_details(url, password)
+    elif dialect == SqlDialect.DUCKDB:
+        return DuckDbSqlClient.from_connection_details(url, password)
     else:
         raise ValueError(f"Unknown dialect: `{dialect}` in URL {url}")
 
