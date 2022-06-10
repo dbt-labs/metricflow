@@ -4,7 +4,7 @@ from typing import List, Optional
 
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.model.objects.common import Metadata
-from metricflow.model.objects.utils import ParseableObject, HashableBaseModel
+from metricflow.model.objects.base import ParseableObject, HashableBaseModel
 from metricflow.object_utils import ExtendedEnum
 
 

@@ -7,7 +7,7 @@ from typing import List, Optional, Dict, Any
 from moz_sql_parser import parse as moz_parse
 
 from metricflow.errors.errors import ConstraintParseException
-from metricflow.model.objects.utils import ParseableField, HashableBaseModel
+from metricflow.model.objects.base import ParseableField, HashableBaseModel
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 
 logger = logging.getLogger(__name__)

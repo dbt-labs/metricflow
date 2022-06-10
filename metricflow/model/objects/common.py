@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 
 from metricflow.errors.errors import ParsingException
-from metricflow.model.objects.utils import HashableBaseModel
+from metricflow.model.objects.base import HashableBaseModel
 
 
 class Version(HashableBaseModel):  # noqa: D

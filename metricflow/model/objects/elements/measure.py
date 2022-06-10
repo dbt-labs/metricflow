@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from metricflow.model.objects.utils import ParseableObject, HashableBaseModel
+from metricflow.model.objects.base import ParseableObject, HashableBaseModel
 from metricflow.object_utils import ExtendedEnum
 from metricflow.specs import MeasureReference, TimeDimensionReference
 

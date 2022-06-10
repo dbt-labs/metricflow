@@ -8,7 +8,7 @@ from typing import Sequence, Tuple, Optional
 
 import yaml
 
-from metricflow.model.objects.utils import FrozenBaseModel
+from metricflow.model.objects.base import FrozenBaseModel
 from metricflow.model.parsing.yaml_loader import SafeLineLoader
 
 logger = logging.getLogger(__name__)

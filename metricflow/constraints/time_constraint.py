@@ -5,7 +5,7 @@ from typing import Optional
 
 import pandas as pd
 
-from metricflow.model.objects.utils import HashableBaseModel
+from metricflow.model.objects.base import HashableBaseModel
 from metricflow.time.time_granularity import TimeGranularity
 
 

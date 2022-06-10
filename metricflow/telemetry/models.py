@@ -5,7 +5,7 @@ from abc import ABC
 from enum import Enum, IntEnum
 from typing import Tuple, Optional
 
-from metricflow.model.objects.utils import FrozenBaseModel
+from metricflow.model.objects.base import FrozenBaseModel
 
 EVENT_SCHEMA = "v1.0"
 
