@@ -1,0 +1,51 @@
+<ExecutionPlan>
+    <SelectSqlQueryToDataFrameTask>
+        <!-- description = Run a query and write the results to a data frame -->
+        <!-- node_id = rsq_0 -->
+        <!-- sql_query =                                                         -->
+        <!--   -- Combine Metrics                                                -->
+        <!--   SELECT                                                            -->
+        <!--     subq_6.bookings AS bookings                                     -->
+        <!--     , subq_7.booking_value AS booking_value                         -->
+        <!--     , COALESCE(subq_6.is_instant, subq_7.is_instant) AS is_instant  -->
+        <!--   FROM (                                                            -->
+        <!--     -- Aggregate Measures                                           -->
+        <!--     -- Compute Metrics via Expressions                              -->
+        <!--     SELECT                                                          -->
+        <!--       SUM(bookings) AS bookings                                     -->
+        <!--       , is_instant                                                  -->
+        <!--     FROM (                                                          -->
+        <!--       -- Read Elements From Data Source 'bookings_source'           -->
+        <!--       -- Pass Only Elements:                                        -->
+        <!--       --   ['bookings', 'is_instant']                               -->
+        <!--       SELECT                                                        -->
+        <!--         1 AS bookings                                               -->
+        <!--         , is_instant                                                -->
+        <!--       FROM (                                                        -->
+        <!--         -- User Defined SQL Query                                   -->
+        <!--         SELECT * FROM ***************************.fct_bookings      -->
+        <!--       ) bookings_source_src_10000                                   -->
+        <!--     ) subq_1                                                        -->
+        <!--     GROUP BY                                                        -->
+        <!--       is_instant                                                    -->
+        <!--   ) subq_6                                                          -->
+        <!--   FULL OUTER JOIN (                                                 -->
+        <!--     -- Read Elements From Data Source 'bookings_source'             -->
+        <!--     -- Pass Only Elements:                                          -->
+        <!--     --   ['booking_value', 'is_instant']                            -->
+        <!--     -- Aggregate Measures                                           -->
+        <!--     -- Compute Metrics via Expressions                              -->
+        <!--     SELECT                                                          -->
+        <!--       SUM(booking_value) AS booking_value                           -->
+        <!--       , is_instant                                                  -->
+        <!--     FROM (                                                          -->
+        <!--       -- User Defined SQL Query                                     -->
+        <!--       SELECT * FROM ***************************.fct_bookings        -->
+        <!--     ) bookings_source_src_10000                                     -->
+        <!--     GROUP BY                                                        -->
+        <!--       is_instant                                                    -->
+        <!--   ) subq_7                                                          -->
+        <!--   ON                                                                -->
+        <!--     subq_6.is_instant = subq_7.is_instant                           -->
+    </SelectSqlQueryToDataFrameTask>
+</ExecutionPlan>
