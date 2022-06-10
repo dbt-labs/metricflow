@@ -60,8 +60,8 @@ class MetricFlowTestEnvironmentVariables:
 def mf_test_session_state(request: FixtureRequest) -> MetricFlowTestSessionState:  # noqa: D
     engine_url = MetricFlowTestEnvironmentVariables.MF_SQL_ENGINE_URL.get_optional()
     if engine_url is None:
-        logger.info(f"{MetricFlowTestEnvironmentVariables.MF_SQL_ENGINE_URL.name} has not been set, so using SQLite")
-        engine_url = "sqlite://"
+        logger.info(f"{MetricFlowTestEnvironmentVariables.MF_SQL_ENGINE_URL.name} has not been set, so using DuckDb")
+        engine_url = "duckdb://"
     engine_password = MetricFlowTestEnvironmentVariables.MF_SQL_ENGINE_PASSWORD.get_optional() or ""
 
     current_time = datetime.datetime.now().strftime("%Y_%m_%d")
