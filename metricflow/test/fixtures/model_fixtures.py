@@ -231,6 +231,7 @@ def simple_model__pre_transforms(template_mapping: Dict[str, str]) -> UserConfig
         os.path.join(os.path.dirname(__file__), "model_yamls/simple_model"),
         template_mapping=template_mapping,
         apply_pre_transformations=True,
+        apply_post_transformations=False,
     )
     assert model_build_result.model
     return model_build_result.model
