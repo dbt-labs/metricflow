@@ -5,6 +5,7 @@ from metricflow.cli.cli_context import CLIContext
 from metricflow.cli.main import (
     drop_materialization,
     get_dimension_values,
+    health_checks,
     list_dimensions,
     list_materializations,
     list_metrics,
@@ -13,7 +14,6 @@ from metricflow.cli.main import (
     validate_configs,
     version,
 )
-from metricflow.model.data_warehouse_model_validator import DataWarehouseModelValidator
 from metricflow.model.model_validator import ModelValidator
 from metricflow.model.validations.validator_helpers import (
     ValidationError,
@@ -25,30 +25,29 @@ from metricflow.test.fixtures.cli_fixtures import MetricFlowCliRunner
 
 
 def test_query(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    resp = cli_runner.run(query, args=["--metrics", "metric1", "--dimensions", "ds"])
-
-    assert "metric1" in resp.output
+    resp = cli_runner.run(query, args=["--metrics", "bookings", "--dimensions", "ds"])
+    assert "bookings" in resp.output
     assert resp.exit_code == 0
 
 
 def test_list_dimensions(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    resp = cli_runner.run(list_dimensions, args=["--metric-names", "metric1"])
+    resp = cli_runner.run(list_dimensions, args=["--metric-names", "bookings"])
 
-    assert "dim1" in resp.output
+    assert "ds" in resp.output
     assert resp.exit_code == 0
 
 
 def test_list_metrics(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
     resp = cli_runner.run(list_metrics)
 
-    assert "metric1: dim1, dim2, dim3" in resp.output
+    assert "bookings_per_listing: ds" in resp.output
     assert resp.exit_code == 0
 
 
 def test_get_dimension_values(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    resp = cli_runner.run(get_dimension_values, args=["--metric-name", "metric1", "--dimension-name", "ds"])
+    resp = cli_runner.run(get_dimension_values, args=["--metric-name", "bookings", "--dimension-name", "is_instant"])
 
-    assert "dim_val1" in resp.output
+    assert "• 0\n• 1\n" in resp.output
     assert resp.exit_code == 0
 
 
@@ -60,20 +59,23 @@ def test_list_materializations(cli_runner: MetricFlowCliRunner) -> None:  # noqa
 
 
 def test_materialize(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    resp = cli_runner.run(materialize, args=["--materialization-name", "test", "--start-time", "2020-01-02"])
+    resp = cli_runner.run(
+        materialize, args=["--materialization-name", "test_materialization", "--start-time", "2020-01-02"]
+    )
 
-    assert "test.table" in resp.output
+    assert "Materialized table created at" in resp.output
+    assert "test_materialization" in resp.output
     assert resp.exit_code == 0
 
 
 def test_drop_materialization(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    resp = cli_runner.run(drop_materialization, args=["--materialization-name", "test"])
+    resp = cli_runner.run(drop_materialization, args=["--materialization-name", "test_materialization"])
 
     assert resp.exit_code == 0
 
 
 def test_validate_configs(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    # Mock validate_model function
+    # Mock validation errors in validate_model function
     mocked_build_result = MagicMock(
         issues=(
             ValidationWarning(None, "warning"),  # type: ignore
@@ -90,29 +92,21 @@ def test_validate_configs(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
 
 
 def test_validate_configs_data_warehouse_validations(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    mocked_build_result_no_issues = MagicMock(issues=())
     dw_validation_issues = [
         ValidationError(None, "Data Warehouse Error"),  # type: ignore
     ]
 
-    with patch.object(ModelValidator, "validate_model", return_value=mocked_build_result_no_issues):
-        with patch.object(CLIContext, "sql_client", return_value=None):  # type: ignore
-            with patch.object(DataWarehouseModelValidator, "validate_data_sources", return_value=dw_validation_issues):
-                resp = cli_runner.run(validate_configs)
+    with patch.object(CLIContext, "sql_client", return_value=None):  # type: ignore
+        with patch("metricflow.cli.main._run_dw_validations", return_value=dw_validation_issues):
+            resp = cli_runner.run(validate_configs)
 
     assert "Data Warehouse Error" in resp.output
     assert resp.exit_code == 0
 
 
 def test_validate_configs_skip_data_warehouse_validations(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    mocked_build_result_no_issues = MagicMock(issues=())
-    dw_validation_issues = [
-        ValidationError(None, "Data Warehouse Error"),  # type: ignore
-    ]
-
-    with patch.object(ModelValidator, "validate_model", return_value=mocked_build_result_no_issues):
-        with patch.object(DataWarehouseModelValidator, "validate_data_sources", return_value=dw_validation_issues):
-            resp = cli_runner.run(validate_configs, args=["--skip-dw"])
+    with patch.object(ModelValidator, "validate_model", return_value=MagicMock(issues=())):
+        resp = cli_runner.run(validate_configs, args=["--skip-dw"])
 
     assert "Data Warehouse Error" not in resp.output
     assert resp.exit_code == 0
@@ -122,4 +116,11 @@ def test_version(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
     resp = cli_runner.run(version)
 
     assert resp.output
+    assert resp.exit_code == 0
+
+
+def test_health_checks(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
+    resp = cli_runner.run(health_checks)
+
+    assert "SELECT 1: Success!" in resp.output
     assert resp.exit_code == 0
