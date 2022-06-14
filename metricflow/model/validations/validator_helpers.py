@@ -6,9 +6,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import date
 from enum import Enum
-from typing import Any, Callable, List, Optional, Tuple, Union
-
 from pydantic import BaseModel, Extra
+from typing import Any, Callable, List, Optional, Tuple, Union
 
 from metricflow.model.objects.elements.dimension import DimensionType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
@@ -124,8 +123,7 @@ class MeasureContext(DataSourceContext):
         return f"with measure `{self.measure_name}` in data source `{self.data_source_name}` {ValidationContext.context_str(self)}"
 
 
-@dataclass(unsafe_hash=True)
-class ValidationIssue:
+class ValidationIssue(BaseModel):
     """An issue that was found while validating the MetricFlow model."""
 
     level: ValidationIssueLevel
@@ -142,26 +140,17 @@ class ValidationIssue:
         return msg_base + self.message
 
 
-@dataclass(unsafe_hash=True)
 class ValidationWarning(ValidationIssue):
     """A warning that was found while validation the model."""
 
-    def __init__(self, message: str, context: Optional[ValidationContext] = None):
-        """Initializes with super (ValidationIssue) with hardcoded level of WARNING"""
-        super().__init__(level=ValidationIssueLevel.WARNING, context=context, message=message)
+    level = ValidationIssueLevel.WARNING
 
 
-@dataclass(unsafe_hash=True)
 class ValidationFutureError(ValidationIssue):
     """A future error that was found while validation the model."""
 
     error_date: date
-
-    def __init__(self, message: str, error_date: date, context: Optional[ValidationContext] = None):
-        """Calls super (ValidationIssue) with hardcoded level of FUTURE_ERROR"""
-        # Special way to set error_date because we're in a frozen dataclass
-        object.__setattr__(self, "error_date", error_date)
-        super().__init__(level=ValidationIssueLevel.FUTURE_ERROR, context=context, message=message)
+    level = ValidationIssueLevel.FUTURE_ERROR
 
     def as_readable_str(self, with_level: bool = True) -> str:
         """Return a easily readable string that can be used to log the issue."""
@@ -171,22 +160,16 @@ class ValidationFutureError(ValidationIssue):
         )
 
 
-@dataclass(unsafe_hash=True)
 class ValidationError(ValidationIssue):
     """An error that was found while validating the model."""
 
-    def __init__(self, message: str, context: Optional[ValidationContext] = None):
-        """Calls super (ValidationIssue) with hardcoded level of ERROR"""
-        super().__init__(level=ValidationIssueLevel.ERROR, context=context, message=message)
+    level = ValidationIssueLevel.ERROR
 
 
-@dataclass(unsafe_hash=True)
 class ValidationFatal(ValidationIssue):
     """A fatal issue that was found while validation the model."""
 
-    def __init__(self, message: str, context: Optional[ValidationContext] = None):
-        """Calls super (ValidationIssue) with hardcoded level of FATAL"""
-        super().__init__(level=ValidationIssueLevel.FATAL, context=context, message=message)
+    level = ValidationIssueLevel.FATAL
 
 
 ValidationIssueType = Union[ValidationIssue, ValidationWarning, ValidationFutureError, ValidationError, ValidationFatal]
