@@ -1,5 +1,6 @@
 import logging
 import signal
+import sys
 
 import click
 import datetime as dt
@@ -81,14 +82,16 @@ def cli(cfg: CLIContext, verbose: bool) -> None:  # noqa: D
             click.echo("Got SIGTERM")
         else:
             # Shouldn't happen since this should ony be registered for SIGINT / SIGTERM.
-            click.echo(f"Got signal {signal_type}")
+            click.echo(f"Got unhandled signal {signal_type}")
+            return
 
-        if (
-            signal_type in (signal.SIGINT, signal.SIGTERM)
-            and cfg.sql_client.sql_engine_attributes.cancel_submitted_queries_supported
-        ):
-            logger.info("Cancelling submitted queries")
-            cfg.sql_client.cancel_submitted_queries()
+        try:
+            if cfg.sql_client.sql_engine_attributes.cancel_submitted_queries_supported:
+                logger.info("Cancelling submitted queries")
+                cfg.sql_client.cancel_submitted_queries()
+                cfg.sql_client.close()
+        finally:
+            sys.exit(-1)
 
     signal.signal(signal.SIGINT, exit_signal_handler)
     signal.signal(signal.SIGTERM, exit_signal_handler)
