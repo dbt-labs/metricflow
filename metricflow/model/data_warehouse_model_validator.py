@@ -1,17 +1,23 @@
 from __future__ import annotations
 
-from collections import OrderedDict
 from dataclasses import dataclass, field
 from math import floor
 from time import perf_counter
 from typing import List, Optional
-from typing import OrderedDict as ODType
 
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
-from metricflow.model.validations.validator_helpers import ValidationError, ValidationIssue, ValidationWarning
+from metricflow.model.validations.validator_helpers import (
+    DataSourceContext,
+    DimensionContext,
+    MetricContext,
+    ValidationContext,
+    ValidationError,
+    ValidationIssue,
+    ValidationWarning,
+)
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 
@@ -22,7 +28,7 @@ class DataWarehouseValidationTask:
 
     query_string: str
     error_message: str
-    object_ref: ODType = field(default_factory=lambda: OrderedDict())
+    context: Optional[ValidationContext] = None
     query_params: SqlBindParameters = field(default_factory=lambda: SqlBindParameters())
     on_fail_subtasks: List[DataWarehouseValidationTask] = field(default_factory=lambda: [])
 
@@ -91,7 +97,11 @@ class DataWarehouseTaskBuilder:
             tasks.append(
                 DataWarehouseValidationTask(
                     query_string=DataWarehouseTaskBuilder._gen_query(data_source=data_source, id=index),
-                    object_ref=ValidationIssue.make_object_reference(data_source_name=data_source.name),
+                    context=DataSourceContext(
+                        file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
+                        line_number=data_source.metadata.file_slice.start_line_number if data_source.metadata else None,
+                        data_source_name=data_source.name,
+                    ),
                     error_message=f"Unable to access data source `{data_source.name}` in data warehouse",
                 )
             )
@@ -122,8 +132,13 @@ class DataWarehouseTaskBuilder:
                         query_string=DataWarehouseTaskBuilder._gen_query(
                             data_source=data_source, id=index, columns=[dim_to_query]
                         ),
-                        object_ref=ValidationIssue.make_object_reference(
-                            data_source_name=data_source.name, dimension_name=dimension.name.element_name
+                        context=DimensionContext(
+                            file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
+                            line_number=data_source.metadata.file_slice.start_line_number
+                            if data_source.metadata
+                            else None,
+                            data_source_name=data_source.name,
+                            dimension_name=dimension.name.element_name,
                         ),
                         error_message=f"Unable to query `{dim_to_query}` in data warehouse for dimension `{dimension.name.element_name}` on data source `{data_source.name}`.",
                     )
@@ -137,7 +152,11 @@ class DataWarehouseTaskBuilder:
                         id=index,
                         columns=data_source_columns,
                     ),
-                    object_ref=ValidationIssue.make_object_reference(data_source_name=data_source.name),
+                    context=DataSourceContext(
+                        file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
+                        line_number=data_source.metadata.file_slice.start_line_number if data_source.metadata else None,
+                        data_source_name=data_source.name,
+                    ),
                     error_message=f"Failed to query dimensions in data warehouse for data source `{data_source.name}`",
                     on_fail_subtasks=data_source_tasks,
                 )
@@ -160,7 +179,11 @@ class DataWarehouseTaskBuilder:
                 DataWarehouseValidationTask(
                     query_string=explain_result.rendered_sql.sql_query,
                     query_params=explain_result.rendered_sql.bind_parameters,
-                    object_ref=ValidationIssue.make_object_reference(metric_name=metric.name),
+                    context=MetricContext(
+                        file_name=metric.metadata.file_slice.filename if metric.metadata else None,
+                        line_number=metric.metadata.file_slice.start_line_number if metric.metadata else None,
+                        metric_name=metric.name,
+                    ),
                     error_message=f"Unable to query metric `{metric.name}`.",
                 )
             )
@@ -202,7 +225,7 @@ class DataWarehouseModelValidator:
             if timeout is not None and perf_counter() - start_time > timeout:
                 issues.append(
                     ValidationWarning(
-                        model_object_reference=OrderedDict(),
+                        context=None,
                         message=f"Hit timeout before completing all tasks. Completed {index}/{len(tasks)} tasks.",
                     )
                 )
@@ -212,7 +235,7 @@ class DataWarehouseModelValidator:
             except Exception as e:
                 issues.append(
                     ValidationError(
-                        model_object_reference=task.object_ref,
+                        context=task.context,
                         message=task.error_message + f"\nRecieved following error from data warehouse:\n{e}",
                     )
                 )

@@ -3,8 +3,8 @@ from typing import Dict, List
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
+    DataSourceContext,
     ModelValidationRule,
-    ValidationIssue,
     ModelObjectType,
     ValidationError,
     ValidationIssueType,
@@ -26,7 +26,7 @@ class ElementConsistencyRule(ModelValidationRule):
     @staticmethod
     def _check_element_type(
         name_to_type: Dict[str, ModelObjectType],
-        data_source_name: str,
+        data_source: DataSource,
         element_name: str,
         element_type: ModelObjectType,
         add_to_dict: bool,
@@ -35,22 +35,25 @@ class ElementConsistencyRule(ModelValidationRule):
 
         Args:
             name_to_type: dict from the name of the element to the expected type of the element in the model.
-            data_source_name: the name of the data source where the element exists
+            data_source: the data source on which the element exists
             element_name: name of the element
             element_type: the type of the element
             add_to_dict: if the given element does not exist in the dictionary, whether to add it.
         """
         issues: List[ValidationIssueType] = []
-
         if element_name in name_to_type:
             existing_type = name_to_type[element_name]
             if existing_type != element_type:
                 issues.append(
                     ValidationError(
-                        model_object_reference=ValidationIssue.make_object_reference(
-                            data_source_name=data_source_name,
+                        context=DataSourceContext(
+                            file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
+                            line_number=data_source.metadata.file_slice.start_line_number
+                            if data_source.metadata
+                            else None,
+                            data_source_name=data_source.name,
                         ),
-                        message=f"In data source {data_source_name}, element `{element_name}` is of type "
+                        message=f"In data source {data_source.name}, element `{element_name}` is of type "
                         f"{element_type}, but it was previously used earlier in the model as "
                         f"{name_to_type[element_name]}",
                     )
@@ -62,12 +65,14 @@ class ElementConsistencyRule(ModelValidationRule):
                 # TODO: Can't check dimensions effectively as their name changes.
                 issues.append(
                     ValidationError(
-                        model_object_reference=ValidationIssue.make_object_reference(
-                            data_source_name=data_source_name,
-                            object_type=element_type,
-                            object_name=element_name,
+                        context=DataSourceContext(
+                            file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
+                            line_number=data_source.metadata.file_slice.start_line_number
+                            if data_source.metadata
+                            else None,
+                            data_source_name=data_source.name,
                         ),
-                        message=f"In data source {data_source_name}, the element named {element_name} "
+                        message=f"In data source {data_source.name}, the element named {element_name} "
                         f"of type {element_type} is not known in the model.",
                     )
                 )
@@ -114,7 +119,7 @@ class ElementConsistencyRule(ModelValidationRule):
         for element_name, element_type in measure_name_tuples + dimension_name_tuples + identifier_name_tuples:
             issues += ElementConsistencyRule._check_element_type(
                 name_to_type=ElementConsistencyRule._get_element_types(model),
-                data_source_name=data_source.name,
+                data_source=data_source,
                 element_name=element_name,
                 element_type=element_type,
                 add_to_dict=add_to_dict,
