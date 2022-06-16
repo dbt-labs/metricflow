@@ -1,0 +1,102 @@
+data_source:
+  name: shopify_orders
+  owners:
+    - support@transformdata.io
+  sql_table: SHOPIFY.ORDER ### Update to your opportunities schema.table
+  mutability:
+    type: immutable
+  identifiers:
+    - name: order
+      type: primary
+      expr: id
+    - name: shipping_address_id
+      type: foreign
+    - name: billing_address_id
+      type: foreign
+    - name: customer_id
+      type: foreign
+    - name: location_id
+      type: foreign
+    - name: user_id
+      type: foreign
+    - name: app_id
+      type: foreign
+    - name: device_id
+      type: foreign 
+  
+  dimensions:
+    - name: ds
+      type: time
+      type_params:
+        is_primary: True
+        time_granularity: day
+      expr: CAST(CREATED_AT as DATETIME)
+    - name: currency
+      type: categorical
+    - name: shipping_address_country
+      type: categorical
+    - name: shipping_address_province
+      type: categorical
+    - name: shipping_address_zip
+      type: categorical
+      
+  measures:
+    - name: total_orders
+      agg: count_distinct
+      expr: id
+      create_metric: true
+    - name: total_sales_amount_usd
+      agg: sum
+      expr: total_price
+      create_metric: true
+    - name: avg_order_value_usd
+      agg: average
+      expr: total_price
+      create_metric: true
+    - name: total_cancellations
+      agg: sum_boolean
+      expr: case when cancelled_at is not null then 1 else 0 end
+      create_metric: true
+ 
+---
+# ORDER_LINE CONFIG
+
+data_source:
+  name: shopify_orders_line
+  owners:
+    - support@transformdata.io
+  sql_table: SHOPIFY.ORDER_LINE ### Update to your opportunities schema.table
+  mutability:
+    type: immutable
+  identifiers:
+    - name: id
+      type: primary
+    - name: order
+      type: foreign
+      expr: order_id
+    - name: product_id
+      type: foreign
+    - name: variant_id
+      type: foreign
+    - name: origin_location_id
+      type: foreign
+    - name: destination_location_id
+      type: foreign
+  dimensions:
+    - name: vendor
+      type: categorical
+    - name: title
+      type: categorical
+  # measures:
+  #   - name: total_quantity
+  #     agg: sum
+  #     expr: quantity
+  #     create_metric: true
+  #   - name: avg_item_value
+  #     agg: average
+  #     expr: price
+  #     create_metric: true
+  #   - name: total_weight_grams
+  #     agg: sum
+  #     expr: grams
+  #     create_metric: true
