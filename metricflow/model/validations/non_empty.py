@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from typing import List
 
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
@@ -20,7 +19,6 @@ class NonEmptyRule(ModelValidationRule):
         if not model.data_sources:
             issues.append(
                 ValidationError(
-                    model_object_reference=OrderedDict(),
                     message="No data sources present in the model.",
                 )
             )
@@ -42,7 +40,6 @@ class NonEmptyRule(ModelValidationRule):
         if not model.metrics and not create_measure_proxy_metrics:
             issues.append(
                 ValidationError(
-                    model_object_reference=OrderedDict(),
                     message="No metrics present in the model.",
                 )
             )

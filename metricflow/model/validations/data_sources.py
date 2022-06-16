@@ -8,8 +8,10 @@ from metricflow.specs import MeasureReference
 from metricflow.time.time_constants import SUPPORTED_GRANULARITIES
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
+    DataSourceContext,
+    DimensionContext,
+    MeasureContext,
     ModelValidationRule,
-    ValidationIssue,
     ValidationIssueType,
     ValidationError,
     ValidationFatal,
@@ -33,12 +35,16 @@ class DataSourceMeasuresUniqueRule(ModelValidationRule):
         for data_source in model.data_sources:
             for measure in data_source.measures:
                 if measure.name in measure_names_to_data_sources:
-                    model_object_reference = ValidationIssue.make_object_reference(
-                        data_source_name=data_source.name, measure_name=measure.name.element_name
-                    )
                     issues.append(
                         ValidationError(
-                            model_object_reference=model_object_reference,
+                            context=MeasureContext(
+                                file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
+                                line_number=data_source.metadata.file_slice.start_line_number
+                                if data_source.metadata
+                                else None,
+                                data_source_name=data_source.name,
+                                measure_name=measure.name.element_name,
+                            ),
                             message=f"Found measure with name {measure.name} in multiple data sources with names "
                             f"({measure_names_to_data_sources[measure.name]})",
                         )
@@ -84,8 +90,11 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
         issues: List[ValidationIssueType] = []
 
         for dim in data_source.dimensions:
-            model_object_reference = ValidationIssue.make_object_reference(
-                data_source_name=data_source.name, dimension_name=dim.name.element_name
+            context = DimensionContext(
+                file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
+                line_number=data_source.metadata.file_slice.start_line_number if data_source.metadata else None,
+                data_source_name=data_source.name,
+                dimension_name=dim.name.element_name,
             )
 
             if dim.type == DimensionType.TIME:
@@ -96,7 +105,7 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
                     if primary_time_dimension_name and dim.name != primary_time_dimension_name:
                         issues.append(
                             ValidationFatal(
-                                model_object_reference=model_object_reference,
+                                context=context,
                                 message=f"In data source {data_source.name}, "
                                 f"found primary time dimension with name: {dim.name}, "
                                 f"another primary time dimension with name: {primary_time_dimension_name} "
@@ -107,7 +116,7 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
                     if dim.type_params.time_granularity not in SUPPORTED_GRANULARITIES:
                         issues.append(
                             ValidationError(
-                                model_object_reference=model_object_reference,
+                                context=context,
                                 message=f"Unsupported time granularity in time dimension with name: {dim.name}, "
                                 f"Please use {[s.value for s in SUPPORTED_GRANULARITIES]}",
                             )
@@ -116,7 +125,11 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
         if not primary_time_present and len(data_source.measures) > 0:
             issues.append(
                 ValidationError(
-                    model_object_reference=ValidationIssue.make_object_reference(data_source_name=data_source.name),
+                    context=DataSourceContext(
+                        file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
+                        line_number=data_source.metadata.file_slice.start_line_number if data_source.metadata else None,
+                        data_source_name=data_source.name,
+                    ),
                     message=f"No primary time dimension in data source with name ({data_source.name}). Please add one",
                 )
             )

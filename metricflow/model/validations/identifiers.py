@@ -10,6 +10,8 @@ from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.elements.identifier import Identifier, IdentifierType, CompositeSubIdentifier
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
+    DataSourceContext,
+    IdentifierContext,
     ModelValidationRule,
     ValidationIssue,
     ValidationError,
@@ -41,15 +43,19 @@ class IdentifierConfigRule(ModelValidationRule):
         issues: List[ValidationIssueType] = []
         for ident in data_source.identifiers:
             if ident.identifiers:
+                context = IdentifierContext(
+                    file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
+                    line_number=data_source.metadata.file_slice.start_line_number if data_source.metadata else None,
+                    data_source_name=data_source.name,
+                    identifier_name=ident.name.element_name,
+                )
+
                 for sub_id in ident.identifiers:
                     if sub_id.ref and (sub_id.name or sub_id.expr):
                         logger.warning(f"Identifier with error is: {ident}")
                         issues.append(
                             ValidationError(
-                                model_object_reference=ValidationIssue.make_object_reference(
-                                    data_source_name=data_source.name,
-                                    identifier_name=ident.name.element_name,
-                                ),
+                                context=context,
                                 message=f"Both ref and name/expr set in sub identifier of identifier "
                                 f"({ident.name.element_name}), please set one",
                             )
@@ -57,9 +63,7 @@ class IdentifierConfigRule(ModelValidationRule):
                     elif sub_id.ref is not None and sub_id.ref not in [i.name for i in data_source.identifiers]:
                         issues.append(
                             ValidationError(
-                                model_object_reference=ValidationIssue.make_object_reference(
-                                    data_source_name=data_source.name, identifier_name=ident.name.element_name
-                                ),
+                                context=context,
                                 message=f"Identifier ref must reference an existing identifier by name. "
                                 f"No identifier in this data source has name: {sub_id.ref}",
                             )
@@ -67,9 +71,7 @@ class IdentifierConfigRule(ModelValidationRule):
                     elif not sub_id.ref and not sub_id.name:
                         issues.append(
                             ValidationError(
-                                model_object_reference=ValidationIssue.make_object_reference(
-                                    data_source_name=data_source.name, identifier_name=ident.name.element_name
-                                ),
+                                context=context,
                                 message=f"Must provide either name or ref for sub identifier of identifier "
                                 f"with name: {ident.name.element_name}",
                             )
@@ -80,9 +82,7 @@ class IdentifierConfigRule(ModelValidationRule):
                             if i.name == sub_id.name and i.expr != sub_id.expr:
                                 issues.append(
                                     ValidationError(
-                                        model_object_reference=ValidationIssue.make_object_reference(
-                                            data_source_name=data_source.name, identifier_name=ident.name.element_name
-                                        ),
+                                        context=context,
                                         message=f"If sub identifier has same name ({sub_id.name.element_name}) "
                                         f"as an existing Identifier they must have the same expr",
                                     )
@@ -106,7 +106,11 @@ class OnePrimaryIdentifierPerDataSourceRule(ModelValidationRule):
         if len(primary_identifier_names) > 1:
             return [
                 ValidationFutureError(
-                    model_object_reference=ValidationIssue.make_object_reference(data_source_name=data_source.name),
+                    context=DataSourceContext(
+                        file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
+                        line_number=data_source.metadata.file_slice.start_line_number if data_source.metadata else None,
+                        data_source_name=data_source.name,
+                    ),
                     message=f"Data sources can have only one primary identifier. The data source"
                     f" `{data_source.name}` has {len(primary_identifier_names)}: {', '.join(primary_identifier_names)}",
                     error_date=date(2022, 1, 12),  # Wed January 12th 2022
@@ -131,7 +135,7 @@ class OnePrimaryIdentifierPerDataSourceRule(ModelValidationRule):
 class SubIdentifierContext:
     """Organizes the context behind identifiers and their sub-identifiers."""
 
-    data_source_name: str
+    data_source: DataSource
     identifier_reference: IdentifierReference
     sub_identifier_names: Tuple[str, ...]
 
@@ -156,7 +160,7 @@ class IdentifierConsistencyRule(ModelValidationRule):
         for identifier in data_source.identifiers or []:
             contexts.append(
                 SubIdentifierContext(
-                    data_source_name=data_source.name,
+                    data_source=data_source,
                     identifier_reference=identifier.name,
                     sub_identifier_names=tuple(IdentifierConsistencyRule._get_sub_identifier_names(identifier)),
                 )
@@ -190,10 +194,13 @@ class IdentifierConsistencyRule(ModelValidationRule):
 
         # convert each invalid identifier configuration into a validation warning
         for identifier_name, sub_identifier_contexts in invalid_sub_identifier_configurations.items():
+            data_source = sub_identifier_contexts[0].data_source
             issues.append(
                 ValidationWarning(
-                    model_object_reference=ValidationIssue.make_object_reference(
-                        data_source_name=sub_identifier_contexts[0].data_source_name,
+                    context=IdentifierContext(
+                        file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
+                        line_number=data_source.metadata.file_slice.start_line_number if data_source.metadata else None,
+                        data_source_name=data_source.name,
                         identifier_name=identifier_name,
                     ),
                     message=(
