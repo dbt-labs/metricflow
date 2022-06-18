@@ -23,7 +23,10 @@ class SqlTable(FrozenBaseModel, ParseableField):
             return SqlTable(schema_name=sql_str_split[0], table_name=sql_str_split[1])
         elif len(sql_str_split) == 3:
             return SqlTable(db_name=sql_str_split[0], schema_name=sql_str_split[1], table_name=sql_str_split[2])
-        raise RuntimeError(f"Invalid input for a SQL table, expected form '<schema>.<table>' but got: {sql_str}")
+        raise RuntimeError(
+            f"Invalid input for a SQL table, expected form '<schema>.<table>' or '<db>.<schema>.<table>' "
+            f"but got: {sql_str}"
+        )
 
     @property
     def sql(self) -> str:
