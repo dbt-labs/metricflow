@@ -79,10 +79,10 @@ def test_validate_configs(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
     # Mock validation errors in validate_model function
     mocked_build_result = MagicMock(
         issues=(
-            ValidationWarning(None, "warning"),  # type: ignore
-            ValidationFutureError(None, "future_error", datetime.now()),  # type: ignore
-            ValidationError(None, "error"),  # type: ignore
-            ValidationFatal(None, "fatal"),  # type: ignore
+            ValidationWarning(context=None, message="warning"),  # type: ignore
+            ValidationFutureError(context=None, message="future_error", error_date=datetime.now()),  # type: ignore
+            ValidationError(context=None, message="error"),  # type: ignore
+            ValidationFatal(context=None, message="fatal"),  # type: ignore
         )
     )
     with patch.object(ModelValidator, "validate_model", return_value=mocked_build_result):
@@ -94,7 +94,7 @@ def test_validate_configs(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
 
 def test_validate_configs_data_warehouse_validations(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
     dw_validation_issues = [
-        ValidationError(None, "Data Warehouse Error"),  # type: ignore
+        ValidationError(context=None, message="Data Warehouse Error"),  # type: ignore
     ]
 
     with patch.object(CLIContext, "sql_client", return_value=None):  # type: ignore

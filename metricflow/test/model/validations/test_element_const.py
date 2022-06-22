@@ -1,12 +1,13 @@
 import pytest
 
 from metricflow.model.model_validator import ModelValidator
-from metricflow.model.objects.data_source import DataSource, Mutability, MutabilityType
+from metricflow.model.objects.data_source import Mutability, MutabilityType
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from metricflow.model.objects.elements.measure import Measure, AggregationType
-from metricflow.model.objects.metric import Metric, MetricType, MetricTypeParams
+from metricflow.model.objects.metric import MetricType, MetricTypeParams
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.specs import MeasureReference, DimensionReference
+from metricflow.test.model.validations.helpers import data_source_with_guaranteed_meta, metric_with_guaranteed_meta
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.model.validations.validator_helpers import ModelValidationException
 
@@ -19,7 +20,7 @@ def test_inconsistent_elements() -> None:  # noqa:D
         ModelValidator().checked_validations(
             UserConfiguredModel(
                 data_sources=[
-                    DataSource(
+                    data_source_with_guaranteed_meta(
                         name="s1",
                         sql_query="SELECT foo FROM bar",
                         dimensions=[
@@ -33,7 +34,7 @@ def test_inconsistent_elements() -> None:  # noqa:D
                         ],
                         mutability=Mutability(type=MutabilityType.IMMUTABLE),
                     ),
-                    DataSource(
+                    data_source_with_guaranteed_meta(
                         name="s2",
                         sql_query="SELECT foo FROM bar",
                         measures=[Measure(name=measure_reference, agg=AggregationType.SUM)],
@@ -41,7 +42,7 @@ def test_inconsistent_elements() -> None:  # noqa:D
                     ),
                 ],
                 metrics=[
-                    Metric(
+                    metric_with_guaranteed_meta(
                         name=measure_reference.element_name,
                         type=MetricType.MEASURE_PROXY,
                         type_params=MetricTypeParams(measures=[measure_reference]),
