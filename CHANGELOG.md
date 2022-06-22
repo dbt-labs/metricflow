@@ -6,6 +6,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.100.0] - 2022-06-22
+
+### Breaking Changes
+- Updated MetricFlow config parameters for BigQuery users. See description on https://github.com/transform-data/metricflow/pull/62 for usage instructions.
+
+### Added
+- Metric / dimension SQL validations via DW engine (@QMalcolm)
+- Support for PostgreSQL and setup for local testing (@rexledesma)
+- Support for DuckDB (@plypaul)
+- Support for individual user logins to BigQuery (@WilliamDee)
+- Ability to create the MetricFlow client from a model in a specified directory (@WilliamDee)
+- Description and owner fields to model objects (@WilliamDee)
+
+### Updated
+- CLI tests without mocks (@WilliamDee)
+- Package dependencies to address security issues (@alliehowe)
+- Query cancellation behavior on CLI exit (@plypaul)
+
 ## [0.93.0] - 2022-04-27
 
 ### Added
