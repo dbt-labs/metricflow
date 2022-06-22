@@ -1,9 +1,10 @@
 import datetime as dt
 import logging
+import os.path
 import pathlib
 import traceback
 from functools import wraps
-from typing import Any, Callable, List, Optional
+from typing import Any, Callable, List, Optional, Tuple
 
 import click
 from dateutil.parser import parse
@@ -29,7 +30,7 @@ from metricflow.model.validations.validator_helpers import ValidationIssueLevel
 logger = logging.getLogger(__name__)
 
 # MetricFlow config keys
-MF_CONFIG_KEYS = [
+MF_CONFIG_KEYS = (
     ConfigKey(key=CONFIG_EMAIL, comment="Optional"),
     ConfigKey(
         key=CONFIG_MODEL_PATH,
@@ -37,9 +38,9 @@ MF_CONFIG_KEYS = [
         comment="Path to directory containing defined models (Leave until after DWH setup)",
     ),
     ConfigKey(key=CONFIG_DWH_SCHEMA),
-]
+)
 # BigQuery config keys
-MF_BIGQUERY_KEYS = [
+MF_BIGQUERY_KEYS = (
     ConfigKey(
         key=CONFIG_DWH_CREDS_PATH, comment="Provide the path to the BigQuery credential file, ignore to use ADC auth"
     ),
@@ -47,25 +48,36 @@ MF_BIGQUERY_KEYS = [
         key=CONFIG_DWH_PROJECT_ID, comment="Provide the GCP Project ID, ignore if using service account credentials"
     ),
     ConfigKey(key=CONFIG_DWH_DIALECT, value="bigquery", comment="Dialect (one of BigQuery, Snowflake, Redshift)"),
-]
+)
 # Redshift config keys
-MF_REDSHIFT_KEYS = [
+MF_REDSHIFT_KEYS = (
     ConfigKey(key=CONFIG_DWH_DB),
     ConfigKey(key=CONFIG_DWH_PASSWORD, comment="Password associated with the provided user"),
     ConfigKey(key=CONFIG_DWH_USER, comment="Username for the data warehouse"),
     ConfigKey(key=CONFIG_DWH_PORT),
     ConfigKey(key=CONFIG_DWH_HOST, comment="Host name"),
     ConfigKey(key=CONFIG_DWH_DIALECT, value="redshift", comment="Dialect (one of BigQuery, Snowflake, Redshift)"),
-]
+)
 # Redshift config keys
-MF_SNOWFLAKE_KEYS = [
+MF_SNOWFLAKE_KEYS = (
     ConfigKey(key=CONFIG_DWH_WAREHOUSE, comment="Provide the warehouse to use"),
     ConfigKey(key=CONFIG_DWH_DB),
     ConfigKey(key=CONFIG_DWH_PASSWORD, comment="Password associated with the provided user"),
     ConfigKey(key=CONFIG_DWH_USER, comment="Username for the data warehouse"),
     ConfigKey(key=CONFIG_DWH_HOST, comment="Snowflake account name"),
     ConfigKey(key=CONFIG_DWH_DIALECT, value="snowflake", comment="Dialect (one of BigQuery, Snowflake, Redshift)"),
-]
+)
+
+
+def generate_duckdb_demo_keys(config_dir: str) -> Tuple[ConfigKey, ...]:
+    """Generate configuration keys for DuckDB with a file in the config_dir."""
+    return (
+        ConfigKey(
+            key=CONFIG_DWH_DB, value=os.path.join(config_dir, "duck.db"), comment="For DuckDB, this is the data file."
+        ),
+        ConfigKey(key=CONFIG_DWH_DIALECT, value="duckdb"),
+        ConfigKey(key=CONFIG_DWH_SCHEMA, value="mf_demo"),
+    )
 
 
 # Click Options
