@@ -3,6 +3,8 @@ from typing import Any, List, Optional, Set
 
 import dateutil.parser
 import pandas as pd
+from sqlalchemy.engine import make_url
+
 from metricflow.configuration.constants import (
     CONFIG_DWH_CREDS_PATH,
     CONFIG_DWH_DB,
@@ -15,7 +17,7 @@ from metricflow.configuration.constants import (
     CONFIG_DWH_WAREHOUSE,
 )
 from metricflow.configuration.yaml_handler import YamlFileHandler
-from metricflow.protocols.sql_client import SqlClient, SupportedSqlEngine
+from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql_clients.big_query import BigQuerySqlClient
 from metricflow.sql_clients.common_client import SqlDialect, not_empty
 from metricflow.sql_clients.duckdb import DuckDbSqlClient
@@ -23,7 +25,6 @@ from metricflow.sql_clients.postgres import PostgresSqlClient
 from metricflow.sql_clients.redshift import RedshiftSqlClient
 from metricflow.sql_clients.snowflake import SnowflakeSqlClient
 from metricflow.sql_clients.sqlite import SqliteSqlClient
-from sqlalchemy.engine import make_url
 
 
 def make_df(  # type: ignore [misc]
@@ -82,8 +83,8 @@ def make_sql_client_from_config(handler: YamlFileHandler) -> SqlClient:
     """Construct a SqlClient given a yaml file config."""
 
     url = handler.url
-    dialect = not_empty(handler.get_value(CONFIG_DWH_DIALECT), CONFIG_DWH_DIALECT, url).upper()
-    if dialect == SupportedSqlEngine.BIGQUERY.name:
+    dialect = not_empty(handler.get_value(CONFIG_DWH_DIALECT), CONFIG_DWH_DIALECT, url).lower()
+    if dialect == SqlDialect.BIGQUERY.value:
         path_to_creds = handler.get_value(CONFIG_DWH_CREDS_PATH)
         project_id = handler.get_value(CONFIG_DWH_PROJECT_ID) or ""
         creds = None
@@ -98,7 +99,7 @@ def make_sql_client_from_config(handler: YamlFileHandler) -> SqlClient:
             with open(path_to_creds, "r") as cred_file:
                 creds = cred_file.read()
         return BigQuerySqlClient(project_id=project_id, password=creds)
-    elif dialect == SupportedSqlEngine.SNOWFLAKE.name:
+    elif dialect == SqlDialect.SNOWFLAKE.value:
         host = not_empty(handler.get_value(CONFIG_DWH_HOST), CONFIG_DWH_HOST, url)
         user = not_empty(handler.get_value(CONFIG_DWH_USER), CONFIG_DWH_USER, url)
         password = not_empty(handler.get_value(CONFIG_DWH_PASSWORD), CONFIG_DWH_PASSWORD, url)
@@ -112,7 +113,7 @@ def make_sql_client_from_config(handler: YamlFileHandler) -> SqlClient:
             url_query_params={"warehouse": warehouse},
             client_session_keep_alive=False,
         )
-    elif dialect == SupportedSqlEngine.REDSHIFT.name:
+    elif dialect == SqlDialect.REDSHIFT.value:
         host = not_empty(handler.get_value(CONFIG_DWH_HOST), CONFIG_DWH_HOST, url)
         port = int(not_empty(handler.get_value(CONFIG_DWH_PORT), CONFIG_DWH_PORT, url))
         user = not_empty(handler.get_value(CONFIG_DWH_USER), CONFIG_DWH_USER, url)
@@ -125,10 +126,22 @@ def make_sql_client_from_config(handler: YamlFileHandler) -> SqlClient:
             password=password,
             database=database,
         )
-    elif dialect == SupportedSqlEngine.DUCKDB.name:
+    elif dialect == SqlDialect.DUCKDB.value:
         database = not_empty(handler.get_value(CONFIG_DWH_DB), CONFIG_DWH_DB, url)
         return DuckDbSqlClient(file_path=database)
-    else:
-        raise ValueError(
-            f"Invalid dialect `{dialect}`, must be one of `bigquery`, `snowflake`, `redshift` , `duckdb` in {url}"
+    elif dialect == SqlDialect.POSTGRESQL.value:
+        host = not_empty(handler.get_value(CONFIG_DWH_HOST), CONFIG_DWH_HOST, url)
+        port = int(not_empty(handler.get_value(CONFIG_DWH_PORT), CONFIG_DWH_PORT, url))
+        user = not_empty(handler.get_value(CONFIG_DWH_USER), CONFIG_DWH_USER, url)
+        password = not_empty(handler.get_value(CONFIG_DWH_PASSWORD), CONFIG_DWH_PASSWORD, url)
+        database = not_empty(handler.get_value(CONFIG_DWH_DB), CONFIG_DWH_DB, url)
+        return PostgresSqlClient(
+            host=host,
+            port=port,
+            username=user,
+            password=password,
+            database=database,
         )
+    else:
+        supported_dialects = [x.value for x in SqlDialect]
+        raise ValueError(f"Invalid dialect '{dialect}', must be one of {supported_dialects} in {url}")
