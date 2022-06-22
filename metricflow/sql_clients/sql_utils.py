@@ -125,5 +125,10 @@ def make_sql_client_from_config(handler: YamlFileHandler) -> SqlClient:
             password=password,
             database=database,
         )
+    elif dialect == SupportedSqlEngine.DUCKDB.name:
+        database = not_empty(handler.get_value(CONFIG_DWH_DB), CONFIG_DWH_DB, url)
+        return DuckDbSqlClient(file_path=database)
     else:
-        raise ValueError(f"Invalid dialect `{dialect}`, must be one of `bigquery`, `snowflake`, `redshift` in {url}")
+        raise ValueError(
+            f"Invalid dialect `{dialect}`, must be one of `bigquery`, `snowflake`, `redshift` , `duckdb` in {url}"
+        )
