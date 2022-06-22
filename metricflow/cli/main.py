@@ -31,6 +31,7 @@ from metricflow.cli.utils import (
     query_options,
     separated_by_comma_option,
     start_end_time_options,
+    generate_duckdb_demo_keys,
 )
 from metricflow.configuration.config_builder import YamlTemplateBuilder
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
@@ -70,7 +71,7 @@ def cli(cfg: CLIContext, verbose: bool) -> None:  # noqa: D
 
         click.echo(
             f"💡 Please update to version {result.available_version}, released {result.release_date} by running:\n"
-            f"\t$ pip install --upgrade {PACKAGE_NAME}",
+            f"\t$ pip install --upgrade {PACKAGE_NAME}\n",
         )
 
     # Cancel queries submitted to the DW if the user precess CTRL + c / process is terminated.
@@ -128,24 +129,38 @@ def setup(cfg: CLIContext, restart: bool) -> None:
             "snowflake": MF_SNOWFLAKE_KEYS,
             "bigquery": MF_BIGQUERY_KEYS,
             "redshift": MF_REDSHIFT_KEYS,
+            "duckdb": generate_duckdb_demo_keys(config_dir=cfg.config.dir_path),
         }
+
+        click.echo("Please enter your data warehouse dialect.")
+        click.echo("Use 'duckdb' for a standalone demo.")
+        click.echo("")
         dialect = click.prompt(
-            "Please enter your data warehouse dialect",
-            type=click.Choice(["snowflake", "bigquery", "redshift"]),
+            "dialect",
+            type=click.Choice(["bigquery", "duckdb", "redshift", "snowflake"]),
             show_choices=True,
         )
-        config_keys = MF_CONFIG_KEYS + dialect_map[dialect]
+        config_keys = list(dialect_map[dialect])
+        for mf_config_key in MF_CONFIG_KEYS:
+            if not any(x.key == mf_config_key.key for x in config_keys):
+                config_keys.append(mf_config_key)
+
         with open(abs_path, "w") as file:
             YamlTemplateBuilder.write_yaml(config_keys, file)
 
+    template_description = (
+        f"A template config file has been created in {abs_path}.\n"
+        if to_create
+        else f"A template config file already exists in {abs_path}, so it was left alone.\n"
+    )
     click.echo(
         textwrap.dedent(
             f"""\
-            💻 A template config file has {'' if to_create else 'already '}been created in {abs_path}.
-
-              1. Fill it out with the relevant details.
-              2. Run `mf health-checks` to validate the Data Warehouse connection.
-              3. Run `mf validate-configs` to validate the Model configurations.
+            💻 {template_description}
+            Next steps:
+              1. Review and fill out relevant fields.
+              2. Run `mf health-checks` to validate the data warehouse connection.
+              3. Run `mf validate-configs` to validate the model configurations.
             """
         )
     )
@@ -208,11 +223,11 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
         exit()
 
     # Seed sample data into data warehouse
-    spinner = Halo(text="🤖 Generating sample data...", spinner="dots")
+    spinner = Halo(text=f"🤖 Generating sample data into schema {cfg.mf_system_schema}...", spinner="dots")
     spinner.start()
     created = create_sample_data(sql_client=cfg.sql_client, system_schema=cfg.mf_system_schema)
     if not created:
-        spinner.warn("🙊 The tables already exists, halting the creation of sample tables.")
+        spinner.warn("🙊 Skipped creating sample tables since they already exist.")
     else:
         spinner.succeed("📀 Sample tables have been successfully created into your data warehouse.")
 

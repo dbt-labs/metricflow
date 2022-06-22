@@ -45,21 +45,23 @@ class DuckDbSqlClient(SqlAlchemySqlClient):
 
     @staticmethod
     def from_connection_details(url: str, password: Optional[str] = None) -> SqlAlchemySqlClient:  # noqa: D
-        expected_url = f"{SqlDialect.DUCKDB.value}://"
-        if url != expected_url:
-            raise ValueError(f"URL was '{url}' but should be '{expected_url}'")
+        parsed_url = sqlalchemy.engine.url.make_url(url)
+        dialect = SqlDialect.DUCKDB.value
+        if parsed_url.drivername != dialect:
+            raise ValueError(f"Expected dialect '{dialect}' in {url}")
+
         if password:
             raise ValueError("Password should be empty")
 
-        return DuckDbSqlClient()
+        return DuckDbSqlClient(file_path=parsed_url.database)
 
-    def __init__(self) -> None:  # noqa: D
+    def __init__(self, file_path: Optional[str] = None) -> None:  # noqa: D
         # DuckDB is not designed with concurrency, but in can work in multi-threaded settings with
         # check_same_thread=False, StaticPool, and serializing of queries via a lock.
         self._concurrency_lock = threading.RLock()
         super().__init__(
             sqlalchemy.create_engine(
-                "duckdb:///:memory:",
+                f"duckdb:///{file_path if file_path else ':memory:'}",
                 connect_args={"check_same_thread": False},
                 poolclass=StaticPool,
             )
