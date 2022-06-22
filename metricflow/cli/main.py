@@ -626,7 +626,7 @@ def drop_materialization(cfg: CLIContext, materialization_name: str) -> None:
 def _print_issues(issues: Sequence[ValidationIssue]) -> None:  # noqa: D
     for issue in issues:
         header = build_validation_header_msg(issue.level)
-        click.echo(f"• {header}: {issue.message}")
+        click.echo(f"• {header}: {issue.as_readable_str(with_level=False)}")
 
 
 def _filter_issues(
