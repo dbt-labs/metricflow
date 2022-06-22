@@ -10,10 +10,11 @@ from metricflow.model.objects.data_source import DataSource, Mutability, Mutabil
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from metricflow.model.objects.elements.identifier import IdentifierType, Identifier, CompositeSubIdentifier
 from metricflow.model.objects.elements.measure import Measure, AggregationType
-from metricflow.model.objects.metric import Metric, MetricType, MetricTypeParams
+from metricflow.model.objects.metric import MetricType, MetricTypeParams
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.specs import DimensionReference, MeasureReference, IdentifierReference
+from metricflow.test.model.validations.helpers import data_source_with_guaranteed_meta, metric_with_guaranteed_meta
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.test.test_utils import find_data_source_with
 
@@ -59,7 +60,7 @@ def test_invalid_composite_identifiers() -> None:  # noqa:D
         ModelValidator().checked_validations(
             UserConfiguredModel(
                 data_sources=[
-                    DataSource(
+                    data_source_with_guaranteed_meta(
                         name="dim1",
                         sql_query=f"SELECT {dim_reference.element_name}, {measure_reference.element_name}, thorium_id FROM bar",
                         measures=[Measure(name=measure_reference, agg=AggregationType.SUM)],
@@ -87,7 +88,7 @@ def test_invalid_composite_identifiers() -> None:  # noqa:D
                     ),
                 ],
                 metrics=[
-                    Metric(
+                    metric_with_guaranteed_meta(
                         name=measure2_reference.element_name,
                         type=MetricType.MEASURE_PROXY,
                         type_params=MetricTypeParams(measures=[measure_reference]),
@@ -108,7 +109,7 @@ def test_composite_identifiers_nonexistent_ref() -> None:  # noqa:D
         ModelValidator().checked_validations(
             UserConfiguredModel(
                 data_sources=[
-                    DataSource(
+                    data_source_with_guaranteed_meta(
                         name="dim1",
                         sql_query=f"SELECT {dim_reference.element_name}, {measure_reference.element_name}, thorium_id FROM bar",
                         measures=[Measure(name=measure_reference, agg=AggregationType.SUM)],
@@ -136,7 +137,7 @@ def test_composite_identifiers_nonexistent_ref() -> None:  # noqa:D
                     ),
                 ],
                 metrics=[
-                    Metric(
+                    metric_with_guaranteed_meta(
                         name=measure2_reference.element_name,
                         type=MetricType.MEASURE_PROXY,
                         type_params=MetricTypeParams(measures=[measure_reference]),
@@ -158,7 +159,7 @@ def test_composite_identifiers_ref_and_name() -> None:  # noqa:D
         ModelValidator().checked_validations(
             UserConfiguredModel(
                 data_sources=[
-                    DataSource(
+                    data_source_with_guaranteed_meta(
                         name="dim1",
                         sql_query=f"SELECT {dim_reference.element_name}, {measure_reference.element_name}, thorium_id FROM bar",
                         measures=[Measure(name=measure_reference, agg=AggregationType.SUM)],
@@ -188,7 +189,7 @@ def test_composite_identifiers_ref_and_name() -> None:  # noqa:D
                     ),
                 ],
                 metrics=[
-                    Metric(
+                    metric_with_guaranteed_meta(
                         name=measure2_reference.element_name,
                         type=MetricType.MEASURE_PROXY,
                         type_params=MetricTypeParams(measures=[measure_reference]),

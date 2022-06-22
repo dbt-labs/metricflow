@@ -1,8 +1,8 @@
 import pytest
 from metricflow.model.model_validator import ModelValidator
-from metricflow.model.objects.materialization import Materialization
 from metricflow.model.validations.materializations import ValidMaterializationRule
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from metricflow.test.model.validations.helpers import materialization_with_guaranteed_meta
 from metricflow.test.test_utils import model_with_materialization
 
 
@@ -10,7 +10,7 @@ def test_can_configure_model_validator_rules(simple_model__pre_transforms: UserC
     model = model_with_materialization(
         simple_model__pre_transforms,
         [
-            Materialization(
+            materialization_with_guaranteed_meta(
                 name="foobar",
                 metrics=["invalid_bookings"],
                 dimensions=["ds"],
