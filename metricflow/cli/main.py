@@ -32,6 +32,7 @@ from metricflow.cli.utils import (
     separated_by_comma_option,
     start_end_time_options,
     generate_duckdb_demo_keys,
+    MF_POSTGRESQL_KEYS,
 )
 from metricflow.configuration.config_builder import YamlTemplateBuilder
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
@@ -40,6 +41,7 @@ from metricflow.model.data_warehouse_model_validator import DataWarehouseModelVa
 from metricflow.model.model_validator import ModelValidator
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import ValidationIssue, ValidationIssueLevel
+from metricflow.sql_clients.common_client import SqlDialect
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
 from metricflow.dag.dag_visualization import display_dag_as_svg
@@ -126,20 +128,23 @@ def setup(cfg: CLIContext, restart: bool) -> None:
     # Seed the config template to the config file
     if to_create:
         dialect_map = {
-            "snowflake": MF_SNOWFLAKE_KEYS,
-            "bigquery": MF_BIGQUERY_KEYS,
-            "redshift": MF_REDSHIFT_KEYS,
-            "duckdb": generate_duckdb_demo_keys(config_dir=cfg.config.dir_path),
+            SqlDialect.SNOWFLAKE.value: MF_SNOWFLAKE_KEYS,
+            SqlDialect.BIGQUERY.value: MF_BIGQUERY_KEYS,
+            SqlDialect.REDSHIFT.value: MF_REDSHIFT_KEYS,
+            SqlDialect.POSTGRESQL.value: MF_POSTGRESQL_KEYS,
+            SqlDialect.DUCKDB.value: generate_duckdb_demo_keys(config_dir=cfg.config.dir_path),
         }
 
         click.echo("Please enter your data warehouse dialect.")
         click.echo("Use 'duckdb' for a standalone demo.")
         click.echo("")
         dialect = click.prompt(
-            "dialect",
-            type=click.Choice(["bigquery", "duckdb", "redshift", "snowflake"]),
+            "Dialect",
+            type=click.Choice(sorted([x for x in dialect_map.keys()])),
             show_choices=True,
         )
+
+        # If there is a collision, prefer to use the key in the dialect.
         config_keys = list(dialect_map[dialect])
         for mf_config_key in MF_CONFIG_KEYS:
             if not any(x.key == mf_config_key.key for x in config_keys):
