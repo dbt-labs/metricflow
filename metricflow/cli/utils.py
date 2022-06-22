@@ -26,6 +26,7 @@ from metricflow.configuration.constants import (
     CONFIG_MODEL_PATH,
 )
 from metricflow.model.validations.validator_helpers import ValidationIssueLevel
+from metricflow.sql_clients.common_client import SqlDialect
 
 logger = logging.getLogger(__name__)
 
@@ -47,8 +48,19 @@ MF_BIGQUERY_KEYS = (
     ConfigKey(
         key=CONFIG_DWH_PROJECT_ID, comment="Provide the GCP Project ID, ignore if using service account credentials"
     ),
-    ConfigKey(key=CONFIG_DWH_DIALECT, value="bigquery", comment="Dialect (one of BigQuery, Snowflake, Redshift)"),
+    ConfigKey(key=CONFIG_DWH_DIALECT, value=SqlDialect.BIGQUERY.value),
 )
+
+# Redshift config keys
+MF_POSTGRESQL_KEYS = (
+    ConfigKey(key=CONFIG_DWH_DB),
+    ConfigKey(key=CONFIG_DWH_PASSWORD, comment="Password associated with the provided user"),
+    ConfigKey(key=CONFIG_DWH_USER, comment="Username for the data warehouse"),
+    ConfigKey(key=CONFIG_DWH_PORT),
+    ConfigKey(key=CONFIG_DWH_HOST, comment="Host name"),
+    ConfigKey(key=CONFIG_DWH_DIALECT, value=SqlDialect.POSTGRESQL.value),
+)
+
 # Redshift config keys
 MF_REDSHIFT_KEYS = (
     ConfigKey(key=CONFIG_DWH_DB),
@@ -56,16 +68,16 @@ MF_REDSHIFT_KEYS = (
     ConfigKey(key=CONFIG_DWH_USER, comment="Username for the data warehouse"),
     ConfigKey(key=CONFIG_DWH_PORT),
     ConfigKey(key=CONFIG_DWH_HOST, comment="Host name"),
-    ConfigKey(key=CONFIG_DWH_DIALECT, value="redshift", comment="Dialect (one of BigQuery, Snowflake, Redshift)"),
+    ConfigKey(key=CONFIG_DWH_DIALECT, value=SqlDialect.REDSHIFT.value),
 )
-# Redshift config keys
+# Snowflake config keys
 MF_SNOWFLAKE_KEYS = (
     ConfigKey(key=CONFIG_DWH_WAREHOUSE, comment="Provide the warehouse to use"),
     ConfigKey(key=CONFIG_DWH_DB),
     ConfigKey(key=CONFIG_DWH_PASSWORD, comment="Password associated with the provided user"),
     ConfigKey(key=CONFIG_DWH_USER, comment="Username for the data warehouse"),
     ConfigKey(key=CONFIG_DWH_HOST, comment="Snowflake account name"),
-    ConfigKey(key=CONFIG_DWH_DIALECT, value="snowflake", comment="Dialect (one of BigQuery, Snowflake, Redshift)"),
+    ConfigKey(key=CONFIG_DWH_DIALECT, value=SqlDialect.SNOWFLAKE.value),
 )
 
 
