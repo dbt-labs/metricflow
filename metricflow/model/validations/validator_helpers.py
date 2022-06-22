@@ -133,9 +133,13 @@ class ValidationIssue:
     context: Optional[ValidationContext]
     # Consider adding a enum here that categories the type of validation issue and standardize the error messages.
 
-    def as_readable_str(self) -> str:
+    def as_readable_str(self, with_level: bool = True) -> str:
         """Return a easily readable string that can be used to log the issue."""
-        return f"{self.level.name} {self.context.context_str if self.context else ''} - {self.message}"
+        msg_base = f"{self.level.name} " if with_level else ""
+        msg_base += self.context.context_str() if self.context else ""
+        if msg_base:
+            msg_base += " - "
+        return msg_base + self.message
 
 
 @dataclass(unsafe_hash=True)
@@ -159,10 +163,10 @@ class ValidationFutureError(ValidationIssue):
         object.__setattr__(self, "error_date", error_date)
         super().__init__(level=ValidationIssueLevel.FUTURE_ERROR, context=context, message=message)
 
-    def as_readable_str(self) -> str:
+    def as_readable_str(self, with_level: bool = True) -> str:
         """Return a easily readable string that can be used to log the issue."""
         return (
-            f"{ValidationIssue.as_readable_str(self)}"
+            f"{ValidationIssue.as_readable_str(self, with_level=with_level)}"
             f"IMPORTANT: this error will break your model starting {self.error_date.strftime('%b %d, %Y')}. "
         )
 
