@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import os
 from abc import ABC, abstractmethod
-from typing import Any, ClassVar
+from typing import Any, ClassVar, Generic, TypeVar
 
 from pydantic import BaseModel, root_validator
 
@@ -101,8 +101,24 @@ class ParseableObject:  # noqa: D
     pass
 
 
-class ParseableField(ABC):  # noqa: D
-    @staticmethod
+ModelObjectT_co = TypeVar("ModelObjectT_co", covariant=True, bound=BaseModel)
+
+
+class PydanticCustomInputParser(ABC, Generic[ModelObjectT_co]):
+    """Implements required"""
+
+    @classmethod
+    def __get_validators__(cls):
+        """Pydantic magic method for allowing parsing of arbitrary input on parse_obj invocation
+
+        This allow for parsing and validation prior to object initialization. Most classes implementing this
+        interface in our model are doing so because the input value from user-supplied YAML will be a string
+        representation rather than the structured object type.
+        """
+        yield cls._from_yaml_value
+
+    @classmethod
     @abstractmethod
-    def parse(s: str) -> ParseableField:  # noqa: D
-        pass
+    def _from_yaml_value(cls, input: Any) -> ModelObjectT_co:
+        """Abstract method for providing object-specific parsing logic"""
+        raise NotImplementedError()

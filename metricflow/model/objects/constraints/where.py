@@ -7,7 +7,7 @@ from typing import List, Optional, Dict, Any
 from moz_sql_parser import parse as moz_parse
 
 from metricflow.errors.errors import ConstraintParseException
-from metricflow.model.objects.base import ParseableField, HashableBaseModel
+from metricflow.model.objects.base import HashableBaseModel, PydanticCustomInputParser
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 
 logger = logging.getLogger(__name__)
@@ -16,7 +16,7 @@ LITERAL_STR = "literal"
 INTERVAL_LITERAL = "interval"
 
 
-class WhereClauseConstraint(HashableBaseModel, ParseableField):
+class WhereClauseConstraint(PydanticCustomInputParser, HashableBaseModel):
     """Contains a string that is a where clause"""
 
     where: str
@@ -41,6 +41,17 @@ class WhereClauseConstraint(HashableBaseModel, ParseableField):
             linkable_names=linkable_names,
             sql_params=sql_params,
         )
+
+    @classmethod
+    def _from_yaml_value(cls, input: Any) -> WhereClauseConstraint:
+        """Parses a WhereClauseConstraint from a constraing string found in a user-provided model specification
+
+        User-provided constraint strings
+        """
+        if isinstance(input, str):
+            return WhereClauseConstraint.parse(input)
+        else:
+            raise ValueError(f"Expected input to be of type string, but got type {type(input)} with value: {input}")
 
     @staticmethod
     def parse(s: str) -> WhereClauseConstraint:
