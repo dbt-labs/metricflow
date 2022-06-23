@@ -2,6 +2,7 @@ import os
 from typing import List, Optional
 import yaml
 from yamllint import config, linter, rules
+from metricflow.model.parsing.validation import METRIC_TYPE, DATA_SOURCE_TYPE, MATERIALIZATION_TYPE
 
 from metricflow.model.validations.validator_helpers import ValidationContext, ValidationIssue, ValidationIssueLevel
 
@@ -61,10 +62,24 @@ class ConfigLinter:  # noqa: D
         self._lint_config = lint_config if lint_config else yaml.dump(data=self.DEFAULT_CONFIG)
         self._config = config.YamlLintConfig(self._lint_config)
 
+    @staticmethod
+    def add_additional_key_duplicates_info(problem: linter.LintProblem) -> None:
+        """Add additional information to the key_duplicates problem description"""
+
+        # desc is of the form f'duplication of key "{key}" in mapping'
+        # the following split gives us ['duplication of key ', <key>, ' in mapping']
+        key = problem.desc.split('"')[1]
+        if key in [DATA_SOURCE_TYPE, MATERIALIZATION_TYPE, METRIC_TYPE]:
+            problem.desc += f'. Key "{key}" is a top level object. If multiple top level objects are specified in the same file, they must be separated using "---"'
+
     def lint_file(self, file_path: str, file_name: str) -> List[ValidationIssue]:  # noqa: D
         issues: List[ValidationIssue] = []
         with open(file_path) as f:
             for problem in linter.run(f, self._config):
+
+                if problem.rule == rules.key_duplicates.ID:
+                    self.add_additional_key_duplicates_info(problem=problem)
+
                 level = ValidationIssueLevel.ERROR if problem.level == ERROR else ValidationIssueLevel.WARNING
                 issues.append(
                     ValidationIssue(
