@@ -5,12 +5,11 @@ from metricflow.errors.errors import ParsingException
 from metricflow.model.objects.metric import Metric, MetricType, CumulativeMetricWindow
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
+    MetricContext,
     ModelValidationRule,
-    ValidationIssue,
     ValidationIssueType,
     ValidationError,
     ValidationFatal,
-    ModelObjectType,
     validate_safely,
 )
 
@@ -38,7 +37,9 @@ class MetricMeasuresRule(ModelValidationRule):
             if measure_in_metric.element_name not in valid_measure_names:
                 issues.append(
                     ValidationFatal(
-                        model_object_reference=ValidationIssue.make_object_reference(
+                        context=MetricContext(
+                            file_name=metric.metadata.file_slice.filename if metric.metadata else None,
+                            line_number=metric.metadata.file_slice.start_line_number if metric.metadata else None,
                             metric_name=metric.name,
                         ),
                         message=f"Invalid measure {measure_in_metric.element_name} in metric {metric.name}",
@@ -74,9 +75,10 @@ class CumulativeMetricRule(ModelValidationRule):
             if metric.type_params.window and metric.type_params.grain_to_date:
                 issues.append(
                     ValidationError(
-                        model_object_reference=ValidationIssue.make_object_reference(
-                            object_type=ModelObjectType.METRIC,
-                            object_name=metric.name,
+                        context=MetricContext(
+                            file_name=metric.metadata.file_slice.filename if metric.metadata else None,
+                            line_number=metric.metadata.file_slice.start_line_number if metric.metadata else None,
+                            metric_name=metric.name,
                         ),
                         message="Both window and grain_to_date set for cumulative metric. Please set one or the other",
                     )
@@ -88,7 +90,9 @@ class CumulativeMetricRule(ModelValidationRule):
                 except ParsingException:
                     issues.append(
                         ValidationError(
-                            model_object_reference=ValidationIssue.make_object_reference(
+                            context=MetricContext(
+                                file_name=metric.metadata.file_slice.filename if metric.metadata else None,
+                                line_number=metric.metadata.file_slice.start_line_number if metric.metadata else None,
                                 metric_name=metric.name,
                             ),
                             message=traceback.format_exc(),

@@ -3,9 +3,9 @@ from typing import Dict, List
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType
 from metricflow.model.validations.validator_helpers import (
+    DimensionContext,
     ModelValidationRule,
     DimensionInvariants,
-    ValidationIssue,
     ValidationIssueType,
     ValidationError,
     validate_safely,
@@ -27,7 +27,7 @@ class DimensionConsistencyRule(ModelValidationRule):
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
         dimension_to_invariant: Dict[DimensionReference, DimensionInvariants] = {}
         time_dims_to_granularity: Dict[DimensionReference, TimeGranularity] = {}
-        issues: List[ValidationIssue] = []
+        issues: List[ValidationIssueType] = []
 
         for data_source in model.data_sources:
             issues += DimensionConsistencyRule._validate_data_source(
@@ -38,7 +38,7 @@ class DimensionConsistencyRule(ModelValidationRule):
                 issues += DimensionConsistencyRule._validate_dimension(
                     dimension=dimension,
                     time_dims_to_granularity=time_dims_to_granularity,
-                    data_source_name=data_source.name,
+                    data_source=data_source,
                 )
         return issues
 
@@ -48,19 +48,24 @@ class DimensionConsistencyRule(ModelValidationRule):
         "have the same time granularity specifications"
     )
     def _validate_dimension(
-        dimension: Dimension, time_dims_to_granularity: Dict[DimensionReference, TimeGranularity], data_source_name: str
+        dimension: Dimension,
+        time_dims_to_granularity: Dict[DimensionReference, TimeGranularity],
+        data_source: DataSource,
     ) -> List[ValidationIssueType]:
         """Checks that time dimensions of the same name that aren't primary have the same time granularity specifications
 
         Args:
             dimension: the dimension to check
-           time_dims_to_granularity: a dict from the dimension to the time granularity it should have
-            data_source_name: the name of the associated data source for use in issue messages
+            time_dims_to_granularity: a dict from the dimension to the time granularity it should have
+            data_source: the associated data source. Used for generated issue messages
         Throws: MdoValidationError if there is an inconsistent dimension in the data source.
         """
         issues: List[ValidationIssueType] = []
-        obj_ref = ValidationIssue.make_object_reference(
-            data_source_name=data_source_name, dimension_name=dimension.name.element_name
+        context = DimensionContext(
+            file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
+            line_number=data_source.metadata.file_slice.start_line_number if data_source.metadata else None,
+            data_source_name=data_source.name,
+            dimension_name=dimension.name.element_name,
         )
 
         if dimension.type == DimensionType.TIME:
@@ -76,10 +81,10 @@ class DimensionConsistencyRule(ModelValidationRule):
                     expected_granularity = time_dims_to_granularity[dimension.name]
                     issues.append(
                         ValidationError(
-                            model_object_reference=obj_ref,
+                            context=context,
                             message=f"Time granularity must be the same for time dimensions with the same name. "
                             f"Problematic dimension: {dimension.name.element_name} in data source with name: "
-                            f"`{data_source_name}`. Expected granularity is {expected_granularity.name}.",
+                            f"`{data_source.name}`. Expected granularity is {expected_granularity.name}.",
                         )
                     )
 
@@ -119,13 +124,17 @@ class DimensionConsistencyRule(ModelValidationRule):
             # is_partition might not be specified in the configs, so default to False.
             is_partition = dimension.is_partition or False
 
-            model_object_reference = ValidationIssue.make_object_reference(
-                data_source_name=data_source.name, dimension_name=dimension.name.element_name
+            context = DimensionContext(
+                file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
+                line_number=data_source.metadata.file_slice.start_line_number if data_source.metadata else None,
+                data_source_name=data_source.name,
+                dimension_name=dimension.name.element_name,
             )
+
             if dimension_invariant.type != dimension.type:
                 issues.append(
                     ValidationError(
-                        model_object_reference=model_object_reference,
+                        context=context,
                         message=f"In data source `{data_source.name}`, type conflict for dimension `{dimension.name}` "
                         f"- already in model as type `{dimension_invariant.type}` but got `{dimension.type}`",
                     )
@@ -133,7 +142,7 @@ class DimensionConsistencyRule(ModelValidationRule):
             if dimension_invariant.is_partition != is_partition:
                 issues.append(
                     ValidationError(
-                        model_object_reference=model_object_reference,
+                        context=context,
                         message=f"In data source `{data_source.name}, conflicting is_partition attribute for dimension "
                         f"`{dimension.name}` - already in model"
                         f" with is_partition as `{dimension_invariant.is_partition}` but got "

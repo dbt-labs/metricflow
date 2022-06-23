@@ -9,7 +9,7 @@ from metricflow.model.data_warehouse_model_validator import (
     DataWarehouseValidationTask,
 )
 from metricflow.model.model_transformer import ModelTransformer
-from metricflow.model.objects.data_source import DataSource, Mutability, MutabilityType
+from metricflow.model.objects.data_source import Mutability, MutabilityType
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType
 from metricflow.model.objects.elements.measure import AggregationType, Measure
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
@@ -20,6 +20,7 @@ from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.specs import DimensionReference, MeasureReference
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.model.validations.helpers import data_source_with_guaranteed_meta
 from metricflow.test.plan_utils import assert_snapshot_text_equal, make_schema_replacement_function
 from metricflow.test.test_utils import as_datetime
 from metricflow.test.time.configurable_time_source import ConfigurableTimeSource
@@ -92,7 +93,7 @@ def test_validate_data_sources(  # noqa: D
     assert len(issues) == 0
 
     model.data_sources.append(
-        DataSource(
+        data_source_with_guaranteed_meta(
             name="test_data_source2",
             sql_table="doesnt_exist",
             dimensions=[],

@@ -3,11 +3,12 @@ from __future__ import annotations
 import functools
 import traceback
 from abc import ABC, abstractmethod
-from collections import OrderedDict
 from dataclasses import dataclass
 from datetime import date
 from enum import Enum
 from typing import Any, Callable, List, Optional, Tuple, Union
+
+from pydantic import BaseModel, Extra
 
 from metricflow.model.objects.elements.dimension import DimensionType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
@@ -39,82 +40,115 @@ class ModelObjectType(Enum):
     METRIC = "metric"
 
 
+class ValidationContext(BaseModel):
+    """The base context class for validation issues"""
+
+    file_name: Optional[str]
+    line_number: Optional[int]
+
+    class Config:
+        """Pydantic class configuration options"""
+
+        extra = Extra.forbid
+
+    def context_str(self) -> str:
+        """Human readable stringified representation of the context"""
+
+        context_string = ""
+
+        if self.file_name:
+            context_string += f"in file `{self.file_name}`"
+            if self.line_number:
+                context_string += f" on line #{self.line_number}"
+
+        return context_string
+
+
+class MaterializationContext(ValidationContext):
+    """The context class for vaidation issues involving materializations"""
+
+    materialization_name: str
+
+    def context_str(self) -> str:
+        """Human readable stringified representation of the context"""
+        return f"with materialization `{self.materialization_name}` {ValidationContext.context_str(self)}"
+
+
+class MetricContext(ValidationContext):
+    """The context class for vaidation issues involving metrics"""
+
+    metric_name: str
+
+    def context_str(self) -> str:
+        """Human readable stringified representation of the context"""
+        return f"with metric `{self.metric_name}` {ValidationContext.context_str(self)}"
+
+
+class DataSourceContext(ValidationContext):
+    """The context class for vaidation issues involving data sources"""
+
+    data_source_name: str
+
+    def context_str(self) -> str:
+        """Human readable stringified representation of the context"""
+        return f"with data source `{self.data_source_name}` {ValidationContext.context_str(self)}"
+
+
+class DimensionContext(DataSourceContext):
+    """The context class for vaidation issues involving dimensions"""
+
+    dimension_name: str
+
+    def context_str(self) -> str:
+        """Human readable stringified representation of the context"""
+        return f"with dimension `{self.dimension_name}` in data source `{self.data_source_name}` {ValidationContext.context_str(self)}"
+
+
+class IdentifierContext(DataSourceContext):
+    """The context class for vaidation issues involving indentifiers"""
+
+    identifier_name: str
+
+    def context_str(self) -> str:
+        """Human readable stringified representation of the context"""
+        return f"with identifier `{self.identifier_name}` in data source `{self.data_source_name}` {ValidationContext.context_str(self)}"
+
+
+class MeasureContext(DataSourceContext):
+    """The context class for vaidation issues involving measures"""
+
+    measure_name: str
+
+    def context_str(self) -> str:
+        """Human readable stringified representation of the context"""
+        return f"with measure `{self.measure_name}` in data source `{self.data_source_name}` {ValidationContext.context_str(self)}"
+
+
 @dataclass(unsafe_hash=True)
 class ValidationIssue:
     """An issue that was found while validating the MetricFlow model."""
 
     level: ValidationIssueLevel
-    # Need a better way to represent the object, but right now this is a dict to the type of object to the name,
-    # inserted in hierarchical order.
-    # e.g. {"data_source": "example_data_source", "measure": "example_measure"}
-    model_object_reference: OrderedDict[ModelObjectType, str]
     message: str
+    context: Optional[ValidationContext]
     # Consider adding a enum here that categories the type of validation issue and standardize the error messages.
 
-    def as_readable_str(self) -> str:
+    def as_readable_str(self, with_level: bool = True) -> str:
         """Return a easily readable string that can be used to log the issue."""
-        object_str = "{" + ", ".join([f"{k.value}: {v}" for k, v in self.model_object_reference.items()]) + "}"
-        return f"[{self.level.name}] Object: {object_str} - {self.message}"
-
-    @staticmethod
-    def make_object_reference(
-        data_source_name: Optional[str] = None,
-        materialization_name: Optional[str] = None,
-        dimension_name: Optional[str] = None,
-        identifier_name: Optional[str] = None,
-        measure_name: Optional[str] = None,
-        metric_name: Optional[str] = None,
-        object_type: Optional[ModelObjectType] = None,
-        object_name: Optional[str] = None,
-    ) -> OrderedDict[ModelObjectType, str]:
-        """Convenience function for making the object reference dict."""
-
-        model_object: OrderedDict[ModelObjectType, str] = OrderedDict()
-        if data_source_name:
-            if object_type == ModelObjectType.DATA_SOURCE:
-                raise RuntimeError("Conflicting object types - multiple data sources")
-            model_object[ModelObjectType.DATA_SOURCE] = data_source_name
-        if materialization_name:
-            if object_type == ModelObjectType.MATERIALIZATION:
-                raise RuntimeError("Conflicting object types - multiple materializations")
-            model_object[ModelObjectType.MATERIALIZATION] = materialization_name
-        if metric_name:
-            if object_type == ModelObjectType.METRIC:
-                raise RuntimeError("Conflicting object types - multiple metrics")
-            model_object[ModelObjectType.METRIC] = metric_name
-        if dimension_name:
-            if object_type == ModelObjectType.DIMENSION:
-                raise RuntimeError("Conflicting object types - multiple dimensions")
-            model_object[ModelObjectType.DIMENSION] = dimension_name
-        if identifier_name:
-            if object_type == ModelObjectType.IDENTIFIER:
-                raise RuntimeError("Conflicting object types - multiple dimensions")
-            model_object[ModelObjectType.IDENTIFIER] = identifier_name
-        if measure_name:
-            if object_type == ModelObjectType.MEASURE:
-                raise RuntimeError("Conflicting object types - multiple dimensions")
-            model_object[ModelObjectType.MEASURE] = measure_name
-
-        if object_type:
-            if not object_name:
-                raise RuntimeError("Object name must be specified with object type.")
-            model_object[object_type] = object_name
-
-        if len(model_object) == 0:
-            raise RuntimeError("No object parameters were passed in.")
-
-        return model_object
+        msg_base = f"{self.level.name} " if with_level else ""
+        msg_base += self.context.context_str() if self.context else ""
+        if msg_base:
+            msg_base += " - "
+        return msg_base + self.message
 
 
 @dataclass(unsafe_hash=True)
 class ValidationWarning(ValidationIssue):
     """A warning that was found while validation the model."""
 
-    def __init__(self, model_object_reference: OrderedDict[ModelObjectType, str], message: str):
+    def __init__(self, message: str, context: Optional[ValidationContext] = None):
         """Initializes with super (ValidationIssue) with hardcoded level of WARNING"""
-        super().__init__(
-            level=ValidationIssueLevel.WARNING, model_object_reference=model_object_reference, message=message
-        )
+        super().__init__(level=ValidationIssueLevel.WARNING, context=context, message=message)
 
 
 @dataclass(unsafe_hash=True)
@@ -123,21 +157,16 @@ class ValidationFutureError(ValidationIssue):
 
     error_date: date
 
-    def __init__(self, model_object_reference: OrderedDict[ModelObjectType, str], message: str, error_date: date):
+    def __init__(self, message: str, error_date: date, context: Optional[ValidationContext] = None):
         """Calls super (ValidationIssue) with hardcoded level of FUTURE_ERROR"""
         # Special way to set error_date because we're in a frozen dataclass
         object.__setattr__(self, "error_date", error_date)
-        super().__init__(
-            level=ValidationIssueLevel.FUTURE_ERROR,
-            model_object_reference=model_object_reference,
-            message=message,
-        )
+        super().__init__(level=ValidationIssueLevel.FUTURE_ERROR, context=context, message=message)
 
-    def as_readable_str(self) -> str:
+    def as_readable_str(self, with_level: bool = True) -> str:
         """Return a easily readable string that can be used to log the issue."""
-        object_str = "{" + ", ".join([f"{k.value}: {v}" for k, v in self.model_object_reference.items()]) + "}"
         return (
-            f"[{self.level.name}] Object: {object_str} - {self.message}. "
+            f"{ValidationIssue.as_readable_str(self, with_level=with_level)}"
             f"IMPORTANT: this error will break your model starting {self.error_date.strftime('%b %d, %Y')}. "
         )
 
@@ -146,35 +175,31 @@ class ValidationFutureError(ValidationIssue):
 class ValidationError(ValidationIssue):
     """An error that was found while validating the model."""
 
-    def __init__(self, model_object_reference: OrderedDict[ModelObjectType, str], message: str):
+    def __init__(self, message: str, context: Optional[ValidationContext] = None):
         """Calls super (ValidationIssue) with hardcoded level of ERROR"""
-        super().__init__(
-            level=ValidationIssueLevel.ERROR, model_object_reference=model_object_reference, message=message
-        )
+        super().__init__(level=ValidationIssueLevel.ERROR, context=context, message=message)
 
 
 @dataclass(unsafe_hash=True)
 class ValidationFatal(ValidationIssue):
     """A fatal issue that was found while validation the model."""
 
-    def __init__(self, model_object_reference: OrderedDict[ModelObjectType, str], message: str):
+    def __init__(self, message: str, context: Optional[ValidationContext] = None):
         """Calls super (ValidationIssue) with hardcoded level of FATAL"""
-        super().__init__(
-            level=ValidationIssueLevel.FATAL, model_object_reference=model_object_reference, message=message
-        )
+        super().__init__(level=ValidationIssueLevel.FATAL, context=context, message=message)
 
 
 ValidationIssueType = Union[ValidationIssue, ValidationWarning, ValidationFutureError, ValidationError, ValidationFatal]
 
 
 def generate_exception_issue(
-    obj_ref: OrderedDict[ModelObjectType, str],
     what_was_being_done: str,
     e: Exception,
+    context: Optional[ValidationContext] = None,
 ) -> ValidationIssue:
     """Generates a validation issue for exceptions"""
     return ValidationError(
-        model_object_reference=obj_ref,
+        context=context,
         message=f"An error occured while {what_was_being_done} - {''.join(traceback.format_exception(etype=type(e), value=e, tb=e.__traceback__))}",
     )
 
@@ -197,7 +222,6 @@ def validate_safely(whats_being_done: str) -> Callable:
                 arguments_str = _func_args_to_string(*args, **kwargs)
                 issues = [
                     generate_exception_issue(
-                        obj_ref=OrderedDict(),
                         what_was_being_done=whats_being_done
                         + VALIDATE_SAFELY_ERROR_STR_TMPLT.format(
                             method_name=func.__name__, arguments_str=arguments_str

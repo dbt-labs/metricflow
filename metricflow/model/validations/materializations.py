@@ -8,8 +8,8 @@ from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.semantics.data_source_container import PydanticDataSourceContainer
 from metricflow.model.semantics.semantic_containers import DataSourceSemantics
 from metricflow.model.validations.validator_helpers import (
+    MaterializationContext,
     ModelValidationRule,
-    ValidationIssue,
     ValidationError,
     ValidationIssueType,
     validate_safely,
@@ -39,12 +39,16 @@ class ValidMaterializationRule(ModelValidationRule):
     ) -> List[ValidationIssueType]:
         issues: List[ValidationIssueType] = []
 
+        context = MaterializationContext(
+            file_name=materialization.metadata.file_slice.filename if materialization.metadata else None,
+            line_number=materialization.metadata.file_slice.start_line_number if materialization.metadata else None,
+            materialization_name=materialization.name,
+        )
+
         if not materialization.dimensions:
             return [
                 ValidationError(
-                    model_object_reference=ValidationIssue.make_object_reference(
-                        materialization_name=materialization.name
-                    ),
+                    context=context,
                     message=f"Materialization '{materialization.name}' does not have dimensions listed",
                 )
             ]
@@ -58,9 +62,7 @@ class ValidMaterializationRule(ModelValidationRule):
         except Exception as err:
             issues.append(
                 ValidationFutureError(
-                    model_object_reference=ValidationIssue.make_object_reference(
-                        materialization_name=materialization.name
-                    ),
+                    context=context,
                     message=str(err),
                     error_date=datetime.date(2022, 5, 23),
                 )
@@ -76,9 +78,7 @@ class ValidMaterializationRule(ModelValidationRule):
         if len(mat_primary_time_dimension_names) == 0:
             issues.append(
                 ValidationError(
-                    model_object_reference=ValidationIssue.make_object_reference(
-                        materialization_name=materialization.name
-                    ),
+                    context=context,
                     message=f"Primary time dimension {primary_time_dimensions_reference.element_name} not listed"
                     f" as a dimension in materialization {materialization.name}",
                 )
@@ -87,9 +87,7 @@ class ValidMaterializationRule(ModelValidationRule):
         if len(mat_primary_time_dimension_names) > 1:
             issues.append(
                 ValidationError(
-                    model_object_reference=ValidationIssue.make_object_reference(
-                        materialization_name=materialization.name
-                    ),
+                    context=context,
                     message=f"Multiple primary time dimensions {mat_primary_time_dimension_names} listed in "
                     f"materialization {materialization.name}",
                 )

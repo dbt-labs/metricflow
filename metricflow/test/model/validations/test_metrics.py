@@ -1,14 +1,15 @@
 import pytest
 
 from metricflow.model.model_validator import ModelValidator
-from metricflow.model.objects.data_source import DataSource, Mutability, MutabilityType
+from metricflow.model.objects.data_source import Mutability, MutabilityType
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from metricflow.model.objects.elements.identifier import Identifier, IdentifierType
 from metricflow.model.objects.elements.measure import Measure, AggregationType
-from metricflow.model.objects.metric import Metric, MetricType, MetricTypeParams
+from metricflow.model.objects.metric import MetricType, MetricTypeParams
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.specs import MeasureReference, DimensionReference, IdentifierReference
+from metricflow.test.model.validations.helpers import data_source_with_guaranteed_meta, metric_with_guaranteed_meta
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.test.fixtures.table_fixtures import DEFAULT_DS
 
@@ -21,7 +22,7 @@ def test_metric_missing_measure() -> None:  # noqa:D
         ModelValidator().checked_validations(
             UserConfiguredModel(
                 data_sources=[
-                    DataSource(
+                    data_source_with_guaranteed_meta(
                         name="sum_measure",
                         sql_query="SELECT foo FROM bar",
                         measures=[Measure(name=measure_reference, agg=AggregationType.SUM)],
@@ -29,7 +30,7 @@ def test_metric_missing_measure() -> None:  # noqa:D
                     )
                 ],
                 metrics=[
-                    Metric(
+                    metric_with_guaranteed_meta(
                         name="metric_with_nonexistent_measure",
                         type=MetricType.MEASURE_PROXY,
                         type_params=MetricTypeParams(measures=[measure2_reference]),
@@ -46,14 +47,14 @@ def test_metric_no_time_dim_dim_only_source() -> None:  # noqa:D
     ModelValidator().checked_validations(
         UserConfiguredModel(
             data_sources=[
-                DataSource(
+                data_source_with_guaranteed_meta(
                     name="sum_measure",
                     sql_query="SELECT foo, country FROM bar",
                     measures=[],
                     dimensions=[Dimension(name=dim_reference, type=DimensionType.CATEGORICAL)],
                     mutability=Mutability(type=MutabilityType.IMMUTABLE),
                 ),
-                DataSource(
+                data_source_with_guaranteed_meta(
                     name="sum_measure2",
                     sql_query="SELECT foo, country FROM bar",
                     measures=[Measure(name=measure_reference, agg=AggregationType.SUM)],
@@ -72,7 +73,7 @@ def test_metric_no_time_dim_dim_only_source() -> None:  # noqa:D
                 ),
             ],
             metrics=[
-                Metric(
+                metric_with_guaranteed_meta(
                     name="metric_with_no_time_dim",
                     type=MetricType.MEASURE_PROXY,
                     type_params=MetricTypeParams(measures=[measure_reference]),
@@ -90,7 +91,7 @@ def test_metric_no_time_dim() -> None:  # noqa:D
         ModelValidator().checked_validations(
             UserConfiguredModel(
                 data_sources=[
-                    DataSource(
+                    data_source_with_guaranteed_meta(
                         name="sum_measure",
                         sql_query="SELECT foo, country FROM bar",
                         measures=[Measure(name=measure_reference, agg=AggregationType.SUM)],
@@ -104,7 +105,7 @@ def test_metric_no_time_dim() -> None:  # noqa:D
                     )
                 ],
                 metrics=[
-                    Metric(
+                    metric_with_guaranteed_meta(
                         name="metric_with_no_time_dim",
                         type=MetricType.MEASURE_PROXY,
                         type_params=MetricTypeParams(measures=[measure_reference]),
@@ -123,7 +124,7 @@ def test_metric_multiple_primary_time_dims() -> None:  # noqa:D
         ModelValidator().checked_validations(
             UserConfiguredModel(
                 data_sources=[
-                    DataSource(
+                    data_source_with_guaranteed_meta(
                         name="sum_measure",
                         sql_query="SELECT foo, date_created, date_deleted FROM bar",
                         measures=[Measure(name=measure_reference, agg=AggregationType.SUM)],
@@ -147,7 +148,7 @@ def test_metric_multiple_primary_time_dims() -> None:  # noqa:D
                     )
                 ],
                 metrics=[
-                    Metric(
+                    metric_with_guaranteed_meta(
                         name="foo",
                         type=MetricType.MEASURE_PROXY,
                         type_params=MetricTypeParams(measures=[measure_reference]),
@@ -163,7 +164,7 @@ def test_generated_metrics_only() -> None:  # noqa:D
     dim2_reference = DimensionReference(element_name=DEFAULT_DS)
     measure_reference = MeasureReference(element_name="measure")
     identifier_reference = IdentifierReference(element_name="primary")
-    data_source = DataSource(
+    data_source = data_source_with_guaranteed_meta(
         name="dim1",
         sql_query=f"SELECT {dim_reference.element_name}, {measure_reference.element_name} FROM bar",
         measures=[Measure(name=measure_reference, agg=AggregationType.SUM)],
