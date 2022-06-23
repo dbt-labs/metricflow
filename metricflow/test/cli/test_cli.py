@@ -85,8 +85,9 @@ def test_validate_configs(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
             ValidationFatal(context=None, message="fatal"),  # type: ignore
         )
     )
-    with patch.object(ModelValidator, "validate_model", return_value=mocked_build_result):
-        resp = cli_runner.run(validate_configs)
+    with patch("metricflow.cli.main.path_to_models", return_value=""):
+        with patch.object(ModelValidator, "validate_model", return_value=mocked_build_result):
+            resp = cli_runner.run(validate_configs)
 
     assert "future_error" in resp.output
     assert resp.exit_code == 0
@@ -97,17 +98,19 @@ def test_validate_configs_data_warehouse_validations(cli_runner: MetricFlowCliRu
         ValidationError(context=None, message="Data Warehouse Error"),  # type: ignore
     ]
 
-    with patch.object(CLIContext, "sql_client", return_value=None):  # type: ignore
-        with patch("metricflow.cli.main._run_dw_validations", return_value=dw_validation_issues):
-            resp = cli_runner.run(validate_configs)
+    with patch("metricflow.cli.main.path_to_models", return_value=""):
+        with patch.object(CLIContext, "sql_client", return_value=None):  # type: ignore
+            with patch("metricflow.cli.main._run_dw_validations", return_value=dw_validation_issues):
+                resp = cli_runner.run(validate_configs)
 
     assert "Data Warehouse Error" in resp.output
     assert resp.exit_code == 0
 
 
 def test_validate_configs_skip_data_warehouse_validations(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    with patch.object(ModelValidator, "validate_model", return_value=MagicMock(issues=())):
-        resp = cli_runner.run(validate_configs, args=["--skip-dw"])
+    with patch("metricflow.cli.main.path_to_models", return_value=""):
+        with patch.object(ModelValidator, "validate_model", return_value=MagicMock(issues=())):
+            resp = cli_runner.run(validate_configs, args=["--skip-dw"])
 
     assert "Data Warehouse Error" not in resp.output
     assert resp.exit_code == 0
