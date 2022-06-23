@@ -1,20 +1,30 @@
 from __future__ import annotations
-from typing import Optional
+from typing import Any, Optional
 
-from metricflow.model.objects.base import FrozenBaseModel, ParseableField
+from metricflow.model.objects.base import FrozenBaseModel, PydanticCustomInputParser
 
 
-class SqlTable(FrozenBaseModel, ParseableField):
+class SqlTable(PydanticCustomInputParser, FrozenBaseModel):
     """Represents a reference to a SQL table."""
 
     db_name: Optional[str] = None
     schema_name: str
     table_name: str
 
-    @staticmethod
-    def parse(s: str) -> SqlTable:
-        """Implement ParseableField interface"""
-        return SqlTable.from_string(s)
+    @classmethod
+    def _from_yaml_value(cls, input: Any) -> SqlTable:
+        """Parses a SqlTable from string input found in a user-provided model specification
+
+        Raises a ValueError on any non-string input, as all user-provided specifications of table identifiers
+        should be strings conforming to the expectations defined in the from_string method.
+        """
+        if isinstance(input, str):
+            return SqlTable.from_string(input)
+        else:
+            raise ValueError(
+                f"SqlTable inputs from model configs are expected to always be of type string, but got type "
+                f"{type(input)} with value: {input}"
+            )
 
     @staticmethod
     def from_string(sql_str: str) -> SqlTable:  # noqa: D
