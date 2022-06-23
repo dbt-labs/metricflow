@@ -1,6 +1,6 @@
 import inspect
 import logging
-import os.path
+import os
 import textwrap
 from dataclasses import dataclass
 from string import Template
