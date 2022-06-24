@@ -1,0 +1,44 @@
+data_source:
+  name: foo
+  description: bar buzz bazz
+  owners:
+    - support@transformdata.io
+  sql_query: "SELECT * FROM $source_schema.fct_animals"
+  dimensions:
+    - name: ds
+      type: time
+      type_params:
+        is_primary: True
+        time_granularity: day
+    - name: is_dog
+      type: categorical
+      is_partition: True
+  measures:
+    - name: count_dogs
+      agg: sum
+      expr: 1
+      create_metric: True
+  mutability:
+    type: immutable
+data_source:
+  name: foo
+  description: bar buzz bazz
+  owners:
+    - support@transformdata.io
+  sql_query: "SELECT * FROM $source_schema.fct_animals"
+  dimensions:
+    - name: ds
+      type: time
+      type_params:
+        is_primary: True
+        time_granularity: day
+    - name: is_dog
+      type: categorical
+      is_partition: True
+  measures:
+    - name: count_dogs
+      agg: sum
+      expr: 1
+      create_metric: True
+  mutability:
+    type: immutable
