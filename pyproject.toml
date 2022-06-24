@@ -38,6 +38,7 @@ click = "^7.1.2"
 python-Levenshtein = "^0.12.2"
 rudder-sdk-python = "^1.0.3"
 duckdb-engine = "^0.1.8"
+duckdb = "0.3.4"
 
 [tool.poetry.dev-dependencies]
 pytest-mock = "^3.7.0"
