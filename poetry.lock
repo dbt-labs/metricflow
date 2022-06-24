@@ -1183,7 +1183,7 @@ testing = ["coverage (>=4)", "coverage-enable-subprocess (>=1)", "flaky (>=3)", 
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<3.10"
-content-hash = "9cd7ae2810bc56b0de2a1ce29dbc820105283e75fd3b5744ec3641b289015b96"
+content-hash = "88c6c3795fd0ea0f597b4ed1024cf26c655a47feaa599ea6fa2a2ab5fd9c0d55"
 
 [metadata.files]
 asn1crypto = [
