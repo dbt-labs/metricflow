@@ -9,11 +9,12 @@
         <!--   -- Aggregate Measures                                                        -->
         <!--   -- Compute Metrics via Expressions                                           -->
         <!--   SELECT                                                                       -->
-        <!--     SUM(subq_1.bookings) AS bookings                                           -->
-        <!--     , subq_1.is_instant AS is_instant                                          -->
+        <!--     SUM(subq_2.bookings) AS bookings                                           -->
+        <!--     , subq_2.is_instant AS is_instant                                          -->
         <!--     , listings_latest_src_10003.country AS listing__country_latest             -->
         <!--   FROM (                                                                       -->
         <!--     -- Read Elements From Data Source 'bookings_source'                        -->
+        <!--     -- Metric Time Dimension 'ds'                                              -->
         <!--     -- Pass Only Elements:                                                     -->
         <!--     --   ['bookings', 'is_instant', 'listing']                                 -->
         <!--     SELECT                                                                     -->
@@ -24,13 +25,13 @@
         <!--       -- User Defined SQL Query                                                -->
         <!--       SELECT * FROM ***************************.fct_bookings                   -->
         <!--     ) bookings_source_src_10000                                                -->
-        <!--   ) subq_1                                                                     -->
+        <!--   ) subq_2                                                                     -->
         <!--   LEFT OUTER JOIN                                                              -->
         <!--     ***************************.dim_listings_latest listings_latest_src_10003  -->
         <!--   ON                                                                           -->
-        <!--     subq_1.listing = listings_latest_src_10003.listing_id                      -->
+        <!--     subq_2.listing = listings_latest_src_10003.listing_id                      -->
         <!--   GROUP BY                                                                     -->
-        <!--     subq_1.is_instant                                                          -->
+        <!--     subq_2.is_instant                                                          -->
         <!--     , listings_latest_src_10003.country                                        -->
     </SelectSqlQueryToDataFrameTask>
 </ExecutionPlan>
