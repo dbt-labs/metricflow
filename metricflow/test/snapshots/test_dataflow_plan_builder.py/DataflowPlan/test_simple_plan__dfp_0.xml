@@ -17,13 +17,18 @@
                     <!-- include_spec = MeasureSpec(element_name='bookings') -->
                     <!-- include_spec =                                                                      -->
                     <!--   {'class': 'DimensionSpec', 'element_name': 'is_instant', 'identifier_links': ()}  -->
-                    <ReadSqlSourceNode>
-                        <!-- description =                                                                           -->
-                        <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
-                        <!-- node_id = rss_0 -->
-                        <!-- data_set =                                                                    -->
-                        <!--   DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
-                    </ReadSqlSourceNode>
+                    <MetricTimeDimensionTransformNode>
+                        <!-- description = Metric Time Dimension 'ds' -->
+                        <!-- node_id = sma_10000 -->
+                        <!-- aggregation_time_dimension = ds -->
+                        <ReadSqlSourceNode>
+                            <!-- description =                                                                           -->
+                            <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                            <!-- node_id = rss_10009 -->
+                            <!-- data_set =                                                                    -->
+                            <!--   DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                        </ReadSqlSourceNode>
+                    </MetricTimeDimensionTransformNode>
                 </FilterElementsNode>
             </AggregateMeasuresNode>
         </ComputeMetricsNode>

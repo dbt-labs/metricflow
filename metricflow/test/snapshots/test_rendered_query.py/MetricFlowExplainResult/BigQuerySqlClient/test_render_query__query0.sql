@@ -5,6 +5,7 @@ SELECT
   , ds
 FROM (
   -- Read Elements From Data Source 'bookings_source'
+  -- Metric Time Dimension 'ds'
   -- Constrain Time Range to [2000-01-01T00:00:00, 2040-12-31T00:00:00]
   -- Pass Only Elements:
   --   ['bookings', 'ds']
@@ -20,6 +21,6 @@ FROM (
   ) AND (
     ds <= CAST('2040-12-31' AS DATETIME)
   )
-) subq_2
+) subq_3
 GROUP BY
   ds

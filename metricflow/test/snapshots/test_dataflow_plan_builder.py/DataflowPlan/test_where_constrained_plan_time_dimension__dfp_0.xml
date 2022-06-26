@@ -22,34 +22,39 @@
                         <!-- node_id = wcc_0 -->
                         <!-- where_condition =                                                                               -->
                         <!--   {'class': 'SpecWhereClauseConstraint',                                                        -->
-                        <!--    'where_condition': "ds >= '2020-01-01'",                                                     -->
-                        <!--    'linkable_names': ('ds',),                                                                   -->
+                        <!--    'where_condition': "metric_time >= '2020-01-01'",                                            -->
+                        <!--    'linkable_names': ('metric_time',),                                                          -->
                         <!--    'linkable_spec_set': {'dimension_specs': (),                                                 -->
-                        <!--                          'time_dimension_specs': ({'element_name': 'ds',                        -->
+                        <!--                          'time_dimension_specs': ({'element_name': 'metric_time',               -->
                         <!--                                                    'identifier_links': (),                      -->
                         <!--                                                    'time_granularity': TimeGranularity.DAY},),  -->
                         <!--                          'identifier_specs': ()},                                               -->
                         <!--    'execution_parameters': {'param_dict': {}}}                                                  -->
                         <FilterElementsNode>
-                            <!-- description =                         -->
-                            <!--   Pass Only Elements:                 -->
-                            <!--     ['bookings', 'is_instant', 'ds']  -->
+                            <!-- description =                                  -->
+                            <!--   Pass Only Elements:                          -->
+                            <!--     ['bookings', 'is_instant', 'metric_time']  -->
                             <!-- node_id = pfe_0 -->
                             <!-- include_spec = MeasureSpec(element_name='bookings') -->
                             <!-- include_spec =                                                                      -->
                             <!--   {'class': 'DimensionSpec', 'element_name': 'is_instant', 'identifier_links': ()}  -->
                             <!-- include_spec =                               -->
                             <!--   {'class': 'TimeDimensionSpec',             -->
-                            <!--    'element_name': 'ds',                     -->
+                            <!--    'element_name': 'metric_time',            -->
                             <!--    'identifier_links': (),                   -->
                             <!--    'time_granularity': TimeGranularity.DAY}  -->
-                            <ReadSqlSourceNode>
-                                <!-- description =                                                                           -->
-                                <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
-                                <!-- node_id = rss_0 -->
-                                <!-- data_set =                                                                    -->
-                                <!--   DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
-                            </ReadSqlSourceNode>
+                            <MetricTimeDimensionTransformNode>
+                                <!-- description = Metric Time Dimension 'ds' -->
+                                <!-- node_id = sma_10000 -->
+                                <!-- aggregation_time_dimension = ds -->
+                                <ReadSqlSourceNode>
+                                    <!-- description =                                                                           -->
+                                    <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                                    <!-- node_id = rss_10009 -->
+                                    <!-- data_set =                                                                    -->
+                                    <!--   DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                                </ReadSqlSourceNode>
+                            </MetricTimeDimensionTransformNode>
                         </FilterElementsNode>
                     </WhereConstraintNode>
                 </FilterElementsNode>

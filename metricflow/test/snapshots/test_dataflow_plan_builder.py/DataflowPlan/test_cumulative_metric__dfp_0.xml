@@ -13,23 +13,28 @@
                     <!-- description = Join Self Over Time Range -->
                     <!-- node_id = jotr_0 -->
                     <FilterElementsNode>
-                        <!-- description =                     -->
-                        <!--   Pass Only Elements:             -->
-                        <!--     ['txn_revenue', 'ds__month']  -->
+                        <!-- description =                              -->
+                        <!--   Pass Only Elements:                      -->
+                        <!--     ['txn_revenue', 'metric_time__month']  -->
                         <!-- node_id = pfe_0 -->
                         <!-- include_spec = MeasureSpec(element_name='txn_revenue') -->
                         <!-- include_spec =                                 -->
                         <!--   {'class': 'TimeDimensionSpec',               -->
-                        <!--    'element_name': 'ds',                       -->
+                        <!--    'element_name': 'metric_time',              -->
                         <!--    'identifier_links': (),                     -->
                         <!--    'time_granularity': TimeGranularity.MONTH}  -->
-                        <ReadSqlSourceNode>
-                            <!-- description =                                                                   -->
-                            <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='revenue'))  -->
-                            <!-- node_id = rss_5 -->
-                            <!-- data_set =                                                            -->
-                            <!--   DataSourceDataSet(DataSourceReference(data_source_name='revenue'))  -->
-                        </ReadSqlSourceNode>
+                        <MetricTimeDimensionTransformNode>
+                            <!-- description = Metric Time Dimension 'ds' -->
+                            <!-- node_id = sma_10004 -->
+                            <!-- aggregation_time_dimension = ds -->
+                            <ReadSqlSourceNode>
+                                <!-- description =                                                                   -->
+                                <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='revenue'))  -->
+                                <!-- node_id = rss_10014 -->
+                                <!-- data_set =                                                            -->
+                                <!--   DataSourceDataSet(DataSourceReference(data_source_name='revenue'))  -->
+                            </ReadSqlSourceNode>
+                        </MetricTimeDimensionTransformNode>
                     </FilterElementsNode>
                 </JoinOverTimeRangeNode>
             </AggregateMeasuresNode>
