@@ -57,7 +57,7 @@ def parse_directory_of_yaml_files_to_model(
         dirs[:] = [d for d in dirs if not d.startswith(".")]
 
         for file in files:
-            if not (file.endswith(".yaml") or file.endswith(".yml")):
+            if not SafeLineLoader.is_valid_yaml_file_ending(file):
                 continue
             # Skip hidden files
             if file.startswith("."):

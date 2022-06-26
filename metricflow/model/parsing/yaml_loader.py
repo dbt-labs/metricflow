@@ -34,3 +34,8 @@ class SafeLineLoader(yaml.SafeLoader):
         )  # change to 1-indexed
 
         return mapping
+
+    @staticmethod
+    def is_valid_yaml_file_ending(filename: str) -> bool:
+        """Checks if YAML file name ends with one of the supported suffixes"""
+        return filename.endswith(".yaml") or filename.endswith(".yml")
