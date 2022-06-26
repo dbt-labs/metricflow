@@ -1,18 +1,21 @@
 from __future__ import annotations
 
 import functools
+import json
 import traceback
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import date
 from enum import Enum
 from pydantic import BaseModel, Extra
-from typing import Any, Callable, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 from metricflow.model.objects.elements.dimension import DimensionType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 
 VALIDATE_SAFELY_ERROR_STR_TMPLT = ". Issue occurred in method `{method_name}` called with {arguments_str}"
+ValidationContextJSON = Dict[str, Union[str, int, None]]
+ValidationIssueJSON = Dict[str, Union[str, int, ValidationContextJSON]]
 
 
 class ValidationIssueLevel(Enum):
@@ -61,6 +64,59 @@ class ValidationContext(BaseModel):
                 context_string += f" on line #{self.line_number}"
 
         return context_string
+
+    @staticmethod
+    def from_dict(context_dict: ValidationContextJSON) -> ValidationContext:
+        """Constructs a ValidationContext object from a JSON format dict"""
+
+        file_name = context_dict.get("file_name", None)
+        line_number = context_dict.get("line_number", None)
+
+        keys = context_dict.keys()
+        if "data_source_name" in keys:
+            data_source_name = context_dict["data_source_name"]
+
+            if "measure_name" in keys:
+                return MeasureContext(
+                    file_name=file_name,
+                    line_number=line_number,
+                    data_source_name=data_source_name,
+                    measure_name=context_dict["measure_name"],
+                )
+            elif "dimension_name" in keys:
+                return DimensionContext(
+                    file_name=file_name,
+                    line_number=line_number,
+                    data_source_name=data_source_name,
+                    dimension_name=context_dict["dimension_name"],
+                )
+            elif "identifier_name" in keys:
+                return IdentifierContext(
+                    file_name=file_name,
+                    line_number=line_number,
+                    data_source_name=data_source_name,
+                    identifier_name=context_dict["identifier_name"],
+                )
+            else:
+                return DataSourceContext(
+                    file_name=file_name,
+                    line_number=line_number,
+                    data_source_name=data_source_name,
+                )
+        elif "materialization_name" in keys:
+            return MaterializationContext(
+                file_name=file_name,
+                line_number=line_number,
+                materialization_name=context_dict["materialization_name"],
+            )
+        elif "metric_name" in keys:
+            return MetricContext(
+                file_name=file_name,
+                line_number=line_number,
+                metric_name=context_dict["metric_name"],
+            )
+        else:
+            return ValidationContext(file_name=file_name, line_number=line_number)
 
 
 class MaterializationContext(ValidationContext):
@@ -138,6 +194,35 @@ class ValidationIssue(BaseModel):
         if msg_base:
             msg_base += " - "
         return msg_base + self.message
+
+    @staticmethod
+    def from_json(json_str: str) -> ValidationIssue:
+        """Convert a json string representing a ValidationIssue into a ValidationIssue"""
+
+        return ValidationIssue.from_dict(json_dict=json.loads(json_str))
+
+    def from_dict(json_dict: ValidationIssueJSON) -> ValidationIssue:
+        """Convert a dict representing a ValidationIssue into a ValidationIssue"""
+
+        context_dict = json_dict["context"]
+        assert isinstance(context_dict, Dict)
+        context = ValidationContext.from_dict(context_dict)
+
+        message = json_dict["message"]
+        level = json_dict["level"]
+
+        if level == ValidationIssueLevel.FUTURE_ERROR.value:
+            error_date_str = json_dict["error_date"]
+            assert isinstance(error_date_str, str)
+            error_date = date.fromisoformat(error_date_str)
+
+            return ValidationFutureError(context=context, message=message, error_date=error_date)
+        else:
+            return ValidationIssue(
+                context=context,
+                level=level,
+                message=message,
+            )
 
 
 class ValidationWarning(ValidationIssue):
