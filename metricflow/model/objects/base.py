@@ -97,10 +97,6 @@ class ModelWithMetadataParsing(BaseModel):
         return values
 
 
-class ParseableObject:  # noqa: D
-    pass
-
-
 ModelObjectT_co = TypeVar("ModelObjectT_co", covariant=True, bound=BaseModel)
 
 
