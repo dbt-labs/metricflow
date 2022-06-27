@@ -32,10 +32,6 @@ class FrozenBaseModel(HashableBaseModel):
         return self.__repr__()
 
 
-class ParseableObject:  # noqa: D
-    pass
-
-
 ModelObjectT_co = TypeVar("ModelObjectT_co", covariant=True, bound=BaseModel)
 
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from metricflow.model.objects.base import ParseableObject, HashableBaseModel
+from metricflow.model.objects.base import HashableBaseModel
 from metricflow.object_utils import ExtendedEnum
 from metricflow.specs import MeasureReference, TimeDimensionReference
 
@@ -43,7 +43,7 @@ class AggregationType(ExtendedEnum):
         return self in (AggregationType.SUM, AggregationType.SUM_BOOLEAN)
 
 
-class Measure(HashableBaseModel, ParseableObject):
+class Measure(HashableBaseModel):
     """Describes a measure"""
 
     name: str

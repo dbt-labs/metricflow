@@ -6,7 +6,7 @@ from typing import Any, List, Optional
 from metricflow.errors.errors import ParsingException
 from metricflow.model.objects.common import Metadata
 from metricflow.model.objects.constraints.where import WhereClauseConstraint
-from metricflow.model.objects.base import HashableBaseModel, ParseableObject, PydanticCustomInputParser
+from metricflow.model.objects.base import HashableBaseModel, PydanticCustomInputParser
 from metricflow.object_utils import ExtendedEnum
 from metricflow.specs import MeasureReference
 from metricflow.time.time_granularity import TimeGranularity
@@ -77,7 +77,7 @@ class CumulativeMetricWindow(PydanticCustomInputParser, HashableBaseModel):
         )
 
 
-class MetricTypeParams(HashableBaseModel, ParseableObject):
+class MetricTypeParams(HashableBaseModel):
     """Type params add additional context to certain metric types (the context depends on the metric type)"""
 
     measure: Optional[str]
@@ -97,7 +97,7 @@ class MetricTypeParams(HashableBaseModel, ParseableObject):
         return MeasureReference(element_name=self.denominator) if self.denominator else None
 
 
-class Metric(HashableBaseModel, ParseableObject):
+class Metric(HashableBaseModel):
     """Describes a metric"""
 
     name: str

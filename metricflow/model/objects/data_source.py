@@ -7,7 +7,7 @@ from metricflow.model.objects.common import Metadata
 from metricflow.model.objects.elements.dimension import Dimension
 from metricflow.model.objects.elements.identifier import Identifier
 from metricflow.model.objects.elements.measure import Measure
-from metricflow.model.objects.base import ParseableObject, HashableBaseModel
+from metricflow.model.objects.base import HashableBaseModel
 from metricflow.object_utils import ExtendedEnum
 from metricflow.specs import LinkableElementReference, MeasureReference
 
@@ -32,7 +32,7 @@ class MutabilityType(ExtendedEnum):
     FULL_MUTATION = "FULL_MUTATION"  # no guarantees, everything may change
 
 
-class MutabilityTypeParams(HashableBaseModel, ParseableObject):
+class MutabilityTypeParams(HashableBaseModel):
     """Type params add additional context to mutability"""
 
     min: Optional[str]
@@ -41,14 +41,14 @@ class MutabilityTypeParams(HashableBaseModel, ParseableObject):
     along: Optional[str]
 
 
-class Mutability(HashableBaseModel, ParseableObject):
+class Mutability(HashableBaseModel):
     """Describes the mutability properties of a data source"""
 
     type: MutabilityType
     type_params: Optional[MutabilityTypeParams]
 
 
-class DataSource(HashableBaseModel, ParseableObject):
+class DataSource(HashableBaseModel):
     """Describes a data source"""
 
     name: str
