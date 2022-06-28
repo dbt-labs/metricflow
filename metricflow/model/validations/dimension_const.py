@@ -136,7 +136,7 @@ class DimensionConsistencyRule(ModelValidationRule):
                     ValidationError(
                         context=context,
                         message=f"In data source `{data_source.name}`, type conflict for dimension `{dimension.name}` "
-                                f"- already in model as type `{dimension_invariant.type}` but got `{dimension.type}`",
+                        f"- already in model as type `{dimension_invariant.type}` but got `{dimension.type}`",
                     )
                 )
             if dimension_invariant.is_partition != is_partition:

@@ -30,10 +30,10 @@ class DataSourceMeasuresUniqueRule(ModelValidationRule):
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
         issues: List[ValidationIssueType] = []
 
-        measure_names_to_data_sources: Dict[MeasureReference, List] = defaultdict(list)
+        measure_references_to_data_sources: Dict[MeasureReference, List] = defaultdict(list)
         for data_source in model.data_sources:
             for measure in data_source.measures:
-                if measure.name in measure_names_to_data_sources:
+                if measure.reference in measure_references_to_data_sources:
                     issues.append(
                         ValidationError(
                             context=MeasureContext(
@@ -45,10 +45,10 @@ class DataSourceMeasuresUniqueRule(ModelValidationRule):
                                 measure_name=measure.reference.element_name,
                             ),
                             message=f"Found measure with name {measure.name} in multiple data sources with names "
-                            f"({measure_names_to_data_sources[measure.reference]})",
+                            f"({measure_references_to_data_sources[measure.reference]})",
                         )
                     )
-                measure_names_to_data_sources[measure.reference].append(data_source.name)
+                measure_references_to_data_sources[measure.reference].append(data_source.name)
 
         return issues
 

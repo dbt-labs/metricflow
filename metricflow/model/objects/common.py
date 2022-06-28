@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import re
 
+from typing import Optional
+
 from metricflow.errors.errors import ParsingException
 from metricflow.model.objects.utils import HashableBaseModel
 
