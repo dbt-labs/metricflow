@@ -8,7 +8,7 @@ from metricflow.model.validations.validator_helpers import (
     ValidationIssueType,
     validate_safely,
     ValidationError,
-    ValidationIssue,
+    MeasureContext,
 )
 from metricflow.specs import TimeDimensionReference
 
@@ -38,25 +38,19 @@ class AggregationTimeDimensionRule(ModelValidationRule):
         issues: List[ValidationIssueType] = []
 
         for measure in data_source.measures:
-            model_object_reference = ValidationIssue.make_object_reference(
-                data_source_name=data_source.name, measure_name=measure.name
+            measure_context = MeasureContext(
+                file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
+                line_number=data_source.metadata.file_slice.start_line_number if data_source.metadata else None,
+                data_source_name=data_source.name,
+                measure_name=measure.reference.element_name,
             )
-            if not measure.agg_time_dimension:
-                issues.append(
-                    ValidationError(
-                        model_object_reference=model_object_reference,
-                        message=f"In data source '{data_source.name}', measure '{measure.name}' does not have an "
-                        f"aggregation time dimension set",
-                    )
-                )
-                continue
             agg_time_dimension_reference = measure.checked_agg_time_dimension
             if not AggregationTimeDimensionRule._time_dimension_in_model(
                 time_dimension_reference=agg_time_dimension_reference, data_source=data_source
             ):
                 issues.append(
                     ValidationError(
-                        model_object_reference=model_object_reference,
+                        context=measure_context,
                         message=f"In data source '{data_source.name}', measure '{measure.name}' has the aggregation "
                         f"time dimension is set to '{agg_time_dimension_reference.element_name}', "
                         f"which not a valid time dimension in the data source",

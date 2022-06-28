@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Optional
 
+from metricflow.model.objects.common import Metadata
 from metricflow.model.objects.utils import ParseableObject, HashableBaseModel
 from metricflow.object_utils import ExtendedEnum
 from metricflow.specs import MeasureReference, TimeDimensionReference
@@ -51,6 +52,7 @@ class Measure(HashableBaseModel, ParseableObject):
     description: Optional[str]
     create_metric: Optional[bool]
     expr: Optional[str] = None
+    metadata: Optional[Metadata]
 
     # Defines the time dimension to aggregate this measure by. If not specified, it means to use the primary time
     # dimension in the data source.
