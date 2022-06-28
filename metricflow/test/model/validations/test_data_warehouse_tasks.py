@@ -2,6 +2,7 @@ from copy import deepcopy
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.model.data_warehouse_model_validator import (
     DataWarehouseModelValidator,
@@ -18,7 +19,6 @@ from metricflow.model.validations.validator_helpers import ValidationIssueLevel
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.specs import DimensionReference, MeasureReference
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.model.validations.helpers import data_source_with_guaranteed_meta
 from metricflow.test.plan_utils import assert_snapshot_text_equal, make_schema_replacement_function
@@ -138,7 +138,7 @@ def test_validate_dimensions(  # noqa: D
     assert len(issues) == 0
 
     dimensions = list(model.data_sources[0].dimensions)
-    dimensions.append(Dimension(name=DimensionReference(element_name="doesnt_exist"), type=DimensionType.CATEGORICAL))
+    dimensions.append(Dimension(name="doesnt_exist", type=DimensionType.CATEGORICAL))
     model.data_sources[0].dimensions = dimensions
 
     issues = dw_validator.validate_dimensions(model)
@@ -195,7 +195,7 @@ def test_validate_metrics(  # noqa: D
     new_measures = list(model.data_sources[0].measures)
     new_measures.append(
         Measure(
-            name=MeasureReference(element_name="count_cats"),
+            name="count_cats",
             agg=AggregationType.SUM,
             expr="is_cat",  # doesn't exist as column
             create_metric=True,

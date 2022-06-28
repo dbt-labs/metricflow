@@ -54,7 +54,7 @@ class DataWarehouseTaskBuilder:
 
         where_stmts: List[str] = []
         for partition in data_source.partitions:
-            element = f"({partition.expr})" if partition.expr else partition.name.element_name
+            element = f"({partition.expr})" if partition.expr else partition.name
             where_stmts.append(DataWarehouseTaskBuilder.PARTITION_COL_TEMPLATE.format(partition=element))
         return DataWarehouseTaskBuilder.WHERE_TEMPLATE.format(where_filters=" AND ".join(where_stmts))
 
@@ -125,7 +125,7 @@ class DataWarehouseTaskBuilder:
             data_source_tasks: List[DataWarehouseValidationTask] = []
             data_source_columns: List[str] = []
             for dimension in data_source.dimensions:
-                dim_to_query = dimension.expr if dimension.expr is not None else dimension.name.element_name
+                dim_to_query = dimension.expr if dimension.expr is not None else dimension.name
                 data_source_columns.append(dim_to_query)
 
                 data_source_tasks.append(
@@ -139,9 +139,10 @@ class DataWarehouseTaskBuilder:
                             if data_source.metadata
                             else None,
                             data_source_name=data_source.name,
-                            dimension_name=dimension.name.element_name,
+                            dimension_name=dimension.name,
                         ),
-                        error_message=f"Unable to query `{dim_to_query}` in data warehouse for dimension `{dimension.name.element_name}` on data source `{data_source.name}`.",
+                        error_message=f"Unable to query `{dim_to_query}` in data warehouse for dimension "
+                        f"`{dimension.name}` on data source `{data_source.name}`.",
                     )
                 )
 
