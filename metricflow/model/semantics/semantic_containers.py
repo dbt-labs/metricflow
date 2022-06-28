@@ -184,10 +184,6 @@ class DataSourceSemantics:
         """Retrieves a full dimension object by name"""
         dimension_reference = time_dimension_reference.dimension_reference()
 
-        logger.info(f"Dimension reference is {dimension_reference}")
-        for key in self._dimension_index.keys():
-            logger.error(f"Key is {key}")
-
         if dimension_reference not in self._dimension_index:
             raise ValueError(
                 f"Could not find dimension with name ({dimension_reference.element_name}) in configured data sources"
@@ -295,6 +291,7 @@ class DataSourceSemantics:
             self._entity_index[ident.entity].append(data_source)
             self._linkable_reference_index[ident.reference].append(data_source)
 
+    @property
     def data_source_references(self) -> Sequence[DataSourceReference]:  # noqa: D
         data_source_names_sorted = sorted(self._data_source_names)
         return tuple(DataSourceReference(data_source_name=x) for x in data_source_names_sorted)
