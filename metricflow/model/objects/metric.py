@@ -36,9 +36,13 @@ class CumulativeMetricWindow(PydanticCustomInputParser, HashableBaseModel):
         """Parses a CumulativeMetricWindow from a string input found in a user provided model specification
 
         The CumulativeMetricWindow is always expected to be provided as a string in user-defined YAML configs.
+        It may also be a CumulativeMetricWindow in cases where we are internally constructing Metric objects.
         """
         if isinstance(input, str):
             return CumulativeMetricWindow.parse(input)
+        elif isinstance(input, CumulativeMetricWindow):
+            # This is internally constructed, pass it through and ignore it in error messaging
+            return input
         else:
             raise ValueError(
                 f"CumulativeMetricWindow inputs from model configs are expected to always be of type string, but got "
