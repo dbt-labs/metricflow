@@ -19,6 +19,7 @@ class ColumnProperties(Generic[T]):
     type: SqlColumnType
     row_count: int
     distinct_row_count: int
+    is_nullable: bool
     null_count: int
     min_value: Optional[T]
     max_value: Optional[T]
@@ -27,11 +28,6 @@ class ColumnProperties(Generic[T]):
     def is_empty(self) -> bool:
         """Whether the column has any rows"""
         return self.row_count == 0
-
-    @property
-    def is_nullable(self) -> bool:
-        """Whether the column is nullable or not"""
-        return self.null_count != 0
 
 
 @dataclass(frozen=True)
@@ -79,21 +75,7 @@ class DataWarehouseInferenceContextProvider(InferenceContextProvider[DataWarehou
 
     def _get_table_properties(self, table: SqlTable) -> TableProperties:
         """Fetch properties about a single table by querying the warehouse."""
-        query = f"SELECT * FROM {table.sql} LIMIT {self.max_sample_size}"
-        df = self.client.query(query)
-        column_props = [
-            ColumnProperties(
-                column=SqlColumn(table=table, column_name=col_name),
-                type=SqlColumnType.from_pandas_dtype(str(series.dtype)),
-                row_count=len(series),
-                distinct_row_count=series.nunique(dropna=False),
-                null_count=series.isnull().sum(),
-                min_value=series.min(),
-                max_value=series.max(),
-            )
-            for col_name, series in df.iteritems()
-        ]
-        return TableProperties(table=table, column_props=column_props)
+        raise NotImplementedError
 
     def get_context(self) -> DataWarehouseInferenceContext:
         """Query the data warehouse for statistics about all tables and populate a context with it."""

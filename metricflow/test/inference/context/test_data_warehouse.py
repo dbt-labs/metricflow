@@ -1,7 +1,5 @@
 from unittest.mock import MagicMock, call
 
-import pandas as pd
-
 from metricflow.dataflow.sql_column import SqlColumn, SqlColumnType
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.inference.context.data_warehouse import (
@@ -18,26 +16,26 @@ def test_column_statistics():  # noqa: D
         type=SqlColumnType.INTEGER,
         row_count=10000,
         distinct_row_count=1000,
+        is_nullable=True,
         null_count=1,
         min_value=0,
         max_value=9999,
     )
     assert props.type == SqlColumnType.INTEGER
     assert not props.is_empty
-    assert props.is_nullable
 
     empty_props = ColumnProperties(
         column=SqlColumn.from_string("db.schema.table.column"),
         type=SqlColumnType.UNKNOWN,
         row_count=0,
         distinct_row_count=0,
+        is_nullable=False,
         null_count=0,
         min_value=None,
         max_value=None,
     )
     assert empty_props.type == SqlColumnType.UNKNOWN
     assert empty_props.is_empty
-    assert not empty_props.is_nullable
 
 
 def test_table_statistics() -> None:  # noqa: D
@@ -48,6 +46,7 @@ def test_table_statistics() -> None:  # noqa: D
             type=SqlColumnType.INTEGER,
             row_count=1000,
             distinct_row_count=1000,
+            is_nullable=False,
             null_count=0,
             min_value=0,
             max_value=999,
@@ -57,6 +56,7 @@ def test_table_statistics() -> None:  # noqa: D
             type=SqlColumnType.FLOAT,
             row_count=2000,
             distinct_row_count=1000,
+            is_nullable=True,
             null_count=10,
             min_value=0,
             max_value=1000,
@@ -81,6 +81,7 @@ def test_data_warehouse_inference_context() -> None:  # noqa: D
             type=SqlColumnType.INTEGER,
             row_count=1000,
             distinct_row_count=1000,
+            is_nullable=False,
             null_count=0,
             min_value=0,
             max_value=999,
@@ -90,6 +91,7 @@ def test_data_warehouse_inference_context() -> None:  # noqa: D
             type=SqlColumnType.FLOAT,
             row_count=2000,
             distinct_row_count=1000,
+            is_nullable=True,
             null_count=10,
             min_value=0,
             max_value=1000,
@@ -103,6 +105,7 @@ def test_data_warehouse_inference_context() -> None:  # noqa: D
             type=SqlColumnType.FLOAT,
             row_count=1000,
             distinct_row_count=1000,
+            is_nullable=False,
             null_count=0,
             min_value=0,
             max_value=999,
@@ -122,103 +125,30 @@ def test_data_warehouse_inference_context() -> None:  # noqa: D
 
 
 def test_context_provider() -> None:  # noqa: D
-    t1_df = pd.DataFrame(
-        [[0, "lucas", 10], [1, "paul", 20], [2, "tom", 30], [3, "thomas", 30]], columns=["user_id", "name", "points"]
-    )
+    tables = [
+        SqlTable.from_string("db.schema.table1"),
+        SqlTable.from_string("db.schema.table2"),
+        SqlTable.from_string("db.schema.table3"),
+    ]
 
-    t2_df = pd.DataFrame(
-        [[7, "tinky winky", 4.1], [None, "gipsy", 4.2], [None, "lala", 4.1], [10, "po", 4]],
-        columns=["user_id", "name", "height"],
-    )
-    # nullable integer columns are converted by pandas to float,
-    # so we need to cast it back to nullable int
-    t2_df["user_id"] = t2_df["user_id"].astype("Int64")
+    ctx_provider = DataWarehouseInferenceContextProvider(client=MagicMock(), tables=tables)
 
-    client = MagicMock()
-    client.query = MagicMock()
-    client.query.side_effect = [t1_df, t2_df]
-
-    ctx_provider = DataWarehouseInferenceContextProvider(
-        client=client,
-        tables=[SqlTable.from_string("db.schema.table1"), SqlTable.from_string("db.schema.table2")],
-        max_sample_size=5,
-    )
+    object.__setattr__(ctx_provider, "_get_table_properties", MagicMock())
+    table_props = [
+        TableProperties(table=tables[0], column_props=[]),
+        TableProperties(table=tables[1], column_props=[]),
+        TableProperties(table=tables[2], column_props=[]),
+    ]
+    ctx_provider._get_table_properties.side_effect = table_props
 
     ctx = ctx_provider.get_context()
 
-    client.query.assert_has_calls(
+    ctx_provider._get_table_properties.assert_has_calls(
         [
-            call("SELECT * FROM db.schema.table1 LIMIT 5"),
-            call("SELECT * FROM db.schema.table2 LIMIT 5"),
-        ],
-        any_order=True,
-    )
-
-    assert ctx == DataWarehouseInferenceContext(
-        [
-            TableProperties(
-                table=SqlTable.from_string("db.schema.table1"),
-                column_props=[
-                    ColumnProperties(
-                        column=SqlColumn.from_string("db.schema.table1.user_id"),
-                        type=SqlColumnType.INTEGER,
-                        row_count=4,
-                        distinct_row_count=4,
-                        null_count=0,
-                        min_value=0,
-                        max_value=3,
-                    ),
-                    ColumnProperties(
-                        column=SqlColumn.from_string("db.schema.table1.name"),
-                        type=SqlColumnType.STRING,
-                        row_count=4,
-                        distinct_row_count=4,
-                        null_count=0,
-                        min_value="lucas",
-                        max_value="tom",
-                    ),
-                    ColumnProperties(
-                        column=SqlColumn.from_string("db.schema.table1.points"),
-                        type=SqlColumnType.INTEGER,
-                        row_count=4,
-                        distinct_row_count=3,
-                        null_count=0,
-                        min_value=10,
-                        max_value=30,
-                    ),
-                ],
-            ),
-            TableProperties(
-                table=SqlTable.from_string("db.schema.table2"),
-                column_props=[
-                    ColumnProperties(
-                        column=SqlColumn.from_string("db.schema.table2.user_id"),
-                        type=SqlColumnType.INTEGER,
-                        row_count=4,
-                        distinct_row_count=3,
-                        null_count=2,
-                        min_value=7,
-                        max_value=10,
-                    ),
-                    ColumnProperties(
-                        column=SqlColumn.from_string("db.schema.table2.name"),
-                        type=SqlColumnType.STRING,
-                        row_count=4,
-                        distinct_row_count=4,
-                        null_count=0,
-                        min_value="gipsy",
-                        max_value="tinky winky",
-                    ),
-                    ColumnProperties(
-                        column=SqlColumn.from_string("db.schema.table2.height"),
-                        type=SqlColumnType.FLOAT,
-                        row_count=4,
-                        distinct_row_count=3,
-                        null_count=0,
-                        min_value=4,
-                        max_value=4.2,
-                    ),
-                ],
-            ),
+            call(tables[0]),
+            call(tables[1]),
+            call(tables[2]),
         ]
     )
+
+    assert ctx == DataWarehouseInferenceContext(table_props=table_props)
