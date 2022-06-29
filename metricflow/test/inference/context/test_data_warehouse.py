@@ -1,65 +1,60 @@
 from unittest.mock import MagicMock, call
-import pytest
 
 import pandas as pd
 
 from metricflow.dataflow.sql_column import SqlColumn, SqlColumnType
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.errors.errors import InferenceError
 from metricflow.inference.context.data_warehouse import (
-    ColumnStatistics,
+    ColumnProperties,
     DataWarehouseInferenceContext,
     DataWarehouseInferenceContextProvider,
-    TableStatistics,
+    TableProperties,
 )
 
 
 def test_column_statistics():  # noqa: D
-    stats = ColumnStatistics(
+    props = ColumnProperties(
         column=SqlColumn.from_string("db.schema.table.column"),
-        dtype="int32",
+        type=SqlColumnType.INTEGER,
         row_count=10000,
         distinct_row_count=1000,
         null_count=1,
         min_value=0,
         max_value=9999,
     )
-    assert stats.type == SqlColumnType.INTEGER
-    assert not stats.is_empty
-    assert stats.is_nullable
-    assert stats.cardinality == 0.1
+    assert props.type == SqlColumnType.INTEGER
+    assert not props.is_empty
+    assert props.is_nullable
 
-    empty_stats = ColumnStatistics(
+    empty_props = ColumnProperties(
         column=SqlColumn.from_string("db.schema.table.column"),
-        dtype=None,
+        type=SqlColumnType.UNKNOWN,
         row_count=0,
         distinct_row_count=0,
         null_count=0,
         min_value=None,
         max_value=None,
     )
-    assert empty_stats.type == SqlColumnType.UNKNOWN
-    assert empty_stats.is_empty
-    assert not empty_stats.is_nullable
-    with pytest.raises(InferenceError):
-        empty_stats.cardinality
+    assert empty_props.type == SqlColumnType.UNKNOWN
+    assert empty_props.is_empty
+    assert not empty_props.is_nullable
 
 
 def test_table_statistics() -> None:  # noqa: D
     table = SqlTable.from_string("db.schema.table")
-    col_stats = [
-        ColumnStatistics(
+    col_props = [
+        ColumnProperties(
             column=SqlColumn(table=table, name="column1"),
-            dtype="int",
+            type=SqlColumnType.INTEGER,
             row_count=1000,
             distinct_row_count=1000,
             null_count=0,
             min_value=0,
             max_value=999,
         ),
-        ColumnStatistics(
+        ColumnProperties(
             column=SqlColumn(table=table, name="column2"),
-            dtype="float",
+            type=SqlColumnType.FLOAT,
             row_count=2000,
             distinct_row_count=1000,
             null_count=10,
@@ -68,11 +63,11 @@ def test_table_statistics() -> None:  # noqa: D
         ),
     ]
 
-    table_stats = TableStatistics(table=table, column_stats=col_stats)
+    table_props = TableProperties(table=table, column_props=col_props)
 
-    assert table_stats.columns == {
-        col_stats[0].column: col_stats[0],
-        col_stats[1].column: col_stats[1],
+    assert table_props.columns == {
+        col_props[0].column: col_props[0],
+        col_props[1].column: col_props[1],
     }
 
 
@@ -81,18 +76,18 @@ def test_data_warehouse_inference_context() -> None:  # noqa: D
     t2 = SqlTable.from_string("db.schema2.table1")
 
     t1_cols = [
-        ColumnStatistics(
+        ColumnProperties(
             column=SqlColumn(table=t1, name="column1"),
-            dtype="int",
+            type=SqlColumnType.INTEGER,
             row_count=1000,
             distinct_row_count=1000,
             null_count=0,
             min_value=0,
             max_value=999,
         ),
-        ColumnStatistics(
+        ColumnProperties(
             column=SqlColumn(table=t1, name="column2"),
-            dtype="float",
+            type=SqlColumnType.FLOAT,
             row_count=2000,
             distinct_row_count=1000,
             null_count=10,
@@ -100,12 +95,12 @@ def test_data_warehouse_inference_context() -> None:  # noqa: D
             max_value=1000,
         ),
     ]
-    t1_stats = TableStatistics(table=t1, column_stats=t1_cols)
+    t1_props = TableProperties(table=t1, column_props=t1_cols)
 
     t2_cols = [
-        ColumnStatistics(
+        ColumnProperties(
             column=SqlColumn(table=t2, name="column_a"),
-            dtype="float",
+            type=SqlColumnType.FLOAT,
             row_count=1000,
             distinct_row_count=1000,
             null_count=0,
@@ -113,11 +108,11 @@ def test_data_warehouse_inference_context() -> None:  # noqa: D
             max_value=999,
         ),
     ]
-    t2_stats = TableStatistics(table=t2, column_stats=t2_cols)
+    t2_props = TableProperties(table=t2, column_props=t2_cols)
 
-    ctx = DataWarehouseInferenceContext(table_stats=[t1_stats, t2_stats])
+    ctx = DataWarehouseInferenceContext(table_props=[t1_props, t2_props])
 
-    assert ctx.tables == {t1: t1_stats, t2: t2_stats}
+    assert ctx.tables == {t1: t1_props, t2: t2_props}
 
     assert ctx.columns == {
         t1_cols[0].column: t1_cols[0],
@@ -161,30 +156,30 @@ def test_context_provider() -> None:  # noqa: D
 
     assert ctx == DataWarehouseInferenceContext(
         [
-            TableStatistics(
+            TableProperties(
                 table=SqlTable.from_string("db.schema.table1"),
-                column_stats=[
-                    ColumnStatistics(
+                column_props=[
+                    ColumnProperties(
                         column=SqlColumn.from_string("db.schema.table1.user_id"),
-                        dtype="int",
+                        type=SqlColumnType.INTEGER,
                         row_count=4,
                         distinct_row_count=4,
                         null_count=0,
                         min_value=0,
                         max_value=3,
                     ),
-                    ColumnStatistics(
+                    ColumnProperties(
                         column=SqlColumn.from_string("db.schema.table1.name"),
-                        dtype="str",
+                        type=SqlColumnType.STRING,
                         row_count=4,
                         distinct_row_count=4,
                         null_count=0,
                         min_value="lucas",
                         max_value="tom",
                     ),
-                    ColumnStatistics(
+                    ColumnProperties(
                         column=SqlColumn.from_string("db.schema.table1.points"),
-                        dtype="int",
+                        type=SqlColumnType.INTEGER,
                         row_count=4,
                         distinct_row_count=3,
                         null_count=0,
@@ -193,30 +188,30 @@ def test_context_provider() -> None:  # noqa: D
                     ),
                 ],
             ),
-            TableStatistics(
+            TableProperties(
                 table=SqlTable.from_string("db.schema.table2"),
-                column_stats=[
-                    ColumnStatistics(
+                column_props=[
+                    ColumnProperties(
                         column=SqlColumn.from_string("db.schema.table2.user_id"),
-                        dtype="int",
+                        type=SqlColumnType.INTEGER,
                         row_count=4,
                         distinct_row_count=3,
                         null_count=2,
                         min_value=7,
                         max_value=10,
                     ),
-                    ColumnStatistics(
+                    ColumnProperties(
                         column=SqlColumn.from_string("db.schema.table2.name"),
-                        dtype="str",
+                        type=SqlColumnType.STRING,
                         row_count=4,
                         distinct_row_count=4,
                         null_count=0,
                         min_value="gipsy",
                         max_value="tinky winky",
                     ),
-                    ColumnStatistics(
+                    ColumnProperties(
                         column=SqlColumn.from_string("db.schema.table2.height"),
-                        dtype="float",
+                        type=SqlColumnType.FLOAT,
                         row_count=4,
                         distinct_row_count=3,
                         null_count=0,

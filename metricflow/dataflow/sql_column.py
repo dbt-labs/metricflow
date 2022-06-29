@@ -11,7 +11,7 @@ from pandas.api.types import (
 )
 
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.model.objects.utils import FrozenBaseModel, ParseableField
+from metricflow.model.objects.utils import FrozenBaseModel
 
 
 class SqlColumnType(str, Enum):
@@ -40,21 +40,16 @@ class SqlColumnType(str, Enum):
         return SqlColumnType.UNKNOWN
 
 
-class SqlColumn(FrozenBaseModel, ParseableField):
+class SqlColumn(FrozenBaseModel):
     """Represents a reference to a SQL column."""
 
     table: SqlTable
     name: str
 
     @staticmethod
-    def parse(s: str) -> SqlColumn:
-        """Implement ParseableField interface"""
-        return SqlColumn.from_string(s)
-
-    @staticmethod
     def from_string(sql_str: str) -> SqlColumn:  # noqa: D
         table_str, column_name = sql_str.rsplit(".", 1)
-        table = SqlTable.parse(table_str)
+        table = SqlTable.from_string(table_str)
         return SqlColumn(table=table, name=column_name)
 
     @property

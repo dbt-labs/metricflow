@@ -4,7 +4,6 @@ from typing import Dict, List, Optional, TypeVar, Generic
 
 from metricflow.dataflow.sql_column import SqlColumn, SqlColumnType
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.errors.errors import InferenceError
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.inference.context.base import InferenceContext, InferenceContextProvider
 
@@ -12,35 +11,22 @@ T = TypeVar("T", str, int, float, date, datetime)
 
 
 @dataclass(frozen=True)
-class ColumnStatistics(Generic[T]):
-    """Holds statistical data about a column."""
+class ColumnProperties(Generic[T]):
+    """Holds properties about a column that were extracted from the data warehouse."""
 
     column: SqlColumn
 
-    dtype: InitVar[Optional[str]]
-    type: SqlColumnType = field(init=False)
-
+    type: SqlColumnType
     row_count: int
     distinct_row_count: int
     null_count: int
     min_value: Optional[T]
     max_value: Optional[T]
 
-    def __post_init__(self, dtype: Optional[str]):  # noqa: D
-        object.__setattr__(self, "type", SqlColumnType.from_pandas_dtype(dtype))
-
     @property
     def is_empty(self) -> bool:
         """Whether the column has any rows"""
         return self.row_count == 0
-
-    @property
-    def cardinality(self) -> float:
-        """The proportion between unique values and the row count of the column."""
-        if self.is_empty:
-            raise InferenceError("Cannot determine the cardinality of empty column.")
-
-        return self.distinct_row_count / self.row_count
 
     @property
     def is_nullable(self) -> bool:
@@ -49,30 +35,30 @@ class ColumnStatistics(Generic[T]):
 
 
 @dataclass(frozen=True)
-class TableStatistics:
-    """Holds statistical data about a table."""
+class TableProperties:
+    """Holds properties of a table and its columns that were extracted from the data warehouse."""
 
-    column_stats: InitVar[List[ColumnStatistics]]
+    column_props: InitVar[List[ColumnProperties]]
 
     table: SqlTable
-    columns: Dict[SqlColumn, ColumnStatistics] = field(default_factory=lambda: {}, init=False)
+    columns: Dict[SqlColumn, ColumnProperties] = field(default_factory=lambda: {}, init=False)
 
-    def __post_init__(self, column_stats: List[ColumnStatistics]) -> None:  # noqa: D
-        for col in column_stats:
+    def __post_init__(self, column_props: List[ColumnProperties]) -> None:  # noqa: D
+        for col in column_props:
             self.columns[col.column] = col
 
 
 @dataclass(frozen=True)
 class DataWarehouseInferenceContext(InferenceContext):
-    """The inference context for a data warehouse. Holds statistics and metadata about each column."""
+    """The inference context for a data warehouse. Holds statistics and metadata about each table and column."""
 
-    table_stats: InitVar[List[TableStatistics]]
+    table_props: InitVar[List[TableProperties]]
 
-    tables: Dict[SqlTable, TableStatistics] = field(default_factory=lambda: {}, init=False)
-    columns: Dict[SqlColumn, ColumnStatistics] = field(default_factory=lambda: {}, init=False)
+    tables: Dict[SqlTable, TableProperties] = field(default_factory=lambda: {}, init=False)
+    columns: Dict[SqlColumn, ColumnProperties] = field(default_factory=lambda: {}, init=False)
 
-    def __post_init__(self, table_stats: List[TableStatistics]) -> None:  # noqa: D
-        for stats in table_stats:
+    def __post_init__(self, table_props: List[TableProperties]) -> None:  # noqa: D
+        for stats in table_props:
             self.tables[stats.table] = stats
             for column in stats.columns.values():
                 self.columns[column.column] = column
@@ -91,15 +77,14 @@ class DataWarehouseInferenceContextProvider(InferenceContextProvider[DataWarehou
     tables: List[SqlTable]
     max_sample_size: int = 1000
 
-    def _get_table_statistics(self, table: SqlTable) -> TableStatistics:
-        """Fetch statistics about a single table by querying the warehouse."""
-
+    def _get_table_properties(self, table: SqlTable) -> TableProperties:
+        """Fetch properties about a single table by querying the warehouse."""
         query = f"SELECT * FROM {table.sql} LIMIT {self.max_sample_size}"
         df = self.client.query(query)
-        column_stats = [
-            ColumnStatistics(
+        column_props = [
+            ColumnProperties(
                 column=SqlColumn(table=table, name=col_name),
-                dtype=str(series.dtype),
+                type=SqlColumnType.from_pandas_dtype(str(series.dtype)),
                 row_count=len(series),
                 distinct_row_count=series.nunique(dropna=False),
                 null_count=series.isnull().sum(),
@@ -108,9 +93,9 @@ class DataWarehouseInferenceContextProvider(InferenceContextProvider[DataWarehou
             )
             for col_name, series in df.iteritems()
         ]
-        return TableStatistics(table=table, column_stats=column_stats)
+        return TableProperties(table=table, column_props=column_props)
 
     def get_context(self) -> DataWarehouseInferenceContext:
         """Query the data warehouse for statistics about all tables and populate a context with it."""
-        table_stats = [self._get_table_statistics(table) for table in self.tables]
-        return DataWarehouseInferenceContext(table_stats=table_stats)
+        table_props = [self._get_table_properties(table) for table in self.tables]
+        return DataWarehouseInferenceContext(table_props=table_props)
