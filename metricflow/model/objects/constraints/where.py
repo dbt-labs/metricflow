@@ -44,12 +44,20 @@ class WhereClauseConstraint(PydanticCustomInputParser, HashableBaseModel):
 
     @classmethod
     def _from_yaml_value(cls, input: Any) -> WhereClauseConstraint:
-        """Parses a WhereClauseConstraint from a constraing string found in a user-provided model specification
+        """Parses a WhereClauseConstraint from a constraint string found in a user-provided model specification
 
-        User-provided constraint strings
+        User-provided constraint strings are SQL snippets conforming to the expectations of SQL WHERE clauses,
+        and as such we parse them using our standard parse method below.
+
+        Note in some cases we might wish to initialize a WhereClauseConstraint inside of a model object. In such
+        cases we simply pass the instance along, since it should have been pre-validated on initialization and
+        therefore we expect it to be internally consistent.
         """
         if isinstance(input, str):
             return WhereClauseConstraint.parse(input)
+        elif isinstance(input, WhereClauseConstraint):
+            # This is internally constructed, pass it through and ignore it in error messaging
+            return input
         else:
             raise ValueError(f"Expected input to be of type string, but got type {type(input)} with value: {input}")
 
