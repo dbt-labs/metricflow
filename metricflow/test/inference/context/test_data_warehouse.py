@@ -44,7 +44,7 @@ def test_table_statistics() -> None:  # noqa: D
     table = SqlTable.from_string("db.schema.table")
     col_props = [
         ColumnProperties(
-            column=SqlColumn(table=table, name="column1"),
+            column=SqlColumn(table=table, column_name="column1"),
             type=SqlColumnType.INTEGER,
             row_count=1000,
             distinct_row_count=1000,
@@ -53,7 +53,7 @@ def test_table_statistics() -> None:  # noqa: D
             max_value=999,
         ),
         ColumnProperties(
-            column=SqlColumn(table=table, name="column2"),
+            column=SqlColumn(table=table, column_name="column2"),
             type=SqlColumnType.FLOAT,
             row_count=2000,
             distinct_row_count=1000,
@@ -77,7 +77,7 @@ def test_data_warehouse_inference_context() -> None:  # noqa: D
 
     t1_cols = [
         ColumnProperties(
-            column=SqlColumn(table=t1, name="column1"),
+            column=SqlColumn(table=t1, column_name="column1"),
             type=SqlColumnType.INTEGER,
             row_count=1000,
             distinct_row_count=1000,
@@ -86,7 +86,7 @@ def test_data_warehouse_inference_context() -> None:  # noqa: D
             max_value=999,
         ),
         ColumnProperties(
-            column=SqlColumn(table=t1, name="column2"),
+            column=SqlColumn(table=t1, column_name="column2"),
             type=SqlColumnType.FLOAT,
             row_count=2000,
             distinct_row_count=1000,
@@ -99,7 +99,7 @@ def test_data_warehouse_inference_context() -> None:  # noqa: D
 
     t2_cols = [
         ColumnProperties(
-            column=SqlColumn(table=t2, name="column_a"),
+            column=SqlColumn(table=t2, column_name="column_a"),
             type=SqlColumnType.FLOAT,
             row_count=1000,
             distinct_row_count=1000,

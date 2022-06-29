@@ -83,7 +83,7 @@ class DataWarehouseInferenceContextProvider(InferenceContextProvider[DataWarehou
         df = self.client.query(query)
         column_props = [
             ColumnProperties(
-                column=SqlColumn(table=table, name=col_name),
+                column=SqlColumn(table=table, column_name=col_name),
                 type=SqlColumnType.from_pandas_dtype(str(series.dtype)),
                 row_count=len(series),
                 distinct_row_count=series.nunique(dropna=False),
