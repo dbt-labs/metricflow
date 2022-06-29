@@ -20,30 +20,21 @@ class MetricMeasuresRule(ModelValidationRule):
     """Checks that the measures referenced in the metrics exist."""
 
     @staticmethod
-    @validate_safely(whats_being_done="checking measures referenced by the metric are exist")
+    @validate_safely(whats_being_done="checking all measures referenced by the metric exist")
     def _validate_metric_measure_references(
         metric: Metric, valid_measure_names: List[str]
     ) -> List[ValidationIssueType]:
         issues: List[ValidationIssueType] = []
-        measures_in_metric = []
 
-        if metric.type_params:
-            if metric.type_params.measures:
-                measures_in_metric.extend(metric.type_params.measures)
-            if metric.type_params.numerator:
-                measures_in_metric.append(metric.type_params.numerator)
-            if metric.type_params.denominator:
-                measures_in_metric.append(metric.type_params.denominator)
-
-        for measure_in_metric in measures_in_metric:
-            if measure_in_metric not in valid_measure_names:
+        for measure_reference in metric.measure_references:
+            if measure_reference.element_name not in valid_measure_names:
                 issues.append(
                     ValidationFatal(
                         context=MetricContext(
                             file_context=FileContext.from_metadata(metadata=metric.metadata),
                             metric=MetricModelReference(metric_name=metric.name),
                         ),
-                        message=f"Invalid measure {measure_in_metric} in metric {metric.name}",
+                        message=f"Invalid measure {measure_reference.element_name} in metric {metric.name}",
                     )
                 )
         return issues
