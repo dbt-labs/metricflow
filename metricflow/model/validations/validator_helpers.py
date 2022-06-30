@@ -7,10 +7,12 @@ from dataclasses import dataclass
 from datetime import date
 from enum import Enum
 from pydantic import BaseModel, Extra
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
 
 from metricflow.model.objects.elements.dimension import DimensionType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from metricflow.model.objects.utils import FrozenBaseModel
+from metricflow.object_utils import assert_values_exhausted
 
 VALIDATE_SAFELY_ERROR_STR_TMPLT = ". Issue occurred in method `{method_name}` called with {arguments_str}"
 ValidationContextJSON = Dict[str, Union[str, int, None]]
@@ -209,6 +211,77 @@ class ValidationFatal(ValidationIssue, BaseModel):
 
 
 ValidationIssueType = Union[ValidationWarning, ValidationFutureError, ValidationError, ValidationFatal]
+
+
+class ModelValidationResults(FrozenBaseModel):
+    """Class for organizating the results of running validations"""
+
+    warnings: Tuple[ValidationWarning, ...] = tuple()
+    future_errors: Tuple[ValidationFutureError, ...] = tuple()
+    errors: Tuple[ValidationError, ...] = tuple()
+    fatals: Tuple[ValidationFatal, ...] = tuple()
+
+    @property
+    def has_blocking_issues(self) -> bool:
+        """Does the ModelValidationResults have ERROR or FATAL issues"""
+        return len(self.errors) != 0 or len(self.fatals) != 0
+
+    @classmethod
+    def from_issues_sequence(cls, issues: Sequence[ValidationIssueType]) -> ModelValidationResults:
+        """Constructs a ModelValidationResults class from a list of ValidationIssues"""
+
+        warnings: List[ValidationWarning] = []
+        future_errors: List[ValidationFutureError] = []
+        errors: List[ValidationError] = []
+        fatals: List[ValidationFatal] = []
+
+        for issue in issues:
+            if issue.level == ValidationIssueLevel.WARNING:
+                warnings.append(issue)
+            elif issue.level == ValidationIssueLevel.FUTURE_ERROR:
+                future_errors.append(issue)
+            elif issue.level == ValidationIssueLevel.ERROR:
+                errors.append(issue)
+            elif issue.level == ValidationIssueLevel.FATAL:
+                fatals.append(issue)
+            else:
+                assert_values_exhausted(issue.level)
+        return cls(
+            warnings=tuple(warnings), future_errors=tuple(future_errors), errors=tuple(errors), fatals=tuple(fatals)
+        )
+
+    @classmethod
+    def merge(cls, results: Sequence[ModelValidationResults]) -> ModelValidationResults:
+        """Creates a new ModelValidatorResults instance from multiple instances
+
+        This is useful when there are multiple validators that are run and the
+        combined results are desireable. For instance there is a ModelValidator
+        and a DataWarehouseModelValidator. These both return validation issues.
+        If it's desireable to combine the results, the following makes it easy.
+        """
+
+        if not isinstance(results, List):
+            results = list(results)
+
+        # this nested comprehension syntax is a little disorienting
+        # basically [element for object in list_of_objects for element in object.list_property]
+        # translates to "for each element in an object's list for each object in a list of objects"
+        warnings = tuple(issue for result in results for issue in result.warnings)
+        future_errors = tuple(issue for result in results for issue in result.future_errors)
+        errors = tuple(issue for result in results for issue in result.errors)
+        fatals = tuple(issue for result in results for issue in result.fatals)
+
+        return cls(
+            warnings=warnings,
+            future_errors=future_errors,
+            errors=errors,
+            fatals=fatals,
+        )
+
+    @property
+    def all_issues(self) -> Tuple[ValidationIssueType, ...]:
+        """For when a singular list of issues is needed"""
+        return self.fatals + self.errors + self.future_errors + self.warnings
 
 
 def generate_exception_issue(
