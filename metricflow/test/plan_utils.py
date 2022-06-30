@@ -207,9 +207,7 @@ def assert_snapshot_text_equal(
         if snapshot_text != expected_snapshot_text:
             differ = difflib.Differ()
             diff = differ.compare(expected_snapshot_text.splitlines(), snapshot_text.splitlines())
-            logger.error(f"Snapshot from {file_path} does not match. Diff from expected to actual:\n" + "\n".join(diff))
-            logger.error(snapshot_text)
-            assert False
+            assert False, f"Snapshot from {file_path} does not match. Diff from expected to actual:\n" + "\n".join(diff)
 
 
 def assert_execution_plan_text_equal(  # noqa: D
