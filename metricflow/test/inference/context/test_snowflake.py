@@ -1,5 +1,5 @@
 import json
-from unittest.mock import MagicMock, call
+from unittest.mock import MagicMock
 
 import pandas as pd
 
@@ -27,7 +27,12 @@ def test_column_type_conversion() -> None:  # noqa: D
     assert ctx_provider._column_type_from_show_columns_data_type("TIME") == SqlColumnType.UNKNOWN
 
 
-def test_context_provider() -> None:  # noqa: D
+def test_context_provider() -> None:
+    """Test `SnowflakeInferenceContextProvider` implementation.
+
+    This test case currently mocks the Snowflake response with a `MagicMock`. This is not ideal
+    and should probably be replaced by integration tests in the future.
+    """
     # See for SHOW COLUMNS result dataframe spec:
     # https://docs.snowflake.com/en/sql-reference/sql/show-columns.html
     show_columns_result = pd.DataFrame(
@@ -68,28 +73,6 @@ def test_context_provider() -> None:  # noqa: D
     )
 
     ctx = ctx_provider.get_context()
-
-    client.query.assert_has_calls(
-        [
-            call("SHOW COLUMNS IN TABLE db.schema.table"),
-            # make sure it produces correct SQL
-            call(
-                "SELECT "
-                "COUNT(DISTINCT intcol) AS intcol_countdistinct, "
-                "MIN(intcol) AS intcol_min, "
-                "MAX(intcol) AS intcol_max, "
-                # no need to query for count null if schema says it is not nullable
-                "0 AS intcol_countnull, "
-                "COUNT(DISTINCT strcol) AS strcol_countdistinct, "
-                "MIN(strcol) AS strcol_min, "
-                "MAX(strcol) AS strcol_max, "
-                "SUM(CASE WHEN strcol IS NULL THEN 1 ELSE 0 END) AS strcol_countnull, "
-                "COUNT(*) AS rowcount "
-                "FROM db.schema.table SAMPLE (50 ROWS)"
-            ),
-        ],
-        any_order=False,
-    )
 
     assert ctx == DataWarehouseInferenceContext(
         [

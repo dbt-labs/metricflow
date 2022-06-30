@@ -1,16 +1,14 @@
-from unittest.mock import MagicMock, call
-
 from metricflow.dataflow.sql_column import SqlColumn, SqlColumnType
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.inference.context.data_warehouse import (
     ColumnProperties,
     DataWarehouseInferenceContext,
-    DataWarehouseInferenceContextProvider,
     TableProperties,
 )
 
 
-def test_column_statistics():  # noqa: D
+def test_column_properties_is_empty():
+    """Just some easy assertions to test is_empty works as intended."""
     props = ColumnProperties(
         column=SqlColumn.from_string("db.schema.table.column"),
         type=SqlColumnType.INTEGER,
@@ -21,7 +19,6 @@ def test_column_statistics():  # noqa: D
         min_value=0,
         max_value=9999,
     )
-    assert props.type == SqlColumnType.INTEGER
     assert not props.is_empty
 
     empty_props = ColumnProperties(
@@ -34,11 +31,15 @@ def test_column_statistics():  # noqa: D
         min_value=None,
         max_value=None,
     )
-    assert empty_props.type == SqlColumnType.UNKNOWN
     assert empty_props.is_empty
 
 
-def test_table_statistics() -> None:  # noqa: D
+def test_table_properties() -> None:
+    """Test `TableProperties` initialization.
+
+    This test case asserts that the conversion from the `column_props` argument (which is a list) to
+    `self.columns` (which is a dict) implemented by `TableProperties.__post_init__` works as intended.
+    """
     table = SqlTable.from_string("db.schema.table")
     col_props = [
         ColumnProperties(
@@ -71,7 +72,13 @@ def test_table_statistics() -> None:  # noqa: D
     }
 
 
-def test_data_warehouse_inference_context() -> None:  # noqa: D
+def test_data_warehouse_inference_context() -> None:
+    """Test `DataWarehouseInferenceContext` initialization.
+
+    This test case asserts that the conversion from the `table_props` argument
+    (which is a list) to `self.tables` and `self.columns` (which are dicts)
+    implemented by `DataWarehouseInferenceContext.__post_init__` works as intended.
+    """
     t1 = SqlTable.from_string("db.schema1.table1")
     t2 = SqlTable.from_string("db.schema2.table1")
 
@@ -122,33 +129,3 @@ def test_data_warehouse_inference_context() -> None:  # noqa: D
         t1_cols[1].column: t1_cols[1],
         t2_cols[0].column: t2_cols[0],
     }
-
-
-def test_context_provider() -> None:  # noqa: D
-    tables = [
-        SqlTable.from_string("db.schema.table1"),
-        SqlTable.from_string("db.schema.table2"),
-        SqlTable.from_string("db.schema.table3"),
-    ]
-
-    ctx_provider = DataWarehouseInferenceContextProvider(client=MagicMock(), tables=tables)
-
-    object.__setattr__(ctx_provider, "_get_table_properties", MagicMock())
-    table_props = [
-        TableProperties(table=tables[0], column_props=[]),
-        TableProperties(table=tables[1], column_props=[]),
-        TableProperties(table=tables[2], column_props=[]),
-    ]
-    ctx_provider._get_table_properties.side_effect = table_props
-
-    ctx = ctx_provider.get_context()
-
-    ctx_provider._get_table_properties.assert_has_calls(
-        [
-            call(tables[0]),
-            call(tables[1]),
-            call(tables[2]),
-        ]
-    )
-
-    assert ctx == DataWarehouseInferenceContext(table_props=table_props)
