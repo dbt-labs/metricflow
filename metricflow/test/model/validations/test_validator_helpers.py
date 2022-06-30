@@ -13,10 +13,13 @@ from metricflow.model.validations.validator_helpers import (
     MeasureContext,
     MetricContext,
     ValidationContextJSON,
+    ValidationError,
+    ValidationFatal,
     ValidationFutureError,
     ValidationIssue,
     ValidationIssueJSON,
     ValidationIssueLevel,
+    ValidationWarning,
 )
 
 
@@ -83,23 +86,8 @@ def metric_context_dict(file_context_dict: Dict[str, Union[str, int]]) -> Dict[s
 def base_issue_dict(file_context_dict: ValidationContextJSON) -> ValidationIssueJSON:  # noqa: D
     return {
         "message": "An issue occured",
-        "level": ValidationIssueLevel.ERROR.value,
         "context": file_context_dict,
     }
-
-
-def test_can_load_issue_from_jsonified_issue() -> None:  # noqa: D
-    issue = ValidationFutureError(
-        context=FileContext(file_name="foo.yaml", line_number=1337),
-        message="A issue was found that will be an error",
-        error_date=date(2022, 6, 13),
-    )
-
-    jsonified_issue = issue.json()
-    new_issue = ValidationIssue.from_json(jsonified_issue)
-
-    assert isinstance(new_issue, ValidationFutureError)
-    assert new_issue == issue
 
 
 def test_load_validation_context(file_context_dict: Dict[str, Union[str, int]]) -> None:  # noqa: D
@@ -168,9 +156,7 @@ def test_load_metric_context(metric_context_dict: ValidationContextJSON) -> None
 
 
 def test_load_validation_fatal(base_issue_dict: ValidationIssueJSON) -> None:  # noqa: D
-    base_issue_dict["level"] = ValidationIssueLevel.FATAL.value
-
-    issue = ValidationIssue.from_json(json.dumps(base_issue_dict))
+    issue = ValidationFatal.parse_raw(json.dumps(base_issue_dict))
 
     assert isinstance(issue, ValidationIssue)
     assert issue.level == ValidationIssueLevel.FATAL
@@ -179,7 +165,7 @@ def test_load_validation_fatal(base_issue_dict: ValidationIssueJSON) -> None:  #
 
 
 def test_load_validation_error(base_issue_dict: ValidationIssueJSON) -> None:  # noqa: D
-    issue = ValidationIssue.from_json(json.dumps(base_issue_dict))
+    issue = ValidationError.parse_raw(json.dumps(base_issue_dict))
 
     assert isinstance(issue, ValidationIssue)
     assert issue.level == ValidationIssueLevel.ERROR
@@ -189,10 +175,9 @@ def test_load_validation_error(base_issue_dict: ValidationIssueJSON) -> None:  #
 
 def test_load_validation_future_error(base_issue_dict: ValidationIssueJSON) -> None:  # noqa: D
     error_date = date(2022, 6, 13)
-    base_issue_dict["level"] = ValidationIssueLevel.FUTURE_ERROR.value
     base_issue_dict["error_date"] = error_date.isoformat()
 
-    issue = ValidationIssue.from_json(json.dumps(base_issue_dict))
+    issue = ValidationFutureError.parse_raw(json.dumps(base_issue_dict))
 
     assert isinstance(issue, ValidationFutureError)
     assert issue.level == ValidationIssueLevel.FUTURE_ERROR
@@ -202,9 +187,7 @@ def test_load_validation_future_error(base_issue_dict: ValidationIssueJSON) -> N
 
 
 def test_load_validation_warning(base_issue_dict: ValidationIssueJSON) -> None:  # noqa: D
-    base_issue_dict["level"] = ValidationIssueLevel.WARNING.value
-
-    issue = ValidationIssue.from_json(json.dumps(base_issue_dict))
+    issue = ValidationWarning.parse_raw(json.dumps(base_issue_dict))
 
     assert isinstance(issue, ValidationIssue)
     assert issue.level == ValidationIssueLevel.WARNING
