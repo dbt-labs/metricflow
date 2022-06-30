@@ -47,7 +47,7 @@ class MetricInputMeasure(PydanticCustomInputParser, HashableBaseModel):
         elif isinstance(input, str):
             return MetricInputMeasure(name=input)
         elif isinstance(input, dict):
-            raise NotImplementedError("Support for object-type parsing for metric measure inputs coming soon!")
+            return MetricInputMeasure(**input)
         else:
             raise ValueError(
                 f"MetricInputMeasure inputs from model configs are expected to be of either type string or "
