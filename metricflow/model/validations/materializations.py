@@ -16,7 +16,8 @@ from metricflow.model.validations.validator_helpers import (
     ValidationError,
     ValidationIssueType,
     validate_safely,
-    ValidationFutureError, )
+    ValidationFutureError,
+)
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
@@ -84,7 +85,7 @@ class ValidMaterializationRule(ModelValidationRule):
                     context=context,
                     message=f"Metric time dimension {DataSet.metric_time_dimension_name()} not listed"
                     f" as a dimension in materialization {materialization.name}",
-                    error_date=datetime.date(2022, 8, 1)
+                    error_date=datetime.date(2022, 8, 1),
                 )
             )
 
