@@ -42,7 +42,7 @@ class ModelObjectType(Enum):
     METRIC = "metric"
 
 
-class ValidationContext(BaseModel):
+class FileContext(BaseModel):
     """The base context class for validation issues"""
 
     file_name: Optional[str]
@@ -65,118 +65,85 @@ class ValidationContext(BaseModel):
 
         return context_string
 
-    @staticmethod
-    def from_dict(context_dict: ValidationContextJSON) -> ValidationContext:
-        """Constructs a ValidationContext object from a JSON format dict"""
 
-        file_name = context_dict.get("file_name", None)
-        line_number = context_dict.get("line_number", None)
+class MaterializationContext(BaseModel):
+    """The context class for validation issues involving materializations"""
 
-        keys = context_dict.keys()
-        if "data_source_name" in keys:
-            data_source_name = context_dict["data_source_name"]
-
-            if "measure_name" in keys:
-                return MeasureContext(
-                    file_name=file_name,
-                    line_number=line_number,
-                    data_source_name=data_source_name,
-                    measure_name=context_dict["measure_name"],
-                )
-            elif "dimension_name" in keys:
-                return DimensionContext(
-                    file_name=file_name,
-                    line_number=line_number,
-                    data_source_name=data_source_name,
-                    dimension_name=context_dict["dimension_name"],
-                )
-            elif "identifier_name" in keys:
-                return IdentifierContext(
-                    file_name=file_name,
-                    line_number=line_number,
-                    data_source_name=data_source_name,
-                    identifier_name=context_dict["identifier_name"],
-                )
-            else:
-                return DataSourceContext(
-                    file_name=file_name,
-                    line_number=line_number,
-                    data_source_name=data_source_name,
-                )
-        elif "materialization_name" in keys:
-            return MaterializationContext(
-                file_name=file_name,
-                line_number=line_number,
-                materialization_name=context_dict["materialization_name"],
-            )
-        elif "metric_name" in keys:
-            return MetricContext(
-                file_name=file_name,
-                line_number=line_number,
-                metric_name=context_dict["metric_name"],
-            )
-        else:
-            return ValidationContext(file_name=file_name, line_number=line_number)
-
-
-class MaterializationContext(ValidationContext):
-    """The context class for vaidation issues involving materializations"""
-
+    file_context: FileContext
     materialization_name: str
 
     def context_str(self) -> str:
         """Human readable stringified representation of the context"""
-        return f"with materialization `{self.materialization_name}` {ValidationContext.context_str(self)}"
+        return f"with materialization `{self.materialization_name}` {self.file_context.context_str()}"
 
 
-class MetricContext(ValidationContext):
-    """The context class for vaidation issues involving metrics"""
+class MetricContext(BaseModel):
+    """The context class for validation issues involving metrics"""
 
+    file_context: FileContext
     metric_name: str
 
     def context_str(self) -> str:
         """Human readable stringified representation of the context"""
-        return f"with metric `{self.metric_name}` {ValidationContext.context_str(self)}"
+        return f"with metric `{self.metric_name}` {self.file_context.context_str()}"
 
 
-class DataSourceContext(ValidationContext):
-    """The context class for vaidation issues involving data sources"""
+class DataSourceContext(BaseModel):
+    """The context class for validation issues involving data sources"""
 
+    file_context: FileContext
     data_source_name: str
 
     def context_str(self) -> str:
         """Human readable stringified representation of the context"""
-        return f"with data source `{self.data_source_name}` {ValidationContext.context_str(self)}"
+        return f"with data source `{self.data_source_name}` {self.file_context.context_str()}"
 
 
-class DimensionContext(DataSourceContext):
-    """The context class for vaidation issues involving dimensions"""
+class DimensionContext(BaseModel):
+    """The context class for validation issues involving dimensions"""
 
+    file_context: FileContext
+    data_source_name: str
     dimension_name: str
 
     def context_str(self) -> str:
         """Human readable stringified representation of the context"""
-        return f"with dimension `{self.dimension_name}` in data source `{self.data_source_name}` {ValidationContext.context_str(self)}"
+        return f"with dimension `{self.dimension_name}` in data source `{self.data_source_name}` {DataSourceContext.context_str(self)}"
 
 
-class IdentifierContext(DataSourceContext):
-    """The context class for vaidation issues involving indentifiers"""
+class IdentifierContext(BaseModel):
+    """The context class for validation issues involving indentifiers"""
 
+    file_context: FileContext
+    data_source_name: str
     identifier_name: str
 
     def context_str(self) -> str:
         """Human readable stringified representation of the context"""
-        return f"with identifier `{self.identifier_name}` in data source `{self.data_source_name}` {ValidationContext.context_str(self)}"
+        return f"with identifier `{self.identifier_name}` in data source `{self.data_source_name}` {DataSourceContext.context_str(self)}"
 
 
-class MeasureContext(DataSourceContext):
-    """The context class for vaidation issues involving measures"""
+class MeasureContext(BaseModel):
+    """The context class for validation issues involving measures"""
 
+    file_context: FileContext
+    data_source_name: str
     measure_name: str
 
     def context_str(self) -> str:
         """Human readable stringified representation of the context"""
-        return f"with measure `{self.measure_name}` in data source `{self.data_source_name}` {ValidationContext.context_str(self)}"
+        return f"with measure `{self.measure_name}` in data source `{self.data_source_name}` {DataSourceContext.context_str(self)}"
+
+
+ValidationContext = Union[
+    FileContext,
+    MaterializationContext,
+    MetricContext,
+    DimensionContext,
+    MeasureContext,
+    IdentifierContext,
+    DataSourceContext,
+]
 
 
 class ValidationIssue(BaseModel):
