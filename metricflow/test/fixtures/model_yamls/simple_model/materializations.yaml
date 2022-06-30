@@ -126,7 +126,7 @@ materialization:
     - location: FAST_CACHE
       format: WIDE
       rollups:
-        - ["ds", "*"]
+        - ["metric_time", "*"]
 
 ---
 materialization:
