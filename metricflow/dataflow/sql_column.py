@@ -23,18 +23,16 @@ class SqlColumn(FrozenBaseModel):
     table: SqlTable
     column_name: str
 
-    def __init__(  # noqa: D
-        self,
+    @staticmethod
+    def from_names(
         column_name: str,
-        table_name: str = None,
-        schema_name: str = None,
-        db_name: str = None,
-        table: SqlTable = None,
+        table_name: str,
+        schema_name: str,
+        db_name: str,
     ):
-        if table is None:
-            table = SqlTable(db_name=db_name, schema_name=schema_name, table_name=table_name)
-
-        super(FrozenBaseModel, self).__init__(table=table, column_name=column_name)
+        """Helper factory method for constructing a column from database, table, schema and column names."""
+        table = SqlTable(db_name=db_name, schema_name=schema_name, table_name=table_name)
+        return SqlColumn(table=table, column_name=column_name)
 
     @staticmethod
     def from_string(sql_str: str) -> SqlColumn:  # noqa: D

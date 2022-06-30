@@ -58,7 +58,7 @@ class SnowflakeInferenceContextProvider(DataWarehouseInferenceContextProvider):
         select_lists = []
 
         for row in all_columns.itertuples():
-            column = SqlColumn(
+            column = SqlColumn.from_names(
                 db_name=row.database_name.lower(),
                 schema_name=row.schema_name.lower(),
                 table_name=row.table_name.lower(),

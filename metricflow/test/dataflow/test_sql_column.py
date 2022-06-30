@@ -10,7 +10,7 @@ def test_sql_column() -> None:  # noqa: D
 
     assert sql_column.sql == column_str
     assert SqlColumn.from_string(column_str) == sql_column
-    assert sql_column == SqlColumn(
+    assert sql_column == SqlColumn.from_names(
         db_name="test_db", schema_name="test_schema", table_name="test_table", column_name="test_column"
     )
 
