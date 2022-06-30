@@ -8,6 +8,7 @@ from datetime import date
 from enum import Enum
 from pydantic import BaseModel, Extra
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
+from metricflow.model.objects.common import Metadata
 
 from metricflow.model.objects.elements.dimension import DimensionType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
@@ -65,6 +66,15 @@ class FileContext(BaseModel):
                 context_string += f" on line #{self.line_number}"
 
         return context_string
+
+    @classmethod
+    def from_metadata(cls, metadata: Optional[Metadata] = None) -> FileContext:
+        """Creates a FileContext instance from a Metadata object"""
+
+        return cls(
+            file_name=metadata.file_slice.filename if metadata else None,
+            line_number=metadata.file_slice.start_line_number if metadata else None,
+        )
 
 
 class MaterializationContext(BaseModel):
