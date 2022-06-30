@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import functools
-import json
 import traceback
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -146,13 +145,18 @@ ValidationContext = Union[
 ]
 
 
-class ValidationIssue(BaseModel):
-    """An issue that was found while validating the MetricFlow model."""
+class ValidationIssue(ABC, BaseModel):
+    """The abstract base ValidationIsssue class that the specific ValidationIssue classes are built from"""
 
-    level: ValidationIssueLevel
     message: str
-    context: Optional[ValidationContext]
-    # Consider adding a enum here that categories the type of validation issue and standardize the error messages.
+    context: Optional[ValidationContext] = None
+
+    @property
+    @abstractmethod
+    def level(self) -> ValidationIssueLevel:
+        """The level of of ValidationIssue"""
+
+        raise NotImplementedError
 
     def as_readable_str(self, with_level: bool = True) -> str:
         """Return a easily readable string that can be used to log the issue."""
@@ -162,47 +166,23 @@ class ValidationIssue(BaseModel):
             msg_base += " - "
         return msg_base + self.message
 
-    @staticmethod
-    def from_json(json_str: str) -> ValidationIssue:
-        """Convert a json string representing a ValidationIssue into a ValidationIssue"""
 
-        return ValidationIssue.from_dict(json_dict=json.loads(json_str))
+class ValidationWarning(ValidationIssue, BaseModel):
+    """A warning that was found while validating the model."""
 
-    def from_dict(json_dict: ValidationIssueJSON) -> ValidationIssue:
-        """Convert a dict representing a ValidationIssue into a ValidationIssue"""
-
-        context_dict = json_dict["context"]
-        assert isinstance(context_dict, Dict)
-        context = ValidationContext.from_dict(context_dict)
-
-        message = json_dict["message"]
-        level = json_dict["level"]
-
-        if level == ValidationIssueLevel.FUTURE_ERROR.value:
-            error_date_str = json_dict["error_date"]
-            assert isinstance(error_date_str, str)
-            error_date = date.fromisoformat(error_date_str)
-
-            return ValidationFutureError(context=context, message=message, error_date=error_date)
-        else:
-            return ValidationIssue(
-                context=context,
-                level=level,
-                message=message,
-            )
+    @property
+    def level(self) -> ValidationIssueLevel:  # noqa: D
+        return ValidationIssueLevel.WARNING
 
 
-class ValidationWarning(ValidationIssue):
-    """A warning that was found while validation the model."""
-
-    level = ValidationIssueLevel.WARNING
-
-
-class ValidationFutureError(ValidationIssue):
-    """A future error that was found while validation the model."""
+class ValidationFutureError(ValidationIssue, BaseModel):
+    """A future error that was found while validating the model."""
 
     error_date: date
-    level = ValidationIssueLevel.FUTURE_ERROR
+
+    @property
+    def level(self) -> ValidationIssueLevel:  # noqa: D
+        return ValidationIssueLevel.FUTURE_ERROR
 
     def as_readable_str(self, with_level: bool = True) -> str:
         """Return a easily readable string that can be used to log the issue."""
@@ -212,19 +192,23 @@ class ValidationFutureError(ValidationIssue):
         )
 
 
-class ValidationError(ValidationIssue):
+class ValidationError(ValidationIssue, BaseModel):
     """An error that was found while validating the model."""
 
-    level = ValidationIssueLevel.ERROR
+    @property
+    def level(self) -> ValidationIssueLevel:  # noqa: D
+        return ValidationIssueLevel.ERROR
 
 
-class ValidationFatal(ValidationIssue):
-    """A fatal issue that was found while validation the model."""
+class ValidationFatal(ValidationIssue, BaseModel):
+    """A fatal issue that was found while validating the model."""
 
-    level = ValidationIssueLevel.FATAL
+    @property
+    def level(self) -> ValidationIssueLevel:  # noqa: D
+        return ValidationIssueLevel.FATAL
 
 
-ValidationIssueType = Union[ValidationIssue, ValidationWarning, ValidationFutureError, ValidationError, ValidationFatal]
+ValidationIssueType = Union[ValidationWarning, ValidationFutureError, ValidationError, ValidationFatal]
 
 
 def generate_exception_issue(
