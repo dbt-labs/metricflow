@@ -13,6 +13,7 @@ from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,
     DimensionContext,
+    FileContext,
     MetricContext,
     ValidationContext,
     ValidationError,
@@ -99,8 +100,7 @@ class DataWarehouseTaskBuilder:
                 DataWarehouseValidationTask(
                     query_string=DataWarehouseTaskBuilder._gen_query(data_source=data_source, id=index),
                     context=DataSourceContext(
-                        file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
-                        line_number=data_source.metadata.file_slice.start_line_number if data_source.metadata else None,
+                        file_context=FileContext.from_metadata(metadata=data_source.metadata),
                         data_source_name=data_source.name,
                     ),
                     error_message=f"Unable to access data source `{data_source.name}` in data warehouse",
@@ -134,10 +134,7 @@ class DataWarehouseTaskBuilder:
                             data_source=data_source, id=index, columns=[dim_to_query]
                         ),
                         context=DimensionContext(
-                            file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
-                            line_number=data_source.metadata.file_slice.start_line_number
-                            if data_source.metadata
-                            else None,
+                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
                             data_source_name=data_source.name,
                             dimension_name=dimension.name,
                         ),
@@ -155,8 +152,7 @@ class DataWarehouseTaskBuilder:
                         columns=data_source_columns,
                     ),
                     context=DataSourceContext(
-                        file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
-                        line_number=data_source.metadata.file_slice.start_line_number if data_source.metadata else None,
+                        file_context=FileContext.from_metadata(metadata=data_source.metadata),
                         data_source_name=data_source.name,
                     ),
                     error_message=f"Failed to query dimensions in data warehouse for data source `{data_source.name}`",
@@ -179,8 +175,7 @@ class DataWarehouseTaskBuilder:
                     query_string=explain_result.rendered_sql.sql_query,
                     query_params=explain_result.rendered_sql.bind_parameters,
                     context=MetricContext(
-                        file_name=metric.metadata.file_slice.filename if metric.metadata else None,
-                        line_number=metric.metadata.file_slice.start_line_number if metric.metadata else None,
+                        file_context=FileContext.from_metadata(metadata=metric.metadata),
                         metric_name=metric.name,
                     ),
                     error_message=f"Unable to query metric `{metric.name}`.",

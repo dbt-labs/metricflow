@@ -11,6 +11,7 @@ from metricflow.model.objects.materialization import Materialization
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.validations.validator_helpers import (
+    FileContext,
     MaterializationContext,
     ModelValidationRule,
     ValidationError,
@@ -43,8 +44,7 @@ class ValidMaterializationRule(ModelValidationRule):
         issues: List[ValidationIssueType] = []
 
         context = MaterializationContext(
-            file_name=materialization.metadata.file_slice.filename if materialization.metadata else None,
-            line_number=materialization.metadata.file_slice.start_line_number if materialization.metadata else None,
+            file_context=FileContext.from_metadata(metadata=materialization.metadata),
             materialization_name=materialization.name,
         )
 

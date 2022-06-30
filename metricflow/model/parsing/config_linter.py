@@ -4,7 +4,12 @@ import yaml
 from yamllint import config, linter, rules
 from metricflow.model.parsing.validation import METRIC_TYPE, DATA_SOURCE_TYPE, MATERIALIZATION_TYPE
 
-from metricflow.model.validations.validator_helpers import ValidationContext, ValidationIssue, ValidationIssueLevel
+from metricflow.model.validations.validator_helpers import (
+    FileContext,
+    ValidationError,
+    ValidationIssue,
+    ValidationWarning,
+)
 
 WARNING = "warning"
 ERROR = "error"
@@ -80,14 +85,21 @@ class ConfigLinter:  # noqa: D
                 if problem.rule == rules.key_duplicates.ID:
                     self.add_additional_key_duplicates_info(problem=problem)
 
-                level = ValidationIssueLevel.ERROR if problem.level == ERROR else ValidationIssueLevel.WARNING
-                issues.append(
-                    ValidationIssue(
-                        level=level,
-                        context=ValidationContext(file_name=file_name, line_number=problem.line),
-                        message=problem.desc,  # type: ignore[misc]
+                if problem.level == ERROR:
+                    issues.append(
+                        ValidationError(
+                            context=FileContext(file_name=file_name, line_number=problem.line),
+                            message=problem.desc,  # type: ignore[misc]
+                        )
                     )
-                )
+                else:
+                    issues.append(
+                        ValidationWarning(
+                            context=FileContext(file_name=file_name, line_number=problem.line),
+                            message=problem.desc,  # type: ignore[misc]
+                        )
+                    )
+
         return issues
 
     def lint_dir(self, dir_path: str) -> List[ValidationIssue]:  # noqa: D

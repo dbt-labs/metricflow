@@ -4,6 +4,7 @@ from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,
+    FileContext,
     ModelValidationRule,
     ModelObjectType,
     ValidationError,
@@ -47,10 +48,7 @@ class ElementConsistencyRule(ModelValidationRule):
                 issues.append(
                     ValidationError(
                         context=DataSourceContext(
-                            file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
-                            line_number=data_source.metadata.file_slice.start_line_number
-                            if data_source.metadata
-                            else None,
+                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
                             data_source_name=data_source.name,
                         ),
                         message=f"In data source {data_source.name}, element `{element_name}` is of type "
@@ -66,10 +64,7 @@ class ElementConsistencyRule(ModelValidationRule):
                 issues.append(
                     ValidationError(
                         context=DataSourceContext(
-                            file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
-                            line_number=data_source.metadata.file_slice.start_line_number
-                            if data_source.metadata
-                            else None,
+                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
                             data_source_name=data_source.name,
                         ),
                         message=f"In data source {data_source.name}, the element named {element_name} "

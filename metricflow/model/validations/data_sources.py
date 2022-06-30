@@ -8,6 +8,7 @@ from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,
     DimensionContext,
+    FileContext,
     MeasureContext,
     ModelValidationRule,
     ValidationIssueType,
@@ -37,10 +38,7 @@ class DataSourceMeasuresUniqueRule(ModelValidationRule):
                     issues.append(
                         ValidationError(
                             context=MeasureContext(
-                                file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
-                                line_number=data_source.metadata.file_slice.start_line_number
-                                if data_source.metadata
-                                else None,
+                                file_context=FileContext.from_metadata(metadata=data_source.metadata),
                                 data_source_name=data_source.name,
                                 measure_name=measure.reference.element_name,
                             ),
@@ -74,8 +72,7 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
 
         for dim in data_source.dimensions:
             context = DimensionContext(
-                file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
-                line_number=data_source.metadata.file_slice.start_line_number if data_source.metadata else None,
+                file_context=FileContext.from_metadata(metadata=data_source.metadata),
                 data_source_name=data_source.name,
                 dimension_name=dim.name,
             )
@@ -99,8 +96,7 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
             issues.append(
                 ValidationError(
                     context=DataSourceContext(
-                        file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
-                        line_number=data_source.metadata.file_slice.start_line_number if data_source.metadata else None,
+                        file_context=FileContext.from_metadata(metadata=data_source.metadata),
                         data_source_name=data_source.name,
                     ),
                     message=f"No primary time dimension in data source with name ({data_source.name}). Please add one",

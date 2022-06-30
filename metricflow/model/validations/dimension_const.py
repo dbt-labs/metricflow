@@ -4,6 +4,7 @@ from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType
 from metricflow.model.validations.validator_helpers import (
     DimensionContext,
+    FileContext,
     ModelValidationRule,
     DimensionInvariants,
     ValidationIssueType,
@@ -62,8 +63,7 @@ class DimensionConsistencyRule(ModelValidationRule):
         """
         issues: List[ValidationIssueType] = []
         context = DimensionContext(
-            file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
-            line_number=data_source.metadata.file_slice.start_line_number if data_source.metadata else None,
+            file_context=FileContext.from_metadata(metadata=data_source.metadata),
             data_source_name=data_source.name,
             dimension_name=dimension.name,
         )
@@ -125,8 +125,7 @@ class DimensionConsistencyRule(ModelValidationRule):
             is_partition = dimension.is_partition or False
 
             context = DimensionContext(
-                file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
-                line_number=data_source.metadata.file_slice.start_line_number if data_source.metadata else None,
+                file_context=FileContext.from_metadata(metadata=data_source.metadata),
                 data_source_name=data_source.name,
                 dimension_name=dimension.name,
             )

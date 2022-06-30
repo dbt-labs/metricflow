@@ -6,6 +6,7 @@ from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,
     DimensionContext,
+    FileContext,
     IdentifierContext,
     MaterializationContext,
     MeasureContext,
@@ -69,10 +70,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
                         measure.reference,
                         "measure",
                         MeasureContext(
-                            file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
-                            line_number=data_source.metadata.file_slice.start_line_number
-                            if data_source.metadata
-                            else None,
+                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
                             data_source_name=data_source.name,
                             measure_name=measure.reference.element_name,
                         ),
@@ -85,10 +83,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
                         identifier.reference,
                         "identifier",
                         IdentifierContext(
-                            file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
-                            line_number=data_source.metadata.file_slice.start_line_number
-                            if data_source.metadata
-                            else None,
+                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
                             data_source_name=data_source.name,
                             identifier_name=identifier.name,
                         ),
@@ -101,10 +96,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
                         dimension.reference,
                         "dimension",
                         DimensionContext(
-                            file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
-                            line_number=data_source.metadata.file_slice.start_line_number
-                            if data_source.metadata
-                            else None,
+                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
                             data_source_name=data_source.name,
                             dimension_name=dimension.name,
                         ),
@@ -141,10 +133,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
                         data_source.name,
                         "data source",
                         DataSourceContext(
-                            file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
-                            line_number=data_source.metadata.file_slice.start_line_number
-                            if data_source.metadata
-                            else None,
+                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
                             data_source_name=data_source.name,
                         ),
                     )
@@ -156,12 +145,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
                         materialization.name,
                         "materialization",
                         MaterializationContext(
-                            file_name=materialization.metadata.file_slice.filename
-                            if materialization.metadata
-                            else None,
-                            line_number=materialization.metadata.file_slice.start_line_number
-                            if materialization.metadata
-                            else None,
+                            file_context=FileContext.from_metadata(metadata=materialization.metadata),
                             materialization_name=materialization.name,
                         ),
                     )
@@ -190,8 +174,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
                     issues.append(
                         ValidationFatal(
                             context=MetricContext(
-                                file_name=metric.metadata.file_slice.filename if metric.metadata else None,
-                                line_number=metric.metadata.file_slice.start_line_number if metric.metadata else None,
+                                file_context=FileContext.from_metadata(metadata=metric.metadata),
                                 metric_name=metric.name,
                             ),
                             message=f"Can't use name `{metric.name}` for a metric when it was already used for a metric",

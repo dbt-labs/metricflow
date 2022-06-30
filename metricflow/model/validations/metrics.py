@@ -5,6 +5,7 @@ from metricflow.errors.errors import ParsingException
 from metricflow.model.objects.metric import Metric, MetricType, CumulativeMetricWindow
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
+    FileContext,
     MetricContext,
     ModelValidationRule,
     ValidationIssueType,
@@ -38,8 +39,7 @@ class MetricMeasuresRule(ModelValidationRule):
                 issues.append(
                     ValidationFatal(
                         context=MetricContext(
-                            file_name=metric.metadata.file_slice.filename if metric.metadata else None,
-                            line_number=metric.metadata.file_slice.start_line_number if metric.metadata else None,
+                            file_context=FileContext.from_metadata(metadata=metric.metadata),
                             metric_name=metric.name,
                         ),
                         message=f"Invalid measure {measure_in_metric} in metric {metric.name}",
@@ -76,8 +76,7 @@ class CumulativeMetricRule(ModelValidationRule):
                 issues.append(
                     ValidationError(
                         context=MetricContext(
-                            file_name=metric.metadata.file_slice.filename if metric.metadata else None,
-                            line_number=metric.metadata.file_slice.start_line_number if metric.metadata else None,
+                            file_context=FileContext.from_metadata(metadata=metric.metadata),
                             metric_name=metric.name,
                         ),
                         message="Both window and grain_to_date set for cumulative metric. Please set one or the other",
@@ -91,8 +90,7 @@ class CumulativeMetricRule(ModelValidationRule):
                     issues.append(
                         ValidationError(
                             context=MetricContext(
-                                file_name=metric.metadata.file_slice.filename if metric.metadata else None,
-                                line_number=metric.metadata.file_slice.start_line_number if metric.metadata else None,
+                                file_context=FileContext.from_metadata(metadata=metric.metadata),
                                 metric_name=metric.name,
                             ),
                             message=traceback.format_exc(),
