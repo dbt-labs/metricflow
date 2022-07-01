@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
 import logging
 import inspect
-from typing import List, Optional, Sequence, Tuple, Type
+from typing import List, Optional, Tuple, Type
 
 from metricflow.dataflow.sql_column import SqlColumn
 from metricflow.inference.context.base import InferenceContext
@@ -83,7 +82,7 @@ class InferenceSignal:
 RequiredContextsType = Tuple[Optional[Type[InferenceContext]], ...]
 
 
-class InferenceRule(ABC):
+class InferenceRule:
     """Implements some sort of heuristic that produces signals about columns.
 
     An inference rule produces zero or more `InferenceSignal` instances about whatever
@@ -107,14 +106,20 @@ class InferenceRule(ABC):
                     "Unanottated types will be provided None contexts, which might trigger further runtime errors."
                 )
                 context_types.append(None)
-            elif not issubclass(param.annotation, InferenceContext):
-                logger.warning(
-                    f"`{cls.__name__}.process` must only accept input contexts as arguments (except for `self`). "
-                    "Extra arguments will always be None."
-                )
-                context_types.append(None)
+                continue
+
+            if isinstance(param.annotation, str):
+                annotation_str = param.annotation
             else:
-                context_types.append(param.annotation)
+                annotation_str = param.annotation.__name__
+
+            annotation_type = InferenceContext.known_subclasses.get(annotation_str, None)
+            if annotation_type is None:
+                logger.warning(
+                    "`InferenceRule.process` arguments must be subclasses of `InferenceContext`. "
+                    "Some calls may have None arguments, which may result in runtime errors."
+                )
+            context_types.append(annotation_type)
 
         cls._required_contexts = tuple(context_types)
 
@@ -125,10 +130,10 @@ class InferenceRule(ABC):
         """The context types this rule requires to run successfully."""
         return self._required_contexts
 
-    @abstractmethod
-    def process(self, *contexts: Sequence[InferenceContext]) -> List[InferenceSignal]:
+    # NOTE: this is not an @abstractmethod since we don't expect children to implement the same signature
+    def process(self) -> List[InferenceSignal]:
         """The actual rule implementation that returns a list of signals based on the input contexts.
 
-        All input context instances will be provided in the same order as specified in REQUIRED_CONTEXTS.
+        All input context instances will be provided in the same order as specified in `required_contexts`.
         """
         raise NotImplementedError

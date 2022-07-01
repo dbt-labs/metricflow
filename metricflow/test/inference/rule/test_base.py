@@ -68,27 +68,29 @@ def test_inference_rule_required_context_extraction():
         pass
 
     class TestRule1(InferenceRule):
-        def process(self, ctx1: CtxType1):
+        def process(self, contexts: CtxType1):  # type: ignore
             pass
 
     class TestRule2(InferenceRule):
-        def process(self, ctx2: CtxType2):
+        def process(self, ctx2: CtxType2):  # type: ignore
             pass
 
     class TestRule1And2(InferenceRule):
-        def process(self, ctx1: CtxType1, ctx2: CtxType2):
+        def process(self, ctx1: CtxType1, ctx2: CtxType2):  # type: ignore
             pass
 
     assert TestRule1().required_contexts == (CtxType1,)
     assert TestRule2().required_contexts == (CtxType2,)
     assert TestRule1And2().required_contexts == (CtxType1, CtxType2)
 
-    # Assert it calls `logger.warning` whenever a context's type is not a subclass
-    # of `InferenceContext` or when it does not have annotations
-    with patch("metricflow.inference.rule.base.logger.warning") as warn_mock:
+    # make sure we're emitting warnings when users try to use contexts that don't
+    # inherit from InferenceContext or if the process method is unannotated
+    with patch("metricflow.inference.rule.base.logger.warning") as warning_mock:
 
-        class ErrorRule(InferenceRule):
-            def process(self, ctx1: CtxType1, ctx2: int, ctx3):
+        class TestError(InferenceRule):
+            def process(self, ctx: CtxType1, ctx2: int, ctx3):  # type: ignore
                 pass
 
-        assert warn_mock.call_count == 2
+        print(TestError().required_contexts)
+        assert TestError().required_contexts == (CtxType1, None, None)
+        assert warning_mock.call_count == 2
