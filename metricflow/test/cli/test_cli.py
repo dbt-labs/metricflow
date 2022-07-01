@@ -22,6 +22,7 @@ from metricflow.model.validations.validator_helpers import (
     ValidationFutureError,
     ValidationWarning,
 )
+from metricflow.protocols.sql_client import SupportedSqlEngine
 from metricflow.test.fixtures.cli_fixtures import MetricFlowCliRunner
 
 
@@ -46,10 +47,14 @@ def test_list_metrics(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
 
 
 def test_get_dimension_values(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    resp = cli_runner.run(get_dimension_values, args=["--metric-name", "bookings", "--dimension-name", "is_instant"])
+    expected_output_lines = ["", "• False", "• True"]
+    if cli_runner.cli_context.sql_client.sql_engine_attributes.sql_engine_type is SupportedSqlEngine.SQLITE:
+        expected_output_lines = ["", "• 0", "• 1"]
 
+    resp = cli_runner.run(get_dimension_values, args=["--metric-name", "bookings", "--dimension-name", "is_instant"])
     actual_output_lines = sorted(resp.output.split("\n"))
-    assert ["", "• False", "• True"] == actual_output_lines
+
+    assert expected_output_lines == actual_output_lines
     assert resp.exit_code == 0
 
 
