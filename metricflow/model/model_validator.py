@@ -69,11 +69,7 @@ class ModelValidator:
             issues.extend(validation_rule.validate_model(model_copy))
             # If there are any fatal errors, stop the validation process.
             if any([x.level == ValidationIssueLevel.FATAL for x in issues]):
-                return ModelBuildResult(model=model_copy, issues=tuple(issues))
-
-        # If there are any errors, don't run any transforms and return the issues found.
-        if any([x.level == ValidationIssueLevel.ERROR for x in issues]):
-            return ModelBuildResult(model=model_copy, issues=tuple(issues))
+                break
 
         return ModelBuildResult(model=model_copy, issues=tuple(issues))
 
