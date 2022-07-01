@@ -4,7 +4,7 @@ import os.path
 import textwrap
 from dataclasses import dataclass
 from string import Template
-from typing import Optional, Dict, List, Union, Type, Any, Tuple
+from typing import Optional, Dict, List, Union, Type, Any
 
 import yaml
 from jsonschema import exceptions
@@ -27,7 +27,7 @@ from metricflow.model.parsing.validation import (
     DOCUMENT_TYPES,
 )
 from metricflow.model.parsing.yaml_loader import ParsingContext, SafeLineLoader, PARSING_CONTEXT_KEY
-from metricflow.model.validations.validator_helpers import ValidationIssueType
+from metricflow.model.validations.validator_helpers import ModelValidationResults
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 class ModelBuildResult:  # noqa: D
     model: Optional[UserConfiguredModel] = None
     # Issues found in the model.
-    issues: Tuple[ValidationIssueType, ...] = tuple()
+    issues: ModelValidationResults = ModelValidationResults()
 
 
 def parse_directory_of_yaml_files_to_model(

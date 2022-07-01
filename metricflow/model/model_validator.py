@@ -21,6 +21,7 @@ from metricflow.model.validations.metrics import MetricMeasuresRule, CumulativeM
 from metricflow.model.validations.non_empty import NonEmptyRule
 from metricflow.model.validations.unique_valid_name import UniqueAndValidNameRule
 from metricflow.model.validations.validator_helpers import (
+    ModelValidationResults,
     ValidationIssueType,
     ModelValidationRule,
     ValidationIssueLevel,
@@ -73,7 +74,7 @@ class ModelValidator:
             if any([x.level == ValidationIssueLevel.FATAL for x in issues]):
                 break
 
-        return ModelBuildResult(model=model_copy, issues=tuple(issues))
+        return ModelBuildResult(model=model_copy, issues=ModelValidationResults.from_issues_sequence(issues))
 
     def checked_validations(self, model: UserConfiguredModel) -> UserConfiguredModel:  # chTODO: remember checked_build
         """Similar to validate(), but throws an exception if validation fails."""
