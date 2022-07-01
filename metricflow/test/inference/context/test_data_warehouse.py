@@ -1,7 +1,8 @@
-from metricflow.dataflow.sql_column import SqlColumn, SqlColumnType
+from metricflow.dataflow.sql_column import SqlColumn
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.inference.context.data_warehouse import (
     ColumnProperties,
+    InferenceColumnType,
     DataWarehouseInferenceContext,
     TableProperties,
 )
@@ -11,7 +12,7 @@ def test_column_properties_is_empty():
     """Just some easy assertions to test is_empty works as intended."""
     props = ColumnProperties(
         column=SqlColumn.from_string("db.schema.table.column"),
-        type=SqlColumnType.INTEGER,
+        type=InferenceColumnType.INTEGER,
         row_count=10000,
         distinct_row_count=1000,
         is_nullable=True,
@@ -23,7 +24,7 @@ def test_column_properties_is_empty():
 
     empty_props = ColumnProperties(
         column=SqlColumn.from_string("db.schema.table.column"),
-        type=SqlColumnType.UNKNOWN,
+        type=InferenceColumnType.UNKNOWN,
         row_count=0,
         distinct_row_count=0,
         is_nullable=False,
@@ -44,7 +45,7 @@ def test_table_properties() -> None:
     col_props = [
         ColumnProperties(
             column=SqlColumn(table=table, column_name="column1"),
-            type=SqlColumnType.INTEGER,
+            type=InferenceColumnType.INTEGER,
             row_count=1000,
             distinct_row_count=1000,
             is_nullable=False,
@@ -54,7 +55,7 @@ def test_table_properties() -> None:
         ),
         ColumnProperties(
             column=SqlColumn(table=table, column_name="column2"),
-            type=SqlColumnType.FLOAT,
+            type=InferenceColumnType.FLOAT,
             row_count=2000,
             distinct_row_count=1000,
             is_nullable=True,
@@ -85,7 +86,7 @@ def test_data_warehouse_inference_context() -> None:
     t1_cols = [
         ColumnProperties(
             column=SqlColumn(table=t1, column_name="column1"),
-            type=SqlColumnType.INTEGER,
+            type=InferenceColumnType.INTEGER,
             row_count=1000,
             distinct_row_count=1000,
             is_nullable=False,
@@ -95,7 +96,7 @@ def test_data_warehouse_inference_context() -> None:
         ),
         ColumnProperties(
             column=SqlColumn(table=t1, column_name="column2"),
-            type=SqlColumnType.FLOAT,
+            type=InferenceColumnType.FLOAT,
             row_count=2000,
             distinct_row_count=1000,
             is_nullable=True,
@@ -109,7 +110,7 @@ def test_data_warehouse_inference_context() -> None:
     t2_cols = [
         ColumnProperties(
             column=SqlColumn(table=t2, column_name="column_a"),
-            type=SqlColumnType.FLOAT,
+            type=InferenceColumnType.FLOAT,
             row_count=1000,
             distinct_row_count=1000,
             is_nullable=False,

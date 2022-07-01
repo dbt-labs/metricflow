@@ -1,20 +1,8 @@
 from __future__ import annotations
-from enum import Enum
 from typing import Optional
 
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.model.objects.utils import FrozenBaseModel
-
-
-class SqlColumnType(str, Enum):
-    """Represents a column type."""
-
-    STRING = "string"
-    BOOLEAN = "boolean"
-    INTEGER = "integer"
-    FLOAT = "float"
-    DATETIME = "datetime"
-    UNKNOWN = "unknown"
 
 
 class SqlColumn(FrozenBaseModel):

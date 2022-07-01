@@ -1,9 +1,10 @@
 import json
-from metricflow.dataflow.sql_column import SqlColumn, SqlColumnType
+from metricflow.dataflow.sql_column import SqlColumn
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.inference.context.data_warehouse import (
     TableProperties,
     ColumnProperties,
+    InferenceColumnType,
     DataWarehouseInferenceContextProvider,
 )
 
@@ -16,23 +17,23 @@ class SnowflakeInferenceContextProvider(DataWarehouseInferenceContextProvider):
     MIN_SUFFIX = "min"
     MAX_SUFFIX = "max"
 
-    def _column_type_from_show_columns_data_type(self, type_str: str) -> SqlColumnType:
-        """Get the correspondent SqlColumnType from Snowflake's returned type string.
+    def _column_type_from_show_columns_data_type(self, type_str: str) -> InferenceColumnType:
+        """Get the correspondent InferenceColumnType from Snowflake's returned type string.
 
         See for reference: https://docs.snowflake.com/en/sql-reference/sql/show-columns.html
         """
         str_dict = {
-            "FIXED": SqlColumnType.INTEGER,
-            "TEXT": SqlColumnType.STRING,
-            "REAL": SqlColumnType.FLOAT,
-            "BOOLEAN": SqlColumnType.BOOLEAN,
-            "DATE": SqlColumnType.DATETIME,
-            "TIMESTAMP_TZ": SqlColumnType.DATETIME,
-            "TIMESTAMP_LTZ": SqlColumnType.DATETIME,
-            "TIMESTAMP_NTZ": SqlColumnType.DATETIME,
+            "FIXED": InferenceColumnType.INTEGER,
+            "TEXT": InferenceColumnType.STRING,
+            "REAL": InferenceColumnType.FLOAT,
+            "BOOLEAN": InferenceColumnType.BOOLEAN,
+            "DATE": InferenceColumnType.DATETIME,
+            "TIMESTAMP_TZ": InferenceColumnType.DATETIME,
+            "TIMESTAMP_LTZ": InferenceColumnType.DATETIME,
+            "TIMESTAMP_NTZ": InferenceColumnType.DATETIME,
         }
 
-        return str_dict.get(type_str, SqlColumnType.UNKNOWN)
+        return str_dict.get(type_str, InferenceColumnType.UNKNOWN)
 
     def _get_select_list_for_column_name(self, name: str, count_nulls: bool) -> str:
         statements = [

@@ -1,13 +1,30 @@
 from dataclasses import InitVar, dataclass, field
 from datetime import date, datetime
+from enum import Enum
 from typing import Dict, List, Optional, TypeVar, Generic
 
-from metricflow.dataflow.sql_column import SqlColumn, SqlColumnType
+from metricflow.dataflow.sql_column import SqlColumn
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.inference.context.base import InferenceContext, InferenceContextProvider
 
 T = TypeVar("T", str, int, float, date, datetime)
+
+
+class InferenceColumnType(str, Enum):
+    """Represents a column type that can be used for inference.
+
+    This does not provide a 1 to 1 mapping between SQL types and enum values. For example,
+    all possible floating point types (FLOAT, DOUBLE etc) are mapped to the same FLOAT
+    value. Same for datetimes and others.
+    """
+
+    STRING = "string"
+    BOOLEAN = "boolean"
+    INTEGER = "integer"
+    FLOAT = "float"
+    DATETIME = "datetime"
+    UNKNOWN = "unknown"
 
 
 @dataclass(frozen=True)
@@ -16,7 +33,7 @@ class ColumnProperties(Generic[T]):
 
     column: SqlColumn
 
-    type: SqlColumnType
+    type: InferenceColumnType
     row_count: int
     distinct_row_count: int
     is_nullable: bool

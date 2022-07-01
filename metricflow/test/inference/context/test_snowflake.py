@@ -4,8 +4,13 @@ from unittest.mock import MagicMock
 import pandas as pd
 
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.dataflow.sql_column import SqlColumn, SqlColumnType
-from metricflow.inference.context.data_warehouse import TableProperties, ColumnProperties, DataWarehouseInferenceContext
+from metricflow.dataflow.sql_column import SqlColumn
+from metricflow.inference.context.data_warehouse import (
+    TableProperties,
+    ColumnProperties,
+    InferenceColumnType,
+    DataWarehouseInferenceContext,
+)
 from metricflow.inference.context.snowflake import SnowflakeInferenceContextProvider
 
 
@@ -13,18 +18,18 @@ def test_column_type_conversion() -> None:  # noqa: D
     ctx_provider = SnowflakeInferenceContextProvider(client=MagicMock(), tables=[])
 
     # known snowflake types
-    assert ctx_provider._column_type_from_show_columns_data_type("FIXED") == SqlColumnType.INTEGER
-    assert ctx_provider._column_type_from_show_columns_data_type("TEXT") == SqlColumnType.STRING
-    assert ctx_provider._column_type_from_show_columns_data_type("REAL") == SqlColumnType.FLOAT
-    assert ctx_provider._column_type_from_show_columns_data_type("BOOLEAN") == SqlColumnType.BOOLEAN
-    assert ctx_provider._column_type_from_show_columns_data_type("DATE") == SqlColumnType.DATETIME
-    assert ctx_provider._column_type_from_show_columns_data_type("TIMESTAMP_TZ") == SqlColumnType.DATETIME
-    assert ctx_provider._column_type_from_show_columns_data_type("TIMESTAMP_LTZ") == SqlColumnType.DATETIME
-    assert ctx_provider._column_type_from_show_columns_data_type("TIMESTAMP_NTZ") == SqlColumnType.DATETIME
+    assert ctx_provider._column_type_from_show_columns_data_type("FIXED") == InferenceColumnType.INTEGER
+    assert ctx_provider._column_type_from_show_columns_data_type("TEXT") == InferenceColumnType.STRING
+    assert ctx_provider._column_type_from_show_columns_data_type("REAL") == InferenceColumnType.FLOAT
+    assert ctx_provider._column_type_from_show_columns_data_type("BOOLEAN") == InferenceColumnType.BOOLEAN
+    assert ctx_provider._column_type_from_show_columns_data_type("DATE") == InferenceColumnType.DATETIME
+    assert ctx_provider._column_type_from_show_columns_data_type("TIMESTAMP_TZ") == InferenceColumnType.DATETIME
+    assert ctx_provider._column_type_from_show_columns_data_type("TIMESTAMP_LTZ") == InferenceColumnType.DATETIME
+    assert ctx_provider._column_type_from_show_columns_data_type("TIMESTAMP_NTZ") == InferenceColumnType.DATETIME
 
     # unknowns
-    assert ctx_provider._column_type_from_show_columns_data_type("BINARY") == SqlColumnType.UNKNOWN
-    assert ctx_provider._column_type_from_show_columns_data_type("TIME") == SqlColumnType.UNKNOWN
+    assert ctx_provider._column_type_from_show_columns_data_type("BINARY") == InferenceColumnType.UNKNOWN
+    assert ctx_provider._column_type_from_show_columns_data_type("TIME") == InferenceColumnType.UNKNOWN
 
 
 def test_context_provider() -> None:
@@ -81,7 +86,7 @@ def test_context_provider() -> None:
                 column_props=[
                     ColumnProperties(
                         column=SqlColumn.from_string("db.schema.table.intcol"),
-                        type=SqlColumnType.INTEGER,
+                        type=InferenceColumnType.INTEGER,
                         row_count=50,
                         distinct_row_count=10,
                         is_nullable=False,
@@ -91,7 +96,7 @@ def test_context_provider() -> None:
                     ),
                     ColumnProperties(
                         column=SqlColumn.from_string("db.schema.table.strcol"),
-                        type=SqlColumnType.STRING,
+                        type=InferenceColumnType.STRING,
                         row_count=50,
                         distinct_row_count=40,
                         is_nullable=True,
