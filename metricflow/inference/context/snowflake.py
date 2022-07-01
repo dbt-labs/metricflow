@@ -51,7 +51,7 @@ class SnowflakeInferenceContextProvider(DataWarehouseInferenceContextProvider):
 
     def _get_table_properties(self, table: SqlTable) -> TableProperties:
         all_columns_query = f"SHOW COLUMNS IN TABLE {table.sql}"
-        all_columns = self.client.query(all_columns_query)
+        all_columns = self._client.query(all_columns_query)
 
         sql_column_list = []
         col_types = {}
@@ -80,7 +80,7 @@ class SnowflakeInferenceContextProvider(DataWarehouseInferenceContextProvider):
         select_lists.append("COUNT(*) AS rowcount")
         select_list = ", ".join(select_lists)
         statistics_query = f"SELECT {select_list} FROM {table.sql} SAMPLE ({self.max_sample_size} ROWS)"
-        statistics_df = self.client.query(statistics_query)
+        statistics_df = self._client.query(statistics_query)
 
         column_props = [
             ColumnProperties(

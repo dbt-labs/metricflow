@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from dataclasses import InitVar, dataclass, field
 from datetime import date, datetime
 from enum import Enum
@@ -77,19 +78,21 @@ class DataWarehouseInferenceContext(InferenceContext):
                 self.columns[column.column] = column
 
 
-@dataclass(frozen=True)
-class DataWarehouseInferenceContextProvider(InferenceContextProvider[DataWarehouseInferenceContext]):
-    """Provides inference context from a data warehouse by querying data from its tables.
+class DataWarehouseInferenceContextProvider(InferenceContextProvider[DataWarehouseInferenceContext], ABC):
+    """Provides inference context from a data warehouse by querying data from its tables."""
 
-    client: the underlying SQL engine client that will be used for querying table data.
-    tables: an exhaustive list of all tables that should be queried.
-    max_sample_size: max number of rows to sample from each table
-    """
+    def __init__(self, client: SqlClient, tables: List[SqlTable], max_sample_size: int = 1000) -> None:
+        """Initialize the class.
 
-    client: SqlClient
-    tables: List[SqlTable]
-    max_sample_size: int = 1000
+        client: the underlying SQL engine client that will be used for querying table data.
+        tables: an exhaustive list of all tables that should be queried.
+        max_sample_size: max number of rows to sample from each table
+        """
+        self._client = client
+        self.tables = tables
+        self.max_sample_size = max_sample_size
 
+    @abstractmethod
     def _get_table_properties(self, table: SqlTable) -> TableProperties:
         """Fetch properties about a single table by querying the warehouse."""
         raise NotImplementedError
