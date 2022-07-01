@@ -80,20 +80,8 @@ class ModelValidator:
         """Similar to validate(), but throws an exception if validation fails."""
         model_copy = copy.deepcopy(model)
         build_result = self.validate_model(model_copy)
-        if build_result.issues is not None:
-            if any(
-                [
-                    x.level == ValidationIssueLevel.WARNING or x.level == ValidationIssueLevel.FUTURE_ERROR
-                    for x in build_result.issues
-                ]
-            ):
-                issues_str = "\n".join([x.as_readable_str() for x in build_result.issues])
-                logger.warning(f"Found some validation warnings in the model:\n{issues_str}")
-            if any(
-                [
-                    x.level == ValidationIssueLevel.ERROR or x.level == ValidationIssueLevel.FATAL
-                    for x in build_result.issues
-                ]
-            ):
-                raise ModelValidationException(issues=build_result.issues)
+
+        if build_result.issues.has_blocking_issues:
+            raise ModelValidationException(issues=tuple(build_result.issues.all_issues))
+
         return model
