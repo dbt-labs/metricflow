@@ -2,21 +2,22 @@ data_source:
   name: shopify_inventory_level
   owners:
     - support@transformdata.io
-  sql_table: SHOPIFY.INVENTORY_LEVEL ### Update to your opportunities schema.table
+  sql_table: SHOPIFY.INVENTORY_LEVEL ### Update to your inventory_level schema.table
   mutability:
-    type: immutable
+    type: full_mutation
+    type_params:
+      update_cron: 0 2 * * *
   identifiers:
-    - name: inventory_item_id
+    - name: inventory_item
       type: primary
-    - name: location_id
-      type: foreign
+      expr: inventory_item_id
   dimensions:
     - name: ds
       type: time
       type_params:
         is_primary: True
         time_granularity: day
-      expr: updated_at::date # Not sure if this actually makes sense
+      expr: updated_at::date # Casting to date using Snowflake syntax. Update as needed based on your warehouse.
   measures:
     - name: total_inventory_quantity
       agg: sum
@@ -26,4 +27,3 @@ data_source:
       agg: average
       expr: available
       create_metric: true
-    # I'd like some measure for total inventory value but not sure yet how to generate

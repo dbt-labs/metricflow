@@ -2,21 +2,25 @@ data_source:
   name: shopify_product_variant
   owners:
     - support@transformdata.io
-  sql_table: SHOPIFY.PRODUCT_VARIANT ### Update to your opportunities schema.table
+  sql_table: SHOPIFY.PRODUCT_VARIANT ### Update to your product_variant schema.table
   mutability:
-    type: immutable
+    type: full_mutation
+    type_params:
+      update_cron: 0 2 * * *
   identifiers:
-    - name: product_id
+    - name: product
       type: primary
-    - name: inventory_item_id
+      expr: product_id
+    - name: inventory_item
       type: foreign
+      expr: inventory_item_id
   dimensions:
     - name: ds
       type: time
       type_params:
         is_primary: True
         time_granularity: day
-      expr: created_at::date
+      expr: created_at::date # Casting to date using Snowflake syntax. Update as needed based on your warehouse.
   measures:
     - name: average_product_price
       agg: average

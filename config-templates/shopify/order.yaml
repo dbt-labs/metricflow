@@ -1,28 +1,19 @@
 data_source:
-  name: shopify_orders
+  name: shopify_order
   owners:
     - support@transformdata.io
-  sql_table: SHOPIFY."ORDER" ### Update to your opportunities schema.table
+  sql_table: SHOPIFY."ORDER" ### Update to your order schema.table
   mutability:
-    type: immutable
+    type: full_mutation
+    type_params:
+      update_cron: 0 2 * * *
   identifiers:
     - name: order
       type: primary
       expr: id
-    - name: shipping_address_id
+    - name: customer
       type: foreign
-    - name: billing_address_id
-      type: foreign
-    - name: customer_id
-      type: foreign
-    - name: location_id
-      type: foreign
-    - name: user_id
-      type: foreign
-    - name: app_id
-      type: foreign
-    - name: device_id
-      type: foreign 
+      expr: customer_id
   
   dimensions:
     - name: ds
@@ -30,7 +21,7 @@ data_source:
       type_params:
         is_primary: True
         time_granularity: day
-      expr: created_at::date
+      expr: created_at::date # Casting to date using Snowflake syntax. Update as needed based on your warehouse.
     - name: currency
       type: categorical
     - name: shipping_address_country

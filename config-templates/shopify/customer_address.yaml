@@ -2,16 +2,17 @@ data_source:
   name: shopify_customers_addresses
   owners:
     - support@transformdata.io
-  sql_table: SHOPIFY.CUSTOMER_ADDRESS ### Update to your opportunities schema.table
+  sql_table: SHOPIFY.CUSTOMER_ADDRESS ### Update to your customer_address schema.table
   mutability:
-    type: immutable
+    type: full_mutation
+    type_params:
+      update_cron: 0 2 * * *
   identifiers:
     - name: id
       type: primary
     - name: customer
       type: foreign
       expr: customer_id
-      # Should be changed to name: customer and expr: customer_id but that causes an error
   dimensions:
     - name: country
       type: categorical
