@@ -15,6 +15,7 @@ from metricflow.model.validations.validator_helpers import (
     DimensionContext,
     FileContext,
     MetricContext,
+    ModelValidationResults,
     ValidationContext,
     ValidationError,
     ValidationIssue,
@@ -199,7 +200,7 @@ class DataWarehouseModelValidator:
 
     def run_tasks(
         self, tasks: List[DataWarehouseValidationTask], timeout: Optional[int] = None
-    ) -> List[ValidationIssue]:
+    ) -> ModelValidationResults:
         """Runs the list of tasks as queries agains the data warehouse, returning any found issues
 
         Args:
@@ -235,11 +236,13 @@ class DataWarehouseModelValidator:
                 )
                 if task.on_fail_subtasks:
                     sub_task_timeout = floor(timeout - (perf_counter() - start_time)) if timeout else None
-                    issues += self.run_tasks(tasks=task.on_fail_subtasks, timeout=sub_task_timeout)
+                    issues += self.run_tasks(tasks=task.on_fail_subtasks, timeout=sub_task_timeout).all_issues
 
-        return issues
+        return ModelValidationResults.from_issues_sequence(issues)
 
-    def validate_data_sources(self, model: UserConfiguredModel, timeout: Optional[int] = None) -> List[ValidationIssue]:
+    def validate_data_sources(
+        self, model: UserConfiguredModel, timeout: Optional[int] = None
+    ) -> ModelValidationResults:
         """Generates a list of tasks for validating the data sources of the model and then runs them
 
         Args:
@@ -252,7 +255,7 @@ class DataWarehouseModelValidator:
         tasks = DataWarehouseTaskBuilder.gen_data_source_tasks(model=model)
         return self.run_tasks(tasks=tasks, timeout=timeout)
 
-    def validate_dimensions(self, model: UserConfiguredModel, timeout: Optional[int] = None) -> List[ValidationIssue]:
+    def validate_dimensions(self, model: UserConfiguredModel, timeout: Optional[int] = None) -> ModelValidationResults:
         """Generates a list of tasks for validating the dimensions of the model and then runs them
 
         Args:
@@ -265,7 +268,7 @@ class DataWarehouseModelValidator:
         tasks = DataWarehouseTaskBuilder.gen_dimension_tasks(model=model)
         return self.run_tasks(tasks=tasks, timeout=timeout)
 
-    def validate_metrics(self, model: UserConfiguredModel, timeout: Optional[int] = None) -> List[ValidationIssue]:
+    def validate_metrics(self, model: UserConfiguredModel, timeout: Optional[int] = None) -> ModelValidationResults:
         """Generates a list of tasks for validating the metrics of the model and then runs them
 
         Args:
