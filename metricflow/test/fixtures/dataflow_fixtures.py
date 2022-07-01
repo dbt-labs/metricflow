@@ -12,8 +12,14 @@ from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.fixtures.sql_client_fixtures import sql_client  # noqa: F401, F403
 
+"""
+Using 'function' scope to make ID generation more deterministic for the dataflow plan builder fixtures..
 
-@pytest.fixture(scope="session")
+Using 'session' scope can result in other 'session' scope fixtures causing ID consistency issues.
+"""
+
+
+@pytest.fixture
 def composite_dataflow_plan_builder(  # noqa: D
     composite_identifier_semantic_model: SemanticModel,
     consistent_id_object_repository: ConsistentIdObjectRepository,
@@ -34,10 +40,7 @@ def dataflow_plan_builder(  # noqa: D
     consistent_id_object_repository: ConsistentIdObjectRepository,
     time_spine_source: TimeSpineSource,
 ) -> DataflowPlanBuilder[DataSourceDataSet]:
-    """Using 'function' scope to make ID generation more deterministic.
 
-    Using 'session' scope can result in other 'session' scope fixtures causing ID consistency issues.
-    """
     return DataflowPlanBuilder(
         source_nodes=consistent_id_object_repository.simple_model_source_nodes,
         semantic_model=simple_semantic_model,

@@ -70,9 +70,9 @@ def consistent_id_object_repository(
     """
 
     with patch_id_generators_helper(start_value=IdNumberSpace.CONSISTENT_ID_REPOSITORY):
-        sm_data_sets = simple_model_data_sets(simple_semantic_model)
-        multihop_data_sets = multihop_model_data_sets(multi_hop_join_semantic_model)
-        composite_data_sets = multihop_model_data_sets(composite_identifier_semantic_model)
+        sm_data_sets = create_data_sets(simple_semantic_model)
+        multihop_data_sets = create_data_sets(multi_hop_join_semantic_model)
+        composite_data_sets = create_data_sets(composite_identifier_semantic_model)
 
         return ConsistentIdObjectRepository(
             simple_model_data_sets=sm_data_sets,
@@ -87,29 +87,8 @@ def consistent_id_object_repository(
         )
 
 
-def simple_model_data_sets(simple_semantic_model: SemanticModel) -> OrderedDict[str, DataSourceDataSet]:
-    """Convert the DataSources in the simple model to SqlDataSets.
-
-    Key is the name of the data source, value is the associated data set.
-    """
-
-    # Use ordered dict and sort by name to get consistency when running tests.
-    data_sets = OrderedDict()
-    data_sources: List[DataSource] = simple_semantic_model.user_configured_model.data_sources
-    data_sources.sort(key=lambda x: x.name)
-
-    converter = DataSourceToDataSetConverter(
-        column_association_resolver=DefaultColumnAssociationResolver(simple_semantic_model)
-    )
-
-    for data_source in data_sources:
-        data_sets[data_source.name] = converter.create_sql_source_data_set(data_source)
-
-    return data_sets
-
-
-def multihop_model_data_sets(multihop_semantic_model: SemanticModel) -> OrderedDict[str, DataSourceDataSet]:
-    """Convert the DataSources in the multihop model to SqlDataSets.
+def create_data_sets(multihop_semantic_model: SemanticModel) -> OrderedDict[str, DataSourceDataSet]:
+    """Convert the DataSources in the model to SqlDataSets.
 
     Key is the name of the data source, value is the associated data set.
     """
