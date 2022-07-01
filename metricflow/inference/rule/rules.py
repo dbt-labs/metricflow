@@ -33,7 +33,7 @@ class ColumnRegexMatcherRule(InferenceRule):
 
         If they do match, produce a signal with the configured type and confidence.
         """
-        matching_columns = [column for column in warehouse.columns if self.pattern.match(column.sql)]
+        matching_columns = [column for column in warehouse.columns if self.pattern.search(column.sql)]
         signals = [
             InferenceSignal(
                 column=column,
