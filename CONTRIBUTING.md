@@ -17,8 +17,6 @@ Welcome to the MetricFlow developer community, we're thrilled to have you aboard
     - Postgres:
         - Postgres provides [pre-built packages for download and installation](https://www.postgresql.org/download/)
         - Mac users might prefer to use Homebrew: `brew install postgresql`
-    - SQLite:
-        - You likely have this installed already, but if it is missing [SQLite provides pre-built packages for download and installation](https://www.sqlite.org/download.html)
     - Docker:
         - This is only required if you are developing with Postgres.
         - Follow the [instructions from Docker](https://docs.docker.com/get-docker/)

@@ -143,7 +143,6 @@ def _issue_sleep_query(sql_client: SqlClient, sleep_time: int) -> None:
     if engine_type == SupportedSqlEngine.SNOWFLAKE:
         sql_client.execute(f"CALL system$wait({sleep_time}, 'SECONDS')")
     elif engine_type in (
-        SupportedSqlEngine.SQLITE,
         SupportedSqlEngine.BIGQUERY,
         SupportedSqlEngine.REDSHIFT,
     ):
@@ -158,7 +157,7 @@ def _supports_sleep_query(sql_client: SqlClient) -> bool:
     if engine_type == SupportedSqlEngine.SNOWFLAKE:
         return True
     elif engine_type in (
-        SupportedSqlEngine.SQLITE,
+        SupportedSqlEngine.DUCKDB,
         SupportedSqlEngine.BIGQUERY,
         SupportedSqlEngine.REDSHIFT,
     ):

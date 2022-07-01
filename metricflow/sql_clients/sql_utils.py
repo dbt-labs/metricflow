@@ -24,7 +24,6 @@ from metricflow.sql_clients.duckdb import DuckDbSqlClient
 from metricflow.sql_clients.postgres import PostgresSqlClient
 from metricflow.sql_clients.redshift import RedshiftSqlClient
 from metricflow.sql_clients.snowflake import SnowflakeSqlClient
-from metricflow.sql_clients.sqlite import SqliteSqlClient
 
 
 def make_df(  # type: ignore [misc]
@@ -71,8 +70,6 @@ def make_sql_client(url: str, password: str) -> SqlClient:  # noqa: D
         return BigQuerySqlClient.from_connection_details(url, password)
     elif dialect == SqlDialect.POSTGRESQL:
         return PostgresSqlClient.from_connection_details(url, password)
-    elif dialect == SqlDialect.SQLITE:
-        return SqliteSqlClient.from_connection_details(url, password)
     elif dialect == SqlDialect.DUCKDB:
         return DuckDbSqlClient.from_connection_details(url, password)
     else:

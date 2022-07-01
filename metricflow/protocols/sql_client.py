@@ -18,7 +18,6 @@ class SupportedSqlEngine(Enum):
     REDSHIFT = "Redshift"
     POSTGRES = "Postgres"
     SNOWFLAKE = "Snowflake"
-    SQLITE = "SQLite"
 
 
 class SqlClient(Protocol):
