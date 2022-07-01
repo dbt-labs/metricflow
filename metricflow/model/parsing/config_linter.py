@@ -6,6 +6,7 @@ from metricflow.model.parsing.validation import METRIC_TYPE, DATA_SOURCE_TYPE, M
 
 from metricflow.model.validations.validator_helpers import (
     FileContext,
+    ModelValidationResults,
     ValidationError,
     ValidationIssue,
     ValidationWarning,
@@ -102,7 +103,7 @@ class ConfigLinter:  # noqa: D
 
         return issues
 
-    def lint_dir(self, dir_path: str) -> List[ValidationIssue]:  # noqa: D
+    def lint_dir(self, dir_path: str) -> ModelValidationResults:  # noqa: D
         issues: List[ValidationIssue] = []
         for root, _dirs, files in os.walk(dir_path):
             for file in files:
@@ -111,4 +112,4 @@ class ConfigLinter:  # noqa: D
                 file_path = os.path.join(root, file)
                 issues += self.lint_file(file_path, file)
 
-        return issues
+        return ModelValidationResults.from_issues_sequence(issues)
