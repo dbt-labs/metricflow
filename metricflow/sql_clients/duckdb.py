@@ -58,6 +58,7 @@ class DuckDbSqlClient(SqlAlchemySqlClient):
     def __init__(self, file_path: Optional[str] = None) -> None:  # noqa: D
         # DuckDB is not designed with concurrency, but in can work in multi-threaded settings with
         # check_same_thread=False, StaticPool, and serializing of queries via a lock.
+        raise Exception("Test CI") 
         self._concurrency_lock = threading.RLock()
         super().__init__(
             sqlalchemy.create_engine(
