@@ -2,6 +2,7 @@ data_source:
   name: salesforce_users
   owners:
     - support@transformdata.io
+    - test@transformdata.io
   sql_table: salesforce.user ### Update to your users schema.table
   mutability:
     type: immutable
