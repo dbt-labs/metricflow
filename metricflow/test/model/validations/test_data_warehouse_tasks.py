@@ -15,7 +15,6 @@ from metricflow.model.objects.elements.dimension import Dimension, DimensionType
 from metricflow.model.objects.elements.measure import AggregationType, Measure
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
-from metricflow.model.validations.validator_helpers import ValidationIssueLevel
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
@@ -65,7 +64,7 @@ def test_task_runner(sql_client: SqlClient, mf_engine: MetricFlowEngine) -> None
     ]
 
     issues = dw_validator.run_tasks(tasks=tasks)
-    assert len(issues) == 0
+    assert len(issues.all_issues) == 0
 
     err_msg_bad = "Could not access table 'doesnt_exist' in data warehouse"
     bad_task = DataWarehouseValidationTask(
@@ -74,9 +73,9 @@ def test_task_runner(sql_client: SqlClient, mf_engine: MetricFlowEngine) -> None
 
     tasks.append(bad_task)
     issues = dw_validator.run_tasks(tasks=tasks)
-    assert len(issues) == 1
-    assert issues[0].level == ValidationIssueLevel.ERROR
-    assert err_msg_bad in issues[0].message
+    assert len(issues.all_issues) == 1
+    assert len(issues.errors) == 1
+    assert err_msg_bad in issues.errors[0].message
 
 
 def test_validate_data_sources(  # noqa: D
@@ -90,7 +89,7 @@ def test_validate_data_sources(  # noqa: D
     dw_validator = DataWarehouseModelValidator(sql_client=sql_client, mf_engine=mf_engine)
 
     issues = dw_validator.validate_data_sources(model)
-    assert len(issues) == 0
+    assert len(issues.all_issues) == 0
 
     model.data_sources.append(
         data_source_with_guaranteed_meta(
@@ -102,9 +101,9 @@ def test_validate_data_sources(  # noqa: D
     )
 
     issues = dw_validator.validate_data_sources(model)
-    assert len(issues) == 1
-    assert issues[0].level == ValidationIssueLevel.ERROR
-    assert "Unable to access data source `test_data_source2`" in issues[0].message
+    assert len(issues.all_issues) == 1
+    assert len(issues.errors) == 1
+    assert "Unable to access data source `test_data_source2`" in issues.all_issues[0].message
 
 
 def test_build_dimension_tasks(  # noqa: D
@@ -135,7 +134,7 @@ def test_validate_dimensions(  # noqa: D
     dw_validator = DataWarehouseModelValidator(sql_client=sql_client, mf_engine=mf_engine)
 
     issues = dw_validator.validate_dimensions(model)
-    assert len(issues) == 0
+    assert len(issues.all_issues) == 0
 
     dimensions = list(model.data_sources[0].dimensions)
     dimensions.append(Dimension(name="doesnt_exist", type=DimensionType.CATEGORICAL))
@@ -144,14 +143,15 @@ def test_validate_dimensions(  # noqa: D
     issues = dw_validator.validate_dimensions(model)
     # One isssue is created for the short circuit query failure, and another is
     # created for the sub task checking the specific dimension
-    assert len(issues) == 2
+    print("\nModelValidationResults", issues)
+    assert len(issues.all_issues) == 2
     assert (
         f"Failed to query dimensions in data warehouse for data source `{model.data_sources[0].name}`"
-        in issues[0].message
+        in issues.all_issues[0].message
     )
     assert (
         f"Unable to query `doesnt_exist` in data warehouse for dimension `doesnt_exist` on data source `{model.data_sources[0].name}`"
-        in issues[1].message
+        in issues.all_issues[1].message
     )
 
 
@@ -189,7 +189,7 @@ def test_validate_metrics(  # noqa: D
     dw_validator = DataWarehouseModelValidator(sql_client=sql_client, mf_engine=mf_engine)
 
     issues = dw_validator.validate_metrics(model)
-    assert len(issues) == 0
+    assert len(issues.all_issues) == 0
 
     # Update model to have a new measure which creates a new metric by proxy
     new_measures = list(model.data_sources[0].measures)
@@ -220,6 +220,6 @@ def test_validate_metrics(  # noqa: D
     # Validate new metric created by proxy causes an issue (because the column used doesn't exist)
     dw_validator = DataWarehouseModelValidator(sql_client=sql_client, mf_engine=new_engine)
     issues = dw_validator.validate_metrics(model)
-    assert len(issues) == 1
-    assert issues[0].level == ValidationIssueLevel.ERROR
-    assert "Unable to query metric `count_cats`" in issues[0].message
+    assert len(issues.all_issues) == 1
+    assert len(issues.errors) == 1
+    assert "Unable to query metric `count_cats`" in issues.errors[0].message

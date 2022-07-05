@@ -15,7 +15,7 @@ def test_measures_only_exist_in_one_data_source(simple_model__pre_transforms: Us
     found_issue = False
 
     if build.issues is not None:
-        for issue in build.issues:
+        for issue in build.issues.all_issues:
             if re.search(duplicate_measure_message, issue.message):
                 found_issue = True
 
@@ -36,7 +36,7 @@ def test_measures_only_exist_in_one_data_source(simple_model__pre_transforms: Us
     build = ModelValidator().validate_model(model)
 
     if build.issues is not None:
-        for issue in build.issues:
+        for issue in build.issues.all_issues:
             if re.search(duplicate_measure_message, issue.message):
                 found_issue = True
 

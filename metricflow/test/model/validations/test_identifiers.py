@@ -42,7 +42,7 @@ def test_data_source_cant_have_more_than_one_primary_identifier(
     found_future_issue = False
 
     if build.issues is not None:
-        for issue in build.issues:
+        for issue in build.issues.all_issues:
             if re.search(future_issue, issue.message):
                 found_future_issue = True
 
@@ -236,6 +236,8 @@ def test_mismatched_identifier(simple_model__pre_transforms: UserConfiguredModel
     build = ModelValidator().validate_model(model)
 
     expected_error_message_fragment = "does not have consistent sub-identifiers"
-    error_count = len([issue for issue in build.issues if re.search(expected_error_message_fragment, issue.message)])
+    error_count = len(
+        [issue for issue in build.issues.all_issues if re.search(expected_error_message_fragment, issue.message)]
+    )
 
     assert error_count == 1
