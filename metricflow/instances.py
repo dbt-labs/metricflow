@@ -58,6 +58,12 @@ class MetricModelReference(ModelReference):
     metric_name: str
 
 
+class MaterializationModelReference(ModelReference):
+    """A reference to a materialization definition in the model."""
+
+    materialization_name: str
+
+
 # Type for the specification used in the instance.
 SpecT = TypeVar("SpecT", bound=InstanceSpec)
 
