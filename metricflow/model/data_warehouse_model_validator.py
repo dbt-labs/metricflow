@@ -1,15 +1,16 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from time import perf_counter
-from typing import List, Optional
-
+from functools import partial
 from math import floor
+from time import perf_counter
+from typing import Callable, List, Optional, Tuple
 
 from metricflow.dataset.dataset import DataSet
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
 from metricflow.instances import DataSourceElementReference, DataSourceReference, MetricModelReference
 from metricflow.model.objects.data_source import DataSource
+from metricflow.model.objects.metric import Metric
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,
@@ -31,10 +32,9 @@ from metricflow.sql.sql_bind_parameters import SqlBindParameters
 class DataWarehouseValidationTask:
     """Dataclass for defining a task to be used in the DataWarehouseModelValidator"""
 
-    query_string: str
+    query_and_params_callable: Callable[[], Tuple[str, SqlBindParameters]]
     error_message: str
     context: Optional[ValidationContext] = None
-    query_params: SqlBindParameters = field(default_factory=lambda: SqlBindParameters())
     on_fail_subtasks: List[DataWarehouseValidationTask] = field(default_factory=lambda: [])
 
 
@@ -94,14 +94,22 @@ class DataWarehouseTaskBuilder:
         query += DataWarehouseTaskBuilder._where_clause_from_partitions(data_source=data_source)
         return query
 
-    @staticmethod
-    def gen_data_source_tasks(model: UserConfiguredModel) -> List[DataWarehouseValidationTask]:
+    @classmethod
+    def _gen_query_and_params(
+        cls, data_source: DataSource, id: int, columns: List[str] = ["true"]
+    ) -> Tuple[str, SqlBindParameters]:
+        """A wrapping function for _gen_query which also returns an empty set of SqlBindParameters"""
+        query = cls._gen_query(data_source=data_source, id=id, columns=columns)
+        return (query, SqlBindParameters())
+
+    @classmethod
+    def gen_data_source_tasks(cls, model: UserConfiguredModel) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the data sources of the model"""
         tasks: List[DataWarehouseValidationTask] = []
         for index, data_source in enumerate(model.data_sources):
             tasks.append(
                 DataWarehouseValidationTask(
-                    query_string=DataWarehouseTaskBuilder._gen_query(data_source=data_source, id=index),
+                    query_and_params_callable=partial(cls._gen_query_and_params, data_source=data_source, id=index),
                     context=DataSourceContext(
                         file_context=FileContext.from_metadata(metadata=data_source.metadata),
                         data_source=DataSourceReference(data_source_name=data_source.name),
@@ -111,8 +119,8 @@ class DataWarehouseTaskBuilder:
             )
         return tasks
 
-    @staticmethod
-    def gen_dimension_tasks(model: UserConfiguredModel) -> List[DataWarehouseValidationTask]:
+    @classmethod
+    def gen_dimension_tasks(cls, model: UserConfiguredModel) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the dimensions of the model
 
         The high level tasks returned are "short cut" queries which try to
@@ -133,8 +141,8 @@ class DataWarehouseTaskBuilder:
 
                 data_source_tasks.append(
                     DataWarehouseValidationTask(
-                        query_string=DataWarehouseTaskBuilder._gen_query(
-                            data_source=data_source, id=index, columns=[dim_to_query]
+                        query_and_params_callable=partial(
+                            cls._gen_query_and_params, data_source=data_source, id=index, columns=[dim_to_query]
                         ),
                         context=DataSourceElementContext(
                             file_context=FileContext.from_metadata(metadata=data_source.metadata),
@@ -151,10 +159,8 @@ class DataWarehouseTaskBuilder:
             # generate the shortcut tasks with sub tasks
             tasks.append(
                 DataWarehouseValidationTask(
-                    query_string=DataWarehouseTaskBuilder._gen_query(
-                        data_source=data_source,
-                        id=index,
-                        columns=data_source_columns,
+                    query_and_params_callable=partial(
+                        cls._gen_query_and_params, data_source=data_source, id=index, columns=data_source_columns
                     ),
                     context=DataSourceContext(
                         file_context=FileContext.from_metadata(metadata=data_source.metadata),
@@ -167,18 +173,29 @@ class DataWarehouseTaskBuilder:
         return tasks
 
     @staticmethod
-    def gen_metric_tasks(model: UserConfiguredModel, mf_engine: MetricFlowEngine) -> List[DataWarehouseValidationTask]:
+    def _gen_metric_task_query_and_params(
+        metric: Metric, mf_engine: MetricFlowEngine
+    ) -> Tuple[str, SqlBindParameters]:  # noqa: D
+        mf_query = MetricFlowQueryRequest.create_with_random_request_id(
+            metric_names=[metric.name], group_by_names=[DataSet.metric_time_dimension_name()]
+        )
+        explain_result: MetricFlowExplainResult = mf_engine.explain(mf_request=mf_query)
+        return (explain_result.rendered_sql.sql_query, explain_result.rendered_sql.bind_parameters)
+
+    @classmethod
+    def gen_metric_tasks(
+        cls, model: UserConfiguredModel, mf_engine: MetricFlowEngine
+    ) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the metrics of the model"""
         tasks: List[DataWarehouseValidationTask] = []
         for metric in model.metrics:
-            mf_query = MetricFlowQueryRequest.create_with_random_request_id(
-                metric_names=[metric.name], group_by_names=[DataSet.metric_time_dimension_name()]
-            )
-            explain_result: MetricFlowExplainResult = mf_engine.explain(mf_request=mf_query)
             tasks.append(
                 DataWarehouseValidationTask(
-                    query_string=explain_result.rendered_sql.sql_query,
-                    query_params=explain_result.rendered_sql.bind_parameters,
+                    query_and_params_callable=partial(
+                        cls._gen_metric_task_query_and_params,
+                        metric=metric,
+                        mf_engine=mf_engine,
+                    ),
                     context=MetricContext(
                         file_context=FileContext.from_metadata(metadata=metric.metadata),
                         metric=MetricModelReference(metric_name=metric.name),
@@ -230,7 +247,8 @@ class DataWarehouseModelValidator:
                 )
                 break
             try:
-                self._sql_client.dry_run(stmt=task.query_string, sql_bind_parameters=task.query_params)
+                (query_string, query_params) = task.query_and_params_callable()
+                self._sql_client.dry_run(stmt=query_string, sql_bind_parameters=query_params)
             except Exception as e:
                 issues.append(
                     ValidationError(
