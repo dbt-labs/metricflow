@@ -1,9 +1,11 @@
 from typing import Dict, List
+from metricflow.instances import DataSourceElementReference
 
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType
 from metricflow.model.validations.validator_helpers import (
-    DimensionContext,
+    DataSourceElementContext,
+    DataSourceElementType,
     FileContext,
     ModelValidationRule,
     DimensionInvariants,
@@ -62,10 +64,12 @@ class DimensionConsistencyRule(ModelValidationRule):
         Throws: MdoValidationError if there is an inconsistent dimension in the data source.
         """
         issues: List[ValidationIssueType] = []
-        context = DimensionContext(
+        context = DataSourceElementContext(
             file_context=FileContext.from_metadata(metadata=data_source.metadata),
-            data_source_name=data_source.name,
-            dimension_name=dimension.name,
+            data_source_element=DataSourceElementReference(
+                data_source_name=data_source.name, element_name=dimension.name
+            ),
+            element_type=DataSourceElementType.DIMENSION,
         )
 
         if dimension.type == DimensionType.TIME:
@@ -124,10 +128,12 @@ class DimensionConsistencyRule(ModelValidationRule):
             # is_partition might not be specified in the configs, so default to False.
             is_partition = dimension.is_partition or False
 
-            context = DimensionContext(
+            context = DataSourceElementContext(
                 file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                data_source_name=data_source.name,
-                dimension_name=dimension.name,
+                data_source_element=DataSourceElementReference(
+                    data_source_name=data_source.name, element_name=dimension.name
+                ),
+                element_type=DataSourceElementType.DIMENSION,
             )
 
             if dimension_invariant.type != dimension.type:

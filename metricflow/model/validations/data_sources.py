@@ -1,15 +1,16 @@
 import logging
 from collections import defaultdict
 from typing import List, Dict
+from metricflow.instances import DataSourceElementReference, DataSourceReference
 
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.elements.dimension import DimensionType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,
-    DimensionContext,
+    DataSourceElementContext,
+    DataSourceElementType,
     FileContext,
-    MeasureContext,
     ModelValidationRule,
     ValidationIssueType,
     ValidationError,
@@ -37,10 +38,12 @@ class DataSourceMeasuresUniqueRule(ModelValidationRule):
                 if measure.reference in measure_references_to_data_sources:
                     issues.append(
                         ValidationError(
-                            context=MeasureContext(
+                            context=DataSourceElementContext(
                                 file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                                data_source_name=data_source.name,
-                                measure_name=measure.reference.element_name,
+                                data_source_element=DataSourceElementReference(
+                                    data_source_name=data_source.name, element_name=measure.name
+                                ),
+                                element_type=DataSourceElementType.MEASURE,
                             ),
                             message=f"Found measure with name {measure.name} in multiple data sources with names "
                             f"({measure_references_to_data_sources[measure.reference]})",
@@ -71,10 +74,12 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
         primary_time_dimensions = []
 
         for dim in data_source.dimensions:
-            context = DimensionContext(
+            context = DataSourceElementContext(
                 file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                data_source_name=data_source.name,
-                dimension_name=dim.name,
+                data_source_element=DataSourceElementReference(
+                    data_source_name=data_source.name, element_name=dim.name
+                ),
+                element_type=DataSourceElementType.DIMENSION,
             )
 
             if dim.type == DimensionType.TIME:
@@ -97,7 +102,7 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
                 ValidationError(
                     context=DataSourceContext(
                         file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                        data_source_name=data_source.name,
+                        data_source=DataSourceReference(data_source_name=data_source.name),
                     ),
                     message=f"No primary time dimension in data source with name ({data_source.name}). Please add one",
                 )
@@ -108,11 +113,8 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
                 issues.append(
                     ValidationError(
                         context=DataSourceContext(
-                            file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
-                            line_number=data_source.metadata.file_slice.start_line_number
-                            if data_source.metadata
-                            else None,
-                            data_source_name=data_source.name,
+                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                            data_source=DataSourceReference(data_source_name=data_source.name),
                         ),
                         message=f"In data source {data_source.name}, "
                         f"Primary time dimension with name: {primary_time_dimension.name} "

@@ -2,14 +2,19 @@ from datetime import date
 from typing import List
 
 import pytest
+from metricflow.instances import (
+    DataSourceElementReference,
+    DataSourceReference,
+    MaterializationModelReference,
+    MetricModelReference,
+)
 
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,
-    DimensionContext,
+    DataSourceElementContext,
+    DataSourceElementType,
     FileContext,
-    IdentifierContext,
     MaterializationContext,
-    MeasureContext,
     MetricContext,
     ModelValidationResults,
     ValidationError,
@@ -29,22 +34,33 @@ def list_of_issues() -> List[ValidationIssueType]:  # noqa: D
     issues: List[ValidationIssueType] = []
     issues.append(
         ValidationWarning(
-            context=DataSourceContext(file_context=file_context, data_source_name=data_source_name),
+            context=DataSourceContext(
+                file_context=file_context,
+                data_source=DataSourceReference(data_source_name=data_source_name),
+            ),
             message="Something caused a warning, problem #1",
         )
     )
     issues.append(
         ValidationWarning(
-            context=DimensionContext(
-                file_context=file_context, data_source_name=data_source_name, dimension_name="My dimension"
+            context=DataSourceElementContext(
+                file_context=file_context,
+                data_source_element=DataSourceElementReference(
+                    data_source_name=data_source_name, element_name="My dimension"
+                ),
+                element_type=DataSourceElementType.DIMENSION,
             ),
             message="Something caused a warning, problem #2",
         )
     )
     issues.append(
         ValidationFutureError(
-            context=IdentifierContext(
-                file_context=file_context, data_source_name=data_source_name, identifier_name="My identifier"
+            context=DataSourceElementContext(
+                file_context=file_context,
+                data_source_element=DataSourceElementReference(
+                    data_source_name=data_source_name, element_name="My identifier"
+                ),
+                element_type=DataSourceElementType.IDENTIFIER,
             ),
             message="Something caused a future error, problem #3",
             error_date=date(2022, 6, 13),
@@ -52,21 +68,32 @@ def list_of_issues() -> List[ValidationIssueType]:  # noqa: D
     )
     issues.append(
         ValidationError(
-            context=MeasureContext(
-                file_context=file_context, data_source_name=data_source_name, measure_name="My measure"
+            context=DataSourceElementContext(
+                file_context=file_context,
+                data_source_name=data_source_name,
+                data_source_element=DataSourceElementReference(
+                    data_source_name=data_source_name, element_name="My measure"
+                ),
+                element_type=DataSourceElementType.MEASURE,
             ),
             message="Something caused an error, problem #4",
         )
     )
     issues.append(
         ValidationError(
-            context=MaterializationContext(file_context=file_context, materialization_name="My materialization"),
+            context=MaterializationContext(
+                file_context=file_context,
+                materialization=MaterializationModelReference(materialization_name="My materialization"),
+            ),
             message="Something caused an error, problem #5",
         )
     )
     issues.append(
         ValidationFatal(
-            context=MetricContext(file_context=file_context, metric_name="My metric"),
+            context=MetricContext(
+                file_context=file_context,
+                metric=MetricModelReference(metric_name="My metric"),
+            ),
             message="Something caused a fatal, problem #6",
         )
     )

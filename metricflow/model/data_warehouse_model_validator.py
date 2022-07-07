@@ -8,11 +8,13 @@ from math import floor
 
 from metricflow.dataset.dataset import DataSet
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
+from metricflow.instances import DataSourceElementReference, DataSourceReference, MetricModelReference
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,
-    DimensionContext,
+    DataSourceElementContext,
+    DataSourceElementType,
     FileContext,
     MetricContext,
     ModelValidationResults,
@@ -102,7 +104,7 @@ class DataWarehouseTaskBuilder:
                     query_string=DataWarehouseTaskBuilder._gen_query(data_source=data_source, id=index),
                     context=DataSourceContext(
                         file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                        data_source_name=data_source.name,
+                        data_source=DataSourceReference(data_source_name=data_source.name),
                     ),
                     error_message=f"Unable to access data source `{data_source.name}` in data warehouse",
                 )
@@ -134,10 +136,12 @@ class DataWarehouseTaskBuilder:
                         query_string=DataWarehouseTaskBuilder._gen_query(
                             data_source=data_source, id=index, columns=[dim_to_query]
                         ),
-                        context=DimensionContext(
+                        context=DataSourceElementContext(
                             file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source_name=data_source.name,
-                            dimension_name=dimension.name,
+                            data_source_element=DataSourceElementReference(
+                                data_source_name=data_source.name, element_name=dimension.name
+                            ),
+                            element_type=DataSourceElementType.DIMENSION,
                         ),
                         error_message=f"Unable to query `{dim_to_query}` in data warehouse for dimension "
                         f"`{dimension.name}` on data source `{data_source.name}`.",
@@ -154,7 +158,7 @@ class DataWarehouseTaskBuilder:
                     ),
                     context=DataSourceContext(
                         file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                        data_source_name=data_source.name,
+                        data_source=DataSourceReference(data_source_name=data_source.name),
                     ),
                     error_message=f"Failed to query dimensions in data warehouse for data source `{data_source.name}`",
                     on_fail_subtasks=data_source_tasks,
@@ -177,7 +181,7 @@ class DataWarehouseTaskBuilder:
                     query_params=explain_result.rendered_sql.bind_parameters,
                     context=MetricContext(
                         file_context=FileContext.from_metadata(metadata=metric.metadata),
-                        metric_name=metric.name,
+                        metric=MetricModelReference(metric_name=metric.name),
                     ),
                     error_message=f"Unable to query metric `{metric.name}`.",
                 )

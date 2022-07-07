@@ -1,11 +1,13 @@
 from typing import Dict, List, Set
+from metricflow.instances import DataSourceElementReference
 
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.elements.identifier import Identifier
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
+    DataSourceElementContext,
+    DataSourceElementType,
     FileContext,
-    IdentifierContext,
     ModelValidationRule,
     ValidationWarning,
     validate_safely,
@@ -45,10 +47,12 @@ class CommonIdentifiersRule(ModelValidationRule):
         ):
             issues.append(
                 ValidationWarning(
-                    context=IdentifierContext(
+                    context=DataSourceElementContext(
                         file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                        data_source_name=data_source.name,
-                        identifier_name=identifier.name,
+                        data_source_element=DataSourceElementReference(
+                            data_source_name=data_source.name, element_name=identifier.name
+                        ),
+                        element_type=DataSourceElementType.IDENTIFIER,
                     ),
                     message=f"Identifier `{identifier.reference.element_name}` "
                     f"only found in one data source `{data_source.name}` "

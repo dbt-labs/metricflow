@@ -2,6 +2,7 @@ import traceback
 from typing import List
 
 from metricflow.errors.errors import ParsingException
+from metricflow.instances import MetricModelReference
 from metricflow.model.objects.metric import Metric, MetricType, CumulativeMetricWindow
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
@@ -40,7 +41,7 @@ class MetricMeasuresRule(ModelValidationRule):
                     ValidationFatal(
                         context=MetricContext(
                             file_context=FileContext.from_metadata(metadata=metric.metadata),
-                            metric_name=metric.name,
+                            metric=MetricModelReference(metric_name=metric.name),
                         ),
                         message=f"Invalid measure {measure_in_metric} in metric {metric.name}",
                     )
@@ -77,7 +78,7 @@ class CumulativeMetricRule(ModelValidationRule):
                     ValidationError(
                         context=MetricContext(
                             file_context=FileContext.from_metadata(metadata=metric.metadata),
-                            metric_name=metric.name,
+                            metric=MetricModelReference(metric_name=metric.name),
                         ),
                         message="Both window and grain_to_date set for cumulative metric. Please set one or the other",
                     )
@@ -91,7 +92,7 @@ class CumulativeMetricRule(ModelValidationRule):
                         ValidationError(
                             context=MetricContext(
                                 file_context=FileContext.from_metadata(metadata=metric.metadata),
-                                metric_name=metric.name,
+                                metric=MetricModelReference(metric_name=metric.name),
                             ),
                             message=traceback.format_exc(),
                         )

@@ -1,15 +1,20 @@
 import re
 from typing import Dict, Tuple, List, Optional
+from metricflow.instances import (
+    DataSourceElementReference,
+    DataSourceReference,
+    MaterializationModelReference,
+    MetricModelReference,
+)
 
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,
-    DimensionContext,
+    DataSourceElementContext,
+    DataSourceElementType,
     FileContext,
-    IdentifierContext,
     MaterializationContext,
-    MeasureContext,
     MetricContext,
     ModelValidationRule,
     ValidationContext,
@@ -69,10 +74,12 @@ class UniqueAndValidNameRule(ModelValidationRule):
                     (
                         measure.reference,
                         "measure",
-                        MeasureContext(
+                        DataSourceElementContext(
                             file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source_name=data_source.name,
-                            measure_name=measure.reference.element_name,
+                            data_source_element=DataSourceElementReference(
+                                data_source_name=data_source.name, element_name=measure.name
+                            ),
+                            element_type=DataSourceElementType.MEASURE,
                         ),
                     )
                 )
@@ -82,10 +89,12 @@ class UniqueAndValidNameRule(ModelValidationRule):
                     (
                         identifier.reference,
                         "identifier",
-                        IdentifierContext(
+                        DataSourceElementContext(
                             file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source_name=data_source.name,
-                            identifier_name=identifier.name,
+                            data_source_element=DataSourceElementReference(
+                                data_source_name=data_source.name, element_name=identifier.name
+                            ),
+                            element_type=DataSourceElementType.IDENTIFIER,
                         ),
                     )
                 )
@@ -95,10 +104,12 @@ class UniqueAndValidNameRule(ModelValidationRule):
                     (
                         dimension.reference,
                         "dimension",
-                        DimensionContext(
+                        DataSourceElementContext(
                             file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source_name=data_source.name,
-                            dimension_name=dimension.name,
+                            data_source_element=DataSourceElementReference(
+                                data_source_name=data_source.name, element_name=dimension.name
+                            ),
+                            element_type=DataSourceElementType.DIMENSION,
                         ),
                     )
                 )
@@ -134,7 +145,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
                         "data source",
                         DataSourceContext(
                             file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source_name=data_source.name,
+                            data_source=DataSourceReference(data_source_name=data_source.name),
                         ),
                     )
                 )
@@ -146,7 +157,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
                         "materialization",
                         MaterializationContext(
                             file_context=FileContext.from_metadata(metadata=materialization.metadata),
-                            materialization_name=materialization.name,
+                            materialization=MaterializationModelReference(materialization_name=materialization.name),
                         ),
                     )
                 )
@@ -175,7 +186,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
                         ValidationFatal(
                             context=MetricContext(
                                 file_context=FileContext.from_metadata(metadata=metric.metadata),
-                                metric_name=metric.name,
+                                metric=MetricModelReference(metric_name=metric.name),
                             ),
                             message=f"Can't use name `{metric.name}` for a metric when it was already used for a metric",
                         )

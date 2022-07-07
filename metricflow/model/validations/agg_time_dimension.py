@@ -1,14 +1,17 @@
 from typing import List
 
+from metricflow.instances import DataSourceElementReference
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.elements.dimension import DimensionType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
+    DataSourceElementContext,
+    DataSourceElementType,
+    FileContext,
     ModelValidationRule,
     ValidationIssueType,
     validate_safely,
     ValidationError,
-    MeasureContext,
 )
 from metricflow.specs import TimeDimensionReference
 
@@ -38,11 +41,12 @@ class AggregationTimeDimensionRule(ModelValidationRule):
         issues: List[ValidationIssueType] = []
 
         for measure in data_source.measures:
-            measure_context = MeasureContext(
-                file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
-                line_number=data_source.metadata.file_slice.start_line_number if data_source.metadata else None,
-                data_source_name=data_source.name,
-                measure_name=measure.reference.element_name,
+            measure_context = DataSourceElementContext(
+                file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                data_source_element=DataSourceElementReference(
+                    data_source_name=data_source.name, element_name=measure.name
+                ),
+                element_type=DataSourceElementType.MEASURE,
             )
             agg_time_dimension_reference = measure.checked_agg_time_dimension
             if not AggregationTimeDimensionRule._time_dimension_in_model(

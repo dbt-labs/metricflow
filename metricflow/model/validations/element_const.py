@@ -1,4 +1,5 @@
 from typing import Dict, List
+from metricflow.instances import DataSourceReference
 
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
@@ -6,7 +7,7 @@ from metricflow.model.validations.validator_helpers import (
     DataSourceContext,
     FileContext,
     ModelValidationRule,
-    ModelObjectType,
+    DataSourceElementType,
     ValidationError,
     ValidationIssueType,
     validate_safely,
@@ -26,10 +27,10 @@ class ElementConsistencyRule(ModelValidationRule):
 
     @staticmethod
     def _check_element_type(
-        name_to_type: Dict[str, ModelObjectType],
+        name_to_type: Dict[str, DataSourceElementType],
         data_source: DataSource,
         element_name: str,
-        element_type: ModelObjectType,
+        element_type: DataSourceElementType,
         add_to_dict: bool,
     ) -> List[ValidationIssueType]:
         """Check if the given element matches the expected type.
@@ -49,7 +50,7 @@ class ElementConsistencyRule(ModelValidationRule):
                     ValidationError(
                         context=DataSourceContext(
                             file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source_name=data_source.name,
+                            data_source=DataSourceReference(data_source_name=data_source.name),
                         ),
                         message=f"In data source {data_source.name}, element `{element_name}` is of type "
                         f"{element_type}, but it was previously used earlier in the model as "
@@ -59,13 +60,13 @@ class ElementConsistencyRule(ModelValidationRule):
         else:
             if add_to_dict:
                 name_to_type[element_name] = element_type
-            elif element_type != ModelObjectType.DIMENSION:
+            elif element_type != DataSourceElementType.DIMENSION:
                 # TODO: Can't check dimensions effectively as their name changes.
                 issues.append(
                     ValidationError(
                         context=DataSourceContext(
                             file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source_name=data_source.name,
+                            data_source=DataSourceReference(data_source_name=data_source.name),
                         ),
                         message=f"In data source {data_source.name}, the element named {element_name} "
                         f"of type {element_type} is not known in the model.",
@@ -75,19 +76,19 @@ class ElementConsistencyRule(ModelValidationRule):
         return issues
 
     @staticmethod
-    def _get_element_types(model: UserConfiguredModel) -> Dict[str, ModelObjectType]:
+    def _get_element_types(model: UserConfiguredModel) -> Dict[str, DataSourceElementType]:
         # Store the element types
-        element_types: Dict[str, ModelObjectType] = {}
+        element_types: Dict[str, DataSourceElementType] = {}
         for data_source in model.data_sources:
             if data_source.measures:
                 for measure in data_source.measures:
-                    element_types[measure.reference.element_name] = ModelObjectType.MEASURE
+                    element_types[measure.name] = DataSourceElementType.MEASURE
             if data_source.dimensions:
                 for dimension in data_source.dimensions:
-                    element_types[dimension.reference.element_name] = ModelObjectType.DIMENSION
+                    element_types[dimension.name] = DataSourceElementType.DIMENSION
             if data_source.identifiers:
                 for identifier in data_source.identifiers:
-                    element_types[identifier.reference.element_name] = ModelObjectType.IDENTIFIER
+                    element_types[identifier.name] = DataSourceElementType.IDENTIFIER
         return element_types
 
     @staticmethod
@@ -107,9 +108,9 @@ class ElementConsistencyRule(ModelValidationRule):
         Returns:
             A list of validation issues found with elements of data sources for the model
         """
-        measure_name_tuples = [(x.name, ModelObjectType.MEASURE) for x in data_source.measures or []]
-        dimension_name_tuples = [(x.name, ModelObjectType.DIMENSION) for x in data_source.dimensions or []]
-        identifier_name_tuples = [(x.name, ModelObjectType.IDENTIFIER) for x in data_source.identifiers or []]
+        measure_name_tuples = [(x.name, DataSourceElementType.MEASURE) for x in data_source.measures or []]
+        dimension_name_tuples = [(x.name, DataSourceElementType.DIMENSION) for x in data_source.dimensions or []]
+        identifier_name_tuples = [(x.name, DataSourceElementType.IDENTIFIER) for x in data_source.identifiers or []]
         issues = []
         for element_name, element_type in measure_name_tuples + dimension_name_tuples + identifier_name_tuples:
             issues += ElementConsistencyRule._check_element_type(

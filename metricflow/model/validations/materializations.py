@@ -1,6 +1,7 @@
 import datetime
 import logging
 from typing import List
+from metricflow.instances import MaterializationModelReference
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
@@ -45,7 +46,7 @@ class ValidMaterializationRule(ModelValidationRule):
 
         context = MaterializationContext(
             file_context=FileContext.from_metadata(metadata=materialization.metadata),
-            materialization_name=materialization.name,
+            materialization=MaterializationModelReference(materialization_name=materialization.name),
         )
 
         if not materialization.dimensions:

@@ -5,14 +5,16 @@ from datetime import date
 from typing import List, MutableSet, Tuple, Sequence, DefaultDict
 
 import more_itertools
+from metricflow.instances import DataSourceElementReference, DataSourceReference
 
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.elements.identifier import Identifier, IdentifierType, CompositeSubIdentifier
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,
+    DataSourceElementContext,
+    DataSourceElementType,
     FileContext,
-    IdentifierContext,
     ModelValidationRule,
     ValidationIssue,
     ValidationError,
@@ -44,10 +46,12 @@ class IdentifierConfigRule(ModelValidationRule):
         issues: List[ValidationIssueType] = []
         for ident in data_source.identifiers:
             if ident.identifiers:
-                context = IdentifierContext(
+                context = DataSourceElementContext(
                     file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                    data_source_name=data_source.name,
-                    identifier_name=ident.name,
+                    data_source_element=DataSourceElementReference(
+                        data_source_name=data_source.name, element_name=ident.name
+                    ),
+                    element_type=DataSourceElementType.IDENTIFIER,
                 )
 
                 for sub_id in ident.identifiers:
@@ -108,7 +112,7 @@ class OnePrimaryIdentifierPerDataSourceRule(ModelValidationRule):
                 ValidationFutureError(
                     context=DataSourceContext(
                         file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                        data_source_name=data_source.name,
+                        data_source=DataSourceReference(data_source_name=data_source.name),
                     ),
                     message=f"Data sources can have only one primary identifier. The data source"
                     f" `{data_source.name}` has {len(primary_identifier_names)}: {', '.join(primary_identifier_names)}",
@@ -196,10 +200,12 @@ class IdentifierConsistencyRule(ModelValidationRule):
             data_source = sub_identifier_contexts[0].data_source
             issues.append(
                 ValidationWarning(
-                    context=IdentifierContext(
+                    context=DataSourceElementContext(
                         file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                        data_source_name=data_source.name,
-                        identifier_name=identifier_name,
+                        data_source_element=DataSourceElementReference(
+                            data_source_name=data_source.name, element_name=identifier_name
+                        ),
+                        element_type=DataSourceElementType.IDENTIFIER,
                     ),
                     message=(
                         f"Identifier '{identifier_name}' does not have consistent sub-identifiers "

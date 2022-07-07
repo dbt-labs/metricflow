@@ -8,6 +8,12 @@ from datetime import date
 from enum import Enum
 from pydantic import BaseModel, Extra
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
+from metricflow.instances import (
+    DataSourceElementReference,
+    DataSourceReference,
+    MaterializationModelReference,
+    MetricModelReference,
+)
 from metricflow.model.objects.common import Metadata
 
 from metricflow.model.objects.elements.dimension import DimensionType
@@ -33,15 +39,12 @@ class ValidationIssueLevel(Enum):
     FATAL = 3
 
 
-class ModelObjectType(Enum):
-    """Maps object types in the models to a readable string."""
+class DataSourceElementType(Enum):
+    """Maps data source element types to a readable string."""
 
-    DATA_SOURCE = "data_source"
-    MATERIALIZATION = "materialization"
     MEASURE = "measure"
     DIMENSION = "dimension"
     IDENTIFIER = "identifier"
-    METRIC = "metric"
 
 
 class FileContext(BaseModel):
@@ -81,79 +84,53 @@ class MaterializationContext(BaseModel):
     """The context class for validation issues involving materializations"""
 
     file_context: FileContext
-    materialization_name: str
+    materialization: MaterializationModelReference
 
     def context_str(self) -> str:
         """Human readable stringified representation of the context"""
-        return f"with materialization `{self.materialization_name}` {self.file_context.context_str()}"
+        return f"with materialization `{self.materialization.materialization_name}` {self.file_context.context_str()}"
 
 
 class MetricContext(BaseModel):
     """The context class for validation issues involving metrics"""
 
     file_context: FileContext
-    metric_name: str
+    metric: MetricModelReference
 
     def context_str(self) -> str:
         """Human readable stringified representation of the context"""
-        return f"with metric `{self.metric_name}` {self.file_context.context_str()}"
+        return f"with metric `{self.metric.metric_name}` {self.file_context.context_str()}"
 
 
 class DataSourceContext(BaseModel):
     """The context class for validation issues involving data sources"""
 
     file_context: FileContext
-    data_source_name: str
+    data_source: DataSourceReference
 
     def context_str(self) -> str:
         """Human readable stringified representation of the context"""
-        return f"with data source `{self.data_source_name}` {self.file_context.context_str()}"
+        return f"with data source `{self.data_source.data_source_name}` {self.file_context.context_str()}"
 
 
-class DimensionContext(BaseModel):
+class DataSourceElementContext(BaseModel):
     """The context class for validation issues involving dimensions"""
 
     file_context: FileContext
-    data_source_name: str
-    dimension_name: str
+    data_source_element: DataSourceElementReference
+    element_type: DataSourceElementType
 
     def context_str(self) -> str:
         """Human readable stringified representation of the context"""
-        return f"with dimension `{self.dimension_name}` in data source `{self.data_source_name}` {DataSourceContext.context_str(self)}"
-
-
-class IdentifierContext(BaseModel):
-    """The context class for validation issues involving indentifiers"""
-
-    file_context: FileContext
-    data_source_name: str
-    identifier_name: str
-
-    def context_str(self) -> str:
-        """Human readable stringified representation of the context"""
-        return f"with identifier `{self.identifier_name}` in data source `{self.data_source_name}` {DataSourceContext.context_str(self)}"
-
-
-class MeasureContext(BaseModel):
-    """The context class for validation issues involving measures"""
-
-    file_context: FileContext
-    data_source_name: str
-    measure_name: str
-
-    def context_str(self) -> str:
-        """Human readable stringified representation of the context"""
-        return f"with measure `{self.measure_name}` in data source `{self.data_source_name}` {DataSourceContext.context_str(self)}"
+        return f"with {self.element_type.value} `{self.data_source_element.element_name}` in data source `{self.data_source_element.data_source_name}` {self.file_context.context_str()}"
 
 
 ValidationContext = Union[
     FileContext,
     MaterializationContext,
     MetricContext,
-    DimensionContext,
-    MeasureContext,
-    IdentifierContext,
     DataSourceContext,
+    DataSourceElementContext,
 ]
 
 
