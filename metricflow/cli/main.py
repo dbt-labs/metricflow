@@ -14,7 +14,7 @@ import time
 from halo import Halo
 from importlib.metadata import version as pkg_version
 from packaging.version import parse
-from typing import Callable, List, Optional, Sequence
+from typing import Callable, List, Optional
 from update_checker import UpdateChecker
 
 from metricflow.cli import PACKAGE_NAME
@@ -26,7 +26,6 @@ from metricflow.cli.utils import (
     MF_CONFIG_KEYS,
     MF_REDSHIFT_KEYS,
     MF_SNOWFLAKE_KEYS,
-    build_validation_header_msg,
     exception_handler,
     query_options,
     separated_by_comma_option,
@@ -42,7 +41,7 @@ from metricflow.model.data_warehouse_model_validator import DataWarehouseModelVa
 from metricflow.model.model_validator import ModelValidator
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.parsing.config_linter import ConfigLinter
-from metricflow.model.validations.validator_helpers import ModelValidationResults, ValidationIssue
+from metricflow.model.validations.validator_helpers import ModelValidationResults
 from metricflow.sql_clients.common_client import SqlDialect
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
@@ -630,12 +629,16 @@ def drop_materialization(cfg: CLIContext, materialization_name: str) -> None:
         spinner.warn(f"Materialized table for `{materialization_name}` did not exist, no table was dropped")
 
 
-# TODO: Refactor to take in a ModelValidationResults object and print
-# with warnings & futuer errors optionally and by default collapsed
-def _print_issues(issues: Sequence[ValidationIssue]) -> None:  # noqa: D
-    for issue in issues:
-        header = build_validation_header_msg(issue.level)
-        click.echo(f"• {header}: {issue.as_readable_str(with_level=False)}")
+def _print_issues(issues: ModelValidationResults, blocking_only: bool = True) -> None:  # noqa: D
+    for issue in issues.fatals:
+        print(f"• {issue.as_readable_str()}")
+    for issue in issues.errors:
+        print(f"• {issue.as_readable_str()}")
+    if not blocking_only:
+        for issue in issues.future_errors:
+            print(f"• {issue.as_readable_str()}")
+        for issue in issues.warnings:
+            print(f"• {issue.as_readable_str()}")
 
 
 def _run_dw_validations(
@@ -674,7 +677,7 @@ def _data_warehouse_validations_runner(
 
     merged_results = ModelValidationResults.merge([data_source_results, dimension_results, metric_results])
 
-    _print_issues(merged_results.all_issues)
+    _print_issues(merged_results)
 
 
 @cli.command()
@@ -700,10 +703,10 @@ def validate_configs(cfg: CLIContext, dw_timeout: Optional[int] = None, skip_dw:
     lint_results = ConfigLinter().lint_dir(path_to_models(handler=cfg.config))
     if not lint_results.has_blocking_issues:
         lint_spinner.succeed("🎉 Successfully linted config YAML files")
-        _print_issues(lint_results.all_issues)
+        _print_issues(lint_results)
     else:
         lint_spinner.fail("Breaking issues found in config YAML files")
-        _print_issues(lint_results.all_issues)
+        _print_issues(lint_results)
         return
 
     build_spinner = Halo(text="Building model from configs", spinner="dots")
@@ -717,10 +720,10 @@ def validate_configs(cfg: CLIContext, dw_timeout: Optional[int] = None, skip_dw:
 
     if not build_result.issues.has_blocking_issues:
         build_spinner.succeed("🎉 Successfully build model from configs")
-        _print_issues(build_result.issues.all_issues)
+        _print_issues(build_result.issues)
     else:
         build_spinner.fail("Errors found when building model from configs")
-        _print_issues(build_result.issues.all_issues)
+        _print_issues(build_result.issues)
         return
 
     if not skip_dw:
