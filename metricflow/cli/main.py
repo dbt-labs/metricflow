@@ -664,7 +664,7 @@ def _run_dw_validations(
 
 def _data_warehouse_validations_runner(
     dw_validator: DataWarehouseModelValidator, model: UserConfiguredModel, timeout: Optional[int]
-) -> None:
+) -> ModelValidationResults:
     """Helper which calls the individual data warehouse validations to run and prints collected issues"""
 
     data_source_results = _run_dw_validations(
@@ -677,9 +677,7 @@ def _data_warehouse_validations_runner(
         dw_validator.validate_metrics, model=model, validation_type="metrics", timeout=timeout
     )
 
-    merged_results = ModelValidationResults.merge([data_source_results, dimension_results, metric_results])
-
-    _print_issues(merged_results)
+    return ModelValidationResults.merge([data_source_results, dimension_results, metric_results])
 
 
 @cli.command()
@@ -705,7 +703,6 @@ def validate_configs(cfg: CLIContext, dw_timeout: Optional[int] = None, skip_dw:
     lint_results = ConfigLinter().lint_dir(path_to_models(handler=cfg.config))
     if not lint_results.has_blocking_issues:
         lint_spinner.succeed(f"🎉 Successfully linted config YAML files ({lint_results.summary()})")
-        _print_issues(lint_results)
     else:
         lint_spinner.fail(f"Breaking issues found in config YAML files ({lint_results.summary()})")
         _print_issues(lint_results)
@@ -722,15 +719,18 @@ def validate_configs(cfg: CLIContext, dw_timeout: Optional[int] = None, skip_dw:
 
     if not build_result.issues.has_blocking_issues:
         build_spinner.succeed(f"🎉 Successfully built model from configs ({build_result.issues.summary()})")
-        _print_issues(build_result.issues)
     else:
         build_spinner.fail(f"Breaking issues found when building model from configs ({build_result.issues.summary()})")
         _print_issues(build_result.issues)
         return
 
+    dw_results = ModelValidationResults()
     if not skip_dw:
         dw_validator = DataWarehouseModelValidator(sql_client=cfg.sql_client, mf_engine=cfg.mf)
-        _data_warehouse_validations_runner(dw_validator=dw_validator, model=user_model, timeout=dw_timeout)
+        dw_results = _data_warehouse_validations_runner(dw_validator=dw_validator, model=user_model, timeout=dw_timeout)
+
+    merged_results = ModelValidationResults.merge([lint_results, build_result.issues, dw_results])
+    _print_issues(merged_results)
 
 
 if __name__ == "__main__":
