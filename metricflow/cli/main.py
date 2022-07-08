@@ -629,12 +629,12 @@ def drop_materialization(cfg: CLIContext, materialization_name: str) -> None:
         spinner.warn(f"Materialized table for `{materialization_name}` did not exist, no table was dropped")
 
 
-def _print_issues(issues: ModelValidationResults, blocking_only: bool = True) -> None:  # noqa: D
+def _print_issues(issues: ModelValidationResults, show_non_blocking: bool = False) -> None:  # noqa: D
     for issue in issues.fatals:
         print(f"• {issue.as_readable_str()}")
     for issue in issues.errors:
         print(f"• {issue.as_readable_str()}")
-    if not blocking_only:
+    if show_non_blocking:
         for issue in issues.future_errors:
             print(f"• {issue.as_readable_str()}")
         for issue in issues.warnings:
@@ -690,10 +690,13 @@ def _data_warehouse_validations_runner(
     default=False,
     help="If specified, skips the data warehouse validations",
 )
+@click.option("--show-all", is_flag=True, default=False, help="If specified, prints warnings and future-errors")
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-def validate_configs(cfg: CLIContext, dw_timeout: Optional[int] = None, skip_dw: bool = False) -> None:
+def validate_configs(
+    cfg: CLIContext, dw_timeout: Optional[int] = None, skip_dw: bool = False, show_all: bool = False
+) -> None:
     """Perform validations against the defined model configurations."""
     cfg.verbose = True
 
@@ -705,7 +708,7 @@ def validate_configs(cfg: CLIContext, dw_timeout: Optional[int] = None, skip_dw:
         lint_spinner.succeed(f"🎉 Successfully linted config YAML files ({lint_results.summary()})")
     else:
         lint_spinner.fail(f"Breaking issues found in config YAML files ({lint_results.summary()})")
-        _print_issues(lint_results)
+        _print_issues(lint_results, show_non_blocking=show_all)
         return
 
     build_spinner = Halo(text="Building model from configs", spinner="dots")
@@ -721,7 +724,7 @@ def validate_configs(cfg: CLIContext, dw_timeout: Optional[int] = None, skip_dw:
         build_spinner.succeed(f"🎉 Successfully built model from configs ({build_result.issues.summary()})")
     else:
         build_spinner.fail(f"Breaking issues found when building model from configs ({build_result.issues.summary()})")
-        _print_issues(build_result.issues)
+        _print_issues(build_result.issues, show_non_blocking=show_all)
         return
 
     dw_results = ModelValidationResults()
@@ -730,7 +733,7 @@ def validate_configs(cfg: CLIContext, dw_timeout: Optional[int] = None, skip_dw:
         dw_results = _data_warehouse_validations_runner(dw_validator=dw_validator, model=user_model, timeout=dw_timeout)
 
     merged_results = ModelValidationResults.merge([lint_results, build_result.issues, dw_results])
-    _print_issues(merged_results)
+    _print_issues(merged_results, show_non_blocking=show_all)
 
 
 if __name__ == "__main__":
