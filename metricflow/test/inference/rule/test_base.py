@@ -1,7 +1,4 @@
-from unittest.mock import patch
-
-from metricflow.inference.context.base import InferenceContext
-from metricflow.inference.rule.base import InferenceRule, InferenceSignalType
+from metricflow.inference.rule.base import InferenceSignalType
 
 
 def test_inference_signal_type_conflict():
@@ -56,41 +53,3 @@ def test_inference_signal_type_conflict():
 
     # MEASURE_FIELD
     # has already been tested in all previous cases since we're testing for commutability.
-
-
-def test_inference_rule_required_context_extraction():
-    """Assert that `InferenceRule.__init_subclass__()` properly initializes the subclass' required contexts from type annotations."""
-
-    class CtxType1(InferenceContext):
-        pass
-
-    class CtxType2(InferenceContext):
-        pass
-
-    class TestRule1(InferenceRule):
-        def process(self, contexts: CtxType1):  # type: ignore
-            pass
-
-    class TestRule2(InferenceRule):
-        def process(self, ctx2: CtxType2):  # type: ignore
-            pass
-
-    class TestRule1And2(InferenceRule):
-        def process(self, ctx1: CtxType1, ctx2: CtxType2):  # type: ignore
-            pass
-
-    assert TestRule1().required_contexts == (CtxType1,)
-    assert TestRule2().required_contexts == (CtxType2,)
-    assert TestRule1And2().required_contexts == (CtxType1, CtxType2)
-
-    # make sure we're emitting warnings when users try to use contexts that don't
-    # inherit from InferenceContext or if the process method is unannotated
-    with patch("metricflow.inference.rule.base.logger.warning") as warning_mock:
-
-        class TestError(InferenceRule):
-            def process(self, ctx: CtxType1, ctx2: int, ctx3):  # type: ignore
-                pass
-
-        print(TestError().required_contexts)
-        assert TestError().required_contexts == (CtxType1, None, None)
-        assert warning_mock.call_count == 2
