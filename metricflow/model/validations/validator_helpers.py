@@ -286,6 +286,27 @@ class ModelValidationResults(FrozenBaseModel):
         """For when a singular list of issues is needed"""
         return self.fatals + self.errors + self.future_errors + self.warnings
 
+    def summary(self) -> str:
+        """Returns a stylized summary string for issues"""
+
+        fatals = click.style(
+            text=f"{ValidationIssueLevel.FATAL.name}S: {len(self.fatals)}",
+            fg=ISSUE_COLOR_MAP[ValidationIssueLevel.FATAL],
+        )
+        errors = click.style(
+            text=f"{ValidationIssueLevel.ERROR.name}S: {len(self.errors)}",
+            fg=ISSUE_COLOR_MAP[ValidationIssueLevel.ERROR],
+        )
+        future_erros = click.style(
+            text=f"{ValidationIssueLevel.FUTURE_ERROR.name}S: {len(self.future_errors)}",
+            fg=ISSUE_COLOR_MAP[ValidationIssueLevel.FUTURE_ERROR],
+        )
+        warnings = click.style(
+            text=f"{ValidationIssueLevel.WARNING.name}S: {len(self.warnings)}",
+            fg=ISSUE_COLOR_MAP[ValidationIssueLevel.WARNING],
+        )
+        return f"{fatals}, {errors}, {future_erros}, {warnings}"
+
 
 def generate_exception_issue(
     what_was_being_done: str,
