@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import re
-from typing import List
+from typing import Callable, List
+from metricflow.dataflow.sql_column import SqlColumn
 
 from metricflow.inference.context.data_warehouse import DataWarehouseInferenceContext
 from metricflow.inference.rule.base import (
@@ -12,33 +12,36 @@ from metricflow.inference.rule.base import (
 )
 
 
-class ColumnRegexMatcherRule(InferenceRule):
-    """Inference rule that checks for matches across all column names."""
+ColumnMatcher = Callable[[SqlColumn], bool]
+
+
+class ColumnMatcherRule(InferenceRule):
+    """Inference rule that checks for matches across all columns."""
 
     def __init__(
-        self, pattern: re.Pattern, signal_type: InferenceSignalType, confidence: InferenceSignalConfidence
+        self, matcher: ColumnMatcher, signal_type: InferenceSignalType, confidence: InferenceSignalConfidence
     ) -> None:
         """Initialize the class.
 
-        pattern: regex Pattern to match against columns' full names, i.e `<db>.<schema>.<table>.<column>`
+        matcher: a function to determine whether a `SqlColumns` matches. If it does, produce the signal
         signal_type: the `InferenceSignalType` to produce whenever the pattern is matched
         confidence: the `InferenceSignalConfidence` to produce whenever the pattern is matched
         """
-        self.pattern = pattern
+        self.matcher = matcher
         self.signal_type = signal_type
         self.confidence = confidence
 
     def process(self, warehouse: DataWarehouseInferenceContext) -> List[InferenceSignal]:  # type: ignore
-        """Try to match all columns' full names with the matching function or pattern.
+        """Try to match all columns' names with the matching function.
 
         If they do match, produce a signal with the configured type and confidence.
         """
-        matching_columns = [column for column in warehouse.columns if self.pattern.search(column.sql)]
+        matching_columns = [column for column in warehouse.columns if self.matcher(column)]
         signals = [
             InferenceSignal(
                 column=column,
                 type=self.signal_type,
-                reason=f"Column name matches regex pattern '{self.pattern.pattern}'",
+                reason=f"Column matched by rule {self.__class__.__name__}.",
                 confidence=self.confidence,
             )
             for column in matching_columns

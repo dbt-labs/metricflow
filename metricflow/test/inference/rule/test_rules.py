@@ -1,13 +1,13 @@
-import re
 from metricflow.dataflow.sql_column import SqlColumn
 from metricflow.inference.context.data_warehouse import DataWarehouseInferenceContext
 from metricflow.inference.rule.base import InferenceSignalConfidence, InferenceSignalType
-from metricflow.inference.rule.rules import ColumnRegexMatcherRule
+from metricflow.inference.rule.rules import ColumnMatcher, ColumnMatcherRule
 
 
-def test_column_regex_matcher(warehouse_ctx: DataWarehouseInferenceContext):  # noqa: D
-    rule = ColumnRegexMatcherRule(
-        pattern=re.compile(r"test_column$"),  # have to pass in
+def test_column_matcher(warehouse_ctx: DataWarehouseInferenceContext):  # noqa: D
+    matcher: ColumnMatcher = lambda col: col.column_name.endswith("test_column")
+    rule = ColumnMatcherRule(
+        matcher=matcher,  # have to pass in
         signal_type=InferenceSignalType.DIMENSION,
         confidence=InferenceSignalConfidence.MEDIUM,
     )
