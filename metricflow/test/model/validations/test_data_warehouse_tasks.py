@@ -1,4 +1,5 @@
 from copy import deepcopy
+from typing import Tuple
 
 import pytest
 from _pytest.fixtures import FixtureRequest
@@ -18,6 +19,7 @@ from metricflow.model.semantic_model import SemanticModel
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.model.validations.helpers import data_source_with_guaranteed_meta
 from metricflow.test.plan_utils import assert_snapshot_text_equal, make_schema_replacement_function
@@ -48,8 +50,9 @@ def test_build_data_source_tasks(
 ) -> None:  # noqa:D
     tasks = DataWarehouseTaskBuilder.gen_data_source_tasks(model=data_warehouse_validation_model)
     assert len(tasks) == len(data_warehouse_validation_model.data_sources)
+    (query_string, _params) = tasks[0].query_and_params_callable()
     assert (
-        tasks[0].query_string
+        query_string
         == f"SELECT (true) AS col0 FROM (SELECT * FROM {mf_test_session_state.mf_source_schema}.fct_animals) AS source0 "
         f"WHERE is_dog IS NOT NULL"
     )
@@ -58,18 +61,21 @@ def test_build_data_source_tasks(
 def test_task_runner(sql_client: SqlClient, mf_engine: MetricFlowEngine) -> None:  # noqa: D
     dw_validator = DataWarehouseModelValidator(sql_client=sql_client, mf_engine=mf_engine)
 
+    def good_query() -> Tuple[str, SqlBindParameters]:
+        return ("SELECT 'foo' AS foo", SqlBindParameters())
+
     tasks = [
-        DataWarehouseValidationTask(query_string="SELECT 'foo' AS foo", error_message="Could not select foo"),
-        DataWarehouseValidationTask(query_string="SELECT 'bar' AS bar", error_message="Could not select bar"),
+        DataWarehouseValidationTask(query_and_params_callable=good_query, error_message="Could not select foo"),
     ]
 
     issues = dw_validator.run_tasks(tasks=tasks)
     assert len(issues.all_issues) == 0
 
+    def bad_query() -> Tuple[str, SqlBindParameters]:
+        return ("SELECT (true) AS col1 FROM doesnt_exist", SqlBindParameters())
+
     err_msg_bad = "Could not access table 'doesnt_exist' in data warehouse"
-    bad_task = DataWarehouseValidationTask(
-        query_string="SELECT (true) AS col1 FROM doesnt_exist", error_message=err_msg_bad
-    )
+    bad_task = DataWarehouseValidationTask(query_and_params_callable=bad_query, error_message=err_msg_bad)
 
     tasks.append(bad_task)
     issues = dw_validator.run_tasks(tasks=tasks)
@@ -112,17 +118,20 @@ def test_build_dimension_tasks(  # noqa: D
     tasks = DataWarehouseTaskBuilder.gen_dimension_tasks(model=data_warehouse_validation_model)
     assert len(tasks) == 1  # on data source query with all dimensions
     assert len(tasks[0].on_fail_subtasks) == 2  # a sub task for each dimension on the data source
+    (query_string, _params) = tasks[0].query_and_params_callable()
     assert (
         f"SELECT (ds) AS col0, (is_dog) AS col1 FROM (SELECT * FROM {mf_test_session_state.mf_source_schema}.fct_animals) AS source0 WHERE is_dog IS NOT NULL"
-        == tasks[0].query_string
+        == query_string
     )
+    (query_string, _params) = tasks[0].on_fail_subtasks[0].query_and_params_callable()
     assert (
         f"SELECT (ds) AS col0 FROM (SELECT * FROM {mf_test_session_state.mf_source_schema}.fct_animals) AS source0 WHERE is_dog IS NOT NULL"
-        == tasks[0].on_fail_subtasks[0].query_string
+        == query_string
     )
+    (query_string, _params) = tasks[0].on_fail_subtasks[1].query_and_params_callable()
     assert (
         f"SELECT (is_dog) AS col0 FROM (SELECT * FROM {mf_test_session_state.mf_source_schema}.fct_animals) AS source0 WHERE is_dog IS NOT NULL"
-        == tasks[0].on_fail_subtasks[1].query_string
+        == query_string
     )
 
 
@@ -164,12 +173,13 @@ def test_build_metric_tasks(  # noqa: D
 ) -> None:
     tasks = DataWarehouseTaskBuilder.gen_metric_tasks(model=data_warehouse_validation_model, mf_engine=mf_engine)
     assert len(tasks) == 1
+    (query_string, _params) = tasks[0].query_and_params_callable()
     assert_snapshot_text_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
         group_id="data_warehouse_validation_model",
         snapshot_id="query0",
-        snapshot_text=tasks[0].query_string,
+        snapshot_text=query_string,
         snapshot_file_extension=".sql",
         incomparable_strings_replacement_function=make_schema_replacement_function(
             system_schema=mf_test_session_state.mf_system_schema, source_schema=mf_test_session_state.mf_source_schema
