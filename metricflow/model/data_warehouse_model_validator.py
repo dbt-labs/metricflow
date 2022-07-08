@@ -8,12 +8,16 @@ from math import floor
 
 from metricflow.dataset.dataset import DataSet
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
+from metricflow.instances import DataSourceElementReference, DataSourceReference, MetricModelReference
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,
-    DimensionContext,
+    DataSourceElementContext,
+    DataSourceElementType,
+    FileContext,
     MetricContext,
+    ModelValidationResults,
     ValidationContext,
     ValidationError,
     ValidationIssue,
@@ -99,9 +103,8 @@ class DataWarehouseTaskBuilder:
                 DataWarehouseValidationTask(
                     query_string=DataWarehouseTaskBuilder._gen_query(data_source=data_source, id=index),
                     context=DataSourceContext(
-                        file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
-                        line_number=data_source.metadata.file_slice.start_line_number if data_source.metadata else None,
-                        data_source_name=data_source.name,
+                        file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                        data_source=DataSourceReference(data_source_name=data_source.name),
                     ),
                     error_message=f"Unable to access data source `{data_source.name}` in data warehouse",
                 )
@@ -133,13 +136,12 @@ class DataWarehouseTaskBuilder:
                         query_string=DataWarehouseTaskBuilder._gen_query(
                             data_source=data_source, id=index, columns=[dim_to_query]
                         ),
-                        context=DimensionContext(
-                            file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
-                            line_number=data_source.metadata.file_slice.start_line_number
-                            if data_source.metadata
-                            else None,
-                            data_source_name=data_source.name,
-                            dimension_name=dimension.name,
+                        context=DataSourceElementContext(
+                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                            data_source_element=DataSourceElementReference(
+                                data_source_name=data_source.name, element_name=dimension.name
+                            ),
+                            element_type=DataSourceElementType.DIMENSION,
                         ),
                         error_message=f"Unable to query `{dim_to_query}` in data warehouse for dimension "
                         f"`{dimension.name}` on data source `{data_source.name}`.",
@@ -155,9 +157,8 @@ class DataWarehouseTaskBuilder:
                         columns=data_source_columns,
                     ),
                     context=DataSourceContext(
-                        file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
-                        line_number=data_source.metadata.file_slice.start_line_number if data_source.metadata else None,
-                        data_source_name=data_source.name,
+                        file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                        data_source=DataSourceReference(data_source_name=data_source.name),
                     ),
                     error_message=f"Failed to query dimensions in data warehouse for data source `{data_source.name}`",
                     on_fail_subtasks=data_source_tasks,
@@ -179,9 +180,8 @@ class DataWarehouseTaskBuilder:
                     query_string=explain_result.rendered_sql.sql_query,
                     query_params=explain_result.rendered_sql.bind_parameters,
                     context=MetricContext(
-                        file_name=metric.metadata.file_slice.filename if metric.metadata else None,
-                        line_number=metric.metadata.file_slice.start_line_number if metric.metadata else None,
-                        metric_name=metric.name,
+                        file_context=FileContext.from_metadata(metadata=metric.metadata),
+                        metric=MetricModelReference(metric_name=metric.name),
                     ),
                     error_message=f"Unable to query metric `{metric.name}`.",
                 )
@@ -204,7 +204,7 @@ class DataWarehouseModelValidator:
 
     def run_tasks(
         self, tasks: List[DataWarehouseValidationTask], timeout: Optional[int] = None
-    ) -> List[ValidationIssue]:
+    ) -> ModelValidationResults:
         """Runs the list of tasks as queries agains the data warehouse, returning any found issues
 
         Args:
@@ -240,11 +240,13 @@ class DataWarehouseModelValidator:
                 )
                 if task.on_fail_subtasks:
                     sub_task_timeout = floor(timeout - (perf_counter() - start_time)) if timeout else None
-                    issues += self.run_tasks(tasks=task.on_fail_subtasks, timeout=sub_task_timeout)
+                    issues += self.run_tasks(tasks=task.on_fail_subtasks, timeout=sub_task_timeout).all_issues
 
-        return issues
+        return ModelValidationResults.from_issues_sequence(issues)
 
-    def validate_data_sources(self, model: UserConfiguredModel, timeout: Optional[int] = None) -> List[ValidationIssue]:
+    def validate_data_sources(
+        self, model: UserConfiguredModel, timeout: Optional[int] = None
+    ) -> ModelValidationResults:
         """Generates a list of tasks for validating the data sources of the model and then runs them
 
         Args:
@@ -257,7 +259,7 @@ class DataWarehouseModelValidator:
         tasks = DataWarehouseTaskBuilder.gen_data_source_tasks(model=model)
         return self.run_tasks(tasks=tasks, timeout=timeout)
 
-    def validate_dimensions(self, model: UserConfiguredModel, timeout: Optional[int] = None) -> List[ValidationIssue]:
+    def validate_dimensions(self, model: UserConfiguredModel, timeout: Optional[int] = None) -> ModelValidationResults:
         """Generates a list of tasks for validating the dimensions of the model and then runs them
 
         Args:
@@ -270,7 +272,7 @@ class DataWarehouseModelValidator:
         tasks = DataWarehouseTaskBuilder.gen_dimension_tasks(model=model)
         return self.run_tasks(tasks=tasks, timeout=timeout)
 
-    def validate_metrics(self, model: UserConfiguredModel, timeout: Optional[int] = None) -> List[ValidationIssue]:
+    def validate_metrics(self, model: UserConfiguredModel, timeout: Optional[int] = None) -> ModelValidationResults:
         """Generates a list of tasks for validating the metrics of the model and then runs them
 
         Args:

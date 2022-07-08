@@ -137,8 +137,8 @@ def test_cross_element_names(simple_model__pre_transforms: UserConfiguredModel) 
     with pytest.raises(
         ModelValidationException,
         match=(
-            f"element `{measure_reference.element_name}` is of type ModelObjectType.MEASURE, but it was previously "
-            f"used earlier in the model as ModelObjectType.DIMENSION"
+            f"element `{measure_reference.element_name}` is of type DataSourceElementType.MEASURE, but it was previously "
+            f"used earlier in the model as DataSourceElementType.DIMENSION"
         ),
     ):
         ModelValidator().checked_validations(model)
@@ -147,8 +147,8 @@ def test_cross_element_names(simple_model__pre_transforms: UserConfiguredModel) 
     with pytest.raises(
         ModelValidationException,
         match=(
-            f"element `{measure_reference.element_name}` is of type ModelObjectType.MEASURE, but it was previously "
-            f"used earlier in the model as ModelObjectType.IDENTIFIER"
+            f"element `{measure_reference.element_name}` is of type DataSourceElementType.MEASURE, but it was previously "
+            f"used earlier in the model as DataSourceElementType.IDENTIFIER"
         ),
     ):
         ModelValidator().checked_validations(model)
@@ -157,8 +157,8 @@ def test_cross_element_names(simple_model__pre_transforms: UserConfiguredModel) 
     with pytest.raises(
         ModelValidationException,
         match=(
-            f"element `{dimension_reference.element_name}` is of type ModelObjectType.DIMENSION, but it was previously "
-            f"used earlier in the model as ModelObjectType.IDENTIFIER"
+            f"element `{dimension_reference.element_name}` is of type DataSourceElementType.DIMENSION, but it was previously "
+            f"used earlier in the model as DataSourceElementType.IDENTIFIER"
         ),
     ):
         ModelValidator().checked_validations(model)

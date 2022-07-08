@@ -1,6 +1,7 @@
 import datetime
 import logging
 from typing import List
+from metricflow.instances import MaterializationModelReference
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
@@ -11,6 +12,7 @@ from metricflow.model.objects.materialization import Materialization
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.validations.validator_helpers import (
+    FileContext,
     MaterializationContext,
     ModelValidationRule,
     ValidationError,
@@ -43,9 +45,8 @@ class ValidMaterializationRule(ModelValidationRule):
         issues: List[ValidationIssueType] = []
 
         context = MaterializationContext(
-            file_name=materialization.metadata.file_slice.filename if materialization.metadata else None,
-            line_number=materialization.metadata.file_slice.start_line_number if materialization.metadata else None,
-            materialization_name=materialization.name,
+            file_context=FileContext.from_metadata(metadata=materialization.metadata),
+            materialization=MaterializationModelReference(materialization_name=materialization.name),
         )
 
         if not materialization.dimensions:

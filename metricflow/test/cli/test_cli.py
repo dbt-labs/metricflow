@@ -17,6 +17,7 @@ from metricflow.cli.main import (
 from metricflow.model.model_validator import ModelValidator
 from metricflow.model.parsing.config_linter import ConfigLinter
 from metricflow.model.validations.validator_helpers import (
+    ModelValidationResults,
     ValidationError,
     ValidationFatal,
     ValidationFutureError,
@@ -78,14 +79,13 @@ def test_drop_materialization(cli_runner: MetricFlowCliRunner) -> None:  # noqa:
 
 def test_validate_configs(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
     # Mock validation errors in validate_model function
-    mocked_build_result = MagicMock(
-        issues=(
-            ValidationWarning(context=None, message="warning"),  # type: ignore
-            ValidationFutureError(context=None, message="future_error", error_date=datetime.now()),  # type: ignore
-            ValidationError(context=None, message="error"),  # type: ignore
-            ValidationFatal(context=None, message="fatal"),  # type: ignore
-        )
+    issues = (
+        ValidationWarning(context=None, message="warning"),  # type: ignore
+        ValidationFutureError(context=None, message="future_error", error_date=datetime.now()),  # type: ignore
+        ValidationError(context=None, message="error"),  # type: ignore
+        ValidationFatal(context=None, message="fatal"),  # type: ignore
     )
+    mocked_build_result = MagicMock(issues=ModelValidationResults.from_issues_sequence(issues))
     with patch("metricflow.cli.main.path_to_models", return_value=""):
         with patch.object(ModelValidator, "validate_model", return_value=mocked_build_result):
             resp = cli_runner.run(validate_configs)
@@ -101,7 +101,10 @@ def test_validate_configs_data_warehouse_validations(cli_runner: MetricFlowCliRu
 
     with patch("metricflow.cli.main.path_to_models", return_value=""):
         with patch.object(CLIContext, "sql_client", return_value=None):  # type: ignore
-            with patch("metricflow.cli.main._run_dw_validations", return_value=dw_validation_issues):
+            with patch(
+                "metricflow.cli.main._run_dw_validations",
+                return_value=ModelValidationResults(errors=dw_validation_issues),
+            ):
                 resp = cli_runner.run(validate_configs)
 
     assert "Data Warehouse Error" in resp.output
@@ -110,7 +113,7 @@ def test_validate_configs_data_warehouse_validations(cli_runner: MetricFlowCliRu
 
 def test_validate_configs_skip_data_warehouse_validations(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
     with patch("metricflow.cli.main.path_to_models", return_value=""):
-        with patch.object(ModelValidator, "validate_model", return_value=MagicMock(issues=())):
+        with patch.object(ModelValidator, "validate_model", return_value=MagicMock(issues=ModelValidationResults())):
             resp = cli_runner.run(validate_configs, args=["--skip-dw"])
 
     assert "Data Warehouse Error" not in resp.output
@@ -120,7 +123,7 @@ def test_validate_configs_skip_data_warehouse_validations(cli_runner: MetricFlow
 def test_validate_configs_with_lint_issues(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
     lint_issues = [ValidationError(context=None, message="YAML Lint Error")]
     with patch("metricflow.cli.main.path_to_models", return_value=""):
-        with patch.object(ConfigLinter, "lint_dir", return_value=lint_issues):
+        with patch.object(ConfigLinter, "lint_dir", return_value=ModelValidationResults(errors=lint_issues)):
             resp = cli_runner.run(validate_configs)
 
     assert "YAML Lint Error" in resp.output
