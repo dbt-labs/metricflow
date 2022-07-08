@@ -18,7 +18,7 @@ def test_any_identifier_rule_factory():  # noqa: D
     assert isinstance(rule, ColumnMatcherRule)
     assert rule.matcher == RuleDefaults._any_identifier_matcher
     assert rule.confidence == InferenceSignalConfidence.HIGH
-    assert rule.signal_type == InferenceSignalType.IDENTIFER
+    assert rule.type_node == InferenceSignalType.ID.UNKNOWN
 
 
 def test_primary_identifier_matcher():  # noqa: D
@@ -35,4 +35,4 @@ def test_primary_identifier_rule_factory():  # noqa: D
     assert isinstance(rule, ColumnMatcherRule)
     assert rule.matcher == RuleDefaults._primary_identifier_matcher
     assert rule.confidence == InferenceSignalConfidence.FOR_SURE
-    assert rule.signal_type == InferenceSignalType.PRIMARY_IDENTIFIER
+    assert rule.type_node == InferenceSignalType.ID.PRIMARY

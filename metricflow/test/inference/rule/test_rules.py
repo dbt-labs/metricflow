@@ -8,7 +8,7 @@ def test_column_matcher(warehouse_ctx: DataWarehouseInferenceContext):  # noqa: 
     matcher: ColumnMatcher = lambda col: col.column_name.endswith("test_column")
     rule = ColumnMatcherRule(
         matcher=matcher,  # have to pass in
-        signal_type=InferenceSignalType.DIMENSION,
+        type_node=InferenceSignalType.DIMENSION.UNKNOWN,
         confidence=InferenceSignalConfidence.MEDIUM,
     )
 
@@ -16,5 +16,5 @@ def test_column_matcher(warehouse_ctx: DataWarehouseInferenceContext):  # noqa: 
 
     assert len(signals) == 1
     assert signals[0].confidence == InferenceSignalConfidence.MEDIUM
-    assert signals[0].type == InferenceSignalType.DIMENSION
+    assert signals[0].type_node == InferenceSignalType.DIMENSION.UNKNOWN
     assert signals[0].column == SqlColumn.from_string("db.schema.table.test_column")

@@ -57,7 +57,7 @@ class RuleDefaults:
         """
         return ColumnMatcherRule(
             matcher=RuleDefaults._primary_identifier_matcher,
-            signal_type=InferenceSignalType.PRIMARY_IDENTIFIER,
+            type_node=InferenceSignalType.ID.PRIMARY,
             confidence=InferenceSignalConfidence.FOR_SURE,
         )
 
@@ -72,6 +72,6 @@ class RuleDefaults:
         """
         return ColumnMatcherRule(
             matcher=RuleDefaults._any_identifier_matcher,
-            signal_type=InferenceSignalType.IDENTIFER,
+            type_node=InferenceSignalType.ID.UNKNOWN,
             confidence=InferenceSignalConfidence.HIGH,
         )
