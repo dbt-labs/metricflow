@@ -654,9 +654,11 @@ def _run_dw_validations(
 
     results = validation_func(model, timeout)
     if not results.has_blocking_issues:
-        spinner.succeed(f"🎉 Finished validating {validation_type} against data warehouse, no errors found")
+        spinner.succeed(f"🎉 Successfully validated {validation_type} against data warehouse ({results.summary()})")
     else:
-        spinner.fail(f"Issues found when validating {validation_type} against data warehouse")
+        spinner.fail(
+            f"Breaking issues found when validating {validation_type} against data warehouse ({results.summary()})"
+        )
     return results
 
 
@@ -702,10 +704,10 @@ def validate_configs(cfg: CLIContext, dw_timeout: Optional[int] = None, skip_dw:
 
     lint_results = ConfigLinter().lint_dir(path_to_models(handler=cfg.config))
     if not lint_results.has_blocking_issues:
-        lint_spinner.succeed("🎉 Successfully linted config YAML files")
+        lint_spinner.succeed(f"🎉 Successfully linted config YAML files ({lint_results.summary()})")
         _print_issues(lint_results)
     else:
-        lint_spinner.fail("Breaking issues found in config YAML files")
+        lint_spinner.fail(f"Breaking issues found in config YAML files ({lint_results.summary()})")
         _print_issues(lint_results)
         return
 
@@ -719,10 +721,10 @@ def validate_configs(cfg: CLIContext, dw_timeout: Optional[int] = None, skip_dw:
     build_result = ModelValidator().validate_model(user_model)
 
     if not build_result.issues.has_blocking_issues:
-        build_spinner.succeed("🎉 Successfully build model from configs")
+        build_spinner.succeed(f"🎉 Successfully built model from configs ({build_result.issues.summary()})")
         _print_issues(build_result.issues)
     else:
-        build_spinner.fail("Errors found when building model from configs")
+        build_spinner.fail(f"Breaking issues found when building model from configs ({build_result.issues.summary()})")
         _print_issues(build_result.issues)
         return
 
