@@ -700,6 +700,9 @@ def validate_configs(
     """Perform validations against the defined model configurations."""
     cfg.verbose = True
 
+    if not show_all:
+        print("(To see warnings and future-errors, run again with flag `--show-all`)")
+
     lint_spinner = Halo(text="Checking for YAML format issues", spinner="dots")
     lint_spinner.start()
 
