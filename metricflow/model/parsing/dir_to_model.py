@@ -6,7 +6,6 @@ from dataclasses import dataclass
 from string import Template
 from typing import Optional, Dict, List, Union, Type, Any
 
-import yaml
 from jsonschema import exceptions
 from yaml.scanner import ScannerError
 
@@ -26,7 +25,12 @@ from metricflow.model.parsing.validation import (
     MATERIALIZATION_TYPE,
     DOCUMENT_TYPES,
 )
-from metricflow.model.parsing.yaml_loader import ParsingContext, SafeLineLoader, PARSING_CONTEXT_KEY
+from metricflow.model.parsing.yaml_loader import (
+    ParsingContext,
+    SafeLineLoader,
+    YamlConfigLoader,
+    PARSING_CONTEXT_KEY,
+)
 from metricflow.model.validations.validator_helpers import ModelValidationResults
 
 logger = logging.getLogger(__name__)
@@ -140,7 +144,9 @@ def parse_config_yaml(
         # Validates that config yaml conforms to json schema
         validate_config_structure(config_yaml)
 
-        for config_document in yaml.load_all(config_yaml.contents, Loader=SafeLineLoader):
+        for config_document in YamlConfigLoader.load_all_with_context(
+            name=config_yaml.filepath, contents=config_yaml.contents
+        ):
             # The config document can be None if there is nothing but white space between two `---`
             # this isn't really an issue, so lets just swallow it
             if config_document is None:

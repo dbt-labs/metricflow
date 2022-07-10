@@ -50,7 +50,13 @@ class FileSlice(HashableBaseModel):  # noqa: D
     end_line_number: int
 
 
-class YamlConfigFile(HashableBaseModel):  # noqa: D
+class YamlConfigFile(HashableBaseModel):
+    """Serializable container for customer model YAML contents
+
+    The serialization support is included here for scenarios where persisting the contents in non-filesystem storage
+    services is necessary or desirable.
+    """
+
     filepath: str
     contents: str
     url: Optional[str]

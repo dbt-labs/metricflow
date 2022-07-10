@@ -1,4 +1,7 @@
-from typing import Dict
+from __future__ import annotations
+
+from io import StringIO
+from typing import Dict, Iterator
 
 import yaml
 
@@ -15,6 +18,32 @@ class ParsingContext:  # noqa: D
 
     def __str__(self) -> str:  # noqa: D
         return f"line: {self.start_line}, filename: {self.filename}"
+
+
+class YamlConfigLoader:
+    """Helper class for loading YAML config strings into an iterator of YAML output"""
+
+    @staticmethod
+    def load_all_with_context(name: str, contents: str) -> Iterator:
+        """Wraps the yaml.load_all method and returns the resulting iterator with parsing context added to output
+
+        This replaces any calls to yaml.load_all(loader=SafeLineLoader), which internally adds ParsingContext info.
+        Note PyYAML reads the name property from the input stream IF that input stream is a file object, otherwise
+        it replaces it with a constant. Therefore, we use as StringIO instance to pass the contents into PyYAML and
+        set the value of the name property on the file object to the name parameter here.
+        """
+        with StringIO(initial_value=contents) as stream:
+            stream.name = name
+            for document in yaml.load_all(stream=stream, Loader=SafeLineLoader):
+                yield document
+
+    @staticmethod
+    def load_all_without_context(contents: str) -> Iterator:
+        """Convenience wrapper for yaml.load_all with the standard yaml.SafeLoader
+
+        This method is here more for readability than anything else.
+        """
+        return yaml.load_all(stream=contents, Loader=yaml.SafeLoader)
 
 
 class SafeLineLoader(yaml.SafeLoader):

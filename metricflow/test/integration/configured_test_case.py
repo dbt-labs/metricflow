@@ -6,10 +6,8 @@ from collections import OrderedDict
 from enum import Enum
 from typing import Sequence, Tuple, Optional
 
-import yaml
-
 from metricflow.model.objects.utils import FrozenBaseModel
-from metricflow.model.parsing.yaml_loader import SafeLineLoader
+from metricflow.model.parsing.yaml_loader import YamlConfigLoader
 
 logger = logging.getLogger(__name__)
 
@@ -101,7 +99,7 @@ class ConfiguredIntegrationTestCaseRepository:
 
         with open(file_path) as f:
             file_contents = f.read()
-            for config_document in yaml.load_all(file_contents, Loader=SafeLineLoader):
+            for config_document in YamlConfigLoader.load_all_without_context(file_contents):
                 # The config document can be None if there is nothing but white space between two `---`
                 # this isn't really an issue, so lets just swallow it
                 if config_document is None:
@@ -111,7 +109,7 @@ class ConfiguredIntegrationTestCaseRepository:
                         f"Test query object YAML must be a dict. Got `{type(config_document)}`: {config_document}"
                     )
 
-                keys = tuple(x for x in config_document.keys() if x != "__parsing_context__")
+                keys = tuple(x for x in config_document.keys())
                 if len(keys) != 1:
                     raise TestCaseParseException(
                         f"Test case document should have one type of key, but this has {len(keys)}. "
@@ -123,7 +121,6 @@ class ConfiguredIntegrationTestCaseRepository:
                 object_cfg = config_document[document_type]
                 if document_type == DOCUMENT_KEY:
                     try:
-                        del object_cfg["__parsing_context__"]
                         results.append(ConfiguredIntegrationTestCase(**object_cfg, file_path=file_path))
                     except Exception as e:
                         raise TestCaseParseException(f"Error while parsing: {file_path}") from e

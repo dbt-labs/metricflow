@@ -1,10 +1,10 @@
 import logging
 
-import yaml
 from jsonschema import exceptions
 
 from metricflow.errors.errors import ParsingException
 from metricflow.model.objects.common import YamlConfigFile
+from metricflow.model.parsing.yaml_loader import YamlConfigLoader
 from metricflow.model.parsing.schemas_internal import (
     metric_validator,
     data_source_validator,
@@ -27,7 +27,7 @@ def validate_config_structure(config_yaml: YamlConfigFile) -> None:  # noqa: D
     we can get all the validation errors rather than just the first
     """
     errors = []
-    for config_document in yaml.load_all(config_yaml.contents, Loader=yaml.SafeLoader):
+    for config_document in YamlConfigLoader.load_all_without_context(config_yaml.contents):
         # The config document can be None if there is nothing but white space between two `---`
         # this isn't really an issue, so lets just swallow it
         if config_document is None:
