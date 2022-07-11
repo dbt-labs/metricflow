@@ -39,6 +39,10 @@ class InferenceSignalNode(ABC):
 
     def __init__(self, parent: Optional[InferenceSignalNode]) -> None:  # noqa: D
         self.parent = parent
+        self.children: List[InferenceSignalNode] = []
+
+        if parent is not None:
+            parent.children.append(self)
 
     @property
     def ancestors(self) -> List[InferenceSignalNode]:
