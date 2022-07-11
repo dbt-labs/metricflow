@@ -6,7 +6,7 @@ from typing import List, Optional
 from metricflow.errors.errors import ParsingException
 from metricflow.model.objects.common import Metadata
 from metricflow.model.objects.constraints.where import WhereClauseConstraint
-from metricflow.model.objects.base import ParseableObject, ParseableField, HashableBaseModel
+from metricflow.model.objects.base import ModelWithMetadataParsing, ParseableObject, ParseableField, HashableBaseModel
 from metricflow.object_utils import ExtendedEnum
 from metricflow.specs import MeasureReference
 from metricflow.time.time_granularity import TimeGranularity
@@ -83,7 +83,7 @@ class MetricTypeParams(HashableBaseModel, ParseableObject):
         return MeasureReference(element_name=self.denominator) if self.denominator else None
 
 
-class Metric(HashableBaseModel, ParseableObject):
+class Metric(HashableBaseModel, ParseableObject, ModelWithMetadataParsing):
     """Describes a metric"""
 
     name: str

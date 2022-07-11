@@ -251,20 +251,6 @@ def parse(  # type: ignore[misc]
     yaml_dict: Dict[str, Any],
 ) -> Any:
     """Parses a model object from (jsonschema-validated) yaml into python object"""
-
-    # Add Metadata
-    ctx = yaml_dict.pop(PARSING_CONTEXT_KEY)
-    assert isinstance(ctx, ParsingContext)
-    yaml_dict["metadata"] = {
-        "repo_file_path": ctx.filename,
-        "file_slice": {
-            "filename": os.path.split(ctx.filename)[-1],
-            "content": ctx.content,
-            "start_line_number": ctx.start_line,
-            "end_line_number": ctx.end_line,
-        },
-    }
-
     for field_name, field_value in _type.__fields__.items():
         if field_name in yaml_dict:
             if not inspect.isclass(field_value.type_):  # this handles the nested generic-type case (eg List[List[str]])

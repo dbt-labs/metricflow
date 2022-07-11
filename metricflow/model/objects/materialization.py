@@ -4,7 +4,7 @@ from typing import List, Optional
 
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.model.objects.common import Metadata
-from metricflow.model.objects.base import ParseableObject, HashableBaseModel
+from metricflow.model.objects.base import ModelWithMetadataParsing, ParseableObject, HashableBaseModel
 from metricflow.object_utils import ExtendedEnum
 
 
@@ -37,7 +37,7 @@ class MaterializationDestination(HashableBaseModel, ParseableObject):
     tableau_params: Optional[MaterializationTableauParams]
 
 
-class Materialization(HashableBaseModel, ParseableObject):
+class Materialization(HashableBaseModel, ParseableObject, ModelWithMetadataParsing):
     """Describes a materialization"""
 
     name: str
