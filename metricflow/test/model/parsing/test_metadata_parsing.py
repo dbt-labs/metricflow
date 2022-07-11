@@ -8,7 +8,7 @@ import pytest
 from metricflow.model.objects.common import Metadata
 from metricflow.model.objects.elements.measure import Measure
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.parsing.yaml_loader import SafeLineLoader
+from metricflow.model.parsing.yaml_loader import YamlConfigLoader
 from metricflow.model.semantic_model import SemanticModel
 
 
@@ -91,7 +91,7 @@ def test_measure_metadata_parsing(simple_user_configured_model: UserConfiguredMo
 
 def _assert_metadata_filename_is_valid(metadata: Metadata) -> None:
     """Sequence of assertion steps to ensure the metadata object has consistent file name parsing"""
-    assert SafeLineLoader.is_valid_yaml_file_ending(metadata.repo_file_path), (
+    assert YamlConfigLoader.is_valid_yaml_file_ending(metadata.repo_file_path), (
         f"Expected repo file path in measure metadata to be a yaml file with an appropriate ending. "
         f"Metadata: {metadata}"
     )

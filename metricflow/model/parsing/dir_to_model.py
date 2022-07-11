@@ -3,7 +3,7 @@ import os
 import textwrap
 from dataclasses import dataclass
 from string import Template
-from typing import Optional, Dict, List, Union, Type, Any
+from typing import Optional, Dict, List, Union, Type
 
 from jsonschema import exceptions
 from yaml.scanner import ScannerError
@@ -25,7 +25,6 @@ from metricflow.model.parsing.validation import (
 )
 from metricflow.model.parsing.yaml_loader import (
     ParsingContext,
-    SafeLineLoader,
     YamlConfigLoader,
     PARSING_CONTEXT_KEY,
 )
@@ -59,7 +58,7 @@ def parse_directory_of_yaml_files_to_model(
         dirs[:] = [d for d in dirs if not d.startswith(".")]
 
         for file in files:
-            if not SafeLineLoader.is_valid_yaml_file_ending(file):
+            if not YamlConfigLoader.is_valid_yaml_file_ending(file):
                 continue
             # Skip hidden files
             if file.startswith("."):
@@ -198,11 +197,11 @@ def parse_config_yaml(
             object_cfg = config_document[document_type]
 
             if document_type == METRIC_TYPE:
-                results.append(parse(metric_class, object_cfg))
+                results.append(metric_class.parse_obj(object_cfg))
             elif document_type == DATA_SOURCE_TYPE:
-                results.append(parse(data_source_class, object_cfg))
+                results.append(data_source_class.parse_obj(object_cfg))
             elif document_type == MATERIALIZATION_TYPE:
-                results.append(parse(materialization_class, object_cfg))
+                results.append(materialization_class.parse_obj(object_cfg))
             else:
                 errors.append(
                     str(
@@ -242,11 +241,3 @@ def parse_config_yaml(
         ) from e
 
     return results
-
-
-def parse(  # type: ignore[misc]
-    _type: Type[Union[DataSource, Metric, Materialization]],
-    yaml_dict: Dict[str, Any],
-) -> Any:
-    """Parses a model object from (jsonschema-validated) yaml into python object"""
-    return _type.parse_obj(yaml_dict)
