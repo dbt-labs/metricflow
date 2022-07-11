@@ -55,6 +55,16 @@ def test_metric_metadata_parsing() -> None:
     assert metric.metadata is not None
     assert metric.metadata.repo_file_path == "test_dir/inline_for_test"
     assert metric.metadata.file_slice.filename == "inline_for_test"
+    expected_metadata_content = textwrap.dedent(
+        """\
+        name: metadata_test
+        type: measure_proxy
+        type_params:
+          measures:
+          - metadata_test_measure
+        """
+    )
+    assert metric.metadata.file_slice.content == expected_metadata_content
 
 
 def test_ratio_metric_parsing() -> None:

@@ -110,3 +110,5 @@ def _assert_measure_metadata_is_valid(measures: Sequence[Measure]) -> None:
             f"Metadata: {measure.metadata}"
         )
         last_end_number = measure.metadata.file_slice.end_line_number
+        # if measure.name == "bookers":
+        #     raise ValueError(measure)
