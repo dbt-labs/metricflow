@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import click
 import functools
 import traceback
 from abc import ABC, abstractmethod
@@ -38,6 +39,20 @@ class ValidationIssueLevel(Enum):
     ERROR = 2
     # Issue is blocking and further validation should be stopped.
     FATAL = 3
+
+    @property
+    def name_plural(self) -> str:
+        """Controlled pluralization of ValidationIssueLevel name value"""
+
+        return f"{self.name}S"
+
+
+ISSUE_COLOR_MAP = {
+    ValidationIssueLevel.WARNING: "cyan",
+    ValidationIssueLevel.ERROR: "bright_red",
+    ValidationIssueLevel.FATAL: "bright_red",
+    ValidationIssueLevel.FUTURE_ERROR: "bright_yellow",
+}
 
 
 class DataSourceElementType(Enum):
@@ -148,13 +163,20 @@ class ValidationIssue(ABC, BaseModel):
 
         raise NotImplementedError
 
-    def as_readable_str(self, with_level: bool = True) -> str:
+    @classmethod
+    def build_validation_header_msg(cls, level: ValidationIssueLevel) -> str:
+        """Builds the header message with colour."""
+        return click.style(level.name, bold=True, fg=ISSUE_COLOR_MAP[level])
+
+    def as_readable_str(self) -> str:
         """Return a easily readable string that can be used to log the issue."""
-        msg_base = f"{self.level.name} " if with_level else ""
-        msg_base += self.context.context_str() if self.context else ""
-        if msg_base:
-            msg_base += " - "
-        return msg_base + self.message
+
+        # The following is two lines instead of one line because
+        # technically self.context.context_str() can return an empty str
+        context_str = self.context.context_str() if self.context else ""
+        context_str += " - " if context_str != "" else ""
+
+        return f"{ValidationIssue.build_validation_header_msg(self.level)}: {context_str}{self.message}"
 
 
 class ValidationWarning(ValidationIssue, BaseModel):
@@ -174,10 +196,10 @@ class ValidationFutureError(ValidationIssue, BaseModel):
     def level(self) -> ValidationIssueLevel:  # noqa: D
         return ValidationIssueLevel.FUTURE_ERROR
 
-    def as_readable_str(self, with_level: bool = True) -> str:
+    def as_readable_str(self) -> str:
         """Return a easily readable string that can be used to log the issue."""
         return (
-            f"{ValidationIssue.as_readable_str(self, with_level=with_level)}"
+            f"{super().as_readable_str()}"
             f"IMPORTANT: this error will break your model starting {self.error_date.strftime('%b %d, %Y')}. "
         )
 
@@ -270,6 +292,27 @@ class ModelValidationResults(FrozenBaseModel):
     def all_issues(self) -> Tuple[ValidationIssueType, ...]:
         """For when a singular list of issues is needed"""
         return self.fatals + self.errors + self.future_errors + self.warnings
+
+    def summary(self) -> str:
+        """Returns a stylized summary string for issues"""
+
+        fatals = click.style(
+            text=f"{ValidationIssueLevel.FATAL.name_plural}: {len(self.fatals)}",
+            fg=ISSUE_COLOR_MAP[ValidationIssueLevel.FATAL],
+        )
+        errors = click.style(
+            text=f"{ValidationIssueLevel.ERROR.name_plural}: {len(self.errors)}",
+            fg=ISSUE_COLOR_MAP[ValidationIssueLevel.ERROR],
+        )
+        future_erros = click.style(
+            text=f"{ValidationIssueLevel.FUTURE_ERROR.name_plural}: {len(self.future_errors)}",
+            fg=ISSUE_COLOR_MAP[ValidationIssueLevel.FUTURE_ERROR],
+        )
+        warnings = click.style(
+            text=f"{ValidationIssueLevel.WARNING.name_plural}: {len(self.warnings)}",
+            fg=ISSUE_COLOR_MAP[ValidationIssueLevel.WARNING],
+        )
+        return f"{fatals}, {errors}, {future_erros}, {warnings}"
 
 
 def generate_exception_issue(

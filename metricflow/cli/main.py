@@ -14,7 +14,7 @@ import time
 from halo import Halo
 from importlib.metadata import version as pkg_version
 from packaging.version import parse
-from typing import Callable, List, Optional, Sequence
+from typing import Callable, List, Optional
 from update_checker import UpdateChecker
 
 from metricflow.cli import PACKAGE_NAME
@@ -26,7 +26,6 @@ from metricflow.cli.utils import (
     MF_CONFIG_KEYS,
     MF_REDSHIFT_KEYS,
     MF_SNOWFLAKE_KEYS,
-    build_validation_header_msg,
     exception_handler,
     query_options,
     separated_by_comma_option,
@@ -42,7 +41,7 @@ from metricflow.model.data_warehouse_model_validator import DataWarehouseModelVa
 from metricflow.model.model_validator import ModelValidator
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.parsing.config_linter import ConfigLinter
-from metricflow.model.validations.validator_helpers import ModelValidationResults, ValidationIssue
+from metricflow.model.validations.validator_helpers import ModelValidationResults
 from metricflow.sql_clients.common_client import SqlDialect
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
@@ -630,12 +629,16 @@ def drop_materialization(cfg: CLIContext, materialization_name: str) -> None:
         spinner.warn(f"Materialized table for `{materialization_name}` did not exist, no table was dropped")
 
 
-# TODO: Refactor to take in a ModelValidationResults object and print
-# with warnings & futuer errors optionally and by default collapsed
-def _print_issues(issues: Sequence[ValidationIssue]) -> None:  # noqa: D
-    for issue in issues:
-        header = build_validation_header_msg(issue.level)
-        click.echo(f"• {header}: {issue.as_readable_str(with_level=False)}")
+def _print_issues(issues: ModelValidationResults, show_non_blocking: bool = False) -> None:  # noqa: D
+    for issue in issues.fatals:
+        print(f"• {issue.as_readable_str()}")
+    for issue in issues.errors:
+        print(f"• {issue.as_readable_str()}")
+    if show_non_blocking:
+        for issue in issues.future_errors:
+            print(f"• {issue.as_readable_str()}")
+        for issue in issues.warnings:
+            print(f"• {issue.as_readable_str()}")
 
 
 def _run_dw_validations(
@@ -651,15 +654,17 @@ def _run_dw_validations(
 
     results = validation_func(model, timeout)
     if not results.has_blocking_issues:
-        spinner.succeed(f"🎉 Finished validating {validation_type} against data warehouse, no errors found")
+        spinner.succeed(f"🎉 Successfully validated {validation_type} against data warehouse ({results.summary()})")
     else:
-        spinner.fail(f"Issues found when validating {validation_type} against data warehouse")
+        spinner.fail(
+            f"Breaking issues found when validating {validation_type} against data warehouse ({results.summary()})"
+        )
     return results
 
 
 def _data_warehouse_validations_runner(
     dw_validator: DataWarehouseModelValidator, model: UserConfiguredModel, timeout: Optional[int]
-) -> None:
+) -> ModelValidationResults:
     """Helper which calls the individual data warehouse validations to run and prints collected issues"""
 
     data_source_results = _run_dw_validations(
@@ -672,9 +677,7 @@ def _data_warehouse_validations_runner(
         dw_validator.validate_metrics, model=model, validation_type="metrics", timeout=timeout
     )
 
-    merged_results = ModelValidationResults.merge([data_source_results, dimension_results, metric_results])
-
-    _print_issues(merged_results.all_issues)
+    return ModelValidationResults.merge([data_source_results, dimension_results, metric_results])
 
 
 @cli.command()
@@ -687,23 +690,28 @@ def _data_warehouse_validations_runner(
     default=False,
     help="If specified, skips the data warehouse validations",
 )
+@click.option("--show-all", is_flag=True, default=False, help="If specified, prints warnings and future-errors")
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-def validate_configs(cfg: CLIContext, dw_timeout: Optional[int] = None, skip_dw: bool = False) -> None:
+def validate_configs(
+    cfg: CLIContext, dw_timeout: Optional[int] = None, skip_dw: bool = False, show_all: bool = False
+) -> None:
     """Perform validations against the defined model configurations."""
     cfg.verbose = True
+
+    if not show_all:
+        print("(To see warnings and future-errors, run again with flag `--show-all`)")
 
     lint_spinner = Halo(text="Checking for YAML format issues", spinner="dots")
     lint_spinner.start()
 
     lint_results = ConfigLinter().lint_dir(path_to_models(handler=cfg.config))
     if not lint_results.has_blocking_issues:
-        lint_spinner.succeed("🎉 Successfully linted config YAML files")
-        _print_issues(lint_results.all_issues)
+        lint_spinner.succeed(f"🎉 Successfully linted config YAML files ({lint_results.summary()})")
     else:
-        lint_spinner.fail("Breaking issues found in config YAML files")
-        _print_issues(lint_results.all_issues)
+        lint_spinner.fail(f"Breaking issues found in config YAML files ({lint_results.summary()})")
+        _print_issues(lint_results, show_non_blocking=show_all)
         return
 
     build_spinner = Halo(text="Building model from configs", spinner="dots")
@@ -716,16 +724,19 @@ def validate_configs(cfg: CLIContext, dw_timeout: Optional[int] = None, skip_dw:
     build_result = ModelValidator().validate_model(user_model)
 
     if not build_result.issues.has_blocking_issues:
-        build_spinner.succeed("🎉 Successfully build model from configs")
-        _print_issues(build_result.issues.all_issues)
+        build_spinner.succeed(f"🎉 Successfully built model from configs ({build_result.issues.summary()})")
     else:
-        build_spinner.fail("Errors found when building model from configs")
-        _print_issues(build_result.issues.all_issues)
+        build_spinner.fail(f"Breaking issues found when building model from configs ({build_result.issues.summary()})")
+        _print_issues(build_result.issues, show_non_blocking=show_all)
         return
 
+    dw_results = ModelValidationResults()
     if not skip_dw:
         dw_validator = DataWarehouseModelValidator(sql_client=cfg.sql_client, mf_engine=cfg.mf)
-        _data_warehouse_validations_runner(dw_validator=dw_validator, model=user_model, timeout=dw_timeout)
+        dw_results = _data_warehouse_validations_runner(dw_validator=dw_validator, model=user_model, timeout=dw_timeout)
+
+    merged_results = ModelValidationResults.merge([lint_results, build_result.issues, dw_results])
+    _print_issues(merged_results, show_non_blocking=show_all)
 
 
 if __name__ == "__main__":
