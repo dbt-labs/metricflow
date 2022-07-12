@@ -6,7 +6,6 @@ from dataclasses import dataclass
 from string import Template
 from typing import Optional, Dict, List, Union, Type, Any
 
-import yaml
 from jsonschema import exceptions
 from yaml.scanner import ScannerError
 
@@ -26,7 +25,12 @@ from metricflow.model.parsing.validation import (
     MATERIALIZATION_TYPE,
     DOCUMENT_TYPES,
 )
-from metricflow.model.parsing.yaml_loader import ParsingContext, SafeLineLoader, PARSING_CONTEXT_KEY
+from metricflow.model.parsing.yaml_loader import (
+    ParsingContext,
+    SafeLineLoader,
+    YamlConfigLoader,
+    PARSING_CONTEXT_KEY,
+)
 from metricflow.model.validations.validator_helpers import ModelValidationResults
 
 logger = logging.getLogger(__name__)
@@ -133,14 +137,15 @@ def parse_config_yaml(
 ) -> List[Union[DataSource, Metric, Materialization]]:
     """Parses transform config file passed as string - Returns list of model objects"""
     results: List[Union[DataSource, Metric, Materialization]] = []
-    filename: str = os.path.split(config_yaml.filepath)[-1]
     ctx: Optional[ParsingContext] = None
     errors = []
     try:
         # Validates that config yaml conforms to json schema
         validate_config_structure(config_yaml)
 
-        for config_document in yaml.load_all(config_yaml.contents, Loader=SafeLineLoader):
+        for config_document in YamlConfigLoader.load_all_with_context(
+            name=config_yaml.filepath, contents=config_yaml.contents
+        ):
             # The config document can be None if there is nothing but white space between two `---`
             # this isn't really an issue, so lets just swallow it
             if config_document is None:
@@ -163,7 +168,6 @@ def parse_config_yaml(
 
             ctx = config_document.pop(PARSING_CONTEXT_KEY)
             assert ctx
-            ctx.filename = filename
 
             if VERSION_KEY in config_document:
                 version = Version.parse(config_document.pop(VERSION_KEY))
@@ -194,17 +198,13 @@ def parse_config_yaml(
             # retrieve last top-level key as type
             document_type = next(iter(config_document.keys()))
             object_cfg = config_document[document_type]
-            yaml_contents_by_line = config_yaml.contents.splitlines()
-
-            # Add filepath to the object context
-            object_cfg[PARSING_CONTEXT_KEY].filename = config_yaml.filepath
 
             if document_type == METRIC_TYPE:
-                results.append(parse(metric_class, object_cfg, config_yaml.filepath, yaml_contents_by_line))
+                results.append(parse(metric_class, object_cfg))
             elif document_type == DATA_SOURCE_TYPE:
-                results.append(parse(data_source_class, object_cfg, config_yaml.filepath, yaml_contents_by_line))
+                results.append(parse(data_source_class, object_cfg))
             elif document_type == MATERIALIZATION_TYPE:
-                results.append(parse(materialization_class, object_cfg, config_yaml.filepath, yaml_contents_by_line))
+                results.append(parse(materialization_class, object_cfg))
             else:
                 errors.append(
                     str(
@@ -249,19 +249,17 @@ def parse_config_yaml(
 def parse(  # type: ignore[misc]
     _type: Type[Union[DataSource, Metric, Materialization]],
     yaml_dict: Dict[str, Any],
-    filepath: str,
-    contents_by_line: List[str],
 ) -> Any:
     """Parses a model object from (jsonschema-validated) yaml into python object"""
 
     # Add Metadata
     ctx = yaml_dict.pop(PARSING_CONTEXT_KEY)
-    filename = os.path.split(filepath)[-1]
+    assert isinstance(ctx, ParsingContext)
     yaml_dict["metadata"] = {
-        "repo_file_path": filepath,
+        "repo_file_path": ctx.filename,
         "file_slice": {
-            "filename": filename,
-            "content": "\n".join(contents_by_line[max(0, ctx.start_line - 1) : ctx.end_line]),
+            "filename": os.path.split(ctx.filename)[-1],
+            "content": ctx.content,
             "start_line_number": ctx.start_line,
             "end_line_number": ctx.end_line,
         },
@@ -275,10 +273,10 @@ def parse(  # type: ignore[misc]
                 if isinstance(yaml_dict[field_name], list):
                     objects = []
                     for obj in yaml_dict[field_name]:
-                        objects.append(parse(field_value.type_, obj, filepath, contents_by_line))  # type: ignore
+                        objects.append(parse(field_value.type_, obj))  # type: ignore
                     yaml_dict[field_name] = objects
                 else:
-                    yaml_dict[field_name] = parse(field_value.type_, yaml_dict[field_name], filepath, contents_by_line)  # type: ignore
+                    yaml_dict[field_name] = parse(field_value.type_, yaml_dict[field_name])  # type: ignore
             elif issubclass(field_value.type_, ParseableField):
                 if isinstance(yaml_dict[field_name], list):
                     objects = []

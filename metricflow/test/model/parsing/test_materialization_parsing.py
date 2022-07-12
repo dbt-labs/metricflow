@@ -59,6 +59,17 @@ def test_materialization_metadata_parsing() -> None:
     assert materialization.metadata is not None
     assert materialization.metadata.repo_file_path == "test_dir/inline_for_test"
     assert materialization.metadata.file_slice.filename == "inline_for_test"
+    expected_metadata_content = textwrap.dedent(
+        """\
+        name: simple_materialization_test
+        metrics:
+        - some_metric
+        dimensions:
+        - some_dimension
+        - time_dimension
+        """
+    )
+    assert materialization.metadata.file_slice.content == expected_metadata_content
 
 
 def test_materialization_with_simple_destinations_parsing() -> None:

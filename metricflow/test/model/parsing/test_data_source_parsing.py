@@ -59,6 +59,14 @@ def test_data_source_metadata_parsing() -> None:
     assert data_source.metadata is not None
     assert data_source.metadata.repo_file_path == "test_dir/inline_for_test"
     assert data_source.metadata.file_slice.filename == "inline_for_test"
+    expected_metadata_content = textwrap.dedent(
+        """\
+        name: metadata_test
+        mutability:
+          type: immutable
+        """
+    )
+    assert data_source.metadata.file_slice.content == expected_metadata_content
 
 
 def test_data_source_sql_table_parsing() -> None:
@@ -299,6 +307,14 @@ def test_data_source_measure_metadata_parsing() -> None:
     assert measure.metadata is not None
     assert measure.metadata.repo_file_path == "test_dir/inline_for_test"
     assert measure.metadata.file_slice.filename == "inline_for_test"
+    expected_metadata_content = textwrap.dedent(
+        """\
+      name: example_measure_with_metadata
+      agg: count_distinct
+      expr: example_input
+      """
+    )
+    assert measure.metadata.file_slice.content == expected_metadata_content
 
 
 def test_data_source_create_metric_measure_parsing() -> None:

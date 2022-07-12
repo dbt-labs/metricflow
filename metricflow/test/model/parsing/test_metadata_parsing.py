@@ -1,3 +1,5 @@
+"""Tests for end to end object metadata parsing from the simple model YAML files"""
+
 import os
 from typing import Sequence
 
@@ -12,7 +14,7 @@ def test_data_source_metadata_parsing(simple_user_configured_model: UserConfigur
 
     This only tests some basic file name parsing for each data source since they are not guaranteed
     to be collected in the same file in the simple model, and the output here has been transformed
-    so the contents might or might not match.
+    so the YAML contents might or might not match.
     """
     assert len(simple_user_configured_model.data_sources) > 0
     for data_source in simple_user_configured_model.data_sources:
@@ -27,7 +29,7 @@ def test_metric_metadata_parsing(simple_user_configured_model: UserConfiguredMod
 
     This only tests some basic file name parsing for each metric since they are not guaranteed
     to be collected in the same file in the simple model, and the output here has been transformed
-    so the contents might or might not match.
+    so the YAML contents might or might not match.
     """
     assert len(simple_user_configured_model.metrics) > 0
     for metric in simple_user_configured_model.metrics:
@@ -42,7 +44,7 @@ def test_materialization_metadata_parsing(simple_user_configured_model: UserConf
 
     This only tests some basic file name parsing for each materialization since they are not guaranteed
     to be collected in the same file in the simple model, and the output here has been transformed
-    so the contents might or might not match.
+    so the YAML contents might or might not match.
     """
     assert len(simple_user_configured_model.materializations) > 0
     for materialization in simple_user_configured_model.materializations:
@@ -53,7 +55,13 @@ def test_materialization_metadata_parsing(simple_user_configured_model: UserConf
 
 
 def test_measure_metadata_parsing(simple_user_configured_model: UserConfiguredModel) -> None:
-    """Tests internal metadata object parsing from a file into the Measure model object"""
+    """Tests internal metadata object parsing from a file into the Measure model object
+
+    This tests the complete parsing process for Measure object metadata, including some baseline testing of things
+    like file line number extraction and propagation. As with other cases, no assertions are made on the
+    YAML contents themselves since they may change from the raw files into the UserConfiguredModel object we access
+    here.
+    """
     assert len(simple_user_configured_model.data_sources) > 0
     for data_source in simple_user_configured_model.data_sources:
         _assert_measure_metadata_is_valid(data_source.measures)
