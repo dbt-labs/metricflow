@@ -32,7 +32,7 @@ class MetricInputMeasure(PydanticCustomInputParser, HashableBaseModel):
     def _from_yaml_value(cls, input: Any):
         """Parses a MetricInputMeasure from a string (name only) or object (struct spec) input
 
-        Internally, we will pass fully formed instnace of a MetricInputMeasure through in any case where
+        Internally, we will pass fully formed instance of a MetricInputMeasure through in any case where
         the Measure object defined in the DataSource has `create_metric` set to True. For these cases, we
         do not need to do further parsing.
 
