@@ -39,6 +39,12 @@ class ValidationIssueLevel(Enum):
     # Issue is blocking and further validation should be stopped.
     FATAL = 3
 
+    @property
+    def name_plural(self) -> str:
+        """Controlled pluralization of ValidationIssueLevel name value"""
+
+        return f"{self.name}S"
+
 
 ISSUE_COLOR_MAP = {
     ValidationIssueLevel.WARNING: "cyan",
@@ -290,19 +296,19 @@ class ModelValidationResults(FrozenBaseModel):
         """Returns a stylized summary string for issues"""
 
         fatals = click.style(
-            text=f"{ValidationIssueLevel.FATAL.name}S: {len(self.fatals)}",
+            text=f"{ValidationIssueLevel.FATAL.name_plural}: {len(self.fatals)}",
             fg=ISSUE_COLOR_MAP[ValidationIssueLevel.FATAL],
         )
         errors = click.style(
-            text=f"{ValidationIssueLevel.ERROR.name}S: {len(self.errors)}",
+            text=f"{ValidationIssueLevel.ERROR.name_plural}: {len(self.errors)}",
             fg=ISSUE_COLOR_MAP[ValidationIssueLevel.ERROR],
         )
         future_erros = click.style(
-            text=f"{ValidationIssueLevel.FUTURE_ERROR.name}S: {len(self.future_errors)}",
+            text=f"{ValidationIssueLevel.FUTURE_ERROR.name_plural}: {len(self.future_errors)}",
             fg=ISSUE_COLOR_MAP[ValidationIssueLevel.FUTURE_ERROR],
         )
         warnings = click.style(
-            text=f"{ValidationIssueLevel.WARNING.name}S: {len(self.warnings)}",
+            text=f"{ValidationIssueLevel.WARNING.name_plural}: {len(self.warnings)}",
             fg=ISSUE_COLOR_MAP[ValidationIssueLevel.WARNING],
         )
         return f"{fatals}, {errors}, {future_erros}, {warnings}"
