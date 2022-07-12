@@ -63,7 +63,7 @@ class WeightedTypeTreeInferenceSolver(InferenceSolver):
         for child in root.children:
             self._set_cumulative_weight(child, weights_dict)
 
-        weights_dict[root] = sum(weights_dict[child] for child in root.children)
+        weights_dict[root] += sum(weights_dict[child] for child in root.children)
 
     def solve_column(self, signals: List[InferenceSignal]) -> Tuple[InferenceSignalNode, List[str]]:
         """Find the appropriate type for a column by traversing through the type tree.
@@ -89,11 +89,14 @@ class WeightedTypeTreeInferenceSolver(InferenceSolver):
 
         node = InferenceSignalType.UNKNOWN
         while node is not None and len(node.children) > 0:
-            weight_total = sum(node_weights[child] for child in node.children)
+            children_weight_total = sum(node_weights[child] for child in node.children)
+
+            if children_weight_total == 0:
+                break
 
             next_node = None
             for child in node.children:
-                if node_weights[child] / weight_total >= self._weight_percent_threshold:
+                if node_weights[child] / children_weight_total >= self._weight_percent_threshold:
                     next_node = child
                     break
 

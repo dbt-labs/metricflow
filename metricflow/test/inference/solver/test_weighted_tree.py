@@ -2,6 +2,7 @@ from metricflow.dataflow.sql_column import SqlColumn
 from metricflow.inference.rule.base import InferenceSignal, InferenceSignalConfidence, InferenceSignalType
 from metricflow.inference.solver.weighted_tree import WeightedTypeTreeInferenceSolver
 
+column = SqlColumn.from_string("db.schema.table.col")
 solver = WeightedTypeTreeInferenceSolver()
 
 
@@ -14,7 +15,6 @@ def test_empty_signals_return_unknown():  # noqa: D
 
 def test_complimentary_signals():
     """Test that `WeightedTypeTreeInferenceSolver` will return the deepest (most specific) node if it finds complimentary signals."""
-    column = SqlColumn.from_string("db.schema.table.col")
     signals = [
         InferenceSignal(
             column=column,
@@ -37,7 +37,6 @@ def test_complimentary_signals():
 
 def test_contradicting_signals():
     """Test that `WeightedTypeTreeInferenceSolver` will return the deepest common ancestor if it finds conflicting signals."""
-    column = SqlColumn.from_string("db.schema.table.col")
     signals = [
         InferenceSignal(
             column=column,
@@ -56,3 +55,26 @@ def test_contradicting_signals():
     type_node, _ = solver.solve_column(signals)
 
     assert type_node == InferenceSignalType.ID.UNKNOWN
+
+
+def test_stop_at_internal_node_if_trail_stops():
+    """Test that if the signal trail stops at an internal node `WeightedTypeTreeInferenceSolver` will return that node instead of going deeper."""
+    signals = [
+        InferenceSignal(
+            column=column,
+            type_node=InferenceSignalType.ID.UNKNOWN,
+            reason="I think it's a key :)",
+            confidence=InferenceSignalConfidence.HIGH,
+        ),
+        InferenceSignal(
+            column=column,
+            type_node=InferenceSignalType.ID.UNIQUE,
+            reason="I think it's a unique key :)",
+            confidence=InferenceSignalConfidence.HIGH,
+        ),
+    ]
+
+    type_node, _ = solver.solve_column(signals)
+
+    # should not progress further into the tree and assume it's PRIMARY
+    assert type_node == InferenceSignalType.ID.UNIQUE
