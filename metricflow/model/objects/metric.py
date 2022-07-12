@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 from hashlib import sha1
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from metricflow.errors.errors import ParsingException
 from metricflow.model.objects.common import Metadata
 from metricflow.model.objects.constraints.where import WhereClauseConstraint
-from metricflow.model.objects.utils import ParseableObject, ParseableField, HashableBaseModel
+from metricflow.model.objects.base import HashableBaseModel, ModelWithMetadataParsing, PydanticCustomInputParser
 from metricflow.object_utils import ExtendedEnum
 from metricflow.specs import MeasureReference
 from metricflow.time.time_granularity import TimeGranularity
@@ -22,7 +22,7 @@ class MetricType(ExtendedEnum):
     CUMULATIVE = "cumulative"
 
 
-class CumulativeMetricWindow(HashableBaseModel, ParseableField):
+class CumulativeMetricWindow(PydanticCustomInputParser, HashableBaseModel):
     """Describes the window of time the metric should be accumulated over. ie '1 day', '2 weeks', etc"""
 
     count: int
@@ -30,6 +30,24 @@ class CumulativeMetricWindow(HashableBaseModel, ParseableField):
 
     def to_string(self) -> str:  # noqa: D
         return f"{self.count} {self.granularity.value}"
+
+    @classmethod
+    def _from_yaml_value(cls, input: Any) -> CumulativeMetricWindow:
+        """Parses a CumulativeMetricWindow from a string input found in a user provided model specification
+
+        The CumulativeMetricWindow is always expected to be provided as a string in user-defined YAML configs.
+        It may also be a CumulativeMetricWindow in cases where we are internally constructing Metric objects.
+        """
+        if isinstance(input, str):
+            return CumulativeMetricWindow.parse(input)
+        elif isinstance(input, CumulativeMetricWindow):
+            # This is internally constructed, pass it through and ignore it in error messaging
+            return input
+        else:
+            raise ValueError(
+                f"CumulativeMetricWindow inputs from model configs are expected to always be of type string, but got "
+                f"type {type(input)} with value: {input}"
+            )
 
     @staticmethod
     def parse(window: str) -> CumulativeMetricWindow:
@@ -63,7 +81,7 @@ class CumulativeMetricWindow(HashableBaseModel, ParseableField):
         )
 
 
-class MetricTypeParams(HashableBaseModel, ParseableObject):
+class MetricTypeParams(HashableBaseModel):
     """Type params add additional context to certain metric types (the context depends on the metric type)"""
 
     measure: Optional[str]
@@ -83,7 +101,7 @@ class MetricTypeParams(HashableBaseModel, ParseableObject):
         return MeasureReference(element_name=self.denominator) if self.denominator else None
 
 
-class Metric(HashableBaseModel, ParseableObject):
+class Metric(HashableBaseModel, ModelWithMetadataParsing):
     """Describes a metric"""
 
     name: str

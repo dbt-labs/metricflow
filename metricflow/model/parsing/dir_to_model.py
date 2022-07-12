@@ -1,10 +1,9 @@
-import inspect
 import logging
-import os.path
+import os
 import textwrap
 from dataclasses import dataclass
 from string import Template
-from typing import Optional, Dict, List, Union, Type, Any
+from typing import Optional, Dict, List, Union, Type
 
 from jsonschema import exceptions
 from yaml.scanner import ScannerError
@@ -16,7 +15,6 @@ from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.materialization import Materialization
 from metricflow.model.objects.metric import Metric
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.objects.utils import ParseableObject, ParseableField
 from metricflow.model.parsing.validation import (
     validate_config_structure,
     VERSION_KEY,
@@ -27,7 +25,6 @@ from metricflow.model.parsing.validation import (
 )
 from metricflow.model.parsing.yaml_loader import (
     ParsingContext,
-    SafeLineLoader,
     YamlConfigLoader,
     PARSING_CONTEXT_KEY,
 )
@@ -61,7 +58,7 @@ def parse_directory_of_yaml_files_to_model(
         dirs[:] = [d for d in dirs if not d.startswith(".")]
 
         for file in files:
-            if not SafeLineLoader.is_valid_yaml_file_ending(file):
+            if not YamlConfigLoader.is_valid_yaml_file_ending(file):
                 continue
             # Skip hidden files
             if file.startswith("."):
@@ -200,11 +197,11 @@ def parse_config_yaml(
             object_cfg = config_document[document_type]
 
             if document_type == METRIC_TYPE:
-                results.append(parse(metric_class, object_cfg))
+                results.append(metric_class.parse_obj(object_cfg))
             elif document_type == DATA_SOURCE_TYPE:
-                results.append(parse(data_source_class, object_cfg))
+                results.append(data_source_class.parse_obj(object_cfg))
             elif document_type == MATERIALIZATION_TYPE:
-                results.append(parse(materialization_class, object_cfg))
+                results.append(materialization_class.parse_obj(object_cfg))
             else:
                 errors.append(
                     str(
@@ -244,46 +241,3 @@ def parse_config_yaml(
         ) from e
 
     return results
-
-
-def parse(  # type: ignore[misc]
-    _type: Type[Union[DataSource, Metric, Materialization]],
-    yaml_dict: Dict[str, Any],
-) -> Any:
-    """Parses a model object from (jsonschema-validated) yaml into python object"""
-
-    # Add Metadata
-    ctx = yaml_dict.pop(PARSING_CONTEXT_KEY)
-    assert isinstance(ctx, ParsingContext)
-    yaml_dict["metadata"] = {
-        "repo_file_path": ctx.filename,
-        "file_slice": {
-            "filename": os.path.split(ctx.filename)[-1],
-            "content": ctx.content,
-            "start_line_number": ctx.start_line,
-            "end_line_number": ctx.end_line,
-        },
-    }
-
-    for field_name, field_value in _type.__fields__.items():
-        if field_name in yaml_dict:
-            if not inspect.isclass(field_value.type_):  # this handles the nested generic-type case (eg List[List[str]])
-                continue
-            if issubclass(field_value.type_, ParseableObject):
-                if isinstance(yaml_dict[field_name], list):
-                    objects = []
-                    for obj in yaml_dict[field_name]:
-                        objects.append(parse(field_value.type_, obj))  # type: ignore
-                    yaml_dict[field_name] = objects
-                else:
-                    yaml_dict[field_name] = parse(field_value.type_, yaml_dict[field_name])  # type: ignore
-            elif issubclass(field_value.type_, ParseableField):
-                if isinstance(yaml_dict[field_name], list):
-                    objects = []
-                    for obj in yaml_dict[field_name]:
-                        objects.append(field_value.type_.parse(obj))
-                    yaml_dict[field_name] = objects
-                else:
-                    yaml_dict[field_name] = field_value.type_.parse(yaml_dict[field_name])
-
-    return _type(**yaml_dict)

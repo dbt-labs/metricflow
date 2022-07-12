@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Optional, List, Dict, Any
 
-from metricflow.model.objects.utils import ParseableObject, HashableBaseModel
+from metricflow.model.objects.base import HashableBaseModel
 from metricflow.object_utils import ExtendedEnum
 from metricflow.specs import IdentifierReference, CompositeSubIdentifierReference
 
@@ -18,7 +18,7 @@ class IdentifierType(ExtendedEnum):
     # RENDER_ONLY = "render_only" # DEPRECATED ? we shouldnt need in the new world?
 
 
-class CompositeSubIdentifier(HashableBaseModel, ParseableObject):
+class CompositeSubIdentifier(HashableBaseModel):
     """CompositeSubIdentifiers either describe or reference the identifiers that comprise a composite identifier"""
 
     name: Optional[str]
@@ -31,7 +31,7 @@ class CompositeSubIdentifier(HashableBaseModel, ParseableObject):
         return CompositeSubIdentifierReference(element_name=self.name)
 
 
-class Identifier(HashableBaseModel, ParseableObject):
+class Identifier(HashableBaseModel):
     """Describes a identifier"""
 
     name: str

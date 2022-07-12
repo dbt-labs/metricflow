@@ -6,19 +6,20 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import date
 from enum import Enum
-from pydantic import BaseModel, Extra
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
+
+from pydantic import BaseModel, Extra
+
 from metricflow.instances import (
     DataSourceElementReference,
     DataSourceReference,
     MaterializationModelReference,
     MetricModelReference,
 )
+from metricflow.model.objects.base import FrozenBaseModel
 from metricflow.model.objects.common import Metadata
-
 from metricflow.model.objects.elements.dimension import DimensionType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.objects.utils import FrozenBaseModel
 from metricflow.object_utils import assert_values_exhausted
 
 VALIDATE_SAFELY_ERROR_STR_TMPLT = ". Issue occurred in method `{method_name}` called with {arguments_str}"

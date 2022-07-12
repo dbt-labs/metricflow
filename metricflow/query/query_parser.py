@@ -136,13 +136,13 @@ class MetricFlowQueryParser:
             if spec_name.element_name in dimension_references:
                 dimension = data_source_semantics.get_dimension(dimension_references[spec_name.element_name])
                 if dimension.type == DimensionType.CATEGORICAL:
-                    where_constraint_dimensions.append(DimensionSpec.parse(spec_name.qualified_name))
+                    where_constraint_dimensions.append(DimensionSpec.from_name(spec_name.qualified_name))
                 elif dimension.type == DimensionType.TIME:
-                    where_constraint_time_dimensions.append(TimeDimensionSpec.parse(spec_name.qualified_name))
+                    where_constraint_time_dimensions.append(TimeDimensionSpec.from_name(spec_name.qualified_name))
                 else:
                     raise RuntimeError(f"Unhandled type: {dimension.type}")
             elif spec_name.element_name in identifier_references:
-                where_constraint_identifiers.append(IdentifierSpec.parse(spec_name.qualified_name))
+                where_constraint_identifiers.append(IdentifierSpec.from_name(spec_name.qualified_name))
             else:
                 raise InvalidQueryException(f"Unknown element: {spec_name}")
 

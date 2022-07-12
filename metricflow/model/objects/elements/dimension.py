@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from metricflow.model.objects.utils import ParseableObject, HashableBaseModel
+from metricflow.model.objects.base import HashableBaseModel
 from metricflow.specs import DimensionReference, TimeDimensionReference
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.object_utils import ExtendedEnum
@@ -21,7 +21,7 @@ class DimensionType(ExtendedEnum):
         return self in [DimensionType.TIME]
 
 
-class DimensionTypeParams(HashableBaseModel, ParseableObject):
+class DimensionTypeParams(HashableBaseModel):
     """Dimension type params add additional context to some types (time) of dimensions"""
 
     is_primary: bool = False
@@ -30,7 +30,7 @@ class DimensionTypeParams(HashableBaseModel, ParseableObject):
     time_granularity: TimeGranularity
 
 
-class Dimension(HashableBaseModel, ParseableObject):
+class Dimension(HashableBaseModel):
     """Describes a dimension"""
 
     name: str

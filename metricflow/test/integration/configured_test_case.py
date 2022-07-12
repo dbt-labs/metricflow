@@ -6,7 +6,7 @@ from collections import OrderedDict
 from enum import Enum
 from typing import Sequence, Tuple, Optional
 
-from metricflow.model.objects.utils import FrozenBaseModel
+from metricflow.model.objects.base import FrozenBaseModel
 from metricflow.model.parsing.yaml_loader import YamlConfigLoader
 
 logger = logging.getLogger(__name__)

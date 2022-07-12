@@ -18,7 +18,7 @@ from typing import List, Optional, Sequence, Tuple, TypeVar, Generic
 from metricflow.column_assoc import ColumnAssociation
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.time.time_granularity import TimeGranularity
-from metricflow.model.objects.utils import ParseableField, FrozenBaseModel
+from metricflow.model.objects.base import FrozenBaseModel
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 
@@ -140,7 +140,7 @@ class LinkableInstanceSpec(InstanceSpec, ABC):
         ).qualified_name
 
 
-class IdentifierSpec(LinkableInstanceSpec, ParseableField):  # noqa: D
+class IdentifierSpec(LinkableInstanceSpec):  # noqa: D
     def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
         return resolver.resolve_identifier_spec(self)
 
@@ -160,7 +160,7 @@ class IdentifierSpec(LinkableInstanceSpec, ParseableField):  # noqa: D
         return (LinklessIdentifierSpec.from_element_name(self.element_name),) + self.identifier_links
 
     @staticmethod
-    def parse(name: str) -> IdentifierSpec:  # noqa: D
+    def from_name(name: str) -> IdentifierSpec:  # noqa: D
         structured_name = StructuredLinkableSpecName.from_name(name)
         return IdentifierSpec(
             identifier_links=tuple(
@@ -186,7 +186,7 @@ IdentifierSpec.update_forward_refs()
 LinklessIdentifierSpec.update_forward_refs()
 
 
-class DimensionSpec(LinkableInstanceSpec, ParseableField):  # noqa: D
+class DimensionSpec(LinkableInstanceSpec):  # noqa: D
     def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
         return (resolver.resolve_dimension_spec(self),)
 
@@ -202,7 +202,7 @@ class DimensionSpec(LinkableInstanceSpec, ParseableField):  # noqa: D
         return DimensionSpec(element_name=spec.element_name, identifier_links=spec.identifier_links)
 
     @staticmethod
-    def parse(name: str) -> DimensionSpec:
+    def from_name(name: str) -> DimensionSpec:
         """Construct from a name e.g. listing__ds__month."""
         parsed_name = StructuredLinkableSpecName.from_name(name)
         return DimensionSpec(
@@ -222,7 +222,7 @@ DimensionSpec.update_forward_refs()
 DEFAULT_TIME_GRANULARITY = TimeGranularity.DAY
 
 
-class TimeDimensionSpec(DimensionSpec, ParseableField):  # noqa: D
+class TimeDimensionSpec(DimensionSpec):  # noqa: D
     time_granularity: TimeGranularity = DEFAULT_TIME_GRANULARITY
 
     def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
@@ -240,7 +240,7 @@ class TimeDimensionSpec(DimensionSpec, ParseableField):  # noqa: D
         return LinklessIdentifierSpec.from_element_name(self.element_name)
 
     @staticmethod
-    def parse(name: str) -> TimeDimensionSpec:  # noqa: D
+    def from_name(name: str) -> TimeDimensionSpec:  # noqa: D
         structured_name = StructuredLinkableSpecName.from_name(name)
         return TimeDimensionSpec(
             identifier_links=tuple(
@@ -315,12 +315,12 @@ class TimeDimensionReference(DimensionReference):  # noqa: D
         return DimensionReference(element_name=self.element_name)
 
 
-class MeasureSpec(InstanceSpec, ParseableField):  # noqa: D
+class MeasureSpec(InstanceSpec):  # noqa: D
     def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
         return (resolver.resolve_measure_spec(self),)
 
     @staticmethod
-    def parse(name: str) -> MeasureSpec:
+    def from_name(name: str) -> MeasureSpec:
         """Construct from a name e.g. listing__ds__month."""
         return MeasureSpec(element_name=name)
 
