@@ -8,8 +8,9 @@ data_source:
     type_params:
       update_cron: 0 2 * * *
   identifiers:
-    - name: id
+    - name: customer_address
       type: primary
+      expr: id
     - name: customer
       type: foreign
       expr: customer_id

@@ -34,7 +34,7 @@ data_source:
 
 ---
 metric:
-  name: weekly_customers
+  name: rolling_7_customers
   owners:
     - hesham@transformdata.io
   type: cumulative
