@@ -63,16 +63,30 @@ materialization_destination_schema = {
     "additionalProperties": False,
 }
 
+metric_input_measure_schema = {
+    "$id": "metric_input_measure_schema",
+    "oneOf": [
+        {"type": "string"},
+        {
+            "type": "object",
+            "properties": {
+                "name": {"type": "string"},
+            },
+            "additionalProperties": False,
+        },
+    ],
+}
+
 metric_type_params_schema = {
     "$id": "metric_type_params",
     "type": "object",
     "properties": {
-        "numerator": {"type": "string"},
-        "denominator": {"type": "string"},
-        "measure": {"type": "string"},
+        "numerator": {"$ref": "metric_input_measure_schema"},
+        "denominator": {"$ref": "metric_input_measure_schema"},
+        "measure": {"$ref": "metric_input_measure_schema"},
         "measures": {
             "type": "array",
-            "items": {"type": "string"},
+            "items": {"$ref": "metric_input_measure_schema"},
         },
         "expr": {"type": ["string", "boolean"]},
         "window": {"type": "string"},
@@ -287,6 +301,7 @@ schema_store = {
     derived_group_by_element_schema["$id"]: derived_group_by_element_schema,
     materialization_schema["$id"]: materialization_schema,
     # Sub-object schemas
+    metric_input_measure_schema["$id"]: metric_input_measure_schema,
     metric_type_params_schema["$id"]: metric_type_params_schema,
     identifier_schema["$id"]: identifier_schema,
     measure_schema["$id"]: measure_schema,

@@ -22,6 +22,44 @@ class MetricType(ExtendedEnum):
     CUMULATIVE = "cumulative"
 
 
+class MetricInputMeasure(PydanticCustomInputParser, HashableBaseModel):
+    """Provides a pointer to a measure along with metric-specific processing directives"""
+
+    name: str
+    # TODO add constraint handling property
+
+    @classmethod
+    def _from_yaml_value(cls, input: Any):
+        """Parses a MetricInputMeasure from a string (name only) or object (struct spec) input
+
+        Internally, we will pass fully formed instance of a MetricInputMeasure through in any case where
+        the Measure object defined in the DataSource has `create_metric` set to True. For these cases, we
+        do not need to do further parsing.
+
+        For user input cases, the original YAML spec for a Metric included measure(s) specified as string names
+        or lists of string names. As such, configs pre-dating the addition of this model type will only provide the
+        base name for this object. The addition of new properties requires a key/value input for each
+        entry, which would need to be handled by object (dict) type parsing logic.
+        """
+        if isinstance(input, MetricInputMeasure):
+            # Internally constructed, pass it through and ignore this case in error messaging
+            return input
+        elif isinstance(input, str):
+            return MetricInputMeasure(name=input)
+        elif isinstance(input, dict):
+            return MetricInputMeasure(**input)
+        else:
+            raise ValueError(
+                f"MetricInputMeasure inputs from model configs are expected to be of either type string or "
+                f"object (key/value pairs), but got type {type(input)} with value: {input}"
+            )
+
+    @property
+    def measure_reference(self) -> MeasureReference:
+        """Property accessor to get the MeasureReference associated with this metric input measure"""
+        return MeasureReference(element_name=self.name)
+
+
 class CumulativeMetricWindow(PydanticCustomInputParser, HashableBaseModel):
     """Describes the window of time the metric should be accumulated over. ie '1 day', '2 weeks', etc"""
 
@@ -84,21 +122,23 @@ class CumulativeMetricWindow(PydanticCustomInputParser, HashableBaseModel):
 class MetricTypeParams(HashableBaseModel):
     """Type params add additional context to certain metric types (the context depends on the metric type)"""
 
-    measure: Optional[str]
-    measures: Optional[List[str]]
-    numerator: Optional[str]
-    denominator: Optional[str]
+    measure: Optional[MetricInputMeasure]
+    measures: Optional[List[MetricInputMeasure]]
+    numerator: Optional[MetricInputMeasure]
+    denominator: Optional[MetricInputMeasure]
     expr: Optional[str]
     window: Optional[CumulativeMetricWindow]
     grain_to_date: Optional[TimeGranularity]
 
     @property
-    def numerator_measure_reference(self) -> Optional[MeasureReference]:  # noqa: D
-        return MeasureReference(element_name=self.numerator) if self.numerator else None
+    def numerator_measure_reference(self) -> Optional[MeasureReference]:
+        """Return the measure reference, if any, associated with the metric input measure defined as the numerator"""
+        return self.numerator.measure_reference if self.numerator else None
 
     @property
-    def denominator_measure_reference(self) -> Optional[MeasureReference]:  # noqa: D
-        return MeasureReference(element_name=self.denominator) if self.denominator else None
+    def denominator_measure_reference(self) -> Optional[MeasureReference]:
+        """Return the measure reference, if any, associated with the metric input measure defined as the denominator"""
+        return self.denominator.measure_reference if self.denominator else None
 
 
 class Metric(HashableBaseModel, ModelWithMetadataParsing):
@@ -112,7 +152,8 @@ class Metric(HashableBaseModel, ModelWithMetadataParsing):
     metadata: Optional[Metadata]
 
     @property
-    def measure_references(self) -> List[MeasureReference]:  # noqa: D
+    def input_measures(self) -> List[MetricInputMeasure]:
+        """Return the complete list of input measure configurations for this metric"""
         tp = self.type_params
         res = tp.measures or []
         if tp.measure:
@@ -122,7 +163,12 @@ class Metric(HashableBaseModel, ModelWithMetadataParsing):
         if tp.denominator:
             res.append(tp.denominator)
 
-        return [MeasureReference(element_name=x) for x in res]
+        return res
+
+    @property
+    def measure_references(self) -> List[MeasureReference]:
+        """Return the measure references associated with all input measure configurations for this metric"""
+        return [x.measure_reference for x in self.input_measures]
 
     @property
     def definition_hash(self) -> str:  # noqa: D

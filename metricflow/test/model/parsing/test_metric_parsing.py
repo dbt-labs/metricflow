@@ -5,7 +5,7 @@ import pytest
 from metricflow.errors.errors import ParsingException
 from metricflow.model.objects.common import YamlConfigFile
 from metricflow.model.objects.constraints.where import WhereClauseConstraint
-from metricflow.model.objects.metric import CumulativeMetricWindow, MetricType
+from metricflow.model.objects.metric import CumulativeMetricWindow, MetricType, MetricInputMeasure
 from metricflow.model.parsing.dir_to_model import parse_yaml_files_to_model
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.time.time_granularity import TimeGranularity
@@ -30,8 +30,29 @@ def test_legacy_measure_metric_parsing() -> None:
     metric = model.metrics[0]
     assert metric.name == "legacy_test"
     assert metric.type is MetricType.MEASURE_PROXY
-    assert metric.type_params.measure == "legacy_measure"
+    assert metric.type_params.measure == MetricInputMeasure(name="legacy_measure")
     assert metric.type_params.measures is None
+
+
+def test_legacy_metric_input_measure_object_parsing() -> None:
+    """Test for parsing a simple metric specification with the `measure` parameter set with object notation"""
+    yaml_contents = textwrap.dedent(
+        """\
+        metric:
+          name: legacy_test
+          type: measure_proxy
+          type_params:
+            measure:
+              name: legacy_measure_from_object
+        """
+    )
+    file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+
+    model = parse_yaml_files_to_model(files=[file])
+
+    assert len(model.metrics) == 1
+    metric = model.metrics[0]
+    assert metric.type_params.measure == MetricInputMeasure(name="legacy_measure_from_object")
 
 
 def test_metric_metadata_parsing() -> None:
@@ -87,9 +108,33 @@ def test_ratio_metric_parsing() -> None:
     metric = model.metrics[0]
     assert metric.name == "ratio_test"
     assert metric.type is MetricType.RATIO
-    assert metric.type_params.numerator == "numerator_measure"
-    assert metric.type_params.denominator == "denominator_measure"
+    assert metric.type_params.numerator == MetricInputMeasure(name="numerator_measure")
+    assert metric.type_params.denominator == MetricInputMeasure(name="denominator_measure")
     assert metric.type_params.measures is None
+
+
+def test_ratio_metric_input_measure_object_parsing() -> None:
+    """Test for parsing a ratio metric specification with object inputs for numerator and denominator"""
+    yaml_contents = textwrap.dedent(
+        """\
+        metric:
+          name: ratio_test
+          type: ratio
+          type_params:
+            numerator:
+              name: numerator_measure_from_object
+            denominator:
+              name: denominator_measure_from_object
+        """
+    )
+    file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+
+    model = parse_yaml_files_to_model(files=[file])
+
+    assert len(model.metrics) == 1
+    metric = model.metrics[0]
+    assert metric.type_params.numerator == MetricInputMeasure(name="numerator_measure_from_object")
+    assert metric.type_params.denominator == MetricInputMeasure(name="denominator_measure_from_object")
 
 
 def test_expr_metric_parsing() -> None:
@@ -113,7 +158,37 @@ def test_expr_metric_parsing() -> None:
     metric = model.metrics[0]
     assert metric.name == "expr_test"
     assert metric.type is MetricType.EXPR
-    assert metric.type_params.measures == ["measure_one", "measure_two"]
+    assert metric.type_params.measures == [
+        MetricInputMeasure(name="measure_one"),
+        MetricInputMeasure(name="measure_two"),
+    ]
+
+
+def test_expr_metric_input_measure_object_parsing() -> None:
+    """Test for parsing a metric specification with object inputs for the list of measures"""
+    yaml_contents = textwrap.dedent(
+        """\
+        metric:
+          name: expr_test
+          type: expr
+          type_params:
+            measures:
+              - name: measure_one_from_object
+              - name: measure_two_from_object
+        """
+    )
+    file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+
+    model = parse_yaml_files_to_model(files=[file])
+
+    assert len(model.metrics) == 1
+    metric = model.metrics[0]
+    assert metric.name == "expr_test"
+    assert metric.type is MetricType.EXPR
+    assert metric.type_params.measures == [
+        MetricInputMeasure(name="measure_one_from_object"),
+        MetricInputMeasure(name="measure_two_from_object"),
+    ]
 
 
 def test_cumulative_window_metric_parsing() -> None:
@@ -137,7 +212,7 @@ def test_cumulative_window_metric_parsing() -> None:
     metric = model.metrics[0]
     assert metric.name == "cumulative_test"
     assert metric.type is MetricType.CUMULATIVE
-    assert metric.type_params.measures == ["cumulative_measure"]
+    assert metric.type_params.measures == [MetricInputMeasure(name="cumulative_measure")]
     assert metric.type_params.window == CumulativeMetricWindow(count=7, granularity=TimeGranularity.DAY)
 
 
@@ -162,7 +237,7 @@ def test_grain_to_date_metric_parsing() -> None:
     metric = model.metrics[0]
     assert metric.name == "grain_to_date_test"
     assert metric.type is MetricType.CUMULATIVE
-    assert metric.type_params.measures == ["cumulative_measure"]
+    assert metric.type_params.measures == [MetricInputMeasure(name="cumulative_measure")]
     assert metric.type_params.window is None
     assert metric.type_params.grain_to_date is TimeGranularity.WEEK
 

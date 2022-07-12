@@ -7,6 +7,7 @@ from metricflow.model.parsing.schemas import (
     data_source_schema,
     materialization_schema,
     derived_group_by_element_schema,
+    metric_input_measure_schema,
     metric_type_params_schema,
     identifier_schema,
     measure_schema,
@@ -88,6 +89,7 @@ schema_store = {
     derived_group_by_element_schema["$id"]: derived_group_by_element_schema,
     materialization_schema["$id"]: materialization_schema,
     # Sub-object schemas
+    metric_input_measure_schema["$id"]: metric_input_measure_schema,
     metric_type_params_schema["$id"]: metric_type_params_schema,
     locked_metadata_schema["$id"]: locked_metadata_schema,
     identifier_schema["$id"]: identifier_schema,
