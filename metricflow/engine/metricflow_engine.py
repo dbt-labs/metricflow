@@ -144,6 +144,17 @@ class MetricFlowExplainResult:
 
         return sql_query
 
+    @property
+    def rendered_sql_without_descriptions(self) -> SqlQuery:
+        """Return the SQL query without the inline descriptions."""
+        sql_query = self.rendered_sql
+        return SqlQuery(
+            sql_query="\n".join(
+                filter(lambda line: not line.strip().startswith("--"), sql_query.sql_query.split("\n"))
+            ),
+            bind_parameters=sql_query.bind_parameters,
+        )
+
 
 class AbstractMetricFlowEngine(ABC):
     """Query interface for clients"""
