@@ -14,15 +14,12 @@ from metricflow.model.objects.common import Version, YamlConfigFile
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.materialization import Materialization
 from metricflow.model.objects.metric import Metric
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.parsing.validation import (
-    validate_config_structure,
-    VERSION_KEY,
-    METRIC_TYPE,
-    DATA_SOURCE_TYPE,
-    MATERIALIZATION_TYPE,
-    DOCUMENT_TYPES,
+from metricflow.model.parsing.schemas_internal import (
+    metric_validator,
+    data_source_validator,
+    materialization_validator,
 )
+from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.parsing.yaml_loader import (
     ParsingContext,
     YamlConfigLoader,
@@ -31,6 +28,12 @@ from metricflow.model.parsing.yaml_loader import (
 from metricflow.model.validations.validator_helpers import ModelValidationResults
 
 logger = logging.getLogger(__name__)
+
+VERSION_KEY = "mf_config_schema"
+METRIC_TYPE = "metric"
+DATA_SOURCE_TYPE = "data_source"
+MATERIALIZATION_TYPE = "materialization"
+DOCUMENT_TYPES = [METRIC_TYPE, DATA_SOURCE_TYPE, MATERIALIZATION_TYPE]
 
 
 @dataclass(frozen=True)
@@ -137,9 +140,6 @@ def parse_config_yaml(
     ctx: Optional[ParsingContext] = None
     errors = []
     try:
-        # Validates that config yaml conforms to json schema
-        validate_config_structure(config_yaml)
-
         for config_document in YamlConfigLoader.load_all_with_context(
             name=config_yaml.filepath, contents=config_yaml.contents
         ):
@@ -197,10 +197,13 @@ def parse_config_yaml(
             object_cfg = config_document[document_type]
 
             if document_type == METRIC_TYPE:
+                metric_validator.validate(config_document[document_type])
                 results.append(metric_class.parse_obj(object_cfg))
             elif document_type == DATA_SOURCE_TYPE:
+                data_source_validator.validate(config_document[document_type])
                 results.append(data_source_class.parse_obj(object_cfg))
             elif document_type == MATERIALIZATION_TYPE:
+                materialization_validator.validate(config_document[document_type])
                 results.append(materialization_class.parse_obj(object_cfg))
             else:
                 errors.append(
