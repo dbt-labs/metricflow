@@ -1,9 +1,8 @@
 import logging
 import os
-import textwrap
 from dataclasses import dataclass
 from string import Template
-from typing import Optional, Dict, List, Union, Type
+from typing import Optional, Dict, List, Tuple, Union, Type
 
 from jsonschema import exceptions
 from yaml.scanner import ScannerError
@@ -25,7 +24,12 @@ from metricflow.model.parsing.yaml_loader import (
     YamlConfigLoader,
     PARSING_CONTEXT_KEY,
 )
-from metricflow.model.validations.validator_helpers import ModelValidationResults
+from metricflow.model.validations.validator_helpers import (
+    FileContext,
+    ModelValidationResults,
+    ValidationError,
+    ValidationIssueType,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -103,7 +107,7 @@ def parse_yaml_files_to_model(
     materializations: List[Materialization] = []
     valid_object_classes = [data_source_class.__name__, metric_class.__name__, materialization_class.__name__]
     for config_file in files:
-        objects = parse_config_yaml(  # parse config file
+        (objects, file_issues) = parse_config_yaml(  # parse config file
             config_file,
             data_source_class=data_source_class,
             metric_class=metric_class,
@@ -134,11 +138,11 @@ def parse_config_yaml(
     data_source_class: Type[DataSource] = DataSource,
     metric_class: Type[Metric] = Metric,
     materialization_class: Type[Materialization] = Materialization,
-) -> List[Union[DataSource, Metric, Materialization]]:
+) -> Tuple[List[Union[DataSource, Metric, Materialization]], List[ValidationIssueType]]:
     """Parses transform config file passed as string - Returns list of model objects"""
     results: List[Union[DataSource, Metric, Materialization]] = []
     ctx: Optional[ParsingContext] = None
-    errors = []
+    issues: List[ValidationIssueType] = []
     try:
         for config_document in YamlConfigLoader.load_all_with_context(
             name=config_yaml.filepath, contents=config_yaml.contents
@@ -148,16 +152,18 @@ def parse_config_yaml(
             if config_document is None:
                 continue
             if not isinstance(config_document, dict):
-                errors.append(
-                    str(
-                        ParsingException(
-                            f"YAML must be a dict. Got `{type(config_document)}`.",
-                            config_filepath=config_yaml.filepath,
-                        )
+                issues.append(
+                    ValidationError(
+                        context=FileContext(file_name=config_yaml.filepath),
+                        message=f"YAML must be a dict. Got `{type(config_document)}`.",
                     )
                 )
                 continue
+
             keys = config_document.keys()
+
+            # This SHOULDN'T ever happen but if it does, we want to know. If this
+            # does ever happen, it is likely due to a change in 'load_all_with_context'
             if PARSING_CONTEXT_KEY not in keys:
                 raise RuntimeError(
                     f"No parsing context present. Expected key `{PARSING_CONTEXT_KEY}` from the YAML parser."
@@ -171,23 +177,20 @@ def parse_config_yaml(
                 major_version = version.major
 
                 if major_version != 0:
-                    errors.append(
-                        str(
-                            ParsingException(
-                                f"Unsupported version {version} in config document.",
-                                config_filepath=config_yaml.filepath,
-                            )
+                    issues.append(
+                        ValidationError(
+                            context=FileContext(file_name=ctx.filename, line_number=ctx.start_line),
+                            message=f"Unsupported version {version} in config document.",
                         )
                     )
 
+            # Because we've popped the VERSION KEY and PARSING_CONTEXT_KEY, there
+            # should only be the base object key remaining
             if len(keys) != 1:
-                errors.append(
-                    str(
-                        ParsingException(
-                            f"Document should have one type of key, but has {keys}.",
-                            ctx=ctx,
-                            config_filepath=config_yaml.filepath,
-                        )
+                issues.append(
+                    ValidationError(
+                        context=FileContext(file_name=ctx.filename, line_number=ctx.start_line),
+                        message=f"Document should have one type of key, but has {keys}.",
                     )
                 )
                 continue
@@ -206,41 +209,28 @@ def parse_config_yaml(
                 materialization_validator.validate(config_document[document_type])
                 results.append(materialization_class.parse_obj(object_cfg))
             else:
-                errors.append(
-                    str(
-                        ParsingException(
-                            message=f"Invalid document type: {document_type}. Expected {DOCUMENT_TYPES}.",
-                            ctx=ctx,
-                            config_filepath=config_yaml.filepath,
-                        )
+                issues.append(
+                    ValidationError(
+                        context=FileContext(file_name=ctx.filename, line_number=ctx.start_line),
+                        message=f"Invalid document type: {document_type}. Expected {DOCUMENT_TYPES}.",
                     )
                 )
-
-        if len(errors) > 0:
-            errors_str = "\n".join([str(x) for x in errors])
-            raise ParsingException(
-                message=f"Found {len(errors)} error(s) parsing configs files:\n"
-                f"{textwrap.indent(errors_str, prefix='    ')}"
-            )
     except exceptions.ValidationError as e:
-        raise ParsingException(
-            message=f"YAML file did not conform to metric spec.\nError: {e}",
-            ctx=ctx,
-            config_filepath=config_yaml.filepath,
-        ) from e
+        context = FileContext(file_name=ctx.filename, line_number=ctx.start_line) if ctx is not None else None
+        issues.append(
+            ValidationError(
+                context=context,
+                message=f"YAML document did not conform to metric spec.\nError: {e}",
+            )
+        )
     except ScannerError as e:
-        raise ParsingException(
-            message=str(e),
-            ctx=ctx,
-            config_filepath=config_yaml.filepath,
-        ) from e
-    except ParsingException:
-        raise
+        context = FileContext(file_name=ctx.filename, line_number=ctx.start_line) if ctx is not None else None
+        issues.append(ValidationError(context=context, message=str(e)))
+    except ParsingException as e:
+        context = FileContext(file_name=ctx.filename, line_number=ctx.start_line) if ctx is not None else None
+        issues.append(ValidationError(context=context, message=str(e)))
     except Exception as e:
-        raise ParsingException(
-            message=str(e),
-            ctx=ctx,
-            config_filepath=config_yaml.filepath,
-        ) from e
+        context = FileContext(file_name=ctx.filename, line_number=ctx.start_line) if ctx is not None else None
+        issues.append(ValidationError(context=context, message=str(e)))
 
-    return results
+    return (results, issues)
