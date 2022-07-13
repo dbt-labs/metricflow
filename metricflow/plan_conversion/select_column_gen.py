@@ -33,11 +33,11 @@ class SelectColumnSet:
         """Return all select columns as a tuple."""
         return tuple(
             # Preferred order is to have metrics first.
-            self.metric_columns
-            + self.measure_columns
-            + self.dimension_columns
-            + self.time_dimension_columns
+            self.time_dimension_columns
             + self.identifier_columns
+            + self.dimension_columns
+            + self.metric_columns
+            + self.measure_columns
         )
 
     def without_measure_columns(self) -> SelectColumnSet:
