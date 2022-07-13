@@ -78,7 +78,9 @@ def parse_directory_of_yaml_files_to_model(
                     YamlConfigFile(filepath=file_path, contents=contents),
                 )
 
-    model = parse_yaml_files_to_model(yaml_config_files)
+    build_result = parse_yaml_files_to_model(yaml_config_files)
+    model = build_result.model
+    assert model
 
     if apply_pre_transformations:
         model = ModelTransformer.pre_validation_transform_model(model)
@@ -94,7 +96,7 @@ def parse_yaml_files_to_model(
     data_source_class: Type[DataSource] = DataSource,
     metric_class: Type[Metric] = Metric,
     materialization_class: Type[Materialization] = Materialization,
-) -> UserConfiguredModel:
+) -> ModelBuildResult:
     """Builds UserConfiguredModel from list of config files (as strings).
 
     Persistent storage connection may be passed to write parsed objects=
@@ -106,6 +108,8 @@ def parse_yaml_files_to_model(
     metrics = []
     materializations: List[Materialization] = []
     valid_object_classes = [data_source_class.__name__, metric_class.__name__, materialization_class.__name__]
+    issues: List[ValidationIssueType] = []
+
     for config_file in files:
         (objects, file_issues) = parse_config_yaml(  # parse config file
             config_file,
@@ -121,15 +125,22 @@ def parse_yaml_files_to_model(
             elif isinstance(obj, materialization_class):
                 materializations.append(obj)
             else:
-                raise ParsingException(
-                    f"Unexpected model object {obj.__name__}. Expected {valid_object_classes}.",
-                    config_filepath=config_file.filepath,
+                file_issues.append(
+                    ValidationError(
+                        context=FileContext(file_name=config_file.filepath),
+                        message=f"Unexpected model object {obj.__name__}. Expected {valid_object_classes}.",
+                    )
                 )
 
-    return UserConfiguredModel(
-        data_sources=data_sources,
-        materializations=materializations,
-        metrics=metrics,
+        issues += file_issues
+
+    return ModelBuildResult(
+        model=UserConfiguredModel(
+            data_sources=data_sources,
+            materializations=materializations,
+            metrics=metrics,
+        ),
+        issues=ModelValidationResults.from_issues_sequence(issues),
     )
 
 
