@@ -32,7 +32,7 @@ class SelectColumnSet:
     def as_tuple(self) -> Tuple[SqlSelectColumn, ...]:
         """Return all select columns as a tuple."""
         return tuple(
-            # Preferred order is to have metrics first.
+            # This order was chosen to match the column sequence data consumers typically prefer.
             self.time_dimension_columns
             + self.identifier_columns
             + self.dimension_columns
