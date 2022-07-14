@@ -26,6 +26,7 @@ from metricflow.model.parsing.yaml_loader import (
 )
 from metricflow.model.validations.validator_helpers import (
     FileContext,
+    ModelValidationException,
     ModelValidationResults,
     ValidationError,
     ValidationIssueType,
@@ -52,6 +53,7 @@ def parse_directory_of_yaml_files_to_model(
     template_mapping: Optional[Dict[str, str]] = None,
     apply_pre_transformations: Optional[bool] = True,
     apply_post_transformations: Optional[bool] = True,
+    raise_issues_as_exceptions: bool = True,
 ) -> ModelBuildResult:
     """Parse files in the given directory to a TMdoModel.
 
@@ -82,13 +84,21 @@ def parse_directory_of_yaml_files_to_model(
     model = build_result.model
     assert model
 
-    if apply_pre_transformations:
-        model = ModelTransformer.pre_validation_transform_model(model)
+    build_issues = build_result.issues
+    try:
+        if apply_pre_transformations:
+            model = ModelTransformer.pre_validation_transform_model(model)
 
-    if apply_post_transformations:
-        model = ModelTransformer.post_validation_transform_model(model)
+        if apply_post_transformations:
+            model = ModelTransformer.post_validation_transform_model(model)
+    except Exception as e:
+        transformation_issue_results = ModelValidationResults(errors=[ValidationError(message=str(e))])
+        build_issues = ModelValidationResults.merge([build_issues, transformation_issue_results])
 
-    return ModelBuildResult(model=model)
+    if raise_issues_as_exceptions and build_issues.has_blocking_issues:
+        raise ModelValidationException(build_issues.all_issues)
+
+    return ModelBuildResult(model=model, issues=build_issues)
 
 
 def parse_yaml_files_to_model(
