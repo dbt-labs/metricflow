@@ -5,7 +5,6 @@ from string import Template
 from typing import Optional, Dict, List, Tuple, Union, Type
 
 from jsonschema import exceptions
-from yaml.scanner import ScannerError
 
 from metricflow.errors.errors import ParsingException
 from metricflow.model.model_transformer import ModelTransformer
@@ -220,38 +219,47 @@ def parse_config_yaml(
             document_type = next(iter(config_document.keys()))
             object_cfg = config_document[document_type]
 
-            if document_type == METRIC_TYPE:
-                metric_validator.validate(config_document[document_type])
-                results.append(metric_class.parse_obj(object_cfg))
-            elif document_type == DATA_SOURCE_TYPE:
-                data_source_validator.validate(config_document[document_type])
-                results.append(data_source_class.parse_obj(object_cfg))
-            elif document_type == MATERIALIZATION_TYPE:
-                materialization_validator.validate(config_document[document_type])
-                results.append(materialization_class.parse_obj(object_cfg))
-            else:
+            try:
+                if document_type == METRIC_TYPE:
+                    metric_validator.validate(config_document[document_type])
+                    results.append(metric_class.parse_obj(object_cfg))
+                elif document_type == DATA_SOURCE_TYPE:
+                    data_source_validator.validate(config_document[document_type])
+                    results.append(data_source_class.parse_obj(object_cfg))
+                elif document_type == MATERIALIZATION_TYPE:
+                    materialization_validator.validate(config_document[document_type])
+                    results.append(materialization_class.parse_obj(object_cfg))
+                else:
+                    issues.append(
+                        ValidationError(
+                            context=FileContext(file_name=ctx.filename, line_number=ctx.start_line),
+                            message=f"Invalid document type: {document_type}. Expected {DOCUMENT_TYPES}.",
+                        )
+                    )
+            # catches exceptions from jsonschema validator
+            except exceptions.ValidationError as e:
+                context = FileContext(file_name=ctx.filename, line_number=ctx.start_line)
                 issues.append(
                     ValidationError(
-                        context=FileContext(file_name=ctx.filename, line_number=ctx.start_line),
-                        message=f"Invalid document type: {document_type}. Expected {DOCUMENT_TYPES}.",
+                        context=context,
+                        message=f"YAML document did not conform to metric spec.\nError: {e}",
                     )
                 )
-    except exceptions.ValidationError as e:
-        context = FileContext(file_name=ctx.filename, line_number=ctx.start_line) if ctx is not None else None
-        issues.append(
-            ValidationError(
-                context=context,
-                message=f"YAML document did not conform to metric spec.\nError: {e}",
-            )
-        )
-    except ScannerError as e:
-        context = FileContext(file_name=ctx.filename, line_number=ctx.start_line) if ctx is not None else None
-        issues.append(ValidationError(context=context, message=str(e)))
-    except ParsingException as e:
-        context = FileContext(file_name=ctx.filename, line_number=ctx.start_line) if ctx is not None else None
-        issues.append(ValidationError(context=context, message=str(e)))
+            # catches exceptions from *.parse_obj calls
+            except ParsingException as e:
+                context = FileContext(file_name=ctx.filename, line_number=ctx.start_line)
+                issues.append(ValidationError(context=context, message=str(e)))
+            # general exception for a given document. Basicially we don't want an exception
+            # on one document to halt checking the rest of the documents
+            except Exception as e:
+                context = FileContext(file_name=ctx.filename, line_number=ctx.start_line)
+                issues.append(ValidationError(context=context, message=str(e)))
+    # If a runtime error occured, we still want this to break things
+    except RuntimeError:
+        raise
+    # Any other error should be handled as an issue
     except Exception as e:
-        context = FileContext(file_name=ctx.filename, line_number=ctx.start_line) if ctx is not None else None
+        context = FileContext(file_name=config_yaml.filepath)
         issues.append(ValidationError(context=context, message=str(e)))
 
     return (results, issues)
