@@ -4,9 +4,9 @@
 -- Metric Time Dimension 'ds'
 -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-02T00:00:00]
 SELECT
-  1 AS bookings
-  , ds
+  ds
   , ds AS metric_time
+  , 1 AS bookings
 FROM (
   -- User Defined SQL Query
   SELECT * FROM ***************************.fct_bookings

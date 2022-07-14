@@ -1,14 +1,14 @@
 -- Constrain Output with WHERE
 SELECT
-  bookings
-  , ds
+  ds
+  , bookings
 FROM (
   -- Read Elements From Data Source 'bookings_source'
   -- Pass Only Elements:
   --   ['bookings', 'ds']
   SELECT
-    1 AS bookings
-    , ds
+    ds
+    , 1 AS bookings
   FROM (
     -- User Defined SQL Query
     SELECT * FROM ***************************.fct_bookings

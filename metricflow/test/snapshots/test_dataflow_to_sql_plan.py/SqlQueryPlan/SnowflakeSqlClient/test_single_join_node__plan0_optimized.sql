@@ -1,15 +1,15 @@
 -- Join Standard Outputs
 SELECT
-  subq_5.bookings AS bookings
+  subq_5.listing AS listing
   , listings_latest_src_10003.country AS listing__country_latest
-  , subq_5.listing AS listing
+  , subq_5.bookings AS bookings
 FROM (
   -- Read Elements From Data Source 'bookings_source'
   -- Pass Only Elements:
   --   ['bookings', 'listing']
   SELECT
-    1 AS bookings
-    , listing_id AS listing
+    listing_id AS listing
+    , 1 AS bookings
   FROM (
     -- User Defined SQL Query
     SELECT * FROM ***************************.fct_bookings

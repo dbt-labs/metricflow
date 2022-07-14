@@ -1,16 +1,7 @@
 -- Read Elements From Data Source 'bookings_source'
 -- Metric Time Dimension 'ds'
 SELECT
-  1 AS bookings
-  , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
-  , booking_value
-  , booking_value AS max_booking_value
-  , booking_value AS min_booking_value
-  , guest_id AS bookers
-  , booking_value AS average_booking_value
-  , is_instant
-  , is_instant AS create_a_cycle_in_the_join_graph__is_instant
-  , ds
+  ds
   , DATE_TRUNC('week', ds) AS ds__week
   , DATE_TRUNC('month', ds) AS ds__month
   , DATE_TRUNC('quarter', ds) AS ds__quarter
@@ -52,6 +43,15 @@ SELECT
   , listing_id AS create_a_cycle_in_the_join_graph__listing
   , guest_id AS create_a_cycle_in_the_join_graph__guest
   , host_id AS create_a_cycle_in_the_join_graph__host
+  , is_instant
+  , is_instant AS create_a_cycle_in_the_join_graph__is_instant
+  , 1 AS bookings
+  , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
+  , booking_value
+  , booking_value AS max_booking_value
+  , booking_value AS min_booking_value
+  , guest_id AS bookers
+  , booking_value AS average_booking_value
 FROM (
   -- User Defined SQL Query
   SELECT * FROM ***************************.fct_bookings

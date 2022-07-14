@@ -1,29 +1,29 @@
 -- Compute Metrics via Expressions
 SELECT
   CAST(subq_5.bookings AS FLOAT64) / CAST(NULLIF(subq_5.bookers, 0) AS FLOAT64) AS bookings_per_booker
-  , subq_5.listing__country_latest
   , subq_5.listing
+  , subq_5.listing__country_latest
 FROM (
   -- Aggregate Measures
   SELECT
-    SUM(subq_4.bookings) AS bookings
-    , COUNT(DISTINCT subq_4.bookers) AS bookers
+    subq_4.listing
     , subq_4.listing__country_latest
-    , subq_4.listing
+    , SUM(subq_4.bookings) AS bookings
+    , COUNT(DISTINCT subq_4.bookers) AS bookers
   FROM (
     -- Join Standard Outputs
     SELECT
-      subq_1.bookings AS bookings
-      , subq_1.bookers AS bookers
+      subq_1.listing AS listing
       , subq_3.country_latest AS listing__country_latest
-      , subq_1.listing AS listing
+      , subq_1.bookings AS bookings
+      , subq_1.bookers AS bookers
     FROM (
       -- Pass Only Elements:
       --   ['bookings', 'bookers', 'listing']
       SELECT
-        subq_0.bookings
+        subq_0.listing
+        , subq_0.bookings
         , subq_0.bookers
-        , subq_0.listing
       FROM (
         -- Read Elements From Data Source 'bookings_source'
         SELECT
@@ -84,8 +84,8 @@ FROM (
       -- Pass Only Elements:
       --   ['listing', 'country_latest']
       SELECT
-        subq_2.country_latest
-        , subq_2.listing
+        subq_2.listing
+        , subq_2.country_latest
       FROM (
         -- Read Elements From Data Source 'listings_latest'
         SELECT
@@ -128,6 +128,6 @@ FROM (
       subq_1.listing = subq_3.listing
   ) subq_4
   GROUP BY
-    subq_4.listing__country_latest
-    , subq_4.listing
+    subq_4.listing
+    , subq_4.listing__country_latest
 ) subq_5

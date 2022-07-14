@@ -10,8 +10,8 @@ FROM (
   -- Pass Only Elements:
   --   ['count_dogs', 'metric_time']
   SELECT
-    1 AS count_dogs
-    , ds AS metric_time
+    ds AS metric_time
+    , 1 AS count_dogs
   FROM (
     SELECT * FROM ***************************.fct_animals
   ) animals_src_0

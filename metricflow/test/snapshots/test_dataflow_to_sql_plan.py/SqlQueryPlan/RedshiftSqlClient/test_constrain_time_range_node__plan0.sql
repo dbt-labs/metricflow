@@ -1,20 +1,20 @@
 -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-02T00:00:00]
 SELECT
-  subq_2.bookings
-  , subq_2.ds
+  subq_2.ds
   , subq_2.metric_time
+  , subq_2.bookings
 FROM (
   -- Metric Time Dimension 'ds'
   SELECT
-    subq_1.bookings
-    , subq_1.ds
+    subq_1.ds
     , subq_1.ds AS metric_time
+    , subq_1.bookings
   FROM (
     -- Pass Only Elements:
     --   ['bookings', 'ds']
     SELECT
-      subq_0.bookings
-      , subq_0.ds
+      subq_0.ds
+      , subq_0.bookings
     FROM (
       -- Read Elements From Data Source 'bookings_source'
       SELECT

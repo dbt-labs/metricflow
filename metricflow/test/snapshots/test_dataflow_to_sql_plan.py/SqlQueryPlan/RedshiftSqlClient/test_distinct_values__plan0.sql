@@ -14,39 +14,30 @@ FROM (
     FROM (
       -- Aggregate Measures
       SELECT
-        SUM(subq_7.bookings) AS bookings
-        , subq_7.listing__country_latest
+        subq_7.listing__country_latest
+        , SUM(subq_7.bookings) AS bookings
       FROM (
         -- Pass Only Elements:
         --   ['bookings', 'listing__country_latest']
         SELECT
-          subq_6.bookings
-          , subq_6.listing__country_latest
+          subq_6.listing__country_latest
+          , subq_6.bookings
         FROM (
           -- Join Standard Outputs
           SELECT
-            subq_2.bookings AS bookings
+            subq_2.listing AS listing
             , subq_5.country_latest AS listing__country_latest
-            , subq_2.listing AS listing
+            , subq_2.bookings AS bookings
           FROM (
             -- Pass Only Elements:
             --   ['bookings', 'listing']
             SELECT
-              subq_1.bookings
-              , subq_1.listing
+              subq_1.listing
+              , subq_1.bookings
             FROM (
               -- Metric Time Dimension 'ds'
               SELECT
-                subq_0.bookings
-                , subq_0.instant_bookings
-                , subq_0.booking_value
-                , subq_0.max_booking_value
-                , subq_0.min_booking_value
-                , subq_0.bookers
-                , subq_0.average_booking_value
-                , subq_0.is_instant
-                , subq_0.create_a_cycle_in_the_join_graph__is_instant
-                , subq_0.ds
+                subq_0.ds
                 , subq_0.ds__week
                 , subq_0.ds__month
                 , subq_0.ds__quarter
@@ -88,6 +79,15 @@ FROM (
                 , subq_0.create_a_cycle_in_the_join_graph__listing
                 , subq_0.create_a_cycle_in_the_join_graph__guest
                 , subq_0.create_a_cycle_in_the_join_graph__host
+                , subq_0.is_instant
+                , subq_0.create_a_cycle_in_the_join_graph__is_instant
+                , subq_0.bookings
+                , subq_0.instant_bookings
+                , subq_0.booking_value
+                , subq_0.max_booking_value
+                , subq_0.min_booking_value
+                , subq_0.bookers
+                , subq_0.average_booking_value
               FROM (
                 -- Read Elements From Data Source 'bookings_source'
                 SELECT
@@ -149,21 +149,12 @@ FROM (
             -- Pass Only Elements:
             --   ['listing', 'country_latest']
             SELECT
-              subq_4.country_latest
-              , subq_4.listing
+              subq_4.listing
+              , subq_4.country_latest
             FROM (
               -- Metric Time Dimension 'ds'
               SELECT
-                subq_3.listings
-                , subq_3.largest_listing
-                , subq_3.smallest_listing
-                , subq_3.country_latest
-                , subq_3.is_lux_latest
-                , subq_3.capacity_latest
-                , subq_3.listing__country_latest
-                , subq_3.listing__is_lux_latest
-                , subq_3.listing__capacity_latest
-                , subq_3.ds
+                subq_3.ds
                 , subq_3.ds__week
                 , subq_3.ds__month
                 , subq_3.ds__quarter
@@ -191,6 +182,15 @@ FROM (
                 , subq_3.listing
                 , subq_3.user
                 , subq_3.listing__user
+                , subq_3.country_latest
+                , subq_3.is_lux_latest
+                , subq_3.capacity_latest
+                , subq_3.listing__country_latest
+                , subq_3.listing__is_lux_latest
+                , subq_3.listing__capacity_latest
+                , subq_3.listings
+                , subq_3.largest_listing
+                , subq_3.smallest_listing
               FROM (
                 -- Read Elements From Data Source 'listings_latest'
                 SELECT

@@ -20,8 +20,8 @@
         <!--       -- Pass Only Elements:                                        -->
         <!--       --   ['bookings', 'is_instant']                               -->
         <!--       SELECT                                                        -->
-        <!--         1 AS bookings                                               -->
-        <!--         , is_instant                                                -->
+        <!--         is_instant                                                  -->
+        <!--         , 1 AS bookings                                             -->
         <!--       FROM (                                                        -->
         <!--         -- User Defined SQL Query                                   -->
         <!--         SELECT * FROM ***************************.fct_bookings      -->

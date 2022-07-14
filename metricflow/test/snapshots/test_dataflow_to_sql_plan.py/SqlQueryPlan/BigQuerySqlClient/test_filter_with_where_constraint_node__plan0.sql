@@ -1,13 +1,13 @@
 -- Constrain Output with WHERE
 SELECT
-  subq_1.bookings
-  , subq_1.ds
+  subq_1.ds
+  , subq_1.bookings
 FROM (
   -- Pass Only Elements:
   --   ['bookings', 'ds']
   SELECT
-    subq_0.bookings
-    , subq_0.ds
+    subq_0.ds
+    , subq_0.bookings
   FROM (
     -- Read Elements From Data Source 'bookings_source'
     SELECT

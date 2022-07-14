@@ -1,15 +1,6 @@
 -- Metric Time Dimension 'ds'
 SELECT
-  subq_0.bookings
-  , subq_0.instant_bookings
-  , subq_0.booking_value
-  , subq_0.max_booking_value
-  , subq_0.min_booking_value
-  , subq_0.bookers
-  , subq_0.average_booking_value
-  , subq_0.is_instant
-  , subq_0.create_a_cycle_in_the_join_graph__is_instant
-  , subq_0.ds
+  subq_0.ds
   , subq_0.ds__week
   , subq_0.ds__month
   , subq_0.ds__quarter
@@ -51,6 +42,15 @@ SELECT
   , subq_0.create_a_cycle_in_the_join_graph__listing
   , subq_0.create_a_cycle_in_the_join_graph__guest
   , subq_0.create_a_cycle_in_the_join_graph__host
+  , subq_0.is_instant
+  , subq_0.create_a_cycle_in_the_join_graph__is_instant
+  , subq_0.bookings
+  , subq_0.instant_bookings
+  , subq_0.booking_value
+  , subq_0.max_booking_value
+  , subq_0.min_booking_value
+  , subq_0.bookers
+  , subq_0.average_booking_value
 FROM (
   -- Read Elements From Data Source 'bookings_source'
   SELECT

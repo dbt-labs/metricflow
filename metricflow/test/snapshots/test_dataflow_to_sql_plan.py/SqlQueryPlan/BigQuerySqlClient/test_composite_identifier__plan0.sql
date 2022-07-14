@@ -6,23 +6,20 @@ SELECT
 FROM (
   -- Aggregate Measures
   SELECT
-    SUM(subq_2.messages) AS messages
-    , subq_2.user_team___team_id
+    subq_2.user_team___team_id
     , subq_2.user_team___user_id
+    , SUM(subq_2.messages) AS messages
   FROM (
     -- Pass Only Elements:
     --   ['messages', 'user_team']
     SELECT
-      subq_1.messages
-      , subq_1.user_team___team_id
+      subq_1.user_team___team_id
       , subq_1.user_team___user_id
+      , subq_1.messages
     FROM (
       -- Metric Time Dimension 'ds'
       SELECT
-        subq_0.messages
-        , subq_0.team_id
-        , subq_0.user_id__team_id
-        , subq_0.ds
+        subq_0.ds
         , subq_0.ds__week
         , subq_0.ds__month
         , subq_0.ds__quarter
@@ -42,6 +39,9 @@ FROM (
         , subq_0.user_team___user_id
         , subq_0.user_id__user_team___team_id
         , subq_0.user_id__user_team___user_id
+        , subq_0.team_id
+        , subq_0.user_id__team_id
+        , subq_0.messages
       FROM (
         -- Read Elements From Data Source 'messages_source'
         SELECT

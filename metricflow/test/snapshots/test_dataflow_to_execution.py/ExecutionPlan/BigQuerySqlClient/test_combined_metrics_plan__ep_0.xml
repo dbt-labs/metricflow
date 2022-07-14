@@ -15,50 +15,50 @@
         <!--     -- Compute Metrics via Expressions                                                    -->
         <!--     SELECT                                                                                -->
         <!--       SUM(bookings) AS bookings                                                           -->
-        <!--       , is_instant                                                                        -->
         <!--       , ds                                                                                -->
+        <!--       , is_instant                                                                        -->
         <!--     FROM (                                                                                -->
         <!--       -- Read Elements From Data Source 'bookings_source'                                 -->
         <!--       -- Metric Time Dimension 'ds'                                                       -->
         <!--       -- Pass Only Elements:                                                              -->
         <!--       --   ['bookings', 'is_instant', 'ds']                                               -->
         <!--       SELECT                                                                              -->
-        <!--         1 AS bookings                                                                     -->
+        <!--         ds                                                                                -->
         <!--         , is_instant                                                                      -->
-        <!--         , ds                                                                              -->
+        <!--         , 1 AS bookings                                                                   -->
         <!--       FROM (                                                                              -->
         <!--         -- User Defined SQL Query                                                         -->
         <!--         SELECT * FROM ***************************.fct_bookings                            -->
         <!--       ) bookings_source_src_10000                                                         -->
         <!--     ) subq_2                                                                              -->
         <!--     GROUP BY                                                                              -->
-        <!--       is_instant                                                                          -->
-        <!--       , ds                                                                                -->
+        <!--       ds                                                                                  -->
+        <!--       , is_instant                                                                        -->
         <!--   ) subq_12                                                                               -->
         <!--   FULL OUTER JOIN (                                                                       -->
         <!--     -- Aggregate Measures                                                                 -->
         <!--     -- Compute Metrics via Expressions                                                    -->
         <!--     SELECT                                                                                -->
         <!--       SUM(instant_bookings) AS instant_bookings                                           -->
-        <!--       , is_instant                                                                        -->
         <!--       , ds                                                                                -->
+        <!--       , is_instant                                                                        -->
         <!--     FROM (                                                                                -->
         <!--       -- Read Elements From Data Source 'bookings_source'                                 -->
         <!--       -- Metric Time Dimension 'ds'                                                       -->
         <!--       -- Pass Only Elements:                                                              -->
         <!--       --   ['instant_bookings', 'is_instant', 'ds']                                       -->
         <!--       SELECT                                                                              -->
-        <!--         CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings                        -->
+        <!--         ds                                                                                -->
         <!--         , is_instant                                                                      -->
-        <!--         , ds                                                                              -->
+        <!--         , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings                      -->
         <!--       FROM (                                                                              -->
         <!--         -- User Defined SQL Query                                                         -->
         <!--         SELECT * FROM ***************************.fct_bookings                            -->
         <!--       ) bookings_source_src_10000                                                         -->
         <!--     ) subq_6                                                                              -->
         <!--     GROUP BY                                                                              -->
-        <!--       is_instant                                                                          -->
-        <!--       , ds                                                                                -->
+        <!--       ds                                                                                  -->
+        <!--       , is_instant                                                                        -->
         <!--   ) subq_13                                                                               -->
         <!--   ON                                                                                      -->
         <!--     (                                                                                     -->
@@ -75,15 +75,15 @@
         <!--     -- Compute Metrics via Expressions                                                    -->
         <!--     SELECT                                                                                -->
         <!--       SUM(booking_value) AS booking_value                                                 -->
-        <!--       , is_instant                                                                        -->
         <!--       , ds                                                                                -->
+        <!--       , is_instant                                                                        -->
         <!--     FROM (                                                                                -->
         <!--       -- User Defined SQL Query                                                           -->
         <!--       SELECT * FROM ***************************.fct_bookings                              -->
         <!--     ) bookings_source_src_10000                                                           -->
         <!--     GROUP BY                                                                              -->
-        <!--       is_instant                                                                          -->
-        <!--       , ds                                                                                -->
+        <!--       ds                                                                                  -->
+        <!--       , is_instant                                                                        -->
         <!--   ) subq_14                                                                               -->
         <!--   ON                                                                                      -->
         <!--     (                                                                                     -->

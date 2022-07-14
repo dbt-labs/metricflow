@@ -8,62 +8,62 @@
         <!--    'column_alias': 'bookings_per_booker'}                -->
         <!-- col1 =                                                   -->
         <!--   {'class': 'SqlSelectColumn',                           -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_15),  -->
-        <!--    'column_alias': 'listing__country_latest'}            -->
-        <!-- col2 =                                                   -->
-        <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_16),  -->
         <!--    'column_alias': 'listing'}                            -->
+        <!-- col2 =                                                   -->
+        <!--   {'class': 'SqlSelectColumn',                           -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_15),  -->
+        <!--    'column_alias': 'listing__country_latest'}            -->
         <!-- from_source = SqlSelectStatementNode(node_id=ss_3) -->
         <!-- where = None -->
         <SqlSelectStatementNode>
             <!-- description = Aggregate Measures -->
             <!-- node_id = ss_3 -->
-            <!-- col0 =                                                              -->
+            <!-- col0 =                                                   -->
+            <!--   {'class': 'SqlSelectColumn',                           -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_14),  -->
+            <!--    'column_alias': 'listing'}                            -->
+            <!-- col1 =                                                   -->
+            <!--   {'class': 'SqlSelectColumn',                           -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_13),  -->
+            <!--    'column_alias': 'listing__country_latest'}            -->
+            <!-- col2 =                                                              -->
             <!--   {'class': 'SqlSelectColumn',                                      -->
             <!--    'expr': SqlFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
             <!--    'column_alias': 'bookings'}                                      -->
-            <!-- col1 =                                                                         -->
+            <!-- col3 =                                                                         -->
             <!--   {'class': 'SqlSelectColumn',                                                 -->
             <!--    'expr': SqlFunctionExpression(node_id=fnc_1, sql_function=COUNT_DISTINCT),  -->
             <!--    'column_alias': 'bookers'}                                                  -->
-            <!-- col2 =                                                   -->
-            <!--   {'class': 'SqlSelectColumn',                           -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_13),  -->
-            <!--    'column_alias': 'listing__country_latest'}            -->
-            <!-- col3 =                                                   -->
-            <!--   {'class': 'SqlSelectColumn',                           -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_14),  -->
-            <!--    'column_alias': 'listing'}                            -->
             <!-- from_source = SqlSelectStatementNode(node_id=ss_2) -->
             <!-- group_by0 =                                              -->
             <!--   {'class': 'SqlSelectColumn',                           -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_13),  -->
-            <!--    'column_alias': 'listing__country_latest'}            -->
-            <!-- group_by1 =                                              -->
-            <!--   {'class': 'SqlSelectColumn',                           -->
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_14),  -->
             <!--    'column_alias': 'listing'}                            -->
+            <!-- group_by1 =                                              -->
+            <!--   {'class': 'SqlSelectColumn',                           -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_13),  -->
+            <!--    'column_alias': 'listing__country_latest'}            -->
             <!-- where = None -->
             <SqlSelectStatementNode>
                 <!-- description = Join Standard Outputs -->
                 <!-- node_id = ss_2 -->
                 <!-- col0 =                                                  -->
                 <!--   {'class': 'SqlSelectColumn',                          -->
-                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_7),  -->
-                <!--    'column_alias': 'bookings'}                          -->
-                <!-- col1 =                                                  -->
-                <!--   {'class': 'SqlSelectColumn',                          -->
-                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_8),  -->
-                <!--    'column_alias': 'bookers'}                           -->
-                <!-- col2 =                                                   -->
+                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_9),  -->
+                <!--    'column_alias': 'listing'}                           -->
+                <!-- col1 =                                                   -->
                 <!--   {'class': 'SqlSelectColumn',                           -->
                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10),  -->
                 <!--    'column_alias': 'listing__country_latest'}            -->
+                <!-- col2 =                                                  -->
+                <!--   {'class': 'SqlSelectColumn',                          -->
+                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_7),  -->
+                <!--    'column_alias': 'bookings'}                          -->
                 <!-- col3 =                                                  -->
                 <!--   {'class': 'SqlSelectColumn',                          -->
-                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_9),  -->
-                <!--    'column_alias': 'listing'}                           -->
+                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_8),  -->
+                <!--    'column_alias': 'bookers'}                           -->
                 <!-- from_source = SqlSelectStatementNode(node_id=ss_0) -->
                 <!-- join_0 =                                                    -->
                 <!--   {'class': 'SqlJoinDescription',                           -->
@@ -79,16 +79,16 @@
                     <!-- node_id = ss_0 -->
                     <!-- col0 =                                                  -->
                     <!--   {'class': 'SqlSelectColumn',                          -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_2),  -->
+                    <!--    'column_alias': 'listing'}                           -->
+                    <!-- col1 =                                                  -->
+                    <!--   {'class': 'SqlSelectColumn',                          -->
                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_0),  -->
                     <!--    'column_alias': 'bookings'}                          -->
-                    <!-- col1 =                                                  -->
+                    <!-- col2 =                                                  -->
                     <!--   {'class': 'SqlSelectColumn',                          -->
                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_1),  -->
                     <!--    'column_alias': 'bookers'}                           -->
-                    <!-- col2 =                                                  -->
-                    <!--   {'class': 'SqlSelectColumn',                          -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_2),  -->
-                    <!--    'column_alias': 'listing'}                           -->
                     <!-- from_source = SqlSelectStatementNode(node_id=ss_10000) -->
                     <!-- where = None -->
                     <SqlSelectStatementNode>
@@ -297,12 +297,12 @@
                     <!-- node_id = ss_1 -->
                     <!-- col0 =                                                  -->
                     <!--   {'class': 'SqlSelectColumn',                          -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_3),  -->
-                    <!--    'column_alias': 'country_latest'}                    -->
-                    <!-- col1 =                                                  -->
-                    <!--   {'class': 'SqlSelectColumn',                          -->
                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_4),  -->
                     <!--    'column_alias': 'listing'}                           -->
+                    <!-- col1 =                                                  -->
+                    <!--   {'class': 'SqlSelectColumn',                          -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_3),  -->
+                    <!--    'column_alias': 'country_latest'}                    -->
                     <!-- from_source = SqlSelectStatementNode(node_id=ss_10003) -->
                     <!-- where = None -->
                     <SqlSelectStatementNode>

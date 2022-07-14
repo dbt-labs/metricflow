@@ -1,45 +1,42 @@
 -- Compute Metrics via Expressions
 SELECT
   subq_7.messages
-  , subq_7.user_team__country
   , subq_7.user_team___team_id
   , subq_7.user_team___user_id
+  , subq_7.user_team__country
 FROM (
   -- Aggregate Measures
   SELECT
-    SUM(subq_6.messages) AS messages
-    , subq_6.user_team__country
-    , subq_6.user_team___team_id
+    subq_6.user_team___team_id
     , subq_6.user_team___user_id
+    , subq_6.user_team__country
+    , SUM(subq_6.messages) AS messages
   FROM (
     -- Pass Only Elements:
     --   ['messages', 'user_team__country', 'user_team']
     SELECT
-      subq_5.messages
-      , subq_5.user_team__country
-      , subq_5.user_team___team_id
+      subq_5.user_team___team_id
       , subq_5.user_team___user_id
+      , subq_5.user_team__country
+      , subq_5.messages
     FROM (
       -- Join Standard Outputs
       SELECT
-        subq_2.messages AS messages
-        , subq_4.country AS user_team__country
-        , subq_2.user_team___team_id AS user_team___team_id
+        subq_2.user_team___team_id AS user_team___team_id
         , subq_2.user_team___user_id AS user_team___user_id
+        , subq_4.country AS user_team__country
+        , subq_2.messages AS messages
       FROM (
         -- Pass Only Elements:
         --   ['messages', 'user_team', 'user_team']
         SELECT
-          subq_1.messages
-          , subq_1.user_team___team_id
+          subq_1.user_team___team_id
           , subq_1.user_team___user_id
+          , subq_1.messages
         FROM (
           -- Metric Time Dimension 'ds'
           SELECT
-            subq_0.messages
-            , subq_0.team_id
-            , subq_0.user_id__team_id
-            , subq_0.ds
+            subq_0.ds
             , subq_0.ds__week
             , subq_0.ds__month
             , subq_0.ds__quarter
@@ -59,6 +56,9 @@ FROM (
             , subq_0.user_team___user_id
             , subq_0.user_id__user_team___team_id
             , subq_0.user_id__user_team___user_id
+            , subq_0.team_id
+            , subq_0.user_id__team_id
+            , subq_0.messages
           FROM (
             -- Read Elements From Data Source 'messages_source'
             SELECT
@@ -88,9 +88,9 @@ FROM (
         -- Pass Only Elements:
         --   ['user_team', 'country']
         SELECT
-          subq_3.country
-          , subq_3.user_team___team_id
+          subq_3.user_team___team_id
           , subq_3.user_team___user_id
+          , subq_3.country
         FROM (
           -- Read Elements From Data Source 'users_source'
           SELECT
@@ -149,7 +149,7 @@ FROM (
     ) subq_5
   ) subq_6
   GROUP BY
-    subq_6.user_team__country
-    , subq_6.user_team___team_id
+    subq_6.user_team___team_id
     , subq_6.user_team___user_id
+    , subq_6.user_team__country
 ) subq_7

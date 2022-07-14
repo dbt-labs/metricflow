@@ -4,26 +4,26 @@
 -- Compute Metrics via Expressions
 SELECT
   CAST(subq_28.bookings AS DOUBLE PRECISION) / CAST(NULLIF(subq_37.views, 0) AS DOUBLE PRECISION) AS bookings_per_view
-  , subq_28.listing__country_latest AS listing__country_latest
   , subq_28.ds AS ds
+  , subq_28.listing__country_latest AS listing__country_latest
 FROM (
   -- Join Standard Outputs
   -- Pass Only Elements:
   --   ['bookings', 'listing__country_latest', 'ds']
   -- Aggregate Measures
   SELECT
-    SUM(subq_22.bookings) AS bookings
+    subq_22.ds AS ds
     , listings_latest_src_10003.country AS listing__country_latest
-    , subq_22.ds AS ds
+    , SUM(subq_22.bookings) AS bookings
   FROM (
     -- Read Elements From Data Source 'bookings_source'
     -- Metric Time Dimension 'ds'
     -- Pass Only Elements:
     --   ['bookings', 'ds', 'listing']
     SELECT
-      1 AS bookings
-      , ds
+      ds
       , listing_id AS listing
+      , 1 AS bookings
     FROM (
       -- User Defined SQL Query
       SELECT * FROM ***************************.fct_bookings
@@ -34,8 +34,8 @@ FROM (
   ON
     subq_22.listing = listings_latest_src_10003.listing_id
   GROUP BY
-    listings_latest_src_10003.country
-    , subq_22.ds
+    subq_22.ds
+    , listings_latest_src_10003.country
 ) subq_28
 INNER JOIN (
   -- Join Standard Outputs
@@ -43,18 +43,18 @@ INNER JOIN (
   --   ['views', 'listing__country_latest', 'ds']
   -- Aggregate Measures
   SELECT
-    SUM(subq_31.views) AS views
+    subq_31.ds AS ds
     , listings_latest_src_10003.country AS listing__country_latest
-    , subq_31.ds AS ds
+    , SUM(subq_31.views) AS views
   FROM (
     -- Read Elements From Data Source 'views_source'
     -- Metric Time Dimension 'ds'
     -- Pass Only Elements:
     --   ['views', 'ds', 'listing']
     SELECT
-      1 AS views
-      , ds
+      ds
       , listing_id AS listing
+      , 1 AS views
     FROM (
       -- User Defined SQL Query
       SELECT user_id, listing_id, ds, ds_partitioned FROM ***************************.fct_views
@@ -65,8 +65,8 @@ INNER JOIN (
   ON
     subq_31.listing = listings_latest_src_10003.listing_id
   GROUP BY
-    listings_latest_src_10003.country
-    , subq_31.ds
+    subq_31.ds
+    , listings_latest_src_10003.country
 ) subq_37
 ON
   (

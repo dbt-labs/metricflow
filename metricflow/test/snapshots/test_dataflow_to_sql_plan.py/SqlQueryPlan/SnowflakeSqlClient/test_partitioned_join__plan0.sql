@@ -5,36 +5,33 @@ SELECT
 FROM (
   -- Aggregate Measures
   SELECT
-    SUM(subq_6.identity_verifications) AS identity_verifications
-    , subq_6.user__home_state
+    subq_6.user__home_state
+    , SUM(subq_6.identity_verifications) AS identity_verifications
   FROM (
     -- Pass Only Elements:
     --   ['identity_verifications', 'user__home_state']
     SELECT
-      subq_5.identity_verifications
-      , subq_5.user__home_state
+      subq_5.user__home_state
+      , subq_5.identity_verifications
     FROM (
       -- Join Standard Outputs
       SELECT
-        subq_2.identity_verifications AS identity_verifications
-        , subq_4.home_state AS user__home_state
-        , subq_2.ds_partitioned AS ds_partitioned
+        subq_2.ds_partitioned AS ds_partitioned
         , subq_4.ds_partitioned AS user__ds_partitioned
         , subq_2.user AS user
+        , subq_4.home_state AS user__home_state
+        , subq_2.identity_verifications AS identity_verifications
       FROM (
         -- Pass Only Elements:
         --   ['identity_verifications', 'user', 'ds_partitioned']
         SELECT
-          subq_1.identity_verifications
-          , subq_1.ds_partitioned
+          subq_1.ds_partitioned
           , subq_1.user
+          , subq_1.identity_verifications
         FROM (
           -- Metric Time Dimension 'ds'
           SELECT
-            subq_0.identity_verifications
-            , subq_0.verification_type
-            , subq_0.verification__verification_type
-            , subq_0.ds
+            subq_0.ds
             , subq_0.ds__week
             , subq_0.ds__month
             , subq_0.ds__quarter
@@ -62,6 +59,9 @@ FROM (
             , subq_0.verification
             , subq_0.user
             , subq_0.verification__user
+            , subq_0.verification_type
+            , subq_0.verification__verification_type
+            , subq_0.identity_verifications
           FROM (
             -- Read Elements From Data Source 'id_verifications'
             SELECT
@@ -99,9 +99,9 @@ FROM (
         -- Pass Only Elements:
         --   ['user', 'ds_partitioned', 'home_state']
         SELECT
-          subq_3.home_state
-          , subq_3.ds_partitioned
+          subq_3.ds_partitioned
           , subq_3.user
+          , subq_3.home_state
         FROM (
           -- Read Elements From Data Source 'users_ds_source'
           SELECT
