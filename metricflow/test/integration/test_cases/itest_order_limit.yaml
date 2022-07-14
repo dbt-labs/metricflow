@@ -9,8 +9,8 @@ integration_test:
   check_order: true
   check_query: |
     SELECT
-      SUM(booking_value) AS booking_value
-      , ds AS metric_time
+      ds AS metric_time
+      , SUM(booking_value) AS booking_value
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds
@@ -27,8 +27,8 @@ integration_test:
   check_order: true
   check_query: |
     SELECT
-      SUM(booking_value) AS booking_value
-      , ds AS metric_time
+      ds AS metric_time
+      , SUM(booking_value) AS booking_value
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds
@@ -46,8 +46,8 @@ integration_test:
   check_order: true
   check_query: |
     SELECT
-      SUM(booking_value) AS booking_value
-      , ds AS metric_time
+      ds AS metric_time
+      , SUM(booking_value) AS booking_value
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds
@@ -66,8 +66,8 @@ integration_test:
   check_order: true
   check_query: |
     SELECT
-      SUM(booking_value) AS booking_value
-      , {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS metric_time__month
+      {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS metric_time__month
+      , SUM(booking_value) AS booking_value
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       metric_time__month
