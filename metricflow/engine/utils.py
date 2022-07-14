@@ -20,9 +20,7 @@ def build_user_configured_model_from_config(handler: YamlFileHandler) -> UserCon
     """Given a yaml file, create a UserConfiguredModel."""
     models_path = path_to_models(handler=handler)
     try:
-        model = parse_directory_of_yaml_files_to_model(models_path).model
-        assert model is not None
-        return model
+        return parse_directory_of_yaml_files_to_model(models_path).model
     except Exception as e:
         raise ModelCreationException from e
 

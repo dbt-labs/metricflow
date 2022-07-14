@@ -43,7 +43,7 @@ DOCUMENT_TYPES = [METRIC_TYPE, DATA_SOURCE_TYPE, MATERIALIZATION_TYPE]
 
 @dataclass(frozen=True)
 class ModelBuildResult:  # noqa: D
-    model: Optional[UserConfiguredModel] = None
+    model: UserConfiguredModel
     # Issues found in the model.
     issues: ModelValidationResults = ModelValidationResults()
 
