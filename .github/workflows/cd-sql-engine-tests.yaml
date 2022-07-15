@@ -107,6 +107,55 @@ jobs:
           MF_SQL_ENGINE_URL: ${{ secrets.MF_BIGQUERY_URL }}
           MF_SQL_ENGINE_PASSWORD: ${{ secrets.MF_BIGQUERY_PWD }}
 
+  postgres-tests:
+    name: PostgreSQL Tests
+    if: ${{ github.event.action != 'labeled' || github.event.label.name == 'run_mf_sql_engine_tests' }}
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: metricflow
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Check-out the repo
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ${{ env.pythonLocation }}
+            ~/.cache/pypoetry
+          key: ${{ env.pythonLocation }}-${{ hashFiles('metricflow/poetry.lock') }}
+
+      - name: Install Poetry
+        run: pip install poetry && poetry config virtualenvs.create false
+
+      - name: Install Deps
+        run: cd metricflow && poetry install
+
+      - name: Run MetricFlow unit tests with PostgreSQL configs
+        run: pytest metricflow/test/
+        env:
+          MF_SQL_ENGINE_URL: postgresql://postgres@localhost:5432/metricflow
+          MF_SQL_ENGINE_PASSWORD: postgres
+
+
   slack-failure:
     environment: DW_INTEGRATION_TESTS
     needs: [ snowflake-tests, redshift-tests, bigquery-tests]
