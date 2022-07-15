@@ -245,7 +245,7 @@ data_source_schema = {
         "constraint": {"$ref": "constraint_schema"},
     },
     "additionalProperties": False,
-    "required": ["name", "mutability"],
+    "required": ["name"],
 }
 
 derived_group_by_element_schema = {
