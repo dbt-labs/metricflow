@@ -285,6 +285,12 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
     default=2,
     help="Choose the number of decimal places to round for the numerical values",
 )
+@click.option(
+    "--hide-sql-descriptions",
+    is_flag=True,
+    default=False,
+    help="Remove inline descriptions from displayed SQL",
+)
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
@@ -302,6 +308,7 @@ def query(
     explain: bool = False,
     display_plans: bool = False,
     decimals: int = DEFAULT_RESULT_DECIMAL_PLACES,
+    hide_sql_descriptions: bool = False,
 ) -> None:
     """Create a new query with MetricFlow and assembles a MetricFlowQueryResult."""
     start = time.time()
@@ -331,7 +338,11 @@ def query(
 
     if explain:
         assert explain_result
-        sql = explain_result.rendered_sql.sql_query
+        sql = (
+            explain_result.rendered_sql_without_descriptions.sql_query
+            if hide_sql_descriptions
+            else explain_result.rendered_sql.sql_query
+        )
         click.echo("🔎 Generated Dataflow Plan + SQL (remove --explain to see data):")
         click.echo(
             textwrap.indent(
