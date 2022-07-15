@@ -31,7 +31,7 @@ class RuleDefaults:
         is the name of the table this column belongs to.
         """
         col_lower = col.column_name.lower()
-        table_lower = col.table_name.lower()
+        table_lower = col.table_name.lower().rstrip("s")
 
         if col_lower == "id":
             return True
