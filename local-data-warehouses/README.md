@@ -11,7 +11,7 @@ We assume that you have SQLite installed in your environment. By default, tests 
 
 We assume that you have PostgreSQL and Docker installed in your environment.
 
-In a separate terminal window, run PostgreSQL in the background.
+In a separate terminal window, run PostgreSQL in the background. Note - you MUST have Docker running on localhost in order for the PostgreSQL container to spin up.
 
 ```sh
 make postgres
