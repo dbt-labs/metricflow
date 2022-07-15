@@ -37,12 +37,17 @@ class InferenceSignalNode(ABC):
     on the property that sibling nodes are mutually exclusive in the hierarchy.
     """
 
-    def __init__(self, parent: Optional[InferenceSignalNode]) -> None:  # noqa: D
+    def __init__(self, parent: Optional[InferenceSignalNode], name: str) -> None:  # noqa: D
+        self.name = name
+
         self.parent = parent
         self.children: List[InferenceSignalNode] = []
 
         if parent is not None:
             parent.children.append(self)
+
+    def __str__(self) -> str:  # noqa: D
+        return f"InferenceSignalNode(name={self.name})"
 
     @property
     def ancestors(self) -> List[InferenceSignalNode]:
@@ -61,15 +66,15 @@ class InferenceSignalNode(ABC):
 # hardcoding it. Having some magic that dynamically assigns attributes could work, but then
 # we lose IDE autocompletion and static checking
 class _TreeNodes:  # noqa: D
-    root = InferenceSignalNode(None)
-    id = InferenceSignalNode(root)
-    foreign_id = InferenceSignalNode(id)
-    unique_id = InferenceSignalNode(id)
-    primary_id = InferenceSignalNode(unique_id)
-    dimension = InferenceSignalNode(root)
-    time_dimension = InferenceSignalNode(dimension)
-    categorical_dimension = InferenceSignalNode(dimension)
-    measure = InferenceSignalNode(root)
+    root = InferenceSignalNode(None, "UNKNOWN")
+    id = InferenceSignalNode(root, "IDENTIFIER")
+    foreign_id = InferenceSignalNode(id, "FOREIGN_IDENTIFIER")
+    unique_id = InferenceSignalNode(id, "UNIQUE_IDENTIFIER")
+    primary_id = InferenceSignalNode(unique_id, "PRIMARY_IDENTIFIER")
+    dimension = InferenceSignalNode(root, "DIMENSION")
+    time_dimension = InferenceSignalNode(dimension, "TIME_DIMENSION")
+    categorical_dimension = InferenceSignalNode(dimension, "CATEGORICAL_DIMENSION")
+    measure = InferenceSignalNode(root, "MEASURE")
 
 
 class InferenceSignalType:
