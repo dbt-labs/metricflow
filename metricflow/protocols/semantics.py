@@ -20,7 +20,13 @@ from metricflow.model.objects.metric import Metric
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.semantics.linkable_spec_resolver import LinkableElementProperties
 from metricflow.references import DimensionReference, IdentifierReference, MeasureReference, TimeDimensionReference
-from metricflow.specs import LinkableInstanceSpec, MeasureSpec, MetricSpec, NonAdditiveDimensionSpec
+from metricflow.specs import (
+    LinkableInstanceSpec,
+    MeasureSpec,
+    MetricInputMeasureSpec,
+    MetricSpec,
+    NonAdditiveDimensionSpec,
+)
 
 
 class DataSourceSemanticsAccessor(Protocol):
@@ -149,7 +155,7 @@ class MetricSemanticsAccessor(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    def measures_for_metric(self, metric_spec: MetricSpec) -> Tuple[MeasureSpec, ...]:
+    def measures_for_metric(self, metric_spec: MetricSpec) -> Tuple[MetricInputMeasureSpec, ...]:
         """Return the measure specs required to compute the metric."""
         raise NotImplementedError
 
