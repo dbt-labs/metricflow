@@ -1,5 +1,5 @@
 from metricflow.dataflow.sql_column import SqlColumn
-from metricflow.inference.rule.base import InferenceSignal, InferenceSignalConfidence, InferenceSignalType
+from metricflow.inference.models import InferenceSignal, InferenceSignalConfidence, InferenceSignalType
 from metricflow.inference.solver.weighted_tree import WeightedTypeTreeInferenceSolver
 
 column = SqlColumn.from_string("db.schema.table.col")

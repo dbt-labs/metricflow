@@ -1,6 +1,6 @@
 from metricflow.dataflow.sql_column import SqlColumn
 from metricflow.inference.context.data_warehouse import DataWarehouseInferenceContext
-from metricflow.inference.rule.base import InferenceSignalConfidence, InferenceSignalType
+from metricflow.inference.models import InferenceSignalConfidence, InferenceSignalType
 from metricflow.inference.rule.rules import ColumnMatcher, ColumnMatcherRule
 
 

@@ -1,7 +1,6 @@
 from metricflow.dataflow.sql_column import SqlColumn
-from metricflow.inference.rule.base import InferenceSignalConfidence, InferenceSignalType
+from metricflow.inference.models import InferenceSignalConfidence, InferenceSignalType
 from metricflow.inference.rule.defaults import RuleDefaults
-
 from metricflow.inference.rule.rules import ColumnMatcherRule
 
 
@@ -25,6 +24,8 @@ def test_primary_identifier_matcher():  # noqa: D
     assert RuleDefaults._primary_identifier_matcher(SqlColumn.from_string("db.schema.table.id"))
     assert RuleDefaults._primary_identifier_matcher(SqlColumn.from_string("db.schema.table.tableid"))
     assert RuleDefaults._primary_identifier_matcher(SqlColumn.from_string("db.schema.table.table_id"))
+    assert RuleDefaults._primary_identifier_matcher(SqlColumn.from_string("db.schema.tables.table_id"))
+    assert RuleDefaults._primary_identifier_matcher(SqlColumn.from_string("db.schema.tables.tableid"))
     assert not RuleDefaults._primary_identifier_matcher(SqlColumn.from_string("db.schema.table.othertable_id"))
     assert not RuleDefaults._primary_identifier_matcher(SqlColumn.from_string("db.schema.table.othertableid"))
     assert not RuleDefaults._primary_identifier_matcher(SqlColumn.from_string("db.schema.table.whatever"))

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Tuple
 
-from metricflow.inference.rule.base import InferenceSignal, InferenceSignalNode
+from metricflow.inference.models import InferenceSignal, InferenceSignalNode
 
 
 class InferenceSolver(ABC):

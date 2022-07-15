@@ -1,7 +1,8 @@
 from typing import List
 from metricflow.dataflow.sql_column import SqlColumn
 
-from metricflow.inference.rule.base import InferenceRule, InferenceSignalConfidence, InferenceSignalType
+from metricflow.inference.models import InferenceSignalConfidence, InferenceSignalType
+from metricflow.inference.rule.base import InferenceRule
 from metricflow.inference.rule.rules import ColumnMatcherRule
 
 

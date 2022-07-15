@@ -1,7 +1,7 @@
 from collections import defaultdict
 from typing import Callable, Dict, List, Tuple, Optional
 
-from metricflow.inference.rule.base import (
+from metricflow.inference.models import (
     InferenceSignal,
     InferenceSignalConfidence,
     InferenceSignalNode,

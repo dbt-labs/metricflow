@@ -4,8 +4,8 @@ from typing import Callable, List
 from metricflow.dataflow.sql_column import SqlColumn
 
 from metricflow.inference.context.data_warehouse import DataWarehouseInferenceContext
-from metricflow.inference.rule.base import (
-    InferenceRule,
+from metricflow.inference.rule.base import InferenceRule
+from metricflow.inference.models import (
     InferenceSignal,
     InferenceSignalConfidence,
     InferenceSignalNode,
