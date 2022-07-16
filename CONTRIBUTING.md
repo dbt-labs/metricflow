@@ -5,7 +5,7 @@ Welcome to the MetricFlow developer community, we're thrilled to have you aboard
 ## Before you get started, please...
 
 1. Familiarize yourself with our [Code of Conduct](http://community.transform.co/metricflow-signup). In summary - be kind to each other. We're all here trying to make the data world a better place to work.
-2. Sign our [Contributor License Agreement](TransformCLA.md). Unfortunately, we cannot accept PRs unless you have signed. If you are not able to sign the agreement you may still participate in our Slack community or interact with Issues
+2. Make sure you can sign our [Contributor License Agreement](TransformCLA.md). Unfortunately, we cannot accept PRs unless you have signed. If you are not able to sign the agreement you may still participate in our Slack community or interact with Issues. To sign the agreement simply put up a PR, and you will receive instructions there.
 
 ## Environment setup
 
@@ -24,7 +24,8 @@ Welcome to the MetricFlow developer community, we're thrilled to have you aboard
 4. Activate a [Python virtual environment](https://docs.python.org/3/library/venv.html). While this is not required, it is *strongly* encouraged.
     - We provide `make venv` and `make remove_venv` helpers for creating/deleting standard Python virtual envs. You may pass `VENV_NAME=your_custom_name` to override the default `venv` location.
     - [conda](https://docs.conda.io/en/latest/) users may prefer [conda's environment management](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) instead.
-5. Run `make install` to get all of your dependencies loaded and ready for development
+5. Install [Poetry](https://python-poetry.org/docs/) via `pip install poetry` - this is the tool we use to manage our build dependencies.
+6. Run `make install` to get all of your dependencies loaded and ready for development
     - This includes useful dev tools, including pre-commit for linting. 
     - You may run `pre-commit install` if you would like the linters to run prior to all local git commits
 

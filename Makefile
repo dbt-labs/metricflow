@@ -32,6 +32,6 @@ lint:
 	pre-commit run --all-files
 
 # Running data warehouses locally
-.PHONY: postgresql
-postgresql:
+.PHONY: postgresql postgres
+postgresql postgres:
 	make -C local-data-warehouses postgresql
