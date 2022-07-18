@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 from typing import Callable, List
-from metricflow.dataflow.sql_column import SqlColumn
 
-from metricflow.inference.context.data_warehouse import DataWarehouseInferenceContext
+from metricflow.inference.context.data_warehouse import ColumnProperties, DataWarehouseInferenceContext
 from metricflow.inference.rule.base import InferenceRule
 from metricflow.inference.models import (
     InferenceSignal,
@@ -12,14 +11,18 @@ from metricflow.inference.models import (
 )
 
 
-ColumnMatcher = Callable[[SqlColumn], bool]
+ColumnMatcher = Callable[[ColumnProperties], bool]
 
 
 class ColumnMatcherRule(InferenceRule):
     """Inference rule that checks for matches across all columns."""
 
     def __init__(
-        self, matcher: ColumnMatcher, type_node: InferenceSignalNode, confidence: InferenceSignalConfidence
+        self,
+        matcher: ColumnMatcher,
+        type_node: InferenceSignalNode,
+        confidence: InferenceSignalConfidence,
+        match_reason: str,
     ) -> None:
         """Initialize the class.
 
@@ -30,18 +33,19 @@ class ColumnMatcherRule(InferenceRule):
         self.matcher = matcher
         self.type_node = type_node
         self.confidence = confidence
+        self.match_reason = match_reason
 
     def process(self, warehouse: DataWarehouseInferenceContext) -> List[InferenceSignal]:  # type: ignore
         """Try to match all columns' names with the matching function.
 
         If they do match, produce a signal with the configured type and confidence.
         """
-        matching_columns = [column for column in warehouse.columns if self.matcher(column)]
+        matching_columns = [column for column, props in warehouse.columns.items() if self.matcher(props)]
         signals = [
             InferenceSignal(
                 column=column,
                 type_node=self.type_node,
-                reason=f"Column matched by rule {self.__class__.__name__}.",
+                reason=self.match_reason,
                 confidence=self.confidence,
             )
             for column in matching_columns
