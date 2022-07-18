@@ -78,8 +78,10 @@ class WeightedTypeTreeInferenceSolver(InferenceSolver):
             ]
 
         confidences_by_type: Dict[InferenceSignalNode, List[InferenceSignalConfidence]] = defaultdict(list)
+        reasons_by_type: Dict[InferenceSignalNode, List[str]] = defaultdict(list)
         for signal in signals:
             confidences_by_type[signal.type_node].append(signal.confidence)
+            reasons_by_type[signal.type_node].append(f"{signal.reason} ({signal.type_node.name})")
 
         node_weights: Dict[InferenceSignalNode, int] = defaultdict(lambda: 0)
         for type_node, confidences_for_type in confidences_by_type.items():
@@ -87,6 +89,7 @@ class WeightedTypeTreeInferenceSolver(InferenceSolver):
 
         self._set_cumulative_weight(InferenceSignalType.UNKNOWN, node_weights)
 
+        reasons = []
         node = InferenceSignalType.UNKNOWN
         while node is not None and len(node.children) > 0:
             children_weight_total = sum(node_weights[child] for child in node.children)
@@ -98,6 +101,7 @@ class WeightedTypeTreeInferenceSolver(InferenceSolver):
             for child in node.children:
                 if node_weights[child] / children_weight_total >= self._weight_percent_threshold:
                     next_node = child
+                    reasons += reasons_by_type[child]
                     break
 
             if next_node is None:
@@ -105,5 +109,4 @@ class WeightedTypeTreeInferenceSolver(InferenceSolver):
 
             node = next_node
 
-        # TODO: return reasons too
-        return node, []
+        return node, reasons

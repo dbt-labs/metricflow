@@ -19,20 +19,21 @@ def test_complimentary_signals():
         InferenceSignal(
             column=column,
             type_node=InferenceSignalType.ID.UNIQUE,
-            reason="I think it's unique :)",
+            reason="UNIQUE",
             confidence=InferenceSignalConfidence.HIGH,
         ),
         InferenceSignal(
             column=column,
             type_node=InferenceSignalType.ID.PRIMARY,
-            reason="I think it's unique :)",
+            reason="PRIMARY",
             confidence=InferenceSignalConfidence.FOR_SURE,
         ),
     ]
 
-    type_node, _ = solver.solve_column(signals)
+    type_node, reasons = solver.solve_column(signals)
 
     assert type_node == InferenceSignalType.ID.PRIMARY
+    assert "UNIQUE" in reasons[0] and "PRIMARY" in reasons[1]
 
 
 def test_contradicting_signals():
@@ -41,13 +42,13 @@ def test_contradicting_signals():
         InferenceSignal(
             column=column,
             type_node=InferenceSignalType.ID.FOREIGN,
-            reason="I think it's a foreign key :)",
+            reason="FOREIGN",
             confidence=InferenceSignalConfidence.HIGH,
         ),
         InferenceSignal(
             column=column,
             type_node=InferenceSignalType.ID.PRIMARY,
-            reason="I think it's a primary key :)",
+            reason="PRIMARY",
             confidence=InferenceSignalConfidence.HIGH,
         ),
     ]
@@ -63,18 +64,19 @@ def test_stop_at_internal_node_if_trail_stops():
         InferenceSignal(
             column=column,
             type_node=InferenceSignalType.ID.UNKNOWN,
-            reason="I think it's a key :)",
+            reason="KEY",
             confidence=InferenceSignalConfidence.HIGH,
         ),
         InferenceSignal(
             column=column,
             type_node=InferenceSignalType.ID.UNIQUE,
-            reason="I think it's a unique key :)",
+            reason="UNIQUE",
             confidence=InferenceSignalConfidence.HIGH,
         ),
     ]
 
-    type_node, _ = solver.solve_column(signals)
+    type_node, reasons = solver.solve_column(signals)
 
     # should not progress further into the tree and assume it's PRIMARY
     assert type_node == InferenceSignalType.ID.UNIQUE
+    assert "KEY" in reasons[0] and "UNIQUE" in reasons[1]
