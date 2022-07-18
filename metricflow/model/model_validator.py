@@ -19,6 +19,7 @@ from metricflow.model.validations.identifiers import (
 from metricflow.model.validations.materializations import ValidMaterializationRule
 from metricflow.model.validations.metrics import MetricMeasuresRule, CumulativeMetricRule
 from metricflow.model.validations.non_empty import NonEmptyRule
+from metricflow.model.validations.reserved_keywords import ReservedKeywordsRule
 from metricflow.model.validations.unique_valid_name import UniqueAndValidNameRule
 from metricflow.model.validations.validator_helpers import (
     ModelValidationResults,
@@ -48,6 +49,7 @@ class ModelValidator:
         UniqueAndValidNameRule(),
         ValidMaterializationRule(),
         AggregationTimeDimensionRule(),
+        ReservedKeywordsRule(),
     )
 
     def __init__(self, rules: Sequence[ModelValidationRule] = DEFAULT_RULES) -> None:
