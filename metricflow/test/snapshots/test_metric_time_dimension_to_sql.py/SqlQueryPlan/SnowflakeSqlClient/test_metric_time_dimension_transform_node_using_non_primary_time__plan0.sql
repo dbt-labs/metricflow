@@ -1,9 +1,6 @@
 -- Metric Time Dimension 'booking_paid_at'
 SELECT
-  subq_0.booking_payments
-  , subq_0.is_instant
-  , subq_0.create_a_cycle_in_the_join_graph__is_instant
-  , subq_0.ds
+  subq_0.ds
   , subq_0.ds__week
   , subq_0.ds__month
   , subq_0.ds__quarter
@@ -45,6 +42,9 @@ SELECT
   , subq_0.create_a_cycle_in_the_join_graph__listing
   , subq_0.create_a_cycle_in_the_join_graph__guest
   , subq_0.create_a_cycle_in_the_join_graph__host
+  , subq_0.is_instant
+  , subq_0.create_a_cycle_in_the_join_graph__is_instant
+  , subq_0.booking_payments
 FROM (
   -- Read Elements From Data Source 'bookings_source'
   SELECT

@@ -4,8 +4,8 @@
         <!-- node_id = ss_3 -->
         <!-- col0 =                                                   -->
         <!--   {'class': 'SqlSelectColumn',                           -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10),  -->
-        <!--    'column_alias': 'bookings'}                           -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_11),  -->
+        <!--    'column_alias': 'listing'}                            -->
         <!-- col1 =                                                   -->
         <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_12),  -->
@@ -16,8 +16,8 @@
         <!--    'column_alias': 'listing__country_latest'}            -->
         <!-- col3 =                                                   -->
         <!--   {'class': 'SqlSelectColumn',                           -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_11),  -->
-        <!--    'column_alias': 'listing'}                            -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10),  -->
+        <!--    'column_alias': 'bookings'}                           -->
         <!-- from_source = SqlSelectStatementNode(node_id=ss_0) -->
         <!-- join_0 =                                                    -->
         <!--   {'class': 'SqlJoinDescription',                           -->
@@ -39,12 +39,12 @@
             <!-- node_id = ss_0 -->
             <!-- col0 =                                                  -->
             <!--   {'class': 'SqlSelectColumn',                          -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_0),  -->
-            <!--    'column_alias': 'bookings'}                          -->
-            <!-- col1 =                                                  -->
-            <!--   {'class': 'SqlSelectColumn',                          -->
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_1),  -->
             <!--    'column_alias': 'listing'}                           -->
+            <!-- col1 =                                                  -->
+            <!--   {'class': 'SqlSelectColumn',                          -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_0),  -->
+            <!--    'column_alias': 'bookings'}                          -->
             <!-- from_source = SqlSelectStatementNode(node_id=ss_10000) -->
             <!-- where = None -->
             <SqlSelectStatementNode>
@@ -253,12 +253,12 @@
             <!-- node_id = ss_1 -->
             <!-- col0 =                                                  -->
             <!--   {'class': 'SqlSelectColumn',                          -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_2),  -->
-            <!--    'column_alias': 'country_latest'}                    -->
-            <!-- col1 =                                                  -->
-            <!--   {'class': 'SqlSelectColumn',                          -->
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_3),  -->
             <!--    'column_alias': 'listing'}                           -->
+            <!-- col1 =                                                  -->
+            <!--   {'class': 'SqlSelectColumn',                          -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_2),  -->
+            <!--    'column_alias': 'country_latest'}                    -->
             <!-- from_source = SqlSelectStatementNode(node_id=ss_10003) -->
             <!-- where = None -->
             <SqlSelectStatementNode>
@@ -408,12 +408,12 @@
             <!-- node_id = ss_2 -->
             <!-- col0 =                                                  -->
             <!--   {'class': 'SqlSelectColumn',                          -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_6),  -->
-            <!--    'column_alias': 'country_latest'}                    -->
-            <!-- col1 =                                                  -->
-            <!--   {'class': 'SqlSelectColumn',                          -->
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_7),  -->
             <!--    'column_alias': 'listing'}                           -->
+            <!-- col1 =                                                  -->
+            <!--   {'class': 'SqlSelectColumn',                          -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_6),  -->
+            <!--    'column_alias': 'country_latest'}                    -->
             <!-- from_source = SqlSelectStatementNode(node_id=ss_10003) -->
             <!-- where = None -->
             <SqlSelectStatementNode>

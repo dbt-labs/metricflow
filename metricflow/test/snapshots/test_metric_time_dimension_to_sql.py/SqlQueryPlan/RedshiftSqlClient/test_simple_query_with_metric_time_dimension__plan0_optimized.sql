@@ -15,8 +15,8 @@ FROM (
     -- Pass Only Elements:
     --   ['bookings', 'metric_time']
     SELECT
-      1 AS bookings
-      , ds AS metric_time
+      ds AS metric_time
+      , 1 AS bookings
     FROM (
       -- User Defined SQL Query
       SELECT * FROM ***************************.fct_bookings

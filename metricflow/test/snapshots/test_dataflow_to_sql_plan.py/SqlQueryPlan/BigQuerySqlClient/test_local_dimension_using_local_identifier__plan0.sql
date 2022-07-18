@@ -5,27 +5,18 @@ SELECT
 FROM (
   -- Aggregate Measures
   SELECT
-    SUM(subq_2.listings) AS listings
-    , subq_2.listing__country_latest
+    subq_2.listing__country_latest
+    , SUM(subq_2.listings) AS listings
   FROM (
     -- Pass Only Elements:
     --   ['listings', 'listing__country_latest']
     SELECT
-      subq_1.listings
-      , subq_1.listing__country_latest
+      subq_1.listing__country_latest
+      , subq_1.listings
     FROM (
       -- Metric Time Dimension 'ds'
       SELECT
-        subq_0.listings
-        , subq_0.largest_listing
-        , subq_0.smallest_listing
-        , subq_0.country_latest
-        , subq_0.is_lux_latest
-        , subq_0.capacity_latest
-        , subq_0.listing__country_latest
-        , subq_0.listing__is_lux_latest
-        , subq_0.listing__capacity_latest
-        , subq_0.ds
+        subq_0.ds
         , subq_0.ds__week
         , subq_0.ds__month
         , subq_0.ds__quarter
@@ -53,6 +44,15 @@ FROM (
         , subq_0.listing
         , subq_0.user
         , subq_0.listing__user
+        , subq_0.country_latest
+        , subq_0.is_lux_latest
+        , subq_0.capacity_latest
+        , subq_0.listing__country_latest
+        , subq_0.listing__is_lux_latest
+        , subq_0.listing__capacity_latest
+        , subq_0.listings
+        , subq_0.largest_listing
+        , subq_0.smallest_listing
       FROM (
         -- Read Elements From Data Source 'listings_latest'
         SELECT

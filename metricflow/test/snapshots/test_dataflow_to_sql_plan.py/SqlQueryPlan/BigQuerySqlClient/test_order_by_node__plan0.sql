@@ -1,27 +1,27 @@
 -- Order By ['ds', 'bookings']
 SELECT
-  subq_3.bookings
+  subq_3.ds
   , subq_3.is_instant
-  , subq_3.ds
+  , subq_3.bookings
 FROM (
   -- Compute Metrics via Expressions
   SELECT
     subq_2.bookings
-    , subq_2.is_instant
     , subq_2.ds
+    , subq_2.is_instant
   FROM (
     -- Aggregate Measures
     SELECT
-      SUM(subq_1.bookings) AS bookings
+      subq_1.ds
       , subq_1.is_instant
-      , subq_1.ds
+      , SUM(subq_1.bookings) AS bookings
     FROM (
       -- Pass Only Elements:
       --   ['bookings', 'is_instant', 'ds']
       SELECT
-        subq_0.bookings
+        subq_0.ds
         , subq_0.is_instant
-        , subq_0.ds
+        , subq_0.bookings
       FROM (
         -- Read Elements From Data Source 'bookings_source'
         SELECT
@@ -79,8 +79,8 @@ FROM (
       ) subq_0
     ) subq_1
     GROUP BY
-      subq_1.is_instant
-      , subq_1.ds
+      subq_1.ds
+      , subq_1.is_instant
   ) subq_2
 ) subq_3
 ORDER BY subq_3.ds, subq_3.bookings DESC

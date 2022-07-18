@@ -11,8 +11,8 @@ CREATE TABLE ***************************.test_table AS (
     -- Pass Only Elements:
     --   ['bookings', 'ds']
     SELECT
-      1 AS bookings
-      , ds
+      ds
+      , 1 AS bookings
     FROM (
       -- User Defined SQL Query
       SELECT * FROM ***************************.fct_bookings

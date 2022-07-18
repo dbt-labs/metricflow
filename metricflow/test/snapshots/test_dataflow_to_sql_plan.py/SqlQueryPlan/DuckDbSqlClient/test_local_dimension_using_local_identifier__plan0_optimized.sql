@@ -9,8 +9,8 @@ FROM (
   -- Pass Only Elements:
   --   ['listings', 'listing__country_latest']
   SELECT
-    1 AS listings
-    , country AS listing__country_latest
+    country AS listing__country_latest
+    , 1 AS listings
   FROM ***************************.dim_listings_latest listings_latest_src_10003
 ) subq_6
 GROUP BY

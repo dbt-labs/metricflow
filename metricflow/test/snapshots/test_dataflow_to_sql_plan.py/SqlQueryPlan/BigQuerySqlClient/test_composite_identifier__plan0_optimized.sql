@@ -10,9 +10,9 @@ FROM (
   -- Pass Only Elements:
   --   ['messages', 'user_team']
   SELECT
-    1 AS messages
-    , team_id AS user_team___team_id
+    team_id AS user_team___team_id
     , user_id AS user_team___user_id
+    , 1 AS messages
   FROM ***************************.fct_messages messages_source_src_10014
 ) subq_6
 GROUP BY

@@ -25,9 +25,9 @@ integration_test:
   check_order: true
   check_query: |
     SELECT
-      SUM(1) AS messages
-      , team_id AS user_team___team_id
+      team_id AS user_team___team_id
       , user_id AS user_team___user_id
+      , SUM(1) AS messages
     FROM {{ source_schema }}.fct_messages
     GROUP BY
       team_id

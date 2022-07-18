@@ -1,14 +1,14 @@
 -- Join Standard Outputs
 SELECT
-  subq_1.bookings AS bookings
+  subq_1.listing AS listing
   , subq_3.country_latest AS listing__country_latest
-  , subq_1.listing AS listing
+  , subq_1.bookings AS bookings
 FROM (
   -- Pass Only Elements:
   --   ['bookings', 'listing']
   SELECT
-    subq_0.bookings
-    , subq_0.listing
+    subq_0.listing
+    , subq_0.bookings
   FROM (
     -- Read Elements From Data Source 'bookings_source'
     SELECT
@@ -69,8 +69,8 @@ LEFT OUTER JOIN (
   -- Pass Only Elements:
   --   ['listing', 'country_latest']
   SELECT
-    subq_2.country_latest
-    , subq_2.listing
+    subq_2.listing
+    , subq_2.country_latest
   FROM (
     -- Read Elements From Data Source 'listings_latest'
     SELECT

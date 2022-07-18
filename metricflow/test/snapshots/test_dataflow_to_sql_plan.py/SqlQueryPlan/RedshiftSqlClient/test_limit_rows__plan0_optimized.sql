@@ -2,16 +2,16 @@
 -- Compute Metrics via Expressions
 -- Order By [] Limit 1
 SELECT
-  SUM(bookings) AS bookings
-  , ds
+  ds
+  , SUM(bookings) AS bookings
 FROM (
   -- Read Elements From Data Source 'bookings_source'
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements:
   --   ['bookings', 'ds']
   SELECT
-    1 AS bookings
-    , ds
+    ds
+    , 1 AS bookings
   FROM (
     -- User Defined SQL Query
     SELECT * FROM ***************************.fct_bookings

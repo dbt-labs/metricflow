@@ -4,184 +4,184 @@
         <!-- node_id = ss_0 -->
         <!-- col0 =                                                  -->
         <!--   {'class': 'SqlSelectColumn',                          -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_0),  -->
-        <!--    'column_alias': 'booking_payments'}                  -->
-        <!-- col1 =                                                  -->
-        <!--   {'class': 'SqlSelectColumn',                          -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_1),  -->
-        <!--    'column_alias': 'is_instant'}                        -->
-        <!-- col2 =                                                              -->
-        <!--   {'class': 'SqlSelectColumn',                                      -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_2),              -->
-        <!--    'column_alias': 'create_a_cycle_in_the_join_graph__is_instant'}  -->
-        <!-- col3 =                                                  -->
-        <!--   {'class': 'SqlSelectColumn',                          -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_3),  -->
         <!--    'column_alias': 'ds'}                                -->
-        <!-- col4 =                                                  -->
+        <!-- col1 =                                                  -->
         <!--   {'class': 'SqlSelectColumn',                          -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_4),  -->
         <!--    'column_alias': 'ds__week'}                          -->
-        <!-- col5 =                                                  -->
+        <!-- col2 =                                                  -->
         <!--   {'class': 'SqlSelectColumn',                          -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_5),  -->
         <!--    'column_alias': 'ds__month'}                         -->
-        <!-- col6 =                                                  -->
+        <!-- col3 =                                                  -->
         <!--   {'class': 'SqlSelectColumn',                          -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_6),  -->
         <!--    'column_alias': 'ds__quarter'}                       -->
-        <!-- col7 =                                                  -->
+        <!-- col4 =                                                  -->
         <!--   {'class': 'SqlSelectColumn',                          -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_7),  -->
         <!--    'column_alias': 'ds__year'}                          -->
-        <!-- col8 =                                                  -->
+        <!-- col5 =                                                  -->
         <!--   {'class': 'SqlSelectColumn',                          -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_8),  -->
         <!--    'column_alias': 'ds_partitioned'}                    -->
-        <!-- col9 =                                                  -->
+        <!-- col6 =                                                  -->
         <!--   {'class': 'SqlSelectColumn',                          -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_9),  -->
         <!--    'column_alias': 'ds_partitioned__week'}              -->
-        <!-- col10 =                                                  -->
+        <!-- col7 =                                                   -->
         <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10),  -->
         <!--    'column_alias': 'ds_partitioned__month'}              -->
-        <!-- col11 =                                                  -->
+        <!-- col8 =                                                   -->
         <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_11),  -->
         <!--    'column_alias': 'ds_partitioned__quarter'}            -->
-        <!-- col12 =                                                  -->
+        <!-- col9 =                                                   -->
         <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_12),  -->
         <!--    'column_alias': 'ds_partitioned__year'}               -->
-        <!-- col13 =                                                  -->
+        <!-- col10 =                                                  -->
         <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_13),  -->
         <!--    'column_alias': 'booking_paid_at'}                    -->
-        <!-- col14 =                                                  -->
+        <!-- col11 =                                                  -->
         <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_14),  -->
         <!--    'column_alias': 'booking_paid_at__week'}              -->
-        <!-- col15 =                                                  -->
+        <!-- col12 =                                                  -->
         <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_15),  -->
         <!--    'column_alias': 'booking_paid_at__month'}             -->
-        <!-- col16 =                                                  -->
+        <!-- col13 =                                                  -->
         <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_16),  -->
         <!--    'column_alias': 'booking_paid_at__quarter'}           -->
-        <!-- col17 =                                                  -->
+        <!-- col14 =                                                  -->
         <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_17),  -->
         <!--    'column_alias': 'booking_paid_at__year'}              -->
-        <!-- col18 =                                                     -->
+        <!-- col15 =                                                     -->
         <!--   {'class': 'SqlSelectColumn',                              -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_18),     -->
         <!--    'column_alias': 'create_a_cycle_in_the_join_graph__ds'}  -->
-        <!-- col19 =                                                           -->
+        <!-- col16 =                                                           -->
         <!--   {'class': 'SqlSelectColumn',                                    -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_19),           -->
         <!--    'column_alias': 'create_a_cycle_in_the_join_graph__ds__week'}  -->
-        <!-- col20 =                                                            -->
+        <!-- col17 =                                                            -->
         <!--   {'class': 'SqlSelectColumn',                                     -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_20),            -->
         <!--    'column_alias': 'create_a_cycle_in_the_join_graph__ds__month'}  -->
-        <!-- col21 =                                                              -->
+        <!-- col18 =                                                              -->
         <!--   {'class': 'SqlSelectColumn',                                       -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_21),              -->
         <!--    'column_alias': 'create_a_cycle_in_the_join_graph__ds__quarter'}  -->
-        <!-- col22 =                                                           -->
+        <!-- col19 =                                                           -->
         <!--   {'class': 'SqlSelectColumn',                                    -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_22),           -->
         <!--    'column_alias': 'create_a_cycle_in_the_join_graph__ds__year'}  -->
-        <!-- col23 =                                                                 -->
+        <!-- col20 =                                                                 -->
         <!--   {'class': 'SqlSelectColumn',                                          -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_23),                 -->
         <!--    'column_alias': 'create_a_cycle_in_the_join_graph__ds_partitioned'}  -->
-        <!-- col24 =                                                                       -->
+        <!-- col21 =                                                                       -->
         <!--   {'class': 'SqlSelectColumn',                                                -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_24),                       -->
         <!--    'column_alias': 'create_a_cycle_in_the_join_graph__ds_partitioned__week'}  -->
-        <!-- col25 =                                                                        -->
+        <!-- col22 =                                                                        -->
         <!--   {'class': 'SqlSelectColumn',                                                 -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_25),                        -->
         <!--    'column_alias': 'create_a_cycle_in_the_join_graph__ds_partitioned__month'}  -->
-        <!-- col26 =                                                                          -->
+        <!-- col23 =                                                                          -->
         <!--   {'class': 'SqlSelectColumn',                                                   -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_26),                          -->
         <!--    'column_alias': 'create_a_cycle_in_the_join_graph__ds_partitioned__quarter'}  -->
-        <!-- col27 =                                                                       -->
+        <!-- col24 =                                                                       -->
         <!--   {'class': 'SqlSelectColumn',                                                -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_27),                       -->
         <!--    'column_alias': 'create_a_cycle_in_the_join_graph__ds_partitioned__year'}  -->
-        <!-- col28 =                                                                  -->
+        <!-- col25 =                                                                  -->
         <!--   {'class': 'SqlSelectColumn',                                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_28),                  -->
         <!--    'column_alias': 'create_a_cycle_in_the_join_graph__booking_paid_at'}  -->
-        <!-- col29 =                                                                        -->
+        <!-- col26 =                                                                        -->
         <!--   {'class': 'SqlSelectColumn',                                                 -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_29),                        -->
         <!--    'column_alias': 'create_a_cycle_in_the_join_graph__booking_paid_at__week'}  -->
-        <!-- col30 =                                                                         -->
+        <!-- col27 =                                                                         -->
         <!--   {'class': 'SqlSelectColumn',                                                  -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_30),                         -->
         <!--    'column_alias': 'create_a_cycle_in_the_join_graph__booking_paid_at__month'}  -->
-        <!-- col31 =                                                                           -->
+        <!-- col28 =                                                                           -->
         <!--   {'class': 'SqlSelectColumn',                                                    -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_31),                           -->
         <!--    'column_alias': 'create_a_cycle_in_the_join_graph__booking_paid_at__quarter'}  -->
-        <!-- col32 =                                                                        -->
+        <!-- col29 =                                                                        -->
         <!--   {'class': 'SqlSelectColumn',                                                 -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_32),                        -->
         <!--    'column_alias': 'create_a_cycle_in_the_join_graph__booking_paid_at__year'}  -->
-        <!-- col33 =                                                  -->
+        <!-- col30 =                                                  -->
         <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_33),  -->
         <!--    'column_alias': 'metric_time'}                        -->
-        <!-- col34 =                                                  -->
+        <!-- col31 =                                                  -->
         <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_34),  -->
         <!--    'column_alias': 'metric_time__week'}                  -->
-        <!-- col35 =                                                  -->
+        <!-- col32 =                                                  -->
         <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_35),  -->
         <!--    'column_alias': 'metric_time__month'}                 -->
-        <!-- col36 =                                                  -->
+        <!-- col33 =                                                  -->
         <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_36),  -->
         <!--    'column_alias': 'metric_time__quarter'}               -->
-        <!-- col37 =                                                  -->
+        <!-- col34 =                                                  -->
         <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_37),  -->
         <!--    'column_alias': 'metric_time__year'}                  -->
-        <!-- col38 =                                                  -->
+        <!-- col35 =                                                  -->
         <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_38),  -->
         <!--    'column_alias': 'listing'}                            -->
-        <!-- col39 =                                                  -->
+        <!-- col36 =                                                  -->
         <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_39),  -->
         <!--    'column_alias': 'guest'}                              -->
-        <!-- col40 =                                                  -->
+        <!-- col37 =                                                  -->
         <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_40),  -->
         <!--    'column_alias': 'host'}                               -->
-        <!-- col41 =                                                  -->
+        <!-- col38 =                                                  -->
         <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_41),  -->
         <!--    'column_alias': 'create_a_cycle_in_the_join_graph'}   -->
-        <!-- col42 =                                                          -->
+        <!-- col39 =                                                          -->
         <!--   {'class': 'SqlSelectColumn',                                   -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_42),          -->
         <!--    'column_alias': 'create_a_cycle_in_the_join_graph__listing'}  -->
-        <!-- col43 =                                                        -->
+        <!-- col40 =                                                        -->
         <!--   {'class': 'SqlSelectColumn',                                 -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_43),        -->
         <!--    'column_alias': 'create_a_cycle_in_the_join_graph__guest'}  -->
-        <!-- col44 =                                                       -->
+        <!-- col41 =                                                       -->
         <!--   {'class': 'SqlSelectColumn',                                -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_44),       -->
         <!--    'column_alias': 'create_a_cycle_in_the_join_graph__host'}  -->
+        <!-- col42 =                                                 -->
+        <!--   {'class': 'SqlSelectColumn',                          -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_1),  -->
+        <!--    'column_alias': 'is_instant'}                        -->
+        <!-- col43 =                                                             -->
+        <!--   {'class': 'SqlSelectColumn',                                      -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_2),              -->
+        <!--    'column_alias': 'create_a_cycle_in_the_join_graph__is_instant'}  -->
+        <!-- col44 =                                                 -->
+        <!--   {'class': 'SqlSelectColumn',                          -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_0),  -->
+        <!--    'column_alias': 'booking_payments'}                  -->
         <!-- from_source = SqlSelectStatementNode(node_id=ss_10000) -->
         <!-- where = None -->
         <SqlSelectStatementNode>

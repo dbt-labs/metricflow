@@ -1,10 +1,7 @@
 -- Read Elements From Data Source 'bookings_source'
 -- Metric Time Dimension 'booking_paid_at'
 SELECT
-  booking_value AS booking_payments
-  , is_instant
-  , is_instant AS create_a_cycle_in_the_join_graph__is_instant
-  , ds
+  ds
   , DATE_TRUNC(ds, isoweek) AS ds__week
   , DATE_TRUNC(ds, month) AS ds__month
   , DATE_TRUNC(ds, quarter) AS ds__quarter
@@ -46,6 +43,9 @@ SELECT
   , listing_id AS create_a_cycle_in_the_join_graph__listing
   , guest_id AS create_a_cycle_in_the_join_graph__guest
   , host_id AS create_a_cycle_in_the_join_graph__host
+  , is_instant
+  , is_instant AS create_a_cycle_in_the_join_graph__is_instant
+  , booking_value AS booking_payments
 FROM (
   -- User Defined SQL Query
   SELECT * FROM ***************************.fct_bookings

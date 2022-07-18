@@ -11,18 +11,18 @@ FROM (
   -- Pass Only Elements:
   --   ['bookings', 'is_instant', 'listing__country_latest']
   SELECT
-    subq_13.bookings AS bookings
-    , subq_13.is_instant AS is_instant
+    subq_13.is_instant AS is_instant
     , listings_latest_src_10003.country AS listing__country_latest
+    , subq_13.bookings AS bookings
   FROM (
     -- Read Elements From Data Source 'bookings_source'
     -- Metric Time Dimension 'ds'
     -- Pass Only Elements:
     --   ['bookings', 'is_instant', 'listing']
     SELECT
-      1 AS bookings
+      listing_id AS listing
       , is_instant
-      , listing_id AS listing
+      , 1 AS bookings
     FROM (
       -- User Defined SQL Query
       SELECT * FROM ***************************.fct_bookings

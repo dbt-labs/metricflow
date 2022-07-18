@@ -4,16 +4,16 @@
         <!-- node_id = ss_3 -->
         <!-- col0 =                                                   -->
         <!--   {'class': 'SqlSelectColumn',                           -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_11),  -->
-        <!--    'column_alias': 'bookings'}                           -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_13),  -->
+        <!--    'column_alias': 'ds'}                                 -->
         <!-- col1 =                                                   -->
         <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_12),  -->
         <!--    'column_alias': 'is_instant'}                         -->
         <!-- col2 =                                                   -->
         <!--   {'class': 'SqlSelectColumn',                           -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_13),  -->
-        <!--    'column_alias': 'ds'}                                 -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_11),  -->
+        <!--    'column_alias': 'bookings'}                           -->
         <!-- from_source = SqlSelectStatementNode(node_id=ss_2) -->
         <!-- where = None -->
         <!-- order_by0 =                                             -->
@@ -33,38 +33,38 @@
             <!--    'column_alias': 'bookings'}                          -->
             <!-- col1 =                                                  -->
             <!--   {'class': 'SqlSelectColumn',                          -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_6),  -->
-            <!--    'column_alias': 'is_instant'}                        -->
-            <!-- col2 =                                                  -->
-            <!--   {'class': 'SqlSelectColumn',                          -->
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_7),  -->
             <!--    'column_alias': 'ds'}                                -->
+            <!-- col2 =                                                  -->
+            <!--   {'class': 'SqlSelectColumn',                          -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_6),  -->
+            <!--    'column_alias': 'is_instant'}                        -->
             <!-- from_source = SqlSelectStatementNode(node_id=ss_1) -->
             <!-- where = None -->
             <SqlSelectStatementNode>
                 <!-- description = Aggregate Measures -->
                 <!-- node_id = ss_1 -->
-                <!-- col0 =                                                              -->
-                <!--   {'class': 'SqlSelectColumn',                                      -->
-                <!--    'expr': SqlFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
-                <!--    'column_alias': 'bookings'}                                      -->
+                <!-- col0 =                                                  -->
+                <!--   {'class': 'SqlSelectColumn',                          -->
+                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_5),  -->
+                <!--    'column_alias': 'ds'}                                -->
                 <!-- col1 =                                                  -->
                 <!--   {'class': 'SqlSelectColumn',                          -->
                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_4),  -->
                 <!--    'column_alias': 'is_instant'}                        -->
-                <!-- col2 =                                                  -->
-                <!--   {'class': 'SqlSelectColumn',                          -->
-                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_5),  -->
-                <!--    'column_alias': 'ds'}                                -->
+                <!-- col2 =                                                              -->
+                <!--   {'class': 'SqlSelectColumn',                                      -->
+                <!--    'expr': SqlFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
+                <!--    'column_alias': 'bookings'}                                      -->
                 <!-- from_source = SqlSelectStatementNode(node_id=ss_0) -->
                 <!-- group_by0 =                                             -->
                 <!--   {'class': 'SqlSelectColumn',                          -->
-                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_4),  -->
-                <!--    'column_alias': 'is_instant'}                        -->
-                <!-- group_by1 =                                             -->
-                <!--   {'class': 'SqlSelectColumn',                          -->
                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_5),  -->
                 <!--    'column_alias': 'ds'}                                -->
+                <!-- group_by1 =                                             -->
+                <!--   {'class': 'SqlSelectColumn',                          -->
+                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_4),  -->
+                <!--    'column_alias': 'is_instant'}                        -->
                 <!-- where = None -->
                 <SqlSelectStatementNode>
                     <!-- description =                         -->
@@ -73,16 +73,16 @@
                     <!-- node_id = ss_0 -->
                     <!-- col0 =                                                  -->
                     <!--   {'class': 'SqlSelectColumn',                          -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_0),  -->
-                    <!--    'column_alias': 'bookings'}                          -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_2),  -->
+                    <!--    'column_alias': 'ds'}                                -->
                     <!-- col1 =                                                  -->
                     <!--   {'class': 'SqlSelectColumn',                          -->
                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_1),  -->
                     <!--    'column_alias': 'is_instant'}                        -->
                     <!-- col2 =                                                  -->
                     <!--   {'class': 'SqlSelectColumn',                          -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_2),  -->
-                    <!--    'column_alias': 'ds'}                                -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_0),  -->
+                    <!--    'column_alias': 'bookings'}                          -->
                     <!-- from_source = SqlSelectStatementNode(node_id=ss_10000) -->
                     <!-- where = None -->
                     <SqlSelectStatementNode>

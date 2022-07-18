@@ -1,26 +1,26 @@
 -- Compute Metrics via Expressions
 SELECT
   booking_value * 0.05 AS booking_fees
-  , subq_5.listing__country_latest
   , subq_5.listing
+  , subq_5.listing__country_latest
 FROM (
   -- Aggregate Measures
   SELECT
-    SUM(subq_4.booking_value) AS booking_value
+    subq_4.listing
     , subq_4.listing__country_latest
-    , subq_4.listing
+    , SUM(subq_4.booking_value) AS booking_value
   FROM (
     -- Join Standard Outputs
     SELECT
-      subq_1.booking_value AS booking_value
+      subq_1.listing AS listing
       , subq_3.country_latest AS listing__country_latest
-      , subq_1.listing AS listing
+      , subq_1.booking_value AS booking_value
     FROM (
       -- Pass Only Elements:
       --   ['booking_value', 'listing']
       SELECT
-        subq_0.booking_value
-        , subq_0.listing
+        subq_0.listing
+        , subq_0.booking_value
       FROM (
         -- Read Elements From Data Source 'bookings_source'
         SELECT
@@ -81,8 +81,8 @@ FROM (
       -- Pass Only Elements:
       --   ['listing', 'country_latest']
       SELECT
-        subq_2.country_latest
-        , subq_2.listing
+        subq_2.listing
+        , subq_2.country_latest
       FROM (
         -- Read Elements From Data Source 'listings_latest'
         SELECT
@@ -125,6 +125,6 @@ FROM (
       subq_1.listing = subq_3.listing
   ) subq_4
   GROUP BY
-    subq_4.listing__country_latest
-    , subq_4.listing
+    subq_4.listing
+    , subq_4.listing__country_latest
 ) subq_5

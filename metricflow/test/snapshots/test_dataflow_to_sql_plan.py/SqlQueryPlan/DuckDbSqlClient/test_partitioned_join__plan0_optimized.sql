@@ -12,9 +12,9 @@ FROM (
   -- Pass Only Elements:
   --   ['identity_verifications', 'user', 'ds_partitioned']
   SELECT
-    1 AS identity_verifications
-    , ds_partitioned
+    ds_partitioned
     , user_id AS user
+    , 1 AS identity_verifications
   FROM ***************************.fct_id_verifications id_verifications_src_10002
 ) subq_10
 LEFT OUTER JOIN
