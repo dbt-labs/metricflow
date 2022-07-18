@@ -54,8 +54,11 @@ class InferenceSignalNode(ABC):
         return self.parent.ancestors + [self.parent]
 
     def is_descendant(self, other: InferenceSignalNode) -> bool:
-        """Whether self is a descendant of other."""
-        return other in self.ancestors
+        """Whether self is a descendant of other.
+
+        NOTE: for practical reasons, a node is considered a descendant of itself.
+        """
+        return other == self or other in self.ancestors
 
 
 # This is kinda horrible but there's no way of instancing the tree with type safety without
@@ -114,3 +117,18 @@ class InferenceSignal:
     type_node: InferenceSignalNode
     reason: str
     confidence: InferenceSignalConfidence
+
+
+@dataclass(frozen=True)
+class InferenceResult:
+    """Encapsulates a final decision about a column.
+
+    column: the target column for this result
+    type_node: the type node of the column
+    reason: a list of human-readable strings that explain why this result was produced. They
+        may eventually reach the user's eyeballs.
+    """
+
+    column: SqlColumn
+    type_node: InferenceSignalNode
+    reasons: List[str]
