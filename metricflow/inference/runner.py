@@ -4,6 +4,7 @@ from collections import defaultdict
 from typing import List
 
 from metricflow.inference.context.base import InferenceContextProvider
+from metricflow.inference.context.data_warehouse import DataWarehouseInferenceContextProvider
 from metricflow.inference.rule.base import InferenceRule, InferenceSignal
 from metricflow.inference.solver.base import InferenceSolver
 from metricflow.inference.renderer.base import InferenceRenderer
@@ -32,7 +33,7 @@ class InferenceRunner:
         solver: the inference solver to be used
         renderers: the renderers that will write inference results as meaningful output
         """
-        if len(context_providers) != 1:
+        if len(context_providers) != 1 or not isinstance(context_providers[0], DataWarehouseInferenceContextProvider):
             raise ValueError("Currently, InferenceRunner requires exactly one DataWarehouseInferenceContextProvider.")
 
         if len(ruleset) == 0:
