@@ -30,7 +30,9 @@ class StreamInferenceRenderer(InferenceRenderer):
             if len(result.reasons) > 0:
                 reasons_str = reason_delim + reason_delim.join(result.reasons)
             lines = [
-                f"{result.column.sql} (#{i + 1})\n" f"  type: {result.type_node.name}\n" f"  reasons: ",
+                f"{result.column.sql} (#{i + 1})\n",
+                f"  type: {result.type_node.name}\n",
+                "  reasons: ",
                 reasons_str,
                 "\n\n",
             ]

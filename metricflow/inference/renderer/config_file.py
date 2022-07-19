@@ -26,7 +26,7 @@ class ConfigFileRenderer(InferenceRenderer):
         dir_path = os.path.abspath(dir_path)
 
         if not overwrite and os.path.exists(dir_path):
-            raise ValueError("ConfigFileRender.override is False but path exists.")
+            raise ValueError("ConfigFileRender.overwrite is False but path exists.")
 
         if os.path.isfile(dir_path):
             raise ValueError("ConfigFileRenderer `dir_path` is a file.")

@@ -106,7 +106,7 @@ class RuleDefaults:
             matcher=RuleDefaults._unique_identifier_matcher,
             type_node=InferenceSignalType.ID.UNIQUE,
             confidence=InferenceSignalConfidence.HIGH,
-            match_reason="Column values are unique.",
+            match_reason="Column has type INTEGER or STRING and its values are unique.",
         )
 
     @staticmethod
