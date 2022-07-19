@@ -11,27 +11,18 @@ FROM (
   FROM (
     -- Aggregate Measures
     SELECT
-      SUM(subq_2.bookings) AS bookings
-      , subq_2.metric_time
+      subq_2.metric_time
+      , SUM(subq_2.bookings) AS bookings
     FROM (
       -- Pass Only Elements:
       --   ['bookings', 'metric_time']
       SELECT
-        subq_1.bookings
-        , subq_1.metric_time
+        subq_1.metric_time
+        , subq_1.bookings
       FROM (
         -- Metric Time Dimension 'ds'
         SELECT
-          subq_0.bookings
-          , subq_0.instant_bookings
-          , subq_0.booking_value
-          , subq_0.max_booking_value
-          , subq_0.min_booking_value
-          , subq_0.bookers
-          , subq_0.average_booking_value
-          , subq_0.is_instant
-          , subq_0.create_a_cycle_in_the_join_graph__is_instant
-          , subq_0.ds
+          subq_0.ds
           , subq_0.ds__week
           , subq_0.ds__month
           , subq_0.ds__quarter
@@ -73,6 +64,15 @@ FROM (
           , subq_0.create_a_cycle_in_the_join_graph__listing
           , subq_0.create_a_cycle_in_the_join_graph__guest
           , subq_0.create_a_cycle_in_the_join_graph__host
+          , subq_0.is_instant
+          , subq_0.create_a_cycle_in_the_join_graph__is_instant
+          , subq_0.bookings
+          , subq_0.instant_bookings
+          , subq_0.booking_value
+          , subq_0.max_booking_value
+          , subq_0.min_booking_value
+          , subq_0.bookers
+          , subq_0.average_booking_value
         FROM (
           -- Read Elements From Data Source 'bookings_source'
           SELECT
@@ -142,21 +142,18 @@ FULL OUTER JOIN (
   FROM (
     -- Aggregate Measures
     SELECT
-      SUM(subq_6.booking_payments) AS booking_payments
-      , subq_6.metric_time
+      subq_6.metric_time
+      , SUM(subq_6.booking_payments) AS booking_payments
     FROM (
       -- Pass Only Elements:
       --   ['booking_payments', 'metric_time']
       SELECT
-        subq_5.booking_payments
-        , subq_5.metric_time
+        subq_5.metric_time
+        , subq_5.booking_payments
       FROM (
         -- Metric Time Dimension 'booking_paid_at'
         SELECT
-          subq_4.booking_payments
-          , subq_4.is_instant
-          , subq_4.create_a_cycle_in_the_join_graph__is_instant
-          , subq_4.ds
+          subq_4.ds
           , subq_4.ds__week
           , subq_4.ds__month
           , subq_4.ds__quarter
@@ -198,6 +195,9 @@ FULL OUTER JOIN (
           , subq_4.create_a_cycle_in_the_join_graph__listing
           , subq_4.create_a_cycle_in_the_join_graph__guest
           , subq_4.create_a_cycle_in_the_join_graph__host
+          , subq_4.is_instant
+          , subq_4.create_a_cycle_in_the_join_graph__is_instant
+          , subq_4.booking_payments
         FROM (
           -- Read Elements From Data Source 'bookings_source'
           SELECT

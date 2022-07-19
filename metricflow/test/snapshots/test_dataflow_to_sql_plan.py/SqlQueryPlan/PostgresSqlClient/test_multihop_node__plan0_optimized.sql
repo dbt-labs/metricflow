@@ -12,9 +12,9 @@ LEFT OUTER JOIN (
   -- Pass Only Elements:
   --   ['account_id', 'ds_partitioned', 'customer_id__customer_name']
   SELECT
-    customer_table_src_10012.customer_name AS customer_id__customer_name
-    , bridge_table_src_10010.ds_partitioned AS ds_partitioned
+    bridge_table_src_10010.ds_partitioned AS ds_partitioned
     , bridge_table_src_10010.account_id AS account_id
+    , customer_table_src_10012.customer_name AS customer_id__customer_name
   FROM ***************************.bridge_table bridge_table_src_10010
   LEFT OUTER JOIN
     ***************************.customer_table customer_table_src_10012

@@ -1,15 +1,15 @@
 -- Compute Metrics via Expressions
 SELECT
   booking_value * 0.05 AS booking_fees
-  , listing__country_latest
   , listing
+  , listing__country_latest
 FROM (
   -- Join Standard Outputs
   -- Aggregate Measures
   SELECT
-    SUM(bookings_source_src_10000.booking_value) AS booking_value
+    bookings_source_src_10000.listing_id AS listing
     , listings_latest_src_10003.country AS listing__country_latest
-    , bookings_source_src_10000.listing_id AS listing
+    , SUM(bookings_source_src_10000.booking_value) AS booking_value
   FROM (
     -- User Defined SQL Query
     SELECT * FROM ***************************.fct_bookings
@@ -19,6 +19,6 @@ FROM (
   ON
     bookings_source_src_10000.listing_id = listings_latest_src_10003.listing_id
   GROUP BY
-    listings_latest_src_10003.country
-    , bookings_source_src_10000.listing_id
+    bookings_source_src_10000.listing_id
+    , listings_latest_src_10003.country
 ) subq_11

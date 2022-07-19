@@ -5,19 +5,18 @@ SELECT
 FROM (
   -- Aggregate Measures
   SELECT
-    SUM(subq_4.txn_revenue) AS txn_revenue
-    , subq_4.ds__month
+    subq_4.ds__month
+    , SUM(subq_4.txn_revenue) AS txn_revenue
   FROM (
     -- Pass Only Elements:
     --   ['txn_revenue', 'ds__month']
     SELECT
-      subq_2.txn_revenue
-      , subq_2.ds__month
+      subq_2.ds__month
+      , subq_2.txn_revenue
     FROM (
       -- Constrain Time Range to [2019-12-01T00:00:00, 2020-01-01T00:00:00]
       SELECT
-        subq_1.txn_revenue
-        , subq_1.ds
+        subq_1.ds
         , subq_1.ds__week
         , subq_1.ds__month
         , subq_1.ds__quarter
@@ -28,11 +27,11 @@ FROM (
         , subq_1.metric_time__quarter
         , subq_1.metric_time__year
         , subq_1.user
+        , subq_1.txn_revenue
       FROM (
         -- Metric Time Dimension 'ds'
         SELECT
-          subq_0.txn_revenue
-          , subq_0.ds
+          subq_0.ds
           , subq_0.ds__week
           , subq_0.ds__month
           , subq_0.ds__quarter
@@ -43,6 +42,7 @@ FROM (
           , subq_0.ds__quarter AS metric_time__quarter
           , subq_0.ds__year AS metric_time__year
           , subq_0.user
+          , subq_0.txn_revenue
         FROM (
           -- Read Elements From Data Source 'revenue'
           SELECT
