@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Any, Optional
+from typing import Any, Optional, Tuple, Union
 
 from metricflow.model.objects.base import FrozenBaseModel, PydanticCustomInputParser
 
@@ -49,3 +49,11 @@ class SqlTable(PydanticCustomInputParser, FrozenBaseModel):
         if self.db_name:
             return f"{self.db_name}.{self.schema_name}.{self.table_name}"
         return f"{self.schema_name}.{self.table_name}"
+
+    @property
+    def parts_tuple(self) -> Union[Tuple[str, str], Tuple[str, str, str]]:
+        """Return a tuple of the sql table parts"""
+        if self.db_name:
+            return (self.db_name, self.schema_name, self.table_name)
+        else:
+            return (self.schema_name, self.table_name)
