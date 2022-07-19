@@ -1,9 +1,8 @@
 from __future__ import annotations
 from collections import defaultdict
 
-from typing import List, Optional
+from typing import List
 
-from metricflow.errors.errors import InferenceError
 from metricflow.inference.context.base import InferenceContextProvider
 from metricflow.inference.rule.base import InferenceRule, InferenceSignal
 from metricflow.inference.solver.base import InferenceSolver
@@ -19,53 +18,36 @@ from metricflow.inference.models import InferenceResult
 class InferenceRunner:
     """Glues together all other inference classes in a sequence that actually runs inference."""
 
-    def __init__(self) -> None:  # noqa: D
-        self.context_providers: List[InferenceContextProvider] = []
-        self.ruleset: List[InferenceRule] = []
-        self.solver: Optional[InferenceSolver] = None
-        self.renderers: List[InferenceRenderer] = []
+    def __init__(
+        self,
+        context_providers: List[InferenceContextProvider],
+        ruleset: List[InferenceRule],
+        solver: InferenceSolver,
+        renderers: List[InferenceRenderer],
+    ) -> None:
+        """Initialize the inference runner.
 
-    def set_ruleset(self, ruleset: List[InferenceRule]) -> InferenceRunner:
-        """Configure the ruleset to be used during inference."""
+        context_providers: a list of context providers to be used
+        ruleset: the set of rules that will produce signals
+        solver: the inference solver to be used
+        renderers: the renderers that will write inference results as meaningful output
+        """
+        if len(context_providers) != 1:
+            raise ValueError("Currently, InferenceRunner requires exactly one DataWarehouseInferenceContextProvider.")
+
+        if len(ruleset) == 0:
+            raise ValueError("Running inference with an empty ruleset would produce no result.")
+
+        if len(renderers) == 0:
+            raise ValueError("Running inference with no renderer would discard the results.")
+
+        self.context_providers = context_providers
         self.ruleset = ruleset
-        return self
-
-    def add_rule(self, rule: InferenceRule) -> InferenceRunner:
-        """Add a rule to this runner's ruleset."""
-        self.ruleset.append(rule)
-        return self
-
-    def add_context_provider(self, provider: InferenceContextProvider) -> InferenceRunner:
-        """Add a context provider to be used during inference"""
-        self.context_providers.append(provider)
-        return self
-
-    def set_solver(self, solver: InferenceSolver) -> InferenceRunner:
-        """Set the solver to be used during inference"""
         self.solver = solver
-        return self
-
-    def add_renderer(self, renderer: InferenceRenderer) -> InferenceRunner:
-        """Add a renderer that writes inference results to an output"""
-        self.renderers.append(renderer)
-        return self
+        self.renderers = renderers
 
     def run(self) -> None:
         """Runs inference with the given configs."""
-        if len(self.context_providers) != 1:
-            raise InferenceError(
-                "Currently, InferenceRunner requires exactly one DataWarehouseInferenceContextProvider."
-            )
-
-        if len(self.ruleset) == 0:
-            raise InferenceError("Running inference with an empty ruleset would produce no result.")
-
-        if self.solver is None:
-            raise InferenceError("Cannot run inference without a solver.")
-
-        if len(self.renderers) == 0:
-            raise InferenceError("Running inference with no renderer would discard the results.")
-
         warehouse = self.context_providers[0].get_context()
         signals: List[InferenceSignal] = []
         for rule in self.ruleset:
