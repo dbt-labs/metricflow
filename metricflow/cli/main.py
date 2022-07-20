@@ -289,7 +289,7 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
     "--show-sql-descriptions",
     is_flag=True,
     default=False,
-    help="Shows inline descriptions MetricFlow Nodes in displayed SQL",
+    help="Shows inline descriptions of nodes in displayed SQL",
 )
 @pass_config
 @exception_handler
