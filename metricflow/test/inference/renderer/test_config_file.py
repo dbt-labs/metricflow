@@ -38,6 +38,11 @@ def test_render_configs(tmpdir: Path):  # noqa: D
             type_node=InferenceSignalType.DIMENSION.TIME,
             reasons=[],
         ),
+        InferenceResult(
+            column=SqlColumn.from_string("db.schema.test_table.primary_time_dim"),
+            type_node=InferenceSignalType.DIMENSION.PRIMARY_TIME,
+            reasons=[],
+        ),
     ]
 
     renderer = ConfigFileRenderer(tmpdir, True)
@@ -55,7 +60,14 @@ def test_render_configs(tmpdir: Path):  # noqa: D
             "name": "test_table",
             "sql_table": "db.schema.test_table",
             "identifiers": [{"type": "primary", "name": "id"}],
-            "dimensions": [{"type": "time", "name": "time_dim"}],
+            "dimensions": [
+                {"type": "time", "name": "time_dim", "type_params": {"time_granularity": "day"}},
+                {
+                    "type": "time",
+                    "name": "primary_time_dim",
+                    "type_params": {"is_primary": True, "time_granularity": "day"},
+                },
+            ],
             "measures": [],
         }
     }

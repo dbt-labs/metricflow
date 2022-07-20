@@ -1,7 +1,8 @@
 from collections import defaultdict
 import os
 from pathlib import Path
-from typing import Dict, Union, List
+from typing import Dict, Literal, Union, List, TypedDict
+from typing_extensions import NotRequired
 
 from ruamel.yaml import YAML
 
@@ -12,10 +13,21 @@ from metricflow.inference.renderer.base import InferenceRenderer
 yaml = YAML()
 
 
+class RenderedTimeColumnConfigTypeParams(TypedDict):  # noqa: D
+    time_granularity: Literal["day"]
+    is_primary: NotRequired[bool]
+
+
+class RenderedColumnConfig(TypedDict):  # noqa: D
+    name: str
+    type: str
+    type_params: NotRequired[RenderedTimeColumnConfigTypeParams]
+
+
 class ConfigFileRenderer(InferenceRenderer):
     """Writes inference results to a set config files"""
 
-    UNKNOWN_FIELD_VALUE = "FIXME"
+    UNKNOWN_FIELD_VALUE = "UNKNOWN"
 
     def __init__(self, dir_path: Union[str, Path], overwrite=False) -> None:
         """Initializes the renderer.
@@ -36,14 +48,14 @@ class ConfigFileRenderer(InferenceRenderer):
     def _get_filename_for_table(self, table: SqlTable) -> str:
         return os.path.abspath(os.path.join(self.dir_path, f"{table.table_name}.yaml"))
 
-    def _render_id_columns(self, results: List[InferenceResult]) -> List[Dict]:
+    def _render_id_columns(self, results: List[InferenceResult]) -> List[RenderedColumnConfig]:
         type_map = {
             InferenceSignalType.ID.PRIMARY: "primary",
             InferenceSignalType.ID.FOREIGN: "foreign",
             InferenceSignalType.ID.UNIQUE: "unique",
         }
 
-        rendered = [
+        rendered: List[RenderedColumnConfig] = [
             {
                 "name": result.column.column_name,
                 "type": type_map.get(result.type_node, ConfigFileRenderer.UNKNOWN_FIELD_VALUE),
@@ -54,20 +66,29 @@ class ConfigFileRenderer(InferenceRenderer):
 
         return rendered
 
-    def _render_dimension_columns(self, results: List[InferenceResult]) -> List[Dict]:
+    def _render_dimension_columns(self, results: List[InferenceResult]) -> List[RenderedColumnConfig]:
         type_map = {
             InferenceSignalType.DIMENSION.TIME: "time",
+            InferenceSignalType.DIMENSION.PRIMARY_TIME: "time",
             InferenceSignalType.DIMENSION.CATEGORICAL: "categorical",
         }
 
-        rendered = [
-            {
+        rendered: List[RenderedColumnConfig] = []
+        for result in results:
+            if not result.type_node.is_descendant(InferenceSignalType.DIMENSION.UNKNOWN):
+                continue
+
+            result_data: RenderedColumnConfig = {
                 "name": result.column.column_name,
                 "type": type_map.get(result.type_node, ConfigFileRenderer.UNKNOWN_FIELD_VALUE),
             }
-            for result in results
-            if result.type_node.is_descendant(InferenceSignalType.DIMENSION.UNKNOWN)
-        ]
+            if result.type_node.is_descendant(InferenceSignalType.DIMENSION.TIME):
+                type_params: RenderedTimeColumnConfigTypeParams = {"time_granularity": "day"}
+                if result.type_node.is_descendant(InferenceSignalType.DIMENSION.PRIMARY_TIME):
+                    type_params["is_primary"] = True
+                result_data["type_params"] = type_params
+
+            rendered.append(result_data)
 
         return rendered
 
