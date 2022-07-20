@@ -1,8 +1,12 @@
 from __future__ import annotations
+from abc import abstractmethod
 
-from typing import Callable, List
+from typing import Callable, List, TypeVar
 
-from metricflow.inference.context.data_warehouse import ColumnProperties, DataWarehouseInferenceContext
+from metricflow.inference.context.data_warehouse import (
+    ColumnProperties,
+    DataWarehouseInferenceContext,
+)
 from metricflow.inference.rule.base import InferenceRule
 from metricflow.inference.models import (
     InferenceSignal,
@@ -10,8 +14,9 @@ from metricflow.inference.models import (
     InferenceSignalNode,
 )
 
+T = TypeVar("T", bound="ColumnMatcherRule")
 
-ColumnMatcher = Callable[[ColumnProperties], bool]
+ColumnMatcher = Callable[[T, ColumnProperties], bool]
 
 
 class ColumnMatcherRule(InferenceRule):
@@ -22,38 +27,36 @@ class ColumnMatcherRule(InferenceRule):
 
     If you need a more specific rule with varying confidence, column cross-checking and that outputs
     multiple types, inherit from `InferenceRule` directly.
+
+    type_node: the `InferenceSignalNode` to produce whenever the pattern is matched
+    confidence: the `InferenceSignalConfidence` to produce whenever the pattern is matched
+    complimentary_signal: whether the produced signal should be complimentary or not
+    match_reason: a human-readable string of the reason why this was matched
     """
 
-    def __init__(
-        self,
-        matcher: ColumnMatcher,
-        type_node: InferenceSignalNode,
-        confidence: InferenceSignalConfidence,
-        match_reason: str,
-    ) -> None:
-        """Initialize the class.
+    type_node: InferenceSignalNode
+    confidence: InferenceSignalConfidence
+    complimentary_signal: bool
+    match_reason: str
 
-        matcher: a function to determine whether `ColumnProperties` matches. If it does, produce the signal
-        type_node: the `InferenceSignalNode` to produce whenever the pattern is matched
-        confidence: the `InferenceSignalConfidence` to produce whenever the pattern is matched
-        """
-        self.matcher = matcher
-        self.type_node = type_node
-        self.confidence = confidence
-        self.match_reason = match_reason
+    @abstractmethod
+    def match_column(self, props: ColumnProperties) -> bool:
+        """A function to determine whether `ColumnProperties` matches. If it does, produce the signal"""
+        raise NotImplementedError
 
     def process(self, warehouse: DataWarehouseInferenceContext) -> List[InferenceSignal]:  # type: ignore
         """Try to match all columns' properties with the matching function.
 
         If they do match, produce a signal with the configured type and confidence.
         """
-        matching_columns = [column for column, props in warehouse.columns.items() if self.matcher(props)]
+        matching_columns = [column for column, props in warehouse.columns.items() if self.match_column(props)]
         signals = [
             InferenceSignal(
                 column=column,
                 type_node=self.type_node,
                 reason=self.match_reason,
                 confidence=self.confidence,
+                is_complimentary=self.complimentary_signal,
             )
             for column in matching_columns
         ]

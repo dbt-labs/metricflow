@@ -1,36 +1,57 @@
 from typing import List
 
-from metricflow.inference.context.data_warehouse import ColumnProperties, InferenceColumnType
-from metricflow.inference.models import InferenceSignalConfidence, InferenceSignalType
+from metricflow.inference.context.data_warehouse import (
+    ColumnProperties,
+    InferenceColumnType,
+    DataWarehouseInferenceContext,
+)
+from metricflow.inference.models import InferenceSignalConfidence, InferenceSignalType, InferenceSignal
 from metricflow.inference.rule.base import InferenceRule
 from metricflow.inference.rule.rules import ColumnMatcherRule
 
 
-class RuleDefaults:
-    """Static factory class for sensible default rules."""
+# -------------
+# IDENTIFIERS
+# -------------
 
-    @staticmethod
-    def _any_identifier_matcher(props: ColumnProperties) -> bool:
-        """This is the default matcher that is used to determine if columns are identifiers.
 
-        It simply matches column names ending with "id", case insensitive.
+class AnyIdentifierByNameRule(ColumnMatcherRule):
+    """Inference rule that checks for columns ending with `id`.
 
-        We searched for words ending with "id" just to assess the chance of this resulting in a
-        false positive. Our guess is most of those words would rarely, if ever, be used as column names.
-        Therefore, not adding a mandatory "_" before "id" would benefit the product by matching names
-        like "userid", despite the rare "squid", "mermaid" or "android" matches.
+    We searched for words ending with "id" just to assess the chance of this resulting in a
+    false positive. Our guess is most of those words would rarely, if ever, be used as column names.
+    Therefore, not adding a mandatory "_" before "id" would benefit the product by matching names
+    like "userid", despite the rare "squid", "mermaid" or "android" matches.
 
-        See: https://www.thefreedictionary.com/words-that-end-in-id
-        """
+    See: https://www.thefreedictionary.com/words-that-end-in-id
+
+    It will always produce ID.UNKNOWN signal with HIGH confidence.
+    """
+
+    type_node = InferenceSignalType.ID.UNKNOWN
+    confidence = InferenceSignalConfidence.HIGH
+    complimentary_signal = False
+    match_reason = "Column name ends with `id`"
+
+    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
         return props.column.column_name.lower().endswith("id")
 
-    @staticmethod
-    def _primary_identifier_matcher(props: ColumnProperties) -> bool:
-        """This is the default matcher that is used to determine if columns are primary identifiers.
 
-        It matches columns named "id" or columns named "<table>id" or "<table>_id", where "<table>"
-        is the name of the table this column belongs to.
-        """
+class PrimaryIdentifierByNameRule(ColumnMatcherRule):
+    """Inference rule that matches primary identifiers by their names.
+
+    It will match columns such as `db.schema.mytable.mytable_id`,
+    `db.schema.mytable.mytableid` and `db.schema.mytable.id`.
+
+    It will always produce a ID.PRIMARY signal with FOR_SURE confidence.
+    """
+
+    type_node = InferenceSignalType.ID.PRIMARY
+    confidence = InferenceSignalConfidence.FOR_SURE
+    complimentary_signal = False
+    match_reason = "Column name matches `(table_name?)(_?)id`"
+
+    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
         col_lower = props.column.column_name.lower()
         table_lower = props.column.table_name.lower().rstrip("s")
 
@@ -39,118 +60,124 @@ class RuleDefaults:
 
         return col_lower == f"{table_lower}_id" or col_lower == f"{table_lower}id"
 
-    @staticmethod
-    def _unique_identifier_matcher(props: ColumnProperties) -> bool:
-        """This is the default matcher to determine if a column is a unique identifier.
 
-        It matches columns with unique values if they are of type INTEGER or STRING.
-        """
-        return props.distinct_row_count == props.row_count and props.type in [
-            InferenceColumnType.INTEGER,
-            InferenceColumnType.STRING,
-        ]
+class UniqueIdentifierByDistinctCountRule(ColumnMatcherRule):
+    """Inference rule that matches unique identifiers by their COUNT DISTINCT.
 
-    @staticmethod
-    def _measure_matcher(props: ColumnProperties) -> bool:
-        """This is the default matcher that is used to determine if columns are measures.
+    It will always produce a ID.UNIQUE complimentary signal with FOR_SURE confidence.
+    """
 
-        It matches columns of type FLOAT.
-        """
-        return props.type == InferenceColumnType.FLOAT
+    type_node = InferenceSignalType.ID.UNIQUE
+    confidence = InferenceSignalConfidence.FOR_SURE
+    complimentary_signal = True
+    match_reason = "The values in the column are unique"
 
-    @staticmethod
-    def _time_dimension_matcher(props: ColumnProperties) -> bool:
-        """This is the default matcher that is used to determine if columns are time dimensions.
+    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
+        return props.distinct_row_count == props.row_count
 
-        It matches columns of type DATETIME.
-        """
+
+# -------------
+# DIMENSIONS
+# -------------
+
+
+class TimeDimensionByTimeTypeRule(ColumnMatcherRule):
+    """Inference rule that checks for time (time, date, datetime, timestamp) columns.
+
+    It will always produce DIMENSION.TIME with FOR_SURE confidence.
+    """
+
+    type_node = InferenceSignalType.DIMENSION.TIME
+    confidence = InferenceSignalConfidence.FOR_SURE
+    complimentary_signal = False
+    match_reason = "Column type is time (TIME, DATE, DATETIME, TIMESTAMP)"
+
+    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
         return props.type == InferenceColumnType.DATETIME
 
-    @staticmethod
-    def default_ruleset() -> List[InferenceRule]:
-        """Returns a sensible default set of inference rules."""
-        return [
-            RuleDefaults.primary_identifier_rule(),
-            RuleDefaults.unique_identifier_rule(),
-            RuleDefaults.any_identifier_rule(),
-            RuleDefaults.measure_rule(),
-            RuleDefaults.time_dimension_rule(),
-        ]
 
-    @staticmethod
-    def primary_identifier_rule() -> ColumnMatcherRule:
-        """A default for finding primary identifiers by their names based on column name matches.
+class PrimaryTimeDimensionByNameRule(ColumnMatcherRule):
+    """Inference rule that checks if the column name is one of `ds` or `created_at`
 
-        The returned rule will match columns such as `db.schema.mytable.mytable_id`,
-        `db.schema.mytable.mytableid` and `db.schema.mytable.id`.
+    It will always produce DIMENSION.PRIMARY_TIME with FOR_SURE confidence.
+    """
 
-        It will always produce a PRIMARY_IDENTIFIER signal with FOR_SURE confidence.
-        """
-        return ColumnMatcherRule(
-            matcher=RuleDefaults._primary_identifier_matcher,
-            type_node=InferenceSignalType.ID.PRIMARY,
-            confidence=InferenceSignalConfidence.FOR_SURE,
-            match_reason="Column name matches `<table>.id`, `<table>.<table>_id` or `<table>.<table>id`",
-        )
+    type_node = InferenceSignalType.DIMENSION.PRIMARY_TIME
+    confidence = InferenceSignalConfidence.FOR_SURE
+    complimentary_signal = False
+    match_reason = "Column name is either of 'ds' or 'created_at'"
 
-    @staticmethod
-    def unique_identifier_rule() -> ColumnMatcherRule:
-        """A default for finding unique identifier columns.
+    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
+        return props.column.column_name in ["ds", "created_at"]
 
-        The returned rule will match columns with all unique values if their types are either
-        INTEGER or STRING.
 
-        It will always produce a UNIQUE_IDENTIFIER signal with HIGH confidence.
-        """
-        return ColumnMatcherRule(
-            matcher=RuleDefaults._unique_identifier_matcher,
-            type_node=InferenceSignalType.ID.UNIQUE,
-            confidence=InferenceSignalConfidence.HIGH,
-            match_reason="Column has type INTEGER or STRING and its values are unique.",
-        )
+class PrimaryTimeDimensionIfOnlyTimeRule(InferenceRule):
+    """Inference rule for checking if the column is the only time column in the table.
 
-    @staticmethod
-    def any_identifier_rule() -> ColumnMatcherRule:
-        """A default for finding identifiers of any type by their names based on column name matches.
+    It will always produce DIMENSION.PRIMARY_TIME signal with FOR_SURE confidence.
+    """
 
-        The returned rule will match columns such as `db.schema.mytable.id`,
-        `db.schema.mytable.othertable_id` and `db.schema.mytable.othertableid`
+    def process(self, warehouse: DataWarehouseInferenceContext) -> List[InferenceSignal]:  # noqa: D
+        signals: List[InferenceSignal] = []
+        for table_props in warehouse.tables.values():
+            time_cols = [
+                col for col, col_props in table_props.columns.items() if col_props.type == InferenceColumnType.DATETIME
+            ]
+            if len(time_cols) == 1:
+                signals.append(
+                    InferenceSignal(
+                        column=time_cols[0],
+                        type_node=InferenceSignalType.DIMENSION.PRIMARY_TIME,
+                        is_complimentary=False,
+                        reason="The column is the only time column in its table",
+                        confidence=InferenceSignalConfidence.FOR_SURE,
+                    )
+                )
+        return signals
 
-        It will always produce an IDENTIFIER signal with HIGH confidence.
-        """
-        return ColumnMatcherRule(
-            matcher=RuleDefaults._any_identifier_matcher,
-            type_node=InferenceSignalType.ID.UNKNOWN,
-            confidence=InferenceSignalConfidence.HIGH,
-            match_reason="Column name ends with `id`",
-        )
 
-    @staticmethod
-    def measure_rule() -> ColumnMatcherRule:
-        """A default for finding measures based on their type.
+class CategoricalDimensionByBooleanTypeRule(ColumnMatcherRule):
+    """Inference rule that checks for boolean columns.
 
-        The returned rule will match columns if their type is FLOAT, DOUBLE or any real value.
+    It will always produce DIMENSION.CATEGORICAL with FOR_SURE confidence.
+    """
 
-        It will always prodyce a MEASURE signal with FOR_SURE confidence
-        """
-        return ColumnMatcherRule(
-            matcher=RuleDefaults._measure_matcher,
-            type_node=InferenceSignalType.MEASURE.UNKNOWN,
-            confidence=InferenceSignalConfidence.FOR_SURE,
-            match_reason="Column has real (float) type",
-        )
+    type_node = InferenceSignalType.DIMENSION.CATEGORICAL
+    confidence = InferenceSignalConfidence.FOR_SURE
+    complimentary_signal = False
+    match_reason = "Column type is BOOLEAN"
 
-    @staticmethod
-    def time_dimension_rule() -> ColumnMatcherRule:
-        """A default for finding time dimensions based on their type.
+    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
+        return props.type == InferenceColumnType.BOOLEAN
 
-        The returned rule will match columns if their type is DATE, DATETIME, TIMESTAMP or any time value.
 
-        It will always prodce a DIMENSION.TIME signal with FOR_SURE confidence
-        """
-        return ColumnMatcherRule(
-            matcher=RuleDefaults._time_dimension_matcher,
-            type_node=InferenceSignalType.DIMENSION.TIME,
-            confidence=InferenceSignalConfidence.FOR_SURE,
-            match_reason="Column has time type",
-        )
+# -------------
+# MEASURES
+# -------------
+
+
+class MeasureByRealTypeRule(ColumnMatcherRule):
+    """Inference rule that checks for real (float, double) columns.
+
+    It will always produce MEASURE with FOR_SURE confidence.
+    """
+
+    type_node = InferenceSignalType.MEASURE.UNKNOWN
+    confidence = InferenceSignalConfidence.FOR_SURE
+    complimentary_signal = False
+    match_reason = "Column type is real (FLOAT, DOUBLE, DOUBLE PRECISION)"
+
+    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
+        return props.type == InferenceColumnType.FLOAT
+
+
+DEFAULT_RULESET = [
+    AnyIdentifierByNameRule(),
+    PrimaryIdentifierByNameRule(),
+    UniqueIdentifierByDistinctCountRule(),
+    TimeDimensionByTimeTypeRule(),
+    PrimaryTimeDimensionByNameRule(),
+    PrimaryTimeDimensionIfOnlyTimeRule(),
+    CategoricalDimensionByBooleanTypeRule(),
+    MeasureByRealTypeRule(),
+]

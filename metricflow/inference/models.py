@@ -72,6 +72,7 @@ class _TreeNodes:  # noqa: D
     primary_id = InferenceSignalNode(unique_id, "PRIMARY_IDENTIFIER")
     dimension = InferenceSignalNode(root, "DIMENSION")
     time_dimension = InferenceSignalNode(dimension, "TIME_DIMENSION")
+    primary_time_dimension = InferenceSignalNode(time_dimension, "PRIMARY_TIME_DIMENSION")
     categorical_dimension = InferenceSignalNode(dimension, "CATEGORICAL_DIMENSION")
     measure = InferenceSignalNode(root, "MEASURE")
 
@@ -94,6 +95,7 @@ class InferenceSignalType:
 
         UNKNOWN = _TreeNodes.dimension
         TIME = _TreeNodes.time_dimension
+        PRIMARY_TIME = _TreeNodes.primary_time_dimension
         CATEGORICAL = _TreeNodes.categorical_dimension
 
     class MEASURE:
@@ -111,12 +113,15 @@ class InferenceSignal:
     reason: a human-readable string that explains why this signal was produced. It may
         eventually reach the user's eyeballs.
     confidence: the confidence that this signal is correct.
+    is_complimentary: whether a solver should only consider this signal if it is complimentary
+        to another signal.
     """
 
     column: SqlColumn
     type_node: InferenceSignalNode
     reason: str
     confidence: InferenceSignalConfidence
+    is_complimentary: bool
 
 
 @dataclass(frozen=True)
