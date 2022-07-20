@@ -113,8 +113,18 @@ class InferenceSignal:
     reason: a human-readable string that explains why this signal was produced. It may
         eventually reach the user's eyeballs.
     confidence: the confidence that this signal is correct.
-    is_complimentary: whether a solver should only consider this signal if it is complimentary
-        to another signal.
+    is_complimentary: whether a solver should only consider this signal if the parent type
+        node is also present.
+
+    About the usage of `is_complimentary`:
+        This can be used to produce contradicting signals that don't affect each other and
+        are only used to further specify parent signals.
+
+        Example: columns with unique values can indicate both unique keys and categorical
+        dimensions, which would contradict each other. If we make these signals complimentary,
+        they will only resolve to "unique identifier" if there is another signal that points
+        to "identifier". Similarly, it will only resolve to "categorical dimension" if there
+        is another signal that points to "dimension".
     """
 
     column: SqlColumn

@@ -10,14 +10,14 @@ from metricflow.inference.models import (
 from metricflow.inference.solver.base import InferenceSolver
 
 
-NodeWeighterFunction = Callable[[List[InferenceSignalConfidence]], int]
+NodeWeighterFunction = Callable[[InferenceSignalConfidence], int]
 
 
 class WeightedTypeTreeInferenceSolver(InferenceSolver):
     """Assigns weights to each type in the column type tree and attemptins to traverse it using a weight percentage threshold."""
 
     @staticmethod
-    def default_weighter_function(confidence_scores: List[InferenceSignalConfidence]) -> int:
+    def default_weighter_function(confidence: InferenceSignalConfidence) -> int:
         """The default weighter function.
 
         It assigns weights 1, 2, 3 and 5 for LOW, MEDIUM, HIGH and FOR_SURE confidences, respectively. It then sums
@@ -30,17 +30,17 @@ class WeightedTypeTreeInferenceSolver(InferenceSolver):
             InferenceSignalConfidence.FOR_SURE: 5,
         }
 
-        return sum(confidence_weight_map[confidence] for confidence in confidence_scores)
+        return confidence_weight_map[confidence]
 
     def __init__(
-        self, weight_percent_threshold: float = 0.9, weighter_function: Optional[NodeWeighterFunction] = None
+        self, weight_percent_threshold: float = 0.75, weighter_function: Optional[NodeWeighterFunction] = None
     ) -> None:
         """Initialize the solver.
 
         weight_percent_threshold: a number between 0.5 and 1. If a node's weight corresponds to a percentage
             above this threshold with respect to its siblings' total weight sum, the solver will progress deeper
             into the type tree, entering that node. If not, it stops at the parent.
-        weighter_function: a function that returns a weight given a list of confidence scores. It will be used
+        weighter_function: a function that returns a weight given a confidence score. It will be used
             to assign integer weights to each node in the type tree based on its input signals.
         """
         assert weight_percent_threshold >= 0.5 and weight_percent_threshold <= 1
@@ -52,18 +52,55 @@ class WeightedTypeTreeInferenceSolver(InferenceSolver):
             else WeightedTypeTreeInferenceSolver.default_weighter_function
         )
 
-    def _set_cumulative_weight(self, root: InferenceSignalNode, weights_dict: Dict[InferenceSignalNode, int]) -> None:
-        """Turn a dictionary of node weights in a tree into a cumulative weight dict, starting at `root`.
+    def _get_cumulative_weights_for_root(
+        self,
+        root: InferenceSignalNode,
+        weights: Dict[InferenceSignalNode, int],
+        non_complimentary_weights: Dict[InferenceSignalNode, int],
+        signals_by_type: Dict[InferenceSignalNode, List[InferenceSignal]],
+    ) -> Dict[InferenceSignalNode, int]:
+        """Get a dict of cumulative weights, starting at `root`.
 
-        It makes it so that a parent node's weight is the sum of all its children plus its own weight.
+        A parent node's weight is the sum of all its children plus its own weight. Complimentary children get
+        excluded from the parent's sum.
+
+        root: the root to start assigning cumulative weights from.
+        weights: the output dictionary to assign the cumulative weights to
+        non_complimentary_weights: similar to weights, but the weight of each node excludes the weights
+            of all of its complimentary children
+        signals_by_type: a dictionary that maps signal type nodes to signals
         """
-        if len(root.children) == 0:
-            return
-
         for child in root.children:
-            self._set_cumulative_weight(child, weights_dict)
+            self._get_cumulative_weights_for_root(
+                root=child,
+                weights=weights,
+                non_complimentary_weights=non_complimentary_weights,
+                signals_by_type=signals_by_type,
+            )
 
-        weights_dict[root] += sum(weights_dict[child] for child in root.children)
+        weights[root] = sum(self._weighter_function(signal.confidence) for signal in signals_by_type[root])
+        non_complimentary_weights[root] = sum(
+            self._weighter_function(signal.confidence)
+            for signal in signals_by_type[root]
+            if not signal.is_complimentary
+        )
+
+        weights[root] += sum(non_complimentary_weights[child] for child in root.children)
+
+        return weights
+
+    def _get_cumulative_weights(self, signals: List[InferenceSignal]) -> Dict[InferenceSignalNode, int]:
+        """Get the cumulative weights dict for a list of signals"""
+        signals_by_type: Dict[InferenceSignalNode, List[InferenceSignal]] = defaultdict(list)
+        for signal in signals:
+            signals_by_type[signal.type_node].append(signal)
+
+        return self._get_cumulative_weights_for_root(
+            root=InferenceSignalType.UNKNOWN,
+            weights=defaultdict(lambda: 0),
+            non_complimentary_weights=defaultdict(lambda: 0),
+            signals_by_type=signals_by_type,
+        )
 
     def solve_column(self, signals: List[InferenceSignal]) -> Tuple[InferenceSignalNode, List[str]]:
         """Find the appropriate type for a column by traversing through the type tree.
@@ -77,17 +114,11 @@ class WeightedTypeTreeInferenceSolver(InferenceSolver):
                 "No signals were extracted for this column, so we know nothing about it."
             ]
 
-        confidences_by_type: Dict[InferenceSignalNode, List[InferenceSignalConfidence]] = defaultdict(list)
         reasons_by_type: Dict[InferenceSignalNode, List[str]] = defaultdict(list)
         for signal in signals:
-            confidences_by_type[signal.type_node].append(signal.confidence)
             reasons_by_type[signal.type_node].append(f"{signal.reason} ({signal.type_node.name})")
 
-        node_weights: Dict[InferenceSignalNode, int] = defaultdict(lambda: 0)
-        for type_node, confidences_for_type in confidences_by_type.items():
-            node_weights[type_node] = self._weighter_function(confidences_for_type)
-
-        self._set_cumulative_weight(InferenceSignalType.UNKNOWN, node_weights)
+        node_weights = self._get_cumulative_weights(signals)
 
         reasons = []
         node = InferenceSignalType.UNKNOWN
