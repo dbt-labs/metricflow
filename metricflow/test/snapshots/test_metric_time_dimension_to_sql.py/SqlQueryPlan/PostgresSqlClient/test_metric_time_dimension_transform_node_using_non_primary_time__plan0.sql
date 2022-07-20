@@ -1,7 +1,50 @@
--- Pass Only Elements:
---   ['bookings']
+-- Metric Time Dimension 'booking_paid_at'
 SELECT
-  subq_0.bookings
+  subq_0.ds
+  , subq_0.ds__week
+  , subq_0.ds__month
+  , subq_0.ds__quarter
+  , subq_0.ds__year
+  , subq_0.ds_partitioned
+  , subq_0.ds_partitioned__week
+  , subq_0.ds_partitioned__month
+  , subq_0.ds_partitioned__quarter
+  , subq_0.ds_partitioned__year
+  , subq_0.booking_paid_at
+  , subq_0.booking_paid_at__week
+  , subq_0.booking_paid_at__month
+  , subq_0.booking_paid_at__quarter
+  , subq_0.booking_paid_at__year
+  , subq_0.create_a_cycle_in_the_join_graph__ds
+  , subq_0.create_a_cycle_in_the_join_graph__ds__week
+  , subq_0.create_a_cycle_in_the_join_graph__ds__month
+  , subq_0.create_a_cycle_in_the_join_graph__ds__quarter
+  , subq_0.create_a_cycle_in_the_join_graph__ds__year
+  , subq_0.create_a_cycle_in_the_join_graph__ds_partitioned
+  , subq_0.create_a_cycle_in_the_join_graph__ds_partitioned__week
+  , subq_0.create_a_cycle_in_the_join_graph__ds_partitioned__month
+  , subq_0.create_a_cycle_in_the_join_graph__ds_partitioned__quarter
+  , subq_0.create_a_cycle_in_the_join_graph__ds_partitioned__year
+  , subq_0.create_a_cycle_in_the_join_graph__booking_paid_at
+  , subq_0.create_a_cycle_in_the_join_graph__booking_paid_at__week
+  , subq_0.create_a_cycle_in_the_join_graph__booking_paid_at__month
+  , subq_0.create_a_cycle_in_the_join_graph__booking_paid_at__quarter
+  , subq_0.create_a_cycle_in_the_join_graph__booking_paid_at__year
+  , subq_0.booking_paid_at AS metric_time
+  , subq_0.booking_paid_at__week AS metric_time__week
+  , subq_0.booking_paid_at__month AS metric_time__month
+  , subq_0.booking_paid_at__quarter AS metric_time__quarter
+  , subq_0.booking_paid_at__year AS metric_time__year
+  , subq_0.listing
+  , subq_0.guest
+  , subq_0.host
+  , subq_0.create_a_cycle_in_the_join_graph
+  , subq_0.create_a_cycle_in_the_join_graph__listing
+  , subq_0.create_a_cycle_in_the_join_graph__guest
+  , subq_0.create_a_cycle_in_the_join_graph__host
+  , subq_0.is_instant
+  , subq_0.create_a_cycle_in_the_join_graph__is_instant
+  , subq_0.booking_payments
 FROM (
   -- Read Elements From Data Source 'bookings_source'
   SELECT
