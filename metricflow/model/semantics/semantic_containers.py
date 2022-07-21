@@ -137,7 +137,11 @@ class MetricSemantics:  # noqa: D
                     input_measure.measure_reference
                 ),
             )
-            spec = MetricInputMeasureSpec(measure_spec=measure_spec, constraint=spec_constraint)
+            spec = MetricInputMeasureSpec(
+                measure_spec=measure_spec,
+                constraint=spec_constraint,
+                alias=input_measure.alias,
+            )
             input_measure_specs.append(spec)
 
         return tuple(input_measure_specs)

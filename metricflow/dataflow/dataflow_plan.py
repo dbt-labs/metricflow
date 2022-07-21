@@ -38,6 +38,7 @@ from metricflow.aggregation_properties import AggregationType
 from metricflow.object_utils import pformat_big_objects
 from metricflow.references import TimeDimensionReference
 from metricflow.specs import (
+    MetricInputMeasureSpec,
     OrderBySpec,
     InstanceSpec,
     MetricSpec,
@@ -350,10 +351,23 @@ class AggregatedMeasuresOutput(Generic[SourceDataSetT], BaseOutput[SourceDataSet
 
 
 class AggregateMeasuresNode(Generic[SourceDataSetT], AggregatedMeasuresOutput[SourceDataSetT]):
-    """A node that aggregates the measures by the associated group by elements."""
+    """A node that aggregates the measures by the associated group by elements.
 
-    def __init__(self, parent_node: BaseOutput) -> None:  # noqa: D
+    In the event that one or more of the aggregated input measures has an alias assigned to it, any output query
+    resulting from an operation on this node must apply the alias and transform the measure instances accordingly,
+    otherwise this join could produce a query with two identically named measure columns with, e.g., different
+    constraints applied to the measure.
+    """
+
+    def __init__(self, parent_node: BaseOutput, metric_input_measure_specs: Tuple[MetricInputMeasureSpec, ...]) -> None:
+        """Initializer for AggregateMeasuresNode
+
+        The input measure specs are required for downstream nodes to be aware of any input measures with
+        user-provided aliases, such as we might encounter with constrained and unconstrained versions of the
+        same input measure.
+        """
         self._parent_node = parent_node
+        self._metric_input_measure_specs = metric_input_measure_specs
 
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[self._parent_node])
 
@@ -371,6 +385,14 @@ class AggregateMeasuresNode(Generic[SourceDataSetT], AggregatedMeasuresOutput[So
     @property
     def parent_node(self) -> BaseOutput:  # noqa: D
         return self._parent_node
+
+    @property
+    def metric_input_measure_specs(self) -> Tuple[MetricInputMeasureSpec, ...]:
+        """Iterable of specs for measure inputs to downstream metrics.
+
+        Used for assigning aliases to output columns produced by aggregated measures.
+        """
+        return self._metric_input_measure_specs
 
 
 class JoinAggregatedMeasuresByGroupByColumnsNode(Generic[SourceDataSetT], AggregatedMeasuresOutput[SourceDataSetT]):
