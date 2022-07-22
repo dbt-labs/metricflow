@@ -7,7 +7,7 @@ from metricflow.inference.context.data_warehouse import (
 )
 from metricflow.inference.models import InferenceSignalConfidence, InferenceSignalType, InferenceSignal
 from metricflow.inference.rule.base import InferenceRule
-from metricflow.inference.rule.rules import ColumnMatcherRule
+from metricflow.inference.rule.rules import ColumnMatcherRule, LowCardinalityRatioRule
 
 
 # -------------
@@ -25,11 +25,11 @@ class AnyIdentifierByNameRule(ColumnMatcherRule):
 
     See: https://www.thefreedictionary.com/words-that-end-in-id
 
-    It will always produce ID.UNKNOWN signal with HIGH confidence.
+    It will always produce ID.UNKNOWN signal with FOR_SURE confidence.
     """
 
     type_node = InferenceSignalType.ID.UNKNOWN
-    confidence = InferenceSignalConfidence.HIGH
+    confidence = InferenceSignalConfidence.FOR_SURE
     complimentary_signal = False
     match_reason = "Column name ends with `id`"
 
@@ -76,6 +76,17 @@ class UniqueIdentifierByDistinctCountRule(ColumnMatcherRule):
         return props.distinct_row_count == props.row_count
 
 
+class ForeignIdentifierByCardinalityRatioRule(LowCardinalityRatioRule):
+    """Inference rule that checks for low cardinality columns.
+
+    It will always produce ID.FOREIGN with MEDIUM confidence (complimentary).
+    """
+
+    type_node = InferenceSignalType.ID.FOREIGN
+    confidence = InferenceSignalConfidence.MEDIUM
+    complimentary_signal = True
+
+
 # -------------
 # DIMENSIONS
 # -------------
@@ -105,10 +116,10 @@ class PrimaryTimeDimensionByNameRule(ColumnMatcherRule):
     type_node = InferenceSignalType.DIMENSION.PRIMARY_TIME
     confidence = InferenceSignalConfidence.FOR_SURE
     complimentary_signal = False
-    match_reason = "Column name is either of 'ds' or 'created_at'"
+    match_reason = "Column name is either of 'ds', 'created_at', 'created_date' or 'created_time'"
 
     def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
-        return props.column.column_name in ["ds", "created_at"]
+        return props.column.column_name in ["ds", "created_at", "created_date", "created_time"]
 
 
 class PrimaryTimeDimensionIfOnlyTimeRule(InferenceRule):
@@ -151,6 +162,47 @@ class CategoricalDimensionByBooleanTypeRule(ColumnMatcherRule):
         return props.type == InferenceColumnType.BOOLEAN
 
 
+class CategoricalDimensionByStringTypeRule(ColumnMatcherRule):
+    """Inference rule that checks for string columns.
+
+    It will always produce DIMENSION.CATEGORICAL with MEDIUM confidence (complimentary).
+    """
+
+    type_node = InferenceSignalType.DIMENSION.CATEGORICAL
+    confidence = InferenceSignalConfidence.MEDIUM
+    complimentary_signal = True
+    match_reason = "Column type is STRING"
+
+    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
+        return props.type == InferenceColumnType.STRING
+
+
+class CategoricalDimensionByIntegerTypeRule(ColumnMatcherRule):
+    """Inference rule that checks for integer columns.
+
+    It will always produce DIMENSION.CATEGORICAL with MEDIUM confidence (complimentary).
+    """
+
+    type_node = InferenceSignalType.DIMENSION.CATEGORICAL
+    confidence = InferenceSignalConfidence.MEDIUM
+    complimentary_signal = True
+    match_reason = "Column type is INTEGER"
+
+    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
+        return props.type == InferenceColumnType.INTEGER
+
+
+class CategoricalDimensionByCardinalityRatioRule(LowCardinalityRatioRule):
+    """Inference rule that checks for low cardinality columns.
+
+    It will always produce DIMENSION.CATEGORICAL with MEDIUM confidence (complimentary).
+    """
+
+    type_node = InferenceSignalType.DIMENSION.CATEGORICAL
+    confidence = InferenceSignalConfidence.MEDIUM
+    complimentary_signal = True
+
+
 # -------------
 # MEASURES
 # -------------
@@ -171,13 +223,33 @@ class MeasureByRealTypeRule(ColumnMatcherRule):
         return props.type == InferenceColumnType.FLOAT
 
 
+class MeasureByIntegerTypeRule(ColumnMatcherRule):
+    """Inference rule that checks for integer  columns.
+
+    It will always produce MEASURE with MEDIUM confidence (complimentary).
+    """
+
+    type_node = InferenceSignalType.MEASURE.UNKNOWN
+    confidence = InferenceSignalConfidence.MEDIUM
+    complimentary_signal = True
+    match_reason = "Column type is INTEGER"
+
+    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
+        return props.type == InferenceColumnType.INTEGER
+
+
 DEFAULT_RULESET = [
     AnyIdentifierByNameRule(),
     PrimaryIdentifierByNameRule(),
     UniqueIdentifierByDistinctCountRule(),
+    ForeignIdentifierByCardinalityRatioRule(0.4),
     TimeDimensionByTimeTypeRule(),
     PrimaryTimeDimensionByNameRule(),
     PrimaryTimeDimensionIfOnlyTimeRule(),
     CategoricalDimensionByBooleanTypeRule(),
+    CategoricalDimensionByStringTypeRule(),
+    CategoricalDimensionByIntegerTypeRule(),
+    CategoricalDimensionByCardinalityRatioRule(0.2),
     MeasureByRealTypeRule(),
+    MeasureByIntegerTypeRule(),
 ]

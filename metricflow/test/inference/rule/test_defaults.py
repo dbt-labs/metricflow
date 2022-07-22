@@ -157,11 +157,28 @@ def test_categorical_dimension_by_boolean_type_matcher():  # noqa: D
     )
 
 
-def test_measure_by_real_type_matcher():  # noqa: D
-    assert defaults.MeasureByRealTypeRule().match_column(
-        get_column_properties("db.schema.table.id", InferenceColumnType.FLOAT, True)
+def test_categorical_dimension_by_string_type_matcher():  # noqa: D
+    assert defaults.CategoricalDimensionByStringTypeRule().match_column(
+        get_column_properties("db.schema.table.dim", InferenceColumnType.STRING, True)
+    )
+    assert not defaults.CategoricalDimensionByStringTypeRule().match_column(
+        get_column_properties("db.schema.table.bla", InferenceColumnType.FLOAT, True)
     )
 
+
+def test_categorical_dimension_by_integer_type_matcher():  # noqa: D
+    assert defaults.CategoricalDimensionByIntegerTypeRule().match_column(
+        get_column_properties("db.schema.table.dim", InferenceColumnType.INTEGER, True)
+    )
+    assert not defaults.CategoricalDimensionByIntegerTypeRule().match_column(
+        get_column_properties("db.schema.table.bla", InferenceColumnType.FLOAT, True)
+    )
+
+
+def test_measure_by_real_type_matcher():  # noqa: D
+    assert defaults.MeasureByRealTypeRule().match_column(
+        get_column_properties("db.schema.table.measure", InferenceColumnType.FLOAT, True)
+    )
     assert not defaults.MeasureByRealTypeRule().match_column(
         get_column_properties("db.schema.table.measure", InferenceColumnType.INTEGER, True)
     )
@@ -176,4 +193,13 @@ def test_measure_by_real_type_matcher():  # noqa: D
     )
     assert not defaults.MeasureByRealTypeRule().match_column(
         get_column_properties("db.schema.table.measure", InferenceColumnType.UNKNOWN, True)
+    )
+
+
+def test_measure_by_integer_type_matcher():  # noqa: D
+    assert defaults.MeasureByIntegerTypeRule().match_column(
+        get_column_properties("db.schema.table.measure", InferenceColumnType.INTEGER, True)
+    )
+    assert not defaults.MeasureByRealTypeRule().match_column(
+        get_column_properties("db.schema.table.measure", InferenceColumnType.BOOLEAN, True)
     )
