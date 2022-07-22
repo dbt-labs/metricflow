@@ -5,8 +5,10 @@ import logging
 from metricflow.instances import (
     InstanceSet,
 )
+from metricflow.model.validations.unique_valid_name import MetricFlowReservedKeywords
 from metricflow.specs import TimeDimensionReference, TimeDimensionSpec
 from metricflow.time.time_granularity import TimeGranularity
+
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +31,7 @@ class DataSet:
         Or to put in another way, if metrics for those measures were plotted together on a graph, this is the name of
         the time dimension for the x-axis.
         """
-        return TimeDimensionReference(element_name="metric_time")
+        return TimeDimensionReference(element_name=MetricFlowReservedKeywords.METRIC_TIME.value)
 
     @staticmethod
     def metric_time_dimension_name() -> str:

@@ -36,7 +36,7 @@ from metricflow.time.time_granularity import TimeGranularity
 class MetricFlowReservedKeywords(enum.Enum):
     """Enumeration of reserved keywords with helper for accessing the reason they are reserved"""
 
-    METRIC_TIME = "METRIC_TIME"
+    METRIC_TIME = "metric_time"
 
     @staticmethod
     def get_reserved_reason(keyword: MetricFlowReservedKeywords) -> str:
@@ -82,8 +82,8 @@ class UniqueAndValidNameRule(ModelValidationRule):
                     f"({TimeGranularity.list_names()})",
                 )
             )
-        if name.upper() in {reserved_name.value for reserved_name in MetricFlowReservedKeywords}:
-            reason = MetricFlowReservedKeywords.get_reserved_reason(MetricFlowReservedKeywords(name.upper()))
+        if name.lower() in {reserved_name.value for reserved_name in MetricFlowReservedKeywords}:
+            reason = MetricFlowReservedKeywords.get_reserved_reason(MetricFlowReservedKeywords(name.lower()))
             issues.append(
                 ValidationError(
                     context=context,
