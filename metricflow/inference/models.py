@@ -140,10 +140,14 @@ class InferenceResult:
 
     column: the target column for this result
     type_node: the type node of the column
-    reason: a list of human-readable strings that explain why this result was produced. They
-        may eventually reach the user's eyeballs.
+    reason: a list of human-readable strings that explain positive reasons why this result
+        was produced. They may eventually reach the user's eyeballs.
+    problems: a list of human-readable strings that explain why a more specific
+        result was not produced or any other confusion/errors it might have encountered
+        while solving. They may eventually reach the user's eyeballs.
     """
 
     column: SqlColumn
     type_node: InferenceSignalNode
     reasons: List[str]
+    problems: List[str]
