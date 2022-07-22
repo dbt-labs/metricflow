@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+import enum
 import re
 from typing import Dict, Tuple, List, Optional
 from metricflow.instances import (
@@ -24,8 +27,27 @@ from metricflow.model.validations.validator_helpers import (
     ValidationIssueType,
     validate_safely,
 )
+from metricflow.object_utils import assert_values_exhausted
 from metricflow.specs import ElementReference
 from metricflow.time.time_granularity import TimeGranularity
+
+
+@enum.unique
+class MetricFlowReservedKeywords(enum.Enum):
+    """Enumeration of reserved keywords with helper for accessing the reason they are reserved"""
+
+    METRIC_TIME = "metric_time"
+
+    @staticmethod
+    def get_reserved_reason(keyword: MetricFlowReservedKeywords) -> str:
+        """Get the reason a given keyword is reserved. Guarantees an exhaustive switch"""
+        if keyword is MetricFlowReservedKeywords.METRIC_TIME:
+            return (
+                "Used as the query input for creating time series metrics from measures with "
+                "different time dimension names."
+            )
+        else:
+            assert_values_exhausted(keyword)
 
 
 class UniqueAndValidNameRule(ModelValidationRule):
@@ -58,6 +80,14 @@ class UniqueAndValidNameRule(ModelValidationRule):
                     context=context,
                     message=f"Invalid name `{name}` - names cannot match reserved time granularity keywords "
                     f"({TimeGranularity.list_names()})",
+                )
+            )
+        if name.lower() in {reserved_name.value for reserved_name in MetricFlowReservedKeywords}:
+            reason = MetricFlowReservedKeywords.get_reserved_reason(MetricFlowReservedKeywords(name.lower()))
+            issues.append(
+                ValidationError(
+                    context=context,
+                    message=f"Invalid name `{name}` - this name is reserved by MetricFlow. Reason: {reason}",
                 )
             )
         return issues
