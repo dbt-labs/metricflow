@@ -7,7 +7,7 @@ from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.validations.unique_valid_name import UniqueAndValidNameRule
+from metricflow.model.validations.unique_valid_name import MetricFlowReservedKeywords, UniqueAndValidNameRule
 from metricflow.object_utils import flatten_nested_sequence
 from metricflow.test.test_utils import find_data_source_with
 
@@ -246,3 +246,16 @@ def test_invalid_names() -> None:  # noqa:D
     assert UniqueAndValidNameRule.check_valid_name("month") != []
     assert UniqueAndValidNameRule.check_valid_name("quarter") != []
     assert UniqueAndValidNameRule.check_valid_name("year") != []
+
+
+def test_reserved_name() -> None:  # noqa: D
+    reserved_keyword = MetricFlowReservedKeywords.METRIC_TIME
+    reserved_reason = MetricFlowReservedKeywords.get_reserved_reason(reserved_keyword)
+    issues = UniqueAndValidNameRule.check_valid_name(reserved_keyword.value.lower())
+    match = False
+    for issue in issues:
+        if issue.message.find(reserved_reason) != -1:
+            match = True
+    assert (
+        match
+    ), f"Did not find reason: '{reserved_reason}' in issues: {issues} for name: '{reserved_keyword.value.lower()}'"
