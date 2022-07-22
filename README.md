@@ -5,6 +5,8 @@
 
 # Welcome to MetricFlow
 
+See our latest updates in the [Metricflow Changelog](CHANGELOG.md)!
+
 MetricFlow translates a simple metric definition into reusable SQL, and executes it against the SQL engine of your choice. This makes it easy to get consistent metric output broken down by attributes (dimensions) of interest.
 
 MetricFlow is a computational framework for building and maintaining consistent metric logic. The name comes from the approach taken to generate metrics. Using the user-defined semantic model, a query is first compiled into a metric dataflow plan. The plan is then converted to an abstract SQL object model, optimized, and rendered to engine-specific SQL.
