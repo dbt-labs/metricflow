@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import List, Tuple
+from typing import List
 
-from metricflow.inference.models import InferenceSignal, InferenceSignalNode
+from metricflow.dataflow.sql_column import SqlColumn
+from metricflow.inference.models import InferenceResult, InferenceSignal
 
 
 class InferenceSolver(ABC):
@@ -12,9 +13,6 @@ class InferenceSolver(ABC):
     """
 
     @abstractmethod
-    def solve_column(self, signals: List[InferenceSignal]) -> Tuple[InferenceSignalNode, List[str]]:
-        """Make a decision about a column based on its input signals.
-
-        Returns a definitive type for the column and a list of human-readable reasons for this decision.
-        """
+    def solve_column(self, column: SqlColumn, signals: List[InferenceSignal]) -> InferenceResult:
+        """Make a decision about a column based on its input signals."""
         raise NotImplementedError

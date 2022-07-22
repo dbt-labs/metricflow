@@ -1,7 +1,9 @@
 from collections import defaultdict
-from typing import Callable, Dict, List, Tuple, Optional
+from typing import Callable, Dict, List, Optional
 
+from metricflow.dataflow.sql_column import SqlColumn
 from metricflow.inference.models import (
+    InferenceResult,
     InferenceSignal,
     InferenceSignalConfidence,
     InferenceSignalNode,
@@ -26,14 +28,14 @@ class WeightedTypeTreeInferenceSolver(InferenceSolver):
         confidence_weight_map = {
             InferenceSignalConfidence.LOW: 1,
             InferenceSignalConfidence.MEDIUM: 2,
-            InferenceSignalConfidence.HIGH: 3,
-            InferenceSignalConfidence.FOR_SURE: 5,
+            InferenceSignalConfidence.HIGH: 4,
+            InferenceSignalConfidence.FOR_SURE: 8,
         }
 
         return confidence_weight_map[confidence]
 
     def __init__(
-        self, weight_percent_threshold: float = 0.75, weighter_function: Optional[NodeWeighterFunction] = None
+        self, weight_percent_threshold: float = 0.6, weighter_function: Optional[NodeWeighterFunction] = None
     ) -> None:
         """Initialize the solver.
 
@@ -102,7 +104,7 @@ class WeightedTypeTreeInferenceSolver(InferenceSolver):
             signals_by_type=signals_by_type,
         )
 
-    def solve_column(self, signals: List[InferenceSignal]) -> Tuple[InferenceSignalNode, List[str]]:
+    def solve_column(self, column: SqlColumn, signals: List[InferenceSignal]) -> InferenceResult:
         """Find the appropriate type for a column by traversing through the type tree.
 
         It traverses the tree by giving weights to all nodes and greedily finding the path with the most
@@ -110,9 +112,15 @@ class WeightedTypeTreeInferenceSolver(InferenceSolver):
         to the provided `weight_percent_threshold`.
         """
         if len(signals) == 0:
-            return InferenceSignalType.UNKNOWN, [
-                "No signals were extracted for this column, so we know nothing about it."
-            ]
+            return InferenceResult(
+                column=column,
+                type_node=InferenceSignalType.UNKNOWN,
+                reasons=[],
+                problems=[
+                    "No signals were extracted for this column",
+                    "Inference solver could not determine a type for this column",
+                ],
+            )
 
         reasons_by_type: Dict[InferenceSignalNode, List[str]] = defaultdict(list)
         for signal in signals:
@@ -120,9 +128,10 @@ class WeightedTypeTreeInferenceSolver(InferenceSolver):
 
         node_weights = self._get_cumulative_weights(signals)
 
-        reasons = []
+        reasons: List[str] = []
+        problems: List[str] = []
         node = InferenceSignalType.UNKNOWN
-        while node is not None and len(node.children) > 0:
+        while len(node.children) > 0:
             children_weight_total = sum(node_weights[child] for child in node.children)
 
             if children_weight_total == 0:
@@ -136,8 +145,19 @@ class WeightedTypeTreeInferenceSolver(InferenceSolver):
                     break
 
             if next_node is None:
+                if len(node.children) > 0:  # there was confusion
+                    children_weight_strings = [
+                        f"{child.name} (weight {node_weights[child]})"
+                        for child in node.children
+                        if node_weights[child] != 0
+                    ]
+                    child_str = " / ".join(children_weight_strings)
+                    problems.append(f"Solver is confused between {child_str}")
                 break
 
             node = next_node
 
-        return node, reasons
+        if node == InferenceSignalType.UNKNOWN:
+            problems.append("Inference solver could not determine a type for this column")
+
+        return InferenceResult(column=column, type_node=node, reasons=reasons, problems=problems)

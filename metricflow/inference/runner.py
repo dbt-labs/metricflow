@@ -8,7 +8,6 @@ from metricflow.inference.context.data_warehouse import DataWarehouseInferenceCo
 from metricflow.inference.rule.base import InferenceRule, InferenceSignal
 from metricflow.inference.solver.base import InferenceSolver
 from metricflow.inference.renderer.base import InferenceRenderer
-from metricflow.inference.models import InferenceResult
 
 # TODO: we still need to add input/output context validations and optimizations.
 # Case 1: Rule 1 requires Context of type A, but no provider privides it. Should fail before running
@@ -60,12 +59,7 @@ class InferenceRunner:
         for signal in signals:
             signals_by_column[signal.column].append(signal)
 
-        solved_columns = {column: self.solver.solve_column(signals) for column, signals in signals_by_column.items()}
-
-        results = [
-            InferenceResult(column=column, type_node=type_node, reasons=reasons)
-            for column, (type_node, reasons) in solved_columns.items()
-        ]
+        results = [self.solver.solve_column(column, signals) for column, signals in signals_by_column.items()]
 
         for renderer in self.renderers:
             renderer.render(results)
