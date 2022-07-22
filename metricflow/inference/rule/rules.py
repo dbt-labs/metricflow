@@ -61,3 +61,31 @@ class ColumnMatcherRule(InferenceRule):
             for column in matching_columns
         ]
         return signals
+
+
+class LowCardinalityRatioRule(ColumnMatcherRule):
+    """Inference rule that checks for string columns with low cardinality to count ratio.
+
+    The ratio is calculated as `distinct_count/(count - null_count)`.
+    """
+
+    def __init__(self, cardinality_count_ratio_threshold: float) -> None:
+        """Initialize the rule.
+
+        cardinality_count_ratio_threshold: rations below this threshold will match.
+        """
+        assert cardinality_count_ratio_threshold >= 0 and cardinality_count_ratio_threshold <= 1
+        self.threshold = cardinality_count_ratio_threshold
+        super().__init__()
+
+    match_reason = "Column has low cardinality"
+
+    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
+        denom = props.row_count - props.null_count
+
+        # undefined ratio
+        if denom == 0:
+            return False
+
+        ratio = props.distinct_row_count / denom
+        return ratio < self.threshold
