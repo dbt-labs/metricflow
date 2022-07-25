@@ -223,12 +223,12 @@ def test_between_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> No
     actual = default_expr_renderer.render_sql_expr(
         SqlBetweenExpression(
             column_arg=SqlColumnReferenceExpression(SqlColumnReference("a", "col0")),
-            left_value=SqlCastToTimestampExpression(
+            start_expr=SqlCastToTimestampExpression(
                 arg=SqlStringLiteralExpression(
                     literal_value="2020-01-01",
                 )
             ),
-            right_value=SqlCastToTimestampExpression(
+            end_expr=SqlCastToTimestampExpression(
                 arg=SqlStringLiteralExpression(
                     literal_value="2020-01-10",
                 )

@@ -1155,12 +1155,12 @@ class SqlBetweenExpression(SqlExpressionNode):
     """A BETWEEN clause like `column BETWEEN val1 AND val2`"""
 
     def __init__(  # noqa: D
-        self, column_arg: SqlExpressionNode, left_value: SqlExpressionNode, right_value: SqlExpressionNode
+        self, column_arg: SqlExpressionNode, start_expr: SqlExpressionNode, end_expr: SqlExpressionNode
     ) -> None:
         self._column_arg = column_arg
-        self._left_value = left_value
-        self._right_value = right_value
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=[column_arg, left_value, right_value])
+        self._start_expr = start_expr
+        self._end_expr = end_expr
+        super().__init__(node_id=self.create_unique_id(), parent_nodes=[column_arg, start_expr, end_expr])
 
     @classmethod
     def id_prefix(cls) -> str:  # noqa: D
@@ -1182,12 +1182,12 @@ class SqlBetweenExpression(SqlExpressionNode):
         return self._column_arg
 
     @property
-    def left_value(self) -> SqlExpressionNode:  # noqa: D
-        return self._left_value
+    def start_expr(self) -> SqlExpressionNode:  # noqa: D
+        return self._start_expr
 
     @property
-    def right_value(self) -> SqlExpressionNode:  # noqa: D
-        return self._right_value
+    def end_expr(self) -> SqlExpressionNode:  # noqa: D
+        return self._end_expr
 
     def rewrite(  # noqa: D
         self,
@@ -1196,8 +1196,8 @@ class SqlBetweenExpression(SqlExpressionNode):
     ) -> SqlExpressionNode:
         return SqlBetweenExpression(
             column_arg=self.column_arg.rewrite(column_replacements, should_render_table_alias),
-            left_value=self.left_value.rewrite(column_replacements, should_render_table_alias),
-            right_value=self.right_value.rewrite(column_replacements, should_render_table_alias),
+            start_expr=self.start_expr.rewrite(column_replacements, should_render_table_alias),
+            end_expr=self.end_expr.rewrite(column_replacements, should_render_table_alias),
         )
 
     @property

@@ -329,12 +329,12 @@ def _make_time_range_comparison_expr(
                 column_name=column_alias,
             )
         ),
-        left_value=SqlCastToTimestampExpression(
+        start_expr=SqlCastToTimestampExpression(
             arg=SqlStringLiteralExpression(
                 literal_value=time_range_constraint.start_time.strftime(ISO8601_PYTHON_FORMAT),
             )
         ),
-        right_value=SqlCastToTimestampExpression(
+        end_expr=SqlCastToTimestampExpression(
             arg=SqlStringLiteralExpression(
                 literal_value=time_range_constraint.end_time.strftime(ISO8601_PYTHON_FORMAT),
             )

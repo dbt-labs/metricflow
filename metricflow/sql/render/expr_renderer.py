@@ -259,15 +259,15 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
 
     def visit_between_expr(self, node: SqlBetweenExpression) -> SqlExpressionRenderResult:  # noqa: D
         rendered_column_arg = self.render_sql_expr(node.column_arg)
-        rendered_left_value = self.render_sql_expr(node.left_value)
-        rendered_right_value = self.render_sql_expr(node.right_value)
+        rendered_start_expr = self.render_sql_expr(node.start_expr)
+        rendered_end_expr = self.render_sql_expr(node.end_expr)
 
         execution_parameters = SqlBindParameters()
         execution_parameters.update(rendered_column_arg.execution_parameters)
-        execution_parameters.update(rendered_left_value.execution_parameters)
-        execution_parameters.update(rendered_right_value.execution_parameters)
+        execution_parameters.update(rendered_start_expr.execution_parameters)
+        execution_parameters.update(rendered_end_expr.execution_parameters)
 
         return SqlExpressionRenderResult(
-            sql=f"{rendered_column_arg.sql} BETWEEN {rendered_left_value.sql} AND {rendered_right_value.sql}",
+            sql=f"{rendered_column_arg.sql} BETWEEN {rendered_start_expr.sql} AND {rendered_end_expr.sql}",
             execution_parameters=execution_parameters,
         )
