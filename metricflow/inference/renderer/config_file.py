@@ -52,7 +52,7 @@ class ConfigFileRenderer(InferenceRenderer):
     def _fixme(self, comment: str) -> str:
         return f"FIXME: {comment}"
 
-    def _render_id_columns(self, results: List[InferenceResult]) -> List[CommentedMap[RenderedColumnConfig]]:
+    def _render_id_columns(self, results: List[InferenceResult]) -> List[CommentedMap]:
         type_map = {
             InferenceSignalType.ID.PRIMARY: "primary",
             InferenceSignalType.ID.FOREIGN: "foreign",
@@ -70,19 +70,19 @@ class ConfigFileRenderer(InferenceRenderer):
 
         return rendered
 
-    def _render_dimension_columns(self, results: List[InferenceResult]) -> List[CommentedMap[RenderedColumnConfig]]:
+    def _render_dimension_columns(self, results: List[InferenceResult]) -> List[CommentedMap]:
         type_map = {
             InferenceSignalType.DIMENSION.TIME: "time",
             InferenceSignalType.DIMENSION.PRIMARY_TIME: "time",
             InferenceSignalType.DIMENSION.CATEGORICAL: "categorical",
         }
 
-        rendered: List[CommentedMap[RenderedColumnConfig]] = []
+        rendered: List[CommentedMap] = []
         for result in results:
             if not result.type_node.is_descendant(InferenceSignalType.DIMENSION.UNKNOWN):
                 continue
 
-            result_data: CommentedMap[RenderedColumnConfig] = CommentedMap(
+            result_data: CommentedMap = CommentedMap(
                 {
                     "name": result.column.column_name,
                     "type": type_map.get(result.type_node, ConfigFileRenderer.UNKNOWN_FIELD_VALUE),
@@ -93,7 +93,7 @@ class ConfigFileRenderer(InferenceRenderer):
                 result_data.yaml_add_eol_comment(self._fixme("unknown field value"), "type")
 
             if result.type_node.is_descendant(InferenceSignalType.DIMENSION.TIME):
-                type_params: CommentedMap[RenderedTimeColumnConfigTypeParams] = {"time_granularity": "day"}
+                type_params: CommentedMap = {"time_granularity": "day"}
                 if result.type_node.is_descendant(InferenceSignalType.DIMENSION.PRIMARY_TIME):
                     type_params["is_primary"] = True
                 result_data["type_params"] = type_params
