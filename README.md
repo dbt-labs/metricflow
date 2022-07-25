@@ -1,11 +1,11 @@
 <p align="center">
-<img src="assets/MetricFlow_logo.png" />
+<img src="https://github.com/transform-data/metricflow/raw/main/assets/MetricFlow_logo.png" />
 <br /><br />
 </p>
 
 # Welcome to MetricFlow
 
-See our latest updates in the [Metricflow Changelog](CHANGELOG.md)!
+See our latest updates in the [Metricflow Changelog](https://github.com/transform-data/metricflow/blob/main/CHANGELOG.md)!
 
 MetricFlow translates a simple metric definition into reusable SQL, and executes it against the SQL engine of your choice. This makes it easy to get consistent metric output broken down by attributes (dimensions) of interest.
 
@@ -37,7 +37,7 @@ If you would like to visualize metric dataflow plans via CLI, install Graphviz:
 The visualizations are in an early state of development, but look similar to:
 
 <p align="center">
-<img src="assets/example_plan.svg" height="500"/>
+<img src="https://github.com/transform-data/metricflow/raw/main/assets/example_plan.svg" height="500"/>
 <br /><br />
 </p>
 
@@ -117,7 +117,7 @@ This project will be a place where people can easily contribute high-quality upd
 
 You might wish to read our [code of conduct](http://community.transform.co/metricflow-signup) and <LINK> engineering practices </LINK> before diving in.
 
-To get started on direct contributions, head on over to our [contributor guide](CONTRIBUTING.md).
+To get started on direct contributions, head on over to our [contributor guide](https://github.com/transform-data/metricflow/blob/main/CONTRIBUTING.md).
 
 ## Resources
 
@@ -125,7 +125,7 @@ To get started on direct contributions, head on over to our [contributor guide](
 - [Documentation](https://docs.transform.co/docs/overview/metricflow-overview)
 - [Slack Community](https://community.transform.co/metricflow-signup)
 - [MetricFlow Git Repository](https://github.com/transform-data/metricflow)
-- [CHANGELOG.md](CHANGELOG.md)
+- [CHANGELOG.md](https://github.com/transform-data/metricflow/blob/main/CHANGELOG.md)
 
 ## License
 
