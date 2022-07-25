@@ -1,8 +1,8 @@
 -- Compute Metrics via Expressions
 SELECT
-  booking_value * 0.05 AS booking_fees
-  , listing
+  listing
   , listing__country_latest
+  , booking_value * 0.05 AS booking_fees
 FROM (
   -- Join Standard Outputs
   -- Aggregate Measures

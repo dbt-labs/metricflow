@@ -4,12 +4,12 @@
         <!-- node_id = ss_12 -->
         <!-- col0 =                                                    -->
         <!--   {'class': 'SqlSelectColumn',                            -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_258),  -->
-        <!--    'column_alias': 'identity_verifications'}              -->
-        <!-- col1 =                                                    -->
-        <!--   {'class': 'SqlSelectColumn',                            -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_257),  -->
         <!--    'column_alias': 'user__home_state'}                    -->
+        <!-- col1 =                                                    -->
+        <!--   {'class': 'SqlSelectColumn',                            -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_258),  -->
+        <!--    'column_alias': 'identity_verifications'}              -->
         <!-- from_source = SqlSelectStatementNode(node_id=ss_11) -->
         <!-- where = None -->
         <SqlSelectStatementNode>

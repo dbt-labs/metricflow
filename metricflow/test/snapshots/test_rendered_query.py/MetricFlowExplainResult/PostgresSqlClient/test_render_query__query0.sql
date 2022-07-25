@@ -1,8 +1,8 @@
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  SUM(bookings) AS bookings
-  , ds
+  ds
+  , SUM(bookings) AS bookings
 FROM (
   -- Read Elements From Data Source 'bookings_source'
   -- Metric Time Dimension 'ds'

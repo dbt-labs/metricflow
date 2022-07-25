@@ -4,8 +4,8 @@
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  SUM(account_month_txns_src_10009.txn_count) AS txn_count
-  , subq_18.customer_id__customer_name AS account_id__customer_id__customer_name
+  subq_18.customer_id__customer_name AS account_id__customer_id__customer_name
+  , SUM(account_month_txns_src_10009.txn_count) AS txn_count
 FROM ***************************.account_month_txns account_month_txns_src_10009
 LEFT OUTER JOIN (
   -- Join Standard Outputs

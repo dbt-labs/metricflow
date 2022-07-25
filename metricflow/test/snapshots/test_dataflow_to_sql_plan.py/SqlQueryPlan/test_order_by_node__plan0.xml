@@ -29,16 +29,16 @@
             <!-- node_id = ss_2 -->
             <!-- col0 =                                                  -->
             <!--   {'class': 'SqlSelectColumn',                          -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_8),  -->
-            <!--    'column_alias': 'bookings'}                          -->
-            <!-- col1 =                                                  -->
-            <!--   {'class': 'SqlSelectColumn',                          -->
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_7),  -->
             <!--    'column_alias': 'ds'}                                -->
-            <!-- col2 =                                                  -->
+            <!-- col1 =                                                  -->
             <!--   {'class': 'SqlSelectColumn',                          -->
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_6),  -->
             <!--    'column_alias': 'is_instant'}                        -->
+            <!-- col2 =                                                  -->
+            <!--   {'class': 'SqlSelectColumn',                          -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_8),  -->
+            <!--    'column_alias': 'bookings'}                          -->
             <!-- from_source = SqlSelectStatementNode(node_id=ss_1) -->
             <!-- where = None -->
             <SqlSelectStatementNode>

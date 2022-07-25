@@ -4,12 +4,12 @@
         <!-- node_id = ss_9 -->
         <!-- col0 =                                                    -->
         <!--   {'class': 'SqlSelectColumn',                            -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_224),  -->
-        <!--    'column_alias': 'revenue_all_time'}                    -->
-        <!-- col1 =                                                    -->
-        <!--   {'class': 'SqlSelectColumn',                            -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_223),  -->
         <!--    'column_alias': 'ds__month'}                           -->
+        <!-- col1 =                                                    -->
+        <!--   {'class': 'SqlSelectColumn',                            -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_224),  -->
+        <!--    'column_alias': 'revenue_all_time'}                    -->
         <!-- from_source = SqlSelectStatementNode(node_id=ss_8) -->
         <!-- where = None -->
         <SqlSelectStatementNode>

@@ -4,10 +4,10 @@
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  SUM(subq_10.messages) AS messages
-  , subq_10.user_team___team_id AS user_team___team_id
+  subq_10.user_team___team_id AS user_team___team_id
   , subq_10.user_team___user_id AS user_team___user_id
   , users_source_src_10016.country AS user_team__country
+  , SUM(subq_10.messages) AS messages
 FROM (
   -- Read Elements From Data Source 'messages_source'
   -- Metric Time Dimension 'ds'

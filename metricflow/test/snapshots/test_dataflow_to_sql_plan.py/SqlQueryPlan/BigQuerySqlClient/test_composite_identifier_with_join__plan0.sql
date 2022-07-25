@@ -1,9 +1,9 @@
 -- Compute Metrics via Expressions
 SELECT
-  subq_7.messages
-  , subq_7.user_team___team_id
+  subq_7.user_team___team_id
   , subq_7.user_team___user_id
   , subq_7.user_team__country
+  , subq_7.messages
 FROM (
   -- Aggregate Measures
   SELECT

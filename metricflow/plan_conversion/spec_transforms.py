@@ -1,5 +1,6 @@
 from typing import Sequence, List
 
+from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.specs import (
     InstanceSpecSetTransform,
     InstanceSpecSet,
@@ -130,7 +131,7 @@ class CreateOnConditionForCombiningMetrics(InstanceSpecSetTransform[SqlExpressio
             )
 
 
-class CreateSelectCoalescedColumnsForLinkableSpecs(InstanceSpecSetTransform[Sequence[SqlSelectColumn]]):
+class CreateSelectCoalescedColumnsForLinkableSpecs(InstanceSpecSetTransform[SelectColumnSet]):
     """Create select columns that coalesce columns corresponding to linkable specs.
 
     e.g.
@@ -151,12 +152,15 @@ class CreateSelectCoalescedColumnsForLinkableSpecs(InstanceSpecSetTransform[Sequ
         self._column_association_resolver = column_association_resolver
         self._table_aliases = table_aliases
 
-    def transform(self, spec_set: InstanceSpecSet) -> Sequence[SqlSelectColumn]:  # noqa: D
-        select_columns: List[SqlSelectColumn] = []
+    def transform(self, spec_set: InstanceSpecSet) -> SelectColumnSet:  # noqa: D
+
+        dimension_columns: List[SqlSelectColumn] = []
+        time_dimension_columns: List[SqlSelectColumn] = []
+        identifier_columns: List[SqlSelectColumn] = []
 
         for dimension_spec in spec_set.dimension_specs:
             column_name = self._column_association_resolver.resolve_dimension_spec(dimension_spec).column_name
-            select_columns.append(
+            dimension_columns.append(
                 SqlSelectColumn(
                     expr=_make_coalesced_expr(self._table_aliases, column_name),
                     column_alias=column_name,
@@ -165,7 +169,7 @@ class CreateSelectCoalescedColumnsForLinkableSpecs(InstanceSpecSetTransform[Sequ
 
         for time_dimension_spec in spec_set.time_dimension_specs:
             column_name = self._column_association_resolver.resolve_time_dimension_spec(time_dimension_spec).column_name
-            select_columns.append(
+            time_dimension_columns.append(
                 SqlSelectColumn(
                     expr=_make_coalesced_expr(self._table_aliases, column_name),
                     column_alias=column_name,
@@ -177,14 +181,18 @@ class CreateSelectCoalescedColumnsForLinkableSpecs(InstanceSpecSetTransform[Sequ
             assert len(column_associations) == 1, "Composite identifiers not supported"
             column_name = column_associations[0].column_name
 
-            select_columns.append(
+            identifier_columns.append(
                 SqlSelectColumn(
                     expr=_make_coalesced_expr(self._table_aliases, column_name),
                     column_alias=column_name,
                 )
             )
 
-        return select_columns
+        return SelectColumnSet(
+            dimension_columns=dimension_columns,
+            time_dimension_columns=time_dimension_columns,
+            identifier_columns=identifier_columns,
+        )
 
 
 class SelectOnlyLinkableSpecs(InstanceSpecSetTransform[InstanceSpecSet]):

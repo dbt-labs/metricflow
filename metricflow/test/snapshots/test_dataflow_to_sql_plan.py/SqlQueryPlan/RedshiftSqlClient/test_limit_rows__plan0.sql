@@ -5,8 +5,8 @@ SELECT
 FROM (
   -- Compute Metrics via Expressions
   SELECT
-    subq_3.bookings
-    , subq_3.ds
+    subq_3.ds
+    , subq_3.bookings
   FROM (
     -- Aggregate Measures
     SELECT

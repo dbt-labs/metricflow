@@ -4,20 +4,20 @@
         <!-- node_id = ss_7 -->
         <!-- col0 =                                                   -->
         <!--   {'class': 'SqlSelectColumn',                           -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_71),  -->
-        <!--    'column_alias': 'messages'}                           -->
-        <!-- col1 =                                                   -->
-        <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_69),  -->
         <!--    'column_alias': 'user_team___team_id'}                -->
-        <!-- col2 =                                                   -->
+        <!-- col1 =                                                   -->
         <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_70),  -->
         <!--    'column_alias': 'user_team___user_id'}                -->
-        <!-- col3 =                                                   -->
+        <!-- col2 =                                                   -->
         <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_68),  -->
         <!--    'column_alias': 'user_team__country'}                 -->
+        <!-- col3 =                                                   -->
+        <!--   {'class': 'SqlSelectColumn',                           -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_71),  -->
+        <!--    'column_alias': 'messages'}                           -->
         <!-- from_source = SqlSelectStatementNode(node_id=ss_6) -->
         <!-- where = None -->
         <SqlSelectStatementNode>

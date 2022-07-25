@@ -975,11 +975,15 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             )
         output_instance_set = output_instance_set.transform(AddMetrics(metric_instances))
 
+        combined_select_column_set = non_metric_select_column_set.merge(
+            SelectColumnSet(metric_columns=metric_select_columns)
+        )
+
         return SqlDataSet(
             instance_set=output_instance_set,
             sql_select_node=SqlSelectStatementNode(
                 description=node.description,
-                select_columns=tuple(metric_select_columns) + non_metric_select_column_set.as_tuple(),
+                select_columns=combined_select_column_set.as_tuple(),
                 from_source=from_data_set.sql_select_node,
                 from_source_alias=from_data_set_alias,
                 joins_descs=(),
@@ -1188,19 +1192,22 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         output_instance_set = InstanceSet.merge([x.instance_set for x in parent_data_sets])
         output_instance_set = output_instance_set.transform(ChangeAssociatedColumns(self._column_association_resolver))
 
-        metric_select_columns = self._make_select_columns_for_metrics(table_alias_to_metric_specs)
-        linkable_select_columns = linkable_spec_set.transform(
+        metric_select_column_set = SelectColumnSet(
+            metric_columns=self._make_select_columns_for_metrics(table_alias_to_metric_specs)
+        )
+        linkable_select_column_set = linkable_spec_set.transform(
             CreateSelectCoalescedColumnsForLinkableSpecs(
                 column_association_resolver=self._column_association_resolver,
                 table_aliases=parent_source_table_aliases,
             )
         )
+        combined_select_column_set = linkable_select_column_set.merge(metric_select_column_set)
 
         return SqlDataSet(
             instance_set=output_instance_set,
             sql_select_node=SqlSelectStatementNode(
                 description=node.description,
-                select_columns=tuple(metric_select_columns) + tuple(linkable_select_columns),
+                select_columns=combined_select_column_set.as_tuple(),
                 from_source=from_source,
                 from_source_alias=from_alias,
                 joins_descs=tuple(joins_descriptions),

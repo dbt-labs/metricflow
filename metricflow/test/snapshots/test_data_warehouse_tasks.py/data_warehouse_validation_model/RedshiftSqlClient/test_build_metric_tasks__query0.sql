@@ -1,8 +1,8 @@
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  SUM(count_dogs) AS count_dogs
-  , metric_time
+  metric_time
+  , SUM(count_dogs) AS count_dogs
 FROM (
   -- Read Elements From Data Source 'animals'
   -- Metric Time Dimension 'ds'

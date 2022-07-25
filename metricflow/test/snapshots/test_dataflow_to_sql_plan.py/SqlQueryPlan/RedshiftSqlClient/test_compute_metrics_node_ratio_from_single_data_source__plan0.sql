@@ -1,8 +1,8 @@
 -- Compute Metrics via Expressions
 SELECT
-  CAST(subq_5.bookings AS DOUBLE PRECISION) / CAST(NULLIF(subq_5.bookers, 0) AS DOUBLE PRECISION) AS bookings_per_booker
-  , subq_5.listing
+  subq_5.listing
   , subq_5.listing__country_latest
+  , CAST(subq_5.bookings AS DOUBLE PRECISION) / CAST(NULLIF(subq_5.bookers, 0) AS DOUBLE PRECISION) AS bookings_per_booker
 FROM (
   -- Aggregate Measures
   SELECT

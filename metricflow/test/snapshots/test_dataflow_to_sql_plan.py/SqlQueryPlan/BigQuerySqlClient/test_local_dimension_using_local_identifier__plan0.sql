@@ -1,7 +1,7 @@
 -- Compute Metrics via Expressions
 SELECT
-  subq_3.listings
-  , subq_3.listing__country_latest
+  subq_3.listing__country_latest
+  , subq_3.listings
 FROM (
   -- Aggregate Measures
   SELECT

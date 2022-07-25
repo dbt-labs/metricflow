@@ -4,16 +4,16 @@
         <!-- node_id = ss_4 -->
         <!-- col0 =                                                   -->
         <!--   {'class': 'SqlSelectColumn',                           -->
-        <!--    'expr': SqlRatioComputationExpression(node_id=rc_0),  -->
-        <!--    'column_alias': 'bookings_per_booker'}                -->
-        <!-- col1 =                                                   -->
-        <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_16),  -->
         <!--    'column_alias': 'listing'}                            -->
-        <!-- col2 =                                                   -->
+        <!-- col1 =                                                   -->
         <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_15),  -->
         <!--    'column_alias': 'listing__country_latest'}            -->
+        <!-- col2 =                                                   -->
+        <!--   {'class': 'SqlSelectColumn',                           -->
+        <!--    'expr': SqlRatioComputationExpression(node_id=rc_0),  -->
+        <!--    'column_alias': 'bookings_per_booker'}                -->
         <!-- from_source = SqlSelectStatementNode(node_id=ss_3) -->
         <!-- where = None -->
         <SqlSelectStatementNode>

@@ -4,8 +4,8 @@
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  SUM(subq_10.identity_verifications) AS identity_verifications
-  , users_ds_source_src_10006.home_state AS user__home_state
+  users_ds_source_src_10006.home_state AS user__home_state
+  , SUM(subq_10.identity_verifications) AS identity_verifications
 FROM (
   -- Read Elements From Data Source 'id_verifications'
   -- Metric Time Dimension 'ds'

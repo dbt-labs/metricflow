@@ -4,12 +4,12 @@
         <!-- node_id = ss_9 -->
         <!-- col0 =                                                    -->
         <!--   {'class': 'SqlSelectColumn',                            -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_249),  -->
-        <!--    'column_alias': 'listings'}                            -->
-        <!-- col1 =                                                    -->
-        <!--   {'class': 'SqlSelectColumn',                            -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_248),  -->
         <!--    'column_alias': 'listing__country_latest'}             -->
+        <!-- col1 =                                                    -->
+        <!--   {'class': 'SqlSelectColumn',                            -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_249),  -->
+        <!--    'column_alias': 'listings'}                            -->
         <!-- from_source = SqlSelectStatementNode(node_id=ss_8) -->
         <!-- where = None -->
         <SqlSelectStatementNode>
