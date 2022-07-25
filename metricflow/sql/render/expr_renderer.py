@@ -27,6 +27,7 @@ from metricflow.sql.sql_exprs import (
     SqlTimeDeltaExpression,
     SqlRatioComputationExpression,
     SqlColumnAliasReferenceExpression,
+    SqlBetweenExpression,
 )
 from metricflow.time.time_granularity import TimeGranularity
 
@@ -253,5 +254,20 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
 
         return SqlExpressionRenderResult(
             sql=f"{numerator_sql} / {denominator_sql}",
+            execution_parameters=execution_parameters,
+        )
+
+    def visit_between_expr(self, node: SqlBetweenExpression) -> SqlExpressionRenderResult:  # noqa: D
+        rendered_column_arg = self.render_sql_expr(node.column_arg)
+        rendered_start_expr = self.render_sql_expr(node.start_expr)
+        rendered_end_expr = self.render_sql_expr(node.end_expr)
+
+        execution_parameters = SqlBindParameters()
+        execution_parameters.update(rendered_column_arg.execution_parameters)
+        execution_parameters.update(rendered_start_expr.execution_parameters)
+        execution_parameters.update(rendered_end_expr.execution_parameters)
+
+        return SqlExpressionRenderResult(
+            sql=f"{rendered_column_arg.sql} BETWEEN {rendered_start_expr.sql} AND {rendered_end_expr.sql}",
             execution_parameters=execution_parameters,
         )
