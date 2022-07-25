@@ -1,8 +1,8 @@
 -- Compute Metrics via Expressions
 SELECT
-  CAST(subq_19.bookings AS FLOAT64) / CAST(NULLIF(subq_19.views, 0) AS FLOAT64) AS bookings_per_view
-  , subq_19.ds
+  subq_19.ds
   , subq_19.listing__country_latest
+  , CAST(subq_19.bookings AS FLOAT64) / CAST(NULLIF(subq_19.views, 0) AS FLOAT64) AS bookings_per_view
 FROM (
   -- Pass Only Elements:
   --   ['listing__country_latest', 'ds', 'bookings', 'views']

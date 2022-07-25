@@ -1,7 +1,7 @@
 -- Compute Metrics via Expressions
 SELECT
-  subq_4.txn_revenue AS revenue_all_time
-  , subq_4.ds__month
+  subq_4.ds__month
+  , subq_4.txn_revenue AS revenue_all_time
 FROM (
   -- Aggregate Measures
   SELECT

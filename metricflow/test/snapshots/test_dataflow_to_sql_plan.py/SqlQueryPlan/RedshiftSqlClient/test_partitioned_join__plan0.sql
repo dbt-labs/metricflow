@@ -1,7 +1,7 @@
 -- Compute Metrics via Expressions
 SELECT
-  subq_7.identity_verifications
-  , subq_7.user__home_state
+  subq_7.user__home_state
+  , subq_7.identity_verifications
 FROM (
   -- Aggregate Measures
   SELECT

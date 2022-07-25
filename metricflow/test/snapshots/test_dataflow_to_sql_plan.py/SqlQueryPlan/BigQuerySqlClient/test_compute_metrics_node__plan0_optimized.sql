@@ -2,9 +2,9 @@
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  SUM(subq_7.bookings) AS bookings
-  , subq_7.listing AS listing
+  subq_7.listing AS listing
   , listings_latest_src_10003.country AS listing__country_latest
+  , SUM(subq_7.bookings) AS bookings
 FROM (
   -- Read Elements From Data Source 'bookings_source'
   -- Pass Only Elements:

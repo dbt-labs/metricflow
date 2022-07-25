@@ -3,9 +3,9 @@
 --   ['listing__country_latest', 'ds', 'bookings', 'views']
 -- Compute Metrics via Expressions
 SELECT
-  CAST(subq_28.bookings AS DOUBLE) / CAST(NULLIF(subq_37.views, 0) AS DOUBLE) AS bookings_per_view
-  , subq_28.ds AS ds
+  subq_28.ds AS ds
   , subq_28.listing__country_latest AS listing__country_latest
+  , CAST(subq_28.bookings AS DOUBLE) / CAST(NULLIF(subq_37.views, 0) AS DOUBLE) AS bookings_per_view
 FROM (
   -- Join Standard Outputs
   -- Pass Only Elements:

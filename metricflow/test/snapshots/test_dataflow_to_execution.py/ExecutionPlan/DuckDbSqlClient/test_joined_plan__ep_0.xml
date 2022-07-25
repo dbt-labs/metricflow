@@ -9,9 +9,9 @@
         <!--   -- Aggregate Measures                                                        -->
         <!--   -- Compute Metrics via Expressions                                           -->
         <!--   SELECT                                                                       -->
-        <!--     SUM(subq_2.bookings) AS bookings                                           -->
-        <!--     , subq_2.is_instant AS is_instant                                          -->
+        <!--     subq_2.is_instant AS is_instant                                            -->
         <!--     , listings_latest_src_10003.country AS listing__country_latest             -->
+        <!--     , SUM(subq_2.bookings) AS bookings                                         -->
         <!--   FROM (                                                                       -->
         <!--     -- Read Elements From Data Source 'bookings_source'                        -->
         <!--     -- Metric Time Dimension 'ds'                                              -->

@@ -6,9 +6,9 @@ SELECT
 FROM (
   -- Compute Metrics via Expressions
   SELECT
-    subq_3.messages
-    , subq_3.user_team___team_id
+    subq_3.user_team___team_id
     , subq_3.user_team___user_id
+    , subq_3.messages
   FROM (
     -- Aggregate Measures
     SELECT

@@ -1,8 +1,8 @@
 -- Compute Metrics via Expressions
 SELECT
-  booking_value * 0.05 AS booking_fees
-  , subq_5.listing
+  subq_5.listing
   , subq_5.listing__country_latest
+  , booking_value * 0.05 AS booking_fees
 FROM (
   -- Aggregate Measures
   SELECT

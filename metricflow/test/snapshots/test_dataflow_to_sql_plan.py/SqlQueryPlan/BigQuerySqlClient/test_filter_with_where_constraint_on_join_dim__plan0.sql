@@ -1,7 +1,7 @@
 -- Compute Metrics via Expressions
 SELECT
-  subq_10.bookings
-  , subq_10.is_instant
+  subq_10.is_instant
+  , subq_10.bookings
 FROM (
   -- Aggregate Measures
   SELECT

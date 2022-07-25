@@ -9,8 +9,8 @@ FROM (
   FROM (
     -- Compute Metrics via Expressions
     SELECT
-      subq_8.bookings
-      , subq_8.listing__country_latest
+      subq_8.listing__country_latest
+      , subq_8.bookings
     FROM (
       -- Aggregate Measures
       SELECT

@@ -6,9 +6,9 @@ SELECT
 FROM (
   -- Compute Metrics via Expressions
   SELECT
-    subq_2.bookings
-    , subq_2.ds
+    subq_2.ds
     , subq_2.is_instant
+    , subq_2.bookings
   FROM (
     -- Aggregate Measures
     SELECT

@@ -6,8 +6,8 @@
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  SUM(revenue) AS trailing_2_months_revenue
-  , DATE_TRUNC(created_at, month) AS ds__month
+  DATE_TRUNC(created_at, month) AS ds__month
+  , SUM(revenue) AS trailing_2_months_revenue
 FROM (
   -- User Defined SQL Query
   SELECT * FROM ***************************.fct_revenue

@@ -2,14 +2,14 @@
     <SqlSelectStatementNode>
         <!-- description = Compute Metrics via Expressions -->
         <!-- node_id = ss_13 -->
-        <!-- col0 =                                                    -->
-        <!--   {'class': 'SqlSelectColumn',                            -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_191),  -->
-        <!--    'column_alias': 'txn_count'}                           -->
-        <!-- col1 =                                                        -->
+        <!-- col0 =                                                        -->
         <!--   {'class': 'SqlSelectColumn',                                -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_190),      -->
         <!--    'column_alias': 'account_id__customer_id__customer_name'}  -->
+        <!-- col1 =                                                    -->
+        <!--   {'class': 'SqlSelectColumn',                            -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_191),  -->
+        <!--    'column_alias': 'txn_count'}                           -->
         <!-- from_source = SqlSelectStatementNode(node_id=ss_12) -->
         <!-- where = None -->
         <SqlSelectStatementNode>

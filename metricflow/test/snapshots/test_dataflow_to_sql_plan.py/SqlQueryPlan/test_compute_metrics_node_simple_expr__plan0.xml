@@ -2,18 +2,18 @@
     <SqlSelectStatementNode>
         <!-- description = Compute Metrics via Expressions -->
         <!-- node_id = ss_4 -->
-        <!-- col0 =                                                                        -->
-        <!--   {'class': 'SqlSelectColumn',                                                -->
-        <!--    'expr': SqlStringExpression(node_id=str_0 sql_expr=booking_value * 0.05),  -->
-        <!--    'column_alias': 'booking_fees'}                                            -->
-        <!-- col1 =                                                   -->
+        <!-- col0 =                                                   -->
         <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_13),  -->
         <!--    'column_alias': 'listing'}                            -->
-        <!-- col2 =                                                   -->
+        <!-- col1 =                                                   -->
         <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_12),  -->
         <!--    'column_alias': 'listing__country_latest'}            -->
+        <!-- col2 =                                                                        -->
+        <!--   {'class': 'SqlSelectColumn',                                                -->
+        <!--    'expr': SqlStringExpression(node_id=str_0 sql_expr=booking_value * 0.05),  -->
+        <!--    'column_alias': 'booking_fees'}                                            -->
         <!-- from_source = SqlSelectStatementNode(node_id=ss_3) -->
         <!-- where = None -->
         <SqlSelectStatementNode>

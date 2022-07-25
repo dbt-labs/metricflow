@@ -1,13 +1,13 @@
 -- Combine Metrics
 SELECT
-  subq_8.bookings AS bookings
+  COALESCE(subq_8.metric_time, subq_9.metric_time) AS metric_time
+  , subq_8.bookings AS bookings
   , subq_9.booking_payments AS booking_payments
-  , COALESCE(subq_8.metric_time, subq_9.metric_time) AS metric_time
 FROM (
   -- Compute Metrics via Expressions
   SELECT
-    subq_3.bookings
-    , subq_3.metric_time
+    subq_3.metric_time
+    , subq_3.bookings
   FROM (
     -- Aggregate Measures
     SELECT
@@ -137,8 +137,8 @@ FROM (
 FULL OUTER JOIN (
   -- Compute Metrics via Expressions
   SELECT
-    subq_7.booking_payments
-    , subq_7.metric_time
+    subq_7.metric_time
+    , subq_7.booking_payments
   FROM (
     -- Aggregate Measures
     SELECT

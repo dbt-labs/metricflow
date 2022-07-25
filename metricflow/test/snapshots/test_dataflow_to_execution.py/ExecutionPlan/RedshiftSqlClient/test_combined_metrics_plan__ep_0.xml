@@ -5,18 +5,18 @@
         <!-- sql_query =                                                                               -->
         <!--   -- Combine Metrics                                                                      -->
         <!--   SELECT                                                                                  -->
-        <!--     subq_12.bookings AS bookings                                                          -->
+        <!--     COALESCE(subq_12.ds, subq_13.ds, subq_14.ds) AS ds                                    -->
+        <!--     , COALESCE(subq_12.is_instant, subq_13.is_instant, subq_14.is_instant) AS is_instant  -->
+        <!--     , subq_12.bookings AS bookings                                                        -->
         <!--     , subq_13.instant_bookings AS instant_bookings                                        -->
         <!--     , subq_14.booking_value AS booking_value                                              -->
-        <!--     , COALESCE(subq_12.is_instant, subq_13.is_instant, subq_14.is_instant) AS is_instant  -->
-        <!--     , COALESCE(subq_12.ds, subq_13.ds, subq_14.ds) AS ds                                  -->
         <!--   FROM (                                                                                  -->
         <!--     -- Aggregate Measures                                                                 -->
         <!--     -- Compute Metrics via Expressions                                                    -->
         <!--     SELECT                                                                                -->
-        <!--       SUM(bookings) AS bookings                                                           -->
-        <!--       , ds                                                                                -->
+        <!--       ds                                                                                  -->
         <!--       , is_instant                                                                        -->
+        <!--       , SUM(bookings) AS bookings                                                         -->
         <!--     FROM (                                                                                -->
         <!--       -- Read Elements From Data Source 'bookings_source'                                 -->
         <!--       -- Metric Time Dimension 'ds'                                                       -->
@@ -39,9 +39,9 @@
         <!--     -- Aggregate Measures                                                                 -->
         <!--     -- Compute Metrics via Expressions                                                    -->
         <!--     SELECT                                                                                -->
-        <!--       SUM(instant_bookings) AS instant_bookings                                           -->
-        <!--       , ds                                                                                -->
+        <!--       ds                                                                                  -->
         <!--       , is_instant                                                                        -->
+        <!--       , SUM(instant_bookings) AS instant_bookings                                         -->
         <!--     FROM (                                                                                -->
         <!--       -- Read Elements From Data Source 'bookings_source'                                 -->
         <!--       -- Metric Time Dimension 'ds'                                                       -->
@@ -74,9 +74,9 @@
         <!--     -- Aggregate Measures                                                                 -->
         <!--     -- Compute Metrics via Expressions                                                    -->
         <!--     SELECT                                                                                -->
-        <!--       SUM(booking_value) AS booking_value                                                 -->
-        <!--       , ds                                                                                -->
+        <!--       ds                                                                                  -->
         <!--       , is_instant                                                                        -->
+        <!--       , SUM(booking_value) AS booking_value                                               -->
         <!--     FROM (                                                                                -->
         <!--       -- User Defined SQL Query                                                           -->
         <!--       SELECT * FROM ***************************.fct_bookings                              -->

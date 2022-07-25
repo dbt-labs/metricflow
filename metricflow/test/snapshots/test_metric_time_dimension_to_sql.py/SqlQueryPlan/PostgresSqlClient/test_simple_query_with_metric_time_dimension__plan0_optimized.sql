@@ -1,14 +1,14 @@
 -- Combine Metrics
 SELECT
-  subq_18.bookings AS bookings
+  COALESCE(subq_18.metric_time, subq_19.metric_time) AS metric_time
+  , subq_18.bookings AS bookings
   , subq_19.booking_payments AS booking_payments
-  , COALESCE(subq_18.metric_time, subq_19.metric_time) AS metric_time
 FROM (
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
-    SUM(bookings) AS bookings
-    , metric_time
+    metric_time
+    , SUM(bookings) AS bookings
   FROM (
     -- Read Elements From Data Source 'bookings_source'
     -- Metric Time Dimension 'ds'
@@ -33,8 +33,8 @@ FULL OUTER JOIN (
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
-    SUM(booking_value) AS booking_payments
-    , booking_paid_at AS metric_time
+    booking_paid_at AS metric_time
+    , SUM(booking_value) AS booking_payments
   FROM (
     -- User Defined SQL Query
     SELECT * FROM ***************************.fct_bookings

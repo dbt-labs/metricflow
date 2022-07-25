@@ -1,7 +1,7 @@
 -- Compute Metrics via Expressions
 SELECT
-  subq_5.txn_revenue AS trailing_2_months_revenue
-  , subq_5.ds__month
+  subq_5.ds__month
+  , subq_5.txn_revenue AS trailing_2_months_revenue
 FROM (
   -- Aggregate Measures
   SELECT

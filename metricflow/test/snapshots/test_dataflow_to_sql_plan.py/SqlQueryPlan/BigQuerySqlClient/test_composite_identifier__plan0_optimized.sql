@@ -1,9 +1,9 @@
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  SUM(messages) AS messages
-  , user_team___team_id
+  user_team___team_id
   , user_team___user_id
+  , SUM(messages) AS messages
 FROM (
   -- Read Elements From Data Source 'messages_source'
   -- Metric Time Dimension 'ds'

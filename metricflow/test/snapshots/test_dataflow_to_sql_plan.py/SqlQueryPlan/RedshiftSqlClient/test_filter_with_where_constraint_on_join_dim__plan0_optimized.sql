@@ -4,8 +4,8 @@
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  SUM(bookings) AS bookings
-  , is_instant
+  is_instant
+  , SUM(bookings) AS bookings
 FROM (
   -- Join Standard Outputs
   -- Pass Only Elements:

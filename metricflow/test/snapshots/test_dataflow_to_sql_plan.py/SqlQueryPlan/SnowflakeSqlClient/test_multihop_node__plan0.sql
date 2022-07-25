@@ -1,7 +1,7 @@
 -- Compute Metrics via Expressions
 SELECT
-  subq_10.txn_count
-  , subq_10.account_id__customer_id__customer_name
+  subq_10.account_id__customer_id__customer_name
+  , subq_10.txn_count
 FROM (
   -- Aggregate Measures
   SELECT
