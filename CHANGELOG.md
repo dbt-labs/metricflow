@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Updated
 - Improved model config schema validation to return all jsonschema errors instead of one at a time (@QMalcolm)
+- Streamlined rendered SQL to use BETWEEN expressions for date range checks (@williamdee)
 
 ## [0.110.0] - 2022-07-21
 
