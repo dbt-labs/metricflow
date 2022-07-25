@@ -32,16 +32,19 @@ def test_render_configs(tmpdir: Path):  # noqa: D
             column=SqlColumn.from_string("db.schema.test_table.id"),
             type_node=InferenceSignalType.ID.PRIMARY,
             reasons=[],
+            problems=[],
         ),
         InferenceResult(
             column=SqlColumn.from_string("db.schema.test_table.time_dim"),
             type_node=InferenceSignalType.DIMENSION.TIME,
             reasons=[],
+            problems=[],
         ),
         InferenceResult(
             column=SqlColumn.from_string("db.schema.test_table.primary_time_dim"),
             type_node=InferenceSignalType.DIMENSION.PRIMARY_TIME,
             reasons=[],
+            problems=[],
         ),
     ]
 

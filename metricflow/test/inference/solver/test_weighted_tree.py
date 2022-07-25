@@ -7,10 +7,11 @@ solver = WeightedTypeTreeInferenceSolver()
 
 
 def test_empty_signals_return_unknown():  # noqa: D
-    type_node, reasons = solver.solve_column([])
+    result = solver.solve_column(column, [])
 
-    assert type_node == InferenceSignalType.UNKNOWN
-    assert len(reasons) == 1
+    assert result.type_node == InferenceSignalType.UNKNOWN
+    assert len(result.reasons) == 0
+    assert len(result.problems) == 2
 
 
 def test_follow_signal_path():
@@ -32,10 +33,10 @@ def test_follow_signal_path():
         ),
     ]
 
-    type_node, reasons = solver.solve_column(signals)
+    result = solver.solve_column(column, signals)
 
-    assert type_node == InferenceSignalType.ID.PRIMARY
-    assert "UNIQUE" in reasons[0] and "PRIMARY" in reasons[1]
+    assert result.type_node == InferenceSignalType.ID.PRIMARY
+    assert "UNIQUE" in result.reasons[0] and "PRIMARY" in result.reasons[1]
 
 
 def test_complimentary_signal_with_parent_trail():
@@ -64,10 +65,10 @@ def test_complimentary_signal_with_parent_trail():
         ),
     ]
 
-    type_node, reasons = solver.solve_column(signals)
+    result = solver.solve_column(column, signals)
 
-    assert type_node == InferenceSignalType.ID.PRIMARY
-    assert "ID" in reasons[0] and "UNIQUE" in reasons[1] and "PRIMARY" in reasons[2]
+    assert result.type_node == InferenceSignalType.ID.PRIMARY
+    assert "ID" in result.reasons[0] and "UNIQUE" in result.reasons[1] and "PRIMARY" in result.reasons[2]
 
 
 def test_complimentary_signals_without_parent_signal():
@@ -96,10 +97,10 @@ def test_complimentary_signals_without_parent_signal():
         ),
     ]
 
-    type_node, reasons = solver.solve_column(signals)
+    result = solver.solve_column(column, signals)
 
-    assert type_node == InferenceSignalType.DIMENSION.CATEGORICAL
-    assert "CATEG_DIM" in reasons[0]
+    assert result.type_node == InferenceSignalType.DIMENSION.CATEGORICAL
+    assert "CATEG_DIM" in result.reasons[0]
 
 
 def test_contradicting_signals():
@@ -121,9 +122,9 @@ def test_contradicting_signals():
         ),
     ]
 
-    type_node, _ = solver.solve_column(signals)
+    result = solver.solve_column(column, signals)
 
-    assert type_node == InferenceSignalType.ID.UNKNOWN
+    assert result.type_node == InferenceSignalType.ID.UNKNOWN
 
 
 def test_stop_at_internal_node_if_trail_stops():
@@ -145,8 +146,8 @@ def test_stop_at_internal_node_if_trail_stops():
         ),
     ]
 
-    type_node, reasons = solver.solve_column(signals)
+    result = solver.solve_column(column, signals)
 
     # should not progress further into the tree and assume it's PRIMARY
-    assert type_node == InferenceSignalType.ID.UNIQUE
-    assert "KEY" in reasons[0] and "UNIQUE" in reasons[1]
+    assert result.type_node == InferenceSignalType.ID.UNIQUE
+    assert "KEY" in result.reasons[0] and "UNIQUE" in result.reasons[1]
