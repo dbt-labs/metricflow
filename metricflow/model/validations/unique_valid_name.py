@@ -22,8 +22,6 @@ from metricflow.model.validations.validator_helpers import (
     ModelValidationRule,
     ValidationContext,
     ValidationError,
-    ValidationFatal,
-    ValidationIssueLevel,
     ValidationIssueType,
     validate_safely,
 )
@@ -148,7 +146,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
         for name, _type, context in element_info_tuples:
             if name in name_to_type:
                 issues.append(
-                    ValidationFatal(
+                    ValidationError(
                         context=context,
                         message=f"In data source `{data_source.name}`, can't use name `{name.element_name}` for a "
                         f"{_type} when it was already used for a {name_to_type[name]}",
@@ -199,7 +197,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
         for name, type_, context in object_info_tuples:
             if name in name_to_type:
                 issues.append(
-                    ValidationFatal(
+                    ValidationError(
                         context=context,
                         message=f"Can't use name `{name}` for a {type_} when it was already used for a "
                         f"{name_to_type[name]}",
@@ -213,7 +211,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
             for metric in model.metrics:
                 if metric.name in metric_names:
                     issues.append(
-                        ValidationFatal(
+                        ValidationError(
                             context=MetricContext(
                                 file_context=FileContext.from_metadata(metadata=metric.metadata),
                                 metric=MetricModelReference(metric_name=metric.name),
@@ -223,9 +221,6 @@ class UniqueAndValidNameRule(ModelValidationRule):
                     )
                 else:
                     metric_names.add(metric.name)
-
-        if any([x.level == ValidationIssueLevel.FATAL for x in issues]):
-            return issues
 
         for name, _, context in object_info_tuples:
             issues += UniqueAndValidNameRule.check_valid_name(name=name, context=context)

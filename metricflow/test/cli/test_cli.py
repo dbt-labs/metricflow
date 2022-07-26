@@ -19,7 +19,6 @@ from metricflow.model.parsing.config_linter import ConfigLinter
 from metricflow.model.validations.validator_helpers import (
     ModelValidationResults,
     ValidationError,
-    ValidationFatal,
     ValidationFutureError,
     ValidationWarning,
 )
@@ -85,7 +84,6 @@ def test_validate_configs(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
         ValidationWarning(context=None, message="warning_message"),  # type: ignore
         ValidationFutureError(context=None, message="future_error_message", error_date=datetime.now()),  # type: ignore
         ValidationError(context=None, message="error_message"),  # type: ignore
-        ValidationFatal(context=None, message="fatal_message"),  # type: ignore
     )
     mocked_build_result = MagicMock(issues=ModelValidationResults.from_issues_sequence(issues))
     with patch("metricflow.cli.main.model_build_result_from_config", return_value=mocked_parsing_result):
@@ -93,7 +91,6 @@ def test_validate_configs(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
             with patch.object(ModelValidator, "validate_model", return_value=mocked_build_result):
                 resp = cli_runner.run(validate_configs)
 
-    assert "fatal_message" in resp.output
     assert "error_message" in resp.output
     assert resp.exit_code == 0
 
@@ -106,7 +103,6 @@ def test_future_errors_and_warnings_conditionally_show_up(cli_runner: MetricFlow
         ValidationWarning(context=None, message="warning_message"),  # type: ignore
         ValidationFutureError(context=None, message="future_error_message", error_date=datetime.now()),  # type: ignore
         ValidationError(context=None, message="error_message"),  # type: ignore
-        ValidationFatal(context=None, message="fatal_message"),  # type: ignore
     )
     mocked_build_result = MagicMock(issues=ModelValidationResults.from_issues_sequence(issues))
     with patch("metricflow.cli.main.model_build_result_from_config", return_value=mocked_parsing_result):

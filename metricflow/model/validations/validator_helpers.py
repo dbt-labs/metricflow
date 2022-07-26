@@ -36,8 +36,6 @@ class ValidationIssueLevel(Enum):
     FUTURE_ERROR = 1
     # Issue will prevent the model from working in MQL
     ERROR = 2
-    # Issue is blocking and further validation should be stopped.
-    FATAL = 3
 
     @property
     def name_plural(self) -> str:
@@ -49,7 +47,6 @@ class ValidationIssueLevel(Enum):
 ISSUE_COLOR_MAP = {
     ValidationIssueLevel.WARNING: "cyan",
     ValidationIssueLevel.ERROR: "bright_red",
-    ValidationIssueLevel.FATAL: "bright_red",
     ValidationIssueLevel.FUTURE_ERROR: "bright_yellow",
 }
 
@@ -216,15 +213,7 @@ class ValidationError(ValidationIssue, BaseModel):
         return ValidationIssueLevel.ERROR
 
 
-class ValidationFatal(ValidationIssue, BaseModel):
-    """A fatal issue that was found while validating the model."""
-
-    @property
-    def level(self) -> ValidationIssueLevel:  # noqa: D
-        return ValidationIssueLevel.FATAL
-
-
-ValidationIssueType = Union[ValidationWarning, ValidationFutureError, ValidationError, ValidationFatal]
+ValidationIssueType = Union[ValidationWarning, ValidationFutureError, ValidationError]
 
 
 class ModelValidationResults(FrozenBaseModel):
@@ -233,12 +222,11 @@ class ModelValidationResults(FrozenBaseModel):
     warnings: Tuple[ValidationWarning, ...] = tuple()
     future_errors: Tuple[ValidationFutureError, ...] = tuple()
     errors: Tuple[ValidationError, ...] = tuple()
-    fatals: Tuple[ValidationFatal, ...] = tuple()
 
     @property
     def has_blocking_issues(self) -> bool:
-        """Does the ModelValidationResults have ERROR or FATAL issues"""
-        return len(self.errors) != 0 or len(self.fatals) != 0
+        """Does the ModelValidationResults have ERROR issues"""
+        return len(self.errors) != 0
 
     @classmethod
     def from_issues_sequence(cls, issues: Sequence[ValidationIssueType]) -> ModelValidationResults:
@@ -247,7 +235,6 @@ class ModelValidationResults(FrozenBaseModel):
         warnings: List[ValidationWarning] = []
         future_errors: List[ValidationFutureError] = []
         errors: List[ValidationError] = []
-        fatals: List[ValidationFatal] = []
 
         for issue in issues:
             if issue.level == ValidationIssueLevel.WARNING:
@@ -256,13 +243,9 @@ class ModelValidationResults(FrozenBaseModel):
                 future_errors.append(issue)
             elif issue.level == ValidationIssueLevel.ERROR:
                 errors.append(issue)
-            elif issue.level == ValidationIssueLevel.FATAL:
-                fatals.append(issue)
             else:
                 assert_values_exhausted(issue.level)
-        return cls(
-            warnings=tuple(warnings), future_errors=tuple(future_errors), errors=tuple(errors), fatals=tuple(fatals)
-        )
+        return cls(warnings=tuple(warnings), future_errors=tuple(future_errors), errors=tuple(errors))
 
     @classmethod
     def merge(cls, results: Sequence[ModelValidationResults]) -> ModelValidationResults:
@@ -283,27 +266,21 @@ class ModelValidationResults(FrozenBaseModel):
         warnings = tuple(issue for result in results for issue in result.warnings)
         future_errors = tuple(issue for result in results for issue in result.future_errors)
         errors = tuple(issue for result in results for issue in result.errors)
-        fatals = tuple(issue for result in results for issue in result.fatals)
 
         return cls(
             warnings=warnings,
             future_errors=future_errors,
             errors=errors,
-            fatals=fatals,
         )
 
     @property
     def all_issues(self) -> Tuple[ValidationIssueType, ...]:
         """For when a singular list of issues is needed"""
-        return self.fatals + self.errors + self.future_errors + self.warnings
+        return self.errors + self.future_errors + self.warnings
 
     def summary(self) -> str:
         """Returns a stylized summary string for issues"""
 
-        fatals = click.style(
-            text=f"{ValidationIssueLevel.FATAL.name_plural}: {len(self.fatals)}",
-            fg=ISSUE_COLOR_MAP[ValidationIssueLevel.FATAL],
-        )
         errors = click.style(
             text=f"{ValidationIssueLevel.ERROR.name_plural}: {len(self.errors)}",
             fg=ISSUE_COLOR_MAP[ValidationIssueLevel.ERROR],
@@ -316,7 +293,7 @@ class ModelValidationResults(FrozenBaseModel):
             text=f"{ValidationIssueLevel.WARNING.name_plural}: {len(self.warnings)}",
             fg=ISSUE_COLOR_MAP[ValidationIssueLevel.WARNING],
         )
-        return f"{fatals}, {errors}, {future_erros}, {warnings}"
+        return f"{errors}, {future_erros}, {warnings}"
 
 
 def generate_exception_issue(

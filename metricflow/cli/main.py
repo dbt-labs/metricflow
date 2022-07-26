@@ -643,8 +643,6 @@ def drop_materialization(cfg: CLIContext, materialization_name: str) -> None:
 def _print_issues(
     issues: ModelValidationResults, show_non_blocking: bool = False, verbose: bool = False
 ) -> None:  # noqa: D
-    for issue in issues.fatals:
-        print(f"• {issue.as_readable_str(verbose=verbose)}")
     for issue in issues.errors:
         print(f"• {issue.as_readable_str(verbose=verbose)}")
     if show_non_blocking:
