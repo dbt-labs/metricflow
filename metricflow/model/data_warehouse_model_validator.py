@@ -249,7 +249,9 @@ class DataWarehouseTaskBuilder:
 
             data_source_sub_tasks: List[DataWarehouseValidationTask] = []
             dataset = render_tools.converter.create_sql_source_data_set(data_source)
-            data_source_specs = dataset.instance_set.spec_set.identifier_specs
+            data_source_specs = DataWarehouseTaskBuilder._remove_identifier_link_specs(
+                dataset.instance_set.spec_set.identifier_specs
+            )
             for spec in data_source_specs:
                 filter_elements_node = FilterElementsNode(parent_node=source_node, include_specs=[spec])
                 data_source_sub_tasks.append(
