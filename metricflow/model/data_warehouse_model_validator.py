@@ -35,7 +35,7 @@ from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationR
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.specs import DimensionSpec
+from metricflow.specs import DimensionSpec, LinkableInstanceSpec
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 
 
@@ -79,6 +79,11 @@ class DataWarehouseValidationTask:
 
 class DataWarehouseTaskBuilder:
     """Task builder for standard data warehouse validation tasks"""
+
+    @staticmethod
+    def _remove_identifier_link_specs(specs: Tuple[LinkableInstanceSpec, ...]) -> Tuple[LinkableInstanceSpec, ...]:
+        """For the purposes of data warehouse validation, specs with identifier_links are unnecesary"""
+        return tuple(spec for spec in specs if not spec.identifier_links)
 
     @staticmethod
     def _data_source_node(render_tools: QueryRenderingTools, data_source: DataSource) -> BaseOutput[DataSourceDataSet]:
@@ -176,7 +181,7 @@ class DataWarehouseTaskBuilder:
 
             data_source_sub_tasks: List[DataWarehouseValidationTask] = []
             dataset = render_tools.converter.create_sql_source_data_set(data_source)
-            data_source_specs = (
+            data_source_specs = DataWarehouseTaskBuilder._remove_identifier_link_specs(
                 dataset.instance_set.spec_set.dimension_specs + dataset.instance_set.spec_set.time_dimension_specs
             )
             for spec in data_source_specs:
