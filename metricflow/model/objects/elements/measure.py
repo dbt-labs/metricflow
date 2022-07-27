@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from typing import Optional
+import json
 
+from typing import Optional, List
 from metricflow.model.objects.common import Metadata
 from metricflow.model.objects.base import ModelWithMetadataParsing, HashableBaseModel
 from metricflow.object_utils import ExtendedEnum
@@ -44,6 +45,28 @@ class AggregationType(ExtendedEnum):
         return self in (AggregationType.SUM, AggregationType.SUM_BOOLEAN)
 
 
+class NonAdditiveDimensionParameters(HashableBaseModel):
+    """Describes the params for specifying non-additive dimensions in a measure.
+
+    NOTE: Currently, only TimeDimensions are supported for this filter
+    """
+
+    name: str
+    window_choice: AggregationType
+    window_groupings: List[str] = []
+
+    @property
+    def bucket_hash(self) -> int:
+        """Returns the hash value used for grouping equivalent params."""
+        attributes = {
+            "window_choice": self.window_choice.name,
+            "name": self.name,
+        }
+        if self.window_groupings:
+            attributes["window_groupings"] = str(sorted(list(self.window_groupings)))
+        return hash(json.dumps(attributes, sort_keys=True))
+
+
 class Measure(HashableBaseModel, ModelWithMetadataParsing):
     """Describes a measure"""
 
@@ -53,6 +76,7 @@ class Measure(HashableBaseModel, ModelWithMetadataParsing):
     create_metric: Optional[bool]
     expr: Optional[str] = None
     metadata: Optional[Metadata]
+    non_additive_dimension: Optional[NonAdditiveDimensionParameters] = None
 
     # Defines the time dimension to aggregate this measure by. If not specified, it means to use the primary time
     # dimension in the data source.

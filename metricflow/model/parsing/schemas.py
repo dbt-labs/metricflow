@@ -141,6 +141,21 @@ dimension_type_params_schema = {
     "required": ["time_granularity"],
 }
 
+non_additive_dimension_schema = {
+    "$id": "non_additive_dimension_schema",
+    "type": "object",
+    "properties": {
+        "name": {"type": "string"},
+        "window_choice": {"enum": aggregation_type_values},
+        "window_groupings": {
+            "type": "array",
+            "items": {"type": "string"},
+        },
+    },
+    "additionalProperties": False,
+    "required": ["name", "window_choice"],
+}
+
 measure_schema = {
     "$id": "measure_schema",
     "type": "object",
@@ -157,6 +172,9 @@ measure_schema = {
         "expr": {"type": ["string", "integer", "boolean"]},
         "create_metric": {"type": "boolean"},
         "create_metric_display_name": {"type": "string"},
+        "non_additive_dimension": {
+            "$ref": "non_additive_dimension_schema",
+        },
     },
     "additionalProperties": False,
     "required": ["name", "agg"],
@@ -313,6 +331,7 @@ schema_store = {
     mutability_type_params_schema["$id"]: mutability_type_params_schema,
     composite_sub_identifier_schema["$id"]: composite_sub_identifier_schema,
     materialization_destination_schema["$id"]: materialization_destination_schema,
+    non_additive_dimension_schema["$id"]: non_additive_dimension_schema,
 }
 
 

@@ -18,6 +18,7 @@ from metricflow.model.parsing.schemas import (
     mutability_type_params_schema,
     composite_sub_identifier_schema,
     materialization_destination_schema,
+    non_additive_dimension_schema,
 )
 
 
@@ -101,6 +102,7 @@ schema_store = {
     mutability_type_params_schema["$id"]: mutability_type_params_schema,
     composite_sub_identifier_schema["$id"]: composite_sub_identifier_schema,
     materialization_destination_schema["$id"]: materialization_destination_schema,
+    non_additive_dimension_schema["$id"]: non_additive_dimension_schema,
 }
 
 resolver = RefResolver.from_schema(schema=metric_schema, store=schema_store)
