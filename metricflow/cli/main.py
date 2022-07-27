@@ -713,6 +713,13 @@ def _data_warehouse_validations_runner(
 @click.option(
     "--verbose-issues", is_flag=True, default=False, help="If specified, prints any extra details issues might have"
 )
+@click.option(
+    "--semantic-validation-workers",
+    required=False,
+    type=int,
+    default=1,
+    help="Optional. Uses the number of workers specified to run the semantic validations. Should only be used for exceptionally large configs",
+)
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
@@ -722,6 +729,7 @@ def validate_configs(
     skip_dw: bool = False,
     show_all: bool = False,
     verbose_issues: bool = False,
+    semantic_validation_workers: int = 1,
 ) -> None:
     """Perform validations against the defined model configurations."""
     cfg.verbose = True
@@ -760,7 +768,7 @@ def validate_configs(
     # Semantic validation
     semantic_spinner = Halo(text="Validating semantics of built model", spinner="dots")
     semantic_spinner.start()
-    semantic_result = ModelValidator().validate_model(user_model)
+    semantic_result = ModelValidator(max_workers=semantic_validation_workers).validate_model(user_model)
 
     if not semantic_result.issues.has_blocking_issues:
         semantic_spinner.succeed(

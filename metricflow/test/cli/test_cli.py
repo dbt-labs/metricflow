@@ -132,12 +132,15 @@ def test_validate_configs_data_warehouse_validations(cli_runner: MetricFlowCliRu
     ]
     with patch("metricflow.cli.main.model_build_result_from_config", return_value=mocked_parsing_result):
         with patch("metricflow.cli.main.path_to_models", return_value=""):
-            with patch.object(CLIContext, "sql_client", return_value=None):  # type: ignore
-                with patch(
-                    "metricflow.cli.main._run_dw_validations",
-                    return_value=ModelValidationResults(errors=dw_validation_issues),
-                ):
-                    resp = cli_runner.run(validate_configs)
+            with patch.object(
+                ModelValidator, "validate_model", return_value=MagicMock(issues=ModelValidationResults())
+            ):
+                with patch.object(CLIContext, "sql_client", return_value=None):  # type: ignore
+                    with patch(
+                        "metricflow.cli.main._run_dw_validations",
+                        return_value=ModelValidationResults(errors=dw_validation_issues),
+                    ):
+                        resp = cli_runner.run(validate_configs)
 
     assert "Data Warehouse Error" in resp.output
     assert resp.exit_code == 0

@@ -1,3 +1,4 @@
+from concurrent.futures import ProcessPoolExecutor, as_completed
 import copy
 import logging
 from typing import List, Sequence
@@ -51,11 +52,12 @@ class ModelValidator:
         ReservedKeywordsRule(),
     )
 
-    def __init__(self, rules: Sequence[ModelValidationRule] = DEFAULT_RULES) -> None:
+    def __init__(self, rules: Sequence[ModelValidationRule] = DEFAULT_RULES, max_workers: int = 1) -> None:
         """Constructor.
 
         Args:
             rules: List of validation rules to run. Defaults to DEFAULT_RULES
+            max_workers: sets the max number of rules to run against the model concurrently
         """
 
         # Raises an error if 'rules' is an empty sequence or None
@@ -63,14 +65,17 @@ class ModelValidator:
             raise ValueError("ModelValidator 'rules' must be a sequence with at least one ModelValidationRule.")
 
         self._rules = rules
+        self._executor = ProcessPoolExecutor(max_workers=max_workers)
 
     def validate_model(self, model: UserConfiguredModel) -> ModelBuildResult:
         """Validate a model according to configured rules."""
         model_copy = copy.deepcopy(model)
 
         issues: List[ValidationIssueType] = []
-        for validation_rule in self._rules:
-            issues.extend(validation_rule.validate_model(model_copy))
+
+        futures = [self._executor.submit(validation_rule.validate_model, model_copy) for validation_rule in self._rules]
+        for future in as_completed(futures):
+            issues.extend(future.result())
 
         return ModelBuildResult(model=model_copy, issues=ModelValidationResults.from_issues_sequence(issues))
 
