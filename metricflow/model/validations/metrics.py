@@ -11,7 +11,6 @@ from metricflow.model.validations.validator_helpers import (
     ModelValidationRule,
     ValidationIssueType,
     ValidationError,
-    ValidationFatal,
     validate_safely,
 )
 
@@ -29,7 +28,7 @@ class MetricMeasuresRule(ModelValidationRule):
         for measure_reference in metric.measure_references:
             if measure_reference.element_name not in valid_measure_names:
                 issues.append(
-                    ValidationFatal(
+                    ValidationError(
                         context=MetricContext(
                             file_context=FileContext.from_metadata(metadata=metric.metadata),
                             metric=MetricModelReference(metric_name=metric.name),

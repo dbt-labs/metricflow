@@ -25,7 +25,6 @@ from metricflow.model.validations.validator_helpers import (
     ModelValidationResults,
     ValidationIssueType,
     ModelValidationRule,
-    ValidationIssueLevel,
     ModelValidationException,
 )
 
@@ -72,9 +71,6 @@ class ModelValidator:
         issues: List[ValidationIssueType] = []
         for validation_rule in self._rules:
             issues.extend(validation_rule.validate_model(model_copy))
-            # If there are any fatal errors, stop the validation process.
-            if any([x.level == ValidationIssueLevel.FATAL for x in issues]):
-                break
 
         return ModelBuildResult(model=model_copy, issues=ModelValidationResults.from_issues_sequence(issues))
 

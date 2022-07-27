@@ -18,7 +18,6 @@ from metricflow.model.validations.validator_helpers import (
     MetricContext,
     ModelValidationResults,
     ValidationError,
-    ValidationFatal,
     ValidationFutureError,
     ValidationIssueLevel,
     ValidationIssueType,
@@ -89,15 +88,15 @@ def list_of_issues() -> List[ValidationIssueType]:  # noqa: D
         )
     )
     issues.append(
-        ValidationFatal(
+        ValidationError(
             context=MetricContext(
                 file_context=file_context,
                 metric=MetricModelReference(metric_name="My metric"),
             ),
-            message="Something caused a fatal, problem #6",
+            message="Something caused a error, problem #6",
         )
     )
-    issues.append(ValidationFatal(context=file_context, message="Something caused a fatal, probelm #7"))
+    issues.append(ValidationError(context=file_context, message="Something caused a error, probelm #7"))
     return issues
 
 
@@ -107,13 +106,11 @@ def test_creating_model_validation_results_from_issue_list(  # noqa: D
     warnings = [issue for issue in list_of_issues if issue.level == ValidationIssueLevel.WARNING]
     future_errors = [issue for issue in list_of_issues if issue.level == ValidationIssueLevel.FUTURE_ERROR]
     errors = [issue for issue in list_of_issues if issue.level == ValidationIssueLevel.ERROR]
-    fatals = [issue for issue in list_of_issues if issue.level == ValidationIssueLevel.FATAL]
 
     model_validation_issues = ModelValidationResults.from_issues_sequence(list_of_issues)
     assert len(model_validation_issues.warnings) == len(warnings)
     assert len(model_validation_issues.future_errors) == len(future_errors)
     assert len(model_validation_issues.errors) == len(errors)
-    assert len(model_validation_issues.fatals) == len(fatals)
     assert model_validation_issues.has_blocking_issues
 
     model_validation_issues = ModelValidationResults(warnings=warnings, future_errors=future_errors)
@@ -136,7 +133,6 @@ def test_jsonifying_and_reloading_model_validation_results_is_equal(  # noqa: D
     new_context_types = [issue.context.__class__ for issue in model_validation_issues_new.warnings]
     new_context_types += [issue.context.__class__ for issue in model_validation_issues_new.future_errors]
     new_context_types += [issue.context.__class__ for issue in model_validation_issues_new.errors]
-    new_context_types += [issue.context.__class__ for issue in model_validation_issues_new.fatals]
     assert set_context_types == set(new_context_types)
 
 
@@ -148,4 +144,3 @@ def test_merge_two_model_validation_results(list_of_issues: List[ValidationIssue
     assert merged.warnings == validation_results.warnings + validation_results_dup.warnings
     assert merged.future_errors == validation_results.future_errors + validation_results_dup.future_errors
     assert merged.errors == validation_results.errors + validation_results_dup.errors
-    assert merged.fatals == validation_results.fatals + validation_results_dup.fatals
