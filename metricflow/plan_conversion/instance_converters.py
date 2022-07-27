@@ -475,6 +475,11 @@ class AliasAggregatedMeasures(InstanceSetTransform[InstanceSet]):
         aliased_input_specs = [spec for spec in self.metric_input_measure_specs if spec.alias]
         for instance in measure_instances:
             matches = [spec for spec in aliased_input_specs if spec.measure_spec == instance.spec]
+            assert (
+                len(matches) < 2
+            ), f"Found duplicate aliased measure spec matches: {matches} for measure instance {instance}. "
+            "We should always have 0 or 1 matches, or else we might pass the wrong aggregated measures to the "
+            "downstream metric computation expression!"
             if matches:
                 aliased_spec = matches[0]
                 aliased_input_specs.remove(aliased_spec)
