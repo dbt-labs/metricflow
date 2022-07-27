@@ -52,7 +52,7 @@ class ModelValidator:
         ReservedKeywordsRule(),
     )
 
-    def __init__(self, rules: Sequence[ModelValidationRule] = DEFAULT_RULES, max_workers: int = 4) -> None:
+    def __init__(self, rules: Sequence[ModelValidationRule] = DEFAULT_RULES, max_workers: int = 1) -> None:
         """Constructor.
 
         Args:
