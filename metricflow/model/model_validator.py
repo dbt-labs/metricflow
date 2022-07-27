@@ -1,4 +1,4 @@
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ProcessPoolExecutor, as_completed
 import copy
 import logging
 from typing import List, Sequence
@@ -65,7 +65,7 @@ class ModelValidator:
             raise ValueError("ModelValidator 'rules' must be a sequence with at least one ModelValidationRule.")
 
         self._rules = rules
-        self._executor = ThreadPoolExecutor(max_workers=max_workers)
+        self._executor = ProcessPoolExecutor(max_workers=max_workers)
 
     def validate_model(self, model: UserConfiguredModel) -> ModelBuildResult:
         """Validate a model according to configured rules."""
