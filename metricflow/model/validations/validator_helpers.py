@@ -202,7 +202,7 @@ class ValidationFutureError(ValidationIssue, BaseModel):
     def as_readable_str(self, verbose: bool = False, prefix: Optional[str] = None) -> str:
         """Return a easily readable string that can be used to log the issue."""
         return (
-            f"{super().as_readable_str(verbose=verbose)}"
+            f"{super().as_readable_str(verbose=verbose, prefix=prefix)}"
             f"IMPORTANT: this error will break your model starting {self.error_date.strftime('%b %d, %Y')}. "
         )
 
