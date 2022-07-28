@@ -644,12 +644,12 @@ def _print_issues(
     issues: ModelValidationResults, show_non_blocking: bool = False, verbose: bool = False
 ) -> None:  # noqa: D
     for issue in issues.errors:
-        print(f"• {issue.as_readable_str(verbose=verbose)}")
+        print(f"• {issue.as_cli_formatted_str(verbose=verbose)}")
     if show_non_blocking:
         for issue in issues.future_errors:
-            print(f"• {issue.as_readable_str(verbose=verbose)}")
+            print(f"• {issue.as_cli_formatted_str(verbose=verbose)}")
         for issue in issues.warnings:
-            print(f"• {issue.as_readable_str(verbose=verbose)}")
+            print(f"• {issue.as_cli_formatted_str(verbose=verbose)}")
 
 
 def _run_dw_validations(
