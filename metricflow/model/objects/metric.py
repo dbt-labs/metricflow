@@ -37,22 +37,12 @@ class MetricInputMeasure(PydanticCustomInputParser, HashableBaseModel):
     def _from_yaml_value(cls, input: PydanticParseableValueType) -> MetricInputMeasure:
         """Parses a MetricInputMeasure from a string (name only) or object (struct spec) input
 
-        Internally, we will pass fully formed instance of a MetricInputMeasure through in any case where
-        the Measure object defined in the DataSource has `create_metric` set to True. For these cases, we
-        do not need to do further parsing.
-
         For user input cases, the original YAML spec for a Metric included measure(s) specified as string names
         or lists of string names. As such, configs pre-dating the addition of this model type will only provide the
-        base name for this object. The addition of new properties requires a key/value input for each
-        entry, which would need to be handled by object (dict) type parsing logic.
+        base name for this object.
         """
-        if isinstance(input, MetricInputMeasure):
-            # Internally constructed, pass it through and ignore this case in error messaging
-            return input
-        elif isinstance(input, str):
+        if isinstance(input, str):
             return MetricInputMeasure(name=input)
-        elif isinstance(input, dict):
-            return MetricInputMeasure(**input)
         else:
             raise ValueError(
                 f"MetricInputMeasure inputs from model configs are expected to be of either type string or "
@@ -79,13 +69,9 @@ class CumulativeMetricWindow(PydanticCustomInputParser, HashableBaseModel):
         """Parses a CumulativeMetricWindow from a string input found in a user provided model specification
 
         The CumulativeMetricWindow is always expected to be provided as a string in user-defined YAML configs.
-        It may also be a CumulativeMetricWindow in cases where we are internally constructing Metric objects.
         """
         if isinstance(input, str):
             return CumulativeMetricWindow.parse(input)
-        elif isinstance(input, CumulativeMetricWindow):
-            # This is internally constructed, pass it through and ignore it in error messaging
-            return input
         else:
             raise ValueError(
                 f"CumulativeMetricWindow inputs from model configs are expected to always be of type string, but got "
