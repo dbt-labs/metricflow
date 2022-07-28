@@ -103,7 +103,7 @@ class DataWarehouseTaskBuilder:
     @staticmethod
     def renderize(
         sql_client: SqlClient, plan_converter: DataflowToSqlQueryPlanConverter, plan_id: str, nodes: FilterElementsNode
-    ):
+    ) -> Tuple[str, SqlBindParameters]:
         """Generates a sql query plan and returns the rendered sql and execution_parameters"""
         sql_plan = plan_converter.convert_to_sql_query_plan(
             sql_engine_attributes=sql_client.sql_engine_attributes,

@@ -4,7 +4,7 @@ from jsonschema._utils import extras_msg
 from jsonschema.validators import extend
 
 
-def custom_find_additional_properties(instance, schema):
+def custom_find_additional_properties(instance, schema):  # type: ignore[no-untyped-def]
     """Return the set of additional properties for the given ``instance``.
 
     NOTE: This is a modified copy of the ``find_additional_properties`` method
@@ -30,7 +30,7 @@ def custom_find_additional_properties(instance, schema):
             yield property
 
 
-def customAdditionalProperties(validator, aP, instance, schema):
+def customAdditionalProperties(validator, aP, instance, schema):  # type: ignore[no-untyped-def]
     """Validator for checking if a schema has additionalProperties when it shouldn't
 
     NOTE: This is a modified copy of the ``additionalProperties`` method

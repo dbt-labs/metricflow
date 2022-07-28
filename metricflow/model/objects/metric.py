@@ -1,12 +1,17 @@
 from __future__ import annotations
 
 from hashlib import sha1
-from typing import Any, List, Optional
+from typing import List, Optional
 
 from metricflow.errors.errors import ParsingException
 from metricflow.model.objects.common import Metadata
 from metricflow.model.objects.constraints.where import WhereClauseConstraint
-from metricflow.model.objects.base import HashableBaseModel, ModelWithMetadataParsing, PydanticCustomInputParser
+from metricflow.model.objects.base import (
+    HashableBaseModel,
+    ModelWithMetadataParsing,
+    PydanticCustomInputParser,
+    PydanticParseableValueType,
+)
 from metricflow.object_utils import ExtendedEnum
 from metricflow.specs import MeasureReference
 from metricflow.time.time_granularity import TimeGranularity
@@ -29,7 +34,7 @@ class MetricInputMeasure(PydanticCustomInputParser, HashableBaseModel):
     # TODO add constraint handling property
 
     @classmethod
-    def _from_yaml_value(cls, input: Any):
+    def _from_yaml_value(cls, input: PydanticParseableValueType) -> MetricInputMeasure:
         """Parses a MetricInputMeasure from a string (name only) or object (struct spec) input
 
         Internally, we will pass fully formed instance of a MetricInputMeasure through in any case where
@@ -70,7 +75,7 @@ class CumulativeMetricWindow(PydanticCustomInputParser, HashableBaseModel):
         return f"{self.count} {self.granularity.value}"
 
     @classmethod
-    def _from_yaml_value(cls, input: Any) -> CumulativeMetricWindow:
+    def _from_yaml_value(cls, input: PydanticParseableValueType) -> CumulativeMetricWindow:
         """Parses a CumulativeMetricWindow from a string input found in a user provided model specification
 
         The CumulativeMetricWindow is always expected to be provided as a string in user-defined YAML configs.
