@@ -1,7 +1,7 @@
 from __future__ import annotations
-from typing import Any, Optional, Tuple, Union
+from typing import Optional, Tuple, Union
 
-from metricflow.model.objects.base import FrozenBaseModel, PydanticCustomInputParser
+from metricflow.model.objects.base import FrozenBaseModel, PydanticCustomInputParser, PydanticParseableValueType
 
 
 class SqlTable(PydanticCustomInputParser, FrozenBaseModel):
@@ -12,7 +12,7 @@ class SqlTable(PydanticCustomInputParser, FrozenBaseModel):
     table_name: str
 
     @classmethod
-    def _from_yaml_value(cls, input: Any) -> SqlTable:
+    def _from_yaml_value(cls, input: PydanticParseableValueType) -> SqlTable:
         """Parses a SqlTable from string input found in a user-provided model specification
 
         Raises a ValueError on any non-string input, as all user-provided specifications of table identifiers

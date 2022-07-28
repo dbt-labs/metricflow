@@ -7,7 +7,7 @@ from typing import List, Optional, Dict, Any
 from moz_sql_parser import parse as moz_parse
 
 from metricflow.errors.errors import ConstraintParseException
-from metricflow.model.objects.base import HashableBaseModel, PydanticCustomInputParser
+from metricflow.model.objects.base import HashableBaseModel, PydanticCustomInputParser, PydanticParseableValueType
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 
 logger = logging.getLogger(__name__)
@@ -43,7 +43,7 @@ class WhereClauseConstraint(PydanticCustomInputParser, HashableBaseModel):
         )
 
     @classmethod
-    def _from_yaml_value(cls, input: Any) -> WhereClauseConstraint:
+    def _from_yaml_value(cls, input: PydanticParseableValueType) -> WhereClauseConstraint:
         """Parses a WhereClauseConstraint from a constraint string found in a user-provided model specification
 
         User-provided constraint strings are SQL snippets conforming to the expectations of SQL WHERE clauses,

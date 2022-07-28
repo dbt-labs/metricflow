@@ -20,7 +20,7 @@ def test_no_reserved_keywords(simple_model__pre_transforms: UserConfiguredModel)
     assert len(issues) == 0
 
 
-def test_reserved_keywords_in_sql_table(simple_model__pre_transforms: UserConfiguredModel):  # noqa: D
+def test_reserved_keywords_in_sql_table(simple_model__pre_transforms: UserConfiguredModel) -> None:  # noqa: D
     model = copied_model(simple_model__pre_transforms)
     (data_source_with_sql_table, _index) = find_data_source_with(
         model=model, function=lambda data_source: data_source.sql_table is not None
@@ -32,7 +32,7 @@ def test_reserved_keywords_in_sql_table(simple_model__pre_transforms: UserConfig
     assert issues[0].level == ValidationIssueLevel.ERROR
 
 
-def test_reserved_keywords_in_dimensions(simple_model__pre_transforms: UserConfiguredModel):  # noqa: D
+def test_reserved_keywords_in_dimensions(simple_model__pre_transforms: UserConfiguredModel) -> None:  # noqa: D
     model = copied_model(simple_model__pre_transforms)
     (data_source, _index) = find_data_source_with(
         model=model, function=lambda data_source: len(data_source.dimensions) > 0
@@ -45,7 +45,7 @@ def test_reserved_keywords_in_dimensions(simple_model__pre_transforms: UserConfi
     assert issues[0].level == ValidationIssueLevel.ERROR
 
 
-def test_reserved_keywords_in_measures(simple_model__pre_transforms: UserConfiguredModel):  # noqa: D
+def test_reserved_keywords_in_measures(simple_model__pre_transforms: UserConfiguredModel) -> None:  # noqa: D
     model = copied_model(simple_model__pre_transforms)
     (data_source, _index) = find_data_source_with(
         model=model, function=lambda data_source: len(data_source.measures) > 0
@@ -58,7 +58,7 @@ def test_reserved_keywords_in_measures(simple_model__pre_transforms: UserConfigu
     assert issues[0].level == ValidationIssueLevel.ERROR
 
 
-def test_reserved_keywords_in_identifiers(simple_model__pre_transforms: UserConfiguredModel):  # noqa: D
+def test_reserved_keywords_in_identifiers(simple_model__pre_transforms: UserConfiguredModel) -> None:  # noqa: D
     model = copied_model(simple_model__pre_transforms)
     (data_source, _index) = find_data_source_with(
         model=model, function=lambda data_source: len(data_source.identifiers) > 0
@@ -72,7 +72,9 @@ def test_reserved_keywords_in_identifiers(simple_model__pre_transforms: UserConf
     assert issues[0].level == ValidationIssueLevel.ERROR
 
 
-def test_reserved_keywords_in_composite_identifiers(simple_model__pre_transforms: UserConfiguredModel):  # noqa: D
+def test_reserved_keywords_in_composite_identifiers(  # noqa: D
+    simple_model__pre_transforms: UserConfiguredModel,
+) -> None:
     model = copied_model(simple_model__pre_transforms)
     (data_source, _index) = find_data_source_with(
         model=model, function=lambda data_source: len(data_source.identifiers) > 0

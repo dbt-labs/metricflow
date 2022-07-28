@@ -10,6 +10,9 @@ from pydantic import BaseModel, root_validator
 from metricflow.errors.errors import ParsingException
 from metricflow.model.parsing.yaml_loader import ParsingContext, PARSING_CONTEXT_KEY
 
+# Type alias for the implicit "Any" type used as input and output for Pydantic's parsing API
+PydanticParseableValueType = Any  # type: ignore[misc]
+
 
 class HashableBaseModel(BaseModel):
     """Extends BaseModel with a generic hash function"""
@@ -54,7 +57,7 @@ class ModelWithMetadataParsing(BaseModel):
 
     @root_validator(pre=True)
     @classmethod
-    def extract_metadata_from_parsing_context(cls, values: Any) -> Any:
+    def extract_metadata_from_parsing_context(cls, values: PydanticParseableValueType) -> PydanticParseableValueType:
         """Takes info from parsing context and converts it to a Metadata model object
 
         Per Pydantic's processing logic, this runs on the collection of input data for whatever model
@@ -104,7 +107,7 @@ class PydanticCustomInputParser(ABC, Generic[ModelObjectT_co]):
     """Implements required"""
 
     @classmethod
-    def __get_validators__(cls):
+    def __get_validators__(cls):  # type: ignore[no-untyped-def]
         """Pydantic magic method for allowing parsing of arbitrary input on parse_obj invocation
 
         This allow for parsing and validation prior to object initialization. Most classes implementing this
@@ -115,6 +118,6 @@ class PydanticCustomInputParser(ABC, Generic[ModelObjectT_co]):
 
     @classmethod
     @abstractmethod
-    def _from_yaml_value(cls, input: Any) -> ModelObjectT_co:
+    def _from_yaml_value(cls, input: PydanticParseableValueType) -> ModelObjectT_co:
         """Abstract method for providing object-specific parsing logic"""
         raise NotImplementedError()
