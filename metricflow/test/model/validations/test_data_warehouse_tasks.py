@@ -1,6 +1,7 @@
 from copy import deepcopy
 from typing import Tuple
 
+import pytest
 from _pytest.fixtures import FixtureRequest
 
 from metricflow.model.data_warehouse_model_validator import (
@@ -19,6 +20,23 @@ from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.model.validations.helpers import data_source_with_guaranteed_meta
 from metricflow.test.plan_utils import assert_snapshot_text_equal, make_schema_replacement_function
+
+
+@pytest.fixture(scope="session")
+def dw_backed_warehouse_validation_model(
+    create_data_warehouse_validation_model_tables: bool,
+    data_warehouse_validation_model: UserConfiguredModel,
+) -> UserConfiguredModel:
+    """Model-generating fixture to ensure the underlying tables are created for querying
+
+    Without an explicit invocation of the create_data_warehouse_validation_model_tables fixture the
+    tables used by the data_warehouse_validation_model are not guaranteed to exist. This fixture
+    guarantees execution of the underlying create table statements for the model, and can be used in
+    any test that executes warehouse validation queries. It is not needed for test cases which simply
+    use the model to construct tasks without executing them.
+    """
+    assert create_data_warehouse_validation_model_tables, "Failed to create DW validation tables!"
+    return data_warehouse_validation_model
 
 
 def test_build_data_source_tasks(
@@ -63,12 +81,11 @@ def test_task_runner(sql_client: SqlClient, mf_test_session_state: MetricFlowTes
 
 
 def test_validate_data_sources(  # noqa: D
-    data_warehouse_validation_model: UserConfiguredModel,
-    create_data_warehouse_validation_model_tables: bool,
+    dw_backed_warehouse_validation_model: UserConfiguredModel,
     sql_client: SqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
-    model = deepcopy(data_warehouse_validation_model)
+    model = deepcopy(dw_backed_warehouse_validation_model)
 
     dw_validator = DataWarehouseModelValidator(
         sql_client=sql_client, system_schema=mf_test_session_state.mf_system_schema
@@ -109,11 +126,11 @@ def test_build_dimension_tasks(  # noqa: D
 
 
 def test_validate_dimensions(  # noqa: D
-    data_warehouse_validation_model: UserConfiguredModel,
+    dw_backed_warehouse_validation_model: UserConfiguredModel,
     sql_client: SqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
-    model = deepcopy(data_warehouse_validation_model)
+    model = deepcopy(dw_backed_warehouse_validation_model)
 
     dw_validator = DataWarehouseModelValidator(
         sql_client=sql_client, system_schema=mf_test_session_state.mf_system_schema
@@ -147,11 +164,11 @@ def test_build_identifiers_tasks(  # noqa: D
 
 
 def test_validate_identifiers(  # noqa: D
-    data_warehouse_validation_model: UserConfiguredModel,
+    dw_backed_warehouse_validation_model: UserConfiguredModel,
     sql_client: SqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
-    model = deepcopy(data_warehouse_validation_model)
+    model = deepcopy(dw_backed_warehouse_validation_model)
 
     dw_validator = DataWarehouseModelValidator(
         sql_client=sql_client, system_schema=mf_test_session_state.mf_system_schema
@@ -185,11 +202,11 @@ def test_build_measure_tasks(  # noqa: D
 
 
 def test_validate_measures(  # noqa: D
-    data_warehouse_validation_model: UserConfiguredModel,
+    dw_backed_warehouse_validation_model: UserConfiguredModel,
     sql_client: SqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
-    model = deepcopy(data_warehouse_validation_model)
+    model = deepcopy(dw_backed_warehouse_validation_model)
 
     dw_validator = DataWarehouseModelValidator(
         sql_client=sql_client, system_schema=mf_test_session_state.mf_system_schema
@@ -236,11 +253,11 @@ def test_build_metric_tasks(  # noqa: D
 
 
 def test_validate_metrics(  # noqa: D
-    data_warehouse_validation_model: UserConfiguredModel,
+    dw_backed_warehouse_validation_model: UserConfiguredModel,
     sql_client: SqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
-    model = deepcopy(data_warehouse_validation_model)
+    model = deepcopy(dw_backed_warehouse_validation_model)
     dw_validator = DataWarehouseModelValidator(
         sql_client=sql_client, system_schema=mf_test_session_state.mf_system_schema
     )
