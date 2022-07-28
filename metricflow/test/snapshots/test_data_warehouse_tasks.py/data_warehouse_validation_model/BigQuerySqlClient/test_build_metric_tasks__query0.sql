@@ -6,7 +6,6 @@ SELECT
 FROM (
   -- Read Elements From Data Source 'animals'
   -- Metric Time Dimension 'ds'
-  -- Constrain Time Range to [2000-01-01T00:00:00, 2040-12-31T00:00:00]
   -- Pass Only Elements:
   --   ['count_dogs', 'metric_time']
   SELECT
@@ -15,7 +14,6 @@ FROM (
   FROM (
     SELECT * FROM ***************************.fct_animals
   ) animals_src_0
-  WHERE ds BETWEEN CAST('2000-01-01' AS DATETIME) AND CAST('2040-12-31' AS DATETIME)
-) subq_3
+) subq_2
 GROUP BY
   metric_time
