@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import os
 from abc import ABC, abstractmethod
-from typing import Any, ClassVar, Generic, TypeVar
+from typing import Any, Callable, ClassVar, Generic, Iterator, TypeVar
 
 from pydantic import BaseModel, root_validator
 
@@ -104,20 +104,53 @@ ModelObjectT_co = TypeVar("ModelObjectT_co", covariant=True, bound=BaseModel)
 
 
 class PydanticCustomInputParser(ABC, Generic[ModelObjectT_co]):
-    """Implements required"""
+    """Implements required methods for enabling custom parsing for Pydantic BaseModel objects
+
+    This abstract class helper is for the specific case where model object classes need to do custom parsing
+    prior to object initialization, meaning that the inputs to the initializer itself must be parsed in a
+    manner custom to the object, but without updating the input values for the rest of the model hierarchy.
+
+    This class will NOT allow for custom handling of dict or object type inputs, assuming that they should be
+    processed and validated in the standard Pydantic way. Any subclass needing to mutate the inputs from a dict
+    or object type in a subclass-specific way should still be able to do so via the standard Pydantic approach
+    of adding a method decorated with @validator or @root_validator, which will work internally to initialization
+    and validation of that model object itself.
+    """
 
     @classmethod
-    def __get_validators__(cls):  # type: ignore[no-untyped-def]
+    def __get_validators__(cls) -> Iterator[Callable]:
         """Pydantic magic method for allowing parsing of arbitrary input on parse_obj invocation
 
         This allow for parsing and validation prior to object initialization. Most classes implementing this
         interface in our model are doing so because the input value from user-supplied YAML will be a string
         representation rather than the structured object type.
         """
-        yield cls._from_yaml_value
+        yield cls.__parse_with_custom_handling
+
+    @classmethod
+    def __parse_with_custom_handling(cls: ModelObjectT_co, input: PydanticParseableValueType) -> ModelObjectT_co:
+        """Core method for handling common valid - or easily validated - input types
+
+        Pydantic objects can commonly appear as JSON object types (from, e.g., deserializing a Pydantic-serialized
+        model) or direct instances of the model object class (from, e.g., initializing an object and passing it in
+        to the initializer of a containing model object). This internal wrapper handles both of these cases in the
+        standard Pydantic way of either validating the object type input on initialization, or passing the
+        already-validated instance along as the output.
+
+        Note this will also pass any Pydantic instance initialized via the `construct` method, which means it is
+        possible for a caller to thread an unvalidated - and therefore improperly initialized - instance through.
+        However, this is part of the contract with `construct` - it is only to be used when the inputs are known
+        to the caller to be pre-validated, and so we do not bother guarding against that here.
+        """
+        if isinstance(input, dict):
+            return cls(**input)
+        elif isinstance(input, cls):
+            return input
+        else:
+            return cls._from_yaml_value(input)
 
     @classmethod
     @abstractmethod
-    def _from_yaml_value(cls, input: PydanticParseableValueType) -> ModelObjectT_co:
+    def _from_yaml_value(cls: ModelObjectT_co, input: PydanticParseableValueType) -> ModelObjectT_co:
         """Abstract method for providing object-specific parsing logic"""
         raise NotImplementedError()

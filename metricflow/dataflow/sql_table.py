@@ -16,15 +16,10 @@ class SqlTable(PydanticCustomInputParser, FrozenBaseModel):
         """Parses a SqlTable from string input found in a user-provided model specification
 
         Raises a ValueError on any non-string input, as all user-provided specifications of table identifiers
-        should be strings conforming to the expectations defined in the from_string method. The lone exception
-        is for SqlTable instance inputs, which could arise if we are initializing Materialization objects internally
-        without direct access to user input.
+        should be strings conforming to the expectations defined in the from_string method.
         """
         if isinstance(input, str):
             return SqlTable.from_string(input)
-        elif isinstance(input, SqlTable):
-            # This is internally constructed, pass it through and ignore it in error messaging
-            return input
         else:
             raise ValueError(
                 f"SqlTable inputs from model configs are expected to always be of type string, but got type "
