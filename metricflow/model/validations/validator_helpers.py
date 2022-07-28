@@ -160,24 +160,26 @@ class ValidationIssue(ABC, BaseModel):
 
         raise NotImplementedError
 
-    @classmethod
-    def build_validation_header_msg(cls, level: ValidationIssueLevel) -> str:
-        """Builds the header message with colour."""
-        return click.style(level.name, bold=True, fg=ISSUE_COLOR_MAP[level])
-
-    def as_readable_str(self, verbose: bool = False) -> str:
+    def as_readable_str(self, verbose: bool = False, prefix: Optional[str] = None) -> str:
         """Return a easily readable string that can be used to log the issue."""
+        prefix = prefix or self.level.name
 
         # The following is two lines instead of one line because
         # technically self.context.context_str() can return an empty str
         context_str = self.context.context_str() if self.context else ""
         context_str += " - " if context_str != "" else ""
 
-        issue_str = f"{ValidationIssue.build_validation_header_msg(self.level)}: {context_str}{self.message}"
+        issue_str = f"{prefix}: {context_str}{self.message}"
         if verbose and self.extra_detail is not None:
             issue_str += f"\n{self.extra_detail}"
 
         return issue_str
+
+    def as_cli_formatted_str(self, verbose: bool = False) -> str:
+        """Returns a color-coded readable string for rendering issues in the CLI"""
+        return self.as_readable_str(
+            verbose=verbose, prefix=click.style(self.level.name, bold=True, fg=ISSUE_COLOR_MAP[self.level])
+        )
 
 
 class ValidationWarning(ValidationIssue, BaseModel):
@@ -197,7 +199,7 @@ class ValidationFutureError(ValidationIssue, BaseModel):
     def level(self) -> ValidationIssueLevel:  # noqa: D
         return ValidationIssueLevel.FUTURE_ERROR
 
-    def as_readable_str(self, verbose: bool = False) -> str:
+    def as_readable_str(self, verbose: bool = False, prefix: Optional[str] = None) -> str:
         """Return a easily readable string that can be used to log the issue."""
         return (
             f"{super().as_readable_str(verbose=verbose)}"
