@@ -52,7 +52,7 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-mf = 'metricflow.cli.main:cli'
+mf-lite = 'metricflow.cli.main:cli'
 
 [tool.black]
 line-length = 120
