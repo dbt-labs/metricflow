@@ -1,12 +1,12 @@
 [tool.poetry]
-name = "metricflow"
+name = "metricflow-lite"
 version = "0.110.1"
-description = "Translates a simple metric definition into reusable SQL and executes it against the SQL engine of your choice."
+description = "Lite version of MetricFlow. This version is missing dependencies for using connectors with data warehouses"
 authors = ["Transform <hello@transformdata.io>"]
 license = "AGPL-3.0-or-later"
 readme = "README.md"
 homepage = "https://transform.co/metricflow"
-repository = "https://github.com/transform-data/metricflow"
+repository = "https://github.com/transform-data/metricflow-lite"
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.10"
