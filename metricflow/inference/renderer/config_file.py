@@ -47,7 +47,7 @@ class ConfigFileRenderer(InferenceRenderer):
         self.dir_path = dir_path
 
     def _get_filename_for_table(self, table: SqlTable) -> str:
-        return os.path.abspath(os.path.join(self.dir_path, f"{table.table_name}.yaml"))
+        return os.path.abspath(os.path.join(self.dir_path, f"{table.sql}.yaml"))
 
     def _fixme(self, comment: str) -> str:
         return f"FIXME: {comment}"
