@@ -7,6 +7,9 @@ license = "AGPL-3.0-or-later"
 readme = "README.md"
 homepage = "https://transform.co/metricflow"
 repository = "https://github.com/transform-data/metricflow-lite"
+packages = [
+  { include = "metricflow/**" }
+]
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.10"
