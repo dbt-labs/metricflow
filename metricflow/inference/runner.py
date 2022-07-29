@@ -49,15 +49,10 @@ class InferenceRunner:
     def run(self) -> None:
         """Runs inference with the given configs."""
         warehouse = self.context_providers[0].get_context()
-        signals: List[InferenceSignal] = []
-        for rule in self.ruleset:
-            rule_signals = rule.process(warehouse)
-            for rule_signal in rule_signals:
-                signals.append(rule_signal)
-
         signals_by_column = defaultdict(list)
-        for signal in signals:
-            signals_by_column[signal.column].append(signal)
+        signals = [rule.process(warehouse) for rule in self.ruleset]
+        for rule_signal in more_itertools.flatten(signals):
+            signals_by_column[rule_signal.column].append(rule_signal)
 
         results = [self.solver.solve_column(column, signals) for column, signals in signals_by_column.items()]
 

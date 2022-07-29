@@ -43,7 +43,7 @@ class InferenceSignalNode(ABC):
             parent.children.append(self)
 
     def __str__(self) -> str:  # noqa: D
-        return f"InferenceSignalNode(name={self.name})"
+        return f"InferenceSignalNode: {self.name}"
 
     @property
     def ancestors(self) -> List[InferenceSignalNode]:
@@ -53,10 +53,11 @@ class InferenceSignalNode(ABC):
 
         return self.parent.ancestors + [self.parent]
 
-    def is_descendant(self, other: InferenceSignalNode) -> bool:
-        """Whether self is a descendant of other.
-
-        NOTE: for practical reasons, a node is considered a descendant of itself.
+    def is_subtype_of(self, other: InferenceSignalNode) -> bool:
+        """Whether self is a subtype of other.
+        
+        A subtype can always be used where its supertype is expected, although the reverse
+        may not be true
         """
         return other == self or other in self.ancestors
 
@@ -116,15 +117,19 @@ class InferenceSignal:
     is_complimentary: whether a solver should only consider this signal if the parent type
         node is also present.
 
-    About the usage of `is_complimentary`:
-        This can be used to produce contradicting signals that don't affect each other and
-        are only used to further specify parent signals.
+    About the usage of `only_applies_to_parent`:
+        This can be used to produce signals which don't affect each other, are not
+        individually indicative of a specific outcome, and as such are only used to 
+        further specify parent signals.
 
         Example: columns with unique values can indicate both unique keys and categorical
-        dimensions, which would contradict each other. If we make these signals complimentary,
-        they will only resolve to "unique identifier" if there is another signal that points
-        to "identifier". Similarly, it will only resolve to "categorical dimension" if there
-        is another signal that points to "dimension".
+        dimensions, which are contradictory outcomes. As such, a unique values signal requires
+        the parent signal (is ID or is DIMENSION) to be present to be useful, and so anything
+        tagged with this flag will only apply to the parent. So you can safely designate a
+        signal as having a HIGH confidence for a given base column type while ignoring
+        it for any other column type.
+        
+         
     """
 
     column: SqlColumn

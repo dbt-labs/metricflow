@@ -16,7 +16,7 @@ NodeWeighterFunction = Callable[[InferenceSignalConfidence], int]
 
 
 class WeightedTypeTreeInferenceSolver(InferenceSolver):
-    """Assigns weights to each type in the column type tree and attemptins to traverse it using a weight percentage threshold."""
+    """Assigns weights to each type in the column type tree and attempts to traverse it using a weight percentage threshold."""
 
     @staticmethod
     def default_weighter_function(confidence: InferenceSignalConfidence) -> int:
@@ -39,13 +39,13 @@ class WeightedTypeTreeInferenceSolver(InferenceSolver):
     ) -> None:
         """Initialize the solver.
 
-        weight_percent_threshold: a number between 0.5 and 1. If a node's weight corresponds to a percentage
+        weight_percent_threshold: a number in (0.5, 1]. If a node's weight corresponds to a percentage
             above this threshold with respect to its siblings' total weight sum, the solver will progress deeper
             into the type tree, entering that node. If not, it stops at the parent.
         weighter_function: a function that returns a weight given a confidence score. It will be used
             to assign integer weights to each node in the type tree based on its input signals.
         """
-        assert weight_percent_threshold >= 0.5 and weight_percent_threshold <= 1
+        assert weight_percent_threshold > 0.5 and weight_percent_threshold <= 1, f"weight_percent_threshold is {weight_percent_threshold}, but it must be > 0.5 and <= 1!"
         self._weight_percent_threshold = weight_percent_threshold
 
         self._weighter_function = (
@@ -57,19 +57,19 @@ class WeightedTypeTreeInferenceSolver(InferenceSolver):
     def _get_cumulative_weights_for_root(
         self,
         root: InferenceSignalNode,
-        weights: Dict[InferenceSignalNode, int],
-        non_complimentary_weights: Dict[InferenceSignalNode, int],
+        output_weights: Dict[InferenceSignalNode, int],
+        output_parent_only_weights: Dict[InferenceSignalNode, int],
         signals_by_type: Dict[InferenceSignalNode, List[InferenceSignal]],
     ) -> Dict[InferenceSignalNode, int]:
         """Get a dict of cumulative weights, starting at `root`.
 
-        A parent node's weight is the sum of all its children plus its own weight. Complimentary children get
-        excluded from the parent's sum.
+        A parent node's weight is the sum of all its children plus its own weight. Children tagged as only
+        applying to their parent are excluded from their grand-parent's sum.
 
         root: the root to start assigning cumulative weights from.
-        weights: the output dictionary to assign the cumulative weights to
-        non_complimentary_weights: similar to weights, but the weight of each node excludes the weights
-            of all of its complimentary children
+        output_weights: the output dictionary to assign the cumulative weights to
+        output_parent_only_weights: similar to output_weights, but the weight of each node excludes the weights
+            of all of its parent-only children
         signals_by_type: a dictionary that maps signal type nodes to signals
         """
         for child in root.children:
@@ -81,13 +81,13 @@ class WeightedTypeTreeInferenceSolver(InferenceSolver):
             )
 
         weights[root] = sum(self._weighter_function(signal.confidence) for signal in signals_by_type[root])
+        weights[root] += sum(non_complimentary_weights[child] for child in root.children)
+
         non_complimentary_weights[root] = sum(
             self._weighter_function(signal.confidence)
             for signal in signals_by_type[root]
             if not signal.is_complimentary
         )
-
-        weights[root] += sum(non_complimentary_weights[child] for child in root.children)
 
         return weights
 
@@ -99,8 +99,8 @@ class WeightedTypeTreeInferenceSolver(InferenceSolver):
 
         return self._get_cumulative_weights_for_root(
             root=InferenceSignalType.UNKNOWN,
-            weights=defaultdict(lambda: 0),
-            non_complimentary_weights=defaultdict(lambda: 0),
+            weights=defaultdict(int),
+            non_complimentary_weights=defaultdict(int),
             signals_by_type=signals_by_type,
         )
 
