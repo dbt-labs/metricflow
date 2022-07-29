@@ -1,4 +1,4 @@
-name: Publish Metricflow Release
+name: Publish Metricflow-Lite Release
 on:
   workflow_dispatch:
   push:
