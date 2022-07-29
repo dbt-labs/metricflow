@@ -25,12 +25,12 @@ class AnyIdentifierByNameRule(ColumnMatcherRule):
 
     See: https://www.thefreedictionary.com/words-that-end-in-id
 
-    It will always produce ID.UNKNOWN signal with FOR_SURE confidence.
+    It will always produce ID.UNKNOWN signal with VERY_HIGH confidence.
     """
 
     type_node = InferenceSignalType.ID.UNKNOWN
-    confidence = InferenceSignalConfidence.FOR_SURE
-    complimentary_signal = False
+    confidence = InferenceSignalConfidence.VERY_HIGH
+    only_applies_to_parent_signal = False
     match_reason = "Column name ends with `id`"
 
     def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
@@ -43,12 +43,12 @@ class PrimaryIdentifierByNameRule(ColumnMatcherRule):
     It will match columns such as `db.schema.mytable.mytable_id`,
     `db.schema.mytable.mytableid` and `db.schema.mytable.id`.
 
-    It will always produce a ID.PRIMARY signal with FOR_SURE confidence.
+    It will always produce a ID.PRIMARY signal with VERY_HIGH confidence.
     """
 
     type_node = InferenceSignalType.ID.PRIMARY
-    confidence = InferenceSignalConfidence.FOR_SURE
-    complimentary_signal = False
+    confidence = InferenceSignalConfidence.VERY_HIGH
+    only_applies_to_parent_signal = False
     match_reason = "Column name matches `(table_name?)(_?)id`"
 
     def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
@@ -64,12 +64,12 @@ class PrimaryIdentifierByNameRule(ColumnMatcherRule):
 class UniqueIdentifierByDistinctCountRule(ColumnMatcherRule):
     """Inference rule that matches unique identifiers by their COUNT DISTINCT.
 
-    It will always produce a ID.UNIQUE complimentary signal with FOR_SURE confidence.
+    It will always produce a ID.UNIQUE complementary signal with VERY_HIGH confidence.
     """
 
     type_node = InferenceSignalType.ID.UNIQUE
-    confidence = InferenceSignalConfidence.FOR_SURE
-    complimentary_signal = True
+    confidence = InferenceSignalConfidence.VERY_HIGH
+    only_applies_to_parent_signal = True
     match_reason = "The values in the column are unique"
 
     def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
@@ -79,12 +79,12 @@ class UniqueIdentifierByDistinctCountRule(ColumnMatcherRule):
 class ForeignIdentifierByCardinalityRatioRule(LowCardinalityRatioRule):
     """Inference rule that checks for low cardinality columns.
 
-    It will always produce ID.FOREIGN with MEDIUM confidence (complimentary).
+    It will always produce ID.FOREIGN with MEDIUM confidence (complementary).
     """
 
     type_node = InferenceSignalType.ID.FOREIGN
     confidence = InferenceSignalConfidence.MEDIUM
-    complimentary_signal = True
+    only_applies_to_parent_signal = True
 
 
 # -------------
@@ -95,12 +95,12 @@ class ForeignIdentifierByCardinalityRatioRule(LowCardinalityRatioRule):
 class TimeDimensionByTimeTypeRule(ColumnMatcherRule):
     """Inference rule that checks for time (time, date, datetime, timestamp) columns.
 
-    It will always produce DIMENSION.TIME with FOR_SURE confidence.
+    It will always produce DIMENSION.TIME with VERY_HIGH confidence.
     """
 
     type_node = InferenceSignalType.DIMENSION.TIME
-    confidence = InferenceSignalConfidence.FOR_SURE
-    complimentary_signal = False
+    confidence = InferenceSignalConfidence.VERY_HIGH
+    only_applies_to_parent_signal = False
     match_reason = "Column type is time (TIME, DATE, DATETIME, TIMESTAMP)"
 
     def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
@@ -110,12 +110,12 @@ class TimeDimensionByTimeTypeRule(ColumnMatcherRule):
 class PrimaryTimeDimensionByNameRule(ColumnMatcherRule):
     """Inference rule that checks if the column name is one of `ds` or `created_at`
 
-    It will always produce DIMENSION.PRIMARY_TIME with FOR_SURE confidence.
+    It will always produce DIMENSION.PRIMARY_TIME with VERY_HIGH confidence.
     """
 
     type_node = InferenceSignalType.DIMENSION.PRIMARY_TIME
-    confidence = InferenceSignalConfidence.FOR_SURE
-    complimentary_signal = False
+    confidence = InferenceSignalConfidence.VERY_HIGH
+    only_applies_to_parent_signal = False
     match_reason = "Column name is either of 'ds', 'created_at', 'created_date' or 'created_time'"
 
     def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
@@ -125,7 +125,7 @@ class PrimaryTimeDimensionByNameRule(ColumnMatcherRule):
 class PrimaryTimeDimensionIfOnlyTimeRule(InferenceRule):
     """Inference rule for checking if the column is the only time column in the table.
 
-    It will always produce DIMENSION.PRIMARY_TIME signal with FOR_SURE confidence.
+    It will always produce DIMENSION.PRIMARY_TIME signal with VERY_HIGH confidence.
     """
 
     def process(self, warehouse: DataWarehouseInferenceContext) -> List[InferenceSignal]:  # noqa: D
@@ -139,9 +139,9 @@ class PrimaryTimeDimensionIfOnlyTimeRule(InferenceRule):
                     InferenceSignal(
                         column=time_cols[0],
                         type_node=InferenceSignalType.DIMENSION.PRIMARY_TIME,
-                        is_complimentary=False,
+                        only_applies_to_parent=False,
                         reason="The column is the only time column in its table",
-                        confidence=InferenceSignalConfidence.FOR_SURE,
+                        confidence=InferenceSignalConfidence.VERY_HIGH,
                     )
                 )
         return signals
@@ -150,12 +150,12 @@ class PrimaryTimeDimensionIfOnlyTimeRule(InferenceRule):
 class CategoricalDimensionByBooleanTypeRule(ColumnMatcherRule):
     """Inference rule that checks for boolean columns.
 
-    It will always produce DIMENSION.CATEGORICAL with FOR_SURE confidence.
+    It will always produce DIMENSION.CATEGORICAL with VERY_HIGH confidence.
     """
 
     type_node = InferenceSignalType.DIMENSION.CATEGORICAL
-    confidence = InferenceSignalConfidence.FOR_SURE
-    complimentary_signal = False
+    confidence = InferenceSignalConfidence.VERY_HIGH
+    only_applies_to_parent_signal = False
     match_reason = "Column type is BOOLEAN"
 
     def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
@@ -165,12 +165,12 @@ class CategoricalDimensionByBooleanTypeRule(ColumnMatcherRule):
 class CategoricalDimensionByStringTypeRule(ColumnMatcherRule):
     """Inference rule that checks for string columns.
 
-    It will always produce DIMENSION.CATEGORICAL with MEDIUM confidence (complimentary).
+    It will always produce DIMENSION.CATEGORICAL with MEDIUM confidence (complementary).
     """
 
     type_node = InferenceSignalType.DIMENSION.CATEGORICAL
     confidence = InferenceSignalConfidence.MEDIUM
-    complimentary_signal = True
+    only_applies_to_parent_signal = True
     match_reason = "Column type is STRING"
 
     def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
@@ -180,12 +180,12 @@ class CategoricalDimensionByStringTypeRule(ColumnMatcherRule):
 class CategoricalDimensionByIntegerTypeRule(ColumnMatcherRule):
     """Inference rule that checks for integer columns.
 
-    It will always produce DIMENSION.CATEGORICAL with MEDIUM confidence (complimentary).
+    It will always produce DIMENSION.CATEGORICAL with MEDIUM confidence (complementary).
     """
 
     type_node = InferenceSignalType.DIMENSION.CATEGORICAL
     confidence = InferenceSignalConfidence.MEDIUM
-    complimentary_signal = True
+    only_applies_to_parent_signal = True
     match_reason = "Column type is INTEGER"
 
     def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
@@ -195,12 +195,12 @@ class CategoricalDimensionByIntegerTypeRule(ColumnMatcherRule):
 class CategoricalDimensionByCardinalityRatioRule(LowCardinalityRatioRule):
     """Inference rule that checks for low cardinality columns.
 
-    It will always produce DIMENSION.CATEGORICAL with MEDIUM confidence (complimentary).
+    It will always produce DIMENSION.CATEGORICAL with MEDIUM confidence (complementary).
     """
 
     type_node = InferenceSignalType.DIMENSION.CATEGORICAL
     confidence = InferenceSignalConfidence.MEDIUM
-    complimentary_signal = True
+    only_applies_to_parent_signal = True
 
 
 # -------------
@@ -211,12 +211,12 @@ class CategoricalDimensionByCardinalityRatioRule(LowCardinalityRatioRule):
 class MeasureByRealTypeRule(ColumnMatcherRule):
     """Inference rule that checks for real (float, double) columns.
 
-    It will always produce MEASURE with FOR_SURE confidence.
+    It will always produce MEASURE with VERY_HIGH confidence.
     """
 
     type_node = InferenceSignalType.MEASURE.UNKNOWN
-    confidence = InferenceSignalConfidence.FOR_SURE
-    complimentary_signal = False
+    confidence = InferenceSignalConfidence.VERY_HIGH
+    only_applies_to_parent_signal = False
     match_reason = "Column type is real (FLOAT, DOUBLE, DOUBLE PRECISION)"
 
     def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
@@ -226,12 +226,12 @@ class MeasureByRealTypeRule(ColumnMatcherRule):
 class MeasureByIntegerTypeRule(ColumnMatcherRule):
     """Inference rule that checks for integer  columns.
 
-    It will always produce MEASURE with MEDIUM confidence (complimentary).
+    It will always produce MEASURE with MEDIUM confidence (complementary).
     """
 
     type_node = InferenceSignalType.MEASURE.UNKNOWN
     confidence = InferenceSignalConfidence.MEDIUM
-    complimentary_signal = True
+    only_applies_to_parent_signal = True
     match_reason = "Column type is INTEGER"
 
     def match_column(self, props: ColumnProperties) -> bool:  # noqa: D

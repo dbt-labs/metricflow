@@ -22,14 +22,14 @@ def test_follow_signal_path():
             type_node=InferenceSignalType.ID.UNIQUE,
             reason="UNIQUE",
             confidence=InferenceSignalConfidence.HIGH,
-            is_complimentary=False,
+            only_applies_to_parent=False,
         ),
         InferenceSignal(
             column=column,
             type_node=InferenceSignalType.ID.PRIMARY,
             reason="PRIMARY",
-            confidence=InferenceSignalConfidence.FOR_SURE,
-            is_complimentary=False,
+            confidence=InferenceSignalConfidence.VERY_HIGH,
+            only_applies_to_parent=False,
         ),
     ]
 
@@ -39,29 +39,29 @@ def test_follow_signal_path():
     assert "UNIQUE" in result.reasons[0] and "PRIMARY" in result.reasons[1]
 
 
-def test_complimentary_signal_with_parent_trail():
-    """Test that the solver will follow the weight trail and take complimentary signals into account if parent has weight"""
+def test_complementary_signal_with_parent_trail():
+    """Test that the solver will follow the weight trail and take complementary signals into account if parent has weight"""
     signals = [
         InferenceSignal(
             column=column,
             type_node=InferenceSignalType.ID.UNKNOWN,
             reason="ID",
             confidence=InferenceSignalConfidence.HIGH,
-            is_complimentary=False,
+            only_applies_to_parent=False,
         ),
         InferenceSignal(
             column=column,
             type_node=InferenceSignalType.ID.UNIQUE,
             reason="UNIQUE",
-            confidence=InferenceSignalConfidence.FOR_SURE,
-            is_complimentary=True,
+            confidence=InferenceSignalConfidence.VERY_HIGH,
+            only_applies_to_parent=True,
         ),
         InferenceSignal(
             column=column,
             type_node=InferenceSignalType.ID.PRIMARY,
             reason="PRIMARY",
-            confidence=InferenceSignalConfidence.FOR_SURE,
-            is_complimentary=True,
+            confidence=InferenceSignalConfidence.VERY_HIGH,
+            only_applies_to_parent=True,
         ),
     ]
 
@@ -71,29 +71,29 @@ def test_complimentary_signal_with_parent_trail():
     assert "ID" in result.reasons[0] and "UNIQUE" in result.reasons[1] and "PRIMARY" in result.reasons[2]
 
 
-def test_complimentary_signals_without_parent_signal():
-    """Test that the solver won't follow the weight trail and take complimentary signals into account if parent has no weight"""
+def test_complementary_signals_without_parent_signal():
+    """Test that the solver won't follow the weight trail and take complementary signals into account if parent has no weight"""
     signals = [
         InferenceSignal(
             column=column,
             type_node=InferenceSignalType.DIMENSION.CATEGORICAL,
             reason="CATEG_DIM",
             confidence=InferenceSignalConfidence.MEDIUM,
-            is_complimentary=False,
+            only_applies_to_parent=False,
         ),
         InferenceSignal(
             column=column,
             type_node=InferenceSignalType.ID.UNIQUE,
             reason="UNIQUE",
-            confidence=InferenceSignalConfidence.FOR_SURE,
-            is_complimentary=True,
+            confidence=InferenceSignalConfidence.VERY_HIGH,
+            only_applies_to_parent=True,
         ),
         InferenceSignal(
             column=column,
             type_node=InferenceSignalType.ID.PRIMARY,
             reason="PRIMARY",
-            confidence=InferenceSignalConfidence.FOR_SURE,
-            is_complimentary=True,
+            confidence=InferenceSignalConfidence.VERY_HIGH,
+            only_applies_to_parent=True,
         ),
     ]
 
@@ -111,14 +111,14 @@ def test_contradicting_signals():
             type_node=InferenceSignalType.ID.FOREIGN,
             reason="FOREIGN",
             confidence=InferenceSignalConfidence.HIGH,
-            is_complimentary=False,
+            only_applies_to_parent=False,
         ),
         InferenceSignal(
             column=column,
             type_node=InferenceSignalType.ID.PRIMARY,
             reason="PRIMARY",
             confidence=InferenceSignalConfidence.HIGH,
-            is_complimentary=False,
+            only_applies_to_parent=False,
         ),
     ]
 
@@ -135,14 +135,14 @@ def test_stop_at_internal_node_if_trail_stops():
             type_node=InferenceSignalType.ID.UNKNOWN,
             reason="KEY",
             confidence=InferenceSignalConfidence.HIGH,
-            is_complimentary=False,
+            only_applies_to_parent=False,
         ),
         InferenceSignal(
             column=column,
             type_node=InferenceSignalType.ID.UNIQUE,
             reason="UNIQUE",
             confidence=InferenceSignalConfidence.HIGH,
-            is_complimentary=False,
+            only_applies_to_parent=False,
         ),
     ]
 

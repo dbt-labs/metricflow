@@ -19,7 +19,7 @@ class InferenceSignalConfidence(Enum):
     results in favor/against certain rules.
     """
 
-    FOR_SURE = 3
+    VERY_HIGH = 3
     HIGH = 2
     MEDIUM = 1
     LOW = 0
@@ -29,7 +29,7 @@ class InferenceSignalNode(ABC):
     """A node in the inference signal type hierarchy.
 
     This class can be used to assembly a type hierarchy tree. It can be used by heuristics
-    to check whether signals produced by rules are conflicting or complimentary, relying
+    to check whether signals produced by rules are conflicting or complementary, relying
     on the property that sibling nodes are mutually exclusive in the hierarchy.
     """
 
@@ -46,20 +46,20 @@ class InferenceSignalNode(ABC):
         return f"InferenceSignalNode: {self.name}"
 
     @property
-    def ancestors(self) -> List[InferenceSignalNode]:
-        """The list of all ancestors for this node, from the root to the direct parent."""
+    def supertypes(self) -> List[InferenceSignalNode]:
+        """The list of all supertypes for this type node, from the root to the direct parent."""
         if self.parent is None:
             return []
 
-        return self.parent.ancestors + [self.parent]
+        return self.parent.supertypes + [self.parent]
 
     def is_subtype_of(self, other: InferenceSignalNode) -> bool:
         """Whether self is a subtype of other.
-        
+
         A subtype can always be used where its supertype is expected, although the reverse
         may not be true
         """
-        return other == self or other in self.ancestors
+        return other == self or other in self.supertypes
 
 
 # This is kinda horrible but there's no way of instancing the tree with type safety without
@@ -114,12 +114,12 @@ class InferenceSignal:
     reason: a human-readable string that explains why this signal was produced. It may
         eventually reach the user's eyeballs.
     confidence: the confidence that this signal is correct.
-    is_complimentary: whether a solver should only consider this signal if the parent type
-        node is also present.
+    only_applies_to_parent: whether a solver should only consider this signal if the parent type
+        node is also present. In other words, this signal is _complementary_ to its parent.
 
     About the usage of `only_applies_to_parent`:
         This can be used to produce signals which don't affect each other, are not
-        individually indicative of a specific outcome, and as such are only used to 
+        individually indicative of a specific outcome, and as such are only used to
         further specify parent signals.
 
         Example: columns with unique values can indicate both unique keys and categorical
@@ -128,15 +128,15 @@ class InferenceSignal:
         tagged with this flag will only apply to the parent. So you can safely designate a
         signal as having a HIGH confidence for a given base column type while ignoring
         it for any other column type.
-        
-         
+
+
     """
 
     column: SqlColumn
     type_node: InferenceSignalNode
     reason: str
     confidence: InferenceSignalConfidence
-    is_complimentary: bool
+    only_applies_to_parent: bool
 
 
 @dataclass(frozen=True)

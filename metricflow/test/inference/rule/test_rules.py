@@ -36,7 +36,7 @@ def create_context_with_counts(rows: int, distinct: int, nulls: int) -> DataWare
 class TestLowCardinalityRule(LowCardinalityRatioRule):  # noqa: D
     type_node = InferenceSignalType.DIMENSION.CATEGORICAL
     confidence = InferenceSignalConfidence.MEDIUM
-    complimentary_signal = False
+    only_applies_to_parent_signal = False
 
 
 def test_column_matcher(warehouse_ctx: DataWarehouseInferenceContext):  # noqa: D
@@ -44,7 +44,7 @@ def test_column_matcher(warehouse_ctx: DataWarehouseInferenceContext):  # noqa: 
         type_node = InferenceSignalType.DIMENSION.UNKNOWN
         confidence = InferenceSignalConfidence.MEDIUM
         match_reason = "test reason"
-        complimentary_signal = False
+        only_applies_to_parent_signal = False
 
         def match_column(self, props: ColumnProperties) -> bool:
             return props.column.column_name.endswith("test_column")
@@ -56,7 +56,7 @@ def test_column_matcher(warehouse_ctx: DataWarehouseInferenceContext):  # noqa: 
     assert signals[0].type_node == InferenceSignalType.DIMENSION.UNKNOWN
     assert signals[0].column == SqlColumn.from_string("db.schema.table.test_column")
     assert signals[0].reason == "test reason"
-    assert not signals[0].is_complimentary
+    assert not signals[0].only_applies_to_parent
 
 
 def test_low_cardinality_ratio_rule_high_cardinality_doesnt_match():  # noqa: D

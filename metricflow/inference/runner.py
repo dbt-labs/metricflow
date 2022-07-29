@@ -3,9 +3,11 @@ from collections import defaultdict
 
 from typing import List
 
+import more_itertools
+
 from metricflow.inference.context.base import InferenceContextProvider
 from metricflow.inference.context.data_warehouse import DataWarehouseInferenceContextProvider
-from metricflow.inference.rule.base import InferenceRule, InferenceSignal
+from metricflow.inference.rule.base import InferenceRule
 from metricflow.inference.solver.base import InferenceSolver
 from metricflow.inference.renderer.base import InferenceRenderer
 

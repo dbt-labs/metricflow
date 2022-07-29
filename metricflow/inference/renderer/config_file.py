@@ -65,7 +65,7 @@ class ConfigFileRenderer(InferenceRenderer):
                 "type": type_map.get(result.type_node, ConfigFileRenderer.UNKNOWN_FIELD_VALUE),
             }
             for result in results
-            if result.type_node.is_descendant(InferenceSignalType.ID.UNKNOWN)
+            if result.type_node.is_subtype_of(InferenceSignalType.ID.UNKNOWN)
         ]
 
         return rendered
@@ -79,7 +79,7 @@ class ConfigFileRenderer(InferenceRenderer):
 
         rendered: List[CommentedMap] = []
         for result in results:
-            if not result.type_node.is_descendant(InferenceSignalType.DIMENSION.UNKNOWN):
+            if not result.type_node.is_subtype_of(InferenceSignalType.DIMENSION.UNKNOWN):
                 continue
 
             result_data: CommentedMap = CommentedMap(
@@ -92,9 +92,9 @@ class ConfigFileRenderer(InferenceRenderer):
             if result_data["type"] == ConfigFileRenderer.UNKNOWN_FIELD_VALUE:
                 result_data.yaml_add_eol_comment(self._fixme("unknown field value"), "type")
 
-            if result.type_node.is_descendant(InferenceSignalType.DIMENSION.TIME):
+            if result.type_node.is_subtype_of(InferenceSignalType.DIMENSION.TIME):
                 type_params: CommentedMap = {"time_granularity": "day"}
-                if result.type_node.is_descendant(InferenceSignalType.DIMENSION.PRIMARY_TIME):
+                if result.type_node.is_subtype_of(InferenceSignalType.DIMENSION.PRIMARY_TIME):
                     type_params["is_primary"] = True
                 result_data["type_params"] = type_params
 

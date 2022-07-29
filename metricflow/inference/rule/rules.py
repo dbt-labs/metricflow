@@ -30,13 +30,14 @@ class ColumnMatcherRule(InferenceRule):
 
     type_node: the `InferenceSignalNode` to produce whenever the pattern is matched
     confidence: the `InferenceSignalConfidence` to produce whenever the pattern is matched
-    complimentary_signal: whether the produced signal should be complimentary or not
+    only_applies_to_parent_signal: whether the produced signal should be only taken into
+        consideration by the solver if the parent is present in the tree.
     match_reason: a human-readable string of the reason why this was matched
     """
 
     type_node: InferenceSignalNode
     confidence: InferenceSignalConfidence
-    complimentary_signal: bool
+    only_applies_to_parent_signal: bool
     match_reason: str
 
     @abstractmethod
@@ -56,7 +57,7 @@ class ColumnMatcherRule(InferenceRule):
                 type_node=self.type_node,
                 reason=self.match_reason,
                 confidence=self.confidence,
-                is_complimentary=self.complimentary_signal,
+                only_applies_to_parent=self.only_applies_to_parent_signal,
             )
             for column in matching_columns
         ]
