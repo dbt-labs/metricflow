@@ -21,6 +21,7 @@ from update_checker import UpdateChecker
 from metricflow.cli import PACKAGE_NAME
 from metricflow.cli.constants import DEFAULT_RESULT_DECIMAL_PLACES, MAX_LIST_OBJECT_ELEMENTS
 from metricflow.cli.cli_context import CLIContext
+import metricflow.cli.custom_click_types as click_custom
 from metricflow.cli.tutorial import create_sample_data, gen_sample_model_configs, remove_sample_tables
 from metricflow.cli.utils import (
     MF_BIGQUERY_KEYS,
@@ -767,7 +768,10 @@ class CLIInferenceProgressReporter(InferenceProgressReporter):
 @cli.command()
 @click.option(
     "--tables",
-    type=str,
+    type=click_custom.ListParamType(
+        value_converter=lambda table_str: SqlTable.from_string(table_str),
+        min_length=1,
+    ),
     required=True,
     help="Comma-separated list of table names to be queried for inference.",
 )
@@ -787,7 +791,11 @@ class CLIInferenceProgressReporter(InferenceProgressReporter):
 )
 @click.option(
     "--solver-weights",
-    type=str,
+    type=click_custom.ListParamType(
+        value_converter=lambda weight_str: int(weight_str),
+        min_length=4,
+        max_length=4,
+    ),
     required=False,
     default="1,2,4,8",
     help="Comma-separated list of 4 integer weights to be assigned for each confidence value. "
@@ -816,27 +824,14 @@ class CLIInferenceProgressReporter(InferenceProgressReporter):
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def infer(
     cfg: CLIContext,
-    tables: str,
+    tables: List[SqlTable],
     max_sample_size: int,
     solver_threshold: float,
-    solver_weights: str,
+    solver_weights: List[int],
     output_dir: str,
     overwrite: bool,
 ) -> None:
     """Infer data source configurations from warehouse information."""
-
-    parsed_tables = [SqlTable.from_string(table_str) for table_str in tables.split(",")]
-    if len(parsed_tables) == 0:
-        click.echo("Must specify at least one table to run inference.")
-        return
-
-    try:
-        parsed_solver_weights = [int(weight_str) for weight_str in solver_weights.split(",")]
-        assert len(parsed_solver_weights) == 4
-    except (AssertionError, ValueError):
-        click.echo("Solver weights must be comma-separated list of 4 integer values.")
-        return
-
     if cfg.sql_client.sql_engine_attributes.sql_engine_type is not SupportedSqlEngine.SNOWFLAKE:
         click.echo(
             "Data Source Inference is currently only supported for Snowflake. "
@@ -845,17 +840,15 @@ def infer(
         )
         return
 
-    provider = SnowflakeInferenceContextProvider(
-        client=cfg.sql_client, tables=parsed_tables, max_sample_size=max_sample_size
-    )
+    provider = SnowflakeInferenceContextProvider(client=cfg.sql_client, tables=tables, max_sample_size=max_sample_size)
 
     # set up the solver
     def solver_weighter_function(confidence: InferenceSignalConfidence) -> int:
         weights = {
-            InferenceSignalConfidence.LOW: parsed_solver_weights[0],
-            InferenceSignalConfidence.MEDIUM: parsed_solver_weights[1],
-            InferenceSignalConfidence.HIGH: parsed_solver_weights[2],
-            InferenceSignalConfidence.VERY_HIGH: parsed_solver_weights[3],
+            InferenceSignalConfidence.LOW: solver_weights[0],
+            InferenceSignalConfidence.MEDIUM: solver_weights[1],
+            InferenceSignalConfidence.HIGH: solver_weights[2],
+            InferenceSignalConfidence.VERY_HIGH: solver_weights[3],
         }
         return weights[confidence]
 
