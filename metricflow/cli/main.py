@@ -39,6 +39,7 @@ from metricflow.cli.utils import (
 from metricflow.configuration.config_builder import YamlTemplateBuilder
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
+from metricflow.decorators import beta_feature_warning
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest, MetricFlowExplainResult, MetricFlowQueryResult
 from metricflow.inference.context.snowflake import SnowflakeInferenceContextProvider
 from metricflow.inference.models import InferenceSignalConfidence
@@ -829,6 +830,7 @@ class CLIInferenceProgressReporter(InferenceProgressReporter):
     default=False,
     help="If specified, allows existing configuration files to be overwritten by inference.",
 )
+@beta_feature_warning(feature_name="Data Source Inference")
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
@@ -854,6 +856,8 @@ def infer(
 
     if tables is None and schema is None:
         raise click.UsageError("Either `--tables` or `--schema` have to be provided.")
+
+    click.echo("Running data source inference...")
 
     if schema is not None and tables is None:
         with _get_spin_context_manager_factory(f"🔍 Fetching available tables for schema `{schema}`")():
@@ -894,8 +898,6 @@ def infer(
         ],
         progress_reporter=CLIInferenceProgressReporter(),
     )
-
-    click.echo("Running data source inference...")
 
     runner.run()
 
