@@ -101,7 +101,7 @@ class MutuallyExclusiveOption(click.Option):
         self.mutually_exclusive = frozenset(kwargs.pop("mutually_exclusive", []))
         if len(self.mutually_exclusive) > 0:
             exclude_str = ",".join(self.mutually_exclusive)
-            kwargs["help"] += f" MUTUALLY_EXCLUSIVE[{exclude_str}]"
+            kwargs["help"] += f" [mutually_exclusive({exclude_str})]"
 
         super(MutuallyExclusiveOption, self).__init__(*args, **kwargs)
 
