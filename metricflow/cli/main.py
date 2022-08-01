@@ -1,3 +1,4 @@
+import contextlib
 import logging
 import signal
 import sys
@@ -14,7 +15,7 @@ import time
 from halo import Halo
 from importlib.metadata import version as pkg_version
 from packaging.version import parse
-from typing import Callable, List, Optional, Sequence
+from typing import Callable, ContextManager, Iterator, List, Optional, Sequence
 from update_checker import UpdateChecker
 
 from metricflow.cli import PACKAGE_NAME
@@ -35,12 +36,21 @@ from metricflow.cli.utils import (
     MF_POSTGRESQL_KEYS,
 )
 from metricflow.configuration.config_builder import YamlTemplateBuilder
+from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest, MetricFlowExplainResult, MetricFlowQueryResult
+from metricflow.inference.context.snowflake import SnowflakeInferenceContextProvider
+from metricflow.inference.models import InferenceSignalConfidence
+from metricflow.inference.rule.defaults import DEFAULT_RULESET
+from metricflow.inference.renderer.stream import StreamInferenceRenderer
+from metricflow.inference.renderer.config_file import ConfigFileRenderer
+from metricflow.inference.solver.weighted_tree import WeightedTypeTreeInferenceSolver
+from metricflow.inference.runner import InferenceProgressReporter, InferenceRunner
 from metricflow.model.data_warehouse_model_validator import DataWarehouseModelValidator
 from metricflow.model.model_validator import ModelValidator
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import ValidationIssue, ValidationIssueLevel
+from metricflow.protocols.sql_client import SupportedSqlEngine
 from metricflow.sql_clients.common_client import SqlDialect
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
@@ -719,6 +729,159 @@ def validate_configs(cfg: CLIContext, dw_timeout: Optional[int] = None, skip_dw:
     if not skip_dw:
         dw_validator = DataWarehouseModelValidator(sql_client=cfg.sql_client, mf_engine=cfg.mf)
         _data_warehouse_validations_runner(dw_validator=dw_validator, model=user_model, timeout=dw_timeout)
+
+
+def _get_spin_context_manager(text: str) -> Callable[[], ContextManager[None]]:
+    @contextlib.contextmanager
+    def _context_manager() -> Iterator[None]:
+        start_ms = int(time.time_ns() / 10e6)
+        spinner = Halo(text=text, spinner="dots")
+        spinner.start()
+        yield
+        end_ms = int(time.time_ns() / 10e6)
+        total_ms = end_ms - start_ms
+        spinner.succeed(text=(click.style(f"{total_ms}ms ", fg="yellow") + text))
+
+    return _context_manager
+
+
+class CLIInferenceProgressReporter(InferenceProgressReporter):
+    """Writes inference progress to stdout as pretty output."""
+
+    @staticmethod
+    @contextlib.contextmanager
+    def warehouse() -> Iterator[None]:  # noqa: D
+        yield
+
+    @staticmethod
+    @contextlib.contextmanager
+    def table(table: SqlTable, index: int, total: int) -> Iterator[None]:  # noqa: D
+        with _get_spin_context_manager(f"🔍 Querying `{table.sql}` ({index + 1} out of {total})")():
+            yield
+
+    rules = staticmethod(_get_spin_context_manager("🤔 Processing inference rules"))  # type: ignore
+    solver = staticmethod(_get_spin_context_manager("🧠 Solving column types"))  # type: ignore
+    renderers = staticmethod(_get_spin_context_manager("📝 Writing output"))  # type: ignore
+
+
+@cli.command()
+@click.option(
+    "--tables",
+    type=str,
+    required=True,
+    help="Comma-separated list of table names to be queried for inference.",
+)
+@click.option(
+    "--max-sample-size",
+    type=click.IntRange(min=1),
+    required=True,
+    default=10000,
+    help="The maximum number of rows to sample from the warehouse, for each table.",
+)
+@click.option(
+    "--solver-threshold",
+    type=click.FloatRange(min=0.5, max=1),
+    required=False,
+    default=0.6,
+    help="The inference solver weight threshold.",
+)
+@click.option(
+    "--solver-weights",
+    type=str,
+    required=False,
+    default="1,2,4,8",
+    help="Comma-separated list of 4 integer weights to be assigned for each confidence value. "
+    "Interpreted weights will be assigned to confidences LOW,MEDIUM,HIGH,VERY_HIGH",
+)
+@click.option(
+    "--output-dir",
+    type=click.Path(
+        dir_okay=True,
+        file_okay=False,
+        writable=True,
+        readable=True,
+    ),
+    required=True,
+    help="Output directory for the inferred config files.",
+)
+@click.option(
+    "--overwrite",
+    is_flag=True,
+    required=True,
+    default=False,
+    help="If specified, allows existing configuration files to be overwritten by inference.",
+)
+@pass_config
+@exception_handler
+@log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
+def infer(
+    cfg: CLIContext,
+    tables: str,
+    max_sample_size: int,
+    solver_threshold: float,
+    solver_weights: str,
+    output_dir: str,
+    overwrite: bool,
+) -> None:
+    """Infer data source configurations from warehouse information."""
+
+    parsed_tables = [SqlTable.from_string(table_str) for table_str in tables.split(",")]
+    if len(parsed_tables) == 0:
+        click.echo("Must specify at least one table to run inference.")
+        return
+
+    try:
+        parsed_solver_weights = [int(weight_str) for weight_str in solver_weights.split(",")]
+        assert len(parsed_solver_weights) == 4
+    except (AssertionError, ValueError):
+        click.echo("Solver weights must be comma-separated list of 4 integer values.")
+        return
+
+    if cfg.sql_client.sql_engine_attributes.sql_engine_type is not SupportedSqlEngine.SNOWFLAKE:
+        click.echo(
+            "Data Source Inference is currently only supported for Snowflake. "
+            "We will add support for all the other warehouses before it becomes a "
+            "stable feature. Stay tuned!"
+        )
+        return
+
+    provider = SnowflakeInferenceContextProvider(
+        client=cfg.sql_client, tables=parsed_tables, max_sample_size=max_sample_size
+    )
+
+    # set up the solver
+    def solver_weighter_function(confidence: InferenceSignalConfidence) -> int:
+        weights = {
+            InferenceSignalConfidence.LOW: parsed_solver_weights[0],
+            InferenceSignalConfidence.MEDIUM: parsed_solver_weights[1],
+            InferenceSignalConfidence.HIGH: parsed_solver_weights[2],
+            InferenceSignalConfidence.VERY_HIGH: parsed_solver_weights[3],
+        }
+        return weights[confidence]
+
+    solver = WeightedTypeTreeInferenceSolver(
+        weight_percent_threshold=solver_threshold, weighter_function=solver_weighter_function
+    )
+
+    os.makedirs(output_dir, exist_ok=True)
+
+    # set up the runner
+    runner = InferenceRunner(
+        context_providers=[provider],
+        ruleset=DEFAULT_RULESET,
+        solver=solver,
+        renderers=[
+            StreamInferenceRenderer.file(os.path.join(output_dir, "reasons.txt")),
+            ConfigFileRenderer(dir_path=output_dir, overwrite=overwrite),
+        ],
+        progress_reporter=CLIInferenceProgressReporter(),
+    )
+
+    click.echo("Running data source inference...")
+
+    runner.run()
+
+    click.echo("🎉 Done running inference!")
 
 
 if __name__ == "__main__":

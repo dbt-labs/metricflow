@@ -19,10 +19,9 @@ def beta_feature_warning(
         @functools.wraps(func)
         def _decorated(*args, **kwargs):
             click.echo(
-                click.style(f"{feature_name} is still in Beta 🧪. ", bold=True)
+                click.style(f"‼️ Warning: {feature_name} is still in Beta 🧪. ", fg="red", bold=True)
                 + "As such, you should not expect it to be 100% stable or be free of bugs. Any public CLI or Python interfaces may change without prior notice."
-                + "\n\n"
-                "If you find any bugs or feel like something is not behaving as it should, feel free to open an issue on the Metricflow Github repo."
+                " If you find any bugs or feel like something is not behaving as it should, feel free to open an issue on the Metricflow Github repo.\n"
             )
             return func(*args, **kwargs)
 
