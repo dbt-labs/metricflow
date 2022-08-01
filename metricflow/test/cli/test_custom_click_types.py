@@ -1,7 +1,8 @@
 import pytest
 import click
+from click.testing import CliRunner
 
-from metricflow.cli.custom_click_types import ListParamType
+from metricflow.cli.custom_click_types import ListParamType, MutuallyExclusiveOption
 
 
 def test_check_min_length():
@@ -44,3 +45,35 @@ def test_use_separator():
 
     no_sep_values = ltype.convert("1,2,3,4,5", None, None)
     assert no_sep_values == ["1,2,3,4,5"]
+
+
+def test_mutually_exclusive_option():
+    """Make sure `MutuallyExclusiveOption` works"""
+
+    @click.command()
+    @click.option(
+        "--foo",
+        cls=MutuallyExclusiveOption,
+        mutually_exclusive=["bar"],
+        help="",
+    )
+    @click.option(
+        "--bar",
+        cls=MutuallyExclusiveOption,
+        mutually_exclusive=["foo"],
+        help="",
+    )
+    def test(foo: str, bar: str) -> None:
+        pass
+
+    runner = CliRunner()
+
+    # should work when exclusivity is respected
+    result = runner.invoke(test, ["--foo", "abc"])
+    assert result.exit_code == 0
+    result = runner.invoke(test, ["--bar", "abc"])
+    assert result.exit_code == 0
+
+    # should fail when it is not respected
+    result = runner.invoke(test, ["--foo", "abc", "--bar", "abc"])
+    assert result.exit_code != 0

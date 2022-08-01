@@ -1,4 +1,4 @@
-from typing import Callable, Generic, List, Optional, TypeVar
+from typing import Any, Callable, Dict, Generic, List, Optional, TypeVar
 import click
 
 T = TypeVar("T")
@@ -66,3 +66,52 @@ class ListParamType(click.ParamType, Generic[T]):
             converted_values.append(converted_val)
 
         return converted_values
+
+
+class MutuallyExclusiveOption(click.Option):
+    """Yype for making click options mutually exclusive.
+
+    Usage:
+    ```
+    @option(
+        '--arg-1',
+        cls=MutuallyExclusiveOption,
+        mutually_exclusive=["arg_2"],
+        # ...
+    )
+    @option(
+        '--arg-2',
+        cls=MutuallyExclusiveOption,
+        mutually_exclusive=["arg_1"],
+        # ...
+    )
+    ```
+    """
+
+    def __init__(
+        self,
+        *args,
+        **kwargs,
+    ):
+        """Initialize the option.
+
+        mutually_exclusive: A list of strings that indicate incompatible options.
+        """
+
+        self.mutually_exclusive = frozenset(kwargs.pop("mutually_exclusive", []))
+        if len(self.mutually_exclusive) > 0:
+            exclude_str = ",".join(self.mutually_exclusive)
+            kwargs["help"] += f" MUTUALLY_EXCLUSIVE[{exclude_str}]"
+
+        super(MutuallyExclusiveOption, self).__init__(*args, **kwargs)
+
+    def handle_parse_result(self, ctx: click.Context, opts: Dict[str, Any], args: List[str]):  # noqa: D
+        mutually_exclusive_opts_present = len(self.mutually_exclusive.intersection(opts)) > 0
+
+        if mutually_exclusive_opts_present and self.name in opts:
+            exclude_str = ",".join(f"'--{opt}'" for opt in self.mutually_exclusive)
+            raise click.BadOptionUsage(
+                self.name, f"cannot use option '--{self.name}' because is mutually exclusive with {exclude_str}", ctx
+            )
+
+        return super(MutuallyExclusiveOption, self).handle_parse_result(ctx, opts, args)
