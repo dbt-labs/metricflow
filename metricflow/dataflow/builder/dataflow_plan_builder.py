@@ -9,6 +9,7 @@ from typing import List, TypeVar, Optional, Generic, Dict, Tuple, Sequence, Set,
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dag.id_generation import IdGeneratorRegistry, DATAFLOW_PLAN_PREFIX
 from metricflow.dataflow.builder.costing import DefaultCostFunction, DataflowPlanNodeCostFunction
+from metricflow.dataflow.builder.measure_additiveness import group_measure_specs_by_additiveness
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.node_evaluator import (
     NodeEvaluatorForLinkableInstances,
@@ -137,13 +138,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         for metric_spec in query_spec.metric_specs:
             logger.info(f"Generating compute metrics node for {metric_spec}")
             metric = self._metric_semantics.get_metric(metric_spec)
-
-            measure_specs = tuple(
-                MeasureSpec(
-                    element_name=x.element_name,
-                )
-                for x in metric.measure_references
-            )
+            measure_specs = self._metric_semantics.measures_for_metric(metric_spec)
 
             logger.info(
                 f"For {metric_spec}, needed measures are:\n" f"{pformat_big_objects(measure_specs=measure_specs)}"
@@ -506,24 +501,54 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             data_sources_for_measures[data_source_names[0]].append(measure_spec)
 
         for data_source, measures in data_sources_for_measures.items():
-            logger.info(f"Building aggregated measures for {data_source}. Measures: {measures}")
-            node = self._build_aggregated_measures_for_single_data_source(
-                measure_specs=tuple(measures),
-                queried_linkable_specs=queried_linkable_specs,
-                where_constraint=where_constraint,
-                time_range_constraint=time_range_constraint,
-                cumulative=cumulative,
-                cumulative_window=cumulative_window,
-                cumulative_grain_to_date=cumulative_grain_to_date,
-            )
-            output_nodes.append(node)
+            grouped_measures_by_additiveness = group_measure_specs_by_additiveness(measures)
+            additive_measure_specs = grouped_measures_by_additiveness.additive_measures
+            grouped_semi_additive_measures = grouped_measures_by_additiveness.grouped_semi_additive_measures
+
+            # Build output node for additive measures
+            if additive_measure_specs:
+                logger.info(
+                    f"Building aggregated measures for {data_source} with additive measures: {additive_measure_specs}"
+                )
+                output_nodes.append(
+                    self._build_aggregated_measures_from_measure_source_node(
+                        measure_specs=additive_measure_specs,
+                        queried_linkable_specs=queried_linkable_specs,
+                        where_constraint=where_constraint,
+                        time_range_constraint=time_range_constraint,
+                        cumulative=cumulative,
+                        cumulative_window=cumulative_window,
+                        cumulative_grain_to_date=cumulative_grain_to_date,
+                    )
+                )
+
+            # Build output nodes for semi-additive measures
+            for semi_additive_measures in grouped_semi_additive_measures:
+                logger.info(
+                    f"Building aggregated measures for {data_source} with semi_additive measures: {semi_additive_measures}"
+                )
+                output_nodes.append(
+                    self._build_aggregated_measures_from_measure_source_node(
+                        measure_specs=semi_additive_measures,
+                        queried_linkable_specs=queried_linkable_specs,
+                        where_constraint=where_constraint,
+                        time_range_constraint=time_range_constraint,
+                        cumulative=cumulative,
+                        cumulative_window=cumulative_window,
+                        cumulative_grain_to_date=cumulative_grain_to_date,
+                    )
+                )
 
         if len(output_nodes) == 1:
             return output_nodes[0]
         else:
+            # Remove the non-additive dimension params from measure_specs moving forward
             return FilterElementsNode(
                 parent_node=JoinAggregatedMeasuresByGroupByColumnsNode(parent_nodes=output_nodes),
-                include_specs=LinkableInstanceSpec.merge(queried_linkable_specs.as_tuple, measure_specs),
+                include_specs=LinkableInstanceSpec.merge(
+                    queried_linkable_specs.as_tuple,
+                    tuple(MeasureSpec(element_name=x.element_name) for x in measure_specs),
+                ),
             )
 
     @staticmethod
@@ -558,7 +583,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
 
         return AggregateMeasuresNode[SqlDataSetT](parent_node=filtered_node)
 
-    def _build_aggregated_measures_for_single_data_source(
+    def _build_aggregated_measures_from_measure_source_node(
         self,
         measure_specs: Tuple[MeasureSpec, ...],
         queried_linkable_specs: LinkableSpecSet,

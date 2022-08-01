@@ -315,7 +315,13 @@ class TimeDimensionReference(DimensionReference):  # noqa: D
         return DimensionReference(element_name=self.element_name)
 
 
+# How to avoid circular import here
+from metricflow.model.objects.elements.measure import NonAdditiveDimensionParameters  # noqa: E402
+
+
 class MeasureSpec(InstanceSpec):  # noqa: D
+    non_additive_dimension: Optional[NonAdditiveDimensionParameters] = None
+
     def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
         return (resolver.resolve_measure_spec(self),)
 
@@ -331,6 +337,9 @@ class MeasureSpec(InstanceSpec):  # noqa: D
     @property
     def as_reference(self) -> MeasureReference:  # noqa: D
         return MeasureReference(element_name=self.element_name)
+
+
+MeasureSpec.update_forward_refs()
 
 
 class MetricSpec(InstanceSpec):  # noqa: D

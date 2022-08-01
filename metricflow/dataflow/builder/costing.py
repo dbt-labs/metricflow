@@ -156,5 +156,8 @@ class DefaultCostFunction(
         return DefaultCost.sum([x.accept(self) for x in node.parent_nodes])
 
     def visit_semi_additive_join_node(self, node: SemiAdditiveJoinNode[SourceDataSetT]) -> DefaultCost:  # noqa: D
-        # TODO: FIX
-        return DefaultCost.sum([x.accept(self) for x in node.parent_nodes])
+        parent_costs = [x.accept(self) for x in node.parent_nodes]
+
+        # Add number of joins to the cost.
+        node_cost = DefaultCost(num_joins=1)
+        return DefaultCost.sum(parent_costs + [node_cost])

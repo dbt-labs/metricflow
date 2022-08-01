@@ -8,6 +8,7 @@ from collections import OrderedDict
 from collections.abc import Mapping
 from dataclasses import is_dataclass, fields
 from enum import Enum
+from hashlib import sha1
 from typing import Sequence, TypeVar, Tuple, NoReturn, Type, Any, List
 
 from metricflow.model.objects.base import HashableBaseModel
@@ -158,6 +159,14 @@ def assert_values_exhausted(value: Enum) -> NoReturn:
     https://github.com/python/mypy/issues/6366#issuecomment-560369716
     """
     assert False, f"Should be unreachable, but got {value}"
+
+
+def hash_strings(strings: Sequence[str]) -> str:
+    """Produces a hash from a list of strings."""
+    hash_builder = sha1()
+    for s in strings:
+        hash_builder.update(s.encode("utf-8"))
+    return hash_builder.hexdigest()
 
 
 T = TypeVar("T", bound="ExtendedEnum")

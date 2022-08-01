@@ -185,6 +185,7 @@ class DataSourceToDataSetConverter:
         for measure in measures or []:
             measure_spec = MeasureSpec(
                 element_name=measure.reference.element_name,
+                non_additive_dimension=measure.non_additive_dimension,
             )
             measure_instance = MeasureInstance(
                 associated_columns=measure_spec.column_associations(self._column_association_resolver),

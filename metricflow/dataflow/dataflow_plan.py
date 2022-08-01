@@ -758,10 +758,10 @@ class FilterElementsNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
         self,
         parent_node: BaseOutput[SourceDataSetT],
         include_specs: Sequence[InstanceSpec],
-        hide_description: bool = False,
+        replace_description: Optional[str] = None,
     ) -> None:
         self._include_specs = include_specs
-        self._hide_description = hide_description
+        self._replace_description = replace_description
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[parent_node])
 
     @classmethod
@@ -778,8 +778,8 @@ class FilterElementsNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
 
     @property
     def description(self) -> str:  # noqa: D
-        if self._hide_description:
-            return "Filter Elements"
+        if self._replace_description:
+            return self._replace_description
 
         formatted_str = textwrap.indent(
             pformat_big_objects([x.qualified_name for x in self._include_specs]), prefix="  "
@@ -789,7 +789,7 @@ class FilterElementsNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
     @property
     def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
         additional_properties = []
-        if not self._hide_description:
+        if not self._replace_description:
             additional_properties = [
                 DisplayedProperty("include_spec", include_spec) for include_spec in self._include_specs
             ]
