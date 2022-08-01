@@ -5,6 +5,7 @@ from typing import List
 
 import more_itertools
 
+from metricflow.decorators import beta_feature_warning
 from metricflow.inference.context.base import InferenceContextProvider
 from metricflow.inference.context.data_warehouse import DataWarehouseInferenceContextProvider
 from metricflow.inference.rule.base import InferenceRule
@@ -20,6 +21,7 @@ from metricflow.inference.renderer.base import InferenceRenderer
 class InferenceRunner:
     """Glues together all other inference classes in a sequence that actually runs inference."""
 
+    @beta_feature_warning(feature_name="Data Source Inference")
     def __init__(
         self,
         context_providers: List[InferenceContextProvider],
