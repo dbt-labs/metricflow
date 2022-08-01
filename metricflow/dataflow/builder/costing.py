@@ -30,6 +30,7 @@ from metricflow.dataflow.dataflow_plan import (
     CombineMetricsNode,
     ConstrainTimeRangeNode,
     WriteToResultTableNode,
+    SemiAdditiveJoinNode,
     MetricTimeDimensionTransformNode,
 )
 
@@ -152,4 +153,8 @@ class DefaultCostFunction(
     def visit_metric_time_dimension_transform_node(  # noqa: D
         self, node: MetricTimeDimensionTransformNode[SourceDataSetT]
     ) -> DefaultCost:
+        return DefaultCost.sum([x.accept(self) for x in node.parent_nodes])
+
+    def visit_semi_additive_join_node(self, node: SemiAdditiveJoinNode[SourceDataSetT]) -> DefaultCost:  # noqa: D
+        # TODO: FIX
         return DefaultCost.sum([x.accept(self) for x in node.parent_nodes])

@@ -12,6 +12,7 @@ import jinja2
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dag.id_generation import (
     DATAFLOW_NODE_AGGREGATE_MEASURES_ID_PREFIX,
+    DATAFLOW_NODE_SEMI_ADDITIVE_JOIN_ID_PREFIX,
     DATAFLOW_NODE_COMPUTE_METRICS_ID_PREFIX,
     DATAFLOW_NODE_JOIN_AGGREGATED_MEASURES_BY_GROUPBY_COLUMNS_PREFIX,
     DATAFLOW_NODE_JOIN_SELF_OVER_TIME_RANGE_ID_PREFIX,
@@ -33,6 +34,7 @@ from metricflow.dataflow.builder.partitions import (
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.dataset import DataSet
 from metricflow.model.objects.metric import CumulativeMetricWindow
+from metricflow.model.objects.elements.measure import AggregationType
 from metricflow.object_utils import pformat_big_objects
 from metricflow.specs import (
     OrderBySpec,
@@ -40,6 +42,7 @@ from metricflow.specs import (
     MetricSpec,
     LinklessIdentifierSpec,
     TimeDimensionReference,
+    TimeDimensionSpec,
     SpecWhereClauseConstraint,
 )
 from metricflow.time.time_granularity import TimeGranularity
@@ -143,6 +146,10 @@ class DataflowPlanNodeVisitor(Generic[SourceDataSetT, VisitorOutputT], ABC):
 
     @abstractmethod
     def visit_join_over_time_range_node(self, node: JoinOverTimeRangeNode[SourceDataSetT]) -> VisitorOutputT:  # noqa: D
+        pass
+
+    @abstractmethod
+    def visit_semi_additive_join_node(self, node: SemiAdditiveJoinNode[SourceDataSetT]) -> VisitorOutputT:  # noqa: D
         pass
 
     @abstractmethod
@@ -410,6 +417,84 @@ class JoinAggregatedMeasuresByGroupByColumnsNode(Generic[SourceDataSetT], Aggreg
         ]
 
 
+class SemiAdditiveJoinNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
+    """A node that performs a row filter by aggregating a given non-additive dimension.
+
+    This is designed to filter a dataset down to singular non-additive time dimension values by aggregating
+    the time dimension with MAX/MIN then joining back to the original dataset on that aggregated value.
+    Additionally, an optional sequence of identifiers can be passed in to group by and join on during the filtering.
+
+    For example, if we have a data set that includes "account_balances,user,date", we can build a
+    "latest_account_balance_by_user" data set using this node by filtering the data set such that for each user,
+    we get the MAX(date) and return the account_balance corresponding to that date.
+
+    Data transformation example,
+    | date       | account_balance | user |                             | date       | account_balance | user |
+    |:-----------|-----------------|-----:|     identifier_specs:       |:-----------|-----------------|-----:|
+    | 2019-12-31 |            1000 |    u1|       - user                | 2020-01-03 |            2000 |    u1|
+    | 2020-01-03 |            2000 |    u1| ->  time_dimension_spec: -> | 2020-01-11              1500 |    u2|
+    | 2020-01-09 |            3000 |    u2|       - date                | 2020-01-12 |            1000 |    u3|
+    | 2020-01-11 |            1500 |    u2|     agg_by_function:
+    | 2020-01-12 |            1000 |    u3|       - MAX
+
+    """
+
+    def __init__(
+        self,
+        parent_node: BaseOutput[SourceDataSetT],
+        identifier_specs: Sequence[LinklessIdentifierSpec],
+        time_dimension_spec: TimeDimensionSpec,
+        agg_by_function: AggregationType,
+    ) -> None:
+        """Constructor.
+
+        Args:
+            parent_node: node with standard output
+            identifier_specs: the identifiers to group the join by
+            time_dimension_spec: the time dimension used for row filtering via an aggregation
+            agg_by_function: the aggregation function used on the time dimension
+        """
+        self._parent_node = parent_node
+        self._identifier_specs = identifier_specs
+        self._time_dimension_spec = time_dimension_spec
+        self._agg_by_function = agg_by_function
+
+        # Doing a list comprehension throws a type error, so doing it this way.
+        parent_nodes: List[DataflowPlanNode[SourceDataSetT]] = [self._parent_node]
+        super().__init__(node_id=self.create_unique_id(), parent_nodes=parent_nodes)
+
+    @classmethod
+    def id_prefix(cls) -> str:  # noqa: D
+        return DATAFLOW_NODE_SEMI_ADDITIVE_JOIN_ID_PREFIX
+
+    def accept(self, visitor: DataflowPlanNodeVisitor[SourceDataSetT, VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+        return visitor.visit_semi_additive_join_node(self)
+
+    @property
+    def description(self) -> str:  # noqa: D
+        return f"""Join on {self.agg_by_function.name}({self.time_dimension_spec.element_name}) and {[i.element_name for i in self.identifier_specs]}"""
+
+    @property
+    def parent_node(self) -> BaseOutput[SourceDataSetT]:  # noqa: D
+        return self._parent_node
+
+    @property
+    def identifier_specs(self) -> Sequence[LinklessIdentifierSpec]:  # noqa: D
+        return self._identifier_specs
+
+    @property
+    def time_dimension_spec(self) -> TimeDimensionSpec:  # noqa: D
+        return self._time_dimension_spec
+
+    @property
+    def agg_by_function(self) -> AggregationType:  # noqa: D
+        return self._agg_by_function
+
+    @property
+    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
+        return super().displayed_properties
+
+
 class ComputedMetricsOutput(Generic[SourceDataSetT], BaseOutput[SourceDataSetT], ABC):
     """A node that outputs data that contains metrics computed from measures."""
 
@@ -673,8 +758,10 @@ class FilterElementsNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
         self,
         parent_node: BaseOutput[SourceDataSetT],
         include_specs: Sequence[InstanceSpec],
+        hide_description: bool = False,
     ) -> None:
         self._include_specs = include_specs
+        self._hide_description = hide_description
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[parent_node])
 
     @classmethod
@@ -691,6 +778,9 @@ class FilterElementsNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
 
     @property
     def description(self) -> str:  # noqa: D
+        if self._hide_description:
+            return "Filter Elements"
+
         formatted_str = textwrap.indent(
             pformat_big_objects([x.qualified_name for x in self._include_specs]), prefix="  "
         )
@@ -698,9 +788,12 @@ class FilterElementsNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
 
     @property
     def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
-        return super().displayed_properties + [
-            DisplayedProperty("include_spec", include_spec) for include_spec in self._include_specs
-        ]
+        additional_properties = []
+        if not self._hide_description:
+            additional_properties = [
+                DisplayedProperty("include_spec", include_spec) for include_spec in self._include_specs
+            ]
+        return super().displayed_properties + additional_properties
 
     @property
     def parent_node(self) -> DataflowPlanNode:  # noqa: D
