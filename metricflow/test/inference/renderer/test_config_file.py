@@ -54,7 +54,7 @@ def test_render_configs(tmpdir: Path):  # noqa: D
 
     renderer.render(inference_results)
 
-    table_file_path = os.path.join(tmpdir, "test_table.yaml")
+    table_file_path = os.path.join(tmpdir, "db.schema.test_table.yaml")
     assert os.path.isfile(table_file_path)
 
     with open(table_file_path, "r") as f:
