@@ -1,3 +1,5 @@
+"""This module contains custom helper click types."""
+
 from typing import Any, Callable, Dict, Generic, List, Optional, TypeVar
 import click
 
@@ -23,7 +25,7 @@ class ListParamType(click.ParamType, Generic[T]):
     ) -> None:
         """Initialize the list param type.
 
-        converter: a function to convert each list value.
+        value_converter: a function to convert each list value.
             Defaults to not converting and keeping them as strings.
         min_length: minimum length for the list, inclusive.
             Defaults to 0.
@@ -69,7 +71,7 @@ class ListParamType(click.ParamType, Generic[T]):
 
 
 class MutuallyExclusiveOption(click.Option):
-    """Yype for making click options mutually exclusive.
+    """Type for making click options mutually exclusive.
 
     Usage:
     ```

@@ -56,7 +56,7 @@ class InferenceProgressReporter(ABC):
 
 
 class NoOpInferenceProgressReporter(InferenceProgressReporter):
-    """Pass-through implementation if `InferenceProgressReporter`."""
+    """Pass-through implementation of `InferenceProgressReporter`."""
 
     @staticmethod
     @contextlib.contextmanager
