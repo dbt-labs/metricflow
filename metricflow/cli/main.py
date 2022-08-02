@@ -736,11 +736,11 @@ def validate_configs(cfg: CLIContext, dw_timeout: Optional[int] = None, skip_dw:
 def _get_spin_context_manager_factory(text: str) -> Callable[[], ContextManager[None]]:
     @contextlib.contextmanager
     def _context_manager() -> Iterator[None]:
-        start_ms = int(time.time_ns() / 10e6)
+        start_ms = int(time.perf_counter() * 1000)
         spinner = Halo(text=text, spinner="dots")
         spinner.start()
         yield
-        end_ms = int(time.time_ns() / 10e6)
+        end_ms = int(time.perf_counter() * 1000)
         total_ms = end_ms - start_ms
         spinner.succeed(text=(click.style(f"{total_ms}ms ", fg="yellow") + text))
 
@@ -859,6 +859,8 @@ def infer(
 
     click.echo("Running data source inference...")
 
+    start_ms = int(time.perf_counter() * 1000)
+
     if schema is not None and tables is None:
         with _get_spin_context_manager_factory(f"🔍 Fetching available tables for schema `{schema}`")():
             # we know it's a Snowflake client, but `list_tables` is not in the `SqlClient` interface.
@@ -901,7 +903,10 @@ def infer(
 
     runner.run()
 
-    click.echo("🎉 Done running inference!")
+    end_ms = int(time.perf_counter() * 1000)
+    total_ms = end_ms - start_ms
+
+    click.echo(f"🎉 Done running inference! Took {click.style(f'{total_ms}ms', fg='yellow')}.")
 
 
 if __name__ == "__main__":
