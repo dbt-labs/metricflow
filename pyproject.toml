@@ -1,12 +1,15 @@
 [tool.poetry]
-name = "metricflow"
+name = "metricflow-lite"
 version = "0.110.1"
-description = "Translates a simple metric definition into reusable SQL and executes it against the SQL engine of your choice."
+description = "Lite version of MetricFlow. This version is missing dependencies for using connectors with data warehouses"
 authors = ["Transform <hello@transformdata.io>"]
 license = "AGPL-3.0-or-later"
 readme = "README.md"
 homepage = "https://transform.co/metricflow"
-repository = "https://github.com/transform-data/metricflow"
+repository = "https://github.com/transform-data/metricflow-lite"
+packages = [
+  { include = "metricflow/**" }
+]
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.10"
@@ -23,7 +26,6 @@ numpy = ">=1.22.2"
 pandas = "1.2.4"
 Jinja2 = "2.11.3"
 PyYAML = "^5.4.1"
-snowflake-connector-python = ">=2.7.8"
 moz-sql-parser = "^4.40.21126"
 tabulate = "0.8.9"
 more-itertools = "8.10.0"
@@ -33,8 +35,6 @@ sqlalchemy-bigquery = "^1.4.3"
 python-dateutil = "2.8.2"
 requests = "^2.27.1"
 MarkupSafe = "2.0.1"
-psycopg2 = "^2.9.3"
-google-cloud-bigquery = "2.34.2"
 halo = "^0.0.31"
 update-checker = "^0.18.0"
 click = "^8.1.3"
@@ -55,7 +55,7 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-mf = 'metricflow.cli.main:cli'
+mf-lite = 'metricflow.cli.main:cli'
 
 [tool.black]
 line-length = 120

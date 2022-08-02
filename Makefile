@@ -23,15 +23,6 @@ install:
 test:
 	poetry run pytest metricflow/test/
 
-.PHONY: test-postgresql
-test-postgresql:
-	MF_SQL_ENGINE_URL="postgresql://metricflow@localhost:5432/metricflow" MF_SQL_ENGINE_PASSWORD="metricflowing" poetry run pytest metricflow/test/
-
 .PHONY: lint
 lint:
 	pre-commit run --all-files
-
-# Running data warehouses locally
-.PHONY: postgresql postgres
-postgresql postgres:
-	make -C local-data-warehouses postgresql

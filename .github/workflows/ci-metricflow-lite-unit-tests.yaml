@@ -1,4 +1,4 @@
-name: MetricFlow Unit Tests (CI)
+name: MetricFlow-Lite Unit Tests (CI)
 on:
   pull_request:
     # run these jobs when a PR is opened, edited, reopened, or updated (synchronize)
@@ -9,8 +9,8 @@ on:
       - reopened
       - synchronize
 jobs:
-  metricflow-unit-tests:
-    name: MetricFlow Unit Tests
+  metricflow-lite-unit-tests:
+    name: MetricFlow-Lite Unit Tests
     runs-on: ubuntu-latest
     steps:
       - name: Check-out the repo
@@ -31,10 +31,10 @@ jobs:
       - name: Install Poetry
         run: pip install poetry && poetry config virtualenvs.create false
 
-      - name: Install Metricflow
+      - name: Install Metricflow-Lite
         run: poetry install
 
-      - name: Run MetricFlow Unit tests suites
+      - name: Run MetricFlow-Lite Unit tests suites
         run: pytest metricflow/test
         env:
           METRICFLOW_CLIENT_EMAIL: ci-tester@gmail.com
