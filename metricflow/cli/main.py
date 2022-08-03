@@ -38,7 +38,6 @@ from metricflow.cli.utils import (
 from metricflow.configuration.config_builder import YamlTemplateBuilder
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
-from metricflow.decorators import beta_feature_warning
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest, MetricFlowExplainResult, MetricFlowQueryResult
 from metricflow.inference.context.snowflake import SnowflakeInferenceContextProvider
 from metricflow.inference.models import InferenceSignalConfidence
@@ -843,7 +842,6 @@ class CLIInferenceProgressReporter(InferenceProgressReporter):
     default=False,
     help="If specified, allows existing configuration files to be overwritten by inference.",
 )
-@beta_feature_warning(feature_name="Data Source Inference")
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
@@ -858,6 +856,12 @@ def infer(
     overwrite: bool,
 ) -> None:
     """Infer data source configurations from warehouse information."""
+
+    click.echo(
+        click.style("‼️ Warning: Data Source Inference is still in Beta 🧪. ", fg="red", bold=True)
+        + "As such, you should not expect it to be 100% stable or be free of bugs. Any public CLI or Python interfaces may change without prior notice."
+        " If you find any bugs or feel like something is not behaving as it should, feel free to open an issue on the Metricflow Github repo.\n"
+    )
 
     if cfg.sql_client.sql_engine_attributes.sql_engine_type is not SupportedSqlEngine.SNOWFLAKE:
         click.echo(

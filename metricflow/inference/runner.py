@@ -2,18 +2,21 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections import defaultdict
 import contextlib
+import logging
 
 from typing import Iterator, List
 
 import more_itertools
 
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.decorators import beta_feature_warning
 from metricflow.inference.context.base import InferenceContextProvider
 from metricflow.inference.context.data_warehouse import DataWarehouseInferenceContextProvider
 from metricflow.inference.rule.base import InferenceRule
 from metricflow.inference.solver.base import InferenceSolver
 from metricflow.inference.renderer.base import InferenceRenderer
+
+
+logger = logging.getLogger(__file__)
 
 
 class InferenceProgressReporter(ABC):
@@ -93,7 +96,6 @@ class NoOpInferenceProgressReporter(InferenceProgressReporter):
 class InferenceRunner:
     """Glues together all other inference classes in a sequence that actually runs inference."""
 
-    @beta_feature_warning(feature_name="Data Source Inference")
     def __init__(
         self,
         context_providers: List[InferenceContextProvider],
@@ -110,6 +112,13 @@ class InferenceRunner:
         renderers: the renderers that will write inference results as meaningful output
         progress_reporter: `InferenceProgressReporter` to report progress
         """
+
+        logger.warning(
+            "Data Source Inference is still in Beta. "
+            "As such, you should not expect it to be 100% stable or be free of bugs. Any public CLI or Python interfaces may change without prior notice."
+            " If you find any bugs or feel like something is not behaving as it should, feel free to open an issue on the Metricflow Github repo."
+        )
+
         if len(context_providers) != 1 or not isinstance(context_providers[0], DataWarehouseInferenceContextProvider):
             raise ValueError("Currently, InferenceRunner requires exactly one DataWarehouseInferenceContextProvider.")
 
