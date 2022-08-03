@@ -1,18 +1,18 @@
 """This module contains custom helper click types."""
 
-from typing import Any, Callable, Dict, Generic, List, Optional, TypeVar
+from typing import Any, Callable, Dict, Generic, List, Optional, Sequence, TypeVar
 import click
 
 T = TypeVar("T")
 
 
-class ListParamType(click.ParamType, Generic[T]):
+class SequenceParamType(click.ParamType, Generic[T]):
     """A click parameter that is a list of elements.
 
-    It can be used to parse strings like "1,2,4,8" into a List[int], for example.
+    It can be used to parse strings like "1,2,4,8" into a Sequence[int], for example.
     """
 
-    name = "list"
+    name = "sequence"
 
     def __init__(
         self,
@@ -23,7 +23,7 @@ class ListParamType(click.ParamType, Generic[T]):
         *args,
         **kwargs,
     ) -> None:
-        """Initialize the list param type.
+        """Initialize the sequence param type.
 
         value_converter: a function to convert each list value.
             Defaults to not converting and keeping them as strings.
@@ -42,7 +42,9 @@ class ListParamType(click.ParamType, Generic[T]):
 
         super().__init__(*args, **kwargs)
 
-    def convert(self, value: str, param: Optional[click.Parameter], ctx: Optional[click.Context]) -> List[T]:  # noqa: D
+    def convert(  # noqa: D
+        self, value: str, param: Optional[click.Parameter], ctx: Optional[click.Context]
+    ) -> Sequence[T]:
         str_values = value.split(self.separator)
 
         if len(str_values) < self.min_length:

@@ -31,7 +31,6 @@ from metricflow.cli.utils import (
     build_validation_header_msg,
     exception_handler,
     query_options,
-    separated_by_comma_option,
     start_end_time_options,
     generate_duckdb_demo_keys,
     MF_POSTGRESQL_KEYS,
@@ -431,8 +430,10 @@ def list_metrics(cfg: CLIContext, show_all_dims: bool = False, search: Optional[
 
 
 @cli.command()
-@separated_by_comma_option(
-    "--metric-names", help_msg="List dimensions by given metrics (intersection). Ex. --metric-names bookings,messages"
+@click.option(
+    "--metric-names",
+    type=click_custom.SequenceParamType(),
+    help="List dimensions by given metrics (intersection). Ex. --metric-names bookings,messages",
 )
 @pass_config
 @exception_handler
@@ -771,7 +772,7 @@ class CLIInferenceProgressReporter(InferenceProgressReporter):
     "--tables",
     cls=click_custom.MutuallyExclusiveOption,
     mutually_exclusive=["schema"],
-    type=click_custom.ListParamType(
+    type=click_custom.SequenceParamType(
         value_converter=lambda table_str: SqlTable.from_string(table_str),
         min_length=1,
     ),
@@ -802,7 +803,7 @@ class CLIInferenceProgressReporter(InferenceProgressReporter):
 )
 @click.option(
     "--solver-weights",
-    type=click_custom.ListParamType(
+    type=click_custom.SequenceParamType(
         value_converter=lambda weight_str: int(weight_str),
         min_length=4,
         max_length=4,
