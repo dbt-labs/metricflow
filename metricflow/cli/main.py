@@ -15,7 +15,7 @@ import time
 from halo import Halo
 from importlib.metadata import version as pkg_version
 from packaging.version import parse
-from typing import Callable, ContextManager, Iterator, List, Optional, Sequence
+from typing import Callable, Iterator, List, Optional, Sequence
 from update_checker import UpdateChecker
 
 from metricflow.cli import PACKAGE_NAME
@@ -734,18 +734,16 @@ def validate_configs(cfg: CLIContext, dw_timeout: Optional[int] = None, skip_dw:
         _data_warehouse_validations_runner(dw_validator=dw_validator, model=user_model, timeout=dw_timeout)
 
 
-def _get_spin_context_manager_factory(text: str) -> Callable[[], ContextManager[None]]:
-    @contextlib.contextmanager
-    def _context_manager() -> Iterator[None]:
-        start_ms = int(time.perf_counter() * 1000)
-        spinner = Halo(text=text, spinner="dots")
-        spinner.start()
-        yield
-        end_ms = int(time.perf_counter() * 1000)
-        total_ms = end_ms - start_ms
-        spinner.succeed(text=(click.style(f"{total_ms}ms ", fg="yellow") + text))
-
-    return _context_manager
+@contextlib.contextmanager
+def _get_spin_context_manager(text: str) -> Iterator[None]:
+    """Get a context manager that produces a spinner."""
+    start_ms = int(time.perf_counter() * 1000)
+    spinner = Halo(text=text, spinner="dots")
+    spinner.start()
+    yield
+    end_ms = int(time.perf_counter() * 1000)
+    total_ms = end_ms - start_ms
+    spinner.succeed(text=(click.style(f"{total_ms}ms ", fg="yellow") + text))
 
 
 class CLIInferenceProgressReporter(InferenceProgressReporter):
@@ -759,12 +757,26 @@ class CLIInferenceProgressReporter(InferenceProgressReporter):
     @staticmethod
     @contextlib.contextmanager
     def table(table: SqlTable, index: int, total: int) -> Iterator[None]:  # noqa: D
-        with _get_spin_context_manager_factory(f"🔍 Querying `{table.sql}` ({index + 1} out of {total})")():
+        with _get_spin_context_manager(f"🔍 Querying `{table.sql}` ({index + 1} out of {total})"):
             yield
 
-    rules = staticmethod(_get_spin_context_manager_factory("🤔 Processing inference rules"))  # type: ignore
-    solver = staticmethod(_get_spin_context_manager_factory("🧠 Solving column types"))  # type: ignore
-    renderers = staticmethod(_get_spin_context_manager_factory("📝 Writing output"))  # type: ignore
+    @staticmethod
+    @contextlib.contextmanager
+    def rules() -> Iterator[None]:  # noqa: D
+        with _get_spin_context_manager("🤔 Processing inference rules"):
+            yield
+
+    @staticmethod
+    @contextlib.contextmanager
+    def solver() -> Iterator[None]:  # noqa: D
+        with _get_spin_context_manager("🧠 Solving column types"):
+            yield
+
+    @staticmethod
+    @contextlib.contextmanager
+    def renderers() -> Iterator[None]:  # noqa: D
+        with _get_spin_context_manager("📝 Writing output"):
+            yield
 
 
 @cli.command()
@@ -863,7 +875,7 @@ def infer(
     start_ms = int(time.perf_counter() * 1000)
 
     if schema is not None and tables is None:
-        with _get_spin_context_manager_factory(f"🔍 Fetching available tables for schema `{schema}`")():
+        with _get_spin_context_manager(f"🔍 Fetching available tables for schema `{schema}`"):
             # we know it's a Snowflake client, but `list_tables` is not in the `SqlClient` interface.
             tables_strs: List[str] = cfg.sql_client.list_tables(schema)  # type: ignore
             tables = [SqlTable(schema_name=schema, table_name=table_name.upper()) for table_name in tables_strs]
@@ -888,7 +900,7 @@ def infer(
         weight_percent_threshold=solver_threshold, weighter_function=solver_weighter_function
     )
 
-    os.makedirs(output_dir, exist_ok=True)
+    pathlib.Path(output_dir).mkdir(exist_ok=True)
 
     # set up the runner
     runner = InferenceRunner(
