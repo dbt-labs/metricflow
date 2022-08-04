@@ -18,8 +18,10 @@ from metricflow.dataflow.dataflow_plan import (
     ConstrainTimeRangeNode,
     BaseOutput,
     MetricTimeDimensionTransformNode,
+    SemiAdditiveJoinNode,
 )
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
+from metricflow.model.objects.elements.measure import AggregationType, NonAdditiveDimensionParameters
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
@@ -1132,4 +1134,75 @@ def test_local_dimension_using_local_identifier(  # noqa: D
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+def test_semi_additive_join_node(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    consistent_id_object_repository: ConsistentIdObjectRepository,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
+    sql_client: SqlClient,
+) -> None:
+    """Tests converting a dataflow plan to a SQL query plan using a SemiAdditiveJoinNode."""
+    non_additive_dimension = NonAdditiveDimensionParameters(name="ds", window_choice=AggregationType.MIN)
+    measure_spec = MeasureSpec(
+        element_name="total_account_balance_first_day", non_additive_dimension=non_additive_dimension
+    )
+    time_dimension_spec = TimeDimensionSpec(element_name="ds", identifier_links=())
+
+    measure_source_node = consistent_id_object_repository.simple_model_read_nodes["accounts_source"]
+    filtered_measure_node = FilterElementsNode[DataSourceDataSet](
+        parent_node=measure_source_node, include_specs=[measure_spec, time_dimension_spec]
+    )
+    semi_additive_join_node = SemiAdditiveJoinNode[DataSourceDataSet](
+        parent_node=filtered_measure_node,
+        identifier_specs=tuple(),
+        time_dimension_spec=time_dimension_spec,
+        agg_by_function=non_additive_dimension.window_choice,
+    )
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=semi_additive_join_node,
+    )
+
+
+def test_semi_additive_join_node_with_grouping(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    consistent_id_object_repository: ConsistentIdObjectRepository,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
+    sql_client: SqlClient,
+) -> None:
+    """Tests converting a dataflow plan to a SQL query plan using a SemiAdditiveJoinNode with a window_grouping."""
+    non_additive_dimension = NonAdditiveDimensionParameters(
+        name="ds",
+        window_choice=AggregationType.MAX,
+        window_groupings=["user"],
+    )
+    measure_spec = MeasureSpec(
+        element_name="current_account_balance_by_user", non_additive_dimension=non_additive_dimension
+    )
+    identifier_spec = LinklessIdentifierSpec(element_name="user", identifier_links=())
+    time_dimension_spec = TimeDimensionSpec(element_name="ds", identifier_links=())
+
+    measure_source_node = consistent_id_object_repository.simple_model_read_nodes["accounts_source"]
+    filtered_measure_node = FilterElementsNode[DataSourceDataSet](
+        parent_node=measure_source_node, include_specs=[measure_spec, identifier_spec, time_dimension_spec]
+    )
+    semi_additive_join_node = SemiAdditiveJoinNode[DataSourceDataSet](
+        parent_node=filtered_measure_node,
+        identifier_specs=(identifier_spec,),
+        time_dimension_spec=time_dimension_spec,
+        agg_by_function=non_additive_dimension.window_choice,
+    )
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=semi_additive_join_node,
     )
