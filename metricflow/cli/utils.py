@@ -10,6 +10,7 @@ import click
 from dateutil.parser import parse
 
 from metricflow.cli.cli_context import CLIContext
+import metricflow.cli.custom_click_types as click_custom
 from metricflow.configuration.config_builder import ConfigKey
 from metricflow.configuration.constants import (
     CONFIG_DWH_CREDS_PATH,
@@ -94,9 +95,10 @@ def generate_duckdb_demo_keys(config_dir: str) -> Tuple[ConfigKey, ...]:
 # Click Options
 def query_options(function: Callable) -> Callable:
     """Common options for a query"""
-    function = separated_by_comma_option(
+    function = click.option(
         "--order",
-        help_msg='Metrics or dimensions to order by ("-" prefix for DESC). For example: --order -ds or --order ds,-revenue',
+        type=click_custom.SequenceParamType(),
+        help='Metrics or dimensions to order by ("-" prefix for DESC). For example: --order -ds or --order ds,-revenue',
         required=False,
     )(function)
     function = click.option(
@@ -112,13 +114,15 @@ def query_options(function: Callable) -> Callable:
         help='SQL-like where statement provided as a string. For example: --where "revenue > 100"',
     )(function)
     function = start_end_time_options(function)
-    function = separated_by_comma_option(
+    function = click.option(
         "--dimensions",
-        help_msg="Dimensions to group by: syntax is --dimensions ds or for multiple dimensions --dimensions ds,org",
+        type=click_custom.SequenceParamType(),
+        help="Dimensions to group by: syntax is --dimensions ds or for multiple dimensions --dimensions ds,org",
     )(function)
-    function = separated_by_comma_option(
+    function = click.option(
         "--metrics",
-        help_msg="Metrics to query for: syntax is --metrics bookings or for multiple metrics --metrics bookings,messages",
+        type=click_custom.SequenceParamType(),
+        help="Metrics to query for: syntax is --metrics bookings or for multiple metrics --metrics bookings,messages",
     )(function)
     return function
 
@@ -141,21 +145,6 @@ def start_end_time_options(function: Callable) -> Callable:
         callback=lambda ctx, param, value: convert_to_datetime(value),
     )(function)
     return function
-
-
-def separated_by_comma_option(option_name: str, help_msg: str = "", required: bool = True) -> Callable:
-    """Parse input containing a string separated by commma to a List."""
-
-    def wraps(function: Callable) -> Callable:
-        function = click.option(
-            option_name,
-            required=required,
-            help=help_msg,
-            callback=lambda ctx, param, value: parse_comma_separated_inputs(value),
-        )(function)
-        return function
-
-    return wraps
 
 
 # Parsers/Validators

@@ -30,7 +30,7 @@ class ConfigFileRenderer(InferenceRenderer):
 
     UNKNOWN_FIELD_VALUE = "FIXME"
 
-    def __init__(self, dir_path: Union[str, Path], overwrite=False) -> None:
+    def __init__(self, dir_path: Union[str, Path], overwrite: bool = False) -> None:
         """Initializes the renderer.
 
         dir_path: The path to the config directory

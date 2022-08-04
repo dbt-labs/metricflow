@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
+import contextlib
 from dataclasses import InitVar, dataclass, field
 from datetime import date, datetime
 from enum import Enum
-from typing import Dict, List, Optional, TypeVar, Generic
+from typing import Callable, ContextManager, Dict, Iterator, List, Optional, TypeVar, Generic
 
 from metricflow.dataflow.sql_column import SqlColumn
 from metricflow.dataflow.sql_table import SqlTable
@@ -78,6 +79,11 @@ class DataWarehouseInferenceContext(InferenceContext):
                 self.columns[column.column] = column
 
 
+@contextlib.contextmanager
+def _default_table_progress(table: SqlTable, index: int, total: int) -> Iterator[None]:
+    yield
+
+
 class DataWarehouseInferenceContextProvider(InferenceContextProvider[DataWarehouseInferenceContext], ABC):
     """Provides inference context from a data warehouse by querying data from its tables."""
 
@@ -97,7 +103,14 @@ class DataWarehouseInferenceContextProvider(InferenceContextProvider[DataWarehou
         """Fetch properties about a single table by querying the warehouse."""
         raise NotImplementedError
 
-    def get_context(self) -> DataWarehouseInferenceContext:
+    def get_context(
+        self,
+        table_progress: Callable[[SqlTable, int, int], ContextManager[None]] = _default_table_progress,
+    ) -> DataWarehouseInferenceContext:
         """Query the data warehouse for statistics about all tables and populate a context with it."""
-        table_props = [self._get_table_properties(table) for table in self.tables]
-        return DataWarehouseInferenceContext(table_props=table_props)
+        table_props_list: List[TableProperties] = []
+        for i, table in enumerate(self.tables):
+            with table_progress(table, i, len(self.tables)):
+                table_props = self._get_table_properties(table)
+                table_props_list.append(table_props)
+        return DataWarehouseInferenceContext(table_props=table_props_list)

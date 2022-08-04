@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Optional
 
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.model.objects.utils import FrozenBaseModel
+from metricflow.model.objects.base import FrozenBaseModel
 
 
 class SqlColumn(FrozenBaseModel):
@@ -17,7 +17,7 @@ class SqlColumn(FrozenBaseModel):
         table_name: str,
         schema_name: str,
         db_name: str,
-    ):
+    ) -> SqlColumn:
         """Helper factory method for constructing a column from database, table, schema and column names."""
         table = SqlTable(db_name=db_name, schema_name=schema_name, table_name=table_name)
         return SqlColumn(table=table, column_name=column_name)
