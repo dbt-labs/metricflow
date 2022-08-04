@@ -37,11 +37,11 @@ class SnowflakeInferenceContextProvider(DataWarehouseInferenceContextProvider):
 
     def _get_select_list_for_column_name(self, name: str, count_nulls: bool) -> str:
         statements = [
-            f"COUNT(DISTINCT {name}) AS {name}_{SnowflakeInferenceContextProvider.COUNT_DISTINCT_SUFFIX}",
-            f"MIN({name}) AS {name}_{SnowflakeInferenceContextProvider.MIN_SUFFIX}",
-            f"MAX({name}) AS {name}_{SnowflakeInferenceContextProvider.MAX_SUFFIX}",
+            f"COUNT(DISTINCT '{name}') AS {name}_{SnowflakeInferenceContextProvider.COUNT_DISTINCT_SUFFIX}",
+            f"MIN('{name}') AS {name}_{SnowflakeInferenceContextProvider.MIN_SUFFIX}",
+            f"MAX('{name}') AS {name}_{SnowflakeInferenceContextProvider.MAX_SUFFIX}",
             (
-                f"SUM(CASE WHEN {name} IS NULL THEN 1 ELSE 0 END) AS {name}_{SnowflakeInferenceContextProvider.COUNT_NULL_SUFFIX}"
+                f"SUM(CASE WHEN '{name}' IS NULL THEN 1 ELSE 0 END) AS {name}_{SnowflakeInferenceContextProvider.COUNT_NULL_SUFFIX}"
                 if count_nulls
                 else f"0 AS {name}_{SnowflakeInferenceContextProvider.COUNT_NULL_SUFFIX}"
             ),
