@@ -8,7 +8,7 @@ from metricflow.inference.context.data_warehouse import (
 )
 
 
-def test_column_properties_is_empty():
+def test_column_properties_is_empty() -> None:
     """Just some easy assertions to test is_empty works as intended."""
     props = ColumnProperties(
         column=SqlColumn.from_string("db.schema.table.column"),

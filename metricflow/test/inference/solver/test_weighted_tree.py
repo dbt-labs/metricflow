@@ -6,7 +6,7 @@ column = SqlColumn.from_string("db.schema.table.col")
 solver = WeightedTypeTreeInferenceSolver()
 
 
-def test_empty_signals_return_unknown():  # noqa: D
+def test_empty_signals_return_unknown() -> None:  # noqa: D
     result = solver.solve_column(column, [])
 
     assert result.type_node == InferenceSignalType.UNKNOWN
@@ -14,7 +14,7 @@ def test_empty_signals_return_unknown():  # noqa: D
     assert len(result.problems) == 2
 
 
-def test_follow_signal_path():
+def test_follow_signal_path() -> None:
     """Test that the solver will return the deepest (most specific) node if it finds a path with multiple signals."""
     signals = [
         InferenceSignal(
@@ -39,7 +39,7 @@ def test_follow_signal_path():
     assert "UNIQUE" in result.reasons[0] and "PRIMARY" in result.reasons[1]
 
 
-def test_complementary_signal_with_parent_trail():
+def test_complementary_signal_with_parent_trail() -> None:
     """Test that the solver will follow the weight trail and take complementary signals into account if parent has weight"""
     signals = [
         InferenceSignal(
@@ -71,7 +71,7 @@ def test_complementary_signal_with_parent_trail():
     assert "ID" in result.reasons[0] and "UNIQUE" in result.reasons[1] and "PRIMARY" in result.reasons[2]
 
 
-def test_complementary_signals_without_parent_signal():
+def test_complementary_signals_without_parent_signal() -> None:
     """Test that the solver won't follow the weight trail and take complementary signals into account if parent has no weight"""
     signals = [
         InferenceSignal(
@@ -103,7 +103,7 @@ def test_complementary_signals_without_parent_signal():
     assert "CATEG_DIM" in result.reasons[0]
 
 
-def test_contradicting_signals():
+def test_contradicting_signals() -> None:
     """Test that the solver will return the deepest common ancestor if it finds conflicting signals."""
     signals = [
         InferenceSignal(
@@ -127,7 +127,7 @@ def test_contradicting_signals():
     assert result.type_node == InferenceSignalType.ID.UNKNOWN
 
 
-def test_stop_at_internal_node_if_trail_stops():
+def test_stop_at_internal_node_if_trail_stops() -> None:
     """Test that if the signal trail stops at an internal node the solver will return that node instead of going deeper."""
     signals = [
         InferenceSignal(

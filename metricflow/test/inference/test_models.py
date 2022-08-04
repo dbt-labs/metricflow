@@ -1,7 +1,7 @@
 from metricflow.inference.models import InferenceSignalType
 
 
-def test_inference_type_node_conflict():
+def test_inference_type_node_conflict() -> None:
     """Make sure the inference signal type hierarchy is correctly configured."""
 
     # IDENTIFIER

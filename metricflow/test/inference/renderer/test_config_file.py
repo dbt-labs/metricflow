@@ -14,12 +14,12 @@ from metricflow.inference.renderer.config_file import ConfigFileRenderer
 yaml = YAML()
 
 
-def test_no_overwrite_with_existing_dir(tmpdir: Path):  # noqa: D
+def test_no_overwrite_with_existing_dir(tmpdir: Path) -> None:  # noqa: D
     with pytest.raises(ValueError):
         ConfigFileRenderer(tmpdir, False)
 
 
-def test_dir_path_is_file(tmpdir: Path):  # noqa: D
+def test_dir_path_is_file(tmpdir: Path) -> None:  # noqa: D
     file_path = os.path.join(tmpdir, "file.txt")
     with open(file_path, "w") as f:
         f.write("file contents!")
@@ -28,7 +28,7 @@ def test_dir_path_is_file(tmpdir: Path):  # noqa: D
         ConfigFileRenderer(file_path, False)
 
 
-def test_render_configs(tmpdir: Path):  # noqa: D
+def test_render_configs(tmpdir: Path) -> None:  # noqa: D
     inference_results = [
         InferenceResult(
             column=SqlColumn.from_string("db.schema.test_table.id"),
