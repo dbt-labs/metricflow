@@ -30,6 +30,10 @@ data_source:
     - name: average_booking_value
       expr: booking_value
       agg: average
+    - name: booking_payments
+      expr: booking_value
+      agg: sum
+      agg_time_dimension: booking_paid_at
 
   dimensions:
     - name: is_instant
@@ -42,6 +46,10 @@ data_source:
     - name: ds_partitioned
       type: time
       is_partition: true
+      type_params:
+        time_granularity: day
+    - name: booking_paid_at
+      type: time
       type_params:
         time_granularity: day
 

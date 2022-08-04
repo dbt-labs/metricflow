@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 import re
+
 from typing import Optional
 
 from metricflow.errors.errors import ParsingException
-from metricflow.model.objects.utils import HashableBaseModel
-from metricflow.object_utils import ExtendedEnum
-from metricflow.specs import LinkableElementReference
+from metricflow.model.objects.base import HashableBaseModel
 
 
 class Version(HashableBaseModel):  # noqa: D
@@ -34,18 +33,6 @@ class Version(HashableBaseModel):  # noqa: D
         return f"{self.__class__.__name__}(major={self.major}, minor={self.minor})"
 
 
-class Element:  # noqa: D
-    name: LinkableElementReference
-    expr: Optional[str]
-    type: ExtendedEnum
-
-    @property
-    def is_primary_time(self) -> bool:  # noqa: D
-        raise NotImplementedError(
-            f"Subclasses of Element must implement `is_primary_time`. This object is of type {type(self)}"
-        )
-
-
 class SourceFile(HashableBaseModel):  # noqa: D
     path: str
     contents: str
@@ -63,7 +50,13 @@ class FileSlice(HashableBaseModel):  # noqa: D
     end_line_number: int
 
 
-class YamlConfigFile(HashableBaseModel):  # noqa: D
+class YamlConfigFile(HashableBaseModel):
+    """Serializable container for customer model YAML contents
+
+    The serialization support is included here for scenarios where persisting the contents in non-filesystem storage
+    services is necessary or desirable.
+    """
+
     filepath: str
     contents: str
     url: Optional[str]

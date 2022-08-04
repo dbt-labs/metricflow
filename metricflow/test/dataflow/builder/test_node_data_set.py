@@ -98,8 +98,8 @@ def test_joined_node_data_set(
     )
 
     # Join "revenue" with "users_latest" to get "user__home_state_latest"
-    revenue_node = ReadSqlSourceNode(consistent_id_object_repository.simple_model_data_sets["revenue"])
-    users_node = ReadSqlSourceNode(consistent_id_object_repository.simple_model_data_sets["users_latest"])
+    revenue_node = consistent_id_object_repository.simple_model_read_nodes["revenue"]
+    users_node = consistent_id_object_repository.simple_model_read_nodes["users_latest"]
     join_node = JoinToBaseOutputNode(
         parent_node=revenue_node,
         join_targets=[

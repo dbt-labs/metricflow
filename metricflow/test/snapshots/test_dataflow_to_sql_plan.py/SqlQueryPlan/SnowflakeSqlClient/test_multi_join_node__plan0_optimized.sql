@@ -1,16 +1,16 @@
 -- Join Standard Outputs
 SELECT
-  subq_7.bookings AS bookings
+  subq_7.listing AS listing
   , subq_9.country_latest AS listing__country_latest
   , subq_11.country_latest AS listing__country_latest
-  , subq_7.listing AS listing
+  , subq_7.bookings AS bookings
 FROM (
   -- Read Elements From Data Source 'bookings_source'
   -- Pass Only Elements:
   --   ['bookings', 'listing']
   SELECT
-    1 AS bookings
-    , listing_id AS listing
+    listing_id AS listing
+    , 1 AS bookings
   FROM (
     -- User Defined SQL Query
     SELECT * FROM ***************************.fct_bookings
@@ -21,8 +21,8 @@ LEFT OUTER JOIN (
   -- Pass Only Elements:
   --   ['listing', 'country_latest']
   SELECT
-    country AS country_latest
-    , listing_id AS listing
+    listing_id AS listing
+    , country AS country_latest
   FROM ***************************.dim_listings_latest listings_latest_src_10003
 ) subq_9
 ON
@@ -32,8 +32,8 @@ LEFT OUTER JOIN (
   -- Pass Only Elements:
   --   ['listing', 'country_latest']
   SELECT
-    country AS country_latest
-    , listing_id AS listing
+    listing_id AS listing
+    , country AS country_latest
   FROM ***************************.dim_listings_latest listings_latest_src_10003
 ) subq_11
 ON

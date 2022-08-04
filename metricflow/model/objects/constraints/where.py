@@ -7,7 +7,7 @@ from typing import List, Optional, Dict, Any
 from moz_sql_parser import parse as moz_parse
 
 from metricflow.errors.errors import ConstraintParseException
-from metricflow.model.objects.utils import ParseableField, HashableBaseModel
+from metricflow.model.objects.base import HashableBaseModel, PydanticCustomInputParser, PydanticParseableValueType
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 
 logger = logging.getLogger(__name__)
@@ -16,7 +16,7 @@ LITERAL_STR = "literal"
 INTERVAL_LITERAL = "interval"
 
 
-class WhereClauseConstraint(HashableBaseModel, ParseableField):
+class WhereClauseConstraint(PydanticCustomInputParser, HashableBaseModel):
     """Contains a string that is a where clause"""
 
     where: str
@@ -42,6 +42,18 @@ class WhereClauseConstraint(HashableBaseModel, ParseableField):
             sql_params=sql_params,
         )
 
+    @classmethod
+    def _from_yaml_value(cls, input: PydanticParseableValueType) -> WhereClauseConstraint:
+        """Parses a WhereClauseConstraint from a constraint string found in a user-provided model specification
+
+        User-provided constraint strings are SQL snippets conforming to the expectations of SQL WHERE clauses,
+        and as such we parse them using our standard parse method below.
+        """
+        if isinstance(input, str):
+            return WhereClauseConstraint.parse(input)
+        else:
+            raise ValueError(f"Expected input to be of type string, but got type {type(input)} with value: {input}")
+
     @staticmethod
     def parse(s: str) -> WhereClauseConstraint:
         """Parse a string into a WhereClauseConstraint
@@ -63,6 +75,8 @@ class WhereClauseConstraint(HashableBaseModel, ParseableField):
 
         where = parsed["where"]
         if isinstance(where, dict):
+            if not len(where.keys()) == 1:
+                raise ConstraintParseException(f"expected parsed constraint to contain exactly one key; got {where}")
             return WhereClauseConstraint(
                 where=s,
                 linkable_names=constraint_dimension_names_from_dict(where),
@@ -88,9 +102,6 @@ def strip_where(s: str) -> str:
 
 
 def constraint_dimension_names_from_dict(where: Dict[str, Any]) -> List[str]:  # type: ignore[misc] # noqa: D
-    if not len(where.keys()) == 1:
-        raise ConstraintParseException(f"expected parsed constraint to contain exactly one key; got {where}")
-
     dims = []
     for key, clause in where.items():
         if key == LITERAL_STR or key == INTERVAL_LITERAL:

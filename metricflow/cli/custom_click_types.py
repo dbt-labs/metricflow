@@ -1,9 +1,15 @@
 """This module contains custom helper click types."""
 
-from typing import Any, Callable, Dict, Generic, List, Optional, Sequence, TypeVar
+from typing import Any, Callable, Dict, Generic, List, Optional, Sequence, TypeVar, Tuple
 import click
 
 T = TypeVar("T")
+
+
+# NOTE: unfortunately python 3.9 has no way of properly typing args and kwargs since it has no
+# typing.ParamSpec. Since click uses args and kwargs, we have to add type ignore.
+#
+# Also, some click interfaces require us to return explicit Any.
 
 
 class SequenceParamType(click.ParamType, Generic[T]):
@@ -14,7 +20,7 @@ class SequenceParamType(click.ParamType, Generic[T]):
 
     name = "sequence"
 
-    def __init__(
+    def __init__(  # type: ignore
         self,
         value_converter: Callable[[str], T] = lambda x: x,  # type: ignore
         min_length: int = 0,
@@ -92,7 +98,7 @@ class MutuallyExclusiveOption(click.Option):
     ```
     """
 
-    def __init__(
+    def __init__(  # type: ignore
         self,
         *args,
         **kwargs,
@@ -109,7 +115,9 @@ class MutuallyExclusiveOption(click.Option):
 
         super(MutuallyExclusiveOption, self).__init__(*args, **kwargs)
 
-    def handle_parse_result(self, ctx: click.Context, opts: Dict[str, Any], args: List[str]):  # noqa: D
+    def handle_parse_result(  # type: ignore # noqa: D
+        self, ctx: click.Context, opts: Dict[str, Any], args: List[str]
+    ) -> Tuple[Any, List[str]]:
         mutually_exclusive_opts_present = len(self.mutually_exclusive.intersection(opts)) > 0
 
         if mutually_exclusive_opts_present and self.name in opts:

@@ -15,7 +15,7 @@ import time
 from halo import Halo
 from importlib.metadata import version as pkg_version
 from packaging.version import parse
-from typing import Callable, Iterator, List, Optional, Sequence
+from typing import Callable, Iterator, List, Optional
 from update_checker import UpdateChecker
 
 from metricflow.cli import PACKAGE_NAME
@@ -28,7 +28,6 @@ from metricflow.cli.utils import (
     MF_CONFIG_KEYS,
     MF_REDSHIFT_KEYS,
     MF_SNOWFLAKE_KEYS,
-    build_validation_header_msg,
     exception_handler,
     query_options,
     start_end_time_options,
@@ -49,8 +48,10 @@ from metricflow.inference.runner import InferenceProgressReporter, InferenceRunn
 from metricflow.model.data_warehouse_model_validator import DataWarehouseModelValidator
 from metricflow.model.model_validator import ModelValidator
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.validations.validator_helpers import ValidationIssue, ValidationIssueLevel
 from metricflow.protocols.sql_client import SupportedSqlEngine
+from metricflow.engine.utils import model_build_result_from_config, path_to_models
+from metricflow.model.parsing.config_linter import ConfigLinter
+from metricflow.model.validations.validator_helpers import ModelValidationResults
 from metricflow.sql_clients.common_client import SqlDialect
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
@@ -200,16 +201,23 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
             2.  Try validating your data model: `mf validate-configs`
             3.  Check out your metrics: `mf list-metrics`
             4.  Check out dimensions for your metric `mf list-dimensions --metric-names transactions`
-            5.  Query your first metric: `mf query --metrics transactions --dimensions ds --order ds`
-            6.  Show the SQL MetricFlow generates: `mf query --metrics transactions --dimensions ds --order ds --explain`
-            7.  Visualize the plan: `mf query --metrics transactions --dimensions ds --order ds --explain --display-plans`
+            5.  Query your first metric: `mf query --metrics transactions --dimensions metric_time --order metric_time`
+            6.  Show the SQL MetricFlow generates:
+                `mf query --metrics transactions --dimensions metric_time --order metric_time --explain`
+            7.  Visualize the plan:
+                `mf query --metrics transactions --dimensions metric_time --order metric_time --explain --display-plans`
                 * This only works if you have graphviz installed - see README.
-                * Aesthetic improvements to the visualization are TBD.
-            8.  Add another dimension: `mf query --metrics transactions --dimensions ds,customer__country --order ds`
-            9.  Add a higher date granularity: `mf query --metrics transactions --dimensions ds__week --order ds__week`
-            10. Try a more complicated query: `mf query --metrics transactions,transaction_usd_na,transaction_usd_na_l7d --dimensions ds,is_large --order ds --start-time 2022-03-20 --end-time 2022-04-01`
+            8.  Add another dimension:
+                `mf query --metrics transactions --dimensions metric_time,customer__country --order metric_time`
+            9.  Add a coarser time granularity:
+                `mf query --metrics transactions --dimensions metric_time__week --order metric_time__week`
+            10. Try a more complicated query:
+                `mf query \\
+                  --metrics transactions,transaction_usd_na,transaction_usd_na_l7d --dimensions metric_time,is_large \\
+                  --order metric_time --start-time 2022-03-20 --end-time 2022-04-01`
                 * You can also add `--explain --display-plans`.
-            11. For more ways to interact with the sample models, go to ‘https://docs.transform.co/docs/metricflow/metricflow-tutorial’.
+            11. For more ways to interact with the sample models, go to
+                ‘https://docs.transform.co/docs/metricflow/metricflow-tutorial’.
             12. Once you’re done, run `mf tutorial --skip-dw --drop-tables` to drop the sample tables.
         """
     )
@@ -294,6 +302,12 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
     default=2,
     help="Choose the number of decimal places to round for the numerical values",
 )
+@click.option(
+    "--show-sql-descriptions",
+    is_flag=True,
+    default=False,
+    help="Shows inline descriptions of nodes in displayed SQL",
+)
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
@@ -311,6 +325,7 @@ def query(
     explain: bool = False,
     display_plans: bool = False,
     decimals: int = DEFAULT_RESULT_DECIMAL_PLACES,
+    show_sql_descriptions: bool = False,
 ) -> None:
     """Create a new query with MetricFlow and assembles a MetricFlowQueryResult."""
     start = time.time()
@@ -340,7 +355,11 @@ def query(
 
     if explain:
         assert explain_result
-        sql = explain_result.rendered_sql.sql_query
+        sql = (
+            explain_result.rendered_sql_without_descriptions.sql_query
+            if not show_sql_descriptions
+            else explain_result.rendered_sql.sql_query
+        )
         click.echo("🔎 Generated Dataflow Plan + SQL (remove --explain to see data):")
         click.echo(
             textwrap.indent(
@@ -640,54 +659,63 @@ def drop_materialization(cfg: CLIContext, materialization_name: str) -> None:
         spinner.warn(f"Materialized table for `{materialization_name}` did not exist, no table was dropped")
 
 
-def _print_issues(issues: Sequence[ValidationIssue]) -> None:  # noqa: D
-    for issue in issues:
-        header = build_validation_header_msg(issue.level)
-        click.echo(f"• {header}: {issue.as_readable_str(with_level=False)}")
-
-
-def _filter_issues(
-    issues: Sequence[ValidationIssue], inlcude_levels: List[ValidationIssueLevel]
-) -> List[ValidationIssue]:  # noqa: D
-    return [issue for issue in issues if issue.level in inlcude_levels]
+def _print_issues(
+    issues: ModelValidationResults, show_non_blocking: bool = False, verbose: bool = False
+) -> None:  # noqa: D
+    for issue in issues.errors:
+        print(f"• {issue.as_cli_formatted_str(verbose=verbose)}")
+    if show_non_blocking:
+        for issue in issues.future_errors:
+            print(f"• {issue.as_cli_formatted_str(verbose=verbose)}")
+        for issue in issues.warnings:
+            print(f"• {issue.as_cli_formatted_str(verbose=verbose)}")
 
 
 def _run_dw_validations(
-    validation_func: Callable[[UserConfiguredModel, Optional[int]], List[ValidationIssue]],
+    validation_func: Callable[[UserConfiguredModel, Optional[int]], ModelValidationResults],
     validation_type: str,
     model: UserConfiguredModel,
     timeout: Optional[int],
-) -> List[ValidationIssue]:
+) -> ModelValidationResults:
     """Helper handles the calling of data warehouse issue generating functions"""
 
     spinner = Halo(text=f"Validating {validation_type} against data warehouse...", spinner="dots")
     spinner.start()
 
-    issues = validation_func(model, timeout)
-    if issues is not None and len(issues) == 0:
-        spinner.succeed(f"🎉 Finished validating {validation_type} against data warehouse, no errors found")
+    results = validation_func(model, timeout)
+    if not results.has_blocking_issues:
+        spinner.succeed(f"🎉 Successfully validated {validation_type} against data warehouse ({results.summary()})")
     else:
-        spinner.fail(f"Issues found when validating {validation_type} against data warehouse")
-    return issues
+        spinner.fail(
+            f"Breaking issues found when validating {validation_type} against data warehouse ({results.summary()})"
+        )
+    return results
 
 
 def _data_warehouse_validations_runner(
     dw_validator: DataWarehouseModelValidator, model: UserConfiguredModel, timeout: Optional[int]
-) -> None:
+) -> ModelValidationResults:
     """Helper which calls the individual data warehouse validations to run and prints collected issues"""
 
-    issues: List[ValidationIssue] = []
-    issues += _run_dw_validations(
+    data_source_results = _run_dw_validations(
         dw_validator.validate_data_sources, model=model, validation_type="data sources", timeout=timeout
     )
-    issues += _run_dw_validations(
+    dimension_results = _run_dw_validations(
         dw_validator.validate_dimensions, model=model, validation_type="dimensions", timeout=timeout
     )
-    issues += _run_dw_validations(
+    identifier_results = _run_dw_validations(
+        dw_validator.validate_identifiers, model=model, validation_type="identifiers", timeout=timeout
+    )
+    measure_results = _run_dw_validations(
+        dw_validator.validate_measures, model=model, validation_type="measures", timeout=timeout
+    )
+    metric_results = _run_dw_validations(
         dw_validator.validate_metrics, model=model, validation_type="metrics", timeout=timeout
     )
 
-    _print_issues(issues)
+    return ModelValidationResults.merge(
+        [data_source_results, dimension_results, identifier_results, measure_results, metric_results]
+    )
 
 
 @cli.command()
@@ -700,37 +728,87 @@ def _data_warehouse_validations_runner(
     default=False,
     help="If specified, skips the data warehouse validations",
 )
+@click.option("--show-all", is_flag=True, default=False, help="If specified, prints warnings and future-errors")
+@click.option(
+    "--verbose-issues", is_flag=True, default=False, help="If specified, prints any extra details issues might have"
+)
+@click.option(
+    "--semantic-validation-workers",
+    required=False,
+    type=int,
+    default=1,
+    help="Optional. Uses the number of workers specified to run the semantic validations. Should only be used for exceptionally large configs",
+)
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-def validate_configs(cfg: CLIContext, dw_timeout: Optional[int] = None, skip_dw: bool = False) -> None:
+def validate_configs(
+    cfg: CLIContext,
+    dw_timeout: Optional[int] = None,
+    skip_dw: bool = False,
+    show_all: bool = False,
+    verbose_issues: bool = False,
+    semantic_validation_workers: int = 1,
+) -> None:
     """Perform validations against the defined model configurations."""
     cfg.verbose = True
 
-    build_spinner = Halo(text="Building model from configs", spinner="dots")
-    build_spinner.start()
+    if not show_all:
+        print("(To see warnings and future-errors, run again with flag `--show-all`)")
 
-    # Structural validation, this will throw error if there's an issue.
-    user_model = cfg.user_configured_model
+    # Lint Validation
+    lint_spinner = Halo(text="Checking for YAML format issues", spinner="dots")
+    lint_spinner.start()
 
-    # Model validation
-    build_result = ModelValidator().validate_model(user_model)
-
-    build_errors = _filter_issues(build_result.issues, [ValidationIssueLevel.ERROR, ValidationIssueLevel.FATAL])
-    if not build_errors:
-        build_spinner.succeed("🎉 Successfully build model from configs")
-        build_warnings = _filter_issues(
-            build_result.issues, [ValidationIssueLevel.FUTURE_ERROR, ValidationIssueLevel.WARNING]
-        )
-        _print_issues(build_warnings)
+    lint_results = ConfigLinter().lint_dir(path_to_models(handler=cfg.config))
+    if not lint_results.has_blocking_issues:
+        lint_spinner.succeed(f"🎉 Successfully linted config YAML files ({lint_results.summary()})")
     else:
-        build_spinner.fail("Errors found when building model from configs")
-        _print_issues(build_result.issues)
+        lint_spinner.fail(f"Breaking issues found in config YAML files ({lint_results.summary()})")
+        _print_issues(lint_results, show_non_blocking=show_all, verbose=verbose_issues)
         return
 
+    # Parsing Validation
+    parsing_spinner = Halo(text="Building model from configs", spinner="dots")
+    parsing_spinner.start()
+    parsing_result = model_build_result_from_config(handler=cfg.config, raise_issues_as_exceptions=False)
+
+    if not parsing_result.issues.has_blocking_issues:
+        parsing_spinner.succeed(f"🎉 Successfully built model from configs ({parsing_result.issues.summary()})")
+    else:
+        parsing_spinner.fail(
+            f"Breaking issues found when building model from configs ({parsing_result.issues.summary()})"
+        )
+        _print_issues(parsing_result.issues, show_non_blocking=show_all, verbose=verbose_issues)
+        return
+
+    user_model = parsing_result.model
+
+    # Semantic validation
+    semantic_spinner = Halo(text="Validating semantics of built model", spinner="dots")
+    semantic_spinner.start()
+    semantic_result = ModelValidator(max_workers=semantic_validation_workers).validate_model(user_model)
+
+    if not semantic_result.issues.has_blocking_issues:
+        semantic_spinner.succeed(
+            f"🎉 Successfully validated the semantics of built model ({semantic_result.issues.summary()})"
+        )
+    else:
+        semantic_spinner.fail(
+            f"Breaking issues found when checking semantics of built model ({semantic_result.issues.summary()})"
+        )
+        _print_issues(semantic_result.issues, show_non_blocking=show_all, verbose=verbose_issues)
+        return
+
+    dw_results = ModelValidationResults()
     if not skip_dw:
-        dw_validator = DataWarehouseModelValidator(sql_client=cfg.sql_client, mf_engine=cfg.mf)
-        _data_warehouse_validations_runner(dw_validator=dw_validator, model=user_model, timeout=dw_timeout)
+        dw_validator = DataWarehouseModelValidator(sql_client=cfg.sql_client, system_schema=cfg.mf_system_schema)
+        dw_results = _data_warehouse_validations_runner(dw_validator=dw_validator, model=user_model, timeout=dw_timeout)
+
+    merged_results = ModelValidationResults.merge(
+        [lint_results, parsing_result.issues, semantic_result.issues, dw_results]
+    )
+    _print_issues(merged_results, show_non_blocking=show_all, verbose=verbose_issues)
 
 
 @contextlib.contextmanager
@@ -871,14 +949,17 @@ def infer(
         )
         return
 
-    if tables is None and schema is None:
+    if tables is None:
+        tables = []
+
+    if len(tables) == 0 and schema is None:
         raise click.UsageError("Either `--tables` or `--schema` have to be provided.")
 
     click.echo("Running data source inference...")
 
     start_ms = int(time.perf_counter() * 1000)
 
-    if schema is not None and tables is None:
+    if schema is not None and len(tables) == 0:
         with _get_spin_context_manager(f"🔍 Fetching available tables for schema `{schema}`"):
             # we know it's a Snowflake client, but `list_tables` is not in the `SqlClient` interface.
             tables_strs: List[str] = cfg.sql_client.list_tables(schema)  # type: ignore

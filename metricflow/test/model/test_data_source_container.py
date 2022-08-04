@@ -6,7 +6,7 @@ from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantics.data_source_container import PydanticDataSourceContainer
 from metricflow.model.semantics.linkable_spec_resolver import LinkableElementProperties
 from metricflow.model.semantics.semantic_containers import DataSourceSemantics, MetricSemantics
-from metricflow.specs import DimensionReference, MetricSpec, MeasureReference
+from metricflow.specs import MetricSpec, MeasureReference
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +31,7 @@ def new_metric_semantics(  # Noqa: D
 
 def test_get_names(new_data_source_semantics: DataSourceSemantics) -> None:  # noqa: D
     expected = [
+        "booking_paid_at",
         "capacity_latest",
         "company_name",
         "country_latest",
@@ -48,6 +49,7 @@ def test_get_names(new_data_source_semantics: DataSourceSemantics) -> None:  # n
     expected = [
         "average_booking_value",
         "bookers",
+        "booking_payments",
         "booking_value",
         "bookings",
         "identity_verifications",
@@ -78,11 +80,12 @@ def test_get_names(new_data_source_semantics: DataSourceSemantics) -> None:  # n
 def test_get_elements(new_data_source_semantics: DataSourceSemantics) -> None:  # noqa: D
     for dimension_reference in new_data_source_semantics.get_dimension_references():
         assert (
-            new_data_source_semantics.get_dimension(dimension_reference=dimension_reference).name == dimension_reference
+            new_data_source_semantics.get_dimension(dimension_reference=dimension_reference).reference
+            == dimension_reference
         )
     for measure_reference in new_data_source_semantics.measure_references:
         measure_reference = MeasureReference(element_name=measure_reference.element_name)
-        assert new_data_source_semantics.get_measure(measure_reference=measure_reference).name == measure_reference
+        assert new_data_source_semantics.get_measure(measure_reference=measure_reference).reference == measure_reference
 
 
 def test_get_data_sources_for_measure(new_data_source_semantics: DataSourceSemantics) -> None:  # noqa: D
@@ -99,11 +102,6 @@ def test_get_data_sources_for_measure(new_data_source_semantics: DataSourceSeman
     assert listings_sources[0].name == "listings_latest"
 
 
-def test_dimension_is_partitioned(new_data_source_semantics: DataSourceSemantics) -> None:  # noqa: D
-    assert new_data_source_semantics.dimension_is_partitioned(DimensionReference(element_name="ds_partitioned")) is True
-    assert new_data_source_semantics.dimension_is_partitioned(DimensionReference(element_name="ds")) is False
-
-
 def test_elements_for_metric(new_metric_semantics: MetricSemantics) -> None:  # noqa: D
     assert set(
         [
@@ -115,6 +113,7 @@ def test_elements_for_metric(new_metric_semantics: MetricSemantics) -> None:  # 
         ]
     ) == {
         "create_a_cycle_in_the_join_graph",
+        "create_a_cycle_in_the_join_graph__booking_paid_at",
         "create_a_cycle_in_the_join_graph__guest",
         "create_a_cycle_in_the_join_graph__host",
         "create_a_cycle_in_the_join_graph__is_instant",

@@ -1,7 +1,7 @@
 from abc import ABC
 from typing import Union
 
-from metricflow.model.objects.utils import FrozenBaseModel
+from metricflow.model.objects.base import FrozenBaseModel
 
 
 class ColumnCorrelationKey(ABC, FrozenBaseModel):

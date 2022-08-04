@@ -1,12 +1,14 @@
 from typing import Dict, Any
 
-from jsonschema import RefResolver, Draft7Validator
+from jsonschema import RefResolver
+from metricflow.model.parsing.schema_validator import SchemaValidator
 
 from metricflow.model.parsing.schemas import (
     metric_schema,
     data_source_schema,
     materialization_schema,
     derived_group_by_element_schema,
+    metric_input_measure_schema,
     metric_type_params_schema,
     identifier_schema,
     measure_schema,
@@ -88,6 +90,7 @@ schema_store = {
     derived_group_by_element_schema["$id"]: derived_group_by_element_schema,
     materialization_schema["$id"]: materialization_schema,
     # Sub-object schemas
+    metric_input_measure_schema["$id"]: metric_input_measure_schema,
     metric_type_params_schema["$id"]: metric_type_params_schema,
     locked_metadata_schema["$id"]: locked_metadata_schema,
     identifier_schema["$id"]: identifier_schema,
@@ -101,7 +104,7 @@ schema_store = {
 }
 
 resolver = RefResolver.from_schema(schema=metric_schema, store=schema_store)
-data_source_validator = Draft7Validator(data_source_schema, resolver=resolver)
-derived_group_by_element_validator = Draft7Validator(derived_group_by_element_schema, resolver=resolver)
-materialization_validator = Draft7Validator(materialization_schema, resolver=resolver)
-metric_validator = Draft7Validator(metric_schema, resolver=resolver)
+data_source_validator = SchemaValidator(data_source_schema, resolver=resolver)
+derived_group_by_element_validator = SchemaValidator(derived_group_by_element_schema, resolver=resolver)
+materialization_validator = SchemaValidator(materialization_schema, resolver=resolver)
+metric_validator = SchemaValidator(metric_schema, resolver=resolver)

@@ -7,7 +7,7 @@ from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.validations.unique_valid_name import UniqueAndValidNameRule
+from metricflow.model.validations.unique_valid_name import MetricFlowReservedKeywords, UniqueAndValidNameRule
 from metricflow.object_utils import flatten_nested_sequence
 from metricflow.test.test_utils import find_data_source_with
 
@@ -119,38 +119,47 @@ def test_cross_element_names(simple_model__pre_transforms: UserConfiguredModel) 
         and len(_categorical_dimensions(data_source=data_source)) > 0,
     )
 
-    measure_reference = usable_ds.measures[0].name
+    measure_reference = usable_ds.measures[0].reference
     # If the matching dimension is a time dimension we can accidentally create two primary time dimensions, and then
     # the validation will throw a different error and fail the test
-    dimension_reference = _categorical_dimensions(data_source=usable_ds)[0].name
+    dimension_reference = _categorical_dimensions(data_source=usable_ds)[0].reference
 
     ds_measure_x_dimension = copy.deepcopy(usable_ds)
     ds_measure_x_identifier = copy.deepcopy(usable_ds)
     ds_dimension_x_identifier = copy.deepcopy(usable_ds)
 
     # We update the matching categorical dimension by reference for convenience
-    ds_measure_x_dimension.get_dimension(dimension_reference).name = measure_reference
-    ds_measure_x_identifier.identifiers[1].name = measure_reference
-    ds_dimension_x_identifier.identifiers[1].name = dimension_reference
+    ds_measure_x_dimension.get_dimension(dimension_reference).name = measure_reference.element_name
+    ds_measure_x_identifier.identifiers[1].name = measure_reference.element_name
+    ds_dimension_x_identifier.identifiers[1].name = dimension_reference.element_name
 
     model.data_sources[usable_ds_index] = ds_measure_x_dimension
     with pytest.raises(
         ModelValidationException,
-        match=rf"can't use name `{measure_reference.element_name}` for a dimension when it was already used for a measure",
+        match=(
+            f"element `{measure_reference.element_name}` is of type DataSourceElementType.MEASURE, but it was previously "
+            f"used earlier in the model as DataSourceElementType.DIMENSION"
+        ),
     ):
         ModelValidator().checked_validations(model)
 
     model.data_sources[usable_ds_index] = ds_measure_x_identifier
     with pytest.raises(
         ModelValidationException,
-        match=rf"can't use name `{measure_reference.element_name}` for a identifier when it was already used for a measure",
+        match=(
+            f"element `{measure_reference.element_name}` is of type DataSourceElementType.MEASURE, but it was previously "
+            f"used earlier in the model as DataSourceElementType.IDENTIFIER"
+        ),
     ):
         ModelValidator().checked_validations(model)
 
     model.data_sources[usable_ds_index] = ds_dimension_x_identifier
     with pytest.raises(
         ModelValidationException,
-        match=rf"can't use name `{dimension_reference.element_name}` for a dimension when it was already used for a identifier",
+        match=(
+            f"element `{dimension_reference.element_name}` is of type DataSourceElementType.DIMENSION, but it was previously "
+            f"used earlier in the model as DataSourceElementType.IDENTIFIER"
+        ),
     ):
         ModelValidator().checked_validations(model)
 
@@ -167,7 +176,7 @@ def test_duplicate_measure_name(simple_model__pre_transforms: UserConfiguredMode
 
     with pytest.raises(
         ModelValidationException,
-        match=rf"can't use name `{duplicated_measure.name.element_name}` for a measure when it was already used for a measure",
+        match=rf"can't use name `{duplicated_measure.reference.element_name}` for a measure when it was already used for a measure",
     ):
         ModelValidator().checked_validations(model)
 
@@ -184,7 +193,7 @@ def test_duplicate_dimension_name(simple_model__pre_transforms: UserConfiguredMo
 
     with pytest.raises(
         ModelValidationException,
-        match=rf"can't use name `{duplicated_dimension.name.element_name}` for a "
+        match=rf"can't use name `{duplicated_dimension.reference.element_name}` for a "
         rf"dimension when it was already used for a dimension",
     ):
         ModelValidator().checked_validations(model)
@@ -202,7 +211,7 @@ def test_duplicate_identifier_name(simple_model__pre_transforms: UserConfiguredM
 
     with pytest.raises(
         ModelValidationException,
-        match=rf"can't use name `{duplicated_identifier.name.element_name}` for a identifier when it was already used for a identifier",
+        match=rf"can't use name `{duplicated_identifier.reference.element_name}` for a identifier when it was already used for a identifier",
     ):
         ModelValidator().checked_validations(model)
 
@@ -237,3 +246,16 @@ def test_invalid_names() -> None:  # noqa:D
     assert UniqueAndValidNameRule.check_valid_name("month") != []
     assert UniqueAndValidNameRule.check_valid_name("quarter") != []
     assert UniqueAndValidNameRule.check_valid_name("year") != []
+
+
+def test_reserved_name() -> None:  # noqa: D
+    reserved_keyword = MetricFlowReservedKeywords.METRIC_TIME
+    reserved_reason = MetricFlowReservedKeywords.get_reserved_reason(reserved_keyword)
+    issues = UniqueAndValidNameRule.check_valid_name(reserved_keyword.value.lower())
+    match = False
+    for issue in issues:
+        if issue.message.find(reserved_reason) != -1:
+            match = True
+    assert (
+        match
+    ), f"Did not find reason: '{reserved_reason}' in issues: {issues} for name: '{reserved_keyword.value.lower()}'"

@@ -1,6 +1,6 @@
 import logging
 
-from metricflow.model.objects.metric import Metric, MetricType, MetricTypeParams
+from metricflow.model.objects.metric import Metric, MetricInputMeasure, MetricType, MetricTypeParams
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.transformations.transform_rule import ModelTransformRule
 
@@ -42,9 +42,12 @@ class CreateProxyMeasureRule(ModelTransformRule):
                 if add_metric is True:
                     model.metrics.append(
                         Metric(
-                            name=measure.name.element_name,
+                            name=measure.name,
                             type=MetricType.MEASURE_PROXY,
-                            type_params=MetricTypeParams(measures=[measure.name], expr=measure.name.element_name),
+                            type_params=MetricTypeParams(
+                                measures=[MetricInputMeasure(name=measure.name)],
+                                expr=measure.name,
+                            ),
                         )
                     )
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections import OrderedDict
 from typing import Dict, Any
 
-from metricflow.model.objects.utils import HashableBaseModel
+from metricflow.model.objects.base import HashableBaseModel
 
 
 class SqlBindParameters(HashableBaseModel):

@@ -1,29 +1,29 @@
 -- Compute Metrics via Expressions
 SELECT
-  CAST(subq_5.bookings AS DOUBLE) / CAST(NULLIF(subq_5.bookers, 0) AS DOUBLE) AS bookings_per_booker
+  subq_5.listing
   , subq_5.listing__country_latest
-  , subq_5.listing
+  , CAST(subq_5.bookings AS DOUBLE) / CAST(NULLIF(subq_5.bookers, 0) AS DOUBLE) AS bookings_per_booker
 FROM (
   -- Aggregate Measures
   SELECT
-    SUM(subq_4.bookings) AS bookings
-    , COUNT(DISTINCT subq_4.bookers) AS bookers
+    subq_4.listing
     , subq_4.listing__country_latest
-    , subq_4.listing
+    , SUM(subq_4.bookings) AS bookings
+    , COUNT(DISTINCT subq_4.bookers) AS bookers
   FROM (
     -- Join Standard Outputs
     SELECT
-      subq_1.bookings AS bookings
-      , subq_1.bookers AS bookers
+      subq_1.listing AS listing
       , subq_3.country_latest AS listing__country_latest
-      , subq_1.listing AS listing
+      , subq_1.bookings AS bookings
+      , subq_1.bookers AS bookers
     FROM (
       -- Pass Only Elements:
       --   ['bookings', 'bookers', 'listing']
       SELECT
-        subq_0.bookings
+        subq_0.listing
+        , subq_0.bookings
         , subq_0.bookers
-        , subq_0.listing
       FROM (
         -- Read Elements From Data Source 'bookings_source'
         SELECT
@@ -34,6 +34,7 @@ FROM (
           , bookings_source_src_10000.booking_value AS min_booking_value
           , bookings_source_src_10000.guest_id AS bookers
           , bookings_source_src_10000.booking_value AS average_booking_value
+          , bookings_source_src_10000.booking_value AS booking_payments
           , bookings_source_src_10000.is_instant
           , bookings_source_src_10000.ds
           , DATE_TRUNC('week', bookings_source_src_10000.ds) AS ds__week
@@ -45,6 +46,11 @@ FROM (
           , DATE_TRUNC('month', bookings_source_src_10000.ds_partitioned) AS ds_partitioned__month
           , DATE_TRUNC('quarter', bookings_source_src_10000.ds_partitioned) AS ds_partitioned__quarter
           , DATE_TRUNC('year', bookings_source_src_10000.ds_partitioned) AS ds_partitioned__year
+          , bookings_source_src_10000.booking_paid_at
+          , DATE_TRUNC('week', bookings_source_src_10000.booking_paid_at) AS booking_paid_at__week
+          , DATE_TRUNC('month', bookings_source_src_10000.booking_paid_at) AS booking_paid_at__month
+          , DATE_TRUNC('quarter', bookings_source_src_10000.booking_paid_at) AS booking_paid_at__quarter
+          , DATE_TRUNC('year', bookings_source_src_10000.booking_paid_at) AS booking_paid_at__year
           , bookings_source_src_10000.is_instant AS create_a_cycle_in_the_join_graph__is_instant
           , bookings_source_src_10000.ds AS create_a_cycle_in_the_join_graph__ds
           , DATE_TRUNC('week', bookings_source_src_10000.ds) AS create_a_cycle_in_the_join_graph__ds__week
@@ -56,6 +62,11 @@ FROM (
           , DATE_TRUNC('month', bookings_source_src_10000.ds_partitioned) AS create_a_cycle_in_the_join_graph__ds_partitioned__month
           , DATE_TRUNC('quarter', bookings_source_src_10000.ds_partitioned) AS create_a_cycle_in_the_join_graph__ds_partitioned__quarter
           , DATE_TRUNC('year', bookings_source_src_10000.ds_partitioned) AS create_a_cycle_in_the_join_graph__ds_partitioned__year
+          , bookings_source_src_10000.booking_paid_at AS create_a_cycle_in_the_join_graph__booking_paid_at
+          , DATE_TRUNC('week', bookings_source_src_10000.booking_paid_at) AS create_a_cycle_in_the_join_graph__booking_paid_at__week
+          , DATE_TRUNC('month', bookings_source_src_10000.booking_paid_at) AS create_a_cycle_in_the_join_graph__booking_paid_at__month
+          , DATE_TRUNC('quarter', bookings_source_src_10000.booking_paid_at) AS create_a_cycle_in_the_join_graph__booking_paid_at__quarter
+          , DATE_TRUNC('year', bookings_source_src_10000.booking_paid_at) AS create_a_cycle_in_the_join_graph__booking_paid_at__year
           , bookings_source_src_10000.listing_id AS listing
           , bookings_source_src_10000.guest_id AS guest
           , bookings_source_src_10000.host_id AS host
@@ -73,8 +84,8 @@ FROM (
       -- Pass Only Elements:
       --   ['listing', 'country_latest']
       SELECT
-        subq_2.country_latest
-        , subq_2.listing
+        subq_2.listing
+        , subq_2.country_latest
       FROM (
         -- Read Elements From Data Source 'listings_latest'
         SELECT
@@ -117,6 +128,6 @@ FROM (
       subq_1.listing = subq_3.listing
   ) subq_4
   GROUP BY
-    subq_4.listing__country_latest
-    , subq_4.listing
+    subq_4.listing
+    , subq_4.listing__country_latest
 ) subq_5

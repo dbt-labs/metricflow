@@ -1,4 +1,6 @@
-from jsonschema import RefResolver, Draft7Validator
+from jsonschema import RefResolver
+
+from metricflow.model.parsing.schema_validator import SchemaValidator
 
 TRANSFORM_OBJECT_NAME_PATTERN = "(?!.*__).*^[a-z][a-z0-9_]*[a-z0-9]$"
 
@@ -63,16 +65,30 @@ materialization_destination_schema = {
     "additionalProperties": False,
 }
 
+metric_input_measure_schema = {
+    "$id": "metric_input_measure_schema",
+    "oneOf": [
+        {"type": "string"},
+        {
+            "type": "object",
+            "properties": {
+                "name": {"type": "string"},
+            },
+            "additionalProperties": False,
+        },
+    ],
+}
+
 metric_type_params_schema = {
     "$id": "metric_type_params",
     "type": "object",
     "properties": {
-        "numerator": {"type": "string"},
-        "denominator": {"type": "string"},
-        "measure": {"type": "string"},
+        "numerator": {"$ref": "metric_input_measure_schema"},
+        "denominator": {"$ref": "metric_input_measure_schema"},
+        "measure": {"$ref": "metric_input_measure_schema"},
         "measures": {
             "type": "array",
-            "items": {"type": "string"},
+            "items": {"$ref": "metric_input_measure_schema"},
         },
         "expr": {"type": ["string", "boolean"]},
         "window": {"type": "string"},
@@ -134,6 +150,10 @@ measure_schema = {
             "pattern": TRANSFORM_OBJECT_NAME_PATTERN,
         },
         "agg": {"enum": aggregation_type_values},
+        "agg_time_dimension": {
+            "type": "string",
+            "pattern": TRANSFORM_OBJECT_NAME_PATTERN,
+        },
         "expr": {"type": ["string", "integer", "boolean"]},
         "create_metric": {"type": "boolean"},
         "create_metric_display_name": {"type": "string"},
@@ -227,7 +247,7 @@ data_source_schema = {
         "constraint": {"$ref": "constraint_schema"},
     },
     "additionalProperties": False,
-    "required": ["name", "mutability"],
+    "required": ["name"],
 }
 
 derived_group_by_element_schema = {
@@ -283,6 +303,7 @@ schema_store = {
     derived_group_by_element_schema["$id"]: derived_group_by_element_schema,
     materialization_schema["$id"]: materialization_schema,
     # Sub-object schemas
+    metric_input_measure_schema["$id"]: metric_input_measure_schema,
     metric_type_params_schema["$id"]: metric_type_params_schema,
     identifier_schema["$id"]: identifier_schema,
     measure_schema["$id"]: measure_schema,
@@ -296,7 +317,7 @@ schema_store = {
 
 
 resolver = RefResolver.from_schema(schema=metric_schema, store=schema_store)
-data_source_validator = Draft7Validator(data_source_schema, resolver=resolver)
-derived_group_by_element_validator = Draft7Validator(derived_group_by_element_schema, resolver=resolver)
-materialization_validator = Draft7Validator(materialization_schema, resolver=resolver)
-metric_validator = Draft7Validator(metric_schema, resolver=resolver)
+data_source_validator = SchemaValidator(data_source_schema, resolver=resolver)
+derived_group_by_element_validator = SchemaValidator(derived_group_by_element_schema, resolver=resolver)
+materialization_validator = SchemaValidator(materialization_schema, resolver=resolver)
+metric_validator = SchemaValidator(metric_schema, resolver=resolver)

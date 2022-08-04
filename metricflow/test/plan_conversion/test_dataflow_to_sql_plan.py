@@ -17,6 +17,7 @@ from metricflow.dataflow.dataflow_plan import (
     OrderByLimitNode,
     ConstrainTimeRangeNode,
     BaseOutput,
+    MetricTimeDimensionTransformNode,
 )
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.model.semantic_model import SemanticModel
@@ -36,6 +37,7 @@ from metricflow.specs import (
     TimeDimensionSpec,
     SpecWhereClauseConstraint,
     LinkableSpecSet,
+    TimeDimensionReference,
 )
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
@@ -58,18 +60,6 @@ def composite_dataflow_to_sql_converter(  # noqa: D
     return DataflowToSqlQueryPlanConverter[DataSourceDataSet](
         column_association_resolver=DefaultColumnAssociationResolver(composite_identifier_semantic_model),
         semantic_model=composite_identifier_semantic_model,
-        time_spine_source=time_spine_source,
-    )
-
-
-@pytest.fixture(scope="session")
-def dataflow_to_sql_converter(  # noqa: D
-    simple_semantic_model: SemanticModel,
-    time_spine_source: TimeSpineSource,
-) -> DataflowToSqlQueryPlanConverter[DataSourceDataSet]:
-    return DataflowToSqlQueryPlanConverter[DataSourceDataSet](
-        column_association_resolver=DefaultColumnAssociationResolver(simple_semantic_model),
-        semantic_model=simple_semantic_model,
         time_spine_source=time_spine_source,
     )
 
@@ -720,14 +710,14 @@ def test_filter_with_where_constraint_on_join_dim(
     )
 
 
-def test_constrain_primary_time_dimension(
+def test_constrain_time_range_node(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     consistent_id_object_repository: ConsistentIdObjectRepository,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
     sql_client: SqlClient,
 ) -> None:
-    """Tests converting a dataflow plan to an SQL query plan there is a leaf compute metrics node."""
+    """Tests converting the ConstrainTimeRangeNode to SQL."""
 
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     filtered_measure_node = FilterElementsNode(
@@ -739,8 +729,13 @@ def test_constrain_primary_time_dimension(
             TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.DAY),
         ],
     )
-    constrain_time_node = ConstrainTimeRangeNode[DataSourceDataSet](
+    metric_time_node = MetricTimeDimensionTransformNode(
         parent_node=filtered_measure_node,
+        aggregation_time_dimension_reference=TimeDimensionReference(element_name="ds"),
+    )
+
+    constrain_time_node = ConstrainTimeRangeNode[DataSourceDataSet](
+        parent_node=metric_time_node,
         time_range_constraint=TimeRangeConstraint(
             start_time=as_datetime("2020-01-01"),
             end_time=as_datetime("2020-01-02"),

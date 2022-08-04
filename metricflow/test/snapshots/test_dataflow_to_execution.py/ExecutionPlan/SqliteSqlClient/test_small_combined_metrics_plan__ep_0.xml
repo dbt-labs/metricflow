@@ -5,9 +5,9 @@
         <!-- sql_query =                                                         -->
         <!--   -- Combine Metrics                                                -->
         <!--   SELECT                                                            -->
-        <!--     subq_6.bookings AS bookings                                     -->
-        <!--     , subq_7.booking_value AS booking_value                         -->
-        <!--     , COALESCE(subq_6.is_instant, subq_7.is_instant) AS is_instant  -->
+        <!--     subq_8.bookings AS bookings                                     -->
+        <!--     , subq_9.booking_value AS booking_value                         -->
+        <!--     , COALESCE(subq_8.is_instant, subq_9.is_instant) AS is_instant  -->
         <!--   FROM (                                                            -->
         <!--     -- Aggregate Measures                                           -->
         <!--     -- Compute Metrics via Expressions                              -->
@@ -16,6 +16,7 @@
         <!--       , is_instant                                                  -->
         <!--     FROM (                                                          -->
         <!--       -- Read Elements From Data Source 'bookings_source'           -->
+        <!--       -- Metric Time Dimension 'ds'                                 -->
         <!--       -- Pass Only Elements:                                        -->
         <!--       --   ['bookings', 'is_instant']                               -->
         <!--       SELECT                                                        -->
@@ -25,12 +26,13 @@
         <!--         -- User Defined SQL Query                                   -->
         <!--         SELECT * FROM ***************************.fct_bookings      -->
         <!--       ) bookings_source_src_10000                                   -->
-        <!--     ) subq_1                                                        -->
+        <!--     ) subq_2                                                        -->
         <!--     GROUP BY                                                        -->
         <!--       is_instant                                                    -->
-        <!--   ) subq_6                                                          -->
+        <!--   ) subq_8                                                          -->
         <!--   FULL OUTER JOIN (                                                 -->
         <!--     -- Read Elements From Data Source 'bookings_source'             -->
+        <!--     -- Metric Time Dimension 'ds'                                   -->
         <!--     -- Pass Only Elements:                                          -->
         <!--     --   ['booking_value', 'is_instant']                            -->
         <!--     -- Aggregate Measures                                           -->
@@ -44,8 +46,8 @@
         <!--     ) bookings_source_src_10000                                     -->
         <!--     GROUP BY                                                        -->
         <!--       is_instant                                                    -->
-        <!--   ) subq_7                                                          -->
+        <!--   ) subq_9                                                          -->
         <!--   ON                                                                -->
-        <!--     subq_6.is_instant = subq_7.is_instant                           -->
+        <!--     subq_8.is_instant = subq_9.is_instant                           -->
     </SelectSqlQueryToDataFrameTask>
 </ExecutionPlan>

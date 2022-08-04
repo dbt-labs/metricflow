@@ -1,13 +1,11 @@
 name: MetricFlow SQL Engine Tests
 
 on:
-  schedule:
-    - cron: '0 12 * * *' # run once per day
+  push:
+    branches:
+      - main
   pull_request:
     types: [ labeled ]
-  pull_request_target:
-      types: [opened, synchronize, reopened]
-
 
 jobs:
   snowflake-tests:
@@ -38,7 +36,7 @@ jobs:
         run: cd metricflow && poetry install
 
       - name: Run MetricFlow unit tests with Snowflake configs
-        run: pytest metricflow/test/integration
+        run: pytest metricflow/test/
         env:
           MF_SQL_ENGINE_URL: ${{ secrets.MF_SNOWFLAKE_URL }}
           MF_SQL_ENGINE_PASSWORD: ${{ secrets.MF_SNOWFLAKE_PWD }}
@@ -71,7 +69,7 @@ jobs:
         run: cd metricflow && poetry install
 
       - name: Run MetricFlow unit tests with Redshift configs
-        run: pytest metricflow/test/integration
+        run: pytest metricflow/test/
         env:
           MF_SQL_ENGINE_URL: ${{ secrets.MF_REDSHIFT_URL }}
           MF_SQL_ENGINE_PASSWORD: ${{ secrets.MF_REDSHIFT_PWD }}
@@ -104,16 +102,31 @@ jobs:
         run: cd metricflow && poetry install
 
       - name: Run MetricFlow unit tests with BigQuery configs
-        run: pytest metricflow/test/integration
+        run: pytest metricflow/test/
         env:
           MF_SQL_ENGINE_URL: ${{ secrets.MF_BIGQUERY_URL }}
           MF_SQL_ENGINE_PASSWORD: ${{ secrets.MF_BIGQUERY_PWD }}
 
-  sqlite-tests:
-    environment: DW_INTEGRATION_TESTS
-    name: SQLite Tests
+  postgres-tests:
+    name: PostgreSQL Tests
     if: ${{ github.event.action != 'labeled' || github.event.label.name == 'run_mf_sql_engine_tests' }}
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: metricflow
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
     steps:
       - name: Check-out the repo
         uses: actions/checkout@v2
@@ -136,10 +149,11 @@ jobs:
       - name: Install Deps
         run: cd metricflow && poetry install
 
-      - name: Run MetricFlow unit tests with SQLite configs
-        run: pytest metricflow/test/integration
+      - name: Run MetricFlow unit tests with PostgreSQL configs
+        run: pytest metricflow/test/
         env:
-          MF_SQL_ENGINE_URL: "sqlite://"
+          MF_SQL_ENGINE_URL: postgresql://postgres@localhost:5432/metricflow
+          MF_SQL_ENGINE_PASSWORD: postgres
 
 
   slack-failure:

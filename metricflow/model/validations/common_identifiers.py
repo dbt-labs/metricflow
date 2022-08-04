@@ -1,10 +1,13 @@
 from typing import Dict, List, Set
+from metricflow.instances import DataSourceElementReference
 
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.elements.identifier import Identifier
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
-    IdentifierContext,
+    DataSourceElementContext,
+    DataSourceElementType,
+    FileContext,
     ModelValidationRule,
     ValidationWarning,
     validate_safely,
@@ -22,10 +25,10 @@ class CommonIdentifiersRule(ModelValidationRule):
         identifiers_to_data_sources: Dict[IdentifierReference, Set[str]] = {}
         for data_source in data_sources or []:
             for identifier in data_source.identifiers or []:
-                if identifier.name in identifiers_to_data_sources:
-                    identifiers_to_data_sources[identifier.name].add(data_source.name)
+                if identifier.reference in identifiers_to_data_sources:
+                    identifiers_to_data_sources[identifier.reference].add(data_source.name)
                 else:
-                    identifiers_to_data_sources[identifier.name] = {data_source.name}
+                    identifiers_to_data_sources[identifier.reference] = {data_source.name}
         return identifiers_to_data_sources
 
     @staticmethod
@@ -39,18 +42,19 @@ class CommonIdentifiersRule(ModelValidationRule):
         # If the identifier is the dict and if the set of data sources minus this data source is empty,
         # then we warn the user that their identifier will be unused in joins
         if (
-            identifier.name in identifiers_to_data_sources
-            and len(identifiers_to_data_sources[identifier.name].difference({data_source.name})) == 0
+            identifier.reference in identifiers_to_data_sources
+            and len(identifiers_to_data_sources[identifier.reference].difference({data_source.name})) == 0
         ):
             issues.append(
                 ValidationWarning(
-                    context=IdentifierContext(
-                        file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
-                        line_number=data_source.metadata.file_slice.start_line_number if data_source.metadata else None,
-                        data_source_name=data_source.name,
-                        identifier_name=identifier.name.element_name,
+                    context=DataSourceElementContext(
+                        file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                        data_source_element=DataSourceElementReference(
+                            data_source_name=data_source.name, element_name=identifier.name
+                        ),
+                        element_type=DataSourceElementType.IDENTIFIER,
                     ),
-                    message=f"Identifier `{identifier.name.element_name}` "
+                    message=f"Identifier `{identifier.reference.element_name}` "
                     f"only found in one data source `{data_source.name}` "
                     f"which means it will be unused in joins.",
                 )

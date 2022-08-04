@@ -1,16 +1,17 @@
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  SUM(listings) AS listings
-  , listing__country_latest
+  listing__country_latest
+  , SUM(listings) AS listings
 FROM (
   -- Read Elements From Data Source 'listings_latest'
+  -- Metric Time Dimension 'ds'
   -- Pass Only Elements:
   --   ['listings', 'listing__country_latest']
   SELECT
-    1 AS listings
-    , country AS listing__country_latest
+    country AS listing__country_latest
+    , 1 AS listings
   FROM ***************************.dim_listings_latest listings_latest_src_10003
-) subq_4
+) subq_6
 GROUP BY
   listing__country_latest

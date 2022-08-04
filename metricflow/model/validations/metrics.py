@@ -2,14 +2,15 @@ import traceback
 from typing import List
 
 from metricflow.errors.errors import ParsingException
+from metricflow.instances import MetricModelReference
 from metricflow.model.objects.metric import Metric, MetricType, CumulativeMetricWindow
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
+    FileContext,
     MetricContext,
     ModelValidationRule,
     ValidationIssueType,
     ValidationError,
-    ValidationFatal,
     validate_safely,
 )
 
@@ -18,31 +19,21 @@ class MetricMeasuresRule(ModelValidationRule):
     """Checks that the measures referenced in the metrics exist."""
 
     @staticmethod
-    @validate_safely(whats_being_done="checking measures referenced by the metric are exist")
+    @validate_safely(whats_being_done="checking all measures referenced by the metric exist")
     def _validate_metric_measure_references(
         metric: Metric, valid_measure_names: List[str]
     ) -> List[ValidationIssueType]:
         issues: List[ValidationIssueType] = []
-        measures_in_metric = []
 
-        if metric.type_params:
-            if metric.type_params.measures:
-                measures_in_metric.extend(metric.type_params.measures)
-            if metric.type_params.numerator:
-                measures_in_metric.append(metric.type_params.numerator)
-            if metric.type_params.denominator:
-                measures_in_metric.append(metric.type_params.denominator)
-
-        for measure_in_metric in measures_in_metric:
-            if measure_in_metric.element_name not in valid_measure_names:
+        for measure_reference in metric.measure_references:
+            if measure_reference.element_name not in valid_measure_names:
                 issues.append(
-                    ValidationFatal(
+                    ValidationError(
                         context=MetricContext(
-                            file_name=metric.metadata.file_slice.filename if metric.metadata else None,
-                            line_number=metric.metadata.file_slice.start_line_number if metric.metadata else None,
-                            metric_name=metric.name,
+                            file_context=FileContext.from_metadata(metadata=metric.metadata),
+                            metric=MetricModelReference(metric_name=metric.name),
                         ),
-                        message=f"Invalid measure {measure_in_metric.element_name} in metric {metric.name}",
+                        message=f"Invalid measure {measure_reference.element_name} in metric {metric.name}",
                     )
                 )
         return issues
@@ -54,7 +45,7 @@ class MetricMeasuresRule(ModelValidationRule):
         valid_measure_names = []
         for data_source in model.data_sources:
             for measure in data_source.measures:
-                valid_measure_names.append(measure.name.element_name)
+                valid_measure_names.append(measure.reference.element_name)
 
         for metric in model.metrics or []:
             issues += MetricMeasuresRule._validate_metric_measure_references(
@@ -76,9 +67,8 @@ class CumulativeMetricRule(ModelValidationRule):
                 issues.append(
                     ValidationError(
                         context=MetricContext(
-                            file_name=metric.metadata.file_slice.filename if metric.metadata else None,
-                            line_number=metric.metadata.file_slice.start_line_number if metric.metadata else None,
-                            metric_name=metric.name,
+                            file_context=FileContext.from_metadata(metadata=metric.metadata),
+                            metric=MetricModelReference(metric_name=metric.name),
                         ),
                         message="Both window and grain_to_date set for cumulative metric. Please set one or the other",
                     )
@@ -87,15 +77,15 @@ class CumulativeMetricRule(ModelValidationRule):
             if metric.type_params.window:
                 try:
                     _, _ = CumulativeMetricWindow.parse(metric.type_params.window.to_string())
-                except ParsingException:
+                except ParsingException as e:
                     issues.append(
                         ValidationError(
                             context=MetricContext(
-                                file_name=metric.metadata.file_slice.filename if metric.metadata else None,
-                                line_number=metric.metadata.file_slice.start_line_number if metric.metadata else None,
-                                metric_name=metric.name,
+                                file_context=FileContext.from_metadata(metadata=metric.metadata),
+                                metric=MetricModelReference(metric_name=metric.name),
                             ),
-                            message=traceback.format_exc(),
+                            message="".join(traceback.format_exception_only(etype=type(e), value=e)),
+                            extra_detail="".join(traceback.format_tb(e.__traceback__)),
                         )
                     )
 

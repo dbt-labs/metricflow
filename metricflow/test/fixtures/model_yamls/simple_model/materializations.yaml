@@ -7,7 +7,7 @@ materialization:
   metrics:
     - booking_value
   dimensions:
-    - ds
+    - metric_time
     - listing
 
 ---
@@ -19,7 +19,7 @@ materialization:
   metrics:
     - booking_value
   dimensions:
-    - ds
+    - metric_time
     - is_instant
 
 ---
@@ -31,7 +31,7 @@ materialization:
   metrics:
     - booking_value
   dimensions:
-    - ds
+    - metric_time
 
 ---
 materialization:
@@ -42,7 +42,7 @@ materialization:
   metrics:
     - booking_value
   dimensions:
-    - ds
+    - metric_time
     - is_instant
 
 ---
@@ -54,7 +54,7 @@ materialization:
   metrics:
     - booking_value
   dimensions:
-    - ds
+    - metric_time
     - listing__country_latest
 
 ---
@@ -67,7 +67,7 @@ materialization:
   metrics:
     - booking_value
   dimensions:
-    - ds
+    - metric_time
     - is_instant
 
 ---
@@ -80,7 +80,7 @@ materialization:
   metrics:
     - booking_value
   dimensions:
-    - ds
+    - metric_time
     - is_instant
 
 ---
@@ -93,7 +93,7 @@ materialization:
   metrics:
     - booking_value
   dimensions:
-    - ds
+    - metric_time
     - listing__country_latest
 
 ---
@@ -105,7 +105,7 @@ materialization:
   metrics:
     - booking_value
   dimensions:
-    - ds
+    - metric_time
     - listing__country_latest
 
 ---
@@ -119,14 +119,14 @@ materialization:
     - booking_value
 
   dimensions:
-    - ds
+    - metric_time
     - is_instant
 
   destinations:
     - location: FAST_CACHE
       format: WIDE
       rollups:
-        - ["ds", "*"]
+        - ["metric_time", "*"]
 
 ---
 materialization:
@@ -139,4 +139,4 @@ materialization:
     - booking_value
 
   dimensions:
-    - ds__month
+    - metric_time__month

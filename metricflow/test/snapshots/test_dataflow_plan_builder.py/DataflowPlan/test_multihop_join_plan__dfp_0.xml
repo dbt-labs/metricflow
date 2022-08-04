@@ -54,13 +54,18 @@
                             <!--    'element_name': 'ds_partitioned',         -->
                             <!--    'identifier_links': (),                   -->
                             <!--    'time_granularity': TimeGranularity.DAY}  -->
-                            <ReadSqlSourceNode>
-                                <!-- description =                                                                              -->
-                                <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='account_month_txns'))  -->
-                                <!-- node_id = rss_0 -->
-                                <!-- data_set =                                                                       -->
-                                <!--   DataSourceDataSet(DataSourceReference(data_source_name='account_month_txns'))  -->
-                            </ReadSqlSourceNode>
+                            <MetricTimeDimensionTransformNode>
+                                <!-- description = Metric Time Dimension 'ds' -->
+                                <!-- node_id = sma_10006 -->
+                                <!-- aggregation_time_dimension = ds -->
+                                <ReadSqlSourceNode>
+                                    <!-- description =                                                                              -->
+                                    <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='account_month_txns'))  -->
+                                    <!-- node_id = rss_10023 -->
+                                    <!-- data_set =                                                                       -->
+                                    <!--   DataSourceDataSet(DataSourceReference(data_source_name='account_month_txns'))  -->
+                                </ReadSqlSourceNode>
+                            </MetricTimeDimensionTransformNode>
                         </FilterElementsNode>
                         <FilterElementsNode>
                             <!-- description =                                                       -->
@@ -102,7 +107,7 @@
                                 <ReadSqlSourceNode>
                                     <!-- description =                                                                        -->
                                     <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='bridge_table'))  -->
-                                    <!-- node_id = rss_1 -->
+                                    <!-- node_id = rss_10024 -->
                                     <!-- data_set =                                                                 -->
                                     <!--   DataSourceDataSet(DataSourceReference(data_source_name='bridge_table'))  -->
                                 </ReadSqlSourceNode>
@@ -198,7 +203,7 @@
                                     <ReadSqlSourceNode>
                                         <!-- description =                                                                          -->
                                         <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='customer_table'))  -->
-                                        <!-- node_id = rss_3 -->
+                                        <!-- node_id = rss_10026 -->
                                         <!-- data_set =                                                                   -->
                                         <!--   DataSourceDataSet(DataSourceReference(data_source_name='customer_table'))  -->
                                     </ReadSqlSourceNode>

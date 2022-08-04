@@ -67,19 +67,19 @@ class DefaultColumnAssociationResolver(ColumnAssociationResolver):
         )
 
     def resolve_identifier_spec(self, identifier_spec: IdentifierSpec) -> Tuple[ColumnAssociation, ...]:  # noqa: D
-        sub_id_specs = []
+        sub_id_references = []
         for data_source in self._semantic_model.user_configured_model.data_sources:
             for identifier in data_source.identifiers:
-                if identifier.name.element_name == identifier_spec.element_name:
-                    sub_id_specs = [sub_id.name for sub_id in identifier.identifiers]
+                if identifier.reference.element_name == identifier_spec.element_name:
+                    sub_id_references = [sub_id.reference for sub_id in identifier.identifiers]
                     break
 
         # composite identifier case
-        if len(sub_id_specs) != 0:
+        if len(sub_id_references) != 0:
             column_associations: Tuple[ColumnAssociation, ...] = ()
-            for sub_id_spec in sub_id_specs:
-                if sub_id_spec is not None:
-                    sub_id_name = f"{identifier_spec.element_name}___{sub_id_spec.element_name}"
+            for sub_id_reference in sub_id_references:
+                if sub_id_reference is not None:
+                    sub_id_name = f"{identifier_spec.element_name}___{sub_id_reference.element_name}"
                     sub_identifier = StructuredLinkableSpecName(
                         identifier_link_names=tuple(x.element_name for x in identifier_spec.identifier_links),
                         element_name=sub_id_name,

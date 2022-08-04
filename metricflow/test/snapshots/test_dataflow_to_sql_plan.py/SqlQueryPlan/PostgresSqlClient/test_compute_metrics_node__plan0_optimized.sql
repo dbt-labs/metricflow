@@ -2,16 +2,16 @@
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  SUM(subq_7.bookings) AS bookings
+  subq_7.listing AS listing
   , listings_latest_src_10003.country AS listing__country_latest
-  , subq_7.listing AS listing
+  , SUM(subq_7.bookings) AS bookings
 FROM (
   -- Read Elements From Data Source 'bookings_source'
   -- Pass Only Elements:
   --   ['bookings', 'listing']
   SELECT
-    1 AS bookings
-    , listing_id AS listing
+    listing_id AS listing
+    , 1 AS bookings
   FROM (
     -- User Defined SQL Query
     SELECT * FROM ***************************.fct_bookings
@@ -22,5 +22,5 @@ LEFT OUTER JOIN
 ON
   subq_7.listing = listings_latest_src_10003.listing_id
 GROUP BY
-  listings_latest_src_10003.country
-  , subq_7.listing
+  subq_7.listing
+  , listings_latest_src_10003.country

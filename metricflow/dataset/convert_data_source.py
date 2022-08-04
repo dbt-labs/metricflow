@@ -79,7 +79,7 @@ class DataSourceToDataSetConverter:
     ) -> DimensionInstance:
         """Create a dimension instance from the dimension object in the model."""
         dimension_spec = DimensionSpec(
-            element_name=dimension.name.element_name,
+            element_name=dimension.reference.element_name,
             identifier_links=identifier_links,
         )
         column_associations = dimension_spec.column_associations(self._column_association_resolver)
@@ -90,7 +90,7 @@ class DataSourceToDataSetConverter:
             defined_from=(
                 DataSourceElementReference(
                     data_source_name=data_source_name,
-                    element_name=dimension.name.element_name,
+                    element_name=dimension.reference.element_name,
                 ),
             ),
         )
@@ -104,7 +104,7 @@ class DataSourceToDataSetConverter:
     ) -> TimeDimensionInstance:
         """Create a time dimension instance from the dimension object from a data source in the model."""
         time_dimension_spec = TimeDimensionSpec(
-            element_name=time_dimension.name.element_name,
+            element_name=time_dimension.reference.element_name,
             identifier_links=identifier_links,
             time_granularity=time_granularity,
         )
@@ -117,7 +117,7 @@ class DataSourceToDataSetConverter:
             defined_from=(
                 DataSourceElementReference(
                     data_source_name=data_source_name,
-                    element_name=time_dimension.name.element_name,
+                    element_name=time_dimension.reference.element_name,
                 ),
             ),
         )
@@ -130,7 +130,7 @@ class DataSourceToDataSetConverter:
     ) -> IdentifierInstance:
         """Create an identifier instance from the identifier object from a data sourcein the model."""
         identifier_spec = IdentifierSpec(
-            element_name=identifier.name.element_name,
+            element_name=identifier.reference.element_name,
             identifier_links=identifier_links,
         )
         column_associations = identifier_spec.column_associations(self._column_association_resolver)
@@ -141,7 +141,7 @@ class DataSourceToDataSetConverter:
             defined_from=(
                 DataSourceElementReference(
                     data_source_name=data_source_name,
-                    element_name=identifier.name.element_name,
+                    element_name=identifier.reference.element_name,
                 ),
             ),
         )
@@ -184,16 +184,15 @@ class DataSourceToDataSetConverter:
         select_columns = []
         for measure in measures or []:
             measure_spec = MeasureSpec(
-                element_name=measure.name.element_name,
+                element_name=measure.reference.element_name,
             )
             measure_instance = MeasureInstance(
                 associated_columns=measure_spec.column_associations(self._column_association_resolver),
-                source_time_dimension_reference=measure_time_dimension_spec.reference,
                 spec=measure_spec,
                 defined_from=(
                     DataSourceElementReference(
                         data_source_name=data_source_name,
-                        element_name=measure.name.element_name,
+                        element_name=measure.reference.element_name,
                     ),
                 ),
                 aggregation_state=AggregationState.NON_AGGREGATED,
@@ -203,7 +202,7 @@ class DataSourceToDataSetConverter:
                 SqlSelectColumn(
                     expr=DataSourceToDataSetConverter._make_element_sql_expr(
                         table_alias=table_alias,
-                        element_name=measure.name.element_name,
+                        element_name=measure.reference.element_name,
                         element_expr=measure.expr,
                     ),
                     column_alias=measure_instance.associated_column.column_name,
@@ -235,7 +234,7 @@ class DataSourceToDataSetConverter:
                     SqlSelectColumn(
                         expr=DataSourceToDataSetConverter._make_element_sql_expr(
                             table_alias=table_alias,
-                            element_name=dimension.name.element_name,
+                            element_name=dimension.reference.element_name,
                             element_expr=dimension.expr,
                         ),
                         column_alias=dimension_instance.associated_column.column_name,
@@ -258,7 +257,7 @@ class DataSourceToDataSetConverter:
                     SqlSelectColumn(
                         expr=DataSourceToDataSetConverter._make_element_sql_expr(
                             table_alias=table_alias,
-                            element_name=dimension.name.element_name,
+                            element_name=dimension.reference.element_name,
                             element_expr=dimension.expr,
                         ),
                         column_alias=time_dimension_instance.associated_column.column_name,
@@ -282,7 +281,7 @@ class DataSourceToDataSetConverter:
                                     time_granularity=time_granularity,
                                     arg=DataSourceToDataSetConverter._make_element_sql_expr(
                                         table_alias=table_alias,
-                                        element_name=dimension.name.element_name,
+                                        element_name=dimension.reference.element_name,
                                         element_expr=dimension.expr,
                                     ),
                                 ),
@@ -312,7 +311,7 @@ class DataSourceToDataSetConverter:
             # identifier.
             if (
                 len(identifier_links) == 1
-                and LinklessIdentifierSpec.from_element_name(identifier.name.element_name) == identifier_links[0]
+                and LinklessIdentifierSpec.from_element_name(identifier.reference.element_name) == identifier_links[0]
             ):
                 continue
 
@@ -331,7 +330,7 @@ class DataSourceToDataSetConverter:
                     expr = sub_id.expr
                     if expr is None:
                         assert sub_id.name is not None
-                        expr = sub_id.name.element_name
+                        expr = sub_id.name
                     sub_id_name = sub_id.ref or sub_id.name
                     assert sub_id_name, f"Sub-identifier {sub_id} must have 'name' or 'ref' defined"
 
@@ -350,7 +349,7 @@ class DataSourceToDataSetConverter:
                     SqlSelectColumn(
                         expr=DataSourceToDataSetConverter._make_element_sql_expr(
                             table_alias=table_alias,
-                            element_name=identifier.name.element_name,
+                            element_name=identifier.reference.element_name,
                             element_expr=identifier.expr,
                         ),
                         column_alias=identifier_instance.associated_column.column_name,
@@ -373,7 +372,7 @@ class DataSourceToDataSetConverter:
         ), f"Primary time dimension missing time granularity: {primary_time_dimension}"
 
         return TimeDimensionSpec(
-            element_name=primary_time_dimension.name.element_name,
+            element_name=primary_time_dimension.reference.element_name,
             identifier_links=(),
             time_granularity=primary_time_dimension.type_params.time_granularity,
         )
@@ -410,7 +409,7 @@ class DataSourceToDataSetConverter:
         for identifier in data_source.identifiers:
             if identifier.type in (IdentifierType.PRIMARY, IdentifierType.UNIQUE):
                 possible_identifier_links.append(
-                    (LinklessIdentifierSpec.from_element_name(element_name=identifier.name.element_name),)
+                    (LinklessIdentifierSpec.from_element_name(element_name=identifier.reference.element_name),)
                 )
 
         # Handle dimensions

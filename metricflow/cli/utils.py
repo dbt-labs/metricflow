@@ -26,7 +26,6 @@ from metricflow.configuration.constants import (
     CONFIG_EMAIL,
     CONFIG_MODEL_PATH,
 )
-from metricflow.model.validations.validator_helpers import ValidationIssueLevel
 from metricflow.sql_clients.common_client import SqlDialect
 
 logger = logging.getLogger(__name__)
@@ -207,15 +206,3 @@ def exception_handler(func: Callable[..., Any]) -> Callable[..., Any]:  # type: 
             exit(1)
 
     return wrapper
-
-
-def build_validation_header_msg(level: ValidationIssueLevel) -> str:
-    """Builds the header message with colour."""
-    colour_map = {
-        ValidationIssueLevel.WARNING: "cyan",
-        ValidationIssueLevel.ERROR: "bright_red",
-        ValidationIssueLevel.FATAL: "bright_red",
-        ValidationIssueLevel.FUTURE_ERROR: "bright_yellow",
-    }
-
-    return click.style(level.name, bold=True, fg=colour_map[level])

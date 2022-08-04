@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 class DuckDbEngineAttributes(SqlEngineAttributes):
-    """Engine-specific attributes for the DckDb query engine"""
+    """Engine-specific attributes for the DuckDb query engine"""
 
     sql_engine_type: ClassVar[SupportedSqlEngine] = SupportedSqlEngine.DUCKDB
 
@@ -41,7 +41,7 @@ class DuckDbEngineAttributes(SqlEngineAttributes):
 
 
 class DuckDbSqlClient(SqlAlchemySqlClient):
-    """Implements Redshift."""
+    """Implements DuckDB."""
 
     @staticmethod
     def from_connection_details(url: str, password: Optional[str] = None) -> SqlAlchemySqlClient:  # noqa: D

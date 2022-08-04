@@ -1,9 +1,11 @@
 <p align="center">
-<img src="assets/MetricFlow_logo.png" />
+<img src="https://github.com/transform-data/metricflow/raw/main/assets/MetricFlow_logo.png" />
 <br /><br />
 </p>
 
 # Welcome to MetricFlow
+
+See our latest updates in the [Metricflow Changelog](https://github.com/transform-data/metricflow/blob/main/CHANGELOG.md)!
 
 MetricFlow translates a simple metric definition into reusable SQL, and executes it against the SQL engine of your choice. This makes it easy to get consistent metric output broken down by attributes (dimensions) of interest.
 
@@ -35,7 +37,7 @@ If you would like to visualize metric dataflow plans via CLI, install Graphviz:
 The visualizations are in an early state of development, but look similar to:
 
 <p align="center">
-<img src="assets/example_plan.svg" height="500"/>
+<img src="https://github.com/transform-data/metricflow/raw/main/assets/example_plan.svg" height="500"/>
 <br /><br />
 </p>
 
@@ -52,6 +54,8 @@ Once installed, MetricFlow can be setup and connected to a data warehouse by fol
 ```
 mf setup
 ```
+
+In case you don't have a connection to a data warehouse available and want a self-contained demo, DuckDB can be selected.
 
 To see what MetricFlow can do without custom configurations, start the tutorial by running:
 
@@ -76,16 +80,23 @@ For reference, the tutorial steps are below:
     2.  Try validating your data model: `mf validate-configs`
     3.  Check out your metrics: `mf list-metrics`
     4.  Check out dimensions for your metric `mf list-dimensions --metric-names transactions`
-    5.  Query your first metric: `mf query --metrics transactions --dimensions ds --order ds`
-    6.  Show the SQL MetricFlow generates: `mf query --metrics transactions --dimensions ds --order ds --explain`
-    7.  Visualize the plan: `mf query --metrics transactions --dimensions ds --order ds --explain --display-plans`
+    5.  Query your first metric: `mf query --metrics transactions --dimensions metric_time --order metric_time`
+    6.  Show the SQL MetricFlow generates:
+        `mf query --metrics transactions --dimensions metric_time --order metric_time --explain`
+    7.  Visualize the plan:
+        `mf query --metrics transactions --dimensions metric_time --order metric_time --explain --display-plans`
         * This only works if you have graphviz installed - see README.
-        * Aesthetic improvements to the visualization are TBD.
-    8.  Add another dimension: `mf query --metrics transactions --dimensions ds,customer__country --order ds`
-    9.  Add a higher date granularity: `mf query --metrics transactions --dimensions ds__week --order ds__week`
-    10. Try a more complicated query: `mf query --metrics transactions,transaction_usd_na,transaction_usd_na_l7d --dimensions ds,is_large --order ds --start-time 2022-03-20 --end-time 2022-04-01`
-        * You can also add `--explain --display-plans` to the above command.
-    11. For more ways to interact with the sample models, go to ‘https://docs.transform.co/docs/metricflow/metricflow-tutorial’.
+    8.  Add another dimension:
+        `mf query --metrics transactions --dimensions metric_time,customer__country --order metric_time`
+    9.  Add a coarser time granularity:
+        `mf query --metrics transactions --dimensions metric_time__week --order metric_time__week`
+    10. Try a more complicated query:
+        `mf query \
+          --metrics transactions,transaction_usd_na,transaction_usd_na_l7d --dimensions metric_time,is_large \
+          --order metric_time --start-time 2022-03-20 --end-time 2022-04-01`
+        * You can also add `--explain --display-plans`.
+    11. For more ways to interact with the sample models, go to
+        ‘https://docs.transform.co/docs/metricflow/metricflow-tutorial’.
     12. Once you’re done, run `mf tutorial --skip-dw --drop-tables` to drop the sample tables.
 ```
 
@@ -115,7 +126,7 @@ This project will be a place where people can easily contribute high-quality upd
 
 You might wish to read our [code of conduct](http://community.transform.co/metricflow-signup) and <LINK> engineering practices </LINK> before diving in.
 
-To get started on direct contributions, head on over to our [contributor guide](CONTRIBUTING.md).
+To get started on direct contributions, head on over to our [contributor guide](https://github.com/transform-data/metricflow/blob/main/CONTRIBUTING.md).
 
 ## Resources
 
@@ -123,7 +134,7 @@ To get started on direct contributions, head on over to our [contributor guide](
 - [Documentation](https://docs.transform.co/docs/overview/metricflow-overview)
 - [Slack Community](https://community.transform.co/metricflow-signup)
 - [MetricFlow Git Repository](https://github.com/transform-data/metricflow)
-- [CHANGELOG.md](CHANGELOG.md)
+- [CHANGELOG.md](https://github.com/transform-data/metricflow/blob/main/CHANGELOG.md)
 
 ## License
 

@@ -1,114 +1,166 @@
 from __future__ import annotations
+from copy import deepcopy
 
 from dataclasses import dataclass, field
+from functools import partial
 from math import floor
 from time import perf_counter
-from typing import List, Optional
+from typing import Callable, List, Optional, Tuple
+from metricflow.dataflow.builder.source_node import SourceNodeBuilder
+from metricflow.dataflow.dataflow_plan import BaseOutput, FilterElementsNode
+from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
+from metricflow.dataset.data_source_adapter import DataSourceDataSet
 
+from metricflow.dataset.dataset import DataSet
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
+from metricflow.instances import DataSourceElementReference, DataSourceReference, MetricModelReference
 from metricflow.model.objects.data_source import DataSource
+from metricflow.model.objects.elements.dimension import Dimension, DimensionType
+from metricflow.model.objects.metric import Metric
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,
-    DimensionContext,
+    DataSourceElementContext,
+    DataSourceElementType,
+    FileContext,
     MetricContext,
+    ModelValidationResults,
     ValidationContext,
     ValidationError,
     ValidationIssue,
     ValidationWarning,
 )
+from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
+from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
+from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.specs import DimensionSpec, LinkableInstanceSpec
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
+
+
+@dataclass
+class QueryRenderingTools:
+    """General tools that data warehosue validations use for rendering the validation queries
+
+    This is necessary for the validation steps that generate raw partial queries against the individual data sources
+    (e.g., selecting a single dimension column).
+    """
+
+    semantic_model: SemanticModel
+    source_node_builder: SourceNodeBuilder
+    converter: DataSourceToDataSetConverter
+    time_spine_source: TimeSpineSource
+    plan_converter: DataflowToSqlQueryPlanConverter
+
+    def __init__(self, model: UserConfiguredModel, system_schema: str) -> None:  # noqa: D
+        self.semantic_model = SemanticModel(user_configured_model=model)
+        self.source_node_builder = SourceNodeBuilder(semantic_model=self.semantic_model)
+        self.time_spine_source = TimeSpineSource(schema_name=system_schema)
+        self.converter = DataSourceToDataSetConverter(
+            column_association_resolver=DefaultColumnAssociationResolver(semantic_model=self.semantic_model)
+        )
+        self.plan_converter = DataflowToSqlQueryPlanConverter(
+            column_association_resolver=DefaultColumnAssociationResolver(self.semantic_model),
+            semantic_model=self.semantic_model,
+            time_spine_source=self.time_spine_source,
+        )
 
 
 @dataclass
 class DataWarehouseValidationTask:
     """Dataclass for defining a task to be used in the DataWarehouseModelValidator"""
 
-    query_string: str
+    query_and_params_callable: Callable[[], Tuple[str, SqlBindParameters]]
     error_message: str
     context: Optional[ValidationContext] = None
-    query_params: SqlBindParameters = field(default_factory=lambda: SqlBindParameters())
     on_fail_subtasks: List[DataWarehouseValidationTask] = field(default_factory=lambda: [])
 
 
 class DataWarehouseTaskBuilder:
     """Task builder for standard data warehouse validation tasks"""
 
-    QUERY_TEMPLATE = "SELECT {columns_select} FROM {data_source} AS source{unique_id}"
-    WHERE_TEMPLATE = " WHERE {where_filters}"
-    PARTITION_COL_TEMPLATE = "{partition} IS NOT NULL"
-    WRAPPED_COL_TEMPLATE = "({column}) AS col{unique_id}"
+    @staticmethod
+    def _remove_identifier_link_specs(specs: Tuple[LinkableInstanceSpec, ...]) -> Tuple[LinkableInstanceSpec, ...]:
+        """For the purposes of data warehouse validation, specs with identifier_links are unnecesary"""
+        return tuple(spec for spec in specs if not spec.identifier_links)
 
     @staticmethod
-    def _wrap_col(col: str, id: int) -> str:  # noqa: D
-        return DataWarehouseTaskBuilder.WRAPPED_COL_TEMPLATE.format(column=col, unique_id=id)
-
-    @staticmethod
-    def _where_clause_from_partitions(data_source: DataSource) -> str:
-        """Takes the partitions for a data source and genrates a WHERE clause based on their definintions"""
-        if not data_source.partitions:
-            return ""
-
-        where_stmts: List[str] = []
-        for partition in data_source.partitions:
-            element = f"({partition.expr})" if partition.expr else partition.name.element_name
-            where_stmts.append(DataWarehouseTaskBuilder.PARTITION_COL_TEMPLATE.format(partition=element))
-        return DataWarehouseTaskBuilder.WHERE_TEMPLATE.format(where_filters=" AND ".join(where_stmts))
-
-    @staticmethod
-    def _gen_query(data_source: DataSource, id: int, columns: List[str] = ["true"]) -> str:
-        """Generates a basic sql query to select parts of them model definition
-
-        Generates a basic sql query for verifying the model's definition with
-        the data warehouse. For example if a data source with an sql_table
-        value of 'table1' and no partition was passed in no columns list the
-        query generated would be "SELECT (true) as col1 FROM table1 AS source0". If a the
-        data source had a partition, say on the dimension 'dim1' then the query
-        would be "SELECT (true) as col1 FROM table1 AS source0 WHERE dim1 IS NOT NULL".
-        And if in addition columns ["dim2", "dim3"] were passed in then the
-        query would be "SELECT (dim2) as col1, (dim3) as col2 FROM table1 AS source0 WHERE
-        dim1 IS NOT NULL".
-
-        Args:
-            data_source: The data source to generate the query for
-            id: A unique id used to alias the table reference
-            columns: Column strings to select
-        Returns:
-            A string representing the query for the passed in arguments.
-        """
-        data_source_str = data_source.sql_table if data_source.sql_table else f"({data_source.sql_query})"
-
-        wrapped_cols = [DataWarehouseTaskBuilder._wrap_col(col, index) for index, col in enumerate(columns)]
-        columns_select = ", ".join(wrapped_cols)
-
-        query = DataWarehouseTaskBuilder.QUERY_TEMPLATE.format(
-            data_source=data_source_str, columns_select=columns_select, unique_id=id
+    def _data_source_node(render_tools: QueryRenderingTools, data_source: DataSource) -> BaseOutput[DataSourceDataSet]:
+        """Builds and returns the DataSourceDataSet node for the given data source"""
+        data_source_semantics = render_tools.semantic_model.data_source_semantics.get_by_reference(
+            DataSourceReference(data_source_name=data_source.name)
         )
-        query += DataWarehouseTaskBuilder._where_clause_from_partitions(data_source=data_source)
-        return query
+        assert data_source_semantics
+
+        source_nodes = render_tools.source_node_builder.create_from_data_sets(
+            (render_tools.converter.create_sql_source_data_set(data_source_semantics),)
+        )
+
+        assert len(source_nodes) == 1
+        return source_nodes[0]
 
     @staticmethod
-    def gen_data_source_tasks(model: UserConfiguredModel) -> List[DataWarehouseValidationTask]:
+    def renderize(
+        sql_client: SqlClient, plan_converter: DataflowToSqlQueryPlanConverter, plan_id: str, nodes: FilterElementsNode
+    ) -> Tuple[str, SqlBindParameters]:
+        """Generates a sql query plan and returns the rendered sql and execution_parameters"""
+        sql_plan = plan_converter.convert_to_sql_query_plan(
+            sql_engine_attributes=sql_client.sql_engine_attributes,
+            sql_query_plan_id=plan_id,
+            dataflow_plan_node=nodes,
+        )
+
+        rendered_plan = sql_client.sql_engine_attributes.sql_query_plan_renderer.render_sql_query_plan(sql_plan)
+        return (rendered_plan.sql, rendered_plan.execution_parameters)
+
+    @classmethod
+    def gen_data_source_tasks(
+        cls, model: UserConfiguredModel, sql_client: SqlClient, system_schema: str
+    ) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the data sources of the model"""
+
+        # we need a dimension to query that we know exists (i.e. the dimension
+        # is guaranteed to not cause a problem) on each data source.
+        # Additionally, we don't want to modify the original model, so we
+        # first make a deep copy of it
+        model = deepcopy(model)
+        for data_source in model.data_sources:
+            data_source.dimensions = list(data_source.dimensions) + [
+                Dimension(name=f"validation_dim_for_{data_source.name}", type=DimensionType.CATEGORICAL, expr="1")
+            ]
+
+        render_tools = QueryRenderingTools(model=model, system_schema=system_schema)
+
         tasks: List[DataWarehouseValidationTask] = []
-        for index, data_source in enumerate(model.data_sources):
+        for data_source in model.data_sources:
+            source_node = cls._data_source_node(render_tools=render_tools, data_source=data_source)
+            spec = DimensionSpec.from_name(name=f"validation_dim_for_{data_source.name}")
+            filter_elements_node = FilterElementsNode(parent_node=source_node, include_specs=[spec])
+
             tasks.append(
                 DataWarehouseValidationTask(
-                    query_string=DataWarehouseTaskBuilder._gen_query(data_source=data_source, id=index),
+                    query_and_params_callable=partial(
+                        cls.renderize,
+                        sql_client=sql_client,
+                        plan_converter=render_tools.plan_converter,
+                        plan_id=f"{data_source.name}_validation",
+                        nodes=filter_elements_node,
+                    ),
                     context=DataSourceContext(
-                        file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
-                        line_number=data_source.metadata.file_slice.start_line_number if data_source.metadata else None,
-                        data_source_name=data_source.name,
+                        file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                        data_source=DataSourceReference(data_source_name=data_source.name),
                     ),
                     error_message=f"Unable to access data source `{data_source.name}` in data warehouse",
                 )
             )
+
         return tasks
 
-    @staticmethod
-    def gen_dimension_tasks(model: UserConfiguredModel) -> List[DataWarehouseValidationTask]:
+    @classmethod
+    def gen_dimension_tasks(
+        cls, model: UserConfiguredModel, sql_client: SqlClient, system_schema: str
+    ) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the dimensions of the model
 
         The high level tasks returned are "short cut" queries which try to
@@ -118,71 +170,229 @@ class DataWarehouseTaskBuilder:
         on the data source to identify which have issues.
         """
 
-        tasks: List[DataWarehouseValidationTask] = []
-        for index, data_source in enumerate(model.data_sources):
-            # generate the subtasks
-            data_source_tasks: List[DataWarehouseValidationTask] = []
-            data_source_columns: List[str] = []
-            for dimension in data_source.dimensions:
-                dim_to_query = dimension.expr if dimension.expr is not None else dimension.name.element_name
-                data_source_columns.append(dim_to_query)
+        render_tools = QueryRenderingTools(model=model, system_schema=system_schema)
 
-                data_source_tasks.append(
+        tasks: List[DataWarehouseValidationTask] = []
+        for data_source in model.data_sources:
+            if not data_source.dimensions:
+                continue
+
+            source_node = cls._data_source_node(render_tools=render_tools, data_source=data_source)
+
+            data_source_sub_tasks: List[DataWarehouseValidationTask] = []
+            dataset = render_tools.converter.create_sql_source_data_set(data_source)
+            data_source_specs = DataWarehouseTaskBuilder._remove_identifier_link_specs(
+                dataset.instance_set.spec_set.dimension_specs + dataset.instance_set.spec_set.time_dimension_specs
+            )
+            for spec in data_source_specs:
+                filter_elements_node = FilterElementsNode(parent_node=source_node, include_specs=[spec])
+                data_source_sub_tasks.append(
                     DataWarehouseValidationTask(
-                        query_string=DataWarehouseTaskBuilder._gen_query(
-                            data_source=data_source, id=index, columns=[dim_to_query]
+                        query_and_params_callable=partial(
+                            cls.renderize,
+                            sql_client=sql_client,
+                            plan_converter=render_tools.plan_converter,
+                            plan_id=f"{data_source.name}_dim_{spec.element_name}_validation",
+                            nodes=filter_elements_node,
                         ),
-                        context=DimensionContext(
-                            file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
-                            line_number=data_source.metadata.file_slice.start_line_number
-                            if data_source.metadata
-                            else None,
-                            data_source_name=data_source.name,
-                            dimension_name=dimension.name.element_name,
+                        context=DataSourceElementContext(
+                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                            data_source_element=DataSourceElementReference(
+                                data_source_name=data_source.name, element_name=spec.element_name
+                            ),
+                            element_type=DataSourceElementType.DIMENSION,
                         ),
-                        error_message=f"Unable to query `{dim_to_query}` in data warehouse for dimension `{dimension.name.element_name}` on data source `{data_source.name}`.",
+                        error_message=f"Unable to query dimension `{spec.element_name}` on data source `{data_source.name}` in data warehouse",
                     )
                 )
 
-            # generate the shortcut tasks with sub tasks
+            filter_elements_node = FilterElementsNode(parent_node=source_node, include_specs=data_source_specs)
             tasks.append(
                 DataWarehouseValidationTask(
-                    query_string=DataWarehouseTaskBuilder._gen_query(
-                        data_source=data_source,
-                        id=index,
-                        columns=data_source_columns,
+                    query_and_params_callable=partial(
+                        cls.renderize,
+                        sql_client=sql_client,
+                        plan_converter=render_tools.plan_converter,
+                        plan_id=f"{data_source.name}_all_dimensions_validation",
+                        nodes=filter_elements_node,
                     ),
                     context=DataSourceContext(
-                        file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
-                        line_number=data_source.metadata.file_slice.start_line_number if data_source.metadata else None,
-                        data_source_name=data_source.name,
+                        file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                        data_source=DataSourceReference(data_source_name=data_source.name),
                     ),
                     error_message=f"Failed to query dimensions in data warehouse for data source `{data_source.name}`",
-                    on_fail_subtasks=data_source_tasks,
+                    on_fail_subtasks=data_source_sub_tasks,
+                )
+            )
+        return tasks
+
+    @classmethod
+    def gen_identifier_tasks(
+        cls, model: UserConfiguredModel, sql_client: SqlClient, system_schema: str
+    ) -> List[DataWarehouseValidationTask]:
+        """Generates a list of tasks for validating the identifiers of the model
+
+        The high level tasks returned are "short cut" queries which try to
+        query all the identifiers for a given data source. If that query fails,
+        one or more of the identifiers is incorrectly specified. Thus if the
+        query fails, there are subtasks which query the individual identifiers
+        on the data source to identify which have issues.
+        """
+
+        render_tools = QueryRenderingTools(model=model, system_schema=system_schema)
+
+        tasks: List[DataWarehouseValidationTask] = []
+        for data_source in model.data_sources:
+            if not data_source.identifiers:
+                continue
+            source_node = cls._data_source_node(render_tools=render_tools, data_source=data_source)
+
+            data_source_sub_tasks: List[DataWarehouseValidationTask] = []
+            dataset = render_tools.converter.create_sql_source_data_set(data_source)
+            data_source_specs = DataWarehouseTaskBuilder._remove_identifier_link_specs(
+                dataset.instance_set.spec_set.identifier_specs
+            )
+            for spec in data_source_specs:
+                filter_elements_node = FilterElementsNode(parent_node=source_node, include_specs=[spec])
+                data_source_sub_tasks.append(
+                    DataWarehouseValidationTask(
+                        query_and_params_callable=partial(
+                            cls.renderize,
+                            sql_client=sql_client,
+                            plan_converter=render_tools.plan_converter,
+                            plan_id=f"{data_source.name}_identifier_{spec.element_name}_validation",
+                            nodes=filter_elements_node,
+                        ),
+                        context=DataSourceElementContext(
+                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                            data_source_element=DataSourceElementReference(
+                                data_source_name=data_source.name, element_name=spec.element_name
+                            ),
+                            element_type=DataSourceElementType.IDENTIFIER,
+                        ),
+                        error_message=f"Unable to query identifier `{spec.element_name}` on data source `{data_source.name}` in data warehouse",
+                    )
+                )
+
+            filter_elements_node = FilterElementsNode(parent_node=source_node, include_specs=data_source_specs)
+            tasks.append(
+                DataWarehouseValidationTask(
+                    query_and_params_callable=partial(
+                        cls.renderize,
+                        sql_client=sql_client,
+                        plan_converter=render_tools.plan_converter,
+                        plan_id=f"{data_source.name}_all_identifiers_validation",
+                        nodes=filter_elements_node,
+                    ),
+                    context=DataSourceContext(
+                        file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                        data_source=DataSourceReference(data_source_name=data_source.name),
+                    ),
+                    error_message=f"Failed to query identifiers in data warehouse for data source `{data_source.name}`",
+                    on_fail_subtasks=data_source_sub_tasks,
+                )
+            )
+        return tasks
+
+    @classmethod
+    def gen_measure_tasks(
+        cls, model: UserConfiguredModel, sql_client: SqlClient, system_schema: str
+    ) -> List[DataWarehouseValidationTask]:
+        """Generates a list of tasks for validating the measures of the model
+
+        The high level tasks returned are "short cut" queries which try to
+        query all the measures for a given data source. If that query fails,
+        one or more of the measures is incorrectly specified. Thus if the
+        query fails, there are subtasks which query the individual measures
+        on the data source to identify which have issues.
+        """
+
+        render_tools = QueryRenderingTools(model=model, system_schema=system_schema)
+
+        tasks: List[DataWarehouseValidationTask] = []
+        for data_source in model.data_sources:
+            if not data_source.measures:
+                continue
+
+            source_node = cls._data_source_node(render_tools=render_tools, data_source=data_source)
+
+            data_source_sub_tasks: List[DataWarehouseValidationTask] = []
+            dataset = render_tools.converter.create_sql_source_data_set(data_source)
+            data_source_specs = dataset.instance_set.spec_set.measure_specs
+            for spec in data_source_specs:
+                filter_elements_node = FilterElementsNode(parent_node=source_node, include_specs=[spec])
+                data_source_sub_tasks.append(
+                    DataWarehouseValidationTask(
+                        query_and_params_callable=partial(
+                            cls.renderize,
+                            sql_client=sql_client,
+                            plan_converter=render_tools.plan_converter,
+                            plan_id=f"{data_source.name}_measure_{spec.element_name}_validation",
+                            nodes=filter_elements_node,
+                        ),
+                        context=DataSourceElementContext(
+                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                            data_source_element=DataSourceElementReference(
+                                data_source_name=data_source.name, element_name=spec.element_name
+                            ),
+                            element_type=DataSourceElementType.MEASURE,
+                        ),
+                        error_message=f"Unable to query measure `{spec.element_name}` on data source `{data_source.name}` in data warehouse",
+                    )
+                )
+
+            filter_elements_node = FilterElementsNode(parent_node=source_node, include_specs=data_source_specs)
+            tasks.append(
+                DataWarehouseValidationTask(
+                    query_and_params_callable=partial(
+                        cls.renderize,
+                        sql_client=sql_client,
+                        plan_converter=render_tools.plan_converter,
+                        plan_id=f"{data_source.name}_all_measures_validation",
+                        nodes=filter_elements_node,
+                    ),
+                    context=DataSourceContext(
+                        file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                        data_source=DataSourceReference(data_source_name=data_source.name),
+                    ),
+                    error_message=f"Failed to query measures in data warehouse for data source `{data_source.name}`",
+                    on_fail_subtasks=data_source_sub_tasks,
                 )
             )
         return tasks
 
     @staticmethod
-    def gen_metric_tasks(model: UserConfiguredModel, mf_engine: MetricFlowEngine) -> List[DataWarehouseValidationTask]:
+    def _gen_metric_task_query_and_params(
+        metric: Metric, mf_engine: MetricFlowEngine
+    ) -> Tuple[str, SqlBindParameters]:  # noqa: D
+        mf_query = MetricFlowQueryRequest.create_with_random_request_id(
+            metric_names=[metric.name], group_by_names=[DataSet.metric_time_dimension_name()]
+        )
+        explain_result: MetricFlowExplainResult = mf_engine.explain(mf_request=mf_query)
+        return (explain_result.rendered_sql.sql_query, explain_result.rendered_sql.bind_parameters)
+
+    @classmethod
+    def gen_metric_tasks(
+        cls, model: UserConfiguredModel, sql_client: SqlClient, system_schema: str
+    ) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the metrics of the model"""
-        primary_time_dim = SemanticModel(
-            user_configured_model=model
-        ).data_source_semantics.primary_time_dimension_reference
+        mf_engine = MetricFlowEngine(
+            semantic_model=SemanticModel(user_configured_model=model),
+            sql_client=sql_client,
+            system_schema=system_schema,
+        )
         tasks: List[DataWarehouseValidationTask] = []
         for metric in model.metrics:
-            mf_query = MetricFlowQueryRequest.create_with_random_request_id(
-                metric_names=[metric.name], group_by_names=[primary_time_dim.element_name]
-            )
-            explain_result: MetricFlowExplainResult = mf_engine.explain(mf_request=mf_query)
             tasks.append(
                 DataWarehouseValidationTask(
-                    query_string=explain_result.rendered_sql.sql_query,
-                    query_params=explain_result.rendered_sql.bind_parameters,
+                    query_and_params_callable=partial(
+                        cls._gen_metric_task_query_and_params,
+                        metric=metric,
+                        mf_engine=mf_engine,
+                    ),
                     context=MetricContext(
-                        file_name=metric.metadata.file_slice.filename if metric.metadata else None,
-                        line_number=metric.metadata.file_slice.start_line_number if metric.metadata else None,
-                        metric_name=metric.name,
+                        file_context=FileContext.from_metadata(metadata=metric.metadata),
+                        metric=MetricModelReference(metric_name=metric.name),
                     ),
                     error_message=f"Unable to query metric `{metric.name}`.",
                 )
@@ -199,13 +409,13 @@ class DataWarehouseModelValidator:
     them (assuming the model has passed these validations before use).
     """
 
-    def __init__(self, sql_client: SqlClient, mf_engine: MetricFlowEngine) -> None:  # noqa: D
+    def __init__(self, sql_client: SqlClient, system_schema: str) -> None:  # noqa: D
         self._sql_client = sql_client
-        self._mf_engine = mf_engine
+        self._sql_schema = system_schema
 
     def run_tasks(
         self, tasks: List[DataWarehouseValidationTask], timeout: Optional[int] = None
-    ) -> List[ValidationIssue]:
+    ) -> ModelValidationResults:
         """Runs the list of tasks as queries agains the data warehouse, returning any found issues
 
         Args:
@@ -231,7 +441,8 @@ class DataWarehouseModelValidator:
                 )
                 break
             try:
-                self._sql_client.dry_run(stmt=task.query_string, sql_bind_parameters=task.query_params)
+                (query_string, query_params) = task.query_and_params_callable()
+                self._sql_client.dry_run(stmt=query_string, sql_bind_parameters=query_params)
             except Exception as e:
                 issues.append(
                     ValidationError(
@@ -241,11 +452,13 @@ class DataWarehouseModelValidator:
                 )
                 if task.on_fail_subtasks:
                     sub_task_timeout = floor(timeout - (perf_counter() - start_time)) if timeout else None
-                    issues += self.run_tasks(tasks=task.on_fail_subtasks, timeout=sub_task_timeout)
+                    issues += self.run_tasks(tasks=task.on_fail_subtasks, timeout=sub_task_timeout).all_issues
 
-        return issues
+        return ModelValidationResults.from_issues_sequence(issues)
 
-    def validate_data_sources(self, model: UserConfiguredModel, timeout: Optional[int] = None) -> List[ValidationIssue]:
+    def validate_data_sources(
+        self, model: UserConfiguredModel, timeout: Optional[int] = None
+    ) -> ModelValidationResults:
         """Generates a list of tasks for validating the data sources of the model and then runs them
 
         Args:
@@ -255,10 +468,12 @@ class DataWarehouseModelValidator:
         Returns:
             A list of validation issues discovered when running the passed in tasks against the data warehosue
         """
-        tasks = DataWarehouseTaskBuilder.gen_data_source_tasks(model=model)
+        tasks = DataWarehouseTaskBuilder.gen_data_source_tasks(
+            model=model, sql_client=self._sql_client, system_schema=self._sql_schema
+        )
         return self.run_tasks(tasks=tasks, timeout=timeout)
 
-    def validate_dimensions(self, model: UserConfiguredModel, timeout: Optional[int] = None) -> List[ValidationIssue]:
+    def validate_dimensions(self, model: UserConfiguredModel, timeout: Optional[int] = None) -> ModelValidationResults:
         """Generates a list of tasks for validating the dimensions of the model and then runs them
 
         Args:
@@ -268,10 +483,42 @@ class DataWarehouseModelValidator:
         Returns:
             A list of validation issues. If there are no validation issues, an empty list is returned.
         """
-        tasks = DataWarehouseTaskBuilder.gen_dimension_tasks(model=model)
+        tasks = DataWarehouseTaskBuilder.gen_dimension_tasks(
+            model=model, sql_client=self._sql_client, system_schema=self._sql_schema
+        )
         return self.run_tasks(tasks=tasks, timeout=timeout)
 
-    def validate_metrics(self, model: UserConfiguredModel, timeout: Optional[int] = None) -> List[ValidationIssue]:
+    def validate_identifiers(self, model: UserConfiguredModel, timeout: Optional[int] = None) -> ModelValidationResults:
+        """Generates a list of tasks for validating the identifiers of the model and then runs them
+
+        Args:
+            model: Model which to run data warehouse validations on
+            timeout: An optional timeout. Default is None. When the timeout is hit, function will return early.
+
+        Returns:
+            A list of validation issues. If there are no validation issues, an empty list is returned.
+        """
+        tasks = DataWarehouseTaskBuilder.gen_identifier_tasks(
+            model=model, sql_client=self._sql_client, system_schema=self._sql_schema
+        )
+        return self.run_tasks(tasks=tasks, timeout=timeout)
+
+    def validate_measures(self, model: UserConfiguredModel, timeout: Optional[int] = None) -> ModelValidationResults:
+        """Generates a list of tasks for validating the measures of the model and then runs them
+
+        Args:
+            model: Model which to run data warehouse validations on
+            timeout: An optional timeout. Default is None. When the timeout is hit, function will return early.
+
+        Returns:
+            A list of validation issues. If there are no validation issues, an empty list is returned.
+        """
+        tasks = DataWarehouseTaskBuilder.gen_measure_tasks(
+            model=model, sql_client=self._sql_client, system_schema=self._sql_schema
+        )
+        return self.run_tasks(tasks=tasks, timeout=timeout)
+
+    def validate_metrics(self, model: UserConfiguredModel, timeout: Optional[int] = None) -> ModelValidationResults:
         """Generates a list of tasks for validating the metrics of the model and then runs them
 
         Args:
@@ -282,5 +529,7 @@ class DataWarehouseModelValidator:
             A list of validation issues. If there are no validation issues, an empty list is returned.
         """
 
-        tasks = DataWarehouseTaskBuilder.gen_metric_tasks(model=model, mf_engine=self._mf_engine)
+        tasks = DataWarehouseTaskBuilder.gen_metric_tasks(
+            model=model, sql_client=self._sql_client, system_schema=self._sql_schema
+        )
         return self.run_tasks(tasks=tasks, timeout=timeout)

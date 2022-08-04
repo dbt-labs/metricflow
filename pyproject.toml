@@ -1,8 +1,12 @@
 [tool.poetry]
 name = "metricflow"
-version = "0.100.1"
-description = ""
+version = "0.110.1"
+description = "Translates a simple metric definition into reusable SQL and executes it against the SQL engine of your choice."
 authors = ["Transform <hello@transformdata.io>"]
+license = "AGPL-3.0-or-later"
+readme = "README.md"
+homepage = "https://transform.co/metricflow"
+repository = "https://github.com/transform-data/metricflow"
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.10"
@@ -33,11 +37,13 @@ psycopg2 = "^2.9.3"
 google-cloud-bigquery = "2.34.2"
 halo = "^0.0.31"
 update-checker = "^0.18.0"
-click = "^7.1.2"
 "ruamel.yaml" = "^0.17.21"
 python-Levenshtein = "^0.12.2"
 rudder-sdk-python = "^1.0.3"
 duckdb-engine = "^0.1.8"
+duckdb = "0.3.4"
+yamllint = "^1.26.3"
+click = ">=7.1.2"
 
 [tool.poetry.dev-dependencies]
 pytest-mock = "^3.7.0"

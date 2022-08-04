@@ -3,9 +3,9 @@ from __future__ import annotations
 from typing import Optional
 
 from metricflow.model.objects.common import Metadata
-from metricflow.model.objects.utils import ParseableObject, HashableBaseModel
+from metricflow.model.objects.base import ModelWithMetadataParsing, HashableBaseModel
 from metricflow.object_utils import ExtendedEnum
-from metricflow.specs import MeasureReference
+from metricflow.specs import MeasureReference, TimeDimensionReference
 
 
 class AggregationType(ExtendedEnum):
@@ -44,12 +44,28 @@ class AggregationType(ExtendedEnum):
         return self in (AggregationType.SUM, AggregationType.SUM_BOOLEAN)
 
 
-class Measure(HashableBaseModel, ParseableObject):
+class Measure(HashableBaseModel, ModelWithMetadataParsing):
     """Describes a measure"""
 
+    name: str
     agg: AggregationType
     description: Optional[str]
     create_metric: Optional[bool]
-    name: MeasureReference
     expr: Optional[str] = None
     metadata: Optional[Metadata]
+
+    # Defines the time dimension to aggregate this measure by. If not specified, it means to use the primary time
+    # dimension in the data source.
+    agg_time_dimension: Optional[str] = None
+
+    @property
+    def checked_agg_time_dimension(self) -> TimeDimensionReference:
+        """Returns the aggregation time dimension, throwing an exception if it's not set."""
+        assert (
+            self.agg_time_dimension
+        ), f"Aggregation time dimension for {self.name} should have been set during model transformation"
+        return TimeDimensionReference(element_name=self.agg_time_dimension)
+
+    @property
+    def reference(self) -> MeasureReference:  # noqa: D
+        return MeasureReference(element_name=self.name)

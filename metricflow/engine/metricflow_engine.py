@@ -12,6 +12,8 @@ import pandas as pd
 from metricflow.configuration.constants import CONFIG_DWH_SCHEMA
 from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
+from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
+from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import DataflowPlan
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
@@ -27,7 +29,7 @@ from metricflow.object_utils import pformat_big_objects, random_id
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_execution import DataflowToExecutionPlanConverter
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
-from metricflow.plan_conversion.time_spine import TimeSpineSource
+from metricflow.plan_conversion.time_spine import TimeSpineSource, TimeSpineTableBuilder
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.specs import ColumnAssociationResolver
@@ -141,6 +143,17 @@ class MetricFlowExplainResult:
             )
 
         return sql_query
+
+    @property
+    def rendered_sql_without_descriptions(self) -> SqlQuery:
+        """Return the SQL query without the inline descriptions."""
+        sql_query = self.rendered_sql
+        return SqlQuery(
+            sql_query="\n".join(
+                filter(lambda line: not line.strip().startswith("--"), sql_query.sql_query.split("\n"))
+            ),
+            bind_parameters=sql_query.bind_parameters,
+        )
 
 
 class AbstractMetricFlowEngine(ABC):
@@ -291,7 +304,10 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             DefaultColumnAssociationResolver(semantic_model)
         )
         self._time_source = time_source
-        self._time_spine_source = time_spine_source or TimeSpineSource(sql_client, schema_name=system_schema)
+        self._time_spine_source = time_spine_source or TimeSpineSource(schema_name=system_schema)
+        self._time_spine_table_builder = TimeSpineTableBuilder(
+            time_spine_source=self._time_spine_source, sql_client=self._sql_client
+        )
 
         self._schema = system_schema
 
@@ -302,14 +318,18 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             self._source_data_sets.append(data_set)
             logger.info(f"Created source dataset from data source '{data_source.name}'")
 
-        self._primary_time_dimension_reference = (
-            self._semantic_model.data_source_semantics.primary_time_dimension_reference
+        source_node_builder = SourceNodeBuilder(self._semantic_model)
+        source_nodes = source_node_builder.create_from_data_sets(self._source_data_sets)
+
+        node_output_resolver = DataflowPlanNodeOutputDataSetResolver[DataSourceDataSet](
+            column_association_resolver=DefaultColumnAssociationResolver(semantic_model),
+            semantic_model=semantic_model,
+            time_spine_source=self._time_spine_source,
         )
 
-        self._dataflow_plan_builder = DataflowPlanBuilder(
-            data_sets=self._source_data_sets,
+        self._dataflow_plan_builder = DataflowPlanBuilder[DataSourceDataSet](
+            source_nodes=source_nodes,
             semantic_model=self._semantic_model,
-            primary_time_dimension_reference=self._primary_time_dimension_reference,
             time_spine_source=self._time_spine_source,
         )
         self._to_sql_query_plan_converter = DataflowToSqlQueryPlanConverter[DataSourceDataSet](
@@ -317,7 +337,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             semantic_model=self._semantic_model,
             time_spine_source=self._time_spine_source,
         )
-        self._to_execution_plan_converter = DataflowToExecutionPlanConverter(
+        self._to_execution_plan_converter = DataflowToExecutionPlanConverter[DataSourceDataSet](
             sql_plan_converter=self._to_sql_query_plan_converter,
             sql_plan_renderer=self._sql_client.sql_engine_attributes.sql_query_plan_renderer,
             sql_client=sql_client,
@@ -326,7 +346,8 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
         self._query_parser = MetricFlowQueryParser(
             model=self._semantic_model,
-            primary_time_dimension_reference=self._primary_time_dimension_reference,
+            source_nodes=source_nodes,
+            node_output_resolver=node_output_resolver,
         )
 
     def _get_materialization_by_name(self, materialization_name: str) -> Optional[Materialization]:
@@ -386,7 +407,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         logger.info(f"Query spec is:\n{pformat_big_objects(query_spec)}")
 
         if self._semantic_model.metric_semantics.contains_cumulative_metric(query_spec.metric_specs):
-            self._time_spine_source.create_if_necessary()
+            self._time_spine_table_builder.create_if_necessary()
             time_constraint_updated = False
             if not mf_query_request.time_constraint_start:
                 time_constraint_start = self._time_source.get_time() - datetime.timedelta(days=365)

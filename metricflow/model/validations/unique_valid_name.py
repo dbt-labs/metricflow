@@ -1,25 +1,51 @@
+from __future__ import annotations
+
+import enum
 import re
 from typing import Dict, Tuple, List, Optional
+from metricflow.instances import (
+    DataSourceElementReference,
+    DataSourceReference,
+    MaterializationModelReference,
+    MetricModelReference,
+)
 
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,
-    DimensionContext,
-    IdentifierContext,
+    DataSourceElementContext,
+    DataSourceElementType,
+    FileContext,
     MaterializationContext,
-    MeasureContext,
     MetricContext,
     ModelValidationRule,
     ValidationContext,
     ValidationError,
-    ValidationFatal,
-    ValidationIssueLevel,
     ValidationIssueType,
     validate_safely,
 )
+from metricflow.object_utils import assert_values_exhausted
 from metricflow.specs import ElementReference
 from metricflow.time.time_granularity import TimeGranularity
+
+
+@enum.unique
+class MetricFlowReservedKeywords(enum.Enum):
+    """Enumeration of reserved keywords with helper for accessing the reason they are reserved"""
+
+    METRIC_TIME = "metric_time"
+
+    @staticmethod
+    def get_reserved_reason(keyword: MetricFlowReservedKeywords) -> str:
+        """Get the reason a given keyword is reserved. Guarantees an exhaustive switch"""
+        if keyword is MetricFlowReservedKeywords.METRIC_TIME:
+            return (
+                "Used as the query input for creating time series metrics from measures with "
+                "different time dimension names."
+            )
+        else:
+            assert_values_exhausted(keyword)
 
 
 class UniqueAndValidNameRule(ModelValidationRule):
@@ -54,6 +80,14 @@ class UniqueAndValidNameRule(ModelValidationRule):
                     f"({TimeGranularity.list_names()})",
                 )
             )
+        if name.lower() in {reserved_name.value for reserved_name in MetricFlowReservedKeywords}:
+            reason = MetricFlowReservedKeywords.get_reserved_reason(MetricFlowReservedKeywords(name.lower()))
+            issues.append(
+                ValidationError(
+                    context=context,
+                    message=f"Invalid name `{name}` - this name is reserved by MetricFlow. Reason: {reason}",
+                )
+            )
         return issues
 
     @staticmethod
@@ -66,15 +100,14 @@ class UniqueAndValidNameRule(ModelValidationRule):
             for measure in data_source.measures:
                 element_info_tuples.append(
                     (
-                        measure.name,
+                        measure.reference,
                         "measure",
-                        MeasureContext(
-                            file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
-                            line_number=data_source.metadata.file_slice.start_line_number
-                            if data_source.metadata
-                            else None,
-                            data_source_name=data_source.name,
-                            measure_name=measure.name.element_name,
+                        DataSourceElementContext(
+                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                            data_source_element=DataSourceElementReference(
+                                data_source_name=data_source.name, element_name=measure.name
+                            ),
+                            element_type=DataSourceElementType.MEASURE,
                         ),
                     )
                 )
@@ -82,15 +115,14 @@ class UniqueAndValidNameRule(ModelValidationRule):
             for identifier in data_source.identifiers:
                 element_info_tuples.append(
                     (
-                        identifier.name,
+                        identifier.reference,
                         "identifier",
-                        IdentifierContext(
-                            file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
-                            line_number=data_source.metadata.file_slice.start_line_number
-                            if data_source.metadata
-                            else None,
-                            data_source_name=data_source.name,
-                            identifier_name=identifier.name.element_name,
+                        DataSourceElementContext(
+                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                            data_source_element=DataSourceElementReference(
+                                data_source_name=data_source.name, element_name=identifier.name
+                            ),
+                            element_type=DataSourceElementType.IDENTIFIER,
                         ),
                     )
                 )
@@ -98,25 +130,23 @@ class UniqueAndValidNameRule(ModelValidationRule):
             for dimension in data_source.dimensions:
                 element_info_tuples.append(
                     (
-                        dimension.name,
+                        dimension.reference,
                         "dimension",
-                        DimensionContext(
-                            file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
-                            line_number=data_source.metadata.file_slice.start_line_number
-                            if data_source.metadata
-                            else None,
-                            data_source_name=data_source.name,
-                            dimension_name=dimension.name.element_name,
+                        DataSourceElementContext(
+                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                            data_source_element=DataSourceElementReference(
+                                data_source_name=data_source.name, element_name=dimension.name
+                            ),
+                            element_type=DataSourceElementType.DIMENSION,
                         ),
                     )
                 )
-
         name_to_type: Dict[ElementReference, str] = {}
 
         for name, _type, context in element_info_tuples:
             if name in name_to_type:
                 issues.append(
-                    ValidationFatal(
+                    ValidationError(
                         context=context,
                         message=f"In data source `{data_source.name}`, can't use name `{name.element_name}` for a "
                         f"{_type} when it was already used for a {name_to_type[name]}",
@@ -142,11 +172,8 @@ class UniqueAndValidNameRule(ModelValidationRule):
                         data_source.name,
                         "data source",
                         DataSourceContext(
-                            file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
-                            line_number=data_source.metadata.file_slice.start_line_number
-                            if data_source.metadata
-                            else None,
-                            data_source_name=data_source.name,
+                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                            data_source=DataSourceReference(data_source_name=data_source.name),
                         ),
                     )
                 )
@@ -157,13 +184,8 @@ class UniqueAndValidNameRule(ModelValidationRule):
                         materialization.name,
                         "materialization",
                         MaterializationContext(
-                            file_name=materialization.metadata.file_slice.filename
-                            if materialization.metadata
-                            else None,
-                            line_number=materialization.metadata.file_slice.start_line_number
-                            if materialization.metadata
-                            else None,
-                            materialization_name=materialization.name,
+                            file_context=FileContext.from_metadata(metadata=materialization.metadata),
+                            materialization=MaterializationModelReference(materialization_name=materialization.name),
                         ),
                     )
                 )
@@ -175,7 +197,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
         for name, type_, context in object_info_tuples:
             if name in name_to_type:
                 issues.append(
-                    ValidationFatal(
+                    ValidationError(
                         context=context,
                         message=f"Can't use name `{name}` for a {type_} when it was already used for a "
                         f"{name_to_type[name]}",
@@ -189,20 +211,16 @@ class UniqueAndValidNameRule(ModelValidationRule):
             for metric in model.metrics:
                 if metric.name in metric_names:
                     issues.append(
-                        ValidationFatal(
+                        ValidationError(
                             context=MetricContext(
-                                file_name=metric.metadata.file_slice.filename if metric.metadata else None,
-                                line_number=metric.metadata.file_slice.start_line_number if metric.metadata else None,
-                                metric_name=metric.name,
+                                file_context=FileContext.from_metadata(metadata=metric.metadata),
+                                metric=MetricModelReference(metric_name=metric.name),
                             ),
                             message=f"Can't use name `{metric.name}` for a metric when it was already used for a metric",
                         )
                     )
                 else:
                     metric_names.add(metric.name)
-
-        if any([x.level == ValidationIssueLevel.FATAL for x in issues]):
-            return issues
 
         for name, _, context in object_info_tuples:
             issues += UniqueAndValidNameRule.check_valid_name(name=name, context=context)

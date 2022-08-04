@@ -21,7 +21,6 @@ from metricflow.specs import (
     TimeDimensionSpec,
     IdentifierSpec,
     MetricSpec,
-    TimeDimensionReference,
 )
 from metricflow.time.time_granularity import TimeGranularity
 
@@ -35,9 +34,6 @@ class LinkableElementProperties(Enum):
     throughout the related classes.
     """
 
-    # A primary time dimension that is accessed by a primary identifier within the data source. e.g. in the test data
-    # source "listings_latest", an example is "listing__ds"
-    LOCAL_LINKED_PRIMARY_TIME = "local_linked_primary_time"
     # A local element as per above definition.
     LOCAL = "local"
     # A local dimension that is prefixed with a local primary identifier.
@@ -57,7 +53,6 @@ class LinkableElementProperties(Enum):
     def all_properties() -> FrozenSet[LinkableElementProperties]:  # noqa: D
         return frozenset(
             {
-                LinkableElementProperties.LOCAL_LINKED_PRIMARY_TIME,
                 LinkableElementProperties.LOCAL,
                 LinkableElementProperties.LOCAL_LINKED,
                 LinkableElementProperties.JOINED,
@@ -330,7 +325,7 @@ def _generate_linkable_time_dimensions(
 
         linkable_dimensions.append(
             LinkableDimension(
-                element_name=dimension.name.element_name,
+                element_name=dimension.reference.element_name,
                 identifier_links=identifier_links,
                 time_granularity=time_granularity,
                 properties=frozenset(properties),
@@ -368,7 +363,7 @@ class DataSourceJoinPath:
             if dimension_type == DimensionType.CATEGORICAL:
                 linkable_dimensions.append(
                     LinkableDimension(
-                        element_name=dimension.name.element_name,
+                        element_name=dimension.reference.element_name,
                         identifier_links=identifier_links,
                         properties=with_properties,
                     )
@@ -386,10 +381,10 @@ class DataSourceJoinPath:
 
         for identifier in data_source.identifiers:
             # Avoid creating "booking_id__booking_id"
-            if identifier.name.element_name != identifier_links[-1]:
+            if identifier.reference.element_name != identifier_links[-1]:
                 linkable_identifiers.append(
                     LinkableIdentifier(
-                        element_name=identifier.name.element_name,
+                        element_name=identifier.reference.element_name,
                         identifier_links=identifier_links,
                         properties=with_properties.union({LinkableElementProperties.IDENTIFIER}),
                     )
@@ -418,18 +413,15 @@ class ValidLinkableSpecResolver:
     def __init__(
         self,
         user_configured_model: UserConfiguredModel,
-        primary_time_dimension_reference: TimeDimensionReference,
         max_identifier_links: int,
     ) -> None:
         """Constructor.
 
         Args:
             user_configured_model: the model to use.
-            primary_time_dimension_reference: the primary time dimension in the model.
             max_identifier_links: the maximum number of joins to do when computing valid elements.
         """
         self._user_configured_model = user_configured_model
-        self._primary_time_dimension_reference = primary_time_dimension_reference
         self._data_sources = self._user_configured_model.data_sources
 
         assert max_identifier_links >= 0
@@ -442,14 +434,14 @@ class ValidLinkableSpecResolver:
         for data_source in self._data_sources:
             for identifier in data_source.identifiers:
                 if identifier.type in (IdentifierType.PRIMARY, IdentifierType.UNIQUE):
-                    self._identifier_to_data_source[identifier.name.element_name].append(data_source)
+                    self._identifier_to_data_source[identifier.reference.element_name].append(data_source)
 
         self._metric_to_linkable_element_sets: Dict[str, List[LinkableElementSet]] = {}
 
         start_time = time.time()
         for metric in self._user_configured_model.metrics:
             linkable_sets_for_measure = []
-            for measure in metric.measure_names:
+            for measure in metric.measure_references:
                 linkable_sets_for_measure.append(self._get_linkable_element_set_for_measure(measure))
 
             self._metric_to_linkable_element_sets[metric.name] = linkable_sets_for_measure
@@ -458,7 +450,7 @@ class ValidLinkableSpecResolver:
     def _get_data_source_for_measure(self, measure_reference: MeasureReference) -> DataSource:  # noqa: D
         data_sources_where_measure_was_found = []
         for data_source in self._data_sources:
-            if any([x.name.element_name == measure_reference.element_name for x in data_source.measures]):
+            if any([x.reference.element_name == measure_reference.element_name for x in data_source.measures]):
                 data_sources_where_measure_was_found.append(data_source)
 
         if len(data_sources_where_measure_was_found) == 0:
@@ -480,7 +472,7 @@ class ValidLinkableSpecResolver:
             if dimension_type == DimensionType.CATEGORICAL:
                 linkable_dimensions.append(
                     LinkableDimension(
-                        element_name=dimension.name.element_name,
+                        element_name=dimension.reference.element_name,
                         identifier_links=(),
                         properties=frozenset({LinkableElementProperties.LOCAL}),
                     )
@@ -500,7 +492,7 @@ class ValidLinkableSpecResolver:
         for identifier in data_source.identifiers:
             linkable_identifiers.append(
                 LinkableIdentifier(
-                    element_name=identifier.name.element_name,
+                    element_name=identifier.reference.element_name,
                     identifier_links=(),
                     properties=frozenset({LinkableElementProperties.LOCAL, LinkableElementProperties.IDENTIFIER}),
                 )
@@ -511,14 +503,10 @@ class ValidLinkableSpecResolver:
             if identifier.type == IdentifierType.PRIMARY:
                 for linkable_dimension in linkable_dimensions:
                     properties = {LinkableElementProperties.LOCAL, LinkableElementProperties.LOCAL_LINKED}
-
-                    if linkable_dimension.element_name == self._primary_time_dimension_reference.element_name:
-                        properties.add(LinkableElementProperties.LOCAL_LINKED_PRIMARY_TIME)
-
                     additional_linkable_dimensions.append(
                         LinkableDimension(
                             element_name=linkable_dimension.element_name,
-                            identifier_links=(identifier.name.element_name,),
+                            identifier_links=(identifier.reference.element_name,),
                             time_granularity=linkable_dimension.time_granularity,
                             properties=frozenset(linkable_dimension.properties.union(properties)),
                         )
@@ -546,7 +534,7 @@ class ValidLinkableSpecResolver:
 
         # Create 1-hop elements
         for identifier in measure_data_source.identifiers:
-            data_sources = self._get_data_sources_with_joinable_identifier(identifier.name.element_name)
+            data_sources = self._get_data_sources_with_joinable_identifier(identifier.reference.element_name)
             for data_source in data_sources:
                 if data_source.name == measure_data_source.name:
                     continue
@@ -554,7 +542,7 @@ class ValidLinkableSpecResolver:
                     DataSourceJoinPath(
                         path_elements=(
                             DataSourceJoinPathElement(
-                                data_source=data_source, join_on_identifier=identifier.name.element_name
+                                data_source=data_source, join_on_identifier=identifier.reference.element_name
                             ),
                         )
                     )
@@ -620,7 +608,7 @@ class ValidLinkableSpecResolver:
         new_join_paths = []
 
         for identifier in data_source.identifiers:
-            identifier_name = identifier.name.element_name
+            identifier_name = identifier.reference.element_name
 
             if identifier_name in set(x.join_on_identifier for x in current_join_path.path_elements):
                 continue

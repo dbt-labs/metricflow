@@ -1,24 +1,24 @@
 -- Compute Metrics via Expressions
 SELECT
-  CAST(bookings AS DOUBLE) / CAST(NULLIF(bookers, 0) AS DOUBLE) AS bookings_per_booker
+  listing
   , listing__country_latest
-  , listing
+  , CAST(bookings AS DOUBLE) / CAST(NULLIF(bookers, 0) AS DOUBLE) AS bookings_per_booker
 FROM (
   -- Join Standard Outputs
   -- Aggregate Measures
   SELECT
-    SUM(subq_7.bookings) AS bookings
-    , COUNT(DISTINCT subq_7.bookers) AS bookers
+    subq_7.listing AS listing
     , listings_latest_src_10003.country AS listing__country_latest
-    , subq_7.listing AS listing
+    , SUM(subq_7.bookings) AS bookings
+    , COUNT(DISTINCT subq_7.bookers) AS bookers
   FROM (
     -- Read Elements From Data Source 'bookings_source'
     -- Pass Only Elements:
     --   ['bookings', 'bookers', 'listing']
     SELECT
-      1 AS bookings
+      listing_id AS listing
+      , 1 AS bookings
       , guest_id AS bookers
-      , listing_id AS listing
     FROM (
       -- User Defined SQL Query
       SELECT * FROM ***************************.fct_bookings
@@ -29,6 +29,6 @@ FROM (
   ON
     subq_7.listing = listings_latest_src_10003.listing_id
   GROUP BY
-    listings_latest_src_10003.country
-    , subq_7.listing
+    subq_7.listing
+    , listings_latest_src_10003.country
 ) subq_11

@@ -137,8 +137,11 @@ class InferenceRunner:
     def run(self) -> None:
         """Runs inference with the given configs."""
 
+        # FIXME: currently we only accept DataWarehouseContextProvider
+        provider: DataWarehouseInferenceContextProvider = self.context_providers[0]  # type: ignore
+
         with self._progress.warehouse():
-            warehouse = self.context_providers[0].get_context(
+            warehouse = provider.get_context(
                 table_progress=self._progress.table,
             )
 

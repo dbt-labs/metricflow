@@ -11,7 +11,6 @@ class SqlDialect(ExtendedEnum):
     POSTGRESQL = "postgresql"
     MYSQL = "mysql"
     SNOWFLAKE = "snowflake"
-    SQLITE = "sqlite"
     BIGQUERY = "bigquery"
 
 

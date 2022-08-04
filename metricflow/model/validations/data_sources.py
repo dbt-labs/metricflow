@@ -1,22 +1,23 @@
 import logging
 from collections import defaultdict
-from typing import List, Optional, Dict, Sequence
+from typing import List, Dict
+from metricflow.instances import DataSourceElementReference, DataSourceReference
 
 from metricflow.model.objects.data_source import DataSource
-from metricflow.model.objects.elements.dimension import Dimension, DimensionType
-from metricflow.specs import MeasureReference
-from metricflow.time.time_constants import SUPPORTED_GRANULARITIES
+from metricflow.model.objects.elements.dimension import DimensionType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,
-    DimensionContext,
-    MeasureContext,
+    DataSourceElementContext,
+    DataSourceElementType,
+    FileContext,
     ModelValidationRule,
     ValidationIssueType,
     ValidationError,
-    ValidationFatal,
     validate_safely,
 )
+from metricflow.specs import MeasureReference
+from metricflow.time.time_constants import SUPPORTED_GRANULARITIES
 
 logger = logging.getLogger(__name__)
 
@@ -31,25 +32,24 @@ class DataSourceMeasuresUniqueRule(ModelValidationRule):
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
         issues: List[ValidationIssueType] = []
 
-        measure_names_to_data_sources: Dict[MeasureReference, List] = defaultdict(list)
+        measure_references_to_data_sources: Dict[MeasureReference, List] = defaultdict(list)
         for data_source in model.data_sources:
             for measure in data_source.measures:
-                if measure.name in measure_names_to_data_sources:
+                if measure.reference in measure_references_to_data_sources:
                     issues.append(
                         ValidationError(
-                            context=MeasureContext(
-                                file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
-                                line_number=data_source.metadata.file_slice.start_line_number
-                                if data_source.metadata
-                                else None,
-                                data_source_name=data_source.name,
-                                measure_name=measure.name.element_name,
+                            context=DataSourceElementContext(
+                                file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                                data_source_element=DataSourceElementReference(
+                                    data_source_name=data_source.name, element_name=measure.name
+                                ),
+                                element_type=DataSourceElementType.MEASURE,
                             ),
                             message=f"Found measure with name {measure.name} in multiple data sources with names "
-                            f"({measure_names_to_data_sources[measure.name]})",
+                            f"({measure_references_to_data_sources[measure.reference]})",
                         )
                     )
-                measure_names_to_data_sources[measure.name].append(data_source.name)
+                measure_references_to_data_sources[measure.reference].append(data_source.name)
 
         return issues
 
@@ -62,56 +62,31 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
         issues: List[ValidationIssueType] = []
 
-        primary_time_dimension_name = None
         for data_source in model.data_sources:
-            dimensions: Optional[Sequence[Dimension]] = data_source.dimensions
-            for dimension in dimensions or []:
-                if (
-                    dimension.type == DimensionType.TIME
-                    and dimension.type_params is not None
-                    and dimension.type_params.is_primary is True
-                ):
-                    primary_time_dimension_name = dimension.name
-
-        for data_source in model.data_sources:
-            issues.extend(
-                DataSourceTimeDimensionWarningsRule._validate_data_source(
-                    data_source=data_source, primary_time_dimension_name=primary_time_dimension_name
-                )
-            )
+            issues.extend(DataSourceTimeDimensionWarningsRule._validate_data_source(data_source=data_source))
         return issues
 
     @staticmethod
     @validate_safely(whats_being_done="checking validity of the data source's time dimensions")
-    def _validate_data_source(
-        data_source: DataSource, primary_time_dimension_name: Optional[str] = None
-    ) -> List[ValidationIssueType]:
-        primary_time_present = False
+    def _validate_data_source(data_source: DataSource) -> List[ValidationIssueType]:
         issues: List[ValidationIssueType] = []
 
+        primary_time_dimensions = []
+
         for dim in data_source.dimensions:
-            context = DimensionContext(
-                file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
-                line_number=data_source.metadata.file_slice.start_line_number if data_source.metadata else None,
-                data_source_name=data_source.name,
-                dimension_name=dim.name.element_name,
+            context = DataSourceElementContext(
+                file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                data_source_element=DataSourceElementReference(
+                    data_source_name=data_source.name, element_name=dim.name
+                ),
+                element_type=DataSourceElementType.DIMENSION,
             )
 
             if dim.type == DimensionType.TIME:
                 if dim.type_params is None:
                     continue
                 elif dim.type_params.is_primary:
-                    primary_time_present = True
-                    if primary_time_dimension_name and dim.name != primary_time_dimension_name:
-                        issues.append(
-                            ValidationFatal(
-                                context=context,
-                                message=f"In data source {data_source.name}, "
-                                f"found primary time dimension with name: {dim.name}, "
-                                f"another primary time dimension with name: {primary_time_dimension_name} "
-                                f"was already found in model.",
-                            )
-                        )
+                    primary_time_dimensions.append(dim)
                 elif dim.type_params.time_granularity:
                     if dim.type_params.time_granularity not in SUPPORTED_GRANULARITIES:
                         issues.append(
@@ -122,16 +97,29 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
                             )
                         )
 
-        if not primary_time_present and len(data_source.measures) > 0:
+        if len(primary_time_dimensions) == 0 and len(data_source.measures) > 0:
             issues.append(
                 ValidationError(
                     context=DataSourceContext(
-                        file_name=data_source.metadata.file_slice.filename if data_source.metadata else None,
-                        line_number=data_source.metadata.file_slice.start_line_number if data_source.metadata else None,
-                        data_source_name=data_source.name,
+                        file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                        data_source=DataSourceReference(data_source_name=data_source.name),
                     ),
                     message=f"No primary time dimension in data source with name ({data_source.name}). Please add one",
                 )
             )
+
+        if len(primary_time_dimensions) > 1:
+            for primary_time_dimension in primary_time_dimensions:
+                issues.append(
+                    ValidationError(
+                        context=DataSourceContext(
+                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                            data_source=DataSourceReference(data_source_name=data_source.name),
+                        ),
+                        message=f"In data source {data_source.name}, "
+                        f"Primary time dimension with name: {primary_time_dimension.name} "
+                        f"is one of many defined as primary.",
+                    )
+                )
 
         return issues
