@@ -330,3 +330,24 @@ metric:
   type_params:
     numerator: bookings
     denominator: booking_value
+---
+metric:
+  name: "total_account_balance_first_day"
+  description: "total_account_balance_first_day"
+  owners:
+    - bobby@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+      - total_account_balance_first_day
+---
+metric:
+  name: "current_account_balance_by_user"
+  description: "current_account_balance_by_user"
+  owners:
+    - bobby@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+      - current_account_balance_by_user
+---

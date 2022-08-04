@@ -245,6 +245,32 @@ def create_simple_model_tables(mf_test_session_state: MetricFlowTestSessionState
         ),
     )
 
+    accounts_data = [
+        ("u0004114", 2135, "2020-01-01"),
+        ("u0005432", 5234, "2020-01-03"),
+        ("u0003141", 24634, "2020-01-01"),
+        ("u0003154", 23452, "2020-01-01"),
+        ("u0004114", 1213, "2020-01-06"),
+        ("u1612112", 5123, "2020-01-02"),
+        ("u0004114", 523, "2020-01-07"),
+        ("u0004114", 7434, "2020-01-10"),
+        ("u0005432", 8456, "2020-01-02"),
+        ("u0003141", 12939, "2020-01-12"),
+        ("u0003452", 6939, "2020-01-02"),
+        ("u0003452", 35, "2020-01-12"),
+    ]
+
+    create_table(
+        sql_client=sql_client,
+        sql_table=SqlTable(schema_name=schema, table_name="fct_accounts"),
+        df=make_df(
+            sql_client=sql_client,
+            columns=["user_id", "account_balance", DEFAULT_DS],
+            time_columns={DEFAULT_DS},
+            data=accounts_data,
+        ),
+    )
+
     return True
 
 

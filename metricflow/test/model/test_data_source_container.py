@@ -47,11 +47,13 @@ def test_get_names(new_data_source_semantics: DataSourceSemantics) -> None:  # n
     assert sorted([d.element_name for d in new_data_source_semantics.get_dimension_references()]) == expected
 
     expected = [
+        "account_balance",
         "average_booking_value",
         "bookers",
         "booking_payments",
         "booking_value",
         "bookings",
+        "current_account_balance_by_user",
         "identity_verifications",
         "instant_bookings",
         "largest_listing",
@@ -59,6 +61,7 @@ def test_get_names(new_data_source_semantics: DataSourceSemantics) -> None:  # n
         "max_booking_value",
         "min_booking_value",
         "smallest_listing",
+        "total_account_balance_first_day",
         "txn_revenue",
         "views",
     ]
