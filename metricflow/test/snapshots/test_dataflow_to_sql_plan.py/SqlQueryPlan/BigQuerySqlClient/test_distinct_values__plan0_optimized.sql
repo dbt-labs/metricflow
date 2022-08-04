@@ -7,15 +7,15 @@
 --   ['listing__country_latest']
 -- Order By ['listing__country_latest'] Limit 100
 SELECT
-  listings_latest_src_10003.country AS listing__country_latest
+  listings_latest_src_10004.country AS listing__country_latest
 FROM (
   -- User Defined SQL Query
   SELECT * FROM ***************************.fct_bookings
-) bookings_source_src_10000
+) bookings_source_src_10001
 LEFT OUTER JOIN
-  ***************************.dim_listings_latest listings_latest_src_10003
+  ***************************.dim_listings_latest listings_latest_src_10004
 ON
-  bookings_source_src_10000.listing_id = listings_latest_src_10003.listing_id
+  bookings_source_src_10001.listing_id = listings_latest_src_10004.listing_id
 GROUP BY
   listing__country_latest
 ORDER BY listing__country_latest

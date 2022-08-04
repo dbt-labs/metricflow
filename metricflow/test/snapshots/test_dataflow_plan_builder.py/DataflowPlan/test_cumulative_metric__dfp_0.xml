@@ -17,7 +17,10 @@
                         <!--   Pass Only Elements:                      -->
                         <!--     ['txn_revenue', 'metric_time__month']  -->
                         <!-- node_id = pfe_0 -->
-                        <!-- include_spec = MeasureSpec(element_name='txn_revenue') -->
+                        <!-- include_spec =                      -->
+                        <!--   {'class': 'MeasureSpec',          -->
+                        <!--    'element_name': 'txn_revenue',   -->
+                        <!--    'non_additive_dimension': None}  -->
                         <!-- include_spec =                                 -->
                         <!--   {'class': 'TimeDimensionSpec',               -->
                         <!--    'element_name': 'metric_time',              -->
@@ -25,15 +28,19 @@
                         <!--    'time_granularity': TimeGranularity.MONTH}  -->
                         <MetricTimeDimensionTransformNode>
                             <!-- description = Metric Time Dimension 'ds' -->
-                            <!-- node_id = sma_10004 -->
+                            <!-- node_id = sma_10007 -->
                             <!-- aggregation_time_dimension = ds -->
-                            <ReadSqlSourceNode>
-                                <!-- description =                                                                   -->
-                                <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='revenue'))  -->
-                                <!-- node_id = rss_10014 -->
-                                <!-- data_set =                                                            -->
-                                <!--   DataSourceDataSet(DataSourceReference(data_source_name='revenue'))  -->
-                            </ReadSqlSourceNode>
+                            <FilterElementsNode>
+                                <!-- description = Pass Only Additive Measures -->
+                                <!-- node_id = pfe_10007 -->
+                                <ReadSqlSourceNode>
+                                    <!-- description =                                                                   -->
+                                    <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='revenue'))  -->
+                                    <!-- node_id = rss_10016 -->
+                                    <!-- data_set =                                                            -->
+                                    <!--   DataSourceDataSet(DataSourceReference(data_source_name='revenue'))  -->
+                                </ReadSqlSourceNode>
+                            </FilterElementsNode>
                         </MetricTimeDimensionTransformNode>
                     </FilterElementsNode>
                 </JoinOverTimeRangeNode>

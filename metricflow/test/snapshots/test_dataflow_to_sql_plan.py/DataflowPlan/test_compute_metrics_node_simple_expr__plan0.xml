@@ -25,7 +25,10 @@
                         <!--   Pass Only Elements:             -->
                         <!--     ['booking_value', 'listing']  -->
                         <!-- node_id = pfe_0 -->
-                        <!-- include_spec = MeasureSpec(element_name='booking_value') -->
+                        <!-- include_spec =                       -->
+                        <!--   {'class': 'MeasureSpec',           -->
+                        <!--    'element_name': 'booking_value',  -->
+                        <!--    'non_additive_dimension': None}   -->
                         <!-- include_spec =                         -->
                         <!--   {'class': 'LinklessIdentifierSpec',  -->
                         <!--    'element_name': 'listing',          -->
@@ -33,7 +36,7 @@
                         <ReadSqlSourceNode>
                             <!-- description =                                                                           -->
                             <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
-                            <!-- node_id = rss_10000 -->
+                            <!-- node_id = rss_10001 -->
                             <!-- data_set =                                                                    -->
                             <!--   DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
                         </ReadSqlSourceNode>
@@ -54,7 +57,7 @@
                         <ReadSqlSourceNode>
                             <!-- description =                                                                           -->
                             <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='listings_latest'))  -->
-                            <!-- node_id = rss_10003 -->
+                            <!-- node_id = rss_10004 -->
                             <!-- data_set =                                                                    -->
                             <!--   DataSourceDataSet(DataSourceReference(data_source_name='listings_latest'))  -->
                         </ReadSqlSourceNode>

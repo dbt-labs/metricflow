@@ -5,13 +5,14 @@ SELECT
   , SUM(listings) AS listings
 FROM (
   -- Read Elements From Data Source 'listings_latest'
+  -- Pass Only Additive Measures
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements:
   --   ['listings', 'listing__country_latest']
   SELECT
     country AS listing__country_latest
     , 1 AS listings
-  FROM ***************************.dim_listings_latest listings_latest_src_10003
-) subq_6
+  FROM ***************************.dim_listings_latest listings_latest_src_10004
+) subq_8
 GROUP BY
   listing__country_latest
