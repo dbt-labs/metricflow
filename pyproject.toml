@@ -8,7 +8,7 @@ readme = "README.md"
 homepage = "https://transform.co/metricflow"
 repository = "https://github.com/transform-data/metricflow-lite"
 packages = [
-  { include = "metricflow/**" }
+  { include = "metricflow" }
 ]
 
 [tool.poetry.dependencies]
