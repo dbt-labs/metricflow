@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "metricflow-lite"
-version = "0.110.1"
+version = "0.110.2.dev"
 description = "Lite version of MetricFlow. This version is missing dependencies for using connectors with data warehouses"
 authors = ["Transform <hello@transformdata.io>"]
 license = "AGPL-3.0-or-later"
