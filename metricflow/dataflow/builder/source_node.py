@@ -59,7 +59,7 @@ class SourceNodeBuilder:
         source_nodes: List[BaseOutput[DataSourceDataSet]] = []
         for data_set in data_sets:
             read_node = ReadSqlSourceNode[DataSourceDataSet](data_set)
-            agg_time_dim_to_measures_store = (
+            agg_time_dim_to_measures_grouper = (
                 self._semantic_model.data_source_semantics.get_aggregation_time_dimensions_with_measures(
                     data_set.data_source_reference
                 )
@@ -67,13 +67,13 @@ class SourceNodeBuilder:
             instance_set_with_no_measures = data_set.instance_set.transform(RemoveMeasures())
 
             # Dimension sources may not have any measures -> no aggregation time dimensions.
-            time_dimension_references = agg_time_dim_to_measures_store.time_dimension_references
+            time_dimension_references = agg_time_dim_to_measures_grouper.keys
             if len(time_dimension_references) == 0:
                 source_nodes.append(read_node)
             else:
                 # Splits the measures by distinct aggregate time dimension.
                 for time_dimension_reference in time_dimension_references:
-                    measures = agg_time_dim_to_measures_store.get(time_dimension_reference)
+                    measures = agg_time_dim_to_measures_grouper.get_values(time_dimension_reference)
                     grouped_measures_by_additiveness = group_measure_specs_by_additiveness(measures)
                     additive_measure_specs = grouped_measures_by_additiveness.additive_measures
 
