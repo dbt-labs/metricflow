@@ -22,6 +22,20 @@ class DimensionType(ExtendedEnum):
         return self in [DimensionType.TIME]
 
 
+class DimensionValidityInfo(HashableBaseModel):
+    """Parameters identifying a given dimension as an identifier for validity state
+
+    This construct is used for supporting SCD Type II tables, such as might be
+    created via dbt's snapshot feature, or generated via periodic loads from external
+    dimension data sources. In either of those cases, there is typically a time dimension
+    associated with the SCD data source that indicates the start and end times of a
+    validity window, where the dimension value is valid for any time within that range.
+    """
+
+    is_start: bool = False
+    is_end: bool = False
+
+
 class DimensionTypeParams(HashableBaseModel):
     """Dimension type params add additional context to some types (time) of dimensions"""
 
@@ -29,6 +43,7 @@ class DimensionTypeParams(HashableBaseModel):
     # For legacy support. This is not used.
     time_format: str = ISO8601_FMT
     time_granularity: TimeGranularity
+    validity_info: Optional[DimensionValidityInfo] = None
 
 
 class Dimension(HashableBaseModel, ModelWithMetadataParsing):
