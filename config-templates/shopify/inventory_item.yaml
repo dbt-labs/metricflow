@@ -30,8 +30,7 @@ data_source:
 ---
 metric:
   name: mtd_total_cost
-  owners:
-    - hesham@transformdata.io
+  owners:  # This will throw an error unless you add a list of owners or remove this entry.
   type: cumulative
   type_params:
     measures:
