@@ -12,8 +12,8 @@ from metricflow.model.objects.elements.dimension import DimensionType, Dimension
 from metricflow.model.objects.elements.identifier import IdentifierType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.object_utils import pformat_big_objects, flatten_nested_sequence
+from metricflow.references import MeasureReference
 from metricflow.specs import (
-    MeasureReference,
     LinklessIdentifierSpec,
     DEFAULT_TIME_GRANULARITY,
     LinkableSpecSet,

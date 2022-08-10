@@ -14,7 +14,7 @@ from metricflow.model.validations.validator_helpers import (
     validate_safely,
 )
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
-from metricflow.specs import DimensionReference
+from metricflow.references import DimensionReference
 from metricflow.time.time_granularity import TimeGranularity
 
 

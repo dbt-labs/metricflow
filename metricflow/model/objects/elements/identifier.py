@@ -4,7 +4,7 @@ from typing import Optional, List, Dict, Any
 
 from metricflow.model.objects.base import HashableBaseModel
 from metricflow.object_utils import ExtendedEnum
-from metricflow.specs import IdentifierReference, CompositeSubIdentifierReference
+from metricflow.references import IdentifierReference, CompositeSubIdentifierReference
 
 
 class IdentifierType(ExtendedEnum):

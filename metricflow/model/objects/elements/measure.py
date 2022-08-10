@@ -4,7 +4,7 @@ from typing import Optional, List
 from metricflow.model.objects.common import Metadata
 from metricflow.model.objects.base import ModelWithMetadataParsing, HashableBaseModel
 from metricflow.object_utils import ExtendedEnum, hash_strings
-from metricflow.specs import MeasureReference, TimeDimensionReference
+from metricflow.references import MeasureReference, TimeDimensionReference
 
 
 class AggregationType(ExtendedEnum):

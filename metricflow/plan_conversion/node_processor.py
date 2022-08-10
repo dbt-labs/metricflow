@@ -15,7 +15,8 @@ from metricflow.dataflow.dataflow_plan import (
 from metricflow.model.semantics.semantic_containers import DataSourceSemantics, MAX_JOIN_HOPS
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.spec_set_transforms import ToElementNameSet
-from metricflow.specs import IdentifierSpec, InstanceSpec, LinkableInstanceSpec, TimeDimensionReference
+from metricflow.references import TimeDimensionReference
+from metricflow.specs import IdentifierSpec, InstanceSpec, LinkableInstanceSpec
 
 SqlDataSetT = TypeVar("SqlDataSetT", bound=SqlDataSet)
 

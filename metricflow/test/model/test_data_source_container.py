@@ -6,7 +6,8 @@ from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantics.data_source_container import PydanticDataSourceContainer
 from metricflow.model.semantics.linkable_spec_resolver import LinkableElementProperties
 from metricflow.model.semantics.semantic_containers import DataSourceSemantics, MetricSemantics
-from metricflow.specs import MetricSpec, MeasureReference
+from metricflow.references import MeasureReference
+from metricflow.specs import MetricSpec
 
 logger = logging.getLogger(__name__)
 

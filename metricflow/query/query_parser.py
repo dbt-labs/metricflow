@@ -22,6 +22,7 @@ from metricflow.model.semantics.semantic_containers import DataSourceSemantics
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.object_utils import pformat_big_objects
 from metricflow.query.query_exceptions import InvalidQueryException
+from metricflow.references import DimensionReference, IdentifierReference, TimeDimensionReference
 from metricflow.specs import (
     MetricFlowQuerySpec,
     MetricSpec,
@@ -31,12 +32,9 @@ from metricflow.specs import (
     LinkableInstanceSpec,
     LinklessIdentifierSpec,
     OrderBySpec,
-    DimensionReference,
-    IdentifierReference,
     OutputColumnNameOverride,
     SpecWhereClauseConstraint,
     LinkableSpecSet,
-    TimeDimensionReference,
 )
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.time.time_granularity_solver import (

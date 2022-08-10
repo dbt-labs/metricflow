@@ -27,6 +27,7 @@ from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationR
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.references import TimeDimensionReference
 from metricflow.specs import (
     DimensionSpec,
     IdentifierSpec,
@@ -39,7 +40,6 @@ from metricflow.specs import (
     TimeDimensionSpec,
     SpecWhereClauseConstraint,
     LinkableSpecSet,
-    TimeDimensionReference,
 )
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
