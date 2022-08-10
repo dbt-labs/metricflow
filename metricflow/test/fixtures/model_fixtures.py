@@ -116,6 +116,7 @@ def template_mapping(mf_test_session_state: MetricFlowTestSessionState) -> Dict[
         "bookings_source_table": f"{schema}.fct_bookings",
         "views_source_table": f"{schema}.fct_views",
         "listings_latest_table": f"{schema}.dim_listings_latest",
+        "listings_table": f"{schema}.dim_listings",
         "listings_latest": f"{schema}.dim_listings_latest_table",
         "dim_listings_latest_table": f"{schema}.dim_listings_latest",
         "users_latest_table": f"{schema}.dim_users_latest",
@@ -235,6 +236,15 @@ def extended_date_semantic_model(mf_test_session_state: MetricFlowTestSessionSta
     model_build_result = parse_directory_of_yaml_files_to_model(
         os.path.join(os.path.dirname(__file__), "model_yamls/extended_date_model"),
         template_mapping=template_mapping,
+    )
+    return SemanticModel(model_build_result.model)
+
+
+@pytest.fixture(scope="session")
+def scd_semantic_model(template_mapping: Dict[str, str]) -> SemanticModel:
+    """Initialize semantic model for SCD tests"""
+    model_build_result = parse_directory_of_yaml_files_to_model(
+        os.path.join(os.path.dirname(__file__), "model_yamls/scd_model"), template_mapping=template_mapping
     )
     return SemanticModel(model_build_result.model)
 

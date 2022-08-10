@@ -129,19 +129,22 @@ def create_simple_model_tables(mf_test_session_state: MetricFlowTestSessionState
         ),
     )
 
+    # The dim_listings table is an SCD type II table in the style of a dbt snapshot with two columns setting the
+    # the range of time when this row was "active", with a NULL value for "active_to" meaning it's still current
     create_table(
         sql_client=sql_client,
         sql_table=SqlTable(schema_name=schema, table_name="dim_listings"),
         df=make_df(
             sql_client=sql_client,
-            columns=["listing_id", "country", "capacity", "is_lux", DEFAULT_DS],
-            time_columns={DEFAULT_DS},
+            columns=["listing_id", "country", "capacity", "is_lux", "user_id", "active_from", "active_to"],
+            time_columns={"active_from", "active_to"},
             data=[
-                ("l3141592", "us", 2, True, "2020-01-01"),
-                ("l2718281", cote_divoire, 4, True, "2020-01-01"),
-                ("l3141592", "us", 3, True, "2020-01-02"),
-                ("l2718281", cote_divoire, 4, False, "2020-01-02"),
-                ("l5948301", "us", 5, True, "2020-01-02"),
+                ("l3141592", "us", 2, True, "u0004114", "2020-01-01", "2020-01-02"),
+                ("l2718281", cote_divoire, 4, True, "u0005432", "2020-01-01", "2020-01-02"),
+                ("l3141592", "us", 3, True, "u0004114", "2020-01-02", None),
+                # This cote_divoire property changed hands to a person from Maryland who considers it not lux
+                ("l2718281", cote_divoire, 4, False, "u0003154", "2020-01-02", None),
+                ("l5948301", "us", 5, True, "u0004114", "2020-01-02", None),
             ],
         ),
     )
@@ -278,6 +281,16 @@ def create_simple_model_tables(mf_test_session_state: MetricFlowTestSessionState
     )
 
     return True
+
+
+@pytest.fixture(scope="session")
+def create_scd_model_tables(create_simple_model_tables: bool) -> bool:
+    """This fixture ensures the scd tables are created when necessary
+
+    The SCD model relies on the simple model tables, so we simply depend on that fixture and return it here.
+    If, at any point, we decide to diverge from the simple model we can update this fixture independently.
+    """
+    return create_simple_model_tables
 
 
 @pytest.fixture(scope="session")
