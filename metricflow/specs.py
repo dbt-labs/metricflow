@@ -12,14 +12,15 @@ from __future__ import annotations
 import itertools
 from abc import ABC, abstractmethod
 from collections import OrderedDict
-from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple, TypeVar, Generic
 
 from metricflow.column_assoc import ColumnAssociation
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.model.objects.base import FrozenBaseModel
+from metricflow.model.objects.elements.measure import NonAdditiveDimensionParameters
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
+from metricflow.references import DimensionReference, MeasureReference, TimeDimensionReference
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 
 
@@ -265,58 +266,6 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
             element_name=self.element_name,
             time_granularity=self.time_granularity,
         ).qualified_name
-
-
-@dataclass(frozen=True)
-class ElementReference:
-    """Used when we need to refer to a dimension, measure, identifier, but other attributes are unknown."""
-
-    element_name: str
-
-
-@dataclass(frozen=True)
-class LinkableElementReference(ElementReference):
-    """Used when we need to refer to a dimension or identifier, but other attributes are unknown."""
-
-    pass
-
-
-@dataclass(frozen=True)
-class MeasureReference(ElementReference):
-    """Used when we need to refer to a measure (separate from LinkableElementReference because measures aren't linkable"""
-
-    pass
-
-
-@dataclass(frozen=True)
-class DimensionReference(LinkableElementReference):  # noqa: D
-    pass
-
-    @property
-    def time_dimension_reference(self) -> TimeDimensionReference:  # noqa: D
-        return TimeDimensionReference(element_name=self.element_name)
-
-
-@dataclass(frozen=True)
-class IdentifierReference(LinkableElementReference):  # noqa: D
-    pass
-
-
-@dataclass(frozen=True)
-class CompositeSubIdentifierReference(ElementReference):  # noqa: D
-    pass
-
-
-@dataclass(frozen=True)
-class TimeDimensionReference(DimensionReference):  # noqa: D
-    pass
-
-    def dimension_reference(self) -> DimensionReference:  # noqa: D
-        return DimensionReference(element_name=self.element_name)
-
-
-# How to avoid circular import here
-from metricflow.model.objects.elements.measure import NonAdditiveDimensionParameters  # noqa: E402
 
 
 class MeasureSpec(InstanceSpec):  # noqa: D

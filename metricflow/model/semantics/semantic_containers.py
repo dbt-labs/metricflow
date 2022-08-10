@@ -24,15 +24,17 @@ from metricflow.model.semantics.linkable_spec_resolver import (
     ValidLinkableSpecResolver,
     LinkableElementProperties,
 )
-from metricflow.specs import (
-    LinkableInstanceSpec,
-    LinkableElementReference,
-    MeasureSpec,
-    MeasureReference,
+from metricflow.references import (
     DimensionReference,
     IdentifierReference,
-    MetricSpec,
+    LinkableElementReference,
+    MeasureReference,
     TimeDimensionReference,
+)
+from metricflow.specs import (
+    LinkableInstanceSpec,
+    MeasureSpec,
+    MetricSpec,
 )
 
 logger = logging.getLogger(__name__)

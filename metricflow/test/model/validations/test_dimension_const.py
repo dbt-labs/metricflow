@@ -7,7 +7,7 @@ from metricflow.model.objects.elements.measure import Measure, AggregationType
 from metricflow.model.objects.metric import MetricType, MetricTypeParams, Metric
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import ModelValidationException
-from metricflow.specs import DimensionReference, MeasureReference, TimeDimensionReference
+from metricflow.references import DimensionReference, MeasureReference, TimeDimensionReference
 from metricflow.test.model.validations.helpers import data_source_with_guaranteed_meta, metric_with_guaranteed_meta
 from metricflow.time.time_granularity import TimeGranularity
 

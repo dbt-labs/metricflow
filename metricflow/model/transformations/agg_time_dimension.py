@@ -5,7 +5,7 @@ from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.elements.dimension import DimensionType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.transformations.transform_rule import ModelTransformRule
-from metricflow.specs import TimeDimensionReference
+from metricflow.references import TimeDimensionReference
 
 logger = logging.getLogger(__name__)
 

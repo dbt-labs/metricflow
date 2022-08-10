@@ -6,7 +6,8 @@ from metricflow.instances import (
     InstanceSet,
 )
 from metricflow.model.validations.unique_valid_name import MetricFlowReservedKeywords
-from metricflow.specs import TimeDimensionReference, TimeDimensionSpec
+from metricflow.references import TimeDimensionReference
+from metricflow.specs import TimeDimensionSpec
 from metricflow.time.time_granularity import TimeGranularity
 
 

@@ -13,13 +13,12 @@ from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.instances import MetricModelReference
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.query.query_exceptions import InvalidQueryException
+from metricflow.references import TimeDimensionReference, MeasureReference
 from metricflow.specs import (
     MetricSpec,
     TimeDimensionSpec,
     LinklessIdentifierSpec,
     DEFAULT_TIME_GRANULARITY,
-    TimeDimensionReference,
-    MeasureReference,
 )
 from metricflow.model.objects.metric import MetricType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel

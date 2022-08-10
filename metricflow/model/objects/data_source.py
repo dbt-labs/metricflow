@@ -9,7 +9,7 @@ from metricflow.model.objects.elements.identifier import Identifier
 from metricflow.model.objects.elements.measure import Measure
 from metricflow.model.objects.base import ModelWithMetadataParsing, HashableBaseModel
 from metricflow.object_utils import ExtendedEnum
-from metricflow.specs import LinkableElementReference, MeasureReference
+from metricflow.references import LinkableElementReference, MeasureReference
 
 
 class DataSourceOrigin(ExtendedEnum):

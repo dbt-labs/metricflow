@@ -16,7 +16,7 @@ from metricflow.model.validations.validator_helpers import (
     ValidationError,
     validate_safely,
 )
-from metricflow.specs import MeasureReference
+from metricflow.references import MeasureReference
 from metricflow.time.time_constants import SUPPORTED_GRANULARITIES
 
 logger = logging.getLogger(__name__)
