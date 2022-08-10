@@ -26,7 +26,7 @@ class RenderedColumnConfig(TypedDict):  # noqa: D
 
 
 class ConfigFileRenderer(InferenceRenderer):
-    """Writes inference results to a set config files"""
+    """Writes inference results to a set of config files"""
 
     UNKNOWN_FIELD_VALUE = "FIXME"
 

@@ -16,7 +16,7 @@ class InferenceSignalConfidence(Enum):
     We chose discrete confidence values instead of a continuous range (e.g a float between 0 and 1)
     to standardize confidence outputs between heuristic rules. We want to avoid different rules
     assuming different values for, say, "medium" or "high" confidence, since this could skew
-    results in favor/against certain rules.
+    results in favor of/against certain rules.
     """
 
     VERY_HIGH = 3
@@ -28,7 +28,7 @@ class InferenceSignalConfidence(Enum):
 class InferenceSignalNode(ABC):
     """A node in the inference signal type hierarchy.
 
-    This class can be used to assembly a type hierarchy tree. It can be used by heuristics
+    This class can be used to assemble a type hierarchy tree. It can be used by heuristics
     to check whether signals produced by rules are conflicting or complementary, relying
     on the property that sibling nodes are mutually exclusive in the hierarchy.
     """

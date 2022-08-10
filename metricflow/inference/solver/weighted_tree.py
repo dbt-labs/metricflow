@@ -22,7 +22,7 @@ class WeightedTypeTreeInferenceSolver(InferenceSolver):
     def default_weighter_function(confidence: InferenceSignalConfidence) -> int:
         """The default weighter function.
 
-        It assigns weights 1, 2, 3 and 8 for LOW, MEDIUM, HIGH and VERY_HIGH confidences, respectively. It then sums
+        It assigns weights 1, 2, 4 and 8 for LOW, MEDIUM, HIGH and VERY_HIGH confidences, respectively. It then sums
         the weights of all provided confidence scores.
         """
         confidence_weight_map = {

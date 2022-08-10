@@ -123,7 +123,7 @@ class MutuallyExclusiveOption(click.Option):
         if mutually_exclusive_opts_present and self.name in opts:
             exclude_str = ",".join(f"'--{opt}'" for opt in self.mutually_exclusive)
             raise click.BadOptionUsage(
-                self.name, f"cannot use option '--{self.name}' because is mutually exclusive with {exclude_str}", ctx
+                self.name, f"cannot use option '--{self.name}' because it is mutually exclusive with {exclude_str}", ctx
             )
 
         return super(MutuallyExclusiveOption, self).handle_parse_result(ctx, opts, args)

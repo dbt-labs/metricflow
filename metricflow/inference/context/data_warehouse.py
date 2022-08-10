@@ -87,7 +87,7 @@ def _default_table_progress(table: SqlTable, index: int, total: int) -> Iterator
 class DataWarehouseInferenceContextProvider(InferenceContextProvider[DataWarehouseInferenceContext], ABC):
     """Provides inference context from a data warehouse by querying data from its tables."""
 
-    def __init__(self, client: SqlClient, tables: List[SqlTable], max_sample_size: int = 1000) -> None:
+    def __init__(self, client: SqlClient, tables: List[SqlTable], max_sample_size: int = 10000) -> None:
         """Initialize the class.
 
         client: the underlying SQL engine client that will be used for querying table data.
