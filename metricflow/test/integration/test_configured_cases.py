@@ -180,6 +180,8 @@ def test_case(
         system_schema=mf_test_session_state.mf_system_schema,
     )
 
+    check_query_helpers = CheckQueryHelpers(sql_client)
+
     query_result = engine.query(
         MetricFlowQueryRequest.create_with_random_request_id(
             metric_names=case.metrics,
@@ -187,14 +189,23 @@ def test_case(
             limit=case.limit,
             time_constraint_start=parser.parse(case.time_constraint[0]) if case.time_constraint else None,
             time_constraint_end=parser.parse(case.time_constraint[1]) if case.time_constraint else None,
-            where_constraint=case.where_constraint,
+            where_constraint=jinja2.Template(case.where_constraint, undefined=jinja2.StrictUndefined,).render(
+                source_schema=mf_test_session_state.mf_source_schema,
+                render_time_constraint=check_query_helpers.render_time_constraint,
+                TimeGranularity=TimeGranularity,
+                render_date_sub=check_query_helpers.render_date_sub,
+                render_date_trunc=check_query_helpers.render_date_trunc,
+                mf_time_spine_source=time_spine_source.spine_table.sql,
+                double_data_type_name=check_query_helpers.double_data_type_name,
+            )
+            if case.where_constraint
+            else None,
             order_by_names=case.order_bys,
         )
     )
 
     actual = query_result.result_df
 
-    check_query_helpers = CheckQueryHelpers(sql_client)
     expected = sql_client.query(
         jinja2.Template(case.check_query, undefined=jinja2.StrictUndefined,).render(
             source_schema=mf_test_session_state.mf_source_schema,

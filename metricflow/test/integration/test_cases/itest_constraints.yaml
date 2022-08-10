@@ -124,3 +124,18 @@ integration_test:
     WHERE {{ render_time_constraint("created_at", "2020-01-01", "2021-01-01") }}
     GROUP BY  created_at
 
+---
+integration_test:
+  name: test_metric_time_in_where
+  description: Tests having metric_time in the where clause constraint.
+  model: SIMPLE_MODEL
+  metrics: ["bookings"]
+  group_bys: ["metric_time"]
+  where_constraint: "{{ render_time_constraint('metric_time', '2020-01-01', '2021-01-02') }}"
+  check_query: |
+    SELECT
+      SUM(1) AS bookings
+      , ds AS metric_time
+    FROM  {{ source_schema }}.fct_bookings
+    WHERE {{ render_time_constraint("ds", "2020-01-01", "2021-01-02") }}
+    GROUP BY ds
