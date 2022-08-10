@@ -131,7 +131,9 @@ class MetricFlowQueryParser:
         }
 
         for spec_name in linkable_spec_names:
-            if spec_name.element_name in dimension_references:
+            if spec_name.element_name == DataSet.metric_time_dimension_name():
+                where_constraint_dimensions.append(TimeDimensionSpec.from_name(spec_name.qualified_name))
+            elif spec_name.element_name in dimension_references:
                 dimension = data_source_semantics.get_dimension(dimension_references[spec_name.element_name])
                 if dimension.type == DimensionType.CATEGORICAL:
                     where_constraint_dimensions.append(DimensionSpec.from_name(spec_name.qualified_name))
