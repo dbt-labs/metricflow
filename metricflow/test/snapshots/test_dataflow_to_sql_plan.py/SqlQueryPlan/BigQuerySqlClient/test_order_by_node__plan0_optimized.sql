@@ -16,7 +16,7 @@ FROM (
   FROM (
     -- User Defined SQL Query
     SELECT * FROM ***************************.fct_bookings
-  ) bookings_source_src_10000
+  ) bookings_source_src_10001
 ) subq_5
 GROUP BY
   ds

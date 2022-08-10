@@ -18,7 +18,10 @@
                         <!--   Pass Only Elements:            -->
                         <!--     ['bookings', 'metric_time']  -->
                         <!-- node_id = pfe_0 -->
-                        <!-- include_spec = MeasureSpec(element_name='bookings') -->
+                        <!-- include_spec =                      -->
+                        <!--   {'class': 'MeasureSpec',          -->
+                        <!--    'element_name': 'bookings',      -->
+                        <!--    'non_additive_dimension': None}  -->
                         <!-- include_spec =                               -->
                         <!--   {'class': 'TimeDimensionSpec',             -->
                         <!--    'element_name': 'metric_time',            -->
@@ -26,15 +29,19 @@
                         <!--    'time_granularity': TimeGranularity.DAY}  -->
                         <MetricTimeDimensionTransformNode>
                             <!-- description = Metric Time Dimension 'ds' -->
-                            <!-- node_id = sma_10000 -->
+                            <!-- node_id = sma_10003 -->
                             <!-- aggregation_time_dimension = ds -->
-                            <ReadSqlSourceNode>
-                                <!-- description =                                                                           -->
-                                <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
-                                <!-- node_id = rss_10009 -->
-                                <!-- data_set =                                                                    -->
-                                <!--   DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
-                            </ReadSqlSourceNode>
+                            <FilterElementsNode>
+                                <!-- description = Pass Only Additive Measures -->
+                                <!-- node_id = pfe_10003 -->
+                                <ReadSqlSourceNode>
+                                    <!-- description =                                                                           -->
+                                    <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                                    <!-- node_id = rss_10011 -->
+                                    <!-- data_set =                                                                    -->
+                                    <!--   DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                                </ReadSqlSourceNode>
+                            </FilterElementsNode>
                         </MetricTimeDimensionTransformNode>
                     </FilterElementsNode>
                 </AggregateMeasuresNode>

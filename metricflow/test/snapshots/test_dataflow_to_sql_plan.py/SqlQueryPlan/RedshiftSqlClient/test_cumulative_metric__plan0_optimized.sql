@@ -1,4 +1,5 @@
 -- Read Elements From Data Source 'revenue'
+-- Pass Only Additive Measures
 -- Metric Time Dimension 'ds'
 -- Pass Only Elements:
 --   ['txn_revenue', 'ds__month']
@@ -10,6 +11,6 @@ SELECT
 FROM (
   -- User Defined SQL Query
   SELECT * FROM ***************************.fct_revenue
-) revenue_src_10005
+) revenue_src_10006
 GROUP BY
   DATE_TRUNC('month', created_at)

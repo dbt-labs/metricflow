@@ -20,8 +20,14 @@
                 <!--    'element_name': 'metric_time',            -->
                 <!--    'identifier_links': (),                   -->
                 <!--    'time_granularity': TimeGranularity.DAY}  -->
-                <!-- include_spec = MeasureSpec(element_name='bookings') -->
-                <!-- include_spec = MeasureSpec(element_name='views') -->
+                <!-- include_spec =                      -->
+                <!--   {'class': 'MeasureSpec',          -->
+                <!--    'element_name': 'bookings',      -->
+                <!--    'non_additive_dimension': None}  -->
+                <!-- include_spec =                      -->
+                <!--   {'class': 'MeasureSpec',          -->
+                <!--    'element_name': 'views',         -->
+                <!--    'non_additive_dimension': None}  -->
                 <JoinAggregatedMeasuresByGroupByColumnsNode>
                     <!-- description = Join Aggregated Measures with Standard Outputs -->
                     <!-- node_id = jamgc_0 -->
@@ -34,7 +40,10 @@
                             <!--   Pass Only Elements:                                       -->
                             <!--     ['bookings', 'listing__country_latest', 'metric_time']  -->
                             <!-- node_id = pfe_2 -->
-                            <!-- include_spec = MeasureSpec(element_name='bookings') -->
+                            <!-- include_spec =                      -->
+                            <!--   {'class': 'MeasureSpec',          -->
+                            <!--    'element_name': 'bookings',      -->
+                            <!--    'non_additive_dimension': None}  -->
                             <!-- include_spec =                                                                  -->
                             <!--   {'class': 'DimensionSpec',                                                    -->
                             <!--    'element_name': 'country_latest',                                            -->
@@ -60,7 +69,10 @@
                                     <!--   Pass Only Elements:                       -->
                                     <!--     ['bookings', 'metric_time', 'listing']  -->
                                     <!-- node_id = pfe_0 -->
-                                    <!-- include_spec = MeasureSpec(element_name='bookings') -->
+                                    <!-- include_spec =                      -->
+                                    <!--   {'class': 'MeasureSpec',          -->
+                                    <!--    'element_name': 'bookings',      -->
+                                    <!--    'non_additive_dimension': None}  -->
                                     <!-- include_spec =                               -->
                                     <!--   {'class': 'TimeDimensionSpec',             -->
                                     <!--    'element_name': 'metric_time',            -->
@@ -72,15 +84,19 @@
                                     <!--    'identifier_links': ()}             -->
                                     <MetricTimeDimensionTransformNode>
                                         <!-- description = Metric Time Dimension 'ds' -->
-                                        <!-- node_id = sma_10000 -->
+                                        <!-- node_id = sma_10003 -->
                                         <!-- aggregation_time_dimension = ds -->
-                                        <ReadSqlSourceNode>
-                                            <!-- description =                                                                           -->
-                                            <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
-                                            <!-- node_id = rss_10009 -->
-                                            <!-- data_set =                                                                    -->
-                                            <!--   DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
-                                        </ReadSqlSourceNode>
+                                        <FilterElementsNode>
+                                            <!-- description = Pass Only Additive Measures -->
+                                            <!-- node_id = pfe_10003 -->
+                                            <ReadSqlSourceNode>
+                                                <!-- description =                                                                           -->
+                                                <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                                                <!-- node_id = rss_10011 -->
+                                                <!-- data_set =                                                                    -->
+                                                <!--   DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                                            </ReadSqlSourceNode>
+                                        </FilterElementsNode>
                                     </MetricTimeDimensionTransformNode>
                                 </FilterElementsNode>
                                 <FilterElementsNode>
@@ -98,15 +114,19 @@
                                     <!--    'identifier_links': ()}            -->
                                     <MetricTimeDimensionTransformNode>
                                         <!-- description = Metric Time Dimension 'ds' -->
-                                        <!-- node_id = sma_10003 -->
+                                        <!-- node_id = sma_10006 -->
                                         <!-- aggregation_time_dimension = ds -->
-                                        <ReadSqlSourceNode>
-                                            <!-- description =                                                                           -->
-                                            <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='listings_latest'))  -->
-                                            <!-- node_id = rss_10012 -->
-                                            <!-- data_set =                                                                    -->
-                                            <!--   DataSourceDataSet(DataSourceReference(data_source_name='listings_latest'))  -->
-                                        </ReadSqlSourceNode>
+                                        <FilterElementsNode>
+                                            <!-- description = Pass Only Additive Measures -->
+                                            <!-- node_id = pfe_10006 -->
+                                            <ReadSqlSourceNode>
+                                                <!-- description =                                                                           -->
+                                                <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='listings_latest'))  -->
+                                                <!-- node_id = rss_10014 -->
+                                                <!-- data_set =                                                                    -->
+                                                <!--   DataSourceDataSet(DataSourceReference(data_source_name='listings_latest'))  -->
+                                            </ReadSqlSourceNode>
+                                        </FilterElementsNode>
                                     </MetricTimeDimensionTransformNode>
                                 </FilterElementsNode>
                             </JoinToBaseOutputNode>
@@ -120,7 +140,10 @@
                             <!--   Pass Only Elements:                                    -->
                             <!--     ['views', 'listing__country_latest', 'metric_time']  -->
                             <!-- node_id = pfe_5 -->
-                            <!-- include_spec = MeasureSpec(element_name='views') -->
+                            <!-- include_spec =                      -->
+                            <!--   {'class': 'MeasureSpec',          -->
+                            <!--    'element_name': 'views',         -->
+                            <!--    'non_additive_dimension': None}  -->
                             <!-- include_spec =                                                                  -->
                             <!--   {'class': 'DimensionSpec',                                                    -->
                             <!--    'element_name': 'country_latest',                                            -->
@@ -146,7 +169,10 @@
                                     <!--   Pass Only Elements:                    -->
                                     <!--     ['views', 'metric_time', 'listing']  -->
                                     <!-- node_id = pfe_3 -->
-                                    <!-- include_spec = MeasureSpec(element_name='views') -->
+                                    <!-- include_spec =                      -->
+                                    <!--   {'class': 'MeasureSpec',          -->
+                                    <!--    'element_name': 'views',         -->
+                                    <!--    'non_additive_dimension': None}  -->
                                     <!-- include_spec =                               -->
                                     <!--   {'class': 'TimeDimensionSpec',             -->
                                     <!--    'element_name': 'metric_time',            -->
@@ -158,15 +184,19 @@
                                     <!--    'identifier_links': ()}             -->
                                     <MetricTimeDimensionTransformNode>
                                         <!-- description = Metric Time Dimension 'ds' -->
-                                        <!-- node_id = sma_10005 -->
+                                        <!-- node_id = sma_10008 -->
                                         <!-- aggregation_time_dimension = ds -->
-                                        <ReadSqlSourceNode>
-                                            <!-- description =                                                                        -->
-                                            <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='views_source'))  -->
-                                            <!-- node_id = rss_10017 -->
-                                            <!-- data_set =                                                                 -->
-                                            <!--   DataSourceDataSet(DataSourceReference(data_source_name='views_source'))  -->
-                                        </ReadSqlSourceNode>
+                                        <FilterElementsNode>
+                                            <!-- description = Pass Only Additive Measures -->
+                                            <!-- node_id = pfe_10008 -->
+                                            <ReadSqlSourceNode>
+                                                <!-- description =                                                                        -->
+                                                <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='views_source'))  -->
+                                                <!-- node_id = rss_10019 -->
+                                                <!-- data_set =                                                                 -->
+                                                <!--   DataSourceDataSet(DataSourceReference(data_source_name='views_source'))  -->
+                                            </ReadSqlSourceNode>
+                                        </FilterElementsNode>
                                     </MetricTimeDimensionTransformNode>
                                 </FilterElementsNode>
                                 <FilterElementsNode>
@@ -184,15 +214,19 @@
                                     <!--    'identifier_links': ()}            -->
                                     <MetricTimeDimensionTransformNode>
                                         <!-- description = Metric Time Dimension 'ds' -->
-                                        <!-- node_id = sma_10003 -->
+                                        <!-- node_id = sma_10006 -->
                                         <!-- aggregation_time_dimension = ds -->
-                                        <ReadSqlSourceNode>
-                                            <!-- description =                                                                           -->
-                                            <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='listings_latest'))  -->
-                                            <!-- node_id = rss_10012 -->
-                                            <!-- data_set =                                                                    -->
-                                            <!--   DataSourceDataSet(DataSourceReference(data_source_name='listings_latest'))  -->
-                                        </ReadSqlSourceNode>
+                                        <FilterElementsNode>
+                                            <!-- description = Pass Only Additive Measures -->
+                                            <!-- node_id = pfe_10006 -->
+                                            <ReadSqlSourceNode>
+                                                <!-- description =                                                                           -->
+                                                <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='listings_latest'))  -->
+                                                <!-- node_id = rss_10014 -->
+                                                <!-- data_set =                                                                    -->
+                                                <!--   DataSourceDataSet(DataSourceReference(data_source_name='listings_latest'))  -->
+                                            </ReadSqlSourceNode>
+                                        </FilterElementsNode>
                                     </MetricTimeDimensionTransformNode>
                                 </FilterElementsNode>
                             </JoinToBaseOutputNode>

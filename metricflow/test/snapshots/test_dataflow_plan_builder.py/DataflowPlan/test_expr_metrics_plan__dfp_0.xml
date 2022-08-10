@@ -14,7 +14,10 @@
                     <!--   Pass Only Elements:                                            -->
                     <!--     ['booking_value', 'listing__country_latest', 'metric_time']  -->
                     <!-- node_id = pfe_2 -->
-                    <!-- include_spec = MeasureSpec(element_name='booking_value') -->
+                    <!-- include_spec =                       -->
+                    <!--   {'class': 'MeasureSpec',           -->
+                    <!--    'element_name': 'booking_value',  -->
+                    <!--    'non_additive_dimension': None}   -->
                     <!-- include_spec =                                                                  -->
                     <!--   {'class': 'DimensionSpec',                                                    -->
                     <!--    'element_name': 'country_latest',                                            -->
@@ -40,7 +43,10 @@
                             <!--   Pass Only Elements:                            -->
                             <!--     ['booking_value', 'metric_time', 'listing']  -->
                             <!-- node_id = pfe_0 -->
-                            <!-- include_spec = MeasureSpec(element_name='booking_value') -->
+                            <!-- include_spec =                       -->
+                            <!--   {'class': 'MeasureSpec',           -->
+                            <!--    'element_name': 'booking_value',  -->
+                            <!--    'non_additive_dimension': None}   -->
                             <!-- include_spec =                               -->
                             <!--   {'class': 'TimeDimensionSpec',             -->
                             <!--    'element_name': 'metric_time',            -->
@@ -52,15 +58,19 @@
                             <!--    'identifier_links': ()}             -->
                             <MetricTimeDimensionTransformNode>
                                 <!-- description = Metric Time Dimension 'ds' -->
-                                <!-- node_id = sma_10000 -->
+                                <!-- node_id = sma_10003 -->
                                 <!-- aggregation_time_dimension = ds -->
-                                <ReadSqlSourceNode>
-                                    <!-- description =                                                                           -->
-                                    <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
-                                    <!-- node_id = rss_10009 -->
-                                    <!-- data_set =                                                                    -->
-                                    <!--   DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
-                                </ReadSqlSourceNode>
+                                <FilterElementsNode>
+                                    <!-- description = Pass Only Additive Measures -->
+                                    <!-- node_id = pfe_10003 -->
+                                    <ReadSqlSourceNode>
+                                        <!-- description =                                                                           -->
+                                        <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                                        <!-- node_id = rss_10011 -->
+                                        <!-- data_set =                                                                    -->
+                                        <!--   DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                                    </ReadSqlSourceNode>
+                                </FilterElementsNode>
                             </MetricTimeDimensionTransformNode>
                         </FilterElementsNode>
                         <FilterElementsNode>
@@ -78,15 +88,19 @@
                             <!--    'identifier_links': ()}            -->
                             <MetricTimeDimensionTransformNode>
                                 <!-- description = Metric Time Dimension 'ds' -->
-                                <!-- node_id = sma_10003 -->
+                                <!-- node_id = sma_10006 -->
                                 <!-- aggregation_time_dimension = ds -->
-                                <ReadSqlSourceNode>
-                                    <!-- description =                                                                           -->
-                                    <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='listings_latest'))  -->
-                                    <!-- node_id = rss_10012 -->
-                                    <!-- data_set =                                                                    -->
-                                    <!--   DataSourceDataSet(DataSourceReference(data_source_name='listings_latest'))  -->
-                                </ReadSqlSourceNode>
+                                <FilterElementsNode>
+                                    <!-- description = Pass Only Additive Measures -->
+                                    <!-- node_id = pfe_10006 -->
+                                    <ReadSqlSourceNode>
+                                        <!-- description =                                                                           -->
+                                        <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='listings_latest'))  -->
+                                        <!-- node_id = rss_10014 -->
+                                        <!-- data_set =                                                                    -->
+                                        <!--   DataSourceDataSet(DataSourceReference(data_source_name='listings_latest'))  -->
+                                    </ReadSqlSourceNode>
+                                </FilterElementsNode>
                             </MetricTimeDimensionTransformNode>
                         </FilterElementsNode>
                     </JoinToBaseOutputNode>

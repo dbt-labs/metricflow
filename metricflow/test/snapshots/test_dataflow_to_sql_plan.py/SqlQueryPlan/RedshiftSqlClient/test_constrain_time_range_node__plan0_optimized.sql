@@ -10,5 +10,5 @@ SELECT
 FROM (
   -- User Defined SQL Query
   SELECT * FROM ***************************.fct_bookings
-) bookings_source_src_10000
+) bookings_source_src_10001
 WHERE ds BETWEEN CAST('2020-01-01' AS TIMESTAMP) AND CAST('2020-01-02' AS TIMESTAMP)

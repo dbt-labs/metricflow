@@ -26,6 +26,7 @@ from metricflow.dataflow.dataflow_plan import (
     ConstrainTimeRangeNode,
     WriteToResultTableNode,
     JoinOverTimeRangeNode,
+    SemiAdditiveJoinNode,
     MetricTimeDimensionTransformNode,
 )
 from metricflow.dataset.dataset import DataSet
@@ -88,6 +89,7 @@ from metricflow.sql.sql_exprs import (
     SqlDateTruncExpression,
     SqlStringLiteralExpression,
     SqlBetweenExpression,
+    SqlFunctionExpression,
 )
 from metricflow.sql.sql_plan import (
     SqlQueryPlan,
@@ -118,10 +120,11 @@ class ColumnEqualityDescription:
 
 
 def make_equijoin_description(
-    right_data_set: SqlDataSet,
+    right_source_node: SqlSelectStatementNode,
     left_source_alias: str,
     right_source_alias: str,
     column_equality_descriptions: Sequence[ColumnEqualityDescription],
+    join_type: SqlJoinType,
 ) -> SqlJoinDescription:
     """Make a join description where the condition is an equals between two columns in the left and right sources.
 
@@ -155,10 +158,10 @@ def make_equijoin_description(
         on_condition = SqlLogicalExpression(operator=SqlLogicalOperator.AND, args=tuple(and_conditions))
 
     return SqlJoinDescription(
-        right_source=right_data_set.sql_select_node,
+        right_source=right_source_node,
         right_source_alias=right_source_alias,
         on_condition=on_condition,
-        join_type=SqlJoinType.LEFT_OUTER,
+        join_type=join_type,
     )
 
 
@@ -685,10 +688,11 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
             sql_join_descs.append(
                 make_equijoin_description(
-                    right_data_set=right_data_set,
+                    right_source_node=right_data_set.sql_select_node,
                     left_source_alias=from_data_set_alias,
                     right_source_alias=right_data_set_alias,
                     column_equality_descriptions=column_equality_descriptions,
+                    join_type=SqlJoinType.LEFT_OUTER,
                 )
             )
 
@@ -1380,6 +1384,108 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 from_source=input_data_set.sql_select_node,
                 from_source_alias=from_data_set_alias,
                 joins_descs=(),
+                group_bys=(),
+                where=None,
+                order_bys=(),
+            ),
+        )
+
+    def visit_semi_additive_join_node(self, node: SemiAdditiveJoinNode) -> SqlDataSet:
+        """Implements the behaviour of SemiAdditiveJoinNode
+
+        This node will get the build a data set row filtered by the aggregate function on the
+        specified dimension that is non-additive. Then that dataset would be joined with the input data
+        on that dimension along with grouping by identifiers that are also passed in.
+        """
+        input_data_set: SqlDataSet = node.parent_node.accept(self)
+
+        from_data_set_alias = self._next_unique_table_alias()
+
+        # Get the output_instance_set of the parent_node
+        output_instance_set = input_data_set.instance_set
+        output_instance_set = output_instance_set.transform(ChangeAssociatedColumns(self._column_association_resolver))
+
+        # Build the JoinDescriptions to handle the row base filtering on the output_data_set
+        join_data_set_alias = self._next_unique_table_alias()
+
+        column_equality_descriptions: List[ColumnEqualityDescription] = []
+
+        # Build Time Dimension SqlSelectColumn
+        time_dimension_column_name = self.column_association_resolver.resolve_time_dimension_spec(
+            node.time_dimension_spec
+        ).column_name
+        time_dimension_select_column = SqlSelectColumn(
+            expr=SqlFunctionExpression.from_aggregation_type(
+                node.agg_by_function,
+                SqlColumnReferenceExpression(
+                    SqlColumnReference(
+                        table_alias=join_data_set_alias,
+                        column_name=time_dimension_column_name,
+                    ),
+                ),
+            ),
+            column_alias=time_dimension_column_name,
+        )
+        column_equality_descriptions.append(
+            ColumnEqualityDescription(
+                left_column_alias=time_dimension_column_name,
+                right_column_alias=time_dimension_column_name,
+            )
+        )
+
+        # Build optional window grouping SqlSelectColumn
+        identifier_select_columns: List[SqlSelectColumn] = []
+        for identifier_spec in node.identifier_specs:
+            identifier_column_associations = self.column_association_resolver.resolve_identifier_spec(identifier_spec)
+            assert len(identifier_column_associations) == 1, "Composite identifiers not supported"
+            identifier_column_name = identifier_column_associations[0].column_name
+            identifier_select_columns.append(
+                SqlSelectColumn(
+                    expr=SqlColumnReferenceExpression(
+                        SqlColumnReference(
+                            table_alias=join_data_set_alias,
+                            column_name=identifier_column_name,
+                        ),
+                    ),
+                    column_alias=identifier_column_name,
+                )
+            )
+            column_equality_descriptions.append(
+                ColumnEqualityDescription(
+                    left_column_alias=identifier_column_name,
+                    right_column_alias=identifier_column_name,
+                )
+            )
+
+        # Construct SelectNode for Row filtering
+        row_filter_sql_select_node = SqlSelectStatementNode(
+            description=f"Filter row on {node.agg_by_function.name}({time_dimension_column_name})",
+            select_columns=tuple(identifier_select_columns) + (time_dimension_select_column,),
+            from_source=input_data_set.sql_select_node,
+            from_source_alias=join_data_set_alias,
+            joins_descs=(),
+            group_bys=tuple(identifier_select_columns),
+            where=None,
+            order_bys=(),
+        )
+
+        sql_join_desc = make_equijoin_description(
+            right_source_node=row_filter_sql_select_node,
+            left_source_alias=from_data_set_alias,
+            right_source_alias=join_data_set_alias,
+            column_equality_descriptions=column_equality_descriptions,
+            join_type=SqlJoinType.INNER,
+        )
+        return SqlDataSet(
+            instance_set=output_instance_set,
+            sql_select_node=SqlSelectStatementNode(
+                description=node.description,
+                select_columns=output_instance_set.transform(
+                    CreateSelectColumnsForInstances(from_data_set_alias, self._column_association_resolver)
+                ).as_tuple(),
+                from_source=input_data_set.sql_select_node,
+                from_source_alias=from_data_set_alias,
+                joins_descs=(sql_join_desc,),
                 group_bys=(),
                 where=None,
                 order_bys=(),

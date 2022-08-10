@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from hashlib import sha1
 from typing import List, Optional
 
 from metricflow.errors.errors import ParsingException
@@ -12,7 +11,7 @@ from metricflow.model.objects.base import (
     PydanticCustomInputParser,
     PydanticParseableValueType,
 )
-from metricflow.object_utils import ExtendedEnum
+from metricflow.object_utils import ExtendedEnum, hash_strings
 from metricflow.specs import MeasureReference
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.time.time_granularity import string_to_time_granularity
@@ -163,16 +162,10 @@ class Metric(HashableBaseModel, ModelWithMetadataParsing):
 
     @property
     def definition_hash(self) -> str:  # noqa: D
-        values: List[Optional[str]] = [self.name, self.type_params.expr or ""]
+        values: List[str] = [self.name, self.type_params.expr or ""]
         if self.constraint:
             values.append(self.constraint.where)
             if self.constraint.linkable_names:
                 values.extend(self.constraint.linkable_names)
         values.extend([m.element_name for m in self.measure_references])
-
-        hash_builder = sha1()
-        for s in values:
-            if s is None:
-                continue
-            hash_builder.update(s.encode("utf-8"))
-        return hash_builder.hexdigest()
+        return hash_strings(values)

@@ -1,342 +1,452 @@
 <SqlQueryPlan>
     <SqlSelectStatementNode>
         <!-- description = Compute Metrics via Expressions -->
-        <!-- node_id = ss_12 -->
+        <!-- node_id = ss_29 -->
         <!-- col0 =                                                    -->
         <!--   {'class': 'SqlSelectColumn',                            -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_257),  -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_540),  -->
         <!--    'column_alias': 'user__home_state'}                    -->
         <!-- col1 =                                                    -->
         <!--   {'class': 'SqlSelectColumn',                            -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_258),  -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_541),  -->
         <!--    'column_alias': 'identity_verifications'}              -->
-        <!-- from_source = SqlSelectStatementNode(node_id=ss_11) -->
+        <!-- from_source = SqlSelectStatementNode(node_id=ss_28) -->
         <!-- where = None -->
         <SqlSelectStatementNode>
             <!-- description = Aggregate Measures -->
-            <!-- node_id = ss_11 -->
+            <!-- node_id = ss_28 -->
             <!-- col0 =                                                    -->
             <!--   {'class': 'SqlSelectColumn',                            -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_256),  -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_539),  -->
             <!--    'column_alias': 'user__home_state'}                    -->
             <!-- col1 =                                                              -->
             <!--   {'class': 'SqlSelectColumn',                                      -->
-            <!--    'expr': SqlFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
+            <!--    'expr': SqlFunctionExpression(node_id=fnc_2, sql_function=SUM),  -->
             <!--    'column_alias': 'identity_verifications'}                        -->
-            <!-- from_source = SqlSelectStatementNode(node_id=ss_10) -->
+            <!-- from_source = SqlSelectStatementNode(node_id=ss_27) -->
             <!-- group_by0 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                            -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_256),  -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_539),  -->
             <!--    'column_alias': 'user__home_state'}                    -->
             <!-- where = None -->
             <SqlSelectStatementNode>
                 <!-- description =                                       -->
                 <!--   Pass Only Elements:                               -->
                 <!--     ['identity_verifications', 'user__home_state']  -->
-                <!-- node_id = ss_10 -->
+                <!-- node_id = ss_27 -->
                 <!-- col0 =                                                    -->
                 <!--   {'class': 'SqlSelectColumn',                            -->
-                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_254),  -->
+                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_537),  -->
                 <!--    'column_alias': 'user__home_state'}                    -->
                 <!-- col1 =                                                    -->
                 <!--   {'class': 'SqlSelectColumn',                            -->
-                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_253),  -->
+                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_536),  -->
                 <!--    'column_alias': 'identity_verifications'}              -->
-                <!-- from_source = SqlSelectStatementNode(node_id=ss_9) -->
+                <!-- from_source = SqlSelectStatementNode(node_id=ss_26) -->
                 <!-- where = None -->
                 <SqlSelectStatementNode>
                     <!-- description = Join Standard Outputs -->
-                    <!-- node_id = ss_9 -->
+                    <!-- node_id = ss_26 -->
                     <!-- col0 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_249),  -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_532),  -->
                     <!--    'column_alias': 'ds_partitioned'}                      -->
                     <!-- col1 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_252),  -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_535),  -->
                     <!--    'column_alias': 'user__ds_partitioned'}                -->
                     <!-- col2 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_250),  -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_533),  -->
                     <!--    'column_alias': 'user'}                                -->
                     <!-- col3 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_251),  -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_534),  -->
                     <!--    'column_alias': 'user__home_state'}                    -->
                     <!-- col4 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_248),  -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_531),  -->
                     <!--    'column_alias': 'identity_verifications'}              -->
-                    <!-- from_source = SqlSelectStatementNode(node_id=ss_7) -->
-                    <!-- join_0 =                                                  -->
-                    <!--   {'class': 'SqlJoinDescription',                         -->
-                    <!--    'right_source': SqlSelectStatementNode(node_id=ss_8),  -->
-                    <!--    'right_source_alias': 'subq_4',                        -->
-                    <!--    'on_condition': SqlLogicalExpression(node_id=lo_0),    -->
-                    <!--    'join_type': SqlJoinType.LEFT_OUTER}                   -->
+                    <!-- from_source = SqlSelectStatementNode(node_id=ss_24) -->
+                    <!-- join_0 =                                                   -->
+                    <!--   {'class': 'SqlJoinDescription',                          -->
+                    <!--    'right_source': SqlSelectStatementNode(node_id=ss_25),  -->
+                    <!--    'right_source_alias': 'subq_5',                         -->
+                    <!--    'on_condition': SqlLogicalExpression(node_id=lo_1),     -->
+                    <!--    'join_type': SqlJoinType.LEFT_OUTER}                    -->
                     <!-- where = None -->
                     <SqlSelectStatementNode>
                         <!-- description =                                             -->
                         <!--   Pass Only Elements:                                     -->
                         <!--     ['identity_verifications', 'user', 'ds_partitioned']  -->
-                        <!-- node_id = ss_7 -->
+                        <!-- node_id = ss_24 -->
                         <!-- col0 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
-                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_239),  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_522),  -->
                         <!--    'column_alias': 'ds_partitioned'}                      -->
                         <!-- col1 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
-                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_240),  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_523),  -->
                         <!--    'column_alias': 'user'}                                -->
                         <!-- col2 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
-                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_238),  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_521),  -->
                         <!--    'column_alias': 'identity_verifications'}              -->
-                        <!-- from_source = SqlSelectStatementNode(node_id=ss_6) -->
+                        <!-- from_source = SqlSelectStatementNode(node_id=ss_23) -->
                         <!-- where = None -->
                         <SqlSelectStatementNode>
                             <!-- description = Metric Time Dimension 'ds' -->
-                            <!-- node_id = ss_6 -->
+                            <!-- node_id = ss_23 -->
                             <!-- col0 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_210),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_493),  -->
                             <!--    'column_alias': 'ds'}                                  -->
                             <!-- col1 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_211),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_494),  -->
                             <!--    'column_alias': 'ds__week'}                            -->
                             <!-- col2 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_212),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_495),  -->
                             <!--    'column_alias': 'ds__month'}                           -->
                             <!-- col3 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_213),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_496),  -->
                             <!--    'column_alias': 'ds__quarter'}                         -->
                             <!-- col4 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_214),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_497),  -->
                             <!--    'column_alias': 'ds__year'}                            -->
                             <!-- col5 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_215),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_498),  -->
                             <!--    'column_alias': 'ds_partitioned'}                      -->
                             <!-- col6 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_216),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_499),  -->
                             <!--    'column_alias': 'ds_partitioned__week'}                -->
                             <!-- col7 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_217),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_500),  -->
                             <!--    'column_alias': 'ds_partitioned__month'}               -->
                             <!-- col8 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_218),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_501),  -->
                             <!--    'column_alias': 'ds_partitioned__quarter'}             -->
                             <!-- col9 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_219),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_502),  -->
                             <!--    'column_alias': 'ds_partitioned__year'}                -->
                             <!-- col10 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_220),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_503),  -->
                             <!--    'column_alias': 'verification__ds'}                    -->
                             <!-- col11 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_221),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_504),  -->
                             <!--    'column_alias': 'verification__ds__week'}              -->
                             <!-- col12 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_222),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_505),  -->
                             <!--    'column_alias': 'verification__ds__month'}             -->
                             <!-- col13 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_223),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_506),  -->
                             <!--    'column_alias': 'verification__ds__quarter'}           -->
                             <!-- col14 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_224),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_507),  -->
                             <!--    'column_alias': 'verification__ds__year'}              -->
                             <!-- col15 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_225),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_508),  -->
                             <!--    'column_alias': 'verification__ds_partitioned'}        -->
                             <!-- col16 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_226),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_509),  -->
                             <!--    'column_alias': 'verification__ds_partitioned__week'}  -->
                             <!-- col17 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                             -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_227),   -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_510),   -->
                             <!--    'column_alias': 'verification__ds_partitioned__month'}  -->
                             <!-- col18 =                                                      -->
                             <!--   {'class': 'SqlSelectColumn',                               -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_228),     -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_511),     -->
                             <!--    'column_alias': 'verification__ds_partitioned__quarter'}  -->
                             <!-- col19 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_229),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_512),  -->
                             <!--    'column_alias': 'verification__ds_partitioned__year'}  -->
                             <!-- col20 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_230),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_513),  -->
                             <!--    'column_alias': 'metric_time'}                         -->
                             <!-- col21 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_231),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_514),  -->
                             <!--    'column_alias': 'metric_time__week'}                   -->
                             <!-- col22 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_232),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_515),  -->
                             <!--    'column_alias': 'metric_time__month'}                  -->
                             <!-- col23 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_233),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_516),  -->
                             <!--    'column_alias': 'metric_time__quarter'}                -->
                             <!-- col24 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_234),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_517),  -->
                             <!--    'column_alias': 'metric_time__year'}                   -->
                             <!-- col25 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_235),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_518),  -->
                             <!--    'column_alias': 'verification'}                        -->
                             <!-- col26 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_236),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_519),  -->
                             <!--    'column_alias': 'user'}                                -->
                             <!-- col27 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_237),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_520),  -->
                             <!--    'column_alias': 'verification__user'}                  -->
                             <!-- col28 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_208),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_491),  -->
                             <!--    'column_alias': 'verification_type'}                   -->
                             <!-- col29 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_209),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_492),  -->
                             <!--    'column_alias': 'verification__verification_type'}     -->
                             <!-- col30 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_207),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_490),  -->
                             <!--    'column_alias': 'identity_verifications'}              -->
-                            <!-- from_source = SqlSelectStatementNode(node_id=ss_10002) -->
+                            <!-- from_source = SqlSelectStatementNode(node_id=ss_22) -->
                             <!-- where = None -->
                             <SqlSelectStatementNode>
-                                <!-- description = Read Elements From Data Source 'id_verifications' -->
-                                <!-- node_id = ss_10002 -->
-                                <!-- col0 =                                                         -->
-                                <!--   {'class': 'SqlSelectColumn',                                 -->
-                                <!--    'expr': SqlStringExpression(node_id=str_10002 sql_expr=1),  -->
-                                <!--    'column_alias': 'identity_verifications'}                   -->
-                                <!-- col1 =                                                      -->
-                                <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10052),  -->
-                                <!--    'column_alias': 'ds'}                                    -->
-                                <!-- col2 =                                                -->
-                                <!--   {'class': 'SqlSelectColumn',                        -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10024),  -->
-                                <!--    'column_alias': 'ds__week'}                        -->
-                                <!-- col3 =                                                -->
-                                <!--   {'class': 'SqlSelectColumn',                        -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10025),  -->
-                                <!--    'column_alias': 'ds__month'}                       -->
-                                <!-- col4 =                                                -->
-                                <!--   {'class': 'SqlSelectColumn',                        -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10026),  -->
-                                <!--    'column_alias': 'ds__quarter'}                     -->
-                                <!-- col5 =                                                -->
-                                <!--   {'class': 'SqlSelectColumn',                        -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10027),  -->
-                                <!--    'column_alias': 'ds__year'}                        -->
-                                <!-- col6 =                                                      -->
-                                <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10057),  -->
-                                <!--    'column_alias': 'ds_partitioned'}                        -->
-                                <!-- col7 =                                                -->
-                                <!--   {'class': 'SqlSelectColumn',                        -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10028),  -->
-                                <!--    'column_alias': 'ds_partitioned__week'}            -->
-                                <!-- col8 =                                                -->
-                                <!--   {'class': 'SqlSelectColumn',                        -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10029),  -->
-                                <!--    'column_alias': 'ds_partitioned__month'}           -->
-                                <!-- col9 =                                                -->
-                                <!--   {'class': 'SqlSelectColumn',                        -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10030),  -->
-                                <!--    'column_alias': 'ds_partitioned__quarter'}         -->
-                                <!-- col10 =                                               -->
-                                <!--   {'class': 'SqlSelectColumn',                        -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10031),  -->
-                                <!--    'column_alias': 'ds_partitioned__year'}            -->
-                                <!-- col11 =                                                     -->
-                                <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10062),  -->
-                                <!--    'column_alias': 'verification_type'}                     -->
-                                <!-- col12 =                                                     -->
-                                <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10063),  -->
-                                <!--    'column_alias': 'verification__ds'}                      -->
-                                <!-- col13 =                                               -->
-                                <!--   {'class': 'SqlSelectColumn',                        -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10032),  -->
-                                <!--    'column_alias': 'verification__ds__week'}          -->
-                                <!-- col14 =                                               -->
-                                <!--   {'class': 'SqlSelectColumn',                        -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10033),  -->
-                                <!--    'column_alias': 'verification__ds__month'}         -->
-                                <!-- col15 =                                               -->
-                                <!--   {'class': 'SqlSelectColumn',                        -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10034),  -->
-                                <!--    'column_alias': 'verification__ds__quarter'}       -->
-                                <!-- col16 =                                               -->
-                                <!--   {'class': 'SqlSelectColumn',                        -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10035),  -->
-                                <!--    'column_alias': 'verification__ds__year'}          -->
-                                <!-- col17 =                                                     -->
-                                <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10068),  -->
-                                <!--    'column_alias': 'verification__ds_partitioned'}          -->
-                                <!-- col18 =                                                   -->
+                                <!-- description = Pass Only Additive Measures -->
+                                <!-- node_id = ss_22 -->
+                                <!-- col0 =                                                    -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10036),      -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_467),  -->
+                                <!--    'column_alias': 'ds'}                                  -->
+                                <!-- col1 =                                                    -->
+                                <!--   {'class': 'SqlSelectColumn',                            -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_468),  -->
+                                <!--    'column_alias': 'ds__week'}                            -->
+                                <!-- col2 =                                                    -->
+                                <!--   {'class': 'SqlSelectColumn',                            -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_469),  -->
+                                <!--    'column_alias': 'ds__month'}                           -->
+                                <!-- col3 =                                                    -->
+                                <!--   {'class': 'SqlSelectColumn',                            -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_470),  -->
+                                <!--    'column_alias': 'ds__quarter'}                         -->
+                                <!-- col4 =                                                    -->
+                                <!--   {'class': 'SqlSelectColumn',                            -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_471),  -->
+                                <!--    'column_alias': 'ds__year'}                            -->
+                                <!-- col5 =                                                    -->
+                                <!--   {'class': 'SqlSelectColumn',                            -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_472),  -->
+                                <!--    'column_alias': 'ds_partitioned'}                      -->
+                                <!-- col6 =                                                    -->
+                                <!--   {'class': 'SqlSelectColumn',                            -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_473),  -->
+                                <!--    'column_alias': 'ds_partitioned__week'}                -->
+                                <!-- col7 =                                                    -->
+                                <!--   {'class': 'SqlSelectColumn',                            -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_474),  -->
+                                <!--    'column_alias': 'ds_partitioned__month'}               -->
+                                <!-- col8 =                                                    -->
+                                <!--   {'class': 'SqlSelectColumn',                            -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_475),  -->
+                                <!--    'column_alias': 'ds_partitioned__quarter'}             -->
+                                <!-- col9 =                                                    -->
+                                <!--   {'class': 'SqlSelectColumn',                            -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_476),  -->
+                                <!--    'column_alias': 'ds_partitioned__year'}                -->
+                                <!-- col10 =                                                   -->
+                                <!--   {'class': 'SqlSelectColumn',                            -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_477),  -->
+                                <!--    'column_alias': 'verification__ds'}                    -->
+                                <!-- col11 =                                                   -->
+                                <!--   {'class': 'SqlSelectColumn',                            -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_478),  -->
+                                <!--    'column_alias': 'verification__ds__week'}              -->
+                                <!-- col12 =                                                   -->
+                                <!--   {'class': 'SqlSelectColumn',                            -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_479),  -->
+                                <!--    'column_alias': 'verification__ds__month'}             -->
+                                <!-- col13 =                                                   -->
+                                <!--   {'class': 'SqlSelectColumn',                            -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_480),  -->
+                                <!--    'column_alias': 'verification__ds__quarter'}           -->
+                                <!-- col14 =                                                   -->
+                                <!--   {'class': 'SqlSelectColumn',                            -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_481),  -->
+                                <!--    'column_alias': 'verification__ds__year'}              -->
+                                <!-- col15 =                                                   -->
+                                <!--   {'class': 'SqlSelectColumn',                            -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_482),  -->
+                                <!--    'column_alias': 'verification__ds_partitioned'}        -->
+                                <!-- col16 =                                                   -->
+                                <!--   {'class': 'SqlSelectColumn',                            -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_483),  -->
                                 <!--    'column_alias': 'verification__ds_partitioned__week'}  -->
-                                <!-- col19 =                                                    -->
+                                <!-- col17 =                                                    -->
                                 <!--   {'class': 'SqlSelectColumn',                             -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10037),       -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_484),   -->
                                 <!--    'column_alias': 'verification__ds_partitioned__month'}  -->
-                                <!-- col20 =                                                      -->
+                                <!-- col18 =                                                      -->
                                 <!--   {'class': 'SqlSelectColumn',                               -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10038),         -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_485),     -->
                                 <!--    'column_alias': 'verification__ds_partitioned__quarter'}  -->
+                                <!-- col19 =                                                   -->
+                                <!--   {'class': 'SqlSelectColumn',                            -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_486),  -->
+                                <!--    'column_alias': 'verification__ds_partitioned__year'}  -->
+                                <!-- col20 =                                                   -->
+                                <!--   {'class': 'SqlSelectColumn',                            -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_487),  -->
+                                <!--    'column_alias': 'verification'}                        -->
                                 <!-- col21 =                                                   -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10039),      -->
-                                <!--    'column_alias': 'verification__ds_partitioned__year'}  -->
-                                <!-- col22 =                                                     -->
-                                <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10073),  -->
-                                <!--    'column_alias': 'verification__verification_type'}       -->
-                                <!-- col23 =                                                     -->
-                                <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10074),  -->
-                                <!--    'column_alias': 'verification'}                          -->
-                                <!-- col24 =                                                     -->
-                                <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10075),  -->
-                                <!--    'column_alias': 'user'}                                  -->
-                                <!-- col25 =                                                     -->
-                                <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10076),  -->
-                                <!--    'column_alias': 'verification__user'}                    -->
-                                <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10001) -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_488),  -->
+                                <!--    'column_alias': 'user'}                                -->
+                                <!-- col22 =                                                   -->
+                                <!--   {'class': 'SqlSelectColumn',                            -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_489),  -->
+                                <!--    'column_alias': 'verification__user'}                  -->
+                                <!-- col23 =                                                   -->
+                                <!--   {'class': 'SqlSelectColumn',                            -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_465),  -->
+                                <!--    'column_alias': 'verification_type'}                   -->
+                                <!-- col24 =                                                   -->
+                                <!--   {'class': 'SqlSelectColumn',                            -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_466),  -->
+                                <!--    'column_alias': 'verification__verification_type'}     -->
+                                <!-- col25 =                                                   -->
+                                <!--   {'class': 'SqlSelectColumn',                            -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_464),  -->
+                                <!--    'column_alias': 'identity_verifications'}              -->
+                                <!-- from_source = SqlSelectStatementNode(node_id=ss_10003) -->
                                 <!-- where = None -->
-                                <SqlTableFromClauseNode>
-                                    <!-- description = Read from ***************************.fct_id_verifications -->
-                                    <!-- node_id = tfc_10001 -->
-                                    <!-- table_id = ***************************.fct_id_verifications -->
-                                </SqlTableFromClauseNode>
+                                <SqlSelectStatementNode>
+                                    <!-- description = Read Elements From Data Source 'id_verifications' -->
+                                    <!-- node_id = ss_10003 -->
+                                    <!-- col0 =                                                         -->
+                                    <!--   {'class': 'SqlSelectColumn',                                 -->
+                                    <!--    'expr': SqlStringExpression(node_id=str_10002 sql_expr=1),  -->
+                                    <!--    'column_alias': 'identity_verifications'}                   -->
+                                    <!-- col1 =                                                      -->
+                                    <!--   {'class': 'SqlSelectColumn',                              -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10061),  -->
+                                    <!--    'column_alias': 'ds'}                                    -->
+                                    <!-- col2 =                                                -->
+                                    <!--   {'class': 'SqlSelectColumn',                        -->
+                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10028),  -->
+                                    <!--    'column_alias': 'ds__week'}                        -->
+                                    <!-- col3 =                                                -->
+                                    <!--   {'class': 'SqlSelectColumn',                        -->
+                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10029),  -->
+                                    <!--    'column_alias': 'ds__month'}                       -->
+                                    <!-- col4 =                                                -->
+                                    <!--   {'class': 'SqlSelectColumn',                        -->
+                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10030),  -->
+                                    <!--    'column_alias': 'ds__quarter'}                     -->
+                                    <!-- col5 =                                                -->
+                                    <!--   {'class': 'SqlSelectColumn',                        -->
+                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10031),  -->
+                                    <!--    'column_alias': 'ds__year'}                        -->
+                                    <!-- col6 =                                                      -->
+                                    <!--   {'class': 'SqlSelectColumn',                              -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10066),  -->
+                                    <!--    'column_alias': 'ds_partitioned'}                        -->
+                                    <!-- col7 =                                                -->
+                                    <!--   {'class': 'SqlSelectColumn',                        -->
+                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10032),  -->
+                                    <!--    'column_alias': 'ds_partitioned__week'}            -->
+                                    <!-- col8 =                                                -->
+                                    <!--   {'class': 'SqlSelectColumn',                        -->
+                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10033),  -->
+                                    <!--    'column_alias': 'ds_partitioned__month'}           -->
+                                    <!-- col9 =                                                -->
+                                    <!--   {'class': 'SqlSelectColumn',                        -->
+                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10034),  -->
+                                    <!--    'column_alias': 'ds_partitioned__quarter'}         -->
+                                    <!-- col10 =                                               -->
+                                    <!--   {'class': 'SqlSelectColumn',                        -->
+                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10035),  -->
+                                    <!--    'column_alias': 'ds_partitioned__year'}            -->
+                                    <!-- col11 =                                                     -->
+                                    <!--   {'class': 'SqlSelectColumn',                              -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10071),  -->
+                                    <!--    'column_alias': 'verification_type'}                     -->
+                                    <!-- col12 =                                                     -->
+                                    <!--   {'class': 'SqlSelectColumn',                              -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10072),  -->
+                                    <!--    'column_alias': 'verification__ds'}                      -->
+                                    <!-- col13 =                                               -->
+                                    <!--   {'class': 'SqlSelectColumn',                        -->
+                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10036),  -->
+                                    <!--    'column_alias': 'verification__ds__week'}          -->
+                                    <!-- col14 =                                               -->
+                                    <!--   {'class': 'SqlSelectColumn',                        -->
+                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10037),  -->
+                                    <!--    'column_alias': 'verification__ds__month'}         -->
+                                    <!-- col15 =                                               -->
+                                    <!--   {'class': 'SqlSelectColumn',                        -->
+                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10038),  -->
+                                    <!--    'column_alias': 'verification__ds__quarter'}       -->
+                                    <!-- col16 =                                               -->
+                                    <!--   {'class': 'SqlSelectColumn',                        -->
+                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10039),  -->
+                                    <!--    'column_alias': 'verification__ds__year'}          -->
+                                    <!-- col17 =                                                     -->
+                                    <!--   {'class': 'SqlSelectColumn',                              -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10077),  -->
+                                    <!--    'column_alias': 'verification__ds_partitioned'}          -->
+                                    <!-- col18 =                                                   -->
+                                    <!--   {'class': 'SqlSelectColumn',                            -->
+                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10040),      -->
+                                    <!--    'column_alias': 'verification__ds_partitioned__week'}  -->
+                                    <!-- col19 =                                                    -->
+                                    <!--   {'class': 'SqlSelectColumn',                             -->
+                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10041),       -->
+                                    <!--    'column_alias': 'verification__ds_partitioned__month'}  -->
+                                    <!-- col20 =                                                      -->
+                                    <!--   {'class': 'SqlSelectColumn',                               -->
+                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10042),         -->
+                                    <!--    'column_alias': 'verification__ds_partitioned__quarter'}  -->
+                                    <!-- col21 =                                                   -->
+                                    <!--   {'class': 'SqlSelectColumn',                            -->
+                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10043),      -->
+                                    <!--    'column_alias': 'verification__ds_partitioned__year'}  -->
+                                    <!-- col22 =                                                     -->
+                                    <!--   {'class': 'SqlSelectColumn',                              -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10082),  -->
+                                    <!--    'column_alias': 'verification__verification_type'}       -->
+                                    <!-- col23 =                                                     -->
+                                    <!--   {'class': 'SqlSelectColumn',                              -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10083),  -->
+                                    <!--    'column_alias': 'verification'}                          -->
+                                    <!-- col24 =                                                     -->
+                                    <!--   {'class': 'SqlSelectColumn',                              -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10084),  -->
+                                    <!--    'column_alias': 'user'}                                  -->
+                                    <!-- col25 =                                                     -->
+                                    <!--   {'class': 'SqlSelectColumn',                              -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10085),  -->
+                                    <!--    'column_alias': 'verification__user'}                    -->
+                                    <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10001) -->
+                                    <!-- where = None -->
+                                    <SqlTableFromClauseNode>
+                                        <!-- description = Read from ***************************.fct_id_verifications -->
+                                        <!-- node_id = tfc_10001 -->
+                                        <!-- table_id = ***************************.fct_id_verifications -->
+                                    </SqlTableFromClauseNode>
+                                </SqlSelectStatementNode>
                             </SqlSelectStatementNode>
                         </SqlSelectStatementNode>
                     </SqlSelectStatementNode>
@@ -344,155 +454,155 @@
                         <!-- description =                                 -->
                         <!--   Pass Only Elements:                         -->
                         <!--     ['user', 'ds_partitioned', 'home_state']  -->
-                        <!-- node_id = ss_8 -->
+                        <!-- node_id = ss_25 -->
                         <!-- col0 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
-                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_242),  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_525),  -->
                         <!--    'column_alias': 'ds_partitioned'}                      -->
                         <!-- col1 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
-                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_243),  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_526),  -->
                         <!--    'column_alias': 'user'}                                -->
                         <!-- col2 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
-                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_241),  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_524),  -->
                         <!--    'column_alias': 'home_state'}                          -->
-                        <!-- from_source = SqlSelectStatementNode(node_id=ss_10006) -->
+                        <!-- from_source = SqlSelectStatementNode(node_id=ss_10007) -->
                         <!-- where = None -->
                         <SqlSelectStatementNode>
                             <!-- description = Read Elements From Data Source 'users_ds_source' -->
-                            <!-- node_id = ss_10006 -->
+                            <!-- node_id = ss_10007 -->
                             <!-- col0 =                                                      -->
                             <!--   {'class': 'SqlSelectColumn',                              -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10118),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10127),  -->
                             <!--    'column_alias': 'ds'}                                    -->
                             <!-- col1 =                                                -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10060),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10064),  -->
                             <!--    'column_alias': 'ds__week'}                        -->
                             <!-- col2 =                                                -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10061),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10065),  -->
                             <!--    'column_alias': 'ds__month'}                       -->
                             <!-- col3 =                                                -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10062),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10066),  -->
                             <!--    'column_alias': 'ds__quarter'}                     -->
                             <!-- col4 =                                                -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10063),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10067),  -->
                             <!--    'column_alias': 'ds__year'}                        -->
                             <!-- col5 =                                                      -->
                             <!--   {'class': 'SqlSelectColumn',                              -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10123),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10132),  -->
                             <!--    'column_alias': 'created_at'}                            -->
                             <!-- col6 =                                                -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10064),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10068),  -->
                             <!--    'column_alias': 'created_at__week'}                -->
                             <!-- col7 =                                                -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10065),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10069),  -->
                             <!--    'column_alias': 'created_at__month'}               -->
                             <!-- col8 =                                                -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10066),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10070),  -->
                             <!--    'column_alias': 'created_at__quarter'}             -->
                             <!-- col9 =                                                -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10067),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10071),  -->
                             <!--    'column_alias': 'created_at__year'}                -->
                             <!-- col10 =                                                     -->
                             <!--   {'class': 'SqlSelectColumn',                              -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10128),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10137),  -->
                             <!--    'column_alias': 'ds_partitioned'}                        -->
                             <!-- col11 =                                               -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10068),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10072),  -->
                             <!--    'column_alias': 'ds_partitioned__week'}            -->
                             <!-- col12 =                                               -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10069),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10073),  -->
                             <!--    'column_alias': 'ds_partitioned__month'}           -->
                             <!-- col13 =                                               -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10070),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10074),  -->
                             <!--    'column_alias': 'ds_partitioned__quarter'}         -->
                             <!-- col14 =                                               -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10071),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10075),  -->
                             <!--    'column_alias': 'ds_partitioned__year'}            -->
                             <!-- col15 =                                                     -->
                             <!--   {'class': 'SqlSelectColumn',                              -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10133),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10142),  -->
                             <!--    'column_alias': 'home_state'}                            -->
                             <!-- col16 =                                                     -->
                             <!--   {'class': 'SqlSelectColumn',                              -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10134),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10143),  -->
                             <!--    'column_alias': 'user__ds'}                              -->
                             <!-- col17 =                                               -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10072),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10076),  -->
                             <!--    'column_alias': 'user__ds__week'}                  -->
                             <!-- col18 =                                               -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10073),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10077),  -->
                             <!--    'column_alias': 'user__ds__month'}                 -->
                             <!-- col19 =                                               -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10074),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10078),  -->
                             <!--    'column_alias': 'user__ds__quarter'}               -->
                             <!-- col20 =                                               -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10075),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10079),  -->
                             <!--    'column_alias': 'user__ds__year'}                  -->
                             <!-- col21 =                                                     -->
                             <!--   {'class': 'SqlSelectColumn',                              -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10139),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10148),  -->
                             <!--    'column_alias': 'user__created_at'}                      -->
                             <!-- col22 =                                               -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10076),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10080),  -->
                             <!--    'column_alias': 'user__created_at__week'}          -->
                             <!-- col23 =                                               -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10077),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10081),  -->
                             <!--    'column_alias': 'user__created_at__month'}         -->
                             <!-- col24 =                                               -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10078),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10082),  -->
                             <!--    'column_alias': 'user__created_at__quarter'}       -->
                             <!-- col25 =                                               -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10079),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10083),  -->
                             <!--    'column_alias': 'user__created_at__year'}          -->
                             <!-- col26 =                                                     -->
                             <!--   {'class': 'SqlSelectColumn',                              -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10144),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10153),  -->
                             <!--    'column_alias': 'user__ds_partitioned'}                  -->
                             <!-- col27 =                                               -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10080),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10084),  -->
                             <!--    'column_alias': 'user__ds_partitioned__week'}      -->
                             <!-- col28 =                                               -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10081),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10085),  -->
                             <!--    'column_alias': 'user__ds_partitioned__month'}     -->
                             <!-- col29 =                                               -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10082),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10086),  -->
                             <!--    'column_alias': 'user__ds_partitioned__quarter'}   -->
                             <!-- col30 =                                               -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10083),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10087),  -->
                             <!--    'column_alias': 'user__ds_partitioned__year'}      -->
                             <!-- col31 =                                                     -->
                             <!--   {'class': 'SqlSelectColumn',                              -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10149),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10158),  -->
                             <!--    'column_alias': 'user__home_state'}                      -->
                             <!-- col32 =                                                     -->
                             <!--   {'class': 'SqlSelectColumn',                              -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10150),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10159),  -->
                             <!--    'column_alias': 'user'}                                  -->
                             <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10004) -->
                             <!-- where = None -->

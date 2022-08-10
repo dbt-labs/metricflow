@@ -1,0 +1,42 @@
+---
+data_source:
+  name: accounts_source
+  description: accounts_source
+  owners:
+    - support@transformdata.io
+
+  sql_query: |
+    -- User Defined SQL Query
+    SELECT * FROM $accounts_source_table
+
+  measures:
+    - name: account_balance
+      agg: sum
+
+    - name: total_account_balance_first_day
+      agg: sum
+      expr: account_balance
+      non_additive_dimension:
+        name: ds
+        window_choice: min
+
+    - name: current_account_balance_by_user
+      agg: sum
+      expr: account_balance
+      non_additive_dimension:
+        name: ds
+        window_choice: max
+        window_groupings:
+          - user
+
+  dimensions:
+    - name: ds
+      type: time
+      type_params:
+        is_primary: True
+        time_granularity: day
+
+  identifiers:
+    - name: user
+      type: foreign
+      expr: user_id

@@ -15,10 +15,11 @@ from metricflow.instances import DataSourceReference, DataSourceElementReference
 from metricflow.model.objects.data_source import DataSource, DataSourceOrigin
 from metricflow.model.objects.elements.dimension import Dimension
 from metricflow.model.objects.elements.identifier import Identifier
-from metricflow.model.objects.elements.measure import Measure, AggregationType
+from metricflow.model.objects.elements.measure import Measure, AggregationType, NonAdditiveDimensionParameters
 from metricflow.model.objects.metric import Metric, MetricType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantics.data_source_container import PydanticDataSourceContainer
+from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.semantics.linkable_spec_resolver import (
     ValidLinkableSpecResolver,
     LinkableElementProperties,
@@ -117,6 +118,7 @@ class MetricSemantics:  # noqa: D
         return tuple(
             MeasureSpec(
                 element_name=x.element_name,
+                non_additive_dimension=self._data_source_semantics.non_additive_dimension_by_measure.get(x),
             )
             for x in metric.measure_references
         )
@@ -142,6 +144,7 @@ class DataSourceSemantics:
         self._measure_aggs: Dict[
             MeasureReference, AggregationType
         ] = {}  # maps measures to their one consistent aggregation
+        self._measure_non_additive_dimension: Dict[MeasureReference, NonAdditiveDimensionParameters] = {}
         self._dimension_index: Dict[DimensionReference, List[DataSource]] = defaultdict(list)
         self._linkable_reference_index: Dict[LinkableElementReference, List[DataSource]] = defaultdict(list)
         self._entity_index: Dict[Optional[str], List[DataSource]] = defaultdict(list)
@@ -149,7 +152,9 @@ class DataSourceSemantics:
         self._data_source_names: Set[str] = set()
 
         self._configured_data_source_container = configured_data_source_container
-        self._data_source_to_aggregation_time_dimensions: Dict[DataSourceReference, List[TimeDimensionReference]] = {}
+        self._data_source_to_aggregation_time_dimensions: Dict[
+            DataSourceReference, ElementGrouper[TimeDimensionReference, MeasureSpec]
+        ] = {}
 
         # Add semantic tracking for data sources from configured_data_source_container
         for data_source in self._configured_data_source_container.values():
@@ -199,6 +204,10 @@ class DataSourceSemantics:
     @property
     def measure_references(self) -> List[MeasureReference]:  # noqa: D
         return list(self._measure_index.keys())
+
+    @property
+    def non_additive_dimension_by_measure(self) -> Dict[MeasureReference, NonAdditiveDimensionParameters]:  # noqa: D
+        return self._measure_non_additive_dimension
 
     def get_measure(self, measure_reference: MeasureReference) -> Measure:  # noqa: D
         if measure_reference not in self._measure_index:
@@ -270,19 +279,23 @@ class DataSourceSemantics:
             return
 
         self._data_source_names.add(data_source.name)
-
-        self._data_source_to_aggregation_time_dimensions[data_source.reference] = []
+        self._data_source_to_aggregation_time_dimensions[data_source.reference] = ElementGrouper[
+            TimeDimensionReference, MeasureSpec
+        ]()
 
         for measure in data_source.measures:
             self._measure_aggs[measure.reference] = measure.agg
             self._measure_index[measure.reference].append(data_source)
-            if (
-                measure.checked_agg_time_dimension
-                not in self._data_source_to_aggregation_time_dimensions[data_source.reference]
-            ):
-                self._data_source_to_aggregation_time_dimensions[data_source.reference].append(
-                    measure.checked_agg_time_dimension
-                )
+            agg_time_dimension = measure.checked_agg_time_dimension
+            self._data_source_to_aggregation_time_dimensions[data_source.reference].add_value(
+                key=agg_time_dimension,
+                value=MeasureSpec(
+                    element_name=measure.name,
+                    non_additive_dimension=measure.non_additive_dimension,
+                ),
+            )
+            if measure.non_additive_dimension:
+                self._measure_non_additive_dimension[measure.reference] = measure.non_additive_dimension
         for dim in data_source.dimensions:
             self._linkable_reference_index[dim.reference].append(data_source)
             self._dimension_index[dim.reference].append(data_source)
@@ -296,10 +309,10 @@ class DataSourceSemantics:
         data_source_names_sorted = sorted(self._data_source_names)
         return tuple(DataSourceReference(data_source_name=x) for x in data_source_names_sorted)
 
-    def get_aggregation_time_dimensions(
+    def get_aggregation_time_dimensions_with_measures(
         self, data_source_reference: DataSourceReference
-    ) -> Sequence[TimeDimensionReference]:
-        """Return all time dimensions used for measure aggregation in a data source."""
+    ) -> ElementGrouper[TimeDimensionReference, MeasureSpec]:
+        """Return all time dimensions in a data source with their associated measures."""
         assert (
             data_source_reference in self._data_source_to_aggregation_time_dimensions
         ), f"Data Source {data_source_reference} is not known"

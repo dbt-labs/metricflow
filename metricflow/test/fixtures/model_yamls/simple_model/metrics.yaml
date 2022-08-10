@@ -3,7 +3,7 @@ metric:
   name: "bookings"
   description: "bookings metric"
   owners:
-      - bobby@transformdata.io
+      - support@transformdata.io
   type: measure_proxy
   type_params:
       measures:
@@ -13,7 +13,7 @@ metric:
     name: "average_booking_value"
     description: "average booking value metric"
     owners:
-        - bobby@transformdata.io
+        - support@transformdata.io
     type: measure_proxy
     type_params:
         measures:
@@ -23,7 +23,7 @@ metric:
   name: "instant_bookings"
   description: "instant bookings"
   owners:
-    - bobby@transformdata.io
+    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -33,7 +33,7 @@ metric:
   name: "booking_value"
   description: "booking value"
   owners:
-    - bobby@transformdata.io
+    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -99,7 +99,7 @@ metric:
   name: "bookers"
   description: "bookers"
   owners:
-    - bobby@transformdata.io
+    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -119,7 +119,7 @@ metric:
   name: "views"
   description: "views"
   owners:
-    - bobby@transformdata.io
+    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -129,7 +129,7 @@ metric:
   name: "listings"
   description: "listings"
   owners:
-    - bobby@transformdata.io
+    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -171,7 +171,7 @@ metric:
   name: "identity_verifications"
   description: "identity_verifications"
   owners:
-    - bobby@transformdata.io
+    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -181,7 +181,7 @@ metric:
   name: "revenue"
   description: "revenue"
   owners:
-    - bobby@transformdata.io
+    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -191,7 +191,7 @@ metric:
   name: "trailing_2_months_revenue"
   description: "trailing_2_months_revenue"
   owners:
-    - bobby@transformdata.io
+    - support@transformdata.io
   type: cumulative
   type_params:
     measures:
@@ -202,7 +202,7 @@ metric:
   name: "revenue_all_time"
   description: "revenue_all_time"
   owners:
-    - bobby@transformdata.io
+    - support@transformdata.io
   type: cumulative
   type_params:
     measures:
@@ -212,7 +212,7 @@ metric:
   name: "every_two_days_bookers" # because the bookings test data only spans 3 days
   description: "every_two_days_bookers"
   owners:
-    - bobby@transformdata.io
+    - support@transformdata.io
   type: cumulative
   type_params:
     measures:
@@ -223,7 +223,7 @@ metric:
   name: "revenue_mtd"
   description: "revenue mtd"
   owners:
-    - bobby@transformdata.io
+    - support@transformdata.io
   type: cumulative
   locked_metadata:
     value_format: '$$,.2f' # we need to double dollars here since string template reserves dollar sign.
@@ -330,3 +330,24 @@ metric:
   type_params:
     numerator: bookings
     denominator: booking_value
+---
+metric:
+  name: "total_account_balance_first_day"
+  description: "total_account_balance_first_day"
+  owners:
+    - support@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+      - total_account_balance_first_day
+---
+metric:
+  name: "current_account_balance_by_user"
+  description: "current_account_balance_by_user"
+  owners:
+    - support@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+      - current_account_balance_by_user
+---

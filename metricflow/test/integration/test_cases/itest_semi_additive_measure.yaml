@@ -1,0 +1,56 @@
+---
+integration_test:
+  name: semi_additive_measure_query_with_grouping
+  description: Tests selecting a measure with semi additive properties with a window_grouping
+  model: SIMPLE_MODEL
+  metrics: ["current_account_balance_by_user"]
+  group_bys: ["user"]
+  check_query: |
+    SELECT
+      a.user AS user
+      , SUM(a.current_account_balance_by_user) AS current_account_balance_by_user
+    FROM (
+      SELECT
+        ds
+        , user_id AS user
+        , account_balance AS current_account_balance_by_user
+      FROM {{ source_schema }}.fct_accounts
+    ) a
+    INNER JOIN (
+      SELECT
+        user_id AS user
+        , MAX(ds) AS ds
+      FROM {{ source_schema }}.fct_accounts
+      GROUP BY
+        user_id
+    ) b
+    ON
+      a.ds = b.ds AND a.user = b.user
+    GROUP BY
+      a.user
+---
+integration_test:
+  name: semi_additive_measure_query
+  description: Tests selecting a measure with semi additive properties
+  model: SIMPLE_MODEL
+  metrics: ["total_account_balance_first_day"]
+  group_bys: ["ds"]
+  check_query: |
+    SELECT
+      a.ds AS ds
+      , SUM(a.total_account_balance_first_day) AS total_account_balance_first_day
+    FROM (
+      SELECT
+        ds
+        , account_balance AS total_account_balance_first_day
+      FROM {{ source_schema }}.fct_accounts
+    ) a
+    INNER JOIN (
+      SELECT
+        MIN(ds) AS ds
+      FROM {{ source_schema }}.fct_accounts
+    ) b
+    ON
+      a.ds = b.ds
+    GROUP BY
+      a.ds
