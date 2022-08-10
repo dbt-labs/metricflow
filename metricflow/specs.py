@@ -18,6 +18,7 @@ from metricflow.column_assoc import ColumnAssociation
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.model.objects.base import FrozenBaseModel
+from metricflow.model.objects.elements.measure import NonAdditiveDimensionParameters
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.references import DimensionReference, MeasureReference, TimeDimensionReference
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
@@ -265,10 +266,6 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
             element_name=self.element_name,
             time_granularity=self.time_granularity,
         ).qualified_name
-
-
-# How to avoid circular import here
-from metricflow.model.objects.elements.measure import NonAdditiveDimensionParameters  # noqa: E402
 
 
 class MeasureSpec(InstanceSpec):  # noqa: D
