@@ -262,7 +262,6 @@ data_source_schema = {
         "measures": {"type": "array", "items": {"$ref": "measure_schema"}},
         "dimensions": {"type": "array", "items": {"$ref": "dimension_schema"}},
         "mutability": {"$ref": "mutability_schema"},
-        "constraint": {"$ref": "constraint_schema"},
     },
     "additionalProperties": False,
     "required": ["name"],
