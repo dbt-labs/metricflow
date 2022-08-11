@@ -34,10 +34,10 @@ integration_test:
   description: Tests selecting a measure with semi additive properties
   model: SIMPLE_MODEL
   metrics: ["total_account_balance_first_day"]
-  group_bys: ["ds"]
+  group_bys: ["metric_time"]
   check_query: |
     SELECT
-      a.ds AS ds
+      a.ds AS metric_time
       , SUM(a.total_account_balance_first_day) AS total_account_balance_first_day
     FROM (
       SELECT
