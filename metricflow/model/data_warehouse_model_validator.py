@@ -97,7 +97,7 @@ class DataWarehouseTaskBuilder:
             (render_tools.converter.create_sql_source_data_set(data_source_semantics),)
         )
 
-        assert len(source_nodes) == 1
+        assert len(source_nodes) >= 1
         return source_nodes[0]
 
     @staticmethod
