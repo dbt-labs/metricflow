@@ -18,10 +18,11 @@
                     <!--   {'class': 'MeasureSpec',           -->
                     <!--    'element_name': 'booking_value',  -->
                     <!--    'non_additive_dimension': None}   -->
-                    <!-- include_spec =                                                                  -->
-                    <!--   {'class': 'DimensionSpec',                                                    -->
-                    <!--    'element_name': 'country_latest',                                            -->
-                    <!--    'identifier_links': ({'element_name': 'listing', 'identifier_links': ()},)}  -->
+                    <!-- include_spec =                                            -->
+                    <!--   {'class': 'DimensionSpec',                              -->
+                    <!--    'element_name': 'country_latest',                      -->
+                    <!--    'identifier_links': ({'class': 'IdentifierReference',  -->
+                    <!--                          'element_name': 'listing'},)}    -->
                     <!-- include_spec =                               -->
                     <!--   {'class': 'TimeDimensionSpec',             -->
                     <!--    'element_name': 'metric_time',            -->
