@@ -617,11 +617,11 @@ def test_order_by_node(
     order_by_node = OrderByLimitNode(
         order_by_specs=[
             OrderBySpec(
-                item=time_dimension_spec,
+                time_dimension_spec=time_dimension_spec,
                 descending=False,
             ),
             OrderBySpec(
-                item=metric_spec,
+                metric_spec=metric_spec,
                 descending=True,
             ),
         ],
@@ -1040,7 +1040,9 @@ def test_composite_identifier_with_order_by(  # noqa: D
             metric_specs=(MetricSpec(element_name="messages"),),
             identifier_specs=(IdentifierSpec(element_name="user_team", identifier_links=()),),
             order_by_specs=(
-                OrderBySpec(item=IdentifierSpec(element_name="user_team", identifier_links=()), descending=True),
+                OrderBySpec(
+                    identifier_spec=IdentifierSpec(element_name="user_team", identifier_links=()), descending=True
+                ),
             ),
         )
     )
