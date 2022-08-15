@@ -20,10 +20,11 @@
                     <!--    'non_additive_dimension': None}  -->
                     <!-- include_spec =                                                                      -->
                     <!--   {'class': 'DimensionSpec', 'element_name': 'is_instant', 'identifier_links': ()}  -->
-                    <!-- include_spec =                                                                  -->
-                    <!--   {'class': 'DimensionSpec',                                                    -->
-                    <!--    'element_name': 'country_latest',                                            -->
-                    <!--    'identifier_links': ({'element_name': 'listing', 'identifier_links': ()},)}  -->
+                    <!-- include_spec =                                            -->
+                    <!--   {'class': 'DimensionSpec',                              -->
+                    <!--    'element_name': 'country_latest',                      -->
+                    <!--    'identifier_links': ({'class': 'IdentifierReference',  -->
+                    <!--                          'element_name': 'listing'},)}    -->
                     <JoinToBaseOutputNode>
                         <!-- description = Join Standard Outputs -->
                         <!-- node_id = jso_0 -->
