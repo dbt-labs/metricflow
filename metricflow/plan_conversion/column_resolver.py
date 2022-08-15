@@ -30,13 +30,13 @@ class DefaultColumnAssociationResolver(ColumnAssociationResolver):
     def resolve_metric_spec(self, metric_spec: MetricSpec) -> ColumnAssociation:  # noqa: D
         return ColumnAssociation(
             column_name=metric_spec.element_name,
-            column_correlation_key=SingleColumnCorrelationKey(),
+            single_column_correlation_key=SingleColumnCorrelationKey(),
         )
 
     def resolve_measure_spec(self, measure_spec: MeasureSpec) -> ColumnAssociation:  # noqa: D
         return ColumnAssociation(
             column_name=measure_spec.element_name,
-            column_correlation_key=SingleColumnCorrelationKey(),
+            single_column_correlation_key=SingleColumnCorrelationKey(),
         )
 
     def resolve_dimension_spec(self, dimension_spec: DimensionSpec) -> ColumnAssociation:  # noqa: D
@@ -45,7 +45,7 @@ class DefaultColumnAssociationResolver(ColumnAssociationResolver):
                 identifier_link_names=tuple(x.element_name for x in dimension_spec.identifier_links),
                 element_name=dimension_spec.element_name,
             ).qualified_name,
-            column_correlation_key=SingleColumnCorrelationKey(),
+            single_column_correlation_key=SingleColumnCorrelationKey(),
         )
 
     def resolve_time_dimension_spec(self, time_dimension_spec: TimeDimensionSpec) -> ColumnAssociation:  # noqa: D
@@ -63,7 +63,7 @@ class DefaultColumnAssociationResolver(ColumnAssociationResolver):
 
         return ColumnAssociation(
             column_name=column_name,
-            column_correlation_key=SingleColumnCorrelationKey(),
+            single_column_correlation_key=SingleColumnCorrelationKey(),
         )
 
     def resolve_identifier_spec(self, identifier_spec: IdentifierSpec) -> Tuple[ColumnAssociation, ...]:  # noqa: D
@@ -87,7 +87,7 @@ class DefaultColumnAssociationResolver(ColumnAssociationResolver):
                     column_associations += (
                         ColumnAssociation(
                             column_name=sub_identifier,
-                            column_correlation_key=CompositeColumnCorrelationKey(
+                            composite_column_correlation_key=CompositeColumnCorrelationKey(
                                 sub_identifier=StructuredLinkableSpecName(
                                     identifier_link_names=(),
                                     element_name=sub_id_name,
@@ -103,6 +103,6 @@ class DefaultColumnAssociationResolver(ColumnAssociationResolver):
                     identifier_link_names=tuple(x.element_name for x in identifier_spec.identifier_links),
                     element_name=identifier_spec.element_name,
                 ).qualified_name,
-                column_correlation_key=SingleColumnCorrelationKey(),
+                single_column_correlation_key=SingleColumnCorrelationKey(),
             ),
         )

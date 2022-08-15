@@ -363,7 +363,7 @@ def _make_time_spine_data_set(
             associated_columns=(
                 ColumnAssociation(
                     column_name=metric_time_dimension_column_name,
-                    column_correlation_key=SingleColumnCorrelationKey(),
+                    single_column_correlation_key=SingleColumnCorrelationKey(),
                 ),
             ),
             spec=metric_time_dimension_instance.spec,

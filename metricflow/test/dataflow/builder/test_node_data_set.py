@@ -46,7 +46,9 @@ def test_no_parent_node_data_set(
             measure_instances=(
                 MeasureInstance(
                     associated_columns=(
-                        ColumnAssociation(column_name="bookings", column_correlation_key=SingleColumnCorrelationKey()),
+                        ColumnAssociation(
+                            column_name="bookings", single_column_correlation_key=SingleColumnCorrelationKey()
+                        ),
                     ),
                     defined_from=(
                         DataSourceElementReference(
