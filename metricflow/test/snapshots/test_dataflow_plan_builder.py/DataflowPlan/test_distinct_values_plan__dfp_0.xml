@@ -5,12 +5,15 @@
         <OrderByLimitNode>
             <!-- description = Order By ['listing__country_latest'] Limit 100 -->
             <!-- node_id = obl_0 -->
-            <!-- order_by_spec =                                                -->
-            <!--   {'class': 'OrderBySpec',                                     -->
-            <!--    'item': {'element_name': 'country_latest',                  -->
-            <!--             'identifier_links': ({'element_name': 'listing',   -->
-            <!--                                   'identifier_links': ()},)},  -->
-            <!--    'descending': False}                                        -->
+            <!-- order_by_spec =                                                          -->
+            <!--   {'class': 'OrderBySpec',                                               -->
+            <!--    'metric_spec': None,                                                  -->
+            <!--    'dimension_spec': {'element_name': 'country_latest',                  -->
+            <!--                       'identifier_links': ({'element_name': 'listing',   -->
+            <!--                                             'identifier_links': ()},)},  -->
+            <!--    'time_dimension_spec': None,                                          -->
+            <!--    'identifier_spec': None,                                              -->
+            <!--    'descending': False}                                                  -->
             <!-- limit = 100 -->
             <FilterElementsNode>
                 <!-- description =                    -->

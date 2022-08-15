@@ -678,7 +678,7 @@ class MetricFlowQueryParser:
                     )
                 order_by_specs.append(
                     OrderBySpec(
-                        item=MetricSpec(element_name=parsed_name.element_name),
+                        metric_spec=MetricSpec(element_name=parsed_name.element_name),
                         descending=descending,
                     )
                 )
@@ -690,7 +690,7 @@ class MetricFlowQueryParser:
                     )
                 order_by_specs.append(
                     OrderBySpec(
-                        item=DimensionSpec(
+                        dimension_spec=DimensionSpec(
                             element_name=parsed_name.element_name,
                             identifier_links=tuple(
                                 LinklessIdentifierSpec.from_element_name(x) for x in parsed_name.identifier_link_names
@@ -709,7 +709,7 @@ class MetricFlowQueryParser:
                 if parsed_name.time_granularity:
                     order_by_specs.append(
                         OrderBySpec(
-                            item=TimeDimensionSpec(
+                            time_dimension_spec=TimeDimensionSpec(
                                 element_name=parsed_name.element_name,
                                 identifier_links=identifier_links,
                                 time_granularity=parsed_name.time_granularity,
@@ -728,7 +728,7 @@ class MetricFlowQueryParser:
                     if partial_time_dimension_spec in time_dimension_spec_replacements:
                         order_by_specs.append(
                             OrderBySpec(
-                                item=time_dimension_spec_replacements[partial_time_dimension_spec],
+                                time_dimension_spec=time_dimension_spec_replacements[partial_time_dimension_spec],
                                 descending=descending,
                             )
                         )
@@ -747,7 +747,7 @@ class MetricFlowQueryParser:
                     )
                 order_by_specs.append(
                     OrderBySpec(
-                        item=IdentifierSpec(
+                        identifier_spec=IdentifierSpec(
                             element_name=parsed_name.element_name,
                             identifier_links=tuple(
                                 LinklessIdentifierSpec.from_element_name(x) for x in parsed_name.identifier_link_names

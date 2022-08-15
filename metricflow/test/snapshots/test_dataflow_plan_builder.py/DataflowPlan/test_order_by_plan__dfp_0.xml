@@ -5,16 +5,22 @@
         <OrderByLimitNode>
             <!-- description = Order By ['metric_time', 'bookings'] -->
             <!-- node_id = obl_0 -->
-            <!-- order_by_spec =                                        -->
-            <!--   {'class': 'OrderBySpec',                             -->
-            <!--    'item': {'element_name': 'metric_time',             -->
-            <!--             'identifier_links': (),                    -->
-            <!--             'time_granularity': TimeGranularity.DAY},  -->
-            <!--    'descending': False}                                -->
-            <!-- order_by_spec =                           -->
-            <!--   {'class': 'OrderBySpec',                -->
-            <!--    'item': {'element_name': 'bookings'},  -->
-            <!--    'descending': True}                    -->
+            <!-- order_by_spec =                                                       -->
+            <!--   {'class': 'OrderBySpec',                                            -->
+            <!--    'metric_spec': None,                                               -->
+            <!--    'dimension_spec': None,                                            -->
+            <!--    'time_dimension_spec': {'element_name': 'metric_time',             -->
+            <!--                            'identifier_links': (),                    -->
+            <!--                            'time_granularity': TimeGranularity.DAY},  -->
+            <!--    'identifier_spec': None,                                           -->
+            <!--    'descending': False}                                               -->
+            <!-- order_by_spec =                                  -->
+            <!--   {'class': 'OrderBySpec',                       -->
+            <!--    'metric_spec': {'element_name': 'bookings'},  -->
+            <!--    'dimension_spec': None,                       -->
+            <!--    'time_dimension_spec': None,                  -->
+            <!--    'identifier_spec': None,                      -->
+            <!--    'descending': True}                           -->
             <!-- limit = None -->
             <ComputeMetricsNode>
                 <!-- description = Compute Metrics via Expressions -->

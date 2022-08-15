@@ -217,7 +217,9 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             computed_metrics_output=distinct_values_node,
             order_by_specs=(
                 OrderBySpec(
-                    item=linkable_spec,
+                    dimension_spec=dimension_spec,
+                    time_dimension_spec=time_dimension_spec,
+                    identifier_spec=identifier_spec,
                     descending=False,
                 ),
             ),

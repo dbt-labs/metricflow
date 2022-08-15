@@ -33,11 +33,13 @@ def test_query_parser(query_parser: MetricFlowQueryParser) -> None:  # noqa: D
     assert query_spec.identifier_specs == (IdentifierSpec(element_name="listing", identifier_links=()),)
     assert query_spec.order_by_specs == (
         OrderBySpec(
-            item=TimeDimensionSpec(element_name=MTD, identifier_links=(), time_granularity=TimeGranularity.DAY),
+            time_dimension_spec=TimeDimensionSpec(
+                element_name=MTD, identifier_links=(), time_granularity=TimeGranularity.DAY
+            ),
             descending=False,
         ),
         OrderBySpec(
-            item=MetricSpec(element_name="bookings"),
+            metric_spec=MetricSpec(element_name="bookings"),
             descending=True,
         ),
     )
@@ -58,7 +60,9 @@ def test_order_by_granularity_conversion(query_parser: MetricFlowQueryParser) ->
     # The lowest common granularity is MONTH, so we expect the PTD in the order by to have that granularity.
     assert (
         OrderBySpec(
-            item=TimeDimensionSpec(element_name=MTD, identifier_links=(), time_granularity=TimeGranularity.DAY),
+            time_dimension_spec=TimeDimensionSpec(
+                element_name=MTD, identifier_links=(), time_granularity=TimeGranularity.DAY
+            ),
             descending=True,
         ),
     ) == query_spec.order_by_specs
@@ -70,7 +74,9 @@ def test_order_by_granularity_no_conversion(query_parser: MetricFlowQueryParser)
     # The only granularity is DAY, so we expect the PTD in the order by to have that granularity.
     assert (
         OrderBySpec(
-            item=TimeDimensionSpec(element_name=MTD, identifier_links=(), time_granularity=TimeGranularity.DAY),
+            time_dimension_spec=TimeDimensionSpec(
+                element_name=MTD, identifier_links=(), time_granularity=TimeGranularity.DAY
+            ),
             descending=False,
         ),
     ) == query_spec.order_by_specs

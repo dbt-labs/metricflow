@@ -16,6 +16,7 @@ from typing import List, Optional, Sequence, Tuple, TypeVar, Generic
 
 from metricflow.column_assoc import ColumnAssociation
 from metricflow.constraints.time_constraint import TimeRangeConstraint
+from metricflow.object_utils import assert_exactly_one_arg_set
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.model.objects.base import FrozenBaseModel
 from metricflow.model.objects.elements.measure import NonAdditiveDimensionParameters
@@ -303,8 +304,28 @@ class MetricSpec(InstanceSpec):  # noqa: D
 
 
 class OrderBySpec(FrozenBaseModel):  # noqa: D
-    item: InstanceSpec
+
+    metric_spec: Optional[MetricSpec] = None
+    dimension_spec: Optional[DimensionSpec] = None
+    time_dimension_spec: Optional[TimeDimensionSpec] = None
+    identifier_spec: Optional[IdentifierSpec] = None
     descending: bool
+
+    def __post_init__(self) -> None:  # noqa: D
+        assert_exactly_one_arg_set(
+            metric_spec=self.metric_spec,
+            dimension_spec=self.dimension_spec,
+            time_dimension_spec=self.time_dimension_spec,
+            identifier_spec=self.identifier_spec,
+        )
+
+    @property
+    def item(self) -> InstanceSpec:  # noqa: D
+        result: Optional[InstanceSpec] = (
+            self.metric_spec or self.dimension_spec or self.time_dimension_spec or self.identifier_spec
+        )
+        assert result
+        return result
 
 
 class FilterSpec(FrozenBaseModel):  # noqa: D
