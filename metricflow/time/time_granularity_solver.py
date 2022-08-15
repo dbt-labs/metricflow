@@ -1,27 +1,27 @@
 from __future__ import annotations
 
 import logging
-import pandas as pd
 from collections import defaultdict, OrderedDict
 from dataclasses import dataclass
 from typing import Tuple, List, Dict, Sequence, Set, Optional
+
+import pandas as pd
 
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import BaseOutput
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.instances import MetricModelReference
+from metricflow.model.objects.metric import MetricType
+from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.query.query_exceptions import InvalidQueryException
-from metricflow.references import TimeDimensionReference, MeasureReference
+from metricflow.references import TimeDimensionReference, MeasureReference, IdentifierReference
 from metricflow.specs import (
     MetricSpec,
     TimeDimensionSpec,
-    LinklessIdentifierSpec,
     DEFAULT_TIME_GRANULARITY,
 )
-from metricflow.model.objects.metric import MetricType
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.time.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
@@ -35,7 +35,7 @@ class PartialTimeDimensionSpec:
     """
 
     element_name: str
-    identifier_links: Tuple[LinklessIdentifierSpec, ...]
+    identifier_links: Tuple[IdentifierReference, ...]
 
 
 @dataclass(frozen=True)

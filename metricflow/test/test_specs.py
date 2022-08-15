@@ -12,6 +12,7 @@ from metricflow.specs import (
     MetricSpec,
     MeasureSpec,
     LinklessIdentifierSpec,
+    IdentifierReference,
 )
 from metricflow.time.time_granularity import TimeGranularity
 
@@ -21,8 +22,8 @@ def dimension_spec() -> DimensionSpec:  # noqa: D
     return DimensionSpec(
         element_name="platform",
         identifier_links=(
-            LinklessIdentifierSpec.from_element_name(element_name="user_id"),
-            LinklessIdentifierSpec.from_element_name(element_name="device_id"),
+            IdentifierReference(element_name="user_id"),
+            IdentifierReference(element_name="device_id"),
         ),
     )
 
@@ -31,7 +32,7 @@ def dimension_spec() -> DimensionSpec:  # noqa: D
 def time_dimension_spec() -> TimeDimensionSpec:  # noqa: D
     return TimeDimensionSpec(
         element_name="signup_ts",
-        identifier_links=(LinklessIdentifierSpec.from_element_name(element_name="user_id"),),
+        identifier_links=(IdentifierReference(element_name="user_id"),),
         time_granularity=TimeGranularity.DAY,
     )
 
@@ -40,7 +41,7 @@ def time_dimension_spec() -> TimeDimensionSpec:  # noqa: D
 def identifier_spec() -> IdentifierSpec:  # noqa: D
     return IdentifierSpec(
         element_name="user_id",
-        identifier_links=(LinklessIdentifierSpec.from_element_name(element_name="listing_id"),),
+        identifier_links=(IdentifierReference(element_name="listing_id"),),
     )
 
 
@@ -51,7 +52,7 @@ def test_merge_specs(dimension_spec: DimensionSpec, identifier_spec: IdentifierS
 
 def test_dimension_without_first_identifier_link(dimension_spec: DimensionSpec) -> None:  # noqa: D
     assert dimension_spec.without_first_identifier_link() == DimensionSpec(
-        element_name="platform", identifier_links=(LinklessIdentifierSpec.from_element_name(element_name="device_id"),)
+        element_name="platform", identifier_links=(IdentifierReference(element_name="device_id"),)
     )
 
 
@@ -96,9 +97,7 @@ def test_merge_linkable_specs(dimension_spec: DimensionSpec, identifier_spec: Id
 
 def test_qualified_name() -> None:  # noqa: D
     assert (
-        DimensionSpec(
-            element_name="country", identifier_links=(LinklessIdentifierSpec.from_element_name("listing_id"),)
-        ).qualified_name
+        DimensionSpec(element_name="country", identifier_links=(IdentifierReference("listing_id"),)).qualified_name
         == "listing_id__country"
     )
 
@@ -133,7 +132,7 @@ def spec_set() -> InstanceSpecSet:  # noqa: D
         identifier_specs=(
             IdentifierSpec(
                 element_name="user_id",
-                identifier_links=(LinklessIdentifierSpec.from_element_name(element_name="listing_id"),),
+                identifier_links=(IdentifierReference(element_name="listing_id"),),
             ),
         ),
     )
@@ -149,7 +148,7 @@ def test_spec_set_linkable_specs(spec_set: InstanceSpecSet) -> None:  # noqa: D
         ),
         IdentifierSpec(
             element_name="user_id",
-            identifier_links=(LinklessIdentifierSpec.from_element_name(element_name="listing_id"),),
+            identifier_links=(IdentifierReference(element_name="listing_id"),),
         ),
     }
 
@@ -168,7 +167,7 @@ def test_spec_set_all_specs(spec_set: InstanceSpecSet) -> None:  # noqa: D
         ),
         IdentifierSpec(
             element_name="user_id",
-            identifier_links=(LinklessIdentifierSpec.from_element_name(element_name="listing_id"),),
+            identifier_links=(IdentifierReference(element_name="listing_id"),),
         ),
     }
 

@@ -973,7 +973,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             metric_instances.append(
                 MetricInstance(
                     associated_columns=(output_column_association,),
-                    defined_from=[MetricModelReference(metric_name=metric_spec.element_name)],
+                    defined_from=(MetricModelReference(metric_name=metric_spec.element_name),),
                     spec=metric_spec,
                 )
             )

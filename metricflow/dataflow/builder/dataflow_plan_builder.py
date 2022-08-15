@@ -60,6 +60,7 @@ from metricflow.specs import (
     SpecWhereClauseConstraint,
     LinkableSpecSet,
     ColumnAssociationResolver,
+    LinklessIdentifierSpec,
 )
 from metricflow.time.time_granularity import TimeGranularity
 
@@ -672,7 +673,8 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
 
             # If we're joining something in, then we need the associated identifier and partitions.
             include_specs: List[LinkableInstanceSpec] = [
-                x.identifier_links[0] for x in join_recipe.satisfiable_linkable_specs
+                LinklessIdentifierSpec.from_reference(x.identifier_links[0])
+                for x in join_recipe.satisfiable_linkable_specs
             ]
             include_specs.extend([x.node_to_join_dimension_spec for x in join_recipe.join_on_partition_dimensions])
             include_specs.extend(

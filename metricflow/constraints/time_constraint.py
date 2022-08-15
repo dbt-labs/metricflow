@@ -1,15 +1,17 @@
 from __future__ import annotations
 
 import datetime
+from dataclasses import dataclass
 from typing import Optional
 
 import pandas as pd
 
-from metricflow.model.objects.base import HashableBaseModel
+from metricflow.dataclass_serialization import SerializableDataclass
 from metricflow.time.time_granularity import TimeGranularity
 
 
-class TimeRangeConstraint(HashableBaseModel):
+@dataclass(frozen=True)
+class TimeRangeConstraint(SerializableDataclass):
     """Describes how the time dimension for metrics should be constrained."""
 
     start_time: datetime.datetime

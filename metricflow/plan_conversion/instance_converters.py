@@ -30,6 +30,7 @@ from metricflow.specs import (
     TimeDimensionSpec,
     LinklessIdentifierSpec,
     LinkableInstanceSpec,
+    IdentifierReference,
 )
 from metricflow.sql.sql_exprs import (
     SqlColumnReferenceExpression,
@@ -244,7 +245,10 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
             # The new dimension spec should include the join on identifier.
             transformed_time_dimension_spec_from_right = TimeDimensionSpec(
                 element_name=time_dimension_instance.spec.element_name,
-                identifier_links=(self._join_on_identifier,) + time_dimension_instance.spec.identifier_links,
+                identifier_links=(
+                    (IdentifierReference(element_name=self._join_on_identifier.element_name),)
+                    + time_dimension_instance.spec.identifier_links
+                ),
                 time_granularity=time_dimension_instance.spec.time_granularity,
             )
             time_dimension_instances_with_additional_link.append(
@@ -303,7 +307,10 @@ class FilterLinkableInstancesWithLeadingLink(InstanceSetTransform[InstanceSet]):
         self._identifier_link = identifier_link
 
     def _should_pass(self, linkable_spec: LinkableInstanceSpec) -> bool:  # noqa: D
-        return len(linkable_spec.identifier_links) == 0 or linkable_spec.identifier_links[0] != self._identifier_link
+        return (
+            len(linkable_spec.identifier_links) == 0
+            or LinklessIdentifierSpec.from_reference(linkable_spec.identifier_links[0]) != self._identifier_link
+        )
 
     def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D
 

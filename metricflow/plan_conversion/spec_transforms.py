@@ -5,7 +5,6 @@ from metricflow.specs import (
     InstanceSpecSetTransform,
     InstanceSpecSet,
     ColumnAssociationResolver,
-    TransformOutputT,
 )
 from metricflow.sql.sql_exprs import (
     SqlExpressionNode,
@@ -198,7 +197,7 @@ class CreateSelectCoalescedColumnsForLinkableSpecs(InstanceSpecSetTransform[Sele
 class SelectOnlyLinkableSpecs(InstanceSpecSetTransform[InstanceSpecSet]):
     """Removes metrics and measures from the spec set."""
 
-    def transform(self, spec_set: InstanceSpecSet) -> TransformOutputT:  # noqa: D
+    def transform(self, spec_set: InstanceSpecSet) -> InstanceSpecSet:  # noqa: D
         return InstanceSpecSet(
             metric_specs=(),
             measure_specs=(),

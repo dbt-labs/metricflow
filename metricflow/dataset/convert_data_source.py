@@ -5,6 +5,7 @@ from typing import Optional, List, Tuple, Sequence
 
 from metricflow.dag.id_generation import IdGeneratorRegistry
 from metricflow.dataflow.sql_table import SqlTable
+from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.instances import (
     MeasureInstance,
     DataSourceElementReference,
@@ -25,7 +26,8 @@ from metricflow.specs import (
     DimensionSpec,
     IdentifierSpec,
     ColumnAssociationResolver,
-    LinklessIdentifierSpec,
+    DEFAULT_TIME_GRANULARITY,
+    IdentifierReference,
 )
 from metricflow.sql.sql_exprs import (
     SqlStringExpression,
@@ -42,7 +44,6 @@ from metricflow.sql.sql_plan import (
     SqlSelectQueryFromClauseNode,
 )
 from metricflow.time.time_granularity import TimeGranularity
-from metricflow.dataset.data_source_adapter import DataSourceDataSet
 
 logger = logging.getLogger(__name__)
 
@@ -75,7 +76,7 @@ class DataSourceToDataSetConverter:
         self,
         data_source_name: str,
         dimension: Dimension,
-        identifier_links: Tuple[LinklessIdentifierSpec, ...],
+        identifier_links: Tuple[IdentifierReference, ...],
     ) -> DimensionInstance:
         """Create a dimension instance from the dimension object in the model."""
         dimension_spec = DimensionSpec(
@@ -99,8 +100,8 @@ class DataSourceToDataSetConverter:
         self,
         data_source_name: str,
         time_dimension: Dimension,
-        identifier_links: Tuple[LinklessIdentifierSpec, ...],
-        time_granularity: Optional[TimeGranularity] = None,
+        identifier_links: Tuple[IdentifierReference, ...],
+        time_granularity: TimeGranularity = DEFAULT_TIME_GRANULARITY,
     ) -> TimeDimensionInstance:
         """Create a time dimension instance from the dimension object from a data source in the model."""
         time_dimension_spec = TimeDimensionSpec(
@@ -126,7 +127,7 @@ class DataSourceToDataSetConverter:
         self,
         data_source_name: str,
         identifier: Identifier,
-        identifier_links: Tuple[LinklessIdentifierSpec, ...],
+        identifier_links: Tuple[IdentifierReference, ...],
     ) -> IdentifierInstance:
         """Create an identifier instance from the identifier object from a data sourcein the model."""
         identifier_spec = IdentifierSpec(
@@ -216,7 +217,7 @@ class DataSourceToDataSetConverter:
         self,
         data_source_name: str,
         dimensions: Sequence[Dimension],
-        identifier_links: Tuple[LinklessIdentifierSpec, ...],
+        identifier_links: Tuple[IdentifierReference, ...],
         table_alias: str,
     ) -> DimensionConversionResult:
         dimension_instances = []
@@ -302,7 +303,7 @@ class DataSourceToDataSetConverter:
         self,
         data_source_name: str,
         identifiers: Sequence[Identifier],
-        identifier_links: Tuple[LinklessIdentifierSpec, ...],
+        identifier_links: Tuple[IdentifierReference, ...],
         table_alias: str,
     ) -> Tuple[Sequence[IdentifierInstance], Sequence[SqlSelectColumn]]:
         identifier_instances = []
@@ -310,10 +311,7 @@ class DataSourceToDataSetConverter:
         for identifier in identifiers or []:
             # We don't want to create something like user_id__user_id, so skip if the link is the same as the
             # identifier.
-            if (
-                len(identifier_links) == 1
-                and LinklessIdentifierSpec.from_element_name(identifier.reference.element_name) == identifier_links[0]
-            ):
+            if len(identifier_links) == 1 and identifier.reference == identifier_links[0]:
                 continue
 
             identifier_instance = self._create_identifier_instance(
@@ -406,12 +404,10 @@ class DataSourceToDataSetConverter:
         # e.g. in the "users" data source, with the "country" dimension and the "user_id" identifier,
         # the dimensions "country" and "user_id__country" both mean the same thing. To make matching easier, create both
         # instances in the instance set. We'll create a different instance for each "possible_identifier_links".
-        possible_identifier_links: List[Tuple[LinklessIdentifierSpec, ...]] = [()]
+        possible_identifier_links: List[Tuple[IdentifierReference, ...]] = [()]
         for identifier in data_source.identifiers:
             if identifier.type in (IdentifierType.PRIMARY, IdentifierType.UNIQUE):
-                possible_identifier_links.append(
-                    (LinklessIdentifierSpec.from_element_name(element_name=identifier.reference.element_name),)
-                )
+                possible_identifier_links.append((identifier.reference,))
 
         # Handle dimensions
         conversion_results = [
