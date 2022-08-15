@@ -2,9 +2,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from metricflow.dataclass_serialization import SerializableDataclass
+
 
 @dataclass(frozen=True)
-class ElementReference:
+class ElementReference(SerializableDataclass):
     """Used when we need to refer to a dimension, measure, identifier, but other attributes are unknown."""
 
     element_name: str

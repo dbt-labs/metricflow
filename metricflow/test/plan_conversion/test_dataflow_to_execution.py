@@ -1,6 +1,7 @@
 from _pytest.fixtures import FixtureRequest
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
+from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_execution import DataflowToExecutionPlanConverter
@@ -11,11 +12,10 @@ from metricflow.specs import (
     MetricFlowQuerySpec,
     MetricSpec,
     DimensionSpec,
-    LinklessIdentifierSpec,
     TimeDimensionSpec,
+    IdentifierReference,
 )
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
-from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.plan_utils import assert_execution_plan_text_equal
 
@@ -54,7 +54,7 @@ def test_joined_plan(  # noqa: D
                 ),
                 DimensionSpec(
                     element_name="country_latest",
-                    identifier_links=(LinklessIdentifierSpec.from_element_name("listing"),),
+                    identifier_links=(IdentifierReference("listing"),),
                 ),
             ),
         )
@@ -166,8 +166,8 @@ def test_multihop_joined_plan(  # noqa: D
                 DimensionSpec(
                     element_name="customer_name",
                     identifier_links=(
-                        LinklessIdentifierSpec.from_element_name(element_name="account_id"),
-                        LinklessIdentifierSpec.from_element_name(element_name="customer_id"),
+                        IdentifierReference(element_name="account_id"),
+                        IdentifierReference(element_name="customer_id"),
                     ),
                 ),
             ),

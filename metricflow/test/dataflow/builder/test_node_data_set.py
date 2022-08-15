@@ -21,6 +21,7 @@ from metricflow.specs import (
     LinklessIdentifierSpec,
     DimensionSpec,
     InstanceSpecSet,
+    IdentifierReference,
 )
 from metricflow.sql.sql_exprs import SqlColumnReferenceExpression, SqlColumnReference
 from metricflow.sql.sql_plan import SqlSelectStatementNode, SqlSelectColumn, SqlTableFromClauseNode
@@ -125,7 +126,7 @@ def test_joined_node_data_set(
         dimension_specs=(
             DimensionSpec(
                 element_name="home_state_latest",
-                identifier_links=(LinklessIdentifierSpec(element_name="user", identifier_links=()),),
+                identifier_links=(IdentifierReference(element_name="user"),),
             ),
         ),
         identifier_specs=(IdentifierSpec(element_name="user", identifier_links=()),),
@@ -137,27 +138,27 @@ def test_joined_node_data_set(
             TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.YEAR),
             TimeDimensionSpec(
                 element_name="ds",
-                identifier_links=(LinklessIdentifierSpec(element_name="user", identifier_links=()),),
+                identifier_links=(IdentifierReference(element_name="user"),),
                 time_granularity=TimeGranularity.DAY,
             ),
             TimeDimensionSpec(
                 element_name="ds",
-                identifier_links=(LinklessIdentifierSpec(element_name="user", identifier_links=()),),
+                identifier_links=(IdentifierReference(element_name="user"),),
                 time_granularity=TimeGranularity.WEEK,
             ),
             TimeDimensionSpec(
                 element_name="ds",
-                identifier_links=(LinklessIdentifierSpec(element_name="user", identifier_links=()),),
+                identifier_links=(IdentifierReference(element_name="user"),),
                 time_granularity=TimeGranularity.MONTH,
             ),
             TimeDimensionSpec(
                 element_name="ds",
-                identifier_links=(LinklessIdentifierSpec(element_name="user", identifier_links=()),),
+                identifier_links=(IdentifierReference(element_name="user"),),
                 time_granularity=TimeGranularity.QUARTER,
             ),
             TimeDimensionSpec(
                 element_name="ds",
-                identifier_links=(LinklessIdentifierSpec(element_name="user", identifier_links=()),),
+                identifier_links=(IdentifierReference(element_name="user"),),
                 time_granularity=TimeGranularity.YEAR,
             ),
         ),

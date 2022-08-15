@@ -14,13 +14,13 @@ from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.object_utils import pformat_big_objects, flatten_nested_sequence
 from metricflow.references import MeasureReference
 from metricflow.specs import (
-    LinklessIdentifierSpec,
     DEFAULT_TIME_GRANULARITY,
     LinkableSpecSet,
     DimensionSpec,
     TimeDimensionSpec,
     IdentifierSpec,
     MetricSpec,
+    IdentifierReference,
 )
 from metricflow.time.time_granularity import TimeGranularity
 
@@ -275,7 +275,7 @@ class LinkableElementSet:
             dimension_specs=tuple(
                 DimensionSpec(
                     element_name=x.element_name,
-                    identifier_links=tuple(LinklessIdentifierSpec.from_element_name(x) for x in x.identifier_links),
+                    identifier_links=tuple(IdentifierReference(element_name=x) for x in x.identifier_links),
                 )
                 for x in self.linkable_dimensions
                 if not x.time_granularity
@@ -283,7 +283,7 @@ class LinkableElementSet:
             time_dimension_specs=tuple(
                 TimeDimensionSpec(
                     element_name=x.element_name,
-                    identifier_links=tuple(LinklessIdentifierSpec.from_element_name(x) for x in x.identifier_links),
+                    identifier_links=tuple(IdentifierReference(element_name=x) for x in x.identifier_links),
                     time_granularity=x.time_granularity,
                 )
                 for x in self.linkable_dimensions
@@ -292,7 +292,7 @@ class LinkableElementSet:
             identifier_specs=tuple(
                 IdentifierSpec(
                     element_name=x.element_name,
-                    identifier_links=tuple(LinklessIdentifierSpec.from_element_name(x) for x in x.identifier_links),
+                    identifier_links=tuple(IdentifierReference(element_name=x) for x in x.identifier_links),
                 )
                 for x in self.linkable_identifiers
             ),

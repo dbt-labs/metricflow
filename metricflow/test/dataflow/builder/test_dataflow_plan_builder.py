@@ -11,9 +11,9 @@ from metricflow.specs import (
     MetricFlowQuerySpec,
     MetricSpec,
     DimensionSpec,
-    LinklessIdentifierSpec,
     SpecWhereClauseConstraint,
     LinkableSpecSet,
+    IdentifierReference,
 )
 from metricflow.specs import (
     OrderBySpec,
@@ -75,7 +75,7 @@ def test_joined_plan(  # noqa: D
                 ),
                 DimensionSpec(
                     element_name="country_latest",
-                    identifier_links=(LinklessIdentifierSpec.from_element_name("listing"),),
+                    identifier_links=(IdentifierReference(element_name="listing"),),
                 ),
             ),
         )
@@ -205,7 +205,7 @@ def test_expr_metrics_plan(
             dimension_specs=(
                 DimensionSpec(
                     element_name="country_latest",
-                    identifier_links=(LinklessIdentifierSpec.from_element_name(element_name="listing"),),
+                    identifier_links=(IdentifierReference(element_name="listing"),),
                 ),
             ),
             time_dimension_specs=(MTD_SPEC_DAY,),
@@ -238,7 +238,7 @@ def test_single_data_source_ratio_metrics_plan(
             dimension_specs=(
                 DimensionSpec(
                     element_name="country_latest",
-                    identifier_links=(LinklessIdentifierSpec.from_element_name(element_name="listing"),),
+                    identifier_links=(IdentifierReference(element_name="listing"),),
                 ),
             ),
             time_dimension_specs=(MTD_SPEC_DAY,),
@@ -271,7 +271,7 @@ def test_multi_data_source_ratio_metrics_plan(
             dimension_specs=(
                 DimensionSpec(
                     element_name="country_latest",
-                    identifier_links=(LinklessIdentifierSpec.from_element_name(element_name="listing"),),
+                    identifier_links=(IdentifierReference(element_name="listing"),),
                 ),
             ),
             time_dimension_specs=(MTD_SPEC_DAY,),
@@ -305,8 +305,8 @@ def test_multihop_join_plan(  # noqa: D
                 DimensionSpec(
                     element_name="customer_name",
                     identifier_links=(
-                        LinklessIdentifierSpec.from_element_name(element_name="account_id"),
-                        LinklessIdentifierSpec.from_element_name(element_name="customer_id"),
+                        IdentifierReference(element_name="account_id"),
+                        IdentifierReference(element_name="customer_id"),
                     ),
                 ),
             ),
@@ -349,7 +349,7 @@ def test_where_constrained_plan(  # noqa: D
                     dimension_specs=(
                         DimensionSpec(
                             element_name="country_latest",
-                            identifier_links=(LinklessIdentifierSpec.from_element_name("listing"),),
+                            identifier_links=(IdentifierReference(element_name="listing"),),
                         ),
                     )
                 ),
@@ -422,7 +422,7 @@ def test_where_constrained_with_common_linkable_plan(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="country_latest",
-                    identifier_links=(LinklessIdentifierSpec.from_element_name("listing"),),
+                    identifier_links=(IdentifierReference(element_name="listing"),),
                 ),
             ),
             where_constraint=SpecWhereClauseConstraint(
@@ -432,7 +432,7 @@ def test_where_constrained_with_common_linkable_plan(  # noqa: D
                     dimension_specs=(
                         DimensionSpec(
                             element_name="country_latest",
-                            identifier_links=(LinklessIdentifierSpec.from_element_name("listing"),),
+                            identifier_links=(IdentifierReference(element_name="listing"),),
                         ),
                     )
                 ),
@@ -468,8 +468,8 @@ def test_multihop_join_plan_ambiguous_dim(  # noqa: D
                     DimensionSpec(
                         element_name="home_country",
                         identifier_links=(
-                            LinklessIdentifierSpec.from_element_name(element_name="listing"),
-                            LinklessIdentifierSpec.from_element_name(element_name="user"),
+                            IdentifierReference(element_name="listing"),
+                            IdentifierReference(element_name="user"),
                         ),
                     ),
                 ),
@@ -515,7 +515,7 @@ def test_distinct_values_plan(  # noqa: D
         metric_specs=(MetricSpec(element_name="bookings"),),
         dimension_spec=DimensionSpec(
             element_name="country_latest",
-            identifier_links=(LinklessIdentifierSpec.from_element_name("listing"),),
+            identifier_links=(IdentifierReference(element_name="listing"),),
         ),
         limit=100,
     )

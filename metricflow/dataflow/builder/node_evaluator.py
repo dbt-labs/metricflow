@@ -194,7 +194,8 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                     # but since we're doing all left joins now, it's been left out.
 
                     required_identifier_matches_data_set_identifier = (
-                        needed_linkable_spec.identifier_links[0] == linkless_identifier_spec_in_node
+                        LinklessIdentifierSpec.from_reference(needed_linkable_spec.identifier_links[0])
+                        == linkless_identifier_spec_in_node
                     )
                     needed_linkable_spec_in_node = (
                         needed_linkable_spec.without_first_identifier_link() in linkable_specs_in_node
@@ -267,7 +268,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
     def evaluate_node(
         self,
         start_node: BaseOutput[SourceDataSetT],
-        required_linkable_specs: List[LinkableInstanceSpec],
+        required_linkable_specs: Sequence[LinkableInstanceSpec],
     ) -> LinkableInstanceSatisfiabilityEvaluation:
         """Evaluates if the "required_linkable_specs" can be realized by joining the "start_node" with other nodes.
 
@@ -296,7 +297,8 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
             is_local = required_linkable_spec in data_set_linkable_specs
             is_unjoinable = (
                 len(required_linkable_spec.identifier_links) == 0
-                or required_linkable_spec.identifier_links[0] not in data_set_linkable_specs
+                or LinklessIdentifierSpec.from_reference(required_linkable_spec.identifier_links[0])
+                not in data_set_linkable_specs
             )
             if is_local:
                 local_linkable_specs.append(required_linkable_spec)

@@ -23,6 +23,7 @@ from metricflow.specs import (
     LinklessIdentifierSpec,
     TimeDimensionSpec,
     LinkableInstanceSpec,
+    IdentifierReference,
 )
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
@@ -109,7 +110,7 @@ def test_node_evaluator_with_unjoinable_specs(  # noqa: D
         required_linkable_specs=[
             DimensionSpec(
                 element_name="verification_type",
-                identifier_links=(LinklessIdentifierSpec.from_element_name("verification"),),
+                identifier_links=(IdentifierReference(element_name="verification"),),
             )
         ],
         start_node=bookings_source_node,
@@ -121,7 +122,7 @@ def test_node_evaluator_with_unjoinable_specs(  # noqa: D
         unjoinable_linkable_specs=(
             DimensionSpec(
                 element_name="verification_type",
-                identifier_links=(LinklessIdentifierSpec.from_element_name("verification"),),
+                identifier_links=(IdentifierReference(element_name="verification"),),
             ),
         ),
     )
@@ -154,7 +155,7 @@ def test_node_evaluator_with_local_spec_using_primary_identifier(  # noqa: D
     evaluation = node_evaluator.evaluate_node(
         required_linkable_specs=[
             DimensionSpec(
-                element_name="home_state_latest", identifier_links=(LinklessIdentifierSpec.from_element_name("user"),)
+                element_name="home_state_latest", identifier_links=(IdentifierReference(element_name="user"),)
             )
         ],
         start_node=bookings_source_node,
@@ -165,7 +166,7 @@ def test_node_evaluator_with_local_spec_using_primary_identifier(  # noqa: D
             local_linkable_specs=(
                 DimensionSpec(
                     element_name="home_state_latest",
-                    identifier_links=(LinklessIdentifierSpec(element_name="user", identifier_links=()),),
+                    identifier_links=(IdentifierReference(element_name="user"),),
                 ),
             ),
             joinable_linkable_specs=(),
@@ -183,9 +184,7 @@ def test_node_evaluator_with_local_spec_using_primary_composite_identifier(  # n
     bookings_source_node = consistent_id_object_repository.composite_model_read_nodes["users_source"]
     evaluation = node_evaluator.evaluate_node(
         required_linkable_specs=[
-            DimensionSpec(
-                element_name="country", identifier_links=(LinklessIdentifierSpec.from_element_name("user_team"),)
-            )
+            DimensionSpec(element_name="country", identifier_links=(IdentifierReference(element_name="user_team"),))
         ],
         start_node=bookings_source_node,
     )
@@ -195,7 +194,7 @@ def test_node_evaluator_with_local_spec_using_primary_composite_identifier(  # n
             local_linkable_specs=(
                 DimensionSpec(
                     element_name="country",
-                    identifier_links=(LinklessIdentifierSpec(element_name="user_team", identifier_links=()),),
+                    identifier_links=(IdentifierReference(element_name="user_team"),),
                 ),
             ),
             joinable_linkable_specs=(),
@@ -217,11 +216,11 @@ def test_node_evaluator_with_joined_spec(  # noqa: D
             DimensionSpec(element_name="is_instant", identifier_links=()),
             DimensionSpec(
                 element_name="country_latest",
-                identifier_links=(LinklessIdentifierSpec.from_element_name(element_name="listing"),),
+                identifier_links=(IdentifierReference(element_name="listing"),),
             ),
             DimensionSpec(
                 element_name="capacity_latest",
-                identifier_links=(LinklessIdentifierSpec.from_element_name(element_name="listing"),),
+                identifier_links=(IdentifierReference(element_name="listing"),),
             ),
         ],
         start_node=bookings_source_node,
@@ -232,25 +231,25 @@ def test_node_evaluator_with_joined_spec(  # noqa: D
         joinable_linkable_specs=(
             DimensionSpec(
                 element_name="country_latest",
-                identifier_links=(LinklessIdentifierSpec(element_name="listing", identifier_links=()),),
+                identifier_links=(IdentifierReference(element_name="listing"),),
             ),
             DimensionSpec(
                 element_name="capacity_latest",
-                identifier_links=(LinklessIdentifierSpec(element_name="listing", identifier_links=()),),
+                identifier_links=(IdentifierReference(element_name="listing"),),
             ),
         ),
         join_recipes=(
             JoinLinkableInstancesRecipe(
                 node_to_join=consistent_id_object_repository.simple_model_read_nodes["listings_latest"],
-                join_on_identifier=LinklessIdentifierSpec(element_name="listing", identifier_links=()),
+                join_on_identifier=LinklessIdentifierSpec.from_element_name("listing"),
                 satisfiable_linkable_specs=[
                     DimensionSpec(
                         element_name="country_latest",
-                        identifier_links=(LinklessIdentifierSpec(element_name="listing", identifier_links=()),),
+                        identifier_links=(IdentifierReference(element_name="listing"),),
                     ),
                     DimensionSpec(
                         element_name="capacity_latest",
-                        identifier_links=(LinklessIdentifierSpec(element_name="listing", identifier_links=()),),
+                        identifier_links=(IdentifierReference(element_name="listing"),),
                     ),
                 ],
                 join_on_partition_dimensions=(),
@@ -271,7 +270,7 @@ def test_node_evaluator_with_joined_spec_on_unique_id(  # noqa: D
         required_linkable_specs=[
             DimensionSpec(
                 element_name="company_name",
-                identifier_links=(LinklessIdentifierSpec.from_element_name(element_name="user"),),
+                identifier_links=(IdentifierReference(element_name="user"),),
             ),
         ],
         start_node=listings_node,
@@ -282,17 +281,17 @@ def test_node_evaluator_with_joined_spec_on_unique_id(  # noqa: D
         joinable_linkable_specs=(
             DimensionSpec(
                 element_name="company_name",
-                identifier_links=(LinklessIdentifierSpec(element_name="user", identifier_links=()),),
+                identifier_links=(IdentifierReference(element_name="user"),),
             ),
         ),
         join_recipes=(
             JoinLinkableInstancesRecipe(
                 node_to_join=consistent_id_object_repository.simple_model_read_nodes["companies"],
-                join_on_identifier=LinklessIdentifierSpec(element_name="user", identifier_links=()),
+                join_on_identifier=LinklessIdentifierSpec.from_element_name("user"),
                 satisfiable_linkable_specs=[
                     DimensionSpec(
                         element_name="company_name",
-                        identifier_links=(LinklessIdentifierSpec(element_name="user", identifier_links=()),),
+                        identifier_links=(IdentifierReference(element_name="user"),),
                     ),
                 ],
                 join_on_partition_dimensions=(),
@@ -313,11 +312,11 @@ def test_node_evaluator_with_multiple_joined_specs(  # noqa: D
         required_linkable_specs=[
             DimensionSpec(
                 element_name="home_state_latest",
-                identifier_links=(LinklessIdentifierSpec.from_element_name(element_name="user"),),
+                identifier_links=(IdentifierReference(element_name="user"),),
             ),
             IdentifierSpec(
                 element_name="user",
-                identifier_links=(LinklessIdentifierSpec.from_element_name(element_name="listing"),),
+                identifier_links=(IdentifierReference(element_name="listing"),),
             ),
         ],
         start_node=views_source,
@@ -328,21 +327,21 @@ def test_node_evaluator_with_multiple_joined_specs(  # noqa: D
         joinable_linkable_specs=(
             IdentifierSpec(
                 element_name="user",
-                identifier_links=(LinklessIdentifierSpec(element_name="listing", identifier_links=()),),
+                identifier_links=(IdentifierReference(element_name="listing"),),
             ),
             DimensionSpec(
                 element_name="home_state_latest",
-                identifier_links=(LinklessIdentifierSpec(element_name="user", identifier_links=()),),
+                identifier_links=(IdentifierReference(element_name="user"),),
             ),
         ),
         join_recipes=(
             JoinLinkableInstancesRecipe(
                 node_to_join=consistent_id_object_repository.simple_model_read_nodes["listings_latest"],
-                join_on_identifier=LinklessIdentifierSpec(element_name="listing", identifier_links=()),
+                join_on_identifier=LinklessIdentifierSpec.from_element_name("listing"),
                 satisfiable_linkable_specs=[
                     IdentifierSpec(
                         element_name="user",
-                        identifier_links=(LinklessIdentifierSpec(element_name="listing", identifier_links=()),),
+                        identifier_links=(IdentifierReference(element_name="listing"),),
                     )
                 ],
                 join_on_partition_dimensions=(),
@@ -350,11 +349,11 @@ def test_node_evaluator_with_multiple_joined_specs(  # noqa: D
             ),
             JoinLinkableInstancesRecipe(
                 node_to_join=consistent_id_object_repository.simple_model_read_nodes["users_latest"],
-                join_on_identifier=LinklessIdentifierSpec(element_name="user", identifier_links=()),
+                join_on_identifier=LinklessIdentifierSpec.from_element_name("user"),
                 satisfiable_linkable_specs=[
                     DimensionSpec(
                         element_name="home_state_latest",
-                        identifier_links=(LinklessIdentifierSpec(element_name="user", identifier_links=()),),
+                        identifier_links=(IdentifierReference(element_name="user"),),
                     )
                 ],
                 join_on_partition_dimensions=(),
@@ -377,8 +376,8 @@ def test_node_evaluator_with_multihop_joined_spec(  # noqa: D
         DimensionSpec(
             element_name="customer_name",
             identifier_links=(
-                LinklessIdentifierSpec.from_element_name(element_name="account_id"),
-                LinklessIdentifierSpec.from_element_name(element_name="customer_id"),
+                IdentifierReference(element_name="account_id"),
+                IdentifierReference(element_name="customer_id"),
             ),
         ),
     ]
@@ -401,21 +400,21 @@ def test_node_evaluator_with_multihop_joined_spec(  # noqa: D
             DimensionSpec(
                 element_name="customer_name",
                 identifier_links=(
-                    LinklessIdentifierSpec.from_element_name(element_name="account_id"),
-                    LinklessIdentifierSpec.from_element_name(element_name="customer_id"),
+                    IdentifierReference(element_name="account_id"),
+                    IdentifierReference(element_name="customer_id"),
                 ),
             ),
         ),
         join_recipes=(
             JoinLinkableInstancesRecipe(
                 node_to_join=evaluation.join_recipes[0].node_to_join,
-                join_on_identifier=LinklessIdentifierSpec(element_name="account_id", identifier_links=()),
+                join_on_identifier=LinklessIdentifierSpec.from_element_name("account_id"),
                 satisfiable_linkable_specs=[
                     DimensionSpec(
                         element_name="customer_name",
                         identifier_links=(
-                            LinklessIdentifierSpec(element_name="account_id", identifier_links=()),
-                            LinklessIdentifierSpec(element_name="customer_id", identifier_links=()),
+                            IdentifierReference(element_name="account_id"),
+                            IdentifierReference(element_name="customer_id"),
                         ),
                     ),
                 ],
@@ -447,7 +446,7 @@ def test_node_evaluator_with_partition_joined_spec(  # noqa: D
         required_linkable_specs=[
             DimensionSpec(
                 element_name="home_state",
-                identifier_links=(LinklessIdentifierSpec.from_element_name(element_name="user"),),
+                identifier_links=(IdentifierReference(element_name="user"),),
             ),
         ],
         start_node=consistent_id_object_repository.simple_model_read_nodes["id_verifications"],
@@ -458,17 +457,17 @@ def test_node_evaluator_with_partition_joined_spec(  # noqa: D
         joinable_linkable_specs=(
             DimensionSpec(
                 element_name="home_state",
-                identifier_links=(LinklessIdentifierSpec(element_name="user", identifier_links=()),),
+                identifier_links=(IdentifierReference(element_name="user"),),
             ),
         ),
         join_recipes=(
             JoinLinkableInstancesRecipe(
                 node_to_join=consistent_id_object_repository.simple_model_read_nodes["users_ds_source"],
-                join_on_identifier=LinklessIdentifierSpec(element_name="user", identifier_links=()),
+                join_on_identifier=LinklessIdentifierSpec.from_element_name("user"),
                 satisfiable_linkable_specs=[
                     DimensionSpec(
                         element_name="home_state",
-                        identifier_links=(LinklessIdentifierSpec(element_name="user", identifier_links=()),),
+                        identifier_links=(IdentifierReference(element_name="user"),),
                     ),
                 ],
                 join_on_partition_dimensions=(),
