@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, Type
 
 
 class InferenceContext(ABC):
@@ -15,6 +15,8 @@ TContext = TypeVar("TContext", bound=InferenceContext)
 
 class InferenceContextProvider(Generic[TContext], ABC):
     """Provides a populated inference context from some datasource."""
+
+    provided_type: Type[TContext]
 
     @abstractmethod
     def get_context(self) -> TContext:

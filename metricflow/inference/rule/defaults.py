@@ -3,10 +3,9 @@ from typing import List
 from metricflow.inference.context.data_warehouse import (
     ColumnProperties,
     InferenceColumnType,
-    DataWarehouseInferenceContext,
 )
 from metricflow.inference.models import InferenceSignalConfidence, InferenceSignalType, InferenceSignal
-from metricflow.inference.rule.base import InferenceRule
+from metricflow.inference.rule.base import InferenceRule, InferenceRuleInputContexts
 from metricflow.inference.rule.rules import ColumnMatcherRule, LowCardinalityRatioRule
 
 
@@ -128,9 +127,9 @@ class PrimaryTimeDimensionIfOnlyTimeRule(InferenceRule):
     It will always produce DIMENSION.PRIMARY_TIME signal with VERY_HIGH confidence.
     """
 
-    def process(self, warehouse: DataWarehouseInferenceContext) -> List[InferenceSignal]:  # noqa: D
+    def process(self, contexts: InferenceRuleInputContexts) -> List[InferenceSignal]:  # noqa: D
         signals: List[InferenceSignal] = []
-        for table_props in warehouse.tables.values():
+        for table_props in contexts.warehouse.tables.values():
             time_cols = [
                 col for col, col_props in table_props.columns.items() if col_props.type == InferenceColumnType.DATETIME
             ]

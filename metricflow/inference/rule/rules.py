@@ -1,13 +1,13 @@
 from __future__ import annotations
 from abc import abstractmethod
 
-from typing import Callable, List, TypeVar
+from typing import Callable, List, Tuple, Type, TypeVar
 
 from metricflow.inference.context.data_warehouse import (
     ColumnProperties,
     DataWarehouseInferenceContext,
 )
-from metricflow.inference.rule.base import InferenceRule
+from metricflow.inference.rule.base import InferenceRule, InferenceRuleInputContexts
 from metricflow.inference.models import (
     InferenceSignal,
     InferenceSignalConfidence,
@@ -35,6 +35,8 @@ class ColumnMatcherRule(InferenceRule):
     match_reason: a human-readable string of the reason why this was matched
     """
 
+    required_contexts: Tuple[Type[DataWarehouseInferenceContext]] = (DataWarehouseInferenceContext,)
+
     type_node: InferenceSignalNode
     confidence: InferenceSignalConfidence
     only_applies_to_parent_signal: bool
@@ -45,12 +47,12 @@ class ColumnMatcherRule(InferenceRule):
         """A function to determine whether `ColumnProperties` matches. If it does, produce the signal"""
         raise NotImplementedError
 
-    def process(self, warehouse: DataWarehouseInferenceContext) -> List[InferenceSignal]:  # type: ignore
+    def process(self, contexts: InferenceRuleInputContexts) -> List[InferenceSignal]:  # type: ignore
         """Try to match all columns' properties with the matching function.
 
         If they do match, produce a signal with the configured type and confidence.
         """
-        matching_columns = [column for column, props in warehouse.columns.items() if self.match_column(props)]
+        matching_columns = [column for column, props in contexts.warehouse.columns.items() if self.match_column(props)]
         signals = [
             InferenceSignal(
                 column=column,
@@ -69,6 +71,8 @@ class LowCardinalityRatioRule(ColumnMatcherRule):
 
     The ratio is calculated as `distinct_count/(count - null_count)`.
     """
+
+    required_contexts: Tuple[Type[DataWarehouseInferenceContext]] = (DataWarehouseInferenceContext,)
 
     def __init__(self, cardinality_count_ratio_threshold: float) -> None:
         """Initialize the rule.
