@@ -1,0 +1,18 @@
+data_source:
+  name: shopify_customers_addresses
+  owners:  # This will throw an error unless you add a list of owners or remove this entry.
+  sql_table: SHOPIFY.CUSTOMER_ADDRESS ### Update to your customer_address schema.table
+  identifiers:
+    - name: customer_address
+      type: primary
+      expr: id
+    - name: customer
+      type: foreign
+      expr: customer_id
+  dimensions:
+    - name: country
+      type: categorical
+    - name: province
+      type: categorical
+    - name: zip
+      type: categorical
