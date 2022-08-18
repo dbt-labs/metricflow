@@ -171,6 +171,10 @@ class IdentifierSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
     def __hash__(self) -> int:  # noqa: D
         return hash((self.element_name, self.identifier_links))
 
+    @property
+    def reference(self) -> IdentifierReference:  # noqa: D
+        return IdentifierReference(element_name=self.element_name)
+
 
 @dataclass(frozen=True)
 class LinklessIdentifierSpec(IdentifierSpec, SerializableDataclass):
