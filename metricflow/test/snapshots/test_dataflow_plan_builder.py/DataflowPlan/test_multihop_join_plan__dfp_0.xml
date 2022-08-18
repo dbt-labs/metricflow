@@ -13,7 +13,7 @@
                     <!-- description =                                                -->
                     <!--   Pass Only Elements:                                        -->
                     <!--     ['txn_count', 'account_id__customer_id__customer_name']  -->
-                    <!-- node_id = pfe_4 -->
+                    <!-- node_id = pfe_3 -->
                     <!-- include_spec =                           -->
                     <!--   {'class': 'MeasureSpec',               -->
                     <!--    'element_name': 'txn_count',          -->
@@ -27,10 +27,10 @@
                     <!--                          'element_name': 'customer_id'})}  -->
                     <JoinToBaseOutputNode>
                         <!-- description = Join Standard Outputs -->
-                        <!-- node_id = jso_2 -->
-                        <!-- join0_for_node_id_pfe_3 =                                                                                                    -->
+                        <!-- node_id = jso_1 -->
+                        <!-- join0_for_node_id_pfe_2 =                                                                                                    -->
                         <!--   {'class': 'JoinDescription',                                                                                               -->
-                        <!--    'join_node': FilterElementsNode(node_id=pfe_3),                                                                           -->
+                        <!--    'join_node': FilterElementsNode(node_id=pfe_2),                                                                           -->
                         <!--    'join_on_identifier': {'class': 'LinklessIdentifierSpec',                                                                 -->
                         <!--                           'element_name': 'account_id',                                                                      -->
                         <!--                           'identifier_links': ()},                                                                           -->
@@ -48,7 +48,7 @@
                             <!-- description =                                      -->
                             <!--   Pass Only Elements:                              -->
                             <!--     ['txn_count', 'account_id', 'ds_partitioned']  -->
-                            <!-- node_id = pfe_2 -->
+                            <!-- node_id = pfe_1 -->
                             <!-- include_spec =                           -->
                             <!--   {'class': 'MeasureSpec',               -->
                             <!--    'element_name': 'txn_count',          -->
@@ -83,7 +83,7 @@
                             <!-- description =                                                       -->
                             <!--   Pass Only Elements:                                               -->
                             <!--     ['account_id', 'ds_partitioned', 'customer_id__customer_name']  -->
-                            <!-- node_id = pfe_3 -->
+                            <!-- node_id = pfe_2 -->
                             <!-- include_spec =                         -->
                             <!--   {'class': 'LinklessIdentifierSpec',  -->
                             <!--    'element_name': 'account_id',       -->
