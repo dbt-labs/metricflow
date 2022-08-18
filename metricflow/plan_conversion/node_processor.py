@@ -1,6 +1,6 @@
 import logging
-from collections import defaultdict
-from typing import Generic, Sequence, List, TypeVar, Optional, Dict
+from dataclasses import dataclass
+from typing import Generic, Sequence, List, TypeVar, Optional, Set
 
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
@@ -12,17 +12,50 @@ from metricflow.dataflow.dataflow_plan import (
     FilterElementsNode,
     JoinDescription,
 )
+from metricflow.model.objects.elements.identifier import IdentifierType
 from metricflow.model.semantics.semantic_containers import MAX_JOIN_HOPS
+from metricflow.object_utils import pformat_big_objects
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.protocols.semantics import DataSourceSemanticsAccessor
+from metricflow.references import TimeDimensionReference, IdentifierReference
 from metricflow.spec_set_transforms import ToElementNameSet
-from metricflow.references import TimeDimensionReference
-from metricflow.specs import IdentifierSpec, InstanceSpec, LinkableInstanceSpec
+from metricflow.specs import InstanceSpec, LinkableInstanceSpec, LinklessIdentifierSpec
 
 SqlDataSetT = TypeVar("SqlDataSetT", bound=SqlDataSet)
 
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass(frozen=True)
+class MultiHopJoinCandidateLineage(Generic[SqlDataSetT]):
+    """Describes how the multi-hop join candidate was formed.
+
+    For example, if
+    * bridge_source has the primary identifier account_id and the foreign identifier customer_id
+    * customers_source has the primary identifier customer_id and dimension country
+    * transactions_source has the transactions measure and the account_id foreign identifier
+
+    Then the candidate lineage can be describe as
+        first_node_to_join = bridge_source
+        second_node_to_join = customers_source
+    to get the country dimension.
+    """
+
+    first_node_to_join: BaseOutput[SqlDataSetT]
+    second_node_to_join: BaseOutput[SqlDataSetT]
+    join_second_node_by_identifier: LinklessIdentifierSpec
+
+
+@dataclass(frozen=True)
+class MultiHopJoinCandidate(Generic[SqlDataSetT]):
+    """A candidate node containing linkable specs that is join of other nodes. It's used to resolve multi-hop queries.
+
+    Also see MultiHopJoinCandidateLineage.
+    """
+
+    node_with_multi_hop_elements: BaseOutput[SqlDataSetT]
+    lineage: MultiHopJoinCandidateLineage[SqlDataSetT]
 
 
 class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
@@ -51,6 +84,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
     ):
         self._node_data_set_resolver = node_data_set_resolver
         self._partition_resolver = PartitionJoinResolver(data_source_semantics)
+        self._data_source_semantics = data_source_semantics
 
     def add_time_range_constraint(
         self,
@@ -83,92 +117,176 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                 processed_nodes.append(source_node)
         return processed_nodes
 
+    def _node_contains_identifier(
+        self,
+        node: BaseOutput[SqlDataSetT],
+        identifier_reference: IdentifierReference,
+        valid_types: Set[IdentifierType],
+    ) -> bool:
+        """Returns true if the output of the node contains an identifier of the given types."""
+        data_set = self._node_data_set_resolver.get_output_data_set(node)
+
+        for identifier_instance_in_first_node in data_set.instance_set.identifier_instances:
+            identifier_spec_in_first_node = identifier_instance_in_first_node.spec
+
+            if identifier_spec_in_first_node.reference != identifier_reference:
+                continue
+
+            if len(identifier_spec_in_first_node.identifier_links) > 0:
+                continue
+
+            assert (
+                len(identifier_instance_in_first_node.defined_from) == 1
+            ), "Multiple items in defined_from not yet supported"
+
+            identifier = self._data_source_semantics.get_identifier_in_data_source(
+                identifier_instance_in_first_node.defined_from[0]
+            )
+            if identifier is None:
+                raise RuntimeError(
+                    f"Invalid DataSourceElementReference {identifier_instance_in_first_node.defined_from[0]}"
+                )
+
+            if identifier.type in valid_types:
+                return True
+
+        return False
+
+    def _get_candidates_nodes_for_multi_hop(
+        self,
+        desired_linkable_spec: LinkableInstanceSpec,
+        nodes: Sequence[BaseOutput[SqlDataSetT]],
+    ) -> Sequence[MultiHopJoinCandidate]:
+        """Assemble nodes representing all possible one-hop joins"""
+
+        if len(desired_linkable_spec.identifier_links) > MAX_JOIN_HOPS:
+            raise NotImplementedError(
+                f"Multi-hop joins with more than {MAX_JOIN_HOPS} identifier links not yet supported. "
+                f"Got: {desired_linkable_spec}"
+            )
+        if len(desired_linkable_spec.identifier_links) != 2:
+            return ()
+
+        multi_hop_join_candidates: List[MultiHopJoinCandidate] = []
+        logger.info(f"Creating nodes for {desired_linkable_spec}")
+
+        for first_node_that_could_be_joined in nodes:
+            data_set = self._node_data_set_resolver.get_output_data_set(first_node_that_could_be_joined)
+
+            # Fan-out joins aren't supported, so the identifiers must be of these types to join.
+            if not (
+                self._node_contains_identifier(
+                    node=first_node_that_could_be_joined,
+                    identifier_reference=desired_linkable_spec.identifier_links[0],
+                    valid_types={IdentifierType.PRIMARY, IdentifierType.UNIQUE},
+                )
+                and self._node_contains_identifier(
+                    node=first_node_that_could_be_joined,
+                    identifier_reference=desired_linkable_spec.identifier_links[1],
+                    valid_types={IdentifierType.PRIMARY, IdentifierType.UNIQUE, IdentifierType.FOREIGN},
+                )
+            ):
+                continue
+
+            for second_node_that_could_be_joined in nodes:
+                if not (
+                    self._node_contains_identifier(
+                        node=second_node_that_could_be_joined,
+                        identifier_reference=desired_linkable_spec.identifier_links[1],
+                        valid_types={IdentifierType.PRIMARY, IdentifierType.UNIQUE},
+                    )
+                ):
+                    continue
+
+                if second_node_that_could_be_joined.node_id == first_node_that_could_be_joined.node_id:
+                    continue
+
+                data_set_of_second_node_that_can_be_joined = self._node_data_set_resolver.get_output_data_set(
+                    second_node_that_could_be_joined
+                )
+
+                # If the element name of the linkable spec doesn't exist in the joined data set, then it can't be
+                # useful for obtaining that linkable spec.
+                element_names_in_data_set = ToElementNameSet().transform(
+                    data_set_of_second_node_that_can_be_joined.instance_set.spec_set
+                )
+
+                if desired_linkable_spec.element_name not in element_names_in_data_set:
+                    continue
+
+                # filter measures out of joinable_node
+                specs = data_set_of_second_node_that_can_be_joined.instance_set.spec_set
+                pass_specs = InstanceSpec.merge(
+                    specs.dimension_specs + specs.identifier_specs + specs.time_dimension_specs
+                )
+                filtered_joinable_node = FilterElementsNode(second_node_that_could_be_joined, pass_specs)
+
+                join_on_partition_dimensions = self._partition_resolver.resolve_partition_dimension_joins(
+                    start_node_spec_set=data_set.instance_set.spec_set,
+                    node_to_join_spec_set=data_set_of_second_node_that_can_be_joined.instance_set.spec_set,
+                )
+                join_on_partition_time_dimensions = self._partition_resolver.resolve_partition_time_dimension_joins(
+                    start_node_spec_set=data_set.instance_set.spec_set,
+                    node_to_join_spec_set=data_set_of_second_node_that_can_be_joined.instance_set.spec_set,
+                )
+
+                multi_hop_join_candidates.append(
+                    MultiHopJoinCandidate(
+                        node_with_multi_hop_elements=JoinToBaseOutputNode(
+                            parent_node=first_node_that_could_be_joined,
+                            join_targets=[
+                                JoinDescription(
+                                    join_node=filtered_joinable_node,
+                                    join_on_identifier=LinklessIdentifierSpec.from_reference(
+                                        desired_linkable_spec.identifier_links[1]
+                                    ),
+                                    join_on_partition_dimensions=join_on_partition_dimensions,
+                                    join_on_partition_time_dimensions=join_on_partition_time_dimensions,
+                                )
+                            ],
+                        ),
+                        lineage=MultiHopJoinCandidateLineage(
+                            first_node_to_join=first_node_that_could_be_joined,
+                            second_node_to_join=second_node_that_could_be_joined,
+                            # identifier_spec_in_first_node should already not have identifier links since we checked
+                            # for that, but using this method for type checking.
+                            join_second_node_by_identifier=LinklessIdentifierSpec.from_reference(
+                                desired_linkable_spec.identifier_links[1]
+                            ),
+                        ),
+                    )
+                )
+
+        for multi_hop_join_candidate in multi_hop_join_candidates:
+            output_data_set = self._node_data_set_resolver.get_output_data_set(
+                multi_hop_join_candidate.node_with_multi_hop_elements
+            )
+            logger.debug(
+                f"Node {multi_hop_join_candidate.node_with_multi_hop_elements} has spec set:\n"
+                f"{pformat_big_objects(output_data_set.instance_set.spec_set)}"
+            )
+
+        return multi_hop_join_candidates
+
     def add_multi_hop_joins(
         self, desired_linkable_specs: Sequence[LinkableInstanceSpec], nodes: Sequence[BaseOutput[SqlDataSetT]]
     ) -> Sequence[BaseOutput[SqlDataSetT]]:
         """Assemble nodes representing all possible one-hop joins"""
 
-        if max(len(x.identifier_links) for x in desired_linkable_specs) > MAX_JOIN_HOPS:
-            raise NotImplementedError("Multi-hop joins with more than 2 identifier links not yet supported")
+        all_multi_hop_join_candidates: List[MultiHopJoinCandidate[SqlDataSetT]] = []
+        lineage_for_all_multi_hop_join_candidates: Set[MultiHopJoinCandidateLineage[SqlDataSetT]] = set()
 
-        join_nodes: List[BaseOutput[SqlDataSetT]] = []
-        identifier_node_index: Dict[IdentifierSpec, List[BaseOutput]] = defaultdict(list)
+        for desired_linkable_spec in desired_linkable_specs:
+            for multi_hop_join_candidate in self._get_candidates_nodes_for_multi_hop(
+                desired_linkable_spec=desired_linkable_spec,
+                nodes=nodes,
+            ):
+                # Dedupe candidates that are the same join.
+                if multi_hop_join_candidate.lineage not in lineage_for_all_multi_hop_join_candidates:
+                    all_multi_hop_join_candidates.append(multi_hop_join_candidate)
+                    lineage_for_all_multi_hop_join_candidates.add(multi_hop_join_candidate.lineage)
 
-        for node in nodes:
-            data_set: SqlDataSet = self._node_data_set_resolver.get_output_data_set(node)
-            for identifier in data_set.instance_set.spec_set.identifier_specs:
-                identifier_node_index[identifier].append(node)
-
-        # Relevant identifier element names are the identifiers listed in the identifier links of the desired linkable
-        # specs.
-        relevant_identifier_element_names = set()
-        # One of the element names in linkable_element_names must exist in the right data set for it to be useful in
-        # satisfying the desired linkable specs.
-        linkable_element_names = {x.element_name for x in desired_linkable_specs}
-        for linkable_spec in desired_linkable_specs:
-            if len(linkable_spec.identifier_links) == 2:
-                relevant_identifier_element_names.add(linkable_spec.identifier_links[1].element_name)
-
-        for node in nodes:
-            data_set = self._node_data_set_resolver.get_output_data_set(node)
-
-            for identifier in data_set.instance_set.spec_set.identifier_specs:
-
-                # No need to create a join node using an identifier that can't be used to satisfy the query.
-                if identifier.element_name not in relevant_identifier_element_names:
-                    continue
-
-                if len(identifier.identifier_links) > 0:
-                    logger.warning(
-                        f"Not constructing multihop joinable sources for identifier ({identifier}) - it has > 0 identifier_links"
-                    )
-                    continue
-
-                for joinable_node in identifier_node_index[identifier]:
-                    if joinable_node.node_id == node.node_id:
-                        continue
-
-                    joinable_node_data_set = self._node_data_set_resolver.get_output_data_set(joinable_node)
-
-                    # If the element name of the linkable spec doesn't exist in the joined data set, then it can't be
-                    # useful for obtaining that linkable spec.
-                    if linkable_element_names is not None:
-                        element_names_in_data_set = ToElementNameSet().transform(
-                            joinable_node_data_set.instance_set.spec_set
-                        )
-
-                        if not element_names_in_data_set.intersection(linkable_element_names):
-                            continue
-                    # filter measures out of joinable_node
-                    specs = joinable_node_data_set.instance_set.spec_set
-                    pass_specs = InstanceSpec.merge(
-                        specs.dimension_specs + specs.identifier_specs + specs.time_dimension_specs
-                    )
-                    filtered_joinable_node = FilterElementsNode(joinable_node, pass_specs)
-
-                    join_on_partition_dimensions = self._partition_resolver.resolve_partition_dimension_joins(
-                        start_node_spec_set=data_set.instance_set.spec_set,
-                        node_to_join_spec_set=joinable_node_data_set.instance_set.spec_set,
-                    )
-                    join_on_partition_time_dimensions = self._partition_resolver.resolve_partition_time_dimension_joins(
-                        start_node_spec_set=data_set.instance_set.spec_set,
-                        node_to_join_spec_set=joinable_node_data_set.instance_set.spec_set,
-                    )
-
-                    join_nodes.append(
-                        JoinToBaseOutputNode(
-                            parent_node=node,
-                            join_targets=[
-                                JoinDescription(
-                                    join_node=filtered_joinable_node,
-                                    join_on_identifier=identifier.without_identifier_links(),
-                                    join_on_partition_dimensions=join_on_partition_dimensions,
-                                    join_on_partition_time_dimensions=join_on_partition_time_dimensions,
-                                )
-                            ],
-                        )
-                    )
-        return list(nodes) + join_nodes
+        return list(x.node_with_multi_hop_elements for x in all_multi_hop_join_candidates) + list(nodes)
 
     def remove_unnecessary_nodes(
         self,

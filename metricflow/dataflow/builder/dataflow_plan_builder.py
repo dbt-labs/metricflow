@@ -361,7 +361,8 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         if DataflowPlanBuilder._contains_multihop_linkables(linkable_specs):
             nodes_available_for_joins = node_processor.add_multi_hop_joins(linkable_specs, source_nodes)
             logger.info(
-                f"After adding multi-hop nonds, there are {nodes_available_for_joins} nodes available for joins"
+                f"After adding multi-hop nodes, there are {len(nodes_available_for_joins)} nodes available for joins:\n"
+                f"{pformat_big_objects(nodes_available_for_joins)}"
             )
 
         logger.info(f"Processing nodes took: {time.time()-start_time:.2f}s")
@@ -393,7 +394,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 start_node=node,
                 required_linkable_specs=list(linkable_specs),
             )
-            logger.info(f"Evaluation of {node} took {time.time() - start_time}s")
+            logger.info(f"Evaluation of {node} took {time.time() - start_time:.2f}s")
 
             logger.debug(
                 f"Evaluation for measure node is:\n"
