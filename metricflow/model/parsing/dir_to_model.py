@@ -61,6 +61,31 @@ class FileParsingResult:
     issues: List[ValidationIssueType]
 
 
+def collect_yaml_config_file_paths(directory: str) -> List[str]:
+    """Collects a list of file paths for model config files
+
+    Ignores files that are:
+        - In hidden directories (i.e. directories starting with '.')
+        - Hidden files (i.e. files starting with '.')
+        - Non YAML files
+    """
+    config_file_paths: List[str] = []
+    for root, dirs, files in os.walk(directory):
+        # Skip hidden directories. os.walk() supports mutation of dirs to skip directories.
+        dirs[:] = [d for d in dirs if not d.startswith(".")]
+
+        for file in files:
+            if not YamlConfigLoader.is_valid_yaml_file_ending(file):
+                continue
+            # Skip hidden files
+            if file.startswith("."):
+                continue
+
+            file_path = os.path.join(root, file)
+            config_file_paths.append(file_path)
+    return config_file_paths
+
+
 def parse_directory_of_yaml_files_to_model(
     directory: str,
     template_mapping: Optional[Dict[str, str]] = None,
@@ -75,23 +100,13 @@ def parse_directory_of_yaml_files_to_model(
     template_mapping = template_mapping or {}
     yaml_config_files = []
 
-    for root, dirs, files in os.walk(directory):
-        # Skip hidden directories. os.walk() supports mutation of dirs to skip directories.
-        dirs[:] = [d for d in dirs if not d.startswith(".")]
-
-        for file in files:
-            if not YamlConfigLoader.is_valid_yaml_file_ending(file):
-                continue
-            # Skip hidden files
-            if file.startswith("."):
-                continue
-
-            file_path = os.path.join(root, file)
-            with open(file_path) as f:
-                contents = Template(f.read()).substitute(template_mapping)
-                yaml_config_files.append(
-                    YamlConfigFile(filepath=file_path, contents=contents),
-                )
+    file_paths = collect_yaml_config_file_paths(directory=directory)
+    for file_path in file_paths:
+        with open(file_path) as f:
+            contents = Template(f.read()).substitute(template_mapping)
+            yaml_config_files.append(
+                YamlConfigFile(filepath=file_path, contents=contents),
+            )
 
     build_result = parse_yaml_files_to_model(yaml_config_files)
     model = build_result.model
