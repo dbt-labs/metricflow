@@ -166,6 +166,26 @@ def test_categorical_dimension_by_string_type_matcher() -> None:  # noqa: D
     )
 
 
+def test_categorical_dimension_by_string__and_cardinality_type_matcher() -> None:  # noqa: D
+    """Tests the composite of string type and cardinality below supplied threshold
+
+    Since the helper cardinality ratio is always either 1 or 0.9, the cardinality thresholds are set to either above
+    0.9 (for checks which should match) or below 0.9 (for checks which should not match, or where the match does
+    not matter)
+    """
+
+    assert defaults.CategoricalDimensionByStringTypeAndLowCardinalityRule(0.99).match_column(
+        get_column_properties("db.schema.table.low_cardinality_string_col", InferenceColumnType.STRING, unique=False)
+    )
+    # INTEGER type columns never match this rule
+    assert not defaults.CategoricalDimensionByStringTypeAndLowCardinalityRule(0.99).match_column(
+        get_column_properties("db.schema.table.int_col", InferenceColumnType.INTEGER, unique=False)
+    )
+    assert not defaults.CategoricalDimensionByCardinalityRatioRule(0.40).match_column(
+        get_column_properties("db.schema.table.high_cardinality_string_col", InferenceColumnType.STRING, unique=False)
+    )
+
+
 def test_categorical_dimension_by_integer_type_matcher() -> None:  # noqa: D
     assert defaults.CategoricalDimensionByIntegerTypeRule().match_column(
         get_column_properties("db.schema.table.dim", InferenceColumnType.INTEGER, True)
