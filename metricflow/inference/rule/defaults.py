@@ -162,6 +162,25 @@ class CategoricalDimensionByBooleanTypeRule(ColumnMatcherRule):
         return props.type == InferenceColumnType.BOOLEAN
 
 
+class CategoricalDimensionByStringTypeAndLowCardinalityRule(LowCardinalityRatioRule):
+    """Inference rule that checks for string typed columns with cardinality below the specified threshold
+
+    It will always produce DIMENSION.CATEGORICAL with HIGH confidence
+    """
+
+    type_node = InferenceSignalType.DIMENSION.CATEGORICAL
+    confidence = InferenceSignalConfidence.HIGH
+    only_applies_to_parent_signal = False
+    match_reason = "Column type is STRING and cardinality ratio is below 0.4"
+
+    def match_column(self, props: ColumnProperties) -> bool:
+        """This is a bit of a hack for composing rules by invoking one directly here"""
+
+        if props.type != InferenceColumnType.STRING:
+            return False
+        return super().match_column(props=props)
+
+
 class CategoricalDimensionByStringTypeRule(ColumnMatcherRule):
     """Inference rule that checks for string columns.
 
@@ -242,12 +261,13 @@ DEFAULT_RULESET = [
     AnyIdentifierByNameRule(),
     PrimaryIdentifierByNameRule(),
     UniqueIdentifierByDistinctCountRule(),
-    ForeignIdentifierByCardinalityRatioRule(0.4),
+    ForeignIdentifierByCardinalityRatioRule(0.6),
     TimeDimensionByTimeTypeRule(),
     PrimaryTimeDimensionByNameRule(),
     PrimaryTimeDimensionIfOnlyTimeRule(),
     CategoricalDimensionByBooleanTypeRule(),
     CategoricalDimensionByStringTypeRule(),
+    CategoricalDimensionByStringTypeAndLowCardinalityRule(0.4),
     CategoricalDimensionByIntegerTypeRule(),
     CategoricalDimensionByCardinalityRatioRule(0.2),
     MeasureByRealTypeRule(),
