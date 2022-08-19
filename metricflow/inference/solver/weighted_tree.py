@@ -120,7 +120,7 @@ class WeightedTypeTreeInferenceSolver(InferenceSolver):
                 reasons=[],
                 problems=[
                     "No signals were extracted for this column",
-                    "Inference solver could not determine a type for this column",
+                    "Inference solver could not determine if column was an identifier, a dimension, or a measure",
                 ],
             )
 
@@ -160,6 +160,8 @@ class WeightedTypeTreeInferenceSolver(InferenceSolver):
             node = next_node
 
         if node == InferenceSignalType.UNKNOWN:
-            problems.append("Inference solver could not determine a type for this column")
+            problems.append(
+                "Inference solver could not determine if column was an identifier, a dimension, or a measure"
+            )
 
         return InferenceResult(column=column, type_node=node, reasons=reasons, problems=problems)
