@@ -21,10 +21,11 @@ class SnowflakeInferenceContextProvider(DataWarehouseInferenceContextProvider):
         """Get the correspondent InferenceColumnType from Snowflake's returned type string.
 
         See for reference: https://docs.snowflake.com/en/sql-reference/sql/show-columns.html
+        For string types: https://docs.snowflake.com/en/sql-reference/data-types-text.html#data-types-for-text-strings
         """
-        str_dict = {
+        type_str = type_str.upper()
+        type_mapping = {
             "FIXED": InferenceColumnType.INTEGER,
-            "TEXT": InferenceColumnType.STRING,
             "REAL": InferenceColumnType.FLOAT,
             "BOOLEAN": InferenceColumnType.BOOLEAN,
             "DATE": InferenceColumnType.DATETIME,
@@ -32,8 +33,28 @@ class SnowflakeInferenceContextProvider(DataWarehouseInferenceContextProvider):
             "TIMESTAMP_LTZ": InferenceColumnType.DATETIME,
             "TIMESTAMP_NTZ": InferenceColumnType.DATETIME,
         }
+        string_prefixes = {
+            "VARCHAR",
+            "CHAR",
+            "CHARACTER",
+            "NCHAR",
+            "STRING",
+            "TEXT",
+            "NVARCHAR",
+            "NVARCHAR2",
+            "CHAR VARYING",
+            "NCHAR VARYING",
+        }
 
-        return str_dict.get(type_str, InferenceColumnType.UNKNOWN)
+        if type_str in type_mapping:
+            return type_mapping[type_str]
+
+        # This might be a string type, which can either be something like "TEXT" or "VARCHAR(256)"
+        for prefix in string_prefixes:
+            if type_str.startswith(prefix):
+                return InferenceColumnType.STRING
+
+        return InferenceColumnType.UNKNOWN
 
     def _get_select_list_for_column_name(self, name: str, count_nulls: bool) -> str:
         statements = [

@@ -19,13 +19,28 @@ def test_column_type_conversion() -> None:  # noqa: D
 
     # known snowflake types
     assert ctx_provider._column_type_from_show_columns_data_type("FIXED") == InferenceColumnType.INTEGER
-    assert ctx_provider._column_type_from_show_columns_data_type("TEXT") == InferenceColumnType.STRING
     assert ctx_provider._column_type_from_show_columns_data_type("REAL") == InferenceColumnType.FLOAT
     assert ctx_provider._column_type_from_show_columns_data_type("BOOLEAN") == InferenceColumnType.BOOLEAN
     assert ctx_provider._column_type_from_show_columns_data_type("DATE") == InferenceColumnType.DATETIME
     assert ctx_provider._column_type_from_show_columns_data_type("TIMESTAMP_TZ") == InferenceColumnType.DATETIME
     assert ctx_provider._column_type_from_show_columns_data_type("TIMESTAMP_LTZ") == InferenceColumnType.DATETIME
     assert ctx_provider._column_type_from_show_columns_data_type("TIMESTAMP_NTZ") == InferenceColumnType.DATETIME
+
+    # String types
+    assert ctx_provider._column_type_from_show_columns_data_type("VARCHAR") == InferenceColumnType.STRING
+    assert ctx_provider._column_type_from_show_columns_data_type("VARCHAR(256)") == InferenceColumnType.STRING
+    assert ctx_provider._column_type_from_show_columns_data_type("CHAR") == InferenceColumnType.STRING
+    assert ctx_provider._column_type_from_show_columns_data_type("CHAR(8)") == InferenceColumnType.STRING
+    assert ctx_provider._column_type_from_show_columns_data_type("CHARACTER(8)") == InferenceColumnType.STRING
+    assert ctx_provider._column_type_from_show_columns_data_type("NCHAR(8)") == InferenceColumnType.STRING
+    assert ctx_provider._column_type_from_show_columns_data_type("STRING") == InferenceColumnType.STRING
+    assert ctx_provider._column_type_from_show_columns_data_type("TEXT") == InferenceColumnType.STRING
+    assert ctx_provider._column_type_from_show_columns_data_type("NVARCHAR(16777216)") == InferenceColumnType.STRING
+    assert ctx_provider._column_type_from_show_columns_data_type("NVARCHAR2(16777216)") == InferenceColumnType.STRING
+    assert ctx_provider._column_type_from_show_columns_data_type("CHAR VARYING(16777216)") == InferenceColumnType.STRING
+    assert (
+        ctx_provider._column_type_from_show_columns_data_type("NCHAR VARYING(16777216)") == InferenceColumnType.STRING
+    )
 
     # unknowns
     assert ctx_provider._column_type_from_show_columns_data_type("BINARY") == InferenceColumnType.UNKNOWN
