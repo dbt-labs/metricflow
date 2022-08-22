@@ -111,10 +111,15 @@ class ConfigLinter:  # noqa: D
 
         return issues
 
-    def lint_dir(self, dir_path: str) -> ModelValidationResults:  # noqa: D
+    def lint_files(self, file_paths: List[str]) -> ModelValidationResults:
+        """Gets a list of ValidationIssues for the given list of YAML file paths"""
         issues: List[ValidationIssue] = []
-        config_file_paths = collect_yaml_config_file_paths(directory=dir_path)
-        for file_path in config_file_paths:
+        for file_path in file_paths:
             issues += self.lint_file(file_path)
 
-        return ModelValidationResults.from_issues_sequence(issues)
+        return ModelValidationResults.from_issues_sequence(issues=issues)
+
+    def lint_dir(self, dir_path: str) -> ModelValidationResults:
+        """Generates ModelValidationResults object for lint issues of model config files found in the given directory"""
+        config_file_paths = collect_yaml_config_file_paths(directory=dir_path)
+        return self.lint_files(file_paths=config_file_paths)
