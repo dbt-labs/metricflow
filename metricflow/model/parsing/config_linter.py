@@ -83,7 +83,10 @@ class ConfigLinter:  # noqa: D
         if key in [DATA_SOURCE_TYPE, MATERIALIZATION_TYPE, METRIC_TYPE]:
             problem.desc += f'. Key "{key}" is a top level object. If multiple top level objects are specified in the same file, they must be separated using "---"'
 
-    def lint_file(self, file_path: str, file_name: str) -> List[ValidationIssue]:  # noqa: D
+    def lint_file(self, file_path: str) -> List[ValidationIssue]:  # noqa: D
+        """Lints a given YAML file for structural issues, returning a list of ValidationIssues"""
+        (_head, file_name) = os.path.split(file_path)
+
         issues: List[ValidationIssue] = []
         with open(file_path) as f:
             for problem in linter.run(f, self._config):
@@ -112,7 +115,6 @@ class ConfigLinter:  # noqa: D
         issues: List[ValidationIssue] = []
         config_file_paths = collect_yaml_config_file_paths(directory=dir_path)
         for file_path in config_file_paths:
-            (_head, filename) = os.path.split(file_path)
-            issues += self.lint_file(file_path, filename)
+            issues += self.lint_file(file_path)
 
         return ModelValidationResults.from_issues_sequence(issues)
