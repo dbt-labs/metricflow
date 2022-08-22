@@ -24,7 +24,6 @@ from metricflow.model.validations.reserved_keywords import ReservedKeywordsRule
 from metricflow.model.validations.unique_valid_name import UniqueAndValidNameRule
 from metricflow.model.validations.validator_helpers import (
     ModelValidationResults,
-    ValidationIssueType,
     ModelValidationRule,
     ModelValidationException,
 )
@@ -69,15 +68,20 @@ class ModelValidator:
 
     def validate_model(self, model: UserConfiguredModel) -> ModelBuildResult:
         """Validate a model according to configured rules."""
-        model_copy = copy.deepcopy(model)
+        serialized_model = model.json()
 
-        issues: List[ValidationIssueType] = []
+        results: List[ModelValidationResults] = []
 
-        futures = [self._executor.submit(validation_rule.validate_model, model_copy) for validation_rule in self._rules]
+        futures = [
+            self._executor.submit(validation_rule.validate_model_serialized_for_multiprocessing, serialized_model)
+            for validation_rule in self._rules
+        ]
         for future in as_completed(futures):
-            issues.extend(future.result())
+            res = future.result()
+            result = ModelValidationResults.parse_raw(res)
+            results.append(result)
 
-        return ModelBuildResult(model=model_copy, issues=ModelValidationResults.from_issues_sequence(issues))
+        return ModelBuildResult(model=model, issues=ModelValidationResults.merge(results))
 
     def checked_validations(self, model: UserConfiguredModel) -> UserConfiguredModel:  # chTODO: remember checked_build
         """Similar to validate(), but throws an exception if validation fails."""
