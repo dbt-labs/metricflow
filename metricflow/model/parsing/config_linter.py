@@ -2,7 +2,12 @@ import os
 from typing import List, Optional
 import yaml
 from yamllint import config, linter, rules
-from metricflow.model.parsing.dir_to_model import METRIC_TYPE, DATA_SOURCE_TYPE, MATERIALIZATION_TYPE
+from metricflow.model.parsing.dir_to_model import (
+    METRIC_TYPE,
+    DATA_SOURCE_TYPE,
+    MATERIALIZATION_TYPE,
+    collect_yaml_config_file_paths,
+)
 
 from metricflow.model.validations.validator_helpers import (
     FileContext,
@@ -105,11 +110,9 @@ class ConfigLinter:  # noqa: D
 
     def lint_dir(self, dir_path: str) -> ModelValidationResults:  # noqa: D
         issues: List[ValidationIssue] = []
-        for root, _dirs, files in os.walk(dir_path):
-            for file in files:
-                if not (file.endswith(".yaml") or file.endswith(".yml")):
-                    continue
-                file_path = os.path.join(root, file)
-                issues += self.lint_file(file_path, file)
+        config_file_paths = collect_yaml_config_file_paths(directory=dir_path)
+        for file_path in config_file_paths:
+            (_head, filename) = os.path.split(file_path)
+            issues += self.lint_file(file_path, filename)
 
         return ModelValidationResults.from_issues_sequence(issues)
