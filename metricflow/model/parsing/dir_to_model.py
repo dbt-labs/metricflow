@@ -112,10 +112,29 @@ def parse_directory_of_yaml_files_to_model(
 
     Strings in the file following the Python string template format are replaced according to the template_mapping dict.
     """
+    file_paths = collect_yaml_config_file_paths(directory=directory)
+    return parse_yaml_file_paths_to_model(
+        file_paths=file_paths,
+        template_mapping=template_mapping,
+        apply_pre_transformations=apply_pre_transformations,
+        apply_post_transformations=apply_post_transformations,
+        raise_issues_as_exceptions=raise_issues_as_exceptions,
+    )
+
+
+def parse_yaml_file_paths_to_model(
+    file_paths: List[str],
+    template_mapping: Optional[Dict[str, str]] = None,
+    apply_pre_transformations: Optional[bool] = True,
+    apply_post_transformations: Optional[bool] = True,
+    raise_issues_as_exceptions: bool = True,
+) -> ModelBuildResult:
+    """Parse files the given list of file paths to a UserConfiguredModel.
+
+    Strings in the files following the Python string template format are replaced according to the template_mapping dict.
+    """
     template_mapping = template_mapping or {}
     yaml_config_files = []
-
-    file_paths = collect_yaml_config_file_paths(directory=directory)
     for file_path in file_paths:
         with open(file_path) as f:
             contents = Template(f.read()).substitute(template_mapping)
