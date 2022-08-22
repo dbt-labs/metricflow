@@ -357,11 +357,23 @@ class DimensionInvariants:
 class ModelValidationRule(ABC):
     """Encapsulates logic for checking the values of objects in a model."""
 
-    @staticmethod
+    @classmethod
     @abstractmethod
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:
+    def validate_model(cls, model: UserConfiguredModel) -> List[ValidationIssueType]:
         """Check the given model and return a list of validation issues"""
         pass
+
+    @classmethod
+    def validate_model_serialized_for_multiprocessing(cls, serialized_model: str) -> str:
+        """Validate a model serialized via Pydantic's .json() method, and return a list of JSON serialized issues
+
+        This method exists because our validations are forked into parallel processes via
+        multiprocessing.ProcessPoolExecutor, and passing a model or validation results object can result in
+        idiosyncratic behavior and inscrutable errors due to interactions between pickling and pydantic objects.
+        """
+        return ModelValidationResults.from_issues_sequence(
+            cls.validate_model(UserConfiguredModel.parse_raw(serialized_model))
+        ).json()
 
 
 class ModelValidationException(Exception):
