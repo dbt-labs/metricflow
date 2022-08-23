@@ -66,6 +66,7 @@ locked_metadata_schema = {
         "display_name": {"type": "string"},
         "tier": {"type": ["string", "integer"]},
         "increase_is_good": {"type": "boolean"},
+        "new_property":  {"type": "boolean"},
     },
     "additionalProperties": False,
 }
