@@ -108,7 +108,7 @@ def parse_directory_of_yaml_files_to_model(
     apply_post_transformations: Optional[bool] = True,
     raise_issues_as_exceptions: bool = True,
 ) -> ModelBuildResult:
-    """Parse files in the given directory to a TMdoModel.
+    """Parse files in the given directory to a UserConfiguredModel.
 
     Strings in the file following the Python string template format are replaced according to the template_mapping dict.
     """
