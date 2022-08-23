@@ -1,0 +1,55 @@
+name: JSON Schema Consistency Check
+on:
+  workflow_dispatch:
+
+  pull_request:
+    # run these jobs when a PR is opened, edited, reopened, or updated (synchronize)
+    # edited = title, body, or the base branch of the PR is modified
+    # synchronize = commit(s) pushed to the pull request
+    types:
+      - opened
+      - reopened
+      - synchronize
+    paths:
+      - 'metricflow/model/parsing/**'
+
+jobs:
+   json-schema-consistency-check:
+    name: Schema Consistency Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check-out the repo
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ${{ env.pythonLocation }}
+            ~/.cache/pypoetry
+          key: ${{ env.pythonLocation }}-${{ hashFiles('poetry.lock') }}
+
+      - name: Install Poetry
+        run: pip install poetry && poetry config virtualenvs.create false
+
+      - name: Install Metricflow
+        run: poetry install
+      
+      - name: Generate JSON Schema
+        run: python3 metricflow/model/parsing/explicit_schema.py
+
+      - name: Schema Consistency Check
+        run: |
+          if [[ $(git diff) ]]
+          then
+            git diff
+            echo 'Failure: JSON schema and generated schema do not match.'
+            exit 1
+          else
+            echo 'Success: JSON schema and generated schema match.'
+          fi
+
