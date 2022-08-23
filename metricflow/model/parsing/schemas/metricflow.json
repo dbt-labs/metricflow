@@ -1,0 +1,728 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "composite_sub_identifier_schema": {
+            "$id": "composite_sub_identifier_schema",
+            "additionalProperties": false,
+            "properties": {
+                "expr": {
+                    "type": [
+                        "string",
+                        "boolean"
+                    ]
+                },
+                "name": {
+                    "type": "string"
+                },
+                "ref": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "data_source": {
+            "$id": "data_source",
+            "additionalProperties": false,
+            "properties": {
+                "dbt_model": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "dimensions": {
+                    "items": {
+                        "$ref": "#/definitions/dimension_schema"
+                    },
+                    "type": "array"
+                },
+                "display_name": {
+                    "type": "string"
+                },
+                "identifiers": {
+                    "items": {
+                        "$ref": "#/definitions/identifier_schema"
+                    },
+                    "type": "array"
+                },
+                "measures": {
+                    "items": {
+                        "$ref": "#/definitions/measure_schema"
+                    },
+                    "type": "array"
+                },
+                "mutability": {
+                    "$ref": "#/definitions/mutability_schema"
+                },
+                "name": {
+                    "pattern": "(?!.*__).*^[a-z][a-z0-9_]*[a-z0-9]$",
+                    "type": "string"
+                },
+                "owners": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "sql_query": {
+                    "type": "string"
+                },
+                "sql_table": {
+                    "type": "string"
+                },
+                "tier": {
+                    "type": [
+                        "string",
+                        "integer"
+                    ]
+                }
+            },
+            "required": [
+                "name"
+            ],
+            "type": "object"
+        },
+        "derived_group_by_element_schema": {
+            "$id": "derived_group_by_element_schema",
+            "additionalProperties": false,
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "display_name": {
+                    "type": "string"
+                },
+                "expr": {
+                    "type": [
+                        "string",
+                        "boolean"
+                    ]
+                },
+                "expr_elements": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "name": {
+                    "pattern": "(?!.*__).*^[a-z][a-z0-9_]*[a-z0-9]$",
+                    "type": "string"
+                },
+                "owners": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "tier": {
+                    "type": [
+                        "string",
+                        "integer"
+                    ]
+                }
+            },
+            "required": [
+                "name",
+                "expr"
+            ],
+            "type": "object"
+        },
+        "dimension_schema": {
+            "$id": "dimension_schema",
+            "additionalProperties": false,
+            "anyOf": [
+                {
+                    "not": {
+                        "$ref": "#/definitions/is-time-dimension"
+                    }
+                },
+                {
+                    "required": [
+                        "type_params"
+                    ]
+                }
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "display_name": {
+                    "type": "string"
+                },
+                "expr": {
+                    "type": [
+                        "string",
+                        "boolean"
+                    ]
+                },
+                "is_partition": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "pattern": "(?!.*__).*^[a-z][a-z0-9_]*[a-z0-9]$",
+                    "type": "string"
+                },
+                "owners": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "tier": {
+                    "type": [
+                        "string",
+                        "integer"
+                    ]
+                },
+                "type": {
+                    "enum": [
+                        "CATEGORICAL",
+                        "TIME",
+                        "categorical",
+                        "time"
+                    ]
+                },
+                "type_params": {
+                    "$ref": "#/definitions/dimension_type_params_schema"
+                }
+            },
+            "required": [
+                "name",
+                "type"
+            ],
+            "type": "object"
+        },
+        "dimension_type_params_schema": {
+            "$id": "dimension_type_params_schema",
+            "additionalProperties": false,
+            "properties": {
+                "is_primary": {
+                    "type": "boolean"
+                },
+                "time_format": {
+                    "type": "string"
+                },
+                "time_granularity": {
+                    "enum": [
+                        "DAY",
+                        "WEEK",
+                        "MONTH",
+                        "QUARTER",
+                        "YEAR",
+                        "day",
+                        "week",
+                        "month",
+                        "quarter",
+                        "year"
+                    ]
+                }
+            },
+            "required": [
+                "time_granularity"
+            ],
+            "type": "object"
+        },
+        "identifier_schema": {
+            "$id": "identifier_schema",
+            "additionalProperties": false,
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "display_name": {
+                    "type": "string"
+                },
+                "entity": {
+                    "type": "string"
+                },
+                "expr": {
+                    "type": [
+                        "string",
+                        "boolean"
+                    ]
+                },
+                "identifiers": {
+                    "items": {
+                        "$ref": "#/definitions/composite_sub_identifier_schema"
+                    },
+                    "type": "array"
+                },
+                "name": {
+                    "pattern": "(?!.*__).*^[a-z][a-z0-9_]*[a-z0-9]$",
+                    "type": "string"
+                },
+                "owners": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "tier": {
+                    "type": [
+                        "string",
+                        "integer"
+                    ]
+                },
+                "type": {
+                    "enum": [
+                        "PRIMARY",
+                        "UNIQUE",
+                        "FOREIGN",
+                        "RENDER_ONLY",
+                        "primary",
+                        "unique",
+                        "foreign",
+                        "render_only"
+                    ]
+                }
+            },
+            "required": [
+                "name",
+                "type"
+            ],
+            "type": "object"
+        },
+        "is-tableau": {
+            "properties": {
+                "location": {
+                    "enum": [
+                        "TABLEAU",
+                        "tableau"
+                    ]
+                }
+            }
+        },
+        "is-time-dimension": {
+            "properties": {
+                "type": {
+                    "enum": [
+                        "TIME",
+                        "time"
+                    ]
+                }
+            },
+            "required": [
+                "type"
+            ]
+        },
+        "locked_metadata": {
+            "$id": "locked_metadata",
+            "additionalProperties": false,
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "display_name": {
+                    "type": "string"
+                },
+                "increase_is_good": {
+                    "type": "boolean"
+                },
+                "tier": {
+                    "type": [
+                        "string",
+                        "integer"
+                    ]
+                },
+                "value_format": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "materialization_destination_schema": {
+            "$id": "materialization_destination_schema",
+            "additionalProperties": false,
+            "anyOf": [
+                {
+                    "not": {
+                        "$ref": "#/definitions/is-tableau"
+                    }
+                },
+                {
+                    "required": [
+                        "tableau_params"
+                    ]
+                }
+            ],
+            "properties": {
+                "format": {
+                    "enum": [
+                        "WIDE",
+                        "wide"
+                    ]
+                },
+                "location": {
+                    "enum": [
+                        "DW",
+                        "FAST_CACHE",
+                        "dw",
+                        "fast_cache",
+                        "TABLEAU",
+                        "tableau"
+                    ]
+                },
+                "rollups": {
+                    "items": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array"
+                    },
+                    "type": "array"
+                },
+                "tableau_params": {
+                    "$id": "materialization_params_tableau",
+                    "properties": {
+                        "projects": {
+                            "projects": {
+                                "type": "string"
+                            },
+                            "type": "array"
+                        }
+                    },
+                    "type": "object"
+                }
+            },
+            "type": "object"
+        },
+        "materialization_schema": {
+            "$id": "materialization_schema",
+            "additionalProperties": false,
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "destination_table": {
+                    "type": "string"
+                },
+                "destinations": {
+                    "items": {
+                        "$ref": "#/definitions/materialization_destination_schema"
+                    },
+                    "type": "array"
+                },
+                "dimensions": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                },
+                "display_name": {
+                    "type": "string"
+                },
+                "metrics": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                },
+                "name": {
+                    "pattern": "(?!.*__).*^[a-z][a-z0-9_]*[a-z0-9]$",
+                    "type": "string"
+                },
+                "owners": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "tier": {
+                    "type": [
+                        "string",
+                        "integer"
+                    ]
+                }
+            },
+            "required": [
+                "name",
+                "dimensions",
+                "metrics"
+            ],
+            "type": "object"
+        },
+        "measure_schema": {
+            "$id": "measure_schema",
+            "additionalProperties": false,
+            "properties": {
+                "agg": {
+                    "enum": [
+                        "SUM",
+                        "MIN",
+                        "MAX",
+                        "AVERAGE",
+                        "COUNT_DISTINCT",
+                        "BOOLEAN",
+                        "SUM_BOOLEAN",
+                        "sum",
+                        "min",
+                        "max",
+                        "average",
+                        "count_distinct",
+                        "boolean",
+                        "sum_boolean"
+                    ]
+                },
+                "agg_time_dimension": {
+                    "pattern": "(?!.*__).*^[a-z][a-z0-9_]*[a-z0-9]$",
+                    "type": "string"
+                },
+                "create_metric": {
+                    "type": "boolean"
+                },
+                "create_metric_display_name": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "display_name": {
+                    "type": "string"
+                },
+                "expr": {
+                    "type": [
+                        "string",
+                        "integer",
+                        "boolean"
+                    ]
+                },
+                "name": {
+                    "pattern": "(?!.*__).*^[a-z][a-z0-9_]*[a-z0-9]$",
+                    "type": "string"
+                },
+                "non_additive_dimension": {
+                    "$ref": "#/definitions/non_additive_dimension_schema"
+                },
+                "owners": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "tier": {
+                    "type": [
+                        "string",
+                        "integer"
+                    ]
+                }
+            },
+            "required": [
+                "name",
+                "agg"
+            ],
+            "type": "object"
+        },
+        "metric": {
+            "$id": "metric",
+            "additionalProperties": false,
+            "properties": {
+                "constraint": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "display_name": {
+                    "type": "string"
+                },
+                "locked_metadata": {
+                    "$ref": "#/definitions/locked_metadata"
+                },
+                "name": {
+                    "pattern": "(?!.*__).*^[a-z][a-z0-9_]*[a-z0-9]$",
+                    "type": "string"
+                },
+                "owners": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "tier": {
+                    "type": [
+                        "string",
+                        "integer"
+                    ]
+                },
+                "type": {
+                    "enum": [
+                        "MEASURE_PROXY",
+                        "RATIO",
+                        "EXPR",
+                        "CUMULATIVE",
+                        "measure_proxy",
+                        "ratio",
+                        "expr",
+                        "cumulative"
+                    ]
+                },
+                "type_params": {
+                    "$ref": "#/definitions/metric_type_params"
+                },
+                "where_constraint": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "name",
+                "type",
+                "type_params"
+            ],
+            "type": "object"
+        },
+        "metric_input_measure_schema": {
+            "$id": "metric_input_measure_schema",
+            "oneOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "additionalProperties": false,
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                }
+            ]
+        },
+        "metric_type_params": {
+            "$id": "metric_type_params",
+            "additionalProperties": false,
+            "properties": {
+                "denominator": {
+                    "$ref": "#/definitions/metric_input_measure_schema"
+                },
+                "expr": {
+                    "type": [
+                        "string",
+                        "boolean"
+                    ]
+                },
+                "grain_to_date": {
+                    "type": "string"
+                },
+                "measure": {
+                    "$ref": "#/definitions/metric_input_measure_schema"
+                },
+                "measures": {
+                    "items": {
+                        "$ref": "#/definitions/metric_input_measure_schema"
+                    },
+                    "type": "array"
+                },
+                "numerator": {
+                    "$ref": "#/definitions/metric_input_measure_schema"
+                },
+                "window": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "mutability_schema": {
+            "$id": "mutability_schema",
+            "additionalProperties": false,
+            "properties": {
+                "type": {
+                    "enum": [
+                        "IMMUTABLE",
+                        "APPEND_ONLY",
+                        "FULL_MUTATION",
+                        "DS_APPEND_ONLY",
+                        "immutable",
+                        "append_only",
+                        "full_mutation",
+                        "ds_append_only"
+                    ]
+                },
+                "type_params": {
+                    "$ref": "#/definitions/mutability_type_params_schema"
+                }
+            },
+            "required": [
+                "type"
+            ],
+            "type": "object"
+        },
+        "mutability_type_params_schema": {
+            "$id": "mutability_type_params_schema",
+            "additionalProperties": false,
+            "properties": {
+                "along": {
+                    "type": "string"
+                },
+                "max": {
+                    "type": "string"
+                },
+                "min": {
+                    "type": "string"
+                },
+                "update_cron": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "non_additive_dimension_schema": {
+            "$id": "non_additive_dimension_schema",
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "window_choice": {
+                    "enum": [
+                        "SUM",
+                        "MIN",
+                        "MAX",
+                        "AVERAGE",
+                        "COUNT_DISTINCT",
+                        "BOOLEAN",
+                        "SUM_BOOLEAN",
+                        "sum",
+                        "min",
+                        "max",
+                        "average",
+                        "count_distinct",
+                        "boolean",
+                        "sum_boolean"
+                    ]
+                },
+                "window_groupings": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "name",
+                "window_choice"
+            ],
+            "type": "object"
+        }
+    },
+    "properties": {
+        "data_source": {
+            "$ref": "#/definitions/data_source"
+        },
+        "derived_group_by_element_schema": {
+            "$ref": "#/definitions/derived_group_by_element_schema"
+        },
+        "materialization_schema": {
+            "$ref": "#/definitions/materialization_schema"
+        },
+        "metric": {
+            "$ref": "#/definitions/metric"
+        }
+    },
+    "title": "MetricFlow file schema",
+    "type": "object"
+}

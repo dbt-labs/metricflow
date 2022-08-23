@@ -35,3 +35,8 @@ lint:
 .PHONY: postgresql postgres
 postgresql postgres:
 	make -C local-data-warehouses postgresql
+
+# Install metricflow for development work.
+.PHONY: json_schema
+json_schema:
+	python3 metricflow/model/parsing/explicit_schema.py
