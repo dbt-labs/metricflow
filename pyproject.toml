@@ -44,6 +44,7 @@ duckdb-engine = "^0.1.8"
 duckdb = "0.3.4"
 yamllint = "^1.26.3"
 click = ">=7.1.2"
+GitPython = "^3.1.27"
 
 [tool.poetry.dev-dependencies]
 pytest-mock = "^3.7.0"

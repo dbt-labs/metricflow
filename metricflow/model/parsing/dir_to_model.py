@@ -3,6 +3,7 @@ import os
 from dataclasses import dataclass
 from string import Template
 import traceback
+import git
 from typing import Optional, Dict, List, Union, Type
 
 from jsonschema import exceptions
@@ -61,20 +62,19 @@ class FileParsingResult:
     issues: List[ValidationIssueType]
 
 
-def parse_directory_of_yaml_files_to_model(
-    directory: str,
-    template_mapping: Optional[Dict[str, str]] = None,
-    apply_pre_transformations: Optional[bool] = True,
-    apply_post_transformations: Optional[bool] = True,
-    raise_issues_as_exceptions: bool = True,
-) -> ModelBuildResult:
-    """Parse files in the given directory to a TMdoModel.
+def collect_yaml_config_file_paths(directory: str) -> List[str]:
+    """Collects a list of file paths for model config files
 
-    Strings in the file following the Python string template format are replaced according to the template_mapping dict.
+    Ignores files that are:
+        - In hidden directories (i.e. directories starting with '.')
+        - Hidden files (i.e. files starting with '.')
+        - Non YAML files
+        - Ignored by the repo's .gitignore file (if a repo is detected)
+
+    NOTE: We ignore files ignored by .gitignore because an issue cropped up wherein
+    sometimes dependencies of projects include YAML files in their package.
     """
-    template_mapping = template_mapping or {}
-    yaml_config_files = []
-
+    config_file_paths: List[str] = []
     for root, dirs, files in os.walk(directory):
         # Skip hidden directories. os.walk() supports mutation of dirs to skip directories.
         dirs[:] = [d for d in dirs if not d.startswith(".")]
@@ -87,11 +87,60 @@ def parse_directory_of_yaml_files_to_model(
                 continue
 
             file_path = os.path.join(root, file)
-            with open(file_path) as f:
-                contents = Template(f.read()).substitute(template_mapping)
-                yaml_config_files.append(
-                    YamlConfigFile(filepath=file_path, contents=contents),
-                )
+            config_file_paths.append(file_path)
+
+    try:
+        repo = git.Repo(directory, search_parent_directories=True)
+        # repo.ignored returns a list of file paths which are the file paths
+        # that should be ignored as a subset of the handed in file paths
+        ignored_files = repo.ignored(config_file_paths)
+        config_file_paths = list(set(config_file_paths) - set(ignored_files))
+    except git.exc.InvalidGitRepositoryError:
+        pass
+
+    return config_file_paths
+
+
+def parse_directory_of_yaml_files_to_model(
+    directory: str,
+    template_mapping: Optional[Dict[str, str]] = None,
+    apply_pre_transformations: Optional[bool] = True,
+    apply_post_transformations: Optional[bool] = True,
+    raise_issues_as_exceptions: bool = True,
+) -> ModelBuildResult:
+    """Parse files in the given directory to a UserConfiguredModel.
+
+    Strings in the file following the Python string template format are replaced according to the template_mapping dict.
+    """
+    file_paths = collect_yaml_config_file_paths(directory=directory)
+    return parse_yaml_file_paths_to_model(
+        file_paths=file_paths,
+        template_mapping=template_mapping,
+        apply_pre_transformations=apply_pre_transformations,
+        apply_post_transformations=apply_post_transformations,
+        raise_issues_as_exceptions=raise_issues_as_exceptions,
+    )
+
+
+def parse_yaml_file_paths_to_model(
+    file_paths: List[str],
+    template_mapping: Optional[Dict[str, str]] = None,
+    apply_pre_transformations: Optional[bool] = True,
+    apply_post_transformations: Optional[bool] = True,
+    raise_issues_as_exceptions: bool = True,
+) -> ModelBuildResult:
+    """Parse files the given list of file paths to a UserConfiguredModel.
+
+    Strings in the files following the Python string template format are replaced according to the template_mapping dict.
+    """
+    template_mapping = template_mapping or {}
+    yaml_config_files = []
+    for file_path in file_paths:
+        with open(file_path) as f:
+            contents = Template(f.read()).substitute(template_mapping)
+            yaml_config_files.append(
+                YamlConfigFile(filepath=file_path, contents=contents),
+            )
 
     build_result = parse_yaml_files_to_model(yaml_config_files)
     model = build_result.model

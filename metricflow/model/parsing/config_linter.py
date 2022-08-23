@@ -2,7 +2,12 @@ import os
 from typing import List, Optional
 import yaml
 from yamllint import config, linter, rules
-from metricflow.model.parsing.dir_to_model import METRIC_TYPE, DATA_SOURCE_TYPE, MATERIALIZATION_TYPE
+from metricflow.model.parsing.dir_to_model import (
+    METRIC_TYPE,
+    DATA_SOURCE_TYPE,
+    MATERIALIZATION_TYPE,
+    collect_yaml_config_file_paths,
+)
 
 from metricflow.model.validations.validator_helpers import (
     FileContext,
@@ -78,7 +83,10 @@ class ConfigLinter:  # noqa: D
         if key in [DATA_SOURCE_TYPE, MATERIALIZATION_TYPE, METRIC_TYPE]:
             problem.desc += f'. Key "{key}" is a top level object. If multiple top level objects are specified in the same file, they must be separated using "---"'
 
-    def lint_file(self, file_path: str, file_name: str) -> List[ValidationIssue]:  # noqa: D
+    def lint_file(self, file_path: str) -> List[ValidationIssue]:  # noqa: D
+        """Lints a given YAML file for structural issues, returning a list of ValidationIssues"""
+        (_head, file_name) = os.path.split(file_path)
+
         issues: List[ValidationIssue] = []
         with open(file_path) as f:
             for problem in linter.run(f, self._config):
@@ -103,13 +111,15 @@ class ConfigLinter:  # noqa: D
 
         return issues
 
-    def lint_dir(self, dir_path: str) -> ModelValidationResults:  # noqa: D
+    def lint_files(self, file_paths: List[str]) -> ModelValidationResults:
+        """Gets a list of ValidationIssues for the given list of YAML file paths"""
         issues: List[ValidationIssue] = []
-        for root, _dirs, files in os.walk(dir_path):
-            for file in files:
-                if not (file.endswith(".yaml") or file.endswith(".yml")):
-                    continue
-                file_path = os.path.join(root, file)
-                issues += self.lint_file(file_path, file)
+        for file_path in file_paths:
+            issues += self.lint_file(file_path)
 
-        return ModelValidationResults.from_issues_sequence(issues)
+        return ModelValidationResults.from_issues_sequence(issues=issues)
+
+    def lint_dir(self, dir_path: str) -> ModelValidationResults:
+        """Generates ModelValidationResults object for lint issues of model config files found in the given directory"""
+        config_file_paths = collect_yaml_config_file_paths(directory=dir_path)
+        return self.lint_files(file_paths=config_file_paths)
