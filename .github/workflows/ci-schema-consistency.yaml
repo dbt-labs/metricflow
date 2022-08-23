@@ -3,8 +3,7 @@ on:
   workflow_dispatch:
 
   pull_request:
-    # run these jobs when a PR is opened, edited, reopened, or updated (synchronize)
-    # edited = title, body, or the base branch of the PR is modified
+    # run these jobs when a PR is opened, reopened, or updated (synchronize)
     # synchronize = commit(s) pushed to the pull request
     types:
       - opened
@@ -47,7 +46,7 @@ jobs:
           if [[ $(git diff) ]]
           then
             git diff
-            echo 'Failure: JSON schema and generated schema do not match.'
+            echo 'Failure: JSON schema and generated schema do not match. Run make json_schema and commit the updated schema changes before merge.'
             exit 1
           else
             echo 'Success: JSON schema and generated schema match.'
