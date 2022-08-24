@@ -1,7 +1,7 @@
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantics.data_source_container import PydanticDataSourceContainer
 from metricflow.model.semantics.semantic_containers import DataSourceSemantics, MetricSemantics
-from metricflow.protocols.semantics import DataSourceSemanticsAccessor
+from metricflow.protocols.semantics import DataSourceSemanticsAccessor, MetricSemanticsAccessor
 
 
 class SemanticModel:
@@ -23,5 +23,5 @@ class SemanticModel:
         return self._data_source_semantics
 
     @property
-    def metric_semantics(self) -> MetricSemantics:  # noqa: D
+    def metric_semantics(self) -> MetricSemanticsAccessor:  # noqa: D
         return self._metric_semantics

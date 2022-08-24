@@ -9,16 +9,18 @@ than the interface specifications.
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Dict, List, Optional, Protocol, Sequence
+from typing import Dict, FrozenSet, List, Optional, Protocol, Sequence, Set, Tuple
 
 from metricflow.instances import DataSourceElementReference, DataSourceReference
 from metricflow.model.objects.data_source import DataSource, DataSourceOrigin
 from metricflow.model.objects.elements.dimension import Dimension
 from metricflow.model.objects.elements.identifier import Identifier
 from metricflow.model.objects.elements.measure import Measure, NonAdditiveDimensionParameters
+from metricflow.model.objects.metric import Metric
 from metricflow.model.semantics.element_group import ElementGrouper
+from metricflow.model.semantics.linkable_spec_resolver import LinkableElementProperties
 from metricflow.references import DimensionReference, IdentifierReference, MeasureReference, TimeDimensionReference
-from metricflow.specs import MeasureSpec
+from metricflow.specs import LinkableInstanceSpec, MeasureSpec, MetricSpec
 
 
 class DataSourceSemanticsAccessor(Protocol):
@@ -103,4 +105,55 @@ class DataSourceSemanticsAccessor(Protocol):
         self, data_source_reference: DataSourceReference
     ) -> ElementGrouper[TimeDimensionReference, MeasureSpec]:
         """Return all aggregation time dimensions in the given data source with their associated measures"""
+        raise NotImplementedError
+
+
+class MetricSemanticsAccessor(Protocol):
+    """Protocol defining core interface for accessing semantic information about a set of metric objects
+
+    This is primarily useful for restricting caller access to the subset of container methods and imports we want
+    them to use. For example, the MetricSemantics class might implement this protocol but also include some
+    public methods for adding or removing metrics from the container, while this protocol only allows the
+    caller to invoke the accessor methods which retrieve semantic information about the collected metrics.
+    """
+
+    @abstractmethod
+    def element_specs_for_metrics(
+        self,
+        metric_specs: List[MetricSpec],
+        with_any_property: FrozenSet[LinkableElementProperties] = LinkableElementProperties.all_properties(),
+        without_any_property: FrozenSet[LinkableElementProperties] = frozenset(),
+    ) -> List[LinkableInstanceSpec]:
+        """Retrieve the matching set of linkable elements common to all metrics requested (intersection)"""
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_metrics(self, metric_names: List[MetricSpec]) -> List[Metric]:
+        """Retrieve the Metric model objects associated with the provided metric specs"""
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def metric_names(self) -> List[MetricSpec]:
+        """Return the metric specs"""
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_metric(self, metric_name: MetricSpec) -> Metric:  # noqa:D
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def valid_hashes(self) -> Set[str]:
+        """Return all of the hashes of the metric definitions."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def measures_for_metric(self, metric_spec: MetricSpec) -> Tuple[MeasureSpec, ...]:
+        """Return the measure specs required to compute the metric."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def contains_cumulative_metric(self, metric_specs: Sequence[MetricSpec]) -> bool:
+        """Returns true if any of the specs correspond to a cumulative metric."""
         raise NotImplementedError
