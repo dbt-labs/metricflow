@@ -4,11 +4,12 @@ from typing import Callable
 
 import pytest
 
+from metricflow.aggregation_properties import AggregationType
 from metricflow.model.model_validator import ModelValidator
 from metricflow.model.objects.data_source import DataSource, Mutability, MutabilityType
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from metricflow.model.objects.elements.identifier import IdentifierType, Identifier, CompositeSubIdentifier
-from metricflow.model.objects.elements.measure import Measure, AggregationType
+from metricflow.model.objects.elements.measure import Measure
 from metricflow.model.objects.metric import MetricType, MetricTypeParams
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import ModelValidationException

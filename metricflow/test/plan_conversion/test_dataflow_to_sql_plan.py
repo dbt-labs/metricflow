@@ -3,6 +3,7 @@ from typing import List
 import pytest
 from _pytest.fixtures import FixtureRequest
 
+from metricflow.aggregation_properties import AggregationType
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan import (
@@ -21,7 +22,7 @@ from metricflow.dataflow.dataflow_plan import (
     SemiAdditiveJoinNode,
 )
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
-from metricflow.model.objects.elements.measure import AggregationType, NonAdditiveDimensionParameters
+from metricflow.model.objects.elements.measure import NonAdditiveDimensionParameters
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter

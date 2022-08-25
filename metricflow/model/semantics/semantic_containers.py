@@ -12,10 +12,11 @@ from metricflow.errors.errors import (
     InvalidDataSourceError,
 )
 from metricflow.instances import DataSourceReference, DataSourceElementReference
+from metricflow.aggregation_properties import AggregationType
 from metricflow.model.objects.data_source import DataSource, DataSourceOrigin
 from metricflow.model.objects.elements.dimension import Dimension
 from metricflow.model.objects.elements.identifier import Identifier
-from metricflow.model.objects.elements.measure import Measure, AggregationType, NonAdditiveDimensionParameters
+from metricflow.model.objects.elements.measure import Measure, NonAdditiveDimensionParameters
 from metricflow.model.objects.metric import Metric, MetricType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantics.data_source_container import PydanticDataSourceContainer
