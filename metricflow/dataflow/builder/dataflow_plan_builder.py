@@ -39,6 +39,7 @@ from metricflow.dataflow.dataflow_plan_to_text import dataflow_dag_as_text
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
+from metricflow.model.spec_converters import WhereConstraintConverter
 from metricflow.model.objects.metric import MetricType, CumulativeMetricWindow
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.object_utils import pformat_big_objects, assert_exactly_one_arg_set
@@ -46,7 +47,6 @@ from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationR
 from metricflow.plan_conversion.node_processor import PreDimensionJoinNodeProcessor
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.time_spine import TimeSpineSource
-from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.specs import (
     MetricSpec,
     LinkableInstanceSpec,
@@ -147,7 +147,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
 
             combined_where = query_spec.where_constraint
             if metric.constraint:
-                metric_constraint = MetricFlowQueryParser.convert_to_spec_where_constraint(
+                metric_constraint = WhereConstraintConverter.convert_to_spec_where_constraint(
                     self._data_source_semantics, metric.constraint
                 )
                 if combined_where:
