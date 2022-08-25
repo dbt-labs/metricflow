@@ -35,6 +35,7 @@ from metricflow.specs import (
     LinkableInstanceSpec,
     MeasureSpec,
     MetricSpec,
+    NonAdditiveDimensionSpec,
 )
 
 logger = logging.getLogger(__name__)
@@ -146,7 +147,7 @@ class DataSourceSemantics:
         self._measure_aggs: Dict[
             MeasureReference, AggregationType
         ] = {}  # maps measures to their one consistent aggregation
-        self._measure_non_additive_dimension: Dict[MeasureReference, NonAdditiveDimensionParameters] = {}
+        self._measure_non_additive_dimension: Dict[MeasureReference, NonAdditiveDimensionSpec] = {}
         self._dimension_index: Dict[DimensionReference, List[DataSource]] = defaultdict(list)
         self._linkable_reference_index: Dict[LinkableElementReference, List[DataSource]] = defaultdict(list)
         self._entity_index: Dict[Optional[str], List[DataSource]] = defaultdict(list)
@@ -208,7 +209,7 @@ class DataSourceSemantics:
         return list(self._measure_index.keys())
 
     @property
-    def non_additive_dimension_by_measure(self) -> Dict[MeasureReference, NonAdditiveDimensionParameters]:  # noqa: D
+    def non_additive_dimension_by_measure(self) -> Dict[MeasureReference, NonAdditiveDimensionSpec]:  # noqa: D
         return self._measure_non_additive_dimension
 
     def get_measure(self, measure_reference: MeasureReference) -> Measure:  # noqa: D
@@ -289,11 +290,12 @@ class DataSourceSemantics:
             self._measure_aggs[measure.reference] = measure.agg
             self._measure_index[measure.reference].append(data_source)
             agg_time_dimension = measure.checked_agg_time_dimension
+            non_additive_dimension: Optional[NonAdditiveDimensionParameters] = measure.non_additive_dimension
             self._data_source_to_aggregation_time_dimensions[data_source.reference].add_value(
                 key=agg_time_dimension,
                 value=MeasureSpec(
                     element_name=measure.name,
-                    non_additive_dimension=measure.non_additive_dimension,
+                    non_additive_dimension=non_additive_dimension,
                 ),
             )
             if measure.non_additive_dimension:
@@ -305,6 +307,14 @@ class DataSourceSemantics:
             self._identifier_ref_to_entity[ident.reference] = ident.entity
             self._entity_index[ident.entity].append(data_source)
             self._linkable_reference_index[ident.reference].append(data_source)
+
+    @staticmethod
+    def _make_measure_spec(measure: Measure) -> MeasureSpec:
+        """WTF mypy?"""
+        return MeasureSpec(
+            element_name=measure.name,
+            non_additive_dimension=measure.non_additive_dimension,
+        )
 
     @property
     def data_source_references(self) -> Sequence[DataSourceReference]:  # noqa: D

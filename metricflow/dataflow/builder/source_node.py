@@ -9,9 +9,8 @@ from metricflow.dataflow.dataflow_plan import (
 )
 from metricflow.dataflow.builder.measure_additiveness import group_measure_specs_by_additiveness
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
-from metricflow.model.objects.elements.measure import NonAdditiveDimensionParameters
 from metricflow.model.semantic_model import SemanticModel
-from metricflow.specs import LinklessIdentifierSpec, TimeDimensionSpec, InstanceSpec
+from metricflow.specs import LinklessIdentifierSpec, NonAdditiveDimensionSpec, TimeDimensionSpec, InstanceSpec
 from metricflow.plan_conversion.instance_converters import RemoveMeasures
 
 
@@ -29,7 +28,7 @@ class SourceNodeBuilder:
     def _build_semi_additive_source_node(
         self,
         parent_node: BaseOutput[DataSourceDataSet],
-        non_additive_dimension: NonAdditiveDimensionParameters,
+        non_additive_dimension: NonAdditiveDimensionSpec,
         filter_specs: Sequence[InstanceSpec],
     ) -> SemiAdditiveJoinNode[DataSourceDataSet]:
         """Builds a SemiAdditiveJoinNode given measures and non-additive dimension attributes."""

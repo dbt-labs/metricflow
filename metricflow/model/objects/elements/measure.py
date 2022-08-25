@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Optional, List
 from metricflow.model.objects.common import Metadata
 from metricflow.model.objects.base import ModelWithMetadataParsing, HashableBaseModel
-from metricflow.object_utils import ExtendedEnum, hash_strings
+from metricflow.object_utils import ExtendedEnum
 from metricflow.references import MeasureReference, TimeDimensionReference
 
 
@@ -52,13 +52,6 @@ class NonAdditiveDimensionParameters(HashableBaseModel):
     name: str
     window_choice: AggregationType
     window_groupings: List[str] = []
-
-    @property
-    def bucket_hash(self) -> str:
-        """Returns the hash value used for grouping equivalent params."""
-        values = [self.window_choice.name, self.name]
-        values.extend(sorted(self.window_groupings))
-        return hash_strings(values)
 
 
 class Measure(HashableBaseModel, ModelWithMetadataParsing):
