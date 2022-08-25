@@ -22,7 +22,6 @@ from metricflow.model.semantics.semantic_containers import DataSourceSemantics
 from metricflow.object_utils import assert_exactly_one_arg_set
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.specs import (
-    MeasureSpec,
     InstanceSpec,
     IdentifierSpec,
     DimensionSpec,
@@ -413,9 +412,7 @@ class ChangeMeasureAggregationState(InstanceSetTransform[InstanceSet]):
                 associated_columns=x.associated_columns,
                 defined_from=x.defined_from,
                 aggregation_state=self._aggregation_state_changes[x.aggregation_state],
-                spec=MeasureSpec(
-                    element_name=x.spec.element_name,
-                ),
+                spec=x.spec,
             )
             for x in instance_set.measure_instances
         )

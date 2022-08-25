@@ -545,13 +545,9 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         if len(output_nodes) == 1:
             return output_nodes[0]
         else:
-            # Remove the non-additive dimension params from measure_specs moving forward
             return FilterElementsNode(
                 parent_node=JoinAggregatedMeasuresByGroupByColumnsNode(parent_nodes=output_nodes),
-                include_specs=LinkableInstanceSpec.merge(
-                    queried_linkable_specs.as_tuple,
-                    tuple(MeasureSpec(element_name=x.element_name) for x in measure_specs),
-                ),
+                include_specs=LinkableInstanceSpec.merge(queried_linkable_specs.as_tuple, measure_specs),
             )
 
     @staticmethod
