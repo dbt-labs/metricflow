@@ -14,16 +14,41 @@ from typing import List
 from metricflow.dataset.dataset import DataSet
 from metricflow.model.objects.constraints.where import WhereClauseConstraint
 from metricflow.model.objects.elements.dimension import DimensionType
+from metricflow.model.objects.elements.measure import Measure
 from metricflow.protocols.semantics import DataSourceSemanticsAccessor
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.specs import (
     DimensionSpec,
     IdentifierSpec,
     LinkableSpecSet,
+    MeasureSpec,
+    NonAdditiveDimensionSpec,
     SpecWhereClauseConstraint,
     StructuredLinkableSpecName,
     TimeDimensionSpec,
 )
+
+
+class MeasureConverter:
+    """Static class for converting Measure model objects to MeasureSpec instances"""
+
+    @staticmethod
+    def convert_to_measure_spec(measure: Measure) -> MeasureSpec:
+        """Converts a Measure to a MeasureSpec, and properly handles non-additive dimension properties"""
+        non_additive_dimension = (
+            NonAdditiveDimensionSpec(
+                name=measure.non_additive_dimension.name,
+                window_choice=measure.non_additive_dimension.window_choice,
+                window_groupings=tuple(measure.non_additive_dimension.window_groupings),
+            )
+            if measure.non_additive_dimension is not None
+            else None
+        )
+
+        return MeasureSpec(
+            element_name=measure.name,
+            non_additive_dimension=non_additive_dimension,
+        )
 
 
 class WhereConstraintConverter:

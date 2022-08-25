@@ -22,7 +22,6 @@ from metricflow.dataflow.dataflow_plan import (
     SemiAdditiveJoinNode,
 )
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
-from metricflow.model.objects.elements.measure import NonAdditiveDimensionParameters
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
@@ -37,6 +36,7 @@ from metricflow.specs import (
     MetricSpec,
     LinklessIdentifierSpec,
     MetricFlowQuerySpec,
+    NonAdditiveDimensionSpec,
     OrderBySpec,
     TimeDimensionSpec,
     SpecWhereClauseConstraint,
@@ -1148,7 +1148,7 @@ def test_semi_additive_join_node(
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan using a SemiAdditiveJoinNode."""
-    non_additive_dimension = NonAdditiveDimensionParameters(name="ds", window_choice=AggregationType.MIN)
+    non_additive_dimension = NonAdditiveDimensionSpec(name="ds", window_choice=AggregationType.MIN)
     measure_spec = MeasureSpec(
         element_name="total_account_balance_first_day", non_additive_dimension=non_additive_dimension
     )
@@ -1181,10 +1181,10 @@ def test_semi_additive_join_node_with_grouping(
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan using a SemiAdditiveJoinNode with a window_grouping."""
-    non_additive_dimension = NonAdditiveDimensionParameters(
+    non_additive_dimension = NonAdditiveDimensionSpec(
         name="ds",
         window_choice=AggregationType.MAX,
-        window_groupings=["user"],
+        window_groupings=("user",),
     )
     measure_spec = MeasureSpec(
         element_name="current_account_balance_by_user", non_additive_dimension=non_additive_dimension

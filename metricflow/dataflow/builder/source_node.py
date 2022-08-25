@@ -9,9 +9,8 @@ from metricflow.dataflow.dataflow_plan import (
 )
 from metricflow.dataflow.builder.measure_additiveness import group_measure_specs_by_additiveness
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
-from metricflow.model.objects.elements.measure import NonAdditiveDimensionParameters
 from metricflow.model.semantic_model import SemanticModel
-from metricflow.specs import LinklessIdentifierSpec, TimeDimensionSpec, InstanceSpec
+from metricflow.specs import LinklessIdentifierSpec, NonAdditiveDimensionSpec, TimeDimensionSpec, InstanceSpec
 from metricflow.plan_conversion.instance_converters import RemoveMeasures
 
 
@@ -29,7 +28,7 @@ class SourceNodeBuilder:
     def _build_semi_additive_source_node(
         self,
         parent_node: BaseOutput[DataSourceDataSet],
-        non_additive_dimension: NonAdditiveDimensionParameters,
+        non_additive_dimension: NonAdditiveDimensionSpec,
         filter_specs: Sequence[InstanceSpec],
     ) -> SemiAdditiveJoinNode[DataSourceDataSet]:
         """Builds a SemiAdditiveJoinNode given measures and non-additive dimension attributes."""
@@ -95,11 +94,11 @@ class SourceNodeBuilder:
                     # Build a SemiAdditiveJoinNode for each semi-additive measure grouping.
                     grouped_semi_additive_measures = grouped_measures_by_additiveness.grouped_semi_additive_measures
                     for measure_group in grouped_semi_additive_measures:
-                        non_additive_dimension_params = measure_group[0].non_additive_dimension
-                        assert non_additive_dimension_params
+                        non_additive_dimension = measure_group[0].non_additive_dimension
+                        assert non_additive_dimension
                         semi_additive_join_node = self._build_semi_additive_source_node(
                             parent_node=read_node,
-                            non_additive_dimension=non_additive_dimension_params,
+                            non_additive_dimension=non_additive_dimension,
                             filter_specs=tuple(instance_set_with_no_measures.spec_set.all_specs) + measure_group,
                         )
                         source_nodes.append(

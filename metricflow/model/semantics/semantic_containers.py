@@ -16,7 +16,7 @@ from metricflow.aggregation_properties import AggregationType
 from metricflow.model.objects.data_source import DataSource, DataSourceOrigin
 from metricflow.model.objects.elements.dimension import Dimension
 from metricflow.model.objects.elements.identifier import Identifier
-from metricflow.model.objects.elements.measure import Measure, NonAdditiveDimensionParameters
+from metricflow.model.objects.elements.measure import Measure
 from metricflow.model.objects.metric import Metric, MetricType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantics.data_source_container import PydanticDataSourceContainer
@@ -25,6 +25,7 @@ from metricflow.model.semantics.linkable_spec_resolver import (
     ValidLinkableSpecResolver,
     LinkableElementProperties,
 )
+from metricflow.model.spec_converters import MeasureConverter
 from metricflow.references import (
     DimensionReference,
     IdentifierReference,
@@ -36,6 +37,7 @@ from metricflow.specs import (
     LinkableInstanceSpec,
     MeasureSpec,
     MetricSpec,
+    NonAdditiveDimensionSpec,
 )
 
 logger = logging.getLogger(__name__)
@@ -121,7 +123,7 @@ class MetricSemantics:  # noqa: D
         return tuple(
             MeasureSpec(
                 element_name=x.element_name,
-                non_additive_dimension=self._data_source_semantics.non_additive_dimension_by_measure.get(x),
+                non_additive_dimension=self._data_source_semantics.non_additive_dimensions_by_measure.get(x),
             )
             for x in metric.measure_references
         )
@@ -151,7 +153,7 @@ class DataSourceSemantics:
         self._measure_aggs: Dict[
             MeasureReference, AggregationType
         ] = {}  # maps measures to their one consistent aggregation
-        self._measure_non_additive_dimension: Dict[MeasureReference, NonAdditiveDimensionParameters] = {}
+        self._measure_non_additive_dimensions: Dict[MeasureReference, NonAdditiveDimensionSpec] = {}
         self._dimension_index: Dict[DimensionReference, List[DataSource]] = defaultdict(list)
         self._linkable_reference_index: Dict[LinkableElementReference, List[DataSource]] = defaultdict(list)
         self._entity_index: Dict[Optional[str], List[DataSource]] = defaultdict(list)
@@ -213,8 +215,8 @@ class DataSourceSemantics:
         return list(self._measure_index.keys())
 
     @property
-    def non_additive_dimension_by_measure(self) -> Dict[MeasureReference, NonAdditiveDimensionParameters]:  # noqa: D
-        return self._measure_non_additive_dimension
+    def non_additive_dimensions_by_measure(self) -> Dict[MeasureReference, NonAdditiveDimensionSpec]:  # noqa: D
+        return self._measure_non_additive_dimensions
 
     def get_measure(self, measure_reference: MeasureReference) -> Measure:  # noqa: D
         if measure_reference not in self._measure_index:
@@ -296,13 +298,15 @@ class DataSourceSemantics:
             agg_time_dimension = measure.checked_agg_time_dimension
             self._data_source_to_aggregation_time_dimensions[data_source.reference].add_value(
                 key=agg_time_dimension,
-                value=MeasureSpec(
-                    element_name=measure.name,
-                    non_additive_dimension=measure.non_additive_dimension,
-                ),
+                value=MeasureConverter.convert_to_measure_spec(measure=measure),
             )
             if measure.non_additive_dimension:
-                self._measure_non_additive_dimension[measure.reference] = measure.non_additive_dimension
+                non_additive_dimension = NonAdditiveDimensionSpec(
+                    name=measure.non_additive_dimension.name,
+                    window_choice=measure.non_additive_dimension.window_choice,
+                    window_groupings=tuple(measure.non_additive_dimension.window_groupings),
+                )
+                self._measure_non_additive_dimensions[measure.reference] = non_additive_dimension
         for dim in data_source.dimensions:
             self._linkable_reference_index[dim.reference].append(data_source)
             self._dimension_index[dim.reference].append(data_source)

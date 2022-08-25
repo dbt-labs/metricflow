@@ -15,12 +15,12 @@ from metricflow.instances import DataSourceElementReference, DataSourceReference
 from metricflow.model.objects.data_source import DataSource, DataSourceOrigin
 from metricflow.model.objects.elements.dimension import Dimension
 from metricflow.model.objects.elements.identifier import Identifier
-from metricflow.model.objects.elements.measure import Measure, NonAdditiveDimensionParameters
+from metricflow.model.objects.elements.measure import Measure
 from metricflow.model.objects.metric import Metric
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.semantics.linkable_spec_resolver import LinkableElementProperties
 from metricflow.references import DimensionReference, IdentifierReference, MeasureReference, TimeDimensionReference
-from metricflow.specs import LinkableInstanceSpec, MeasureSpec, MetricSpec
+from metricflow.specs import LinkableInstanceSpec, MeasureSpec, MetricSpec, NonAdditiveDimensionSpec
 
 
 class DataSourceSemanticsAccessor(Protocol):
@@ -57,7 +57,7 @@ class DataSourceSemanticsAccessor(Protocol):
 
     @property
     @abstractmethod
-    def non_additive_dimension_by_measure(self) -> Dict[MeasureReference, NonAdditiveDimensionParameters]:
+    def non_additive_dimensions_by_measure(self) -> Dict[MeasureReference, NonAdditiveDimensionSpec]:
         """Return a mapping from all semi-additive measures to their corresponding non additive dimension parameters
 
         This includes all measures with non-additive dimension parameters, if any, from the collection of data sources.
