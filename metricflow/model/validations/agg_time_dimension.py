@@ -56,8 +56,8 @@ class AggregationTimeDimensionRule(ModelValidationRule):
                     ValidationError(
                         context=measure_context,
                         message=f"In data source '{data_source.name}', measure '{measure.name}' has the aggregation "
-                        f"time dimension is set to '{agg_time_dimension_reference.element_name}', "
-                        f"which not a valid time dimension in the data source",
+                        f"time dimension set to '{agg_time_dimension_reference.element_name}', "
+                        f"which is not a valid time dimension in the data source",
                     )
                 )
 
