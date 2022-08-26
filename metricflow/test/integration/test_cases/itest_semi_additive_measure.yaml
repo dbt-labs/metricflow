@@ -54,3 +54,55 @@ integration_test:
       a.ds = b.ds
     GROUP BY
       a.ds
+---
+integration_test:
+  name: semi_additive_measure_query_with_join_linkable_specs
+  description: |
+    Tests semi-additive measure with a path hitting join linkable specs. 
+    There are cases (like this query where we have a non-local linkable spec "user__home_state_latest") where
+    we are directly copying a MeasureSpec via constructing it. Previously, this led to a code path not passing all the attributes,
+    then somewhere along the path it would end up throwing a MeasureSpec not in [List of MeasureSpec] due to an attribute
+    being missing. This test case hits that path and ensures that we are copying attributes correctly.  
+  model: SIMPLE_MODEL
+  metrics: ["current_account_balance_by_user"]
+  group_bys: ["user"]
+  where_constraint: "user__home_state_latest = 'CA'"
+  check_query: |
+    SELECT
+      e.user AS user
+      , SUM(e.current_account_balance_by_user) AS current_account_balance_by_user
+    FROM (
+      SELECT
+        c.user AS user
+        , d.home_state_latest AS user__home_state_latest
+        , c.current_account_balance_by_user AS current_account_balance_by_user
+      FROM (
+        SELECT
+          a.user AS user
+          , a.current_account_balance_by_user AS current_account_balance_by_user
+        FROM (
+          SELECT
+            ds
+            , user_id AS user
+            , account_balance AS current_account_balance_by_user
+          FROM {{ source_schema }}.fct_accounts
+        ) a
+        INNER JOIN (
+          SELECT
+            user_id AS user
+            , MAX(ds) AS ds
+          FROM {{ source_schema }}.fct_accounts
+          GROUP BY
+            user_id
+        ) b
+        ON
+          a.ds = b.ds AND a.user = b.user
+      ) c
+      LEFT OUTER JOIN
+        {{ source_schema }}.dim_users_latest d
+      ON
+        c.user = d.user_id
+    ) e
+    WHERE user__home_state_latest = 'CA'
+    GROUP BY
+      e.user
