@@ -300,7 +300,7 @@ class NonAdditiveDimensionSpec(SerializableDataclass):
 @dataclass(frozen=True)
 class MeasureSpec(InstanceSpec):  # noqa: D
     element_name: str
-    non_additive_dimension: Optional[NonAdditiveDimensionSpec] = None
+    non_additive_dimension_spec: Optional[NonAdditiveDimensionSpec] = None
 
     def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
         return (resolver.resolve_measure_spec(self),)

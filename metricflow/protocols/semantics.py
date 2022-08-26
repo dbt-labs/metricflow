@@ -57,7 +57,7 @@ class DataSourceSemanticsAccessor(Protocol):
 
     @property
     @abstractmethod
-    def non_additive_dimensions_by_measure(self) -> Dict[MeasureReference, NonAdditiveDimensionSpec]:
+    def non_additive_dimension_specs_by_measure(self) -> Dict[MeasureReference, NonAdditiveDimensionSpec]:
         """Return a mapping from all semi-additive measures to their corresponding non additive dimension parameters
 
         This includes all measures with non-additive dimension parameters, if any, from the collection of data sources.

@@ -1148,9 +1148,9 @@ def test_semi_additive_join_node(
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan using a SemiAdditiveJoinNode."""
-    non_additive_dimension = NonAdditiveDimensionSpec(name="ds", window_choice=AggregationType.MIN)
+    non_additive_dimension_spec = NonAdditiveDimensionSpec(name="ds", window_choice=AggregationType.MIN)
     measure_spec = MeasureSpec(
-        element_name="total_account_balance_first_day", non_additive_dimension=non_additive_dimension
+        element_name="total_account_balance_first_day", non_additive_dimension_spec=non_additive_dimension_spec
     )
     time_dimension_spec = TimeDimensionSpec(element_name="ds", identifier_links=())
 
@@ -1162,7 +1162,7 @@ def test_semi_additive_join_node(
         parent_node=filtered_measure_node,
         identifier_specs=tuple(),
         time_dimension_spec=time_dimension_spec,
-        agg_by_function=non_additive_dimension.window_choice,
+        agg_by_function=non_additive_dimension_spec.window_choice,
     )
     convert_and_check(
         request=request,
@@ -1181,13 +1181,13 @@ def test_semi_additive_join_node_with_grouping(
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan using a SemiAdditiveJoinNode with a window_grouping."""
-    non_additive_dimension = NonAdditiveDimensionSpec(
+    non_additive_dimension_spec = NonAdditiveDimensionSpec(
         name="ds",
         window_choice=AggregationType.MAX,
         window_groupings=("user",),
     )
     measure_spec = MeasureSpec(
-        element_name="current_account_balance_by_user", non_additive_dimension=non_additive_dimension
+        element_name="current_account_balance_by_user", non_additive_dimension_spec=non_additive_dimension_spec
     )
     identifier_spec = LinklessIdentifierSpec(element_name="user", identifier_links=())
     time_dimension_spec = TimeDimensionSpec(element_name="ds", identifier_links=())
@@ -1200,7 +1200,7 @@ def test_semi_additive_join_node_with_grouping(
         parent_node=filtered_measure_node,
         identifier_specs=(identifier_spec,),
         time_dimension_spec=time_dimension_spec,
-        agg_by_function=non_additive_dimension.window_choice,
+        agg_by_function=non_additive_dimension_spec.window_choice,
     )
     convert_and_check(
         request=request,

@@ -14,10 +14,10 @@
                     <!--   Pass Only Elements:                                            -->
                     <!--     ['booking_value', 'listing__country_latest', 'metric_time']  -->
                     <!-- node_id = pfe_2 -->
-                    <!-- include_spec =                       -->
-                    <!--   {'class': 'MeasureSpec',           -->
-                    <!--    'element_name': 'booking_value',  -->
-                    <!--    'non_additive_dimension': None}   -->
+                    <!-- include_spec =                           -->
+                    <!--   {'class': 'MeasureSpec',               -->
+                    <!--    'element_name': 'booking_value',      -->
+                    <!--    'non_additive_dimension_spec': None}  -->
                     <!-- include_spec =                                            -->
                     <!--   {'class': 'DimensionSpec',                              -->
                     <!--    'element_name': 'country_latest',                      -->
@@ -44,10 +44,10 @@
                             <!--   Pass Only Elements:                            -->
                             <!--     ['booking_value', 'metric_time', 'listing']  -->
                             <!-- node_id = pfe_0 -->
-                            <!-- include_spec =                       -->
-                            <!--   {'class': 'MeasureSpec',           -->
-                            <!--    'element_name': 'booking_value',  -->
-                            <!--    'non_additive_dimension': None}   -->
+                            <!-- include_spec =                           -->
+                            <!--   {'class': 'MeasureSpec',               -->
+                            <!--    'element_name': 'booking_value',      -->
+                            <!--    'non_additive_dimension_spec': None}  -->
                             <!-- include_spec =                               -->
                             <!--   {'class': 'TimeDimensionSpec',             -->
                             <!--    'element_name': 'metric_time',            -->

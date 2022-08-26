@@ -14,10 +14,10 @@
                     <!--   Pass Only Elements:                                        -->
                     <!--     ['txn_count', 'account_id__customer_id__customer_name']  -->
                     <!-- node_id = pfe_4 -->
-                    <!-- include_spec =                      -->
-                    <!--   {'class': 'MeasureSpec',          -->
-                    <!--    'element_name': 'txn_count',     -->
-                    <!--    'non_additive_dimension': None}  -->
+                    <!-- include_spec =                           -->
+                    <!--   {'class': 'MeasureSpec',               -->
+                    <!--    'element_name': 'txn_count',          -->
+                    <!--    'non_additive_dimension_spec': None}  -->
                     <!-- include_spec =                                             -->
                     <!--   {'class': 'DimensionSpec',                               -->
                     <!--    'element_name': 'customer_name',                        -->
@@ -49,10 +49,10 @@
                             <!--   Pass Only Elements:                              -->
                             <!--     ['txn_count', 'account_id', 'ds_partitioned']  -->
                             <!-- node_id = pfe_2 -->
-                            <!-- include_spec =                      -->
-                            <!--   {'class': 'MeasureSpec',          -->
-                            <!--    'element_name': 'txn_count',     -->
-                            <!--    'non_additive_dimension': None}  -->
+                            <!-- include_spec =                           -->
+                            <!--   {'class': 'MeasureSpec',               -->
+                            <!--    'element_name': 'txn_count',          -->
+                            <!--    'non_additive_dimension_spec': None}  -->
                             <!-- include_spec =                         -->
                             <!--   {'class': 'LinklessIdentifierSpec',  -->
                             <!--    'element_name': 'account_id',       -->

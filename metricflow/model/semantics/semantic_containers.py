@@ -123,7 +123,7 @@ class MetricSemantics:  # noqa: D
         return tuple(
             MeasureSpec(
                 element_name=x.element_name,
-                non_additive_dimension=self._data_source_semantics.non_additive_dimensions_by_measure.get(x),
+                non_additive_dimension_spec=self._data_source_semantics.non_additive_dimension_specs_by_measure.get(x),
             )
             for x in metric.measure_references
         )
@@ -153,7 +153,7 @@ class DataSourceSemantics:
         self._measure_aggs: Dict[
             MeasureReference, AggregationType
         ] = {}  # maps measures to their one consistent aggregation
-        self._measure_non_additive_dimensions: Dict[MeasureReference, NonAdditiveDimensionSpec] = {}
+        self._measure_non_additive_dimension_specs: Dict[MeasureReference, NonAdditiveDimensionSpec] = {}
         self._dimension_index: Dict[DimensionReference, List[DataSource]] = defaultdict(list)
         self._linkable_reference_index: Dict[LinkableElementReference, List[DataSource]] = defaultdict(list)
         self._entity_index: Dict[Optional[str], List[DataSource]] = defaultdict(list)
@@ -215,8 +215,8 @@ class DataSourceSemantics:
         return list(self._measure_index.keys())
 
     @property
-    def non_additive_dimensions_by_measure(self) -> Dict[MeasureReference, NonAdditiveDimensionSpec]:  # noqa: D
-        return self._measure_non_additive_dimensions
+    def non_additive_dimension_specs_by_measure(self) -> Dict[MeasureReference, NonAdditiveDimensionSpec]:  # noqa: D
+        return self._measure_non_additive_dimension_specs
 
     def get_measure(self, measure_reference: MeasureReference) -> Measure:  # noqa: D
         if measure_reference not in self._measure_index:
@@ -301,12 +301,12 @@ class DataSourceSemantics:
                 value=MeasureConverter.convert_to_measure_spec(measure=measure),
             )
             if measure.non_additive_dimension:
-                non_additive_dimension = NonAdditiveDimensionSpec(
+                non_additive_dimension_spec = NonAdditiveDimensionSpec(
                     name=measure.non_additive_dimension.name,
                     window_choice=measure.non_additive_dimension.window_choice,
                     window_groupings=tuple(measure.non_additive_dimension.window_groupings),
                 )
-                self._measure_non_additive_dimensions[measure.reference] = non_additive_dimension
+                self._measure_non_additive_dimension_specs[measure.reference] = non_additive_dimension_spec
         for dim in data_source.dimensions:
             self._linkable_reference_index[dim.reference].append(data_source)
             self._dimension_index[dim.reference].append(data_source)

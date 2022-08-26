@@ -7,7 +7,7 @@ def test_bucket_measure_specs_by_additiveness() -> None:  # noqa: D
     # Semi-additive Bucket 1
     measure_1 = MeasureSpec(
         element_name="measure_1",
-        non_additive_dimension=NonAdditiveDimensionSpec(
+        non_additive_dimension_spec=NonAdditiveDimensionSpec(
             name="ds",
             window_choice=AggregationType.MIN,
         ),
@@ -16,7 +16,7 @@ def test_bucket_measure_specs_by_additiveness() -> None:  # noqa: D
     # Semi-additive Bucket 2
     measure_2 = MeasureSpec(
         element_name="measure_2",
-        non_additive_dimension=NonAdditiveDimensionSpec(
+        non_additive_dimension_spec=NonAdditiveDimensionSpec(
             name="ds",
             window_choice=AggregationType.MIN,
             window_groupings=("id_1", "id_2"),
@@ -24,7 +24,7 @@ def test_bucket_measure_specs_by_additiveness() -> None:  # noqa: D
     )
     measure_3 = MeasureSpec(
         element_name="measure_3",
-        non_additive_dimension=NonAdditiveDimensionSpec(
+        non_additive_dimension_spec=NonAdditiveDimensionSpec(
             name="ds",
             window_choice=AggregationType.MIN,
             window_groupings=("id_2", "id_1"),

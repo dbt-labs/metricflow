@@ -23,9 +23,9 @@ def group_measure_specs_by_additiveness(measure_specs: Sequence[MeasureSpec]) ->
     bucket = collections.defaultdict(list)
     additive_bucket = []
     for spec in measure_specs:
-        non_additive_dimension = spec.non_additive_dimension
-        if non_additive_dimension:
-            bucket[non_additive_dimension.bucket_hash].append(spec)
+        non_additive_dimension_spec = spec.non_additive_dimension_spec
+        if non_additive_dimension_spec:
+            bucket[non_additive_dimension_spec.bucket_hash].append(spec)
         else:
             additive_bucket.append(spec)
     return GroupedMeasureSpecsByAdditiveness(

@@ -35,7 +35,7 @@ class MeasureConverter:
     @staticmethod
     def convert_to_measure_spec(measure: Measure) -> MeasureSpec:
         """Converts a Measure to a MeasureSpec, and properly handles non-additive dimension properties"""
-        non_additive_dimension = (
+        non_additive_dimension_spec = (
             NonAdditiveDimensionSpec(
                 name=measure.non_additive_dimension.name,
                 window_choice=measure.non_additive_dimension.window_choice,
@@ -47,7 +47,7 @@ class MeasureConverter:
 
         return MeasureSpec(
             element_name=measure.name,
-            non_additive_dimension=non_additive_dimension,
+            non_additive_dimension_spec=non_additive_dimension_spec,
         )
 
 
