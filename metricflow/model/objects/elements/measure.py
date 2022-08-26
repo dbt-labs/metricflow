@@ -79,9 +79,11 @@ class Measure(HashableBaseModel, ModelWithMetadataParsing):
     @property
     def checked_agg_time_dimension(self) -> TimeDimensionReference:
         """Returns the aggregation time dimension, throwing an exception if it's not set."""
-        assert (
-            self.agg_time_dimension
-        ), f"Aggregation time dimension for {self.name} should have been set during model transformation"
+        assert self.agg_time_dimension, (
+            f"Aggregation time dimension for measure {self.name} is not set! This should either be set directly on "
+            f"the measure specification in the model, or else defaulted to the primary time dimension in the data "
+            f"source containing the measure."
+        )
         return TimeDimensionReference(element_name=self.agg_time_dimension)
 
     @property
