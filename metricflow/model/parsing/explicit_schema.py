@@ -7,10 +7,10 @@ from typing import Dict, List, Union
 from metricflow.model.parsing import schemas_internal
 
 TOP_LEVEL_SCHEMAS = {
-    "metric",
-    "data_source",
-    "derived_group_by_element_schema",
-    "materialization_schema",
+    "metric": "metric",
+    "data_source": "data_source",
+    "derived_group_by_element_schema": "derived_identifier",
+    "materialization_schema": "materialization",
 }
 
 BASE_SCHEMA = {
@@ -39,8 +39,8 @@ def generate_explict_schema(schema_store: Dict) -> Dict:
         definitions[schema_name] = rewritten_schema
 
     properties = {}
-    for schema_name in TOP_LEVEL_SCHEMAS:
-        properties[schema_name] = {"$ref": ref_to_definition_mapping[schema_name]}
+    for schema_name, object_name in TOP_LEVEL_SCHEMAS.items():
+        properties[object_name] = {"$ref": ref_to_definition_mapping[schema_name]}
 
     full_schema: Dict = deepcopy(BASE_SCHEMA)
     full_schema["properties"] = properties
