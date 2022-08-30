@@ -134,7 +134,11 @@ class MetricSemantics:  # noqa: D
 
 
 class DataSourceSemantics:
-    """Tracks semantic information for data source held in a set of DataSourceContainers"""
+    """Tracks semantic information for data source held in a set of DataSourceContainers
+
+    This implements both the DataSourceSemanticsAccessors protocol, the interface type we use throughout the codebase.
+    That interface prevents unwanted calls to methods for adding data sources to the container.
+    """
 
     def __init__(  # noqa: D
         self,

@@ -18,9 +18,9 @@ from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.model.objects.constraints.where import WhereClauseConstraint
 from metricflow.model.objects.elements.dimension import DimensionType
 from metricflow.model.semantic_model import SemanticModel
-from metricflow.model.semantics.semantic_containers import DataSourceSemantics
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.object_utils import pformat_big_objects
+from metricflow.protocols.semantics import DataSourceSemanticsAccessor
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.references import DimensionReference, IdentifierReference, TimeDimensionReference
 from metricflow.specs import (
@@ -105,12 +105,12 @@ class MetricFlowQueryParser:
 
     @staticmethod
     def convert_to_linkable_specs(
-        data_source_semantics: DataSourceSemantics, where_constraint_names: List[str]
+        data_source_semantics: DataSourceSemanticsAccessor, where_constraint_names: List[str]
     ) -> LinkableSpecSet:
         """Processes where_clause_constraint.linkable_names into associated LinkableInstanceSpecs (dims, times, ids)
 
         where_constraint_names: WhereConstraintClause.linkable_names
-        data_source_semantics: DataSourceSemantics from the instantiated class
+        data_source_semantics: DataSourceSemanticsAccessor from the instantiated class
 
         output: InstanceSpecSet of Tuple(DimensionSpec), Tuple(TimeDimensionSpec), Tuple(IdentifierSpec)
         """
@@ -153,14 +153,15 @@ class MetricFlowQueryParser:
 
     @staticmethod
     def convert_to_spec_where_constraint(
-        data_source_semantics: DataSourceSemantics, where_constraint: WhereClauseConstraint
+        data_source_semantics: DataSourceSemanticsAccessor, where_constraint: WhereClauseConstraint
     ) -> SpecWhereClauseConstraint:
         """Converts a where constraint to one using specs."""
         return SpecWhereClauseConstraint(
             where_condition=where_constraint.where,
             linkable_names=tuple(where_constraint.linkable_names),
             linkable_spec_set=MetricFlowQueryParser.convert_to_linkable_specs(
-                data_source_semantics=data_source_semantics, where_constraint_names=where_constraint.linkable_names
+                data_source_semantics=data_source_semantics,
+                where_constraint_names=where_constraint.linkable_names,
             ),
             execution_parameters=where_constraint.sql_params,
         )

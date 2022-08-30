@@ -36,7 +36,7 @@ from metricflow.specs import (
     LinklessIdentifierSpec,
     InstanceSpecSet,
 )
-from metricflow.model.semantics.semantic_containers import DataSourceSemantics
+from metricflow.protocols.semantics import DataSourceSemanticsAccessor
 
 logger = logging.getLogger(__name__)
 
@@ -105,7 +105,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
 
     def __init__(
         self,
-        data_source_semantics: DataSourceSemantics,
+        data_source_semantics: DataSourceSemanticsAccessor,
         nodes_available_for_joins: Sequence[BaseOutput[SourceDataSetT]],
         node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver[SourceDataSetT],
     ) -> None:

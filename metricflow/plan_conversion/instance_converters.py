@@ -18,7 +18,7 @@ from metricflow.instances import (
     InstanceSetTransform,
     TimeDimensionInstance,
 )
-from metricflow.model.semantics.semantic_containers import DataSourceSemantics
+from metricflow.protocols.semantics import DataSourceSemanticsAccessor
 from metricflow.object_utils import assert_exactly_one_arg_set
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.specs import (
@@ -149,7 +149,10 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
     """
 
     def __init__(  # noqa: D
-        self, table_alias: str, column_resolver: ColumnAssociationResolver, data_source_semantics: DataSourceSemantics
+        self,
+        table_alias: str,
+        column_resolver: ColumnAssociationResolver,
+        data_source_semantics: DataSourceSemanticsAccessor,
     ) -> None:
         self._data_source_semantics = data_source_semantics
         super().__init__(table_alias=table_alias, column_resolver=column_resolver)
