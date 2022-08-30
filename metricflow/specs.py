@@ -14,13 +14,13 @@ from abc import ABC, abstractmethod
 from collections import OrderedDict
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple, TypeVar, Generic, Any
+from metricflow.aggregation_properties import AggregationType
 
 from metricflow.column_assoc import ColumnAssociation
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dataclass_serialization import SerializableDataclass
-from metricflow.model.objects.elements.measure import NonAdditiveDimensionParameters
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
-from metricflow.object_utils import assert_exactly_one_arg_set
+from metricflow.object_utils import assert_exactly_one_arg_set, hash_strings
 from metricflow.references import DimensionReference, MeasureReference, TimeDimensionReference, IdentifierReference
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.time.time_granularity import TimeGranularity
@@ -278,9 +278,29 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
 
 
 @dataclass(frozen=True)
+class NonAdditiveDimensionSpec(SerializableDataclass):
+    """Spec representing non-additive dimension parameters for use within a MeasureSpec
+
+    This is sourced from the NonAdditiveDimensionParameters model object, which provides the parsed parameter set,
+    while the spec contains the information needed for dataflow plan operations
+    """
+
+    name: str
+    window_choice: AggregationType
+    window_groupings: Tuple[str, ...] = ()
+
+    @property
+    def bucket_hash(self) -> str:
+        """Returns the hash value used for grouping equivalent params."""
+        values = [self.window_choice.name, self.name]
+        values.extend(sorted(self.window_groupings))
+        return hash_strings(values)
+
+
+@dataclass(frozen=True)
 class MeasureSpec(InstanceSpec):  # noqa: D
     element_name: str
-    non_additive_dimension: Optional[NonAdditiveDimensionParameters] = None
+    non_additive_dimension_spec: Optional[NonAdditiveDimensionSpec] = None
 
     def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
         return (resolver.resolve_measure_spec(self),)

@@ -20,9 +20,9 @@ from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType
 from metricflow.model.objects.elements.identifier import Identifier, IdentifierType
 from metricflow.model.objects.elements.measure import Measure
+from metricflow.model.spec_converters import MeasureConverter
 from metricflow.specs import (
     TimeDimensionSpec,
-    MeasureSpec,
     DimensionSpec,
     IdentifierSpec,
     ColumnAssociationResolver,
@@ -184,10 +184,7 @@ class DataSourceToDataSetConverter:
         measure_instances = []
         select_columns = []
         for measure in measures or []:
-            measure_spec = MeasureSpec(
-                element_name=measure.reference.element_name,
-                non_additive_dimension=measure.non_additive_dimension,
-            )
+            measure_spec = MeasureConverter.convert_to_measure_spec(measure=measure)
             measure_instance = MeasureInstance(
                 associated_columns=measure_spec.column_associations(self._column_association_resolver),
                 spec=measure_spec,

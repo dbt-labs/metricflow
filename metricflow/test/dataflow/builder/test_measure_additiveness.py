@@ -1,13 +1,13 @@
 from metricflow.dataflow.builder.measure_additiveness import group_measure_specs_by_additiveness
-from metricflow.model.objects.elements.measure import AggregationType, NonAdditiveDimensionParameters
-from metricflow.specs import MeasureSpec
+from metricflow.aggregation_properties import AggregationType
+from metricflow.specs import MeasureSpec, NonAdditiveDimensionSpec
 
 
 def test_bucket_measure_specs_by_additiveness() -> None:  # noqa: D
     # Semi-additive Bucket 1
     measure_1 = MeasureSpec(
         element_name="measure_1",
-        non_additive_dimension=NonAdditiveDimensionParameters(
+        non_additive_dimension_spec=NonAdditiveDimensionSpec(
             name="ds",
             window_choice=AggregationType.MIN,
         ),
@@ -16,18 +16,18 @@ def test_bucket_measure_specs_by_additiveness() -> None:  # noqa: D
     # Semi-additive Bucket 2
     measure_2 = MeasureSpec(
         element_name="measure_2",
-        non_additive_dimension=NonAdditiveDimensionParameters(
+        non_additive_dimension_spec=NonAdditiveDimensionSpec(
             name="ds",
             window_choice=AggregationType.MIN,
-            window_groupings=["id_1", "id_2"],
+            window_groupings=("id_1", "id_2"),
         ),
     )
     measure_3 = MeasureSpec(
         element_name="measure_3",
-        non_additive_dimension=NonAdditiveDimensionParameters(
+        non_additive_dimension_spec=NonAdditiveDimensionSpec(
             name="ds",
             window_choice=AggregationType.MIN,
-            window_groupings=["id_2", "id_1"],
+            window_groupings=("id_2", "id_1"),
         ),
     )
 

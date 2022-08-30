@@ -1,6 +1,6 @@
 import logging
 
-from metricflow.model.objects.elements.measure import AggregationType
+from metricflow.aggregation_properties import AggregationType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.transformations.transform_rule import ModelTransformRule
 

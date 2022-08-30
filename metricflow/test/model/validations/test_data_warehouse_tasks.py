@@ -4,6 +4,7 @@ from typing import Tuple
 import pytest
 from _pytest.fixtures import FixtureRequest
 
+from metricflow.aggregation_properties import AggregationType
 from metricflow.model.data_warehouse_model_validator import (
     DataWarehouseModelValidator,
     DataWarehouseTaskBuilder,
@@ -13,7 +14,7 @@ from metricflow.model.model_transformer import ModelTransformer
 from metricflow.model.objects.data_source import Mutability, MutabilityType
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType
 from metricflow.model.objects.elements.identifier import Identifier, IdentifierType
-from metricflow.model.objects.elements.measure import AggregationType, Measure
+from metricflow.model.objects.elements.measure import Measure
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
