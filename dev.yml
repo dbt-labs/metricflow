@@ -1,0 +1,35 @@
+name: metricflow
+type: python
+
+up:
+  - git_hooks:
+      pre-commit: shadowenv exec -- pre-commit run --all-files
+  - python: 3.9.13
+  - custom:
+      name: Adds transform as a remote repository
+      met?: git remote | grep transform
+      meet: git remote add transform git@github.com:transform-data/metricflow.git
+  - custom:
+      name: Install poetry
+      met?: poetry --version
+      meet: pip install poetry
+  - custom:
+      name: Install requirements
+      met?: poetry install
+      meet: "true"
+
+commands:
+  rm-venv:
+    run: >
+      PYTHON_VERSION=$(sed -n "s/^  - python: //p" dev.yml) &&
+      rm -r ~/.pyenv/versions/$PYTHON_VERSION || true &&
+      rm -r ~/.pyenv/virtualenvs/metricflow/$PYTHON_VERSION || true
+  rebase: bin/rebase-fork
+  lint: pre-commit run --all-files
+  mf: poetry run mf "$@"
+  test: bin/test "$@"
+  itest: poetry run pytest -k "$@" metricflow/test/integration
+  deps:
+    subcommands:
+      add: poetry add "$@"
+      add-dev: poetry add --dev "$@"

@@ -1,0 +1,9 @@
+#!/bin/bash -e
+# Assumes transform remote exists
+
+TESTS_DIR=$1
+if [[ -z "${TESTS_DIR}" ]]; then
+  TESTS_DIR="metricflow/test"
+fi
+
+poetry run pytest "${TESTS_DIR}"

@@ -1,0 +1,5 @@
+#!/bin/bash -e
+# Assumes transform remote exists
+
+git fetch --all
+git rebase transform/main
