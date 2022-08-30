@@ -6,6 +6,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.111.1] - 2022-08-30
+
+### Added
+- A lightweight Visual Studio Code [extension for authoring configs](https://marketplace.visualstudio.com/items?itemName=Transform.metricflow) with simple support for inline schema validation and auto-completion! Local repo changes limited to JSON schema generation. (@jack-transform)
+- Metric model template for Shopify metrics - if you use Shopify, this template can get you up and running for tracking your Shopify metrics! (@hesham-nawaz)
+
+### Fixed
+- Fixed warehouse validation failures caused by interaction with measure-specific aggregation times (@QMalcolm)
+- Resolved intermittent semantic validation failures due to unpicklable pydantic objects (@tlento)
+- Fixed edge case with semi-additive measures failing on certain join dimension connections (@WilliamDee)
+- Restructured semantic container depedencies to eliminate certain classes of circular import errors (@tlento)
+
+### Updated
+- Replaced Pydantic objects with serializable Dataclasses to improve plan building speed. This can reduce time to generate dataflow plans by 10-20x for complex queries. (@plypaul)
+- Refactored validation logic to make it easier to reason about (@QMalcolm)
+- Modified inference detection rules to make it more likely to classify low cardinality string columns as categorical dimensions (@tlento)
+
+
 ## [0.111.0] - 2022-08-10
 
 ### Added
