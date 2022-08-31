@@ -2,6 +2,7 @@ import datetime
 import logging
 import traceback
 from typing import List
+from metricflow.errors.errors import SemanticException
 from metricflow.instances import MaterializationModelReference
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
@@ -109,7 +110,18 @@ class ValidMaterializationRule(ModelValidationRule):
         """Check that all of the metrics and dimensions listed in a materialization are valid."""
         issues: List[ValidationIssueType] = []
 
-        semantic_model = SemanticModel(model)
+        try:
+            semantic_model = SemanticModel(model)
+        except (AssertionError, SemanticException) as e:
+            return [
+                ValidationError(
+                    message="Unable to run materialization validations as the building of the semantic model failed. "
+                    "If running the suite of validation rules, the underlying cause should be covered by another "
+                    "validation error.",
+                    extra_detail="".join(traceback.format_exception(etype=type(e), value=e, tb=e.__traceback__)),
+                )
+            ]
+
         source_data_sets: List[DataSourceDataSet] = []
         converter = DataSourceToDataSetConverter(
             column_association_resolver=DefaultColumnAssociationResolver(semantic_model)
