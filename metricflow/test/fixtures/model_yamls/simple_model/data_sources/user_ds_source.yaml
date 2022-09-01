@@ -30,6 +30,5 @@ data_source:
       type: primary
       expr: user_id
 
-
   mutability:
     type: immutable

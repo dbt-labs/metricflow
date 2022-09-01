@@ -7,7 +7,6 @@ data_source:
 
   sql_table: $fct_users_table
 
-
   dimensions:
     - name: ds
       expr: created_at

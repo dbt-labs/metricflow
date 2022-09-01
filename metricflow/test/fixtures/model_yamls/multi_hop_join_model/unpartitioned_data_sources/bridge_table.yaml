@@ -1,4 +1,4 @@
---- 
+---
 data_source:
   name: bridge_table
   description: bridge_table
@@ -19,5 +19,3 @@ data_source:
 
   mutability:
     type: immutable
-
-

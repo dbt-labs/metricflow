@@ -32,6 +32,5 @@ data_source:
       type: primary
       expr: listing_id
 
-
   mutability:
     type: immutable

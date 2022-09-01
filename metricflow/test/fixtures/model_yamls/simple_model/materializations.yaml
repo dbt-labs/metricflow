@@ -9,7 +9,6 @@ materialization:
   dimensions:
     - metric_time
     - listing
-
 ---
 materialization:
   name: test_materialization
@@ -21,7 +20,6 @@ materialization:
   dimensions:
     - metric_time
     - is_instant
-
 ---
 materialization:
   name: test_materialization_ds_only
@@ -32,7 +30,6 @@ materialization:
     - booking_value
   dimensions:
     - metric_time
-
 ---
 materialization:
   name: test_materialization2
@@ -44,7 +41,6 @@ materialization:
   dimensions:
     - metric_time
     - is_instant
-
 ---
 materialization:
   name: test_materialization3
@@ -56,7 +52,6 @@ materialization:
   dimensions:
     - metric_time
     - listing__country_latest
-
 ---
 materialization:
   name: test_materialization_custom_destination
@@ -69,7 +64,6 @@ materialization:
   dimensions:
     - metric_time
     - is_instant
-
 ---
 materialization:
   name: test_materialization2_custom_destination
@@ -82,7 +76,6 @@ materialization:
   dimensions:
     - metric_time
     - is_instant
-
 ---
 materialization:
   name: test_materialization3_custom_destination
@@ -95,7 +88,6 @@ materialization:
   dimensions:
     - metric_time
     - listing__country_latest
-
 ---
 materialization:
   name: test_materialization_with_join
@@ -107,7 +99,6 @@ materialization:
   dimensions:
     - metric_time
     - listing__country_latest
-
 ---
 materialization:
   name: test_materialization_fast_cache
@@ -127,7 +118,6 @@ materialization:
       format: WIDE
       rollups:
         - ["metric_time", "*"]
-
 ---
 materialization:
   name: materialization_with_ds_month

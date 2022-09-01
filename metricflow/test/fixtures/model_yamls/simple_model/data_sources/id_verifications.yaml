@@ -34,6 +34,5 @@ data_source:
       type: foreign
       expr: user_id
 
-
   mutability:
     type: immutable

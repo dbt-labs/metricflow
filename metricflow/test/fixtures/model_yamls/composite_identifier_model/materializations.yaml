@@ -10,7 +10,6 @@ materialization:
     - ds
     - user_team
     - user_team__country
-
 ---
 materialization:
   name: messages_with_user_team_and_team

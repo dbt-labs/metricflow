@@ -32,6 +32,6 @@ data_source:
     type: append_only
     type_params:
       along: dt
-      min: '2020-01-01'
-      max: '2020-01-31'
+      min: "2020-01-01"
+      max: "2020-01-31"
       update_cron: manual
