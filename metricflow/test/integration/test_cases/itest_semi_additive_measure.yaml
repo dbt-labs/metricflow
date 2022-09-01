@@ -58,11 +58,11 @@ integration_test:
 integration_test:
   name: semi_additive_measure_query_with_join_linkable_specs
   description: |
-    Tests semi-additive measure with a path hitting join linkable specs. 
+    Tests semi-additive measure with a path hitting join linkable specs.
     There are cases (like this query where we have a non-local linkable spec "user__home_state_latest") where
     we are directly copying a MeasureSpec via constructing it. Previously, this led to a code path not passing all the attributes,
     then somewhere along the path it would end up throwing a MeasureSpec not in [List of MeasureSpec] due to an attribute
-    being missing. This test case hits that path and ensures that we are copying attributes correctly.  
+    being missing. This test case hits that path and ensures that we are copying attributes correctly.
   model: SIMPLE_MODEL
   metrics: ["current_account_balance_by_user"]
   group_bys: ["user"]

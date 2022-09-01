@@ -22,7 +22,11 @@ integration_test:
   description: Tests a query requesting mulitple multi-hop join dims that dont come from the same data source
   model: UNPARTITIONED_MULTI_HOP_JOIN_MODEL
   metrics: ["txn_count"]
-  group_bys: ["account_id__customer_id__customer_name", "account_id__customer_id__country"]
+  group_bys:
+    [
+      "account_id__customer_id__customer_name",
+      "account_id__customer_id__country",
+    ]
   check_query: |
     SELECT
       dim_src0.customer_name as account_id__customer_id__customer_name
@@ -52,7 +56,11 @@ integration_test:
   description: Tests a query requesting mulitple multi-hop join dims from the same source
   model: UNPARTITIONED_MULTI_HOP_JOIN_MODEL
   metrics: ["txn_count"]
-  group_bys: ["account_id__customer_id__customer_name", "account_id__customer_id__customer_atomic_weight"]
+  group_bys:
+    [
+      "account_id__customer_id__customer_name",
+      "account_id__customer_id__customer_atomic_weight",
+    ]
   check_query: |
     SELECT
       ct.customer_name as account_id__customer_id__customer_name
@@ -72,7 +80,12 @@ integration_test:
   description: Tests a query with multihop and single hop join dimensions
   model: UNPARTITIONED_MULTI_HOP_JOIN_MODEL
   metrics: ["txn_count"]
-  group_bys: ["account_id__customer_id__customer_name", "account_id__customer_id__country", "account_id__extra_dim"]
+  group_bys:
+    [
+      "account_id__customer_id__customer_name",
+      "account_id__customer_id__country",
+      "account_id__extra_dim",
+    ]
   check_query: |
     SELECT
       dim_src0.customer_name as account_id__customer_id__customer_name

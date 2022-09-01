@@ -102,4 +102,3 @@ integration_test:
     GROUP BY
       v.ds
       , u.home_state
-
