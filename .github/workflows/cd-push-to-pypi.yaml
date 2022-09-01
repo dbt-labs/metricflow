@@ -2,8 +2,8 @@ name: Publish Metricflow Release
 on:
   workflow_dispatch:
   push:
-    tags:        
-      - '*'
+    tags:
+      - "*"
 
 jobs:
   poetry-publish:
@@ -24,4 +24,4 @@ jobs:
         run: make install
 
       - name: Poetry Publish
-        run: poetry build && poetry publish -u transform_data -p ${{ secrets.PYPI_PASSWORD }} 
+        run: poetry build && poetry publish -u transform_data -p ${{ secrets.PYPI_PASSWORD }}

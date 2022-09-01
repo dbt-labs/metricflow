@@ -10,10 +10,10 @@ on:
       - reopened
       - synchronize
     paths:
-      - 'metricflow/model/parsing/**'
+      - "metricflow/model/parsing/**"
 
 jobs:
-   json-schema-consistency-check:
+  json-schema-consistency-check:
     name: Schema Consistency Check
     runs-on: ubuntu-latest
     steps:
@@ -37,7 +37,7 @@ jobs:
 
       - name: Install Metricflow
         run: poetry install
-      
+
       - name: Generate JSON Schema
         run: python3 metricflow/model/parsing/explicit_schema.py
 
@@ -51,4 +51,3 @@ jobs:
           else
             echo 'Success: JSON schema and generated schema match.'
           fi
-
