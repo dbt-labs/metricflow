@@ -3,13 +3,11 @@ from __future__ import annotations
 import dataclasses
 import datetime
 import logging
-import typing
 from builtins import NameError
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Type, TypeVar, Dict, Tuple, Optional
-from typing import Union
-from typing import get_origin, get_args
+from typing import Any, Dict, Optional, Type, TypeVar, Tuple, Union, get_args, get_origin, get_type_hints
+from typing_extensions import TypeAlias
 
 import pydantic
 from pydantic import BaseModel
@@ -21,6 +19,8 @@ logger = logging.getLogger(__name__)
 
 # Any Pydantic object
 PydanticT = TypeVar("PydanticT", bound=Type[BaseModel])
+# Any value
+AnyValueType: TypeAlias = Any  # type: ignore[misc]
 
 
 class UnknownClassError(Exception):
@@ -39,7 +39,7 @@ def _get_dataclass_field_types(dataclass_type: Type) -> Dict[str, Type]:
     """Returns the types of fields in a dataclass. Returns a dict from the name of the field to the type."""
     assert dataclasses.is_dataclass(dataclass_type)
     try:
-        return typing.get_type_hints(dataclass_type, localns={})
+        return get_type_hints(dataclass_type, localns={})
     except NameError as e:
         raise UnknownClassError(
             f"Error getting type hints for dataclass {dataclass_type}. Please see the nested exception as a required "
@@ -49,7 +49,7 @@ def _get_dataclass_field_types(dataclass_type: Type) -> Dict[str, Type]:
 
 def _is_optional_type(type_to_check: Type) -> bool:
     """Returns true if the given type is an optional type. Python represents optional as Union[SomeType, NoneType]."""
-    if get_origin(type_to_check) is typing.Union:
+    if get_origin(type_to_check) is Union:
         args = get_args(type_to_check)
         if len(args) == 2 and issubclass(args[1], type(None)):
             return True
@@ -158,9 +158,9 @@ class DataclassSerializer:
     def __init__(self) -> None:  # noqa: D
         self._to_pydantic_type_converter = DataClassTypeToPydanticTypeConverter()
 
-    def _convert_dataclass_instance_to_pydantic_model(  # type: ignore[misc]
-        self, object_type: Type, obj: Optional[Any] = None
-    ) -> Any:
+    def _convert_dataclass_instance_to_pydantic_model(
+        self, object_type: Type, obj: Optional[AnyValueType] = None
+    ) -> AnyValueType:
         if not _is_supported_field_type_in_serializable_dataclass(object_type):
             raise RuntimeError(f"Unsupported field type: {object_type}")
         elif _is_optional_type(object_type):
@@ -190,7 +190,7 @@ class DataclassSerializer:
             PydanticModel = self._to_pydantic_type_converter.to_pydantic_type(object_type)
 
             field_dict = _get_dataclass_field_types(object_type)
-            field_values: Dict[str, Any] = {}  # type: ignore
+            field_values: Dict[str, AnyValueType] = {}
             for field_name, field_type in field_dict.items():
                 field_values[field_name] = self._convert_dataclass_instance_to_pydantic_model(
                     object_type=field_type, obj=getattr(obj, field_name)
@@ -215,9 +215,9 @@ class DataClassDeserializer:
     def __init__(self) -> None:  # noqa: D
         self._to_pydantic_type_converter = DataClassTypeToPydanticTypeConverter()
 
-    def _convert_field_in_pydantic_object_to_actual_object(  # type: ignore[misc]
-        self, field_type: Type, obj: Optional[Any] = None
-    ) -> Any:
+    def _convert_field_in_pydantic_object_to_actual_object(
+        self, field_type: Type, obj: Optional[AnyValueType] = None
+    ) -> AnyValueType:
         if not _is_supported_field_type_in_serializable_dataclass(field_type):
             raise RuntimeError(f"Unsupported type: {field_type}")
         elif _is_optional_type(field_type):
@@ -304,7 +304,7 @@ class DataClassTypeToPydanticTypeConverter:  # noqa: D
         field_dict = _get_dataclass_field_types(dataclass_type)
 
         # Maps the name of the field to (type of field, default value)
-        fields_for_pydantic_model: Dict[str, Tuple[Type, Any]] = {}  # type: ignore
+        fields_for_pydantic_model: Dict[str, Tuple[Type, AnyValueType]] = {}
         logger.debug(f"Need to add: {pformat_big_objects(field_dict.keys())}")
         for field_name, field_type in field_dict.items():
             field_definition = DataClassTypeToPydanticTypeConverter._convert_field_type_object(field_type)
@@ -352,10 +352,10 @@ class DataClassTypeToPydanticTypeConverter:  # noqa: D
 class DataclassFieldDefinition:  # type: ignore[misc]
     """Describes the field definition in a dataclass as describe by the annotation."""
 
-    field_type: Any  # type: ignore[misc]
-    default_value: Any  # type: ignore[misc]
+    field_type: AnyValueType
+    default_value: AnyValueType
 
-    def as_tuple(self) -> Tuple[Type, Any]:  # type: ignore[misc]  # noqa: D
+    def as_tuple(self) -> Tuple[Type, AnyValueType]:  # noqa: D
         return (self.annotated_field_type, self.default_value)
 
     @property
