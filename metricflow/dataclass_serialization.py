@@ -314,7 +314,7 @@ class DataClassTypeToPydanticTypeConverter:  # noqa: D
         logger.debug(f"Need to add: {pformat_big_objects(field_dict.keys())}")
         for field_name, field_definition in field_dict.items():
             field_definition = DataClassTypeToPydanticTypeConverter._convert_nested_fields(field_definition)
-            fields_for_pydantic_model[field_name] = field_definition.as_tuple()
+            fields_for_pydantic_model[field_name] = field_definition.as_pydantic_field_tuple()
             logger.debug(f"Adding {field_name} with type {field_definition.annotated_field_type}")
 
         class_name = dataclass_type.__name__ + "AsPydantic"
@@ -340,41 +340,54 @@ class DataClassTypeToPydanticTypeConverter:  # noqa: D
         elif _is_optional_type(field_definition.annotated_field_type):
             optional_field_type_parameter = _get_type_parameter_for_optional(field_definition.annotated_field_type)
             converted_field_definition = DataClassTypeToPydanticTypeConverter._convert_nested_fields(
-                FieldDefinition(field_type=optional_field_type_parameter, default_value=None)
+                FieldDefinition(field_type=optional_field_type_parameter)
             )
             return FieldDefinition(  # type: ignore[arg-type]
-                Union[converted_field_definition.field_type, type(None)], converted_field_definition.default_value
+                Union[converted_field_definition.field_type, type(None)], field_definition.default_value
             )
         elif _is_sequence_like_tuple_type(field_definition.annotated_field_type):
             tuple_field_type_parameter = _get_type_parameter_for_sequence_like_tuple_type(
                 field_definition.annotated_field_type
             )
             converted_field_definition = DataClassTypeToPydanticTypeConverter._convert_nested_fields(
-                FieldDefinition(field_type=tuple_field_type_parameter, default_value=None)
+                FieldDefinition(field_type=tuple_field_type_parameter)
             )
-            return FieldDefinition(
-                Tuple[converted_field_definition.field_type, ...], converted_field_definition.default_value
-            )
+            return FieldDefinition(Tuple[converted_field_definition.field_type, ...], field_definition.default_value)
         elif issubclass(field_definition.annotated_field_type, SerializableDataclass):
             return FieldDefinition(
-                DataClassTypeToPydanticTypeConverter._convert_dataclass_type_to_pydantic_type(
+                field_type=DataClassTypeToPydanticTypeConverter._convert_dataclass_type_to_pydantic_type(
                     field_definition.annotated_field_type
                 ),
-                ...,
+                default_value=field_definition.default_value,
             )
         else:
-            return FieldDefinition(field_definition.annotated_field_type, ...)
+            return field_definition
 
 
 @dataclass(frozen=True)
-class FieldDefinition:  # type: ignore[misc]
-    """Describes the field definition in a dataclass as describe by the annotation."""
+class FieldDefinition:
+    """Describes the field definition in a dataclass as described by the annotation.
+
+    Note the default_value follows Pydantic semantics. A default value of ... indicates that there is no default, and
+    as such a value must be provided for this field in the Pydantic BaseModel or Dataclass representation. We cannot
+    use None for this, as None is a valid default for optional types.
+    """
 
     field_type: AnyValueType
-    default_value: Optional[AnyValueType]
+    default_value: Optional[AnyValueType] = ...
 
-    def as_tuple(self) -> Tuple[Type, AnyValueType]:  # noqa: D
-        return (self.annotated_field_type, self.default_value)
+    def __post_init__(self) -> None:
+        """Validate the combination of default_value and field_type"""
+        if self.default_value is None:
+            assert _is_optional_type(self.field_type), (
+                f"Invalid default of None provided for field definition - type {self.field_type} will not allow it! "
+                f"Use ... or dataclasses.MISSING instead"
+            )
+
+    def as_pydantic_field_tuple(self) -> Tuple[Type, AnyValueType]:
+        """Pydantic fields can be initialized with a Tuple[Type, Any], where the second parameter is the default value"""
+        default = self.default_value if self.default_value != dataclasses.MISSING else ...
+        return (self.annotated_field_type, default)
 
     @property
     def annotated_field_type(self) -> Type:  # noqa: D
