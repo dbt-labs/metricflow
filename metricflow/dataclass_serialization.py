@@ -51,7 +51,7 @@ def _is_optional_type(type_to_check: Type) -> bool:
     """Returns true if the given type is an optional type. Python represents optional as Union[SomeType, NoneType]."""
     if get_origin(type_to_check) is typing.Union:
         args = get_args(type_to_check)
-        if len(args) == 2 and type(None) in args:
+        if len(args) == 2 and issubclass(args[1], type(None)):
             return True
     return False
 
@@ -59,11 +59,7 @@ def _is_optional_type(type_to_check: Type) -> bool:
 def _get_type_parameter_for_optional(type_to_check: Type) -> Type:
     """Given Union[SomeType, NoneType], return SomeType."""
     assert _is_optional_type(type_to_check)
-    return (
-        get_args(type_to_check)[0]
-        if not issubclass(get_args(type_to_check)[0], type(None))
-        else get_args(type_to_check)[0]
-    )
+    return get_args(type_to_check)[0]
 
 
 def _is_supported_field_type_in_serializable_dataclass(field_type: Type) -> bool:
