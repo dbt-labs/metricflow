@@ -35,11 +35,17 @@ class DataclassDeserializationError(Exception):
     pass
 
 
-def _get_dataclass_field_types(dataclass_type: Type) -> Dict[str, Type]:
+def _get_dataclass_field_definitions(dataclass_type: Type) -> Dict[str, FieldDefinition]:
     """Returns the types of fields in a dataclass. Returns a dict from the name of the field to the type."""
     assert dataclasses.is_dataclass(dataclass_type)
     try:
-        return get_type_hints(dataclass_type, localns={})
+        type_hints = get_type_hints(dataclass_type, localns={})
+        fields = dataclasses.fields(dataclass_type)
+        return {
+            field.name: FieldDefinition(field_type=type_hints[field.name], default_value=field.default)
+            for field in fields
+        }
+
     except NameError as e:
         raise UnknownClassError(
             f"Error getting type hints for dataclass {dataclass_type}. Please see the nested exception as a required "
@@ -189,11 +195,11 @@ class DataclassSerializer:
                 raise RuntimeError(f"{obj} is not a SerializableDataclass")
             PydanticModel = self._to_pydantic_type_converter.to_pydantic_type(object_type)
 
-            field_dict = _get_dataclass_field_types(object_type)
+            field_dict = _get_dataclass_field_definitions(object_type)
             field_values: Dict[str, AnyValueType] = {}
-            for field_name, field_type in field_dict.items():
+            for field_name, field_definition in field_dict.items():
                 field_values[field_name] = self._convert_dataclass_instance_to_pydantic_model(
-                    object_type=field_type, obj=getattr(obj, field_name)
+                    object_type=field_definition.annotated_field_type, obj=getattr(obj, field_name)
                 )
             return PydanticModel(**field_values)
 
@@ -253,10 +259,10 @@ class DataClassDeserializer:
     ) -> SerializableDataclassT:
         logger.debug(f"Constructing dataclass of type {dataclass_type} from {repr(obj)}")
         object_args = {}
-        field_dict = _get_dataclass_field_types(dataclass_type)
-        for field_name, field_type in field_dict.items():
+        field_dict = _get_dataclass_field_definitions(dataclass_type)
+        for field_name, field_definition in field_dict.items():
             object_args[field_name] = self._convert_field_in_pydantic_object_to_actual_object(
-                field_type=field_type,
+                field_type=field_definition.annotated_field_type,
                 obj=getattr(obj, field_name),
             )
 
@@ -301,15 +307,15 @@ class DataClassTypeToPydanticTypeConverter:  # noqa: D
         assert issubclass(dataclass_type, SerializableDataclass)
         assert dataclasses.is_dataclass(dataclass_type)
 
-        field_dict = _get_dataclass_field_types(dataclass_type)
+        field_dict = _get_dataclass_field_definitions(dataclass_type)
 
         # Maps the name of the field to (type of field, default value)
         fields_for_pydantic_model: Dict[str, Tuple[Type, AnyValueType]] = {}
         logger.debug(f"Need to add: {pformat_big_objects(field_dict.keys())}")
-        for field_name, field_type in field_dict.items():
-            field_definition = DataClassTypeToPydanticTypeConverter._convert_field_type_object(field_type)
+        for field_name, field_definition in field_dict.items():
+            field_definition = DataClassTypeToPydanticTypeConverter._convert_nested_fields(field_definition)
             fields_for_pydantic_model[field_name] = field_definition.as_tuple()
-            logger.debug(f"Adding {field_name} with type {field_type}")
+            logger.debug(f"Adding {field_name} with type {field_definition.annotated_field_type}")
 
         class_name = dataclass_type.__name__ + "AsPydantic"
         logger.debug(
@@ -321,39 +327,51 @@ class DataClassTypeToPydanticTypeConverter:  # noqa: D
         return pydantic_model
 
     @staticmethod
-    def _convert_field_type_object(field_type: Type) -> DataclassFieldDefinition:
-        if not _is_supported_field_type_in_serializable_dataclass(field_type):
-            raise RuntimeError(f"Unsupported type: {field_type}")
-        elif _is_optional_type(field_type):
-            optional_field_type_parameter = _get_type_parameter_for_optional(field_type)
-            converted_field_definition = DataClassTypeToPydanticTypeConverter._convert_field_type_object(
-                optional_field_type_parameter
+    def _convert_nested_fields(field_definition: FieldDefinition) -> FieldDefinition:
+        """Recursively converts a given field definition into a fully serializable type specification
+
+        The initial set of FieldDefinitions sourced from the dataclass might contain arbitrarily
+        nested SerializableDataclass objects, which would need further parsing in order to be fully
+        serializable via our Pydantic conversion. This method does that traversal and returns the complete
+        set of Pydantic-compatible nested types.
+        """
+        if not _is_supported_field_type_in_serializable_dataclass(field_definition.annotated_field_type):
+            raise RuntimeError(f"Unsupported type: {field_definition.annotated_field_type}")
+        elif _is_optional_type(field_definition.annotated_field_type):
+            optional_field_type_parameter = _get_type_parameter_for_optional(field_definition.annotated_field_type)
+            converted_field_definition = DataClassTypeToPydanticTypeConverter._convert_nested_fields(
+                FieldDefinition(field_type=optional_field_type_parameter, default_value=None)
             )
-            return DataclassFieldDefinition(  # type: ignore[arg-type]
+            return FieldDefinition(  # type: ignore[arg-type]
                 Union[converted_field_definition.field_type, type(None)], converted_field_definition.default_value
             )
-        elif _is_sequence_like_tuple_type(field_type):
-            tuple_field_type_parameter = _get_type_parameter_for_sequence_like_tuple_type(field_type)
-            converted_field_definition = DataClassTypeToPydanticTypeConverter._convert_field_type_object(
-                tuple_field_type_parameter
+        elif _is_sequence_like_tuple_type(field_definition.annotated_field_type):
+            tuple_field_type_parameter = _get_type_parameter_for_sequence_like_tuple_type(
+                field_definition.annotated_field_type
             )
-            return DataclassFieldDefinition(
+            converted_field_definition = DataClassTypeToPydanticTypeConverter._convert_nested_fields(
+                FieldDefinition(field_type=tuple_field_type_parameter, default_value=None)
+            )
+            return FieldDefinition(
                 Tuple[converted_field_definition.field_type, ...], converted_field_definition.default_value
             )
-        elif issubclass(field_type, SerializableDataclass):
-            return DataclassFieldDefinition(
-                DataClassTypeToPydanticTypeConverter._convert_dataclass_type_to_pydantic_type(field_type), ...
+        elif issubclass(field_definition.annotated_field_type, SerializableDataclass):
+            return FieldDefinition(
+                DataClassTypeToPydanticTypeConverter._convert_dataclass_type_to_pydantic_type(
+                    field_definition.annotated_field_type
+                ),
+                ...,
             )
         else:
-            return DataclassFieldDefinition(field_type, ...)
+            return FieldDefinition(field_definition.annotated_field_type, ...)
 
 
 @dataclass(frozen=True)
-class DataclassFieldDefinition:  # type: ignore[misc]
+class FieldDefinition:  # type: ignore[misc]
     """Describes the field definition in a dataclass as describe by the annotation."""
 
     field_type: AnyValueType
-    default_value: AnyValueType
+    default_value: Optional[AnyValueType]
 
     def as_tuple(self) -> Tuple[Type, AnyValueType]:  # noqa: D
         return (self.annotated_field_type, self.default_value)
