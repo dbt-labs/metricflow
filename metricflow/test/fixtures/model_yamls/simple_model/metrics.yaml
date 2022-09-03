@@ -420,3 +420,23 @@ metric:
       alias: booking_value_with_is_instant_constraint
     denominator:
       name: booking_value
+---
+metric:
+  name: regional_starting_balance_ratios
+  description: |
+    First day account balance ratio of western vs eastern region starting balance ratios,
+    used to test interaction between semi-additive measures and measure constraints
+  owners:
+    - support@transformdata.io
+  type: ratio
+  locked_metadata:
+    value_format: ".2%"
+  type_params:
+    numerator:
+      name: total_account_balance_first_day
+      constraint: "user__home_state_latest IN ('CA', 'HI', 'WA')"
+      alias: west_coast_balance_first_day
+    denominator:
+      name: total_account_balance_first_day
+      constraint: "user__home_state_latest IN ('MD', 'NY', 'TX')"
+      alias: east_coast_balance_first_dat

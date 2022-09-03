@@ -362,7 +362,13 @@ class MetricInputMeasureSpec(SerializableDataclass):
     @property
     def post_aggregation_spec(self) -> MeasureSpec:
         """Return a MeasureSpec instance representing the post-aggregation spec state for the underlying measure"""
-        return MeasureSpec(element_name=self.alias) if self.alias else self.measure_spec
+        if self.alias:
+            return MeasureSpec(
+                element_name=self.alias,
+                non_additive_dimension_spec=self.measure_spec.non_additive_dimension_spec,
+            )
+        else:
+            return self.measure_spec
 
 
 @dataclass(frozen=True)

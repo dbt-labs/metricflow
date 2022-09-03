@@ -119,3 +119,39 @@ integration_test:
       GROUP BY ds
     ) b
     ON a.ds = b.ds
+---
+integration_test:
+  name: ratio_with_constraints_on_semi_additive_measures
+  description: |
+    Tests querying a metric with measure constraints on semi-additive input measures
+  model: SIMPLE_MODEL
+  required_features: ["FULL_OUTER_JOIN"]
+  metrics: ["regional_starting_balance_ratios"]
+  group_bys: ["metric_time"]
+  check_query: |
+    SELECT
+      a.total_account_balance_first_day / b.total_account_balance_first_day AS regional_starting_balance_ratios
+      , COALESCE(a.ds, b.ds) AS metric_time
+    FROM (
+      SELECT
+        CAST(SUM(account_balance) AS {{ double_data_type_name }}) AS total_account_balance_first_day
+        , fa_west.ds
+      FROM {{ source_schema }}.fct_accounts fa_west
+      LEFT OUTER JOIN {{ source_schema }}.dim_users_latest dul_west
+      ON fa_west.user_id = dul_west.user_id
+      WHERE dul_west.home_state_latest IN ('CA', 'HI', 'WA')
+      GROUP BY fa_west.ds
+    ) a
+    JOIN (
+      SELECT
+        CAST(SUM(account_balance) AS {{ double_data_type_name }}) AS total_account_balance_first_day
+        , fa_east.ds
+      FROM {{ source_schema }}.fct_accounts fa_east
+      LEFT OUTER JOIN {{ source_schema }}.dim_users_latest dul_east
+      ON fa_east.user_id = dul_east.user_id
+      WHERE dul_east.home_state_latest IN ('MD', 'NY', 'TX')
+      GROUP BY fa_east.ds
+    ) b
+    ON a.ds = b.ds
+    -- Patch to cover current behavior of only considering the min value in the time constraint regional_starting_balance_ratios
+    WHERE COALESCE(a.ds, b.ds) = '2020-01-01'
