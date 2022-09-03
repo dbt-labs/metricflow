@@ -13,6 +13,17 @@ class GroupedMeasureSpecsByAdditiveness:
     grouped_semi_additive_measures: Sequence[Tuple[MeasureSpec, ...]]
     additive_measures: Tuple[MeasureSpec, ...]
 
+    @property
+    def measures_by_additiveness(self) -> Tuple[Tuple[MeasureSpec, ...], ...]:
+        """Returns a single tuple of tuples of MeasureSpecs grouped by additiveness
+
+        The additive measures are identifiable by the nature of their NonAdditiveDimensionSpec property.
+        """
+        if self.additive_measures:
+            return (self.additive_measures,) + tuple(self.grouped_semi_additive_measures)
+
+        return tuple(self.grouped_semi_additive_measures)
+
 
 def group_measure_specs_by_additiveness(measure_specs: Sequence[MeasureSpec]) -> GroupedMeasureSpecsByAdditiveness:
     """Bucket the provided measure specs by
