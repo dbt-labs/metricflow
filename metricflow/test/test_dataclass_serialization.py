@@ -21,7 +21,7 @@ def dataclass_deserializer() -> DataClassDeserializer:  # noqa: D
 
 @dataclass(frozen=True)
 class SimpleDataclass(SerializableDataclass):  # noqa: D
-    field0: int
+    field0: int = -1
 
 
 @dataclass(frozen=True)
@@ -57,6 +57,16 @@ class SimpleClassWithProtocol(SimpleProtocol, SerializableDataclass):  # noqa: D
 @dataclass(frozen=True)
 class NestedDataclassWithProtocol(SerializableDataclass):  # noqa: D
     field7: SimpleClassWithProtocol
+
+
+@dataclass(frozen=True)
+class DataclassWithDefaultTuple(SerializableDataclass):  # noqa: D
+    field8: Tuple[DataclassWithOptional, ...] = tuple()
+
+
+@dataclass(frozen=True)
+class DataclassWithDataclassDefault(SerializableDataclass):  # noqa: D
+    field9: SimpleDataclass = SimpleDataclass(field0=-10)
 
 
 def test_simple_dataclass(  # noqa: D
@@ -103,6 +113,22 @@ def test_dataclass_with_optional(  # noqa: D
     assert obj == deserialized_object
 
 
+def test_dataclass_deserialization_with_optional_default(dataclass_deserializer: DataClassDeserializer) -> None:
+    """Tests application of default value when deserializing a sparse optional
+
+    This is necessary to support cases where new optional fields are added and defaulted None, but serialized
+    values - which should be compatible - exist without the field in place
+    """
+    serialized_object = r'{"field4": {"field0": 5}}'
+
+    deserialized_object = dataclass_deserializer.pydantic_deserialize(
+        DataclassWithOptional, serialized_obj=serialized_object
+    )
+    assert deserialized_object == DataclassWithOptional(field4=SimpleDataclass(field0=5))
+    # Verify default
+    assert deserialized_object.field3 is None
+
+
 def test_dataclass_with_tuple(  # noqa: D
     dataclass_serializer: DataclassSerializer, dataclass_deserializer: DataClassDeserializer
 ) -> None:
@@ -113,6 +139,22 @@ def test_dataclass_with_tuple(  # noqa: D
         DataclassWithTuple, serialized_obj=serialized_object
     )
     assert obj == deserialized_object
+
+
+def test_dataclass_deserialization_with_tuple_default(dataclass_deserializer: DataClassDeserializer) -> None:
+    """Tests application of default tuple value when deserializing a sparse tuple dataclass container
+
+    As with Optional, this is necessary to support cases where a default is set for a field added after
+    some instances were already serialized, but with an empty tuple in place as a default.
+    """
+    serialized_object = r"{}"
+
+    deserialized_object = dataclass_deserializer.pydantic_deserialize(
+        DataclassWithDefaultTuple, serialized_obj=serialized_object
+    )
+    assert deserialized_object == DataclassWithDefaultTuple()
+    # Verify default
+    assert deserialized_object.field8 == tuple()
 
 
 def test_dataclass_with_protocol(  # noqa: D
@@ -137,3 +179,29 @@ def test_nested_dataclass_with_protocol(  # noqa: D
         NestedDataclassWithProtocol, serialized_obj=serialized_object
     )
     assert obj == deserialized_object
+
+
+def test_nested_dataclass_deserialization_with_primitive_default(dataclass_deserializer: DataClassDeserializer) -> None:
+    """Tests application of default value when deserializing a sparse primitive type dataclass container
+
+    This ensures a default set on a primitive, with nesting, still deserializes correctly even if the value is
+    not present.
+    """
+    serialized_object = r'{"field1": {}}'
+
+    deserialized_object = dataclass_deserializer.pydantic_deserialize(NestedDataclass, serialized_obj=serialized_object)
+    assert deserialized_object == NestedDataclass(field1=SimpleDataclass())
+    # Verify default
+    assert deserialized_object.field1.field0 == -1
+
+
+def test_dataclass_deserialization_with_dataclass_default(dataclass_deserializer: DataClassDeserializer) -> None:
+    """Tests application of default value when deserializing a dataclass with a default dataclass value set"""
+    serialized_object = r"{}"
+
+    deserialized_object = dataclass_deserializer.pydantic_deserialize(
+        DataclassWithDataclassDefault, serialized_obj=serialized_object
+    )
+    assert deserialized_object == DataclassWithDataclassDefault(field9=SimpleDataclass(field0=-10))
+    # Verify default
+    assert deserialized_object.field9.field0 == -10
