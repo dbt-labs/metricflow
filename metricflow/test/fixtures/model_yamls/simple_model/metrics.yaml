@@ -440,3 +440,17 @@ metric:
       name: total_account_balance_first_day
       constraint: "user__home_state_latest IN ('MD', 'NY', 'TX')"
       alias: east_coast_balance_first_dat
+---
+metric:
+  name: double_counted_delayed_bookings
+  description: |
+    Minimal repro case for an expr with a single constrained and aliased measure as input.
+  owners:
+    - support@transformdata.io
+  type: expr
+  type_params:
+    expr: delayed_bookings * 2
+    measures:
+      - name: bookings
+        constraint: NOT is_instant
+        alias: delayed_bookings

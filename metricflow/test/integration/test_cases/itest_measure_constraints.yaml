@@ -155,3 +155,18 @@ integration_test:
     ON a.ds = b.ds
     -- Patch to cover current behavior of only considering the min value in the time constraint regional_starting_balance_ratios
     WHERE COALESCE(a.ds, b.ds) = '2020-01-01'
+---
+integration_test:
+  name: expr_with_single_constrained_and_aliased_measure
+  description: |
+    Tests querying a metric with a single input measure with constraint and alias
+  model: SIMPLE_MODEL
+  metrics: ["double_counted_delayed_bookings"]
+  group_bys: ["metric_time"]
+  check_query: |
+    SELECT
+      SUM(1) * 2 AS double_counted_delayed_bookings
+      , ds AS metric_time
+    FROM {{ source_schema }}.fct_bookings
+    WHERE NOT is_instant
+    GROUP BY ds
