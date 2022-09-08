@@ -15,33 +15,6 @@ from metricflow.test.model.validations.helpers import data_source_with_guarantee
 from metricflow.time.time_granularity import TimeGranularity
 
 
-@pytest.mark.skip("TODO: Will convert to validation rule")
-def test_metric_missing_measure() -> None:  # noqa:D
-    with pytest.raises(ModelValidationException):
-        measure_name = "my_measure"
-        measure2_name = "nonexistent_measure"
-        model_validator = ModelValidator()
-        model_validator.checked_validations(
-            UserConfiguredModel(
-                data_sources=[
-                    data_source_with_guaranteed_meta(
-                        name="sum_measure",
-                        sql_query="SELECT foo FROM bar",
-                        measures=[Measure(name=measure_name, agg=AggregationType.SUM)],
-                        mutability=Mutability(type=MutabilityType.IMMUTABLE),
-                    )
-                ],
-                metrics=[
-                    metric_with_guaranteed_meta(
-                        name="metric_with_nonexistent_measure",
-                        type=MetricType.MEASURE_PROXY,
-                        type_params=MetricTypeParams(measures=[measure2_name]),
-                    )
-                ],
-            )
-        )
-
-
 def test_metric_no_time_dim_dim_only_source() -> None:  # noqa:D
     dim_name = "country"
     dim2_name = "ename"

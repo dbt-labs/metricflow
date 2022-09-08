@@ -67,7 +67,10 @@ class MetricMeasuresRule(ModelValidationRule):
                             file_context=FileContext.from_metadata(metadata=metric.metadata),
                             metric=MetricModelReference(metric_name=metric.name),
                         ),
-                        message=f"Invalid measure {measure_reference.element_name} in metric {metric.name}",
+                        message=(
+                            f"Measure {measure_reference.element_name} referenced in metric {metric.name} is not "
+                            f"defined in the model!"
+                        ),
                     )
                 )
         return issues
