@@ -5,7 +5,7 @@ import copy
 from metricflow.model.model_validator import ModelValidator
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType
-from metricflow.model.validations.validator_helpers import ModelValidationException
+from metricflow.model.validations.validator_helpers import DataSourceElementType, ModelValidationException
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.unique_valid_name import MetricFlowReservedKeywords, UniqueAndValidNameRule
 from metricflow.object_utils import flatten_nested_sequence
@@ -137,8 +137,8 @@ def test_cross_element_names(simple_model__pre_transforms: UserConfiguredModel) 
     with pytest.raises(
         ModelValidationException,
         match=(
-            f"element `{measure_reference.element_name}` is of type DataSourceElementType.MEASURE, but it was previously "
-            f"used earlier in the model as DataSourceElementType.DIMENSION"
+            f"element `{measure_reference.element_name}` is of type {DataSourceElementType.DIMENSION}, but it is used as "
+            f"types .*?DataSourceElementType.DIMENSION.*?DataSourceElementType.MEASURE.*? across the model"
         ),
     ):
         ModelValidator().checked_validations(model)
@@ -147,8 +147,8 @@ def test_cross_element_names(simple_model__pre_transforms: UserConfiguredModel) 
     with pytest.raises(
         ModelValidationException,
         match=(
-            f"element `{measure_reference.element_name}` is of type DataSourceElementType.MEASURE, but it was previously "
-            f"used earlier in the model as DataSourceElementType.IDENTIFIER"
+            f"element `{measure_reference.element_name}` is of type {DataSourceElementType.IDENTIFIER}, but it is used as "
+            f"types .*?DataSourceElementType.IDENTIFIER.*?DataSourceElementType.MEASURE.*? across the model"
         ),
     ):
         ModelValidator().checked_validations(model)
@@ -157,8 +157,8 @@ def test_cross_element_names(simple_model__pre_transforms: UserConfiguredModel) 
     with pytest.raises(
         ModelValidationException,
         match=(
-            f"element `{dimension_reference.element_name}` is of type DataSourceElementType.DIMENSION, but it was previously "
-            f"used earlier in the model as DataSourceElementType.IDENTIFIER"
+            f"element `{dimension_reference.element_name}` is of type {DataSourceElementType.DIMENSION}, but it is used as "
+            f"types .*?DataSourceElementType.DIMENSION.*?DataSourceElementType.IDENTIFIER.*? across the model"
         ),
     ):
         ModelValidator().checked_validations(model)

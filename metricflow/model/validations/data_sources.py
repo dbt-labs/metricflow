@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 class DataSourceMeasuresUniqueRule(ModelValidationRule):
-    """Checks time dimensions in data sources."""
+    """Asserts all measure names are unique across the model."""
 
     @staticmethod
     @validate_safely(
