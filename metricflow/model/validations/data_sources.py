@@ -1,6 +1,5 @@
 import logging
-from collections import defaultdict
-from typing import List, Dict
+from typing import List
 from metricflow.instances import DataSourceElementReference, DataSourceReference
 
 from metricflow.model.objects.data_source import DataSource
@@ -16,42 +15,9 @@ from metricflow.model.validations.validator_helpers import (
     ValidationError,
     validate_safely,
 )
-from metricflow.references import MeasureReference
 from metricflow.time.time_constants import SUPPORTED_GRANULARITIES
 
 logger = logging.getLogger(__name__)
-
-
-class DataSourceMeasuresUniqueRule(ModelValidationRule):
-    """Asserts all measure names are unique across the model."""
-
-    @staticmethod
-    @validate_safely(
-        whats_being_done="running model validation ensuring measures exist in only one configured data source"
-    )
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
-        issues: List[ValidationIssueType] = []
-
-        measure_references_to_data_sources: Dict[MeasureReference, List] = defaultdict(list)
-        for data_source in model.data_sources:
-            for measure in data_source.measures:
-                if measure.reference in measure_references_to_data_sources:
-                    issues.append(
-                        ValidationError(
-                            context=DataSourceElementContext(
-                                file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                                data_source_element=DataSourceElementReference(
-                                    data_source_name=data_source.name, element_name=measure.name
-                                ),
-                                element_type=DataSourceElementType.MEASURE,
-                            ),
-                            message=f"Found measure with name {measure.name} in multiple data sources with names "
-                            f"({measure_references_to_data_sources[measure.reference]})",
-                        )
-                    )
-                measure_references_to_data_sources[measure.reference].append(data_source.name)
-
-        return issues
 
 
 class DataSourceTimeDimensionWarningsRule(ModelValidationRule):

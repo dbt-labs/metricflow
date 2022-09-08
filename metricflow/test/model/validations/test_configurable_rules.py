@@ -24,7 +24,7 @@ def test_can_configure_model_validator_rules(simple_model__pre_transforms: UserC
     issues = ModelValidator().validate_model(model).issues
     assert len(issues.all_issues) == 1, f"ModelValidator with default rules had unexpected number of issues {issues}"
 
-    # confirm that a custom configuration excluding DataSourceMeasuresUniqueRule, no issue is raised
+    # confirm that a custom configuration excluding ValidMaterializationRule, no issue is raised
     rules = [rule for rule in ModelValidator.DEFAULT_RULES if rule.__class__ is not ValidMaterializationRule]
     issues = ModelValidator(rules=rules).validate_model(model).issues
     assert len(issues.all_issues) == 0, f"ModelValidator without ValidMaterializationRule returned issues {issues}"
