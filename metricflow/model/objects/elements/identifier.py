@@ -3,7 +3,8 @@ from __future__ import annotations
 from pydantic import validator
 from typing import Any, Optional, List
 
-from metricflow.model.objects.base import HashableBaseModel
+from metricflow.model.objects.base import HashableBaseModel, ModelWithMetadataParsing
+from metricflow.model.objects.common import Metadata
 from metricflow.object_utils import ExtendedEnum
 from metricflow.references import IdentifierReference, CompositeSubIdentifierReference
 
@@ -32,7 +33,7 @@ class CompositeSubIdentifier(HashableBaseModel):
         return CompositeSubIdentifierReference(element_name=self.name)
 
 
-class Identifier(HashableBaseModel):
+class Identifier(HashableBaseModel, ModelWithMetadataParsing):
     """Describes a identifier"""
 
     name: str
@@ -42,6 +43,7 @@ class Identifier(HashableBaseModel):
     entity: Optional[str]
     identifiers: List[CompositeSubIdentifier] = []
     expr: Optional[str] = None
+    metadata: Optional[Metadata]
 
     @validator("entity", always=True)
     @classmethod
