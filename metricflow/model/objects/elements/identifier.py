@@ -58,7 +58,7 @@ class Identifier(HashableBaseModel, ModelWithMetadataParsing):
         if value is None:
             if "name" not in values:
                 raise ValueError("Failed to default entity value because objects name value was not defined")
-            return IdentifierReference(element_name=values["name"]).element_name
+            value = values["name"]
 
         # guarantee value is string
         if not isinstance(value, str):
