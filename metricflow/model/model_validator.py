@@ -15,7 +15,11 @@ from metricflow.model.validations.identifiers import (
     IdentifierConsistencyRule,
 )
 from metricflow.model.validations.materializations import ValidMaterializationRule
-from metricflow.model.validations.measures import DataSourceMeasuresUniqueRule, MetricMeasuresRule
+from metricflow.model.validations.measures import (
+    DataSourceMeasuresUniqueRule,
+    MeasureConstraintAliasesRule,
+    MetricMeasuresRule,
+)
 from metricflow.model.validations.metrics import CumulativeMetricRule
 from metricflow.model.validations.non_empty import NonEmptyRule
 from metricflow.model.validations.reserved_keywords import ReservedKeywordsRule
@@ -40,6 +44,7 @@ class ModelValidator:
         IdentifierConfigRule(),
         IdentifierConsistencyRule(),
         OnePrimaryIdentifierPerDataSourceRule(),
+        MeasureConstraintAliasesRule(),
         MetricMeasuresRule(),
         CumulativeMetricRule(),
         NonEmptyRule(),
