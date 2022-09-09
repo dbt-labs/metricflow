@@ -20,13 +20,13 @@ Welcome to the MetricFlow developer community, we're thrilled to have you aboard
     - Docker:
         - This is only required if you are developing with Postgres.
         - Follow the [instructions from Docker](https://docs.docker.com/get-docker/)
-3. [Create a fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) of the [MetricFlow repo](https://github.com/transform-data/metricflow) and [clone it locally](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository). 
+3. [Create a fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) of the [MetricFlow repo](https://github.com/transform-data/metricflow) and [clone it locally](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository).
 4. Activate a [Python virtual environment](https://docs.python.org/3/library/venv.html). While this is not required, it is *strongly* encouraged.
     - We provide `make venv` and `make remove_venv` helpers for creating/deleting standard Python virtual envs. You may pass `VENV_NAME=your_custom_name` to override the default `venv` location.
     - [conda](https://docs.conda.io/en/latest/) users may prefer [conda's environment management](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) instead.
-5. Install [Poetry](https://python-poetry.org/docs/) via `pip install poetry` - this is the tool we use to manage our build dependencies.
+5. Install [Poetry](https://python-poetry.org/docs/) via `pip install poetry` - this is the tool we use to manage our build dependencies. Note, due to [an issue with poetry configurations using virtualenvs.create.false](https://github.com/python-poetry/poetry/issues/6459) some environments (e.g., Ubuntu) may experience dependency resolution problems with poetry 1.2.0, in which case you should make sure you have a virtual env set up prior to installation. If you really must use the global machine env you may be able to work around the problem by using `pip install poetry==1.1.15`.
 6. Run `make install` to get all of your dependencies loaded and ready for development
-    - This includes useful dev tools, including pre-commit for linting. 
+    - This includes useful dev tools, including pre-commit for linting.
     - You may run `pre-commit install` if you would like the linters to run prior to all local git commits
 
 ## Start testing and development
@@ -40,7 +40,7 @@ You're ready to start! Note all `make` and `poetry` commands should be run from 
 2. Now you may wish to break some tests. Make some local changes and run the relevant tests again and see if you broke them!
     - Working with integration tests
         - These tests are driven by a set of test configs in [metricflow/test/integration/test_cases](metricflow/test/integration/test_cases/). They compare the output of a MetricFlow query against the output of a similar SQL query.
-        - These tests all run on consistent input data, which is [created in the target warehouse via setup fixtures](metricflow/test/fixtures/table_fixtures.py). 
+        - These tests all run on consistent input data, which is [created in the target warehouse via setup fixtures](metricflow/test/fixtures/table_fixtures.py).
             - Modify this file if you are looking to test boundary cases involving things like repeated rows of data.
         - Let's break a test!
             - Change a SQL query inside of [metricflow/test/integration/test_cases/itest_simple.yaml](metricflow/test/integration/test_cases/itest_simple.yaml)
@@ -58,7 +58,7 @@ You're ready to start! Note all `make` and `poetry` commands should be run from 
         - `export MF_SQL_ENGINE_URL=<YOUR_WAREHOUSE_CONNECTION_URL>`
         - `export MF_SQL_ENGINE_PASSWORD=<YOUR_WAREHOUSE_PASSWORD>`
     - Run `make test` to execute the entire test suite against the target engine.
-    - By default, without `MF_SQL_ENGINE_URL` and `MF_SQL_ENGINE_PASSWORD` set, your tests will run against SQLite. 
+    - By default, without `MF_SQL_ENGINE_URL` and `MF_SQL_ENGINE_PASSWORD` set, your tests will run against SQLite.
 4. Run the linters with `make lint` at any time, but especially before submitting a PR. We use:
     - `Black` for formatting
     - `Flake8` for general Python linting

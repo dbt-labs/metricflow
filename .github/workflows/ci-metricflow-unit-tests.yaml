@@ -29,7 +29,7 @@ jobs:
           key: ${{ env.pythonLocation }}-${{ hashFiles('poetry.lock') }}
 
       - name: Install Poetry
-        run: pip install poetry && poetry config virtualenvs.create false
+        run: pip install poetry==1.1.15 && poetry config virtualenvs.create false
 
       - name: Install Metricflow
         run: poetry install
