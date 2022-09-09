@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-from typing import Optional, List, Dict, Any
+from pydantic import validator
+from typing import Any, Optional, List
 
-from metricflow.model.objects.base import HashableBaseModel
+from metricflow.model.objects.base import HashableBaseModel, ModelWithMetadataParsing
+from metricflow.model.objects.common import Metadata
 from metricflow.object_utils import ExtendedEnum
 from metricflow.references import IdentifierReference, CompositeSubIdentifierReference
 
@@ -31,7 +33,7 @@ class CompositeSubIdentifier(HashableBaseModel):
         return CompositeSubIdentifierReference(element_name=self.name)
 
 
-class Identifier(HashableBaseModel):
+class Identifier(HashableBaseModel, ModelWithMetadataParsing):
     """Describes a identifier"""
 
     name: str
@@ -41,31 +43,27 @@ class Identifier(HashableBaseModel):
     entity: Optional[str]
     identifiers: List[CompositeSubIdentifier] = []
     expr: Optional[str] = None
+    metadata: Optional[Metadata]
 
-    def __init__(  # type: ignore
-        self,
-        name: str,
-        type: IdentifierType,
-        role: Optional[str] = None,
-        entity: Optional[str] = None,
-        identifiers: Optional[List[CompositeSubIdentifier]] = None,
-        expr: Optional[str] = None,
-        **kwargs: Dict[str, Any],  # the parser may instantiate objects with additional fields (eg __parsing_context__)
-    ) -> None:
-        """Normal pydantic initializer except we set entity to name"""
+    @validator("entity", always=True)
+    @classmethod
+    def default_entity_value(cls, value: Any, values: Any) -> str:  # type: ignore[misc]
+        """Defaulting the value of the identifier 'entity' value using pydantic validator
 
-        identifiers = identifiers or []
+        If an entity value is provided that is a string, that will become the value of
+        entity. If the provifed entity value is None, the entity value becomes the
+        element_name representation of the identifier's name.
+        """
 
-        super().__init__(
-            name=name,
-            type=type,
-            role=role,
-            entity=entity,
-            identifiers=identifiers,
-            expr=expr,
-        )
-        if self.entity is None:
-            self.entity = self.reference.element_name
+        if value is None:
+            if "name" not in values:
+                raise ValueError("Failed to default entity value because objects name value was not defined")
+            value = values["name"]
+
+        # guarantee value is string
+        if not isinstance(value, str):
+            raise ValueError(f"Entity value should be a string (str) type, but got {type(value)} with value: {value}")
+        return value
 
     @property
     def is_primary_time(self) -> bool:  # noqa: D
