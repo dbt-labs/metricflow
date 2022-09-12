@@ -78,7 +78,7 @@ class MetricFlowClient:
     def _create_mf_request(
         self,
         metrics: List[str],
-        dimensions: List[str],
+        dimensions: List[str] = [],
         limit: Optional[int] = None,
         start_time: Optional[str] = None,
         end_time: Optional[str] = None,
@@ -106,7 +106,7 @@ class MetricFlowClient:
     def query(
         self,
         metrics: List[str],
-        dimensions: List[str],
+        dimensions: List[str] = [],
         limit: Optional[int] = None,
         start_time: Optional[str] = None,
         end_time: Optional[str] = None,
@@ -147,7 +147,7 @@ class MetricFlowClient:
     def explain(
         self,
         metrics: List[str],
-        dimensions: List[str],
+        dimensions: List[str] = [],
         limit: Optional[int] = None,
         start_time: Optional[str] = None,
         end_time: Optional[str] = None,
