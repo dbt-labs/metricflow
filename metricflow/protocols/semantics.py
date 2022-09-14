@@ -108,7 +108,7 @@ class DataSourceSemanticsAccessor(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    def get_data_sources_for_identifier(self, identifier_reference: IdentifierReference) -> List[DataSource]:
+    def get_data_sources_for_identifier(self, identifier_reference: IdentifierReference) -> Set[DataSource]:
         """Return all data sources associated with an identifier reference"""
         raise NotImplementedError
 

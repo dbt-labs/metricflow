@@ -329,7 +329,7 @@ class DataSourceSemantics:
         ), f"Data Source {data_source_reference} is not known"
         return self._data_source_to_aggregation_time_dimensions[data_source_reference]
 
-    def get_data_sources_for_identifier(self, identifier_reference: IdentifierReference) -> List[DataSource]:
+    def get_data_sources_for_identifier(self, identifier_reference: IdentifierReference) -> Set[DataSource]:
         """Return all data sources associated with an identifier reference"""
         identifier_entity = self._identifier_ref_to_entity[identifier_reference]
-        return self._entity_index[identifier_entity]
+        return set(self._entity_index[identifier_entity])

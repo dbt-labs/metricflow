@@ -194,4 +194,4 @@ def test_get_data_sources_for_identifier(new_data_source_semantics: DataSourceSe
     linked_data_sources = new_data_source_semantics.get_data_sources_for_identifier(
         identifier_reference=identifier_reference
     )
-    assert len(linked_data_sources) == 10
+    assert len(linked_data_sources) == 9
