@@ -6,7 +6,7 @@ from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantics.data_source_container import PydanticDataSourceContainer
 from metricflow.model.semantics.linkable_spec_resolver import LinkableElementProperties
 from metricflow.model.semantics.semantic_containers import DataSourceSemantics, MetricSemantics
-from metricflow.references import MeasureReference
+from metricflow.references import IdentifierReference, MeasureReference
 from metricflow.specs import MetricSpec
 
 logger = logging.getLogger(__name__)
@@ -187,3 +187,11 @@ def test_local_linked_elements_for_metric(new_metric_semantics: MetricSemantics)
         "listing__ds",
         "listing__capacity_latest",
     }
+
+
+def test_get_data_sources_for_identifier(new_data_source_semantics: DataSourceSemantics) -> None:  # noqa: D
+    identifier_reference = IdentifierReference(element_name="user")
+    linked_data_sources = new_data_source_semantics.get_data_sources_for_identifier(
+        identifier_reference=identifier_reference
+    )
+    assert len(linked_data_sources) == 9

@@ -107,6 +107,11 @@ class DataSourceSemanticsAccessor(Protocol):
         """Return all aggregation time dimensions in the given data source with their associated measures"""
         raise NotImplementedError
 
+    @abstractmethod
+    def get_data_sources_for_identifier(self, identifier_reference: IdentifierReference) -> Set[DataSource]:
+        """Return all data sources associated with an identifier reference"""
+        raise NotImplementedError
+
 
 class MetricSemanticsAccessor(Protocol):
     """Protocol defining core interface for accessing semantic information about a set of metric objects
