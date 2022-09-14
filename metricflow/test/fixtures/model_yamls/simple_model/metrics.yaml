@@ -3,21 +3,21 @@ metric:
   name: "bookings"
   description: "bookings metric"
   owners:
-      - support@transformdata.io
+    - support@transformdata.io
   type: measure_proxy
   type_params:
-      measures:
-          - bookings
+    measures:
+      - bookings
 ---
 metric:
-    name: "average_booking_value"
-    description: "average booking value metric"
-    owners:
-        - support@transformdata.io
-    type: measure_proxy
-    type_params:
-        measures:
-            - average_booking_value
+  name: "average_booking_value"
+  description: "average booking value metric"
+  owners:
+    - support@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+      - average_booking_value
 ---
 metric:
   name: "instant_bookings"
@@ -151,21 +151,21 @@ metric:
   name: "smallest_listing"
   description: "smallest listing"
   owners:
-   - support@transformdata.io
+    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
-     - smallest_listing
+      - smallest_listing
 ---
 metric:
   name: "largest_listing"
   description: "largest listing"
   owners:
-   - support@transformdata.io
+    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
-     - largest_listing
+      - largest_listing
 ---
 metric:
   name: "identity_verifications"
@@ -226,7 +226,7 @@ metric:
     - support@transformdata.io
   type: cumulative
   locked_metadata:
-    value_format: '$$,.2f' # we need to double dollars here since string template reserves dollar sign.
+    value_format: "$$,.2f" # we need to double dollars here since string template reserves dollar sign.
   type_params:
     measures:
       - txn_revenue
@@ -238,10 +238,9 @@ metric:
   owners:
     - support@transformdata.io
   type: measure_proxy
-  constraint:
-    lux_or_normal_listing != 'LUX_TEST_ID'
+  constraint: lux_or_normal_listing != 'LUX_TEST_ID'
   locked_metadata:
-    value_format: ''
+    value_format: ""
   type_params:
     measures:
       - listings
@@ -250,71 +249,71 @@ metric:
   name: booking_fees
   description: Booking value multiplied by constant - simple expr metric test
   owners:
-   - support@transformdata.io
+    - support@transformdata.io
   type: expr
   type_params:
     expr: "booking_value * 0.05"
     measures:
-     - booking_value
+      - booking_value
 ---
 metric:
   name: booking_fees_per_booker
   description: booking_fees divided by bookers - single source multi measure expr test
   owners:
-   - support@transformdata.io
+    - support@transformdata.io
   type: expr
   type_params:
     expr: "booking_value * 0.05 / bookers"
     measures:
-     - booking_value
-     - bookers
+      - booking_value
+      - bookers
 ---
 metric:
   name: views_times_booking_value
   description: Booking_value multiplied by views - expr metric test
   owners:
-   - support@transformdata.io
+    - support@transformdata.io
   type: expr
   locked_metadata:
-    value_format: ',d'
+    value_format: ",d"
   type_params:
     expr: "booking_value * views"
     measures:
-     - booking_value
-     - views
+      - booking_value
+      - views
 ---
 metric:
   name: bookings_per_booker
   description: bookings divided by bookers - single data source ratio metric test
   owners:
-   - support@transformdata.io
+    - support@transformdata.io
   type: ratio
   type_params:
     numerator: bookings
     denominator: bookers
   locked_metadata:
-    value_format: ',.2f'
+    value_format: ",.2f"
 ---
 metric:
   name: bookings_per_view
   description: Bookings divided by views - ratio metric test
   owners:
-   - support@transformdata.io
+    - support@transformdata.io
   type: ratio
   type_params:
     numerator: bookings
     denominator: views
   locked_metadata:
-    value_format: ',.2f'
+    value_format: ",.2f"
 ---
 metric:
   name: bookings_per_listing
   description: Bookings divided by listings - ratio with primary identifier test
   owners:
-   - support@transformdata.io
+    - support@transformdata.io
   type: ratio
   locked_metadata:
-    value_format: '.2%'
+    value_format: ".2%"
   type_params:
     numerator: bookings
     denominator: listings
@@ -323,10 +322,10 @@ metric:
   name: bookings_per_dollar
   description: Number of bookings per dollar of value
   owners:
-   - support@transformdata.io
+    - support@transformdata.io
   type: ratio
   locked_metadata:
-    value_format: '.2%'
+    value_format: ".2%"
   type_params:
     numerator: bookings
     denominator: booking_value
@@ -351,3 +350,93 @@ metric:
     measures:
       - current_account_balance_by_user
 ---
+metric:
+  name: instant_booking_fraction_of_max_value
+  description: |
+    Average instant booking value as a ratio of overall max booking value.
+    Tests constrained ratio measure.
+  owners:
+    - support@transformdata.io
+  type: ratio
+  locked_metadata:
+    value_format: ".2%"
+  type_params:
+    numerator:
+      name: average_booking_value
+      constraint: is_instant
+    denominator:
+      name: max_booking_value
+---
+metric:
+  name: lux_booking_fraction_of_max_value
+  description: |
+    Average lux booking value as a ratio of overall max booking value.
+    Tests constrained ratio measure with external dimension join.
+  owners:
+    - support@transformdata.io
+  type: ratio
+  locked_metadata:
+    value_format: ".2%"
+  type_params:
+    numerator:
+      name: average_booking_value
+      constraint: listing__is_lux_latest
+    denominator:
+      name: max_booking_value
+---
+metric:
+  name: lux_booking_value_rate_expr
+  description: |
+    Lux booking value defined as an expr with lux booking value, lux bookings, and total value as inputs.
+    Tests constrained measure expr metric with external dimension join.
+  owners:
+    - support@transformdata.io
+  type: expr
+  locked_metadata:
+    value_format: ".2%"
+  type_params:
+    expr: "average_booking_value * bookings / NULLIF(booking_value, 0)"
+    measures:
+      - name: average_booking_value
+        constraint: listing__is_lux_latest
+      - name: bookings
+        constraint: listing__is_lux_latest
+      - name: booking_value
+---
+metric:
+  name: instant_booking_value_ratio
+  description: |
+    Instant booking value defined as a ratio metric of instant booking value / booking value
+    Tests constrained measure ratio metric with re-use of the same base measure
+  owners:
+    - support@transformdata.io
+  type: ratio
+  locked_metadata:
+    value_format: ".2%"
+  type_params:
+    numerator:
+      name: booking_value
+      constraint: is_instant
+      alias: booking_value_with_is_instant_constraint
+    denominator:
+      name: booking_value
+---
+metric:
+  name: regional_starting_balance_ratios
+  description: |
+    First day account balance ratio of western vs eastern region starting balance ratios,
+    used to test interaction between semi-additive measures and measure constraints
+  owners:
+    - support@transformdata.io
+  type: ratio
+  locked_metadata:
+    value_format: ".2%"
+  type_params:
+    numerator:
+      name: total_account_balance_first_day
+      constraint: "user__home_state_latest IN ('CA', 'HI', 'WA')"
+      alias: west_coast_balance_first_day
+    denominator:
+      name: total_account_balance_first_day
+      constraint: "user__home_state_latest IN ('MD', 'NY', 'TX')"
+      alias: east_coast_balance_first_dat

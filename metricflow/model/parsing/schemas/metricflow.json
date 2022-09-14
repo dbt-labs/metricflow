@@ -584,6 +584,12 @@
                 {
                     "additionalProperties": false,
                     "properties": {
+                        "alias": {
+                            "type": "string"
+                        },
+                        "constraint": {
+                            "type": "string"
+                        },
                         "name": {
                             "type": "string"
                         }

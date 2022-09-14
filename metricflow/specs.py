@@ -314,6 +314,11 @@ class MeasureSpec(InstanceSpec):  # noqa: D
         """Construct from a name e.g. listing__ds__month."""
         return MeasureSpec(element_name=name)
 
+    @staticmethod
+    def from_reference(reference: MeasureReference) -> MeasureSpec:
+        """Initialize from a measure reference instance"""
+        return MeasureSpec(element_name=reference.element_name)
+
     @property
     def qualified_name(self) -> str:  # noqa: D
         return self.element_name
@@ -334,6 +339,36 @@ class MetricSpec(InstanceSpec):  # noqa: D
     @property
     def qualified_name(self) -> str:  # noqa: D
         return self.element_name
+
+
+@dataclass(frozen=True)
+class MetricInputMeasureSpec(SerializableDataclass):
+    """The spec for a measure defined as a metric input.
+
+    This is necessary because the MeasureSpec is used as a key linking the measures used in the query
+    to the measures defined in the data sources. Adding metric-specific information, like constraints,
+    causes lookups connecting query -> data source to fail in strange ways. This spec, then, provides
+    both the key (in the form of a MeasureSpec) along with whatever measure-specific attributes
+    a user might specify in a metric definition or query accessing the metric itself.
+
+    Note - when specifying a metric comprised of two input instances of the same measure, at least one
+    must have a distinct alias, otherwise SQL exceptions may occur. This should be enforced via validation.
+    """
+
+    measure_spec: MeasureSpec
+    constraint: Optional[SpecWhereClauseConstraint] = None
+    alias: Optional[str] = None
+
+    @property
+    def post_aggregation_spec(self) -> MeasureSpec:
+        """Return a MeasureSpec instance representing the post-aggregation spec state for the underlying measure"""
+        if self.alias:
+            return MeasureSpec(
+                element_name=self.alias,
+                non_additive_dimension_spec=self.measure_spec.non_additive_dimension_spec,
+            )
+        else:
+            return self.measure_spec
 
 
 @dataclass(frozen=True)
