@@ -6,10 +6,7 @@ from typing import List, Sequence
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.parsing.dir_to_model import ModelBuildResult
 from metricflow.model.validations.agg_time_dimension import AggregationTimeDimensionRule
-from metricflow.model.validations.data_sources import (
-    DataSourceMeasuresUniqueRule,
-    DataSourceTimeDimensionWarningsRule,
-)
+from metricflow.model.validations.data_sources import DataSourceTimeDimensionWarningsRule
 from metricflow.model.validations.dimension_const import DimensionConsistencyRule
 from metricflow.model.validations.element_const import ElementConsistencyRule
 from metricflow.model.validations.identifiers import (
@@ -18,7 +15,12 @@ from metricflow.model.validations.identifiers import (
     IdentifierConsistencyRule,
 )
 from metricflow.model.validations.materializations import ValidMaterializationRule
-from metricflow.model.validations.metrics import MetricMeasuresRule, CumulativeMetricRule
+from metricflow.model.validations.measures import (
+    DataSourceMeasuresUniqueRule,
+    MeasureConstraintAliasesRule,
+    MetricMeasuresRule,
+)
+from metricflow.model.validations.metrics import CumulativeMetricRule
 from metricflow.model.validations.non_empty import NonEmptyRule
 from metricflow.model.validations.reserved_keywords import ReservedKeywordsRule
 from metricflow.model.validations.unique_valid_name import UniqueAndValidNameRule
@@ -42,6 +44,7 @@ class ModelValidator:
         IdentifierConfigRule(),
         IdentifierConsistencyRule(),
         OnePrimaryIdentifierPerDataSourceRule(),
+        MeasureConstraintAliasesRule(),
         MetricMeasuresRule(),
         CumulativeMetricRule(),
         NonEmptyRule(),
