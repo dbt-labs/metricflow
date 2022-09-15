@@ -1,13 +1,13 @@
-from typing import Dict, List
+from collections import defaultdict
+from typing import List, DefaultDict
 from metricflow.instances import DataSourceReference
 
-from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,
+    DataSourceElementType,
     FileContext,
     ModelValidationRule,
-    DataSourceElementType,
     ValidationError,
     ValidationIssueType,
     validate_safely,
@@ -15,109 +15,60 @@ from metricflow.model.validations.validator_helpers import (
 
 
 class ElementConsistencyRule(ModelValidationRule):
-    """Checks that elements in data sources with the same name are of the same element type across the model"""
+    """Checks that elements in data sources with the same name are of the same element type across the model
+
+    This reduces the potential confusion that might arise from having an identifier named `country` and a dimension
+    named `country` while allowing for things like the `user` identifier to exist in multiple data sources. Note not
+    all element types allow duplicates, and there are separate validation rules for those cases. See, for example,
+    the DataSourceMeasuresUniqueRule.
+    """
 
     @staticmethod
     @validate_safely(whats_being_done="running model validation ensuring model wide element consistency")
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
         issues = []
-        for data_source in model.data_sources:
-            issues += ElementConsistencyRule._check_data_source(model=model, data_source=data_source, add_to_dict=True)
-        return issues
+        element_name_to_types = ElementConsistencyRule._get_element_name_to_types(model=model)
+        invalid_elements = {
+            name: type_mapping for name, type_mapping in element_name_to_types.items() if len(type_mapping) > 1
+        }
 
-    @staticmethod
-    def _check_element_type(
-        name_to_type: Dict[str, DataSourceElementType],
-        data_source: DataSource,
-        element_name: str,
-        element_type: DataSourceElementType,
-        add_to_dict: bool,
-    ) -> List[ValidationIssueType]:
-        """Check if the given element matches the expected type.
-
-        Args:
-            name_to_type: dict from the name of the element to the expected type of the element in the model.
-            data_source: the data source on which the element exists
-            element_name: name of the element
-            element_type: the type of the element
-            add_to_dict: if the given element does not exist in the dictionary, whether to add it.
-        """
-        issues: List[ValidationIssueType] = []
-        if element_name in name_to_type:
-            existing_type = name_to_type[element_name]
-            if existing_type != element_type:
+        for element_name, type_to_context in invalid_elements.items():
+            # Sort these by value to ensure consistent error messaging
+            types_used = [DataSourceElementType(v) for v in sorted(k.value for k in type_to_context.keys())]
+            for element_type in types_used:
+                data_source_contexts = type_to_context[element_type]
+                data_source_names = {ctx.data_source.data_source_name for ctx in data_source_contexts}
+                data_source_context = data_source_contexts[0]
                 issues.append(
                     ValidationError(
-                        context=DataSourceContext(
-                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source=DataSourceReference(data_source_name=data_source.name),
-                        ),
-                        message=f"In data source {data_source.name}, element `{element_name}` is of type "
-                        f"{element_type}, but it was previously used earlier in the model as "
-                        f"{name_to_type[element_name]}",
-                    )
-                )
-        else:
-            if add_to_dict:
-                name_to_type[element_name] = element_type
-            elif element_type != DataSourceElementType.DIMENSION:
-                # TODO: Can't check dimensions effectively as their name changes.
-                issues.append(
-                    ValidationError(
-                        context=DataSourceContext(
-                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source=DataSourceReference(data_source_name=data_source.name),
-                        ),
-                        message=f"In data source {data_source.name}, the element named {element_name} "
-                        f"of type {element_type} is not known in the model.",
+                        context=data_source_context,
+                        message=f"In data sources {data_source_names}, element `{element_name}` is of type "
+                        f"{element_type}, but it is used as types {types_used} across the model.",
                     )
                 )
 
         return issues
 
     @staticmethod
-    def _get_element_types(model: UserConfiguredModel) -> Dict[str, DataSourceElementType]:
-        # Store the element types
-        element_types: Dict[str, DataSourceElementType] = {}
+    def _get_element_name_to_types(
+        model: UserConfiguredModel,
+    ) -> DefaultDict[str, DefaultDict[DataSourceElementType, List[DataSourceContext]]]:
+        """Create a mapping of all element names in the model to types with a list of associated DataSourceContexts"""
+        element_types: DefaultDict[str, DefaultDict[DataSourceElementType, List[DataSourceContext]]] = defaultdict(
+            lambda: defaultdict(list)
+        )
         for data_source in model.data_sources:
+            data_source_context = DataSourceContext(
+                file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                data_source=DataSourceReference(data_source_name=data_source.name),
+            )
             if data_source.measures:
                 for measure in data_source.measures:
-                    element_types[measure.name] = DataSourceElementType.MEASURE
+                    element_types[measure.name][DataSourceElementType.MEASURE].append(data_source_context)
             if data_source.dimensions:
                 for dimension in data_source.dimensions:
-                    element_types[dimension.name] = DataSourceElementType.DIMENSION
+                    element_types[dimension.name][DataSourceElementType.DIMENSION].append(data_source_context)
             if data_source.identifiers:
                 for identifier in data_source.identifiers:
-                    element_types[identifier.name] = DataSourceElementType.IDENTIFIER
+                    element_types[identifier.name][DataSourceElementType.IDENTIFIER].append(data_source_context)
         return element_types
-
-    @staticmethod
-    @validate_safely(
-        whats_being_done="checking that a data source's elements that share names with other elements across the model also are the same type"
-    )
-    def _check_data_source(
-        model: UserConfiguredModel, data_source: DataSource, add_to_dict: bool
-    ) -> List[ValidationIssueType]:  # noqa: D
-        """Check if the elements in the data source matches the expected type.
-
-        Args:
-            model: UserConfiguredModel to check
-            data_source: the data source to check
-            add_to_dict: if the given element does not exist in the dictionary, whether to add it.
-
-        Returns:
-            A list of validation issues found with elements of data sources for the model
-        """
-        measure_name_tuples = [(x.name, DataSourceElementType.MEASURE) for x in data_source.measures or []]
-        dimension_name_tuples = [(x.name, DataSourceElementType.DIMENSION) for x in data_source.dimensions or []]
-        identifier_name_tuples = [(x.name, DataSourceElementType.IDENTIFIER) for x in data_source.identifiers or []]
-        issues = []
-        for element_name, element_type in measure_name_tuples + dimension_name_tuples + identifier_name_tuples:
-            issues += ElementConsistencyRule._check_element_type(
-                name_to_type=ElementConsistencyRule._get_element_types(model),
-                data_source=data_source,
-                element_name=element_name,
-                element_type=element_type,
-                add_to_dict=add_to_dict,
-            )
-        return issues

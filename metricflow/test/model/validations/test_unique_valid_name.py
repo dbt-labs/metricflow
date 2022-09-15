@@ -1,10 +1,7 @@
-from typing import Tuple
 import pytest
 import copy
 
 from metricflow.model.model_validator import ModelValidator
-from metricflow.model.objects.data_source import DataSource
-from metricflow.model.objects.elements.dimension import Dimension, DimensionType
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.unique_valid_name import MetricFlowReservedKeywords, UniqueAndValidNameRule
@@ -14,10 +11,6 @@ from metricflow.test.test_utils import find_data_source_with
 
 def copied_model(simple_model__pre_transforms: UserConfiguredModel) -> UserConfiguredModel:  # noqa: D
     return copy.deepcopy(simple_model__pre_transforms)
-
-
-def _categorical_dimensions(data_source: DataSource) -> Tuple[Dimension, ...]:
-    return tuple(dim for dim in data_source.dimensions if dim.type == DimensionType.CATEGORICAL)
 
 
 """
@@ -106,62 +99,6 @@ def test_top_level_elements_cant_share_names_except_with_metrics(
     A name for any of these elements must be unique to all other element names
     for the given data source.
 """
-
-
-def test_cross_element_names(simple_model__pre_transforms: UserConfiguredModel) -> None:  # noqa:D
-    model = copied_model(simple_model__pre_transforms)
-
-    # ensure we have a usable data source for the test
-    usable_ds, usable_ds_index = find_data_source_with(
-        model,
-        lambda data_source: len(data_source.measures) > 0
-        and len(data_source.identifiers) > 0
-        and len(_categorical_dimensions(data_source=data_source)) > 0,
-    )
-
-    measure_reference = usable_ds.measures[0].reference
-    # If the matching dimension is a time dimension we can accidentally create two primary time dimensions, and then
-    # the validation will throw a different error and fail the test
-    dimension_reference = _categorical_dimensions(data_source=usable_ds)[0].reference
-
-    ds_measure_x_dimension = copy.deepcopy(usable_ds)
-    ds_measure_x_identifier = copy.deepcopy(usable_ds)
-    ds_dimension_x_identifier = copy.deepcopy(usable_ds)
-
-    # We update the matching categorical dimension by reference for convenience
-    ds_measure_x_dimension.get_dimension(dimension_reference).name = measure_reference.element_name
-    ds_measure_x_identifier.identifiers[1].name = measure_reference.element_name
-    ds_dimension_x_identifier.identifiers[1].name = dimension_reference.element_name
-
-    model.data_sources[usable_ds_index] = ds_measure_x_dimension
-    with pytest.raises(
-        ModelValidationException,
-        match=(
-            f"element `{measure_reference.element_name}` is of type DataSourceElementType.MEASURE, but it was previously "
-            f"used earlier in the model as DataSourceElementType.DIMENSION"
-        ),
-    ):
-        ModelValidator().checked_validations(model)
-
-    model.data_sources[usable_ds_index] = ds_measure_x_identifier
-    with pytest.raises(
-        ModelValidationException,
-        match=(
-            f"element `{measure_reference.element_name}` is of type DataSourceElementType.MEASURE, but it was previously "
-            f"used earlier in the model as DataSourceElementType.IDENTIFIER"
-        ),
-    ):
-        ModelValidator().checked_validations(model)
-
-    model.data_sources[usable_ds_index] = ds_dimension_x_identifier
-    with pytest.raises(
-        ModelValidationException,
-        match=(
-            f"element `{dimension_reference.element_name}` is of type DataSourceElementType.DIMENSION, but it was previously "
-            f"used earlier in the model as DataSourceElementType.IDENTIFIER"
-        ),
-    ):
-        ModelValidator().checked_validations(model)
 
 
 def test_duplicate_measure_name(simple_model__pre_transforms: UserConfiguredModel) -> None:  # noqa:D
