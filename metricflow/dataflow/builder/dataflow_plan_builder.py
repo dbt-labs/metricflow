@@ -524,38 +524,16 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             grouped_measures_by_additiveness = group_measure_specs_by_additiveness(
                 tuple(input_specs_by_measure_spec.keys())
             )
-            additive_measure_specs = grouped_measures_by_additiveness.additive_measures
-            grouped_semi_additive_measures = grouped_measures_by_additiveness.grouped_semi_additive_measures
+            measures_by_additiveness = grouped_measures_by_additiveness.measures_by_additiveness
 
-            # TODO: deduplicate this repeated logic
-            # Build output node for additive measures
-            if additive_measure_specs:
+            # Build output nodes for each distinct non-additive dimension spec
+            for measure_specs in measures_by_additiveness:
+                assert len(measure_specs) > 0, "received empy set of measure specs, this should not happen!"
+                non_additive_spec = measure_specs[0].non_additive_dimension_spec
                 logger.info(
-                    f"Building aggregated measures for {data_source} with additive measures: {additive_measure_specs}"
+                    f"Building aggregated measures for {data_source} with non-additive dimension spec: {non_additive_spec}"
                 )
-                input_specs = tuple(
-                    input_specs_by_measure_spec[measure_spec] for measure_spec in additive_measure_specs
-                )
-                output_nodes.append(
-                    self._build_aggregated_measures_from_measure_source_node(
-                        metric_input_measure_specs=input_specs,
-                        queried_linkable_specs=queried_linkable_specs,
-                        where_constraint=node_where_constraint,
-                        time_range_constraint=time_range_constraint,
-                        cumulative=cumulative,
-                        cumulative_window=cumulative_window,
-                        cumulative_grain_to_date=cumulative_grain_to_date,
-                    )
-                )
-
-            # Build output nodes for semi-additive measures
-            for semi_additive_measures in grouped_semi_additive_measures:
-                logger.info(
-                    f"Building aggregated measures for {data_source} with semi_additive measures: {semi_additive_measures}"
-                )
-                input_specs = tuple(
-                    input_specs_by_measure_spec[measure_spec] for measure_spec in semi_additive_measures
-                )
+                input_specs = tuple(input_specs_by_measure_spec[measure_spec] for measure_spec in measure_specs)
                 output_nodes.append(
                     self._build_aggregated_measures_from_measure_source_node(
                         metric_input_measure_specs=input_specs,
