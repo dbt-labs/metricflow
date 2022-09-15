@@ -527,9 +527,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             measures_by_additiveness = grouped_measures_by_additiveness.measures_by_additiveness
 
             # Build output nodes for each distinct non-additive dimension spec
-            for measure_specs in measures_by_additiveness:
-                assert len(measure_specs) > 0, "received empy set of measure specs, this should not happen!"
-                non_additive_spec = measure_specs[0].non_additive_dimension_spec
+            for non_additive_spec, measure_specs in measures_by_additiveness.items():
                 logger.info(
                     f"Building aggregated measures for {data_source} with non-additive dimension spec: {non_additive_spec}"
                 )
