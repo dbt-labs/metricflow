@@ -189,3 +189,18 @@ def test_cancel_submitted_queries(  # noqa: D
     with pytest.raises(ProgrammingError):
         if sql_client.sql_engine_attributes.sql_engine_type == SupportedSqlEngine.SNOWFLAKE:
             _issue_sleep_query(sql_client, 5)
+
+
+def test_update_params_with_same_item() -> None:  # noqa: D
+    bind_params0 = SqlBindParameters(param_dict=OrderedDict({"key": "value"}))
+    bind_params1 = SqlBindParameters(param_dict=OrderedDict({"key": "value"}))
+
+    bind_params0.update(bind_params1)
+
+
+def test_update_params_with_same_key_different_values() -> None:  # noqa: D
+    bind_params0 = SqlBindParameters(param_dict=OrderedDict({"key": "value0"}))
+    bind_params1 = SqlBindParameters(param_dict=OrderedDict({"key": "value1"}))
+
+    with pytest.raises(RuntimeError):
+        bind_params0.update(bind_params1)
