@@ -17,7 +17,7 @@ class SqlBindParameters(HashableBaseModel):
     def update(self, additional_params: SqlBindParameters) -> None:
         """Add the parameters to this set, mutating it."""
         for key, value in additional_params.param_dict.items():
-            if key in self.param_dict:
+            if key in self.param_dict and self.param_dict[key] != value:
                 raise RuntimeError(
                     f"Conflict with key {key} in merging parameters. "
                     f"Existing params: {self.param_dict} Additional params: {additional_params}"
