@@ -1456,12 +1456,12 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                     ),
                 ),
             ),
-            column_alias=time_dimension_column_name,
+            column_alias=f"{time_dimension_column_name}__{node.agg_by_function.value}",
         )
         column_equality_descriptions.append(
             ColumnEqualityDescription(
                 left_column_alias=time_dimension_column_name,
-                right_column_alias=time_dimension_column_name,
+                right_column_alias=time_dimension_select_column.column_alias,
             )
         )
 
@@ -1489,6 +1489,25 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 )
             )
 
+        # Propogate additional group by during query time of the non-additive time dimension
+        queried_time_dimension_select_column: Optional[SqlSelectColumn] = None
+        if node.queried_time_dimension_spec:
+            query_time_dimension_column_name = self.column_association_resolver.resolve_time_dimension_spec(
+                node.queried_time_dimension_spec
+            ).column_name
+            queried_time_dimension_select_column = SqlSelectColumn(
+                expr=SqlColumnReferenceExpression(
+                    SqlColumnReference(
+                        table_alias=join_data_set_alias,
+                        column_name=query_time_dimension_column_name,
+                    ),
+                ),
+                column_alias=query_time_dimension_column_name,
+            )
+
+        row_filter_group_bys = tuple(identifier_select_columns)
+        if queried_time_dimension_select_column:
+            row_filter_group_bys += (queried_time_dimension_select_column,)
         # Construct SelectNode for Row filtering
         row_filter_sql_select_node = SqlSelectStatementNode(
             description=f"Filter row on {node.agg_by_function.name}({time_dimension_column_name})",
@@ -1496,7 +1515,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             from_source=input_data_set.sql_select_node,
             from_source_alias=join_data_set_alias,
             joins_descs=(),
-            group_bys=tuple(identifier_select_columns),
+            group_bys=row_filter_group_bys,
             where=None,
             order_bys=(),
         )
