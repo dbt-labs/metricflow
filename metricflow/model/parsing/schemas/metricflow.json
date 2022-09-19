@@ -709,8 +709,7 @@
                 }
             },
             "required": [
-                "name",
-                "window_choice"
+                "name"
             ],
             "type": "object"
         }

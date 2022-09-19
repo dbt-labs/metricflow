@@ -155,7 +155,7 @@ non_additive_dimension_schema = {
         },
     },
     "additionalProperties": False,
-    "required": ["name", "window_choice"],
+    "required": ["name"],
 }
 
 measure_schema = {
