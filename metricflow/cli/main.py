@@ -49,7 +49,7 @@ from metricflow.inference.runner import InferenceProgressReporter, InferenceRunn
 from metricflow.model.data_warehouse_model_validator import DataWarehouseModelValidator
 from metricflow.model.model_validator import ModelValidator
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
-from metricflow.protocols.sql_client import SupportedSqlEngine
+from metricflow.protocols.sql_client import SqlEngine
 from metricflow.engine.utils import model_build_result_from_config, path_to_models
 from metricflow.model.parsing.config_linter import ConfigLinter
 from metricflow.model.validations.validator_helpers import ModelValidationResults
@@ -943,7 +943,7 @@ def infer(
         " If you find any bugs or feel like something is not behaving as it should, feel free to open an issue on the Metricflow Github repo: https://github.com/transform-data/metricflow/issues \n"
     )
 
-    if cfg.sql_client.sql_engine_attributes.sql_engine_type is not SupportedSqlEngine.SNOWFLAKE:
+    if cfg.sql_client.sql_engine_attributes.sql_engine_type is not SqlEngine.SNOWFLAKE:
         click.echo(
             "Data Source Inference is currently only supported for Snowflake. "
             "We will add support for all the other warehouses before it becomes a "

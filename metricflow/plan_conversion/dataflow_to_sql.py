@@ -63,7 +63,7 @@ from metricflow.plan_conversion.spec_transforms import (
 )
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.time_spine import TimeSpineSource
-from metricflow.protocols.sql_client import SqlEngineAttributes, SupportedSqlEngine
+from metricflow.protocols.sql_client import SqlEngineAttributes, SqlEngine
 from metricflow.specs import (
     ColumnAssociationResolver,
     MetricSpec,
@@ -1320,7 +1320,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
         # TODO: Make this a more generally accessible attribute instead of checking against the
         # BigQuery-ness of the engine
-        use_column_alias_in_group_by = sql_engine_attributes.sql_engine_type is SupportedSqlEngine.BIGQUERY
+        use_column_alias_in_group_by = sql_engine_attributes.sql_engine_type is SqlEngine.BIGQUERY
 
         for optimizer in SqlQueryOptimizerConfiguration.optimizers_for_level(
             optimization_level, use_column_alias_in_group_by=use_column_alias_in_group_by

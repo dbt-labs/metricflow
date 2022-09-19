@@ -3,7 +3,7 @@ from typing import ClassVar, Optional, Mapping, Union, Sequence
 
 import sqlalchemy
 
-from metricflow.protocols.sql_client import SupportedSqlEngine, SqlEngineAttributes
+from metricflow.protocols.sql_client import SqlEngine, SqlEngineAttributes
 from metricflow.sql.render.redshift import RedshiftSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql_clients.common_client import SqlDialect, not_empty
@@ -18,7 +18,7 @@ class RedshiftEngineAttributes(SqlEngineAttributes):
     This is an implementation of the SqlEngineAttributes protocol for Redshift
     """
 
-    sql_engine_type: ClassVar[SupportedSqlEngine] = SupportedSqlEngine.REDSHIFT
+    sql_engine_type: ClassVar[SqlEngine] = SqlEngine.REDSHIFT
 
     # SQL Engine capabilities
     date_trunc_supported: ClassVar[bool] = True

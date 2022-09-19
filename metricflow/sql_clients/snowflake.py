@@ -10,7 +10,7 @@ import pandas as pd
 import sqlalchemy
 from sqlalchemy.exc import ProgrammingError
 
-from metricflow.protocols.sql_client import SupportedSqlEngine, SqlEngineAttributes
+from metricflow.protocols.sql_client import SqlEngine, SqlEngineAttributes
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
@@ -24,7 +24,7 @@ class SnowflakeEngineAttributes(SqlEngineAttributes):
     This is an implementation of the SqlEngineAttributes protocol for Snowflake
     """
 
-    sql_engine_type: ClassVar[SupportedSqlEngine] = SupportedSqlEngine.SNOWFLAKE
+    sql_engine_type: ClassVar[SqlEngine] = SqlEngine.SNOWFLAKE
 
     # SQL Engine capabilities
     date_trunc_supported: ClassVar[bool] = True

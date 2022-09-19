@@ -7,7 +7,7 @@ import sqlalchemy
 from sqlalchemy.pool import StaticPool
 
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.protocols.sql_client import SupportedSqlEngine, SqlEngineAttributes
+from metricflow.protocols.sql_client import SqlEngine, SqlEngineAttributes
 from metricflow.sql.render.duckdb_renderer import DuckDbSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 class DuckDbEngineAttributes(SqlEngineAttributes):
     """Engine-specific attributes for the DuckDb query engine"""
 
-    sql_engine_type: ClassVar[SupportedSqlEngine] = SupportedSqlEngine.DUCKDB
+    sql_engine_type: ClassVar[SqlEngine] = SqlEngine.DUCKDB
 
     # SQL Engine capabilities
     date_trunc_supported: ClassVar[bool] = True

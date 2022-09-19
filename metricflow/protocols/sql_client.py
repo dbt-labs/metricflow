@@ -10,8 +10,8 @@ from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from pandas import DataFrame
 
 
-class SupportedSqlEngine(Enum):
-    """Enumeration of DB engines currently supported by MetricFlow"""
+class SqlEngine(Enum):
+    """Enumeration of SQL engines, including ones that are not yet supported."""
 
     BIGQUERY = "BigQuery"
     DUCKDB = "DuckDB"
@@ -19,6 +19,9 @@ class SupportedSqlEngine(Enum):
     POSTGRES = "Postgres"
     SNOWFLAKE = "Snowflake"
     DATABRICKS = "Databricks"
+
+    # Not yet supported.
+    MYSQL = "MySQL"
 
 
 class SqlClient(Protocol):
@@ -163,7 +166,7 @@ class SqlEngineAttributes(Protocol):
     caused by changes to the protocol itself when inheritance is used.
     """
 
-    sql_engine_type: ClassVar[SupportedSqlEngine]
+    sql_engine_type: ClassVar[SqlEngine]
 
     # SQL Engine capabilities
     date_trunc_supported: ClassVar[bool]

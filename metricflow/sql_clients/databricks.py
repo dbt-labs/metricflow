@@ -10,7 +10,7 @@ from databricks import sql
 
 from metricflow.sql_clients.common_client import SqlDialect
 from metricflow.sql_clients.base_sql_client_implementation import BaseSqlClientImplementation
-from metricflow.protocols.sql_client import SqlEngineAttributes, SupportedSqlEngine
+from metricflow.protocols.sql_client import SqlEngineAttributes, SqlEngine
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer, SqlQueryPlanRenderer
@@ -35,7 +35,7 @@ PANDAS_TO_SQL_DTYPES = {
 class DatabricksEngineAttributes(SqlEngineAttributes):
     """SQL engine attributes for Databricks."""
 
-    sql_engine_type: ClassVar[SupportedSqlEngine] = SupportedSqlEngine.DATABRICKS
+    sql_engine_type: ClassVar[SqlEngine] = SqlEngine.DATABRICKS
 
     # SQL Engine capabilities
     date_trunc_supported: ClassVar[bool] = True
