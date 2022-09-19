@@ -1429,39 +1429,43 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         specified dimension that is non-additive. Then that dataset would be joined with the input data
         on that dimension along with grouping by identifiers that are also passed in.
         """
-        input_data_set: SqlDataSet = node.parent_node.accept(self)
+        from_data_set: SqlDataSet = node.parent_node.accept(self)
 
         from_data_set_alias = self._next_unique_table_alias()
 
         # Get the output_instance_set of the parent_node
-        output_instance_set = input_data_set.instance_set
+        output_instance_set = from_data_set.instance_set
         output_instance_set = output_instance_set.transform(ChangeAssociatedColumns(self._column_association_resolver))
 
         # Build the JoinDescriptions to handle the row base filtering on the output_data_set
-        join_data_set_alias = self._next_unique_table_alias()
+        inner_join_data_set_alias = self._next_unique_table_alias()
 
         column_equality_descriptions: List[ColumnEqualityDescription] = []
 
         # Build Time Dimension SqlSelectColumn
         time_dimension_column_name = self.column_association_resolver.resolve_time_dimension_spec(
-            node.time_dimension_spec
+            time_dimension_spec=node.time_dimension_spec
+        ).column_name
+        join_time_dimension_column_name = self.column_association_resolver.resolve_time_dimension_spec(
+            time_dimension_spec=node.time_dimension_spec,
+            aggregation_state=AggregationState.COMPLETE,
         ).column_name
         time_dimension_select_column = SqlSelectColumn(
             expr=SqlFunctionExpression.from_aggregation_type(
                 node.agg_by_function,
                 SqlColumnReferenceExpression(
                     SqlColumnReference(
-                        table_alias=join_data_set_alias,
+                        table_alias=inner_join_data_set_alias,
                         column_name=time_dimension_column_name,
                     ),
                 ),
             ),
-            column_alias=f"{time_dimension_column_name}__{node.agg_by_function.value}",
+            column_alias=join_time_dimension_column_name,
         )
         column_equality_descriptions.append(
             ColumnEqualityDescription(
                 left_column_alias=time_dimension_column_name,
-                right_column_alias=time_dimension_select_column.column_alias,
+                right_column_alias=join_time_dimension_column_name,
             )
         )
 
@@ -1475,7 +1479,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 SqlSelectColumn(
                     expr=SqlColumnReferenceExpression(
                         SqlColumnReference(
-                            table_alias=join_data_set_alias,
+                            table_alias=inner_join_data_set_alias,
                             column_name=identifier_column_name,
                         ),
                     ),
@@ -1498,7 +1502,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             queried_time_dimension_select_column = SqlSelectColumn(
                 expr=SqlColumnReferenceExpression(
                     SqlColumnReference(
-                        table_alias=join_data_set_alias,
+                        table_alias=inner_join_data_set_alias,
                         column_name=query_time_dimension_column_name,
                     ),
                 ),
@@ -1512,14 +1516,15 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         row_filter_sql_select_node = SqlSelectStatementNode(
             description=f"Filter row on {node.agg_by_function.name}({time_dimension_column_name})",
             select_columns=tuple(identifier_select_columns) + (time_dimension_select_column,),
-            from_source=input_data_set.sql_select_node,
-            from_source_alias=join_data_set_alias,
+            from_source=from_data_set.sql_select_node,
+            from_source_alias=inner_join_data_set_alias,
             joins_descs=(),
             group_bys=row_filter_group_bys,
             where=None,
             order_bys=(),
         )
 
+        join_data_set_alias = self._next_unique_table_alias()
         sql_join_desc = make_equijoin_description(
             right_source_node=row_filter_sql_select_node,
             left_source_alias=from_data_set_alias,
@@ -1534,7 +1539,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 select_columns=output_instance_set.transform(
                     CreateSelectColumnsForInstances(from_data_set_alias, self._column_association_resolver)
                 ).as_tuple(),
-                from_source=input_data_set.sql_select_node,
+                from_source=from_data_set.sql_select_node,
                 from_source_alias=from_data_set_alias,
                 joins_descs=(sql_join_desc,),
                 group_bys=(),

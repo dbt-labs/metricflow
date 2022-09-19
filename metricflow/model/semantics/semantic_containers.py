@@ -171,6 +171,7 @@ class DataSourceSemantics:
         self._measure_aggs: Dict[
             MeasureReference, AggregationType
         ] = {}  # maps measures to their one consistent aggregation
+        self._measure_agg_time_dimension: Dict[MeasureReference, TimeDimensionReference] = {}
         self._measure_non_additive_dimension_specs: Dict[MeasureReference, NonAdditiveDimensionSpec] = {}
         self._dimension_index: Dict[DimensionReference, List[DataSource]] = defaultdict(list)
         self._linkable_reference_index: Dict[LinkableElementReference, List[DataSource]] = defaultdict(list)
@@ -251,6 +252,11 @@ class DataSourceSemantics:
     def get_data_sources_for_measure(self, measure_reference: MeasureReference) -> List[DataSource]:  # noqa: D
         return self._measure_index[measure_reference]
 
+    def get_agg_time_dimension_for_measure(  # noqa: D
+        self, measure_reference: MeasureReference
+    ) -> TimeDimensionReference:
+        return self._measure_agg_time_dimension[measure_reference]
+
     def get_identifier_in_data_source(self, ref: DataSourceElementReference) -> Optional[Identifier]:  # Noqa: d
         data_source = self.get(ref.data_source_name)
         if not data_source:
@@ -318,6 +324,7 @@ class DataSourceSemantics:
                 key=agg_time_dimension,
                 value=MeasureConverter.convert_to_measure_spec(measure=measure),
             )
+            self._measure_agg_time_dimension[measure.reference] = agg_time_dimension
             if measure.non_additive_dimension:
                 non_additive_dimension_spec = NonAdditiveDimensionSpec(
                     name=measure.non_additive_dimension.name,

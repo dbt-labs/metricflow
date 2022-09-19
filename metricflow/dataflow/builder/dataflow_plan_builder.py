@@ -33,6 +33,7 @@ from metricflow.dataflow.dataflow_plan import (
     WhereConstraintNode,
     WriteToResultDataframeNode,
     WriteToResultTableNode,
+    SemiAdditiveJoinNode,
     SinkOutput,
 )
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_dag_as_text
@@ -47,6 +48,7 @@ from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationR
 from metricflow.plan_conversion.node_processor import PreDimensionJoinNodeProcessor
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.time_spine import TimeSpineSource
+from metricflow.references import TimeDimensionReference
 from metricflow.specs import (
     MetricSpec,
     MetricInputMeasureSpec,
@@ -58,6 +60,7 @@ from metricflow.specs import (
     InstanceSpec,
     DimensionSpec,
     OrderBySpec,
+    NonAdditiveDimensionSpec,
     SpecWhereClauseConstraint,
     LinkableSpecSet,
     ColumnAssociationResolver,
@@ -83,6 +86,16 @@ class MeasureRecipe(Generic[SqlDataSetT]):
     measure_node: BaseOutput[SqlDataSetT]
     required_local_linkable_specs: Tuple[LinkableInstanceSpec, ...]
     join_linkable_instances_recipes: Tuple[JoinLinkableInstancesRecipe, ...]
+
+
+@dataclass(frozen=True)
+class MeasureSpecProperties:
+    """Input dataclass for grouping properties of a sequence of MeasureSpecs."""
+
+    measure_specs: Sequence[MeasureSpec]
+    data_source_name: str
+    agg_time_dimension: TimeDimensionReference
+    non_additive_dimension_spec: Optional[NonAdditiveDimensionSpec] = None
 
 
 class DataflowPlanBuilder(Generic[SqlDataSetT]):
@@ -296,7 +309,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
 
         return sorted(nodes, key=sort_function)
 
-    def _select_source_nodes_with_meausres(
+    def _select_source_nodes_with_measures(
         self, measure_specs: Set[MeasureSpec], source_nodes: Sequence[BaseOutput[SqlDataSetT]]
     ) -> Sequence[BaseOutput[SqlDataSetT]]:
         nodes = []
@@ -309,9 +322,61 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 nodes.append(source_node)
         return nodes
 
+    def _find_non_additive_dimension_in_linkable_specs(
+        self,
+        agg_time_dimension: TimeDimensionReference,
+        linkable_specs: Sequence[LinkableInstanceSpec],
+        non_additive_dimension_spec: NonAdditiveDimensionSpec,
+    ) -> Optional[TimeDimensionSpec]:
+        """Finds the TimeDimensionSpec matching the non_additive_dimension_spec, if any"""
+        queried_time_dimension_spec: Optional[LinkableInstanceSpec] = None
+        for linkable_spec in linkable_specs:
+            dimension_name_match = linkable_spec.element_name == non_additive_dimension_spec.name
+            metric_time_match = (
+                non_additive_dimension_spec.name == agg_time_dimension.element_name
+                and linkable_spec.element_name == self._metric_time_dimension_reference.element_name
+            )
+            if dimension_name_match or metric_time_match:
+                queried_time_dimension_spec = linkable_spec
+                break
+        assert queried_time_dimension_spec is None or isinstance(
+            queried_time_dimension_spec, TimeDimensionSpec
+        ), "Non-additive dimension can only be a time dimension, if specified."
+        return queried_time_dimension_spec
+
+    def _build_measure_spec_properties(self, measure_specs: Sequence[MeasureSpec]) -> MeasureSpecProperties:
+        """Ensures that the group of MeasureSpecs has the same non_additive_dimension_spec and agg_time_dimension"""
+        if len(measure_specs) == 0:
+            raise ValueError("Cannot build MeasureParametersForRecipe when given an empty sequence of measure_specs.")
+        data_sources = self._get_data_source_names_for_measures(measure_specs)
+        if len(data_sources) > 1:
+            raise ValueError(
+                f"Cannot find common properties for measures {measure_specs} coming from multiple "
+                f"data sources: {data_sources}. This suggests the measure_specs were not correctly filtered."
+            )
+
+        agg_time_dimension = agg_time_dimension = self._data_source_semantics.get_agg_time_dimension_for_measure(
+            measure_specs[0].as_reference
+        )
+        non_additive_dimension_spec = measure_specs[0].non_additive_dimension_spec
+        for measure_spec in measure_specs:
+            if non_additive_dimension_spec != measure_spec.non_additive_dimension_spec:
+                raise ValueError(f"measure_specs {measure_specs} do not have the same non_additive_dimension_spec.")
+            measure_agg_time_dimension = self._data_source_semantics.get_agg_time_dimension_for_measure(
+                measure_spec.as_reference
+            )
+            if measure_agg_time_dimension != agg_time_dimension:
+                raise ValueError(f"measure_specs {measure_specs} do not have the same agg_time_dimension.")
+        return MeasureSpecProperties(
+            measure_specs=measure_specs,
+            data_source_name=data_sources.pop(),
+            agg_time_dimension=agg_time_dimension,
+            non_additive_dimension_spec=non_additive_dimension_spec,
+        )
+
     def _find_measure_recipe(
         self,
-        measure_specs: Sequence[MeasureSpec],
+        measure_spec_properties: MeasureSpecProperties,
         linkable_specs: Sequence[LinkableInstanceSpec],
         time_range_constraint: Optional[TimeRangeConstraint] = None,
     ) -> Optional[MeasureRecipe]:
@@ -320,13 +385,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         Prior to calling this method we should always be checking that all input measure specs come from
         the same base data source, otherwise the internal conditions here will be impossible to satisfy
         """
-        data_sources = self._get_data_source_names_for_measures(measure_specs)
-        if len(data_sources) > 1:
-            raise ValueError(
-                f"Cannot find a single measure recipe for measures {measure_specs} coming from multiple "
-                f"data sources: {data_sources}. This suggests the measure_specs were not correctly filtered."
-            )
-
+        measure_specs = measure_spec_properties.measure_specs
         node_processor = PreDimensionJoinNodeProcessor(
             data_source_semantics=self._data_source_semantics,
             node_data_set_resolver=self._node_data_set_resolver,
@@ -335,7 +394,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         source_nodes: Sequence[BaseOutput[SqlDataSetT]] = self._source_nodes
 
         # We only care about nodes that have all required measures
-        potential_measure_nodes: Sequence[BaseOutput[SqlDataSetT]] = self._select_source_nodes_with_meausres(
+        potential_measure_nodes: Sequence[BaseOutput[SqlDataSetT]] = self._select_source_nodes_with_measures(
             measure_specs=set(measure_specs), source_nodes=source_nodes
         )
 
@@ -556,42 +615,6 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 ),
             )
 
-    @staticmethod
-    def _add_where_and_aggregate(
-        metric_input_measure_specs: Tuple[MetricInputMeasureSpec, ...],
-        queried_linkable_specs: LinkableSpecSet,
-        unaggregated_node: BaseOutput[SqlDataSetT],
-        where_constraint: SpecWhereClauseConstraint,
-    ) -> BaseOutput[SqlDataSetT]:
-        """Applies the where constraint appropriately and produce aggregated measures.
-
-        Assumes that the input node has all measure specs, queried_linkable_specs, and also the specs required by the
-        where clause.
-        """
-        where_constrained_node = WhereConstraintNode(
-            parent_node=unaggregated_node,
-            where_constraint=where_constraint,
-        )
-
-        if where_constraint.linkable_spec_set.is_subset_of(queried_linkable_specs):
-            return AggregateMeasuresNode[SqlDataSetT](
-                parent_node=where_constrained_node, metric_input_measure_specs=metric_input_measure_specs
-            )
-
-        # At this point, it's the case that the linkable specs in the where clause are not a subset of the queried
-        # linkable specs. A filter is needed after a where clause so that the linkable specs in the where clause don't
-        # show up in the final result.
-        #
-        # e.g. for "bookings" by "ds" where "is_instant", "is_instant" should not be in the results.
-        filtered_node = FilterElementsNode(
-            parent_node=where_constrained_node,
-            include_specs=tuple(x.measure_spec for x in metric_input_measure_specs) + queried_linkable_specs.as_tuple,
-        )
-
-        return AggregateMeasuresNode[SqlDataSetT](
-            parent_node=filtered_node, metric_input_measure_specs=metric_input_measure_specs
-        )
-
     def _build_aggregated_measures_from_measure_source_node(
         self,
         metric_input_measure_specs: Tuple[MetricInputMeasureSpec, ...],
@@ -606,6 +629,9 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             linkable_spec.element_name for linkable_spec in queried_linkable_specs.as_tuple
         ]
         measure_specs = tuple(x.measure_spec for x in metric_input_measure_specs)
+        measure_properties = self._build_measure_spec_properties(measure_specs)
+        non_additive_dimension_spec = measure_properties.non_additive_dimension_spec
+
         cumulative_metric_adjusted_time_constraint: Optional[TimeRangeConstraint] = None
         if cumulative and time_range_constraint is not None:
             logger.info(f"Time range constraint before adjustment is {time_range_constraint}")
@@ -623,12 +649,22 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             )
             logger.info(f"Adjusted time range constraint {cumulative_metric_adjusted_time_constraint}")
 
-        required_linkable_specs = (
-            LinkableSpecSet.merge((queried_linkable_specs, where_constraint.linkable_spec_set))
-            if where_constraint
-            else queried_linkable_specs
-        )
+        # Extraneous linkable specs are specs that are used in this phase that should not show up in the final result
+        # unless it was already a requested spec in the query
+        extraneous_linkable_specs = LinkableSpecSet()
+        if where_constraint:
+            extraneous_linkable_specs = LinkableSpecSet.merge(
+                (extraneous_linkable_specs, where_constraint.linkable_spec_set)
+            )
+        if non_additive_dimension_spec:
+            extraneous_linkable_specs = LinkableSpecSet.merge(
+                (
+                    extraneous_linkable_specs,
+                    LinkableSpecSet(time_dimension_specs=(non_additive_dimension_spec.as_time_dimension_spec,)),
+                )
+            )
 
+        required_linkable_specs = LinkableSpecSet.merge((queried_linkable_specs, extraneous_linkable_specs))
         logger.info(
             f"Looking for a recipe to get:\n"
             f"{pformat_big_objects(measure_specs=measure_specs, required_linkable_set=required_linkable_specs)}"
@@ -636,7 +672,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
 
         find_recipe_start_time = time.time()
         measure_recipe = self._find_measure_recipe(
-            measure_specs=measure_specs,
+            measure_spec_properties=measure_properties,
             time_range_constraint=cumulative_metric_adjusted_time_constraint or time_range_constraint,
             linkable_specs=required_linkable_specs.as_tuple,
         )
@@ -734,15 +770,47 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 unaggregated_measure_node, time_range_constraint
             )
 
+        pre_aggregate_node: BaseOutput[SqlDataSetT] = cumulative_metric_constrained_node or unaggregated_measure_node
         if where_constraint:
-            return DataflowPlanBuilder._add_where_and_aggregate(
-                metric_input_measure_specs=metric_input_measure_specs,
-                unaggregated_node=cumulative_metric_constrained_node or unaggregated_measure_node,
-                queried_linkable_specs=queried_linkable_specs,
+            # Apply where constraint on the node
+            pre_aggregate_node = WhereConstraintNode(
+                parent_node=pre_aggregate_node,
                 where_constraint=where_constraint,
             )
 
+        if non_additive_dimension_spec is not None:
+            # Apply semi additive join on the node
+            agg_time_dimension = measure_properties.agg_time_dimension
+            queried_time_dimension_spec: Optional[
+                TimeDimensionSpec
+            ] = self._find_non_additive_dimension_in_linkable_specs(
+                agg_time_dimension=agg_time_dimension,
+                linkable_specs=queried_linkable_specs.as_tuple,
+                non_additive_dimension_spec=non_additive_dimension_spec,
+            )
+            time_dimension_spec = TimeDimensionSpec.from_name(non_additive_dimension_spec.name)
+            window_groupings = tuple(
+                LinklessIdentifierSpec.from_element_name(name) for name in non_additive_dimension_spec.window_groupings
+            )
+            pre_aggregate_node = SemiAdditiveJoinNode[SqlDataSetT](
+                parent_node=pre_aggregate_node,
+                identifier_specs=window_groupings,
+                time_dimension_spec=time_dimension_spec,
+                agg_by_function=non_additive_dimension_spec.window_choice,
+                queried_time_dimension_spec=queried_time_dimension_spec,
+            )
+
+        if not extraneous_linkable_specs.is_subset_of(queried_linkable_specs):
+            # At this point, it's the case that the linkable specs in the extraneous specs are not a subset of the queried
+            # linkable specs. A filter is needed after, say, a where clause so that the linkable specs in the where clause don't
+            # show up in the final result.
+            #
+            # e.g. for "bookings" by "ds" where "is_instant", "is_instant" should not be in the results.
+            pre_aggregate_node = FilterElementsNode[SqlDataSetT](
+                parent_node=pre_aggregate_node,
+                include_specs=measure_specs + queried_linkable_specs.as_tuple,
+            )
         return AggregateMeasuresNode[SqlDataSetT](
-            parent_node=cumulative_metric_constrained_node or unaggregated_measure_node,
+            parent_node=pre_aggregate_node,
             metric_input_measure_specs=metric_input_measure_specs,
         )
