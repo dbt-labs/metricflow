@@ -135,26 +135,56 @@ integration_test:
     FROM (
       SELECT
         CAST(SUM(account_balance) AS {{ double_data_type_name }}) AS total_account_balance_first_day
-        , fa_west.ds
-      FROM {{ source_schema }}.fct_accounts fa_west
+        , fa_west_filtered.ds
+      FROM (
+        SELECT 
+          fa_west.ds
+          , fa_west.ds AS metric_time
+          , user_id AS user
+          , account_balance
+        FROM {{ source_schema }}.fct_accounts fa_west
+        INNER JOIN (
+          SELECT
+            MIN(ds) AS ds__min
+          FROM {{ source_schema }}.fct_accounts
+          GROUP BY
+            ds
+        ) c
+        ON
+          fa_west.ds = c.ds__min
+      ) fa_west_filtered
       LEFT OUTER JOIN {{ source_schema }}.dim_users_latest dul_west
-      ON fa_west.user_id = dul_west.user_id
+      ON fa_west_filtered.user = dul_west.user_id
       WHERE dul_west.home_state_latest IN ('CA', 'HI', 'WA')
-      GROUP BY fa_west.ds
+      GROUP BY fa_west_filtered.ds
     ) a
     JOIN (
       SELECT
         CAST(SUM(account_balance) AS {{ double_data_type_name }}) AS total_account_balance_first_day
-        , fa_east.ds
-      FROM {{ source_schema }}.fct_accounts fa_east
+        , fa_east_filtered.ds
+      FROM (
+        SELECT 
+          fa_east.ds
+          , fa_east.ds AS metric_time
+          , user_id AS user
+          , account_balance
+        FROM {{ source_schema }}.fct_accounts fa_east
+        INNER JOIN (
+          SELECT
+            MIN(ds) AS ds__min
+          FROM {{ source_schema }}.fct_accounts
+          GROUP BY
+            ds
+        ) d
+        ON
+          fa_east.ds = d.ds__min
+      ) fa_east_filtered
       LEFT OUTER JOIN {{ source_schema }}.dim_users_latest dul_east
-      ON fa_east.user_id = dul_east.user_id
+      ON fa_east_filtered.user = dul_east.user_id
       WHERE dul_east.home_state_latest IN ('MD', 'NY', 'TX')
-      GROUP BY fa_east.ds
+      GROUP BY fa_east_filtered.ds
     ) b
     ON a.ds = b.ds
-    -- Patch to cover current behavior of only considering the min value in the time constraint regional_starting_balance_ratios
-    WHERE COALESCE(a.ds, b.ds) = '2020-01-01'
 ---
 integration_test:
   name: expr_with_single_constrained_and_aliased_measure
