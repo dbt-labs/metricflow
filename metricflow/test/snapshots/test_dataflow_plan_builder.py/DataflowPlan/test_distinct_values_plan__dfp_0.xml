@@ -73,19 +73,15 @@
                                     <!--    'identifier_links': ()}             -->
                                     <MetricTimeDimensionTransformNode>
                                         <!-- description = Metric Time Dimension 'ds' -->
-                                        <!-- node_id = sma_10003 -->
+                                        <!-- node_id = sma_10001 -->
                                         <!-- aggregation_time_dimension = ds -->
-                                        <FilterElementsNode>
-                                            <!-- description = Pass Only Additive Measures -->
-                                            <!-- node_id = pfe_10003 -->
-                                            <ReadSqlSourceNode>
-                                                <!-- description =                                                                           -->
-                                                <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
-                                                <!-- node_id = rss_10011 -->
-                                                <!-- data_set =                                                                    -->
-                                                <!--   DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
-                                            </ReadSqlSourceNode>
-                                        </FilterElementsNode>
+                                        <ReadSqlSourceNode>
+                                            <!-- description =                                                                           -->
+                                            <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                                            <!-- node_id = rss_10011 -->
+                                            <!-- data_set =                                                                    -->
+                                            <!--   DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                                        </ReadSqlSourceNode>
                                     </MetricTimeDimensionTransformNode>
                                 </FilterElementsNode>
                                 <FilterElementsNode>
@@ -103,19 +99,15 @@
                                     <!--    'identifier_links': ()}            -->
                                     <MetricTimeDimensionTransformNode>
                                         <!-- description = Metric Time Dimension 'ds' -->
-                                        <!-- node_id = sma_10006 -->
+                                        <!-- node_id = sma_10004 -->
                                         <!-- aggregation_time_dimension = ds -->
-                                        <FilterElementsNode>
-                                            <!-- description = Pass Only Additive Measures -->
-                                            <!-- node_id = pfe_10006 -->
-                                            <ReadSqlSourceNode>
-                                                <!-- description =                                                                           -->
-                                                <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='listings_latest'))  -->
-                                                <!-- node_id = rss_10014 -->
-                                                <!-- data_set =                                                                    -->
-                                                <!--   DataSourceDataSet(DataSourceReference(data_source_name='listings_latest'))  -->
-                                            </ReadSqlSourceNode>
-                                        </FilterElementsNode>
+                                        <ReadSqlSourceNode>
+                                            <!-- description =                                                                           -->
+                                            <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='listings_latest'))  -->
+                                            <!-- node_id = rss_10014 -->
+                                            <!-- data_set =                                                                    -->
+                                            <!--   DataSourceDataSet(DataSourceReference(data_source_name='listings_latest'))  -->
+                                        </ReadSqlSourceNode>
                                     </MetricTimeDimensionTransformNode>
                                 </FilterElementsNode>
                             </JoinToBaseOutputNode>

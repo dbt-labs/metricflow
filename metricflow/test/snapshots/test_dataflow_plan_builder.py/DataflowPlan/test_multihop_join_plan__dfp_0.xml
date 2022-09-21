@@ -64,19 +64,15 @@
                             <!--    'time_granularity': TimeGranularity.DAY}  -->
                             <MetricTimeDimensionTransformNode>
                                 <!-- description = Metric Time Dimension 'ds' -->
-                                <!-- node_id = sma_10009 -->
+                                <!-- node_id = sma_10007 -->
                                 <!-- aggregation_time_dimension = ds -->
-                                <FilterElementsNode>
-                                    <!-- description = Pass Only Additive Measures -->
-                                    <!-- node_id = pfe_10009 -->
-                                    <ReadSqlSourceNode>
-                                        <!-- description =                                                                              -->
-                                        <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='account_month_txns'))  -->
-                                        <!-- node_id = rss_10025 -->
-                                        <!-- data_set =                                                                       -->
-                                        <!--   DataSourceDataSet(DataSourceReference(data_source_name='account_month_txns'))  -->
-                                    </ReadSqlSourceNode>
-                                </FilterElementsNode>
+                                <ReadSqlSourceNode>
+                                    <!-- description =                                                                              -->
+                                    <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='account_month_txns'))  -->
+                                    <!-- node_id = rss_10025 -->
+                                    <!-- data_set =                                                                       -->
+                                    <!--   DataSourceDataSet(DataSourceReference(data_source_name='account_month_txns'))  -->
+                                </ReadSqlSourceNode>
                             </MetricTimeDimensionTransformNode>
                         </FilterElementsNode>
                         <FilterElementsNode>

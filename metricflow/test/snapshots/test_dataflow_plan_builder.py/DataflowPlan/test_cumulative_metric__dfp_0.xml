@@ -28,19 +28,15 @@
                         <!--    'time_granularity': TimeGranularity.MONTH}  -->
                         <MetricTimeDimensionTransformNode>
                             <!-- description = Metric Time Dimension 'ds' -->
-                            <!-- node_id = sma_10007 -->
+                            <!-- node_id = sma_10005 -->
                             <!-- aggregation_time_dimension = ds -->
-                            <FilterElementsNode>
-                                <!-- description = Pass Only Additive Measures -->
-                                <!-- node_id = pfe_10007 -->
-                                <ReadSqlSourceNode>
-                                    <!-- description =                                                                   -->
-                                    <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='revenue'))  -->
-                                    <!-- node_id = rss_10016 -->
-                                    <!-- data_set =                                                            -->
-                                    <!--   DataSourceDataSet(DataSourceReference(data_source_name='revenue'))  -->
-                                </ReadSqlSourceNode>
-                            </FilterElementsNode>
+                            <ReadSqlSourceNode>
+                                <!-- description =                                                                   -->
+                                <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='revenue'))  -->
+                                <!-- node_id = rss_10016 -->
+                                <!-- data_set =                                                            -->
+                                <!--   DataSourceDataSet(DataSourceReference(data_source_name='revenue'))  -->
+                            </ReadSqlSourceNode>
                         </MetricTimeDimensionTransformNode>
                     </FilterElementsNode>
                 </JoinOverTimeRangeNode>

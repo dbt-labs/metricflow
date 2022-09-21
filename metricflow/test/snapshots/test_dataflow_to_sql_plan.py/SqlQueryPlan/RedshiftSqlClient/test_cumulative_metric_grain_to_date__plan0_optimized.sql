@@ -1,5 +1,4 @@
 -- Read Elements From Data Source 'revenue'
--- Pass Only Additive Measures
 -- Metric Time Dimension 'ds'
 -- Pass Only Elements:
 --   ['txn_revenue', 'ds__month']

@@ -4,7 +4,7 @@
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  subq_20.customer_id__customer_name AS account_id__customer_id__customer_name
+  subq_18.customer_id__customer_name AS account_id__customer_id__customer_name
   , SUM(account_month_txns_src_10010.txn_count) AS txn_count
 FROM ***************************.account_month_txns account_month_txns_src_10010
 LEFT OUTER JOIN (
@@ -24,12 +24,12 @@ LEFT OUTER JOIN (
     ) AND (
       bridge_table_src_10011.ds_partitioned = customer_table_src_10013.ds_partitioned
     )
-) subq_20
+) subq_18
 ON
   (
-    account_month_txns_src_10010.account_id = subq_20.account_id
+    account_month_txns_src_10010.account_id = subq_18.account_id
   ) AND (
-    account_month_txns_src_10010.ds_partitioned = subq_20.ds_partitioned
+    account_month_txns_src_10010.ds_partitioned = subq_18.ds_partitioned
   )
 GROUP BY
-  subq_20.customer_id__customer_name
+  subq_18.customer_id__customer_name

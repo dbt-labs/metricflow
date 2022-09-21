@@ -11,12 +11,11 @@ FROM (
   -- Pass Only Elements:
   --   ['bookings', 'is_instant', 'listing__country_latest']
   SELECT
-    subq_16.is_instant AS is_instant
+    subq_13.is_instant AS is_instant
     , listings_latest_src_10004.country AS listing__country_latest
-    , subq_16.bookings AS bookings
+    , subq_13.bookings AS bookings
   FROM (
     -- Read Elements From Data Source 'bookings_source'
-    -- Pass Only Additive Measures
     -- Metric Time Dimension 'ds'
     -- Pass Only Elements:
     --   ['bookings', 'is_instant', 'listing']
@@ -28,12 +27,12 @@ FROM (
       -- User Defined SQL Query
       SELECT * FROM ***************************.fct_bookings
     ) bookings_source_src_10001
-  ) subq_16
+  ) subq_13
   LEFT OUTER JOIN
     ***************************.dim_listings_latest listings_latest_src_10004
   ON
-    subq_16.listing = listings_latest_src_10004.listing_id
-) subq_22
+    subq_13.listing = listings_latest_src_10004.listing_id
+) subq_18
 WHERE listing__country_latest = 'us'
 GROUP BY
   is_instant

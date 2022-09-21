@@ -7,10 +7,10 @@ FROM (
   -- Pass Only Elements:
   --   ['metric_time', 'average_booking_value', 'bookings', 'booking_value']
   SELECT
-    subq_32.metric_time AS metric_time
-    , subq_32.bookings AS bookings
-    , subq_32.average_booking_value AS average_booking_value
-    , subq_37.booking_value AS booking_value
+    subq_27.metric_time AS metric_time
+    , subq_27.bookings AS bookings
+    , subq_27.average_booking_value AS average_booking_value
+    , subq_31.booking_value AS booking_value
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements:
@@ -25,13 +25,12 @@ FROM (
       -- Pass Only Elements:
       --   ['average_booking_value', 'bookings', 'listing__is_lux_latest', 'metric_time']
       SELECT
-        subq_23.metric_time AS metric_time
+        subq_19.metric_time AS metric_time
         , listings_latest_src_10004.is_lux AS listing__is_lux_latest
-        , subq_23.bookings AS bookings
-        , subq_23.average_booking_value AS average_booking_value
+        , subq_19.bookings AS bookings
+        , subq_19.average_booking_value AS average_booking_value
       FROM (
         -- Read Elements From Data Source 'bookings_source'
-        -- Pass Only Additive Measures
         -- Metric Time Dimension 'ds'
         -- Pass Only Elements:
         --   ['average_booking_value', 'bookings', 'metric_time', 'listing']
@@ -44,19 +43,18 @@ FROM (
           -- User Defined SQL Query
           SELECT * FROM ***************************.fct_bookings
         ) bookings_source_src_10001
-      ) subq_23
+      ) subq_19
       LEFT OUTER JOIN
         ***************************.dim_listings_latest listings_latest_src_10004
       ON
-        subq_23.listing = listings_latest_src_10004.listing_id
-    ) subq_29
+        subq_19.listing = listings_latest_src_10004.listing_id
+    ) subq_24
     WHERE listing__is_lux_latest
     GROUP BY
       metric_time
-  ) subq_32
+  ) subq_27
   INNER JOIN (
     -- Read Elements From Data Source 'bookings_source'
-    -- Pass Only Additive Measures
     -- Metric Time Dimension 'ds'
     -- Pass Only Elements:
     --   ['booking_value', 'metric_time']
@@ -70,13 +68,13 @@ FROM (
     ) bookings_source_src_10001
     GROUP BY
       metric_time
-  ) subq_37
+  ) subq_31
   ON
     (
       (
-        subq_32.metric_time = subq_37.metric_time
+        subq_27.metric_time = subq_31.metric_time
       ) OR (
-        (subq_32.metric_time IS NULL) AND (subq_37.metric_time IS NULL)
+        (subq_27.metric_time IS NULL) AND (subq_31.metric_time IS NULL)
       )
     )
-) subq_39
+) subq_33

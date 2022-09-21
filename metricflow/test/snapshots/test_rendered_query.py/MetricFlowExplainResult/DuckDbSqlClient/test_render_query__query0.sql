@@ -5,7 +5,6 @@ SELECT
   , SUM(bookings) AS bookings
 FROM (
   -- Read Elements From Data Source 'bookings_source'
-  -- Pass Only Additive Measures
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements:
   --   ['bookings', 'ds']
@@ -16,6 +15,6 @@ FROM (
     -- User Defined SQL Query
     SELECT * FROM ***************************.fct_bookings
   ) bookings_source_src_1
-) subq_3
+) subq_2
 GROUP BY
   ds

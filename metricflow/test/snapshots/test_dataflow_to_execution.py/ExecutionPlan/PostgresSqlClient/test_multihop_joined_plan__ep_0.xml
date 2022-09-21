@@ -9,7 +9,7 @@
         <!--   -- Aggregate Measures                                                                  -->
         <!--   -- Compute Metrics via Expressions                                                     -->
         <!--   SELECT                                                                                 -->
-        <!--     subq_8.customer_id__customer_name AS account_id__customer_id__customer_name          -->
+        <!--     subq_7.customer_id__customer_name AS account_id__customer_id__customer_name          -->
         <!--     , SUM(account_month_txns_src_10010.txn_count) AS txn_count                           -->
         <!--   FROM ***************************.account_month_txns account_month_txns_src_10010       -->
         <!--   LEFT OUTER JOIN (                                                                      -->
@@ -29,14 +29,14 @@
         <!--       ) AND (                                                                            -->
         <!--         bridge_table_src_10011.ds_partitioned = customer_table_src_10013.ds_partitioned  -->
         <!--       )                                                                                  -->
-        <!--   ) subq_8                                                                               -->
+        <!--   ) subq_7                                                                               -->
         <!--   ON                                                                                     -->
         <!--     (                                                                                    -->
-        <!--       account_month_txns_src_10010.account_id = subq_8.account_id                        -->
+        <!--       account_month_txns_src_10010.account_id = subq_7.account_id                        -->
         <!--     ) AND (                                                                              -->
-        <!--       account_month_txns_src_10010.ds_partitioned = subq_8.ds_partitioned                -->
+        <!--       account_month_txns_src_10010.ds_partitioned = subq_7.ds_partitioned                -->
         <!--     )                                                                                    -->
         <!--   GROUP BY                                                                               -->
-        <!--     subq_8.customer_id__customer_name                                                    -->
+        <!--     subq_7.customer_id__customer_name                                                    -->
     </SelectSqlQueryToDataFrameTask>
 </ExecutionPlan>
