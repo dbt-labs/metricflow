@@ -1,9 +1,9 @@
 import collections
 
 from dataclasses import dataclass
-from typing import Sequence, Tuple
+from typing import Dict, Optional, Sequence, Tuple
 
-from metricflow.specs import MeasureSpec
+from metricflow.specs import MeasureSpec, NonAdditiveDimensionSpec
 
 
 @dataclass(frozen=True)
@@ -14,15 +14,23 @@ class GroupedMeasureSpecsByAdditiveness:
     additive_measures: Tuple[MeasureSpec, ...]
 
     @property
-    def measures_by_additiveness(self) -> Tuple[Tuple[MeasureSpec, ...], ...]:
-        """Returns a single tuple of tuples of MeasureSpecs grouped by additiveness
+    def measures_by_additiveness(self) -> Dict[Optional[NonAdditiveDimensionSpec], Tuple[MeasureSpec, ...]]:
+        """Returns a mapping from additiveness spec to a tuple of measure specs
 
-        The additive measures are identifiable by the nature of their NonAdditiveDimensionSpec property.
+        This is useful if you wish to consume the tuples of MeasureSpecs in a single pass without having to
+        divide calls up by the existence of an additiveness specification
         """
+        additiveness_to_measures: Dict[Optional[NonAdditiveDimensionSpec], Tuple[MeasureSpec, ...]] = {}
         if self.additive_measures:
-            return (self.additive_measures,) + tuple(self.grouped_semi_additive_measures)
+            additiveness_to_measures[None] = self.additive_measures
 
-        return tuple(self.grouped_semi_additive_measures)
+        for grouped_specs in self.grouped_semi_additive_measures:
+            assert len(grouped_specs) > 0, "received empty set of measure specs, this should not happen!"
+            # These all have the same additiveness spec value
+            non_additive_spec = grouped_specs[0].non_additive_dimension_spec
+            additiveness_to_measures[non_additive_spec] = grouped_specs
+
+        return additiveness_to_measures
 
 
 def group_measure_specs_by_additiveness(measure_specs: Sequence[MeasureSpec]) -> GroupedMeasureSpecsByAdditiveness:
