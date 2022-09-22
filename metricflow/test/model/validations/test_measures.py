@@ -2,6 +2,8 @@ import copy
 import re
 
 import pytest
+from metricflow.aggregation_properties import AggregationType
+from metricflow.model.objects.elements.measure import Measure, NonAdditiveDimensionParameters
 from metricflow.model.objects.metric import Metric, MetricInputMeasure, MetricType, MetricTypeParams
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.model_validator import ModelValidator
@@ -221,3 +223,50 @@ def test_reused_measure_alias_within_metric(simple_model__pre_transforms: UserCo
     assert (
         actual_error.find(expected_error_substring) != -1
     ), f"Expected error {expected_error_substring} not found in error string! Instead got {actual_error}"
+
+
+def test_invalid_non_additive_dimension_properties(simple_model__pre_transforms: UserConfiguredModel) -> None:
+    """Tests validator for invalid cases of non_additive_dimension properties."""
+    model = copy.deepcopy(simple_model__pre_transforms)
+    invalid_measure = Measure(
+        name="bad_measure",
+        agg=AggregationType.SUM,
+        non_additive_dimension=NonAdditiveDimensionParameters(
+            name="doesntexist",  # Time dimension doesn't exist
+            window_choice=AggregationType.SUM,  # Should only be MIN/MAX
+            window_groupings=["wherethisidentifier"],  # Identifier doesn't exist
+        ),
+        agg_time_dimension="ds",
+    )
+    invalid_measure2 = Measure(
+        name="bad_measure2",
+        agg=AggregationType.SUM,
+        non_additive_dimension=NonAdditiveDimensionParameters(
+            name="is_instant",  # Is a CATEGORICAL dimension
+            window_choice=AggregationType.MIN,
+        ),
+        agg_time_dimension="ds",
+    )
+    data_source_with_measures = find_data_source_with(model, lambda data_source: data_source.name == "bookings_source")[
+        0
+    ]
+    data_source_with_measures.measures.extend([invalid_measure, invalid_measure2])  # type: ignore
+    build = ModelValidator().validate_model(model)
+    expected_error_substring_1 = (
+        f"that is not defined as a dimension in data source '{data_source_with_measures.name}'."
+    )
+    expected_error_substring_2 = "has a non_additive_dimension with an invalid 'window_choice'"
+    expected_error_substring_3 = "has a non_additive_dimension with an invalid 'window_groupings'"
+    expected_error_substring_4 = "that is defined as a categorical dimension which is not supported."
+    missing_error_strings = set()
+    for expected_str in [
+        expected_error_substring_1,
+        expected_error_substring_2,
+        expected_error_substring_3,
+        expected_error_substring_4,
+    ]:
+        if not any(actual_str.as_readable_str().find(expected_str) != -1 for actual_str in build.issues.errors):
+            missing_error_strings.add(expected_str)
+    assert (
+        len(missing_error_strings) == 0
+    ), f"Failed to match one or more expected errors: {missing_error_strings} in {set([x.as_readable_str() for x in build.issues.errors])}"

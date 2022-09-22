@@ -3,7 +3,9 @@ from typing import DefaultDict, Dict, List, Set
 
 from more_itertools import bucket
 
+from metricflow.aggregation_properties import AggregationType
 from metricflow.instances import MetricModelReference
+from metricflow.model.objects.elements.dimension import DimensionType
 from metricflow.model.objects.metric import Metric
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.unique_valid_name import UniqueAndValidNameRule
@@ -213,6 +215,98 @@ class MetricMeasuresRule(ModelValidationRule):
             issues += MetricMeasuresRule._validate_metric_measure_references(
                 metric=metric, valid_measure_names=valid_measure_names
             )
+        return issues
+
+
+class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
+    """Checks that the measure's non_additive_dimensions are properly defined."""
+
+    @staticmethod
+    @validate_safely(whats_being_done="ensuring that a measure's non_additive_dimensions is valid")
+    def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
+        issues: List[ValidationIssueType] = []
+        for data_source in model.data_sources or []:
+            for measure in data_source.measures:
+                non_additive_dimension = measure.non_additive_dimension
+                if non_additive_dimension is None:
+                    continue
+
+                # Validates that the non_additive_dimension exists as a time dimension in the data source
+                matching_dimension = next(
+                    (dim for dim in data_source.dimensions if non_additive_dimension.name == dim.name), None
+                )
+                if matching_dimension is None:
+                    issues.append(
+                        ValidationError(
+                            context=DataSourceElementContext(
+                                file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                                data_source_element=DataSourceElementReference(
+                                    data_source_name=data_source.name, element_name=measure.name
+                                ),
+                                element_type=DataSourceElementType.MEASURE,
+                            ),
+                            message=(
+                                f"Measure '{measure.name}' has a non_additive_dimension with name '{non_additive_dimension.name}' "
+                                f"that is not defined as a dimension in data source '{data_source.name}'."
+                            ),
+                        )
+                    )
+                if matching_dimension and matching_dimension.type != DimensionType.TIME:
+                    issues.append(
+                        ValidationError(
+                            context=DataSourceElementContext(
+                                file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                                data_source_element=DataSourceElementReference(
+                                    data_source_name=data_source.name, element_name=measure.name
+                                ),
+                                element_type=DataSourceElementType.MEASURE,
+                            ),
+                            message=(
+                                f"Measure '{measure.name}' has a non_additive_dimension with name '{non_additive_dimension.name}' "
+                                f"that is defined as a categorical dimension which is not supported."
+                            ),
+                        )
+                    )
+
+                # Validates that the window_choice is either MIN/MAX
+                if non_additive_dimension.window_choice not in {AggregationType.MIN, AggregationType.MAX}:
+                    issues.append(
+                        ValidationError(
+                            context=DataSourceElementContext(
+                                file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                                data_source_element=DataSourceElementReference(
+                                    data_source_name=data_source.name, element_name=measure.name
+                                ),
+                                element_type=DataSourceElementType.MEASURE,
+                            ),
+                            message=(
+                                f"Measure '{measure.name}' has a non_additive_dimension with an invalid 'window_choice' of '{non_additive_dimension.window_choice.value}'. "
+                                f"Only choices supported are 'min' or 'max'."
+                            ),
+                        )
+                    )
+
+                # Validates that all window_groupings are identifiers
+                identifiers_in_data_source = {identifier.name for identifier in data_source.identifiers}
+                window_groupings = set(non_additive_dimension.window_groupings)
+                intersected_identifiers = window_groupings.intersection(identifiers_in_data_source)
+                if len(intersected_identifiers) != len(window_groupings):
+                    issues.append(
+                        ValidationError(
+                            context=DataSourceElementContext(
+                                file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                                data_source_element=DataSourceElementReference(
+                                    data_source_name=data_source.name, element_name=measure.name
+                                ),
+                                element_type=DataSourceElementType.MEASURE,
+                            ),
+                            message=(
+                                f"Measure '{measure.name}' has a non_additive_dimension with an invalid 'window_groupings'. "
+                                f"These identifiers {window_groupings.difference(intersected_identifiers)} do not exist in the data source."
+                            ),
+                        )
+                    )
+
         return issues
 
 

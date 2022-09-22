@@ -19,6 +19,7 @@ from metricflow.model.validations.measures import (
     DataSourceMeasuresUniqueRule,
     MeasureConstraintAliasesRule,
     MetricMeasuresRule,
+    MeasuresNonAdditiveDimensionRule,
 )
 from metricflow.model.validations.metrics import CumulativeMetricRule
 from metricflow.model.validations.non_empty import NonEmptyRule
@@ -52,6 +53,7 @@ class ModelValidator:
         ValidMaterializationRule(),
         AggregationTimeDimensionRule(),
         ReservedKeywordsRule(),
+        MeasuresNonAdditiveDimensionRule(),
     )
 
     def __init__(self, rules: Sequence[ModelValidationRule] = DEFAULT_RULES, max_workers: int = 1) -> None:
