@@ -526,11 +526,13 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             )
             measures_by_additiveness = grouped_measures_by_additiveness.measures_by_additiveness
 
-            # Build output nodes for each distinct non-additive dimension spec
+            # Build output nodes for each distinct non-additive dimension spec, including the None case
             for non_additive_spec, measure_specs in measures_by_additiveness.items():
-                logger.info(
-                    f"Building aggregated measures for {data_source} with non-additive dimension spec: {non_additive_spec}"
-                )
+                non_additive_message = ""
+                if non_additive_spec is not None:
+                    non_additive_message = f" with non-additive dimension spec: {non_additive_spec}"
+
+                logger.info(f"Building aggregated measures for {data_source}{non_additive_message}")
                 input_specs = tuple(input_specs_by_measure_spec[measure_spec] for measure_spec in measure_specs)
                 output_nodes.append(
                     self._build_aggregated_measures_from_measure_source_node(
