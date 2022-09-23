@@ -1,5 +1,6 @@
 import logging
 
+from metricflow.aggregation_properties import AggregationState
 from metricflow.column_assoc import ColumnAssociation, SingleColumnCorrelationKey
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, JoinToBaseOutputNode, JoinDescription
@@ -8,7 +9,6 @@ from metricflow.instances import (
     InstanceSet,
     MeasureInstance,
     DataSourceElementReference,
-    AggregationState,
 )
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver

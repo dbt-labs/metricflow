@@ -5,6 +5,7 @@ from collections import OrderedDict
 from dataclasses import dataclass
 from typing import TypeVar, Generic, Union, List, Sequence, Optional
 
+from metricflow.aggregation_properties import AggregationState
 from metricflow.column_assoc import ColumnAssociation, SingleColumnCorrelationKey
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dag.id_generation import IdGeneratorRegistry
@@ -31,7 +32,6 @@ from metricflow.dataflow.dataflow_plan import (
 )
 from metricflow.dataset.dataset import DataSet
 from metricflow.instances import (
-    AggregationState,
     InstanceSet,
     MetricInstance,
     MetricModelReference,

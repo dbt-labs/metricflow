@@ -1,6 +1,7 @@
 import logging
 from typing import Tuple
 
+from metricflow.aggregation_properties import AggregationState
 from metricflow.column_assoc import (
     SingleColumnCorrelationKey,
     ColumnAssociation,

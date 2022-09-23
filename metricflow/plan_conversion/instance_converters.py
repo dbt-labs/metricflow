@@ -7,8 +7,8 @@ from collections import OrderedDict
 from itertools import chain
 from typing import List, Sequence, Optional, Dict, Tuple
 
+from metricflow.aggregation_properties import AggregationState
 from metricflow.instances import (
-    AggregationState,
     MdoInstance,
     DimensionInstance,
     IdentifierInstance,

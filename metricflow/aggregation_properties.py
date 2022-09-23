@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from enum import Enum
+
 from metricflow.object_utils import ExtendedEnum
 
 
@@ -37,3 +39,15 @@ class AggregationType(ExtendedEnum):
         2. We can calculate the "other" column in the postprocessor (meaning the metric is expansive)
         """
         return self in (AggregationType.SUM, AggregationType.SUM_BOOLEAN)
+
+
+class AggregationState(Enum):
+    """Represents how the measure is aggregated."""
+
+    # When reading from the source, the measure is considered non-aggregated.
+    NON_AGGREGATED = "NON_AGGREGATED"
+    PARTIAL = "PARTIAL"
+    COMPLETE = "COMPLETE"
+
+    def __repr__(self) -> str:  # noqa: D
+        return f"{self.__class__.__name__}.{self.name}"
