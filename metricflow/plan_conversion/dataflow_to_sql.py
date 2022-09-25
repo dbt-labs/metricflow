@@ -121,16 +121,25 @@ class ColumnEqualityDescription:
     right_column_alias: str
 
 
-def make_equijoin_description(
+def make_sql_join_description(
     right_source_node: SqlSelectStatementNode,
     left_source_alias: str,
     right_source_alias: str,
     column_equality_descriptions: Sequence[ColumnEqualityDescription],
     join_type: SqlJoinType,
 ) -> SqlJoinDescription:
-    """Make a join description where the condition is an equals between two columns in the left and right sources.
+    """Make a join description where the condition is a set of equality comparisons between columns.
 
-    A source is defined as either a table or a subquery.
+    Typically the columns in column_equality_descriptions are identifiers we are trying to match,
+    although they may include things like dimension partitions or time dimension columns where an
+    equality is expected.
+
+    Args:
+        right_source_node: node representing the join target, may be either a table or subquery
+        left_source_alias: string alias identifier for the join source
+        right_source_alias: string alias identifier for the join target
+        column_equality_descriptions: set of equality constraints for the ON statement
+        join_type: type of SQL join, e.g., LEFT, INNER, etc.
     """
     assert len(column_equality_descriptions) > 0
 
@@ -695,7 +704,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 )
 
             sql_join_descs.append(
-                make_equijoin_description(
+                make_sql_join_description(
                     right_source_node=right_data_set.sql_select_node,
                     left_source_alias=from_data_set_alias,
                     right_source_alias=right_data_set_alias,
@@ -1532,7 +1541,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         )
 
         join_data_set_alias = self._next_unique_table_alias()
-        sql_join_desc = make_equijoin_description(
+        sql_join_desc = make_sql_join_description(
             right_source_node=row_filter_sql_select_node,
             left_source_alias=from_data_set_alias,
             right_source_alias=join_data_set_alias,
