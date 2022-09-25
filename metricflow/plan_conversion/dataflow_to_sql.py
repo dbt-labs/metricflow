@@ -476,6 +476,15 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         """Return the next unique table alias to use in generating queries."""
         return IdGeneratorRegistry.for_class(self.__class__).create_id(prefix="subq")
 
+    @staticmethod
+    def _get_metric_time_instances_from_data_set(data_set: SqlDataSet) -> Sequence[TimeDimensionInstance]:
+        """Helper to extract the metric time instances from a given dataset"""
+        return tuple(
+            time_dimension_instance
+            for time_dimension_instance in data_set.instance_set.time_dimension_instances
+            if time_dimension_instance.spec.element_name == DataSet.metric_time_dimension_name()
+        )
+
     def visit_source_node(self, node: ReadSqlSourceNode[SqlDataSetT]) -> SqlDataSet:
         """Generate the SQL to read from the source."""
         return SqlDataSet(
@@ -494,11 +503,8 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
         metric_time_dimension_spec: Optional[TimeDimensionSpec] = None
         metric_time_dimension_instance: Optional[TimeDimensionInstance] = None
-        for instance in input_data_set.instance_set.time_dimension_instances:
-            if (
-                instance.spec.element_name == node.metric_time_dimension_reference.element_name
-                and len(instance.spec.identifier_links) == 0
-            ):
+        for instance in DataflowToSqlQueryPlanConverter._get_metric_time_instances_from_data_set(input_data_set):
+            if len(instance.spec.identifier_links) == 0:
                 metric_time_dimension_instance = instance
                 metric_time_dimension_spec = instance.spec
                 break
@@ -1255,26 +1261,25 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             ),
         )
 
-    def visit_constrain_time_range_node(self, node: ConstrainTimeRangeNode[SourceDataSetT]) -> SqlDataSet:  # noqa: D
+    def visit_constrain_time_range_node(self, node: ConstrainTimeRangeNode[SourceDataSetT]) -> SqlDataSet:
+        """Convert ConstrainTimeRangeNode to a SqlDataSet by building the time constraint comparison
+
+        Use the smallest time granularity to build the comparison since that's what was used in the data source
+        definition and it wouldn't have a DATE_TRUNC() in the expression. We want to build this:
+
+            ds >= '2020-01-01' AND ds <= '2020-02-01'
+
+        instead of this: DATE_TRUNC('month', ds) >= '2020-01-01' AND DATE_TRUNC('month', ds <= '2020-02-01')
+        """
+
         from_data_set: SqlDataSet = node.parent_node.accept(self)
         from_data_set_alias = self._next_unique_table_alias()
 
-        time_dimension_instances_for_metric_time = [
-            time_dimension_instance
-            for time_dimension_instance in from_data_set.instance_set.time_dimension_instances
-            if time_dimension_instance.spec.element_name == DataSet.metric_time_dimension_name()
-        ]
+        time_dimension_instances_for_metric_time = sorted(
+            DataflowToSqlQueryPlanConverter._get_metric_time_instances_from_data_set(from_data_set),
+            key=lambda x: x.spec.time_granularity.to_int(),
+        )
 
-        # Use the smallest time granularity to build the comparison since that's what was used in the data source
-        # definition and it wouldn't have a DATE_TRUNC() in the expression. We want to build
-        #
-        # ds >= '2020-01-01' AND ds <= '2020-02-01'
-        #
-        # not DATE_TRUNC('month', ds) >= '2020-01-01' AND DATE_TRUNC('month', ds <= '2020-02-01')
-        def sort_function_for_time_granularity(instance: TimeDimensionInstance) -> int:
-            return instance.spec.time_granularity.to_int()
-
-        time_dimension_instances_for_metric_time.sort(key=sort_function_for_time_granularity)
         assert (
             len(time_dimension_instances_for_metric_time) > 0
         ), "No metric time dimensions found in the input data set for this node"
