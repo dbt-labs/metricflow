@@ -136,11 +136,24 @@ def parse_yaml_file_paths_to_model(
     template_mapping = template_mapping or {}
     yaml_config_files = []
     for file_path in file_paths:
-        with open(file_path) as f:
-            contents = Template(f.read()).substitute(template_mapping)
-            yaml_config_files.append(
-                YamlConfigFile(filepath=file_path, contents=contents),
-            )
+        try:
+            with open(file_path) as f:
+                contents = Template(f.read()).substitute(template_mapping)
+                yaml_config_files.append(
+                    YamlConfigFile(filepath=file_path, contents=contents),
+                )
+        except UnicodeDecodeError as e:
+            # We could alternatively return this as a validation issue, but this
+            # exception is hit *before* building the model. Currently the
+            # ModelBuildResult guarantees a UserConfiguredModel. We could make
+            # UserConfiguredModel optional on ModelBuildResult, but this has
+            # undesirable consequences.
+            raise Exception(
+                f"The content of file `{file_path}` doesn't match the encoding of the file."
+                " If you know the encoding the content is in, try resaving the file with that encoding explicitly."
+                " Alternatively this error generally arises due to copy and pasted content,"
+                " try manually typing up the problem file instead of copy and pasting"
+            ) from e
 
     build_result = parse_yaml_files_to_model(yaml_config_files)
     model = build_result.model
