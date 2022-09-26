@@ -26,6 +26,9 @@ identifier_type_enum_values += [x.lower() for x in identifier_type_enum_values]
 aggregation_type_values = ["SUM", "MIN", "MAX", "AVERAGE", "COUNT_DISTINCT", "BOOLEAN", "SUM_BOOLEAN"]
 aggregation_type_values += [x.lower() for x in aggregation_type_values]
 
+window_aggregation_type_values = ["MIN", "MAX"]
+window_aggregation_type_values += [x.lower() for x in window_aggregation_type_values]
+
 time_granularity_values = ["DAY", "WEEK", "MONTH", "QUARTER", "YEAR"]
 time_granularity_values += [x.lower() for x in time_granularity_values]
 
@@ -148,7 +151,7 @@ non_additive_dimension_schema = {
     "type": "object",
     "properties": {
         "name": {"type": "string"},
-        "window_choice": {"enum": aggregation_type_values},
+        "window_choice": {"enum": window_aggregation_type_values},
         "window_groupings": {
             "type": "array",
             "items": {"type": "string"},

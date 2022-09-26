@@ -685,20 +685,10 @@
                 },
                 "window_choice": {
                     "enum": [
-                        "SUM",
                         "MIN",
                         "MAX",
-                        "AVERAGE",
-                        "COUNT_DISTINCT",
-                        "BOOLEAN",
-                        "SUM_BOOLEAN",
-                        "sum",
                         "min",
-                        "max",
-                        "average",
-                        "count_distinct",
-                        "boolean",
-                        "sum_boolean"
+                        "max"
                     ]
                 },
                 "window_groupings": {
