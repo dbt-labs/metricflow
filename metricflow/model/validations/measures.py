@@ -230,6 +230,32 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                 non_additive_dimension = measure.non_additive_dimension
                 if non_additive_dimension is None:
                     continue
+                agg_time_dimension = next(
+                    (
+                        dim
+                        for dim in data_source.dimensions
+                        if measure.checked_agg_time_dimension.element_name == dim.name
+                    ),
+                    None,
+                )
+                if agg_time_dimension is None:
+                    # Sanity check, should never hit this
+                    issues.append(
+                        ValidationError(
+                            context=DataSourceElementContext(
+                                file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                                data_source_element=DataSourceElementReference(
+                                    data_source_name=data_source.name, element_name=measure.name
+                                ),
+                                element_type=DataSourceElementType.MEASURE,
+                            ),
+                            message=(
+                                f"Measure '{measure.name}' has a agg_time_dimension of {measure.checked_agg_time_dimension.element_name} "
+                                f"that is not defined as a dimension in data source '{data_source.name}'."
+                            ),
+                        )
+                    )
+                    continue
 
                 # Validates that the non_additive_dimension exists as a time dimension in the data source
                 matching_dimension = next(
@@ -251,22 +277,50 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                             ),
                         )
                     )
-                if matching_dimension and matching_dimension.type != DimensionType.TIME:
-                    issues.append(
-                        ValidationError(
-                            context=DataSourceElementContext(
-                                file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                                data_source_element=DataSourceElementReference(
-                                    data_source_name=data_source.name, element_name=measure.name
+                if matching_dimension:
+                    # Check that it's a time dimension
+                    if matching_dimension.type != DimensionType.TIME:
+                        issues.append(
+                            ValidationError(
+                                context=DataSourceElementContext(
+                                    file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                                    data_source_element=DataSourceElementReference(
+                                        data_source_name=data_source.name, element_name=measure.name
+                                    ),
+                                    element_type=DataSourceElementType.MEASURE,
                                 ),
-                                element_type=DataSourceElementType.MEASURE,
-                            ),
-                            message=(
-                                f"Measure '{measure.name}' has a non_additive_dimension with name '{non_additive_dimension.name}' "
-                                f"that is defined as a categorical dimension which is not supported."
-                            ),
+                                message=(
+                                    f"Measure '{measure.name}' has a non_additive_dimension with name '{non_additive_dimension.name}' "
+                                    f"that is defined as a categorical dimension which is not supported."
+                                ),
+                            )
                         )
-                    )
+
+                    # Validates that the non_additive_dimension time_granularity is >= agg_time_dimension time_granularity
+                    if (
+                        matching_dimension.type_params
+                        and agg_time_dimension.type_params
+                        and (
+                            matching_dimension.type_params.time_granularity
+                            != agg_time_dimension.type_params.time_granularity
+                        )
+                    ):
+                        issues.append(
+                            ValidationError(
+                                context=DataSourceElementContext(
+                                    file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                                    data_source_element=DataSourceElementReference(
+                                        data_source_name=data_source.name, element_name=measure.name
+                                    ),
+                                    element_type=DataSourceElementType.MEASURE,
+                                ),
+                                message=(
+                                    f"Measure '{measure.name}' has a non_additive_dimension with name '{non_additive_dimension.name}' that has "
+                                    f"a base time granularity ({matching_dimension.type_params.time_granularity.name}) that is not equal to the measure's "
+                                    f"agg_time_dimension {agg_time_dimension.name} with a base granularity of ({agg_time_dimension.type_params.time_granularity.name})."
+                                ),
+                            )
+                        )
 
                 # Validates that the window_choice is either MIN/MAX
                 if non_additive_dimension.window_choice not in {AggregationType.MIN, AggregationType.MAX}:
