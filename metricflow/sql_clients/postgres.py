@@ -83,7 +83,7 @@ class PostgresSqlClient(SqlAlchemySqlClient):
 
     @property
     def sql_engine_attributes(self) -> SqlEngineAttributes:
-        """Collection of attributes and features specific to the Snowflake SQL engine"""
+        """Collection of attributes and features specific to the Postgres SQL engine"""
         return PostgresEngineAttributes()
 
     def cancel_submitted_queries(self) -> None:  # noqa: D

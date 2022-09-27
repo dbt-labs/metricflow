@@ -46,6 +46,7 @@ duckdb = "0.3.4"
 yamllint = "^1.26.3"
 click = ">=7.1.2"
 GitPython = "^3.1.27"
+databricks = "^0.2"
 
 [tool.poetry.dev-dependencies]
 pytest-mock = "^3.7.0"
