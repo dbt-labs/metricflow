@@ -214,6 +214,14 @@ class ReadSqlSourceNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
 
 
 @dataclass(frozen=True)
+class ValidityWindowJoinDescription:
+    """Encapsulates details about join constraints around validity windows"""
+
+    window_start_dimension: TimeDimensionSpec
+    window_end_dimension: TimeDimensionSpec
+
+
+@dataclass(frozen=True)
 class JoinDescription(Generic[SourceDataSetT]):
     """Describes how data from a node should be joined to data from another node."""
 
@@ -222,6 +230,8 @@ class JoinDescription(Generic[SourceDataSetT]):
 
     join_on_partition_dimensions: Tuple[PartitionDimensionJoinDescription, ...]
     join_on_partition_time_dimensions: Tuple[PartitionTimeDimensionJoinDescription, ...]
+
+    validity_window: Optional[ValidityWindowJoinDescription] = None
 
 
 class JoinToBaseOutputNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):

@@ -56,12 +56,17 @@ class ConsistentIdObjectRepository:
     composite_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]]
     composite_model_source_nodes: Sequence[BaseOutput[DataSourceDataSet]]
 
+    scd_model_data_sets: OrderedDict[str, DataSourceDataSet]
+    scd_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]]
+    scd_model_source_nodes: Sequence[BaseOutput[DataSourceDataSet]]
+
 
 @pytest.fixture(scope="session")
 def consistent_id_object_repository(
     simple_semantic_model: SemanticModel,
     multi_hop_join_semantic_model: SemanticModel,
     composite_identifier_semantic_model: SemanticModel,
+    scd_semantic_model: SemanticModel,
 ) -> ConsistentIdObjectRepository:  # noqa: D
     """Create objects that have incremental numeric IDs with a consistent value.
 
@@ -73,6 +78,7 @@ def consistent_id_object_repository(
         sm_data_sets = create_data_sets(simple_semantic_model)
         multihop_data_sets = create_data_sets(multi_hop_join_semantic_model)
         composite_data_sets = create_data_sets(composite_identifier_semantic_model)
+        scd_data_sets = create_data_sets(scd_semantic_model)
 
         return ConsistentIdObjectRepository(
             simple_model_data_sets=sm_data_sets,
@@ -83,6 +89,11 @@ def consistent_id_object_repository(
             composite_model_read_nodes=_data_set_to_read_nodes(composite_data_sets),
             composite_model_source_nodes=_data_set_to_source_nodes(
                 composite_identifier_semantic_model, composite_data_sets
+            ),
+            scd_model_data_sets=scd_data_sets,
+            scd_model_read_nodes=_data_set_to_read_nodes(scd_data_sets),
+            scd_model_source_nodes=_data_set_to_source_nodes(
+                semantic_model=scd_semantic_model, data_sets=scd_data_sets
             ),
         )
 

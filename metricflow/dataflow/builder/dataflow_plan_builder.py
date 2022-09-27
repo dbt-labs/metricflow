@@ -776,6 +776,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                     join_on_identifier=join_recipe.join_on_identifier,
                     join_on_partition_dimensions=join_recipe.join_on_partition_dimensions,
                     join_on_partition_time_dimensions=join_recipe.join_on_partition_time_dimensions,
+                    validity_window=join_recipe.validity_window,
                 )
             )
 

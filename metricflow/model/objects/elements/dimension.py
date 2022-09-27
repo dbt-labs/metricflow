@@ -72,3 +72,14 @@ class Dimension(HashableBaseModel, ModelWithMetadataParsing):
     def time_dimension_reference(self) -> TimeDimensionReference:  # noqa: D
         assert self.type == DimensionType.TIME, f"Got type as {self.type} instead of {DimensionType.TIME}"
         return TimeDimensionReference(element_name=self.name)
+
+    @property
+    def validity_info(self) -> Optional[DimensionValidityInfo]:
+        """Returns the DimensionValidityInfo property, if it exists.
+
+        This is to avoid repeatedly checking that type params is not None before doing anything with ValidityInfo
+        """
+        if self.type_params:
+            return self.type_params.validity_info
+
+        return None

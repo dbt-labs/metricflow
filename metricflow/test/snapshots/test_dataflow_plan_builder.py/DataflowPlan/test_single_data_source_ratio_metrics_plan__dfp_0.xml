@@ -46,7 +46,8 @@
                         <!--                           'element_name': 'listing',          -->
                         <!--                           'identifier_links': ()},            -->
                         <!--    'join_on_partition_dimensions': (),                        -->
-                        <!--    'join_on_partition_time_dimensions': ()}                   -->
+                        <!--    'join_on_partition_time_dimensions': (),                   -->
+                        <!--    'validity_window': None}                                   -->
                         <FilterElementsNode>
                             <!-- description =                                          -->
                             <!--   Pass Only Elements:                                  -->

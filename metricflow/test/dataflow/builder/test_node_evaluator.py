@@ -11,6 +11,7 @@ from metricflow.dataflow.builder.node_evaluator import (
     JoinLinkableInstancesRecipe,
 )
 from metricflow.dataflow.builder.partitions import PartitionTimeDimensionJoinDescription
+from metricflow.dataflow.dataflow_plan import ValidityWindowJoinDescription
 from metricflow.dataset.dataset import DataSet
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
@@ -482,6 +483,68 @@ def test_node_evaluator_with_partition_joined_spec(  # noqa: D
                             identifier_links=(),
                         ),
                     ),
+                ),
+            ),
+        ),
+        unjoinable_linkable_specs=(),
+    )
+
+
+def test_node_evaluator_with_scd_target(
+    consistent_id_object_repository: ConsistentIdObjectRepository,
+    scd_semantic_model: SemanticModel,
+    time_spine_source: TimeSpineSource,
+) -> None:
+    """Tests the case where the joined node is an SCD with a validity window filter"""
+
+    node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
+        column_association_resolver=DefaultColumnAssociationResolver(scd_semantic_model),
+        semantic_model=scd_semantic_model,
+        time_spine_source=time_spine_source,
+    )
+
+    source_nodes = tuple(consistent_id_object_repository.scd_model_read_nodes.values())
+
+    node_evaluator = NodeEvaluatorForLinkableInstances(
+        data_source_semantics=scd_semantic_model.data_source_semantics,
+        # Use all nodes in the simple model as candidates for joins.
+        nodes_available_for_joins=source_nodes,
+        node_data_set_resolver=node_data_set_resolver,
+    )
+
+    evaluation = node_evaluator.evaluate_node(
+        required_linkable_specs=[
+            DimensionSpec(
+                element_name="is_lux",
+                identifier_links=(IdentifierReference(element_name="listing"),),
+            )
+        ],
+        start_node=consistent_id_object_repository.scd_model_read_nodes["bookings_source"],
+    )
+
+    assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
+        local_linkable_specs=(),
+        joinable_linkable_specs=(
+            DimensionSpec(
+                element_name="is_lux",
+                identifier_links=(IdentifierReference(element_name="listing"),),
+            ),
+        ),
+        join_recipes=(
+            JoinLinkableInstancesRecipe(
+                node_to_join=consistent_id_object_repository.scd_model_read_nodes["listings"],
+                join_on_identifier=LinklessIdentifierSpec.from_element_name("listing"),
+                satisfiable_linkable_specs=[
+                    DimensionSpec(
+                        element_name="is_lux",
+                        identifier_links=(IdentifierReference(element_name="listing"),),
+                    ),
+                ],
+                join_on_partition_dimensions=(),
+                join_on_partition_time_dimensions=(),
+                validity_window=ValidityWindowJoinDescription(
+                    window_start_dimension=TimeDimensionSpec(element_name="window_start", identifier_links=()),
+                    window_end_dimension=TimeDimensionSpec(element_name="window_end", identifier_links=()),
                 ),
             ),
         ),
