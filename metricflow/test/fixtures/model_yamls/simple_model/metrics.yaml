@@ -227,6 +227,9 @@ metric:
   type: cumulative
   locked_metadata:
     value_format: "$$,.2f" # we need to double dollars here since string template reserves dollar sign.
+    tags:
+      - "Finance"
+      - "Monthly"
   type_params:
     measures:
       - txn_revenue
@@ -241,6 +244,8 @@ metric:
   constraint: lux_or_normal_listing != 'LUX_TEST_ID'
   locked_metadata:
     value_format: ""
+    tags:
+      - "Listings"
   type_params:
     measures:
       - listings
@@ -276,6 +281,9 @@ metric:
   type: expr
   locked_metadata:
     value_format: ",d"
+    tags:
+      - "Bookings"
+      - "Views"
   type_params:
     expr: "booking_value * views"
     measures:
@@ -293,6 +301,9 @@ metric:
     denominator: bookers
   locked_metadata:
     value_format: ",.2f"
+    tags:
+      - "Bookings"
+      - "Bookers"
 ---
 metric:
   name: bookings_per_view
@@ -305,6 +316,9 @@ metric:
     denominator: views
   locked_metadata:
     value_format: ",.2f"
+    tags:
+      - "Bookings"
+      - "Views"
 ---
 metric:
   name: bookings_per_listing
@@ -314,6 +328,9 @@ metric:
   type: ratio
   locked_metadata:
     value_format: ".2%"
+    tags:
+      - "Bookings"
+      - "Listings"
   type_params:
     numerator: bookings
     denominator: listings
@@ -326,6 +343,9 @@ metric:
   type: ratio
   locked_metadata:
     value_format: ".2%"
+    tags:
+      - "Bookings"
+      - "Finance"
   type_params:
     numerator: bookings
     denominator: booking_value
@@ -360,6 +380,8 @@ metric:
   type: ratio
   locked_metadata:
     value_format: ".2%"
+    tags:
+      - "Bookings"
   type_params:
     numerator:
       name: average_booking_value
@@ -377,6 +399,9 @@ metric:
   type: ratio
   locked_metadata:
     value_format: ".2%"
+    tags:
+      - "Bookings"
+      - "Lux"
   type_params:
     numerator:
       name: average_booking_value
@@ -394,6 +419,9 @@ metric:
   type: expr
   locked_metadata:
     value_format: ".2%"
+    tags:
+      - "Bookings"
+      - "Lux"
   type_params:
     expr: "average_booking_value * bookings / NULLIF(booking_value, 0)"
     measures:
@@ -413,6 +441,8 @@ metric:
   type: ratio
   locked_metadata:
     value_format: ".2%"
+    tags:
+      - "Bookings"
   type_params:
     numerator:
       name: booking_value
@@ -431,6 +461,8 @@ metric:
   type: ratio
   locked_metadata:
     value_format: ".2%"
+    tags:
+      - "Finance"
   type_params:
     numerator:
       name: total_account_balance_first_day
