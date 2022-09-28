@@ -57,7 +57,8 @@ def make_df(  # type: ignore [misc]
     )
 
 
-def make_sql_client(url: str, password: str) -> SqlClient:  # noqa: D
+def make_sql_client(url: str, password: str) -> SqlClient:
+    """Build SQL client based on env configs. Used only in tests."""
     if SqlDialect.DATABRICKS.value in url.split("://")[0]:
         dialect = SqlDialect.DATABRICKS
     else:
