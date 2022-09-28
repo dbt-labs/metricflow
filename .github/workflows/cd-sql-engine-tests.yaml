@@ -107,6 +107,39 @@ jobs:
           MF_SQL_ENGINE_URL: ${{ secrets.MF_BIGQUERY_URL }}
           MF_SQL_ENGINE_PASSWORD: ${{ secrets.MF_BIGQUERY_PWD }}
 
+  databricks-tests:
+    environment: DW_INTEGRATION_TESTS
+    name: Databricks Tests
+    if: ${{ github.event.action != 'labeled' || github.event.label.name == 'run_mf_sql_engine_tests' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check-out the repo
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ${{ env.pythonLocation }}
+            ~/.cache/pypoetry
+          key: ${{ env.pythonLocation }}-${{ hashFiles('metricflow/poetry.lock') }}
+
+      - name: Install Poetry
+        run: pip install poetry==1.1.15 && poetry config virtualenvs.create false
+
+      - name: Install Deps
+        run: cd metricflow && poetry install
+
+      - name: Run MetricFlow unit tests with Databricks configs
+        run: pytest metricflow/test/
+        env:
+          MF_SQL_ENGINE_URL: ${{ secrets.MF_DATABRICKS_URL }}
+          MF_SQL_ENGINE_PASSWORD: ${{ secrets.MF_DATABRICKS_PWD }}
+
   postgres-tests:
     name: PostgreSQL Tests
     if: ${{ github.event.action != 'labeled' || github.event.label.name == 'run_mf_sql_engine_tests' }}
