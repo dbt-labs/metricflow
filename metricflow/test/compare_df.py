@@ -26,6 +26,10 @@ def _dataframes_contain_same_data(
             elif isinstance(expected.iloc[c, r], float) and isinstance(actual.iloc[c, r], float):
                 if not math.isclose(expected.iloc[c, r], actual.iloc[c, r]):
                     return False
+            elif isinstance(expected.iloc[c, r], pd.Timestamp) and isinstance(actual.iloc[c, r], pd.Timestamp):
+                # Convert to UTC (if not already) and remove timezone. Some engines add tz UTC by default.
+                if actual.iloc[c, r].tz_convert(None) != expected.iloc[c, r]:
+                    return False
             elif expected.iloc[c, r] != actual.iloc[c, r]:
                 return False
     return True

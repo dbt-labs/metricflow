@@ -57,7 +57,6 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         self.http_path = http_path
         self.access_token = access_token
 
-    # TODO: why do we even need this method? just for tests? Shouldn't we use the same configs in tests as prod?
     @staticmethod
     def from_connection_details(url: str, password: Optional[str]) -> DatabricksSqlClient:  # noqa: D
         # Is the input format right for this? What's normal for databricks users?
@@ -93,7 +92,7 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
     def _engine_specific_query_implementation(self, stmt: str, bind_params: SqlBindParameters) -> pd.DataFrame:
         with self.get_connection() as connection:  # this syntax might not close itself automatically
             with connection.cursor() as cursor:
-                cursor.execute(operation=stmt, parameters=bind_params.param_dict)
+                cursor.execute(operation=stmt, parameters=dict(bind_params.param_dict))
                 logger.info("Fetching query results as PyArrow Table.")
                 pyarrow_df = cursor.fetchall_arrow()
 
@@ -111,7 +110,18 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
 
     def _engine_specific_dry_run_implementation(self, stmt: str, bind_params: SqlBindParameters) -> None:
         """Check that query will run successfully without actually running the query, error if not."""
-        self._engine_specific_execute_implementation(stmt=f"EXPLAIN {stmt}", bind_params=bind_params)
+        stmt = f"EXPLAIN {stmt}"
+
+        with self.get_connection() as connection:
+            with connection.cursor() as cursor:
+                logger.info(f"Executing SQL statment: {stmt}")
+                cursor.execute(operation=stmt, parameters=bind_params.param_dict)
+
+                # If the plan contains errors, they won't be raised. Parse plan string to find & raise errors.
+                result = str(cursor.fetchall_arrow()["plan"][0])
+                if "org.apache.spark.sql.AnalysisException" in result:
+                    error = result.split("== Physical Plan ==")[1].split(";")[0]
+                    raise sql.exc.ServerOperationError(error)
 
     # TODO: this is VERYYY SLOWWWWW.
     def create_table_from_dataframe(  # noqa: D

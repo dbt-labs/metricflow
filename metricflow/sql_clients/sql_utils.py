@@ -59,13 +59,10 @@ def make_df(  # type: ignore [misc]
 
 def make_sql_client(url: str, password: str) -> SqlClient:
     """Build SQL client based on env configs. Used only in tests."""
-    if SqlDialect.DATABRICKS.value in url.split("://")[0]:
-        dialect = SqlDialect.DATABRICKS
-    else:
-        dialect_protocol = make_url(url).drivername.split("+")
-        dialect = SqlDialect(dialect_protocol[0])
-        if len(dialect_protocol) > 2:
-            raise ValueError(f"Invalid # of +'s in {url}")
+    dialect_protocol = make_url(url.split(";")[0]).drivername.split("+")
+    dialect = SqlDialect(dialect_protocol[0])
+    if len(dialect_protocol) > 2:
+        raise ValueError(f"Invalid # of +'s in {url}")
 
     if dialect == SqlDialect.REDSHIFT:
         return RedshiftSqlClient.from_connection_details(url, password)

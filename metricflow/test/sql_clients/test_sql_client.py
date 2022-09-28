@@ -142,10 +142,7 @@ def _issue_sleep_query(sql_client: SqlClient, sleep_time: int) -> None:
     engine_type = sql_client.sql_engine_attributes.sql_engine_type
     if engine_type == SupportedSqlEngine.SNOWFLAKE:
         sql_client.execute(f"CALL system$wait({sleep_time}, 'SECONDS')")
-    elif engine_type in (
-        SupportedSqlEngine.BIGQUERY,
-        SupportedSqlEngine.REDSHIFT,
-    ):
+    elif engine_type in (SupportedSqlEngine.BIGQUERY, SupportedSqlEngine.REDSHIFT, SupportedSqlEngine.DATABRICKS):
         raise RuntimeError(f"Sleep yet not supported with {engine_type}")
 
     assert_values_exhausted(engine_type)
@@ -160,6 +157,7 @@ def _supports_sleep_query(sql_client: SqlClient) -> bool:
         SupportedSqlEngine.DUCKDB,
         SupportedSqlEngine.BIGQUERY,
         SupportedSqlEngine.REDSHIFT,
+        SupportedSqlEngine.DATABRICKS,
     ):
         return False
 
