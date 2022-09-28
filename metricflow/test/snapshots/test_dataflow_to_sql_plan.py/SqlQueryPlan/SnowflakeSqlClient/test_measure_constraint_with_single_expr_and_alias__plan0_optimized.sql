@@ -12,7 +12,6 @@ FROM (
     , SUM(bookings) AS delayed_bookings
   FROM (
     -- Read Elements From Data Source 'bookings_source'
-    -- Pass Only Additive Measures
     -- Metric Time Dimension 'ds'
     -- Pass Only Elements:
     --   ['bookings', 'is_instant', 'metric_time']
@@ -24,8 +23,8 @@ FROM (
       -- User Defined SQL Query
       SELECT * FROM ***************************.fct_bookings
     ) bookings_source_src_10001
-  ) subq_10
+  ) subq_8
   WHERE NOT is_instant
   GROUP BY
     metric_time
-) subq_13
+) subq_11

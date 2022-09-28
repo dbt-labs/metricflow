@@ -5,11 +5,11 @@
         <!-- sql_query =                                                                               -->
         <!--   -- Combine Metrics                                                                      -->
         <!--   SELECT                                                                                  -->
-        <!--     COALESCE(subq_15.ds, subq_16.ds, subq_17.ds) AS ds                                    -->
-        <!--     , COALESCE(subq_15.is_instant, subq_16.is_instant, subq_17.is_instant) AS is_instant  -->
-        <!--     , subq_15.bookings AS bookings                                                        -->
-        <!--     , subq_16.instant_bookings AS instant_bookings                                        -->
-        <!--     , subq_17.booking_value AS booking_value                                              -->
+        <!--     COALESCE(subq_12.ds, subq_13.ds, subq_14.ds) AS ds                                    -->
+        <!--     , COALESCE(subq_12.is_instant, subq_13.is_instant, subq_14.is_instant) AS is_instant  -->
+        <!--     , subq_12.bookings AS bookings                                                        -->
+        <!--     , subq_13.instant_bookings AS instant_bookings                                        -->
+        <!--     , subq_14.booking_value AS booking_value                                              -->
         <!--   FROM (                                                                                  -->
         <!--     -- Aggregate Measures                                                                 -->
         <!--     -- Compute Metrics via Expressions                                                    -->
@@ -19,7 +19,6 @@
         <!--       , SUM(bookings) AS bookings                                                         -->
         <!--     FROM (                                                                                -->
         <!--       -- Read Elements From Data Source 'bookings_source'                                 -->
-        <!--       -- Pass Only Additive Measures                                                      -->
         <!--       -- Metric Time Dimension 'ds'                                                       -->
         <!--       -- Pass Only Elements:                                                              -->
         <!--       --   ['bookings', 'is_instant', 'ds']                                               -->
@@ -31,11 +30,11 @@
         <!--         -- User Defined SQL Query                                                         -->
         <!--         SELECT * FROM ***************************.fct_bookings                            -->
         <!--       ) bookings_source_src_10001                                                         -->
-        <!--     ) subq_3                                                                              -->
+        <!--     ) subq_2                                                                              -->
         <!--     GROUP BY                                                                              -->
         <!--       ds                                                                                  -->
         <!--       , is_instant                                                                        -->
-        <!--   ) subq_15                                                                               -->
+        <!--   ) subq_12                                                                               -->
         <!--   FULL OUTER JOIN (                                                                       -->
         <!--     -- Aggregate Measures                                                                 -->
         <!--     -- Compute Metrics via Expressions                                                    -->
@@ -45,7 +44,6 @@
         <!--       , SUM(instant_bookings) AS instant_bookings                                         -->
         <!--     FROM (                                                                                -->
         <!--       -- Read Elements From Data Source 'bookings_source'                                 -->
-        <!--       -- Pass Only Additive Measures                                                      -->
         <!--       -- Metric Time Dimension 'ds'                                                       -->
         <!--       -- Pass Only Elements:                                                              -->
         <!--       --   ['instant_bookings', 'is_instant', 'ds']                                       -->
@@ -57,20 +55,19 @@
         <!--         -- User Defined SQL Query                                                         -->
         <!--         SELECT * FROM ***************************.fct_bookings                            -->
         <!--       ) bookings_source_src_10001                                                         -->
-        <!--     ) subq_8                                                                              -->
+        <!--     ) subq_6                                                                              -->
         <!--     GROUP BY                                                                              -->
         <!--       ds                                                                                  -->
         <!--       , is_instant                                                                        -->
-        <!--   ) subq_16                                                                               -->
+        <!--   ) subq_13                                                                               -->
         <!--   ON                                                                                      -->
         <!--     (                                                                                     -->
-        <!--       subq_15.is_instant = subq_16.is_instant                                             -->
+        <!--       subq_12.is_instant = subq_13.is_instant                                             -->
         <!--     ) AND (                                                                               -->
-        <!--       subq_15.ds = subq_16.ds                                                             -->
+        <!--       subq_12.ds = subq_13.ds                                                             -->
         <!--     )                                                                                     -->
         <!--   FULL OUTER JOIN (                                                                       -->
         <!--     -- Read Elements From Data Source 'bookings_source'                                   -->
-        <!--     -- Pass Only Additive Measures                                                        -->
         <!--     -- Metric Time Dimension 'ds'                                                         -->
         <!--     -- Pass Only Elements:                                                                -->
         <!--     --   ['booking_value', 'is_instant', 'ds']                                            -->
@@ -87,12 +84,12 @@
         <!--     GROUP BY                                                                              -->
         <!--       ds                                                                                  -->
         <!--       , is_instant                                                                        -->
-        <!--   ) subq_17                                                                               -->
+        <!--   ) subq_14                                                                               -->
         <!--   ON                                                                                      -->
         <!--     (                                                                                     -->
-        <!--       COALESCE(subq_15.is_instant, subq_16.is_instant) = subq_17.is_instant               -->
+        <!--       COALESCE(subq_12.is_instant, subq_13.is_instant) = subq_14.is_instant               -->
         <!--     ) AND (                                                                               -->
-        <!--       COALESCE(subq_15.ds, subq_16.ds) = subq_17.ds                                       -->
+        <!--       COALESCE(subq_12.ds, subq_13.ds) = subq_14.ds                                       -->
         <!--     )                                                                                     -->
     </SelectSqlQueryToDataFrameTask>
 </ExecutionPlan>

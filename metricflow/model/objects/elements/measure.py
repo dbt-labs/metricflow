@@ -14,7 +14,9 @@ class NonAdditiveDimensionParameters(HashableBaseModel):
     """
 
     name: str
-    window_choice: AggregationType
+
+    # Optional Fields
+    window_choice: AggregationType = AggregationType.MIN
     window_groupings: List[str] = []
 
 

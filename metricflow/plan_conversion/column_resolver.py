@@ -1,6 +1,7 @@
 import logging
-from typing import Tuple
+from typing import Optional, Tuple
 
+from metricflow.aggregation_properties import AggregationState
 from metricflow.column_assoc import (
     SingleColumnCorrelationKey,
     ColumnAssociation,
@@ -48,7 +49,9 @@ class DefaultColumnAssociationResolver(ColumnAssociationResolver):
             single_column_correlation_key=SingleColumnCorrelationKey(),
         )
 
-    def resolve_time_dimension_spec(self, time_dimension_spec: TimeDimensionSpec) -> ColumnAssociation:  # noqa: D
+    def resolve_time_dimension_spec(  # noqa: D
+        self, time_dimension_spec: TimeDimensionSpec, aggregation_state: Optional[AggregationState] = None
+    ) -> ColumnAssociation:
         if time_dimension_spec.time_granularity == TimeGranularity.DAY:
             column_name = StructuredLinkableSpecName(
                 identifier_link_names=tuple(x.element_name for x in time_dimension_spec.identifier_links),
@@ -62,7 +65,7 @@ class DefaultColumnAssociationResolver(ColumnAssociationResolver):
             ).qualified_name
 
         return ColumnAssociation(
-            column_name=column_name,
+            column_name=column_name + (f"__{aggregation_state.value.lower()}" if aggregation_state else ""),
             single_column_correlation_key=SingleColumnCorrelationKey(),
         )
 

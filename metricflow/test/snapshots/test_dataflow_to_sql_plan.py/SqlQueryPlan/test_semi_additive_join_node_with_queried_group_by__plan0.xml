@@ -1,0 +1,168 @@
+<SqlQueryPlan>
+    <SqlSelectStatementNode>
+        <!-- description = Join on MIN(ds) and [] grouping by ds -->
+        <!-- node_id = ss_1 -->
+        <!-- col0 =                                                  -->
+        <!--   {'class': 'SqlSelectColumn',                          -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_8),  -->
+        <!--    'column_alias': 'ds'}                                -->
+        <!-- col1 =                                                  -->
+        <!--   {'class': 'SqlSelectColumn',                          -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_9),  -->
+        <!--    'column_alias': 'ds__week'}                          -->
+        <!-- col2 =                                                   -->
+        <!--   {'class': 'SqlSelectColumn',                           -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10),  -->
+        <!--    'column_alias': 'ds__month'}                          -->
+        <!-- col3 =                                                   -->
+        <!--   {'class': 'SqlSelectColumn',                           -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_11),  -->
+        <!--    'column_alias': 'ds__quarter'}                        -->
+        <!-- col4 =                                                   -->
+        <!--   {'class': 'SqlSelectColumn',                           -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_12),  -->
+        <!--    'column_alias': 'ds__year'}                           -->
+        <!-- col5 =                                                   -->
+        <!--   {'class': 'SqlSelectColumn',                           -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_13),  -->
+        <!--    'column_alias': 'user'}                               -->
+        <!-- col6 =                                                  -->
+        <!--   {'class': 'SqlSelectColumn',                          -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_7),  -->
+        <!--    'column_alias': 'account_type'}                      -->
+        <!-- col7 =                                                  -->
+        <!--   {'class': 'SqlSelectColumn',                          -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_4),  -->
+        <!--    'column_alias': 'account_balance'}                   -->
+        <!-- col8 =                                                  -->
+        <!--   {'class': 'SqlSelectColumn',                          -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_5),  -->
+        <!--    'column_alias': 'total_account_balance_first_day'}   -->
+        <!-- col9 =                                                  -->
+        <!--   {'class': 'SqlSelectColumn',                          -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_6),  -->
+        <!--    'column_alias': 'current_account_balance_by_user'}   -->
+        <!-- from_source = SqlSelectStatementNode(node_id=ss_10000) -->
+        <!-- join_0 =                                                    -->
+        <!--   {'class': 'SqlJoinDescription',                           -->
+        <!--    'right_source': SqlSelectStatementNode(node_id=ss_0),    -->
+        <!--    'right_source_alias': 'subq_2',                          -->
+        <!--    'on_condition': SqlComparisonExpression(node_id=cmp_0),  -->
+        <!--    'join_type': SqlJoinType.INNER}                          -->
+        <!-- where = None -->
+        <SqlSelectStatementNode>
+            <!-- description = Read Elements From Data Source 'accounts_source' -->
+            <!-- node_id = ss_10000 -->
+            <!-- col0 =                                                      -->
+            <!--   {'class': 'SqlSelectColumn',                              -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10000),  -->
+            <!--    'column_alias': 'account_balance'}                       -->
+            <!-- col1 =                                                      -->
+            <!--   {'class': 'SqlSelectColumn',                              -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10001),  -->
+            <!--    'column_alias': 'total_account_balance_first_day'}       -->
+            <!-- col2 =                                                      -->
+            <!--   {'class': 'SqlSelectColumn',                              -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10002),  -->
+            <!--    'column_alias': 'current_account_balance_by_user'}       -->
+            <!-- col3 =                                                      -->
+            <!--   {'class': 'SqlSelectColumn',                              -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10003),  -->
+            <!--    'column_alias': 'ds'}                                    -->
+            <!-- col4 =                                                -->
+            <!--   {'class': 'SqlSelectColumn',                        -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10000),  -->
+            <!--    'column_alias': 'ds__week'}                        -->
+            <!-- col5 =                                                -->
+            <!--   {'class': 'SqlSelectColumn',                        -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10001),  -->
+            <!--    'column_alias': 'ds__month'}                       -->
+            <!-- col6 =                                                -->
+            <!--   {'class': 'SqlSelectColumn',                        -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10002),  -->
+            <!--    'column_alias': 'ds__quarter'}                     -->
+            <!-- col7 =                                                -->
+            <!--   {'class': 'SqlSelectColumn',                        -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10003),  -->
+            <!--    'column_alias': 'ds__year'}                        -->
+            <!-- col8 =                                                      -->
+            <!--   {'class': 'SqlSelectColumn',                              -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10008),  -->
+            <!--    'column_alias': 'account_type'}                          -->
+            <!-- col9 =                                                      -->
+            <!--   {'class': 'SqlSelectColumn',                              -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10009),  -->
+            <!--    'column_alias': 'user'}                                  -->
+            <!-- from_source = SqlSelectQueryFromClauseNode(node_id=tfc_10000) -->
+            <!-- where = None -->
+            <SqlSelectQueryFromClauseNode>
+                <!-- description = Read From a Select Query -->
+                <!-- node_id = tfc_10000 -->
+            </SqlSelectQueryFromClauseNode>
+        </SqlSelectStatementNode>
+        <SqlSelectStatementNode>
+            <!-- description = Filter row on MIN(ds) -->
+            <!-- node_id = ss_0 -->
+            <!-- col0 =                                                              -->
+            <!--   {'class': 'SqlSelectColumn',                                      -->
+            <!--    'expr': SqlFunctionExpression(node_id=fnc_0, sql_function=MIN),  -->
+            <!--    'column_alias': 'ds__complete'}                                  -->
+            <!-- from_source = SqlSelectStatementNode(node_id=ss_10000) -->
+            <!-- group_by0 =                                             -->
+            <!--   {'class': 'SqlSelectColumn',                          -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_1),  -->
+            <!--    'column_alias': 'ds__week'}                          -->
+            <!-- where = None -->
+            <SqlSelectStatementNode>
+                <!-- description = Read Elements From Data Source 'accounts_source' -->
+                <!-- node_id = ss_10000 -->
+                <!-- col0 =                                                      -->
+                <!--   {'class': 'SqlSelectColumn',                              -->
+                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10000),  -->
+                <!--    'column_alias': 'account_balance'}                       -->
+                <!-- col1 =                                                      -->
+                <!--   {'class': 'SqlSelectColumn',                              -->
+                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10001),  -->
+                <!--    'column_alias': 'total_account_balance_first_day'}       -->
+                <!-- col2 =                                                      -->
+                <!--   {'class': 'SqlSelectColumn',                              -->
+                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10002),  -->
+                <!--    'column_alias': 'current_account_balance_by_user'}       -->
+                <!-- col3 =                                                      -->
+                <!--   {'class': 'SqlSelectColumn',                              -->
+                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10003),  -->
+                <!--    'column_alias': 'ds'}                                    -->
+                <!-- col4 =                                                -->
+                <!--   {'class': 'SqlSelectColumn',                        -->
+                <!--    'expr': SqlDateTruncExpression(node_id=dt_10000),  -->
+                <!--    'column_alias': 'ds__week'}                        -->
+                <!-- col5 =                                                -->
+                <!--   {'class': 'SqlSelectColumn',                        -->
+                <!--    'expr': SqlDateTruncExpression(node_id=dt_10001),  -->
+                <!--    'column_alias': 'ds__month'}                       -->
+                <!-- col6 =                                                -->
+                <!--   {'class': 'SqlSelectColumn',                        -->
+                <!--    'expr': SqlDateTruncExpression(node_id=dt_10002),  -->
+                <!--    'column_alias': 'ds__quarter'}                     -->
+                <!-- col7 =                                                -->
+                <!--   {'class': 'SqlSelectColumn',                        -->
+                <!--    'expr': SqlDateTruncExpression(node_id=dt_10003),  -->
+                <!--    'column_alias': 'ds__year'}                        -->
+                <!-- col8 =                                                      -->
+                <!--   {'class': 'SqlSelectColumn',                              -->
+                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10008),  -->
+                <!--    'column_alias': 'account_type'}                          -->
+                <!-- col9 =                                                      -->
+                <!--   {'class': 'SqlSelectColumn',                              -->
+                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10009),  -->
+                <!--    'column_alias': 'user'}                                  -->
+                <!-- from_source = SqlSelectQueryFromClauseNode(node_id=tfc_10000) -->
+                <!-- where = None -->
+                <SqlSelectQueryFromClauseNode>
+                    <!-- description = Read From a Select Query -->
+                    <!-- node_id = tfc_10000 -->
+                </SqlSelectQueryFromClauseNode>
+            </SqlSelectStatementNode>
+        </SqlSelectStatementNode>
+    </SqlSelectStatementNode>
+</SqlQueryPlan>

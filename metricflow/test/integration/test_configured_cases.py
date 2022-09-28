@@ -205,7 +205,8 @@ def test_case(
     )
 
     actual = query_result.result_df
-
+    print(actual)
+    print(query_result.sql)
     expected = sql_client.query(
         jinja2.Template(case.check_query, undefined=jinja2.StrictUndefined,).render(
             source_schema=mf_test_session_state.mf_source_schema,

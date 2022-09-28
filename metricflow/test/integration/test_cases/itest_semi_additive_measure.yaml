@@ -1,6 +1,6 @@
 ---
 integration_test:
-  name: semi_additive_measure_query_with_grouping
+  name: semi_additive_measure_query_with_identifier_grouping
   description: Tests selecting a measure with semi additive properties with a window_grouping
   model: SIMPLE_MODEL
   metrics: ["current_account_balance_by_user"]
@@ -48,7 +48,10 @@ integration_test:
     INNER JOIN (
       SELECT
         MIN(ds) AS ds
+        , {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time
       FROM {{ source_schema }}.fct_accounts
+      GROUP BY
+        metric_time
     ) b
     ON
       a.ds = b.ds
@@ -106,3 +109,119 @@ integration_test:
     WHERE user__home_state_latest = 'CA'
     GROUP BY
       e.user
+---
+integration_test:
+  name: semi_additive_measure_query_with_group_by_window
+  description: Tests selecting a semi-additive measure with a group by window
+  model: SIMPLE_MODEL
+  metrics: ["total_account_balance_first_day"]
+  group_bys: ["ds__week"]
+  check_query: |
+    SELECT
+      a.ds__week
+      , SUM(a.total_account_balance_first_day) AS total_account_balance_first_day
+    FROM (
+      SELECT
+        ds
+        , {{ render_date_trunc("ds", TimeGranularity.WEEK) }} AS ds__week
+        , account_balance AS total_account_balance_first_day
+      FROM {{ source_schema }}.fct_accounts
+    ) a
+    INNER JOIN (
+      SELECT
+        MIN(ds) AS ds
+        , {{ render_date_trunc("ds", TimeGranularity.WEEK) }} AS ds__week
+      FROM {{ source_schema }}.fct_accounts
+      GROUP BY
+        ds__week
+    ) b
+    ON
+      a.ds = b.ds
+    GROUP BY
+      a.ds__week
+---
+integration_test:
+  name: semi_additive_measure_query_with_where_constraint
+  description: Tests selecting a semi-additive measure with where_constraint
+  model: SIMPLE_MODEL
+  metrics: ["current_account_balance_by_user"]
+  group_bys: ["user"]
+  where_constraint: "account_type = 'savings'"
+  check_query: |
+    SELECT
+      b.user AS user
+      , SUM(b.current_account_balance_by_user) AS current_account_balance_by_user
+    FROM (
+      SELECT
+        ds
+        , a.user
+        , current_account_balance_by_user
+      FROM (
+        SELECT
+          ds
+          , user_id AS user
+          , account_type
+          , account_balance AS current_account_balance_by_user
+        FROM {{ source_schema }}.fct_accounts
+      ) a
+      WHERE account_type = 'savings'
+    ) b
+    INNER JOIN (
+      SELECT
+        c.user
+        , MAX(ds) AS ds__complete
+      FROM (
+        SELECT
+          ds
+          , user_id AS user
+          , account_type
+        FROM {{ source_schema }}.fct_accounts
+      ) c
+      WHERE account_type = 'savings'
+      GROUP BY
+        c.user
+    ) d
+    ON
+      (b.ds = d.ds__complete) AND (b.user = d.user)
+    GROUP BY
+      b.user
+---
+integration_test:
+  name: semi_additive_measure_query_with_where_time_constraint
+  description: Tests selecting a semi-additive measure with a time constraint written as a where clause
+  model: SIMPLE_MODEL
+  metrics: ["total_account_balance_first_day"]
+  group_bys: ["account_type"]
+  where_constraint: "ds >= '2020-01-03'"
+  check_query: |
+    SELECT
+      b.account_type AS account_type
+      , SUM(b.total_account_balance_first_day) AS total_account_balance_first_day
+    FROM (
+      SELECT
+        ds
+        , account_type
+        , total_account_balance_first_day
+      FROM (
+        SELECT
+          ds
+          , account_type
+          , account_balance AS total_account_balance_first_day
+        FROM {{ source_schema }}.fct_accounts
+      ) a
+      WHERE ds >= '2020-01-03'
+    ) b
+    INNER JOIN (
+      SELECT
+        MIN(ds) AS ds__complete
+      FROM (
+        SELECT
+          ds
+        FROM {{ source_schema }}.fct_accounts
+      ) c
+      WHERE ds >= '2020-01-03'
+    ) d
+    ON
+      b.ds = d.ds__complete
+    GROUP BY
+      b.account_type

@@ -86,6 +86,10 @@ class DataSourceSemanticsAccessor(Protocol):
         raise NotImplementedError
 
     @abstractmethod
+    def get_agg_time_dimension_for_measure(self, measure_reference: MeasureReference) -> TimeDimensionReference:
+        """Retrieves the aggregate time dimension that is associated with the measure reference"""
+
+    @abstractmethod
     def get_identifier_in_data_source(self, ref: DataSourceElementReference) -> Optional[Identifier]:
         """Retrieve the identifier matching the element -> data source mapping, if any"""
         raise NotImplementedError

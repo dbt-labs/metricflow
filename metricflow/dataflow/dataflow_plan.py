@@ -454,11 +454,38 @@ class SemiAdditiveJoinNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
     | date       | account_balance | user |                             | date       | account_balance | user |
     |:-----------|-----------------|-----:|     identifier_specs:       |:-----------|-----------------|-----:|
     | 2019-12-31 |            1000 |    u1|       - user                | 2020-01-03 |            2000 |    u1|
-    | 2020-01-03 |            2000 |    u1| ->  time_dimension_spec: -> | 2020-01-11              1500 |    u2|
+    | 2020-01-03 |            2000 |    u1| ->  time_dimension_spec: -> | 2020-01-12              1500 |    u2|
     | 2020-01-09 |            3000 |    u2|       - date                | 2020-01-12 |            1000 |    u3|
-    | 2020-01-11 |            1500 |    u2|     agg_by_function:
+    | 2020-01-12 |            1500 |    u2|     agg_by_function:
     | 2020-01-12 |            1000 |    u3|       - MAX
 
+
+    Similarly, if we don't provide any identifier_specs, it would end up performing the aggregation filter only on the
+    time_dimension_spec without any grouping by any identifiers.
+
+    Data transformation example,
+    | date       | account_balance | user |                             | date       | account_balance |
+    |:-----------|-----------------|-----:|     identifier_specs:       |:-----------|----------------:|
+    | 2019-12-31 |            1000 |    u1|                             | 2020-01-12 |            2500 |
+    | 2020-01-03 |            2000 |    u1| ->  time_dimension_spec: ->
+    | 2020-01-09 |            3000 |    u2|       - date
+    | 2020-01-12 |            1500 |    u2|     agg_by_function:
+    | 2020-01-12 |            1000 |    u3|       - MAX
+
+
+    Additionally, we can aggregate against 'windows' of a dataset. For example, if we group by a non_additive time dimension,
+    we perform the MIN/MAX filtering on the granularity window provided in that group by instead of the full time range.
+
+    Data transformation example,
+    | date       | account_balance | user |                                  | date       | account_balance |
+    |:-----------|-----------------|-----:|     identifier_specs:            |:-----------|----------------:|
+    | 2019-12-31 |            1500 |    u1|     time_dimension_spec:         | 2019-12-31 |            1500 |
+    | 2020-01-03 |            2000 |    u1| ->    - date                  -> | 2020-01-07 |            3000 |
+    | 2020-01-09 |            3000 |    u2|     agg_by_function:             | 2020-01-14 |            3250 |
+    | 2020-01-12 |            1500 |    u2|       - MIN
+    | 2020-01-14 |            1250 |    u3|     queried_time_dimension_spec:
+    | 2020-01-14 |            2000 |    u2|       - date__week
+    | 2020-01-15 |            4000 |    u1|
     """
 
     def __init__(
@@ -467,6 +494,7 @@ class SemiAdditiveJoinNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
         identifier_specs: Sequence[LinklessIdentifierSpec],
         time_dimension_spec: TimeDimensionSpec,
         agg_by_function: AggregationType,
+        queried_time_dimension_spec: Optional[TimeDimensionSpec] = None,
     ) -> None:
         """Constructor.
 
@@ -475,11 +503,13 @@ class SemiAdditiveJoinNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
             identifier_specs: the identifiers to group the join by
             time_dimension_spec: the time dimension used for row filtering via an aggregation
             agg_by_function: the aggregation function used on the time dimension
+            queried_time_dimension_spec: The group by provided in the query used to build the windows we want to filter on.
         """
         self._parent_node = parent_node
         self._identifier_specs = identifier_specs
         self._time_dimension_spec = time_dimension_spec
         self._agg_by_function = agg_by_function
+        self._queried_time_dimension_spec = queried_time_dimension_spec
 
         # Doing a list comprehension throws a type error, so doing it this way.
         parent_nodes: List[DataflowPlanNode[SourceDataSetT]] = [self._parent_node]
@@ -494,7 +524,7 @@ class SemiAdditiveJoinNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
 
     @property
     def description(self) -> str:  # noqa: D
-        return f"""Join on {self.agg_by_function.name}({self.time_dimension_spec.element_name}) and {[i.element_name for i in self.identifier_specs]}"""
+        return f"""Join on {self.agg_by_function.name}({self.time_dimension_spec.element_name}) and {[i.element_name for i in self.identifier_specs]} grouping by {self.queried_time_dimension_spec.element_name if self.queried_time_dimension_spec else None}"""
 
     @property
     def parent_node(self) -> BaseOutput[SourceDataSetT]:  # noqa: D
@@ -511,6 +541,10 @@ class SemiAdditiveJoinNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
     @property
     def agg_by_function(self) -> AggregationType:  # noqa: D
         return self._agg_by_function
+
+    @property
+    def queried_time_dimension_spec(self) -> Optional[TimeDimensionSpec]:  # noqa: D
+        return self._queried_time_dimension_spec
 
     @property
     def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D

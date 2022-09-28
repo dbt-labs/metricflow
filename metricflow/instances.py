@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from enum import Enum
 from typing import List, TypeVar, Generic, Tuple
 
+from metricflow.aggregation_properties import AggregationState
 from metricflow.column_assoc import ColumnAssociation
 from metricflow.dataclass_serialization import SerializableDataclass
 from metricflow.specs import (
@@ -102,18 +102,6 @@ class MdoInstance(ABC, Generic[SpecT]):
 class DataSourceElementInstance(SerializableDataclass):  # noqa: D
     # This instance is derived from something defined in a data source.
     defined_from: Tuple[DataSourceElementReference, ...]
-
-
-class AggregationState(Enum):
-    """Represents how the measure is aggregated."""
-
-    # When reading from the source, the measure is considered non-aggregated.
-    NON_AGGREGATED = "NON_AGGREGATED"
-    PARTIAL = "PARTIAL"
-    COMPLETE = "COMPLETE"
-
-    def __repr__(self) -> str:  # noqa: D
-        return f"{self.__class__.__name__}.{self.name}"
 
 
 @dataclass(frozen=True)

@@ -36,8 +36,8 @@ def test_cross_element_names(simple_model__pre_transforms: UserConfiguredModel) 
 
     # We update the matching categorical dimension by reference for convenience
     ds_measure_x_dimension.get_dimension(dimension_reference).name = measure_reference.element_name
-    ds_measure_x_identifier.identifiers[1].name = measure_reference.element_name
-    ds_dimension_x_identifier.identifiers[1].name = dimension_reference.element_name
+    ds_measure_x_identifier.identifiers[0].name = measure_reference.element_name
+    ds_dimension_x_identifier.identifiers[0].name = dimension_reference.element_name
 
     model.data_sources[usable_ds_index] = ds_measure_x_dimension
     with pytest.raises(
