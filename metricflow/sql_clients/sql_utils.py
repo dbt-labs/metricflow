@@ -24,6 +24,7 @@ from metricflow.sql_clients.duckdb import DuckDbSqlClient
 from metricflow.sql_clients.postgres import PostgresSqlClient
 from metricflow.sql_clients.redshift import RedshiftSqlClient
 from metricflow.sql_clients.snowflake import SnowflakeSqlClient
+from metricflow.sql_clients.databricks import DatabricksSqlClient
 
 
 def make_df(  # type: ignore [misc]
@@ -57,10 +58,13 @@ def make_df(  # type: ignore [misc]
 
 
 def make_sql_client(url: str, password: str) -> SqlClient:  # noqa: D
-    dialect_protocol = make_url(url).drivername.split("+")
-    dialect = SqlDialect(dialect_protocol[0])
-    if len(dialect_protocol) > 2:
-        raise ValueError(f"Invalid # of +'s in {url}")
+    if SqlDialect.DATABRICKS.value in url.split("://")[0]:
+        dialect = SqlDialect.DATABRICKS
+    else:
+        dialect_protocol = make_url(url).drivername.split("+")
+        dialect = SqlDialect(dialect_protocol[0])
+        if len(dialect_protocol) > 2:
+            raise ValueError(f"Invalid # of +'s in {url}")
 
     if dialect == SqlDialect.REDSHIFT:
         return RedshiftSqlClient.from_connection_details(url, password)
@@ -72,6 +76,8 @@ def make_sql_client(url: str, password: str) -> SqlClient:  # noqa: D
         return PostgresSqlClient.from_connection_details(url, password)
     elif dialect == SqlDialect.DUCKDB:
         return DuckDbSqlClient.from_connection_details(url, password)
+    elif dialect == SqlDialect.DATABRICKS:
+        return DatabricksSqlClient.from_connection_details(url, password)
     else:
         raise ValueError(f"Unknown dialect: `{dialect}` in URL {url}")
 

@@ -1,8 +1,11 @@
+from __future__ import annotations
 from typing import Optional, List, ClassVar
 import pandas as pd
 import logging
 import time
-from databricks import sql, Connection
+import sqlalchemy
+from databricks import sql
+from metricflow.sql_clients.common_client import SqlDialect
 from metricflow.sql_clients.base_sql_client_implementation import BaseSqlClientImplementation
 from metricflow.protocols.sql_client import SqlEngineAttributes, SupportedSqlEngine
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
@@ -36,14 +39,40 @@ class DatabricksEngineAttributes(SqlEngineAttributes):
 
 
 # TODO: support both cluster and SQL warehouse connection. SQL warehouse is prob what we have now? pending Jordan
-class Databricks(BaseSqlClientImplementation):
+class DatabricksSqlClient(BaseSqlClientImplementation):
     """Client used to connect to Databricks engine."""
 
+    def __init__(self, host: str, http_path: str, access_token: str) -> None:
+        self.host = host
+        self.http_path = http_path
+        self.access_token = access_token
+
+    @staticmethod
+    def from_connection_details(url: str, password: Optional[str]) -> DatabricksSqlClient:  # noqa: D
+        # Is the input format right for this? What's normal for databricks users?
+        try:
+            url, http_path = url.split(";")  # TODO: there might not only be http path in there
+            parsed_url = sqlalchemy.engine.url.make_url(url)
+        except:  # which exceptions to swallow?
+            # What type of exception to raise?
+            raise ValueError("Unexpected url format. Expected: `databricks://<HOST>:443;HttpPath=<HTTP PATH>")
+
+        dialect = SqlDialect.DATABRICKS.value
+        if parsed_url.drivername != dialect:
+            raise ValueError(f"Expected dialect '{dialect}' in {url}")
+
+        if not password:
+            raise ValueError(f"Password not supplied for {url}")
+        
+        if not parsed_url.host:
+            raise ValueError(f"Host not provided.")
+
+        return DatabricksSqlClient(host=parsed_url.host, http_path=http_path, access_token=password)
+
     @property
-    def get_connection(self) -> Connection:
+    def get_connection(self):
         """Get connection to Databricks cluster/warehouse."""
-        # TODO
-        return sql.connect(server_hostname="", http_path="", access_token="")
+        return sql.connect(server_hostname=self.host, http_path=self.http_path, access_token=self.access_token)
 
     @property
     def sql_engine_attributes(self) -> SqlEngineAttributes:
@@ -98,3 +127,6 @@ class Databricks(BaseSqlClientImplementation):
                 return [
                     table.TABLE_NAME for table in cursor.fetchall()
                 ]  # will this close itself if I return before close?
+
+    def cancel_submitted_queries(self) -> None:
+        pass

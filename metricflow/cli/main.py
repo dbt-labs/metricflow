@@ -33,6 +33,7 @@ from metricflow.cli.utils import (
     start_end_time_options,
     generate_duckdb_demo_keys,
     MF_POSTGRESQL_KEYS,
+    MF_DATABRICKS_KEYS,
 )
 from metricflow.configuration.config_builder import YamlTemplateBuilder
 from metricflow.dataflow.sql_table import SqlTable
@@ -144,6 +145,7 @@ def setup(cfg: CLIContext, restart: bool) -> None:
             SqlDialect.REDSHIFT.value: MF_REDSHIFT_KEYS,
             SqlDialect.POSTGRESQL.value: MF_POSTGRESQL_KEYS,
             SqlDialect.DUCKDB.value: generate_duckdb_demo_keys(config_dir=cfg.config.dir_path),
+            SqlDialect.DATABRICKS.value: MF_DATABRICKS_KEYS,
         }
 
         click.echo("Please enter your data warehouse dialect.")
