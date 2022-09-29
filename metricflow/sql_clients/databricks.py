@@ -16,13 +16,6 @@ from metricflow.sql.render.databricks import DatabricksSqlQueryPlanRenderer
 logger = logging.getLogger(__name__)
 
 HTTP_PATH_KEY = "httppath="
-PYARROW_TO_SQL_DTYPES = {
-    "string": "string",
-    "double": "double",
-    "bool": "boolean",
-    "int64": "int",
-    "timestamp[ns]": "timestamp",
-}
 PANDAS_TO_SQL_DTYPES = {
     "object": "string",
     "float64": "double",
@@ -44,7 +37,8 @@ class DatabricksEngineAttributes(SqlEngineAttributes):
     multi_threading_supported: ClassVar[bool] = True
     timestamp_type_supported: ClassVar[bool] = True
     timestamp_to_string_comparison_supported: ClassVar[bool] = True
-    cancel_submitted_queries_supported: ClassVar[bool] = True
+    # So far the only clear way to cancel a query is through the Databricks UI.
+    cancel_submitted_queries_supported: ClassVar[bool] = False
 
     # SQL Dialect replacement strings
     double_data_type_name: ClassVar[str] = "DOUBLE"
@@ -66,14 +60,16 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
     def from_connection_details(url: str, password: Optional[str]) -> DatabricksSqlClient:  # noqa: D
         """Parse MF_SQL_ENGINE_URL & MF_SQL_ENGINE_PASSWORD into useful connection params.
 
-        Note that this is only used in test. Using just these 2 env variables ensures uniformity across engines.
+        Using just these 2 env variables ensures uniformity across engines.
         """
         try:
-            split_url = url.split(";")  # TODO: there might not only be http path in there
+            split_url = url.split(";")
             parsed_url = sqlalchemy.engine.url.make_url(split_url[0])
-            for piece in split_url:
+            http_path = ""
+            for piece in split_url[1:]:
                 if HTTP_PATH_KEY in piece.lower():
                     __, http_path = piece.split("=")
+                    break
             dialect = SqlDialect.DATABRICKS.value
             if not http_path or parsed_url.drivername != dialect or not parsed_url.host:
                 raise ValueError
@@ -99,11 +95,11 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
 
     @staticmethod
     def params_or_none(bind_params: SqlBindParameters) -> Optional[Dict[str, str]]:
-        """If there are no parameters, use None to prevent collition with `%` wildcard."""
+        """If there are no parameters, use None to prevent collision with `%` wildcard."""
         return None if bind_params == SqlBindParameters() else bind_params.param_dict
 
     def _engine_specific_query_implementation(self, stmt: str, bind_params: SqlBindParameters) -> pd.DataFrame:
-        with self.get_connection() as connection:  # this syntax might not close itself automatically
+        with self.get_connection() as connection:
             with connection.cursor() as cursor:
                 cursor.execute(operation=stmt, parameters=self.params_or_none(bind_params))
                 logger.info("Fetching query results as PyArrow Table.")
@@ -145,9 +141,6 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         start_time = time.time()
         with self.get_connection() as connection:
             with connection.cursor() as cursor:
-                # TODO: if this piece is slow, trash it and use pandas dtypes
-                # pyarrow_df = pyarrow.Table.from_pandas(df)
-
                 # Create table
                 columns = df.columns
                 columns_to_insert = []
@@ -163,6 +156,7 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
                     for cell in row:
                         if type(cell) in [str, pd.Timestamp]:
                             # Wrap cell in quotes & escape existing single quotes
+                            # TODO: check on this, link to docs
                             cells.append(f"""'{str(cell).replace("'", '"')}'""")
                         else:
                             cells.append(str(cell))
@@ -177,7 +171,6 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
                 cursor.tables(schema_name=schema_name)
                 return [table.TABLE_NAME for table in cursor.fetchall()]
 
-    # TODO?
     def cancel_submitted_queries(self) -> None:  # noqa: D
         pass
 
