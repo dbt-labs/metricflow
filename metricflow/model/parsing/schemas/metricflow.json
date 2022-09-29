@@ -321,6 +321,12 @@
                 "increase_is_good": {
                     "type": "boolean"
                 },
+                "tags": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
                 "tier": {
                     "type": [
                         "string",
