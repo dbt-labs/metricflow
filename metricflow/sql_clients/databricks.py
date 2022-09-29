@@ -3,7 +3,6 @@ from typing import Optional, List, ClassVar, Dict
 import pandas as pd
 import logging
 import time
-import pyarrow
 import sqlalchemy
 from databricks import sql
 from metricflow.sql_clients.common_client import SqlDialect
@@ -23,6 +22,13 @@ PYARROW_TO_SQL_DTYPES = {
     "bool": "boolean",
     "int64": "int",
     "timestamp[ns]": "timestamp",
+}
+PANDAS_TO_SQL_DTYPES = {
+    "object": "string",
+    "float64": "double",
+    "bool": "boolean",
+    "int64": "int",
+    "datetime64[ns]": "timestamp",
 }
 
 
@@ -140,17 +146,15 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         start_time = time.time()
         with self.get_connection() as connection:
             with connection.cursor() as cursor:
-                pyarrow_df = pyarrow.Table.from_pandas(
-                    df
-                )  # TODO: if this piece is slow, trash it and use pandas dtypes
+                # TODO: if this piece is slow, trash it and use pandas dtypes
+                # pyarrow_df = pyarrow.Table.from_pandas(df)
 
                 # Create table
-                columns = [col for col in pyarrow_df.itercolumns()]
-                column_names = pyarrow_df.column_names
+                columns = df.columns
                 columns_to_insert = []
-                for i in range(pyarrow_df.num_columns):
+                for i in range(len(df.columns)):
                     # Format as "column_name column_type"
-                    columns_to_insert.append(f"{column_names[i]} {PYARROW_TO_SQL_DTYPES[str(columns[i].type)]}")
+                    columns_to_insert.append(f"{columns[i]} {PANDAS_TO_SQL_DTYPES[str(df[columns[i]].dtype)]}")
                 cursor.execute(f"CREATE TABLE IF NOT EXISTS {sql_table.sql} ({', '.join(columns_to_insert)})")
 
                 # Insert rows
@@ -174,6 +178,7 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
                 cursor.tables(schema_name=schema_name)
                 return [table.TABLE_NAME for table in cursor.fetchall()]
 
+    # TODO?
     def cancel_submitted_queries(self) -> None:  # noqa: D
         pass
 
