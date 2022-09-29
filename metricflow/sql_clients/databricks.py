@@ -132,11 +132,9 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
                     error = result.split("== Physical Plan ==")[1].split(";")[0]
                     raise sql.exc.ServerOperationError(error)
 
-    # TODO: this is VERYYY SLOWWWWW.
     def create_table_from_dataframe(  # noqa: D
         self, sql_table: SqlTable, df: pd.DataFrame, chunk_size: Optional[int] = None
     ) -> None:
-        # TODO: chunk size?? or just raise error if it's not used
         logger.info(f"Creating table '{sql_table.sql}' from a DataFrame with {df.shape[0]} row(s)")
         start_time = time.time()
         with self.get_connection() as connection:
@@ -156,8 +154,8 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
                     for cell in row:
                         if type(cell) in [str, pd.Timestamp]:
                             # Wrap cell in quotes & escape existing single quotes
-                            # TODO: check on this, link to docs
-                            cells.append(f"""'{str(cell).replace("'", '"')}'""")
+                            escaped_cell = str(cell).replace("'", "\\'")
+                            cells.append(f"'{escaped_cell}'")
                         else:
                             cells.append(str(cell))
                     values.append(f"({', '.join(cells)})")
