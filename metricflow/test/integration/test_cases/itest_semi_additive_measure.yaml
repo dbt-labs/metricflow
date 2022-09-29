@@ -115,30 +115,30 @@ integration_test:
   description: Tests selecting a semi-additive measure with a group by window
   model: SIMPLE_MODEL
   metrics: ["total_account_balance_first_day"]
-  group_bys: ["ds__week"]
+  group_bys: ["metric_time__week"]
   check_query: |
     SELECT
-      a.ds__week
+      a.metric_time__week
       , SUM(a.total_account_balance_first_day) AS total_account_balance_first_day
     FROM (
       SELECT
         ds
-        , {{ render_date_trunc("ds", TimeGranularity.WEEK) }} AS ds__week
+        , {{ render_date_trunc("ds", TimeGranularity.WEEK) }} AS metric_time__week
         , account_balance AS total_account_balance_first_day
       FROM {{ source_schema }}.fct_accounts
     ) a
     INNER JOIN (
       SELECT
         MIN(ds) AS ds
-        , {{ render_date_trunc("ds", TimeGranularity.WEEK) }} AS ds__week
+        , {{ render_date_trunc("ds", TimeGranularity.WEEK) }} AS metric_time__week
       FROM {{ source_schema }}.fct_accounts
       GROUP BY
-        ds__week
+        metric_time__week
     ) b
     ON
       a.ds = b.ds
     GROUP BY
-      a.ds__week
+      a.metric_time__week
 ---
 integration_test:
   name: semi_additive_measure_query_with_where_constraint
