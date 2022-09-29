@@ -32,6 +32,7 @@ def new_metric_semantics(  # Noqa: D
 
 def test_get_names(new_data_source_semantics: DataSourceSemantics) -> None:  # noqa: D
     expected = [
+        "account_type",
         "booking_paid_at",
         "capacity_latest",
         "company_name",

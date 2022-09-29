@@ -3,6 +3,7 @@ import re
 from dataclasses import dataclass
 from typing import Optional, List, Tuple, Sequence
 
+from metricflow.aggregation_properties import AggregationState
 from metricflow.dag.id_generation import IdGeneratorRegistry
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
@@ -14,7 +15,6 @@ from metricflow.instances import (
     IdentifierInstance,
     InstanceSet,
     DataSourceReference,
-    AggregationState,
 )
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType

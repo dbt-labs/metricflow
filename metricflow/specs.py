@@ -14,7 +14,7 @@ from abc import ABC, abstractmethod
 from collections import OrderedDict
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple, TypeVar, Generic, Any
-from metricflow.aggregation_properties import AggregationType
+from metricflow.aggregation_properties import AggregationType, AggregationState
 
 from metricflow.column_assoc import ColumnAssociation
 from metricflow.constraints.time_constraint import TimeRangeConstraint
@@ -56,7 +56,9 @@ class ColumnAssociationResolver(ABC):
         pass
 
     @abstractmethod
-    def resolve_time_dimension_spec(self, time_dimension_spec: TimeDimensionSpec) -> ColumnAssociation:  # noqa: D
+    def resolve_time_dimension_spec(  # noqa: D
+        self, time_dimension_spec: TimeDimensionSpec, aggregation_state: Optional[AggregationState] = None
+    ) -> ColumnAssociation:
         pass
 
     @abstractmethod
@@ -300,6 +302,15 @@ class NonAdditiveDimensionSpec(SerializableDataclass):
         values.extend(sorted(self.window_groupings))
         return hash_strings(values)
 
+    @property
+    def as_time_dimension_spec(self) -> TimeDimensionSpec:  # noqa: D
+        return TimeDimensionSpec.from_name(self.name)
+
+    def __eq__(self, other: Any) -> bool:  # type: ignore[misc] # noqa: D
+        if not isinstance(other, NonAdditiveDimensionSpec):
+            return False
+        return self.bucket_hash == other.bucket_hash
+
 
 @dataclass(frozen=True)
 class MeasureSpec(InstanceSpec):  # noqa: D
@@ -326,6 +337,16 @@ class MeasureSpec(InstanceSpec):  # noqa: D
     @property
     def as_reference(self) -> MeasureReference:  # noqa: D
         return MeasureReference(element_name=self.element_name)
+
+    @property
+    def linkable_specs(self) -> LinkableSpecSet:  # noqa: D
+        return LinkableSpecSet(
+            dimension_specs=(),
+            time_dimension_specs=(self.non_additive_dimension_spec.as_time_dimension_spec,)
+            if self.non_additive_dimension_spec
+            else (),
+            identifier_specs=(),
+        )
 
 
 @dataclass(frozen=True)

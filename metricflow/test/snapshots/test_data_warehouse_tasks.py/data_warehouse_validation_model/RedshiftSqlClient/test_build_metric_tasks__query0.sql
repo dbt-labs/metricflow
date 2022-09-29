@@ -5,7 +5,6 @@ SELECT
   , SUM(count_dogs) AS count_dogs
 FROM (
   -- Read Elements From Data Source 'animals'
-  -- Pass Only Additive Measures
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements:
   --   ['count_dogs', 'metric_time']
@@ -15,6 +14,6 @@ FROM (
   FROM (
     SELECT * FROM ***************************.fct_animals
   ) animals_src_0
-) subq_3
+) subq_2
 GROUP BY
   metric_time

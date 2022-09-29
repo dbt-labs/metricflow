@@ -3,6 +3,7 @@ import re
 
 import pytest
 from metricflow.aggregation_properties import AggregationType
+from metricflow.model.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from metricflow.model.objects.elements.measure import Measure, NonAdditiveDimensionParameters
 from metricflow.model.objects.metric import Metric, MetricInputMeasure, MetricType, MetricTypeParams
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
@@ -10,6 +11,7 @@ from metricflow.model.model_validator import ModelValidator
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.object_utils import flatten_nested_sequence
 from metricflow.test.test_utils import find_data_source_with
+from metricflow.time.time_granularity import TimeGranularity
 
 
 def test_metric_missing_measure(simple_model__pre_transforms: UserConfiguredModel) -> None:
@@ -247,10 +249,25 @@ def test_invalid_non_additive_dimension_properties(simple_model__pre_transforms:
         ),
         agg_time_dimension="ds",
     )
+    invalid_measure3 = Measure(
+        name="bad_measure3",
+        agg=AggregationType.SUM,
+        non_additive_dimension=NonAdditiveDimensionParameters(
+            name="weekly_time",  # Not same base granularity as agg_time_dimension
+            window_choice=AggregationType.MIN,
+        ),
+        agg_time_dimension="ds",
+    )
+    weekly_time_dimension = Dimension(
+        name="weekly_time",
+        type=DimensionType.TIME,
+        type_params=DimensionTypeParams(time_granularity=TimeGranularity.WEEK),
+    )
     data_source_with_measures = find_data_source_with(model, lambda data_source: data_source.name == "bookings_source")[
         0
     ]
-    data_source_with_measures.measures.extend([invalid_measure, invalid_measure2])  # type: ignore
+    data_source_with_measures.dimensions.extend([weekly_time_dimension])  # type: ignore
+    data_source_with_measures.measures.extend([invalid_measure, invalid_measure2, invalid_measure3])  # type: ignore
     build = ModelValidator().validate_model(model)
     expected_error_substring_1 = (
         f"that is not defined as a dimension in data source '{data_source_with_measures.name}'."
@@ -258,12 +275,14 @@ def test_invalid_non_additive_dimension_properties(simple_model__pre_transforms:
     expected_error_substring_2 = "has a non_additive_dimension with an invalid 'window_choice'"
     expected_error_substring_3 = "has a non_additive_dimension with an invalid 'window_groupings'"
     expected_error_substring_4 = "that is defined as a categorical dimension which is not supported."
+    expected_error_substring_5 = "that is not equal to the measure's agg_time_dimension"
     missing_error_strings = set()
     for expected_str in [
         expected_error_substring_1,
         expected_error_substring_2,
         expected_error_substring_3,
         expected_error_substring_4,
+        expected_error_substring_5,
     ]:
         if not any(actual_str.as_readable_str().find(expected_str) != -1 for actual_str in build.issues.errors):
             missing_error_strings.add(expected_str)
