@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Optional, List, ClassVar
+from typing import Optional, List, ClassVar, Dict
 import pandas as pd
 import logging
 import time
@@ -91,10 +91,16 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         """Databricks engine attributes."""
         return DatabricksEngineAttributes()
 
+    @staticmethod
+    def params_or_none(bind_params: SqlBindParameters) -> Optional[Dict[str, str]]:
+        """If there are no parameters, use None to prevent collition with `%` wildcard."""
+        return None if bind_params == SqlBindParameters() else bind_params.param_dict
+
     def _engine_specific_query_implementation(self, stmt: str, bind_params: SqlBindParameters) -> pd.DataFrame:
         with self.get_connection() as connection:  # this syntax might not close itself automatically
             with connection.cursor() as cursor:
-                cursor.execute(operation=stmt, parameters=dict(bind_params.param_dict))
+                print(self.params_or_none(bind_params))
+                cursor.execute(operation=stmt, parameters=self.params_or_none(bind_params))
                 logger.info("Fetching query results as PyArrow Table.")
                 pyarrow_df = cursor.fetchall_arrow()
 
@@ -108,7 +114,7 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         with self.get_connection() as connection:
             with connection.cursor() as cursor:
                 logger.info(f"Executing SQL statment: {stmt}")
-                cursor.execute(operation=stmt, parameters=bind_params.param_dict)
+                cursor.execute(operation=stmt, parameters=self.params_or_none(bind_params))
 
     def _engine_specific_dry_run_implementation(self, stmt: str, bind_params: SqlBindParameters) -> None:
         """Check that query will run successfully without actually running the query, error if not."""
@@ -117,7 +123,7 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         with self.get_connection() as connection:
             with connection.cursor() as cursor:
                 logger.info(f"Executing SQL statment: {stmt}")
-                cursor.execute(operation=stmt, parameters=bind_params.param_dict)
+                cursor.execute(operation=stmt, parameters=self.params_or_none(bind_params))
 
                 # If the plan contains errors, they won't be raised. Parse plan string to find & raise errors.
                 result = str(cursor.fetchall_arrow()["plan"][0])
@@ -129,6 +135,7 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
     def create_table_from_dataframe(  # noqa: D
         self, sql_table: SqlTable, df: pd.DataFrame, chunk_size: Optional[int] = None
     ) -> None:
+        # TODO: chunk size?? or just raise error if it's not used
         logger.info(f"Creating table '{sql_table.sql}' from a DataFrame with {df.shape[0]} row(s)")
         start_time = time.time()
         with self.get_connection() as connection:

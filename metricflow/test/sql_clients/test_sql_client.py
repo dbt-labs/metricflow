@@ -96,8 +96,8 @@ def test_table_exists(mf_test_session_state: MetricFlowTestSessionState, sql_cli
     assert sql_client.table_exists(sql_table)
 
 
-# TODO: Does not work with Databricks
-def test_percent_signs_in_query(sql_client: SqlClient) -> None:  # noqa: D
+def test_percent_signs_in_query(sql_client: SqlClient) -> None:
+    """Note: this only syntax works for Datbricks if no execution params are passed."""
     stmt = "SELECT foo FROM ( SELECT 'abba' AS foo ) source0 WHERE foo LIKE '%a'"
     sql_client.query(stmt)
     df = sql_client.query(stmt)

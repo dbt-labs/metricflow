@@ -87,6 +87,7 @@ MF_DATABRICKS_KEYS = (
     ConfigKey(key=CONFIG_DWH_HTTP_PATH),
     ConfigKey(key=CONFIG_DWH_HOST),
     ConfigKey(key=CONFIG_DWH_ACCESS_TOKEN),
+    ConfigKey(key=CONFIG_DWH_DIALECT, value=SqlDialect.DATABRICKS.value),
 )
 
 
