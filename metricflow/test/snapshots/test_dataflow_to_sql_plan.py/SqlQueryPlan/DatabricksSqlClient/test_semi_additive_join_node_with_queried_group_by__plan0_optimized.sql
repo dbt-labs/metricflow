@@ -1,4 +1,4 @@
--- Join on MIN(ds) and [] grouping by None
+-- Join on MIN(ds) and [] grouping by ds
 SELECT
   subq_3.ds AS ds
   , subq_3.ds__week AS ds__week
@@ -37,6 +37,8 @@ INNER JOIN (
     -- User Defined SQL Query
     SELECT * FROM ***************************.fct_accounts
   ) accounts_source_src_10000
+  GROUP BY
+    DATE_TRUNC('week', ds)
 ) subq_5
 ON
   subq_3.ds = subq_5.ds__complete

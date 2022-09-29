@@ -105,7 +105,6 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
     def _engine_specific_query_implementation(self, stmt: str, bind_params: SqlBindParameters) -> pd.DataFrame:
         with self.get_connection() as connection:  # this syntax might not close itself automatically
             with connection.cursor() as cursor:
-                print(self.params_or_none(bind_params))
                 cursor.execute(operation=stmt, parameters=self.params_or_none(bind_params))
                 logger.info("Fetching query results as PyArrow Table.")
                 pyarrow_df = cursor.fetchall_arrow()

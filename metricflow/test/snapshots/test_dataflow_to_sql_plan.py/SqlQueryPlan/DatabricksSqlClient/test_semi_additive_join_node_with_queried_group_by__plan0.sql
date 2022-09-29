@@ -1,4 +1,4 @@
--- Join on MAX(ds) and ['user'] grouping by None
+-- Join on MIN(ds) and [] grouping by ds
 SELECT
   subq_0.ds AS ds
   , subq_0.ds__week AS ds__week
@@ -29,10 +29,9 @@ FROM (
   ) accounts_source_src_10000
 ) subq_0
 INNER JOIN (
-  -- Filter row on MAX(ds)
+  -- Filter row on MIN(ds)
   SELECT
-    subq_1.user
-    , MAX(subq_1.ds) AS ds__complete
+    MIN(subq_1.ds) AS ds__complete
   FROM (
     -- Read Elements From Data Source 'accounts_source'
     SELECT
@@ -52,7 +51,7 @@ INNER JOIN (
     ) accounts_source_src_10000
   ) subq_1
   GROUP BY
-    subq_1.user
+    subq_1.ds__week
 ) subq_2
 ON
-  (subq_0.ds = subq_2.ds__complete) AND (subq_0.user = subq_2.user)
+  subq_0.ds = subq_2.ds__complete

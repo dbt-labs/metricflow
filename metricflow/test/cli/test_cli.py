@@ -47,7 +47,6 @@ def test_list_metrics(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
 
 def test_get_dimension_values(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
     resp = cli_runner.run(get_dimension_values, args=["--metric-name", "bookings", "--dimension-name", "is_instant"])
-
     actual_output_lines = sorted(resp.output.split("\n"))
     assert ["", "• False", "• True"] == actual_output_lines
     assert resp.exit_code == 0
