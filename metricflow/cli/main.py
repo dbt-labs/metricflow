@@ -152,7 +152,7 @@ def setup(cfg: CLIContext, restart: bool) -> None:
         click.echo("Use 'duckdb' for a standalone demo.")
         click.echo("")
         dialect = click.prompt(
-            "Dialect!!!",
+            "Dialect",
             type=click.Choice(sorted([x for x in dialect_map.keys()])),
             show_choices=True,
         )
