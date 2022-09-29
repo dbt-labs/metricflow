@@ -28,7 +28,7 @@ def _dataframes_contain_same_data(
                     return False
             elif isinstance(expected.iloc[c, r], pd.Timestamp) and isinstance(actual.iloc[c, r], pd.Timestamp):
                 # Convert to UTC (if not already) and remove timezone. Some engines add tz UTC by default.
-                if actual.iloc[c, r].tz_convert(None) != expected.iloc[c, r]:
+                if actual.iloc[c, r].tz_convert(None) != expected.iloc[c, r].tz_convert(None):
                     return False
             elif expected.iloc[c, r] != actual.iloc[c, r]:
                 return False

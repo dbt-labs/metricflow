@@ -144,6 +144,11 @@ class SqlClient(Protocol):
         """Cancel queries submitted through this client (that may be still running) with best-effort."""
         raise NotImplementedError
 
+    @abstractmethod
+    def render_execution_param_key(self, execution_param_key: str) -> str:
+        """Wrap execution parameter key with syntax accepted by engine."""
+        raise NotImplementedError
+
 
 class SqlEngineAttributes(Protocol):
     """Base interface for SQL engine-specific attributes and features

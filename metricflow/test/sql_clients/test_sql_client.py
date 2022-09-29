@@ -38,7 +38,7 @@ def test_query(sql_client: SqlClient) -> None:  # noqa: D
 
 
 def test_query_with_execution_params(sql_client: SqlClient) -> None:  # noqa: D
-    expr = "SELECT :x as y"
+    expr = f"SELECT {sql_client.render_execution_param_key('x')} as y"
     sql_execution_params = SqlBindParameters()
     sql_execution_params.param_dict = OrderedDict([("x", "1")])
     df = sql_client.query(expr, sql_bind_parameters=sql_execution_params)
@@ -55,7 +55,7 @@ def test_select_one_query(sql_client: SqlClient) -> None:  # noqa: D
 
 
 def test_failed_query_with_execution_params(sql_client: SqlClient) -> None:  # noqa: D
-    expr = "SELECT :x"
+    expr = f"SELECT {sql_client.render_execution_param_key('x')}"
     sql_execution_params = SqlBindParameters()
     sql_execution_params.param_dict = OrderedDict([("x", "1")])
 
@@ -96,6 +96,7 @@ def test_table_exists(mf_test_session_state: MetricFlowTestSessionState, sql_cli
     assert sql_client.table_exists(sql_table)
 
 
+# TODO: Does not work with Databricks
 def test_percent_signs_in_query(sql_client: SqlClient) -> None:  # noqa: D
     stmt = "SELECT foo FROM ( SELECT 'abba' AS foo ) source0 WHERE foo LIKE '%a'"
     sql_client.query(stmt)

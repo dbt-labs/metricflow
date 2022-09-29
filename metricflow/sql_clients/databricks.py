@@ -167,3 +167,7 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
 
     def cancel_submitted_queries(self) -> None:  # noqa: D
         pass
+
+    def render_execution_param_key(self, execution_param_key: str) -> str:
+        """Wrap execution parameter key with syntax accepted by engine."""
+        return f"%({execution_param_key})s"
