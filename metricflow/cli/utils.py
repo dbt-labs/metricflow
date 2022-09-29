@@ -26,7 +26,7 @@ from metricflow.configuration.constants import (
     CONFIG_EMAIL,
     CONFIG_MODEL_PATH,
     CONFIG_DWH_HTTP_PATH,
-    CONFIG_DWH_TOKEN,
+    CONFIG_DWH_ACCESS_TOKEN,
 )
 from metricflow.sql_clients.common_client import SqlDialect
 
@@ -86,7 +86,7 @@ MF_SNOWFLAKE_KEYS = (
 MF_DATABRICKS_KEYS = (
     ConfigKey(key=CONFIG_DWH_HTTP_PATH),
     ConfigKey(key=CONFIG_DWH_HOST),
-    ConfigKey(key=CONFIG_DWH_TOKEN),
+    ConfigKey(key=CONFIG_DWH_ACCESS_TOKEN),
 )
 
 

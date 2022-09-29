@@ -15,6 +15,8 @@ from metricflow.configuration.constants import (
     CONFIG_DWH_PROJECT_ID,
     CONFIG_DWH_USER,
     CONFIG_DWH_WAREHOUSE,
+    CONFIG_DWH_ACCESS_TOKEN,
+    CONFIG_DWH_HTTP_PATH,
 )
 from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.protocols.sql_client import SqlClient
@@ -143,6 +145,11 @@ def make_sql_client_from_config(handler: YamlFileHandler) -> SqlClient:
             password=password,
             database=database,
         )
+    elif dialect == SqlDialect.DATABRICKS.value:
+        host = not_empty(handler.get_value(CONFIG_DWH_HOST), CONFIG_DWH_HOST, url)
+        access_token = not_empty(handler.get_value(CONFIG_DWH_ACCESS_TOKEN), CONFIG_DWH_ACCESS_TOKEN, url)
+        http_path = not_empty(handler.get_value(CONFIG_DWH_HTTP_PATH), CONFIG_DWH_HTTP_PATH, url)
+        return DatabricksSqlClient(host=host, access_token=access_token, http_path=http_path)
     else:
         supported_dialects = [x.value for x in SqlDialect]
         raise ValueError(f"Invalid dialect '{dialect}', must be one of {supported_dialects} in {url}")
