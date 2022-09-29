@@ -48,7 +48,6 @@ class DatabricksEngineAttributes(SqlEngineAttributes):
     sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer] = DatabricksSqlQueryPlanRenderer()
 
 
-# TODO: support both cluster and SQL warehouse connection. SQL warehouse is prob what we have now? pending Jordan
 class DatabricksSqlClient(BaseSqlClientImplementation):
     """Client used to connect to Databricks engine."""
 
@@ -59,7 +58,10 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
 
     @staticmethod
     def from_connection_details(url: str, password: Optional[str]) -> DatabricksSqlClient:  # noqa: D
-        # Is the input format right for this? What's normal for databricks users?
+        """Parse MF_SQL_ENGINE_URL & MF_SQL_ENGINE_PASSWORD into useful connection params.
+
+        Note that this is only used in test. Using just these 2 env variables ensures uniformity across engines.
+        """
         try:
             split_url = url.split(";")  # TODO: there might not only be http path in there
             parsed_url = sqlalchemy.engine.url.make_url(split_url[0])
