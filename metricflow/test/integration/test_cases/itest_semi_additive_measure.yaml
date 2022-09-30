@@ -30,6 +30,40 @@ integration_test:
       a.user
 ---
 integration_test:
+  name: semi_additive_measure_query_with_identifier_grouping_no_group_by
+  description: |
+    Tests selecting a measure with semi additive properties with a window_grouping that are not in the query group by
+  model: SIMPLE_MODEL
+  metrics: ["current_account_balance_by_user"]
+  group_bys: ["metric_time__week"]
+  check_query: |
+    SELECT
+      a.metric_time__week
+      , SUM(a.current_account_balance_by_user) AS current_account_balance_by_user
+    FROM (
+      SELECT
+        ds
+        , {{ render_date_trunc("ds", TimeGranularity.WEEK) }} AS metric_time__week
+        , user_id AS user
+        , account_balance AS current_account_balance_by_user
+      FROM {{ source_schema }}.fct_accounts
+    ) a
+    INNER JOIN (
+      SELECT
+        user_id AS user
+        , {{ render_date_trunc("ds", TimeGranularity.WEEK) }} AS metric_time__week
+        , MAX(ds) AS ds
+      FROM {{ source_schema }}.fct_accounts
+      GROUP BY
+        metric_time__week
+        , user_id
+    ) b
+    ON
+      a.ds = b.ds AND a.user = b.user
+    GROUP BY
+      a.metric_time__week
+---
+integration_test:
   name: semi_additive_measure_query
   description: Tests selecting a measure with semi additive properties
   model: SIMPLE_MODEL
