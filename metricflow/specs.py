@@ -303,8 +303,14 @@ class NonAdditiveDimensionSpec(SerializableDataclass):
         return hash_strings(values)
 
     @property
-    def as_time_dimension_spec(self) -> TimeDimensionSpec:  # noqa: D
-        return TimeDimensionSpec.from_name(self.name)
+    def linkable_specs(self) -> LinkableSpecSet:  # noqa: D
+        return LinkableSpecSet(
+            dimension_specs=(),
+            time_dimension_specs=(TimeDimensionSpec.from_name(self.name),),
+            identifier_specs=tuple(
+                LinklessIdentifierSpec.from_element_name(identifier_name) for identifier_name in self.window_groupings
+            ),
+        )
 
     def __eq__(self, other: Any) -> bool:  # type: ignore[misc] # noqa: D
         if not isinstance(other, NonAdditiveDimensionSpec):
@@ -337,16 +343,6 @@ class MeasureSpec(InstanceSpec):  # noqa: D
     @property
     def as_reference(self) -> MeasureReference:  # noqa: D
         return MeasureReference(element_name=self.element_name)
-
-    @property
-    def linkable_specs(self) -> LinkableSpecSet:  # noqa: D
-        return LinkableSpecSet(
-            dimension_specs=(),
-            time_dimension_specs=(self.non_additive_dimension_spec.as_time_dimension_spec,)
-            if self.non_additive_dimension_spec
-            else (),
-            identifier_specs=(),
-        )
 
 
 @dataclass(frozen=True)

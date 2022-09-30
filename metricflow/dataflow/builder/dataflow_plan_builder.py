@@ -658,10 +658,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             )
         if non_additive_dimension_spec:
             extraneous_linkable_specs = LinkableSpecSet.merge(
-                (
-                    extraneous_linkable_specs,
-                    LinkableSpecSet(time_dimension_specs=(non_additive_dimension_spec.as_time_dimension_spec,)),
-                )
+                (extraneous_linkable_specs, non_additive_dimension_spec.linkable_specs)
             )
 
         required_linkable_specs = LinkableSpecSet.merge((queried_linkable_specs, extraneous_linkable_specs))
