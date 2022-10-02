@@ -25,6 +25,8 @@ from metricflow.configuration.constants import (
     CONFIG_DWH_WAREHOUSE,
     CONFIG_EMAIL,
     CONFIG_MODEL_PATH,
+    CONFIG_DWH_HTTP_PATH,
+    CONFIG_DWH_ACCESS_TOKEN,
 )
 from metricflow.sql_clients.common_client import SqlDialect
 
@@ -51,7 +53,7 @@ MF_BIGQUERY_KEYS = (
     ConfigKey(key=CONFIG_DWH_DIALECT, value=SqlDialect.BIGQUERY.value),
 )
 
-# Redshift config keys
+# Postgres config keys
 MF_POSTGRESQL_KEYS = (
     ConfigKey(key=CONFIG_DWH_DB),
     ConfigKey(key=CONFIG_DWH_PASSWORD, comment="Password associated with the provided user"),
@@ -78,6 +80,14 @@ MF_SNOWFLAKE_KEYS = (
     ConfigKey(key=CONFIG_DWH_USER, comment="Username for the data warehouse"),
     ConfigKey(key=CONFIG_DWH_HOST, comment="Snowflake account name"),
     ConfigKey(key=CONFIG_DWH_DIALECT, value=SqlDialect.SNOWFLAKE.value),
+)
+
+# Databricks config keys
+MF_DATABRICKS_KEYS = (
+    ConfigKey(key=CONFIG_DWH_HTTP_PATH),
+    ConfigKey(key=CONFIG_DWH_HOST),
+    ConfigKey(key=CONFIG_DWH_ACCESS_TOKEN),
+    ConfigKey(key=CONFIG_DWH_DIALECT, value=SqlDialect.DATABRICKS.value),
 )
 
 

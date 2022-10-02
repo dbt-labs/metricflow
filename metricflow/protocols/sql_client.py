@@ -18,6 +18,7 @@ class SupportedSqlEngine(Enum):
     REDSHIFT = "Redshift"
     POSTGRES = "Postgres"
     SNOWFLAKE = "Snowflake"
+    DATABRICKS = "Databricks"
 
 
 class SqlClient(Protocol):
@@ -141,6 +142,11 @@ class SqlClient(Protocol):
     @abstractmethod
     def cancel_submitted_queries(self) -> None:  # noqa: D
         """Cancel queries submitted through this client (that may be still running) with best-effort."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def render_execution_param_key(self, execution_param_key: str) -> str:
+        """Wrap execution parameter key with syntax accepted by engine."""
         raise NotImplementedError
 
 

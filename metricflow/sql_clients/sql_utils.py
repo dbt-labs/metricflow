@@ -15,6 +15,8 @@ from metricflow.configuration.constants import (
     CONFIG_DWH_PROJECT_ID,
     CONFIG_DWH_USER,
     CONFIG_DWH_WAREHOUSE,
+    CONFIG_DWH_ACCESS_TOKEN,
+    CONFIG_DWH_HTTP_PATH,
 )
 from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.protocols.sql_client import SqlClient
@@ -24,6 +26,7 @@ from metricflow.sql_clients.duckdb import DuckDbSqlClient
 from metricflow.sql_clients.postgres import PostgresSqlClient
 from metricflow.sql_clients.redshift import RedshiftSqlClient
 from metricflow.sql_clients.snowflake import SnowflakeSqlClient
+from metricflow.sql_clients.databricks import DatabricksSqlClient
 
 
 def make_df(  # type: ignore [misc]
@@ -56,8 +59,9 @@ def make_df(  # type: ignore [misc]
     )
 
 
-def make_sql_client(url: str, password: str) -> SqlClient:  # noqa: D
-    dialect_protocol = make_url(url).drivername.split("+")
+def make_sql_client(url: str, password: str) -> SqlClient:
+    """Build SQL client based on env configs. Used only in tests."""
+    dialect_protocol = make_url(url.split(";")[0]).drivername.split("+")
     dialect = SqlDialect(dialect_protocol[0])
     if len(dialect_protocol) > 2:
         raise ValueError(f"Invalid # of +'s in {url}")
@@ -72,6 +76,8 @@ def make_sql_client(url: str, password: str) -> SqlClient:  # noqa: D
         return PostgresSqlClient.from_connection_details(url, password)
     elif dialect == SqlDialect.DUCKDB:
         return DuckDbSqlClient.from_connection_details(url, password)
+    elif dialect == SqlDialect.DATABRICKS:
+        return DatabricksSqlClient.from_connection_details(url, password)
     else:
         raise ValueError(f"Unknown dialect: `{dialect}` in URL {url}")
 
@@ -139,6 +145,11 @@ def make_sql_client_from_config(handler: YamlFileHandler) -> SqlClient:
             password=password,
             database=database,
         )
+    elif dialect == SqlDialect.DATABRICKS.value:
+        host = not_empty(handler.get_value(CONFIG_DWH_HOST), CONFIG_DWH_HOST, url)
+        access_token = not_empty(handler.get_value(CONFIG_DWH_ACCESS_TOKEN), CONFIG_DWH_ACCESS_TOKEN, url)
+        http_path = not_empty(handler.get_value(CONFIG_DWH_HTTP_PATH), CONFIG_DWH_HTTP_PATH, url)
+        return DatabricksSqlClient(host=host, access_token=access_token, http_path=http_path)
     else:
         supported_dialects = [x.value for x in SqlDialect]
         raise ValueError(f"Invalid dialect '{dialect}', must be one of {supported_dialects} in {url}")

@@ -1,0 +1,53 @@
+<ExecutionPlan>
+    <SelectSqlQueryToDataFrameTask>
+        <!-- description = Run a query and write the results to a data frame -->
+        <!-- node_id = rsq_0 -->
+        <!-- sql_query =                                                       -->
+        <!--   -- Combine Metrics                                              -->
+        <!--   SELECT                                                          -->
+        <!--     COALESCE(subq_8.is_instant, subq_9.is_instant) AS is_instant  -->
+        <!--     , subq_8.bookings AS bookings                                 -->
+        <!--     , subq_9.booking_value AS booking_value                       -->
+        <!--   FROM (                                                          -->
+        <!--     -- Aggregate Measures                                         -->
+        <!--     -- Compute Metrics via Expressions                            -->
+        <!--     SELECT                                                        -->
+        <!--       is_instant                                                  -->
+        <!--       , SUM(bookings) AS bookings                                 -->
+        <!--     FROM (                                                        -->
+        <!--       -- Read Elements From Data Source 'bookings_source'         -->
+        <!--       -- Metric Time Dimension 'ds'                               -->
+        <!--       -- Pass Only Elements:                                      -->
+        <!--       --   ['bookings', 'is_instant']                             -->
+        <!--       SELECT                                                      -->
+        <!--         is_instant                                                -->
+        <!--         , 1 AS bookings                                           -->
+        <!--       FROM (                                                      -->
+        <!--         -- User Defined SQL Query                                 -->
+        <!--         SELECT * FROM ***************************.fct_bookings    -->
+        <!--       ) bookings_source_src_10001                                 -->
+        <!--     ) subq_2                                                      -->
+        <!--     GROUP BY                                                      -->
+        <!--       is_instant                                                  -->
+        <!--   ) subq_8                                                        -->
+        <!--   FULL OUTER JOIN (                                               -->
+        <!--     -- Read Elements From Data Source 'bookings_source'           -->
+        <!--     -- Metric Time Dimension 'ds'                                 -->
+        <!--     -- Pass Only Elements:                                        -->
+        <!--     --   ['booking_value', 'is_instant']                          -->
+        <!--     -- Aggregate Measures                                         -->
+        <!--     -- Compute Metrics via Expressions                            -->
+        <!--     SELECT                                                        -->
+        <!--       is_instant                                                  -->
+        <!--       , SUM(booking_value) AS booking_value                       -->
+        <!--     FROM (                                                        -->
+        <!--       -- User Defined SQL Query                                   -->
+        <!--       SELECT * FROM ***************************.fct_bookings      -->
+        <!--     ) bookings_source_src_10001                                   -->
+        <!--     GROUP BY                                                      -->
+        <!--       is_instant                                                  -->
+        <!--   ) subq_9                                                        -->
+        <!--   ON                                                              -->
+        <!--     subq_8.is_instant = subq_9.is_instant                         -->
+    </SelectSqlQueryToDataFrameTask>
+</ExecutionPlan>

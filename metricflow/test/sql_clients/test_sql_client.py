@@ -38,7 +38,7 @@ def test_query(sql_client: SqlClient) -> None:  # noqa: D
 
 
 def test_query_with_execution_params(sql_client: SqlClient) -> None:  # noqa: D
-    expr = "SELECT :x as y"
+    expr = f"SELECT {sql_client.render_execution_param_key('x')} as y"
     sql_execution_params = SqlBindParameters()
     sql_execution_params.param_dict = OrderedDict([("x", "1")])
     df = sql_client.query(expr, sql_bind_parameters=sql_execution_params)
@@ -55,7 +55,7 @@ def test_select_one_query(sql_client: SqlClient) -> None:  # noqa: D
 
 
 def test_failed_query_with_execution_params(sql_client: SqlClient) -> None:  # noqa: D
-    expr = "SELECT :x"
+    expr = f"SELECT {sql_client.render_execution_param_key('x')}"
     sql_execution_params = SqlBindParameters()
     sql_execution_params.param_dict = OrderedDict([("x", "1")])
 
@@ -96,7 +96,8 @@ def test_table_exists(mf_test_session_state: MetricFlowTestSessionState, sql_cli
     assert sql_client.table_exists(sql_table)
 
 
-def test_percent_signs_in_query(sql_client: SqlClient) -> None:  # noqa: D
+def test_percent_signs_in_query(sql_client: SqlClient) -> None:
+    """Note: this only syntax works for Datbricks if no execution params are passed."""
     stmt = "SELECT foo FROM ( SELECT 'abba' AS foo ) source0 WHERE foo LIKE '%a'"
     sql_client.query(stmt)
     df = sql_client.query(stmt)
@@ -142,10 +143,7 @@ def _issue_sleep_query(sql_client: SqlClient, sleep_time: int) -> None:
     engine_type = sql_client.sql_engine_attributes.sql_engine_type
     if engine_type == SupportedSqlEngine.SNOWFLAKE:
         sql_client.execute(f"CALL system$wait({sleep_time}, 'SECONDS')")
-    elif engine_type in (
-        SupportedSqlEngine.BIGQUERY,
-        SupportedSqlEngine.REDSHIFT,
-    ):
+    elif engine_type in (SupportedSqlEngine.BIGQUERY, SupportedSqlEngine.REDSHIFT, SupportedSqlEngine.DATABRICKS):
         raise RuntimeError(f"Sleep yet not supported with {engine_type}")
 
     assert_values_exhausted(engine_type)
@@ -160,6 +158,7 @@ def _supports_sleep_query(sql_client: SqlClient) -> bool:
         SupportedSqlEngine.DUCKDB,
         SupportedSqlEngine.BIGQUERY,
         SupportedSqlEngine.REDSHIFT,
+        SupportedSqlEngine.DATABRICKS,
     ):
         return False
 

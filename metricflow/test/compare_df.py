@@ -1,5 +1,4 @@
 import logging
-
 import math
 import pandas as pd
 
@@ -25,6 +24,15 @@ def _dataframes_contain_same_data(
                 pass
             elif isinstance(expected.iloc[c, r], float) and isinstance(actual.iloc[c, r], float):
                 if not math.isclose(expected.iloc[c, r], actual.iloc[c, r]):
+                    return False
+            elif (
+                isinstance(expected.iloc[c, r], pd.Timestamp)
+                and isinstance(actual.iloc[c, r], pd.Timestamp)
+                # If expected has no tz but actual is UTC, remove timezone. Some engines add UTC by default.
+                and actual.iloc[c, r].tzname() == "UTC"
+                and expected.iloc[c, r].tzname() is None
+            ):
+                if actual.iloc[c, r].tz_localize(None) != expected.iloc[c, r].tz_localize(None):
                     return False
             elif expected.iloc[c, r] != actual.iloc[c, r]:
                 return False
