@@ -72,7 +72,7 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
             dialect = SqlDialect.DATABRICKS.value
             if not http_path or parsed_url.drivername != dialect or not parsed_url.host:
                 raise ValueError
-        except:  # noqa: E722
+        except ValueError:
             # If any errors in parsing URL, show user what expected URL looks like.
             raise ValueError(
                 "Unexpected format for MF_SQL_ENGINE_URL. Expected: `databricks://<HOST>:443;HttpPath=<HTTP PATH>"
