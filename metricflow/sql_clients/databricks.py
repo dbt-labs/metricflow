@@ -10,8 +10,7 @@ from metricflow.sql_clients.base_sql_client_implementation import BaseSqlClientI
 from metricflow.protocols.sql_client import SqlEngineAttributes, SupportedSqlEngine
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
-from metricflow.sql.render.databricks import DatabricksSqlQueryPlanRenderer
+from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer, SqlQueryPlanRenderer
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +44,7 @@ class DatabricksEngineAttributes(SqlEngineAttributes):
     timestamp_type_name: ClassVar[Optional[str]] = "TIMESTAMP"
 
     # MetricFlow attributes
-    sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer] = DatabricksSqlQueryPlanRenderer()
+    sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer] = DefaultSqlQueryPlanRenderer()
 
 
 class DatabricksSqlClient(BaseSqlClientImplementation):
