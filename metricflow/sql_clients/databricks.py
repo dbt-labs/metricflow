@@ -70,13 +70,17 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
                     __, http_path = piece.split("=")
                     break
             dialect = SqlDialect.DATABRICKS.value
-            if not http_path or parsed_url.drivername != dialect or not parsed_url.host:
-                raise ValueError
-        except ValueError:
+            if not http_path:
+                raise ValueError("HTTP path not found in URL.")
+            if parsed_url.drivername != dialect:
+                raise ValueError(f"Unexpected dialect in URL: {parsed_url.drivername}. Expected: {dialect}")
+            if not parsed_url.host:
+                raise ValueError("Host not found in URL.")
+        except ValueError as e:
             # If any errors in parsing URL, show user what expected URL looks like.
             raise ValueError(
-                "Unexpected format for MF_SQL_ENGINE_URL. Expected: `databricks://<HOST>:443;HttpPath=<HTTP PATH>"
-            )
+                f"Unexpected format for MF_SQL_ENGINE_URL. Expected: `{dialect}://<HOST>:443;HttpPath=<HTTP PATH>`."
+            ) from e
 
         if not password:
             raise ValueError(f"Password not supplied for {url}")
@@ -147,18 +151,24 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
                 cursor.execute(f"CREATE TABLE IF NOT EXISTS {sql_table.sql} ({', '.join(columns_to_insert)})")
 
                 # Insert rows
-                values = []
+                values = ""
                 for row in df.itertuples(index=False, name=None):
-                    cells = []
+                    cells = ""
                     for cell in row:
+                        cells += ", " if cells else ""
                         if type(cell) in [str, pd.Timestamp]:
                             # Wrap cell in quotes & escape existing single quotes
                             escaped_cell = str(cell).replace("'", "\\'")
-                            cells.append(f"'{escaped_cell}'")
+                            cells += f"'{escaped_cell}'"
                         else:
-                            cells.append(str(cell))
-                    values.append(f"({', '.join(cells)})")
-                cursor.execute(f"INSERT INTO {sql_table.sql} VALUES {', '.join(values)}")
+                            cells += str(cell)
+
+                    values += (",\n" if values else "") + f"({cells})"
+                    if chunk_size and len(values) == chunk_size:
+                        cursor.execute(f"INSERT INTO {sql_table.sql} VALUES {values}")
+                        values = ""
+                if values:
+                    cursor.execute(f"INSERT INTO {sql_table.sql} VALUES {values}")
 
         logger.info(f"Created table '{sql_table.sql}' from a DataFrame in {time.time() - start_time:.2f}s")
 
