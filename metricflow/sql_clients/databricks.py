@@ -147,18 +147,24 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
                 cursor.execute(f"CREATE TABLE IF NOT EXISTS {sql_table.sql} ({', '.join(columns_to_insert)})")
 
                 # Insert rows
-                values = []
+                values = ""
                 for row in df.itertuples(index=False, name=None):
-                    cells = []
+                    cells = ""
                     for cell in row:
+                        cells += ", " if cells else ""
                         if type(cell) in [str, pd.Timestamp]:
                             # Wrap cell in quotes & escape existing single quotes
                             escaped_cell = str(cell).replace("'", "\\'")
-                            cells.append(f"'{escaped_cell}'")
+                            cells += f"'{escaped_cell}'"
                         else:
-                            cells.append(str(cell))
-                    values.append(f"({', '.join(cells)})")
-                cursor.execute(f"INSERT INTO {sql_table.sql} VALUES {', '.join(values)}")
+                            cells += str(cell)
+
+                    values += (",\n" if values else "") + f"({', '.join(cells)})"
+                    if chunk_size and len(values) == chunk_size:
+                        cursor.execute(f"INSERT INTO {sql_table.sql} VALUES {values}")
+                        values = ""
+                if values:
+                    cursor.execute(f"INSERT INTO {sql_table.sql} VALUES {values}")
 
         logger.info(f"Created table '{sql_table.sql}' from a DataFrame in {time.time() - start_time:.2f}s")
 
