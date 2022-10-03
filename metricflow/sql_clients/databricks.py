@@ -70,13 +70,17 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
                     __, http_path = piece.split("=")
                     break
             dialect = SqlDialect.DATABRICKS.value
-            if not http_path or parsed_url.drivername != dialect or not parsed_url.host:
-                raise ValueError
-        except ValueError:
+            if not http_path:
+                raise ValueError("HTTP path not found in URL.")
+            if parsed_url.drivername != dialect:
+                raise ValueError(f"Unexpected dialect in URL: {parsed_url.drivername}. Expected: {dialect}")
+            if not parsed_url.host:
+                raise ValueError("Host not found in URL.")
+        except ValueError as e:
             # If any errors in parsing URL, show user what expected URL looks like.
             raise ValueError(
-                "Unexpected format for MF_SQL_ENGINE_URL. Expected: `databricks://<HOST>:443;HttpPath=<HTTP PATH>"
-            )
+                f"Unexpected format for MF_SQL_ENGINE_URL. Expected: `{dialect}://<HOST>:443;HttpPath=<HTTP PATH>`."
+            ) from e
 
         if not password:
             raise ValueError(f"Password not supplied for {url}")
@@ -159,7 +163,7 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
                         else:
                             cells += str(cell)
 
-                    values += (",\n" if values else "") + f"({', '.join(cells)})"
+                    values += (",\n" if values else "") + f"({cells})"
                     if chunk_size and len(values) == chunk_size:
                         cursor.execute(f"INSERT INTO {sql_table.sql} VALUES {values}")
                         values = ""
