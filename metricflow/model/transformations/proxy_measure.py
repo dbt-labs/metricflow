@@ -1,14 +1,11 @@
 import logging
 
+from metricflow.errors.errors import ModelTransformError
 from metricflow.model.objects.metric import Metric, MetricInputMeasure, MetricType, MetricTypeParams
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.transformations.transform_rule import ModelTransformRule
 
 logger = logging.getLogger(__name__)
-
-
-class ModelTransformError(Exception):  # noqa: D
-    pass
 
 
 class CreateProxyMeasureRule(ModelTransformRule):

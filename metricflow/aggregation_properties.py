@@ -17,18 +17,32 @@ class AggregationType(ExtendedEnum):
     SUM_BOOLEAN = "sum_boolean"
     AVERAGE = "average"
 
-    # COUNT = "count" not yet implemented ... non-expansive as COUNT(COUNT(X), COUNT(Y)) != COUNT(COUNT(X ∪ Y))
+    COUNT = "count"
     # AVERAGE = "average"  not yet implemented ...requires us to keep track of two quantities, count and sum
 
     @property
     def is_expansive(self) -> bool:
-        """Expansive ≝ Op( X ∪ Y ∪ ...) = Op( Op(X) ∪ Op(Y) ∪ ...)"""
-        return self in (AggregationType.SUM, AggregationType.MIN, AggregationType.MAX, AggregationType.BOOLEAN)
+        """Expansive ≝ Op( X ∪ Y ∪ ...) = Op( Op(X) ∪ Op(Y) ∪ ...)
+
+        NOTE: COUNT is only expansive because it's transformed into a SUM agg during model transformation
+        """
+        return self in (
+            AggregationType.SUM,
+            AggregationType.MIN,
+            AggregationType.MAX,
+            AggregationType.BOOLEAN,
+            AggregationType.COUNT,
+        )
 
     @property
     def fill_nulls_with_0(self) -> bool:
         """Indicates if charts should show 0 instead of null where there are gaps in data."""
-        return self in (AggregationType.SUM, AggregationType.COUNT_DISTINCT, AggregationType.SUM_BOOLEAN)
+        return self in (
+            AggregationType.SUM,
+            AggregationType.COUNT_DISTINCT,
+            AggregationType.SUM_BOOLEAN,
+            AggregationType.COUNT,
+        )
 
     @property
     def can_limit_dimension_values(self) -> bool:
@@ -38,7 +52,7 @@ class AggregationType(ExtendedEnum):
         1. The dimensions we care about most are the ones with the highest numeric values
         2. We can calculate the "other" column in the postprocessor (meaning the metric is expansive)
         """
-        return self in (AggregationType.SUM, AggregationType.SUM_BOOLEAN)
+        return self in (AggregationType.SUM, AggregationType.SUM_BOOLEAN, AggregationType.COUNT)
 
 
 class AggregationState(Enum):
