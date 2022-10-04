@@ -465,13 +465,15 @@
                         "COUNT_DISTINCT",
                         "BOOLEAN",
                         "SUM_BOOLEAN",
+                        "COUNT",
                         "sum",
                         "min",
                         "max",
                         "average",
                         "count_distinct",
                         "boolean",
-                        "sum_boolean"
+                        "sum_boolean",
+                        "count"
                     ]
                 },
                 "agg_time_dimension": {
