@@ -364,6 +364,37 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
         return issues
 
 
+class CountAggregationExprRule(ModelValidationRule):
+    """Checks that COUNT measures have an expr provided."""
+
+    @staticmethod
+    @validate_safely(
+        whats_being_done="running model validation ensuring expr exist for measures with count aggregation"
+    )
+    def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
+        issues: List[ValidationIssueType] = []
+
+        for data_source in model.data_sources:
+            for measure in data_source.measures:
+                if measure.agg == AggregationType.COUNT and measure.expr is None:
+                    issues.append(
+                        ValidationError(
+                            context=DataSourceElementContext(
+                                file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                                data_source_element=DataSourceElementReference(
+                                    data_source_name=data_source.name, element_name=measure.name
+                                ),
+                                element_type=DataSourceElementType.MEASURE,
+                            ),
+                            message=(
+                                f"Measure '{measure.name}' uses a COUNT aggregation, which requires an expr to be provided. "
+                                f"Provide 'expr: 1' if a count of all rows is desired."
+                            ),
+                        )
+                    )
+        return issues
+
+
 def _get_measure_names_from_model(model: UserConfiguredModel) -> Set[str]:
     """Return every distinct measure name specified in the model"""
     measure_names = set()

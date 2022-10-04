@@ -16,7 +16,7 @@ class ConvertCountToSumRule(ModelTransformRule):
                 if measure.agg == AggregationType.COUNT:
                     if measure.expr is None:
                         raise ModelTransformError(
-                            f"Measure '{measure.name}' is has a COUNT aggregation which requires an expr to be provided. "
+                            f"Measure '{measure.name}' uses a COUNT aggregation, which requires an expr to be provided. "
                             f"Provide 'expr: 1' if a count of all rows is desired."
                         )
                     if measure.expr != ONE:
