@@ -82,3 +82,31 @@ integration_test:
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds
+---
+integration_test:
+  name: count_agg
+  description: Tests COUNT aggregation.
+  model: SIMPLE_MODEL
+  metrics: ["referred_bookings"]
+  group_bys: ["metric_time"]
+  check_query: |
+    SELECT
+      SUM(CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END) AS referred_bookings
+      , ds AS metric_time
+    FROM {{ source_schema }}.fct_bookings
+    GROUP BY
+      ds
+---
+integration_test:
+  name: count_agg_with_count_expected_query
+  description: Tests COUNT aggregation against a query using COUNT instead of SUM-CASE.
+  model: SIMPLE_MODEL
+  metrics: ["referred_bookings"]
+  group_bys: ["metric_time"]
+  check_query: |
+    SELECT
+      COUNT(referrer_id) AS referred_bookings
+      , ds AS metric_time
+    FROM {{ source_schema }}.fct_bookings
+    GROUP BY
+      ds

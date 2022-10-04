@@ -62,6 +62,7 @@ def test_get_names(new_data_source_semantics: DataSourceSemantics) -> None:  # n
         "listings",
         "max_booking_value",
         "min_booking_value",
+        "referred_bookings",
         "smallest_listing",
         "total_account_balance_first_day",
         "txn_revenue",

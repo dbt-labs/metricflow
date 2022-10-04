@@ -486,3 +486,13 @@ metric:
       - name: bookings
         constraint: NOT is_instant
         alias: delayed_bookings
+---
+metric:
+  name: "referred_bookings"
+  description: "bookings made through a referral"
+  owners:
+    - support@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+      - referred_bookings
