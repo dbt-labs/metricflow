@@ -32,7 +32,7 @@ class DatabricksEngineAttributes(SqlEngineAttributes):
     # SQL Engine capabilities
     date_trunc_supported: ClassVar[bool] = True
     full_outer_joins_supported: ClassVar[bool] = True
-    indexes_supported: ClassVar[bool] = True
+    indexes_supported: ClassVar[bool] = False
     multi_threading_supported: ClassVar[bool] = True
     timestamp_type_supported: ClassVar[bool] = True
     timestamp_to_string_comparison_supported: ClassVar[bool] = True
