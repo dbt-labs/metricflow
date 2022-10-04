@@ -27,6 +27,7 @@ from metricflow.configuration.constants import (
     CONFIG_MODEL_PATH,
     CONFIG_DWH_HTTP_PATH,
     CONFIG_DWH_ACCESS_TOKEN,
+    CONFIG_DBT_REPO,
 )
 from metricflow.sql_clients.common_client import SqlDialect
 
@@ -41,6 +42,10 @@ MF_CONFIG_KEYS = (
         comment="Path to directory containing defined models (Leave until after DWH setup)",
     ),
     ConfigKey(key=CONFIG_DWH_SCHEMA),
+    ConfigKey(
+        key=CONFIG_DBT_REPO,
+        comment=f"If set to `True`, MetricFlow will interpret the value of `{CONFIG_MODEL_PATH}` to point to dbt configs",
+    ),
 )
 # BigQuery config keys
 MF_BIGQUERY_KEYS = (
