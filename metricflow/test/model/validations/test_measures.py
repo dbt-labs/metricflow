@@ -289,3 +289,27 @@ def test_invalid_non_additive_dimension_properties(simple_model__pre_transforms:
     assert (
         len(missing_error_strings) == 0
     ), f"Failed to match one or more expected errors: {missing_error_strings} in {set([x.as_readable_str() for x in build.issues.errors])}"
+
+
+def test_count_measure_missing_expr(simple_model__pre_transforms: UserConfiguredModel) -> None:
+    """Tests that all measures with COUNT agg should have expr provided."""
+    model = copy.deepcopy(simple_model__pre_transforms)
+    data_source = find_data_source_with(model, lambda ds: ds.name == "bookings_source")[0]
+    invalid_measure = Measure(
+        name="bad_measure",
+        agg=AggregationType.COUNT,
+        agg_time_dimension="ds",
+    )
+    data_source.measures.append(invalid_measure)  # type: ignore
+
+    build = ModelValidator().validate_model(model)
+    expected_error_substring = (
+        "measure 'bad_measure' uses a COUNT aggregation, which requires an expr to be provided. "
+        "Provide 'expr: 1' if a count of all rows is desired."
+    )
+    assert len(build.issues.errors) == 1
+
+    actual_error = build.issues.errors[0].as_readable_str()
+    assert (
+        actual_error.find(expected_error_substring) != -1
+    ), f"Expected error {expected_error_substring} not found in error string! Instead got {actual_error}"
