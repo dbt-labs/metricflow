@@ -115,6 +115,7 @@ FROM (
                     , subq_0.min_booking_value
                     , subq_0.bookers
                     , subq_0.average_booking_value
+                    , subq_0.referred_bookings
                   FROM (
                     -- Read Elements From Data Source 'bookings_source'
                     SELECT
@@ -126,6 +127,7 @@ FROM (
                       , bookings_source_src_10001.guest_id AS bookers
                       , bookings_source_src_10001.booking_value AS average_booking_value
                       , bookings_source_src_10001.booking_value AS booking_payments
+                      , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
                       , bookings_source_src_10001.is_instant
                       , bookings_source_src_10001.ds
                       , DATE_TRUNC('week', bookings_source_src_10001.ds) AS ds__week
@@ -332,6 +334,7 @@ FROM (
             , subq_11.min_booking_value
             , subq_11.bookers
             , subq_11.average_booking_value
+            , subq_11.referred_bookings
           FROM (
             -- Read Elements From Data Source 'bookings_source'
             SELECT
@@ -343,6 +346,7 @@ FROM (
               , bookings_source_src_10001.guest_id AS bookers
               , bookings_source_src_10001.booking_value AS average_booking_value
               , bookings_source_src_10001.booking_value AS booking_payments
+              , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
               , bookings_source_src_10001.is_instant
               , bookings_source_src_10001.ds
               , DATE_TRUNC('week', bookings_source_src_10001.ds) AS ds__week

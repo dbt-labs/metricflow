@@ -304,7 +304,7 @@ def test_count_measure_missing_expr(simple_model__pre_transforms: UserConfigured
 
     build = ModelValidator().validate_model(model)
     expected_error_substring = (
-        "measure 'bad_measure' uses a COUNT aggregation, which requires an expr to be provided. "
+        "Measure 'bad_measure' uses a COUNT aggregation, which requires an expr to be provided. "
         "Provide 'expr: 1' if a count of all rows is desired."
     )
     assert len(build.issues.errors) == 1
