@@ -107,16 +107,20 @@ class CLIContext:
         return self._semantic_model
 
     @property
-    def user_configured_model(self) -> UserConfiguredModel:  # noqa: D
-        if self._user_configured_model is None:
-            self._user_configured_model = build_user_configured_model_from_config(self.config)
-        assert self._user_configured_model is not None
-        return self._user_configured_model
-
-    @property
     def model_path_is_for_dbt(self) -> bool:  # noqa: D
         if self._model_path_is_for_dbt is None:
             config_value = self.config.get_value(key=CONFIG_DBT_REPO) or ""
             self._model_path_is_for_dbt = config_value.lower() in ["yes", "y", "true", "t", "1"]
 
         return self._model_path_is_for_dbt
+
+    @property
+    def user_configured_model(self) -> UserConfiguredModel:  # noqa: D
+        if self._user_configured_model is None:
+            if self.model_path_is_for_dbt:
+                raise NotImplementedError("Parsing user_configured_models from dbt config files is not yet supported")
+            else:
+                self._user_configured_model = build_user_configured_model_from_config(self.config)
+
+        assert self._user_configured_model is not None
+        return self._user_configured_model
