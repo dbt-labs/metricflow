@@ -186,6 +186,7 @@ class SqlEngineAttributes(Protocol):
     # SQL Dialect replacement strings
     double_data_type_name: ClassVar[str]
     timestamp_type_name: ClassVar[Optional[str]]
+    random_function_name: ClassVar[str]
 
     # MetricFlow attributes
     sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer]

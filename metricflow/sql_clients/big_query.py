@@ -13,7 +13,7 @@ from metricflow.sql_clients.common_client import SqlDialect
 from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
 
 
-class BigQueryEngineAttributes:
+class BigQueryEngineAttributes(SqlEngineAttributes):
     """Engine-specific attributes for the BigQuery query engine
 
     This is an implementation of the SqlEngineAttributes protocol for BigQuery
@@ -34,6 +34,7 @@ class BigQueryEngineAttributes:
     # SQL Dialect replacement strings
     double_data_type_name: ClassVar[str] = "FLOAT64"
     timestamp_type_name: ClassVar[Optional[str]] = "DATETIME"
+    random_function_name: ClassVar[str] = "RAND"
 
     # MetricFlow attributes
     sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer] = BigQuerySqlQueryPlanRenderer()
