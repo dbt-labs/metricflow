@@ -43,7 +43,7 @@ def make_df(  # type: ignore [misc]
             new_row = []
             # Change the type of the column if it's in time_columns
             for i, column in enumerate(columns):
-                if column in time_columns:
+                if column in time_columns and row[i] is not None:
                     # ts_suffix = " 00:00:00" if ":" not in row[i] else ""
                     # ts_input = row[i] + ts_suffix
                     new_row.append(dateutil.parser.parse(row[i]))

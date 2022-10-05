@@ -81,6 +81,9 @@ def test_create_table_from_dataframe(  # noqa: D
         data=[
             (1, "abc", 1.23, False, "2020-01-01"),
             (2, "def", 4.56, True, "2020-01-02"),
+            (3, "ghi", 1.1, False, None),  # Test NaT type
+            (None, "jkl", None, True, "2020-01-03"),  # Test NaN types
+            (3, None, 1.2, None, "2020-01-04"),  # Test None types for NA conversions
         ],
     )
     sql_table = SqlTable(schema_name=mf_test_session_state.mf_source_schema, table_name=_random_table())
