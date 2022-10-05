@@ -23,7 +23,7 @@ mutability_type_values += [x.lower() for x in mutability_type_values]
 identifier_type_enum_values = ["PRIMARY", "UNIQUE", "FOREIGN", "RENDER_ONLY"]
 identifier_type_enum_values += [x.lower() for x in identifier_type_enum_values]
 
-aggregation_type_values = ["SUM", "MIN", "MAX", "AVERAGE", "COUNT_DISTINCT", "BOOLEAN", "SUM_BOOLEAN"]
+aggregation_type_values = ["SUM", "MIN", "MAX", "AVERAGE", "COUNT_DISTINCT", "BOOLEAN", "SUM_BOOLEAN", "COUNT"]
 aggregation_type_values += [x.lower() for x in aggregation_type_values]
 
 window_aggregation_type_values = ["MIN", "MAX"]

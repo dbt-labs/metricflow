@@ -99,3 +99,9 @@ class ModelCreationException(Exception):
 
 class InferenceError(Exception):
     """Exception to represent errors related to inference."""
+
+
+class ModelTransformError(Exception):
+    """Exception to represent errors related to model transformations."""
+
+    pass

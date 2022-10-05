@@ -34,6 +34,10 @@ data_source:
       expr: booking_value
       agg: sum
       agg_time_dimension: booking_paid_at
+    - name: referred_bookings
+      expr: referrer_id
+      agg: count
+
 
   dimensions:
     - name: is_instant

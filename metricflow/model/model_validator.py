@@ -16,6 +16,7 @@ from metricflow.model.validations.identifiers import (
 )
 from metricflow.model.validations.materializations import ValidMaterializationRule
 from metricflow.model.validations.measures import (
+    CountAggregationExprRule,
     DataSourceMeasuresUniqueRule,
     MeasureConstraintAliasesRule,
     MetricMeasuresRule,
@@ -38,6 +39,7 @@ class ModelValidator:
     """A Validator that acts on UserConfiguredModel"""
 
     DEFAULT_RULES = (
+        CountAggregationExprRule(),
         DataSourceMeasuresUniqueRule(),
         DataSourceTimeDimensionWarningsRule(),
         DimensionConsistencyRule(),
