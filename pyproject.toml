@@ -47,6 +47,7 @@ yamllint = "^1.26.3"
 click = ">=7.1.2"
 GitPython = "^3.1.27"
 databricks-sql-connector = "2.0.3"
+dbt-core = "^1.2.2"
 
 [tool.poetry.dev-dependencies]
 pytest-mock = "^3.7.0"
