@@ -1,10 +1,13 @@
 from __future__ import annotations
-from typing import Optional, List, ClassVar, Dict
-import pandas as pd
+
 import logging
 import time
+from typing import Optional, List, ClassVar, Dict
+
+import pandas as pd
 import sqlalchemy
 from databricks import sql
+
 from metricflow.sql_clients.common_client import SqlDialect
 from metricflow.sql_clients.base_sql_client_implementation import BaseSqlClientImplementation
 from metricflow.protocols.sql_client import SqlEngineAttributes, SupportedSqlEngine
@@ -15,10 +18,15 @@ from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer,
 logger = logging.getLogger(__name__)
 
 HTTP_PATH_KEY = "httppath="
+
+# This is a non-exhaustive list of pandas dtypes, but in theory it will cover the ones we need to support
+# for data frames generated and run through type inference.
 PANDAS_TO_SQL_DTYPES = {
+    "string": "string",
     "object": "string",
     "float64": "double",
     "bool": "boolean",
+    "boolean": "boolean",
     "int64": "int",
     "datetime64[ns]": "timestamp",
 }
@@ -143,11 +151,14 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         with self.get_connection() as connection:
             with connection.cursor() as cursor:
                 # Create table
+                # update dtypes to convert None to NA in boolean columns.
+                # This mirrors the SQLAlchemy schema detection logic in pandas.io.sql
+                df = df.convert_dtypes()
                 columns = df.columns
                 columns_to_insert = []
                 for i in range(len(df.columns)):
                     # Format as "column_name column_type"
-                    columns_to_insert.append(f"{columns[i]} {PANDAS_TO_SQL_DTYPES[str(df[columns[i]].dtype)]}")
+                    columns_to_insert.append(f"{columns[i]} {PANDAS_TO_SQL_DTYPES[str(df[columns[i]].dtype).lower()]}")
                 cursor.execute(f"CREATE TABLE IF NOT EXISTS {sql_table.sql} ({', '.join(columns_to_insert)})")
 
                 # Insert rows
@@ -156,12 +167,13 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
                     cells = ""
                     for cell in row:
                         cells += ", " if cells else ""
-                        if type(cell) in [str, pd.Timestamp]:
+                        if pd.isnull(cell):
+                            # Databricks does not support None, NA, nan, or NaT
+                            cells += "null"
+                        elif type(cell) in [str, pd.Timestamp]:
                             # Wrap cell in quotes & escape existing single quotes
                             escaped_cell = str(cell).replace("'", "\\'")
                             cells += f"'{escaped_cell}'"
-                        elif cell is None:
-                            cells += "null"
                         else:
                             cells += str(cell)
 
