@@ -10,6 +10,7 @@ import pandas as pd
 import sqlalchemy
 
 from metricflow.dataflow.sql_table import SqlTable
+from metricflow.protocols.sql_request import SqlRequestTagSet
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.base_sql_client_implementation import BaseSqlClientImplementation
 
@@ -21,6 +22,7 @@ class SqlAlchemySqlClient(BaseSqlClientImplementation, ABC):
 
     def __init__(self, engine: sqlalchemy.engine.Engine) -> None:  # noqa: D
         self._engine = engine
+        super().__init__()
 
     @staticmethod
     def build_engine_url(  # noqa: D
@@ -135,3 +137,6 @@ class SqlAlchemySqlClient(BaseSqlClientImplementation, ABC):
 
         if errors:
             raise ValueError(f"Found errors in the URL: {url}\n" + "\n".join(errors))
+
+    def cancel_request(self, pattern_tag_set: SqlRequestTagSet) -> int:  # noqa: D
+        raise NotImplementedError

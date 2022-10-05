@@ -9,7 +9,9 @@ import sqlalchemy
 from databricks import sql
 
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.protocols.sql_client import SqlEngineAttributes, SqlEngine
+from metricflow.protocols.sql_client import SqlEngine
+from metricflow.protocols.sql_client import SqlEngineAttributes
+from metricflow.protocols.sql_request import SqlRequestTagSet
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer, SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.base_sql_client_implementation import BaseSqlClientImplementation
@@ -35,7 +37,7 @@ PANDAS_TO_SQL_DTYPES = {
 }
 
 
-class DatabricksEngineAttributes(SqlEngineAttributes):
+class DatabricksEngineAttributes:
     """SQL engine attributes for Databricks."""
 
     sql_engine_type: ClassVar[SqlEngine] = SqlEngine.DATABRICKS
@@ -232,3 +234,6 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         """Check if SQL statement is renaming a table."""
         stmt_uppercased = stmt.upper()
         return SQL_RENAME in stmt_uppercased and SQL_ALTER_TABLE in stmt_uppercased
+
+    def cancel_request(self, pattern_tag_set: SqlRequestTagSet) -> int:  # noqa: D
+        raise NotImplementedError

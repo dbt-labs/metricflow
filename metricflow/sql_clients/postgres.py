@@ -2,7 +2,10 @@ import logging
 from typing import ClassVar, Mapping, Optional, Sequence, Union
 
 import sqlalchemy
-from metricflow.protocols.sql_client import SqlEngineAttributes, SqlEngine
+
+from metricflow.protocols.sql_client import SqlEngine
+from metricflow.protocols.sql_client import SqlEngineAttributes
+from metricflow.protocols.sql_request import SqlRequestTagSet
 from metricflow.sql.render.postgres import PostgresSQLSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql_clients.common_client import SqlDialect, not_empty
@@ -11,7 +14,7 @@ from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
 logger = logging.getLogger(__name__)
 
 
-class PostgresEngineAttributes(SqlEngineAttributes):
+class PostgresEngineAttributes:
     """Engine-specific attributes for the Postgres query engine
 
     This is an implementation of the SqlEngineAttributes protocol for Postgres
@@ -88,4 +91,7 @@ class PostgresSqlClient(SqlAlchemySqlClient):
         return PostgresEngineAttributes()
 
     def cancel_submitted_queries(self) -> None:  # noqa: D
+        raise NotImplementedError
+
+    def cancel_request(self, pattern_tag_set: SqlRequestTagSet) -> int:  # noqa: D
         raise NotImplementedError
