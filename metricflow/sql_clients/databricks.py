@@ -160,6 +160,8 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
                             # Wrap cell in quotes & escape existing single quotes
                             escaped_cell = str(cell).replace("'", "\\'")
                             cells += f"'{escaped_cell}'"
+                        elif cell is None:
+                            cells += "null"
                         else:
                             cells += str(cell)
 
