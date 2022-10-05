@@ -10,7 +10,9 @@ import pandas as pd
 import sqlalchemy
 from sqlalchemy.exc import ProgrammingError
 
-from metricflow.protocols.sql_client import SqlEngine, SqlEngineAttributes
+from metricflow.protocols.sql_client import SqlEngine
+from metricflow.protocols.sql_client import SqlEngineAttributes
+from metricflow.protocols.sql_request import SqlRequestTagSet
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
@@ -18,7 +20,7 @@ from metricflow.sql_clients.common_client import SqlDialect, not_empty
 from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
 
 
-class SnowflakeEngineAttributes(SqlEngineAttributes):
+class SnowflakeEngineAttributes:
     """Engine-specific attributes for the Snowflake query engine
 
     This is an implementation of the SqlEngineAttributes protocol for Snowflake
@@ -240,3 +242,6 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
                 for session_id in self._known_session_ids:
                     logger.info(f"Cancelling queries associated with session id: {session_id}")
                     conn.execute(f"SELECT SYSTEM$cancel_all_queries({session_id})")
+
+    def cancel_request(self, pattern_tag_set: SqlRequestTagSet) -> int:  # noqa: D
+        raise NotImplementedError

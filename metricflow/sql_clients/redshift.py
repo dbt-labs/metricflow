@@ -3,7 +3,9 @@ from typing import ClassVar, Optional, Mapping, Union, Sequence
 
 import sqlalchemy
 
-from metricflow.protocols.sql_client import SqlEngine, SqlEngineAttributes
+from metricflow.protocols.sql_client import SqlEngine
+from metricflow.protocols.sql_client import SqlEngineAttributes
+from metricflow.protocols.sql_request import SqlRequestTagSet
 from metricflow.sql.render.redshift import RedshiftSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql_clients.common_client import SqlDialect, not_empty
@@ -12,7 +14,7 @@ from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
 logger = logging.getLogger(__name__)
 
 
-class RedshiftEngineAttributes(SqlEngineAttributes):
+class RedshiftEngineAttributes:
     """Engine-specific attributes for the Redshift query engine
 
     This is an implementation of the SqlEngineAttributes protocol for Redshift
@@ -89,4 +91,7 @@ class RedshiftSqlClient(SqlAlchemySqlClient):
         return RedshiftEngineAttributes()
 
     def cancel_submitted_queries(self) -> None:  # noqa: D
+        raise NotImplementedError
+
+    def cancel_request(self, pattern_tag_set: SqlRequestTagSet) -> int:  # noqa: D
         raise NotImplementedError

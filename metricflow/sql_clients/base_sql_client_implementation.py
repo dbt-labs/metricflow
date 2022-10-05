@@ -1,15 +1,25 @@
+from __future__ import annotations
+
 import logging
 import textwrap
+import threading
 import time
 from abc import ABC, abstractmethod
-from typing import Dict, List, Optional, Any, Tuple
+from typing import Any, Tuple, Sequence
+from typing import Optional, List, Dict
 
 import jinja2
 import pandas as pd
 
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.protocols.sql_client import SqlEngineAttributes, SqlClient
+from metricflow.object_utils import random_id
+from metricflow.protocols.async_sql_client import AsyncSqlClient
+from metricflow.protocols.sql_client import (
+    SqlEngineAttributes,
+)
+from metricflow.protocols.sql_request import SqlRequestId, SqlRequestResult, SqlRequestTagSet
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.sql_clients.async_request import SqlRequestExecutorThread
 
 logger = logging.getLogger(__name__)
 
@@ -20,10 +30,14 @@ class SqlClientException(Exception):
     pass
 
 
-class BaseSqlClientImplementation(ABC, SqlClient):
+class BaseSqlClientImplementation(ABC, AsyncSqlClient):
     """Abstract implementation that other SQL clients are based on."""
 
     INDENT = "    "
+
+    def __init__(self) -> None:  # noqa: D
+        self._request_id_to_thread: Dict[SqlRequestId, SqlRequestExecutorThread] = {}
+        self._state_lock = threading.Lock()
 
     def generate_health_check_tests(self, schema_name: str) -> List[Tuple[str, Any]]:  # type: ignore
         """List of base health checks we want to perform."""
@@ -203,3 +217,61 @@ class BaseSqlClientImplementation(ABC, SqlClient):
     def render_execution_param_key(self, execution_param_key: str) -> str:
         """Wrap execution parameter key with syntax accepted by engine."""
         return f":{execution_param_key}"
+
+    def async_query(  # noqa: D
+        self,
+        statement: str,
+        bind_parameters: SqlBindParameters = SqlBindParameters(),
+        tags: SqlRequestTagSet = SqlRequestTagSet(),
+    ) -> SqlRequestId:
+        with self._state_lock:
+            request_id = SqlRequestId(f"mf_rid__{random_id()}")
+            thread = SqlRequestExecutorThread(
+                sql_client=self,
+                request_id=request_id,
+                statement=statement,
+                bind_parameters=bind_parameters,
+                user_tags=tags,
+            )
+            self._request_id_to_thread[request_id] = thread
+            self._request_id_to_thread[request_id].start()
+            return request_id
+
+    def async_execute(  # noqa: D
+        self,
+        statement: str,
+        bind_parameters: SqlBindParameters = SqlBindParameters(),
+        tags: SqlRequestTagSet = SqlRequestTagSet(),
+    ) -> SqlRequestId:
+        with self._state_lock:
+            request_id = SqlRequestId(f"mf_rid__{random_id()}")
+            thread = SqlRequestExecutorThread(
+                sql_client=self,
+                request_id=request_id,
+                statement=statement,
+                bind_parameters=bind_parameters,
+                user_tags=tags,
+                is_query=False,
+            )
+            self._request_id_to_thread[request_id] = thread
+            self._request_id_to_thread[request_id].start()
+            return request_id
+
+    def async_request_result(self, query_id: SqlRequestId) -> SqlRequestResult:  # noqa: D
+        thread: Optional[SqlRequestExecutorThread] = None
+        with self._state_lock:
+            thread = self._request_id_to_thread.get(query_id)
+            if thread is None:
+                raise RuntimeError(
+                    f"Query ID: {query_id} is not known. Either the query ID is invalid, or results for the query ID "
+                    f"were already fetched."
+                )
+
+        thread.join()
+        with self._state_lock:
+            del self._request_id_to_thread[query_id]
+        return thread.result
+
+    def active_requests(self) -> Sequence[SqlRequestId]:  # noqa: D
+        with self._state_lock:
+            return tuple(executor_thread.request_id for executor_thread in self._request_id_to_thread.values())

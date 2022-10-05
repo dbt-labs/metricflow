@@ -19,14 +19,15 @@ from metricflow.configuration.constants import (
     CONFIG_DWH_HTTP_PATH,
 )
 from metricflow.configuration.yaml_handler import YamlFileHandler
+from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql_clients.big_query import BigQuerySqlClient
 from metricflow.sql_clients.common_client import SqlDialect, not_empty
+from metricflow.sql_clients.databricks import DatabricksSqlClient
 from metricflow.sql_clients.duckdb import DuckDbSqlClient
 from metricflow.sql_clients.postgres import PostgresSqlClient
 from metricflow.sql_clients.redshift import RedshiftSqlClient
 from metricflow.sql_clients.snowflake import SnowflakeSqlClient
-from metricflow.sql_clients.databricks import DatabricksSqlClient
 
 
 def make_df(  # type: ignore [misc]
@@ -59,7 +60,7 @@ def make_df(  # type: ignore [misc]
     )
 
 
-def make_sql_client(url: str, password: str) -> SqlClient:
+def make_sql_client(url: str, password: str) -> AsyncSqlClient:
     """Build SQL client based on env configs. Used only in tests."""
     dialect_protocol = make_url(url.split(";")[0]).drivername.split("+")
     dialect = SqlDialect(dialect_protocol[0])
