@@ -16,6 +16,7 @@ from metricflow.protocols.sql_request import SqlRequestTagSet
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.sql_clients.async_request import SqlStatementCommentMetadata
 from metricflow.sql_clients.common_client import SqlDialect, not_empty
 from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
 
@@ -244,4 +245,25 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
                     conn.execute(f"SELECT SYSTEM$cancel_all_queries({session_id})")
 
     def cancel_request(self, pattern_tag_set: SqlRequestTagSet) -> int:  # noqa: D
-        raise NotImplementedError
+        # Running queries have an end_time set to the epoch time:
+        # https://docs.snowflake.com/en/sql-reference/functions/query_history.html
+        # Using '1970-01-01' to avoid timezone issues.
+        result = self.query(
+            """
+            SELECT query_id, query_text
+            FROM TABLE(INFORMATION_SCHEMA.QUERY_HISTORY())
+            WHERE end_time <= '1971-01-01'
+            ORDER BY start_time
+            LIMIT 100
+            """
+        )
+        num_cancelled_queries = 0
+        for query_id, query_text in result.values:
+            tag_set = SqlStatementCommentMetadata.parse_tag_metadata_in_comments(query_text)
+
+            if tag_set and pattern_tag_set.is_subset_of(tag_set):
+                logger.info(f"Cancelling query ID: {query_id}")
+                self.execute(f"SELECT SYSTEM$CANCEL_QUERY('{query_id}')")
+                num_cancelled_queries += 1
+
+        return num_cancelled_queries
