@@ -169,7 +169,6 @@ def test_case(
     elif case.model is IntegrationTestModel.EXTENDED_DATE_MODEL:
         semantic_model = extended_date_semantic_model
     elif case.model is IntegrationTestModel.SCD_MODEL:
-        pytest.skip("SCD join support has not yet been implemented")
         semantic_model = scd_semantic_model
     else:
         assert_values_exhausted(case.model)

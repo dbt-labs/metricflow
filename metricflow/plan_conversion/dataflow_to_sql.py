@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from collections import OrderedDict
 from dataclasses import dataclass
-from typing import TypeVar, Generic, Union, List, Sequence, Optional
+from typing import Generic, List, Optional, Sequence, Tuple, TypeVar, Union
 
 from metricflow.aggregation_properties import AggregationState
 from metricflow.column_assoc import ColumnAssociation, SingleColumnCorrelationKey
@@ -127,6 +127,7 @@ def make_sql_join_description(
     right_source_alias: str,
     column_equality_descriptions: Sequence[ColumnEqualityDescription],
     join_type: SqlJoinType,
+    additional_on_conditions: Sequence[SqlExpressionNode] = tuple(),
 ) -> SqlJoinDescription:
     """Make a join description where the condition is a set of equality comparisons between columns.
 
@@ -140,10 +141,11 @@ def make_sql_join_description(
         right_source_alias: string alias identifier for the join target
         column_equality_descriptions: set of equality constraints for the ON statement
         join_type: type of SQL join, e.g., LEFT, INNER, etc.
+        additional_on_conditions: set of additional constraints to add in the ON statement (via AND)
     """
     assert len(column_equality_descriptions) > 0
 
-    and_conditions = []
+    and_conditions: List[SqlExpressionNode] = []
     for column_equality_description in column_equality_descriptions:
         and_conditions.append(
             SqlComparisonExpression(
@@ -162,6 +164,8 @@ def make_sql_join_description(
                 ),
             )
         )
+    and_conditions += additional_on_conditions
+
     on_condition: SqlExpressionNode
     if len(and_conditions) == 1:
         on_condition = and_conditions[0]
@@ -174,6 +178,66 @@ def make_sql_join_description(
         on_condition=on_condition,
         join_type=join_type,
     )
+
+
+def _make_validity_window_on_condition(
+    left_source_alias: str,
+    left_source_time_dimension_name: str,
+    right_source_alias: str,
+    window_start_dimension_name: str,
+    window_end_dimension_name: str,
+) -> Tuple[SqlExpressionNode, ...]:
+    """Helper to convert a validity window join description to a renderable SQL expresssion
+
+    Takes in a join description consisting of a start and end time dimension spec, and generates
+    a node representing the equivalent of this expression:
+
+        {start_dimension_name} >= metric_time AND ({end_dimension_name} < metric_time OR {end_dimension_name} IS NULL)
+
+    """
+    window_start_condition = SqlComparisonExpression(
+        left_expr=SqlColumnReferenceExpression(
+            SqlColumnReference(
+                table_alias=left_source_alias,
+                column_name=left_source_time_dimension_name,
+            )
+        ),
+        comparison=SqlComparison.GREATER_THAN_OR_EQUALS,
+        right_expr=SqlColumnReferenceExpression(
+            SqlColumnReference(
+                table_alias=right_source_alias,
+                column_name=window_start_dimension_name,
+            )
+        ),
+    )
+    window_end_by_time = SqlComparisonExpression(
+        left_expr=SqlColumnReferenceExpression(
+            SqlColumnReference(
+                table_alias=left_source_alias,
+                column_name=left_source_time_dimension_name,
+            )
+        ),
+        comparison=SqlComparison.LESS_THAN,
+        right_expr=SqlColumnReferenceExpression(
+            SqlColumnReference(
+                table_alias=right_source_alias,
+                column_name=window_end_dimension_name,
+            )
+        ),
+    )
+    window_end_is_null = SqlIsNullExpression(
+        SqlColumnReferenceExpression(
+            SqlColumnReference(
+                table_alias=right_source_alias,
+                column_name=window_end_dimension_name,
+            )
+        )
+    )
+    window_end_condition = SqlLogicalExpression(
+        operator=SqlLogicalOperator.OR, args=(window_end_by_time, window_end_is_null)
+    )
+
+    return (window_start_condition, window_end_condition)
 
 
 def _make_aggregate_measures_join_condition(
@@ -703,6 +767,39 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                     )
                 )
 
+            if join_description.validity_window is None:
+                validity_conditions: Tuple[SqlExpressionNode, ...] = tuple()
+            else:
+                # The join to base output node requires a metric_time dimension to process a join against an
+                # a dataset with a validity window specified, as that dataset represents an SCD data source
+                # We fetch the metric time instance with the smallest granularity and shortest identifier link path,
+                # since this will be used in the ON statement for the join against the validity window.
+                from_data_set_metric_time_dimension_instances = sorted(
+                    DataflowToSqlQueryPlanConverter._get_metric_time_instances_from_data_set(data_set=from_data_set),
+                    key=lambda x: (x.spec.time_granularity.to_int(), len(x.spec.identifier_links)),
+                )
+                assert from_data_set_metric_time_dimension_instances, (
+                    f"Cannot process join to data set with alias {right_data_set_alias} because it has a validity "
+                    f"window set: {join_description.validity_window}, but source data set with alias "
+                    f"{from_data_set_alias} does not have a metric time dimension we can use for the window join!"
+                )
+                from_data_set_time_dimension_name = from_data_set.column_association_for_time_dimension(
+                    from_data_set_metric_time_dimension_instances[0].spec,
+                ).column_name
+                window_start_dimension_name = right_data_set.column_association_for_time_dimension(
+                    join_description.validity_window.window_start_dimension
+                ).column_name
+                window_end_dimension_name = right_data_set.column_association_for_time_dimension(
+                    join_description.validity_window.window_end_dimension
+                ).column_name
+                validity_conditions = _make_validity_window_on_condition(
+                    left_source_alias=from_data_set_alias,
+                    left_source_time_dimension_name=from_data_set_time_dimension_name,
+                    right_source_alias=right_data_set_alias,
+                    window_start_dimension_name=window_start_dimension_name,
+                    window_end_dimension_name=window_end_dimension_name,
+                )
+
             sql_join_descs.append(
                 make_sql_join_description(
                     right_source_node=right_data_set.sql_select_node,
@@ -710,6 +807,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                     right_source_alias=right_data_set_alias,
                     column_equality_descriptions=column_equality_descriptions,
                     join_type=SqlJoinType.LEFT_OUTER,
+                    additional_on_conditions=validity_conditions,
                 )
             )
 

@@ -30,6 +30,8 @@ FROM (
           -- Join Standard Outputs
           SELECT
             subq_2.metric_time AS metric_time
+            , subq_4.window_start AS listing__window_start
+            , subq_4.window_end AS listing__window_end
             , subq_2.listing AS listing
             , subq_4.capacity AS listing__capacity
             , subq_2.bookings AS bookings
@@ -106,9 +108,11 @@ FROM (
           ) subq_2
           LEFT OUTER JOIN (
             -- Pass Only Elements:
-            --   ['listing', 'capacity']
+            --   ['listing', 'window_start', 'window_end', 'capacity']
             SELECT
-              subq_3.listing
+              subq_3.window_start
+              , subq_3.window_end
+              , subq_3.listing
               , subq_3.capacity
             FROM (
               -- Read Elements From Data Source 'listings'
@@ -146,7 +150,17 @@ FROM (
             ) subq_3
           ) subq_4
           ON
-            subq_2.listing = subq_4.listing
+            (
+              subq_2.listing = subq_4.listing
+            ) AND (
+              subq_2.metric_time >= subq_4.window_start
+            ) AND (
+              (
+                subq_2.metric_time < subq_4.window_end
+              ) OR (
+                subq_4.window_end IS NULL
+              )
+            )
         ) subq_5
       ) subq_6
       WHERE listing__capacity > 2
