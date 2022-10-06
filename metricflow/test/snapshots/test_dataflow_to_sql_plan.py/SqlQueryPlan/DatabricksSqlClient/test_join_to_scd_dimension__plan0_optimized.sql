@@ -28,7 +28,21 @@ FROM (
   LEFT OUTER JOIN
     ***************************.dim_listings listings_src_10019
   ON
+<<<<<<< HEAD
     subq_12.listing = listings_src_10019.listing_id
+=======
+    (
+      subq_12.listing = listings_src_10019.listing_id
+    ) AND (
+      subq_12.metric_time >= listings_src_10019.active_from
+    ) AND (
+      (
+        subq_12.metric_time < listings_src_10019.active_to
+      ) OR (
+        listings_src_10019.active_to IS NULL
+      )
+    )
+>>>>>>> c9f3463 (Update plan files to fix tests)
 ) subq_16
 WHERE listing__capacity > 2
 GROUP BY
