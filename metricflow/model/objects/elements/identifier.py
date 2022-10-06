@@ -75,4 +75,4 @@ class Identifier(HashableBaseModel, ModelWithMetadataParsing):
 
     @property
     def reference(self) -> IdentifierReference:  # noqa: D
-        return IdentifierReference(element_name=self.name)
+        return IdentifierReference(element_name=self.name, entity=self.entity or self.name)

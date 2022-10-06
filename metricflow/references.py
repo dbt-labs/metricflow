@@ -37,7 +37,11 @@ class DimensionReference(LinkableElementReference):  # noqa: D
 
 @dataclass(frozen=True)
 class IdentifierReference(LinkableElementReference):  # noqa: D
-    pass
+    entity: str = ""
+
+    def __post_init__(self) -> None:
+        """This enables entity for identifier as we want to use the alias during the resolving but the element_name in the query"""
+        object.__setattr__(self, "entity", self.entity or self.element_name)
 
 
 @dataclass(frozen=True)

@@ -67,7 +67,7 @@ class JoinPathKey:
     """A key that can uniquely identify an element and the joins used to realize the element."""
 
     element_name: str
-    identifier_links: Tuple[str, ...]
+    identifier_links: Tuple[IdentifierReference, ...]
     time_granularity: Optional[TimeGranularity]
 
 
@@ -76,7 +76,7 @@ class LinkableDimension:
     """Describes how a dimension can be realized by joining based on identifier links."""
 
     element_name: str
-    identifier_links: Tuple[str, ...]
+    identifier_links: Tuple[IdentifierReference, ...]
     properties: FrozenSet[LinkableElementProperties]
     time_granularity: Optional[TimeGranularity] = None
 
@@ -102,9 +102,9 @@ class LinkableDimension:
 class LinkableIdentifier:
     """Describes how an identifier can be realized by joining based on identifier links."""
 
-    element_name: str
+    reference: IdentifierReference
     properties: FrozenSet[LinkableElementProperties]
-    identifier_links: Tuple[str, ...]
+    identifier_links: Tuple[IdentifierReference, ...]
 
     @property
     def path_key(self) -> JoinPathKey:  # noqa: D
@@ -113,9 +113,13 @@ class LinkableIdentifier:
         )
 
     @property
+    def element_name(self) -> str:  # noqa:  D
+        return self.reference.element_name
+
+    @property
     def after_intersection(self) -> LinkableIdentifier:  # noqa: D
         return LinkableIdentifier(
-            element_name=self.element_name,
+            reference=self.reference,
             identifier_links=self.identifier_links,
             properties=frozenset({LinkableElementProperties.INTERSECTED}),
         )
@@ -275,7 +279,7 @@ class LinkableElementSet:
             dimension_specs=tuple(
                 DimensionSpec(
                     element_name=x.element_name,
-                    identifier_links=tuple(IdentifierReference(element_name=x) for x in x.identifier_links),
+                    identifier_links=x.identifier_links,
                 )
                 for x in self.linkable_dimensions
                 if not x.time_granularity
@@ -283,18 +287,14 @@ class LinkableElementSet:
             time_dimension_specs=tuple(
                 TimeDimensionSpec(
                     element_name=x.element_name,
-                    identifier_links=tuple(IdentifierReference(element_name=x) for x in x.identifier_links),
+                    identifier_links=x.identifier_links,
                     time_granularity=x.time_granularity,
                 )
                 for x in self.linkable_dimensions
                 if x.time_granularity
             ),
             identifier_specs=tuple(
-                IdentifierSpec(
-                    element_name=x.element_name,
-                    identifier_links=tuple(IdentifierReference(element_name=x) for x in x.identifier_links),
-                )
-                for x in self.linkable_identifiers
+                IdentifierSpec.from_reference(x.reference, x.identifier_links) for x in self.linkable_identifiers
             ),
         )
 
@@ -304,11 +304,13 @@ class DataSourceJoinPathElement:
     """Describes joining a data source by the given identifier."""
 
     data_source: DataSource
-    join_on_identifier: str
+    join_on_identifier: IdentifierReference
 
 
 def _generate_linkable_time_dimensions(
-    dimension: Dimension, identifier_links: Tuple[str, ...], with_properties: FrozenSet[LinkableElementProperties]
+    dimension: Dimension,
+    identifier_links: Tuple[IdentifierReference, ...],
+    with_properties: FrozenSet[LinkableElementProperties],
 ) -> Sequence[LinkableDimension]:
     """Generates different versions of the given dimension, but at other valid time granularities."""
     linkable_dimensions = []
@@ -381,10 +383,10 @@ class DataSourceJoinPath:
 
         for identifier in data_source.identifiers:
             # Avoid creating "booking_id__booking_id"
-            if identifier.reference.element_name != identifier_links[-1]:
+            if identifier.reference != identifier_links[-1]:
                 linkable_identifiers.append(
                     LinkableIdentifier(
-                        element_name=identifier.reference.element_name,
+                        reference=identifier.reference,
                         identifier_links=identifier_links,
                         properties=with_properties.union({LinkableElementProperties.IDENTIFIER}),
                     )
@@ -423,7 +425,6 @@ class ValidLinkableSpecResolver:
         """
         self._user_configured_model = user_configured_model
         self._data_sources = self._user_configured_model.data_sources
-
         assert max_identifier_links >= 0
         self._max_identifier_links = max_identifier_links
 
@@ -445,6 +446,7 @@ class ValidLinkableSpecResolver:
                 linkable_sets_for_measure.append(self._get_linkable_element_set_for_measure(measure))
 
             self._metric_to_linkable_element_sets[metric.name] = linkable_sets_for_measure
+
         logger.info(f"Building the [metric -> valid linkable element] index took: {time.time() - start_time:.2f}s")
 
     def _get_data_source_for_measure(self, measure_reference: MeasureReference) -> DataSource:  # noqa: D
@@ -492,7 +494,7 @@ class ValidLinkableSpecResolver:
         for identifier in data_source.identifiers:
             linkable_identifiers.append(
                 LinkableIdentifier(
-                    element_name=identifier.reference.element_name,
+                    reference=identifier.reference,
                     identifier_links=(),
                     properties=frozenset({LinkableElementProperties.LOCAL, LinkableElementProperties.IDENTIFIER}),
                 )
@@ -506,7 +508,7 @@ class ValidLinkableSpecResolver:
                     additional_linkable_dimensions.append(
                         LinkableDimension(
                             element_name=linkable_dimension.element_name,
-                            identifier_links=(identifier.reference.element_name,),
+                            identifier_links=(identifier.reference,),
                             time_granularity=linkable_dimension.time_granularity,
                             properties=frozenset(linkable_dimension.properties.union(properties)),
                         )
@@ -519,9 +521,9 @@ class ValidLinkableSpecResolver:
             ambiguous_linkable_identifiers=(),
         )
 
-    def _get_data_sources_with_joinable_identifier(self, identifier_name: str) -> Sequence[DataSource]:
+    def _get_data_sources_with_joinable_identifier(self, identifier: IdentifierReference) -> Sequence[DataSource]:
         # May switch to non-cached implementation.
-        data_sources = self._identifier_to_data_source[identifier_name]
+        data_sources = self._identifier_to_data_source[identifier.entity]
         return data_sources
 
     def _get_linkable_element_set_for_measure(self, measure_reference: MeasureReference) -> LinkableElementSet:
@@ -534,19 +536,18 @@ class ValidLinkableSpecResolver:
 
         # Create 1-hop elements
         for identifier in measure_data_source.identifiers:
-            data_sources = self._get_data_sources_with_joinable_identifier(identifier.reference.element_name)
+            data_sources = self._get_data_sources_with_joinable_identifier(identifier.reference)
             for data_source in data_sources:
                 if data_source.name == measure_data_source.name:
                     continue
                 join_paths.append(
                     DataSourceJoinPath(
                         path_elements=(
-                            DataSourceJoinPathElement(
-                                data_source=data_source, join_on_identifier=identifier.reference.element_name
-                            ),
+                            DataSourceJoinPathElement(data_source=data_source, join_on_identifier=identifier.reference),
                         )
                     )
                 )
+
         all_linkable_elements = LinkableElementSet.merge(
             [local_linkable_elements]
             + [
@@ -608,12 +609,12 @@ class ValidLinkableSpecResolver:
         new_join_paths = []
 
         for identifier in data_source.identifiers:
-            identifier_name = identifier.reference.element_name
+            identifier_reference = identifier.reference
 
-            if identifier_name in set(x.join_on_identifier for x in current_join_path.path_elements):
+            if identifier_reference in set(x.join_on_identifier for x in current_join_path.path_elements):
                 continue
 
-            data_sources_that_can_be_joined = self._get_data_sources_with_joinable_identifier(identifier_name)
+            data_sources_that_can_be_joined = self._get_data_sources_with_joinable_identifier(identifier_reference)
             for data_source in data_sources_that_can_be_joined:
                 # Don't create cycles in the join path by not repeating a data source in the path.
                 if data_source.name == measure_data_source.name or any(
@@ -623,7 +624,7 @@ class ValidLinkableSpecResolver:
 
                 new_join_path = DataSourceJoinPath(
                     path_elements=current_join_path.path_elements
-                    + (DataSourceJoinPathElement(data_source=data_source, join_on_identifier=identifier_name),)
+                    + (DataSourceJoinPathElement(data_source=data_source, join_on_identifier=identifier_reference),)
                 )
                 new_join_paths.append(new_join_path)
 

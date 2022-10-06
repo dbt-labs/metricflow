@@ -41,8 +41,16 @@ class SqlDataSet(DataSet):
         matching_instances = 0
         column_associations_to_return = None
         for linkable_instance in self.instance_set.identifier_instances:
+            # first try and match on the element name, if it fails, match on entity => element_name
+            # no idea why OOO is not used at all
             if (
                 identifier_spec.element_name == linkable_instance.spec.element_name
+                and identifier_spec.identifier_links == linkable_instance.spec.identifier_links
+            ):
+                column_associations_to_return = linkable_instance.associated_columns
+                matching_instances += 1
+            elif (
+                identifier_spec.entity == linkable_instance.spec.element_name
                 and identifier_spec.identifier_links == linkable_instance.spec.identifier_links
             ):
                 column_associations_to_return = linkable_instance.associated_columns

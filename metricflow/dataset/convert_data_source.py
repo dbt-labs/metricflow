@@ -130,9 +130,9 @@ class DataSourceToDataSetConverter:
         identifier_links: Tuple[IdentifierReference, ...],
     ) -> IdentifierInstance:
         """Create an identifier instance from the identifier object from a data sourcein the model."""
-        identifier_spec = IdentifierSpec(
-            element_name=identifier.reference.element_name,
-            identifier_links=identifier_links,
+        identifier_spec = IdentifierSpec.from_reference(
+            identifier.reference,
+            identifier_links,
         )
         column_associations = identifier_spec.column_associations(self._column_association_resolver)
 

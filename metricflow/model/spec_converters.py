@@ -98,7 +98,8 @@ class WhereConstraintConverter:
                 else:
                     raise RuntimeError(f"Unhandled type: {dimension.type}")
             elif spec_name.element_name in identifier_references:
-                where_constraint_identifiers.append(IdentifierSpec.from_name(spec_name.qualified_name))
+                reference = identifier_references[spec_name.element_name]
+                where_constraint_identifiers.append(IdentifierSpec.from_reference(reference, ()))
             else:
                 raise InvalidQueryException(f"Unknown element: {spec_name}")
 

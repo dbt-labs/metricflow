@@ -332,13 +332,13 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             semantic_model=self._semantic_model,
             time_spine_source=self._time_spine_source,
         )
-        self._to_sql_query_plan_converter = DataflowToSqlQueryPlanConverter[DataSourceDataSet](
+        sql_plan_converter = DataflowToSqlQueryPlanConverter[DataSourceDataSet](
             column_association_resolver=self._column_association_resolver,
             semantic_model=self._semantic_model,
             time_spine_source=self._time_spine_source,
         )
         self._to_execution_plan_converter = DataflowToExecutionPlanConverter[DataSourceDataSet](
-            sql_plan_converter=self._to_sql_query_plan_converter,
+            sql_plan_converter=sql_plan_converter,
             sql_plan_renderer=self._sql_client.sql_engine_attributes.sql_query_plan_renderer,
             sql_client=sql_client,
         )

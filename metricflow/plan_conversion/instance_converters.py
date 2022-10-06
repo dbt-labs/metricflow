@@ -7,8 +7,8 @@ from collections import OrderedDict
 from itertools import chain
 from typing import List, Sequence, Optional, Dict, Tuple
 
-from metricflow.aggregation_properties import AggregationState
 from metricflow.instances import (
+    AggregationState,
     MdoInstance,
     DimensionInstance,
     IdentifierInstance,
@@ -22,8 +22,6 @@ from metricflow.protocols.semantics import DataSourceSemanticsAccessor
 from metricflow.object_utils import assert_exactly_one_arg_set
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.specs import (
-    MeasureSpec,
-    MetricInputMeasureSpec,
     InstanceSpec,
     IdentifierSpec,
     DimensionSpec,
@@ -148,8 +146,6 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
 
     However, for measure columns, convert them into expressions like "SUM(fct_bookings.bookings) AS bookings" so that
     the resulting expressions can be used for aggregations.
-
-    Also add an output alias that conforms to the alias
     """
 
     def __init__(  # noqa: D
@@ -157,42 +153,23 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
         table_alias: str,
         column_resolver: ColumnAssociationResolver,
         data_source_semantics: DataSourceSemanticsAccessor,
-        metric_input_measure_specs: Sequence[MetricInputMeasureSpec],
     ) -> None:
         self._data_source_semantics = data_source_semantics
-        self.metric_input_measure_specs = metric_input_measure_specs
         super().__init__(table_alias=table_alias, column_resolver=column_resolver)
 
-    def _make_sql_column_expression_to_aggregate_measures(
-        self, measure_instances: Tuple[MeasureInstance, ...]
-    ) -> List[SqlSelectColumn]:
-        output_columns: List[SqlSelectColumn] = []
-        aliased_input_specs = [spec for spec in self.metric_input_measure_specs if spec.alias]
-        for instance in measure_instances:
-            matches = [spec for spec in aliased_input_specs if spec.measure_spec == instance.spec]
-            if matches:
-                aliased_spec = matches[0]
-                aliased_input_specs.remove(aliased_spec)
-                output_measure_spec = aliased_spec.post_aggregation_spec
-            else:
-                output_measure_spec = instance.spec
-
-            output_columns.append(
-                self._make_sql_column_expression_to_aggregate_measure(
-                    measure_instance=instance, output_measure_spec=output_measure_spec
-                )
-            )
-
-        return output_columns
-
     def _make_sql_column_expression_to_aggregate_measure(  # noqa: D
-        self, measure_instance: MeasureInstance, output_measure_spec: MeasureSpec
+        self, measure_instance: MeasureInstance
     ) -> SqlSelectColumn:
         """Convert one measure instance into a SQL column"""
         # Get the column name of the measure in the table that we're reading from
         column_name_in_table = measure_instance.associated_column.column_name
 
         # Create an expression that will aggregate the given measure.
+        new_column_association_for_aggregated_measure = self._column_resolver.resolve_measure_spec(
+            measure_instance.spec
+        )
+        new_column_name_for_aggregated_measure = new_column_association_for_aggregated_measure.column_name
+
         # Figure out the aggregation function for the measure.
         measure = self._data_source_semantics.get_measure(measure_instance.spec.as_reference)
         aggregation_type = measure.agg
@@ -205,11 +182,6 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
             aggregation_type=aggregation_type, sql_column_expression=expression_to_get_measure
         )
 
-        # Get the output column name from the measure/alias
-
-        new_column_association_for_aggregated_measure = self._column_resolver.resolve_measure_spec(output_measure_spec)
-        new_column_name_for_aggregated_measure = new_column_association_for_aggregated_measure.column_name
-
         return SqlSelectColumn(
             expr=expression_to_aggregate_measure,
             column_alias=new_column_name_for_aggregated_measure,
@@ -219,8 +191,9 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
         metric_cols = list(
             chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.metric_instances])
         )
-
-        measure_cols = self._make_sql_column_expression_to_aggregate_measures(instance_set.measure_instances)
+        measure_cols = [
+            self._make_sql_column_expression_to_aggregate_measure(x) for x in instance_set.measure_instances
+        ]
         dimension_cols = list(
             chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.dimension_instances])
         )
@@ -298,6 +271,7 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
             # The new identifier spec should include the join on identifier.
             transformed_identifier_spec_from_right = IdentifierSpec(
                 element_name=identifier_instance.spec.element_name,
+                entity=identifier_instance.spec.entity,
                 identifier_links=self._join_on_identifier.as_linkless_prefix
                 + identifier_instance.spec.identifier_links,
             )
@@ -363,6 +337,7 @@ class FilterLinkableInstancesWithLeadingLink(InstanceSetTransform[InstanceSet]):
 class FilterElements(InstanceSetTransform[InstanceSet]):
     """Return an instance set with the elements that don't match any of the pass specs removed."""
 
+    # why are those two NOT an InstanceSpecSet ?
     def __init__(  # noqa: D
         self,
         include_specs: Optional[Sequence[InstanceSpec]] = None,
@@ -381,9 +356,9 @@ class FilterElements(InstanceSetTransform[InstanceSet]):
     def _should_pass(self, element_spec: InstanceSpec) -> bool:  # noqa: D
         # TODO: Use better matching function
         if self._include_specs:
-            return any(x == element_spec for x in self._include_specs)
+            return any(x.matches(element_spec) for x in self._include_specs)
         elif self._exclude_specs:
-            return not any(x == element_spec for x in self._exclude_specs)
+            return not any(x.matches(element_spec) for x in self._exclude_specs)
         assert False
 
     def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D
@@ -391,14 +366,14 @@ class FilterElements(InstanceSetTransform[InstanceSet]):
 
         if self._include_specs:
             for include_spec in self._include_specs:
-                if include_spec not in instance_set.spec_set.all_specs:
+                if include_spec not in instance_set.spec_set:
                     raise RuntimeError(
                         f"Include spec {include_spec} is not in the spec set {instance_set.spec_set} - "
                         f"check if this node was constructed correctly."
                     )
         elif self._exclude_specs:
             for exclude_spec in self._exclude_specs:
-                if exclude_spec not in instance_set.spec_set.all_specs:
+                if exclude_spec not in instance_set.spec_set:
                     raise RuntimeError(
                         f"Exclude spec {exclude_spec} is not in the spec set {instance_set.spec_set} - "
                         f"check if this node was constructed correctly."
@@ -448,59 +423,6 @@ class ChangeMeasureAggregationState(InstanceSetTransform[InstanceSet]):
         )
         return InstanceSet(
             measure_instances=measure_instances,
-            dimension_instances=instance_set.dimension_instances,
-            time_dimension_instances=instance_set.time_dimension_instances,
-            identifier_instances=instance_set.identifier_instances,
-            metric_instances=instance_set.metric_instances,
-        )
-
-
-class AliasAggregatedMeasures(InstanceSetTransform[InstanceSet]):
-    """Returns a new instance set where all measures have been assigned an alias spec"""
-
-    def __init__(self, metric_input_measure_specs: Sequence[MetricInputMeasureSpec]):
-        """Initializer stores the input specs, which contain the aliases for each measure
-
-        Note this class only works if used in conjunction with an AggregateMeasuresNode that has been generated
-        by querying a single data source for a single set of aggregated measures. This is currently enforced
-        by the structure of the DataflowPlanBuilder, which ensures each AggregateMeasuresNode corresponds to
-        a single data source set of measures for a single metric, and that these outputs will then be
-        combinded via joins.
-        """
-        self.metric_input_measure_specs = metric_input_measure_specs
-
-    def _alias_measure_instances(self, measure_instances: Tuple[MeasureInstance, ...]) -> Tuple[MeasureInstance, ...]:
-        """Update all measure instances with aliases, if any are found in the input spec set"""
-        aliased_instances: List[MeasureInstance] = []
-        aliased_input_specs = [spec for spec in self.metric_input_measure_specs if spec.alias]
-        for instance in measure_instances:
-            matches = [spec for spec in aliased_input_specs if spec.measure_spec == instance.spec]
-            assert (
-                len(matches) < 2
-            ), f"Found duplicate aliased measure spec matches: {matches} for measure instance {instance}. "
-            "We should always have 0 or 1 matches, or else we might pass the wrong aggregated measures to the "
-            "downstream metric computation expression!"
-            if matches:
-                aliased_spec = matches[0]
-                aliased_input_specs.remove(aliased_spec)
-                measure_spec = aliased_spec.post_aggregation_spec
-            else:
-                measure_spec = instance.spec
-
-            aliased_instances.append(
-                MeasureInstance(
-                    associated_columns=instance.associated_columns,
-                    spec=measure_spec,
-                    aggregation_state=instance.aggregation_state,
-                    defined_from=instance.defined_from,
-                )
-            )
-
-        return tuple(aliased_instances)
-
-    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D
-        return InstanceSet(
-            measure_instances=self._alias_measure_instances(instance_set.measure_instances),
             dimension_instances=instance_set.dimension_instances,
             time_dimension_instances=instance_set.time_dimension_instances,
             identifier_instances=instance_set.identifier_instances,

@@ -300,7 +300,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
         doesn't mean that the node will be useful, but not having common elements definitely means it's not useful.
         """
         relevant_element_names = {x.element_name for x in desired_linkable_specs}.union(
-            {y.element_name for x in desired_linkable_specs for y in x.identifier_links}
+            {y.entity for x in desired_linkable_specs for y in x.identifier_links}
         )
 
         # The metric time dimension is used everywhere, so don't count it unless specifically desired in linkable spec

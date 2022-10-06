@@ -168,11 +168,10 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                 if ident.type not in (IdentifierType.PRIMARY, IdentifierType.UNIQUE):
                     continue
 
-                linkless_identifier_spec_in_node = LinklessIdentifierSpec.from_element_name(
-                    identifier_spec_in_node.element_name
-                )
+                linkless_identifier_spec_in_node = LinklessIdentifierSpec.from_spec(identifier_spec_in_node)
 
                 satisfiable_linkable_specs = []
+                required_identifier_specs = []
                 for needed_linkable_spec in needed_linkable_specs:
                     assert (
                         len(needed_linkable_spec.identifier_links) != 0
@@ -193,15 +192,17 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                     # We might also need to check the identifier type and see if it's the type of join we're allowing,
                     # but since we're doing all left joins now, it's been left out.
 
+                    # why convert all of that when we only want to see if the identifier entity matches the spec
+                    required_identifier_spec = needed_linkable_spec.identifier_links[0]
                     required_identifier_matches_data_set_identifier = (
-                        LinklessIdentifierSpec.from_reference(needed_linkable_spec.identifier_links[0])
-                        == linkless_identifier_spec_in_node
+                        required_identifier_spec.entity == linkless_identifier_spec_in_node.entity
                     )
                     needed_linkable_spec_in_node = (
                         needed_linkable_spec.without_first_identifier_link() in linkable_specs_in_node
                     )
                     if required_identifier_matches_data_set_identifier and needed_linkable_spec_in_node:
                         satisfiable_linkable_specs.append(needed_linkable_spec)
+                        required_identifier_specs.append(required_identifier_spec)
 
                 # If this node can satisfy some linkable specs, it could be useful to join on, so add it to the
                 # candidate list.
@@ -217,7 +218,8 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                     candidates_for_join.append(
                         JoinLinkableInstancesRecipe(
                             node_to_join=node,
-                            join_on_identifier=linkless_identifier_spec_in_node,
+                            join_on_identifier=LinklessIdentifierSpec.from_reference(required_identifier_specs[0]),
+                            # join_on_identifier=linkless_identifier_spec_in_node,
                             satisfiable_linkable_specs=satisfiable_linkable_specs,
                             join_on_partition_dimensions=join_on_partition_dimensions,
                             join_on_partition_time_dimensions=join_on_partition_time_dimensions,

@@ -73,7 +73,7 @@ class DefaultColumnAssociationResolver(ColumnAssociationResolver):
         sub_id_references = []
         for data_source in self._semantic_model.user_configured_model.data_sources:
             for identifier in data_source.identifiers:
-                if identifier.reference.element_name == identifier_spec.element_name:
+                if identifier.reference.entity == identifier_spec.entity:
                     sub_id_references = [sub_id.reference for sub_id in identifier.identifiers]
                     break
 
