@@ -7,7 +7,7 @@ from metricflow.errors.errors import SqlClientCreationException, MetricFlowInitE
 from metricflow.configuration.config_handler import ConfigHandler
 from metricflow.configuration.constants import CONFIG_DBT_REPO, CONFIG_DWH_SCHEMA
 from metricflow.engine.metricflow_engine import MetricFlowEngine
-from metricflow.engine.utils import build_user_configured_model_from_config
+from metricflow.engine.utils import build_user_configured_model_from_config, build_user_configured_model_from_dbt_config
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql_clients.sql_utils import make_sql_client_from_config
@@ -118,7 +118,7 @@ class CLIContext:
     def user_configured_model(self) -> UserConfiguredModel:  # noqa: D
         if self._user_configured_model is None:
             if self.model_path_is_for_dbt:
-                raise NotImplementedError("Parsing user_configured_models from dbt config files is not yet supported")
+                self._user_configured_model = build_user_configured_model_from_dbt_config(self.config)
             else:
                 self._user_configured_model = build_user_configured_model_from_config(self.config)
 
