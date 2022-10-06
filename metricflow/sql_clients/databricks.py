@@ -119,6 +119,10 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         logger.info("Beginning conversion of PyArrow Table to pandas DataFrame.")
         pandas_df = pyarrow_df.to_pandas()
         logger.info("Completed conversion of PyArrow Table to pandas DataFrame.")
+        # Remove tz from any datetime cols. Databricks tables add UTC by default.
+        for col_name in pandas_df:
+            if pd.api.types.is_datetime64_any_dtype(pandas_df[col_name]):
+                pandas_df[col_name] = pandas_df[col_name].dt.tz_localize(None)
         return pandas_df
 
     def _engine_specific_execute_implementation(self, stmt: str, bind_params: SqlBindParameters) -> None:
