@@ -93,7 +93,7 @@ def dbt_metric_to_metricflow_elements(dbt_metric: DbtMetric, manifest: DbtManife
 def transform_manifest_into_user_configured_model(manifest: DbtManifest) -> ModelBuildResult:  # noqa: D
     data_sources = {}
     metrics = []
-    for dbt_metric in manifest.metrics:
+    for dbt_metric in manifest.metrics.values():
         transformed_dbt_metric = dbt_metric_to_metricflow_elements(dbt_metric=dbt_metric, manifest=manifest)
         if transformed_dbt_metric.data_source.name not in data_sources:
             data_sources[transformed_dbt_metric.data_source.name] = transformed_dbt_metric.data_source
