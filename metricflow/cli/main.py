@@ -217,7 +217,7 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
                 `mf query \\
                   --metrics transactions,transaction_usd_na,transaction_usd_na_l7d --dimensions metric_time,is_large \\
                   --order metric_time --start-time 2022-03-20 --end-time 2022-04-01`
-                * You can also add `--explain --display-plans`.
+                * You can also add `--explain` or `--display-plans`.
             11. For more ways to interact with the sample models, go to
                 ‘https://docs.transform.co/docs/metricflow/metricflow-tutorial’.
             12. Once you’re done, run `mf tutorial --skip-dw --drop-tables` to drop the sample tables.
