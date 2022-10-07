@@ -235,6 +235,23 @@ def create_simple_model_tables(mf_test_session_state: MetricFlowTestSessionState
             data=[
                 ("l3141592", "ll_001"),
                 ("l5948301", "LUX_TEST_ID"),
+                ("l2718281", "ll_002"),
+            ],
+        ),
+    )
+
+    create_table(
+        sql_client=sql_client,
+        sql_table=SqlTable(schema_name=schema, table_name="dim_lux_listings"),
+        df=make_df(
+            sql_client=sql_client,
+            columns=["lux_listing_id", "is_confirmed_lux", "valid_from", "valid_to"],
+            time_columns={"valid_from", "valid_to"},
+            data=[
+                ("ll_001", True, "2020-01-01", None),
+                ("LUX_TEST_ID", True, "2020-01-02", None),
+                ("ll_002", True, "2020-01-01", "2020-01-02"),
+                ("ll_002", False, "2020-01-02", None),
             ],
         ),
     )
@@ -277,6 +294,27 @@ def create_simple_model_tables(mf_test_session_state: MetricFlowTestSessionState
             columns=["user_id", "account_balance", DEFAULT_DS, "account_type"],
             time_columns={DEFAULT_DS},
             data=accounts_data,
+        ),
+    )
+
+    create_table(
+        sql_client=sql_client,
+        sql_table=SqlTable(schema_name=schema, table_name="dim_primary_accounts"),
+        df=make_df(
+            sql_client=sql_client,
+            columns=["user_id", "account_type", "set_as_primary", "removed_as_primary"],
+            time_columns={"set_as_primary", "removed_as_primary"},
+            data=[
+                ("u0004114", "savings", "2020-01-01", "2020-01-02"),
+                ("u1612112", "checking", "2020-01-01", "2020-01-01"),
+                ("u0005432", "savings", "2020-01-02", "2020-01-03"),
+                ("u0003452", "checking", "2020-01-01", None),
+                ("u0003154", "checking", "2020-01-01", None),
+                ("u0003141", "checking", "2020-01-01", None),
+                ("u0004114", "savings", "2020-01-02", None),
+                ("u1612112", "checking", "2020-01-02", "2020-01-02"),
+                ("u0005432", "checking", "2020-01-03", None),
+            ],
         ),
     )
 

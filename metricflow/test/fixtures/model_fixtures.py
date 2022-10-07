@@ -135,12 +135,14 @@ def template_mapping(mf_test_session_state: MetricFlowTestSessionState) -> Dict[
         "fct_id_verifications_table": f"{schema}.fct_id_verifications",
         "fct_revenue_table": f"{schema}.fct_revenue",
         "dim_lux_listing_id_mapping_table": f"{schema}.dim_lux_listing_id_mapping",
+        "dim_lux_listings_table": f"{schema}.dim_lux_listings",
         "thorium_table": f"{schema}.thorium",
         "osmium_table": f"{schema}.osmium",
         "dysprosium_table": f"{schema}.dysprosium",
         "dim_companies_table": f"{schema}.dim_companies",
         "source_schema": schema,
         "accounts_source_table": f"{schema}.fct_accounts",
+        "primary_accounts_table": f"{schema}.dim_primary_accounts",
     }
 
 

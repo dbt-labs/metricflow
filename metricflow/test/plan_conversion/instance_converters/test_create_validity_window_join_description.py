@@ -1,7 +1,10 @@
+import pytest
+
 from metricflow.dataflow.dataflow_plan import ValidityWindowJoinDescription
-from metricflow.specs import TimeDimensionSpec
+from metricflow.instances import InstanceSet
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
+from metricflow.specs import TimeDimensionSpec
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.time.time_granularity import TimeGranularity
 
@@ -52,5 +55,14 @@ def test_validity_window_conversion(
     ), f"Expected validity window: `{expected_join_description}` but got: `{validity_window_join_description}`"
 
 
-# TODO: Add tests for other conditions (e.g., multiple validity windows in one data set) as multi-hop join support
-# for SCDs is added.
+def test_multiple_validity_windows(
+    consistent_id_object_repository: ConsistentIdObjectRepository, scd_semantic_model: SemanticModel
+) -> None:
+    """Tests the behavior of this converter when it encounters an instance set with multiple validity windows"""
+    first_dataset = consistent_id_object_repository.scd_model_data_sets["listings"]
+    second_dataset = consistent_id_object_repository.scd_model_data_sets["primary_accounts"]
+    merged_instance_set = InstanceSet.merge([first_dataset.instance_set, second_dataset.instance_set])
+    with pytest.raises(AssertionError, match="Found more than 1 set of validity window specs"):
+        CreateValidityWindowJoinDescription(data_source_semantics=scd_semantic_model.data_source_semantics).transform(
+            merged_instance_set
+        )
