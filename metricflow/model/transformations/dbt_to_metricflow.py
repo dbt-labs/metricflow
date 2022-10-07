@@ -3,10 +3,11 @@ from dbt.contracts.graph.parsed import ParsedMetric as DbtMetric, ParsedModelNod
 from dbt.exceptions import ref_invalid_args
 from dbt.parser.manifest import Manifest as DbtManifest
 from metricflow.model.objects.data_source import DataSource
-from metricflow.model.objects.elements.dimension import Dimension, DimensionType
+from metricflow.model.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from metricflow.model.objects.metric import Metric
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.parsing.dir_to_model import ModelBuildResult
+from metricflow.time.time_granularity import TimeGranularity
 
 
 def _resolve_metric_model_ref(manifest: DbtManifest, dbt_metric: DbtMetric) -> DbtModelNode:  # noqa: D
@@ -38,7 +39,7 @@ def _db_table_from_model_node(node: DbtModelNode) -> str:  # noqa: D
     return f"{node.database}.{node.schema}.{node.name}"
 
 
-def _build_dimensions(dimensions: List[str]) -> List[Dimension]:  # noqa: D
+def _dimensions_from_dbt_metric_dimensions(dimensions: List[str]) -> List[Dimension]:  # noqa: D
     built_dimensions = []
     for dimension in dimensions:
         built_dimensions.append(
@@ -48,6 +49,18 @@ def _build_dimensions(dimensions: List[str]) -> List[Dimension]:  # noqa: D
             )
         )
     return built_dimensions
+
+
+def _build_dimensions(dbt_metric: DbtMetric) -> List[Dimension]:  # noqa: D
+    dimensions = _dimensions_from_dbt_metric_dimensions(dimensions=dbt_metric.dimensions)
+    dimensions.append(
+        Dimension(
+            name=dbt_metric.timestamp,
+            type=DimensionType.TIME,
+            type_params=DimensionTypeParams(time_granularity=TimeGranularity.DAY),
+        )
+    )
+    return dimensions
 
 
 def _build_data_source(dbt_metric: DbtMetric, manifest: DbtManifest) -> DataSource:  # noqa: D
@@ -61,7 +74,7 @@ def _build_data_source(dbt_metric: DbtMetric, manifest: DbtManifest) -> DataSour
         description=metric_model_ref.description,
         sql_table=data_source_table,
         dbt_model=data_source_table,
-        dimensions=_build_dimensions(dbt_metric.dimensions),
+        dimensions=_build_dimensions(dbt_metric),
     )
 
 
