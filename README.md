@@ -30,7 +30,7 @@
 
 See our latest updates in the [Metricflow Changelog](https://github.com/transform-data/metricflow/blob/main/CHANGELOG.md)!
 
-MetricFlow is a semantic layer that makes it easy to organized metric definition and build performant and legible SQL. This makes it easy to get consistent metrics output broken down by attributes (dimensions) of interest.
+MetricFlow is a semantic layer that makes it easy to organize metric definitions. It takes those definitions and generates legible and reusable SQL. This makes it easy to get consistent metrics output broken down by attributes (dimensions) of interest.
 
 The name comes from the approach taken to generate metrics. A query is compiled into a query plan (represented below) called a dataflow that constructs metrics. The plan is then optimized and rendered to engine-specific SQL.
 
@@ -68,81 +68,17 @@ mf setup
 
 In case you don't have a connection to a data warehouse available and want a self-contained demo, DuckDB can be selected.
 
-You may need to install postgresql or graphviz. You can do so using brew: `brew install postgresql` or `brew install graphviz`
+You may need to install Postgres or Graphviz. You can do so by following the install instructions for [Postgres](https://www.postgresql.org/download/) or [Graphviz](https://www.graphviz.org/download/). Mac users may prefer to use brew: `brew install postgresql` or `brew install graphviz`.
 
 ### Tutorial
 
-The best way to get started is to follow the tutorial:
+The best way to get started is to follow the [tutorial](https://docs.transform.co/docs/metricflow/metricflow-tutorial) steps:
 
 ```
 mf tutorial
 ```
 
 There are several examples of MetricFlow configs on common data sets in the [config-templates](/Users/nicholashandel/repositories/metricflow/config-templates) folder. The tutorial will rely on a small set of [sample configs](/Users/nicholashandel/repositories/metricflow/metricflow/cli/sample_models).
-
-The tutorial steps are:
-
-1.  In `{$HOME}/.metricflow/config.yml`, `model_path` should be `{$HOME}/.metricflow/sample_models`.
-
-2.  Try validating your data model: `
-
-```
-mf validate-configs
-```
-
-3.  Check out your metrics:
-
-```
-mf list-metrics
-```
-
-4.  Check out dimensions for your metric
-
-```
-mf list-dimensions --metric-names transactions
-```
-
-5.  Query your first metric:
-
-```
-mf query --metrics transactions --dimensions metric_time --order metric_time
-```
-
-6.  Show the SQL MetricFlow generates with `--explain`:
-
-```
-mf query --metrics transactions --dimensions metric_time --order metric_time --explain
-```
-
-7.  Visualize the plan with `--display-plans`:
-
-```
-mf query --metrics transactions --dimensions metric_time --order metric_time --explain --display-plans
-```
-
-8.  Add another dimension:
-
-```
-mf query --metrics transactions --dimensions metric_time,customer__country --order metric_time
-```
-
-9. Add a coarser time granularity:
-
-```
-mf query --metrics transactions --dimensions metric_time__week --order metric_time__week
-```
-
-10. Try a more complicated query:
-
-- You can also add `--explain` or `--display-plans` to inspect the logic.
-
-```
-mf query --metrics transactions,transaction_usd_na,transaction_usd_na_l7d --dimensions metric_time,is_large --order metric_time --start-time 2022-03-20 --end-time 2022-04-01
-```
-
-11. For more ways to interact with the sample models, see our [docs](https://docs.transform.co/docs/api/cli/cli-query).
-
-12. Once you’re done, run `mf tutorial --skip-dw --drop-tables` to drop the sample tables.
 
 ## Resources
 
