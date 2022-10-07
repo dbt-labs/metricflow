@@ -4,7 +4,8 @@
       <img  alt="metricflow logo" src="https://github.com/transform-data/metricflow/raw/main/assets/MetricFlow_logo.png" width="auto" height="120">
     </picture>
   </a>
-  Build and maintain all of your metric logic in code.
+  <br /><br />
+  <b>Build and maintain all of your metric logic in code.</b>
   <br /><br />
   <a target="_blank" href="https://twitter.com/transformio">
     <img src="https://img.shields.io/twitter/follow/transformio?labelColor=image.png&color=163B36&logo=twitter&style=flat">
