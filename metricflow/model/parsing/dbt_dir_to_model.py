@@ -1,8 +1,8 @@
 from dbt.lib import get_dbt_config
 from dbt import tracking
 from dbt.parser.manifest import ManifestLoader as DbtManifestLoader, Manifest as DbtManifest
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.parsing.dir_to_model import ModelBuildResult
+from metricflow.model.transformations.dbt_to_metricflow import transform_manifest_into_user_configured_model
 
 
 def get_dbt_project_manifest(directory: str) -> DbtManifest:
@@ -17,10 +17,5 @@ def get_dbt_project_manifest(directory: str) -> DbtManifest:
 
 def parse_dbt_project_to_model(directory: str) -> ModelBuildResult:
     """Parse dbt model files in the given directory to a UserConfiguredModel."""
-
-    manifest = get_dbt_project_manifest(directory=directory)  # noqa: F841
-
-    # TODO: Implement transforming dbt_metrics into a UserConfiguredModel
-    raise NotImplementedError("Transforming dbt metrics into a Metricflow UserConfiguredModel has not been implemented")
-
-    return ModelBuildResult(model=UserConfiguredModel(data_sources=[], metrics=[], materializations=[]))
+    manifest = get_dbt_project_manifest(directory=directory)
+    return transform_manifest_into_user_configured_model(manifest=manifest)
