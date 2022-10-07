@@ -1,4 +1,5 @@
-from typing import List, Union
+from dataclasses import dataclass
+from typing import List
 from dbt.contracts.graph.parsed import ParsedMetric as DbtMetric, ParsedModelNode as DbtModelNode
 from dbt.exceptions import ref_invalid_args
 from dbt.contracts.graph.manifest import Manifest as DbtManifest
@@ -8,6 +9,12 @@ from metricflow.model.objects.metric import Metric
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.parsing.dir_to_model import ModelBuildResult
 from metricflow.time.time_granularity import TimeGranularity
+
+
+@dataclass
+class TransformedDbtMetric:  # noqa: D
+    data_source: DataSource
+    metrics: List[Metric]
 
 
 def _resolve_metric_model_ref(manifest: DbtManifest, dbt_metric: DbtMetric) -> DbtModelNode:  # noqa: D
@@ -78,16 +85,20 @@ def _build_data_source(dbt_metric: DbtMetric, manifest: DbtManifest) -> DataSour
     )
 
 
-def dbt_metric_to_metricflow_elements(  # noqa: D
-    dbt_metric: DbtMetric, manifest: DbtManifest
-) -> List[Union[DataSource, Metric]]:
+def dbt_metric_to_metricflow_elements(dbt_metric: DbtMetric, manifest: DbtManifest) -> TransformedDbtMetric:  # noqa: D
     data_source = _build_data_source(dbt_metric, manifest)
-    return [data_source]
+    return TransformedDbtMetric(data_source=data_source, metrics=[])
 
 
 def transform_manifest_into_user_configured_model(manifest: DbtManifest) -> ModelBuildResult:  # noqa: D
-    elements = []
+    data_sources = {}
+    metrics = []
     for dbt_metric in manifest.metrics.values():
-        elements += dbt_metric_to_metricflow_elements(dbt_metric=dbt_metric, manifest=manifest)
-    raise NotImplementedError("`transform_manifest_into_user_configured_model` isn't finished")
-    return ModelBuildResult(model=UserConfiguredModel(data_sources=[], metrics=[], materializations=[]))
+        transformed_dbt_metric = dbt_metric_to_metricflow_elements(dbt_metric=dbt_metric, manifest=manifest)
+        if transformed_dbt_metric.data_source.name not in data_sources:
+            data_sources[transformed_dbt_metric.data_source.name] = transformed_dbt_metric.data_source
+        else:
+            raise NotImplementedError("Merging two data sources has not been implemented")
+        metrics.extend(transformed_dbt_metric.metrics)
+
+    return ModelBuildResult(model=UserConfiguredModel(data_sources=list(data_sources.values()), metrics=metrics))
