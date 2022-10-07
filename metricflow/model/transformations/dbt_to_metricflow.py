@@ -25,10 +25,10 @@ def _resolve_metric_model_ref(manifest: DbtManifest, dbt_metric: DbtMetric) -> D
     target_package = None
 
     if len(ref_parts) == 1:
-        target_model = ref_parts[0].strip()
+        target_model = ref_parts[0].strip(" \"'\t\r\n")
     elif len(ref_parts) == 2:
-        target_package = ref_parts[0].strip()
-        target_model = ref_parts[1].strip()
+        target_package = ref_parts[0].strip(" \"'\t\r\n")
+        target_model = ref_parts[1].strip(" \"'\t\r\n")
     else:
         ref_invalid_args(dbt_metric.name, ref_parts)
 
@@ -38,7 +38,9 @@ def _resolve_metric_model_ref(manifest: DbtManifest, dbt_metric: DbtMetric) -> D
         current_project=manifest.metadata.project_id,
         node_package=dbt_metric.package_name,
     )
-    assert isinstance(node, DbtModelNode)
+    assert isinstance(
+        node, DbtModelNode
+    ), f"Ref `{dbt_metric.model}` resolved to {node}, which is not of type `{DbtModelNode.__name__}`"
     return node
 
 
