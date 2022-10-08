@@ -13,14 +13,14 @@ data_source:
       expr: set_as_primary
       type_params:
         time_granularity: day
-        validity_info:
+        validity_params:
           is_start: True
     - name: primary_to
       type: time
       expr: removed_as_primary
       type_params:
         time_granularity: day
-        validity_info:
+        validity_params:
           is_end: True
     - name: account_type
       type: categorical

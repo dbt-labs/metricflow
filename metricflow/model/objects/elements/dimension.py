@@ -22,7 +22,7 @@ class DimensionType(ExtendedEnum):
         return self in [DimensionType.TIME]
 
 
-class DimensionValidityInfo(HashableBaseModel):
+class DimensionValidityParams(HashableBaseModel):
     """Parameters identifying a given dimension as an identifier for validity state
 
     This construct is used for supporting SCD Type II tables, such as might be
@@ -43,7 +43,7 @@ class DimensionTypeParams(HashableBaseModel):
     # For legacy support. This is not used.
     time_format: str = ISO8601_FMT
     time_granularity: TimeGranularity
-    validity_info: Optional[DimensionValidityInfo] = None
+    validity_params: Optional[DimensionValidityParams] = None
 
 
 class Dimension(HashableBaseModel, ModelWithMetadataParsing):
@@ -74,12 +74,12 @@ class Dimension(HashableBaseModel, ModelWithMetadataParsing):
         return TimeDimensionReference(element_name=self.name)
 
     @property
-    def validity_info(self) -> Optional[DimensionValidityInfo]:
-        """Returns the DimensionValidityInfo property, if it exists.
+    def validity_params(self) -> Optional[DimensionValidityParams]:
+        """Returns the DimensionValidityParams property, if it exists.
 
-        This is to avoid repeatedly checking that type params is not None before doing anything with ValidityInfo
+        This is to avoid repeatedly checking that type params is not None before doing anything with ValidityParams
         """
         if self.type_params:
-            return self.type_params.validity_info
+            return self.type_params.validity_params
 
         return None

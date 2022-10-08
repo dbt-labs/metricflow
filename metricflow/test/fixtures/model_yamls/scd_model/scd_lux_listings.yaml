@@ -29,14 +29,14 @@ data_source:
       expr: valid_from
       type_params:
         time_granularity: day
-        validity_info:
+        validity_params:
           is_start: True
     - name: window_end
       type: time
       expr: valid_to
       type_params:
         time_granularity: day
-        validity_info:
+        validity_params:
           is_end: True
     - name: is_confirmed_lux
       type: categorical

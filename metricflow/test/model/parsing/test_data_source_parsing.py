@@ -531,7 +531,7 @@ def test_data_source_dimension_metadata_parsing() -> None:
     assert dimension.metadata.file_slice.content == expected_metadata_content
 
 
-def test_data_source_dimension_validity_info_parsing() -> None:
+def test_data_source_dimension_validity_params_parsing() -> None:
     """Test for parsing dimension validity info out of a data source specification"""
     yaml_contents = textwrap.dedent(
         """\
@@ -545,13 +545,13 @@ def test_data_source_dimension_validity_info_parsing() -> None:
               type: time
               type_params:
                 time_granularity: day
-                validity_info:
+                validity_params:
                   is_start: True
             - name: end_time_dimension
               type: time
               type_params:
                 time_granularity: day
-                validity_info:
+                validity_params:
                   is_end: True
         """
     )
@@ -564,11 +564,11 @@ def test_data_source_dimension_validity_info_parsing() -> None:
     assert len(data_source.dimensions) == 2
     start_dimension = data_source.dimensions[0]
     assert start_dimension.type_params is not None
-    assert start_dimension.type_params.validity_info is not None
-    assert start_dimension.type_params.validity_info.is_start is True
-    assert start_dimension.type_params.validity_info.is_end is False
+    assert start_dimension.type_params.validity_params is not None
+    assert start_dimension.type_params.validity_params.is_start is True
+    assert start_dimension.type_params.validity_params.is_end is False
     end_dimension = data_source.dimensions[1]
     assert end_dimension.type_params is not None
-    assert end_dimension.type_params.validity_info is not None
-    assert end_dimension.type_params.validity_info.is_start is False
-    assert end_dimension.type_params.validity_info.is_end is True
+    assert end_dimension.type_params.validity_params is not None
+    assert end_dimension.type_params.validity_params.is_start is False
+    assert end_dimension.type_params.validity_params.is_end is True

@@ -244,7 +244,7 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
 
 
 @dataclass(frozen=True)
-class _DimensionValidityInfo:
+class _DimensionValidityParams:
     """Helper dataclass for managing dimension validity properties"""
 
     dimension_name: str
@@ -266,18 +266,18 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
 
     def _get_validity_dimensions_for_data_source(
         self, data_source_name: str
-    ) -> Optional[Tuple[_DimensionValidityInfo, _DimensionValidityInfo]]:
+    ) -> Optional[Tuple[_DimensionValidityParams, _DimensionValidityParams]]:
         """Returns a 2-tuple (start, end) of validity window dimensions info, if any exist in the data source"""
         data_source = self._data_source_semantics.get(data_source_name=data_source_name)
         assert data_source, f"Could not find data source with name {data_source_name} after data set conversion!"
 
-        validity_dims = [dim for dim in data_source.dimensions if dim.validity_info is not None]
+        validity_dims = [dim for dim in data_source.dimensions if dim.validity_params is not None]
 
         if not validity_dims:
             return None
 
-        start_dims = [dim for dim in validity_dims if dim.validity_info and dim.validity_info.is_start]
-        end_dims = [dim for dim in validity_dims if dim.validity_info and dim.validity_info.is_end]
+        start_dims = [dim for dim in validity_dims if dim.validity_params and dim.validity_params.is_start]
+        end_dims = [dim for dim in validity_dims if dim.validity_params and dim.validity_params.is_end]
         assert len(start_dims) == 1, (
             f"Error, found more than one validity window start dimension in data source `{data_source_name}`. "
             f"This should have been blocked by model validation! Start dims: `{start_dims}`"
@@ -294,10 +294,12 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
         assert end_dim.type_params, "Typechecker hint - validity info cannot exist without the type params"
 
         return (
-            _DimensionValidityInfo(
+            _DimensionValidityParams(
                 dimension_name=start_dim.name, time_granularity=start_dim.type_params.time_granularity
             ),
-            _DimensionValidityInfo(dimension_name=end_dim.name, time_granularity=end_dim.type_params.time_granularity),
+            _DimensionValidityParams(
+                dimension_name=end_dim.name, time_granularity=end_dim.type_params.time_granularity
+            ),
         )
 
     def transform(self, instance_set: InstanceSet) -> Optional[ValidityWindowJoinDescription]:

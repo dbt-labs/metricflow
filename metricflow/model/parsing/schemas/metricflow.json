@@ -215,6 +215,9 @@
                         "quarter",
                         "year"
                     ]
+                },
+                "validity_params": {
+                    "$ref": "#/definitions/validity_params_schema"
                 }
             },
             "required": [
@@ -740,6 +743,19 @@
             "required": [
                 "name"
             ],
+            "type": "object"
+        },
+        "validity_params_schema": {
+            "$id": "validity_params_schema",
+            "additionalProperties": false,
+            "properties": {
+                "is_end": {
+                    "type": "boolean"
+                },
+                "is_start": {
+                    "type": "boolean"
+                }
+            },
             "type": "object"
         }
     },
