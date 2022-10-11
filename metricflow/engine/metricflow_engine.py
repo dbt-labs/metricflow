@@ -26,7 +26,7 @@ from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
 from metricflow.execution.execution_plan_to_text import execution_plan_to_text
 from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.model.semantic_model import SemanticModel
-from metricflow.model.semantics.linkable_spec_resolver import LinkableElementProperties
+from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.object_utils import pformat_big_objects, random_id
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_execution import DataflowToExecutionPlanConverter

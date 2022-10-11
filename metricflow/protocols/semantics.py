@@ -18,14 +18,15 @@ from metricflow.model.objects.elements.identifier import Identifier
 from metricflow.model.objects.elements.measure import Measure
 from metricflow.model.objects.metric import Metric
 from metricflow.model.semantics.element_group import ElementGrouper
-from metricflow.model.semantics.linkable_spec_resolver import LinkableElementProperties
+from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.references import (
     DimensionReference,
     IdentifierReference,
     MeasureReference,
-    MetricReference,
     TimeDimensionReference,
+    MetricReference,
 )
+
 from metricflow.specs import (
     LinkableInstanceSpec,
     MeasureSpec,
