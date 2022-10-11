@@ -127,6 +127,7 @@ def query_options(function: Callable) -> Callable:
     function = click.option(
         "--dimensions",
         type=click_custom.SequenceParamType(),
+        default="",
         help="Dimensions to group by: syntax is --dimensions ds or for multiple dimensions --dimensions ds,org",
     )(function)
     function = click.option(

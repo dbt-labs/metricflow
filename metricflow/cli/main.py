@@ -316,7 +316,7 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
 def query(
     cfg: CLIContext,
     metrics: List[str],
-    dimensions: List[str],
+    dimensions: List[str] = [],
     where: Optional[str] = None,
     start_time: Optional[dt.datetime] = None,
     end_time: Optional[dt.datetime] = None,

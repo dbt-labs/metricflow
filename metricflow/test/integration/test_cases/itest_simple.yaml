@@ -14,6 +14,43 @@ integration_test:
       is_instant
 ---
 integration_test:
+  name: simple_query_with_no_group_bys
+  description: Tests selecting a metric with no group bys.
+  model: SIMPLE_MODEL
+  metrics: ["booking_value"]
+  group_bys: []
+  check_query: |
+    SELECT
+      SUM(booking_value) AS booking_value
+    FROM {{ source_schema }}.fct_bookings
+---
+integration_test:
+  name: simple_query_with_no_group_bys_time_constraint
+  description: Tests selecting a metric with no group bys and a time constraint.
+  model: SIMPLE_MODEL
+  metrics: ["booking_value"]
+  time_constraint: ["2020-01-01", "2020-01-01"]
+  group_bys: []
+  check_query: |
+    SELECT
+      SUM(booking_value) AS booking_value
+    FROM {{ source_schema }}.fct_bookings
+    WHERE {{ render_time_constraint("ds", "2020-01-01", "2020-01-01") }}
+---
+integration_test:
+  name: simple_query_with_no_group_bys_where_constraint
+  description: Tests selecting a metric with no group bys and a where constraint.
+  model: SIMPLE_MODEL
+  metrics: ["booking_value"]
+  group_bys: []
+  where_constraint: "is_instant"
+  check_query: |
+    SELECT
+      SUM(booking_value) AS booking_value
+    FROM {{ source_schema }}.fct_bookings
+    WHERE is_instant
+---
+integration_test:
   name: simple_query_without_dates_available
   description: Tests selecting a metric and the time dimension with a time constraint.
   model: SIMPLE_MODEL

@@ -608,6 +608,12 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         if len(output_nodes) == 1:
             return output_nodes[0]
         else:
+            if len(queried_linkable_specs.as_tuple) == 0:
+                raise NotImplementedError(
+                    "Querying metrics that require a join with no dimensions is not yet supported."
+                    "This can happen with a metric that pulls measures from different data sources, "
+                    "or a metric that pulls measures with different constraints or non-additive dimension specifications."
+                )
             return FilterElementsNode(
                 parent_node=JoinAggregatedMeasuresByGroupByColumnsNode(parent_nodes=output_nodes),
                 include_specs=LinkableInstanceSpec.merge(
