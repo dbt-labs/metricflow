@@ -5,6 +5,7 @@ from typing import Dict, List, Set
 from dbt.contracts.graph.parsed import ParsedMetric as DbtMetric, ParsedModelNode as DbtModelNode
 from dbt.exceptions import ref_invalid_args
 from dbt.contracts.graph.manifest import Manifest as DbtManifest
+from metricflow.aggregation_properties import AggregationType
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from metricflow.model.objects.elements.identifier import Identifier
@@ -20,6 +21,17 @@ from metricflow.time.time_granularity import TimeGranularity
 class TransformedDbtMetric:  # noqa: D
     data_source: DataSource
     metrics: List[Metric]
+
+
+CALC_METHOD_TO_MEASURE_TYPE: Dict[str, AggregationType] = {
+    "count": AggregationType.COUNT,
+    "count_distinct": AggregationType.COUNT_DISTINCT,
+    "sum": AggregationType.SUM,
+    "average": AggregationType.AVERAGE,
+    "min": AggregationType.MIN,
+    "max": AggregationType.MAX,
+    # "derived": AggregationType.DERIVED # Derived DBT metrics don't create measures
+}
 
 
 def _resolve_metric_model_ref(manifest: DbtManifest, dbt_metric: DbtMetric) -> DbtModelNode:  # noqa: D
@@ -93,6 +105,12 @@ def _build_dimensions(dbt_metric: DbtMetric) -> List[Dimension]:  # noqa: D
     return dimensions
 
 
+def _build_measure(dbt_metric: DbtMetric) -> Measure:  # noqa: D
+    return Measure(
+        name=dbt_metric.name, agg=CALC_METHOD_TO_MEASURE_TYPE[dbt_metric.calculation_method], expr=dbt_metric.expression
+    )
+
+
 def _build_data_source(dbt_metric: DbtMetric, manifest: DbtManifest) -> DataSource:  # noqa: D
     metric_model_ref: DbtModelNode = _resolve_metric_model_ref(
         manifest=manifest,
@@ -105,6 +123,7 @@ def _build_data_source(dbt_metric: DbtMetric, manifest: DbtManifest) -> DataSour
         sql_table=data_source_table,
         dbt_model=data_source_table,
         dimensions=_build_dimensions(dbt_metric),
+        measures=[_build_measure(dbt_metric)],
     )
 
 
