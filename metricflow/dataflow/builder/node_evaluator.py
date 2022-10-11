@@ -19,7 +19,6 @@ import logging
 from dataclasses import dataclass
 from typing import Generic, List, Optional, Sequence, TypeVar, Tuple
 
-from metricflow.model.objects.elements.identifier import IdentifierType
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.partitions import PartitionJoinResolver
 from metricflow.dataflow.dataflow_plan import (
@@ -30,15 +29,16 @@ from metricflow.dataflow.dataflow_plan import (
     ValidityWindowJoinDescription,
 )
 from metricflow.instances import InstanceSet
+from metricflow.model.semantics.valid_join import DataSourceJoinValidator
 from metricflow.object_utils import pformat_big_objects
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
+
+from metricflow.protocols.semantics import DataSourceSemanticsAccessor
 from metricflow.specs import (
     LinkableInstanceSpec,
     LinklessIdentifierSpec,
-    InstanceSpecSet,
 )
-from metricflow.protocols.semantics import DataSourceSemanticsAccessor
 
 logger = logging.getLogger(__name__)
 
@@ -106,6 +106,8 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
     We want to know if we can get "bookings", "is_instant", "listing_id__country" using the start_node. The result
     should be that we know: "is_instant" is available locally (i.e. in the same node), and if we join another node
     containing "listing_id" and "country" by "listing_id", we can get "listing_id__country".
+
+    Since it's used on the left side of the join, the items in the "start_node" are sometimes labeled "left".
     """
 
     def __init__(
@@ -126,10 +128,11 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
         self._nodes_available_for_joins = nodes_available_for_joins
         self._node_data_set_resolver = node_data_set_resolver
         self._partition_resolver = PartitionJoinResolver(self._data_source_semantics)
+        self._join_validator = DataSourceJoinValidator(self._data_source_semantics)
 
     def _find_joinable_candidate_nodes_that_can_satisfy_linkable_specs(
         self,
-        start_node_spec_set: InstanceSpecSet,
+        start_node_instance_set: InstanceSet,
         needed_linkable_specs: List[LinkableInstanceSpec],
     ) -> List[JoinLinkableInstancesRecipe]:
         """Get nodes that can be joined to get 1 or more of the "needed_linkable_specs".
@@ -137,44 +140,68 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
         The returned list is ordered by the number of "needed_linkable_specs" that it can satisfy.
         """
         candidates_for_join: List[JoinLinkableInstancesRecipe] = []
-
-        for node in self._nodes_available_for_joins:
-            data_set: SqlDataSet = self._node_data_set_resolver.get_output_data_set(node)
-            linkable_specs_in_node = data_set.instance_set.spec_set.linkable_specs
-            identifier_specs_in_node = data_set.instance_set.spec_set.identifier_specs
+        start_node_spec_set = start_node_instance_set.spec_set
+        for right_node in self._nodes_available_for_joins:
+            data_set_in_right_node: SqlDataSet = self._node_data_set_resolver.get_output_data_set(right_node)
+            linkable_specs_in_right_node = data_set_in_right_node.instance_set.spec_set.linkable_specs
+            identifier_specs_in_right_node = data_set_in_right_node.instance_set.spec_set.identifier_specs
 
             # For each unlinked identifier in the data set, create a candidate for joining.
             # For a data set to be useful for satisfying a linkable spec, it needs to have the identifier
             # and the linkable spec without the identifier. This allows joining based on the identifier, which will
             # then produce the linkable spec. See comments further below for more details.
 
-            for identifier_spec_in_node in identifier_specs_in_node:
+            for identifier_spec_in_right_node in identifier_specs_in_right_node:
                 # If an identifier has links, what that means and whether it can be used is unclear at the moment,
                 # so skip it.
-                if len(identifier_spec_in_node.identifier_links) > 0:
+                if len(identifier_spec_in_right_node.identifier_links) > 0:
                     continue
 
-                identifier_instance = None
-                for instance in data_set.instance_set.identifier_instances:
-                    if instance.spec == identifier_spec_in_node:
-                        identifier_instance = instance
+                identifier_instance_in_right_node = None
+                for instance in data_set_in_right_node.instance_set.identifier_instances:
+                    if instance.spec == identifier_spec_in_right_node:
+                        identifier_instance_in_right_node = instance
                         break
 
-                if identifier_instance is None:
-                    raise RuntimeError(f"Could not find identifier instance with name ({identifier_spec_in_node})")
+                if identifier_instance_in_right_node is None:
+                    raise RuntimeError(
+                        f"Could not find identifier instance with name ({identifier_spec_in_right_node})"
+                    )
 
                 assert (
-                    len(identifier_instance.defined_from) == 1
-                ), f"Did not get exactly 1 defined_from in {identifier_instance}"
+                    len(identifier_instance_in_right_node.defined_from) == 1
+                ), f"Did not get exactly 1 defined_from in {identifier_instance_in_right_node}"
 
-                ident = self._data_source_semantics.get_identifier_in_data_source(identifier_instance.defined_from[0])
-                if ident is None:
-                    raise RuntimeError(f"Invalid DataSourceElementReference {identifier_instance.defined_from[0]}")
-                if ident.type not in (IdentifierType.PRIMARY, IdentifierType.UNIQUE):
+                identifier_in_right_node = self._data_source_semantics.get_identifier_in_data_source(
+                    identifier_instance_in_right_node.defined_from[0]
+                )
+                if identifier_in_right_node is None:
+                    raise RuntimeError(
+                        f"Invalid DataSourceElementReference {identifier_instance_in_right_node.defined_from[0]}"
+                    )
+
+                identifier_instance_in_left_node = None
+                for instance in start_node_instance_set.identifier_instances:
+                    if instance.spec.reference == identifier_spec_in_right_node.reference:
+                        identifier_instance_in_left_node = instance
+                        break
+
+                if identifier_instance_in_left_node is None:
+                    # The right node can have a superset of identifiers.
+                    continue
+
+                assert len(identifier_instance_in_left_node.defined_from) == 1
+                assert len(identifier_instance_in_right_node.defined_from) == 1
+
+                if not self._join_validator.is_valid_data_source_join(
+                    left_data_source_reference=identifier_instance_in_left_node.defined_from[0].data_source_reference,
+                    right_data_source_reference=identifier_instance_in_right_node.defined_from[0].data_source_reference,
+                    on_identifier_reference=identifier_spec_in_right_node.reference,
+                ):
                     continue
 
                 linkless_identifier_spec_in_node = LinklessIdentifierSpec.from_element_name(
-                    identifier_spec_in_node.element_name
+                    identifier_spec_in_right_node.element_name
                 )
 
                 satisfiable_linkable_specs = []
@@ -203,7 +230,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                         == linkless_identifier_spec_in_node
                     )
                     needed_linkable_spec_in_node = (
-                        needed_linkable_spec.without_first_identifier_link() in linkable_specs_in_node
+                        needed_linkable_spec.without_first_identifier_link() in linkable_specs_in_right_node
                     )
                     if required_identifier_matches_data_set_identifier and needed_linkable_spec_in_node:
                         satisfiable_linkable_specs.append(needed_linkable_spec)
@@ -213,19 +240,19 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                 if len(satisfiable_linkable_specs) > 0:
                     join_on_partition_dimensions = self._partition_resolver.resolve_partition_dimension_joins(
                         start_node_spec_set=start_node_spec_set,
-                        node_to_join_spec_set=data_set.instance_set.spec_set,
+                        node_to_join_spec_set=data_set_in_right_node.instance_set.spec_set,
                     )
                     join_on_partition_time_dimensions = self._partition_resolver.resolve_partition_time_dimension_joins(
                         start_node_spec_set=start_node_spec_set,
-                        node_to_join_spec_set=data_set.instance_set.spec_set,
+                        node_to_join_spec_set=data_set_in_right_node.instance_set.spec_set,
                     )
                     validity_window_join_description = CreateValidityWindowJoinDescription(
                         self._data_source_semantics
-                    ).transform(instance_set=data_set.instance_set)
+                    ).transform(instance_set=data_set_in_right_node.instance_set)
 
                     candidates_for_join.append(
                         JoinLinkableInstancesRecipe(
-                            node_to_join=node,
+                            node_to_join=right_node,
                             join_on_identifier=linkless_identifier_spec_in_node,
                             satisfiable_linkable_specs=satisfiable_linkable_specs,
                             join_on_partition_dimensions=join_on_partition_dimensions,
@@ -319,7 +346,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                 possibly_joinable_linkable_specs.append(required_linkable_spec)
 
         candidates_for_join = self._find_joinable_candidate_nodes_that_can_satisfy_linkable_specs(
-            start_node_spec_set=candidate_spec_set, needed_linkable_specs=possibly_joinable_linkable_specs
+            start_node_instance_set=candidate_instance_set, needed_linkable_specs=possibly_joinable_linkable_specs
         )
         join_candidates: List[JoinLinkableInstancesRecipe] = []
 

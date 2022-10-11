@@ -12,8 +12,8 @@ from metricflow.dataflow.dataflow_plan import (
     FilterElementsNode,
     JoinDescription,
 )
-from metricflow.model.objects.elements.identifier import IdentifierType
 from metricflow.model.semantics.metric_semantics import MAX_JOIN_HOPS
+from metricflow.model.semantics.valid_join import DataSourceJoinValidator
 from metricflow.object_utils import pformat_big_objects
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.protocols.semantics import DataSourceSemanticsAccessor
@@ -85,6 +85,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
         self._node_data_set_resolver = node_data_set_resolver
         self._partition_resolver = PartitionJoinResolver(data_source_semantics)
         self._data_source_semantics = data_source_semantics
+        self._join_validator = DataSourceJoinValidator(data_source_semantics)
 
     def add_time_range_constraint(
         self,
@@ -121,7 +122,6 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
         self,
         node: BaseOutput[SqlDataSetT],
         identifier_reference: IdentifierReference,
-        valid_types: Set[IdentifierType],
     ) -> bool:
         """Returns true if the output of the node contains an identifier of the given types."""
         data_set = self._node_data_set_resolver.get_output_data_set(node)
@@ -147,8 +147,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                     f"Invalid DataSourceElementReference {identifier_instance_in_first_node.defined_from[0]}"
                 )
 
-            if identifier.type in valid_types:
-                return True
+            return True
 
         return False
 
@@ -171,19 +170,19 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
         logger.info(f"Creating nodes for {desired_linkable_spec}")
 
         for first_node_that_could_be_joined in nodes:
-            data_set = self._node_data_set_resolver.get_output_data_set(first_node_that_could_be_joined)
+            data_set_of_first_node_that_could_be_joined = self._node_data_set_resolver.get_output_data_set(
+                first_node_that_could_be_joined
+            )
 
-            # Fan-out joins aren't supported, so the identifiers must be of these types to join.
+            # When joining on the identifier, the first node needs the first and second identifier links.
             if not (
                 self._node_contains_identifier(
                     node=first_node_that_could_be_joined,
                     identifier_reference=desired_linkable_spec.identifier_links[0],
-                    valid_types={IdentifierType.PRIMARY, IdentifierType.UNIQUE},
                 )
                 and self._node_contains_identifier(
                     node=first_node_that_could_be_joined,
                     identifier_reference=desired_linkable_spec.identifier_links[1],
-                    valid_types={IdentifierType.PRIMARY, IdentifierType.UNIQUE, IdentifierType.FOREIGN},
                 )
             ):
                 continue
@@ -193,11 +192,11 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                     self._node_contains_identifier(
                         node=second_node_that_could_be_joined,
                         identifier_reference=desired_linkable_spec.identifier_links[1],
-                        valid_types={IdentifierType.PRIMARY, IdentifierType.UNIQUE},
                     )
                 ):
                     continue
 
+                # Avoid loops between the same data sources.
                 if second_node_that_could_be_joined.node_id == first_node_that_could_be_joined.node_id:
                     continue
 
@@ -214,6 +213,16 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                 if desired_linkable_spec.element_name not in element_names_in_data_set:
                     continue
 
+                # The first and second nodes are joined by this identifier
+                identifier_reference_to_join_first_and_second_nodes = desired_linkable_spec.identifier_links[1]
+
+                if not self._join_validator.is_valid_instance_set_join(
+                    left_instance_set=data_set_of_first_node_that_could_be_joined.instance_set,
+                    right_instance_set=data_set_of_second_node_that_can_be_joined.instance_set,
+                    on_identifier_reference=identifier_reference_to_join_first_and_second_nodes,
+                ):
+                    continue
+
                 # filter measures out of joinable_node
                 specs = data_set_of_second_node_that_can_be_joined.instance_set.spec_set
                 pass_specs = InstanceSpec.merge(
@@ -222,11 +231,11 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                 filtered_joinable_node = FilterElementsNode(second_node_that_could_be_joined, pass_specs)
 
                 join_on_partition_dimensions = self._partition_resolver.resolve_partition_dimension_joins(
-                    start_node_spec_set=data_set.instance_set.spec_set,
+                    start_node_spec_set=data_set_of_first_node_that_could_be_joined.instance_set.spec_set,
                     node_to_join_spec_set=data_set_of_second_node_that_can_be_joined.instance_set.spec_set,
                 )
                 join_on_partition_time_dimensions = self._partition_resolver.resolve_partition_time_dimension_joins(
-                    start_node_spec_set=data_set.instance_set.spec_set,
+                    start_node_spec_set=data_set_of_first_node_that_could_be_joined.instance_set.spec_set,
                     node_to_join_spec_set=data_set_of_second_node_that_can_be_joined.instance_set.spec_set,
                 )
 
