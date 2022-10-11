@@ -9,6 +9,7 @@ from typing import List, TypeVar, Generic, Tuple
 from metricflow.aggregation_properties import AggregationState
 from metricflow.column_assoc import ColumnAssociation
 from metricflow.dataclass_serialization import SerializableDataclass
+from metricflow.references import ElementReference
 from metricflow.specs import (
     MeasureSpec,
     DimensionSpec,
@@ -42,10 +43,26 @@ class DataSourceReference(ModelReference):
 
 @dataclass(frozen=True)
 class DataSourceElementReference(ModelReference):
-    """A reference to an element definition in a data source definition in the model."""
+    """A reference to an element definition in a data source definition in the model.
+
+    TODO: Fields should be *Reference objects.
+    """
 
     data_source_name: str
     element_name: str
+
+    @staticmethod
+    def create_from_references(  # noqa: D
+        data_source_reference: DataSourceReference, element_reference: ElementReference
+    ) -> DataSourceElementReference:
+        return DataSourceElementReference(
+            data_source_name=data_source_reference.data_source_name,
+            element_name=element_reference.element_name,
+        )
+
+    @property
+    def data_source_reference(self) -> DataSourceReference:  # noqa: D
+        return DataSourceReference(self.data_source_name)
 
     def is_from(self, ref: DataSourceReference) -> bool:
         """Returns true if this reference is from the same data source as the supplied reference."""

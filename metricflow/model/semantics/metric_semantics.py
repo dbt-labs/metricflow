@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 MAX_JOIN_HOPS = 2
 
+
 class MetricSemantics:  # noqa: D
     def __init__(  # noqa: D
         self, user_configured_model: UserConfiguredModel, data_source_semantics: DataSourceSemantics
@@ -33,6 +34,7 @@ class MetricSemantics:  # noqa: D
 
         self._linkable_spec_resolver = ValidLinkableSpecResolver(
             user_configured_model=self._user_configured_model,
+            data_source_semantics=data_source_semantics,
             max_identifier_links=MAX_JOIN_HOPS,
         )
 
@@ -147,4 +149,3 @@ class MetricSemantics:  # noqa: D
             )
             input_metric_specs.append(spec)
         return tuple(input_metric_specs)
-

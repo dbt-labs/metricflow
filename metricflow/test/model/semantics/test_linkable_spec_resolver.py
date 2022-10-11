@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 def simple_model_spec_resolver(simple_semantic_model: SemanticModel) -> ValidLinkableSpecResolver:  # noqa: D
     return ValidLinkableSpecResolver(
         user_configured_model=simple_semantic_model.user_configured_model,
+        data_source_semantics=simple_semantic_model.data_source_semantics,
         max_identifier_links=MAX_JOIN_HOPS,
     )
 
@@ -169,6 +170,7 @@ def test_joined_property(simple_model_spec_resolver: ValidLinkableSpecResolver) 
 def test_multi_hop_property(multi_hop_join_semantic_model: SemanticModel) -> None:  # noqa: D
     multi_hop_spec_resolver = ValidLinkableSpecResolver(
         user_configured_model=multi_hop_join_semantic_model.user_configured_model,
+        data_source_semantics=multi_hop_join_semantic_model.data_source_semantics,
         max_identifier_links=MAX_JOIN_HOPS,
     )
     property_check_helper(
