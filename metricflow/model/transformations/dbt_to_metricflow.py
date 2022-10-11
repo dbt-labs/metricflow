@@ -73,6 +73,23 @@ def _build_dimensions(dbt_metric: DbtMetric) -> List[Dimension]:  # noqa: D
             type_params=DimensionTypeParams(time_granularity=TimeGranularity.DAY),
         )
     )
+
+    # We need to deduplicate the filters because a field could be the same in
+    # two filters. For example, if two filters exist for `amount`, one with
+    # `>= 500` and the other `< 1000`, but only one dimension should be created
+    distinct_dbt_metric_filter_fields = set([filter.field for filter in dbt_metric.filters])
+    # Add dimension per distinct filter field
+    # exclude when field is also listed as a DbtMetric.dimension
+    # exclude when field is also the DbtMetric.timestamp
+    for filter_field in distinct_dbt_metric_filter_fields:
+        if filter_field not in dbt_metric.dimensions and filter_field != dbt_metric.timestamp:
+            dimensions.append(
+                Dimension(
+                    name=filter_field,
+                    type=DimensionType.CATEGORICAL,
+                )
+            )
+
     return dimensions
 
 
