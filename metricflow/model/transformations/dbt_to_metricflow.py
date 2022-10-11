@@ -1,16 +1,18 @@
 from dataclasses import dataclass
 from operator import xor
 import traceback
-from typing import Dict, List, Set
+from typing import Dict, List, Optional, Set
 from dbt.contracts.graph.parsed import ParsedMetric as DbtMetric, ParsedModelNode as DbtModelNode
+from dbt.contracts.graph.unparsed import MetricFilter as DbtMetricFilter
 from dbt.exceptions import ref_invalid_args
 from dbt.contracts.graph.manifest import Manifest as DbtManifest
 from metricflow.aggregation_properties import AggregationType
+from metricflow.model.objects.constraints.where import WhereClauseConstraint
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from metricflow.model.objects.elements.identifier import Identifier
 from metricflow.model.objects.elements.measure import Measure
-from metricflow.model.objects.metric import Metric
+from metricflow.model.objects.metric import Metric, MetricInputMeasure, MetricType, MetricTypeParams
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.parsing.dir_to_model import ModelBuildResult
 from metricflow.model.validations.validator_helpers import ModelValidationResults, ValidationError, ValidationIssue
@@ -20,7 +22,7 @@ from metricflow.time.time_granularity import TimeGranularity
 @dataclass
 class TransformedDbtMetric:  # noqa: D
     data_source: DataSource
-    metrics: List[Metric]
+    metric: Metric
 
 
 CALC_METHOD_TO_MEASURE_TYPE: Dict[str, AggregationType] = {
@@ -127,9 +129,34 @@ def _build_data_source(dbt_metric: DbtMetric, manifest: DbtManifest) -> DataSour
     )
 
 
+def _where_clause_from_filters(filters: List[DbtMetricFilter]) -> str:  # noqa: D
+    clauses = [f"{filter.field} {filter.operator} {filter.value}" for filter in filters]
+    return " AND ".join(clauses)
+
+
+def _build_proxy_metric(dbt_metric: DbtMetric) -> Metric:  # noqa: D
+    where_clause_constraint: Optional[WhereClauseConstraint] = None
+    if dbt_metric.filters:
+        where_clause_constraint = WhereClauseConstraint(
+            where=_where_clause_from_filters(filters=dbt_metric.filters),
+            linkable_names=[filter.field for filter in dbt_metric.filters],
+        )
+
+    return Metric(
+        name=dbt_metric.name,
+        description=dbt_metric.description,
+        type=MetricType.MEASURE_PROXY,
+        type_params=MetricTypeParams(
+            measure=MetricInputMeasure(name=dbt_metric.name),
+        ),
+        constraint=where_clause_constraint,
+    )
+
+
 def dbt_metric_to_metricflow_elements(dbt_metric: DbtMetric, manifest: DbtManifest) -> TransformedDbtMetric:  # noqa: D
     data_source = _build_data_source(dbt_metric, manifest)
-    return TransformedDbtMetric(data_source=data_source, metrics=[])
+    proxy_metric = _build_proxy_metric(dbt_metric)
+    return TransformedDbtMetric(data_source=data_source, metric=proxy_metric)
 
 
 def merge_data_sources(data_sources: List[DataSource]) -> DataSource:  # noqa: D
@@ -203,7 +230,7 @@ def transform_manifest_into_user_configured_model(manifest: DbtManifest) -> Mode
                 data_sources_map[transformed_dbt_metric.data_source.name] = [transformed_dbt_metric.data_source]
             else:
                 data_sources_map[transformed_dbt_metric.data_source.name].append(transformed_dbt_metric.data_source)
-            metrics.extend(transformed_dbt_metric.metrics)
+            metrics.append(transformed_dbt_metric.metric)
 
     # As it might be the case that we generated many of the same data source,
     # we need to merge / dedupe them
