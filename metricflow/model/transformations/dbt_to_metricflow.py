@@ -67,12 +67,14 @@ def _db_table_from_model_node(node: DbtModelNode) -> str:  # noqa: D
     return f"{node.database}.{node.schema}.{node.name}"
 
 
-def _build_dimension(name: str, known_time_dimensions: List[str]) -> Dimension:
-    if name in known_time_dimensions:
+def _build_dimension(name: str, dbt_metric: DbtMetric, time_dimension_stats: Dict[str, List[str]]) -> Dimension:
+    if name in time_dimension_stats.keys():
         return Dimension(
             name=name,
             type=DimensionType.TIME,
-            type_params=DimensionTypeParams(time_granularity=TimeGranularity.DAY),
+            type_params=DimensionTypeParams(
+                is_primary=dbt_metric.model in time_dimension_stats[name], time_granularity=TimeGranularity.DAY
+            ),
         )
     else:
         return Dimension(
@@ -81,20 +83,18 @@ def _build_dimension(name: str, known_time_dimensions: List[str]) -> Dimension:
         )
 
 
-def _build_dimensions(dbt_metric: DbtMetric, known_time_dimensions: List[str]) -> List[Dimension]:  # noqa: D
+def _build_dimensions(dbt_metric: DbtMetric, time_dimension_stats: Dict[str, List[str]]) -> List[Dimension]:  # noqa: D
     dimensions = []
 
     # Build dimensions specifically from DbtMetric.dimensions list
     for dimension in dbt_metric.dimensions:
-        dimensions.append(_build_dimension(name=dimension, known_time_dimensions=known_time_dimensions))
+        dimensions.append(
+            _build_dimension(name=dimension, dbt_metric=dbt_metric, time_dimension_stats=time_dimension_stats)
+        )
 
     # Add DbtMetric.timestamp as a time dimension
     dimensions.append(
-        Dimension(
-            name=dbt_metric.timestamp,
-            type=DimensionType.TIME,
-            type_params=DimensionTypeParams(time_granularity=TimeGranularity.DAY),
-        )
+        _build_dimension(name=dbt_metric.timestamp, dbt_metric=dbt_metric, time_dimension_stats=time_dimension_stats)
     )
 
     # We need to deduplicate the filters because a field could be the same in
@@ -106,7 +106,9 @@ def _build_dimensions(dbt_metric: DbtMetric, known_time_dimensions: List[str]) -
     # exclude when field is also the DbtMetric.timestamp
     for filter_field in distinct_dbt_metric_filter_fields:
         if filter_field not in dbt_metric.dimensions and filter_field != dbt_metric.timestamp:
-            dimensions.append(_build_dimension(name=filter_field, known_time_dimensions=known_time_dimensions))
+            dimensions.append(
+                _build_dimension(name=filter_field, dbt_metric=dbt_metric, time_dimension_stats=time_dimension_stats)
+            )
 
     return dimensions
 
@@ -121,7 +123,7 @@ def _build_measure(dbt_metric: DbtMetric) -> Measure:  # noqa: D
 
 
 def _build_data_source(
-    dbt_metric: DbtMetric, manifest: DbtManifest, known_time_dimensions: List[str]
+    dbt_metric: DbtMetric, manifest: DbtManifest, time_dimension_stats: Dict[str, List[str]]
 ) -> DataSource:  # noqa: D
     metric_model_ref: DbtModelNode = _resolve_metric_model_ref(
         manifest=manifest,
@@ -133,7 +135,7 @@ def _build_data_source(
         description=metric_model_ref.description,
         sql_table=data_source_table,
         dbt_model=data_source_table,
-        dimensions=_build_dimensions(dbt_metric, known_time_dimensions),
+        dimensions=_build_dimensions(dbt_metric, time_dimension_stats),
         measures=[_build_measure(dbt_metric)],
     )
 
@@ -163,9 +165,9 @@ def _build_proxy_metric(dbt_metric: DbtMetric) -> Metric:  # noqa: D
 
 
 def dbt_metric_to_metricflow_elements(  # noqa: D
-    dbt_metric: DbtMetric, manifest: DbtManifest, known_time_dimensions: List[str]
+    dbt_metric: DbtMetric, manifest: DbtManifest, time_dimension_stats: Dict[str, List[str]]
 ) -> TransformedDbtMetric:
-    data_source = _build_data_source(dbt_metric, manifest, known_time_dimensions)
+    data_source = _build_data_source(dbt_metric, manifest, time_dimension_stats)
     proxy_metric = _build_proxy_metric(dbt_metric)
     return TransformedDbtMetric(data_source=data_source, metric=proxy_metric)
 
@@ -227,15 +229,31 @@ def merge_data_sources(data_sources: List[DataSource]) -> DataSource:  # noqa: D
     )
 
 
-def collect_time_dimension_names_from_metrics(dbt_metrics: List[DbtMetric]) -> List[str]:  # noqa: D
-    return list(set([dbt_metric.timestamp for dbt_metric in dbt_metrics]))
+def collect_time_dimension_names_from_metrics(dbt_metrics: List[DbtMetric]) -> Dict[str, List[str]]:  # noqa: D
+    time_dimensions: Dict[str, List[str]] = {}
+    time_stats_for_metric_models: Dict[str, Dict[str, int]] = {}
+    for dbt_metric in dbt_metrics:
+        if dbt_metric.calculation_method != "derived":
+            if dbt_metric.timestamp not in time_dimensions:
+                time_dimensions[dbt_metric.timestamp] = []
+
+            if dbt_metric.model not in time_stats_for_metric_models:
+                time_stats_for_metric_models[dbt_metric.model] = {dbt_metric.timestamp: 1}
+            else:
+                time_stats_for_metric_models[dbt_metric.model][dbt_metric.timestamp] += 1
+
+    for metric_model, time_stats in time_stats_for_metric_models.items():
+        primary_time_dim = max(time_stats, key=time_stats.get)  # type: ignore
+        time_dimensions[primary_time_dim].append(metric_model)
+
+    return time_dimensions
 
 
 def transform_manifest_into_user_configured_model(manifest: DbtManifest) -> ModelBuildResult:  # noqa: D
     data_sources_map: Dict[str, List[DataSource]] = {}
     metrics = []
     issues: List[ValidationIssue] = []
-    known_time_dimensions = collect_time_dimension_names_from_metrics(manifest.metrics.values())
+    time_dimension_stats = collect_time_dimension_names_from_metrics(manifest.metrics.values())
 
     for dbt_metric in manifest.metrics.values():
         # TODO: Handle derived dbt metrics
@@ -243,7 +261,7 @@ def transform_manifest_into_user_configured_model(manifest: DbtManifest) -> Mode
             continue
         else:
             transformed_dbt_metric = dbt_metric_to_metricflow_elements(
-                dbt_metric=dbt_metric, manifest=manifest, known_time_dimensions=known_time_dimensions
+                dbt_metric=dbt_metric, manifest=manifest, time_dimension_stats=time_dimension_stats
             )
             if transformed_dbt_metric.data_source.name not in data_sources_map:
                 data_sources_map[transformed_dbt_metric.data_source.name] = [transformed_dbt_metric.data_source]
