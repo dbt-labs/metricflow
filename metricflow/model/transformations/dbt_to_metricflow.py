@@ -53,20 +53,19 @@ def _db_table_from_model_node(node: DbtModelNode) -> str:  # noqa: D
     return f"{node.database}.{node.schema}.{node.name}"
 
 
-def _dimensions_from_dbt_metric_dimensions(dimensions: List[str]) -> List[Dimension]:  # noqa: D
-    built_dimensions = []
-    for dimension in dimensions:
-        built_dimensions.append(
+def _build_dimensions(dbt_metric: DbtMetric) -> List[Dimension]:  # noqa: D
+    dimensions = []
+
+    # Build dimensions specifically from DbtMetric.dimensions list
+    for dimension in dbt_metric.dimensions:
+        dimensions.append(
             Dimension(
                 name=dimension,
                 type=DimensionType.CATEGORICAL,
             )
         )
-    return built_dimensions
 
-
-def _build_dimensions(dbt_metric: DbtMetric) -> List[Dimension]:  # noqa: D
-    dimensions = _dimensions_from_dbt_metric_dimensions(dimensions=dbt_metric.dimensions)
+    # Add DbtMetric.timestamp as a time dimension
     dimensions.append(
         Dimension(
             name=dbt_metric.timestamp,
