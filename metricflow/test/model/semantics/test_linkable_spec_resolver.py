@@ -6,8 +6,8 @@ import pytest
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.semantics.linkable_spec_resolver import (
     ValidLinkableSpecResolver,
-    LinkableElementProperties,
 )
+from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.metric_semantics import MAX_JOIN_HOPS
 from metricflow.references import MetricReference
 

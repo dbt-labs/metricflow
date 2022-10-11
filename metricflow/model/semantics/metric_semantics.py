@@ -6,7 +6,8 @@ from metricflow.errors.errors import MetricNotFoundError, DuplicateMetricError, 
 from metricflow.model.objects.metric import Metric, MetricType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantics.data_source_semantics import DataSourceSemantics
-from metricflow.model.semantics.linkable_spec_resolver import ValidLinkableSpecResolver, LinkableElementProperties
+from metricflow.model.semantics.linkable_spec_resolver import ValidLinkableSpecResolver
+from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.spec_converters import WhereConstraintConverter
 from metricflow.references import MetricReference
 from metricflow.specs import MetricSpec, LinkableInstanceSpec, MetricInputMeasureSpec, MeasureSpec
