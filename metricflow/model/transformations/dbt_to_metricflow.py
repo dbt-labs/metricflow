@@ -109,7 +109,10 @@ def _build_dimensions(dbt_metric: DbtMetric) -> List[Dimension]:  # noqa: D
 
 def _build_measure(dbt_metric: DbtMetric) -> Measure:  # noqa: D
     return Measure(
-        name=dbt_metric.name, agg=CALC_METHOD_TO_MEASURE_TYPE[dbt_metric.calculation_method], expr=dbt_metric.expression
+        name=dbt_metric.name,
+        agg=CALC_METHOD_TO_MEASURE_TYPE[dbt_metric.calculation_method],
+        expr=dbt_metric.expression,
+        agg_time_dimension=dbt_metric.timestamp,
     )
 
 
