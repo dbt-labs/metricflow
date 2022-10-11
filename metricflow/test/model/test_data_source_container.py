@@ -5,7 +5,8 @@ import pytest
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantics.data_source_container import PydanticDataSourceContainer
 from metricflow.model.semantics.linkable_spec_resolver import LinkableElementProperties
-from metricflow.model.semantics.semantic_containers import DataSourceSemantics, MetricSemantics
+from metricflow.model.semantics.data_source_semantics import DataSourceSemantics
+from metricflow.model.semantics.metric_semantics import MetricSemantics
 from metricflow.references import IdentifierReference, MeasureReference
 from metricflow.references import MetricReference
 

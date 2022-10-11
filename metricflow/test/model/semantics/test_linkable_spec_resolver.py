@@ -8,7 +8,7 @@ from metricflow.model.semantics.linkable_spec_resolver import (
     ValidLinkableSpecResolver,
     LinkableElementProperties,
 )
-from metricflow.model.semantics.semantic_containers import MAX_JOIN_HOPS
+from metricflow.model.semantics.metric_semantics import MAX_JOIN_HOPS
 from metricflow.references import MetricReference
 
 logger = logging.getLogger(__name__)
