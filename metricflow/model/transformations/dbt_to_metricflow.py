@@ -67,17 +67,26 @@ def _db_table_from_model_node(node: DbtModelNode) -> str:  # noqa: D
     return f"{node.database}.{node.schema}.{node.name}"
 
 
-def _build_dimensions(dbt_metric: DbtMetric) -> List[Dimension]:  # noqa: D
+def _build_dimension(name: str, known_time_dimensions: List[str]) -> Dimension:
+    if name in known_time_dimensions:
+        return Dimension(
+            name=name,
+            type=DimensionType.TIME,
+            type_params=DimensionTypeParams(time_granularity=TimeGranularity.DAY),
+        )
+    else:
+        return Dimension(
+            name=name,
+            type=DimensionType.CATEGORICAL,
+        )
+
+
+def _build_dimensions(dbt_metric: DbtMetric, known_time_dimensions: List[str]) -> List[Dimension]:  # noqa: D
     dimensions = []
 
     # Build dimensions specifically from DbtMetric.dimensions list
     for dimension in dbt_metric.dimensions:
-        dimensions.append(
-            Dimension(
-                name=dimension,
-                type=DimensionType.CATEGORICAL,
-            )
-        )
+        dimensions.append(_build_dimension(name=dimension, known_time_dimensions=known_time_dimensions))
 
     # Add DbtMetric.timestamp as a time dimension
     dimensions.append(
@@ -97,12 +106,7 @@ def _build_dimensions(dbt_metric: DbtMetric) -> List[Dimension]:  # noqa: D
     # exclude when field is also the DbtMetric.timestamp
     for filter_field in distinct_dbt_metric_filter_fields:
         if filter_field not in dbt_metric.dimensions and filter_field != dbt_metric.timestamp:
-            dimensions.append(
-                Dimension(
-                    name=filter_field,
-                    type=DimensionType.CATEGORICAL,
-                )
-            )
+            dimensions.append(_build_dimension(name=filter_field, known_time_dimensions=known_time_dimensions))
 
     return dimensions
 
@@ -116,7 +120,9 @@ def _build_measure(dbt_metric: DbtMetric) -> Measure:  # noqa: D
     )
 
 
-def _build_data_source(dbt_metric: DbtMetric, manifest: DbtManifest) -> DataSource:  # noqa: D
+def _build_data_source(
+    dbt_metric: DbtMetric, manifest: DbtManifest, known_time_dimensions: List[str]
+) -> DataSource:  # noqa: D
     metric_model_ref: DbtModelNode = _resolve_metric_model_ref(
         manifest=manifest,
         dbt_metric=dbt_metric,
@@ -127,7 +133,7 @@ def _build_data_source(dbt_metric: DbtMetric, manifest: DbtManifest) -> DataSour
         description=metric_model_ref.description,
         sql_table=data_source_table,
         dbt_model=data_source_table,
-        dimensions=_build_dimensions(dbt_metric),
+        dimensions=_build_dimensions(dbt_metric, known_time_dimensions),
         measures=[_build_measure(dbt_metric)],
     )
 
@@ -156,8 +162,10 @@ def _build_proxy_metric(dbt_metric: DbtMetric) -> Metric:  # noqa: D
     )
 
 
-def dbt_metric_to_metricflow_elements(dbt_metric: DbtMetric, manifest: DbtManifest) -> TransformedDbtMetric:  # noqa: D
-    data_source = _build_data_source(dbt_metric, manifest)
+def dbt_metric_to_metricflow_elements(  # noqa: D
+    dbt_metric: DbtMetric, manifest: DbtManifest, known_time_dimensions: List[str]
+) -> TransformedDbtMetric:
+    data_source = _build_data_source(dbt_metric, manifest, known_time_dimensions)
     proxy_metric = _build_proxy_metric(dbt_metric)
     return TransformedDbtMetric(data_source=data_source, metric=proxy_metric)
 
@@ -219,16 +227,24 @@ def merge_data_sources(data_sources: List[DataSource]) -> DataSource:  # noqa: D
     )
 
 
+def collect_time_dimension_names_from_metrics(dbt_metrics: List[DbtMetric]) -> List[str]:  # noqa: D
+    return list(set([dbt_metric.timestamp for dbt_metric in dbt_metrics]))
+
+
 def transform_manifest_into_user_configured_model(manifest: DbtManifest) -> ModelBuildResult:  # noqa: D
     data_sources_map: Dict[str, List[DataSource]] = {}
     metrics = []
     issues: List[ValidationIssue] = []
+    known_time_dimensions = collect_time_dimension_names_from_metrics(manifest.metrics.values())
+
     for dbt_metric in manifest.metrics.values():
         # TODO: Handle derived dbt metrics
         if dbt_metric.calculation_method == "derived":
             continue
         else:
-            transformed_dbt_metric = dbt_metric_to_metricflow_elements(dbt_metric=dbt_metric, manifest=manifest)
+            transformed_dbt_metric = dbt_metric_to_metricflow_elements(
+                dbt_metric=dbt_metric, manifest=manifest, known_time_dimensions=known_time_dimensions
+            )
             if transformed_dbt_metric.data_source.name not in data_sources_map:
                 data_sources_map[transformed_dbt_metric.data_source.name] = [transformed_dbt_metric.data_source]
             else:
