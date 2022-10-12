@@ -4,7 +4,7 @@ import logging
 import time
 from abc import ABC
 from contextlib import contextmanager
-from typing import Iterator, List, Optional, Mapping, Union, Sequence, Set
+from typing import Iterator, Optional, Mapping, Union, Sequence, Set
 
 import pandas as pd
 import sqlalchemy
@@ -74,7 +74,7 @@ class SqlAlchemySqlClient(BaseSqlClientImplementation, ABC):
             pool_pre_ping=True,
         )
 
-    def list_tables(self, schema_name: str) -> List[str]:  # noqa: D
+    def list_tables(self, schema_name: str) -> Sequence[str]:  # noqa: D
         return self._engine.table_names(schema=schema_name)
 
     @contextmanager

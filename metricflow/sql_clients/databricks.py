@@ -2,18 +2,18 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import Optional, List, ClassVar, Dict
+from typing import Optional, ClassVar, Dict, Sequence
 
 import pandas as pd
 import sqlalchemy
 from databricks import sql
 
-from metricflow.sql_clients.common_client import SqlDialect
-from metricflow.sql_clients.base_sql_client_implementation import BaseSqlClientImplementation
-from metricflow.protocols.sql_client import SqlEngineAttributes, SqlEngine
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.dataflow.sql_table import SqlTable
+from metricflow.protocols.sql_client import SqlEngineAttributes, SqlEngine
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer, SqlQueryPlanRenderer
+from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.sql_clients.base_sql_client_implementation import BaseSqlClientImplementation
+from metricflow.sql_clients.common_client import SqlDialect
 
 logger = logging.getLogger(__name__)
 
@@ -190,7 +190,7 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
 
         logger.info(f"Created table '{sql_table.sql}' from a DataFrame in {time.time() - start_time:.2f}s")
 
-    def list_tables(self, schema_name: str) -> List[str]:  # noqa: D
+    def list_tables(self, schema_name: str) -> Sequence[str]:  # noqa: D
         with self.get_connection() as connection:
             with connection.cursor() as cursor:
                 cursor.tables(schema_name=schema_name)
