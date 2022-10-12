@@ -24,6 +24,7 @@ class MetricType(ExtendedEnum):
     RATIO = "ratio"
     EXPR = "expr"
     CUMULATIVE = "cumulative"
+    DERIVED = "derived"
 
 
 class MetricInputMeasure(PydanticCustomInputParser, HashableBaseModel):
@@ -62,6 +63,30 @@ class MetricInputMeasure(PydanticCustomInputParser, HashableBaseModel):
     def post_aggregation_measure_reference(self) -> MeasureReference:
         """Property accessor to get the MeasureReference with the aliased name, if appropriate"""
         return MeasureReference(element_name=self.alias or self.name)
+
+
+class MetricInput(PydanticCustomInputParser, HashableBaseModel):
+    """Provides a pointer to a metric along with the additional properties used on that metric."""
+
+    name: str
+    constraint: Optional[WhereClauseConstraint]
+    alias: Optional[str]
+
+    @classmethod
+    def _from_yaml_value(cls, input: PydanticParseableValueType) -> MetricInput:
+        """Parses a MetricInput from a string (name only) or object (struct spec) input
+
+        For user input cases, the original YAML spec for a Metric included metric(s) specified as string names
+        or lists of string names. As such, configs pre-dating the addition of this model type will only provide the
+        base name for this object.
+        """
+        if isinstance(input, str):
+            return MetricInput(name=input)
+        else:
+            raise ValueError(
+                f"MetricInput inputs from model configs are expected to be of either type string or "
+                f"object (key/value pairs), but got type {type(input)} with value: {input}"
+            )
 
 
 class CumulativeMetricWindow(PydanticCustomInputParser, HashableBaseModel):
@@ -129,6 +154,7 @@ class MetricTypeParams(HashableBaseModel):
     expr: Optional[str]
     window: Optional[CumulativeMetricWindow]
     grain_to_date: Optional[TimeGranularity]
+    metrics: Optional[List[MetricInput]]
 
     @property
     def numerator_measure_reference(self) -> Optional[MeasureReference]:
@@ -169,6 +195,11 @@ class Metric(HashableBaseModel, ModelWithMetadataParsing):
     def measure_references(self) -> List[MeasureReference]:
         """Return the measure references associated with all input measure configurations for this metric"""
         return [x.measure_reference for x in self.input_measures]
+
+    @property
+    def input_metrics(self) -> List[MetricInput]:
+        """Return the associated input metrics for this metric"""
+        return self.type_params.metrics or []
 
     @property
     def definition_hash(self) -> str:  # noqa: D
