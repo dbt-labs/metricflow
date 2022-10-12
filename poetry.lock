@@ -1,4 +1,25 @@
 [[package]]
+name = "agate"
+version = "1.6.3"
+description = "A data analysis library that is optimized for humans instead of machines."
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+Babel = ">=2.0"
+isodate = ">=0.5.4"
+leather = ">=0.3.2"
+parsedatetime = ">=2.1,<2.5 || >2.5,<2.6 || >2.6"
+python-slugify = ">=1.2.1"
+pytimeparse = ">=1.1.5"
+six = ">=1.9.0"
+
+[package.extras]
+docs = ["Sphinx (>=1.2.2)", "sphinx-rtd-theme (>=0.1.6)"]
+test = ["coverage (>=3.7.1)", "cssselect (>=0.9.1)", "lxml (>=3.6.0)", "nose (>=1.1.2)", "pytz (>=2015.4)", "mock (>=1.3.0)", "unittest2 (>=1.1.0)", "PyICU (>=2.4.2)"]
+
+[[package]]
 name = "asn1crypto"
 version = "1.5.1"
 description = "Fast ASN.1 parser and serializer with definitions for private keys, public keys, certificates, CRL, OCSP, CMS, PKCS#3, PKCS#7, PKCS#8, PKCS#12, PKCS#5, X.509 and TSP"
@@ -21,12 +42,55 @@ docs = ["sphinx-notfound-page", "zope.interface", "sphinx", "furo"]
 dev = ["cloudpickle", "pre-commit", "sphinx-notfound-page", "sphinx", "furo", "zope.interface", "pytest-mypy-plugins", "mypy (>=0.900,!=0.940)", "pytest (>=4.3.0)", "pympler", "hypothesis", "coverage[toml] (>=5.0.2)"]
 
 [[package]]
+name = "babel"
+version = "2.10.3"
+description = "Internationalization utilities"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+pytz = ">=2015.7"
+
+[[package]]
 name = "backoff"
 version = "1.11.1"
 description = "Function decoration for backoff and retry"
 category = "main"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+
+[[package]]
+name = "boto3"
+version = "1.24.89"
+description = "The AWS SDK for Python"
+category = "main"
+optional = false
+python-versions = ">= 3.7"
+
+[package.dependencies]
+botocore = ">=1.27.89,<1.28.0"
+jmespath = ">=0.7.1,<2.0.0"
+s3transfer = ">=0.6.0,<0.7.0"
+
+[package.extras]
+crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
+
+[[package]]
+name = "botocore"
+version = "1.27.89"
+description = "Low-level, data-driven core of boto 3."
+category = "main"
+optional = false
+python-versions = ">= 3.7"
+
+[package.dependencies]
+jmespath = ">=0.7.1,<2.0.0"
+python-dateutil = ">=2.1,<3.0.0"
+urllib3 = ">=1.25.4,<1.27"
+
+[package.extras]
+crt = ["awscrt (==0.14.0)"]
 
 [[package]]
 name = "cachetools"
@@ -135,6 +199,101 @@ python-versions = ">=3.7.1,<4.0.0"
 pandas = ">=1.3.0,<2.0.0"
 pyarrow = ">=5.0.0,<6.0.0"
 thrift = ">=0.13.0,<0.14.0"
+
+[[package]]
+name = "dbt-bigquery"
+version = "1.3.0"
+description = "The BigQuery adapter plugin for dbt"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+dbt-core = ">=1.3.0,<1.4.0"
+google-api-core = ">=1.16.0,<3"
+google-cloud-bigquery = ">=1.25.0,<3"
+google-cloud-core = ">=1.3.0,<3"
+google-cloud-dataproc = ">=4.0.3"
+google-cloud-storage = ">=2.4.0"
+googleapis-common-protos = ">=1.6.0,<2"
+protobuf = ">=3.13.0,<4"
+
+[[package]]
+name = "dbt-core"
+version = "1.3.0"
+description = "With dbt, data analysts and engineers can build analytics the way engineers build applications."
+category = "main"
+optional = false
+python-versions = ">=3.7.2"
+
+[package.dependencies]
+agate = ">=1.6,<1.6.4"
+cffi = ">=1.9,<2.0.0"
+click = ">=7.0,<9"
+colorama = ">=0.3.9,<0.4.6"
+dbt-extractor = ">=0.4.1,<0.5.0"
+hologram = ">=0.0.14,<=0.0.15"
+idna = ">=2.5,<4"
+isodate = ">=0.6,<0.7"
+Jinja2 = "3.1.2"
+logbook = ">=1.5,<1.6"
+mashumaro = {version = "3.0.4", extras = ["msgpack"]}
+minimal-snowplow-tracker = "0.0.2"
+networkx = {version = ">=2.3,<3", markers = "python_version >= \"3.8\""}
+packaging = ">=20.9,<22.0"
+pathspec = ">=0.9.0,<0.10.0"
+pyyaml = ">=6.0"
+requests = "<3.0.0"
+sqlparse = ">=0.2.3,<0.5"
+typing-extensions = ">=3.7.4"
+werkzeug = ">=1,<3"
+
+[[package]]
+name = "dbt-extractor"
+version = "0.4.1"
+description = "A tool to analyze and extract information from Jinja used in dbt projects."
+category = "main"
+optional = false
+python-versions = ">=3.6.1"
+
+[[package]]
+name = "dbt-postgres"
+version = "1.3.0"
+description = "The postgres adapter plugin for dbt (data build tool)"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+dbt-core = "1.3.0"
+psycopg2-binary = ">=2.8,<3.0"
+
+[[package]]
+name = "dbt-redshift"
+version = "1.3.0"
+description = "The Redshift adapter plugin for dbt"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+boto3 = ">=1.4.4,<2.0.0"
+dbt-core = ">=1.3.0,<1.4.0"
+dbt-postgres = ">=1.3.0,<1.4.0"
+
+[[package]]
+name = "dbt-snowflake"
+version = "1.3.0"
+description = "The Snowflake adapter plugin for dbt"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+cryptography = ">=3.2,<37.0.0"
+dbt-core = ">=1.3.0,<1.4.0"
+requests = "<3.0.0"
+snowflake-connector-python = {version = ">=2.4.1,<2.8.0", extras = ["secure-local-storage"]}
 
 [[package]]
 name = "distlib"
@@ -324,6 +483,40 @@ google-auth = ">=1.25.0,<3.0dev"
 grpc = ["grpcio (>=1.38.0,<2.0dev)"]
 
 [[package]]
+name = "google-cloud-dataproc"
+version = "5.0.3"
+description = "Google Cloud Dataproc API client library"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+google-api-core = {version = ">=1.32.0,<2.0.0 || >=2.8.0,<3.0.0dev", extras = ["grpc"]}
+proto-plus = ">=1.22.0,<2.0.0dev"
+protobuf = ">=3.19.5,<3.20.0 || >3.20.0,<3.20.1 || >3.20.1,<4.21.0 || >4.21.0,<4.21.1 || >4.21.1,<4.21.2 || >4.21.2,<4.21.3 || >4.21.3,<4.21.4 || >4.21.4,<4.21.5 || >4.21.5,<5.0.0dev"
+
+[package.extras]
+libcst = ["libcst (>=0.2.5)"]
+
+[[package]]
+name = "google-cloud-storage"
+version = "2.5.0"
+description = "Google Cloud Storage API client library"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+google-api-core = ">=1.31.5,<2.0.0 || >2.3.0,<3.0.0dev"
+google-auth = ">=1.25.0,<3.0dev"
+google-cloud-core = ">=2.3.0,<3.0dev"
+google-resumable-media = ">=2.3.2"
+requests = ">=2.18.0,<3.0.0dev"
+
+[package.extras]
+protobuf = ["protobuf (<5.0.0dev)"]
+
+[[package]]
 name = "google-crc32c"
 version = "1.5.0"
 description = "A python wrapper of the C library 'Google CRC32C'"
@@ -433,6 +626,18 @@ termcolor = ">=1.1.0"
 ipython = ["IPython (==5.7.0)", "ipywidgets (==7.1.0)"]
 
 [[package]]
+name = "hologram"
+version = "0.0.15"
+description = "JSON schema generation from dataclasses"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+jsonschema = ">=3.0,<4.0"
+python-dateutil = ">=2.8,<2.9"
+
+[[package]]
 name = "identify"
 version = "2.5.3"
 description = "File identification library for Python"
@@ -452,12 +657,66 @@ optional = false
 python-versions = ">=3.5"
 
 [[package]]
+name = "importlib-metadata"
+version = "5.0.0"
+description = "Read metadata from Python packages"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+zipp = ">=0.5"
+
+[package.extras]
+docs = ["sphinx (>=3.5)", "jaraco.packaging (>=9)", "rst.linker (>=1.9)", "furo", "jaraco.tidelift (>=1.4)"]
+perf = ["ipython"]
+testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "flake8 (<5)", "pytest-cov", "pytest-enabler (>=1.3)", "packaging", "pyfakefs", "flufl.flake8", "pytest-perf (>=0.9.2)", "pytest-black (>=0.3.7)", "pytest-mypy (>=0.9.1)", "importlib-resources (>=1.3)"]
+
+[[package]]
 name = "iniconfig"
 version = "1.1.1"
 description = "iniconfig: brain-dead simple config-ini parsing"
 category = "dev"
 optional = false
 python-versions = "*"
+
+[[package]]
+name = "isodate"
+version = "0.6.1"
+description = "An ISO 8601 date/time/duration parser and formatter"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+six = "*"
+
+[[package]]
+name = "jaraco.classes"
+version = "3.2.3"
+description = "Utility functions for Python class constructs"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+more-itertools = "*"
+
+[package.extras]
+docs = ["sphinx (>=3.5)", "jaraco.packaging (>=9)", "rst.linker (>=1.9)", "jaraco.tidelift (>=1.4)"]
+testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "flake8 (<5)", "pytest-cov", "pytest-enabler (>=1.3)", "pytest-black (>=0.3.7)", "pytest-mypy (>=0.9.1)"]
+
+[[package]]
+name = "jeepney"
+version = "0.8.0"
+description = "Low-level, pure Python DBus protocol wrapper."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.extras]
+trio = ["async-generator", "trio"]
+test = ["async-timeout", "trio", "testpath", "pytest-asyncio (>=0.17)", "pytest-trio", "pytest"]
 
 [[package]]
 name = "jinja2"
@@ -472,6 +731,14 @@ MarkupSafe = ">=2.0"
 
 [package.extras]
 i18n = ["Babel (>=2.7)"]
+
+[[package]]
+name = "jmespath"
+version = "1.0.1"
+description = "JSON Matching Expressions"
+category = "main"
+optional = false
+python-versions = ">=3.7"
 
 [[package]]
 name = "jsonschema"
@@ -491,6 +758,36 @@ format = ["idna", "jsonpointer (>1.13)", "rfc3987", "strict-rfc3339", "webcolors
 format_nongpl = ["idna", "jsonpointer (>1.13)", "webcolors", "rfc3986-validator (>0.1.0)", "rfc3339-validator"]
 
 [[package]]
+name = "keyring"
+version = "23.9.3"
+description = "Store and access your passwords safely."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+importlib-metadata = {version = ">=3.6", markers = "python_version < \"3.10\""}
+"jaraco.classes" = "*"
+jeepney = {version = ">=0.4.2", markers = "sys_platform == \"linux\""}
+pywin32-ctypes = {version = "<0.1.0 || >0.1.0,<0.1.1 || >0.1.1", markers = "sys_platform == \"win32\""}
+SecretStorage = {version = ">=3.2", markers = "sys_platform == \"linux\""}
+
+[package.extras]
+docs = ["sphinx", "jaraco.packaging (>=9)", "rst.linker (>=1.9)", "jaraco.tidelift (>=1.4)"]
+testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "flake8 (<5)", "pytest-cov", "pytest-enabler (>=1.3)", "pytest-black (>=0.3.7)", "pytest-mypy (>=0.9.1)"]
+
+[[package]]
+name = "leather"
+version = "0.3.4"
+description = "Python charting for 80% of humans."
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+six = ">=1.6.1"
+
+[[package]]
 name = "log-symbols"
 version = "0.0.14"
 description = "Colored symbols for various log levels for Python"
@@ -502,12 +799,59 @@ python-versions = "*"
 colorama = ">=0.3.9"
 
 [[package]]
+name = "logbook"
+version = "1.5.3"
+description = "A logging replacement for Python"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.extras]
+all = ["redis", "brotli", "pytest (>4.0)", "execnet (>=1.0.9)", "cython", "pyzmq", "pytest-cov (>=2.6)", "sqlalchemy", "jinja2"]
+compression = ["brotli"]
+dev = ["pytest-cov (>=2.6)", "pytest (>4.0)", "cython"]
+execnet = ["execnet (>=1.0.9)"]
+jinja = ["jinja2"]
+redis = ["redis"]
+sqlalchemy = ["sqlalchemy"]
+test = ["pytest-cov (>=2.6)", "pytest (>4.0)"]
+zmq = ["pyzmq"]
+
+[[package]]
 name = "markupsafe"
 version = "2.0.1"
 description = "Safely add untrusted strings to HTML/XML markup."
 category = "main"
 optional = false
 python-versions = ">=3.6"
+
+[[package]]
+name = "mashumaro"
+version = "3.0.4"
+description = "Fast serialization framework on top of dataclasses"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+msgpack = {version = ">=0.5.6", optional = true, markers = "extra == \"msgpack\""}
+typing-extensions = "*"
+
+[package.extras]
+msgpack = ["msgpack (>=0.5.6)"]
+yaml = ["pyyaml (>=3.13)"]
+
+[[package]]
+name = "minimal-snowplow-tracker"
+version = "0.0.2"
+description = "A minimal snowplow event tracker for Python. Add analytics to your Python and Django apps, webapps and games"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+requests = ">=2.2.1,<3.0"
+six = ">=1.9.0,<2.0"
 
 [[package]]
 name = "mo-dots"
@@ -596,6 +940,29 @@ mo-future = "3.147.20327"
 mo-logs = "4.23.21108"
 
 [[package]]
+name = "msgpack"
+version = "1.0.4"
+description = "MessagePack serializer"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
+name = "networkx"
+version = "2.8.7"
+description = "Python package for creating and manipulating graphs and networks"
+category = "main"
+optional = false
+python-versions = ">=3.8"
+
+[package.extras]
+default = ["numpy (>=1.19)", "scipy (>=1.8)", "matplotlib (>=3.4)", "pandas (>=1.3)"]
+developer = ["pre-commit (>=2.20)", "mypy (>=0.981)"]
+doc = ["sphinx (>=5)", "pydata-sphinx-theme (>=0.9)", "sphinx-gallery (>=0.10)", "numpydoc (>=1.4)", "pillow (>=9.1)", "nb2plots (>=0.6)", "texext (>=0.6.6)"]
+extra = ["lxml (>=4.6)", "pygraphviz (>=1.9)", "pydot (>=1.4.2)", "sympy (>=1.10)"]
+test = ["pytest (>=7.1)", "pytest-cov (>=3.0)", "codecov (>=2.1)"]
+
+[[package]]
 name = "nodeenv"
 version = "1.7.0"
 description = "Node.js virtual environment builder"
@@ -650,12 +1017,23 @@ pytz = ">=2020.1"
 test = ["pytest-xdist (>=1.31)", "pytest (>=6.0)", "hypothesis (>=5.5.3)"]
 
 [[package]]
+name = "parsedatetime"
+version = "2.4"
+description = "Parse human-readable date/time text."
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+future = "*"
+
+[[package]]
 name = "pathspec"
-version = "0.10.1"
+version = "0.9.0"
 description = "Utility library for gitignore style pattern matching of file paths."
 category = "main"
 optional = false
-python-versions = ">=3.7"
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 
 [[package]]
 name = "platformdirs"
@@ -713,8 +1091,8 @@ testing = ["google-api-core[grpc] (>=1.31.5)"]
 
 [[package]]
 name = "protobuf"
-version = "4.21.5"
-description = ""
+version = "3.20.3"
+description = "Protocol Buffers"
 category = "main"
 optional = false
 python-versions = ">=3.7"
@@ -722,6 +1100,14 @@ python-versions = ">=3.7"
 [[package]]
 name = "psycopg2"
 version = "2.9.3"
+description = "psycopg2 - Python-PostgreSQL Database Adapter"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[[package]]
+name = "psycopg2-binary"
+version = "2.9.4"
 description = "psycopg2 - Python-PostgreSQL Database Adapter"
 category = "main"
 optional = false
@@ -906,9 +1292,39 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "python-slugify"
+version = "6.1.2"
+description = "A Python slugify application that also handles Unicode"
+category = "main"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*"
+
+[package.dependencies]
+text-unidecode = ">=1.3"
+
+[package.extras]
+unidecode = ["Unidecode (>=1.1.1)"]
+
+[[package]]
+name = "pytimeparse"
+version = "1.1.8"
+description = "Time expression parser"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "pytz"
 version = "2022.2.1"
 description = "World timezone definitions, modern and historical"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
+name = "pywin32-ctypes"
+version = "0.2.0"
+description = ""
 category = "main"
 optional = false
 python-versions = "*"
@@ -992,6 +1408,32 @@ six = ">=1.4"
 test = ["mock (==2.0.0)", "pylint (==1.9.3)", "flake8 (==3.7.9)", "coverage (==4.5.4)"]
 
 [[package]]
+name = "s3transfer"
+version = "0.6.0"
+description = "An Amazon S3 Transfer Manager"
+category = "main"
+optional = false
+python-versions = ">= 3.7"
+
+[package.dependencies]
+botocore = ">=1.12.36,<2.0a.0"
+
+[package.extras]
+crt = ["botocore[crt] (>=1.20.29,<2.0a.0)"]
+
+[[package]]
+name = "secretstorage"
+version = "3.3.3"
+description = "Python bindings to FreeDesktop.org Secret Service API"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+cryptography = ">=2.0"
+jeepney = ">=0.6"
+
+[[package]]
 name = "six"
 version = "1.16.0"
 description = "Python 2 and 3 compatibility utilities"
@@ -1023,6 +1465,7 @@ charset-normalizer = ">=2,<3"
 cryptography = ">=3.1.0,<37.0.0"
 filelock = ">=3.5,<4"
 idna = ">=2.5,<4"
+keyring = {version = "<16.1.0 || >16.1.0,<24.0.0", optional = true, markers = "extra == \"secure-local-storage\""}
 oscrypto = "<2.0.0"
 pycryptodomex = ">=3.2,<3.5.0 || >3.5.0,<4.0.0"
 pyjwt = "<3.0.0"
@@ -1139,6 +1582,14 @@ python-versions = ">=3.6"
 typing-extensions = ">=3.7.4"
 
 [[package]]
+name = "sqlparse"
+version = "0.4.3"
+description = "A non-validating SQL parser."
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[[package]]
 name = "tabulate"
 version = "0.8.9"
 description = "Pretty-print tabular data"
@@ -1153,6 +1604,14 @@ widechars = ["wcwidth"]
 name = "termcolor"
 version = "1.1.0"
 description = "ANSII Color formatting for output in terminal."
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
+name = "text-unidecode"
+version = "1.3"
+description = "The most basic Text::Unidecode port"
 category = "main"
 optional = false
 python-versions = "*"
@@ -1244,6 +1703,17 @@ docs = ["proselint (>=0.13)", "sphinx (>=5.1.1)", "sphinx-argparse (>=0.3.1)", "
 testing = ["coverage (>=6.2)", "coverage-enable-subprocess (>=1)", "flaky (>=3.7)", "packaging (>=21.3)", "pytest (>=7.0.1)", "pytest-env (>=0.6.2)", "pytest-freezegun (>=0.4.2)", "pytest-mock (>=3.6.1)", "pytest-randomly (>=3.10.3)", "pytest-timeout (>=2.1)"]
 
 [[package]]
+name = "werkzeug"
+version = "2.1.2"
+description = "The comprehensive WSGI web application library."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.extras]
+watchdog = ["watchdog"]
+
+[[package]]
 name = "yamllint"
 version = "1.27.1"
 description = "A linter for YAML files."
@@ -1255,21 +1725,37 @@ python-versions = ">=3.6"
 pathspec = ">=0.5.3"
 pyyaml = "*"
 
+[[package]]
+name = "zipp"
+version = "3.9.0"
+description = "Backport of pathlib-compatible object wrapper for zip files"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.extras]
+docs = ["sphinx (>=3.5)", "jaraco.packaging (>=9)", "rst.linker (>=1.9)", "furo", "jaraco.tidelift (>=1.4)"]
+testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "flake8 (<5)", "pytest-cov", "pytest-enabler (>=1.3)", "jaraco.itertools", "func-timeout", "jaraco.functools", "more-itertools", "pytest-black (>=0.3.7)", "pytest-mypy (>=0.9.1)"]
+
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<3.10"
-content-hash = "2dc75362173b1bd87a32dffe7c1e4b3e50ce2aec22a8b0d4bb2057e01758bd5d"
+content-hash = "dad6a2d14af808345f096e073a2f8280475f268064d0a8c7ffab011ba1cc2912"
 
 [metadata.files]
+agate = []
 asn1crypto = [
     {file = "asn1crypto-1.5.1-py2.py3-none-any.whl", hash = "sha256:db4e40728b728508912cbb3d44f19ce188f218e9eba635821bb4b68564f8fd67"},
     {file = "asn1crypto-1.5.1.tar.gz", hash = "sha256:13ae38502be632115abf8a24cbe5f4da52e3b5231990aff31123c805306ccb9c"},
 ]
 attrs = []
+babel = []
 backoff = [
     {file = "backoff-1.11.1-py2.py3-none-any.whl", hash = "sha256:61928f8fa48d52e4faa81875eecf308eccfb1016b018bb6bd21e05b5d90a96c5"},
     {file = "backoff-1.11.1.tar.gz", hash = "sha256:ccb962a2378418c667b3c979b504fdeb7d9e0d29c0579e3b13b86467177728cb"},
 ]
+boto3 = []
+botocore = []
 cachetools = [
     {file = "cachetools-5.2.0-py3-none-any.whl", hash = "sha256:f9f17d2aec496a9aa6b76f53e3b614c965223c061982d434d160f930c698a9db"},
     {file = "cachetools-5.2.0.tar.gz", hash = "sha256:6a94c6402995a99c3970cc7e4884bb60b4a8639938157eeed436098bf9831757"},
@@ -1316,6 +1802,12 @@ cryptography = [
     {file = "cryptography-36.0.2.tar.gz", hash = "sha256:70f8f4f7bb2ac9f340655cbac89d68c527af5bb4387522a8413e841e3e6628c9"},
 ]
 databricks-sql-connector = []
+dbt-bigquery = []
+dbt-core = []
+dbt-extractor = []
+dbt-postgres = []
+dbt-redshift = []
+dbt-snowflake = []
 distlib = []
 duckdb = [
     {file = "duckdb-0.3.4-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:4ecfa5e8c6bde61efead473b05b35ed989dc08fe76c7ab1c931e4c16e082b10b"},
@@ -1379,6 +1871,8 @@ google-cloud-bigquery = [
 ]
 google-cloud-bigquery-storage = []
 google-cloud-core = []
+google-cloud-dataproc = []
+google-cloud-storage = []
 google-crc32c = []
 google-resumable-media = [
     {file = "google-resumable-media-2.3.3.tar.gz", hash = "sha256:27c52620bd364d1c8116eaac4ea2afcbfb81ae9139fb3199652fcac1724bfb6c"},
@@ -1396,24 +1890,33 @@ halo = [
     {file = "halo-0.0.31-py2-none-any.whl", hash = "sha256:5350488fb7d2aa7c31a1344120cee67a872901ce8858f60da7946cef96c208ab"},
     {file = "halo-0.0.31.tar.gz", hash = "sha256:7b67a3521ee91d53b7152d4ee3452811e1d2a6321975137762eb3d70063cc9d6"},
 ]
+hologram = []
 identify = []
 idna = [
     {file = "idna-3.3-py3-none-any.whl", hash = "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff"},
     {file = "idna-3.3.tar.gz", hash = "sha256:9d643ff0a55b762d5cdb124b8eaa99c66322e2157b69160bc32796e824360e6d"},
 ]
+importlib-metadata = []
 iniconfig = [
     {file = "iniconfig-1.1.1-py2.py3-none-any.whl", hash = "sha256:011e24c64b7f47f6ebd835bb12a743f2fbe9a26d4cecaa7f53bc4f35ee9da8b3"},
     {file = "iniconfig-1.1.1.tar.gz", hash = "sha256:bc3af051d7d14b2ee5ef9969666def0cd1a000e121eaea580d4a313df4b37f32"},
 ]
+isodate = []
+"jaraco.classes" = []
+jeepney = []
 jinja2 = []
+jmespath = []
 jsonschema = [
     {file = "jsonschema-3.2.0-py2.py3-none-any.whl", hash = "sha256:4e5b3cf8216f577bee9ce139cbe72eca3ea4f292ec60928ff24758ce626cd163"},
     {file = "jsonschema-3.2.0.tar.gz", hash = "sha256:c8a85b28d377cc7737e46e2d9f2b4f44ee3c0e1deac6bf46ddefc7187d30797a"},
 ]
+keyring = []
+leather = []
 log-symbols = [
     {file = "log_symbols-0.0.14-py3-none-any.whl", hash = "sha256:4952106ff8b605ab7d5081dd2c7e6ca7374584eff7086f499c06edd1ce56dcca"},
     {file = "log_symbols-0.0.14.tar.gz", hash = "sha256:cf0bbc6fe1a8e53f0d174a716bc625c4f87043cc21eb55dd8a740cfe22680556"},
 ]
+logbook = []
 markupsafe = [
     {file = "MarkupSafe-2.0.1-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:d8446c54dc28c01e5a2dbac5a25f071f6653e6e40f3a8818e8b45d790fe6ef53"},
     {file = "MarkupSafe-2.0.1-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:36bc903cbb393720fad60fc28c10de6acf10dc6cc883f3e24ee4012371399a38"},
@@ -1485,6 +1988,8 @@ markupsafe = [
     {file = "MarkupSafe-2.0.1-cp39-cp39-win_amd64.whl", hash = "sha256:693ce3f9e70a6cf7d2fb9e6c9d8b204b6b39897a2c4a1aa65728d5ac97dcc1d8"},
     {file = "MarkupSafe-2.0.1.tar.gz", hash = "sha256:594c67807fb16238b30c44bdf74f36c02cdf22d1c8cda91ef8a0ed8dabf5620a"},
 ]
+mashumaro = []
+minimal-snowplow-tracker = []
 mo-dots = [
     {file = "mo-dots-4.22.21108.tar.gz", hash = "sha256:f9f2f9a6e44e214959aecd55857b6df487b8e86daf51334e2e982d47ea33ed23"},
 ]
@@ -1511,6 +2016,8 @@ more-itertools = [
 moz-sql-parser = [
     {file = "moz-sql-parser-4.40.21126.tar.gz", hash = "sha256:b3d37cc8ff118d86009aa12646791549537ec0ae8ac312efd4641289c8eee080"},
 ]
+msgpack = []
+networkx = []
 nodeenv = []
 numpy = []
 oscrypto = [
@@ -1522,7 +2029,11 @@ packaging = [
     {file = "packaging-21.3.tar.gz", hash = "sha256:dd47c42927d89ab911e606518907cc2d3a1f38bbd026385970643f9c5b8ecfeb"},
 ]
 pandas = []
-pathspec = []
+parsedatetime = []
+pathspec = [
+    {file = "pathspec-0.9.0-py2.py3-none-any.whl", hash = "sha256:7d15c4ddb0b5c802d161efc417ec1a2558ea2653c2e8ad9c19098201dc1c993a"},
+    {file = "pathspec-0.9.0.tar.gz", hash = "sha256:e564499435a2673d586f6b2130bb5b95f04a3ba06f81b8f895b651a3c76aabb1"},
+]
 platformdirs = [
     {file = "platformdirs-2.5.2-py3-none-any.whl", hash = "sha256:027d8e83a2d7de06bbac4e5ef7e023c02b863d7ea5d079477e722bb41ab25788"},
     {file = "platformdirs-2.5.2.tar.gz", hash = "sha256:58c8abb07dcb441e6ee4b11d8df0ac856038f944ab98b7be6b27b2a3c7feef19"},
@@ -1547,6 +2058,7 @@ psycopg2 = [
     {file = "psycopg2-2.9.3-cp39-cp39-win_amd64.whl", hash = "sha256:06f32425949bd5fe8f625c49f17ebb9784e1e4fe928b7cce72edc36fb68e4c0c"},
     {file = "psycopg2-2.9.3.tar.gz", hash = "sha256:8e841d1bf3434da985cc5ef13e6f75c8981ced601fd70cc6bf33351b91562981"},
 ]
+psycopg2-binary = []
 py = [
     {file = "py-1.11.0-py2.py3-none-any.whl", hash = "sha256:607c53218732647dff4acdfcd50cb62615cedf612e72d1724fb1a0cc6405b378"},
     {file = "py-1.11.0.tar.gz", hash = "sha256:51c75c4126074b472f746a24399ad32f6053d1b34b68d2fa41e558e6f4a98719"},
@@ -1666,7 +2178,10 @@ python-dateutil = [
 python-levenshtein = [
     {file = "python-Levenshtein-0.12.2.tar.gz", hash = "sha256:dc2395fbd148a1ab31090dd113c366695934b9e85fe5a4b2a032745efd0346f6"},
 ]
+python-slugify = []
+pytimeparse = []
 pytz = []
+pywin32-ctypes = []
 pyyaml = []
 requests = []
 rsa = []
@@ -1705,6 +2220,8 @@ rudder-sdk-python = [
     {file = "rudder-sdk-python-1.0.5.tar.gz", hash = "sha256:fc222fdca9607ddcdb1c1921897acfe3a26385284b03b487528e0d81618d12da"},
     {file = "rudder_sdk_python-1.0.5-py2.py3-none-any.whl", hash = "sha256:5bc7167e37c260748a930027e7446bcb364e23bb3395046a0f996b347c473850"},
 ]
+s3transfer = []
+secretstorage = []
 six = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
     {file = "six-1.16.0.tar.gz", hash = "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"},
@@ -1766,6 +2283,7 @@ sqlalchemy-redshift = [
     {file = "sqlalchemy_redshift-0.8.1-py2.py3-none-any.whl", hash = "sha256:22518011c50f2fbe7e06d804aec90b693175b540152dd4a2c8c7acd78618fafe"},
 ]
 sqlalchemy2-stubs = []
+sqlparse = []
 tabulate = [
     {file = "tabulate-0.8.9-py3-none-any.whl", hash = "sha256:d7c013fe7abbc5e491394e10fa845f8f32fe54f8dc60c6622c6cf482d25d47e4"},
     {file = "tabulate-0.8.9.tar.gz", hash = "sha256:eb1d13f25760052e8931f2ef80aaf6045a6cceb47514db8beab24cded16f13a7"},
@@ -1773,6 +2291,7 @@ tabulate = [
 termcolor = [
     {file = "termcolor-1.1.0.tar.gz", hash = "sha256:1d6d69ce66211143803fbc56652b41d73b4a400a2891d7bf7a1cdf4c02de613b"},
 ]
+text-unidecode = []
 thrift = []
 toml = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},
@@ -1789,4 +2308,6 @@ update-checker = [
 ]
 urllib3 = []
 virtualenv = []
+werkzeug = []
 yamllint = []
+zipp = []
