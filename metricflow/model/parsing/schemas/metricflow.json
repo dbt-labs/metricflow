@@ -563,10 +563,12 @@
                         "RATIO",
                         "EXPR",
                         "CUMULATIVE",
+                        "DERIVED",
                         "measure_proxy",
                         "ratio",
                         "expr",
-                        "cumulative"
+                        "cumulative",
+                        "derived"
                     ]
                 },
                 "type_params": {
@@ -585,6 +587,29 @@
         },
         "metric_input_measure_schema": {
             "$id": "metric_input_measure_schema",
+            "oneOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "additionalProperties": false,
+                    "properties": {
+                        "alias": {
+                            "type": "string"
+                        },
+                        "constraint": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                }
+            ]
+        },
+        "metric_input_schema": {
+            "$id": "metric_input_schema",
             "oneOf": [
                 {
                     "type": "string"
@@ -628,6 +653,12 @@
                 "measures": {
                     "items": {
                         "$ref": "#/definitions/metric_input_measure_schema"
+                    },
+                    "type": "array"
+                },
+                "metrics": {
+                    "items": {
+                        "$ref": "#/definitions/metric_input_schema"
                     },
                     "type": "array"
                 },
