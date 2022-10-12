@@ -4,7 +4,7 @@ import logging
 import threading
 import urllib.parse
 from contextlib import contextmanager
-from typing import ClassVar, Optional, Dict, Iterator, List, Tuple, Any, Set
+from typing import ClassVar, Optional, Dict, Iterator, List, Tuple, Any, Set, Sequence
 
 import pandas as pd
 import sqlalchemy
@@ -205,7 +205,7 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
     ) -> pd.DataFrame:
         return self._query(stmt, bind_params)
 
-    def list_tables(self, schema_name: str) -> List[str]:  # noqa: D
+    def list_tables(self, schema_name: str) -> Sequence[str]:  # noqa: D
         df = self.query(
             f"SHOW TABLES IN {schema_name}",
         )

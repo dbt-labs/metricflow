@@ -2,12 +2,13 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from enum import Enum
-from typing import ClassVar, Dict, Optional, Protocol
+from typing import ClassVar, Dict, Optional, Protocol, Sequence
+
+from pandas import DataFrame
 
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from pandas import DataFrame
 
 
 class SqlEngine(Enum):
@@ -98,6 +99,11 @@ class SqlClient(Protocol):
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
     ) -> None:
         """Base dry_run method"""
+        raise NotImplementedError
+
+    @abstractmethod
+    def list_tables(self, schema_name: str) -> Sequence[str]:
+        """List the tables in the given schema"""
         raise NotImplementedError
 
     @abstractmethod

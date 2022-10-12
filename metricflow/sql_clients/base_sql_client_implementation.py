@@ -163,10 +163,6 @@ class BaseSqlClientImplementation(ABC, SqlClient):
     ) -> None:
         pass
 
-    @abstractmethod
-    def list_tables(self, schema_name: str) -> List[str]:  # noqa: D
-        pass
-
     def table_exists(self, sql_table: SqlTable) -> bool:  # noqa: D
         return sql_table.table_name in self.list_tables(sql_table.schema_name)
 

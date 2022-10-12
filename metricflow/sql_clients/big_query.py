@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from typing import ClassVar, Optional, List
+from typing import ClassVar, Optional, Sequence
 
 import sqlalchemy
 
@@ -104,7 +104,7 @@ class BigQuerySqlClient(SqlAlchemySqlClient):
         """Collection of attributes and features specific to the BigQuery SQL engine"""
         return BigQueryEngineAttributes()
 
-    def list_tables(self, schema_name: str) -> List[str]:  # noqa: D
+    def list_tables(self, schema_name: str) -> Sequence[str]:  # noqa: D
         with self.engine_connection(engine=self._engine) as conn:
             insp = sqlalchemy.inspection.inspect(conn)
             schema_dot_tables = insp.get_table_names(schema=schema_name)
