@@ -109,7 +109,9 @@ class DbtManifestTransformer:
 
         return self._resolved_dbt_model_refs[hashed]
 
-    def _db_table_from_model_node(self, node: DbtModelNode) -> str:  # noqa: D
+    @classmethod
+    def db_table_from_model_node(cls, node: DbtModelNode) -> str:
+        """Get the '.' joined database table name of a DbtModelNode"""
         return f"{node.database}.{node.schema}.{node.name}"
 
     def _build_dimension(self, name: str, dbt_metric: DbtMetric) -> Dimension:  # noqa: D
@@ -160,7 +162,7 @@ class DbtManifestTransformer:
 
     def _build_data_source(self, dbt_metric: DbtMetric) -> DataSource:  # noqa: D
         metric_model_ref = self.resolve_metric_model_ref(dbt_metric=dbt_metric)
-        data_source_table = self._db_table_from_model_node(metric_model_ref)
+        data_source_table = self.db_table_from_model_node(metric_model_ref)
         return DataSource(
             name=metric_model_ref.name,
             description=metric_model_ref.description,
