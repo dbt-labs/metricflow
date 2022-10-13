@@ -487,3 +487,73 @@ integration_test:
         booking_paid_at
     ) b
     ON a.metric_time = b.metric_time
+---
+integration_test:
+  name: derived_metric
+  description: Tests a derived metric query
+  model: SIMPLE_MODEL
+  metrics: ["non_referred_bookings_pct"]
+  group_bys: ["metric_time"]
+  check_query: |
+    SELECT
+      (bookings - ref_bookings) / bookings AS non_referred_bookings_pct
+      , metric_time
+    FROM (
+      SELECT
+        SUM(CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END) AS ref_bookings
+        , SUM(1) AS bookings
+        , ds AS metric_time
+      FROM {{ source_schema }}.fct_bookings
+      GROUP BY
+        ds
+    )
+---
+integration_test:
+  name: derived_metric_ratio
+  description: Tests a ratio metric defined as a derived metric
+  model: SIMPLE_MODEL
+  metrics: ["bookings_per_lux_listing_derived"]
+  group_bys: ["metric_time"]
+  check_query: |
+    SELECT
+      bookings / lux_listings AS bookings_per_lux_listing_derived
+      , a.metric_time
+    FROM (
+      SELECT
+        SUM(1) AS bookings
+        , ds AS metric_time
+      FROM {{ source_schema }}.fct_bookings
+      GROUP BY
+        ds
+    ) a
+    FULL OUTER JOIN (
+      SELECT
+        SUM(1) AS lux_listings
+        , created_at AS metric_time
+      FROM {{ source_schema }}.dim_listings_latest
+      WHERE is_lux
+      GROUP BY
+        created_at
+    ) b
+    ON a.metric_time = b.metric_time
+---
+integration_test:
+  name: nested_derived_metric
+  description: Tests a nested derived metric
+  model: SIMPLE_MODEL
+  metrics: ["instant_plus_non_referred_bookings_pct"]
+  group_bys: ["metric_time"]
+  check_query: |
+    SELECT
+      (instant_bookings / bookings) + ((bookings - ref_bookings) / bookings) AS instant_plus_non_referred_bookings_pct
+      , metric_time
+    FROM (
+      SELECT
+        SUM(CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END) AS ref_bookings
+        , SUM(CASE WHEN is_instant THEN 1 ELSE 0 END) AS instant_bookings
+        , SUM(1) AS bookings
+        , ds AS metric_time
+      FROM {{ source_schema }}.fct_bookings
+      GROUP BY
+        ds
+    )
