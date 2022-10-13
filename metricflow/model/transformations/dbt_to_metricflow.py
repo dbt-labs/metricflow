@@ -155,7 +155,15 @@ class DbtManifestTransformer:
 
         return dimensions
 
-    def _build_measure(self, dbt_metric: DbtMetric) -> Measure:  # noqa: D
+    def build_measure(self, dbt_metric: DbtMetric) -> Measure:
+        """Attemps to build a measure for a given DbtMetric
+
+        Raises:
+            RuntimeError: A measure can't be built for `derived` dbt metrics
+        """
+        if dbt_metric.calculation_method == "derived":
+            raise RuntimeError("Cannot build a MetricFlow measure for `derived` DbtMetric")
+
         return Measure(
             name=dbt_metric.name,
             agg=CALC_METHOD_TO_MEASURE_TYPE[dbt_metric.calculation_method],
@@ -180,7 +188,7 @@ class DbtManifestTransformer:
             sql_table=data_source_table,
             dbt_model=data_source_table,
             dimensions=self.build_dimensions(dbt_metric),
-            measures=[self._build_measure(dbt_metric)],
+            measures=[self.build_measure(dbt_metric)],
         )
 
     def _where_clause_from_filters(self, filters: List[DbtMetricFilter]) -> str:  # noqa: D
