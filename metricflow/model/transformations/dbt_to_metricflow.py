@@ -51,6 +51,21 @@ class DbtManifestTransformer:
             manifest: A dbt Manifest object
         """
         self.manifest = manifest
+        self._time_dimension_stats: Optional[Dict[str, List[str]]] = None  # lazy load it
+
+    @property
+    def time_dimension_stats(self) -> Dict[str, List[str]]:
+        """The stats on time dimensions from the dbt Manifest
+
+        The time dimension stats are returned as a dictionary where in the keys
+        are the names of the time dimension, and the value associated with each
+        key is a list of `DbtMetric.model`s which that the associated time
+        dimension should be primary for
+        """
+        if not self._time_dimension_stats:
+            self._time_dimension_stats = self.collect_time_dimension_stats(dbt_metrics=self.manifest.metrics.values())
+
+        return self._time_dimension_stats
 
     def _resolve_metric_model_ref(self, dbt_metric: DbtMetric) -> DbtModelNode:  # noqa: D
         if dbt_metric.model[:4] != "ref(":
@@ -81,15 +96,13 @@ class DbtManifestTransformer:
     def _db_table_from_model_node(self, node: DbtModelNode) -> str:  # noqa: D
         return f"{node.database}.{node.schema}.{node.name}"
 
-    def _build_dimension(
-        self, name: str, dbt_metric: DbtMetric, time_dimension_stats: Dict[str, List[str]]
-    ) -> Dimension:
-        if name in time_dimension_stats.keys():
+    def _build_dimension(self, name: str, dbt_metric: DbtMetric) -> Dimension:  # noqa: D
+        if name in self.time_dimension_stats.keys():
             return Dimension(
                 name=name,
                 type=DimensionType.TIME,
                 type_params=DimensionTypeParams(
-                    is_primary=dbt_metric.model in time_dimension_stats[name], time_granularity=TimeGranularity.DAY
+                    is_primary=dbt_metric.model in self.time_dimension_stats[name], time_granularity=TimeGranularity.DAY
                 ),
             )
         else:
@@ -98,23 +111,15 @@ class DbtManifestTransformer:
                 type=DimensionType.CATEGORICAL,
             )
 
-    def _build_dimensions(
-        self, dbt_metric: DbtMetric, time_dimension_stats: Dict[str, List[str]]
-    ) -> List[Dimension]:  # noqa: D
+    def _build_dimensions(self, dbt_metric: DbtMetric) -> List[Dimension]:  # noqa: D
         dimensions = []
 
         # Build dimensions specifically from DbtMetric.dimensions list
         for dimension in dbt_metric.dimensions:
-            dimensions.append(
-                self._build_dimension(name=dimension, dbt_metric=dbt_metric, time_dimension_stats=time_dimension_stats)
-            )
+            dimensions.append(self._build_dimension(name=dimension, dbt_metric=dbt_metric))
 
         # Add DbtMetric.timestamp as a time dimension
-        dimensions.append(
-            self._build_dimension(
-                name=dbt_metric.timestamp, dbt_metric=dbt_metric, time_dimension_stats=time_dimension_stats
-            )
-        )
+        dimensions.append(self._build_dimension(name=dbt_metric.timestamp, dbt_metric=dbt_metric))
 
         # We need to deduplicate the filters because a field could be the same in
         # two filters. For example, if two filters exist for `amount`, one with
@@ -125,11 +130,7 @@ class DbtManifestTransformer:
         # exclude when field is also the DbtMetric.timestamp
         for filter_field in distinct_dbt_metric_filter_fields:
             if filter_field not in dbt_metric.dimensions and filter_field != dbt_metric.timestamp:
-                dimensions.append(
-                    self._build_dimension(
-                        name=filter_field, dbt_metric=dbt_metric, time_dimension_stats=time_dimension_stats
-                    )
-                )
+                dimensions.append(self._build_dimension(name=filter_field, dbt_metric=dbt_metric))
 
         return dimensions
 
@@ -141,9 +142,7 @@ class DbtManifestTransformer:
             agg_time_dimension=dbt_metric.timestamp,
         )
 
-    def _build_data_source(
-        self, dbt_metric: DbtMetric, time_dimension_stats: Dict[str, List[str]]
-    ) -> DataSource:  # noqa: D
+    def _build_data_source(self, dbt_metric: DbtMetric) -> DataSource:  # noqa: D
         metric_model_ref = self._resolve_metric_model_ref(dbt_metric=dbt_metric)
         data_source_table = self._db_table_from_model_node(metric_model_ref)
         return DataSource(
@@ -151,7 +150,7 @@ class DbtManifestTransformer:
             description=metric_model_ref.description,
             sql_table=data_source_table,
             dbt_model=data_source_table,
-            dimensions=self._build_dimensions(dbt_metric, time_dimension_stats),
+            dimensions=self._build_dimensions(dbt_metric),
             measures=[self._build_measure(dbt_metric)],
         )
 
@@ -177,10 +176,8 @@ class DbtManifestTransformer:
             constraint=where_clause_constraint,
         )
 
-    def dbt_metric_to_metricflow_elements(  # noqa: D
-        self, dbt_metric: DbtMetric, time_dimension_stats: Dict[str, List[str]]
-    ) -> TransformedDbtMetric:
-        data_source = self._build_data_source(dbt_metric, time_dimension_stats)
+    def dbt_metric_to_metricflow_elements(self, dbt_metric: DbtMetric) -> TransformedDbtMetric:  # noqa: D
+        data_source = self._build_data_source(dbt_metric)
         proxy_metric = self._build_proxy_metric(dbt_metric)
         return TransformedDbtMetric(data_source=data_source, metric=proxy_metric)
 
@@ -242,8 +239,19 @@ class DbtManifestTransformer:
         )
 
     @classmethod
-    def collect_time_dimension_names_from_metrics(cls, dbt_metrics: List[DbtMetric]) -> Dict[str, List[str]]:  # noqa: D
+    def collect_time_dimension_stats(cls, dbt_metrics: List[DbtMetric]) -> Dict[str, List[str]]:
+        """Compiles stats on time dimensions for a given list of DbtMetrics
+
+        Arguably this is probably a fairly black magic function. This function
+        determines which time dimensions are primary for which `DbtMetric.model`
+        """
+        # For storing the time dimension names and the `DbtMetric.model`s they are primary for
         time_dimensions: Dict[str, List[str]] = {}
+
+        # Map each `DbtMetric.model` value to counts of how many times each time
+        # dimension is associated with it. The time dimension that is associated
+        # with a `DbtMetric.model` the most will be considered the primary time
+        # dimenson for the data source that is built for the `DbtMetric.model`
         time_stats_for_metric_models: Dict[str, Dict[str, int]] = {}
         for dbt_metric in dbt_metrics:
             if dbt_metric.calculation_method != "derived":
@@ -255,6 +263,8 @@ class DbtManifestTransformer:
                 else:
                     time_stats_for_metric_models[dbt_metric.model][dbt_metric.timestamp] += 1
 
+        # Take the mapping created above and set the `DbtMetric.model` values
+        # that should be primary for the time dimension
         for metric_model, time_stats in time_stats_for_metric_models.items():
             primary_time_dim = max(time_stats, key=time_stats.get)  # type: ignore
             time_dimensions[primary_time_dim].append(metric_model)
@@ -265,16 +275,13 @@ class DbtManifestTransformer:
         data_sources_map: Dict[str, List[DataSource]] = {}
         metrics = []
         issues: List[ValidationIssue] = []
-        time_dimension_stats = self.collect_time_dimension_names_from_metrics(self.manifest.metrics.values())
 
         for dbt_metric in self.manifest.metrics.values():
             # TODO: Handle derived dbt metrics
             if dbt_metric.calculation_method == "derived":
                 continue
             else:
-                transformed_dbt_metric = self.dbt_metric_to_metricflow_elements(
-                    dbt_metric=dbt_metric, time_dimension_stats=time_dimension_stats
-                )
+                transformed_dbt_metric = self.dbt_metric_to_metricflow_elements(dbt_metric=dbt_metric)
                 if transformed_dbt_metric.data_source.name not in data_sources_map:
                     data_sources_map[transformed_dbt_metric.data_source.name] = [transformed_dbt_metric.data_source]
                 else:
