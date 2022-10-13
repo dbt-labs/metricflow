@@ -114,7 +114,9 @@ class DbtManifestTransformer:
         """Get the '.' joined database table name of a DbtModelNode"""
         return f"{node.database}.{node.schema}.{node.name}"
 
-    def _build_dimension(self, name: str, dbt_metric: DbtMetric) -> Dimension:  # noqa: D
+    def _build_dimension(self, name: str, dbt_metric: DbtMetric) -> Dimension:
+        """Helper for `build_dimenions which builds either a categorical or time dimension"""
+
         if name in self.time_dimension_stats.keys():
             return Dimension(
                 name=name,
@@ -129,7 +131,8 @@ class DbtManifestTransformer:
                 type=DimensionType.CATEGORICAL,
             )
 
-    def _build_dimensions(self, dbt_metric: DbtMetric) -> List[Dimension]:  # noqa: D
+    def build_dimensions(self, dbt_metric: DbtMetric) -> List[Dimension]:
+        """Given a DbtMetric, builds all the associated MetricFlow dimensions"""
         dimensions = []
 
         # Build dimensions specifically from DbtMetric.dimensions list
@@ -176,7 +179,7 @@ class DbtManifestTransformer:
             description=metric_model_ref.description,
             sql_table=data_source_table,
             dbt_model=data_source_table,
-            dimensions=self._build_dimensions(dbt_metric),
+            dimensions=self.build_dimensions(dbt_metric),
             measures=[self._build_measure(dbt_metric)],
         )
 
