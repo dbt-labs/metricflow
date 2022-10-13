@@ -6,6 +6,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.120.0] - 2022-10-19
+
+### Breaking Changes
+- Minor API change on SqlClient protocol could break existing API users writing custom SqlClient classes. MyPy should detect this issue. See [the relevant PR](https://github.com/transform-data/metricflow/pull/282) for details.
+
+### Added
+- Support for Databricks! Now you can use Metricflow with your Databricks-backed warehouse! (@courtneyholcomb)
+- The ability to define constraints on input measures for ratio and expr metric types. This is a temporary quality of life improvement until full-featured derived metrics (i.e., metrics based on other metrics) are available. (@tlento)
+- Support for different time granularities, improved group by expression handling, and corrected constraint handling on semi-additive measures (@WilliamDee)
+- Support for `count` as a measure aggregation type. Note this is implemented as an alias around `sum`, so use of the `DISTINCT` keyword in expressions is not supported, and will be blocked via validation in a separate update. Users wishing for a `COUNT(DISTINCT thing)` equivalent should continue to use the `count_distinct` aggregation type. (@WilliamDee)
+
+### Fixed
+- Resolved incorrect constraint handling with semi-additive measures (@WilliamDee)
+- Eliminated Dataclass deserialization errors on default parameters (@tlento)
+
+### Updated
+- Optimized multi-hop join candidate selection (@plypaul)
+- Improved error handling and error messages on config validation (@QMalcolm, @tlento)
+- Streamlined our project README (@nhandel)
+- CLI now accepts metric-only queries in limited circumstances. See the assertion checks [in the PR](https://github.com/transform-data/metricflow/pull/256) for details. We will announce this as a new feature when it is complete, but for the time being users may try it out to see if it meets their needs in its current form. (@WilliamDee)
+
 ## [0.111.1] - 2022-08-30
 
 ### Added
