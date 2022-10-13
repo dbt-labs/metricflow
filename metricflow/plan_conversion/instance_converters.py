@@ -537,6 +537,19 @@ class RemoveMeasures(InstanceSetTransform[InstanceSet]):
         )
 
 
+class RemoveMetrics(InstanceSetTransform[InstanceSet]):
+    """Remove metrics from the instance set."""
+
+    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D
+        return InstanceSet(
+            measure_instances=instance_set.measure_instances,
+            dimension_instances=instance_set.dimension_instances,
+            time_dimension_instances=instance_set.time_dimension_instances,
+            identifier_instances=instance_set.identifier_instances,
+            metric_instances=(),
+        )
+
+
 class ChangeAssociatedColumns(InstanceSetTransform[InstanceSet]):
     """Change the columns associated with instances to the one specified by the resolver."""
 

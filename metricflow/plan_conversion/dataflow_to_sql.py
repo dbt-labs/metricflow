@@ -43,6 +43,7 @@ from metricflow.object_utils import assert_values_exhausted
 from metricflow.plan_conversion.instance_converters import (
     AliasAggregatedMeasures,
     RemoveMeasures,
+    RemoveMetrics,
     AddMetrics,
     CreateSelectColumnsForInstances,
     CreateSelectColumnsWithMeasuresAggregated,
@@ -913,6 +914,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
         # Also, the output columns should always follow the resolver format.
         output_instance_set = output_instance_set.transform(ChangeAssociatedColumns(self._column_association_resolver))
+        output_instance_set = output_instance_set.transform(RemoveMetrics())
 
         non_metric_select_column_set: SelectColumnSet = output_instance_set.transform(
             CreateSelectColumnsForInstances(
@@ -987,7 +989,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                         column_name=expr,
                     )
                 )
-            elif metric.type == MetricType.EXPR:
+            elif metric.type == MetricType.EXPR or metric.type == MetricType.DERIVED:
                 assert metric.type_params.expr
                 metric_expr = SqlStringExpression(sql_expr=metric.type_params.expr)
             else:
@@ -995,7 +997,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
             assert metric_expr
 
-            output_column_association = self._column_association_resolver.resolve_metric_spec(metric_spec)
+            output_column_association = self._column_association_resolver.resolve_metric_spec(metric_spec.alias_spec)
             metric_select_columns.append(
                 SqlSelectColumn(
                     expr=metric_expr,
@@ -1006,7 +1008,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 MetricInstance(
                     associated_columns=(output_column_association,),
                     defined_from=(MetricModelReference(metric_name=metric_spec.element_name),),
-                    spec=metric_spec,
+                    spec=metric_spec.alias_spec,
                 )
             )
         output_instance_set = output_instance_set.transform(AddMetrics(metric_instances))

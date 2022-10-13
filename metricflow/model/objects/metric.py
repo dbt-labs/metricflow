@@ -65,28 +65,12 @@ class MetricInputMeasure(PydanticCustomInputParser, HashableBaseModel):
         return MeasureReference(element_name=self.alias or self.name)
 
 
-class MetricInput(PydanticCustomInputParser, HashableBaseModel):
+class MetricInput(HashableBaseModel):
     """Provides a pointer to a metric along with the additional properties used on that metric."""
 
     name: str
     constraint: Optional[WhereClauseConstraint]
     alias: Optional[str]
-
-    @classmethod
-    def _from_yaml_value(cls, input: PydanticParseableValueType) -> MetricInput:
-        """Parses a MetricInput from a string (name only) or object (struct spec) input
-
-        For user input cases, the original YAML spec for a Metric included metric(s) specified as string names
-        or lists of string names. As such, configs pre-dating the addition of this model type will only provide the
-        base name for this object.
-        """
-        if isinstance(input, str):
-            return MetricInput(name=input)
-        else:
-            raise ValueError(
-                f"MetricInput inputs from model configs are expected to be of either type string or "
-                f"object (key/value pairs), but got type {type(input)} with value: {input}"
-            )
 
 
 class CumulativeMetricWindow(PydanticCustomInputParser, HashableBaseModel):

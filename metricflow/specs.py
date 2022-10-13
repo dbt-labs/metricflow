@@ -355,6 +355,12 @@ class MeasureSpec(InstanceSpec):  # noqa: D
 class MetricSpec(InstanceSpec):  # noqa: D
     # Time-over-time could go here
     element_name: str
+    constraint: Optional[SpecWhereClauseConstraint] = None
+    alias: Optional[str] = None
+
+    @staticmethod
+    def from_element_name(element_name: str) -> MetricSpec:  # noqa: D
+        return MetricSpec(element_name=element_name)
 
     def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
         return (resolver.resolve_metric_spec(self),)
@@ -371,6 +377,14 @@ class MetricSpec(InstanceSpec):  # noqa: D
     def from_reference(reference: MetricReference) -> MetricSpec:
         """Initialize from a metric reference instance"""
         return MetricSpec(element_name=reference.element_name)
+
+    @property
+    def alias_spec(self) -> MetricSpec:
+        """Returns a MetricSpec represneting the alias state."""
+        return MetricSpec(
+            element_name=self.alias or self.element_name,
+            constraint=self.constraint,
+        )
 
 
 @dataclass(frozen=True)
