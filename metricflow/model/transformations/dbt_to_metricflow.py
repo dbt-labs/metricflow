@@ -236,7 +236,8 @@ class DbtManifestTransformer:
             constraint=where_clause_constraint,
         )
 
-    def dbt_metric_to_metricflow_elements(self, dbt_metric: DbtMetric) -> TransformedDbtMetric:  # noqa: D
+    def dbt_metric_to_metricflow_elements(self, dbt_metric: DbtMetric) -> TransformedDbtMetric:
+        """Builds a MetricFlow data source and proxy metric for the given DbtMetric"""
         data_source = self.build_data_source_for_metric(dbt_metric)
         proxy_metric = self.build_proxy_metric(dbt_metric)
         return TransformedDbtMetric(data_source=data_source, metric=proxy_metric)
