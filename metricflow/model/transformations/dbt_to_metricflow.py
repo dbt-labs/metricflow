@@ -206,7 +206,19 @@ class DbtManifestTransformer:
         clauses = [f"{filter.field} {filter.operator} {filter.value}" for filter in filters]
         return " AND ".join(clauses)
 
-    def _build_proxy_metric(self, dbt_metric: DbtMetric) -> Metric:  # noqa: D
+    def build_proxy_metric(self, dbt_metric: DbtMetric) -> Metric:
+        """Attempt to build a proxy metric for the given DbtMetric
+
+        For DbtMetrics which have a calculation method != 'derived',
+        we have separately created a measure of the appropriate type.
+        This method creates the proxy metric for the measure.
+
+        Raises:
+            RuntimeError: A proxy metric can't be built for `derived` dbt metrics
+        """
+        if dbt_metric.calculation_method == "derived":
+            raise RuntimeError("Cannot build a MetricFlow proxy metric for `derived` DbtMetric")
+
         where_clause_constraint: Optional[WhereClauseConstraint] = None
         if dbt_metric.filters:
             where_clause_constraint = WhereClauseConstraint(
@@ -226,7 +238,7 @@ class DbtManifestTransformer:
 
     def dbt_metric_to_metricflow_elements(self, dbt_metric: DbtMetric) -> TransformedDbtMetric:  # noqa: D
         data_source = self.build_data_source_for_metric(dbt_metric)
-        proxy_metric = self._build_proxy_metric(dbt_metric)
+        proxy_metric = self.build_proxy_metric(dbt_metric)
         return TransformedDbtMetric(data_source=data_source, metric=proxy_metric)
 
     @classmethod
