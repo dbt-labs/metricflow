@@ -346,7 +346,12 @@ class DbtManifestTransformer:
 
         return time_dimensions
 
-    def build_user_configured_model(self) -> ModelBuildResult:  # noqa: D
+    def build_user_configured_model(self) -> ModelBuildResult:
+        """Builds a UserConfiguredModel from the manifest of the instance
+
+        Note:
+            Currently skips DbtMetric that are `derived`
+        """
         data_sources_map: Dict[str, List[DataSource]] = {}
         metrics = []
         issues: List[ValidationIssue] = []
