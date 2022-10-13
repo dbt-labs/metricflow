@@ -191,7 +191,18 @@ class DbtManifestTransformer:
             measures=[self.build_measure(dbt_metric)],
         )
 
-    def _where_clause_from_filters(self, filters: List[DbtMetricFilter]) -> str:  # noqa: D
+    @classmethod
+    def build_where_stmt_from_filters(cls, filters: List[DbtMetricFilter]) -> str:
+        """Builds an SQL 'where' statement from the passed in filters
+
+        Each dbt filter has a field, an operator, and a value. With these dbt
+        forms the individual statment '{field} {operator} {value}' and joins
+        them with an 'AND'. Thus we do the same.
+
+        Note:
+            TODO: We could probably replace this with whatever method dbt uses to
+            build the statement.
+        """
         clauses = [f"{filter.field} {filter.operator} {filter.value}" for filter in filters]
         return " AND ".join(clauses)
 
@@ -199,7 +210,7 @@ class DbtManifestTransformer:
         where_clause_constraint: Optional[WhereClauseConstraint] = None
         if dbt_metric.filters:
             where_clause_constraint = WhereClauseConstraint(
-                where=self._where_clause_from_filters(filters=dbt_metric.filters),
+                where=self.build_where_stmt_from_filters(filters=dbt_metric.filters),
                 linkable_names=[filter.field for filter in dbt_metric.filters],
             )
 
