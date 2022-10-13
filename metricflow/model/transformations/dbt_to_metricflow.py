@@ -262,51 +262,52 @@ class DbtManifestTransformer:
         measures: Set[Measure] = set()
         identifiers: Set[Identifier] = set()
         dimensions: Set[Dimension] = set()
-        names: List[str] = []
-        descriptions: List[str] = []
-        sql_tables: List[str] = []
-        sql_queries: List[str] = []
-        dbt_models: List[str] = []
+        names: Set[str] = set()
+        descriptions: Set[str] = set()
+        sql_tables: Set[str] = set()
+        sql_queries: Set[str] = set()
+        dbt_models: Set[str] = set()
         for data_source in data_sources:
-            names.append(data_source.name) if data_source.name else None
-            descriptions.append(data_source.description) if data_source.description else None
-            sql_tables.append(data_source.sql_table) if data_source.sql_table else None
-            sql_queries.append(data_source.sql_query) if data_source.sql_query else None
-            dbt_models.append(data_source.dbt_model) if data_source.dbt_model else None
+            # This is an atypical pattern but results in less work. The following
+            # five lines are ternaries wherein the attribute is added to tracking
+            # set for the attribute, but only if the attribute is defined for the
+            # data source. The `else None` is required because python ternaries
+            # require an `else` statement. Having the else be `None` is simply
+            # saying nothing happens, i.e. the set is not modified.
+            names.add(data_source.name) if data_source.name else None
+            descriptions.add(data_source.description) if data_source.description else None
+            sql_tables.add(data_source.sql_table) if data_source.sql_table else None
+            sql_queries.add(data_source.sql_query) if data_source.sql_query else None
+            dbt_models.add(data_source.dbt_model) if data_source.dbt_model else None
+
+            # ensure any unique sub elements get added to the set of sub elements
             measures = measures.union(set(data_source.measures)) if data_source.measures else measures
             identifiers = identifiers.union(set(data_source.identifiers)) if data_source.identifiers else identifiers
             dimensions = dimensions.union(set(data_source.dimensions)) if data_source.dimensions else dimensions
 
-        # get distinct variations
-        set_names = set(names)
-        set_descriptions = set(descriptions)
-        set_sql_tables = set(sql_tables)
-        set_sql_queries = set(sql_queries)
-        set_dbt_models = set(dbt_models)
-
-        assert len(set_names) == 1, "Cannot merge data sources, all data sources to merge must have same name"
+        assert len(names) == 1, "Cannot merge data sources, all data sources to merge must have same name"
         assert (
-            len(set_descriptions) <= 1
+            len(descriptions) <= 1
         ), "Cannot merge data sources, all data sources to merge must have same descritpion (or none)"
         assert (
-            len(set_sql_tables) <= 1
+            len(sql_tables) <= 1
         ), "Cannot merge data sources, all data sources to merge must have same sql_table (or none)"
         assert (
-            len(set_sql_queries) <= 1
+            len(sql_queries) <= 1
         ), "Cannot merge data sources, all data sources to merge must have same sql_query (or none)"
         assert xor(
-            len(set_sql_tables) == 1, len(set_sql_queries) == 1
+            len(sql_tables) == 1, len(sql_queries) == 1
         ), "Cannot merge data sources, definitions for both sql_table and sql_query exist"
         assert (
-            len(set_dbt_models) <= 1
+            len(dbt_models) <= 1
         ), "Cannot merge data sources, all data sources to merge must have same dbt_model (or none)"
 
         return DataSource(
-            name=list(set_names)[0],
-            description=list(set_descriptions)[0] if set_descriptions else None,
-            sql_table=list(set_sql_tables)[0] if set_sql_tables else None,
-            sql_query=list(set_sql_queries)[0] if set_sql_queries else None,
-            dbt_model=list(set_dbt_models)[0] if set_dbt_models else None,
+            name=list(names)[0],
+            description=list(descriptions)[0] if descriptions else None,
+            sql_table=list(sql_tables)[0] if sql_tables else None,
+            sql_query=list(sql_queries)[0] if sql_queries else None,
+            dbt_model=list(dbt_models)[0] if dbt_models else None,
             dimensions=list(dimensions),
             identifiers=list(identifiers),
             measures=list(measures),
