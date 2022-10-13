@@ -243,10 +243,22 @@ class DbtManifestTransformer:
         return TransformedDbtMetric(data_source=data_source, metric=proxy_metric)
 
     @classmethod
-    def merge_data_sources(cls, data_sources: List[DataSource]) -> DataSource:  # noqa: D
+    def merge_data_sources(cls, data_sources: List[DataSource]) -> DataSource:
+        """Attemps to merge a list of data sources into a single data source
+
+        Because each DbtMetric (which isn't `derived`) creates a data source,
+        and many DbtMetric can create the same data source with the differring
+        numbers and defintions for dimensions and measures, we need a way to
+        deduplicate/merge them. This function does that. It requires that the
+        base information (name/table/query/description/etc) of the data source
+        not be variable and that dimensions/measures/identifers with the same
+        name have the same attributes.
+        """
+
         if len(data_sources) == 1:
             return data_sources[0]
 
+        # collect the variations of data source properties
         measures: Set[Measure] = set()
         identifiers: Set[Identifier] = set()
         dimensions: Set[Dimension] = set()
@@ -265,6 +277,7 @@ class DbtManifestTransformer:
             identifiers = identifiers.union(set(data_source.identifiers)) if data_source.identifiers else identifiers
             dimensions = dimensions.union(set(data_source.dimensions)) if data_source.dimensions else dimensions
 
+        # get distinct variations
         set_names = set(names)
         set_descriptions = set(descriptions)
         set_sql_tables = set(sql_tables)
