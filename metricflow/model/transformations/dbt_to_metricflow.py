@@ -160,7 +160,15 @@ class DbtManifestTransformer:
             agg_time_dimension=dbt_metric.timestamp,
         )
 
-    def _build_data_source(self, dbt_metric: DbtMetric) -> DataSource:  # noqa: D
+    def build_data_source_for_metric(self, dbt_metric: DbtMetric) -> DataSource:
+        """Attemps to build a data source for a given DbtMetric
+
+        Raises:
+            RuntimeError: A data source can't be built for `derived` dbt metrics
+        """
+        if dbt_metric.calculation_method == "derived":
+            raise RuntimeError("Cannot build a MetricFlow data source for `derived` DbtMetric")
+
         metric_model_ref = self.resolve_metric_model_ref(dbt_metric=dbt_metric)
         data_source_table = self.db_table_from_model_node(metric_model_ref)
         return DataSource(
@@ -195,7 +203,7 @@ class DbtManifestTransformer:
         )
 
     def dbt_metric_to_metricflow_elements(self, dbt_metric: DbtMetric) -> TransformedDbtMetric:  # noqa: D
-        data_source = self._build_data_source(dbt_metric)
+        data_source = self.build_data_source_for_metric(dbt_metric)
         proxy_metric = self._build_proxy_metric(dbt_metric)
         return TransformedDbtMetric(data_source=data_source, metric=proxy_metric)
 
