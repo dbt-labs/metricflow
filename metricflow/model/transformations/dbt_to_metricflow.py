@@ -52,6 +52,7 @@ class DbtManifestTransformer:
         """
         self.manifest = manifest
         self._time_dimension_stats: Optional[Dict[str, List[str]]] = None  # lazy load it
+        self._resolved_dbt_model_refs: Dict[int, DbtModelNode] = {}  # cache of resolved nodes
 
     @property
     def time_dimension_stats(self) -> Dict[str, List[str]]:
@@ -67,13 +68,23 @@ class DbtManifestTransformer:
 
         return self._time_dimension_stats
 
-    def _resolve_metric_model_ref(self, dbt_metric: DbtMetric) -> DbtModelNode:  # noqa: D
+    def resolve_metric_model_ref(self, dbt_metric: DbtMetric) -> DbtModelNode:
+        """Returns a DbtModelNode based on the `DbtMetric.model` ref
+
+        There should be a way to do this using dbt, and ideally we'll transition
+        to doing this whatever that way is, but for the time being this was the
+        fastest solution time wise. In addition to resolving the ref, this method
+        caches the resolved ref node and uses the cache when possible to avoid re-
+        resolving nodes.
+        """
         if dbt_metric.model[:4] != "ref(":
             raise RuntimeError("Can only resolve refs for ref strings that begin with `ref(`")
-        ref_parts = dbt_metric.model[4:-1].split(",")
+
         target_model = None
         target_package = None
 
+        # Parse the DbtMetric.model into it's parts
+        ref_parts = dbt_metric.model[4:-1].split(",")
         if len(ref_parts) == 1:
             target_model = ref_parts[0].strip(" \"'\t\r\n")
         elif len(ref_parts) == 2:
@@ -82,16 +93,21 @@ class DbtManifestTransformer:
         else:
             ref_invalid_args(dbt_metric.name, ref_parts)
 
-        node = self.manifest.resolve_ref(
-            target_model_name=target_model,
-            target_model_package=target_package,
-            current_project=self.manifest.metadata.project_id,
-            node_package=dbt_metric.package_name,
-        )
-        assert isinstance(
-            node, DbtModelNode
-        ), f"Ref `{dbt_metric.model}` resolved to {node}, which is not of type `{DbtModelNode.__name__}`"
-        return node
+        hashed = hash((target_model, target_package, self.manifest.metadata.project_id, dbt_metric.package_name))
+        if hashed not in self._resolved_dbt_model_refs:
+            node = self.manifest.resolve_ref(
+                target_model_name=target_model,
+                target_model_package=target_package,
+                current_project=self.manifest.metadata.project_id,
+                node_package=dbt_metric.package_name,
+            )
+            assert isinstance(
+                node, DbtModelNode
+            ), f"Ref `{dbt_metric.model}` resolved to {node}, which is not of type `{DbtModelNode.__name__}`"
+
+            self._resolved_dbt_model_refs[hashed] = node
+
+        return self._resolved_dbt_model_refs[hashed]
 
     def _db_table_from_model_node(self, node: DbtModelNode) -> str:  # noqa: D
         return f"{node.database}.{node.schema}.{node.name}"
@@ -143,7 +159,7 @@ class DbtManifestTransformer:
         )
 
     def _build_data_source(self, dbt_metric: DbtMetric) -> DataSource:  # noqa: D
-        metric_model_ref = self._resolve_metric_model_ref(dbt_metric=dbt_metric)
+        metric_model_ref = self.resolve_metric_model_ref(dbt_metric=dbt_metric)
         data_source_table = self._db_table_from_model_node(metric_model_ref)
         return DataSource(
             name=metric_model_ref.name,
