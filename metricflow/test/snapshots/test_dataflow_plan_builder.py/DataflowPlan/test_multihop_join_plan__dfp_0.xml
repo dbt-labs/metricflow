@@ -5,7 +5,11 @@
         <ComputeMetricsNode>
             <!-- description = Compute Metrics via Expressions -->
             <!-- node_id = cm_0 -->
-            <!-- metric_spec = MetricSpec(element_name='txn_count') -->
+            <!-- metric_spec =                    -->
+            <!--   {'class': 'MetricSpec',        -->
+            <!--    'element_name': 'txn_count',  -->
+            <!--    'constraint': None,           -->
+            <!--    'alias': None}                -->
             <AggregateMeasuresNode>
                 <!-- description = Aggregate Measures -->
                 <!-- node_id = am_0 -->

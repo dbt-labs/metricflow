@@ -15,18 +15,25 @@
             <!--                            'identifier_links': (),                    -->
             <!--                            'time_granularity': TimeGranularity.DAY},  -->
             <!--    'identifier_spec': None}                                           -->
-            <!-- order_by_spec =                                                         -->
-            <!--   {'class': 'OrderBySpec',                                              -->
-            <!--    'descending': True,                                                  -->
-            <!--    'metric_spec': {'class': 'MetricSpec', 'element_name': 'bookings'},  -->
-            <!--    'dimension_spec': None,                                              -->
-            <!--    'time_dimension_spec': None,                                         -->
-            <!--    'identifier_spec': None}                                             -->
+            <!-- order_by_spec =                                 -->
+            <!--   {'class': 'OrderBySpec',                      -->
+            <!--    'descending': True,                          -->
+            <!--    'metric_spec': {'class': 'MetricSpec',       -->
+            <!--                    'element_name': 'bookings',  -->
+            <!--                    'constraint': None,          -->
+            <!--                    'alias': None},              -->
+            <!--    'dimension_spec': None,                      -->
+            <!--    'time_dimension_spec': None,                 -->
+            <!--    'identifier_spec': None}                     -->
             <!-- limit = None -->
             <ComputeMetricsNode>
                 <!-- description = Compute Metrics via Expressions -->
                 <!-- node_id = cm_0 -->
-                <!-- metric_spec = MetricSpec(element_name='bookings') -->
+                <!-- metric_spec =                   -->
+                <!--   {'class': 'MetricSpec',       -->
+                <!--    'element_name': 'bookings',  -->
+                <!--    'constraint': None,          -->
+                <!--    'alias': None}               -->
                 <AggregateMeasuresNode>
                     <!-- description = Aggregate Measures -->
                     <!-- node_id = am_0 -->
