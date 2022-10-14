@@ -4,7 +4,7 @@ from typing import ClassVar, Optional, Mapping, Union, Sequence
 
 import sqlalchemy
 
-from metricflow.protocols.sql_client import SqlEngine
+from metricflow.protocols.sql_client import SqlEngine, SqlIsolationLevel
 from metricflow.protocols.sql_client import SqlEngineAttributes
 from metricflow.protocols.sql_request import SqlRequestTagSet
 from metricflow.sql.render.redshift import RedshiftSqlQueryPlanRenderer
@@ -25,6 +25,12 @@ class RedshiftEngineAttributes:
     sql_engine_type: ClassVar[SqlEngine] = SqlEngine.REDSHIFT
 
     # SQL Engine capabilities
+    supported_isolation_levels: ClassVar[Sequence[SqlIsolationLevel]] = (
+        SqlIsolationLevel.READ_UNCOMMITTED,
+        SqlIsolationLevel.READ_COMMITTED,
+        SqlIsolationLevel.REPEATABLE_READ,
+        SqlIsolationLevel.SERIALIZABLE,
+    )
     date_trunc_supported: ClassVar[bool] = True
     full_outer_joins_supported: ClassVar[bool] = True
     indexes_supported: ClassVar[bool] = False

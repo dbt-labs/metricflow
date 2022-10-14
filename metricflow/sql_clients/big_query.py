@@ -10,7 +10,7 @@ import sqlalchemy
 from google.cloud import bigquery
 from google.cloud.bigquery import QueryJob
 
-from metricflow.protocols.sql_client import SqlEngine
+from metricflow.protocols.sql_client import SqlEngine, SqlIsolationLevel
 from metricflow.protocols.sql_client import (
     SqlEngineAttributes,
 )
@@ -34,6 +34,7 @@ class BigQueryEngineAttributes:
     sql_engine_type: ClassVar[SqlEngine] = SqlEngine.BIGQUERY
 
     # SQL Engine capabilities
+    supported_isolation_levels: ClassVar[Sequence[SqlIsolationLevel]] = ()
     date_trunc_supported: ClassVar[bool] = True
     full_outer_joins_supported: ClassVar[bool] = True
     indexes_supported: ClassVar[bool] = False

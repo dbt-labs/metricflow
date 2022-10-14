@@ -84,3 +84,12 @@ def test_cancel_request(  # noqa: D
 
     assert async_sql_client.async_request_result(request_id).exception is not None
     assert num_cancelled == 1
+
+
+def test_isolation_level(  # noqa: D
+    mf_test_session_state: MetricFlowTestSessionState, async_sql_client: AsyncSqlClient
+) -> None:
+    for isolation_level in async_sql_client.sql_engine_attributes.supported_isolation_levels:
+        logger.info(f"Testing isolation level: {isolation_level}")
+        request_id = async_sql_client.async_query("SELECT 1", isolation_level=isolation_level)
+        async_sql_client.async_request_result(request_id)

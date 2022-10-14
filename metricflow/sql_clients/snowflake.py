@@ -10,14 +10,14 @@ import pandas as pd
 import sqlalchemy
 from sqlalchemy.exc import ProgrammingError
 
-from metricflow.protocols.sql_client import SqlEngine
+from metricflow.protocols.sql_client import SqlEngine, SqlIsolationLevel
 from metricflow.protocols.sql_client import SqlEngineAttributes
 from metricflow.protocols.sql_request import SqlRequestTagSet
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.async_request import SqlStatementCommentMetadata
-from metricflow.sql_clients.common_client import SqlDialect, not_empty
+from metricflow.sql_clients.common_client import SqlDialect, not_empty, check_isolation_level
 from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
 
 
@@ -30,6 +30,7 @@ class SnowflakeEngineAttributes:
     sql_engine_type: ClassVar[SqlEngine] = SqlEngine.SNOWFLAKE
 
     # SQL Engine capabilities
+    supported_isolation_levels: ClassVar[Sequence[SqlIsolationLevel]] = ()
     date_trunc_supported: ClassVar[bool] = True
     full_outer_joins_supported: ClassVar[bool] = True
     indexes_supported: ClassVar[bool] = False
@@ -159,7 +160,9 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
         return SnowflakeEngineAttributes()
 
     @contextmanager
-    def engine_connection(self, engine: sqlalchemy.engine.Engine) -> Iterator[sqlalchemy.engine.Connection]:
+    def engine_connection(
+        self, engine: sqlalchemy.engine.Engine, isolation_level: Optional[SqlIsolationLevel] = None
+    ) -> Iterator[sqlalchemy.engine.Connection]:
         """Context Manager for providing a configured connection.
 
         Snowflake allows setting a WEEK_START parameter on each session. This forces the value to be
@@ -167,8 +170,8 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
         options construct, which the DBClient could read in at initialization and use here (for example).
         At this time we hard-code the ISO standard.
         """
-
-        with super().engine_connection(self._engine) as conn:
+        check_isolation_level(self, isolation_level)
+        with super().engine_connection(self._engine, isolation_level=isolation_level) as conn:
             # WEEK_START 1 means Monday.
             conn.execute("ALTER SESSION SET WEEK_START = 1;")
             results = conn.execute("SELECT CURRENT_SESSION()")
@@ -187,9 +190,11 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
         self,
         stmt: str,
         bind_params: SqlBindParameters = SqlBindParameters(),
+        isolation_level: Optional[SqlIsolationLevel] = None,
         allow_re_auth: bool = True,
     ) -> pd.DataFrame:
-        with self.engine_connection(engine=self._engine) as conn:
+        check_isolation_level(self, isolation_level)
+        with self.engine_connection(engine=self._engine, isolation_level=isolation_level) as conn:
             try:
                 return pd.read_sql_query(sqlalchemy.text(stmt), conn, params=bind_params.param_dict)
             except ProgrammingError as e:
@@ -201,13 +206,18 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
                         self._engine.dispose()
                         self._engine = self._create_engine()
                     # this was our one chance to re-auth
-                    return self._query(stmt, allow_re_auth=False, bind_params=bind_params)
+                    return self._query(
+                        stmt, allow_re_auth=False, bind_params=bind_params, isolation_level=isolation_level
+                    )
                 raise e
 
-    def _engine_specific_query_implementation(  # noqa: D
-        self, stmt: str, bind_params: SqlBindParameters
+    def _engine_specific_query_implementation(
+        self,
+        stmt: str,
+        bind_params: SqlBindParameters,
+        isolation_level: Optional[SqlIsolationLevel] = None,
     ) -> pd.DataFrame:
-        return self._query(stmt, bind_params)
+        return self._query(stmt, bind_params, isolation_level)
 
     def list_tables(self, schema_name: str) -> Sequence[str]:  # noqa: D
         df = self.query(
