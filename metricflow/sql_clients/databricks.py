@@ -9,13 +9,12 @@ import sqlalchemy
 from databricks import sql
 
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.protocols.sql_client import SqlEngine
-from metricflow.protocols.sql_client import SqlEngineAttributes
+from metricflow.protocols.sql_client import SqlEngineAttributes, SqlEngine, SqlIsolationLevel
 from metricflow.protocols.sql_request import SqlRequestTagSet
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer, SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.base_sql_client_implementation import BaseSqlClientImplementation
-from metricflow.sql_clients.common_client import SqlDialect
+from metricflow.sql_clients.common_client import SqlDialect, check_isolation_level
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +42,7 @@ class DatabricksEngineAttributes:
     sql_engine_type: ClassVar[SqlEngine] = SqlEngine.DATABRICKS
 
     # SQL Engine capabilities
+    supported_isolation_levels: ClassVar[Sequence[SqlIsolationLevel]] = ()
     date_trunc_supported: ClassVar[bool] = True
     full_outer_joins_supported: ClassVar[bool] = True
     indexes_supported: ClassVar[bool] = False
@@ -135,7 +135,13 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         """If there are no parameters, use None to prevent collision with `%` wildcard."""
         return None if bind_params == SqlBindParameters() else bind_params.param_dict
 
-    def _engine_specific_query_implementation(self, stmt: str, bind_params: SqlBindParameters) -> pd.DataFrame:
+    def _engine_specific_query_implementation(
+        self,
+        stmt: str,
+        bind_params: SqlBindParameters,
+        isolation_level: Optional[SqlIsolationLevel] = None,
+    ) -> pd.DataFrame:
+        check_isolation_level(self, isolation_level)
         with self.get_connection() as connection:
             with connection.cursor() as cursor:
                 cursor.execute(operation=stmt, parameters=self.params_or_none(bind_params))
@@ -151,7 +157,12 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
                 pandas_df[col_name] = pandas_df[col_name].dt.tz_localize(None)
         return pandas_df
 
-    def _engine_specific_execute_implementation(self, stmt: str, bind_params: SqlBindParameters) -> None:
+    def _engine_specific_execute_implementation(
+        self,
+        stmt: str,
+        bind_params: SqlBindParameters,
+        isolation_level: Optional[SqlIsolationLevel] = None,
+    ) -> None:
         """Execute statement, returning nothing."""
         with self.get_connection(self.stmt_is_table_rename(stmt)) as connection:
             with connection.cursor() as cursor:

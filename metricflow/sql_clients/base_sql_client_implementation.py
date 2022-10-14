@@ -17,9 +17,11 @@ from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.protocols.sql_client import (
     SqlEngineAttributes,
 )
+from metricflow.protocols.sql_client import SqlIsolationLevel
 from metricflow.protocols.sql_request import SqlRequestId, SqlRequestResult, SqlRequestTagSet
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql_clients.async_request import SqlRequestExecutorThread
+from metricflow.sql_clients.async_request import SqlStatementCommentMetadata
+from metricflow.sql_clients.common_client import check_isolation_level
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +38,7 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
     INDENT = "    "
 
     def __init__(self) -> None:  # noqa: D
-        self._request_id_to_thread: Dict[SqlRequestId, SqlRequestExecutorThread] = {}
+        self._request_id_to_thread: Dict[SqlRequestId, BaseSqlClientImplementation.SqlRequestExecutorThread] = {}
         self._state_lock = threading.Lock()
 
     def generate_health_check_tests(self, schema_name: str) -> List[Tuple[str, Any]]:  # type: ignore
@@ -92,6 +94,7 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
             sql_bind_parameters: The parameter replacement mapping for filling in
                 concrete values for SQL query parameters.
         """
+
         start = time.time()
         logger.info(
             f"Running query:"
@@ -110,6 +113,7 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
         stmt: str,
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
     ) -> None:
+
         start = time.time()
         logger.info(
             f"Running query:"
@@ -154,12 +158,22 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
         raise NotImplementedError
 
     @abstractmethod
-    def _engine_specific_query_implementation(self, stmt: str, bind_params: SqlBindParameters) -> pd.DataFrame:
+    def _engine_specific_query_implementation(
+        self,
+        stmt: str,
+        bind_params: SqlBindParameters,
+        isolation_level: Optional[SqlIsolationLevel] = None,
+    ) -> pd.DataFrame:
         """Sub-classes should implement this to query the engine."""
         pass
 
     @abstractmethod
-    def _engine_specific_execute_implementation(self, stmt: str, bind_params: SqlBindParameters) -> None:
+    def _engine_specific_execute_implementation(
+        self,
+        stmt: str,
+        bind_params: SqlBindParameters,
+        isolation_level: Optional[SqlIsolationLevel] = None,
+    ) -> None:
         """Sub-classes should implement this to execute a statement that doesn't return results."""
         pass
 
@@ -223,15 +237,18 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
         statement: str,
         bind_parameters: SqlBindParameters = SqlBindParameters(),
         tags: SqlRequestTagSet = SqlRequestTagSet(),
+        isolation_level: Optional[SqlIsolationLevel] = None,
     ) -> SqlRequestId:
+        check_isolation_level(self, isolation_level)
         with self._state_lock:
             request_id = SqlRequestId(f"mf_rid__{random_id()}")
-            thread = SqlRequestExecutorThread(
+            thread = BaseSqlClientImplementation.SqlRequestExecutorThread(
                 sql_client=self,
                 request_id=request_id,
                 statement=statement,
                 bind_parameters=bind_parameters,
                 user_tags=tags,
+                isolation_level=isolation_level,
             )
             self._request_id_to_thread[request_id] = thread
             self._request_id_to_thread[request_id].start()
@@ -242,23 +259,26 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
         statement: str,
         bind_parameters: SqlBindParameters = SqlBindParameters(),
         tags: SqlRequestTagSet = SqlRequestTagSet(),
+        isolation_level: Optional[SqlIsolationLevel] = None,
     ) -> SqlRequestId:
+        check_isolation_level(self, isolation_level)
         with self._state_lock:
             request_id = SqlRequestId(f"mf_rid__{random_id()}")
-            thread = SqlRequestExecutorThread(
+            thread = BaseSqlClientImplementation.SqlRequestExecutorThread(
                 sql_client=self,
                 request_id=request_id,
                 statement=statement,
                 bind_parameters=bind_parameters,
                 user_tags=tags,
                 is_query=False,
+                isolation_level=isolation_level,
             )
             self._request_id_to_thread[request_id] = thread
             self._request_id_to_thread[request_id].start()
             return request_id
 
     def async_request_result(self, query_id: SqlRequestId) -> SqlRequestResult:  # noqa: D
-        thread: Optional[SqlRequestExecutorThread] = None
+        thread: Optional[BaseSqlClientImplementation.SqlRequestExecutorThread] = None
         with self._state_lock:
             thread = self._request_id_to_thread.get(query_id)
             if thread is None:
@@ -275,3 +295,82 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
     def active_requests(self) -> Sequence[SqlRequestId]:  # noqa: D
         with self._state_lock:
             return tuple(executor_thread.request_id for executor_thread in self._request_id_to_thread.values())
+
+    class SqlRequestExecutorThread(threading.Thread):
+        """Thread that helps to execute a request to the SQL engine asynchronously."""
+
+        def __init__(  # noqa: D
+            self,
+            sql_client: BaseSqlClientImplementation,
+            request_id: SqlRequestId,
+            statement: str,
+            bind_parameters: SqlBindParameters,
+            user_tags: SqlRequestTagSet,
+            is_query: bool = True,
+            isolation_level: Optional[SqlIsolationLevel] = None,
+        ) -> None:
+            """Initializer.
+
+            Args:
+                sql_client: SQL client used to execute statements.
+                request_id: The request ID associated with the statement.
+                statement: The statement to execute.
+                bind_parameters: The parameters to use for the statement.
+                user_tags: Tags that should be associated with the request for the statement.
+                is_query: Whether the request is for .query (returns data) or .execute (does not return data)
+                isolation_level: The isolation level to use for the query.
+            """
+            self._sql_client = sql_client
+            self._request_id = request_id
+            self._statement = statement
+            self._bind_parameters = bind_parameters
+            self._user_tags = user_tags
+            self._result: Optional[SqlRequestResult] = None
+            self._is_query = is_query
+            self._isolation_level = isolation_level
+            super().__init__(name=f"Async Execute SQL Request ID: {request_id}", daemon=True)
+
+        def run(self) -> None:  # noqa: D
+            start_time = time.time()
+            try:
+                statement = SqlStatementCommentMetadata.add_tag_metadata_as_comment(
+                    self._statement, self._user_tags.add_request_id(self._request_id)
+                )
+                logger.info(
+                    f"Running {self._request_id} asynchronously:\n\n"
+                    f"{textwrap.indent(self._statement, prefix=BaseSqlClientImplementation.INDENT)}\n"
+                    + (
+                        f"\nwith parameters: {dict(self._bind_parameters.param_dict)}"
+                        if self._bind_parameters.param_dict
+                        else ""
+                    )
+                )
+                if self._is_query:
+                    df = self._sql_client._engine_specific_query_implementation(
+                        statement,
+                        self._bind_parameters,
+                        self._isolation_level,
+                    )
+                    self._result = SqlRequestResult(df=df)
+                else:
+                    self._sql_client._engine_specific_execute_implementation(
+                        statement,
+                        self._bind_parameters,
+                        self._isolation_level,
+                    )
+                    self._result = SqlRequestResult(df=pd.DataFrame())
+                logger.info(f"Successfully executed {self._request_id} in {time.time() - start_time:.2f}s")
+            except Exception as e:
+                logger.exception(
+                    f"Unsuccessfully executed {self._request_id} in {time.time() - start_time:.2f}s with exception:"
+                )
+                self._result = SqlRequestResult(exception=e)
+
+        @property
+        def result(self) -> SqlRequestResult:  # noqa: D
+            assert self._result is not None, ".result() should only be called once the thread is finished running"
+            return self._result
+
+        @property
+        def request_id(self) -> SqlRequestId:  # noqa: D
+            return self._request_id

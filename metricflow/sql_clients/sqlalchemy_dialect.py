@@ -10,9 +10,11 @@ import pandas as pd
 import sqlalchemy
 
 from metricflow.dataflow.sql_table import SqlTable
+from metricflow.protocols.sql_client import SqlIsolationLevel
 from metricflow.protocols.sql_request import SqlRequestTagSet
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.base_sql_client_implementation import BaseSqlClientImplementation
+from metricflow.sql_clients.common_client import check_isolation_level
 
 logger = logging.getLogger(__name__)
 
@@ -80,22 +82,38 @@ class SqlAlchemySqlClient(BaseSqlClientImplementation, ABC):
         return self._engine.table_names(schema=schema_name)
 
     @contextmanager
-    def engine_connection(self, engine: sqlalchemy.engine.Engine) -> Iterator[sqlalchemy.engine.Connection]:
+    def engine_connection(
+        self, engine: sqlalchemy.engine.Engine, isolation_level: Optional[SqlIsolationLevel] = None
+    ) -> Iterator[sqlalchemy.engine.Connection]:
         """Context Manager for providing a configured connection."""
-        conn = engine.connect()
+        check_isolation_level(self, isolation_level)
+
+        if isolation_level is not None:
+            # Passing isolation_level=None will throw an error in some engines.
+            conn = engine.connect().execution_options(isolation_level=isolation_level.value)
+        else:
+            conn = engine.connect()
         try:
             yield conn
         finally:
             conn.close()
 
     def _engine_specific_query_implementation(  # noqa: D
-        self, stmt: str, bind_params: SqlBindParameters
+        self,
+        stmt: str,
+        bind_params: SqlBindParameters,
+        isolation_level: Optional[SqlIsolationLevel] = None,
     ) -> pd.DataFrame:
-        with self.engine_connection(self._engine) as conn:
+        with self.engine_connection(self._engine, isolation_level=isolation_level) as conn:
             return pd.read_sql_query(sqlalchemy.text(stmt), conn, params=bind_params.param_dict)
 
-    def _engine_specific_execute_implementation(self, stmt: str, bind_params: SqlBindParameters) -> None:  # noqa: D
-        with self.engine_connection(self._engine) as conn:
+    def _engine_specific_execute_implementation(  # noqa: D
+        self,
+        stmt: str,
+        bind_params: SqlBindParameters,
+        isolation_level: Optional[SqlIsolationLevel] = None,
+    ) -> None:
+        with self.engine_connection(self._engine, isolation_level=isolation_level) as conn:
             conn.execute(sqlalchemy.text(stmt), bind_params.param_dict)
 
     def _engine_specific_dry_run_implementation(self, stmt: str, bind_params: SqlBindParameters) -> None:  # noqa: D

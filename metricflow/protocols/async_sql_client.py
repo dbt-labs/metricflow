@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Protocol, Sequence
+from typing import Protocol, Sequence, Optional
 
-from metricflow.protocols.sql_client import SqlClient
+from metricflow.protocols.sql_client import SqlClient, SqlIsolationLevel
 from metricflow.protocols.sql_request import SqlRequestId, SqlRequestResult, SqlRequestTagSet
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 
@@ -16,6 +16,7 @@ class AsyncSqlClient(SqlClient, Protocol):
         statement: str,
         bind_parameters: SqlBindParameters = SqlBindParameters(),
         tags: SqlRequestTagSet = SqlRequestTagSet(),
+        isolation_level: Optional[SqlIsolationLevel] = None,
     ) -> SqlRequestId:
         """Execute a query asynchronously."""
         raise NotImplementedError
@@ -31,6 +32,7 @@ class AsyncSqlClient(SqlClient, Protocol):
         statement: str,
         bind_parameters: SqlBindParameters = SqlBindParameters(),
         tags: SqlRequestTagSet = SqlRequestTagSet(),
+        isolation_level: Optional[SqlIsolationLevel] = None,
     ) -> SqlRequestId:
         """Execute a statement that does not return values asynchronously."""
         raise NotImplementedError
