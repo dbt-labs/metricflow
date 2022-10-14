@@ -32,8 +32,8 @@ from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanCon
 from metricflow.plan_conversion.time_spine import TimeSpineSource, TimeSpineTableBuilder
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.query.query_parser import MetricFlowQueryParser
-from metricflow.specs import ColumnAssociationResolver
-from metricflow.specs import MetricSpec, MetricFlowQuerySpec
+from metricflow.specs import ColumnAssociationResolver, MetricFlowQuerySpec
+from metricflow.references import MetricReference
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.time.time_source import TimeSource
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
@@ -406,7 +406,9 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         )
         logger.info(f"Query spec is:\n{pformat_big_objects(query_spec)}")
 
-        if self._semantic_model.metric_semantics.contains_cumulative_metric(query_spec.metric_specs):
+        if self._semantic_model.metric_semantics.contains_cumulative_metric(
+            tuple(m.as_reference for m in query_spec.metric_specs)
+        ):
             self._time_spine_table_builder.create_if_necessary()
             time_constraint_updated = False
             if not mf_query_request.time_constraint_start:
@@ -464,7 +466,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         return [
             Dimension(name=dim.qualified_name)
             for dim in self._semantic_model.metric_semantics.element_specs_for_metrics(
-                metric_specs=[MetricSpec(element_name=mname) for mname in metric_names],
+                metric_references=[MetricReference(element_name=mname) for mname in metric_names],
                 without_any_property=frozenset(
                     {
                         LinkableElementProperties.IDENTIFIER,
@@ -486,8 +488,8 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def list_metrics(self) -> List[Metric]:  # noqa: D
-        metric_specs = self._semantic_model.metric_semantics.metric_names
-        metrics = self._semantic_model.metric_semantics.get_metrics(metric_specs)
+        metric_references = self._semantic_model.metric_semantics.metric_references
+        metrics = self._semantic_model.metric_semantics.get_metrics(metric_references)
         return [
             Metric(
                 name=metric.name,

@@ -12,14 +12,13 @@ from metricflow.model.objects.elements.dimension import DimensionType, Dimension
 from metricflow.model.objects.elements.identifier import IdentifierType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.object_utils import pformat_big_objects, flatten_nested_sequence
-from metricflow.references import MeasureReference
+from metricflow.references import MeasureReference, MetricReference
 from metricflow.specs import (
     DEFAULT_TIME_GRANULARITY,
     LinkableSpecSet,
     DimensionSpec,
     TimeDimensionSpec,
     IdentifierSpec,
-    MetricSpec,
     IdentifierReference,
 )
 from metricflow.time.time_granularity import TimeGranularity
@@ -583,16 +582,16 @@ class ValidLinkableSpecResolver:
 
     def get_linkable_elements_for_metrics(
         self,
-        metric_specs: Sequence[MetricSpec],
+        metric_references: Sequence[MetricReference],
         with_any_of: FrozenSet[LinkableElementProperties],
         without_any_of: FrozenSet[LinkableElementProperties],
     ) -> LinkableElementSet:
         """Gets the valid linkable elements that are common to all requested metrics."""
         linkable_element_sets = []
-        for metric_spec in metric_specs:
-            element_sets = self._metric_to_linkable_element_sets.get(metric_spec.element_name)
+        for metric_reference in metric_references:
+            element_sets = self._metric_to_linkable_element_sets.get(metric_reference.element_name)
             if not element_sets:
-                raise ValueError(f"Unknown metric: {metric_spec} in element set")
+                raise ValueError(f"Unknown metric: {metric_reference} in element set")
             metric_result = LinkableElementSet.intersection(
                 [x.filter(with_any_of=with_any_of, without_any_of=without_any_of) for x in element_sets]
             )

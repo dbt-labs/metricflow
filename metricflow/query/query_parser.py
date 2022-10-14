@@ -22,7 +22,7 @@ from metricflow.model.spec_converters import WhereConstraintConverter
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.object_utils import pformat_big_objects
 from metricflow.query.query_exceptions import InvalidQueryException
-from metricflow.references import DimensionReference, IdentifierReference, TimeDimensionReference
+from metricflow.references import DimensionReference, IdentifierReference, MetricReference, TimeDimensionReference
 from metricflow.specs import (
     MetricFlowQuerySpec,
     MetricSpec,
@@ -92,7 +92,7 @@ class MetricFlowQueryParser:
             else:
                 raise RuntimeError(f"Unhandled linkable type: {dimension.type}")
 
-        self._known_metric_names = set(self._metric_semantics.metric_names)
+        self._known_metric_names = set(self._metric_semantics.metric_references)
         self._metric_time_dimension_reference = DataSet.metric_time_dimension_reference()
         self._time_granularity_solver = TimeGranularitySolver(
             semantic_model=self._model,
@@ -160,12 +160,12 @@ class MetricFlowQueryParser:
 
     def _validate_linkable_specs(
         self,
-        metric_specs: Tuple[MetricSpec, ...],
+        metric_references: Tuple[MetricReference, ...],
         all_linkable_specs: LinkableInstanceSpecs,
         time_dimension_specs: Tuple[TimeDimensionSpec, ...],
     ) -> None:
         invalid_group_bys = self._get_invalid_linkable_specs(
-            metric_specs=metric_specs,
+            metric_references=metric_references,
             dimension_specs=all_linkable_specs.dimension_specs,
             time_dimension_specs=time_dimension_specs,
             identifier_specs=all_linkable_specs.identifier_specs,
@@ -173,7 +173,7 @@ class MetricFlowQueryParser:
         if len(invalid_group_bys) > 0:
             valid_group_by_names_for_metrics = sorted(
                 x.qualified_name
-                for x in self._metric_semantics.element_specs_for_metrics(metric_specs=list(metric_specs))
+                for x in self._metric_semantics.element_specs_for_metrics(metric_references=list(metric_references))
             )
             # Create suggestions for invalid dimensions in case the user made a typo.
             suggestion_sections = {}
@@ -186,7 +186,7 @@ class MetricFlowQueryParser:
                 suggestion_sections[section_key] = section_value
             raise UnableToSatisfyQueryError(
                 f"Dimensions {[x.qualified_name for x in invalid_group_bys]} cannot be "
-                f"resolved for metrics {[x.qualified_name for x in metric_specs]}. The invalid dimension may not "
+                f"resolved for metrics {[x.element_name for x in metric_references]}. The invalid dimension may not "
                 f"exist, require an ambiguous join (e.g. a join path that can be satisfied in multiple ways), "
                 f"or require a fanout join.",
                 context=suggestion_sections,
@@ -217,7 +217,10 @@ class MetricFlowQueryParser:
         else:
             parsed_where_constraint = where_constraint
 
-        metric_specs = self._parse_metric_names(metric_names)
+        metric_references = self._parse_metric_names(metric_names)
+        metric_specs = tuple(
+            self._metric_semantics.get_metric_spec(metric_reference) for metric_reference in metric_references
+        )
 
         if time_constraint_start is None:
             time_constraint_start = TimeRangeConstraint.ALL_TIME_BEGIN()
@@ -262,10 +265,10 @@ class MetricFlowQueryParser:
             # If the time constraint is all time, just ignore and not render
             time_constraint = None
 
-        requested_linkable_specs = self._parse_linkable_element_names(group_by_names, metric_specs)
+        requested_linkable_specs = self._parse_linkable_element_names(group_by_names, metric_references)
         partial_time_dimension_spec_replacements = (
             self._time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
-                metric_specs=metric_specs,
+                metric_references=metric_references,
                 partial_time_dimension_specs=requested_linkable_specs.partial_time_dimension_specs,
                 metric_time_dimension_reference=self._metric_time_dimension_reference,
                 time_granularity=time_granularity,
@@ -280,35 +283,35 @@ class MetricFlowQueryParser:
             time_dimension_spec for _, time_dimension_spec in partial_time_dimension_spec_replacements.items()
         )
 
-        self._time_granularity_solver.validate_time_granularity(metric_specs, time_dimension_specs)
+        self._time_granularity_solver.validate_time_granularity(metric_references, time_dimension_specs)
 
         order_by_specs = self._parse_order_by(order or [], partial_time_dimension_spec_replacements)
 
-        for metric_spec in metric_specs:
-            metric = self._metric_semantics.get_metric(metric_spec)
+        for metric_reference in metric_references:
+            metric = self._metric_semantics.get_metric(metric_reference)
             if metric.constraint is not None:
                 all_linkable_specs = self._parse_linkable_element_names(
                     qualified_linkable_names=all_group_by_names + metric.constraint.linkable_names,
-                    metric_specs=(metric_spec,),
+                    metric_references=(metric_reference,),
                 )
                 self._validate_linkable_specs(
-                    metric_specs=(metric_spec,),
+                    metric_references=(metric_reference,),
                     all_linkable_specs=all_linkable_specs,
                     time_dimension_specs=time_dimension_specs,
                 )
         all_linkable_specs = self._parse_linkable_element_names(
             qualified_linkable_names=all_group_by_names,
-            metric_specs=metric_specs,
+            metric_references=metric_references,
         )
         self._validate_linkable_specs(
-            metric_specs=metric_specs,
+            metric_references=metric_references,
             all_linkable_specs=all_linkable_specs,
             time_dimension_specs=time_dimension_specs,
         )
 
         self._validate_order_by_specs(
             order_by_specs=order_by_specs,
-            metric_specs=metric_specs,
+            metric_references=metric_references,
             linkable_specs=LinkableSpecSet(
                 dimension_specs=requested_linkable_specs.dimension_specs,
                 time_dimension_specs=time_dimension_specs,
@@ -320,7 +323,7 @@ class MetricFlowQueryParser:
         if time_constraint:
             logger.info(f"Time constraint before adjustment is {time_constraint}")
             time_constraint = self._adjust_time_range_constraint(
-                metric_specs=metric_specs,
+                metric_references=metric_references,
                 time_dimension_specs=time_dimension_specs,
                 time_range_constraint=time_constraint,
             )
@@ -335,7 +338,7 @@ class MetricFlowQueryParser:
             )
             and not time_granularity
         ):
-            if self._metrics_have_same_time_granularities(metric_specs):
+            if self._metrics_have_same_time_granularities(metric_references=metric_references):
                 _, replace_with_time_dimension_spec = self._find_replacement_for_metric_time_dimension(
                     partial_time_dimension_spec_replacements
                 )
@@ -371,11 +374,16 @@ class MetricFlowQueryParser:
     def _validate_order_by_specs(
         self,
         order_by_specs: Sequence[OrderBySpec],
-        metric_specs: Sequence[MetricSpec],
+        metric_references: Sequence[MetricReference],
         linkable_specs: LinkableSpecSet,
     ) -> None:
         """Checks that the order by specs references an item in the query."""
 
+        # TODO: this is a workaround
+        # Need to figure out whether we should clean up OrderBySpec or if we have to actually pass a fully resolved MetricSpec here
+        metric_specs = [
+            MetricSpec(element_name=metric_reference.element_name) for metric_reference in metric_references
+        ]
         for order_by_spec in order_by_specs:
             if not (
                 order_by_spec.item in metric_specs
@@ -387,12 +395,12 @@ class MetricFlowQueryParser:
 
     def _adjust_time_range_constraint(
         self,
-        metric_specs: Sequence[MetricSpec],
+        metric_references: Sequence[MetricReference],
         time_dimension_specs: Sequence[TimeDimensionSpec],
         time_range_constraint: TimeRangeConstraint,
     ) -> TimeRangeConstraint:
         """Adjust the time range constraint so that it matches the boundaries of the granularity of the result."""
-        self._time_granularity_solver.validate_time_granularity(metric_specs, time_dimension_specs)
+        self._time_granularity_solver.validate_time_granularity(metric_references, time_dimension_specs)
 
         smallest_primary_time_granularity_in_query = self._find_smallest_metric_time_dimension_spec_granularity(
             time_dimension_specs
@@ -402,7 +410,7 @@ class MetricFlowQueryParser:
 
         else:
             _, adjusted_to_granularity = self._time_granularity_solver.local_dimension_granularity_range(
-                metric_specs=metric_specs,
+                metric_references=metric_references,
                 local_time_dimension_reference=self._metric_time_dimension_reference,
             )
         logger.info(f"Adjusted primary time granularity is {adjusted_to_granularity}")
@@ -436,9 +444,9 @@ class MetricFlowQueryParser:
                 return True
         return False
 
-    def _metrics_have_same_time_granularities(self, metric_specs: Sequence[MetricSpec]) -> bool:
+    def _metrics_have_same_time_granularities(self, metric_references: Sequence[MetricReference]) -> bool:
         (min_granularity, max_granularity,) = self._time_granularity_solver.local_dimension_granularity_range(
-            metric_specs=metric_specs,
+            metric_references=metric_references,
             local_time_dimension_reference=self._metric_time_dimension_reference,
         )
         return min_granularity == max_granularity
@@ -462,22 +470,22 @@ class MetricFlowQueryParser:
         else:
             return None
 
-    def _parse_metric_names(self, metric_names: Sequence[str]) -> Tuple[MetricSpec, ...]:
+    def _parse_metric_names(self, metric_names: Sequence[str]) -> Tuple[MetricReference, ...]:
         """Converts metric names into metric names. An exception is thrown if the name is invalid."""
 
         # The config must be lower-case, so we lower case for case-insensitivity against query inputs from the user.
         metric_names = [x.lower() for x in metric_names]
 
-        known_metric_names = set(self._metric_semantics.metric_names)
-        metric_specs: List[MetricSpec] = []
+        known_metric_names = set(self._metric_semantics.metric_references)
+        metric_references: List[MetricReference] = []
         for metric_name in metric_names:
-            metric_spec = MetricSpec(element_name=metric_name)
-            if metric_spec not in known_metric_names:
+            metric_reference = MetricReference(element_name=metric_name)
+            if metric_reference not in known_metric_names:
                 suggestions = {
                     f"Suggestions for '{metric_name}'": pformat_big_objects(
                         MetricFlowQueryParser._top_fuzzy_matches(
                             item=metric_name,
-                            candidate_items=[x.qualified_name for x in self._metric_semantics.metric_names],
+                            candidate_items=[x.element_name for x in self._metric_semantics.metric_references],
                         )
                     )
                 }
@@ -485,11 +493,11 @@ class MetricFlowQueryParser:
                     f"Unknown metric: '{metric_name}'",
                     context=suggestions,
                 )
-            metric_specs.append(metric_spec)
-        return tuple(metric_specs)
+            metric_references.append(metric_reference)
+        return tuple(metric_references)
 
     def _parse_linkable_element_names(
-        self, qualified_linkable_names: Sequence[str], metric_specs: Sequence[MetricSpec]
+        self, qualified_linkable_names: Sequence[str], metric_references: Sequence[MetricReference]
     ) -> LinkableInstanceSpecs:
         """Convert the linkable spec names into the respective specification objects."""
 
@@ -527,7 +535,7 @@ class MetricFlowQueryParser:
                 identifier_specs.append(IdentifierSpec(element_name=element_name, identifier_links=identifier_links))
             else:
                 valid_group_by_names_for_metrics = sorted(
-                    x.qualified_name for x in self._metric_semantics.element_specs_for_metrics(list(metric_specs))
+                    x.qualified_name for x in self._metric_semantics.element_specs_for_metrics(list(metric_references))
                 )
 
                 suggestions = {
@@ -552,7 +560,7 @@ class MetricFlowQueryParser:
 
     def _get_invalid_linkable_specs(
         self,
-        metric_specs: Tuple[MetricSpec, ...],
+        metric_references: Tuple[MetricReference, ...],
         dimension_specs: Tuple[DimensionSpec, ...],
         time_dimension_specs: Tuple[TimeDimensionSpec, ...],
         identifier_specs: Tuple[IdentifierSpec, ...],
@@ -560,7 +568,9 @@ class MetricFlowQueryParser:
         """Checks that each requested linkable instance can be retrieved for the given metric"""
         invalid_linkable_specs: List[LinkableInstanceSpec] = []
         # TODO: distinguish between dimensions that invalid via typo vs ambiguous join path
-        valid_linkable_specs = self._metric_semantics.element_specs_for_metrics(metric_specs=list(metric_specs))
+        valid_linkable_specs = self._metric_semantics.element_specs_for_metrics(
+            metric_references=list(metric_references)
+        )
 
         for dimension_spec in dimension_specs:
             if dimension_spec not in valid_linkable_specs:
@@ -597,7 +607,7 @@ class MetricFlowQueryParser:
                 descending = True
             parsed_name = StructuredLinkableSpecName.from_name(order_by_name)
 
-            if MetricSpec(element_name=parsed_name.element_name) in self._known_metric_names:
+            if MetricReference(element_name=parsed_name.element_name) in self._known_metric_names:
                 if parsed_name.time_granularity:
                     raise InvalidQueryException(
                         f"Order by item '{order_by_name}' references a metric but has a time granularity"
