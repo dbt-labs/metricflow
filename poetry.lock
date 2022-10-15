@@ -3,7 +3,7 @@ name = "agate"
 version = "1.6.3"
 description = "A data analysis library that is optimized for humans instead of machines."
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [package.dependencies]
@@ -46,7 +46,7 @@ name = "babel"
 version = "2.10.3"
 description = "Internationalization utilities"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.6"
 
 [package.dependencies]
@@ -65,7 +65,7 @@ name = "boto3"
 version = "1.24.89"
 description = "The AWS SDK for Python"
 category = "main"
-optional = false
+optional = true
 python-versions = ">= 3.7"
 
 [package.dependencies]
@@ -81,7 +81,7 @@ name = "botocore"
 version = "1.27.89"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
-optional = false
+optional = true
 python-versions = ">= 3.7"
 
 [package.dependencies]
@@ -205,7 +205,7 @@ name = "dbt-bigquery"
 version = "1.3.0"
 description = "The BigQuery adapter plugin for dbt"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.7"
 
 [package.dependencies]
@@ -223,7 +223,7 @@ name = "dbt-core"
 version = "1.3.0"
 description = "With dbt, data analysts and engineers can build analytics the way engineers build applications."
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.7.2"
 
 [package.dependencies]
@@ -253,7 +253,7 @@ name = "dbt-extractor"
 version = "0.4.1"
 description = "A tool to analyze and extract information from Jinja used in dbt projects."
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.6.1"
 
 [[package]]
@@ -261,7 +261,7 @@ name = "dbt-postgres"
 version = "1.3.0"
 description = "The postgres adapter plugin for dbt (data build tool)"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.7"
 
 [package.dependencies]
@@ -273,7 +273,7 @@ name = "dbt-redshift"
 version = "1.3.0"
 description = "The Redshift adapter plugin for dbt"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.7"
 
 [package.dependencies]
@@ -286,7 +286,7 @@ name = "dbt-snowflake"
 version = "1.3.0"
 description = "The Snowflake adapter plugin for dbt"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.7"
 
 [package.dependencies]
@@ -487,7 +487,7 @@ name = "google-cloud-dataproc"
 version = "5.0.3"
 description = "Google Cloud Dataproc API client library"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.7"
 
 [package.dependencies]
@@ -503,7 +503,7 @@ name = "google-cloud-storage"
 version = "2.5.0"
 description = "Google Cloud Storage API client library"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.7"
 
 [package.dependencies]
@@ -630,7 +630,7 @@ name = "hologram"
 version = "0.0.15"
 description = "JSON schema generation from dataclasses"
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [package.dependencies]
@@ -661,7 +661,7 @@ name = "importlib-metadata"
 version = "5.0.0"
 description = "Read metadata from Python packages"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.7"
 
 [package.dependencies]
@@ -685,7 +685,7 @@ name = "isodate"
 version = "0.6.1"
 description = "An ISO 8601 date/time/duration parser and formatter"
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [package.dependencies]
@@ -696,7 +696,7 @@ name = "jaraco.classes"
 version = "3.2.3"
 description = "Utility functions for Python class constructs"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.7"
 
 [package.dependencies]
@@ -711,7 +711,7 @@ name = "jeepney"
 version = "0.8.0"
 description = "Low-level, pure Python DBus protocol wrapper."
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.7"
 
 [package.extras]
@@ -737,7 +737,7 @@ name = "jmespath"
 version = "1.0.1"
 description = "JSON Matching Expressions"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.7"
 
 [[package]]
@@ -762,7 +762,7 @@ name = "keyring"
 version = "23.9.3"
 description = "Store and access your passwords safely."
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.7"
 
 [package.dependencies]
@@ -781,7 +781,7 @@ name = "leather"
 version = "0.3.4"
 description = "Python charting for 80% of humans."
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [package.dependencies]
@@ -803,7 +803,7 @@ name = "logbook"
 version = "1.5.3"
 description = "A logging replacement for Python"
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [package.extras]
@@ -830,7 +830,7 @@ name = "mashumaro"
 version = "3.0.4"
 description = "Fast serialization framework on top of dataclasses"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.6"
 
 [package.dependencies]
@@ -846,7 +846,7 @@ name = "minimal-snowplow-tracker"
 version = "0.0.2"
 description = "A minimal snowplow event tracker for Python. Add analytics to your Python and Django apps, webapps and games"
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [package.dependencies]
@@ -944,7 +944,7 @@ name = "msgpack"
 version = "1.0.4"
 description = "MessagePack serializer"
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [[package]]
@@ -952,7 +952,7 @@ name = "networkx"
 version = "2.8.7"
 description = "Python package for creating and manipulating graphs and networks"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.8"
 
 [package.extras]
@@ -1021,7 +1021,7 @@ name = "parsedatetime"
 version = "2.4"
 description = "Parse human-readable date/time text."
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [package.dependencies]
@@ -1110,7 +1110,7 @@ name = "psycopg2-binary"
 version = "2.9.4"
 description = "psycopg2 - Python-PostgreSQL Database Adapter"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.6"
 
 [[package]]
@@ -1296,7 +1296,7 @@ name = "python-slugify"
 version = "6.1.2"
 description = "A Python slugify application that also handles Unicode"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*"
 
 [package.dependencies]
@@ -1310,7 +1310,7 @@ name = "pytimeparse"
 version = "1.1.8"
 description = "Time expression parser"
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [[package]]
@@ -1326,7 +1326,7 @@ name = "pywin32-ctypes"
 version = "0.2.0"
 description = ""
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [[package]]
@@ -1412,7 +1412,7 @@ name = "s3transfer"
 version = "0.6.0"
 description = "An Amazon S3 Transfer Manager"
 category = "main"
-optional = false
+optional = true
 python-versions = ">= 3.7"
 
 [package.dependencies]
@@ -1426,7 +1426,7 @@ name = "secretstorage"
 version = "3.3.3"
 description = "Python bindings to FreeDesktop.org Secret Service API"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.6"
 
 [package.dependencies]
@@ -1586,7 +1586,7 @@ name = "sqlparse"
 version = "0.4.3"
 description = "A non-validating SQL parser."
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.5"
 
 [[package]]
@@ -1613,7 +1613,7 @@ name = "text-unidecode"
 version = "1.3"
 description = "The most basic Text::Unidecode port"
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [[package]]
@@ -1707,7 +1707,7 @@ name = "werkzeug"
 version = "2.1.2"
 description = "The comprehensive WSGI web application library."
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.7"
 
 [package.extras]
@@ -1730,17 +1730,23 @@ name = "zipp"
 version = "3.9.0"
 description = "Backport of pathlib-compatible object wrapper for zip files"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.7"
 
 [package.extras]
 docs = ["sphinx (>=3.5)", "jaraco.packaging (>=9)", "rst.linker (>=1.9)", "furo", "jaraco.tidelift (>=1.4)"]
 testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "flake8 (<5)", "pytest-cov", "pytest-enabler (>=1.3)", "jaraco.itertools", "func-timeout", "jaraco.functools", "more-itertools", "pytest-black (>=0.3.7)", "pytest-mypy (>=0.9.1)"]
 
+[extras]
+dbt-bigquery = ["dbt-bigquery"]
+dbt-postgres = ["dbt-postgres"]
+dbt-redshift = ["dbt-redshift"]
+dbt-snowflake = ["dbt-snowflake"]
+
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<3.10"
-content-hash = "dad6a2d14af808345f096e073a2f8280475f268064d0a8c7ffab011ba1cc2912"
+content-hash = "0a6cdd7a6a5f3f06b56a7b263fd6b6ba5597094a3a34907ce8e4d2bf2e415b1f"
 
 [metadata.files]
 agate = []
