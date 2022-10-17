@@ -253,16 +253,16 @@ class DbtManifestTransformer:
         return TransformedDbtMetric(data_source=data_source, metric=proxy_metric)
 
     @classmethod
-    def merge_data_sources(cls, data_sources: List[DataSource]) -> DataSource:
-        """Attemps to merge a list of data sources into a single data source
+    def deduplicate_data_sources(cls, data_sources: List[DataSource]) -> DataSource:
+        """Attempts to deduplicate a list of data sources into a single data source
 
         Because each DbtMetric (which isn't `derived`) creates a data source,
-        and many DbtMetric can create the same data source with the differring
-        numbers and defintions for dimensions and measures, we need a way to
-        deduplicate/merge them. This function does that. It requires that the
-        base information (name/table/query/description/etc) of the data source
-        not be variable and that dimensions/measures/identifers with the same
-        name have the same attributes.
+        and many DbtMetric can create the same data source with differring
+        defintions for dimensions and measures, we need a way to deduplicate/merge
+        them. This function does that. It requires that the base information
+        (name/table/query/description/etc) of the data source not be variable and
+        that dimensions/measures/identifers with the same name have the same
+        attributes.
         """
 
         if len(data_sources) == 1:
@@ -382,7 +382,7 @@ class DbtManifestTransformer:
         deduped_data_sources = []
         for name, data_sources in data_sources_map.items():
             try:
-                deduped_data_sources.append(self.merge_data_sources(data_sources))
+                deduped_data_sources.append(self.deduplicate_data_sources(data_sources))
             except Exception as e:
                 issues.append(
                     ValidationError(
