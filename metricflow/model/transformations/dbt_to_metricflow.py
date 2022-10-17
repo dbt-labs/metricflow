@@ -1,7 +1,8 @@
+from collections import defaultdict
 from dataclasses import dataclass
 from operator import xor
 import traceback
-from typing import Dict, List, Optional, Set
+from typing import DefaultDict, Dict, List, Optional, Set
 from dbt.contracts.graph.parsed import ParsedMetric as DbtMetric, ParsedModelNode as DbtModelNode
 from dbt.contracts.graph.unparsed import MetricFilter as DbtMetricFilter
 from dbt.exceptions import ref_invalid_args
@@ -359,9 +360,11 @@ class DbtManifestTransformer:
         """Builds a UserConfiguredModel from the manifest of the instance
 
         Note:
-            Currently skips DbtMetric that are `derived`
+            TODO: This currently skips DbtMetric that are `derived`. Once MetricFlow
+            supports derived metrics, we'll need to add that functionality to
+            handle dbt derived metrics -> metricflow derived metrics.
         """
-        data_sources_map: Dict[str, List[DataSource]] = {}
+        data_sources_map: DefaultDict[str, List[DataSource]] = defaultdict(list)
         metrics = []
         issues: List[ValidationIssue] = []
 
@@ -371,10 +374,7 @@ class DbtManifestTransformer:
                 continue
             else:
                 transformed_dbt_metric = self.dbt_metric_to_metricflow_elements(dbt_metric=dbt_metric)
-                if transformed_dbt_metric.data_source.name not in data_sources_map:
-                    data_sources_map[transformed_dbt_metric.data_source.name] = [transformed_dbt_metric.data_source]
-                else:
-                    data_sources_map[transformed_dbt_metric.data_source.name].append(transformed_dbt_metric.data_source)
+                data_sources_map[transformed_dbt_metric.data_source.name].append(transformed_dbt_metric.data_source)
                 metrics.append(transformed_dbt_metric.metric)
 
         # As it might be the case that we generated many of the same data source,
