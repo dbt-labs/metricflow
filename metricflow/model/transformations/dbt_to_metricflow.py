@@ -68,30 +68,39 @@ class DbtManifestTransformer:
 
         return self._time_dimension_stats
 
-    def resolve_metric_model_ref(self, dbt_metric: DbtMetric) -> DbtModelNode:
-        """Returns a DbtModelNode based on the `DbtMetric.model` ref
+    def resolve_metric_model(self, dbt_metric: DbtMetric) -> DbtModelNode:
+        """Returns a DbtModelNode based on the `DbtMetric.model`
 
-        There should be a way to do this using dbt, and ideally we'll transition
-        to doing this whatever that way is, but for the time being this was the
-        fastest solution time wise. In addition to resolving the ref, this method
-        caches the resolved ref node and uses the cache when possible to avoid re-
-        resolving nodes.
+        `DbtMetric.model` string values should either be a model name, or a
+        dbt [ref] (https://docs.getdbt.com/reference/dbt-jinja-functions/ref) object for a model. A dbt `ref` contains either one or two
+        strings. If two strings are specified, the first is the target package
+        and the second is the target model. If only one string is specified
+        then it represents the target model.
+
+        TODO: There should be a way to do this using dbt, and ideally we'll
+        transition to doing this whatever that way is, but for the time being
+        this was the fastest solution time wise. In addition to resolving the
+        ref, this method caches the resolved ref node and uses the cache when
+        possible to avoid re-resolving nodes.
         """
-        if dbt_metric.model[:4] != "ref(":
-            raise RuntimeError("Can only resolve refs for ref strings that begin with `ref(`")
+        if dbt_metric.model is None:
+            raise RuntimeError("Unable to resolve a model for a `DbtMetric.model` value of `None`")
 
         target_model = None
         target_package = None
 
-        # Parse the DbtMetric.model into it's parts
-        ref_parts = dbt_metric.model[4:-1].split(",")
-        if len(ref_parts) == 1:
-            target_model = ref_parts[0].strip(" \"'\t\r\n")
-        elif len(ref_parts) == 2:
-            target_package = ref_parts[0].strip(" \"'\t\r\n")
-            target_model = ref_parts[1].strip(" \"'\t\r\n")
+        if dbt_metric.model[:4] == "ref(":
+            # Parse the DbtMetric.model into it's parts
+            ref_parts = dbt_metric.model[4:-1].split(",")
+            if len(ref_parts) == 1:
+                target_model = ref_parts[0].strip(" \"'\t\r\n")
+            elif len(ref_parts) == 2:
+                target_package = ref_parts[0].strip(" \"'\t\r\n")
+                target_model = ref_parts[1].strip(" \"'\t\r\n")
+            else:
+                ref_invalid_args(dbt_metric.name, ref_parts)
         else:
-            ref_invalid_args(dbt_metric.name, ref_parts)
+            target_model = dbt_metric.model
 
         hashed = hash((target_model, target_package, self.manifest.metadata.project_id, dbt_metric.package_name))
         if hashed not in self._resolved_dbt_model_refs:
@@ -180,7 +189,7 @@ class DbtManifestTransformer:
         if dbt_metric.calculation_method == "derived":
             raise RuntimeError("Cannot build a MetricFlow data source for `derived` DbtMetric")
 
-        metric_model_ref = self.resolve_metric_model_ref(dbt_metric=dbt_metric)
+        metric_model_ref = self.resolve_metric_model(dbt_metric=dbt_metric)
         data_source_table = self.db_table_from_model_node(metric_model_ref)
         return DataSource(
             name=metric_model_ref.name,
