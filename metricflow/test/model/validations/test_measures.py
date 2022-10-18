@@ -313,3 +313,22 @@ def test_count_measure_missing_expr(simple_model__pre_transforms: UserConfigured
     assert (
         actual_error.find(expected_error_substring) != -1
     ), f"Expected error {expected_error_substring} not found in error string! Instead got {actual_error}"
+
+
+def test_count_measure_with_distinct_expr(simple_model__pre_transforms: UserConfiguredModel) -> None:
+    """Tests that measures with COUNT agg can NOT use the DISTINCT keyword."""
+    model = copy.deepcopy(simple_model__pre_transforms)
+    data_source = find_data_source_with(model, lambda ds: ds.name == "bookings_source")[0]
+    invalid_measure = Measure(
+        name="distinct_count", agg=AggregationType.COUNT, agg_time_dimension="ds", expr="DISTINCT listing"
+    )
+    data_source.measures.append(invalid_measure)  # type: ignore
+
+    build = ModelValidator().validate_model(model)
+    expected_error_substring = "Measure 'distinct_count' uses a 'count' aggregation with a DISTINCT expr"
+
+    assert len(build.issues.errors) == 1
+    actual_error = build.issues.errors[0].as_readable_str()
+    assert (
+        actual_error.find(expected_error_substring) != -1
+    ), f"Expected error {expected_error_substring} not found in error string! Instead got {actual_error}"
