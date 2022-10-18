@@ -7,7 +7,6 @@ from metricflow.configuration.constants import CONFIG_MODEL_PATH
 from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.errors.errors import ModelCreationException
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.parsing.dbt_dir_to_model import parse_dbt_project_to_model
 from metricflow.model.parsing.dir_to_model import ModelBuildResult, parse_directory_of_yaml_files_to_model
 from metricflow.sql_clients.common_client import not_empty
 
@@ -52,6 +51,13 @@ def model_build_result_from_dbt_config(
     """
     dbt_models_path = path_to_models(handler=handler)
     try:
+        # This import results in eventually importing dbt, and dbt is an
+        # optional dep meaning it isn't guaranteed to be installed. If the
+        # import is at the top ofthe file MetricFlow will blow up if dbt
+        # isn't installed. Thus by importing it here, we only run into the
+        # exception if this method is called without dbt installed.
+        from metricflow.model.parsing.dbt_dir_to_model import parse_dbt_project_to_model
+
         return parse_dbt_project_to_model(dbt_models_path)
     except Exception as e:
         raise ModelCreationException from e

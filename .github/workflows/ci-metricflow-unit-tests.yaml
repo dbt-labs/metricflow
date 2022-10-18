@@ -32,7 +32,7 @@ jobs:
         run: pip install poetry==1.1.15 && poetry config virtualenvs.create false
 
       - name: Install Metricflow
-        run: poetry install -E dbt-snowflake
+        run: poetry install
 
       - name: Run MetricFlow Unit tests suites
         run: pytest metricflow/test
