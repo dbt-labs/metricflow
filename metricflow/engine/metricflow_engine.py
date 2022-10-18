@@ -19,7 +19,7 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
 from metricflow.engine.models import Dimension, Materialization, Metric
 from metricflow.engine.time_source import ServerTimeSource
-from metricflow.engine.utils import build_user_configured_model_from_config, build_user_configured_model_from_dbt_config
+from metricflow.engine.utils import build_user_configured_model_from_config
 from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
 from metricflow.execution.execution_plan_to_text import execution_plan_to_text
 from metricflow.execution.executor import SequentialPlanExecutor
@@ -276,6 +276,13 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         # Ideally we should put this getting of of CONFIG_DBT_REPO in a helper
         dbt_repo = handler.get_value(CONFIG_DBT_REPO) or ""
         if dbt_repo.lower() in ["yes", "y", "true", "t", "1"]:
+            # This import results in eventually importing dbt, and dbt is an
+            # optional dep meaning it isn't guaranteed to be installed. If the
+            # import is at the top ofthe file MetricFlow will blow up if dbt
+            # isn't installed. Thus by importing it here, we only run into the
+            # exception if this conditional is hit without dbt installed
+            from metricflow.engine.utils import build_user_configured_model_from_dbt_config
+
             semantic_model = SemanticModel(build_user_configured_model_from_dbt_config(handler))
         else:
             semantic_model = SemanticModel(build_user_configured_model_from_config(handler))
