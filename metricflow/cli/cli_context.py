@@ -5,7 +5,7 @@ from typing import Dict, Optional
 
 from metricflow.errors.errors import SqlClientCreationException, MetricFlowInitException
 from metricflow.configuration.config_handler import ConfigHandler
-from metricflow.configuration.constants import CONFIG_DBT_REPO, CONFIG_DWH_SCHEMA
+from metricflow.configuration.constants import CONFIG_DBT_PROFILE, CONFIG_DBT_REPO, CONFIG_DBT_TARGET, CONFIG_DWH_SCHEMA
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.engine.utils import build_user_configured_model_from_config, build_user_configured_model_from_dbt_config
 from metricflow.model.semantic_model import SemanticModel
@@ -118,7 +118,12 @@ class CLIContext:
     def user_configured_model(self) -> UserConfiguredModel:  # noqa: D
         if self._user_configured_model is None:
             if self.model_path_is_for_dbt:
-                self._user_configured_model = build_user_configured_model_from_dbt_config(self.config)
+                dbt_profile = self.config.get_value(CONFIG_DBT_PROFILE)
+                dbt_target = self.config.get_value(CONFIG_DBT_TARGET)
+
+                self._user_configured_model = build_user_configured_model_from_dbt_config(
+                    handler=self.config, profile=dbt_profile, target=dbt_target
+                )
             else:
                 self._user_configured_model = build_user_configured_model_from_config(self.config)
 

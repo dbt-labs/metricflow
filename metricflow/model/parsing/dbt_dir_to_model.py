@@ -34,9 +34,11 @@ def get_dbt_project_manifest(
     return DbtManifestLoader.get_full_manifest(config=dbt_config)
 
 
-def parse_dbt_project_to_model(directory: str) -> ModelBuildResult:
+def parse_dbt_project_to_model(
+    directory: str, profile: Optional[str] = None, target: Optional[str] = None
+) -> ModelBuildResult:
     """Parse dbt model files in the given directory to a UserConfiguredModel."""
-    manifest = get_dbt_project_manifest(directory=directory)
+    manifest = get_dbt_project_manifest(directory=directory, profile=profile, target=target)
     build_result = DbtManifestTransformer(manifest=manifest).build_user_configured_model()
     transformed_model = ModelTransformer.pre_validation_transform_model(model=build_result.model)
     transformed_model = ModelTransformer.post_validation_transform_model(model=transformed_model)
