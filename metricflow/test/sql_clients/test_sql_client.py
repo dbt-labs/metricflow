@@ -144,28 +144,37 @@ def test_dry_run_of_bad_query_raises_exception(sql_client: SqlClient) -> None:  
 def _issue_sleep_query(sql_client: SqlClient, sleep_time: int) -> None:
     """Issue a query that sleeps for a given number of seconds"""
     engine_type = sql_client.sql_engine_attributes.sql_engine_type
-    if engine_type == SqlEngine.SNOWFLAKE:
+    if engine_type is SqlEngine.SNOWFLAKE:
         sql_client.execute(f"CALL system$wait({sleep_time}, 'SECONDS')")
-    elif engine_type in (SqlEngine.BIGQUERY, SqlEngine.REDSHIFT, SqlEngine.DATABRICKS):
+    elif (
+        engine_type is SqlEngine.DUCKDB
+        or engine_type is SqlEngine.BIGQUERY
+        or engine_type is SqlEngine.REDSHIFT
+        or engine_type is SqlEngine.DATABRICKS
+        or engine_type is SqlEngine.POSTGRES
+        or engine_type is SqlEngine.MYSQL
+    ):
         raise RuntimeError(f"Sleep yet not supported with {engine_type}")
-
-    assert_values_exhausted(engine_type)
+    else:
+        assert_values_exhausted(engine_type)
 
 
 def _supports_sleep_query(sql_client: SqlClient) -> bool:
     """Returns true if the given SQL client is supported by _issue_sleep_query()"""
     engine_type = sql_client.sql_engine_attributes.sql_engine_type
-    if engine_type == SqlEngine.SNOWFLAKE:
+    if engine_type is SqlEngine.SNOWFLAKE:
         return True
-    elif engine_type in (
-        SqlEngine.DUCKDB,
-        SqlEngine.BIGQUERY,
-        SqlEngine.REDSHIFT,
-        SqlEngine.DATABRICKS,
+    elif (
+        engine_type is SqlEngine.DUCKDB
+        or engine_type is SqlEngine.BIGQUERY
+        or engine_type is SqlEngine.REDSHIFT
+        or engine_type is SqlEngine.DATABRICKS
+        or engine_type is SqlEngine.POSTGRES
+        or engine_type is SqlEngine.MYSQL
     ):
         return False
-
-    assert_values_exhausted(engine_type)
+    else:
+        assert_values_exhausted(engine_type)
 
 
 def test_cancel_submitted_queries(  # noqa: D
