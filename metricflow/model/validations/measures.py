@@ -376,19 +376,39 @@ class CountAggregationExprRule(ModelValidationRule):
 
         for data_source in model.data_sources:
             for measure in data_source.measures:
+                context = DataSourceElementContext(
+                    file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                    data_source_element=DataSourceElementReference(
+                        data_source_name=data_source.name, element_name=measure.name
+                    ),
+                    element_type=DataSourceElementType.MEASURE,
+                )
                 if measure.agg == AggregationType.COUNT and measure.expr is None:
                     issues.append(
                         ValidationError(
-                            context=DataSourceElementContext(
-                                file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                                data_source_element=DataSourceElementReference(
-                                    data_source_name=data_source.name, element_name=measure.name
-                                ),
-                                element_type=DataSourceElementType.MEASURE,
-                            ),
+                            context=context,
                             message=(
                                 f"Measure '{measure.name}' uses a COUNT aggregation, which requires an expr to be provided. "
                                 f"Provide 'expr: 1' if a count of all rows is desired."
+                            ),
+                        )
+                    )
+                if (
+                    measure.agg == AggregationType.COUNT
+                    and measure.expr
+                    and measure.expr.lower().startswith("distinct ")
+                ):
+                    # TODO: Expand this to include SUM and potentially AVG agg types as well
+                    # Note expansion of this guard requires the addition of sum_distinct and avg_distinct agg types
+                    # or else an adjustment to the error message below.
+                    issues.append(
+                        ValidationError(
+                            context=context,
+                            message=(
+                                f"Measure '{measure.name}' uses a '{measure.agg.value}' aggregation with a DISTINCT expr: "
+                                f"'{measure.expr}. This is not supported, as it effectively converts an additive "
+                                f"measure into a non-additive one, and this could cause certain queries to return "
+                                f"incorrect results. Please use the {measure.agg.value}_distinct aggregation type."
                             ),
                         )
                     )
