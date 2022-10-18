@@ -9,7 +9,7 @@ from metricflow.model.semantics.linkable_spec_resolver import (
     LinkableElementProperties,
 )
 from metricflow.model.semantics.semantic_containers import MAX_JOIN_HOPS
-from metricflow.specs import MetricSpec
+from metricflow.references import MetricReference
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +24,7 @@ def simple_model_spec_resolver(simple_semantic_model: SemanticModel) -> ValidLin
 
 def test_linkable_spec_resolver(simple_model_spec_resolver: ValidLinkableSpecResolver) -> None:  # noqa: D
     result = simple_model_spec_resolver.get_linkable_elements_for_metrics(
-        metric_specs=[MetricSpec(element_name="bookings"), MetricSpec(element_name="views")],
+        metric_references=[MetricReference(element_name="bookings"), MetricReference(element_name="views")],
         with_any_of=LinkableElementProperties.all_properties(),
         without_any_of=frozenset({LinkableElementProperties.DERIVED_TIME_GRANULARITY}),
     ).as_spec_set
@@ -66,12 +66,12 @@ def test_linkable_spec_resolver(simple_model_spec_resolver: ValidLinkableSpecRes
 
 def property_check_helper(  # noqa: D
     spec_resolver: ValidLinkableSpecResolver,
-    metric_specs: Sequence[MetricSpec],
+    metric_references: Sequence[MetricReference],
     element_property: LinkableElementProperties,
     expected_names: Sequence[str],
 ) -> None:
     results = spec_resolver.get_linkable_elements_for_metrics(
-        metric_specs=metric_specs,
+        metric_references=metric_references,
         with_any_of=frozenset({element_property}),
         without_any_of=frozenset(),
     ).as_spec_set.as_tuple
@@ -83,7 +83,7 @@ def property_check_helper(  # noqa: D
 def test_local_property(simple_model_spec_resolver: ValidLinkableSpecResolver) -> None:  # noqa: D
     property_check_helper(
         spec_resolver=simple_model_spec_resolver,
-        metric_specs=[MetricSpec(element_name="listings")],
+        metric_references=[MetricReference(element_name="listings")],
         element_property=LinkableElementProperties.LOCAL,
         expected_names=[
             "capacity_latest",
@@ -121,7 +121,7 @@ def test_local_property(simple_model_spec_resolver: ValidLinkableSpecResolver) -
 def test_local_linked_property(simple_model_spec_resolver: ValidLinkableSpecResolver) -> None:  # noqa: D
     property_check_helper(
         spec_resolver=simple_model_spec_resolver,
-        metric_specs=[MetricSpec(element_name="listings")],
+        metric_references=[MetricReference(element_name="listings")],
         element_property=LinkableElementProperties.LOCAL_LINKED,
         expected_names=[
             "listing__capacity_latest",
@@ -144,7 +144,7 @@ def test_local_linked_property(simple_model_spec_resolver: ValidLinkableSpecReso
 def test_joined_property(simple_model_spec_resolver: ValidLinkableSpecResolver) -> None:  # noqa: D
     property_check_helper(
         spec_resolver=simple_model_spec_resolver,
-        metric_specs=[MetricSpec(element_name="listings")],
+        metric_references=[MetricReference(element_name="listings")],
         element_property=LinkableElementProperties.JOINED,
         expected_names=[
             "listing__lux_listing",
@@ -173,7 +173,7 @@ def test_multi_hop_property(multi_hop_join_semantic_model: SemanticModel) -> Non
     )
     property_check_helper(
         spec_resolver=multi_hop_spec_resolver,
-        metric_specs=[MetricSpec(element_name="txn_count")],
+        metric_references=[MetricReference(element_name="txn_count")],
         element_property=LinkableElementProperties.MULTI_HOP,
         expected_names=[
             "account_id__customer_id__country",
@@ -192,7 +192,7 @@ def test_multi_hop_property(multi_hop_join_semantic_model: SemanticModel) -> Non
 def test_derived_time_granularity_property(simple_model_spec_resolver: ValidLinkableSpecResolver) -> None:  # noqa: D
     property_check_helper(
         spec_resolver=simple_model_spec_resolver,
-        metric_specs=[MetricSpec(element_name="listings")],
+        metric_references=[MetricReference(element_name="listings")],
         element_property=LinkableElementProperties.DERIVED_TIME_GRANULARITY,
         expected_names=[
             "created_at__month",
@@ -226,7 +226,7 @@ def test_derived_time_granularity_property(simple_model_spec_resolver: ValidLink
 def test_identifier_property(simple_model_spec_resolver: ValidLinkableSpecResolver) -> None:  # noqa: D
     property_check_helper(
         spec_resolver=simple_model_spec_resolver,
-        metric_specs=[MetricSpec(element_name="listings")],
+        metric_references=[MetricReference(element_name="listings")],
         element_property=LinkableElementProperties.IDENTIFIER,
         expected_names=["listing", "listing__lux_listing", "user", "user__company"],
     )

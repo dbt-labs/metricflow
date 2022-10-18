@@ -16,9 +16,8 @@ from metricflow.model.objects.metric import MetricType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.query.query_exceptions import InvalidQueryException
-from metricflow.references import TimeDimensionReference, MeasureReference, IdentifierReference
+from metricflow.references import TimeDimensionReference, MeasureReference, MetricReference, IdentifierReference
 from metricflow.specs import (
-    MetricSpec,
     TimeDimensionSpec,
     DEFAULT_TIME_GRANULARITY,
 )
@@ -97,7 +96,7 @@ class TimeGranularitySolver:
         return metric_reference_to_measure_references
 
     def local_dimension_granularity_range(
-        self, metric_specs: Sequence[MetricSpec], local_time_dimension_reference: TimeDimensionReference
+        self, metric_references: Sequence[MetricReference], local_time_dimension_reference: TimeDimensionReference
     ) -> Tuple[TimeGranularity, TimeGranularity]:
         """Return the ranges of time granularities for a local dimension associated with the measures in metrics.
 
@@ -114,9 +113,9 @@ class TimeGranularitySolver:
         """
         all_time_granularities = set()
 
-        for metric_spec in metric_specs:
+        for metric_reference in metric_references:
             for measure_reference in self._metric_reference_to_measure_reference[
-                MetricModelReference(metric_name=metric_spec.element_name)
+                MetricModelReference(metric_name=metric_reference.element_name)
             ]:
                 key = LocalTimeDimensionGranularityKey(
                     measure_reference=measure_reference,
@@ -127,7 +126,7 @@ class TimeGranularitySolver:
                 if len(valid_time_granularities_for_measure) == 0:
                     raise InvalidQueryException(
                         f"Local dimension {local_time_dimension_reference} does not exist for measure "
-                        f"'{measure_reference}' of metric '{metric_spec}"
+                        f"'{measure_reference}' of metric '{metric_reference}"
                     )
 
                 all_time_granularities.add(min(valid_time_granularities_for_measure))
@@ -135,7 +134,7 @@ class TimeGranularitySolver:
         return min(all_time_granularities), max(all_time_granularities)
 
     def validate_time_granularity(
-        self, metric_specs: Sequence[MetricSpec], time_dimension_specs: Sequence[TimeDimensionSpec]
+        self, metric_references: Sequence[MetricReference], time_dimension_specs: Sequence[TimeDimensionSpec]
     ) -> None:
         """Check that the granularity specified for time dimensions is valid with respect to the metrics.
 
@@ -145,24 +144,24 @@ class TimeGranularitySolver:
             # Validate local time dimensions.
             if time_dimension_spec.identifier_links == ():
                 _, min_granularity_for_querying = self.local_dimension_granularity_range(
-                    metric_specs=metric_specs,
+                    metric_references=metric_references,
                     local_time_dimension_reference=time_dimension_spec.reference,
                 )
                 if time_dimension_spec.time_granularity < min_granularity_for_querying:
                     raise RequestTimeGranularityException(
-                        f"The minimum time granularity for querying metrics {metric_specs} is "
+                        f"The minimum time granularity for querying metrics {metric_references} is "
                         f"{min_granularity_for_querying}. Got {time_dimension_spec}"
                     )
 
                 # If there is a cumulative metric, granularity changes aren't supported.
-                for metric_spec in metric_specs:
-                    metric = self._semantic_model.metric_semantics.get_metric(metric_spec)
+                for metric_reference in metric_references:
+                    metric = self._semantic_model.metric_semantics.get_metric(metric_reference)
                     if (
                         metric.type == MetricType.CUMULATIVE
                         and time_dimension_spec.time_granularity != min_granularity_for_querying
                     ):
                         raise RequestTimeGranularityException(
-                            f"For querying cumulative metric '{metric_spec.qualified_name}', the granularity of "
+                            f"For querying cumulative metric '{metric_reference.element_name}', the granularity of "
                             f"'{time_dimension_spec.qualified_name}' must be {min_granularity_for_querying.name}"
                         )
 
@@ -170,7 +169,7 @@ class TimeGranularitySolver:
 
     def resolve_granularity_for_partial_time_dimension_specs(
         self,
-        metric_specs: Sequence[MetricSpec],
+        metric_references: Sequence[MetricReference],
         partial_time_dimension_specs: Sequence[PartialTimeDimensionSpec],
         metric_time_dimension_reference: TimeDimensionReference,
         time_granularity: Optional[TimeGranularity] = None,
@@ -184,7 +183,7 @@ class TimeGranularitySolver:
             # Handle local time dimensions
             if partial_time_dimension_spec.identifier_links == ():
                 _, min_time_granularity_for_querying = self.local_dimension_granularity_range(
-                    metric_specs=metric_specs,
+                    metric_references=metric_references,
                     local_time_dimension_reference=TimeDimensionReference(
                         element_name=partial_time_dimension_spec.element_name
                     ),

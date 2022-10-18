@@ -21,7 +21,13 @@ from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dataclass_serialization import SerializableDataclass
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.object_utils import assert_exactly_one_arg_set, hash_strings
-from metricflow.references import DimensionReference, MeasureReference, TimeDimensionReference, IdentifierReference
+from metricflow.references import (
+    DimensionReference,
+    MeasureReference,
+    MetricReference,
+    TimeDimensionReference,
+    IdentifierReference,
+)
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.time.time_granularity import TimeGranularity
 
@@ -356,6 +362,15 @@ class MetricSpec(InstanceSpec):  # noqa: D
     @property
     def qualified_name(self) -> str:  # noqa: D
         return self.element_name
+
+    @property
+    def as_reference(self) -> MetricReference:  # noqa: D
+        return MetricReference(element_name=self.element_name)
+
+    @staticmethod
+    def from_reference(reference: MetricReference) -> MetricSpec:
+        """Initialize from a metric reference instance"""
+        return MetricSpec(element_name=reference.element_name)
 
 
 @dataclass(frozen=True)

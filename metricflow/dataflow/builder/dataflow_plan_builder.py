@@ -152,8 +152,9 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         compute_metrics_nodes: List[ComputedMetricsOutput[SqlDataSetT]] = []
         for metric_spec in query_spec.metric_specs:
             logger.info(f"Generating compute metrics node for {metric_spec}")
-            metric = self._metric_semantics.get_metric(metric_spec)
-            metric_input_measure_specs = self._metric_semantics.measures_for_metric(metric_spec)
+            metric_reference = metric_spec.as_reference
+            metric = self._metric_semantics.get_metric(metric_reference)
+            metric_input_measure_specs = self._metric_semantics.measures_for_metric(metric_reference)
 
             logger.info(
                 f"For {metric_spec}, needed measures are:\n"

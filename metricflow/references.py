@@ -51,3 +51,8 @@ class TimeDimensionReference(DimensionReference):  # noqa: D
 
     def dimension_reference(self) -> DimensionReference:  # noqa: D
         return DimensionReference(element_name=self.element_name)
+
+
+@dataclass(frozen=True)
+class MetricReference(ElementReference):  # noqa: D
+    pass

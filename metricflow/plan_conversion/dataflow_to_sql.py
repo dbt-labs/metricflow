@@ -925,7 +925,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         metric_select_columns = []
         metric_instances = []
         for metric_spec in node.metric_specs:
-            metric = self._metric_semantics.get_metric(metric_spec)
+            metric = self._metric_semantics.get_metric(metric_spec.as_reference)
 
             metric_expr: Optional[SqlExpressionNode] = None
             if metric.type is MetricType.RATIO:
