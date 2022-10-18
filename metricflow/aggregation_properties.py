@@ -35,6 +35,11 @@ class AggregationType(ExtendedEnum):
         )
 
     @property
+    def is_additive(self) -> bool:
+        """Indicates that if you sum values over a dimension grouping, you will still get an accurate result for this metric."""
+        return self in (AggregationType.SUM, AggregationType.SUM_BOOLEAN, AggregationType.COUNT)
+
+    @property
     def fill_nulls_with_0(self) -> bool:
         """Indicates if charts should show 0 instead of null where there are gaps in data."""
         return self in (
