@@ -164,4 +164,16 @@ class DataSourceValidityWindowRule(ModelValidationRule):
             )
             issues.append(error)
 
+        if data_source.measures:
+            # Temporarily block measure definitions in data sources with validity windows set
+            error = ValidationError(
+                context=context,
+                message=(
+                    f"Data source {data_source.name} has both measures and validity param dimensions defined. This "
+                    f"is not currently supported! Please remove either the measures or the validity params. "
+                    f"Measures: {data_source.measures}. Validity param dimensions: {validity_param_dims}"
+                ),
+            )
+            issues.append(error)
+
         return issues
