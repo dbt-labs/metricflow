@@ -36,7 +36,7 @@ jobs:
         run: pip install poetry==1.1.15 && poetry config virtualenvs.create false
 
       - name: Install Metricflow
-        run: poetry install
+        run: poetry install -E dbt-snowflake
 
       - name: Generate JSON Schema
         run: python3 metricflow/model/parsing/explicit_schema.py

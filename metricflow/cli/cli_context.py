@@ -5,9 +5,9 @@ from typing import Dict, Optional
 
 from metricflow.errors.errors import SqlClientCreationException, MetricFlowInitException
 from metricflow.configuration.config_handler import ConfigHandler
-from metricflow.configuration.constants import CONFIG_DWH_SCHEMA
+from metricflow.configuration.constants import CONFIG_DBT_REPO, CONFIG_DWH_SCHEMA
 from metricflow.engine.metricflow_engine import MetricFlowEngine
-from metricflow.engine.utils import build_user_configured_model_from_config
+from metricflow.engine.utils import build_user_configured_model_from_config, build_user_configured_model_from_dbt_config
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql_clients.sql_utils import make_sql_client_from_config
@@ -26,6 +26,7 @@ class CLIContext:
         self._user_configured_model: Optional[UserConfiguredModel] = None
         self._semantic_model: Optional[SemanticModel] = None
         self._mf_system_schema: Optional[str] = None
+        self._model_path_is_for_dbt: Optional[bool] = None
         self.config = ConfigHandler()
         self._configure_logging()
 
@@ -106,8 +107,20 @@ class CLIContext:
         return self._semantic_model
 
     @property
+    def model_path_is_for_dbt(self) -> bool:  # noqa: D
+        if self._model_path_is_for_dbt is None:
+            config_value = self.config.get_value(key=CONFIG_DBT_REPO) or ""
+            self._model_path_is_for_dbt = config_value.lower() in ["yes", "y", "true", "t", "1"]
+
+        return self._model_path_is_for_dbt
+
+    @property
     def user_configured_model(self) -> UserConfiguredModel:  # noqa: D
         if self._user_configured_model is None:
-            self._user_configured_model = build_user_configured_model_from_config(self.config)
+            if self.model_path_is_for_dbt:
+                self._user_configured_model = build_user_configured_model_from_dbt_config(self.config)
+            else:
+                self._user_configured_model = build_user_configured_model_from_config(self.config)
+
         assert self._user_configured_model is not None
         return self._user_configured_model

@@ -9,7 +9,7 @@ from typing import Optional, List, Sequence
 
 import pandas as pd
 
-from metricflow.configuration.constants import CONFIG_DWH_SCHEMA
+from metricflow.configuration.constants import CONFIG_DBT_REPO, CONFIG_DWH_SCHEMA
 from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
@@ -19,7 +19,7 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
 from metricflow.engine.models import Dimension, Materialization, Metric
 from metricflow.engine.time_source import ServerTimeSource
-from metricflow.engine.utils import build_user_configured_model_from_config
+from metricflow.engine.utils import build_user_configured_model_from_config, build_user_configured_model_from_dbt_config
 from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
 from metricflow.execution.execution_plan_to_text import execution_plan_to_text
 from metricflow.execution.executor import SequentialPlanExecutor
@@ -272,7 +272,13 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     def from_config(handler: YamlFileHandler) -> MetricFlowEngine:
         """Initialize MetricFlowEngine via yaml config file."""
         sql_client = make_sql_client_from_config(handler)
-        semantic_model = SemanticModel(build_user_configured_model_from_config(handler))
+
+        # Ideally we should put this getting of of CONFIG_DBT_REPO in a helper
+        dbt_repo = handler.get_value(CONFIG_DBT_REPO) or ""
+        if dbt_repo.lower() in ["yes", "y", "true", "t", "1"]:
+            semantic_model = SemanticModel(build_user_configured_model_from_dbt_config(handler))
+        else:
+            semantic_model = SemanticModel(build_user_configured_model_from_config(handler))
         system_schema = not_empty(handler.get_value(CONFIG_DWH_SCHEMA), CONFIG_DWH_SCHEMA, handler.url)
         return MetricFlowEngine(
             semantic_model=semantic_model,
