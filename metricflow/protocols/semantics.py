@@ -30,7 +30,6 @@ from metricflow.specs import (
     LinkableInstanceSpec,
     MeasureSpec,
     MetricInputMeasureSpec,
-    MetricSpec,
     NonAdditiveDimensionSpec,
 )
 
@@ -161,11 +160,6 @@ class MetricSemanticsAccessor(Protocol):
 
     @abstractmethod
     def get_metric(self, metric_reference: MetricReference) -> Metric:  # noqa:D
-        raise NotImplementedError
-
-    @abstractmethod
-    def get_metric_spec(self, metric_reference: MetricReference) -> MetricSpec:  # noqa: D
-        """Returns a resolved metric spec by reference."""
         raise NotImplementedError
 
     @property

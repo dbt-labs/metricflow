@@ -218,9 +218,7 @@ class MetricFlowQueryParser:
             parsed_where_constraint = where_constraint
 
         metric_references = self._parse_metric_names(metric_names)
-        metric_specs = tuple(
-            self._metric_semantics.get_metric_spec(metric_reference) for metric_reference in metric_references
-        )
+        metric_specs = tuple(MetricSpec.from_reference(metric_reference) for metric_reference in metric_references)
 
         if time_constraint_start is None:
             time_constraint_start = TimeRangeConstraint.ALL_TIME_BEGIN()
@@ -381,9 +379,7 @@ class MetricFlowQueryParser:
 
         # TODO: this is a workaround
         # Need to figure out whether we should clean up OrderBySpec or if we have to actually pass a fully resolved MetricSpec here
-        metric_specs = [
-            MetricSpec(element_name=metric_reference.element_name) for metric_reference in metric_references
-        ]
+        metric_specs = [MetricSpec.from_reference(metric_reference) for metric_reference in metric_references]
         for order_by_spec in order_by_specs:
             if not (
                 order_by_spec.item in metric_specs

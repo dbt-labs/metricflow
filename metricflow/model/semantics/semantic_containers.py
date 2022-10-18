@@ -38,7 +38,6 @@ from metricflow.specs import (
     LinkableInstanceSpec,
     MeasureSpec,
     MetricInputMeasureSpec,
-    MetricSpec,
     NonAdditiveDimensionSpec,
 )
 
@@ -101,10 +100,6 @@ class MetricSemantics:  # noqa: D
         if metric_reference not in self._metrics:
             raise MetricNotFoundError(f"Unable to find metric `{metric_reference}`. Perhaps it has not been registered")
         return self._metrics[metric_reference]
-
-    def get_metric_spec(self, metric_reference: MetricReference) -> MetricSpec:  # noqa: D
-        metric = self.get_metric(metric_reference)
-        return MetricSpec(element_name=metric.name)
 
     def add_metric(self, metric: Metric) -> None:
         """Add metric, validating presence of required measures"""

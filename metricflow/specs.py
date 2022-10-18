@@ -367,6 +367,11 @@ class MetricSpec(InstanceSpec):  # noqa: D
     def as_reference(self) -> MetricReference:  # noqa: D
         return MetricReference(element_name=self.element_name)
 
+    @staticmethod
+    def from_reference(reference: MetricReference) -> MetricSpec:
+        """Initialize from a metric reference instance"""
+        return MetricSpec(element_name=reference.element_name)
+
 
 @dataclass(frozen=True)
 class MetricInputMeasureSpec(SerializableDataclass):
