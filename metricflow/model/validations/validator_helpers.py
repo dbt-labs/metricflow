@@ -239,11 +239,11 @@ class ModelValidationResults(FrozenBaseModel):
         errors: List[ValidationError] = []
 
         for issue in issues:
-            if issue.level == ValidationIssueLevel.WARNING:
+            if issue.level is ValidationIssueLevel.WARNING:
                 warnings.append(issue)
-            elif issue.level == ValidationIssueLevel.FUTURE_ERROR:
+            elif issue.level is ValidationIssueLevel.FUTURE_ERROR:
                 future_errors.append(issue)
-            elif issue.level == ValidationIssueLevel.ERROR:
+            elif issue.level is ValidationIssueLevel.ERROR:
                 errors.append(issue)
             else:
                 assert_values_exhausted(issue.level)

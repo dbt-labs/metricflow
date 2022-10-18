@@ -674,13 +674,17 @@ class SqlFunction(Enum):
             return SqlFunction.MIN
         elif aggregation_type is AggregationType.SUM:
             return SqlFunction.SUM
-        elif aggregation_type is AggregationType.SUM_BOOLEAN or aggregation_type is AggregationType.BOOLEAN:
+        elif (
+            aggregation_type is AggregationType.SUM_BOOLEAN
+            or aggregation_type is AggregationType.BOOLEAN
+            or aggregation_type is AggregationType.COUNT
+        ):
             raise RuntimeError(
-                f"Unhandled boolean aggregation type {aggregation_type} - this should have been transformed to SUM "
+                f"Unhandled aggregation type {aggregation_type} - this should have been transformed to SUM "
                 "during model parsing."
             )
-
-        assert_values_exhausted(aggregation_type)
+        else:
+            assert_values_exhausted(aggregation_type)
 
 
 class SqlFunctionExpression(SqlExpressionNode):
