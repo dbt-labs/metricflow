@@ -6,7 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.120.0] - 2022-10-19
+## [0.130.0] - 2022-10-18
+### Added
+- [#292](https://github.com/transform-data/metricflow/pull/292) This is the initial implementation of the MetricFlow dbt metrics integration. Allows MetricFlow to bootstrap itself natively from a dbt project that has metrics 🎉
+
+### Updated
+- Refactored the semantic layer to use the MetricReference object as opposed to MetricSpec (@WilliamDee)
+
+## [0.120.0] - 2022-10-13
 
 ### Breaking Changes
 - Minor API change on SqlClient protocol could break existing API users writing custom SqlClient classes. MyPy should detect this issue. See [the relevant PR](https://github.com/transform-data/metricflow/pull/282) for details.
