@@ -6,7 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.130.1] - 2022-10-19
+
+### Added
+- Support for overriding dbt `profile` and `targets` attributes when querying dbt models (@QMalcolm)
+- Validation to block use of `DISTINCT` keyword in `COUNT` aggregation expressions, as this can lead to incorrect results if optimized queries relying on partial aggregation attempt to do something like `SUM(counts)` to retrieve a less granular total value. (@tlento)
+
+### Updated
+- Made minor improvements to safeguards for internal development (@tlento)
+
+
 ## [0.130.0] - 2022-10-18
+
 ### Added
 - [#292](https://github.com/transform-data/metricflow/pull/292) This is the initial implementation of the MetricFlow dbt metrics integration. Allows MetricFlow to bootstrap itself natively from a dbt project that has metrics 🎉
 
