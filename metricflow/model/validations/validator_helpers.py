@@ -299,15 +299,16 @@ class ModelValidationResults(FrozenBaseModel):
 
 
 def generate_exception_issue(
-    what_was_being_done: str,
-    e: Exception,
-    context: Optional[ValidationContext] = None,
+    what_was_being_done: str, e: Exception, context: Optional[ValidationContext] = None, extras: Dict[str, str] = {}
 ) -> ValidationIssue:
     """Generates a validation issue for exceptions"""
+    if "stacktrace" not in extras:
+        extras["stacktrace"] = "".join(traceback.format_tb(e.__traceback__))
+
     return ValidationError(
         context=context,
         message=f"An error occured while {what_was_being_done} - {''.join(traceback.format_exception_only(etype=type(e), value=e))}",
-        extra_detail="".join(traceback.format_tb(e.__traceback__)),
+        extra_detail="\n".join([f"{key}: {value}" for key, value in extras.items()]),
     )
 
 
@@ -329,11 +330,9 @@ def validate_safely(whats_being_done: str) -> Callable:
                 arguments_str = _func_args_to_string(*args, **kwargs)
                 issues = [
                     generate_exception_issue(
-                        what_was_being_done=whats_being_done
-                        + VALIDATE_SAFELY_ERROR_STR_TMPLT.format(
-                            method_name=func.__name__, arguments_str=arguments_str
-                        ),
+                        what_was_being_done=whats_being_done,
                         e=e,
+                        extras={"method_name": func.__name__, "passed_args": arguments_str},
                     )
                 ]
             return issues
