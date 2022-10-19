@@ -18,6 +18,9 @@ from metricflow.sql_clients.common_client import SqlDialect
 logger = logging.getLogger(__name__)
 
 HTTP_PATH_KEY = "httppath="
+HTTP_PATH_RENAME_KEY = "httppathrename="
+SQL_RENAME = " RENAME TO "
+SQL_ALTER_TABLE = "ALTER TABLE "
 
 # This is a non-exhaustive list of pandas dtypes, but in theory it will cover the ones we need to support
 # for data frames generated and run through type inference.
@@ -58,10 +61,13 @@ class DatabricksEngineAttributes(SqlEngineAttributes):
 class DatabricksSqlClient(BaseSqlClientImplementation):
     """Client used to connect to Databricks engine."""
 
-    def __init__(self, host: str, http_path: str, access_token: str) -> None:  # noqa: D
+    def __init__(  # noqa: D
+        self, host: str, http_path: str, access_token: str, http_path_for_table_renames: Optional[str] = None
+    ) -> None:
         self.host = host
         self.http_path = http_path
         self.access_token = access_token
+        self.http_path_for_table_renames = http_path_for_table_renames
 
     @staticmethod
     def from_connection_details(url: str, password: Optional[str]) -> DatabricksSqlClient:  # noqa: D
@@ -73,10 +79,13 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
             split_url = url.split(";")
             parsed_url = sqlalchemy.engine.url.make_url(split_url[0])
             http_path = ""
+            http_path_for_table_renames = None
             for piece in split_url[1:]:
                 if HTTP_PATH_KEY in piece.lower():
                     __, http_path = piece.split("=")
-                    break
+                elif HTTP_PATH_RENAME_KEY in piece.lower():
+                    __, http_path_for_table_renames = piece.split("=")
+
             dialect = SqlDialect.DATABRICKS.value
             if not http_path:
                 raise ValueError("HTTP path not found in URL.")
@@ -87,17 +96,27 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         except ValueError as e:
             # If any errors in parsing URL, show user what expected URL looks like.
             raise ValueError(
-                f"Unexpected format for MF_SQL_ENGINE_URL. Expected: `{dialect}://<HOST>:443;HttpPath=<HTTP PATH>`."
+                f"Unexpected format for MF_SQL_ENGINE_URL. Expected: `{dialect}://<HOST>:443;HttpPath=<HTTP PATH>` "
+                f"or optionally `{dialect}://<HOST>:443;HttpPath=<HTTP PATH>;HttpPathRename=<HTTP PATH FOR RENAMES>`."
             ) from e
 
         if not password:
             raise ValueError(f"Password not supplied for {url}")
 
-        return DatabricksSqlClient(host=parsed_url.host, http_path=http_path, access_token=password)
+        return DatabricksSqlClient(
+            host=parsed_url.host,
+            http_path=http_path,
+            access_token=password,
+            http_path_for_table_renames=http_path_for_table_renames,
+        )
 
-    def get_connection(self) -> sql.client.Connection:
+    def get_connection(self, table_rename: bool = False) -> sql.client.Connection:
         """Get connection to Databricks cluster/warehouse."""
-        return sql.connect(server_hostname=self.host, http_path=self.http_path, access_token=self.access_token)
+        return sql.connect(
+            server_hostname=self.host,
+            http_path=self.http_path_for_table_renames if table_rename else self.http_path,
+            access_token=self.access_token,
+        )
 
     @property
     def sql_engine_attributes(self) -> SqlEngineAttributes:
@@ -127,7 +146,7 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
 
     def _engine_specific_execute_implementation(self, stmt: str, bind_params: SqlBindParameters) -> None:
         """Execute statement, returning nothing."""
-        with self.get_connection() as connection:
+        with self.get_connection(self.stmt_is_table_rename(stmt)) as connection:
             with connection.cursor() as cursor:
                 logger.info(f"Executing SQL statment: {stmt}")
                 cursor.execute(operation=stmt, parameters=self.params_or_none(bind_params))
@@ -136,7 +155,7 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         """Check that query will run successfully without actually running the query, error if not."""
         stmt = f"EXPLAIN {stmt}"
 
-        with self.get_connection() as connection:
+        with self.get_connection(self.stmt_is_table_rename(stmt)) as connection:
             with connection.cursor() as cursor:
                 logger.info(f"Executing SQL statment: {stmt}")
                 cursor.execute(operation=stmt, parameters=self.params_or_none(bind_params))
@@ -202,3 +221,9 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
     def render_execution_param_key(self, execution_param_key: str) -> str:
         """Wrap execution parameter key with syntax accepted by engine."""
         return f"%({execution_param_key})s"
+
+    @staticmethod
+    def stmt_is_table_rename(stmt: str) -> bool:
+        """Check if SQL statement is renaming a table."""
+        stmt_uppercased = stmt.upper()
+        return SQL_RENAME in stmt_uppercased and SQL_ALTER_TABLE in stmt_uppercased
