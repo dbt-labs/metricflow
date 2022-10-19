@@ -38,6 +38,7 @@ from metricflow.specs import (
     LinkableInstanceSpec,
     MeasureSpec,
     MetricInputMeasureSpec,
+    MetricSpec,
     NonAdditiveDimensionSpec,
 )
 
@@ -154,6 +155,28 @@ class MetricSemantics:  # noqa: D
             if self.get_metric(metric_reference).type == MetricType.CUMULATIVE:
                 return True
         return False
+
+    def metric_input_specs_for_metric(self, metric_reference: MetricReference) -> Tuple[MetricSpec, ...]:
+        """Return the metric specs referenced by the metric. Current use case is for derived metrics."""
+        metric = self.get_metric(metric_reference)
+        input_metric_specs: List[MetricSpec] = []
+
+        for input_metric in metric.input_metrics:
+            spec_constraint = (
+                WhereConstraintConverter.convert_to_spec_where_constraint(
+                    data_source_semantics=self._data_source_semantics,
+                    where_constraint=input_metric.constraint,
+                )
+                if input_metric.constraint is not None
+                else None
+            )
+            spec = MetricSpec(
+                element_name=input_metric.name,
+                constraint=spec_constraint,
+                alias=input_metric.alias,
+            )
+            input_metric_specs.append(spec)
+        return tuple(input_metric_specs)
 
 
 class DataSourceSemantics:

@@ -5,7 +5,11 @@
         <ComputeMetricsNode>
             <!-- description = Compute Metrics via Expressions -->
             <!-- node_id = cm_0 -->
-            <!-- metric_spec = MetricSpec(element_name='instant_booking_value_ratio') -->
+            <!-- metric_spec =                                      -->
+            <!--   {'class': 'MetricSpec',                          -->
+            <!--    'element_name': 'instant_booking_value_ratio',  -->
+            <!--    'constraint': None,                             -->
+            <!--    'alias': None}                                  -->
             <FilterElementsNode>
                 <!-- description =                                                                     -->
                 <!--   Pass Only Elements:                                                             -->

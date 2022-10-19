@@ -4,6 +4,7 @@ import logging
 from typing import Sequence
 
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from metricflow.model.transformations.add_input_metric_measures import AddInputMetricMeasuresRule
 from metricflow.model.transformations.agg_time_dimension import SetMeasureAggregationTimeDimensionRule
 from metricflow.model.transformations.boolean_measure import BooleanMeasureAggregationRule
 from metricflow.model.transformations.convert_count import ConvertCountToSumRule
@@ -31,6 +32,7 @@ class ModelTransformer:
         BooleanMeasureAggregationRule(),
         CompositeIdentifierExpressionRule(),
         ConvertCountToSumRule(),
+        AddInputMetricMeasuresRule(),
     )
 
     @staticmethod

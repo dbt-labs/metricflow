@@ -8,6 +8,7 @@ from metricflow.model.parsing.schemas import (
     data_source_schema,
     materialization_schema,
     derived_group_by_element_schema,
+    metric_input_schema,
     metric_input_measure_schema,
     metric_type_params_schema,
     identifier_schema,
@@ -107,6 +108,7 @@ schema_store = {
     composite_sub_identifier_schema["$id"]: composite_sub_identifier_schema,
     materialization_destination_schema["$id"]: materialization_destination_schema,
     non_additive_dimension_schema["$id"]: non_additive_dimension_schema,
+    metric_input_schema["$id"]: metric_input_schema,
 }
 
 resolver = RefResolver.from_schema(schema=metric_schema, store=schema_store)
