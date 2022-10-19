@@ -6,7 +6,7 @@ from metricflow.model.objects.data_source import Mutability, MutabilityType
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from metricflow.model.objects.elements.identifier import Identifier, IdentifierType
 from metricflow.model.objects.elements.measure import Measure
-from metricflow.model.objects.metric import MetricType, MetricTypeParams
+from metricflow.model.objects.metric import MetricInput, MetricType, MetricTypeParams
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.references import DimensionReference, IdentifierReference, TimeDimensionReference
@@ -178,3 +178,76 @@ def test_generated_metrics_only() -> None:  # noqa:D
             materializations=[],
         )
     )
+
+
+def test_derived_metric() -> None:  # noqa: D
+    measure_name = "foo"
+    model_validator = ModelValidator()
+    result = model_validator.validate_model(
+        UserConfiguredModel(
+            data_sources=[
+                data_source_with_guaranteed_meta(
+                    name="sum_measure",
+                    sql_query="SELECT foo, ds FROM bar",
+                    measures=[
+                        Measure(
+                            name=measure_name,
+                            agg=AggregationType.SUM,
+                            agg_time_dimension="ds",
+                        )
+                    ],
+                    dimensions=[
+                        Dimension(
+                            name="ds",
+                            type=DimensionType.TIME,
+                            type_params=DimensionTypeParams(
+                                is_primary=True,
+                                time_granularity=TimeGranularity.DAY,
+                            ),
+                        ),
+                    ],
+                    mutability=Mutability(type=MutabilityType.IMMUTABLE),
+                ),
+            ],
+            metrics=[
+                metric_with_guaranteed_meta(
+                    name="random_metric",
+                    type=MetricType.MEASURE_PROXY,
+                    type_params=MetricTypeParams(measures=[measure_name]),
+                ),
+                metric_with_guaranteed_meta(
+                    name="random_metric2",
+                    type=MetricType.MEASURE_PROXY,
+                    type_params=MetricTypeParams(measures=[measure_name]),
+                ),
+                metric_with_guaranteed_meta(
+                    name="alias_collision",
+                    type=MetricType.DERIVED,
+                    type_params=MetricTypeParams(
+                        expr="random_metric2 * 2",
+                        metrics=[
+                            MetricInput(name="random_metric", alias="random_metric2"),
+                            MetricInput(name="random_metric2"),
+                        ],
+                    ),
+                ),
+                metric_with_guaranteed_meta(
+                    name="doesntexist",
+                    type=MetricType.DERIVED,
+                    type_params=MetricTypeParams(expr="notexist * 2", metrics=[MetricInput(name="notexist")]),
+                ),
+            ],
+            materializations=[],
+        )
+    )
+    build_issues = result.issues.errors
+    assert len(build_issues) == 2
+    expected_substr1 = "is already being used. Please choose another alias"
+    expected_substr2 = "does not exist as a configured metric in the model"
+    missing_error_strings = set()
+    for expected_str in [expected_substr1, expected_substr2]:
+        if not any(actual_str.as_readable_str().find(expected_str) != -1 for actual_str in build_issues):
+            missing_error_strings.add(expected_str)
+    assert (
+        len(missing_error_strings) == 0
+    ), f"Failed to match one or more expected errors: {missing_error_strings} in {set([x.as_readable_str() for x in build_issues])}"
