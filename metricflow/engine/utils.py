@@ -38,13 +38,18 @@ def model_build_result_from_config(
 
 
 def model_build_result_from_dbt_config(
-    handler: YamlFileHandler, raise_issues_as_exceptions: bool = True
+    handler: YamlFileHandler,
+    raise_issues_as_exceptions: bool = True,
+    profile: Optional[str] = None,
+    target: Optional[str] = None,
 ) -> ModelBuildResult:
     """Given a yaml file, creates a ModelBuildResult.
 
     Args:
         handler: a file handler for loading the configs from
         raise_issues_as_exceptions: determines if issues should be raised, or returned as issues
+        profile: a dbt profile to override the project default, default None
+        target: a dbt target to overide the profile default, default None
 
     Returns:
         ModelBuildResult that contains the UserConfigureModel and any associated ValidationIssues
@@ -58,7 +63,7 @@ def model_build_result_from_dbt_config(
         # exception if this method is called without dbt installed.
         from metricflow.model.parsing.dbt_dir_to_model import parse_dbt_project_to_model
 
-        return parse_dbt_project_to_model(dbt_models_path)
+        return parse_dbt_project_to_model(directory=dbt_models_path, profile=profile, target=target)
     except Exception as e:
         raise ModelCreationException from e
 
@@ -68,9 +73,11 @@ def build_user_configured_model_from_config(handler: YamlFileHandler) -> UserCon
     return model_build_result_from_config(handler=handler).model
 
 
-def build_user_configured_model_from_dbt_config(handler: YamlFileHandler) -> UserConfiguredModel:
+def build_user_configured_model_from_dbt_config(
+    handler: YamlFileHandler, profile: Optional[str] = None, target: Optional[str] = None
+) -> UserConfiguredModel:
     """Given a yaml file, create a UserConfiguredModel."""
-    return model_build_result_from_dbt_config(handler=handler).model
+    return model_build_result_from_dbt_config(handler=handler, profile=profile, target=target).model
 
 
 def convert_to_datetime(datetime_str: Optional[str]) -> Optional[dt.datetime]:

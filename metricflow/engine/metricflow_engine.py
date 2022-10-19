@@ -9,7 +9,7 @@ from typing import Optional, List, Sequence
 
 import pandas as pd
 
-from metricflow.configuration.constants import CONFIG_DBT_REPO, CONFIG_DWH_SCHEMA
+from metricflow.configuration.constants import CONFIG_DBT_PROFILE, CONFIG_DBT_REPO, CONFIG_DBT_TARGET, CONFIG_DWH_SCHEMA
 from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
@@ -283,7 +283,12 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             # exception if this conditional is hit without dbt installed
             from metricflow.engine.utils import build_user_configured_model_from_dbt_config
 
-            semantic_model = SemanticModel(build_user_configured_model_from_dbt_config(handler))
+            dbt_profile = handler.get_value(CONFIG_DBT_PROFILE)
+            dbt_target = handler.get_value(CONFIG_DBT_TARGET)
+
+            semantic_model = SemanticModel(
+                build_user_configured_model_from_dbt_config(handler=handler, profile=dbt_profile, target=dbt_target)
+            )
         else:
             semantic_model = SemanticModel(build_user_configured_model_from_config(handler))
         system_schema = not_empty(handler.get_value(CONFIG_DWH_SCHEMA), CONFIG_DWH_SCHEMA, handler.url)
