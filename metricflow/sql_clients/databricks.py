@@ -61,9 +61,14 @@ class DatabricksEngineAttributes(SqlEngineAttributes):
 class DatabricksSqlClient(BaseSqlClientImplementation):
     """Client used to connect to Databricks engine."""
 
-    def __init__(  # noqa: D
+    def __init__(
         self, host: str, http_path: str, access_token: str, http_path_for_table_renames: Optional[str] = None
     ) -> None:
+        """Instantiate client.
+
+        Note: Databricks SQL warehouse connections using S3 do not allow table renames. In this case, users must
+        specify an HTTP path that points to a cluster that can be used for table renames.
+        """
         self.host = host
         self.http_path = http_path
         self.access_token = access_token
