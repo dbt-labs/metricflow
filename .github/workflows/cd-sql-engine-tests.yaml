@@ -36,7 +36,7 @@ jobs:
         run: cd metricflow && poetry install
 
       - name: Run MetricFlow unit tests with Snowflake configs
-        run: pytest metricflow/test/
+        run: poetry run pytest metricflow/test/
         env:
           MF_SQL_ENGINE_URL: ${{ secrets.MF_SNOWFLAKE_URL }}
           MF_SQL_ENGINE_PASSWORD: ${{ secrets.MF_SNOWFLAKE_PWD }}
@@ -69,7 +69,7 @@ jobs:
         run: cd metricflow && poetry install
 
       - name: Run MetricFlow unit tests with Redshift configs
-        run: pytest metricflow/test/
+        run: poetry run pytest metricflow/test/
         env:
           MF_SQL_ENGINE_URL: ${{ secrets.MF_REDSHIFT_URL }}
           MF_SQL_ENGINE_PASSWORD: ${{ secrets.MF_REDSHIFT_PWD }}
@@ -102,7 +102,7 @@ jobs:
         run: cd metricflow && poetry install
 
       - name: Run MetricFlow unit tests with BigQuery configs
-        run: pytest metricflow/test/
+        run: poetry run pytest metricflow/test/
         env:
           MF_SQL_ENGINE_URL: ${{ secrets.MF_BIGQUERY_URL }}
           MF_SQL_ENGINE_PASSWORD: ${{ secrets.MF_BIGQUERY_PWD }}
@@ -135,7 +135,7 @@ jobs:
         run: cd metricflow && poetry install
 
       - name: Run MetricFlow unit tests with Databricks configs
-        run: pytest metricflow/test/
+        run: poetry run pytest metricflow/test/
         env:
           MF_SQL_ENGINE_URL: ${{ secrets.MF_DATABRICKS_URL }}
           MF_SQL_ENGINE_PASSWORD: ${{ secrets.MF_DATABRICKS_PWD }}
@@ -183,7 +183,7 @@ jobs:
         run: cd metricflow && poetry install
 
       - name: Run MetricFlow unit tests with PostgreSQL configs
-        run: pytest metricflow/test/
+        run: poetry run pytest metricflow/test/
         env:
           MF_SQL_ENGINE_URL: postgresql://postgres@localhost:5432/metricflow
           MF_SQL_ENGINE_PASSWORD: postgres
