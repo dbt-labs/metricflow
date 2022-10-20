@@ -264,7 +264,7 @@ class _DimensionValidityParams:
 class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[ValidityWindowJoinDescription]]):
     """Create and return a ValidityWindowJoinDescription based on the given InstanceSet
 
-    During join resolution we need to determien whether or not a given data set represents a
+    During join resolution we need to determine whether or not a given data set represents a
     Type II SCD dataset - i.e., one with a validity window defined on each row. This requires
     checking the set of dimension instances and determining whether or not those originate from
     an SCD source, and extracting validity window information accordingly.
