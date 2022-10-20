@@ -8,8 +8,8 @@ on:
       - reopened
       - synchronize
 jobs:
-  metricflow-unit-tests:
-    name: MetricFlow Unit Tests
+  metricflow-unit-tests-duckdb:
+    name: MetricFlow Unit Tests - DuckDB
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -40,8 +40,8 @@ jobs:
         run: poetry run pytest metricflow/test
         env:
           METRICFLOW_CLIENT_EMAIL: ci-tester@gmail.com
-  postgres-tests:
-    name: Metricflow Unit Tests - PostgreSQL
+  metricflow-unit-tests-postgres:
+    name: MetricFlow Unit Tests - PostgreSQL
     runs-on: ubuntu-latest
 
     services:
@@ -86,3 +86,12 @@ jobs:
         env:
           MF_SQL_ENGINE_URL: postgresql://postgres@localhost:5432/metricflow
           MF_SQL_ENGINE_PASSWORD: postgres
+  metricflow-unit-tests:
+    name: MetricFlow Unit Tests
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    needs: [metricflow-unit-tests-duckdb, metricflow-unit-tests-postgres]
+
+    steps:
+      - name: Check success
+        run: test ${{ needs.metricflow-unit-tests-duckdb.result }} = 'success' -a ${{ needs.metricflow-unit-tests-postgres.result }} = 'success'
