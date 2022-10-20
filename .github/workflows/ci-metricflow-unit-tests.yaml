@@ -38,7 +38,7 @@ jobs:
         env:
           METRICFLOW_CLIENT_EMAIL: ci-tester@gmail.com
   postgres-tests:
-    name: PostgreSQL Tests
+    name: Metricflow Unit Tests - PostgreSQL
     runs-on: ubuntu-latest
 
     services:
