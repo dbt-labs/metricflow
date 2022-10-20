@@ -115,11 +115,11 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
             http_path_for_table_renames=http_path_for_table_renames,
         )
 
-    def get_connection(self, table_rename: bool = False) -> sql.client.Connection:
+    def get_connection(self, is_table_rename: bool = False) -> sql.client.Connection:
         """Get connection to Databricks cluster/warehouse."""
         return sql.connect(
             server_hostname=self.host,
-            http_path=self.http_path_for_table_renames if table_rename else self.http_path,
+            http_path=self.http_path_for_table_renames if is_table_rename else self.http_path,
             access_token=self.access_token,
         )
 
