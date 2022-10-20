@@ -30,7 +30,7 @@ jobs:
           key: ${{ env.pythonLocation }}-${{ hashFiles('metricflow/poetry.lock') }}
 
       - name: Install Poetry
-        run: pip install poetry==1.1.15 && poetry config virtualenvs.create false
+        run: pip install poetry
 
       - name: Install Deps
         run: cd metricflow && poetry install
@@ -63,7 +63,7 @@ jobs:
           key: ${{ env.pythonLocation }}-${{ hashFiles('metricflow/poetry.lock') }}
 
       - name: Install Poetry
-        run: pip install poetry==1.1.15 && poetry config virtualenvs.create false
+        run: pip install poetry
 
       - name: Install Deps
         run: cd metricflow && poetry install
@@ -96,7 +96,7 @@ jobs:
           key: ${{ env.pythonLocation }}-${{ hashFiles('metricflow/poetry.lock') }}
 
       - name: Install Poetry
-        run: pip install poetry==1.1.15 && poetry config virtualenvs.create false
+        run: pip install poetry
 
       - name: Install Deps
         run: cd metricflow && poetry install
@@ -129,7 +129,7 @@ jobs:
           key: ${{ env.pythonLocation }}-${{ hashFiles('metricflow/poetry.lock') }}
 
       - name: Install Poetry
-        run: pip install poetry==1.1.15 && poetry config virtualenvs.create false
+        run: pip install poetry
 
       - name: Install Deps
         run: cd metricflow && poetry install
@@ -177,7 +177,7 @@ jobs:
           key: ${{ env.pythonLocation }}-${{ hashFiles('metricflow/poetry.lock') }}
 
       - name: Install Poetry
-        run: pip install poetry==1.1.15 && poetry config virtualenvs.create false
+        run: pip install poetry
 
       - name: Install Deps
         run: cd metricflow && poetry install

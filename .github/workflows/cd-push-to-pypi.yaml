@@ -18,7 +18,7 @@ jobs:
           python-version: "3.8"
 
       - name: Install Poetry
-        run: pip install poetry==1.1.15 && poetry config virtualenvs.create false
+        run: pip install poetry
 
       - name: Install dependencies
         run: make install
