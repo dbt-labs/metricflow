@@ -203,26 +203,26 @@ integration_test:
     ON a.ds = b.ds
 ---
 integration_test:
- name: min_measure_proxy
- description: Test measure_proxy metric with a min.
- model: SIMPLE_MODEL
- metrics: ["min_booking_value"]
- group_bys: []
- check_query: |
-   SELECT
-     min(booking_value) AS min_booking_value
-   FROM {{ source_schema }}.fct_bookings
+  name: min_measure_proxy
+  description: Test measure_proxy metric with a min.
+  model: SIMPLE_MODEL
+  metrics: ["min_booking_value"]
+  group_bys: []
+  check_query: |
+    SELECT
+      min(booking_value) AS min_booking_value
+    FROM {{ source_schema }}.fct_bookings
 ---
 integration_test:
- name: max_measure_proxy
- description: Test measure_proxy metric with a max.
- model: SIMPLE_MODEL
- metrics: ["max_booking_value"]
- group_bys: []
- check_query: |
-   SELECT
-     max(booking_value) AS max_booking_value
-   FROM {{ source_schema }}.fct_bookings
+  name: max_measure_proxy
+  description: Test measure_proxy metric with a max.
+  model: SIMPLE_MODEL
+  metrics: ["max_booking_value"]
+  group_bys: []
+  check_query: |
+    SELECT
+      max(booking_value) AS max_booking_value
+    FROM {{ source_schema }}.fct_bookings
 ---
 integration_test:
   name: count_distinct
@@ -430,7 +430,7 @@ integration_test:
     Tests query with 3 metrics, and also checks an optimizing issue when there is a expression metric that is joined.
   model: SIMPLE_MODEL
   required_features: ["FULL_OUTER_JOIN"]
-  metrics: ["bookings", "bookings_per_booker", "booking_value",]
+  metrics: ["bookings", "bookings_per_booker", "booking_value"]
   group_bys: ["metric_time"]
   check_query: |
     SELECT
@@ -506,7 +506,7 @@ integration_test:
       FROM {{ source_schema }}.fct_bookings
       GROUP BY
         ds
-    )
+    ) a
 ---
 integration_test:
   name: derived_metric_ratio
@@ -556,4 +556,4 @@ integration_test:
       FROM {{ source_schema }}.fct_bookings
       GROUP BY
         ds
-    )
+    ) a
