@@ -1,8 +1,7 @@
 name: MetricFlow Unit Tests (CI)
 on:
   pull_request:
-    # run these jobs when a PR is opened, edited, reopened, or updated (synchronize)
-    # edited = title, body, or the base branch of the PR is modified
+    # run these jobs when a PR is opened, reopened, or updated (synchronize)
     # synchronize = commit(s) pushed to the pull request
     types:
       - opened
@@ -38,3 +37,49 @@ jobs:
         run: pytest metricflow/test
         env:
           METRICFLOW_CLIENT_EMAIL: ci-tester@gmail.com
+  postgres-tests:
+    name: PostgreSQL Tests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: metricflow
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Check-out the repo
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ${{ env.pythonLocation }}
+            ~/.cache/pypoetry
+          key: ${{ env.pythonLocation }}-${{ hashFiles('metricflow/poetry.lock') }}
+
+      - name: Install Poetry
+        run: pip install poetry==1.1.15 && poetry config virtualenvs.create false
+
+      - name: Install Deps
+        run: cd metricflow && poetry install
+
+      - name: Run MetricFlow unit tests with PostgreSQL configs
+        run: pytest metricflow/test/
+        env:
+          MF_SQL_ENGINE_URL: postgresql://postgres@localhost:5432/metricflow
+          MF_SQL_ENGINE_PASSWORD: postgres
