@@ -78,6 +78,8 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         self.access_token = access_token
         self.http_path_for_table_renames = http_path_for_table_renames
 
+        super().__init__()
+
     @staticmethod
     def from_connection_details(url: str, password: Optional[str]) -> DatabricksSqlClient:  # noqa: D
         """Parse MF_SQL_ENGINE_URL & MF_SQL_ENGINE_PASSWORD into useful connection params.
