@@ -504,7 +504,7 @@ metric:
     - support@transformdata.io
   type: derived
   type_params:
-    expr: (bookings - ref_bookings) / bookings
+    expr: (bookings - ref_bookings) * 1.0 / bookings
     metrics:
       - name: referred_bookings
         alias: ref_bookings
@@ -517,7 +517,7 @@ metric:
     - support@transformdata.io
   type: derived
   type_params:
-    expr: bookings / lux_listing
+    expr: bookings * 1.0 / NULLIF(lux_listing, 0)
     metrics:
       - name: bookings
       - name: listings
@@ -533,7 +533,7 @@ metric:
     - support@transformdata.io
   type: derived
   type_params:
-    expr: non_referred + (instant / bookings)
+    expr: non_referred + (instant * 1.0 / bookings)
     metrics:
       - name: non_referred_bookings_pct
         alias: non_referred
@@ -541,3 +541,4 @@ metric:
         alias: instant
       - name: bookings
 ---
+
