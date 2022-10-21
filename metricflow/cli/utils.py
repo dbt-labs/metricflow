@@ -26,6 +26,7 @@ from metricflow.configuration.constants import (
     CONFIG_EMAIL,
     CONFIG_MODEL_PATH,
     CONFIG_DWH_HTTP_PATH,
+    CONFIG_DWH_HTTP_PATH_RENAME,
     CONFIG_DWH_ACCESS_TOKEN,
     CONFIG_DBT_REPO,
 )
@@ -90,6 +91,7 @@ MF_SNOWFLAKE_KEYS = (
 # Databricks config keys
 MF_DATABRICKS_KEYS = (
     ConfigKey(key=CONFIG_DWH_HTTP_PATH),
+    ConfigKey(key=CONFIG_DWH_HTTP_PATH_RENAME),
     ConfigKey(key=CONFIG_DWH_HOST),
     ConfigKey(key=CONFIG_DWH_ACCESS_TOKEN),
     ConfigKey(key=CONFIG_DWH_DIALECT, value=SqlDialect.DATABRICKS.value),
