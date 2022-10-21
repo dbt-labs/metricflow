@@ -6,7 +6,7 @@ from typing import List, Sequence
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.parsing.dir_to_model import ModelBuildResult
 from metricflow.model.validations.agg_time_dimension import AggregationTimeDimensionRule
-from metricflow.model.validations.data_sources import DataSourceTimeDimensionWarningsRule
+from metricflow.model.validations.data_sources import DataSourceTimeDimensionWarningsRule, DataSourceValidityWindowRule
 from metricflow.model.validations.dimension_const import DimensionConsistencyRule
 from metricflow.model.validations.element_const import ElementConsistencyRule
 from metricflow.model.validations.identifiers import (
@@ -43,6 +43,7 @@ class ModelValidator:
         CountAggregationExprRule(),
         DataSourceMeasuresUniqueRule(),
         DataSourceTimeDimensionWarningsRule(),
+        DataSourceValidityWindowRule(),
         DimensionConsistencyRule(),
         ElementConsistencyRule(),
         IdentifierConfigRule(),
