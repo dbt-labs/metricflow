@@ -125,7 +125,9 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         """Get connection to Databricks cluster/warehouse."""
         return sql.connect(
             server_hostname=self.host,
-            http_path=self.http_path_for_table_renames if is_table_rename else self.http_path,
+            http_path=self.http_path_for_table_renames
+            if self.http_path_for_table_renames and is_table_rename
+            else self.http_path,
             access_token=self.access_token,
         )
 
