@@ -21,6 +21,8 @@ HTTP_PATH_KEY = "httppath="
 HTTP_PATH_RENAME_KEY = "httppathrename="
 SQL_RENAME = " RENAME TO "
 SQL_ALTER_TABLE = "ALTER TABLE "
+SQL_WAREHOUSE_ERROR_KEY = "Error occurred during query planning"
+CLUSTER_ERROR_KEY = "org.apache.spark.sql.AnalysisException"
 
 # This is a non-exhaustive list of pandas dtypes, but in theory it will cover the ones we need to support
 # for data frames generated and run through type inference.
@@ -165,10 +167,15 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
                 logger.info(f"Executing SQL statment: {stmt}")
                 cursor.execute(operation=stmt, parameters=self.params_or_none(bind_params))
 
-                # If the plan contains errors, they won't be raised. Parse plan string to find & raise errors.
-                result = str(cursor.fetchall_arrow()["plan"][0])
-                if "org.apache.spark.sql.AnalysisException" in result:
-                    error = result.split("== Physical Plan ==")[1].split(";")[0]
+                # If the plan contains errors, they won't be raised. Parse results to find & raise errors.
+                result = cursor.fetchall_arrow()["plan"]
+                str_result = str(result)
+                if SQL_WAREHOUSE_ERROR_KEY in str_result:
+                    error = "".join([str(row) for row in result])
+                    raise sql.exc.ServerOperationError(error)
+
+                if CLUSTER_ERROR_KEY in str_result:
+                    error = str_result.split("== Physical Plan ==")[1].split(";")[0]
                     raise sql.exc.ServerOperationError(error)
 
     def create_table_from_dataframe(  # noqa: D
