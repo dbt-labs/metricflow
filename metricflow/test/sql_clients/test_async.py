@@ -82,7 +82,10 @@ def test_cancel_request(  # noqa: D
         if num_cancelled > 0:
             break
 
-    assert async_sql_client.async_request_result(request_id).exception is not None
+    exception = async_sql_client.async_request_result(request_id).exception
+    if exception is not None:
+        raise RuntimeError("Encountered unexpected exception during test query!") from exception
+
     assert num_cancelled == 1
 
 
