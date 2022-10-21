@@ -7,8 +7,7 @@ from typing import Sequence
 
 import google.oauth2.service_account
 import sqlalchemy
-from google.cloud import bigquery
-from google.cloud.bigquery import QueryJob
+from google.cloud.bigquery import Client, QueryJob
 
 from metricflow.protocols.sql_client import SqlEngine, SqlIsolationLevel
 from metricflow.protocols.sql_client import (
@@ -76,7 +75,7 @@ class BigQuerySqlClient(SqlAlchemySqlClient):
         password_json = json.loads(password) if password else {}
         self._project_id = project_id or password_json.get("project_id")
         bq_engine = BigQuerySqlClient._create_bq_engine(project_id=project_id, password=password)
-        self._bq_client = bigquery.Client(
+        self._bq_client = Client(
             project=self._project_id,
             credentials=google.oauth2.service_account.Credentials.from_service_account_info(password_json)
             if password_json
