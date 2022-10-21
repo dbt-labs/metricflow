@@ -20,10 +20,10 @@ jobs:
       - name: Check-out the repo
         uses: actions/checkout@v2
 
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
         with:
-          python-version: "3.8"
+          python-version: "3.9"
 
       - uses: actions/cache@v2
         with:
@@ -33,7 +33,7 @@ jobs:
           key: ${{ env.pythonLocation }}-${{ hashFiles('poetry.lock') }}
 
       - name: Install Poetry
-        run: pip install poetry==1.1.15 && poetry config virtualenvs.create false
+        run: pip install poetry
 
       - name: Install Metricflow
         run: poetry install

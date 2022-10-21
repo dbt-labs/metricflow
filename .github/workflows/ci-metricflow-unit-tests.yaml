@@ -8,17 +8,20 @@ on:
       - reopened
       - synchronize
 jobs:
-  metricflow-unit-tests:
-    name: MetricFlow Unit Tests
+  metricflow-unit-tests-duckdb:
+    name: MetricFlow Unit Tests - DuckDB
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9"]
     steps:
       - name: Check-out the repo
         uses: actions/checkout@v2
 
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
         with:
-          python-version: "3.8"
+          python-version: ${{ matrix.python-version }}
 
       - uses: actions/cache@v2
         with:
@@ -28,17 +31,17 @@ jobs:
           key: ${{ env.pythonLocation }}-${{ hashFiles('poetry.lock') }}
 
       - name: Install Poetry
-        run: pip install poetry==1.1.15 && poetry config virtualenvs.create false
+        run: pip install poetry
 
       - name: Install Metricflow
         run: poetry install
 
       - name: Run MetricFlow Unit tests suites
-        run: pytest metricflow/test
+        run: poetry run pytest metricflow/test
         env:
           METRICFLOW_CLIENT_EMAIL: ci-tester@gmail.com
-  postgres-tests:
-    name: PostgreSQL Tests
+  metricflow-unit-tests-postgres:
+    name: MetricFlow Unit Tests - PostgreSQL
     runs-on: ubuntu-latest
 
     services:
@@ -60,10 +63,10 @@ jobs:
       - name: Check-out the repo
         uses: actions/checkout@v2
 
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
         with:
-          python-version: "3.8"
+          python-version: "3.9"
 
       - uses: actions/cache@v2
         with:
@@ -73,13 +76,22 @@ jobs:
           key: ${{ env.pythonLocation }}-${{ hashFiles('metricflow/poetry.lock') }}
 
       - name: Install Poetry
-        run: pip install poetry==1.1.15 && poetry config virtualenvs.create false
+        run: pip install poetry
 
       - name: Install Deps
         run: cd metricflow && poetry install
 
       - name: Run MetricFlow unit tests with PostgreSQL configs
-        run: pytest metricflow/test/
+        run: poetry run pytest metricflow/test/
         env:
           MF_SQL_ENGINE_URL: postgresql://postgres@localhost:5432/metricflow
           MF_SQL_ENGINE_PASSWORD: postgres
+  metricflow-unit-tests:
+    name: MetricFlow Unit Tests
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    needs: [metricflow-unit-tests-duckdb, metricflow-unit-tests-postgres]
+
+    steps:
+      - name: Check success
+        run: test ${{ needs.metricflow-unit-tests-duckdb.result }} = 'success' -a ${{ needs.metricflow-unit-tests-postgres.result }} = 'success'

@@ -17,10 +17,10 @@ jobs:
       - name: Check-out the repo
         uses: actions/checkout@v2
 
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
         with:
-          python-version: "3.8"
+          python-version: "3.9"
 
       - uses: actions/cache@v2
         with:
@@ -30,13 +30,13 @@ jobs:
           key: ${{ env.pythonLocation }}-${{ hashFiles('metricflow/poetry.lock') }}
 
       - name: Install Poetry
-        run: pip install poetry==1.1.15 && poetry config virtualenvs.create false
+        run: pip install poetry
 
       - name: Install Deps
         run: cd metricflow && poetry install
 
       - name: Run MetricFlow unit tests with Snowflake configs
-        run: pytest metricflow/test/
+        run: poetry run pytest metricflow/test/
         env:
           MF_SQL_ENGINE_URL: ${{ secrets.MF_SNOWFLAKE_URL }}
           MF_SQL_ENGINE_PASSWORD: ${{ secrets.MF_SNOWFLAKE_PWD }}
@@ -50,10 +50,10 @@ jobs:
       - name: Check-out the repo
         uses: actions/checkout@v2
 
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
         with:
-          python-version: "3.8"
+          python-version: "3.9"
 
       - uses: actions/cache@v2
         with:
@@ -63,13 +63,13 @@ jobs:
           key: ${{ env.pythonLocation }}-${{ hashFiles('metricflow/poetry.lock') }}
 
       - name: Install Poetry
-        run: pip install poetry==1.1.15 && poetry config virtualenvs.create false
+        run: pip install poetry
 
       - name: Install Deps
         run: cd metricflow && poetry install
 
       - name: Run MetricFlow unit tests with Redshift configs
-        run: pytest metricflow/test/
+        run: poetry run pytest metricflow/test/
         env:
           MF_SQL_ENGINE_URL: ${{ secrets.MF_REDSHIFT_URL }}
           MF_SQL_ENGINE_PASSWORD: ${{ secrets.MF_REDSHIFT_PWD }}
@@ -83,10 +83,10 @@ jobs:
       - name: Check-out the repo
         uses: actions/checkout@v2
 
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
         with:
-          python-version: "3.8"
+          python-version: "3.9"
 
       - uses: actions/cache@v2
         with:
@@ -96,13 +96,13 @@ jobs:
           key: ${{ env.pythonLocation }}-${{ hashFiles('metricflow/poetry.lock') }}
 
       - name: Install Poetry
-        run: pip install poetry==1.1.15 && poetry config virtualenvs.create false
+        run: pip install poetry
 
       - name: Install Deps
         run: cd metricflow && poetry install
 
       - name: Run MetricFlow unit tests with BigQuery configs
-        run: pytest metricflow/test/
+        run: poetry run pytest metricflow/test/
         env:
           MF_SQL_ENGINE_URL: ${{ secrets.MF_BIGQUERY_URL }}
           MF_SQL_ENGINE_PASSWORD: ${{ secrets.MF_BIGQUERY_PWD }}
@@ -116,10 +116,10 @@ jobs:
       - name: Check-out the repo
         uses: actions/checkout@v2
 
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
         with:
-          python-version: "3.8"
+          python-version: "3.9"
 
       - uses: actions/cache@v2
         with:
@@ -129,13 +129,13 @@ jobs:
           key: ${{ env.pythonLocation }}-${{ hashFiles('metricflow/poetry.lock') }}
 
       - name: Install Poetry
-        run: pip install poetry==1.1.15 && poetry config virtualenvs.create false
+        run: pip install poetry
 
       - name: Install Deps
         run: cd metricflow && poetry install
 
       - name: Run MetricFlow unit tests with Databricks configs
-        run: pytest metricflow/test/
+        run: poetry run pytest metricflow/test/
         env:
           MF_SQL_ENGINE_URL: ${{ secrets.MF_DATABRICKS_URL }}
           MF_SQL_ENGINE_PASSWORD: ${{ secrets.MF_DATABRICKS_PWD }}
@@ -164,10 +164,10 @@ jobs:
       - name: Check-out the repo
         uses: actions/checkout@v2
 
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
         with:
-          python-version: "3.8"
+          python-version: "3.9"
 
       - uses: actions/cache@v2
         with:
@@ -177,13 +177,13 @@ jobs:
           key: ${{ env.pythonLocation }}-${{ hashFiles('metricflow/poetry.lock') }}
 
       - name: Install Poetry
-        run: pip install poetry==1.1.15 && poetry config virtualenvs.create false
+        run: pip install poetry
 
       - name: Install Deps
         run: cd metricflow && poetry install
 
       - name: Run MetricFlow unit tests with PostgreSQL configs
-        run: pytest metricflow/test/
+        run: poetry run pytest metricflow/test/
         env:
           MF_SQL_ENGINE_URL: postgresql://postgres@localhost:5432/metricflow
           MF_SQL_ENGINE_PASSWORD: postgres
