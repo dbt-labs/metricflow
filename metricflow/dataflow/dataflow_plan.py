@@ -46,6 +46,7 @@ from metricflow.specs import (
     TimeDimensionSpec,
     SpecWhereClauseConstraint,
 )
+from metricflow.sql.sql_plan import SqlJoinType
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.visitor import Visitable, VisitorOutputT
 
@@ -902,7 +903,9 @@ class CombineMetricsNode(Generic[SourceDataSetT], ComputedMetricsOutput[SourceDa
     def __init__(  # noqa: D
         self,
         parent_nodes: Sequence[ComputedMetricsOutput[SourceDataSetT]],
+        join_type: SqlJoinType = SqlJoinType.FULL_OUTER,
     ) -> None:
+        self._join_type = join_type
         super().__init__(node_id=self.create_unique_id(), parent_nodes=list(parent_nodes))
 
     @classmethod
@@ -915,6 +918,11 @@ class CombineMetricsNode(Generic[SourceDataSetT], ComputedMetricsOutput[SourceDa
     @property
     def description(self) -> str:  # noqa: D
         return "Combine Metrics"
+
+    @property
+    def join_type(self) -> SqlJoinType:
+        """The type of join used for combining metrics."""
+        return self._join_type
 
 
 class ConstrainTimeRangeNode(AggregatedMeasuresOutput[SourceDataSetT], BaseOutput[SourceDataSetT]):

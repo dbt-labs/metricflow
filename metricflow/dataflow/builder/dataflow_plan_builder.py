@@ -66,6 +66,7 @@ from metricflow.specs import (
     ColumnAssociationResolver,
     LinklessIdentifierSpec,
 )
+from metricflow.sql.sql_plan import SqlJoinType
 from metricflow.time.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
@@ -157,7 +158,17 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         queried_linkable_specs: LinkableSpecSet,
         where_constraint: Optional[SpecWhereClauseConstraint] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
+        combine_metrics_join_type: SqlJoinType = SqlJoinType.FULL_OUTER,
     ) -> ComputedMetricsOutput[SqlDataSetT]:
+        """Builds a computed metrics output node.
+
+        Args:
+            metric_specs: Specs for metrics to compute.
+            queried_linkable_specs: Dimensions/identifiers that were queried for.
+            where_constraint: Where constraint used to compute the metric.
+            time_range_constraint: Time range constraint used to compute the metric.
+            combine_metrics_join_type: The join used when combining the computed metrics.
+        """
         compute_metrics_nodes: List[ComputedMetricsOutput[SqlDataSetT]] = []
         for metric_spec in metric_specs:
             logger.info(f"Generating compute metrics node for {metric_spec}")
@@ -177,6 +188,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                     queried_linkable_specs=queried_linkable_specs,
                     where_constraint=where_constraint,
                     time_range_constraint=time_range_constraint,
+                    combine_metrics_join_type=SqlJoinType.INNER,
                 )
                 compute_metrics_nodes.append(
                     ComputeMetricsNode[SqlDataSetT](
@@ -222,7 +234,10 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         if len(compute_metrics_nodes) == 1:
             return compute_metrics_nodes[0]
 
-        return CombineMetricsNode[SqlDataSetT](parent_nodes=compute_metrics_nodes)
+        return CombineMetricsNode[SqlDataSetT](
+            parent_nodes=compute_metrics_nodes,
+            join_type=combine_metrics_join_type,
+        )
 
     def build_plan_for_distinct_values(
         self,
