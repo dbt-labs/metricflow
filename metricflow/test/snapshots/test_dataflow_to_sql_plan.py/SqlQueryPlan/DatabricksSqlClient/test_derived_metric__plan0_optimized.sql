@@ -30,7 +30,7 @@ FROM (
     GROUP BY
       metric_time
   ) subq_19
-  FULL OUTER JOIN (
+  INNER JOIN (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
