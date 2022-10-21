@@ -526,7 +526,7 @@ integration_test:
       GROUP BY
         ds
     ) a
-    FULL OUTER JOIN (
+    INNER JOIN (
       SELECT
         SUM(1) AS lux_listings
         , created_at AS metric_time

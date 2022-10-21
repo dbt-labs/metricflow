@@ -1335,7 +1335,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                         table_aliases_in_coalesce=parent_source_table_aliases[:i],
                         table_alias_on_right_equality=parent_source_table_aliases[i],
                     ).transform(linkable_spec_set),
-                    join_type=SqlJoinType.FULL_OUTER,
+                    join_type=node.join_type,
                 )
             )
 

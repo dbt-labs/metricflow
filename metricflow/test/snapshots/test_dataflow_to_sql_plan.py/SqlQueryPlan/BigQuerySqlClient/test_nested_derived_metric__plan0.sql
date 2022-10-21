@@ -153,7 +153,7 @@ FROM (
             subq_2.metric_time
         ) subq_3
       ) subq_8
-      FULL OUTER JOIN (
+      INNER JOIN (
         -- Compute Metrics via Expressions
         SELECT
           subq_7.metric_time
@@ -290,7 +290,7 @@ FROM (
         subq_8.metric_time = subq_9.metric_time
     ) subq_10
   ) subq_19
-  FULL OUTER JOIN (
+  INNER JOIN (
     -- Compute Metrics via Expressions
     SELECT
       subq_14.metric_time
@@ -425,7 +425,7 @@ FROM (
   ) subq_20
   ON
     subq_19.metric_time = subq_20.metric_time
-  FULL OUTER JOIN (
+  INNER JOIN (
     -- Compute Metrics via Expressions
     SELECT
       subq_18.metric_time

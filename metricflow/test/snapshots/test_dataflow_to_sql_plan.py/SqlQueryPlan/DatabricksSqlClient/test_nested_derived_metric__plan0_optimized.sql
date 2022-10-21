@@ -42,7 +42,7 @@ FROM (
         GROUP BY
           metric_time
       ) subq_31
-      FULL OUTER JOIN (
+      INNER JOIN (
         -- Aggregate Measures
         -- Compute Metrics via Expressions
         SELECT
@@ -68,7 +68,7 @@ FROM (
         subq_31.metric_time = subq_32.metric_time
     ) subq_33
   ) subq_42
-  FULL OUTER JOIN (
+  INNER JOIN (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
@@ -92,7 +92,7 @@ FROM (
   ) subq_43
   ON
     subq_42.metric_time = subq_43.metric_time
-  FULL OUTER JOIN (
+  INNER JOIN (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT

@@ -141,7 +141,7 @@ FROM (
         subq_2.metric_time
     ) subq_3
   ) subq_8
-  FULL OUTER JOIN (
+  INNER JOIN (
     -- Compute Metrics via Expressions
     SELECT
       subq_7.metric_time
