@@ -70,7 +70,7 @@ def test_validity_window_must_have_a_start() -> None:
     validity_window_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
     model = parse_yaml_files_to_validation_ready_model([base_model_file(), validity_window_file])
 
-    with pytest.raises(ModelValidationException, match="has 1 validity param dimensions defined"):
+    with pytest.raises(ModelValidationException, match="has 1 dimensions defined with validity params"):
         ModelValidator().checked_validations(model.model)
 
 
@@ -98,7 +98,7 @@ def test_validity_window_must_have_an_end() -> None:
     validity_window_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
     model = parse_yaml_files_to_validation_ready_model([base_model_file(), validity_window_file])
 
-    with pytest.raises(ModelValidationException, match="has 1 validity param dimensions defined"):
+    with pytest.raises(ModelValidationException, match="has 1 dimensions defined with validity params"):
         ModelValidator().checked_validations(model.model)
 
 
@@ -211,7 +211,7 @@ def test_multiple_validity_windows_are_invalid() -> None:
     validity_window_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
     model = parse_yaml_files_to_validation_ready_model([base_model_file(), validity_window_file])
 
-    with pytest.raises(ModelValidationException, match="has 4 validity param dimensions defined"):
+    with pytest.raises(ModelValidationException, match="has 4 dimensions defined with validity params"):
         ModelValidator().checked_validations(model.model)
 
 
@@ -247,4 +247,48 @@ def test_empty_validity_windows_are_invalid() -> None:
     model = parse_yaml_files_to_validation_ready_model([base_model_file(), validity_window_file])
 
     with pytest.raises(ModelValidationException, match="does not have exactly one each"):
+        ModelValidator().checked_validations(model.model)
+
+
+def test_measures_are_prevented() -> None:
+    """Tests validation asserting that measures are not allowed in a data source with validity windows
+
+    This block is temporary while we sort out the proper syntax for defining a measure in SCD-style data sources
+    and implement whatever additional functionality is needed for measures which are semi-additive to the window.
+    """
+
+    yaml_contents = textwrap.dedent(
+        """\
+        data_source:
+          name: scd_data_source
+          sql_table: some_schema.scd_table
+          identifiers:
+            - name: scd_key
+              type: primary
+          dimensions:
+            - name: country
+              type: categorical
+            - name: window_start
+              type: time
+              type_params:
+                time_granularity: day
+                validity_params:
+                  is_start: true
+                is_primary: true
+            - name: window_end
+              type: time
+              type_params:
+                time_granularity: day
+                validity_params:
+                  is_end: true
+          measures:
+            - name: num_countries
+              agg: count_distinct
+              expr: country
+        """
+    )
+    validity_window_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+    model = parse_yaml_files_to_validation_ready_model([base_model_file(), validity_window_file])
+
+    with pytest.raises(ModelValidationException, match="has both measures and validity param dimensions defined"):
         ModelValidator().checked_validations(model.model)
