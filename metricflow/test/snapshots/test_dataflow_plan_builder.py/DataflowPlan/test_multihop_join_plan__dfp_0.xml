@@ -47,7 +47,8 @@
                         <!--                                           'node_to_join_time_dimension_spec': {'class': 'TimeDimensionSpec',                 -->
                         <!--                                                                                'element_name': 'ds_partitioned',             -->
                         <!--                                                                                'identifier_links': (),                       -->
-                        <!--                                                                                'time_granularity': TimeGranularity.DAY}},)}  -->
+                        <!--                                                                                'time_granularity': TimeGranularity.DAY}},),  -->
+                        <!--    'validity_window': None}                                                                                                  -->
                         <FilterElementsNode>
                             <!-- description =                                      -->
                             <!--   Pass Only Elements:                              -->
@@ -116,7 +117,8 @@
                                 <!--                                           'node_to_join_time_dimension_spec': {'class': 'TimeDimensionSpec',                 -->
                                 <!--                                                                                'element_name': 'ds_partitioned',             -->
                                 <!--                                                                                'identifier_links': (),                       -->
-                                <!--                                                                                'time_granularity': TimeGranularity.DAY}},)}  -->
+                                <!--                                                                                'time_granularity': TimeGranularity.DAY}},),  -->
+                                <!--    'validity_window': None}                                                                                                  -->
                                 <ReadSqlSourceNode>
                                     <!-- description =                                                                        -->
                                     <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='bridge_table'))  -->

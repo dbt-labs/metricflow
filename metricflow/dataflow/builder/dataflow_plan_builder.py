@@ -737,7 +737,6 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         if cumulative:
             time_range_node = JoinOverTimeRangeNode(
                 parent_node=filtered_measure_source_node,
-                metric_time_dimension_reference=self._metric_time_dimension_reference,
                 window=cumulative_window,
                 grain_to_date=cumulative_grain_to_date,
                 time_range_constraint=time_range_constraint,
@@ -752,7 +751,8 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             # Sanity check - all linkable specs should have a link, or else why would we be joining them.
             assert all([len(x.identifier_links) > 0 for x in join_recipe.satisfiable_linkable_specs])
 
-            # If we're joining something in, then we need the associated identifier and partitions.
+            # If we're joining something in, then we need the associated identifier, partitions, and time dimension
+            # specs defining the validity window (if necessary)
             include_specs: List[LinkableInstanceSpec] = [
                 LinklessIdentifierSpec.from_reference(x.identifier_links[0])
                 for x in join_recipe.satisfiable_linkable_specs
@@ -761,6 +761,13 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             include_specs.extend(
                 [x.node_to_join_time_dimension_spec for x in join_recipe.join_on_partition_time_dimensions]
             )
+            if join_recipe.validity_window:
+                include_specs.extend(
+                    [
+                        join_recipe.validity_window.window_start_dimension,
+                        join_recipe.validity_window.window_end_dimension,
+                    ]
+                )
 
             # satisfiable_linkable_specs describes what can be satisfied after the join, so remove the identifier
             # link when filtering before the join.
@@ -777,6 +784,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                     join_on_identifier=join_recipe.join_on_identifier,
                     join_on_partition_dimensions=join_recipe.join_on_partition_dimensions,
                     join_on_partition_time_dimensions=join_recipe.join_on_partition_time_dimensions,
+                    validity_window=join_recipe.validity_window,
                 )
             )
 

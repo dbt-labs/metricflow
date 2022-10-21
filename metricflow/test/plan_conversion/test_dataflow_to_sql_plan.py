@@ -80,6 +80,18 @@ def multihop_dataflow_to_sql_converter(  # noqa: D
     )
 
 
+@pytest.fixture(scope="session")
+def scd_dataflow_to_sql_converter(  # noqa: D
+    scd_semantic_model: SemanticModel,
+    time_spine_source: TimeSpineSource,
+) -> DataflowToSqlQueryPlanConverter[DataSourceDataSet]:
+    return DataflowToSqlQueryPlanConverter[DataSourceDataSet](
+        column_association_resolver=DefaultColumnAssociationResolver(scd_semantic_model),
+        semantic_model=scd_semantic_model,
+        time_spine_source=time_spine_source,
+    )
+
+
 def convert_and_check(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1360,6 +1372,80 @@ def test_nested_derived_metric(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+def test_join_to_scd_dimension(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    scd_dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
+    scd_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
+    sql_client: SqlClient,
+) -> None:
+    """Tests conversion of a plan using a dimension with a validity window inside a measure constraint"""
+    dataflow_plan = scd_dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="family_bookings"),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
+        ),
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=scd_dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+def test_multi_hop_through_scd_dimension(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    scd_dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
+    scd_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
+    sql_client: SqlClient,
+) -> None:
+    """Tests conversion of a plan using a dimension that is reached through an SCD table"""
+    dataflow_plan = scd_dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings"),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
+            dimension_specs=(DimensionSpec.from_name(name="listing__user__home_state_latest"),),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=scd_dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+def test_multi_hop_to_scd_dimension(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    scd_dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
+    scd_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
+    sql_client: SqlClient,
+) -> None:
+    """Tests conversion of a plan using an SCD dimension that is reached through another table"""
+    dataflow_plan = scd_dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings"),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
+            dimension_specs=(DimensionSpec.from_name(name="listing__lux_listing__is_confirmed_lux"),),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=scd_dataflow_to_sql_converter,
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
     )

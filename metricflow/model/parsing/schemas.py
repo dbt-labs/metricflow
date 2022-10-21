@@ -154,6 +154,16 @@ identifier_schema = {
     "required": ["name", "type"],
 }
 
+validity_params_schema = {
+    "$id": "validity_params_schema",
+    "type": "object",
+    "properties": {
+        "is_start": {"type": "boolean"},
+        "is_end": {"type": "boolean"},
+    },
+    "additionalProperties": False,
+}
+
 dimension_type_params_schema = {
     "$id": "dimension_type_params_schema",
     "type": "object",
@@ -161,6 +171,7 @@ dimension_type_params_schema = {
         "is_primary": {"type": "boolean"},
         "time_format": {"type": "string"},
         "time_granularity": {"enum": time_granularity_values},
+        "validity_params": {"$ref": "validity_params_schema"},
     },
     "additionalProperties": False,
     "required": ["time_granularity"],
@@ -350,6 +361,7 @@ schema_store = {
     identifier_schema["$id"]: identifier_schema,
     measure_schema["$id"]: measure_schema,
     dimension_schema["$id"]: dimension_schema,
+    validity_params_schema["$id"]: validity_params_schema,
     dimension_type_params_schema["$id"]: dimension_type_params_schema,
     mutability_schema["$id"]: mutability_schema,
     mutability_type_params_schema["$id"]: mutability_type_params_schema,

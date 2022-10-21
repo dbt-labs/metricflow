@@ -4,10 +4,13 @@ from __future__ import annotations
 
 import logging
 from collections import OrderedDict
+from dataclasses import dataclass
 from itertools import chain
-from typing import List, Sequence, Optional, Dict, Tuple
+from more_itertools import bucket
+from typing import Dict, List, Optional, Sequence, Tuple
 
 from metricflow.aggregation_properties import AggregationState
+from metricflow.dataflow.dataflow_plan import ValidityWindowJoinDescription
 from metricflow.instances import (
     MdoInstance,
     DimensionInstance,
@@ -39,6 +42,7 @@ from metricflow.sql.sql_exprs import (
     SqlFunctionExpression,
 )
 from metricflow.sql.sql_plan import SqlSelectColumn
+from metricflow.time.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -237,6 +241,123 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
             time_dimension_columns=time_dimension_cols,
             identifier_columns=identifier_cols,
         )
+
+
+@dataclass(frozen=True)
+class _DimensionValidityParams:
+    """Helper dataclass for managing dimension validity properties"""
+
+    dimension_name: str
+    time_granularity: TimeGranularity
+
+
+class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[ValidityWindowJoinDescription]]):
+    """Create and return a ValidityWindowJoinDescription based on the given InstanceSet
+
+    During join resolution we need to determien whether or not a given data set represents a
+    Type II SCD dataset - i.e., one with a validity window defined on each row. This requires
+    checking the set of dimension instances and determining whether or not those originate from
+    an SCD source, and extracting validity window information accordingly.
+    """
+
+    def __init__(self, data_source_semantics: DataSourceSemanticsAccessor) -> None:
+        """Initializer. The DataSourceSemanticsAccessor is needed for getting the original model definition."""
+        self._data_source_semantics = data_source_semantics
+
+    def _get_validity_dimensions_for_data_source(
+        self, data_source_name: str
+    ) -> Optional[Tuple[_DimensionValidityParams, _DimensionValidityParams]]:
+        """Returns a 2-tuple (start, end) of validity window dimensions info, if any exist in the data source"""
+        data_source = self._data_source_semantics.get(data_source_name=data_source_name)
+        assert data_source, f"Could not find data source with name {data_source_name} after data set conversion!"
+
+        validity_dims = [dim for dim in data_source.dimensions if dim.validity_params is not None]
+
+        if not validity_dims:
+            return None
+
+        start_dims = [dim for dim in validity_dims if dim.validity_params and dim.validity_params.is_start]
+        end_dims = [dim for dim in validity_dims if dim.validity_params and dim.validity_params.is_end]
+        assert len(start_dims) == 1, (
+            f"Error, found more than one validity window start dimension in data source `{data_source_name}`. "
+            f"This should have been blocked by model validation! Start dims: `{start_dims}`"
+        )
+        assert len(end_dims) == 1, (
+            f"Error, found more than one validity window end dimension in data source `{data_source_name}`. "
+            f"This should have been blocked by model validation! End dims: `{end_dims}`"
+        )
+        start_dim = start_dims[0]
+        end_dim = end_dims[0]
+
+        # TODO: clean up type_params optional state for Dimension (time dimension?) objects
+        assert start_dim.type_params, "Typechecker hint - validity info cannot exist without the type params"
+        assert end_dim.type_params, "Typechecker hint - validity info cannot exist without the type params"
+
+        return (
+            _DimensionValidityParams(
+                dimension_name=start_dim.name, time_granularity=start_dim.type_params.time_granularity
+            ),
+            _DimensionValidityParams(
+                dimension_name=end_dim.name, time_granularity=end_dim.type_params.time_granularity
+            ),
+        )
+
+    def transform(self, instance_set: InstanceSet) -> Optional[ValidityWindowJoinDescription]:
+        """Return find the Time Dimension specs defining a validity window, if any, and return it
+
+        This currently throws an exception if more than one such window is found, and effectively prevents
+        us from processing a dataset composed of a join between two SCD data sources. This restriction is in
+        place as a temporary simplification - if there is need for this feature we can enable it.
+        """
+        data_source_to_window: Dict[str, ValidityWindowJoinDescription] = {}
+        instances_by_data_source = bucket(
+            instance_set.time_dimension_instances, lambda x: x.origin_data_source_reference.data_source_name
+        )
+        for data_source_name in instances_by_data_source:
+            validity_dims = self._get_validity_dimensions_for_data_source(data_source_name=data_source_name)
+            if validity_dims is None:
+                continue
+
+            start_dim, end_dim = validity_dims
+            specs = {instance.spec for instance in instances_by_data_source[data_source_name]}
+            start_specs = [
+                spec
+                for spec in specs
+                if spec.element_name == start_dim.dimension_name and spec.time_granularity == start_dim.time_granularity
+            ]
+            end_specs = [
+                spec
+                for spec in specs
+                if spec.element_name == end_dim.dimension_name and spec.time_granularity == end_dim.time_granularity
+            ]
+            linkless_start_specs = {spec.without_identifier_links() for spec in start_specs}
+            linkless_end_specs = {spec.without_identifier_links() for spec in end_specs}
+            assert len(linkless_start_specs) == 1 and len(linkless_end_specs) == 1, (
+                f"Did not find exactly one pair of specs from data source `{data_source_name}` matching the validity "
+                f"window end points defined in the data source. This means we cannot process an SCD join, because we "
+                f"require exactly one validity window to be specified for the query! The window in the data source "
+                f"is defined by start dimension `{start_dim}` and end dimension `{end_dim}`. We found "
+                f"{len(linkless_start_specs)} linkless specs for window start ({linkless_start_specs}) and "
+                f"{len(linkless_end_specs)} linkless specs for window end ({linkless_end_specs})."
+            )
+            # SCD join targets are joined as dimension links in much the same was as partitions are joined. Therefore,
+            # we treat this like a partition time column join and take the dimension spec with the shortest set of
+            # identifier links so that the subquery uses the correct reference in the ON statement
+            start_specs = sorted(start_specs, key=lambda x: len(x.identifier_links))
+            end_specs = sorted(end_specs, key=lambda x: len(x.identifier_links))
+            data_source_to_window[data_source_name] = ValidityWindowJoinDescription(
+                window_start_dimension=start_specs[0], window_end_dimension=end_specs[0]
+            )
+
+        assert len(data_source_to_window) < 2, (
+            f"Found more than 1 set of validity window specs in the input instance set. This is not currently "
+            f"supported, as joins between SCD data sources are not yet allowed! {data_source_to_window}"
+        )
+
+        if data_source_to_window:
+            return list(data_source_to_window.values())[0]
+
+        return None
 
 
 class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):

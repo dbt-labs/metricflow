@@ -103,6 +103,24 @@ class DataSourceElementInstance(SerializableDataclass):  # noqa: D
     # This instance is derived from something defined in a data source.
     defined_from: Tuple[DataSourceElementReference, ...]
 
+    @property
+    def origin_data_source_reference(self) -> DataSourceElementReference:
+        """Property to grab the element reference pointing to the origin data source for this element instance
+
+        By convention this is the zeroth element in the Tuple. At this time these tuples are always of exactly
+        length 1, so the simple assertions here work.
+
+        TODO: make this a required input value, rather than a derived property on these objects
+        """
+        if len(self.defined_from) != 1:
+            raise ValueError(
+                f"DataSourceElementInstances should have exactly one entry in the `defined_from` property, because "
+                f"otherwise there is no way to ensure that the first element is always the origin data source! Found "
+                f"{len(self.defined_from)} elements in this particular instance: {self.defined_from}."
+            )
+
+        return self.defined_from[0]
+
 
 @dataclass(frozen=True)
 class MeasureInstance(MdoInstance[MeasureSpec], DataSourceElementInstance):  # noqa: D
