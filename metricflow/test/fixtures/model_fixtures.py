@@ -56,12 +56,17 @@ class ConsistentIdObjectRepository:
     composite_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]]
     composite_model_source_nodes: Sequence[BaseOutput[DataSourceDataSet]]
 
+    scd_model_data_sets: OrderedDict[str, DataSourceDataSet]
+    scd_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]]
+    scd_model_source_nodes: Sequence[BaseOutput[DataSourceDataSet]]
+
 
 @pytest.fixture(scope="session")
 def consistent_id_object_repository(
     simple_semantic_model: SemanticModel,
     multi_hop_join_semantic_model: SemanticModel,
     composite_identifier_semantic_model: SemanticModel,
+    scd_semantic_model: SemanticModel,
 ) -> ConsistentIdObjectRepository:  # noqa: D
     """Create objects that have incremental numeric IDs with a consistent value.
 
@@ -73,6 +78,7 @@ def consistent_id_object_repository(
         sm_data_sets = create_data_sets(simple_semantic_model)
         multihop_data_sets = create_data_sets(multi_hop_join_semantic_model)
         composite_data_sets = create_data_sets(composite_identifier_semantic_model)
+        scd_data_sets = create_data_sets(scd_semantic_model)
 
         return ConsistentIdObjectRepository(
             simple_model_data_sets=sm_data_sets,
@@ -83,6 +89,11 @@ def consistent_id_object_repository(
             composite_model_read_nodes=_data_set_to_read_nodes(composite_data_sets),
             composite_model_source_nodes=_data_set_to_source_nodes(
                 composite_identifier_semantic_model, composite_data_sets
+            ),
+            scd_model_data_sets=scd_data_sets,
+            scd_model_read_nodes=_data_set_to_read_nodes(scd_data_sets),
+            scd_model_source_nodes=_data_set_to_source_nodes(
+                semantic_model=scd_semantic_model, data_sets=scd_data_sets
             ),
         )
 
@@ -116,6 +127,7 @@ def template_mapping(mf_test_session_state: MetricFlowTestSessionState) -> Dict[
         "bookings_source_table": f"{schema}.fct_bookings",
         "views_source_table": f"{schema}.fct_views",
         "listings_latest_table": f"{schema}.dim_listings_latest",
+        "listings_table": f"{schema}.dim_listings",
         "listings_latest": f"{schema}.dim_listings_latest_table",
         "dim_listings_latest_table": f"{schema}.dim_listings_latest",
         "users_latest_table": f"{schema}.dim_users_latest",
@@ -123,12 +135,14 @@ def template_mapping(mf_test_session_state: MetricFlowTestSessionState) -> Dict[
         "fct_id_verifications_table": f"{schema}.fct_id_verifications",
         "fct_revenue_table": f"{schema}.fct_revenue",
         "dim_lux_listing_id_mapping_table": f"{schema}.dim_lux_listing_id_mapping",
+        "dim_lux_listings_table": f"{schema}.dim_lux_listings",
         "thorium_table": f"{schema}.thorium",
         "osmium_table": f"{schema}.osmium",
         "dysprosium_table": f"{schema}.dysprosium",
         "dim_companies_table": f"{schema}.dim_companies",
         "source_schema": schema,
         "accounts_source_table": f"{schema}.fct_accounts",
+        "primary_accounts_table": f"{schema}.dim_primary_accounts",
     }
 
 
@@ -235,6 +249,15 @@ def extended_date_semantic_model(mf_test_session_state: MetricFlowTestSessionSta
     model_build_result = parse_directory_of_yaml_files_to_model(
         os.path.join(os.path.dirname(__file__), "model_yamls/extended_date_model"),
         template_mapping=template_mapping,
+    )
+    return SemanticModel(model_build_result.model)
+
+
+@pytest.fixture(scope="session")
+def scd_semantic_model(template_mapping: Dict[str, str]) -> SemanticModel:
+    """Initialize semantic model for SCD tests"""
+    model_build_result = parse_directory_of_yaml_files_to_model(
+        os.path.join(os.path.dirname(__file__), "model_yamls/scd_model"), template_mapping=template_mapping
     )
     return SemanticModel(model_build_result.model)
 

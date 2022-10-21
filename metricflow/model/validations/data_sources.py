@@ -89,3 +89,101 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
                 )
 
         return issues
+
+
+class DataSourceValidityWindowRule(ModelValidationRule):
+    """Checks validity windows in data sources to ensure they comply with runtime requirements"""
+
+    @staticmethod
+    @validate_safely(whats_being_done="checking correctness of the time dimension validity parameters in the model")
+    def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:
+        """Checks the validity param definitions in every data source in the model"""
+        issues: List[ValidationIssueType] = []
+
+        for data_source in model.data_sources:
+            issues.extend(DataSourceValidityWindowRule._validate_data_source(data_source=data_source))
+
+        return issues
+
+    @staticmethod
+    @validate_safely(
+        whats_being_done="checking the data source's validity parameters for compatibility with runtime requirements"
+    )
+    def _validate_data_source(data_source: DataSource) -> List[ValidationIssueType]:
+        """Runs assertions on data sources with validity parameters set on one or more time dimensions"""
+
+        issues: List[ValidationIssueType] = []
+
+        validity_param_dims = [dim for dim in data_source.dimensions if dim.validity_params is not None]
+
+        if not validity_param_dims:
+            return issues
+
+        context = DataSourceContext(
+            file_context=FileContext.from_metadata(metadata=data_source.metadata),
+            data_source=DataSourceReference(data_source_name=data_source.name),
+        )
+        requirements = (
+            "Data sources using dimension validity params to define a validity window must have exactly two time "
+            "dimensions with validity params specified - one marked `is_start` and the other marked `is_end`."
+        )
+        validity_param_dimension_names = [dim.name for dim in validity_param_dims]
+        start_dim_names = [
+            dim.name for dim in validity_param_dims if dim.validity_params and dim.validity_params.is_start
+        ]
+        end_dim_names = [dim.name for dim in validity_param_dims if dim.validity_params and dim.validity_params.is_end]
+        num_start_dims = len(start_dim_names)
+        num_end_dims = len(end_dim_names)
+
+        if len(validity_param_dims) == 1 and num_start_dims == 1 and num_end_dims == 1:
+            # Defining a single point window, such as one might find in a daily snapshot table keyed on date,
+            # is not currently supported.
+            error = ValidationError(
+                context=context,
+                message=(
+                    f"Data source {data_source.name} has a single validity param dimension that defines its window: "
+                    f"`{validity_param_dimension_names[0]}`. This is not a currently supported configuration! "
+                    f"{requirements} If you have one column defining a window, as in a daily snapshot table, you can "
+                    f"define a separate dimension and increment the time value in the `expr` field as a work-around."
+                ),
+            )
+            issues.append(error)
+        elif len(validity_param_dims) != 2:
+            error = ValidationError(
+                context=context,
+                message=(
+                    f"Data source {data_source.name} has {len(validity_param_dims)} dimensions defined with validity "
+                    f"params. They are: {validity_param_dimension_names}. There must be either zero or two! "
+                    f"If you wish to define a validity window for this data source, please follow these requirements: "
+                    f"{requirements}"
+                ),
+            )
+            issues.append(error)
+        elif num_start_dims != 1 or num_end_dims != 1:
+            # Validity windows must define both a start and an end, and there should be exactly one
+            start_dim_names = []
+            error = ValidationError(
+                context=context,
+                message=(
+                    f"Data source {data_source.name} has two validity param dimensions defined, but does not have "
+                    f"exactly one each marked with is_start and is_end! Dimensions: {validity_param_dimension_names}. "
+                    f"is_start dimensions: {start_dim_names}. is_end dimensions: {end_dim_names}. {requirements}"
+                ),
+            )
+            issues.append(error)
+
+        if data_source.measures:
+            # Temporarily block measure definitions in data sources with validity windows set
+            measure_names = [measure.name for measure in data_source.measures]
+            error = ValidationError(
+                context=context,
+                message=(
+                    f"Data source {data_source.name} has both measures and validity param dimensions defined. This "
+                    f"is not currently supported! Please remove either the measures or the validity params. "
+                    f"Measure names: {measure_names}. Validity param dimension names: "
+                    f"{validity_param_dimension_names}."
+                ),
+            )
+            issues.append(error)
+
+        return issues

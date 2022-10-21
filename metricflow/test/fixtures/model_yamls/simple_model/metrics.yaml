@@ -496,3 +496,48 @@ metric:
   type_params:
     measures:
       - referred_bookings
+---
+metric:
+  name: "non_referred_bookings_pct"
+  description: "percentage of bookings that are not made through a referral"
+  owners:
+    - support@transformdata.io
+  type: derived
+  type_params:
+    expr: (bookings - ref_bookings) / bookings
+    metrics:
+      - name: referred_bookings
+        alias: ref_bookings
+      - name: bookings
+---
+metric:
+  name: bookings_per_lux_listing_derived
+  description: Bookings divided by listings - using derived metric type
+  owners:
+    - support@transformdata.io
+  type: derived
+  type_params:
+    expr: bookings / lux_listing
+    metrics:
+      - name: bookings
+      - name: listings
+        alias: lux_listing
+        constraint: is_lux_latest
+---
+metric:
+  name: "instant_plus_non_referred_bookings_pct"
+  description: |
+    percentage of bookings that are not made through a referral + instant booking pct,
+    used to test nested derived metrics.
+  owners:
+    - support@transformdata.io
+  type: derived
+  type_params:
+    expr: non_referred + (instant / bookings)
+    metrics:
+      - name: non_referred_bookings_pct
+        alias: non_referred
+      - name: instant_bookings
+        alias: instant
+      - name: bookings
+---

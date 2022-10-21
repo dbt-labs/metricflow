@@ -5,7 +5,11 @@
         <ComputeMetricsNode>
             <!-- description = Compute Metrics via Expressions -->
             <!-- node_id = cm_0 -->
-            <!-- metric_spec = MetricSpec(element_name='bookings') -->
+            <!-- metric_spec =                   -->
+            <!--   {'class': 'MetricSpec',       -->
+            <!--    'element_name': 'bookings',  -->
+            <!--    'constraint': None,          -->
+            <!--    'alias': None}               -->
             <AggregateMeasuresNode>
                 <!-- description = Aggregate Measures -->
                 <!-- node_id = am_0 -->
@@ -61,7 +65,8 @@
                                 <!--                           'element_name': 'listing',          -->
                                 <!--                           'identifier_links': ()},            -->
                                 <!--    'join_on_partition_dimensions': (),                        -->
-                                <!--    'join_on_partition_time_dimensions': ()}                   -->
+                                <!--    'join_on_partition_time_dimensions': (),                   -->
+                                <!--    'validity_window': None}                                   -->
                                 <FilterElementsNode>
                                     <!-- description =                              -->
                                     <!--   Pass Only Elements:                      -->

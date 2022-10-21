@@ -133,7 +133,12 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         self, query_spec: MetricFlowQuerySpec, output_sql_table: Optional[SqlTable] = None
     ) -> DataflowPlan[SqlDataSetT]:
         """Generate a plan for reading the results of a query with the given spec into a dataframe or table"""
-        metrics_output_node = self._build_metrics_output_node(query_spec)
+        metrics_output_node = self._build_metrics_output_node(
+            metric_specs=query_spec.metric_specs,
+            queried_linkable_specs=query_spec.linkable_specs,
+            where_constraint=query_spec.where_constraint,
+            time_range_constraint=query_spec.time_range_constraint,
+        )
 
         sink_node = DataflowPlanBuilder.build_sink_node_from_metrics_output_node(
             computed_metrics_output=metrics_output_node,
@@ -146,49 +151,74 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
 
         return DataflowPlan(plan_id=plan_id, sink_output_nodes=[sink_node])
 
-    def _build_metrics_output_node(self, query_spec: MetricFlowQuerySpec) -> ComputedMetricsOutput[SqlDataSetT]:
-        """Build a node that computes all requested metrics along with linkables."""
-
+    def _build_metrics_output_node(
+        self,
+        metric_specs: Sequence[MetricSpec],
+        queried_linkable_specs: LinkableSpecSet,
+        where_constraint: Optional[SpecWhereClauseConstraint] = None,
+        time_range_constraint: Optional[TimeRangeConstraint] = None,
+    ) -> ComputedMetricsOutput[SqlDataSetT]:
         compute_metrics_nodes: List[ComputedMetricsOutput[SqlDataSetT]] = []
-        for metric_spec in query_spec.metric_specs:
+        for metric_spec in metric_specs:
             logger.info(f"Generating compute metrics node for {metric_spec}")
             metric_reference = metric_spec.as_reference
             metric = self._metric_semantics.get_metric(metric_reference)
             metric_input_measure_specs = self._metric_semantics.measures_for_metric(metric_reference)
 
-            logger.info(
-                f"For {metric_spec}, needed measures are:\n"
-                f"{pformat_big_objects(metric_input_measure_specs=metric_input_measure_specs)}"
-            )
-
-            combined_where = query_spec.where_constraint
-            if metric.constraint:
-                metric_constraint = WhereConstraintConverter.convert_to_spec_where_constraint(
-                    self._data_source_semantics, metric.constraint
+            if metric.type == MetricType.DERIVED:
+                metric_input_specs = self._metric_semantics.metric_input_specs_for_metric(metric_reference)
+                logger.info(
+                    f"For derived metric: {metric_spec}, needed metrics are:\n"
+                    f"{pformat_big_objects(metric_input_specs=metric_input_specs)}"
                 )
-                if combined_where:
-                    combined_where = combined_where.combine(metric_constraint)
-                else:
-                    combined_where = metric_constraint
 
-            aggregated_measures_node = self.build_aggregated_measures(
-                metric_input_measure_specs=metric_input_measure_specs,
-                queried_linkable_specs=query_spec.linkable_specs,
-                where_constraint=combined_where,
-                time_range_constraint=query_spec.time_range_constraint,
-                cumulative=metric.type == MetricType.CUMULATIVE,
-                cumulative_window=metric.type_params.window if metric.type == MetricType.CUMULATIVE else None,
-                cumulative_grain_to_date=(
-                    metric.type_params.grain_to_date if metric.type == MetricType.CUMULATIVE else None
-                ),
-            )
-            compute_metrics_nodes.append(
-                self.build_computed_metrics_node(
-                    metric_spec=metric_spec,
-                    aggregated_measures_node=aggregated_measures_node,
+                compute_metric_node = self._build_metrics_output_node(
+                    metric_specs=metric_input_specs,
+                    queried_linkable_specs=queried_linkable_specs,
+                    where_constraint=where_constraint,
+                    time_range_constraint=time_range_constraint,
                 )
-            )
+                compute_metrics_nodes.append(
+                    ComputeMetricsNode[SqlDataSetT](
+                        parent_node=compute_metric_node,
+                        metric_specs=[metric_spec],
+                    )
+                )
+            else:
+                metric_input_measure_specs = self._metric_semantics.measures_for_metric(metric_reference)
 
+                logger.info(
+                    f"For {metric_spec}, needed measures are:\n"
+                    f"{pformat_big_objects(metric_input_measure_specs=metric_input_measure_specs)}"
+                )
+                combined_where = where_constraint
+                if metric.constraint:
+                    metric_constraint = WhereConstraintConverter.convert_to_spec_where_constraint(
+                        self._data_source_semantics, metric.constraint
+                    )
+                    combined_where = combined_where.combine(metric_constraint) if combined_where else metric_constraint
+
+                if metric_spec.constraint:
+                    combined_where = (
+                        combined_where.combine(metric_spec.constraint) if combined_where else metric_spec.constraint
+                    )
+                aggregated_measures_node = self.build_aggregated_measures(
+                    metric_input_measure_specs=metric_input_measure_specs,
+                    queried_linkable_specs=queried_linkable_specs,
+                    where_constraint=combined_where,
+                    time_range_constraint=time_range_constraint,
+                    cumulative=metric.type == MetricType.CUMULATIVE,
+                    cumulative_window=metric.type_params.window if metric.type == MetricType.CUMULATIVE else None,
+                    cumulative_grain_to_date=(
+                        metric.type_params.grain_to_date if metric.type == MetricType.CUMULATIVE else None
+                    ),
+                )
+                compute_metrics_nodes.append(
+                    self.build_computed_metrics_node(
+                        metric_spec=metric_spec,
+                        aggregated_measures_node=aggregated_measures_node,
+                    )
+                )
         if len(compute_metrics_nodes) == 1:
             return compute_metrics_nodes[0]
 
@@ -215,14 +245,18 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         linkable_spec: Optional[LinkableInstanceSpec] = dimension_spec or time_dimension_spec or identifier_spec
         assert linkable_spec
 
+        query_spec = MetricFlowQuerySpec(
+            metric_specs=metric_specs,
+            dimension_specs=(dimension_spec,) if dimension_spec else (),
+            time_dimension_specs=(time_dimension_spec,) if time_dimension_spec else (),
+            identifier_specs=(identifier_spec,) if identifier_spec else (),
+            time_range_constraint=time_range_constraint,
+        )
         metrics_output_node = self._build_metrics_output_node(
-            query_spec=MetricFlowQuerySpec(
-                metric_specs=metric_specs,
-                dimension_specs=(dimension_spec,) if dimension_spec else (),
-                time_dimension_specs=(time_dimension_spec,) if time_dimension_spec else (),
-                identifier_specs=(identifier_spec,) if identifier_spec else (),
-                time_range_constraint=time_range_constraint,
-            ),
+            metric_specs=query_spec.metric_specs,
+            queried_linkable_specs=query_spec.linkable_specs,
+            where_constraint=query_spec.where_constraint,
+            time_range_constraint=query_spec.time_range_constraint,
         )
 
         distinct_values_node = FilterElementsNode(
@@ -703,7 +737,6 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         if cumulative:
             time_range_node = JoinOverTimeRangeNode(
                 parent_node=filtered_measure_source_node,
-                metric_time_dimension_reference=self._metric_time_dimension_reference,
                 window=cumulative_window,
                 grain_to_date=cumulative_grain_to_date,
                 time_range_constraint=time_range_constraint,
@@ -718,7 +751,8 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             # Sanity check - all linkable specs should have a link, or else why would we be joining them.
             assert all([len(x.identifier_links) > 0 for x in join_recipe.satisfiable_linkable_specs])
 
-            # If we're joining something in, then we need the associated identifier and partitions.
+            # If we're joining something in, then we need the associated identifier, partitions, and time dimension
+            # specs defining the validity window (if necessary)
             include_specs: List[LinkableInstanceSpec] = [
                 LinklessIdentifierSpec.from_reference(x.identifier_links[0])
                 for x in join_recipe.satisfiable_linkable_specs
@@ -727,6 +761,13 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             include_specs.extend(
                 [x.node_to_join_time_dimension_spec for x in join_recipe.join_on_partition_time_dimensions]
             )
+            if join_recipe.validity_window:
+                include_specs.extend(
+                    [
+                        join_recipe.validity_window.window_start_dimension,
+                        join_recipe.validity_window.window_end_dimension,
+                    ]
+                )
 
             # satisfiable_linkable_specs describes what can be satisfied after the join, so remove the identifier
             # link when filtering before the join.
@@ -743,6 +784,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                     join_on_identifier=join_recipe.join_on_identifier,
                     join_on_partition_dimensions=join_recipe.join_on_partition_dimensions,
                     join_on_partition_time_dimensions=join_recipe.join_on_partition_time_dimensions,
+                    validity_window=join_recipe.validity_window,
                 )
             )
 

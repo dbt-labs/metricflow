@@ -214,6 +214,14 @@ class ReadSqlSourceNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
 
 
 @dataclass(frozen=True)
+class ValidityWindowJoinDescription:
+    """Encapsulates details about join constraints around validity windows"""
+
+    window_start_dimension: TimeDimensionSpec
+    window_end_dimension: TimeDimensionSpec
+
+
+@dataclass(frozen=True)
 class JoinDescription(Generic[SourceDataSetT]):
     """Describes how data from a node should be joined to data from another node."""
 
@@ -222,6 +230,8 @@ class JoinDescription(Generic[SourceDataSetT]):
 
     join_on_partition_dimensions: Tuple[PartitionDimensionJoinDescription, ...]
     join_on_partition_time_dimensions: Tuple[PartitionTimeDimensionJoinDescription, ...]
+
+    validity_window: Optional[ValidityWindowJoinDescription] = None
 
 
 class JoinToBaseOutputNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
@@ -282,7 +292,6 @@ class JoinOverTimeRangeNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT])
     def __init__(
         self,
         parent_node: BaseOutput[SourceDataSetT],
-        metric_time_dimension_reference: TimeDimensionReference,
         window: Optional[CumulativeMetricWindow],
         grain_to_date: Optional[TimeGranularity],
         node_id: Optional[NodeId] = None,
@@ -302,7 +311,6 @@ class JoinOverTimeRangeNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT])
         self._parent_node = parent_node
         self._grain_to_date = grain_to_date
         self._window = window
-        self._metric_time_dimension_reference = metric_time_dimension_reference
         self.time_range_constraint = time_range_constraint
 
         # Doing a list comprehension throws a type error, so doing it this way.
@@ -315,10 +323,6 @@ class JoinOverTimeRangeNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT])
 
     def accept(self, visitor: DataflowPlanNodeVisitor[SourceDataSetT, VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_join_over_time_range_node(self)
-
-    @property
-    def metric_time_dimension_reference(self) -> TimeDimensionReference:  # noqa: D
-        return self._metric_time_dimension_reference
 
     @property
     def grain_to_date(self) -> Optional[TimeGranularity]:  # noqa: D

@@ -11,6 +11,7 @@ from metricflow.dataflow.builder.node_evaluator import (
     JoinLinkableInstancesRecipe,
 )
 from metricflow.dataflow.builder.partitions import PartitionTimeDimensionJoinDescription
+from metricflow.dataflow.dataflow_plan import BaseOutput, ValidityWindowJoinDescription
 from metricflow.dataset.dataset import DataSet
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
@@ -56,26 +57,26 @@ def node_evaluator(
 
 
 def make_multihop_node_evaluator(
-    consistent_id_object_repository: ConsistentIdObjectRepository,
-    multihop_semantic_model: SemanticModel,
+    model_source_nodes: Sequence[BaseOutput[DataSourceDataSet]],
+    semantic_model_with_multihop_links: SemanticModel,
     desired_linkable_specs: Sequence[LinkableInstanceSpec],
     time_spine_source: TimeSpineSource,
 ) -> NodeEvaluatorForLinkableInstances:  # noqa: D
     """Return a node evaluator using the nodes in multihop_data_source_name_to_nodes"""
     node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
-        column_association_resolver=DefaultColumnAssociationResolver(multihop_semantic_model),
-        semantic_model=multihop_semantic_model,
+        column_association_resolver=DefaultColumnAssociationResolver(semantic_model_with_multihop_links),
+        semantic_model=semantic_model_with_multihop_links,
         time_spine_source=time_spine_source,
     )
 
     node_processor = PreDimensionJoinNodeProcessor(
-        data_source_semantics=multihop_semantic_model.data_source_semantics,
+        data_source_semantics=semantic_model_with_multihop_links.data_source_semantics,
         node_data_set_resolver=node_data_set_resolver,
     )
 
     nodes_available_for_joins = node_processor.remove_unnecessary_nodes(
         desired_linkable_specs=desired_linkable_specs,
-        nodes=consistent_id_object_repository.multihop_model_source_nodes,
+        nodes=model_source_nodes,
         metric_time_dimension_reference=DataSet.metric_time_dimension_reference(),
     )
 
@@ -84,7 +85,7 @@ def make_multihop_node_evaluator(
     )
 
     return NodeEvaluatorForLinkableInstances(
-        data_source_semantics=multihop_semantic_model.data_source_semantics,
+        data_source_semantics=semantic_model_with_multihop_links.data_source_semantics,
         nodes_available_for_joins=nodes_available_for_joins,
         node_data_set_resolver=node_data_set_resolver,
     )
@@ -383,8 +384,8 @@ def test_node_evaluator_with_multihop_joined_spec(  # noqa: D
     ]
 
     multihop_node_evaluator = make_multihop_node_evaluator(
-        consistent_id_object_repository=consistent_id_object_repository,
-        multihop_semantic_model=multi_hop_join_semantic_model,
+        model_source_nodes=consistent_id_object_repository.multihop_model_source_nodes,
+        semantic_model_with_multihop_links=multi_hop_join_semantic_model,
         desired_linkable_specs=linkable_specs,
         time_spine_source=time_spine_source,
     )
@@ -487,3 +488,214 @@ def test_node_evaluator_with_partition_joined_spec(  # noqa: D
         ),
         unjoinable_linkable_specs=(),
     )
+
+
+def test_node_evaluator_with_scd_target(
+    consistent_id_object_repository: ConsistentIdObjectRepository,
+    scd_semantic_model: SemanticModel,
+    time_spine_source: TimeSpineSource,
+) -> None:
+    """Tests the case where the joined node is an SCD with a validity window filter"""
+
+    node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
+        column_association_resolver=DefaultColumnAssociationResolver(scd_semantic_model),
+        semantic_model=scd_semantic_model,
+        time_spine_source=time_spine_source,
+    )
+
+    source_nodes = tuple(consistent_id_object_repository.scd_model_read_nodes.values())
+
+    node_evaluator = NodeEvaluatorForLinkableInstances(
+        data_source_semantics=scd_semantic_model.data_source_semantics,
+        # Use all nodes in the simple model as candidates for joins.
+        nodes_available_for_joins=source_nodes,
+        node_data_set_resolver=node_data_set_resolver,
+    )
+
+    evaluation = node_evaluator.evaluate_node(
+        required_linkable_specs=[
+            DimensionSpec(
+                element_name="is_lux",
+                identifier_links=(IdentifierReference(element_name="listing"),),
+            )
+        ],
+        start_node=consistent_id_object_repository.scd_model_read_nodes["bookings_source"],
+    )
+
+    assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
+        local_linkable_specs=(),
+        joinable_linkable_specs=(
+            DimensionSpec(
+                element_name="is_lux",
+                identifier_links=(IdentifierReference(element_name="listing"),),
+            ),
+        ),
+        join_recipes=(
+            JoinLinkableInstancesRecipe(
+                node_to_join=consistent_id_object_repository.scd_model_read_nodes["listings"],
+                join_on_identifier=LinklessIdentifierSpec.from_element_name("listing"),
+                satisfiable_linkable_specs=[
+                    DimensionSpec(
+                        element_name="is_lux",
+                        identifier_links=(IdentifierReference(element_name="listing"),),
+                    ),
+                ],
+                join_on_partition_dimensions=(),
+                join_on_partition_time_dimensions=(),
+                validity_window=ValidityWindowJoinDescription(
+                    window_start_dimension=TimeDimensionSpec(element_name="window_start", identifier_links=()),
+                    window_end_dimension=TimeDimensionSpec(element_name="window_end", identifier_links=()),
+                ),
+            ),
+        ),
+        unjoinable_linkable_specs=(),
+    )
+
+
+def test_node_evaluator_with_multi_hop_scd_target(
+    consistent_id_object_repository: ConsistentIdObjectRepository,
+    scd_semantic_model: SemanticModel,
+    time_spine_source: TimeSpineSource,
+) -> None:
+    """Tests the case where the joined node is an SCD reached through another node
+
+    The validity window should have an identifier link, the validity window join is mediated by an intervening
+    node, and so we need to refer to that column via the link prefix.
+    """
+    linkable_specs = [DimensionSpec.from_name("listing__lux_listing__is_confirmed_lux")]
+    node_evaluator = make_multihop_node_evaluator(
+        model_source_nodes=consistent_id_object_repository.scd_model_source_nodes,
+        semantic_model_with_multihop_links=scd_semantic_model,
+        desired_linkable_specs=linkable_specs,
+        time_spine_source=time_spine_source,
+    )
+
+    evaluation = node_evaluator.evaluate_node(
+        required_linkable_specs=linkable_specs,
+        start_node=consistent_id_object_repository.scd_model_read_nodes["bookings_source"],
+    )
+
+    assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
+        local_linkable_specs=(),
+        joinable_linkable_specs=(
+            DimensionSpec(
+                element_name="is_confirmed_lux",
+                identifier_links=(
+                    IdentifierReference(element_name="listing"),
+                    IdentifierReference(element_name="lux_listing"),
+                ),
+            ),
+        ),
+        join_recipes=(
+            JoinLinkableInstancesRecipe(
+                node_to_join=evaluation.join_recipes[0].node_to_join,
+                join_on_identifier=LinklessIdentifierSpec.from_element_name("listing"),
+                satisfiable_linkable_specs=[
+                    DimensionSpec(
+                        element_name="is_confirmed_lux",
+                        identifier_links=(
+                            IdentifierReference(element_name="listing"),
+                            IdentifierReference(element_name="lux_listing"),
+                        ),
+                    ),
+                ],
+                join_on_partition_dimensions=(),
+                join_on_partition_time_dimensions=(),
+                validity_window=ValidityWindowJoinDescription(
+                    window_start_dimension=TimeDimensionSpec(
+                        element_name="window_start", identifier_links=(IdentifierReference(element_name="lux_listing"),)
+                    ),
+                    window_end_dimension=TimeDimensionSpec(
+                        element_name="window_end", identifier_links=(IdentifierReference(element_name="lux_listing"),)
+                    ),
+                ),
+            ),
+        ),
+        unjoinable_linkable_specs=(),
+    )
+
+
+def test_node_evaluator_with_multi_hop_through_scd(
+    consistent_id_object_repository: ConsistentIdObjectRepository,
+    scd_semantic_model: SemanticModel,
+    time_spine_source: TimeSpineSource,
+) -> None:
+    """Tests the case where the joined node is reached via an SCD
+
+    The validity window should NOT have any identifier links, as the validity window join is not mediated by an
+    intervening node and therefore the column name does not use the link prefix.
+    """
+    linkable_specs = [DimensionSpec.from_name("listing__user__home_state_latest")]
+    node_evaluator = make_multihop_node_evaluator(
+        model_source_nodes=consistent_id_object_repository.scd_model_source_nodes,
+        semantic_model_with_multihop_links=scd_semantic_model,
+        desired_linkable_specs=linkable_specs,
+        time_spine_source=time_spine_source,
+    )
+
+    evaluation = node_evaluator.evaluate_node(
+        required_linkable_specs=linkable_specs,
+        start_node=consistent_id_object_repository.scd_model_read_nodes["bookings_source"],
+    )
+
+    assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
+        local_linkable_specs=(),
+        joinable_linkable_specs=(
+            DimensionSpec(
+                element_name="home_state_latest",
+                identifier_links=(
+                    IdentifierReference(element_name="listing"),
+                    IdentifierReference(element_name="user"),
+                ),
+            ),
+        ),
+        join_recipes=(
+            JoinLinkableInstancesRecipe(
+                node_to_join=evaluation.join_recipes[0].node_to_join,
+                join_on_identifier=LinklessIdentifierSpec.from_element_name("listing"),
+                satisfiable_linkable_specs=[
+                    DimensionSpec(
+                        element_name="home_state_latest",
+                        identifier_links=(
+                            IdentifierReference(element_name="listing"),
+                            IdentifierReference(element_name="user"),
+                        ),
+                    ),
+                ],
+                join_on_partition_dimensions=(),
+                join_on_partition_time_dimensions=(),
+                validity_window=ValidityWindowJoinDescription(
+                    window_start_dimension=TimeDimensionSpec(element_name="window_start", identifier_links=()),
+                    window_end_dimension=TimeDimensionSpec(element_name="window_end", identifier_links=()),
+                ),
+            ),
+        ),
+        unjoinable_linkable_specs=(),
+    )
+
+
+def test_node_evaluator_with_invalid_multi_hop_scd(
+    consistent_id_object_repository: ConsistentIdObjectRepository,
+    scd_semantic_model: SemanticModel,
+    time_spine_source: TimeSpineSource,
+) -> None:
+    """Tests the case where the joined node is reached via an illegal SCD <-> SCD join
+
+    This should fail with an exception, since such joins are not currently supported and we do not yet filter out
+    unsupported SCD <-> SCD join paths from the possible set of join recipes.
+    """
+    linkable_specs = [DimensionSpec.from_name("listing__user__account_type")]
+    node_evaluator = make_multihop_node_evaluator(
+        model_source_nodes=consistent_id_object_repository.scd_model_source_nodes,
+        semantic_model_with_multihop_links=scd_semantic_model,
+        desired_linkable_specs=linkable_specs,
+        time_spine_source=time_spine_source,
+    )
+
+    with pytest.raises(
+        AssertionError, match="Found more than 1 set of validity window specs in the input instance set"
+    ):
+        node_evaluator.evaluate_node(
+            required_linkable_specs=linkable_specs,
+            start_node=consistent_id_object_repository.scd_model_read_nodes["bookings_source"],
+        )
