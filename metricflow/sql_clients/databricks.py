@@ -175,7 +175,7 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
                     raise sql.exc.ServerOperationError(error)
 
                 if CLUSTER_ERROR_KEY in str_result:
-                    error = str_result.split("== Physical Plan ==")[1].split(";")[0]
+                    error = str(result[0]).split("== Physical Plan ==")[1].split(";")[0]
                     raise sql.exc.ServerOperationError(error)
 
     def create_table_from_dataframe(  # noqa: D
