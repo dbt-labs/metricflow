@@ -1,7 +1,7 @@
 import logging
 import math
 import pandas as pd
-
+from typing import SupportsFloat
 
 logger = logging.getLogger(__name__)
 
@@ -22,8 +22,8 @@ def _dataframes_contain_same_data(
             # NaNs can't be compared for equality.
             if pd.isna(expected.iloc[c, r]) and pd.isna(actual.iloc[c, r]):
                 pass
-            elif isinstance(expected.iloc[c, r], float) and isinstance(actual.iloc[c, r], float):
-                if not math.isclose(expected.iloc[c, r], actual.iloc[c, r]):
+            elif isinstance(expected.iloc[c, r], SupportsFloat) and isinstance(actual.iloc[c, r], SupportsFloat):
+                if not math.isclose(expected.iloc[c, r], actual.iloc[c, r], rel_tol=1e-6):
                     return False
             elif (
                 isinstance(expected.iloc[c, r], pd.Timestamp)
