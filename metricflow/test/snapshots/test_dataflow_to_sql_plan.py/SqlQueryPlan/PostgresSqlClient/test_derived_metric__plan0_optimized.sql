@@ -1,7 +1,7 @@
 -- Compute Metrics via Expressions
 SELECT
   metric_time
-  , (bookings - ref_bookings) / bookings AS non_referred_bookings_pct
+  , (bookings - ref_bookings) * 1.0 / bookings AS non_referred_bookings_pct
 FROM (
   -- Combine Metrics
   SELECT

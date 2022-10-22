@@ -1,7 +1,7 @@
 -- Compute Metrics via Expressions
 SELECT
   subq_22.metric_time
-  , non_referred + (instant / bookings) AS instant_plus_non_referred_bookings_pct
+  , non_referred + (instant * 1.0 / bookings) AS instant_plus_non_referred_bookings_pct
 FROM (
   -- Combine Metrics
   SELECT
@@ -13,7 +13,7 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       subq_10.metric_time
-      , (bookings - ref_bookings) / bookings AS non_referred
+      , (bookings - ref_bookings) * 1.0 / bookings AS non_referred
     FROM (
       -- Combine Metrics
       SELECT

@@ -496,7 +496,7 @@ integration_test:
   group_bys: ["metric_time"]
   check_query: |
     SELECT
-      (bookings - ref_bookings) / bookings AS non_referred_bookings_pct
+      (bookings - ref_bookings) / CAST(bookings AS {{ double_data_type_name }}) AS non_referred_bookings_pct
       , metric_time
     FROM (
       SELECT
@@ -516,7 +516,7 @@ integration_test:
   group_bys: ["metric_time"]
   check_query: |
     SELECT
-      bookings / lux_listings AS bookings_per_lux_listing_derived
+      bookings / CAST(NULLIF(lux_listings, 0) AS {{ double_data_type_name }}) AS bookings_per_lux_listing_derived
       , a.metric_time
     FROM (
       SELECT
@@ -545,7 +545,7 @@ integration_test:
   group_bys: ["metric_time"]
   check_query: |
     SELECT
-      (instant_bookings / bookings) + ((bookings - ref_bookings) / bookings) AS instant_plus_non_referred_bookings_pct
+      (instant_bookings / CAST(bookings AS {{ double_data_type_name }})) + ((bookings - ref_bookings) / CAST(bookings AS {{ double_data_type_name }})) AS instant_plus_non_referred_bookings_pct
       , metric_time
     FROM (
       SELECT

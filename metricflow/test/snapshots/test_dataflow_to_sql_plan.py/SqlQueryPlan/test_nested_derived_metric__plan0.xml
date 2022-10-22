@@ -6,10 +6,10 @@
         <!--   {'class': 'SqlSelectColumn',                            -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_473),  -->
         <!--    'column_alias': 'metric_time'}                         -->
-        <!-- col1 =                                                                                       -->
-        <!--   {'class': 'SqlSelectColumn',                                                               -->
-        <!--    'expr': SqlStringExpression(node_id=str_1 sql_expr=non_referred + (instant / bookings)),  -->
-        <!--    'column_alias': 'instant_plus_non_referred_bookings_pct'}                                 -->
+        <!-- col1 =                                                                                             -->
+        <!--   {'class': 'SqlSelectColumn',                                                                     -->
+        <!--    'expr': SqlStringExpression(node_id=str_1 sql_expr=non_referred + (instant * 1.0 / bookings)),  -->
+        <!--    'column_alias': 'instant_plus_non_referred_bookings_pct'}                                       -->
         <!-- from_source = SqlSelectStatementNode(node_id=ss_25) -->
         <!-- where = None -->
         <SqlSelectStatementNode>
@@ -52,10 +52,10 @@
                 <!--   {'class': 'SqlSelectColumn',                            -->
                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_345),  -->
                 <!--    'column_alias': 'metric_time'}                         -->
-                <!-- col1 =                                                                                        -->
-                <!--   {'class': 'SqlSelectColumn',                                                                -->
-                <!--    'expr': SqlStringExpression(node_id=str_0 sql_expr=(bookings - ref_bookings) / bookings),  -->
-                <!--    'column_alias': 'non_referred'}                                                            -->
+                <!-- col1 =                                                                                              -->
+                <!--   {'class': 'SqlSelectColumn',                                                                      -->
+                <!--    'expr': SqlStringExpression(node_id=str_0 sql_expr=(bookings - ref_bookings) * 1.0 / bookings),  -->
+                <!--    'column_alias': 'non_referred'}                                                                  -->
                 <!-- from_source = SqlSelectStatementNode(node_id=ss_15) -->
                 <!-- where = None -->
                 <SqlSelectStatementNode>
