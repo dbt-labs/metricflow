@@ -230,6 +230,7 @@ metric:
     tags:
       - "Finance"
       - "Monthly"
+    private: true
   type_params:
     measures:
       - txn_revenue
