@@ -39,7 +39,7 @@ jobs:
         run: poetry install
 
       - name: Generate JSON Schema
-        run: python3 metricflow/model/parsing/explicit_schema.py
+        run: python metricflow/model/parsing/explicit_schema.py
 
       - name: Schema Consistency Check
         run: |
