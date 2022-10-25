@@ -13,7 +13,7 @@ from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from metricflow.model.objects.elements.identifier import Identifier
 from metricflow.model.objects.elements.measure import Measure
-from metricflow.model.objects.metric import Metric, MetricInputMeasure, MetricType, MetricTypeParams
+from metricflow.model.objects.metric import Metric, MetricInput, MetricInputMeasure, MetricType, MetricTypeParams
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.parsing.dir_to_model import ModelBuildResult
 from metricflow.model.validations.validator_helpers import ModelValidationResults, ValidationError, ValidationIssue
@@ -246,6 +246,34 @@ class DbtManifestTransformer:
             constraint=where_clause_constraint,
         )
 
+    @classmethod
+    def build_derived_metric(cls, dbt_metric: DbtMetric) -> Metric:
+        """Attempt to build a derived metric for the given DbtMetric
+
+        Raises:
+            RuntimeError: A derived metric can't be built for non `derived` dbt metrics
+        """
+        print("\n------ In build_derived_metric")
+        if dbt_metric.calculation_method != "derived":
+            raise RuntimeError("Cannot build a MetricFlow proxy metric for `derived` DbtMetric")
+
+        where_clause_constraint: Optional[WhereClauseConstraint] = None
+        if dbt_metric.filters:
+            where_clause_constraint = WhereClauseConstraint(
+                where=cls.build_where_stmt_from_filters(filters=dbt_metric.filters),
+                linkable_names=[filter.field for filter in dbt_metric.filters],
+            )
+
+        print("metric name:", dbt_metric.name)
+        print("used metrics:", dbt_metric.metrics)
+        return Metric(
+            name=dbt_metric.name,
+            description=dbt_metric.description,
+            type=MetricType.DERIVED,
+            type_params=MetricTypeParams(metrics=[MetricInput(name=metric[0]) for metric in dbt_metric.metrics]),
+            constraint=where_clause_constraint,
+        )
+
     def dbt_metric_to_metricflow_elements(self, dbt_metric: DbtMetric) -> TransformedDbtMetric:
         """Builds a MetricFlow data source and proxy metric for the given DbtMetric"""
         data_source = self.build_data_source_for_metric(dbt_metric)
@@ -371,7 +399,7 @@ class DbtManifestTransformer:
         for dbt_metric in self.manifest.metrics.values():
             # TODO: Handle derived dbt metrics
             if dbt_metric.calculation_method == "derived":
-                continue
+                metrics.append(self.build_derived_metric(dbt_metric=dbt_metric))
             else:
                 transformed_dbt_metric = self.dbt_metric_to_metricflow_elements(dbt_metric=dbt_metric)
                 data_sources_map[transformed_dbt_metric.data_source.name].append(transformed_dbt_metric.data_source)
