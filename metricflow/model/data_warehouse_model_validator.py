@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from functools import partial
 from math import floor
 from time import perf_counter
+import traceback
 from typing import Callable, List, Optional, Tuple
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import BaseOutput, FilterElementsNode
@@ -448,6 +449,7 @@ class DataWarehouseModelValidator:
                     ValidationError(
                         context=task.context,
                         message=task.error_message + f"\nRecieved following error from data warehouse:\n{e}",
+                        extra_detail="".join(traceback.format_tb(e.__traceback__)),
                     )
                 )
                 if task.on_fail_subtasks:
