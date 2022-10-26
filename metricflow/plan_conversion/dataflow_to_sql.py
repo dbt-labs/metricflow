@@ -549,15 +549,6 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         """Return the next unique table alias to use in generating queries."""
         return IdGeneratorRegistry.for_class(self.__class__).create_id(prefix="subq")
 
-    @staticmethod
-    def _get_metric_time_instances_from_data_set(data_set: SqlDataSet) -> Sequence[TimeDimensionInstance]:
-        """Helper to extract the metric time instances from a given dataset"""
-        return tuple(
-            time_dimension_instance
-            for time_dimension_instance in data_set.instance_set.time_dimension_instances
-            if time_dimension_instance.spec.element_name == DataSet.metric_time_dimension_name()
-        )
-
     def visit_source_node(self, node: ReadSqlSourceNode[SqlDataSetT]) -> SqlDataSet:
         """Generate the SQL to read from the source."""
         return SqlDataSet(
@@ -576,7 +567,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
         metric_time_dimension_spec: Optional[TimeDimensionSpec] = None
         metric_time_dimension_instance: Optional[TimeDimensionInstance] = None
-        for instance in DataflowToSqlQueryPlanConverter._get_metric_time_instances_from_data_set(input_data_set):
+        for instance in input_data_set.metric_time_dimension_instances:
             if len(instance.spec.identifier_links) == 0:
                 metric_time_dimension_instance = instance
                 metric_time_dimension_spec = instance.spec
@@ -775,7 +766,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 # We fetch the metric time instance with the smallest granularity and shortest identifier link path,
                 # since this will be used in the ON statement for the join against the validity window.
                 from_data_set_metric_time_dimension_instances = sorted(
-                    DataflowToSqlQueryPlanConverter._get_metric_time_instances_from_data_set(data_set=from_data_set),
+                    from_data_set.metric_time_dimension_instances,
                     key=lambda x: (x.spec.time_granularity.to_int(), len(x.spec.identifier_links)),
                 )
                 assert from_data_set_metric_time_dimension_instances, (
@@ -1389,7 +1380,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         from_data_set_alias = self._next_unique_table_alias()
 
         time_dimension_instances_for_metric_time = sorted(
-            DataflowToSqlQueryPlanConverter._get_metric_time_instances_from_data_set(from_data_set),
+            from_data_set.metric_time_dimension_instances,
             key=lambda x: x.spec.time_granularity.to_int(),
         )
 

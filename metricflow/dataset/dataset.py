@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import logging
+from typing import Sequence
 
-from metricflow.instances import (
-    InstanceSet,
-)
+from metricflow.instances import InstanceSet, TimeDimensionInstance
 from metricflow.model.validations.unique_valid_name import MetricFlowReservedKeywords
 from metricflow.references import TimeDimensionReference
 from metricflow.specs import TimeDimensionSpec
@@ -24,6 +23,15 @@ class DataSet:
     def instance_set(self) -> InstanceSet:
         """Returns the instances contained in this dataset."""
         return self._instance_set
+
+    @property
+    def metric_time_dimension_instances(self) -> Sequence[TimeDimensionInstance]:
+        """Extracts all TimeDimensionInstances from the InstanceSet associated with this DataSet"""
+        return tuple(
+            time_dimension_instance
+            for time_dimension_instance in self.instance_set.time_dimension_instances
+            if time_dimension_instance.spec.element_name == DataSet.metric_time_dimension_name()
+        )
 
     @staticmethod
     def metric_time_dimension_reference() -> TimeDimensionReference:
