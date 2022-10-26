@@ -61,9 +61,7 @@ class DataSource(HashableBaseModel, ModelWithMetadataParsing):
     measures: Sequence[Measure] = []
     dimensions: Sequence[Dimension] = []
 
-    mutability: Mutability = Mutability(
-        type=MutabilityType.FULL_MUTATION, type_params=MutabilityTypeParams(update_cron="0 0,12 * * *")
-    )
+    mutability: Mutability = Mutability(type=MutabilityType.FULL_MUTATION)
 
     origin: DataSourceOrigin = DataSourceOrigin.SOURCE
     metadata: Optional[Metadata]
