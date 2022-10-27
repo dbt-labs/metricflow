@@ -212,7 +212,7 @@ def _make_aggregate_measures_join_condition(
 
 def _make_cumulative_metric_join_condition(
     from_data_set_alias: str,
-    from_data_set_identifier_col: str,
+    from_data_set_metric_time_col: str,
     right_data_set_alias: str,
     right_data_set_identifier_col: str,
     window: Optional[CumulativeMetricWindow],
@@ -223,7 +223,7 @@ def _make_cumulative_metric_join_condition(
             left_expr=SqlColumnReferenceExpression(
                 SqlColumnReference(
                     table_alias=from_data_set_alias,
-                    column_name=from_data_set_identifier_col,
+                    column_name=from_data_set_metric_time_col,
                 )
             ),
             comparison=SqlComparison.LESS_THAN_OR_EQUALS,
@@ -243,7 +243,7 @@ def _make_cumulative_metric_join_condition(
                 left_expr=SqlColumnReferenceExpression(
                     SqlColumnReference(
                         table_alias=from_data_set_alias,
-                        column_name=from_data_set_identifier_col,
+                        column_name=from_data_set_metric_time_col,
                     )
                 ),
                 comparison=SqlComparison.LESS_THAN_OR_EQUALS,
@@ -258,7 +258,7 @@ def _make_cumulative_metric_join_condition(
                 left_expr=SqlColumnReferenceExpression(
                     SqlColumnReference(
                         table_alias=from_data_set_alias,
-                        column_name=from_data_set_identifier_col,
+                        column_name=from_data_set_metric_time_col,
                     )
                 ),
                 comparison=SqlComparison.GREATER_THAN,
@@ -280,7 +280,7 @@ def _make_cumulative_metric_join_condition(
 
 def _make_grain_to_date_cumulative_metric_join_condition(
     from_data_set_alias: str,
-    from_data_set_identifier_col: str,
+    from_data_set_metric_time_col: str,
     right_data_set_alias: str,
     right_data_set_identifier_col: str,
     grain_to_date: TimeGranularity,
@@ -293,7 +293,7 @@ def _make_grain_to_date_cumulative_metric_join_condition(
                 left_expr=SqlColumnReferenceExpression(
                     SqlColumnReference(
                         table_alias=from_data_set_alias,
-                        column_name=from_data_set_identifier_col,
+                        column_name=from_data_set_metric_time_col,
                     )
                 ),
                 comparison=SqlComparison.LESS_THAN_OR_EQUALS,
@@ -308,7 +308,7 @@ def _make_grain_to_date_cumulative_metric_join_condition(
                 left_expr=SqlColumnReferenceExpression(
                     SqlColumnReference(
                         table_alias=from_data_set_alias,
-                        column_name=from_data_set_identifier_col,
+                        column_name=from_data_set_metric_time_col,
                     )
                 ),
                 comparison=SqlComparison.GREATER_THAN_OR_EQUALS,
@@ -496,8 +496,6 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         input_data_set = node.parent_node.accept(self)
         input_data_set_alias = self._next_unique_table_alias()
 
-        sql_join_descs: List[SqlJoinDescription] = []
-
         metric_time_dimension_spec: Optional[TimeDimensionSpec] = None
         metric_time_dimension_instance: Optional[TimeDimensionInstance] = None
         for instance in input_data_set.metric_time_dimension_instances:
@@ -511,10 +509,10 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         if metric_time_dimension_spec is None:
             return input_data_set
 
-        input_data_set_identifier_column_association = input_data_set.column_association_for_time_dimension(
+        input_data_set_metric_time_column_association = input_data_set.column_association_for_time_dimension(
             metric_time_dimension_spec
         )
-        input_data_set_identifier_col = input_data_set_identifier_column_association.column_name
+        input_data_set_metric_time_col = input_data_set_metric_time_column_association.column_name
 
         time_spine_data_set_alias = self._next_unique_table_alias()
 
@@ -545,7 +543,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         if node.window is not None:
             constrain_metric_time_column_condition_both = _make_cumulative_metric_join_condition(
                 input_data_set_alias,
-                input_data_set_identifier_col,
+                input_data_set_metric_time_col,
                 time_spine_data_set_alias,
                 time_spine_data_set_time_dimension_col,
                 node.window,
@@ -553,7 +551,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         elif node.grain_to_date is not None:
             constrain_metric_time_column_condition_both = _make_grain_to_date_cumulative_metric_join_condition(
                 input_data_set_alias,
-                input_data_set_identifier_col,
+                input_data_set_metric_time_col,
                 time_spine_data_set_alias,
                 time_spine_data_set_time_dimension_col,
                 node.grain_to_date,
@@ -561,19 +559,19 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         elif node.window is None:  # `window is None` for clarity (could be else since we have window and !window)
             constrain_metric_time_column_condition_both = _make_cumulative_metric_join_condition(
                 input_data_set_alias,
-                input_data_set_identifier_col,
+                input_data_set_metric_time_col,
                 time_spine_data_set_alias,
                 time_spine_data_set_time_dimension_col,
                 None,
             )
 
-        sql_join_descs.append(
+        sql_join_descs: Tuple[SqlJoinDescription] = (
             SqlJoinDescription(
                 right_source=input_data_set.sql_select_node,
                 right_source_alias=input_data_set_alias,
                 on_condition=constrain_metric_time_column_condition_both,
                 join_type=SqlJoinType.INNER,
-            )
+            ),
         )
 
         modified_input_instance_set = InstanceSet(
@@ -607,7 +605,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 ),
                 from_source=time_spine_data_set.sql_select_node,
                 from_source_alias=time_spine_data_set_alias,
-                joins_descs=tuple(sql_join_descs),
+                joins_descs=sql_join_descs,
                 group_bys=(),
                 where=None,
                 order_bys=(),
