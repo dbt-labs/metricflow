@@ -26,7 +26,7 @@ class DataSet:
 
     @property
     def metric_time_dimension_instances(self) -> Sequence[TimeDimensionInstance]:
-        """Extracts all TimeDimensionInstances from the InstanceSet associated with this DataSet"""
+        """Extracts all metric time TimeDimensionInstances from the InstanceSet associated with this DataSet"""
         return tuple(
             time_dimension_instance
             for time_dimension_instance in self.instance_set.time_dimension_instances

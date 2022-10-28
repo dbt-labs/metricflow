@@ -36,7 +36,7 @@ from metricflow.instances import (
     MetricModelReference,
     TimeDimensionInstance,
 )
-from metricflow.model.objects.metric import CumulativeMetricWindow, MetricType
+from metricflow.model.objects.metric import MetricType
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.object_utils import assert_values_exhausted
 from metricflow.plan_conversion.instance_converters import (
@@ -62,7 +62,11 @@ from metricflow.plan_conversion.spec_transforms import (
     SelectOnlyLinkableSpecs,
 )
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
-from metricflow.plan_conversion.sql_join_builder import ColumnEqualityDescription, SqlQueryPlanJoinBuilder
+from metricflow.plan_conversion.sql_join_builder import (
+    ColumnEqualityDescription,
+    SqlQueryPlanJoinBuilder,
+    AnnotatedSqlDataSet,
+)
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlEngineAttributes, SqlEngine
 from metricflow.specs import (
@@ -86,7 +90,6 @@ from metricflow.sql.sql_exprs import (
     SqlLogicalOperator,
     SqlStringExpression,
     SqlCastToTimestampExpression,
-    SqlTimeDeltaExpression,
     SqlRatioComputationExpression,
     SqlDateTruncExpression,
     SqlStringLiteralExpression,
@@ -104,7 +107,6 @@ from metricflow.sql.sql_plan import (
     SqlTableFromClauseNode,
 )
 from metricflow.time.time_constants import ISO8601_PYTHON_FORMAT
-from metricflow.time.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -207,124 +209,6 @@ def _make_aggregate_measures_join_condition(
     return SqlLogicalExpression(
         operator=SqlLogicalOperator.AND,
         args=tuple(join_conditions),
-    )
-
-
-def _make_cumulative_metric_join_condition(
-    from_data_set_alias: str,
-    from_data_set_metric_time_col: str,
-    right_data_set_alias: str,
-    right_data_set_identifier_col: str,
-    window: Optional[CumulativeMetricWindow],
-) -> SqlExpressionNode:
-    """Creates SqlLogicalExpression representing a cumulative metric self-join condition"""
-    if window is None:  # accumulate over all time
-        return SqlComparisonExpression(
-            left_expr=SqlColumnReferenceExpression(
-                SqlColumnReference(
-                    table_alias=from_data_set_alias,
-                    column_name=from_data_set_metric_time_col,
-                )
-            ),
-            comparison=SqlComparison.LESS_THAN_OR_EQUALS,
-            right_expr=SqlColumnReferenceExpression(
-                SqlColumnReference(
-                    table_alias=right_data_set_alias,
-                    column_name=right_data_set_identifier_col,
-                )
-            ),
-        )
-
-    # ds <= <date> and  ds > <date> - <window>
-    return SqlLogicalExpression(
-        operator=SqlLogicalOperator.AND,
-        args=(
-            SqlComparisonExpression(
-                left_expr=SqlColumnReferenceExpression(
-                    SqlColumnReference(
-                        table_alias=from_data_set_alias,
-                        column_name=from_data_set_metric_time_col,
-                    )
-                ),
-                comparison=SqlComparison.LESS_THAN_OR_EQUALS,
-                right_expr=SqlColumnReferenceExpression(
-                    SqlColumnReference(
-                        table_alias=right_data_set_alias,
-                        column_name=right_data_set_identifier_col,
-                    )
-                ),
-            ),
-            SqlComparisonExpression(
-                left_expr=SqlColumnReferenceExpression(
-                    SqlColumnReference(
-                        table_alias=from_data_set_alias,
-                        column_name=from_data_set_metric_time_col,
-                    )
-                ),
-                comparison=SqlComparison.GREATER_THAN,
-                right_expr=SqlTimeDeltaExpression(
-                    SqlColumnReferenceExpression(
-                        SqlColumnReference(
-                            table_alias=right_data_set_alias,
-                            column_name=right_data_set_identifier_col,
-                        )
-                    ),
-                    count=window.count,
-                    granularity=window.granularity,
-                    grain_to_date=None,
-                ),
-            ),
-        ),
-    )
-
-
-def _make_grain_to_date_cumulative_metric_join_condition(
-    from_data_set_alias: str,
-    from_data_set_metric_time_col: str,
-    right_data_set_alias: str,
-    right_data_set_identifier_col: str,
-    grain_to_date: TimeGranularity,
-) -> SqlLogicalExpression:
-    """Creates SqlLogicalExpression representing a grain_to_date cumulative metric self-join condition"""
-    return SqlLogicalExpression(
-        operator=SqlLogicalOperator.AND,
-        args=(
-            SqlComparisonExpression(
-                left_expr=SqlColumnReferenceExpression(
-                    SqlColumnReference(
-                        table_alias=from_data_set_alias,
-                        column_name=from_data_set_metric_time_col,
-                    )
-                ),
-                comparison=SqlComparison.LESS_THAN_OR_EQUALS,
-                right_expr=SqlColumnReferenceExpression(
-                    SqlColumnReference(
-                        table_alias=right_data_set_alias,
-                        column_name=right_data_set_identifier_col,
-                    )
-                ),
-            ),
-            SqlComparisonExpression(
-                left_expr=SqlColumnReferenceExpression(
-                    SqlColumnReference(
-                        table_alias=from_data_set_alias,
-                        column_name=from_data_set_metric_time_col,
-                    )
-                ),
-                comparison=SqlComparison.GREATER_THAN_OR_EQUALS,
-                right_expr=SqlTimeDeltaExpression(
-                    SqlColumnReferenceExpression(
-                        SqlColumnReference(
-                            table_alias=right_data_set_alias,
-                            column_name=right_data_set_identifier_col,
-                        )
-                    ),
-                    count=0,
-                    granularity=grain_to_date,
-                    grain_to_date=grain_to_date,
-                ),
-            ),
-        ),
     )
 
 
@@ -509,11 +393,6 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         if metric_time_dimension_spec is None:
             return input_data_set
 
-        input_data_set_metric_time_column_association = input_data_set.column_association_for_time_dimension(
-            metric_time_dimension_spec
-        )
-        input_data_set_metric_time_col = input_data_set_metric_time_column_association.column_name
-
         time_spine_data_set_alias = self._next_unique_table_alias()
 
         metric_time_dimension_column_name = self.column_association_resolver.resolve_time_dimension_spec(
@@ -531,47 +410,28 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         )
         table_alias_to_instance_set[time_spine_data_set_alias] = time_spine_data_set.instance_set
 
-        # Figure out which columns in the "right" data set correspond to the time dimension that we want to join on.
+        # Figure out which columns correspond to the time dimension that we want to join on.
+        input_data_set_metric_time_column_association = input_data_set.column_association_for_time_dimension(
+            metric_time_dimension_spec
+        )
+        input_data_set_metric_time_col = input_data_set_metric_time_column_association.column_name
+
         time_spine_data_set_column_associations = time_spine_data_set.column_association_for_time_dimension(
             metric_time_dimension_spec
         )
         time_spine_data_set_time_dimension_col = time_spine_data_set_column_associations.column_name
 
-        # Build an expression like "a.ds <= b.ds AND a.ds >= b.ds - <window>
-        # If no window is present we join across all time -> "a.ds <= b.ds"
-        constrain_metric_time_column_condition_both: Optional[SqlExpressionNode] = None
-        if node.window is not None:
-            constrain_metric_time_column_condition_both = _make_cumulative_metric_join_condition(
-                input_data_set_alias,
-                input_data_set_metric_time_col,
-                time_spine_data_set_alias,
-                time_spine_data_set_time_dimension_col,
-                node.window,
-            )
-        elif node.grain_to_date is not None:
-            constrain_metric_time_column_condition_both = _make_grain_to_date_cumulative_metric_join_condition(
-                input_data_set_alias,
-                input_data_set_metric_time_col,
-                time_spine_data_set_alias,
-                time_spine_data_set_time_dimension_col,
-                node.grain_to_date,
-            )
-        elif node.window is None:  # `window is None` for clarity (could be else since we have window and !window)
-            constrain_metric_time_column_condition_both = _make_cumulative_metric_join_condition(
-                input_data_set_alias,
-                input_data_set_metric_time_col,
-                time_spine_data_set_alias,
-                time_spine_data_set_time_dimension_col,
-                None,
-            )
+        annotated_input_data_set = AnnotatedSqlDataSet(
+            data_set=input_data_set, alias=input_data_set_alias, _metric_time_column_name=input_data_set_metric_time_col
+        )
+        annotated_time_spine_data_set = AnnotatedSqlDataSet(
+            data_set=time_spine_data_set,
+            alias=time_spine_data_set_alias,
+            _metric_time_column_name=time_spine_data_set_time_dimension_col,
+        )
 
-        sql_join_descs: Tuple[SqlJoinDescription] = (
-            SqlJoinDescription(
-                right_source=input_data_set.sql_select_node,
-                right_source_alias=input_data_set_alias,
-                on_condition=constrain_metric_time_column_condition_both,
-                join_type=SqlJoinType.INNER,
-            ),
+        join_desc = SqlQueryPlanJoinBuilder.make_cumulative_metric_time_range_join_description(
+            node=node, metric_data_set=annotated_input_data_set, time_spine_data_set=annotated_time_spine_data_set
         )
 
         modified_input_instance_set = InstanceSet(
@@ -605,7 +465,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 ),
                 from_source=time_spine_data_set.sql_select_node,
                 from_source_alias=time_spine_data_set_alias,
-                joins_descs=sql_join_descs,
+                joins_descs=(join_desc,),
                 group_bys=(),
                 where=None,
                 order_bys=(),
