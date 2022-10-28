@@ -14,7 +14,7 @@ materialization_location_values += materialization_location_tableau_values
 materialization_format_values = ["WIDE"]
 materialization_format_values += [x.lower() for x in materialization_format_values]
 
-metric_types_enum_values = ["MEASURE_PROXY", "RATIO", "EXPR", "CUMULATIVE"]
+metric_types_enum_values = ["MEASURE_PROXY", "RATIO", "EXPR", "CUMULATIVE", "DERIVED"]
 metric_types_enum_values += [x.lower() for x in metric_types_enum_values]
 
 mutability_type_values = ["IMMUTABLE", "APPEND_ONLY", "FULL_MUTATION", "DS_APPEND_ONLY"]
@@ -84,6 +84,22 @@ metric_input_measure_schema = {
     ],
 }
 
+metric_input_schema = {
+    "$id": "metric_input_schema",
+    "oneOf": [
+        {"type": "string"},
+        {
+            "type": "object",
+            "properties": {
+                "name": {"type": "string"},
+                "constraint": {"type": "string"},
+                "alias": {"type": "string"},
+            },
+            "additionalProperties": False,
+        },
+    ],
+}
+
 metric_type_params_schema = {
     "$id": "metric_type_params",
     "type": "object",
@@ -98,6 +114,10 @@ metric_type_params_schema = {
         "expr": {"type": ["string", "boolean"]},
         "window": {"type": "string"},
         "grain_to_date": {"type": "string"},
+        "metrics": {
+            "type": "array",
+            "items": {"$ref": "metric_input_schema"},
+        },
     },
     "additionalProperties": False,
 }
@@ -134,6 +154,16 @@ identifier_schema = {
     "required": ["name", "type"],
 }
 
+validity_params_schema = {
+    "$id": "validity_params_schema",
+    "type": "object",
+    "properties": {
+        "is_start": {"type": "boolean"},
+        "is_end": {"type": "boolean"},
+    },
+    "additionalProperties": False,
+}
+
 dimension_type_params_schema = {
     "$id": "dimension_type_params_schema",
     "type": "object",
@@ -141,6 +171,7 @@ dimension_type_params_schema = {
         "is_primary": {"type": "boolean"},
         "time_format": {"type": "string"},
         "time_granularity": {"enum": time_granularity_values},
+        "validity_params": {"$ref": "validity_params_schema"},
     },
     "additionalProperties": False,
     "required": ["time_granularity"],
@@ -330,12 +361,14 @@ schema_store = {
     identifier_schema["$id"]: identifier_schema,
     measure_schema["$id"]: measure_schema,
     dimension_schema["$id"]: dimension_schema,
+    validity_params_schema["$id"]: validity_params_schema,
     dimension_type_params_schema["$id"]: dimension_type_params_schema,
     mutability_schema["$id"]: mutability_schema,
     mutability_type_params_schema["$id"]: mutability_type_params_schema,
     composite_sub_identifier_schema["$id"]: composite_sub_identifier_schema,
     materialization_destination_schema["$id"]: materialization_destination_schema,
     non_additive_dimension_schema["$id"]: non_additive_dimension_schema,
+    metric_input_schema["$id"]: metric_input_schema,
 }
 
 

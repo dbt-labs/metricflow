@@ -10,15 +10,18 @@ import pandas as pd
 import sqlalchemy
 from sqlalchemy.exc import ProgrammingError
 
-from metricflow.protocols.sql_client import SqlEngine, SqlEngineAttributes
+from metricflow.protocols.sql_client import SqlEngine, SqlIsolationLevel
+from metricflow.protocols.sql_client import SqlEngineAttributes
+from metricflow.protocols.sql_request import SqlRequestTagSet
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql_clients.common_client import SqlDialect, not_empty
+from metricflow.sql_clients.async_request import SqlStatementCommentMetadata
+from metricflow.sql_clients.common_client import SqlDialect, not_empty, check_isolation_level
 from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
 
 
-class SnowflakeEngineAttributes(SqlEngineAttributes):
+class SnowflakeEngineAttributes:
     """Engine-specific attributes for the Snowflake query engine
 
     This is an implementation of the SqlEngineAttributes protocol for Snowflake
@@ -27,6 +30,7 @@ class SnowflakeEngineAttributes(SqlEngineAttributes):
     sql_engine_type: ClassVar[SqlEngine] = SqlEngine.SNOWFLAKE
 
     # SQL Engine capabilities
+    supported_isolation_levels: ClassVar[Sequence[SqlIsolationLevel]] = ()
     date_trunc_supported: ClassVar[bool] = True
     full_outer_joins_supported: ClassVar[bool] = True
     indexes_supported: ClassVar[bool] = False
@@ -38,6 +42,7 @@ class SnowflakeEngineAttributes(SqlEngineAttributes):
     # SQL Dialect replacement strings
     double_data_type_name: ClassVar[str] = "DOUBLE"
     timestamp_type_name: ClassVar[Optional[str]] = "TIMESTAMP"
+    random_function_name: ClassVar[str] = "RANDOM"
 
     # MetricFlow attributes
     sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer] = DefaultSqlQueryPlanRenderer()
@@ -155,7 +160,9 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
         return SnowflakeEngineAttributes()
 
     @contextmanager
-    def engine_connection(self, engine: sqlalchemy.engine.Engine) -> Iterator[sqlalchemy.engine.Connection]:
+    def engine_connection(
+        self, engine: sqlalchemy.engine.Engine, isolation_level: Optional[SqlIsolationLevel] = None
+    ) -> Iterator[sqlalchemy.engine.Connection]:
         """Context Manager for providing a configured connection.
 
         Snowflake allows setting a WEEK_START parameter on each session. This forces the value to be
@@ -163,8 +170,8 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
         options construct, which the DBClient could read in at initialization and use here (for example).
         At this time we hard-code the ISO standard.
         """
-
-        with super().engine_connection(self._engine) as conn:
+        check_isolation_level(self, isolation_level)
+        with super().engine_connection(self._engine, isolation_level=isolation_level) as conn:
             # WEEK_START 1 means Monday.
             conn.execute("ALTER SESSION SET WEEK_START = 1;")
             results = conn.execute("SELECT CURRENT_SESSION()")
@@ -183,9 +190,11 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
         self,
         stmt: str,
         bind_params: SqlBindParameters = SqlBindParameters(),
+        isolation_level: Optional[SqlIsolationLevel] = None,
         allow_re_auth: bool = True,
     ) -> pd.DataFrame:
-        with self.engine_connection(engine=self._engine) as conn:
+        check_isolation_level(self, isolation_level)
+        with self.engine_connection(engine=self._engine, isolation_level=isolation_level) as conn:
             try:
                 return pd.read_sql_query(sqlalchemy.text(stmt), conn, params=bind_params.param_dict)
             except ProgrammingError as e:
@@ -197,13 +206,18 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
                         self._engine.dispose()
                         self._engine = self._create_engine()
                     # this was our one chance to re-auth
-                    return self._query(stmt, allow_re_auth=False, bind_params=bind_params)
+                    return self._query(
+                        stmt, allow_re_auth=False, bind_params=bind_params, isolation_level=isolation_level
+                    )
                 raise e
 
-    def _engine_specific_query_implementation(  # noqa: D
-        self, stmt: str, bind_params: SqlBindParameters
+    def _engine_specific_query_implementation(
+        self,
+        stmt: str,
+        bind_params: SqlBindParameters,
+        isolation_level: Optional[SqlIsolationLevel] = None,
     ) -> pd.DataFrame:
-        return self._query(stmt, bind_params)
+        return self._query(stmt, bind_params, isolation_level)
 
     def list_tables(self, schema_name: str) -> Sequence[str]:  # noqa: D
         df = self.query(
@@ -239,3 +253,27 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
                 for session_id in self._known_session_ids:
                     logger.info(f"Cancelling queries associated with session id: {session_id}")
                     conn.execute(f"SELECT SYSTEM$cancel_all_queries({session_id})")
+
+    def cancel_request(self, pattern_tag_set: SqlRequestTagSet) -> int:  # noqa: D
+        # Running queries have an end_time set to the epoch time:
+        # https://docs.snowflake.com/en/sql-reference/functions/query_history.html
+        # Using '1970-01-01' to avoid timezone issues.
+        result = self.query(
+            """
+            SELECT query_id, query_text
+            FROM TABLE(INFORMATION_SCHEMA.QUERY_HISTORY())
+            WHERE end_time <= '1971-01-01'
+            ORDER BY start_time
+            LIMIT 100
+            """
+        )
+        num_cancelled_queries = 0
+        for query_id, query_text in result.values:
+            tag_set = SqlStatementCommentMetadata.parse_tag_metadata_in_comments(query_text)
+
+            if tag_set and pattern_tag_set.is_subset_of(tag_set):
+                logger.info(f"Cancelling query ID: {query_id}")
+                self.execute(f"SELECT SYSTEM$CANCEL_QUERY('{query_id}')")
+                num_cancelled_queries += 1
+
+        return num_cancelled_queries

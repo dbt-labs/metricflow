@@ -1,13 +1,15 @@
 import logging
 import threading
-from typing import ClassVar, Optional
+from typing import ClassVar, Optional, Sequence
 
 import pandas as pd
 import sqlalchemy
 from sqlalchemy.pool import StaticPool
 
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.protocols.sql_client import SqlEngine, SqlEngineAttributes
+from metricflow.protocols.sql_client import SqlEngine, SqlIsolationLevel
+from metricflow.protocols.sql_client import SqlEngineAttributes
+from metricflow.protocols.sql_request import SqlRequestTagSet
 from metricflow.sql.render.duckdb_renderer import DuckDbSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
@@ -17,12 +19,13 @@ from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
 logger = logging.getLogger(__name__)
 
 
-class DuckDbEngineAttributes(SqlEngineAttributes):
+class DuckDbEngineAttributes:
     """Engine-specific attributes for the DuckDb query engine"""
 
     sql_engine_type: ClassVar[SqlEngine] = SqlEngine.DUCKDB
 
     # SQL Engine capabilities
+    supported_isolation_levels: ClassVar[Sequence[SqlIsolationLevel]] = ()
     date_trunc_supported: ClassVar[bool] = True
     full_outer_joins_supported: ClassVar[bool] = True
     indexes_supported: ClassVar[bool] = True
@@ -35,6 +38,7 @@ class DuckDbEngineAttributes(SqlEngineAttributes):
     # SQL Dialect replacement strings
     double_data_type_name: ClassVar[str] = "DOUBLE"
     timestamp_type_name: ClassVar[Optional[str]] = "TIMESTAMP"
+    random_function_name: ClassVar[str] = "RANDOM"
 
     # MetricFlow attributes
     sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer] = DuckDbSqlQueryPlanRenderer()
@@ -76,14 +80,23 @@ class DuckDbSqlClient(SqlAlchemySqlClient):
         raise NotImplementedError
 
     def _engine_specific_query_implementation(  # noqa: D
-        self, stmt: str, bind_params: SqlBindParameters
+        self,
+        stmt: str,
+        bind_params: SqlBindParameters,
+        isolation_level: Optional[SqlIsolationLevel] = None,
     ) -> pd.DataFrame:
         with self._concurrency_lock:
-            return super()._engine_specific_query_implementation(stmt=stmt, bind_params=bind_params)
+            return super()._engine_specific_query_implementation(
+                stmt=stmt, bind_params=bind_params, isolation_level=isolation_level
+            )
 
-    def _engine_specific_execute_implementation(self, stmt: str, bind_params: SqlBindParameters) -> None:  # noqa: D
+    def _engine_specific_execute_implementation(  # noqa: D
+        self, stmt: str, bind_params: SqlBindParameters, isolation_level: Optional[SqlIsolationLevel] = None
+    ) -> None:
         with self._concurrency_lock:
-            return super()._engine_specific_execute_implementation(stmt=stmt, bind_params=bind_params)
+            return super()._engine_specific_execute_implementation(
+                stmt=stmt, bind_params=bind_params, isolation_level=isolation_level
+            )
 
     def _engine_specific_dry_run_implementation(self, stmt: str, bind_params: SqlBindParameters) -> None:  # noqa: D
         with self._concurrency_lock:
@@ -98,3 +111,6 @@ class DuckDbSqlClient(SqlAlchemySqlClient):
                 df=df,
                 chunk_size=chunk_size,
             )
+
+    def cancel_request(self, pattern_tag_set: SqlRequestTagSet) -> int:  # noqa: D
+        raise NotImplementedError

@@ -138,11 +138,13 @@ def test_case(
     unpartitioned_multi_hop_join_semantic_model: SemanticModel,
     multi_hop_join_semantic_model: SemanticModel,
     extended_date_semantic_model: SemanticModel,
+    scd_semantic_model: SemanticModel,
     sql_client: SqlClient,
     create_simple_model_tables: bool,
     create_message_source_tables: bool,
     create_bridge_table: bool,
     create_extended_date_model_tables: bool,
+    create_scd_model_tables: bool,
     time_spine_source: TimeSpineSource,
 ) -> None:
     """Runs all integration tests configured in the test case YAML directory."""
@@ -166,6 +168,8 @@ def test_case(
         semantic_model = multi_hop_join_semantic_model
     elif case.model is IntegrationTestModel.EXTENDED_DATE_MODEL:
         semantic_model = extended_date_semantic_model
+    elif case.model is IntegrationTestModel.SCD_MODEL:
+        semantic_model = scd_semantic_model
     else:
         assert_values_exhausted(case.model)
 

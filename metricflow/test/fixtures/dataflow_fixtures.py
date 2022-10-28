@@ -64,6 +64,21 @@ def multihop_dataflow_plan_builder(  # noqa: D
     )
 
 
+@pytest.fixture
+def scd_dataflow_plan_builder(  # noqa: D
+    scd_semantic_model: SemanticModel,
+    consistent_id_object_repository: ConsistentIdObjectRepository,
+    time_spine_source: TimeSpineSource,
+) -> DataflowPlanBuilder[DataSourceDataSet]:
+
+    return DataflowPlanBuilder(
+        source_nodes=consistent_id_object_repository.scd_model_source_nodes,
+        semantic_model=scd_semantic_model,
+        cost_function=DefaultCostFunction[DataSourceDataSet](),
+        time_spine_source=time_spine_source,
+    )
+
+
 @pytest.fixture(scope="session")
 def time_spine_source(  # noqa: D
     sql_client: SqlClient, mf_test_session_state: MetricFlowTestSessionState  # noqa: F811

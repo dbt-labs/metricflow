@@ -1,17 +1,22 @@
 import logging
+import textwrap
 from typing import ClassVar, Mapping, Optional, Sequence, Union
 
 import sqlalchemy
-from metricflow.protocols.sql_client import SqlEngineAttributes, SqlEngine
+
+from metricflow.protocols.sql_client import SqlEngine, SqlIsolationLevel
+from metricflow.protocols.sql_client import SqlEngineAttributes
+from metricflow.protocols.sql_request import SqlRequestTagSet
 from metricflow.sql.render.postgres import PostgresSQLSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
+from metricflow.sql_clients.async_request import SqlStatementCommentMetadata
 from metricflow.sql_clients.common_client import SqlDialect, not_empty
 from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
 
 logger = logging.getLogger(__name__)
 
 
-class PostgresEngineAttributes(SqlEngineAttributes):
+class PostgresEngineAttributes:
     """Engine-specific attributes for the Postgres query engine
 
     This is an implementation of the SqlEngineAttributes protocol for Postgres
@@ -20,18 +25,19 @@ class PostgresEngineAttributes(SqlEngineAttributes):
     sql_engine_type: ClassVar[SqlEngine] = SqlEngine.POSTGRES
 
     # SQL Engine capabilities
+    supported_isolation_levels: ClassVar[Sequence[SqlIsolationLevel]] = ()
     date_trunc_supported: ClassVar[bool] = True
     full_outer_joins_supported: ClassVar[bool] = True
     indexes_supported: ClassVar[bool] = True
     multi_threading_supported: ClassVar[bool] = True
     timestamp_type_supported: ClassVar[bool] = True
     timestamp_to_string_comparison_supported: ClassVar[bool] = True
-    # Cancelling should be possible, but not yet implemented.
-    cancel_submitted_queries_supported: ClassVar[bool] = False
+    cancel_submitted_queries_supported: ClassVar[bool] = True
 
     # SQL Dialect replacement strings
     double_data_type_name: ClassVar[str] = "DOUBLE PRECISION"
     timestamp_type_name: ClassVar[Optional[str]] = "TIMESTAMP"
+    random_function_name: ClassVar[str] = "RANDOM"
 
     # MetricFlow attributes
     sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer] = PostgresSQLSqlQueryPlanRenderer()
@@ -87,4 +93,30 @@ class PostgresSqlClient(SqlAlchemySqlClient):
         return PostgresEngineAttributes()
 
     def cancel_submitted_queries(self) -> None:  # noqa: D
-        raise NotImplementedError
+        for request_id in self.active_requests():
+            self.cancel_request(SqlRequestTagSet.create_from_request_id(request_id))
+
+    def cancel_request(self, pattern_tag_set: SqlRequestTagSet) -> int:  # noqa: D
+        result = self.query(
+            textwrap.dedent(
+                """\
+                SELECT pid AS query_id, query AS query_text
+                FROM pg_stat_activity
+                WHERE query != '<IDLE>' AND query NOT ILIKE '%pg_stat_activity%'
+                ORDER BY query_start desc;
+                """
+            )
+        )
+
+        num_cancelled_queries = 0
+
+        for query_id, query_text in result.values:
+            tag_set = SqlStatementCommentMetadata.parse_tag_metadata_in_comments(query_text)
+
+            # Check for a match where the query's tag
+            if tag_set and pattern_tag_set.is_subset_of(tag_set):
+                logger.info(f"Cancelling query ID: {query_id}")
+                self.execute(f"SELECT pg_cancel_backend({query_id});")
+                num_cancelled_queries += 1
+
+        return num_cancelled_queries

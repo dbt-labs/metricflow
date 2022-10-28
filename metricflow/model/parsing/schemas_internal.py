@@ -8,11 +8,13 @@ from metricflow.model.parsing.schemas import (
     data_source_schema,
     materialization_schema,
     derived_group_by_element_schema,
+    metric_input_schema,
     metric_input_measure_schema,
     metric_type_params_schema,
     identifier_schema,
     measure_schema,
     dimension_schema,
+    validity_params_schema,
     dimension_type_params_schema,
     mutability_schema,
     mutability_type_params_schema,
@@ -70,6 +72,7 @@ locked_metadata_schema = {
             "type": "array",
             "items": {"type": "string"},
         },
+        "private": {"type": "boolean"},
     },
     "additionalProperties": False,
 }
@@ -101,12 +104,14 @@ schema_store = {
     identifier_schema["$id"]: identifier_schema,
     measure_schema["$id"]: measure_schema,
     dimension_schema["$id"]: dimension_schema,
+    validity_params_schema["$id"]: validity_params_schema,
     dimension_type_params_schema["$id"]: dimension_type_params_schema,
     mutability_schema["$id"]: mutability_schema,
     mutability_type_params_schema["$id"]: mutability_type_params_schema,
     composite_sub_identifier_schema["$id"]: composite_sub_identifier_schema,
     materialization_destination_schema["$id"]: materialization_destination_schema,
     non_additive_dimension_schema["$id"]: non_additive_dimension_schema,
+    metric_input_schema["$id"]: metric_input_schema,
 }
 
 resolver = RefResolver.from_schema(schema=metric_schema, store=schema_store)

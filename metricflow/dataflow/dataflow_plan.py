@@ -46,6 +46,7 @@ from metricflow.specs import (
     TimeDimensionSpec,
     SpecWhereClauseConstraint,
 )
+from metricflow.sql.sql_plan import SqlJoinType
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.visitor import Visitable, VisitorOutputT
 
@@ -214,6 +215,14 @@ class ReadSqlSourceNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
 
 
 @dataclass(frozen=True)
+class ValidityWindowJoinDescription:
+    """Encapsulates details about join constraints around validity windows"""
+
+    window_start_dimension: TimeDimensionSpec
+    window_end_dimension: TimeDimensionSpec
+
+
+@dataclass(frozen=True)
 class JoinDescription(Generic[SourceDataSetT]):
     """Describes how data from a node should be joined to data from another node."""
 
@@ -222,6 +231,8 @@ class JoinDescription(Generic[SourceDataSetT]):
 
     join_on_partition_dimensions: Tuple[PartitionDimensionJoinDescription, ...]
     join_on_partition_time_dimensions: Tuple[PartitionTimeDimensionJoinDescription, ...]
+
+    validity_window: Optional[ValidityWindowJoinDescription] = None
 
 
 class JoinToBaseOutputNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
@@ -282,7 +293,6 @@ class JoinOverTimeRangeNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT])
     def __init__(
         self,
         parent_node: BaseOutput[SourceDataSetT],
-        metric_time_dimension_reference: TimeDimensionReference,
         window: Optional[CumulativeMetricWindow],
         grain_to_date: Optional[TimeGranularity],
         node_id: Optional[NodeId] = None,
@@ -302,7 +312,6 @@ class JoinOverTimeRangeNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT])
         self._parent_node = parent_node
         self._grain_to_date = grain_to_date
         self._window = window
-        self._metric_time_dimension_reference = metric_time_dimension_reference
         self.time_range_constraint = time_range_constraint
 
         # Doing a list comprehension throws a type error, so doing it this way.
@@ -315,10 +324,6 @@ class JoinOverTimeRangeNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT])
 
     def accept(self, visitor: DataflowPlanNodeVisitor[SourceDataSetT, VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_join_over_time_range_node(self)
-
-    @property
-    def metric_time_dimension_reference(self) -> TimeDimensionReference:  # noqa: D
-        return self._metric_time_dimension_reference
 
     @property
     def grain_to_date(self) -> Optional[TimeGranularity]:  # noqa: D
@@ -898,7 +903,9 @@ class CombineMetricsNode(Generic[SourceDataSetT], ComputedMetricsOutput[SourceDa
     def __init__(  # noqa: D
         self,
         parent_nodes: Sequence[ComputedMetricsOutput[SourceDataSetT]],
+        join_type: SqlJoinType = SqlJoinType.FULL_OUTER,
     ) -> None:
+        self._join_type = join_type
         super().__init__(node_id=self.create_unique_id(), parent_nodes=list(parent_nodes))
 
     @classmethod
@@ -911,6 +918,11 @@ class CombineMetricsNode(Generic[SourceDataSetT], ComputedMetricsOutput[SourceDa
     @property
     def description(self) -> str:  # noqa: D
         return "Combine Metrics"
+
+    @property
+    def join_type(self) -> SqlJoinType:
+        """The type of join used for combining metrics."""
+        return self._join_type
 
 
 class ConstrainTimeRangeNode(AggregatedMeasuresOutput[SourceDataSetT], BaseOutput[SourceDataSetT]):

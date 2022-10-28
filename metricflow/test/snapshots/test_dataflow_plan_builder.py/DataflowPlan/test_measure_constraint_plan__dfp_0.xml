@@ -5,7 +5,11 @@
         <ComputeMetricsNode>
             <!-- description = Compute Metrics via Expressions -->
             <!-- node_id = cm_0 -->
-            <!-- metric_spec = MetricSpec(element_name='lux_booking_value_rate_expr') -->
+            <!-- metric_spec =                                      -->
+            <!--   {'class': 'MetricSpec',                          -->
+            <!--    'element_name': 'lux_booking_value_rate_expr',  -->
+            <!--    'constraint': None,                             -->
+            <!--    'alias': None}                                  -->
             <FilterElementsNode>
                 <!-- description =                                                              -->
                 <!--   Pass Only Elements:                                                      -->
@@ -101,7 +105,8 @@
                                         <!--                           'element_name': 'listing',          -->
                                         <!--                           'identifier_links': ()},            -->
                                         <!--    'join_on_partition_dimensions': (),                        -->
-                                        <!--    'join_on_partition_time_dimensions': ()}                   -->
+                                        <!--    'join_on_partition_time_dimensions': (),                   -->
+                                        <!--    'validity_window': None}                                   -->
                                         <FilterElementsNode>
                                             <!-- description =                                                        -->
                                             <!--   Pass Only Elements:                                                -->

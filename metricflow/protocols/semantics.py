@@ -30,6 +30,7 @@ from metricflow.specs import (
     LinkableInstanceSpec,
     MeasureSpec,
     MetricInputMeasureSpec,
+    MetricSpec,
     NonAdditiveDimensionSpec,
 )
 
@@ -176,4 +177,9 @@ class MetricSemanticsAccessor(Protocol):
     @abstractmethod
     def contains_cumulative_metric(self, metric_references: Sequence[MetricReference]) -> bool:
         """Returns true if any of the specs correspond to a cumulative metric."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def metric_input_specs_for_metric(self, metric_spec: MetricReference) -> Tuple[MetricSpec, ...]:
+        """Returns the metric input specs required to compute the metric."""
         raise NotImplementedError

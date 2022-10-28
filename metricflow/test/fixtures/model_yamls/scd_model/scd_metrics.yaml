@@ -1,0 +1,34 @@
+---
+metric:
+  name: bookings
+  description: raw booking count
+  owners:
+    - support@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+      - bookings
+---
+metric:
+  name: family_bookings
+  description: Bookings of units with capacity for more than 2 people.
+  owners:
+    - support@transformdata.io
+  type: measure_proxy
+  constraint:
+    listing__capacity > 2
+  type_params:
+    measures:
+      - bookings
+---
+metric:
+  name: potentially_lux_bookings
+  description: raw booking count for listings that are lux, or unknown
+  owners:
+    - support@transformdata.io
+  type: measure_proxy
+  constraint:
+    listing__is_lux OR listing__is_lux IS NULL
+  type_params:
+    measures:
+      - bookings

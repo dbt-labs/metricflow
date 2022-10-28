@@ -17,20 +17,22 @@ from __future__ import annotations
 import itertools
 import logging
 from dataclasses import dataclass
-from typing import List, Sequence, Generic, TypeVar, Tuple
+from typing import Generic, List, Optional, Sequence, TypeVar, Tuple
 
 from metricflow.model.objects.elements.identifier import IdentifierType
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.partitions import PartitionJoinResolver
 from metricflow.dataflow.dataflow_plan import (
-    JoinDescription,
     BaseOutput,
+    JoinDescription,
     PartitionDimensionJoinDescription,
     PartitionTimeDimensionJoinDescription,
+    ValidityWindowJoinDescription,
 )
 from metricflow.instances import InstanceSet
 from metricflow.object_utils import pformat_big_objects
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
+from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
 from metricflow.specs import (
     LinkableInstanceSpec,
     LinklessIdentifierSpec,
@@ -62,6 +64,8 @@ class JoinLinkableInstancesRecipe:
     join_on_partition_dimensions: Tuple[PartitionDimensionJoinDescription, ...]
     join_on_partition_time_dimensions: Tuple[PartitionTimeDimensionJoinDescription, ...]
 
+    validity_window: Optional[ValidityWindowJoinDescription] = None
+
     @property
     def join_description(self) -> JoinDescription:
         """The recipe as a join description to use in the dataflow plan node."""
@@ -70,6 +74,7 @@ class JoinLinkableInstancesRecipe:
             join_on_identifier=self.join_on_identifier,
             join_on_partition_dimensions=self.join_on_partition_dimensions,
             join_on_partition_time_dimensions=self.join_on_partition_time_dimensions,
+            validity_window=self.validity_window,
         )
 
 
@@ -214,6 +219,10 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                         start_node_spec_set=start_node_spec_set,
                         node_to_join_spec_set=data_set.instance_set.spec_set,
                     )
+                    validity_window_join_description = CreateValidityWindowJoinDescription(
+                        self._data_source_semantics
+                    ).transform(instance_set=data_set.instance_set)
+
                     candidates_for_join.append(
                         JoinLinkableInstancesRecipe(
                             node_to_join=node,
@@ -221,6 +230,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                             satisfiable_linkable_specs=satisfiable_linkable_specs,
                             join_on_partition_dimensions=join_on_partition_dimensions,
                             join_on_partition_time_dimensions=join_on_partition_time_dimensions,
+                            validity_window=validity_window_join_description,
                         )
                     )
 
@@ -257,6 +267,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                         satisfiable_linkable_specs=updated_satisfiable_linkable_specs,
                         join_on_partition_dimensions=candidate_for_join.join_on_partition_dimensions,
                         join_on_partition_time_dimensions=candidate_for_join.join_on_partition_time_dimensions,
+                        validity_window=candidate_for_join.validity_window,
                     )
                 )
         return sorted(
