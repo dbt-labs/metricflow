@@ -102,3 +102,18 @@ class DbtTransformer:
             model=UserConfiguredModel(data_sources=data_sources, materializations=materializations, metrics=metrics),
             issues=ModelValidationResults.from_issues_sequence(issues=issues),
         )
+
+    def transform_and_build(self, dbt_metrics: Tuple[MetricNode, ...]) -> ModelBuildResult:
+        """Builds a UserConfiguredModel from dbt MetricNodes"""
+        transformation_result = self.transform(dbt_metrics=dbt_metrics)
+
+        if transformation_result.validation_results.has_blocking_issues:
+            return ModelBuildResult(
+                model=UserConfiguredModel(data_sources=[], metrics=[]), issues=transformation_result.validation_results
+            )
+
+        build_result = self.build(transformed_objects=transformation_result.transformed_objects)
+        return ModelBuildResult(
+            build_result.model,
+            ModelValidationResults.merge([transformation_result.validation_results, build_result.issues]),
+        )
