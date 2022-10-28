@@ -1,5 +1,7 @@
+from copy import deepcopy
 import logging
-from typing import Tuple, Type
+import traceback
+from typing import List, Tuple, Type
 
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode
 from metricflow.model.dbt_transformations.dbt_transform_rule import (
@@ -10,7 +12,9 @@ from metricflow.model.dbt_transformations.dbt_transform_rule import (
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.materialization import Materialization
 from metricflow.model.objects.metric import Metric
-from metricflow.model.validations.validator_helpers import ModelValidationResults
+from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from metricflow.model.parsing.dir_to_model import ModelBuildResult
+from metricflow.model.validations.validator_helpers import ModelValidationResults, ValidationError, ValidationIssue
 
 logger = logging.getLogger(__name__)
 
@@ -42,3 +46,59 @@ class DbtTransformer:
             validation_results = ModelValidationResults.merge([validation_results, transformation_rule_issues])
 
         return DbtTransformationResult(transformed_objects=transformed_objects, validation_results=validation_results)
+
+    def build(self, transformed_objects: DbtTransformedObjects) -> ModelBuildResult:
+        """Takes in a map of dicts representing UserConfiguredModel objects, and builds a UserConfiguredModel"""
+        # we don't want to modify the passed in objects, so we decopy them
+        copied_objects = deepcopy(transformed_objects)
+
+        # Move dimensions, identifiers, and measures on to their respective data sources
+        for data_source_name, dimensions_map in copied_objects.dimensions.items():
+            copied_objects.data_sources[data_source_name]["dimensions"] = list(dimensions_map.values())
+        for data_source_name, identifiers_map in copied_objects.identifiers.items():
+            copied_objects.data_sources[data_source_name]["identifiers"] = list(identifiers_map.values())
+        for data_source_name, measure_map in copied_objects.measures.items():
+            copied_objects.data_sources[data_source_name]["measures"] = list(measure_map.values())
+
+        issues: List[ValidationIssue] = []
+
+        data_sources: List[Type[DataSource]] = []
+        for data_source_dict in copied_objects.data_sources.values():
+            try:
+                data_sources.append(self.data_source_class.parse_obj(data_source_dict))
+            except Exception as e:
+                issues.append(
+                    ValidationError(
+                        message=f"Failed to parse dict of data source {data_source_dict.get('name')} to object",
+                        extra_detail="".join(traceback.format_tb(e.__traceback__)),
+                    )
+                )
+
+        materializations: List[Type[Materialization]] = []
+        for materialization_dict in copied_objects.materializations.values():
+            try:
+                materializations.append(self.materialization_class.parse_obj(materialization_dict))
+            except Exception as e:
+                issues.append(
+                    ValidationError(
+                        message=f"Failed to parse dict of materialization {materialization_dict.get('name')} to object",
+                        extra_detail="".join(traceback.format_tb(e.__traceback__)),
+                    )
+                )
+
+        metrics: List[Type[Metric]] = []
+        for metric_dict in copied_objects.metrics.values():
+            try:
+                metrics.append(self.metric_class.parse_obj(metric_dict))
+            except Exception as e:
+                issues.append(
+                    ValidationError(
+                        message=f"Failed to parse dict of metric {metric_dict.get('name')} to object",
+                        extra_detail="".join(traceback.format_tb(e.__traceback__)),
+                    )
+                )
+
+        return ModelBuildResult(
+            model=UserConfiguredModel(data_sources=data_sources, materializations=materializations, metrics=metrics),
+            issues=ModelValidationResults.from_issues_sequence(issues=issues),
+        )
