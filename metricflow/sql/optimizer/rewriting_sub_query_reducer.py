@@ -455,7 +455,9 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
                 SqlJoinDescription(
                     right_source=join_select_node.from_source,
                     right_source_alias=join_select_node.from_source_alias,
-                    on_condition=join_desc.on_condition.rewrite(column_replacements),
+                    on_condition=join_desc.on_condition.rewrite(column_replacements)
+                    if join_desc.on_condition
+                    else None,
                     join_type=join_desc.join_type,
                 )
             )
@@ -472,7 +474,9 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
                 SqlJoinDescription(
                     right_source=x.right_source,
                     right_source_alias=x.right_source_alias,
-                    on_condition=x.on_condition.rewrite(column_replacements=column_replacements),
+                    on_condition=x.on_condition.rewrite(column_replacements=column_replacements)
+                    if x.on_condition
+                    else None,
                     join_type=x.join_type,
                 )
                 for x in new_join_descs
@@ -500,7 +504,9 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
                 SqlJoinDescription(
                     right_source=x.right_source,
                     right_source_alias=x.right_source_alias,
-                    on_condition=x.on_condition.rewrite(column_replacements=column_replacements),
+                    on_condition=x.on_condition.rewrite(column_replacements=column_replacements)
+                    if x.on_condition
+                    else None,
                     join_type=x.join_type,
                 )
                 for x in new_join_descs

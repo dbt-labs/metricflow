@@ -109,8 +109,8 @@ class SqlJoinDescription:
     # The source that goes on the right side of the JOIN keyword.
     right_source: SqlQueryPlanNode
     right_source_alias: str
-    on_condition: SqlExpressionNode
     join_type: SqlJoinType
+    on_condition: Optional[SqlExpressionNode] = None
 
 
 @dataclass(frozen=True)

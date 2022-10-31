@@ -4,9 +4,13 @@ import logging
 import textwrap
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import List, Tuple, Sequence
+from typing import List, Optional, Tuple, Sequence
 
-from metricflow.sql.render.expr_renderer import DefaultSqlExpressionRenderer, SqlExpressionRenderer
+from metricflow.sql.render.expr_renderer import (
+    DefaultSqlExpressionRenderer,
+    SqlExpressionRenderer,
+    SqlExpressionRenderResult,
+)
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_plan import (
     SqlQueryPlanNodeVisitor,
@@ -158,8 +162,10 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
             params.update(right_source_rendered.execution_parameters)
 
             # Render the on condition for the join
-            on_condition_rendered = self.EXPR_RENDERER.render_sql_expr(join_description.on_condition)
-            params.update(on_condition_rendered.execution_parameters)
+            on_condition_rendered: Optional[SqlExpressionRenderResult] = None
+            if join_description.on_condition:
+                on_condition_rendered = self.EXPR_RENDERER.render_sql_expr(join_description.on_condition)
+                params.update(on_condition_rendered.execution_parameters)
 
             if join_description.right_source.is_table:
                 join_section_lines.append(join_description.join_type.value)
@@ -172,8 +178,10 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
                 join_section_lines.append(f"{join_description.join_type.value} (")
                 join_section_lines.append(textwrap.indent(right_source_rendered.sql, prefix=self.INDENT))
                 join_section_lines.append(f") {join_description.right_source_alias}")
-            join_section_lines.append("ON")
-            join_section_lines.append(textwrap.indent(on_condition_rendered.sql, prefix=self.INDENT))
+
+            if on_condition_rendered:
+                join_section_lines.append("ON")
+                join_section_lines.append(textwrap.indent(on_condition_rendered.sql, prefix=self.INDENT))
 
         return "\n".join(join_section_lines), params
 
