@@ -97,6 +97,7 @@ class SqlJoinType(Enum):
     LEFT_OUTER = "LEFT OUTER JOIN"
     FULL_OUTER = "FULL OUTER JOIN"
     INNER = "INNER JOIN"
+    CROSS_JOIN = "CROSS JOIN"
 
     def __repr__(self) -> str:  # noqa: D
         return f"{self.__class__.__name__}.{self.name}"
