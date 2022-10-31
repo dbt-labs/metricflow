@@ -208,9 +208,6 @@ class MetricFlowQueryParser:
             where_constraint and where_constraint_str
         ), "Both where_constraint and where_constraint_str should not be set"
 
-        if len(group_by_names) == 0:
-            assert len(metric_names) == 1, "Querying for multiple metrics with no dimensions is not yet supported."
-
         parsed_where_constraint: Optional[WhereClauseConstraint]
         if where_constraint_str:
             parsed_where_constraint = WhereClauseConstraint.parse(where_constraint_str)
