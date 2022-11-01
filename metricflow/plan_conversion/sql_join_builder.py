@@ -25,23 +25,46 @@ def _make_cumulative_metric_join_condition(
     time_spine_data_set_alias: str,
     time_spine_data_set_time_col: str,
     window: Optional[CumulativeMetricWindow],
+    grain_to_date: Optional[TimeGranularity],
 ) -> SqlExpressionNode:
-    """Creates SqlLogicalExpression representing a cumulative metric self-join condition"""
-    if window is None:  # accumulate over all time
-        return SqlComparisonExpression(
-            left_expr=SqlColumnReferenceExpression(
-                SqlColumnReference(
-                    table_alias=metric_data_set_alias,
-                    column_name=metric_data_set_metric_time_col,
-                )
-            ),
-            comparison=SqlComparison.LESS_THAN_OR_EQUALS,
-            right_expr=SqlColumnReferenceExpression(
-                SqlColumnReference(
-                    table_alias=time_spine_data_set_alias,
-                    column_name=time_spine_data_set_time_col,
-                )
-            ),
+    """Creates SqlExpression representing a cumulative metric self-join conditions"""
+
+    # Comparison expression against the endpoint of the cumulative time range,
+    # meaning the metric time must always be BEFORE the time spine time
+    end_of_range_comparison_expression = SqlComparisonExpression(
+        left_expr=SqlColumnReferenceExpression(
+            SqlColumnReference(
+                table_alias=metric_data_set_alias,
+                column_name=metric_data_set_metric_time_col,
+            )
+        ),
+        comparison=SqlComparison.LESS_THAN_OR_EQUALS,
+        right_expr=SqlColumnReferenceExpression(
+            SqlColumnReference(
+                table_alias=time_spine_data_set_alias,
+                column_name=time_spine_data_set_time_col,
+            )
+        ),
+    )
+
+    if window is None and grain_to_date is None:  # accumulate over all time
+        return end_of_range_comparison_expression
+
+    # Set up configuration for the start of range comparison expression. The operator
+    # and time delta window/granularity differ depending on whether it's a window-based
+    # or grain-to-date accumulation
+    if window is not None and grain_to_date is None:
+        start_of_range_comparison_operator = SqlComparison.GREATER_THAN
+        delta_count = window.count
+        delta_granularity = window.granularity
+    elif window is None and grain_to_date is not None:
+        start_of_range_comparison_operator = SqlComparison.GREATER_THAN_OR_EQUALS
+        delta_count = 0
+        delta_granularity = grain_to_date
+    else:
+        raise ValueError(
+            f"Attempting to build a time spine join with both a window and a grain_to_date set! Window: {window}. "
+            f"Grain_to_date: {grain_to_date}."
         )
 
     # ds <= <date> and  ds > <date> - <window>
@@ -70,7 +93,7 @@ def _make_cumulative_metric_join_condition(
                         column_name=metric_data_set_metric_time_col,
                     )
                 ),
-                comparison=SqlComparison.GREATER_THAN,
+                comparison=start_of_range_comparison_operator,
                 right_expr=SqlTimeDeltaExpression(
                     SqlColumnReferenceExpression(
                         SqlColumnReference(
@@ -78,58 +101,8 @@ def _make_cumulative_metric_join_condition(
                             column_name=time_spine_data_set_time_col,
                         )
                     ),
-                    count=window.count,
-                    granularity=window.granularity,
-                    grain_to_date=None,
-                ),
-            ),
-        ),
-    )
-
-
-def _make_grain_to_date_cumulative_metric_join_condition(
-    metric_data_set_alias: str,
-    metric_data_set_metric_time_col: str,
-    time_spine_data_set_alias: str,
-    time_spine_data_set_time_col: str,
-    grain_to_date: TimeGranularity,
-) -> SqlLogicalExpression:
-    """Creates SqlLogicalExpression representing a grain_to_date cumulative metric self-join condition"""
-    return SqlLogicalExpression(
-        operator=SqlLogicalOperator.AND,
-        args=(
-            SqlComparisonExpression(
-                left_expr=SqlColumnReferenceExpression(
-                    SqlColumnReference(
-                        table_alias=metric_data_set_alias,
-                        column_name=metric_data_set_metric_time_col,
-                    )
-                ),
-                comparison=SqlComparison.LESS_THAN_OR_EQUALS,
-                right_expr=SqlColumnReferenceExpression(
-                    SqlColumnReference(
-                        table_alias=time_spine_data_set_alias,
-                        column_name=time_spine_data_set_time_col,
-                    )
-                ),
-            ),
-            SqlComparisonExpression(
-                left_expr=SqlColumnReferenceExpression(
-                    SqlColumnReference(
-                        table_alias=metric_data_set_alias,
-                        column_name=metric_data_set_metric_time_col,
-                    )
-                ),
-                comparison=SqlComparison.GREATER_THAN_OR_EQUALS,
-                right_expr=SqlTimeDeltaExpression(
-                    SqlColumnReferenceExpression(
-                        SqlColumnReference(
-                            table_alias=time_spine_data_set_alias,
-                            column_name=time_spine_data_set_time_col,
-                        )
-                    ),
-                    count=0,
-                    granularity=grain_to_date,
+                    count=delta_count,
+                    granularity=delta_granularity,
                     grain_to_date=grain_to_date,
                 ),
             ),
@@ -238,31 +211,14 @@ class SqlQueryPlanJoinBuilder:
 
         # Build an expression like "a.ds <= b.ds AND a.ds >= b.ds - <window>
         # If no window is present we join across all time -> "a.ds <= b.ds"
-        constrain_metric_time_column_condition_both: Optional[SqlExpressionNode] = None
-        if node.window is not None:
-            constrain_metric_time_column_condition_both = _make_cumulative_metric_join_condition(
-                metric_data_set.alias,
-                metric_data_set.metric_time_column_name,
-                time_spine_data_set.alias,
-                time_spine_data_set.metric_time_column_name,
-                node.window,
-            )
-        elif node.grain_to_date is not None:
-            constrain_metric_time_column_condition_both = _make_grain_to_date_cumulative_metric_join_condition(
-                metric_data_set.alias,
-                metric_data_set.metric_time_column_name,
-                time_spine_data_set.alias,
-                time_spine_data_set.metric_time_column_name,
-                node.grain_to_date,
-            )
-        elif node.window is None:  # `window is None` for clarity (could be else since we have window and !window)
-            constrain_metric_time_column_condition_both = _make_cumulative_metric_join_condition(
-                metric_data_set.alias,
-                metric_data_set.metric_time_column_name,
-                time_spine_data_set.alias,
-                time_spine_data_set.metric_time_column_name,
-                None,
-            )
+        constrain_metric_time_column_condition_both = _make_cumulative_metric_join_condition(
+            metric_data_set.alias,
+            metric_data_set.metric_time_column_name,
+            time_spine_data_set.alias,
+            time_spine_data_set.metric_time_column_name,
+            node.window,
+            node.grain_to_date,
+        )
 
         return SqlJoinDescription(
             right_source=metric_data_set.data_set.sql_select_node,
