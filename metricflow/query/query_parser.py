@@ -17,6 +17,7 @@ from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.model.objects.constraints.where import WhereClauseConstraint
 from metricflow.model.objects.elements.dimension import DimensionType
+from metricflow.model.objects.metric import MetricType
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.spec_converters import WhereConstraintConverter
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
@@ -158,6 +159,18 @@ class MetricFlowQueryParser:
         finally:
             logger.info(f"Parsing the query took: {time.time() - start_time:.2f}s")
 
+    def _validate_no_dimension_query_for_metric(self, metric_references: Sequence[MetricReference]) -> None:
+        """Validate if all requested metrics are queryable without any dimensions."""
+        for metric_reference in metric_references:
+            metric = self._metric_semantics.get_metric(metric_reference)
+            if metric.type == MetricType.CUMULATIVE:
+                # Cumulative metrics configured with a window/grain_to_date cannot be queried without a dimension.
+                if metric.type_params.window or metric.type_params.grain_to_date:
+                    raise UnableToSatisfyQueryError(
+                        f"Metric {metric.name} is a cumulative metric specified with a window/grain_to_date "
+                        f"which must be queried with the dimension 'metric_time'.",
+                    )
+
     def _validate_linkable_specs(
         self,
         metric_references: Tuple[MetricReference, ...],
@@ -259,6 +272,9 @@ class MetricFlowQueryParser:
         if time_constraint == TimeRangeConstraint.all_time():
             # If the time constraint is all time, just ignore and not render
             time_constraint = None
+
+        if len(group_by_names) == 0:
+            self._validate_no_dimension_query_for_metric(metric_references=metric_references)
 
         requested_linkable_specs = self._parse_linkable_element_names(group_by_names, metric_references)
         partial_time_dimension_spec_replacements = (
