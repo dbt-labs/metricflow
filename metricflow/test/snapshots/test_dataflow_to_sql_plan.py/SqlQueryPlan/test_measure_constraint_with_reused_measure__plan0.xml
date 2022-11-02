@@ -51,8 +51,8 @@
                 <!--   {'class': 'SqlJoinDescription',                          -->
                 <!--    'right_source': SqlSelectStatementNode(node_id=ss_14),  -->
                 <!--    'right_source_alias': 'subq_9',                         -->
-                <!--    'on_condition': SqlLogicalExpression(node_id=lo_2),     -->
-                <!--    'join_type': SqlJoinType.INNER}                         -->
+                <!--    'join_type': SqlJoinType.INNER,                         -->
+                <!--    'on_condition': SqlLogicalExpression(node_id=lo_2)}     -->
                 <!-- where = None -->
                 <SqlSelectStatementNode>
                     <!-- description = Aggregate Measures -->

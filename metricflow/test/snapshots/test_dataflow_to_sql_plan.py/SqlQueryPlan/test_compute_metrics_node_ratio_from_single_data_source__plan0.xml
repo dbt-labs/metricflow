@@ -69,8 +69,8 @@
                 <!--   {'class': 'SqlJoinDescription',                           -->
                 <!--    'right_source': SqlSelectStatementNode(node_id=ss_1),    -->
                 <!--    'right_source_alias': 'subq_3',                          -->
-                <!--    'on_condition': SqlComparisonExpression(node_id=cmp_0),  -->
-                <!--    'join_type': SqlJoinType.LEFT_OUTER}                     -->
+                <!--    'join_type': SqlJoinType.LEFT_OUTER,                     -->
+                <!--    'on_condition': SqlComparisonExpression(node_id=cmp_0)}  -->
                 <!-- where = None -->
                 <SqlSelectStatementNode>
                     <!-- description =                           -->

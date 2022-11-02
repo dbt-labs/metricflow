@@ -92,8 +92,8 @@
                     <!--   {'class': 'SqlJoinDescription',                         -->
                     <!--    'right_source': SqlSelectStatementNode(node_id=ss_8),  -->
                     <!--    'right_source_alias': 'subq_7',                        -->
-                    <!--    'on_condition': SqlLogicalExpression(node_id=lo_1),    -->
-                    <!--    'join_type': SqlJoinType.LEFT_OUTER}                   -->
+                    <!--    'join_type': SqlJoinType.LEFT_OUTER,                   -->
+                    <!--    'on_condition': SqlLogicalExpression(node_id=lo_1)}    -->
                     <!-- where = None -->
                     <SqlSelectStatementNode>
                         <!-- description =                               -->
@@ -519,8 +519,8 @@
                             <!--   {'class': 'SqlJoinDescription',                           -->
                             <!--    'right_source': SqlSelectStatementNode(node_id=ss_6),    -->
                             <!--    'right_source_alias': 'subq_5',                          -->
-                            <!--    'on_condition': SqlComparisonExpression(node_id=cmp_1),  -->
-                            <!--    'join_type': SqlJoinType.LEFT_OUTER}                     -->
+                            <!--    'join_type': SqlJoinType.LEFT_OUTER,                     -->
+                            <!--    'on_condition': SqlComparisonExpression(node_id=cmp_1)}  -->
                             <!-- where = None -->
                             <SqlSelectStatementNode>
                                 <!-- description = Read Elements From Data Source 'listings' -->

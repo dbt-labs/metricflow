@@ -72,8 +72,8 @@
                     <!--   {'class': 'SqlJoinDescription',                         -->
                     <!--    'right_source': SqlSelectStatementNode(node_id=ss_7),  -->
                     <!--    'right_source_alias': 'subq_7',                        -->
-                    <!--    'on_condition': SqlLogicalExpression(node_id=lo_2),    -->
-                    <!--    'join_type': SqlJoinType.LEFT_OUTER}                   -->
+                    <!--    'join_type': SqlJoinType.LEFT_OUTER,                   -->
+                    <!--    'on_condition': SqlLogicalExpression(node_id=lo_2)}    -->
                     <!-- where = None -->
                     <SqlSelectStatementNode>
                         <!-- description =                                      -->
@@ -439,8 +439,8 @@
                             <!--   {'class': 'SqlJoinDescription',                         -->
                             <!--    'right_source': SqlSelectStatementNode(node_id=ss_5),  -->
                             <!--    'right_source_alias': 'subq_5',                        -->
-                            <!--    'on_condition': SqlLogicalExpression(node_id=lo_1),    -->
-                            <!--    'join_type': SqlJoinType.LEFT_OUTER}                   -->
+                            <!--    'join_type': SqlJoinType.LEFT_OUTER,                   -->
+                            <!--    'on_condition': SqlLogicalExpression(node_id=lo_1)}    -->
                             <!-- where = None -->
                             <SqlSelectStatementNode>
                                 <!-- description = Read Elements From Data Source 'bridge_table' -->
