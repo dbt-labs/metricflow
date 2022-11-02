@@ -1,8 +1,9 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, TypeVar
 
 from metricflow.dataflow.dataflow_plan import JoinOverTimeRangeNode
-from metricflow.model.objects.metric import CumulativeMetricWindow
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.sql.sql_plan import SqlExpressionNode, SqlJoinDescription, SqlJoinType, SqlSelectStatementNode
 from metricflow.sql.sql_exprs import (
@@ -14,18 +15,14 @@ from metricflow.sql.sql_exprs import (
     SqlLogicalOperator,
     SqlTimeDeltaExpression,
 )
-from metricflow.time.time_granularity import TimeGranularity
 
 SqlDataSetT = TypeVar("SqlDataSetT", bound=SqlDataSet)
 
 
 def _make_cumulative_metric_join_condition(
-    metric_data_set_alias: str,
-    metric_data_set_metric_time_col: str,
-    time_spine_data_set_alias: str,
-    time_spine_data_set_time_col: str,
-    window: Optional[CumulativeMetricWindow],
-    grain_to_date: Optional[TimeGranularity],
+    metric_data_set: AnnotatedSqlDataSet,
+    time_spine_data_set: AnnotatedSqlDataSet,
+    node: JoinOverTimeRangeNode[SqlDataSetT],
 ) -> SqlExpressionNode:
     """Creates SqlExpression representing a cumulative metric self-join conditions"""
 
@@ -34,76 +31,62 @@ def _make_cumulative_metric_join_condition(
     end_of_range_comparison_expression = SqlComparisonExpression(
         left_expr=SqlColumnReferenceExpression(
             SqlColumnReference(
-                table_alias=metric_data_set_alias,
-                column_name=metric_data_set_metric_time_col,
+                table_alias=metric_data_set.alias,
+                column_name=metric_data_set.metric_time_column_name,
             )
         ),
         comparison=SqlComparison.LESS_THAN_OR_EQUALS,
         right_expr=SqlColumnReferenceExpression(
             SqlColumnReference(
-                table_alias=time_spine_data_set_alias,
-                column_name=time_spine_data_set_time_col,
+                table_alias=time_spine_data_set.alias,
+                column_name=time_spine_data_set.metric_time_column_name,
             )
         ),
     )
 
-    if window is None and grain_to_date is None:  # accumulate over all time
+    if node.window is None and node.grain_to_date is None:  # accumulate over all time
         return end_of_range_comparison_expression
 
     # Set up configuration for the start of range comparison expression. The operator
     # and time delta window/granularity differ depending on whether it's a window-based
     # or grain-to-date accumulation
-    if window is not None and grain_to_date is None:
+    if node.window is not None and node.grain_to_date is None:
         start_of_range_comparison_operator = SqlComparison.GREATER_THAN
-        delta_count = window.count
-        delta_granularity = window.granularity
-    elif window is None and grain_to_date is not None:
+        delta_count = node.window.count
+        delta_granularity = node.window.granularity
+    elif node.window is None and node.grain_to_date is not None:
         start_of_range_comparison_operator = SqlComparison.GREATER_THAN_OR_EQUALS
         delta_count = 0
-        delta_granularity = grain_to_date
+        delta_granularity = node.grain_to_date
     else:
         raise ValueError(
-            f"Attempting to build a time spine join with both a window and a grain_to_date set! Window: {window}. "
-            f"Grain_to_date: {grain_to_date}."
+            f"Attempting to build a time spine join with both a window and a grain_to_date set! Window: "
+            f"{node.window}. Grain_to_date: {node.grain_to_date}."
         )
 
     # ds <= <date> and  ds > <date> - <window>
     return SqlLogicalExpression(
         operator=SqlLogicalOperator.AND,
         args=(
+            end_of_range_comparison_expression,
             SqlComparisonExpression(
                 left_expr=SqlColumnReferenceExpression(
                     SqlColumnReference(
-                        table_alias=metric_data_set_alias,
-                        column_name=metric_data_set_metric_time_col,
-                    )
-                ),
-                comparison=SqlComparison.LESS_THAN_OR_EQUALS,
-                right_expr=SqlColumnReferenceExpression(
-                    SqlColumnReference(
-                        table_alias=time_spine_data_set_alias,
-                        column_name=time_spine_data_set_time_col,
-                    )
-                ),
-            ),
-            SqlComparisonExpression(
-                left_expr=SqlColumnReferenceExpression(
-                    SqlColumnReference(
-                        table_alias=metric_data_set_alias,
-                        column_name=metric_data_set_metric_time_col,
+                        table_alias=metric_data_set.alias,
+                        column_name=metric_data_set.metric_time_column_name,
                     )
                 ),
                 comparison=start_of_range_comparison_operator,
                 right_expr=SqlTimeDeltaExpression(
                     SqlColumnReferenceExpression(
                         SqlColumnReference(
-                            table_alias=time_spine_data_set_alias,
-                            column_name=time_spine_data_set_time_col,
+                            table_alias=time_spine_data_set.alias,
+                            column_name=time_spine_data_set.metric_time_column_name,
                         )
                     ),
                     count=delta_count,
                     granularity=delta_granularity,
-                    grain_to_date=grain_to_date,
+                    grain_to_date=node.grain_to_date,
                 ),
             ),
         ),
@@ -212,12 +195,9 @@ class SqlQueryPlanJoinBuilder:
         # Build an expression like "a.ds <= b.ds AND a.ds >= b.ds - <window>
         # If no window is present we join across all time -> "a.ds <= b.ds"
         constrain_metric_time_column_condition_both = _make_cumulative_metric_join_condition(
-            metric_data_set.alias,
-            metric_data_set.metric_time_column_name,
-            time_spine_data_set.alias,
-            time_spine_data_set.metric_time_column_name,
-            node.window,
-            node.grain_to_date,
+            metric_data_set,
+            time_spine_data_set,
+            node,
         )
 
         return SqlJoinDescription(
