@@ -895,6 +895,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         from_data_set_alias = self._next_unique_table_alias()
         table_alias_to_instance_set[from_data_set_alias] = from_data_set.instance_set
         join_aliases = [column.column_name for column in from_data_set.groupable_column_associations]
+        use_cross_join = len(join_aliases) == 0
 
         sql_join_descs: List[SqlJoinDescription] = []
         for aggregated_node in node.parent_nodes[1:]:
@@ -915,8 +916,10 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                         column_aliases=join_aliases,
                         left_source_alias=from_data_set_alias,
                         right_source_alias=right_data_set_alias,
-                    ),
-                    join_type=SqlJoinType.INNER,
+                    )
+                    if not use_cross_join
+                    else None,
+                    join_type=SqlJoinType.INNER if not use_cross_join else SqlJoinType.CROSS_JOIN,
                 )
             )
             # All groupby columns are shared by all inputs, so we only want the measure/metric columns
@@ -1291,6 +1294,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             [set(x.instance_set.spec_set.linkable_specs) == set(linkable_specs) for x in parent_data_sets]
         ), "All parent nodes should have the same set of linkable instances since all values are coalesced."
         linkable_spec_set = parent_data_sets[0].instance_set.spec_set.transform(SelectOnlyLinkableSpecs())
+        use_cross_join = len(linkable_spec_set.all_specs) == 0
 
         # Create a FULL OUTER join where the join key is all previous dimension values from all sources coalesced.
         #
@@ -1334,8 +1338,10 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                         column_association_resolver=self._column_association_resolver,
                         table_aliases_in_coalesce=parent_source_table_aliases[:i],
                         table_alias_on_right_equality=parent_source_table_aliases[i],
-                    ).transform(linkable_spec_set),
-                    join_type=node.join_type,
+                    ).transform(linkable_spec_set)
+                    if not use_cross_join
+                    else None,
+                    join_type=node.join_type if not use_cross_join else SqlJoinType.CROSS_JOIN,
                 )
             )
 

@@ -54,7 +54,8 @@ class SqlColumnPrunerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
             all_expr_search_results.append(select_column.expr.lineage)
 
         for join_description in select_node.join_descs:
-            all_expr_search_results.append(join_description.on_condition.lineage)
+            if join_description.on_condition:
+                all_expr_search_results.append(join_description.on_condition.lineage)
 
         for group_by in select_node.group_bys:
             all_expr_search_results.append(group_by.expr.lineage)

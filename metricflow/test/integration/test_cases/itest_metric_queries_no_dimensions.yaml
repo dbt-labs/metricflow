@@ -1,0 +1,77 @@
+---
+integration_test:
+  name: simple_query
+  description: Tests selecting a metric with no group bys.
+  model: SIMPLE_MODEL
+  metrics: ["booking_value"]
+  group_bys: []
+  check_query: |
+    SELECT
+      SUM(booking_value) AS booking_value
+    FROM {{ source_schema }}.fct_bookings
+---
+integration_test:
+  name: simple_query_with_time_constraint
+  description: Tests selecting a metric with no group bys and a time constraint.
+  model: SIMPLE_MODEL
+  metrics: ["booking_value"]
+  time_constraint: ["2020-01-01", "2020-01-01"]
+  group_bys: []
+  check_query: |
+    SELECT
+      SUM(booking_value) AS booking_value
+    FROM {{ source_schema }}.fct_bookings
+    WHERE {{ render_time_constraint("ds", "2020-01-01", "2020-01-01") }}
+---
+integration_test:
+  name: simple_query_with_where_constraint
+  description: Tests selecting a metric with no group bys and a where constraint.
+  model: SIMPLE_MODEL
+  metrics: ["booking_value"]
+  group_bys: []
+  where_constraint: "is_instant"
+  check_query: |
+    SELECT
+      SUM(booking_value) AS booking_value
+    FROM {{ source_schema }}.fct_bookings
+    WHERE is_instant
+---
+integration_test:
+  name: query_with_multiple_metrics
+  description: Tests query with multiple metrics with no group bys.
+  model: SIMPLE_MODEL
+  metrics: ["bookings", "listings"]
+  group_bys: []
+  check_query: |
+    SELECT
+      a.bookings
+      , b.listings
+    FROM (
+      SELECT
+        SUM(1) AS bookings
+      FROM {{ source_schema }}.fct_bookings
+    ) a CROSS JOIN (
+      SELECT
+        SUM(1) AS listings
+      FROM {{ source_schema }}.dim_listings_latest
+    ) b
+---
+integration_test:
+  name: query_with_metric_with_multiple_source
+  description: Tests query with metric from multiple measures from multiple data source.
+  model: SIMPLE_MODEL
+  metrics: ["bookings_per_listing"]
+  group_bys: []
+  check_query: |
+    SELECT
+      (CAST(a.bookings AS {{ double_data_type_name }}) / CAST(b.listings AS {{ double_data_type_name }})) AS bookings_per_listing
+    FROM (
+      SELECT
+        SUM(1) AS bookings
+      FROM {{ source_schema }}.fct_bookings
+    ) a CROSS JOIN (
+      SELECT
+        SUM(1) AS listings
+      FROM {{ source_schema }}.dim_listings_latest
+    ) b
+---

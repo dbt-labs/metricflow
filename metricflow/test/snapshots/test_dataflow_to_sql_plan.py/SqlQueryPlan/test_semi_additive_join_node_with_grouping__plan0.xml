@@ -47,8 +47,8 @@
         <!--   {'class': 'SqlJoinDescription',                         -->
         <!--    'right_source': SqlSelectStatementNode(node_id=ss_0),  -->
         <!--    'right_source_alias': 'subq_2',                        -->
-        <!--    'on_condition': SqlLogicalExpression(node_id=lo_0),    -->
-        <!--    'join_type': SqlJoinType.INNER}                        -->
+        <!--    'join_type': SqlJoinType.INNER,                        -->
+        <!--    'on_condition': SqlLogicalExpression(node_id=lo_0)}    -->
         <!-- where = None -->
         <SqlSelectStatementNode>
             <!-- description = Read Elements From Data Source 'accounts_source' -->
