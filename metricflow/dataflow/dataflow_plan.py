@@ -302,13 +302,19 @@ class JoinOverTimeRangeNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT])
 
         Args:
             parent_node: node with standard output
-            metric_time_dimension_reference: the name of the virtual time dimension used in queries to refer to the time
-            dimension that each measure should be aggregated by.
+            metric_time_dimension_reference: the name of the virtual time dimension used in queries to refer to the
+            time dimension that each measure should be aggregated by.
             window: time window to join over
-            grain_to_date: indicates time range should start from the beginning of this time granularity (eg month to day)
+            grain_to_date: indicates time range should start from the beginning of this time granularity
+            (eg month to day)
             node_id: Override the node ID with this value
             time_range_constraint: time range to aggregate over
         """
+        if window and grain_to_date:
+            raise RuntimeError(
+                f"This node cannot be initialized with both window and grain_to_date set. This configuration should "
+                f"have been prevented by model validation. window: {window}. grain_to_date: {grain_to_date}."
+            )
         self._parent_node = parent_node
         self._grain_to_date = grain_to_date
         self._window = window

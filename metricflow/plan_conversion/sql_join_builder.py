@@ -11,6 +11,7 @@ from metricflow.sql.sql_exprs import (
     SqlColumnReferenceExpression,
     SqlComparison,
     SqlComparisonExpression,
+    SqlDateTruncExpression,
     SqlLogicalExpression,
     SqlLogicalOperator,
     SqlTimeDeltaExpression,
@@ -25,70 +26,54 @@ def _make_cumulative_metric_join_condition(
     node: JoinOverTimeRangeNode[SqlDataSetT],
 ) -> SqlExpressionNode:
     """Creates SqlExpression representing a cumulative metric self-join conditions"""
+    metric_time_column_expr = SqlColumnReferenceExpression(
+        SqlColumnReference(
+            table_alias=metric_data_set.alias,
+            column_name=metric_data_set.metric_time_column_name,
+        )
+    )
+    time_spine_column_expr = SqlColumnReferenceExpression(
+        SqlColumnReference(
+            table_alias=time_spine_data_set.alias,
+            column_name=time_spine_data_set.metric_time_column_name,
+        )
+    )
 
     # Comparison expression against the endpoint of the cumulative time range,
     # meaning the metric time must always be BEFORE the time spine time
     end_of_range_comparison_expression = SqlComparisonExpression(
-        left_expr=SqlColumnReferenceExpression(
-            SqlColumnReference(
-                table_alias=metric_data_set.alias,
-                column_name=metric_data_set.metric_time_column_name,
-            )
-        ),
+        left_expr=metric_time_column_expr,
         comparison=SqlComparison.LESS_THAN_OR_EQUALS,
-        right_expr=SqlColumnReferenceExpression(
-            SqlColumnReference(
-                table_alias=time_spine_data_set.alias,
-                column_name=time_spine_data_set.metric_time_column_name,
-            )
-        ),
+        right_expr=time_spine_column_expr,
     )
 
-    if node.window is None and node.grain_to_date is None:  # accumulate over all time
+    if node.window is None and node.grain_to_date is None:
+        # Accumulate over all time
         return end_of_range_comparison_expression
 
-    # Set up configuration for the start of range comparison expression. The operator
-    # and time delta window/granularity differ depending on whether it's a window-based
-    # or grain-to-date accumulation
-    if node.window is not None and node.grain_to_date is None:
-        start_of_range_comparison_operator = SqlComparison.GREATER_THAN
-        delta_count = node.window.count
-        delta_granularity = node.window.granularity
-    elif node.window is None and node.grain_to_date is not None:
-        start_of_range_comparison_operator = SqlComparison.GREATER_THAN_OR_EQUALS
-        delta_count = 0
-        delta_granularity = node.grain_to_date
+    if node.window:
+        start_of_range_comparison_expr = SqlComparisonExpression(
+            left_expr=metric_time_column_expr,
+            comparison=SqlComparison.GREATER_THAN,
+            right_expr=SqlTimeDeltaExpression(
+                arg=time_spine_column_expr,
+                count=node.window.count,
+                granularity=node.window.granularity,
+            ),
+        )
     else:
-        raise ValueError(
-            f"Attempting to build a time spine join with both a window and a grain_to_date set! Window: "
-            f"{node.window}. Grain_to_date: {node.grain_to_date}."
+        assert node.grain_to_date, "Type refinement assertion - node.grain_to_date cannot be None"
+        start_of_range_comparison_expr = SqlComparisonExpression(
+            left_expr=metric_time_column_expr,
+            comparison=SqlComparison.GREATER_THAN_OR_EQUALS,
+            right_expr=SqlDateTruncExpression(arg=time_spine_column_expr, time_granularity=node.grain_to_date),
         )
 
-    # ds <= <date> and  ds > <date> - <window>
     return SqlLogicalExpression(
         operator=SqlLogicalOperator.AND,
         args=(
             end_of_range_comparison_expression,
-            SqlComparisonExpression(
-                left_expr=SqlColumnReferenceExpression(
-                    SqlColumnReference(
-                        table_alias=metric_data_set.alias,
-                        column_name=metric_data_set.metric_time_column_name,
-                    )
-                ),
-                comparison=start_of_range_comparison_operator,
-                right_expr=SqlTimeDeltaExpression(
-                    SqlColumnReferenceExpression(
-                        SqlColumnReference(
-                            table_alias=time_spine_data_set.alias,
-                            column_name=time_spine_data_set.metric_time_column_name,
-                        )
-                    ),
-                    count=delta_count,
-                    granularity=delta_granularity,
-                    grain_to_date=node.grain_to_date,
-                ),
-            ),
+            start_of_range_comparison_expr,
         ),
     )
 
