@@ -224,9 +224,17 @@ def test_adjusted_time_constraint_at_boundaries(
     assert (
         time_granularity_solver.adjust_time_range_to_granularity(
             time_range_constraint=TimeRangeConstraint(
-                start_time=TimeRangeConstraint.all_time().start_time + datetime.timedelta(days=-30),
-                end_time=TimeRangeConstraint.all_time().end_time + datetime.timedelta(days=30),
+                start_time=TimeRangeConstraint.all_time().start_time + datetime.timedelta(days=1),
+                end_time=TimeRangeConstraint.all_time().end_time,
             ),
+            time_granularity=TimeGranularity.WEEK,
+        )
+        == TimeRangeConstraint.all_time()
+    )
+
+    assert (
+        time_granularity_solver.adjust_time_range_to_granularity(
+            time_range_constraint=TimeRangeConstraint.all_time(),
             time_granularity=TimeGranularity.WEEK,
         )
         == TimeRangeConstraint.all_time()
