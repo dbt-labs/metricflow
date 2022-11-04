@@ -20,59 +20,6 @@ from metricflow.sql.sql_exprs import (
 SqlDataSetT = TypeVar("SqlDataSetT", bound=SqlDataSet)
 
 
-def _make_cumulative_metric_join_condition(
-    metric_data_set: AnnotatedSqlDataSet,
-    time_spine_data_set: AnnotatedSqlDataSet,
-    node: JoinOverTimeRangeNode[SqlDataSetT],
-) -> SqlExpressionNode:
-    """Creates SqlExpression representing a cumulative metric self-join conditions"""
-    metric_time_column_expr = SqlColumnReferenceExpression(
-        SqlColumnReference(
-            table_alias=metric_data_set.alias,
-            column_name=metric_data_set.metric_time_column_name,
-        )
-    )
-    time_spine_column_expr = SqlColumnReferenceExpression(
-        SqlColumnReference(
-            table_alias=time_spine_data_set.alias,
-            column_name=time_spine_data_set.metric_time_column_name,
-        )
-    )
-
-    # Comparison expression against the endpoint of the cumulative time range,
-    # meaning the metric time must always be BEFORE the time spine time
-    end_of_range_comparison_expression = SqlComparisonExpression(
-        left_expr=metric_time_column_expr,
-        comparison=SqlComparison.LESS_THAN_OR_EQUALS,
-        right_expr=time_spine_column_expr,
-    )
-
-    comparison_expressions: List[SqlComparisonExpression] = [end_of_range_comparison_expression]
-    if node.window:
-        start_of_range_comparison_expr = SqlComparisonExpression(
-            left_expr=metric_time_column_expr,
-            comparison=SqlComparison.GREATER_THAN,
-            right_expr=SqlTimeDeltaExpression(
-                arg=time_spine_column_expr,
-                count=node.window.count,
-                granularity=node.window.granularity,
-            ),
-        )
-        comparison_expressions.append(start_of_range_comparison_expr)
-    elif node.grain_to_date:
-        start_of_range_comparison_expr = SqlComparisonExpression(
-            left_expr=metric_time_column_expr,
-            comparison=SqlComparison.GREATER_THAN_OR_EQUALS,
-            right_expr=SqlDateTruncExpression(arg=time_spine_column_expr, time_granularity=node.grain_to_date),
-        )
-        comparison_expressions.append(start_of_range_comparison_expr)
-
-    return SqlLogicalExpression(
-        operator=SqlLogicalOperator.AND,
-        args=tuple(comparison_expressions),
-    )
-
-
 @dataclass(frozen=True)
 class ColumnEqualityDescription:
     """Helper class to enumerate columns that should be equal between sources in a join."""
@@ -174,15 +121,55 @@ class SqlQueryPlanJoinBuilder:
 
         # Build an expression like "a.ds <= b.ds AND a.ds >= b.ds - <window>
         # If no window is present we join across all time -> "a.ds <= b.ds"
-        constrain_metric_time_column_condition_both = _make_cumulative_metric_join_condition(
-            metric_data_set,
-            time_spine_data_set,
-            node,
+        metric_time_column_expr = SqlColumnReferenceExpression(
+            SqlColumnReference(
+                table_alias=metric_data_set.alias,
+                column_name=metric_data_set.metric_time_column_name,
+            )
+        )
+        time_spine_column_expr = SqlColumnReferenceExpression(
+            SqlColumnReference(
+                table_alias=time_spine_data_set.alias,
+                column_name=time_spine_data_set.metric_time_column_name,
+            )
+        )
+
+        # Comparison expression against the endpoint of the cumulative time range,
+        # meaning the metric time must always be BEFORE the time spine time
+        end_of_range_comparison_expression = SqlComparisonExpression(
+            left_expr=metric_time_column_expr,
+            comparison=SqlComparison.LESS_THAN_OR_EQUALS,
+            right_expr=time_spine_column_expr,
+        )
+
+        comparison_expressions: List[SqlComparisonExpression] = [end_of_range_comparison_expression]
+        if node.window:
+            start_of_range_comparison_expr = SqlComparisonExpression(
+                left_expr=metric_time_column_expr,
+                comparison=SqlComparison.GREATER_THAN,
+                right_expr=SqlTimeDeltaExpression(
+                    arg=time_spine_column_expr,
+                    count=node.window.count,
+                    granularity=node.window.granularity,
+                ),
+            )
+            comparison_expressions.append(start_of_range_comparison_expr)
+        elif node.grain_to_date:
+            start_of_range_comparison_expr = SqlComparisonExpression(
+                left_expr=metric_time_column_expr,
+                comparison=SqlComparison.GREATER_THAN_OR_EQUALS,
+                right_expr=SqlDateTruncExpression(arg=time_spine_column_expr, time_granularity=node.grain_to_date),
+            )
+            comparison_expressions.append(start_of_range_comparison_expr)
+
+        cumulative_join_condition = SqlLogicalExpression(
+            operator=SqlLogicalOperator.AND,
+            args=tuple(comparison_expressions),
         )
 
         return SqlJoinDescription(
             right_source=metric_data_set.data_set.sql_select_node,
             right_source_alias=metric_data_set.alias,
-            on_condition=constrain_metric_time_column_condition_both,
+            on_condition=cumulative_join_condition,
             join_type=SqlJoinType.INNER,
         )
