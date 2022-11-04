@@ -47,10 +47,7 @@ def _make_cumulative_metric_join_condition(
         right_expr=time_spine_column_expr,
     )
 
-    if node.window is None and node.grain_to_date is None:
-        # Accumulate over all time
-        return end_of_range_comparison_expression
-
+    comparison_expressions: List[SqlComparisonExpression] = [end_of_range_comparison_expression]
     if node.window:
         start_of_range_comparison_expr = SqlComparisonExpression(
             left_expr=metric_time_column_expr,
@@ -61,20 +58,18 @@ def _make_cumulative_metric_join_condition(
                 granularity=node.window.granularity,
             ),
         )
-    else:
-        assert node.grain_to_date, "Type refinement assertion - node.grain_to_date cannot be None"
+        comparison_expressions.append(start_of_range_comparison_expr)
+    elif node.grain_to_date:
         start_of_range_comparison_expr = SqlComparisonExpression(
             left_expr=metric_time_column_expr,
             comparison=SqlComparison.GREATER_THAN_OR_EQUALS,
             right_expr=SqlDateTruncExpression(arg=time_spine_column_expr, time_granularity=node.grain_to_date),
         )
+        comparison_expressions.append(start_of_range_comparison_expr)
 
     return SqlLogicalExpression(
         operator=SqlLogicalOperator.AND,
-        args=(
-            end_of_range_comparison_expression,
-            start_of_range_comparison_expr,
-        ),
+        args=tuple(comparison_expressions),
     )
 
 
