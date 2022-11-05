@@ -1,5 +1,6 @@
 import pathlib
-from typing import Any, List, Optional, Set
+from typing import Any, List, Optional, Set, Union
+import datetime
 
 import dateutil.parser
 import pandas as pd
@@ -154,3 +155,7 @@ def make_sql_client_from_config(handler: YamlFileHandler) -> SqlClient:
     else:
         supported_dialects = [x.value for x in SqlDialect]
         raise ValueError(f"Invalid dialect '{dialect}', must be one of {supported_dialects} in {url}")
+
+
+# Supported SQL column types (not comprehensive).
+SQLColumnType = Union[str, int, float, datetime.datetime, datetime.date, bool]

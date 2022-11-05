@@ -20,7 +20,7 @@ from metricflow.column_assoc import ColumnAssociation
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dataclass_serialization import SerializableDataclass
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
-from metricflow.object_utils import assert_exactly_one_arg_set, hash_strings
+from metricflow.object_utils import assert_exactly_one_arg_set, hash_items
 from metricflow.references import (
     DimensionReference,
     MeasureReference,
@@ -306,7 +306,7 @@ class NonAdditiveDimensionSpec(SerializableDataclass):
         """Returns the hash value used for grouping equivalent params."""
         values = [self.window_choice.name, self.name]
         values.extend(sorted(self.window_groupings))
-        return hash_strings(values)
+        return hash_items(values)
 
     @property
     def linkable_specs(self) -> LinkableSpecSet:  # noqa: D

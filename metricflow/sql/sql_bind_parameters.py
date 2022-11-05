@@ -4,6 +4,7 @@ from collections import OrderedDict
 from typing import Dict, Any
 
 from metricflow.model.objects.base import HashableBaseModel
+from metricflow.sql_clients.sql_utils import SQLColumnType
 
 
 class SqlBindParameters(HashableBaseModel):
@@ -12,7 +13,7 @@ class SqlBindParameters(HashableBaseModel):
     These can be used as per https://docs.sqlalchemy.org/en/14/core/tutorial.html#using-textual-sql
     """
 
-    param_dict: Dict[str, str] = OrderedDict()
+    param_dict: Dict[str, SQLColumnType] = OrderedDict()
 
     def update(self, additional_params: SqlBindParameters) -> None:
         """Add the parameters to this set, mutating it."""

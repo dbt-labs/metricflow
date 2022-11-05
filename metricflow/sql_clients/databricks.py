@@ -15,6 +15,7 @@ from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer,
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.base_sql_client_implementation import BaseSqlClientImplementation
 from metricflow.sql_clients.common_client import SqlDialect, check_isolation_level
+from metricflow.sql_clients.sql_utils import SQLColumnType
 
 logger = logging.getLogger(__name__)
 
@@ -137,7 +138,7 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         return DatabricksEngineAttributes()
 
     @staticmethod
-    def params_or_none(bind_params: SqlBindParameters) -> Optional[Dict[str, str]]:
+    def params_or_none(bind_params: SqlBindParameters) -> Optional[Dict[str, SQLColumnType]]:
         """If there are no parameters, use None to prevent collision with `%` wildcard."""
         return None if bind_params == SqlBindParameters() else bind_params.param_dict
 

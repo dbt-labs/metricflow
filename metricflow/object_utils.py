@@ -10,6 +10,7 @@ from dataclasses import is_dataclass, fields
 from enum import Enum
 from hashlib import sha1
 from typing import Sequence, TypeVar, Tuple, NoReturn, Type, Any, List
+from metricflow.sql_clients.sql_utils import SQLColumnType
 
 from metricflow.model.objects.base import HashableBaseModel
 
@@ -174,11 +175,11 @@ def assert_values_exhausted(value: NoReturn) -> NoReturn:
     assert False, f"Should be unreachable, but got {value}"
 
 
-def hash_strings(strings: Sequence[str]) -> str:
+def hash_items(items: Sequence[SQLColumnType]) -> str:
     """Produces a hash from a list of strings."""
     hash_builder = sha1()
-    for s in strings:
-        hash_builder.update(s.encode("utf-8"))
+    for item in items:
+        hash_builder.update(str(item).encode("utf-8"))
     return hash_builder.hexdigest()
 
 
