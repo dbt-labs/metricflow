@@ -4,7 +4,7 @@ from collections import OrderedDict
 from typing import Dict, Any
 
 from metricflow.model.objects.base import HashableBaseModel
-from metricflow.sql_clients.sql_utils import SQLColumnType
+from metricflow.object_utils import SQLColumnType
 
 
 class SqlBindParameters(HashableBaseModel):

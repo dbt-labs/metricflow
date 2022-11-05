@@ -1,3 +1,4 @@
+from __future__ import annotations
 import itertools
 import logging
 import pprint
@@ -8,9 +9,9 @@ from collections import OrderedDict
 from collections.abc import Mapping
 from dataclasses import is_dataclass, fields
 from enum import Enum
+import datetime
 from hashlib import sha1
-from typing import Sequence, TypeVar, Tuple, NoReturn, Type, Any, List
-from metricflow.sql_clients.sql_utils import SQLColumnType
+from typing import Sequence, TypeVar, Tuple, NoReturn, Type, Any, List, Union
 
 from metricflow.model.objects.base import HashableBaseModel
 
@@ -211,3 +212,7 @@ class ExtendedEnum(Enum):
     def list_names(cls) -> List[str]:
         """List valid names within this enum class"""
         return list(cls.__members__.keys())
+
+
+# Supported SQL column types (not comprehensive).
+SQLColumnType = Union[str, int, float, datetime.datetime, datetime.date, bool]
