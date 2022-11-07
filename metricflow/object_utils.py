@@ -176,7 +176,7 @@ def assert_values_exhausted(value: NoReturn) -> NoReturn:
     assert False, f"Should be unreachable, but got {value}"
 
 
-def hash_items(items: Sequence[SQLColumnType]) -> str:
+def hash_items(items: Sequence[SqlColumnType]) -> str:
     """Produces a hash from a list of strings."""
     hash_builder = sha1()
     for item in items:
@@ -215,4 +215,4 @@ class ExtendedEnum(Enum):
 
 
 # Supported SQL column types (not comprehensive).
-SQLColumnType = Union[str, int, float, datetime.datetime, datetime.date, bool]
+SqlColumnType = Union[str, int, float, datetime.datetime, datetime.date, bool]
