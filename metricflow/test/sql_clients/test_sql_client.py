@@ -22,7 +22,7 @@ def _random_table() -> str:
     return f"test_table_{random_id()}"
 
 
-def _select_x_as_y(sql_client: SqlClient, x: int = 1, y: str = "y") -> str:  # noqa: D
+def _select_x_as_y(x: int = 1, y: str = "y") -> str:  # noqa: D
     return f"SELECT {x} AS {y}"
 
 
@@ -34,7 +34,7 @@ def _check_1col(df: pd.DataFrame, col: str = "y", vals: Set[Union[int, str]] = {
 
 
 def test_query(sql_client: SqlClient) -> None:  # noqa: D
-    df = sql_client.query(_select_x_as_y(sql_client))
+    df = sql_client.query(_select_x_as_y())
     _check_1col(df)
 
 
@@ -76,7 +76,7 @@ def test_failed_query_with_execution_params(sql_client: SqlClient) -> None:  # n
 
 def test_create_table(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D
     sql_table = SqlTable(schema_name=mf_test_session_state.mf_source_schema, table_name=_random_table())
-    sql_client.create_table_as_select(sql_table, _select_x_as_y(sql_client))
+    sql_client.create_table_as_select(sql_table, _select_x_as_y())
     df = sql_client.query(f"SELECT * FROM {sql_table.sql}")
     _check_1col(df)
 
@@ -105,7 +105,7 @@ def test_create_table_from_dataframe(  # noqa: D
 
 def test_table_exists(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D
     sql_table = SqlTable(schema_name=mf_test_session_state.mf_source_schema, table_name=_random_table())
-    sql_client.create_table_as_select(sql_table, _select_x_as_y(sql_client))
+    sql_client.create_table_as_select(sql_table, _select_x_as_y())
     assert sql_client.table_exists(sql_table)
 
 
