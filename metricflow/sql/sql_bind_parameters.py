@@ -15,6 +15,14 @@ class SqlBindParameters(HashableBaseModel):
 
     param_dict: Dict[str, SqlColumnType] = OrderedDict()
 
+    class Config:
+        """Pydantic config: smart_union prevents unexpected type coercion.
+
+        https://pydantic-docs.helpmanual.io/usage/model_config/#smart-union
+        """
+
+        smart_union = True
+
     def update(self, additional_params: SqlBindParameters) -> None:
         """Add the parameters to this set, mutating it."""
         for key, value in additional_params.param_dict.items():
