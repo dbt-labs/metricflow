@@ -22,7 +22,6 @@ class DbtMapToDataSourceName(DbtTransformRule):
             if metric.model:
                 try:
                     assert_metric_model_name(metric=metric)
-                    objects.add_data_source_object_if_not_exists(metric.model.name)
                     objects.data_sources[metric.model.name]["name"] = metric.model.name
 
                 except Exception as e:
@@ -46,7 +45,6 @@ class DbtMapToDataSourceDescription(DbtTransformRule):
                     assert_metric_model_name(metric=metric)
                     # Don't need to assert `metric.model.description` because
                     # it's optional and can be set to None
-                    objects.add_data_source_object_if_not_exists(metric.model.name)
                     objects.data_sources[metric.model.name]["description"] = metric.model.description
 
                 except Exception as e:
@@ -72,7 +70,6 @@ class DbtMapDataSourceSqlTable(DbtTransformRule):
                         metric.model.database
                     ), f"Expected a `database` for `{metric.name}` metric's `model`, got `None`"
                     assert metric.model.schema, f"Expected a `schema` for `{metric.name}` metric's `model`, got `None`"
-                    objects.add_data_source_object_if_not_exists(metric.model.name)
                     objects.data_sources[metric.model.name]["sql_table"] = SqlTable(
                         db_name=metric.model.database,
                         schema_name=metric.model.schema,

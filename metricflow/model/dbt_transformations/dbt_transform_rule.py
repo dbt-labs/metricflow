@@ -1,29 +1,39 @@
 from abc import ABC, abstractmethod
+from collections import defaultdict
 from dataclasses import dataclass, field
-from typing import Any, Dict, Tuple
+from typing import Any, Tuple, DefaultDict, Dict
+from typing_extensions import TypeAlias
 
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode, ModelNode
 from metricflow.model.validations.validator_helpers import ModelValidationResults
+
+
+TransformedObjectsValueType: TypeAlias = Any  # type: ignore[misc]
 
 
 @dataclass
 class DbtTransformedObjects:  # type: ignore[misc]
     """Model elements, and sub elements, mapped by element name path"""
 
-    data_sources: Dict[str, Dict[str, Any]] = field(default_factory=dict)  # type: ignore[misc]
-    metrics: Dict[str, Dict[str, Any]] = field(default_factory=dict)  # type: ignore[misc]
-    materializations: Dict[str, Dict[str, Any]] = field(default_factory=dict)  # type: ignore[misc]
+    data_sources: DefaultDict[str, Dict[str, TransformedObjectsValueType]] = field(
+        default_factory=lambda: defaultdict(dict)
+    )
+    metrics: DefaultDict[str, Dict[str, TransformedObjectsValueType]] = field(default_factory=lambda: defaultdict(dict))
+    materializations: DefaultDict[str, Dict[str, TransformedObjectsValueType]] = field(
+        default_factory=lambda: defaultdict(dict)
+    )
     # access path is ["data_source_name"]["dimension_name"] -> dict dimension representation
-    dimensions: Dict[str, Dict[str, Dict[str, Any]]] = field(default_factory=dict)  # type: ignore[misc]
+    dimensions: DefaultDict[str, DefaultDict[str, Dict[str, TransformedObjectsValueType]]] = field(
+        default_factory=lambda: defaultdict(lambda: defaultdict(dict))
+    )
     # access path is ["data_source_name"]["identifier_name"] -> dict identifier representation
-    identifiers: Dict[str, Dict[str, Dict[str, Any]]] = field(default_factory=dict)  # type: ignore[misc]
+    identifiers: DefaultDict[str, DefaultDict[str, Dict[str, TransformedObjectsValueType]]] = field(
+        default_factory=lambda: defaultdict(lambda: defaultdict(dict))
+    )
     # access path is ["data_source_name"]["measure_name"] -> dict measure representation
-    measures: Dict[str, Dict[str, Dict[str, Any]]] = field(default_factory=dict)  # type: ignore[misc]
-
-    def add_data_source_object_if_not_exists(self, name: str) -> None:
-        """Checks if a mapping exists for the given data source name, and adds one if not found"""
-        if self.data_sources.get(name) is None:
-            self.data_sources[name] = {}
+    measures: DefaultDict[str, DefaultDict[str, Dict[str, TransformedObjectsValueType]]] = field(
+        default_factory=lambda: defaultdict(lambda: defaultdict(dict))
+    )
 
 
 @dataclass
