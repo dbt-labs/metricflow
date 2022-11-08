@@ -2,7 +2,7 @@ import logging
 import threading
 from collections import OrderedDict
 from typing import Set, Union
-
+import datetime
 import pandas as pd
 import pytest
 from metricflow.dataflow.sql_table import SqlTable
@@ -12,6 +12,7 @@ from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.sql_utils import make_df
 from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.sql_clients.duckdb import DuckDbSqlClient
 from sqlalchemy.exc import ProgrammingError
 
 logger = logging.getLogger(__name__)
@@ -37,15 +38,24 @@ def test_query(sql_client: SqlClient) -> None:  # noqa: D
     _check_1col(df)
 
 
-def test_query_with_execution_params(sql_client: SqlClient) -> None:  # noqa: D
-    expr = f"SELECT {sql_client.render_execution_param_key('x')} as y"
-    sql_execution_params = SqlBindParameters()
-    sql_execution_params.param_dict = OrderedDict([("x", "1")])
-    df = sql_client.query(expr, sql_bind_parameters=sql_execution_params)
-    assert isinstance(df, pd.DataFrame)
-    assert df.shape == (1, 1)
-    assert df.columns.tolist() == ["y"]
-    assert set(df["y"]) == {"1"}
+def test_query_with_execution_params(sql_client: SqlClient) -> None:
+    """Test querying with execution parameters of all supported datatypes."""
+    for param in [2, "hi", 3.5, True, False, None, datetime.datetime(2022, 1, 1), datetime.date(2020, 12, 31)]:
+        sql_execution_params = SqlBindParameters(param_dict={"x": param})
+        assert sql_execution_params.param_dict["x"] == param  # check that pydantic did not coerce type unexpectedly
+
+        expr = f"SELECT {sql_client.render_execution_param_key('x')} as y"
+        df = sql_client.query(expr, sql_bind_parameters=sql_execution_params)
+        assert isinstance(df, pd.DataFrame)
+        assert df.shape == (1, 1)
+        assert df.columns.tolist() == ["y"]
+
+        if type(sql_client) in [DuckDbSqlClient]:
+            # DuckDB converts all other types to str
+            if isinstance(param, str):
+                assert set(df["y"]) == {param}
+        else:
+            assert set(df["y"]) == {param}
 
 
 def test_select_one_query(sql_client: SqlClient) -> None:  # noqa: D
