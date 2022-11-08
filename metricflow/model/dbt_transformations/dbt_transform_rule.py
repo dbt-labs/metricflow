@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Any, Dict, Tuple
 
-from dbt_metadata_client.dbt_metadata_api_schema import MetricNode
+from dbt_metadata_client.dbt_metadata_api_schema import MetricNode, ModelNode
 from metricflow.model.validations.validator_helpers import ModelValidationResults
 
 
@@ -30,6 +30,18 @@ class DbtTransformedObjects:  # type: ignore[misc]
 class DbtTransformationResult:  # noqa: D
     transformed_objects: DbtTransformedObjects
     validation_results: ModelValidationResults
+
+
+def assert_metric_model_name(metric: MetricNode) -> None:
+    """Asserts that a metric has a model and that model has a name
+
+    We abstracted this into a function, because it is a common pattern
+    in DbtTransformRules.
+    """
+    assert isinstance(
+        metric.model, ModelNode
+    ), f"Expected `ModelNode` for `{metric.name}` metric's `model`, got `{type(metric.model)}`"
+    assert metric.model.name, f"Expected a `name` for `{metric.name}` metric's `model`, got `None`"
 
 
 class DbtTransformRule(ABC):

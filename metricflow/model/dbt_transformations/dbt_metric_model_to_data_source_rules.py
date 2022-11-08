@@ -1,9 +1,13 @@
 import traceback
 from typing import List, Tuple
 
-from dbt_metadata_client.dbt_metadata_api_schema import ModelNode, MetricNode
+from dbt_metadata_client.dbt_metadata_api_schema import MetricNode
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.model.dbt_transformations.dbt_transform_rule import DbtTransformRule, DbtTransformedObjects
+from metricflow.model.dbt_transformations.dbt_transform_rule import (
+    DbtTransformRule,
+    DbtTransformedObjects,
+    assert_metric_model_name,
+)
 from metricflow.model.validations.validator_helpers import ModelValidationResults, ValidationIssue, ValidationError
 
 
@@ -17,10 +21,7 @@ class DbtMapToDataSourceName(DbtTransformRule):
             # Derived metrics don't have models, so skip when model doesn't exist
             if metric.model:
                 try:
-                    assert isinstance(
-                        metric.model, ModelNode
-                    ), f"Expected `ModelNode` for `{metric.name}` metric's `model`, got `{type(metric.model)}`"
-                    assert metric.model.name, f"Expected a `name` for `{metric.name}` metric's `model`, got `None`"
+                    assert_metric_model_name(metric=metric)
                     objects.add_data_source_object_if_not_exists(metric.model.name)
                     objects.data_sources[metric.model.name]["name"] = metric.model.name
 
@@ -42,10 +43,7 @@ class DbtMapToDataSourceDescription(DbtTransformRule):
             # Derived metrics don't have models, so skip when model doesn't exist
             if metric.model:
                 try:
-                    assert isinstance(
-                        metric.model, ModelNode
-                    ), f"Expected `ModelNode` for `{metric.name}` metric's `model`, got `{type(metric.model)}`"
-                    assert metric.model.name, f"Expected a `name` for `{metric.name}` metric's `model`, got `None`"
+                    assert_metric_model_name(metric=metric)
                     # Don't need to assert `metric.model.description` because
                     # it's optional and can be set to None
                     objects.add_data_source_object_if_not_exists(metric.model.name)
@@ -69,10 +67,7 @@ class DbtMapDataSourceSqlTable(DbtTransformRule):
             # Derived metrics don't have models, so skip when model doesn't exist
             if metric.model:
                 try:
-                    assert isinstance(
-                        metric.model, ModelNode
-                    ), f"Expected `ModelNode` for `{metric.name}` metric's `model`, got `{type(metric.model)}`"
-                    assert metric.model.name, f"Expected a `name` for `{metric.name}` metric's `model`, got `None`"
+                    assert_metric_model_name(metric=metric)
                     assert (
                         metric.model.database
                     ), f"Expected a `database` for `{metric.name}` metric's `model`, got `None`"
