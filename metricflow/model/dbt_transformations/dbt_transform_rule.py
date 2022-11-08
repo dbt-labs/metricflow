@@ -20,6 +20,11 @@ class DbtTransformedObjects:  # type: ignore[misc]
     # access path is ["data_source_name"]["measure_name"] -> dict measure representation
     measures: Dict[str, Dict[str, Dict[str, Any]]] = field(default_factory=dict)  # type: ignore[misc]
 
+    def add_data_source_object_if_not_exists(self, name: str) -> None:
+        """Checks if a mapping exists for the given data source name, and adds one if not found"""
+        if self.data_sources.get(name) is None:
+            self.data_sources[name] = {}
+
 
 @dataclass
 class DbtTransformationResult:  # noqa: D
