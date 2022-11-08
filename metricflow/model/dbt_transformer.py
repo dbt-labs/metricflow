@@ -9,6 +9,30 @@ from metricflow.model.dbt_transformations.dbt_transform_rule import (
     DbtTransformationResult,
     DbtTransformedObjects,
 )
+from metricflow.model.dbt_transformations.dbt_metric_model_to_data_source_rules import (
+    DbtMapToDataSourceName,
+    DbtMapToDataSourceDescription,
+    DbtMapDataSourceSqlTable,
+)
+from metricflow.model.dbt_transformations.dbt_metric_to_metrics_rules import (
+    DbtToMetricName,
+    DbtToMetricDescription,
+    DbtToMetricType,
+    DbtToMeasureProxyMetricTypeParams,
+    DbtToMetricConstraint,
+    DbtToDerivedMetricTypeParams,
+)
+from metricflow.model.dbt_transformations.dbt_metric_to_dimensions_rules import (
+    DbtDimensionsToDimensions,
+    DbtTimestampToDimension,
+    DbtFiltersToDimensions,
+)
+from metricflow.model.dbt_transformations.dbt_metric_to_measure import (
+    DbtToMeasureName,
+    DbtToMeasureExpr,
+    DbtToMeasureAgg,
+    DbtToMeasureAggTimeDimension,
+)
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.materialization import Materialization
 from metricflow.model.objects.metric import Metric
@@ -18,7 +42,28 @@ from metricflow.model.validations.validator_helpers import ModelValidationResult
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_RULES: Tuple[DbtTransformRule, ...] = tuple()
+DEFAULT_RULES: Tuple[DbtTransformRule, ...] = (
+    # Build data sources
+    DbtMapToDataSourceName(),
+    DbtMapToDataSourceDescription(),
+    DbtMapDataSourceSqlTable(),
+    # Build Metrics
+    DbtToMetricName(),
+    DbtToMetricDescription(),
+    DbtToMetricType(),
+    DbtToMeasureProxyMetricTypeParams(),
+    DbtToMetricConstraint(),
+    DbtToDerivedMetricTypeParams(),
+    # Build Dimensions
+    DbtDimensionsToDimensions(),
+    DbtTimestampToDimension(),
+    DbtFiltersToDimensions(),
+    # Build Measures
+    DbtToMeasureName(),
+    DbtToMeasureExpr(),
+    DbtToMeasureAgg(),
+    DbtToMeasureAggTimeDimension(),
+)
 
 
 class DbtTransformer:
