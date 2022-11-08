@@ -177,7 +177,6 @@ class DataSourceToDataSetConverter:
         self,
         data_source_name: str,
         measures: Sequence[Measure],
-        measure_time_dimension_spec: TimeDimensionSpec,
         table_alias: str,
     ) -> Tuple[Sequence[MeasureInstance], Sequence[SqlSelectColumn]]:
         # Convert all elements to instances
@@ -387,11 +386,9 @@ class DataSourceToDataSetConverter:
 
         # Handle measures
         if len(data_source.measures) > 0:
-            primary_time_dimension = self._find_primary_time_dimension(data_source)
             measure_instances, select_columns = self._convert_measures(
                 data_source_name=data_source.name,
                 measures=data_source.measures,
-                measure_time_dimension_spec=primary_time_dimension,
                 table_alias=from_source_alias,
             )
             all_measure_instances.extend(measure_instances)
