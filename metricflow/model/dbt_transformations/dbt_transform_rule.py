@@ -54,6 +54,16 @@ def assert_metric_model_name(metric: MetricNode) -> None:
     assert metric.model.name, f"Expected a `name` for `{metric.name}` metric's `model`, got `None`"
 
 
+def assert_essential_metric_properties(metric: MetricNode) -> None:
+    """Asserts that a dbt metric has the essential properties commonly needed when building metrics
+
+    We abstracted this into a function, because it is a common pattern
+    in DbtTransformRules.
+    """
+    assert metric.name, f"Expected a `name` for `{metric.name}` metric, got `None`"
+    assert metric.calculation_method, f"Expected a `calculation_method` for `{metric.name}` metric, got `None`"
+
+
 class DbtTransformRule(ABC):
     """Encapsulates logic for transforming a dbt manifest. e.g. add metrics based on measures."""
 
