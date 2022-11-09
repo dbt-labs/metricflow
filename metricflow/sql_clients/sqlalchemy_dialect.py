@@ -82,7 +82,7 @@ class SqlAlchemySqlClient(BaseSqlClientImplementation, ABC):
         return self._engine.table_names(schema=schema_name)
 
     @contextmanager
-    def engine_connection(
+    def _engine_connection(
         self, engine: sqlalchemy.engine.Engine, isolation_level: Optional[SqlIsolationLevel] = None
     ) -> Iterator[sqlalchemy.engine.Connection]:
         """Context Manager for providing a configured connection."""
@@ -104,7 +104,7 @@ class SqlAlchemySqlClient(BaseSqlClientImplementation, ABC):
         bind_params: SqlBindParameters,
         isolation_level: Optional[SqlIsolationLevel] = None,
     ) -> pd.DataFrame:
-        with self.engine_connection(self._engine, isolation_level=isolation_level) as conn:
+        with self._engine_connection(self._engine, isolation_level=isolation_level) as conn:
             return pd.read_sql_query(sqlalchemy.text(stmt), conn, params=bind_params.param_dict)
 
     def _engine_specific_execute_implementation(  # noqa: D
@@ -113,11 +113,11 @@ class SqlAlchemySqlClient(BaseSqlClientImplementation, ABC):
         bind_params: SqlBindParameters,
         isolation_level: Optional[SqlIsolationLevel] = None,
     ) -> None:
-        with self.engine_connection(self._engine, isolation_level=isolation_level) as conn:
+        with self._engine_connection(self._engine, isolation_level=isolation_level) as conn:
             conn.execute(sqlalchemy.text(stmt), bind_params.param_dict)
 
     def _engine_specific_dry_run_implementation(self, stmt: str, bind_params: SqlBindParameters) -> None:  # noqa: D
-        with self.engine_connection(self._engine) as conn:
+        with self._engine_connection(self._engine) as conn:
             s = "EXPLAIN " + stmt
             conn.execute(sqlalchemy.text(s), bind_params.param_dict)
 
@@ -126,7 +126,7 @@ class SqlAlchemySqlClient(BaseSqlClientImplementation, ABC):
     ) -> None:
         logger.info(f"Creating table '{sql_table.sql}' from a DataFrame with {df.shape[0]} row(s)")
         start_time = time.time()
-        with self.engine_connection(self._engine) as conn:
+        with self._engine_connection(self._engine) as conn:
             pd.io.sql.to_sql(
                 frame=df,
                 name=sql_table.table_name,

@@ -127,7 +127,7 @@ class BigQuerySqlClient(SqlAlchemySqlClient):
         return BigQueryEngineAttributes()
 
     def list_tables(self, schema_name: str) -> Sequence[str]:  # noqa: D
-        with self.engine_connection(engine=self._engine) as conn:
+        with self._engine_connection(engine=self._engine) as conn:
             insp = sqlalchemy.inspection.inspect(conn)
             schema_dot_tables = insp.get_table_names(schema=schema_name)
             return [x.replace(schema_name + ".", "") for x in schema_dot_tables]
