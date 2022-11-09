@@ -139,11 +139,7 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
 
     @staticmethod
     def params_or_none(bind_params: SqlBindParameters) -> Optional[Dict[str, SqlColumnType]]:
-        """If there are no parameters, use None to prevent collision with `%` wildcard.
-
-        Databricks SQL connector does not currently support boolean exececution params yet.
-        Convert boolean params to string.
-        """
+        """If there are no parameters, use None to prevent collision with `%` wildcard."""
         return None if bind_params == SqlBindParameters() else bind_params.param_dict
 
     def _engine_specific_query_implementation(
