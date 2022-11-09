@@ -39,7 +39,6 @@ def test_query(sql_client: SqlClient) -> None:  # noqa: D
 
 def test_query_with_execution_params(sql_client: SqlClient) -> None:
     """Test querying with execution parameters of all supported datatypes."""
-    # TODO: add None for all engines except BQ? Check if needed
     for param in [2, "hi", 3.5, True, False, datetime.datetime(2022, 1, 1), datetime.date(2020, 12, 31)]:
         sql_execution_params = SqlBindParameters(param_dict={"x": param})
         assert sql_execution_params.param_dict["x"] == param  # check that pydantic did not coerce type unexpectedly
@@ -56,6 +55,9 @@ def test_query_with_execution_params(sql_client: SqlClient) -> None:
         # Some engines use JSON bool syntax (i.e., True -> 'true')
         if isinstance(param, bool):
             assert str_result in [str_param, str_param.lower()]
+        # Some engines add decimals to datetime milliseconds; trim here
+        elif isinstance(param, datetime.datetime):
+            assert str_result[: len(str_param)] == str_param
         else:
             assert str_result == str_param
 
