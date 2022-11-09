@@ -24,7 +24,7 @@ jobs:
         with:
           python-version: "3.9"
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           # cache the python dependencies and precommit-created virtual envs
           path: |
