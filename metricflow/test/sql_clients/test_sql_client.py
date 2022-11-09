@@ -12,7 +12,6 @@ from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.sql_utils import make_df
 from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
-from metricflow.sql_clients.duckdb import DuckDbSqlClient
 from sqlalchemy.exc import ProgrammingError
 
 logger = logging.getLogger(__name__)
@@ -50,12 +49,14 @@ def test_query_with_execution_params(sql_client: SqlClient) -> None:
         assert df.shape == (1, 1)
         assert df.columns.tolist() == ["y"]
 
-        if type(sql_client) in [DuckDbSqlClient]:
-            # DuckDB converts all other types to str
-            if isinstance(param, str):
-                assert set(df["y"]) == {param}
+        # Some engines convert some types to str; convert everything to str for comparison
+        str_param = str(param)
+        str_result = str(df["y"][0])
+        # Some engines use JSON bool syntax (i.e., True -> 'true')
+        if isinstance(param, bool):
+            assert str_result in [str_param, str_param.lower()]
         else:
-            assert set(df["y"]) == {param}
+            assert str_result == str_param
 
 
 def test_select_one_query(sql_client: SqlClient) -> None:  # noqa: D
