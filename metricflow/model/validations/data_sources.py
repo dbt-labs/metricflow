@@ -63,7 +63,13 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
                             )
                         )
 
-        if len(primary_time_dimensions) == 0 and len(data_source.measures) > 0:
+        # A data source must have a primary time dimension if it has
+        # any measures that don't have an `agg_time_dimension` set
+        if (
+            len(primary_time_dimensions) == 0
+            and len(data_source.measures) > 0
+            and any(measure.agg_time_dimension is None for measure in data_source.measures)
+        ):
             issues.append(
                 ValidationError(
                     context=DataSourceContext(

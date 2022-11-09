@@ -1,6 +1,7 @@
 import pytest
 
 from metricflow.model.model_validator import ModelValidator
+from metricflow.model.objects.elements.dimension import DimensionType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.test.model.validations.test_unique_valid_name import copied_model
@@ -42,3 +43,21 @@ def test_unset_aggregation_time_dimension(data_warehouse_validation_model: UserC
     ):
         model_validator = ModelValidator()
         model_validator.checked_validations(model)
+
+
+def test_missing_primary_time_ok_if_all_measures_have_agg_time_dim(
+    data_warehouse_validation_model: UserConfiguredModel,
+) -> None:  # noqa:D
+    model = copied_model(data_warehouse_validation_model)
+    data_source_with_measures, _ = find_data_source_with(
+        model,
+        lambda data_source: len(data_source.measures) > 0,
+    )
+
+    for dimension in data_source_with_measures.dimensions:
+        if dimension.type == DimensionType.TIME:
+            assert dimension.type_params, f"Time dimension `{dimension.name}` is missing `type_params`"
+            dimension.type_params.is_primary = False
+
+    model_validator = ModelValidator()
+    model_validator.checked_validations(model)
