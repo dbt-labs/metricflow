@@ -15,14 +15,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check-out the repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Python 3.9
         uses: actions/setup-python@v4
         with:
           python-version: "3.9"
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: |
             ${{ env.pythonLocation }}
@@ -48,14 +48,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check-out the repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Python 3.9
         uses: actions/setup-python@v4
         with:
           python-version: "3.9"
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: |
             ${{ env.pythonLocation }}
@@ -81,14 +81,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check-out the repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Python 3.9
         uses: actions/setup-python@v4
         with:
           python-version: "3.9"
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: |
             ${{ env.pythonLocation }}
@@ -114,14 +114,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check-out the repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Python 3.9
         uses: actions/setup-python@v4
         with:
           python-version: "3.9"
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: |
             ${{ env.pythonLocation }}
@@ -162,14 +162,14 @@ jobs:
 
     steps:
       - name: Check-out the repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Python 3.9
         uses: actions/setup-python@v4
         with:
           python-version: "3.9"
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: |
             ${{ env.pythonLocation }}
@@ -194,7 +194,7 @@ jobs:
     if: ${{ github.event_name != 'pull_request' && failure() }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Slack Failure
         uses: kpritam/slack-job-status-action@v1
         with:

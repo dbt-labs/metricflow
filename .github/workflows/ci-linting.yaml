@@ -18,13 +18,13 @@ jobs:
     name: Run Pre-Commit Linting Hooks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Python 3.9
         uses: actions/setup-python@v4
         with:
           python-version: "3.9"
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           # cache the python dependencies and precommit-created virtual envs
           path: |
