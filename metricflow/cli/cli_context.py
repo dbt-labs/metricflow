@@ -1,17 +1,16 @@
 import logging
-
 from logging.handlers import TimedRotatingFileHandler
 from typing import Dict, Optional
 
-from metricflow.errors.errors import SqlClientCreationException, MetricFlowInitException
 from metricflow.configuration.config_handler import ConfigHandler
 from metricflow.configuration.constants import CONFIG_DBT_PROFILE, CONFIG_DBT_REPO, CONFIG_DBT_TARGET, CONFIG_DWH_SCHEMA
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.engine.utils import build_user_configured_model_from_config, build_user_configured_model_from_dbt_config
-from metricflow.model.semantic_model import SemanticModel
-from metricflow.protocols.sql_client import SqlClient
-from metricflow.sql_clients.sql_utils import make_sql_client_from_config
+from metricflow.errors.errors import SqlClientCreationException, MetricFlowInitException
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from metricflow.model.semantic_model import SemanticModel
+from metricflow.protocols.async_sql_client import AsyncSqlClient
+from metricflow.sql_clients.sql_utils import make_sql_client_from_config
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +21,7 @@ class CLIContext:
     def __init__(self) -> None:  # noqa: D
         self.verbose = False
         self._mf: Optional[MetricFlowEngine] = None
-        self._sql_client: Optional[SqlClient] = None
+        self._sql_client: Optional[AsyncSqlClient] = None
         self._user_configured_model: Optional[UserConfiguredModel] = None
         self._semantic_model: Optional[SemanticModel] = None
         self._mf_system_schema: Optional[str] = None
@@ -67,7 +66,7 @@ class CLIContext:
             raise SqlClientCreationException from e
 
     @property
-    def sql_client(self) -> SqlClient:  # noqa: D
+    def sql_client(self) -> AsyncSqlClient:  # noqa: D
         if self._sql_client is None:
             # Initialize the SqlClient if not set
             self.__initialize_sql_client()
