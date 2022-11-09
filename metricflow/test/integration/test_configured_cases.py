@@ -13,6 +13,7 @@ from metricflow.plan_conversion.column_resolver import (
     DefaultColumnAssociationResolver,
 )
 from metricflow.plan_conversion.time_spine import TimeSpineSource
+from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_exprs import (
     SqlTimeDeltaExpression,
@@ -139,7 +140,7 @@ def test_case(
     multi_hop_join_semantic_model: SemanticModel,
     extended_date_semantic_model: SemanticModel,
     scd_semantic_model: SemanticModel,
-    sql_client: SqlClient,
+    async_sql_client: AsyncSqlClient,
     create_simple_model_tables: bool,
     create_message_source_tables: bool,
     create_bridge_table: bool,
@@ -151,7 +152,7 @@ def test_case(
     case = CONFIGURED_INTEGRATION_TESTS_REPOSITORY.get_test_case(name)
     logger.info(f"Running integration test case: '{case.name}' from file '{case.file_path}'")
 
-    missing_required_features = filter_not_supported_features(sql_client, case.required_features)
+    missing_required_features = filter_not_supported_features(async_sql_client, case.required_features)
     if missing_required_features:
         pytest.skip(f"DW does not support {missing_required_features}")
 
@@ -177,14 +178,14 @@ def test_case(
 
     engine = MetricFlowEngine(
         semantic_model=semantic_model,
-        sql_client=sql_client,
+        sql_client=async_sql_client,
         column_association_resolver=DefaultColumnAssociationResolver(semantic_model),
         time_source=ConfigurableTimeSource(as_datetime("2021-01-04")),
         time_spine_source=time_spine_source,
         system_schema=mf_test_session_state.mf_system_schema,
     )
 
-    check_query_helpers = CheckQueryHelpers(sql_client)
+    check_query_helpers = CheckQueryHelpers(async_sql_client)
 
     query_result = engine.query(
         MetricFlowQueryRequest.create_with_random_request_id(
@@ -210,7 +211,7 @@ def test_case(
 
     actual = query_result.result_df
 
-    expected = sql_client.query(
+    expected = async_sql_client.query(
         jinja2.Template(case.check_query, undefined=jinja2.StrictUndefined,).render(
             source_schema=mf_test_session_state.mf_source_schema,
             render_time_constraint=check_query_helpers.render_time_constraint,

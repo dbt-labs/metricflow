@@ -10,10 +10,10 @@ from typing import List, Sequence, Optional, Tuple
 import jinja2
 import pandas as pd
 
-from metricflow.protocols.sql_client import SqlClient
-from metricflow.dag.mf_dag import DagNode, MetricFlowDag, NodeId, DisplayedProperty
 from metricflow.dag.id_generation import EXEC_NODE_READ_SQL_QUERY, EXEC_NODE_WRITE_TO_TABLE
+from metricflow.dag.mf_dag import DagNode, MetricFlowDag, NodeId, DisplayedProperty
 from metricflow.dataflow.sql_table import SqlTable
+from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.visitor import Visitable
 
@@ -93,7 +93,7 @@ class SelectSqlQueryToDataFrameTask(ExecutionPlanTask):
 
     def __init__(  # noqa: D
         self,
-        sql_client: SqlClient,
+        sql_client: AsyncSqlClient,
         sql_query: str,
         execution_parameters: SqlBindParameters,
         parent_nodes: Optional[List[ExecutionPlanTask]] = None,
@@ -144,7 +144,7 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
 
     def __init__(  # noqa: D
         self,
-        sql_client: SqlClient,
+        sql_client: AsyncSqlClient,
         sql_query: str,
         execution_parameters: SqlBindParameters,
         output_table: SqlTable,

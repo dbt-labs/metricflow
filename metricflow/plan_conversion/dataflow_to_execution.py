@@ -1,7 +1,6 @@
 import logging
 from typing import Generic, Tuple, Optional, Union
 
-from metricflow.protocols.sql_client import SqlClient
 from metricflow.dag.id_generation import IdGeneratorRegistry, SQL_QUERY_PLAN_PREFIX, EXEC_PLAN_PREFIX
 from metricflow.dataflow.dataflow_plan import (
     SourceDataSetT,
@@ -20,6 +19,7 @@ from metricflow.execution.execution_plan import (
     SelectSqlQueryToTableTask,
 )
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter, SqlDataSetT
+from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.specs import OutputColumnNameOverride
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_plan import SqlSelectStatementNode, SqlSelectColumn, SqlQueryPlan
@@ -35,7 +35,7 @@ class DataflowToExecutionPlanConverter(Generic[SqlDataSetT], SinkNodeVisitor[Sql
         self,
         sql_plan_converter: DataflowToSqlQueryPlanConverter[SqlDataSetT],
         sql_plan_renderer: SqlQueryPlanRenderer,
-        sql_client: SqlClient,
+        sql_client: AsyncSqlClient,
         output_column_name_overrides: Tuple[OutputColumnNameOverride, ...] = (),
     ) -> None:
         """Constructor.

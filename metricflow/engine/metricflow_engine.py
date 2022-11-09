@@ -17,9 +17,11 @@ from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import DataflowPlan
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
+from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.engine.models import Dimension, Materialization, Metric
 from metricflow.engine.time_source import ServerTimeSource
 from metricflow.engine.utils import build_user_configured_model_from_config
+from metricflow.errors.errors import ExecutionException, MaterializationNotFoundError
 from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
 from metricflow.execution.execution_plan_to_text import execution_plan_to_text
 from metricflow.execution.executor import SequentialPlanExecutor
@@ -30,18 +32,16 @@ from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationR
 from metricflow.plan_conversion.dataflow_to_execution import DataflowToExecutionPlanConverter
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.time_spine import TimeSpineSource, TimeSpineTableBuilder
-from metricflow.protocols.sql_client import SqlClient
+from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.query.query_parser import MetricFlowQueryParser
-from metricflow.specs import ColumnAssociationResolver, MetricFlowQuerySpec
 from metricflow.references import MetricReference
+from metricflow.specs import ColumnAssociationResolver, MetricFlowQuerySpec
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
-from metricflow.time.time_source import TimeSource
-from metricflow.dataset.data_source_adapter import DataSourceDataSet
-from metricflow.errors.errors import ExecutionException, MaterializationNotFoundError
-from metricflow.sql_clients.sql_utils import make_sql_client_from_config
 from metricflow.sql_clients.common_client import not_empty
+from metricflow.sql_clients.sql_utils import make_sql_client_from_config
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
+from metricflow.time.time_source import TimeSource
 
 logger = logging.getLogger(__name__)
 _telemetry_reporter = TelemetryReporter(report_levels_higher_or_equal_to=TelemetryLevel.USAGE)
@@ -301,7 +301,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     def __init__(
         self,
         semantic_model: SemanticModel,
-        sql_client: SqlClient,
+        sql_client: AsyncSqlClient,
         system_schema: str,
         time_source: TimeSource = ServerTimeSource(),
         column_association_resolver: Optional[ColumnAssociationResolver] = None,

@@ -83,7 +83,7 @@ def make_sql_client(url: str, password: str) -> AsyncSqlClient:
         raise ValueError(f"Unknown dialect: `{dialect}` in URL {url}")
 
 
-def make_sql_client_from_config(handler: YamlFileHandler) -> SqlClient:
+def make_sql_client_from_config(handler: YamlFileHandler) -> AsyncSqlClient:
     """Construct a SqlClient given a yaml file config."""
 
     url = handler.url
