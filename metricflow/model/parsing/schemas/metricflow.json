@@ -339,6 +339,9 @@
                         "integer"
                     ]
                 },
+                "unit": {
+                    "type": "string"
+                },
                 "value_format": {
                     "type": "string"
                 }
