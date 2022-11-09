@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - court/constraint-types
   pull_request:
     types: [labeled]
 
