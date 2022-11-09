@@ -215,4 +215,4 @@ class ExtendedEnum(Enum):
 
 
 # Supported SQL column types (not comprehensive).
-SqlColumnType = Union[str, int, float, datetime.datetime, datetime.date, bool, None]
+SqlColumnType = Union[str, int, float, datetime.datetime, datetime.date, bool]
