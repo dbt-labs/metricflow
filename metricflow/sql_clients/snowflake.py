@@ -160,7 +160,7 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
         return SnowflakeEngineAttributes()
 
     @contextmanager
-    def engine_connection(
+    def _engine_connection(
         self, engine: sqlalchemy.engine.Engine, isolation_level: Optional[SqlIsolationLevel] = None
     ) -> Iterator[sqlalchemy.engine.Connection]:
         """Context Manager for providing a configured connection.
@@ -171,7 +171,7 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
         At this time we hard-code the ISO standard.
         """
         check_isolation_level(self, isolation_level)
-        with super().engine_connection(self._engine, isolation_level=isolation_level) as conn:
+        with super()._engine_connection(self._engine, isolation_level=isolation_level) as conn:
             # WEEK_START 1 means Monday.
             conn.execute("ALTER SESSION SET WEEK_START = 1;")
             results = conn.execute("SELECT CURRENT_SESSION()")
@@ -194,7 +194,7 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
         allow_re_auth: bool = True,
     ) -> pd.DataFrame:
         check_isolation_level(self, isolation_level)
-        with self.engine_connection(engine=self._engine, isolation_level=isolation_level) as conn:
+        with self._engine_connection(engine=self._engine, isolation_level=isolation_level) as conn:
             try:
                 return pd.read_sql_query(sqlalchemy.text(stmt), conn, params=bind_params.param_dict)
             except ProgrammingError as e:
@@ -248,7 +248,7 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
             self._engine.dispose()
 
     def cancel_submitted_queries(self) -> None:  # noqa: D
-        with super().engine_connection(self._engine) as conn:
+        with super()._engine_connection(self._engine) as conn:
             with self._known_sessions_ids_lock:
                 for session_id in self._known_session_ids:
                     logger.info(f"Cancelling queries associated with session id: {session_id}")
