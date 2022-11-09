@@ -11,7 +11,7 @@ from metricflow.model.objects.base import (
     PydanticCustomInputParser,
     PydanticParseableValueType,
 )
-from metricflow.object_utils import ExtendedEnum, hash_strings
+from metricflow.object_utils import ExtendedEnum, hash_items
 from metricflow.references import MeasureReference
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.time.time_granularity import string_to_time_granularity
@@ -193,4 +193,4 @@ class Metric(HashableBaseModel, ModelWithMetadataParsing):
             if self.constraint.linkable_names:
                 values.extend(self.constraint.linkable_names)
         values.extend([m.element_name for m in self.measure_references])
-        return hash_strings(values)
+        return hash_items(values)

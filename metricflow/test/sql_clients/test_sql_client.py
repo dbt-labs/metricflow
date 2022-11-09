@@ -2,7 +2,7 @@ import logging
 import threading
 from collections import OrderedDict
 from typing import Set, Union
-
+import datetime
 import pandas as pd
 import pytest
 from metricflow.dataflow.sql_table import SqlTable
@@ -21,7 +21,7 @@ def _random_table() -> str:
     return f"test_table_{random_id()}"
 
 
-def _select_x_as_y(sql_client: SqlClient, x: int = 1, y: str = "y") -> str:  # noqa: D
+def _select_x_as_y(x: int = 1, y: str = "y") -> str:  # noqa: D
     return f"SELECT {x} AS {y}"
 
 
@@ -33,19 +33,33 @@ def _check_1col(df: pd.DataFrame, col: str = "y", vals: Set[Union[int, str]] = {
 
 
 def test_query(sql_client: SqlClient) -> None:  # noqa: D
-    df = sql_client.query(_select_x_as_y(sql_client))
+    df = sql_client.query(_select_x_as_y())
     _check_1col(df)
 
 
-def test_query_with_execution_params(sql_client: SqlClient) -> None:  # noqa: D
-    expr = f"SELECT {sql_client.render_execution_param_key('x')} as y"
-    sql_execution_params = SqlBindParameters()
-    sql_execution_params.param_dict = OrderedDict([("x", "1")])
-    df = sql_client.query(expr, sql_bind_parameters=sql_execution_params)
-    assert isinstance(df, pd.DataFrame)
-    assert df.shape == (1, 1)
-    assert df.columns.tolist() == ["y"]
-    assert set(df["y"]) == {"1"}
+def test_query_with_execution_params(sql_client: SqlClient) -> None:
+    """Test querying with execution parameters of all supported datatypes."""
+    for param in [2, "hi", 3.5, True, False, datetime.datetime(2022, 1, 1), datetime.date(2020, 12, 31)]:
+        sql_execution_params = SqlBindParameters(param_dict={"x": param})
+        assert sql_execution_params.param_dict["x"] == param  # check that pydantic did not coerce type unexpectedly
+
+        expr = f"SELECT {sql_client.render_execution_param_key('x')} as y"
+        df = sql_client.query(expr, sql_bind_parameters=sql_execution_params)
+        assert isinstance(df, pd.DataFrame)
+        assert df.shape == (1, 1)
+        assert df.columns.tolist() == ["y"]
+
+        # Some engines convert some types to str; convert everything to str for comparison
+        str_param = str(param)
+        str_result = str(df["y"][0])
+        # Some engines use JSON bool syntax (i.e., True -> 'true')
+        if isinstance(param, bool):
+            assert str_result in [str_param, str_param.lower()]
+        # Some engines add decimals to datetime milliseconds; trim here
+        elif isinstance(param, datetime.datetime):
+            assert str_result[: len(str_param)] == str_param
+        else:
+            assert str_result == str_param
 
 
 def test_select_one_query(sql_client: SqlClient) -> None:  # noqa: D
@@ -66,7 +80,7 @@ def test_failed_query_with_execution_params(sql_client: SqlClient) -> None:  # n
 
 def test_create_table(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D
     sql_table = SqlTable(schema_name=mf_test_session_state.mf_source_schema, table_name=_random_table())
-    sql_client.create_table_as_select(sql_table, _select_x_as_y(sql_client))
+    sql_client.create_table_as_select(sql_table, _select_x_as_y())
     df = sql_client.query(f"SELECT * FROM {sql_table.sql}")
     _check_1col(df)
 
@@ -95,7 +109,7 @@ def test_create_table_from_dataframe(  # noqa: D
 
 def test_table_exists(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D
     sql_table = SqlTable(schema_name=mf_test_session_state.mf_source_schema, table_name=_random_table())
-    sql_client.create_table_as_select(sql_table, _select_x_as_y(sql_client))
+    sql_client.create_table_as_select(sql_table, _select_x_as_y())
     assert sql_client.table_exists(sql_table)
 
 
@@ -221,7 +235,7 @@ def test_list_tables(mf_test_session_state: MetricFlowTestSessionState, sql_clie
     source_schema = mf_test_session_state.mf_source_schema
     sql_table = SqlTable(schema_name=source_schema, table_name=_random_table())
     table_count_before_create = len(sql_client.list_tables(source_schema))
-    sql_client.create_table_as_select(sql_table, _select_x_as_y(sql_client))
+    sql_client.create_table_as_select(sql_table, _select_x_as_y())
     table_list = sql_client.list_tables(source_schema)
     table_count_after_create = len(table_list)
     assert table_count_after_create == table_count_before_create + 1
