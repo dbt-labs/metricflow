@@ -147,7 +147,9 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         if bind_params == SqlBindParameters():
             return None
 
-        return {k: (str(v) if isinstance(v, bool) else v) for k, v in bind_params.param_dict.items()}
+        # TODO: check if this is actually necessary
+        # return {k: (str(v) if isinstance(v, bool) else v) for k, v in bind_params.param_dict.items()}
+        return bind_params.param_dict
 
     def _engine_specific_query_implementation(
         self,
