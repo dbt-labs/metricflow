@@ -144,12 +144,7 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         Databricks SQL connector does not currently support boolean exececution params yet.
         Convert boolean params to string.
         """
-        if bind_params == SqlBindParameters():
-            return None
-
-        # TODO: check if this is actually necessary
-        # return {k: (str(v) if isinstance(v, bool) else v) for k, v in bind_params.param_dict.items()}
-        return bind_params.param_dict
+        return None if bind_params == SqlBindParameters() else bind_params.param_dict
 
     def _engine_specific_query_implementation(
         self,
