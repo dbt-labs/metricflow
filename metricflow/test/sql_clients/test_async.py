@@ -62,6 +62,19 @@ def test_cancel_request(  # noqa: D
         async_sql_client, mf_test_session_state.mf_system_schema, num_rows=100
     )
 
+    num_attempts = 3
+
+    for attempt_num in range(num_attempts):
+        if try_cancel_request(async_sql_client, table_with_1000_rows, table_with_100_rows, attempt_num):
+            return
+
+    assert False, f"Was not able to cancel a request after {num_attempts} attempts"
+
+
+def try_cancel_request(
+    async_sql_client: AsyncSqlClient, table_with_1000_rows: SqlTable, table_with_100_rows: SqlTable, attempt_num: int
+) -> bool:
+    """Try to cancel a query and return True if successful."""
     request_id = async_sql_client.async_execute(
         textwrap.dedent(
             f"""
@@ -82,8 +95,15 @@ def test_cancel_request(  # noqa: D
         if num_cancelled > 0:
             break
 
-    assert async_sql_client.async_request_result(request_id).exception is not None
-    assert num_cancelled == 1
+    result_exception = async_sql_client.async_request_result(request_id).exception
+    if result_exception is not None and num_cancelled == 1:
+        return True
+
+    logger.warning(
+        f"Cancellation did not occur on attempt #{attempt_num}. This may be okay as SQL engines do not guarantee "
+        f"cancellation requests: num_cancelled={num_cancelled} result_exception={result_exception}"
+    )
+    return False
 
 
 def test_isolation_level(  # noqa: D

@@ -17,6 +17,20 @@ class TimeRangeConstraint(SerializableDataclass):
     start_time: datetime.datetime
     end_time: datetime.datetime
 
+    def __post_init__(self) -> None:  # noqa: D
+        if self.start_time > self.end_time:
+            raise RuntimeError(
+                f"start_time must not be > end_time. start_time={self.start_time} end_time={self.end_time}"
+            )
+
+        if self.start_time < TimeRangeConstraint.ALL_TIME_BEGIN():
+            raise RuntimeError(
+                f"start_time={self.start_time} exceeds the limits of {TimeRangeConstraint.ALL_TIME_BEGIN()}"
+            )
+
+        if self.end_time > TimeRangeConstraint.ALL_TIME_END():
+            raise RuntimeError(f"end_time={self.end_time} exceeds the limits of {TimeRangeConstraint.ALL_TIME_END()}")
+
     @staticmethod
     def ALL_TIME_BEGIN() -> datetime.datetime:  # noqa: D
         return datetime.datetime(2000, 1, 1)
