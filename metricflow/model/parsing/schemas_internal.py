@@ -73,6 +73,7 @@ locked_metadata_schema = {
             "items": {"type": "string"},
         },
         "private": {"type": "boolean"},
+        "unit": {"type": "string"},
     },
     "additionalProperties": False,
 }

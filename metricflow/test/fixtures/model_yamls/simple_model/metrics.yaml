@@ -231,6 +231,7 @@ metric:
       - "Finance"
       - "Monthly"
     private: true
+    unit: "dollars"
   type_params:
     measures:
       - txn_revenue
