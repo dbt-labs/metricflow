@@ -20,7 +20,10 @@ from metricflow.configuration.constants import (
 )
 from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.protocols.async_sql_client import AsyncSqlClient
-from metricflow.protocols.sql_client import SqlClient
+from metricflow.protocols.sql_client import SqlClient, SqlIsolationLevel
+from metricflow.protocols.sql_request import SqlRequestTagSet
+from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.sql_clients.base_sql_client_implementation import SqlClientException
 from metricflow.sql_clients.big_query import BigQuerySqlClient
 from metricflow.sql_clients.common_client import SqlDialect, not_empty
 from metricflow.sql_clients.databricks import DatabricksSqlClient
@@ -154,3 +157,44 @@ def make_sql_client_from_config(handler: YamlFileHandler) -> AsyncSqlClient:
     else:
         supported_dialects = [x.value for x in SqlDialect]
         raise ValueError(f"Invalid dialect '{dialect}', must be one of {supported_dialects} in {url}")
+
+
+def sync_execute(  # noqa: D
+    async_sql_client: AsyncSqlClient,
+    statement: str,
+    bind_parameters: SqlBindParameters = SqlBindParameters(),
+    sql_tags: SqlRequestTagSet = SqlRequestTagSet(),
+    isolation_level: Optional[SqlIsolationLevel] = None,
+) -> None:
+    request_id = async_sql_client.async_execute(
+        statement=statement,
+        bind_parameters=bind_parameters,
+        tags=sql_tags,
+        isolation_level=isolation_level,
+    )
+
+    result = async_sql_client.async_request_result(request_id)
+    if result.exception:
+        raise SqlClientException("Got an exception when trying to execute a statement") from result.exception
+    return
+
+
+def sync_query(  # noqa: D
+    async_sql_client: AsyncSqlClient,
+    statement: str,
+    bind_parameters: SqlBindParameters = SqlBindParameters(),
+    sql_tags: SqlRequestTagSet = SqlRequestTagSet(),
+    isolation_level: Optional[SqlIsolationLevel] = None,
+) -> pd.DataFrame:
+    request_id = async_sql_client.async_query(
+        statement=statement,
+        bind_parameters=bind_parameters,
+        tags=sql_tags,
+        isolation_level=isolation_level,
+    )
+
+    result = async_sql_client.async_request_result(request_id)
+    if result.exception:
+        raise SqlClientException("Got an exception when trying to execute a statement") from result.exception
+    assert result.df is not None, "A dataframe should have been returned if there was no error"
+    return result.df
