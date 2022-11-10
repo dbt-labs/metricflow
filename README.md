@@ -78,7 +78,7 @@ The best way to get started is to follow the [tutorial](https://docs.transform.c
 mf tutorial
 ```
 
-There are several examples of MetricFlow configs on common data sets in the [config-templates](./config-templates) folder. The tutorial will rely on a small set of [sample configs](./metricflow/cli/sample_models).
+There are several examples of MetricFlow configs on common data sets in the [config-templates](https://github.com/transform-data/metricflow/tree/main/config-templates) folder. The tutorial will rely on a small set of [sample configs](https://github.com/transform-data/metricflow/tree/main/metricflow/cli/sample_models).
 
 ## Resources
 
