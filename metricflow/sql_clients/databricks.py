@@ -147,6 +147,7 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         stmt: str,
         bind_params: SqlBindParameters,
         isolation_level: Optional[SqlIsolationLevel] = None,
+        tags: SqlRequestTagSet = SqlRequestTagSet(),
     ) -> pd.DataFrame:
         check_isolation_level(self, isolation_level)
         with self.get_connection() as connection:
@@ -169,6 +170,7 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         stmt: str,
         bind_params: SqlBindParameters,
         isolation_level: Optional[SqlIsolationLevel] = None,
+        tags: SqlRequestTagSet = SqlRequestTagSet(),
     ) -> None:
         """Execute statement, returning nothing."""
         with self.get_connection(self.stmt_is_table_rename(stmt)) as connection:

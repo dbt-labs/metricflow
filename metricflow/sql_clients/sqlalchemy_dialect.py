@@ -83,7 +83,10 @@ class SqlAlchemySqlClient(BaseSqlClientImplementation, ABC):
 
     @contextmanager
     def _engine_connection(
-        self, engine: sqlalchemy.engine.Engine, isolation_level: Optional[SqlIsolationLevel] = None
+        self,
+        engine: sqlalchemy.engine.Engine,
+        isolation_level: Optional[SqlIsolationLevel] = None,
+        tags: SqlRequestTagSet = SqlRequestTagSet(),
     ) -> Iterator[sqlalchemy.engine.Connection]:
         """Context Manager for providing a configured connection."""
         check_isolation_level(self, isolation_level)
@@ -98,22 +101,24 @@ class SqlAlchemySqlClient(BaseSqlClientImplementation, ABC):
         finally:
             conn.close()
 
-    def _engine_specific_query_implementation(  # noqa: D
+    def _engine_specific_query_implementation(
         self,
         stmt: str,
         bind_params: SqlBindParameters,
         isolation_level: Optional[SqlIsolationLevel] = None,
+        tags: SqlRequestTagSet = SqlRequestTagSet(),
     ) -> pd.DataFrame:
-        with self._engine_connection(self._engine, isolation_level=isolation_level) as conn:
+        with self._engine_connection(self._engine, isolation_level=isolation_level, tags=tags) as conn:
             return pd.read_sql_query(sqlalchemy.text(stmt), conn, params=bind_params.param_dict)
 
-    def _engine_specific_execute_implementation(  # noqa: D
+    def _engine_specific_execute_implementation(
         self,
         stmt: str,
         bind_params: SqlBindParameters,
         isolation_level: Optional[SqlIsolationLevel] = None,
+        tags: SqlRequestTagSet = SqlRequestTagSet(),
     ) -> None:
-        with self._engine_connection(self._engine, isolation_level=isolation_level) as conn:
+        with self._engine_connection(self._engine, isolation_level=isolation_level, tags=tags) as conn:
             conn.execute(sqlalchemy.text(stmt), bind_params.param_dict)
 
     def _engine_specific_dry_run_implementation(self, stmt: str, bind_params: SqlBindParameters) -> None:  # noqa: D

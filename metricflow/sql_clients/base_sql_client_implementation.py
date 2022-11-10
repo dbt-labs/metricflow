@@ -163,6 +163,7 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
         stmt: str,
         bind_params: SqlBindParameters,
         isolation_level: Optional[SqlIsolationLevel] = None,
+        tags: SqlRequestTagSet = SqlRequestTagSet(),
     ) -> pd.DataFrame:
         """Sub-classes should implement this to query the engine."""
         pass
@@ -173,6 +174,7 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
         stmt: str,
         bind_params: SqlBindParameters,
         isolation_level: Optional[SqlIsolationLevel] = None,
+        tags: SqlRequestTagSet = SqlRequestTagSet(),
     ) -> None:
         """Sub-classes should implement this to execute a statement that doesn't return results."""
         pass
@@ -348,15 +350,17 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
                 if self._is_query:
                     df = self._sql_client._engine_specific_query_implementation(
                         statement,
-                        self._bind_parameters,
-                        self._isolation_level,
+                        bind_params=self._bind_parameters,
+                        isolation_level=self._isolation_level,
+                        tags=self._user_tags,
                     )
                     self._result = SqlRequestResult(df=df)
                 else:
                     self._sql_client._engine_specific_execute_implementation(
                         statement,
-                        self._bind_parameters,
-                        self._isolation_level,
+                        bind_params=self._bind_parameters,
+                        isolation_level=self._isolation_level,
+                        tags=self._user_tags,
                     )
                     self._result = SqlRequestResult(df=pd.DataFrame())
                 logger.info(f"Successfully executed {self._request_id} in {time.time() - start_time:.2f}s")
