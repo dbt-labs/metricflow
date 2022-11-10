@@ -1,12 +1,15 @@
 import logging
 import textwrap
 import time
+from collections import OrderedDict
 from typing import Optional
 
 import pytest
 
 from metricflow.dataflow.sql_table import SqlTable
+from metricflow.object_utils import assert_values_exhausted
 from metricflow.protocols.async_sql_client import AsyncSqlClient
+from metricflow.protocols.sql_client import SqlEngine
 from metricflow.protocols.sql_request import SqlRequestTagSet
 from metricflow.sql_clients.sql_utils import make_df
 from metricflow.test.compare_df import assert_dataframes_equal
@@ -113,3 +116,35 @@ def test_isolation_level(  # noqa: D
         logger.info(f"Testing isolation level: {isolation_level}")
         request_id = async_sql_client.async_query("SELECT 1", isolation_level=isolation_level)
         async_sql_client.async_request_result(request_id)
+
+
+def test_request_tags(
+    mf_test_session_state: MetricFlowTestSessionState,
+    async_sql_client: AsyncSqlClient,
+) -> None:
+    """Test whether request tags are appropriately used in queries to the SQL engine."""
+    engine_type = async_sql_client.sql_engine_attributes.sql_engine_type
+
+    if engine_type is SqlEngine.SNOWFLAKE:
+        request_id0 = async_sql_client.async_query(
+            "SHOW PARAMETERS LIKE 'QUERY_TAG'",
+            tags=SqlRequestTagSet(tag_dict=OrderedDict({"example_key": "example_value"})),
+        )
+        result0 = async_sql_client.async_request_result(request_id0)
+        df = result0.df
+        assert df is not None
+        assert result0.exception is None
+
+        assert len(df.index) == 1
+        assert df.iloc[0]["value"] == '{"example_key": "example_value"}'
+    elif (
+        engine_type is SqlEngine.DUCKDB
+        or engine_type is SqlEngine.BIGQUERY
+        or engine_type is SqlEngine.REDSHIFT
+        or engine_type is SqlEngine.DATABRICKS
+        or engine_type is SqlEngine.POSTGRES
+        or engine_type is SqlEngine.MYSQL
+    ):
+        pytest.skip(f"Testing tags not supported in {engine_type}")
+    else:
+        assert_values_exhausted(engine_type)
