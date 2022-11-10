@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import logging
 import threading
 import urllib.parse
@@ -161,7 +162,10 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
 
     @contextmanager
     def _engine_connection(
-        self, engine: sqlalchemy.engine.Engine, isolation_level: Optional[SqlIsolationLevel] = None
+        self,
+        engine: sqlalchemy.engine.Engine,
+        isolation_level: Optional[SqlIsolationLevel] = None,
+        tags: SqlRequestTagSet = SqlRequestTagSet(),
     ) -> Iterator[sqlalchemy.engine.Connection]:
         """Context Manager for providing a configured connection.
 
@@ -174,6 +178,11 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
         with super()._engine_connection(self._engine, isolation_level=isolation_level) as conn:
             # WEEK_START 1 means Monday.
             conn.execute("ALTER SESSION SET WEEK_START = 1;")
+            if tags.tag_dict:
+                conn.execute(
+                    sqlalchemy.text("ALTER SESSION SET QUERY_TAG = :query_tag"),
+                    {"query_tag": json.dumps(tags.tag_dict)},
+                )
             results = conn.execute("SELECT CURRENT_SESSION()")
             sessions = []
             for row in results:
@@ -192,9 +201,10 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
         bind_params: SqlBindParameters = SqlBindParameters(),
         isolation_level: Optional[SqlIsolationLevel] = None,
         allow_re_auth: bool = True,
+        tags: SqlRequestTagSet = SqlRequestTagSet(),
     ) -> pd.DataFrame:
         check_isolation_level(self, isolation_level)
-        with self._engine_connection(engine=self._engine, isolation_level=isolation_level) as conn:
+        with self._engine_connection(engine=self._engine, isolation_level=isolation_level, tags=tags) as conn:
             try:
                 return pd.read_sql_query(sqlalchemy.text(stmt), conn, params=bind_params.param_dict)
             except ProgrammingError as e:
@@ -216,8 +226,9 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
         stmt: str,
         bind_params: SqlBindParameters,
         isolation_level: Optional[SqlIsolationLevel] = None,
+        tags: SqlRequestTagSet = SqlRequestTagSet(),
     ) -> pd.DataFrame:
-        return self._query(stmt, bind_params, isolation_level)
+        return self._query(stmt, bind_params=bind_params, isolation_level=isolation_level, tags=tags)
 
     def list_tables(self, schema_name: str) -> Sequence[str]:  # noqa: D
         df = self.query(
