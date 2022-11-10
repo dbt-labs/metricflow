@@ -79,19 +79,24 @@ class DuckDbSqlClient(SqlAlchemySqlClient):
     def cancel_submitted_queries(self) -> None:  # noqa: D
         raise NotImplementedError
 
-    def _engine_specific_query_implementation(  # noqa: D
+    def _engine_specific_query_implementation(
         self,
         stmt: str,
         bind_params: SqlBindParameters,
         isolation_level: Optional[SqlIsolationLevel] = None,
+        tags: SqlRequestTagSet = SqlRequestTagSet(),
     ) -> pd.DataFrame:
         with self._concurrency_lock:
             return super()._engine_specific_query_implementation(
                 stmt=stmt, bind_params=bind_params, isolation_level=isolation_level
             )
 
-    def _engine_specific_execute_implementation(  # noqa: D
-        self, stmt: str, bind_params: SqlBindParameters, isolation_level: Optional[SqlIsolationLevel] = None
+    def _engine_specific_execute_implementation(
+        self,
+        stmt: str,
+        bind_params: SqlBindParameters,
+        isolation_level: Optional[SqlIsolationLevel] = None,
+        tags: SqlRequestTagSet = SqlRequestTagSet(),
     ) -> None:
         with self._concurrency_lock:
             return super()._engine_specific_execute_implementation(
