@@ -20,6 +20,7 @@ from metricflow.execution.execution_plan import (
 )
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter, SqlDataSetT
 from metricflow.protocols.async_sql_client import AsyncSqlClient
+from metricflow.protocols.sql_request import SqlRequestTagSet
 from metricflow.specs import OutputColumnNameOverride
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_plan import SqlSelectStatementNode, SqlSelectColumn, SqlQueryPlan
@@ -36,6 +37,7 @@ class DataflowToExecutionPlanConverter(Generic[SqlDataSetT], SinkNodeVisitor[Sql
         sql_plan_converter: DataflowToSqlQueryPlanConverter[SqlDataSetT],
         sql_plan_renderer: SqlQueryPlanRenderer,
         sql_client: AsyncSqlClient,
+        sql_tags: SqlRequestTagSet = SqlRequestTagSet(),
         output_column_name_overrides: Tuple[OutputColumnNameOverride, ...] = (),
     ) -> None:
         """Constructor.
@@ -44,11 +46,13 @@ class DataflowToExecutionPlanConverter(Generic[SqlDataSetT], SinkNodeVisitor[Sql
             sql_plan_converter: Converts a dataflow plan node to a SQL query plan
             sql_plan_renderer: Converts a SQL query plan to SQL text
             sql_client: The client to use for running queries.
+            sql_tags: Tags to supply to the SQL client when running statements.
             output_column_name_overrides: In the output dataframe / table, name output columns in a specific way.
         """
         self._sql_plan_converter = sql_plan_converter
         self._sql_plan_renderer = sql_plan_renderer
         self._sql_client = sql_client
+        self._sql_tags = sql_tags
         self._output_column_name_overrides = output_column_name_overrides
 
     @staticmethod
@@ -128,6 +132,7 @@ class DataflowToExecutionPlanConverter(Generic[SqlDataSetT], SinkNodeVisitor[Sql
                 sql_client=self._sql_client,
                 sql_query=render_result.sql,
                 execution_parameters=render_result.execution_parameters,
+                sql_tags=self._sql_tags,
             )
         else:
             leaf_task = SelectSqlQueryToTableTask(
@@ -135,6 +140,7 @@ class DataflowToExecutionPlanConverter(Generic[SqlDataSetT], SinkNodeVisitor[Sql
                 sql_query=render_result.sql,
                 execution_parameters=render_result.execution_parameters,
                 output_table=output_table,
+                sql_tags=self._sql_tags,
             )
 
         return ExecutionPlan(
