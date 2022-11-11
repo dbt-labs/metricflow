@@ -258,8 +258,7 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
 
     # Seed sample model file
     model_path = os.path.join(cfg.config.dir_path, "sample_models")
-    if not os.path.exists(model_path):
-        pathlib.Path(model_path).mkdir(parents=True)
+    pathlib.Path(model_path).mkdir(parents=True, exist_ok=True)
     click.echo(f"🤖 Attempting to generate model configs to your local filesystem in '{str(model_path)}'.")
     spinner = Halo(text="Dropping tables...", spinner="dots")
     spinner.start()
