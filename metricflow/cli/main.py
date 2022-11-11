@@ -757,17 +757,21 @@ def validate_configs(
     if not show_all:
         print("(To see warnings and future-errors, run again with flag `--show-all`)")
 
-    # Lint Validation
-    lint_spinner = Halo(text="Checking for YAML format issues", spinner="dots")
-    lint_spinner.start()
-
-    lint_results = ConfigLinter().lint_dir(path_to_models(handler=cfg.config))
-    if not lint_results.has_blocking_issues:
-        lint_spinner.succeed(f"🎉 Successfully linted config YAML files ({lint_results.summary()})")
+    # Skip linting validation for dbt cloud
+    if cfg.dbt_cloud_job_args is not None:
+        lint_results = ModelValidationResults()
     else:
-        lint_spinner.fail(f"Breaking issues found in config YAML files ({lint_results.summary()})")
-        _print_issues(lint_results, show_non_blocking=show_all, verbose=verbose_issues)
-        return
+        # Lint Validation
+        lint_spinner = Halo(text="Checking for YAML format issues", spinner="dots")
+        lint_spinner.start()
+
+        lint_results = ConfigLinter().lint_dir(path_to_models(handler=cfg.config))
+        if not lint_results.has_blocking_issues:
+            lint_spinner.succeed(f"🎉 Successfully linted config YAML files ({lint_results.summary()})")
+        else:
+            lint_spinner.fail(f"Breaking issues found in config YAML files ({lint_results.summary()})")
+            _print_issues(lint_results, show_non_blocking=show_all, verbose=verbose_issues)
+            return
 
     # Parsing Validation
     parsing_spinner = Halo(text="Building model from configs", spinner="dots")
