@@ -52,6 +52,7 @@ from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.engine.utils import model_build_result_from_config, path_to_models
 from metricflow.model.parsing.config_linter import ConfigLinter
+from metricflow.model.parsing.dbt_cloud_to_model import model_build_result_for_dbt_cloud_job
 from metricflow.model.validations.validator_helpers import ModelValidationResults
 from metricflow.sql_clients.common_client import SqlDialect
 from metricflow.telemetry.models import TelemetryLevel
@@ -776,7 +777,11 @@ def validate_configs(
     # Parsing Validation
     parsing_spinner = Halo(text="Building model from configs", spinner="dots")
     parsing_spinner.start()
-    parsing_result = model_build_result_from_config(handler=cfg.config, raise_issues_as_exceptions=False)
+
+    if cfg.dbt_cloud_job_args is not None:
+        parsing_result = model_build_result_for_dbt_cloud_job(job_args=cfg.dbt_cloud_job_args)
+    else:
+        parsing_result = model_build_result_from_config(handler=cfg.config, raise_issues_as_exceptions=False)
 
     if not parsing_result.issues.has_blocking_issues:
         parsing_spinner.succeed(f"🎉 Successfully built model from configs ({parsing_result.issues.summary()})")
