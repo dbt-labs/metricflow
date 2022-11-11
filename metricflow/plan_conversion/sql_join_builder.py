@@ -12,6 +12,7 @@ from metricflow.sql.sql_exprs import (
     SqlComparison,
     SqlComparisonExpression,
     SqlDateTruncExpression,
+    SqlIsNullExpression,
     SqlLogicalExpression,
     SqlLogicalOperator,
     SqlTimeDeltaExpression,
@@ -22,10 +23,19 @@ SqlDataSetT = TypeVar("SqlDataSetT", bound=SqlDataSet)
 
 @dataclass(frozen=True)
 class ColumnEqualityDescription:
-    """Helper class to enumerate columns that should be equal between sources in a join."""
+    """Helper class to enumerate columns that should be equal between sources in a join.
+
+    The `treat_nulls_as_equal` property determines what to do with null valued inputs. By default SQL returns
+    NULL for any equality comparison with a NULL on either side, which means `NULL = NULL` returns NULL, which
+    evaluates to False in the join comparison. If that parameter is overridden to True, then the column comparison
+    will be rendered as:
+
+        `(left_column_alias = right_column_alias OR (left_column_alias IS NULL AND right_column_alias IS NULL))`
+    """
 
     left_column_alias: str
     right_column_alias: str
+    treat_nulls_as_equal: bool = False
 
 
 @dataclass(frozen=True)
@@ -57,11 +67,14 @@ class SqlQueryPlanJoinBuilder:
         join_type: SqlJoinType,
         additional_on_conditions: Sequence[SqlExpressionNode] = tuple(),
     ) -> SqlJoinDescription:
-        """Make a join description where the condition is a set of equality comparisons between columns.
+        """Make a join description where the base condition is a set of equality comparisons between columns.
 
         Typically the columns in column_equality_descriptions are identifiers we are trying to match,
         although they may include things like dimension partitions or time dimension columns where an
         equality is expected.
+
+        Since the framework currently supports join keys OR condition-free cross joins, this helper will require
+        either a non-empty set of column equality conditions or a CROSS JOIN.
 
         Args:
             right_source_node: node representing the join target, may be either a table or subquery
@@ -71,31 +84,48 @@ class SqlQueryPlanJoinBuilder:
             join_type: type of SQL join, e.g., LEFT, INNER, etc.
             additional_on_conditions: set of additional constraints to add in the ON statement (via AND)
         """
-        assert len(column_equality_descriptions) > 0
+        assert (
+            len(column_equality_descriptions) > 0 or join_type is SqlJoinType.CROSS_JOIN
+        ), f"No column equality conditions specified for join with type {join_type} - this may render invalid SQL!"
 
         and_conditions: List[SqlExpressionNode] = []
         for column_equality_description in column_equality_descriptions:
-            and_conditions.append(
-                SqlComparisonExpression(
-                    left_expr=SqlColumnReferenceExpression(
-                        SqlColumnReference(
-                            table_alias=left_source_alias,
-                            column_name=column_equality_description.left_column_alias,
-                        )
-                    ),
-                    comparison=SqlComparison.EQUALS,
-                    right_expr=SqlColumnReferenceExpression(
-                        SqlColumnReference(
-                            table_alias=right_source_alias,
-                            column_name=column_equality_description.right_column_alias,
-                        )
-                    ),
+            left_column = SqlColumnReferenceExpression(
+                SqlColumnReference(
+                    table_alias=left_source_alias,
+                    column_name=column_equality_description.left_column_alias,
                 )
             )
+            right_column = SqlColumnReferenceExpression(
+                SqlColumnReference(
+                    table_alias=right_source_alias,
+                    column_name=column_equality_description.right_column_alias,
+                )
+            )
+            column_equality_expression = SqlComparisonExpression(
+                left_expr=left_column,
+                comparison=SqlComparison.EQUALS,
+                right_expr=right_column,
+            )
+            if column_equality_description.treat_nulls_as_equal:
+                null_comparison_expression = SqlLogicalExpression(
+                    operator=SqlLogicalOperator.AND,
+                    args=(SqlIsNullExpression(arg=left_column), SqlIsNullExpression(arg=right_column)),
+                )
+                and_conditions.append(
+                    SqlLogicalExpression(
+                        operator=SqlLogicalOperator.OR, args=(column_equality_expression, null_comparison_expression)
+                    )
+                )
+            else:
+                and_conditions.append(column_equality_expression)
+
         and_conditions += additional_on_conditions
 
-        on_condition: SqlExpressionNode
-        if len(and_conditions) == 1:
+        on_condition: Optional[SqlExpressionNode]
+        if len(and_conditions) == 0:
+            on_condition = None
+        elif len(and_conditions) == 1:
             on_condition = and_conditions[0]
         else:
             on_condition = SqlLogicalExpression(operator=SqlLogicalOperator.AND, args=tuple(and_conditions))

@@ -175,43 +175,6 @@ def _make_validity_window_on_condition(
     return (window_start_condition, window_end_condition)
 
 
-def _make_aggregate_measures_join_condition(
-    column_aliases: Sequence[str],
-    left_source_alias: str,
-    right_source_alias: str,
-) -> SqlLogicalExpression:
-    """Make the ON condition particular to the aggregate measures join scenario
-
-    In most cases equality will suffice, but in the event of NULL values on both sides we include
-    those in the join. This is questionable, so maybe we shouldn't do it.
-    """
-
-    join_conditions = []
-    for column_alias in column_aliases:
-        left_column = SqlColumnReferenceExpression(
-            SqlColumnReference(table_alias=left_source_alias, column_name=column_alias)
-        )
-        right_column = SqlColumnReferenceExpression(
-            SqlColumnReference(table_alias=right_source_alias, column_name=column_alias)
-        )
-        equality_condition = SqlComparisonExpression(
-            left_expr=left_column, right_expr=right_column, comparison=SqlComparison.EQUALS
-        )
-
-        left_is_null = SqlIsNullExpression(arg=left_column)
-        right_is_null = SqlIsNullExpression(arg=right_column)
-        both_null_condition = SqlLogicalExpression(operator=SqlLogicalOperator.AND, args=(left_is_null, right_is_null))
-
-        join_conditions.append(
-            SqlLogicalExpression(operator=SqlLogicalOperator.OR, args=(equality_condition, both_null_condition))
-        )
-
-    return SqlLogicalExpression(
-        operator=SqlLogicalOperator.AND,
-        args=tuple(join_conditions),
-    )
-
-
 def _make_time_range_comparison_expr(
     table_alias: str, column_alias: str, time_range_constraint: TimeRangeConstraint
 ) -> SqlExpressionNode:
@@ -690,17 +653,20 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                     f"We only support joins where all dimensions have the same name, but we got {right_column_names} "
                     f"and {join_aliases}, which differ by {right_column_names.difference(set(join_aliases))}!"
                 )
+            # sort column names to ensure consistent join ordering for ease of debugging and testing
+            ordered_right_column_names = sorted(right_column_names)
+            column_equality_descriptions = [
+                ColumnEqualityDescription(
+                    left_column_alias=colname, right_column_alias=colname, treat_nulls_as_equal=True
+                )
+                for colname in ordered_right_column_names
+            ]
             sql_join_descs.append(
-                SqlJoinDescription(
-                    right_source=right_data_set.sql_select_node,
+                SqlQueryPlanJoinBuilder.make_sql_join_description(
+                    right_source_node=right_data_set.sql_select_node,
                     right_source_alias=right_data_set_alias,
-                    on_condition=_make_aggregate_measures_join_condition(
-                        column_aliases=join_aliases,
-                        left_source_alias=from_data_set_alias,
-                        right_source_alias=right_data_set_alias,
-                    )
-                    if not use_cross_join
-                    else None,
+                    left_source_alias=from_data_set_alias,
+                    column_equality_descriptions=column_equality_descriptions,
                     join_type=SqlJoinType.INNER if not use_cross_join else SqlJoinType.CROSS_JOIN,
                 )
             )
