@@ -93,7 +93,7 @@
                     <!--    'right_source': SqlSelectStatementNode(node_id=ss_8),  -->
                     <!--    'right_source_alias': 'subq_7',                        -->
                     <!--    'join_type': SqlJoinType.LEFT_OUTER,                   -->
-                    <!--    'on_condition': SqlLogicalExpression(node_id=lo_1)}    -->
+                    <!--    'on_condition': SqlLogicalExpression(node_id=lo_2)}    -->
                     <!-- where = None -->
                     <SqlSelectStatementNode>
                         <!-- description =                               -->

@@ -204,38 +204,9 @@ class SqlQueryPlanJoinBuilder:
                 )
             )
 
-        if join_description.validity_window is None:
-            validity_conditions: Tuple[SqlExpressionNode, ...] = tuple()
-        else:
-            # The join to base output node requires a metric_time dimension to process a join against an
-            # a dataset with a validity window specified, as that dataset represents an SCD data source
-            # We fetch the metric time instance with the smallest granularity and shortest identifier link path,
-            # since this will be used in the ON statement for the join against the validity window.
-            left_data_set_metric_time_dimension_instances = sorted(
-                left_data_set.data_set.metric_time_dimension_instances,
-                key=lambda x: (x.spec.time_granularity.to_int(), len(x.spec.identifier_links)),
-            )
-            assert left_data_set_metric_time_dimension_instances, (
-                f"Cannot process join to data set with alias {right_data_set.alias} because it has a validity "
-                f"window set: {join_description.validity_window}, but source data set with alias "
-                f"{left_data_set.alias} does not have a metric time dimension we can use for the window join!"
-            )
-            left_data_set_time_dimension_name = left_data_set.data_set.column_association_for_time_dimension(
-                left_data_set_metric_time_dimension_instances[0].spec,
-            ).column_name
-            window_start_dimension_name = right_data_set.data_set.column_association_for_time_dimension(
-                join_description.validity_window.window_start_dimension
-            ).column_name
-            window_end_dimension_name = right_data_set.data_set.column_association_for_time_dimension(
-                join_description.validity_window.window_end_dimension
-            ).column_name
-            validity_conditions = SqlQueryPlanJoinBuilder._make_time_window_join_condition(
-                left_source_alias=left_data_set.alias,
-                left_source_time_dimension_name=left_data_set_time_dimension_name,
-                right_source_alias=right_data_set.alias,
-                window_start_dimension_name=window_start_dimension_name,
-                window_end_dimension_name=window_end_dimension_name,
-            )
+        validity_conditions = SqlQueryPlanJoinBuilder._make_validity_window_on_conditions(
+            left_data_set=left_data_set, right_data_set=right_data_set, join_description=join_description
+        )
 
         return SqlQueryPlanJoinBuilder.make_sql_join_description(
             right_source_node=right_data_set.data_set.sql_select_node,
@@ -247,13 +218,62 @@ class SqlQueryPlanJoinBuilder:
         )
 
     @staticmethod
+    def _make_validity_window_on_conditions(
+        left_data_set: AnnotatedSqlDataSet,
+        right_data_set: AnnotatedSqlDataSet,
+        join_description: JoinDescription,
+    ) -> Tuple[SqlExpressionNode, ...]:
+        """Build a time window join condition if the join description includes a validity window description
+
+        When the validity window is set, it means we are dealing with a dataset representing an SCD Type II
+        style data source, with a start and end boundary on the window. A base output join against such data
+        sources requires a metric_time dimension to process the join.
+
+        By convention, the join description ties the validity window to the "right" side data source, and so
+        we extract the metric time instance from the left data set.
+
+        We use the instance with the smallest granularity and shortest identifier link path, since it will be
+        used in the ON statement for the join against the validity window.
+        """
+        if join_description.validity_window is None:
+            return tuple()
+
+        left_data_set_metric_time_dimension_instances = sorted(
+            left_data_set.data_set.metric_time_dimension_instances,
+            key=lambda x: (x.spec.time_granularity.to_int(), len(x.spec.identifier_links)),
+        )
+        assert left_data_set_metric_time_dimension_instances, (
+            f"Cannot process join to data set with alias {right_data_set.alias} because it has a validity "
+            f"window set: {join_description.validity_window}, but source data set with alias "
+            f"{left_data_set.alias} does not have a metric time dimension we can use for the window join!"
+        )
+        left_data_set_time_dimension_name = left_data_set.data_set.column_association_for_time_dimension(
+            left_data_set_metric_time_dimension_instances[0].spec,
+        ).column_name
+        window_start_dimension_name = right_data_set.data_set.column_association_for_time_dimension(
+            join_description.validity_window.window_start_dimension
+        ).column_name
+        window_end_dimension_name = right_data_set.data_set.column_association_for_time_dimension(
+            join_description.validity_window.window_end_dimension
+        ).column_name
+        window_join_condition = SqlQueryPlanJoinBuilder._make_time_window_join_condition(
+            left_source_alias=left_data_set.alias,
+            left_source_time_dimension_name=left_data_set_time_dimension_name,
+            right_source_alias=right_data_set.alias,
+            window_start_dimension_name=window_start_dimension_name,
+            window_end_dimension_name=window_end_dimension_name,
+        )
+
+        return (window_join_condition,)
+
+    @staticmethod
     def _make_time_window_join_condition(
         left_source_alias: str,
         left_source_time_dimension_name: str,
         right_source_alias: str,
         window_start_dimension_name: str,
         window_end_dimension_name: str,
-    ) -> Tuple[SqlExpressionNode, ...]:
+    ) -> SqlLogicalExpression:
         """Helper to generate a renderable SqlExpression for expressing a time window join condition.
 
         The output will render the following expression:
@@ -286,7 +306,9 @@ class SqlQueryPlanJoinBuilder:
             operator=SqlLogicalOperator.OR, args=(window_end_by_time, window_end_is_null)
         )
 
-        return (window_start_condition, window_end_condition)
+        return SqlLogicalExpression(
+            operator=SqlLogicalOperator.AND, args=(window_start_condition, window_end_condition)
+        )
 
     @staticmethod
     def make_cumulative_metric_time_range_join_description(
