@@ -152,6 +152,7 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         check_isolation_level(self, isolation_level)
         with self.get_connection() as connection:
             with connection.cursor() as cursor:
+                logger.info(f"Executing SQL statement: {stmt}")
                 cursor.execute(operation=stmt, parameters=self.params_or_none(bind_params))
                 logger.info("Fetching query results as PyArrow Table.")
                 pyarrow_df = cursor.fetchall_arrow()
@@ -175,7 +176,7 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         """Execute statement, returning nothing."""
         with self.get_connection(self.stmt_is_table_rename(stmt)) as connection:
             with connection.cursor() as cursor:
-                logger.info(f"Executing SQL statment: {stmt}")
+                logger.info(f"Executing SQL statement: {stmt}")
                 cursor.execute(operation=stmt, parameters=self.params_or_none(bind_params))
 
     def _engine_specific_dry_run_implementation(self, stmt: str, bind_params: SqlBindParameters) -> None:
