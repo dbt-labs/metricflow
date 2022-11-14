@@ -36,4 +36,4 @@ jobs:
         run: pip install pre-commit
 
       - name: Run Linter
-        run: pre-commit run --show-diff-on-failure --color=always --all-files
+        run: pre-commit run --show-diff-on-failure --color=always --all-files || (cat /home/runner/.cache/pre-commit/pre-commit.log && false)
