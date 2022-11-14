@@ -21,49 +21,6 @@ from metricflow.sql.sql_exprs import (
 SqlDataSetT = TypeVar("SqlDataSetT", bound=SqlDataSet)
 
 
-def _make_validity_window_on_condition(
-    left_source_alias: str,
-    left_source_time_dimension_name: str,
-    right_source_alias: str,
-    window_start_dimension_name: str,
-    window_end_dimension_name: str,
-) -> Tuple[SqlExpressionNode, ...]:
-    """Helper to convert a validity window join description to a renderable SQL expresssion
-
-    Takes in a join description consisting of a start and end time dimension spec, and generates
-    a node representing the equivalent of this expression:
-
-        {start_dimension_name} >= metric_time AND ({end_dimension_name} < metric_time OR {end_dimension_name} IS NULL)
-
-    """
-    left_time_column_expr = SqlColumnReferenceExpression(
-        SqlColumnReference(table_alias=left_source_alias, column_name=left_source_time_dimension_name)
-    )
-    window_start_column_expr = SqlColumnReferenceExpression(
-        SqlColumnReference(table_alias=right_source_alias, column_name=window_start_dimension_name)
-    )
-    window_end_column_expr = SqlColumnReferenceExpression(
-        SqlColumnReference(table_alias=right_source_alias, column_name=window_end_dimension_name)
-    )
-
-    window_start_condition = SqlComparisonExpression(
-        left_expr=left_time_column_expr,
-        comparison=SqlComparison.GREATER_THAN_OR_EQUALS,
-        right_expr=window_start_column_expr,
-    )
-    window_end_by_time = SqlComparisonExpression(
-        left_expr=left_time_column_expr,
-        comparison=SqlComparison.LESS_THAN,
-        right_expr=window_end_column_expr,
-    )
-    window_end_is_null = SqlIsNullExpression(window_end_column_expr)
-    window_end_condition = SqlLogicalExpression(
-        operator=SqlLogicalOperator.OR, args=(window_end_by_time, window_end_is_null)
-    )
-
-    return (window_start_condition, window_end_condition)
-
-
 @dataclass(frozen=True)
 class ColumnEqualityDescription:
     """Helper class to enumerate columns that should be equal between sources in a join.
@@ -272,7 +229,7 @@ class SqlQueryPlanJoinBuilder:
             window_end_dimension_name = right_data_set.data_set.column_association_for_time_dimension(
                 join_description.validity_window.window_end_dimension
             ).column_name
-            validity_conditions = _make_validity_window_on_condition(
+            validity_conditions = SqlQueryPlanJoinBuilder._make_time_window_join_condition(
                 left_source_alias=left_data_set.alias,
                 left_source_time_dimension_name=left_data_set_time_dimension_name,
                 right_source_alias=right_data_set.alias,
@@ -288,6 +245,48 @@ class SqlQueryPlanJoinBuilder:
             join_type=SqlJoinType.LEFT_OUTER,
             additional_on_conditions=validity_conditions,
         )
+
+    @staticmethod
+    def _make_time_window_join_condition(
+        left_source_alias: str,
+        left_source_time_dimension_name: str,
+        right_source_alias: str,
+        window_start_dimension_name: str,
+        window_end_dimension_name: str,
+    ) -> Tuple[SqlExpressionNode, ...]:
+        """Helper to generate a renderable SqlExpression for expressing a time window join condition.
+
+        The output will render the following expression:
+
+            {start_dimension_name} >= metric_time AND ({end_dimension_name} < metric_time OR {end_dimension_name} IS NULL)
+
+        """
+        left_time_column_expr = SqlColumnReferenceExpression(
+            SqlColumnReference(table_alias=left_source_alias, column_name=left_source_time_dimension_name)
+        )
+        window_start_column_expr = SqlColumnReferenceExpression(
+            SqlColumnReference(table_alias=right_source_alias, column_name=window_start_dimension_name)
+        )
+        window_end_column_expr = SqlColumnReferenceExpression(
+            SqlColumnReference(table_alias=right_source_alias, column_name=window_end_dimension_name)
+        )
+
+        window_start_condition = SqlComparisonExpression(
+            left_expr=left_time_column_expr,
+            comparison=SqlComparison.GREATER_THAN_OR_EQUALS,
+            right_expr=window_start_column_expr,
+        )
+        window_end_by_time = SqlComparisonExpression(
+            left_expr=left_time_column_expr,
+            comparison=SqlComparison.LESS_THAN,
+            right_expr=window_end_column_expr,
+        )
+        window_end_is_null = SqlIsNullExpression(window_end_column_expr)
+        window_end_condition = SqlLogicalExpression(
+            operator=SqlLogicalOperator.OR, args=(window_end_by_time, window_end_is_null)
+        )
+
+        return (window_start_condition, window_end_condition)
 
     @staticmethod
     def make_cumulative_metric_time_range_join_description(
