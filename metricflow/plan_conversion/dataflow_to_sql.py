@@ -399,8 +399,8 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
             sql_join_descs.append(
                 SqlQueryPlanJoinBuilder.make_base_output_join_description(
-                    annotated_left_data_set=AnnotatedSqlDataSet(data_set=from_data_set, alias=from_data_set_alias),
-                    annotated_right_data_set=AnnotatedSqlDataSet(data_set=right_data_set, alias=right_data_set_alias),
+                    left_data_set=AnnotatedSqlDataSet(data_set=from_data_set, alias=from_data_set_alias),
+                    right_data_set=AnnotatedSqlDataSet(data_set=right_data_set, alias=right_data_set_alias),
                     join_description=join_description,
                 )
             )
