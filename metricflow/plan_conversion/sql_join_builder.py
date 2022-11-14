@@ -36,44 +36,27 @@ def _make_validity_window_on_condition(
         {start_dimension_name} >= metric_time AND ({end_dimension_name} < metric_time OR {end_dimension_name} IS NULL)
 
     """
+    left_time_column_expr = SqlColumnReferenceExpression(
+        SqlColumnReference(table_alias=left_source_alias, column_name=left_source_time_dimension_name)
+    )
+    window_start_column_expr = SqlColumnReferenceExpression(
+        SqlColumnReference(table_alias=right_source_alias, column_name=window_start_dimension_name)
+    )
+    window_end_column_expr = SqlColumnReferenceExpression(
+        SqlColumnReference(table_alias=right_source_alias, column_name=window_end_dimension_name)
+    )
+
     window_start_condition = SqlComparisonExpression(
-        left_expr=SqlColumnReferenceExpression(
-            SqlColumnReference(
-                table_alias=left_source_alias,
-                column_name=left_source_time_dimension_name,
-            )
-        ),
+        left_expr=left_time_column_expr,
         comparison=SqlComparison.GREATER_THAN_OR_EQUALS,
-        right_expr=SqlColumnReferenceExpression(
-            SqlColumnReference(
-                table_alias=right_source_alias,
-                column_name=window_start_dimension_name,
-            )
-        ),
+        right_expr=window_start_column_expr,
     )
     window_end_by_time = SqlComparisonExpression(
-        left_expr=SqlColumnReferenceExpression(
-            SqlColumnReference(
-                table_alias=left_source_alias,
-                column_name=left_source_time_dimension_name,
-            )
-        ),
+        left_expr=left_time_column_expr,
         comparison=SqlComparison.LESS_THAN,
-        right_expr=SqlColumnReferenceExpression(
-            SqlColumnReference(
-                table_alias=right_source_alias,
-                column_name=window_end_dimension_name,
-            )
-        ),
+        right_expr=window_end_column_expr,
     )
-    window_end_is_null = SqlIsNullExpression(
-        SqlColumnReferenceExpression(
-            SqlColumnReference(
-                table_alias=right_source_alias,
-                column_name=window_end_dimension_name,
-            )
-        )
-    )
+    window_end_is_null = SqlIsNullExpression(window_end_column_expr)
     window_end_condition = SqlLogicalExpression(
         operator=SqlLogicalOperator.OR, args=(window_end_by_time, window_end_is_null)
     )
