@@ -25,6 +25,14 @@ class MetricType(ExtendedEnum):
     EXPR = "expr"
     CUMULATIVE = "cumulative"
     DERIVED = "derived"
+    CONVERSION = "conversion"
+
+
+class ConversionCalculationType(ExtendedEnum):
+    """Types of calculations for a conversion metric."""
+
+    CONVERSIONS = "conversions"
+    CONVERSION_RATE = "conversion_rate"
 
 
 class MetricInputMeasure(PydanticCustomInputParser, HashableBaseModel):
@@ -139,6 +147,10 @@ class MetricTypeParams(HashableBaseModel):
     window: Optional[MetricTimeWindow]
     grain_to_date: Optional[TimeGranularity]
     metrics: Optional[List[MetricInput]]
+    base_measure: Optional[MetricInputMeasure]
+    conversion_measure: Optional[MetricInputMeasure]
+    calculation: Optional[ConversionCalculationType]
+    entity: Optional[str]
 
     @property
     def numerator_measure_reference(self) -> Optional[MeasureReference]:
@@ -172,7 +184,10 @@ class Metric(HashableBaseModel, ModelWithMetadataParsing):
             res.append(tp.numerator)
         if tp.denominator:
             res.append(tp.denominator)
-
+        if tp.base_measure:
+            res.append(tp.base_measure)
+        if tp.conversion_measure:
+            res.append(tp.conversion_measure)
         return res
 
     @property
