@@ -619,26 +619,19 @@
         },
         "metric_input_schema": {
             "$id": "metric_input_schema",
-            "oneOf": [
-                {
+            "additionalProperties": false,
+            "properties": {
+                "alias": {
                     "type": "string"
                 },
-                {
-                    "additionalProperties": false,
-                    "properties": {
-                        "alias": {
-                            "type": "string"
-                        },
-                        "constraint": {
-                            "type": "string"
-                        },
-                        "name": {
-                            "type": "string"
-                        }
-                    },
-                    "type": "object"
+                "constraint": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
                 }
-            ]
+            },
+            "type": "object"
         },
         "metric_type_params": {
             "$id": "metric_type_params",

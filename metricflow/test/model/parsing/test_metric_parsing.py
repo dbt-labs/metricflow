@@ -2,7 +2,7 @@ import textwrap
 
 from metricflow.model.objects.common import YamlConfigFile
 from metricflow.model.objects.constraints.where import WhereClauseConstraint
-from metricflow.model.objects.metric import CumulativeMetricWindow, MetricType, MetricInputMeasure
+from metricflow.model.objects.metric import CumulativeMetricWindow, MetricInput, MetricInputMeasure, MetricType
 from metricflow.model.parsing.dir_to_model import parse_yaml_files_to_model
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
@@ -283,6 +283,41 @@ def test_constraint_metric_parsing() -> None:
         where="some_dimension IN ('value1', 'value2')",
         linkable_names=["some_dimension"],
         sql_params=SqlBindParameters(),
+    )
+
+
+def test_derived_metric_input_parsing() -> None:
+    """Test for parsing derived metrics with metric_input properties"""
+    yaml_contents = textwrap.dedent(
+        """\
+        metric:
+          name: derived_metric_test
+          type: derived
+          type_params:
+            expr: sum(constrained_input_metric) / input_metric
+            metrics:
+              - name: input_metric
+              - name: input_metric
+                alias: constrained_input_metric
+                constraint: input_metric < 10
+        """
+    )
+    file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+
+    build_result = parse_yaml_files_to_model(files=[file])
+
+    assert len(build_result.model.metrics) == 1
+    metric = build_result.model.metrics[0]
+    assert metric.name == "derived_metric_test"
+    assert metric.type is MetricType.DERIVED
+    assert metric.type_params
+    assert metric.type_params.metrics
+    assert len(metric.type_params.metrics) == 2
+    assert metric.type_params.metrics[0] == MetricInput(name="input_metric")
+    assert metric.type_params.metrics[1] == MetricInput(
+        name="input_metric",
+        alias="constrained_input_metric",
+        constraint=WhereClauseConstraint(where="input_metric < 10", linkable_names=["input_metric"]),
     )
 
 
