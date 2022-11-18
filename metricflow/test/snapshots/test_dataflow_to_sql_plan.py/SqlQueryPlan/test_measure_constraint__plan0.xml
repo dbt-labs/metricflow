@@ -60,7 +60,7 @@
                 <!--    'right_source': SqlSelectStatementNode(node_id=ss_18),  -->
                 <!--    'right_source_alias': 'subq_14',                        -->
                 <!--    'join_type': SqlJoinType.INNER,                         -->
-                <!--    'on_condition': SqlLogicalExpression(node_id=lo_2)}     -->
+                <!--    'on_condition': SqlLogicalExpression(node_id=lo_1)}     -->
                 <!-- where = None -->
                 <SqlSelectStatementNode>
                     <!-- description = Aggregate Measures -->

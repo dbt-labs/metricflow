@@ -232,12 +232,14 @@ FROM (
         (
           subq_2.listing = subq_7.listing
         ) AND (
-          subq_2.metric_time >= subq_7.window_start
-        ) AND (
           (
-            subq_2.metric_time < subq_7.window_end
-          ) OR (
-            subq_7.window_end IS NULL
+            subq_2.metric_time >= subq_7.window_start
+          ) AND (
+            (
+              subq_2.metric_time < subq_7.window_end
+            ) OR (
+              subq_7.window_end IS NULL
+            )
           )
         )
     ) subq_8

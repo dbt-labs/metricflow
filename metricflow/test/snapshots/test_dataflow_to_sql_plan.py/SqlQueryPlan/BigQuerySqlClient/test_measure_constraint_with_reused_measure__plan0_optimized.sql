@@ -49,9 +49,7 @@ INNER JOIN (
 ) subq_21
 ON
   (
-    (
-      subq_17.metric_time = subq_21.metric_time
-    ) OR (
-      (subq_17.metric_time IS NULL) AND (subq_21.metric_time IS NULL)
-    )
+    subq_17.metric_time = subq_21.metric_time
+  ) OR (
+    (subq_17.metric_time IS NULL) AND (subq_21.metric_time IS NULL)
   )

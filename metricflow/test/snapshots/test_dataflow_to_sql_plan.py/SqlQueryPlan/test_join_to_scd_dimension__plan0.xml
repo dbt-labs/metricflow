@@ -4,11 +4,11 @@
         <!-- node_id = ss_10 -->
         <!-- col0 =                                                    -->
         <!--   {'class': 'SqlSelectColumn',                            -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_113),  -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_111),  -->
         <!--    'column_alias': 'metric_time'}                         -->
         <!-- col1 =                                                    -->
         <!--   {'class': 'SqlSelectColumn',                            -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_114),  -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_112),  -->
         <!--    'column_alias': 'family_bookings'}                     -->
         <!-- from_source = SqlSelectStatementNode(node_id=ss_9) -->
         <!-- where = None -->
@@ -17,7 +17,7 @@
             <!-- node_id = ss_9 -->
             <!-- col0 =                                                    -->
             <!--   {'class': 'SqlSelectColumn',                            -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_112),  -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_110),  -->
             <!--    'column_alias': 'metric_time'}                         -->
             <!-- col1 =                                                              -->
             <!--   {'class': 'SqlSelectColumn',                                      -->
@@ -26,7 +26,7 @@
             <!-- from_source = SqlSelectStatementNode(node_id=ss_8) -->
             <!-- group_by0 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                            -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_112),  -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_110),  -->
             <!--    'column_alias': 'metric_time'}                         -->
             <!-- where = None -->
             <SqlSelectStatementNode>
@@ -36,11 +36,11 @@
                 <!-- node_id = ss_8 -->
                 <!-- col0 =                                                    -->
                 <!--   {'class': 'SqlSelectColumn',                            -->
-                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_110),  -->
+                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_108),  -->
                 <!--    'column_alias': 'metric_time'}                         -->
                 <!-- col1 =                                                    -->
                 <!--   {'class': 'SqlSelectColumn',                            -->
-                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_109),  -->
+                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_107),  -->
                 <!--    'column_alias': 'bookings'}                            -->
                 <!-- from_source = SqlSelectStatementNode(node_id=ss_7) -->
                 <!-- where = None -->
@@ -49,15 +49,15 @@
                     <!-- node_id = ss_7 -->
                     <!-- col0 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_108),  -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_106),  -->
                     <!--    'column_alias': 'metric_time'}                         -->
                     <!-- col1 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_107),  -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_105),  -->
                     <!--    'column_alias': 'listing__capacity'}                   -->
                     <!-- col2 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_106),  -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_104),  -->
                     <!--    'column_alias': 'bookings'}                            -->
                     <!-- from_source = SqlSelectStatementNode(node_id=ss_6) -->
                     <!-- where =                                                              -->
@@ -69,15 +69,15 @@
                         <!-- node_id = ss_6 -->
                         <!-- col0 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
-                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_105),  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_103),  -->
                         <!--    'column_alias': 'metric_time'}                         -->
                         <!-- col1 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
-                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_104),  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_102),  -->
                         <!--    'column_alias': 'listing__capacity'}                   -->
                         <!-- col2 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
-                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_103),  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_101),  -->
                         <!--    'column_alias': 'bookings'}                            -->
                         <!-- from_source = SqlSelectStatementNode(node_id=ss_5) -->
                         <!-- where = None -->
@@ -86,27 +86,27 @@
                             <!-- node_id = ss_5 -->
                             <!-- col0 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                           -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_98),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_96),  -->
                             <!--    'column_alias': 'metric_time'}                        -->
-                            <!-- col1 =                                                    -->
-                            <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_101),  -->
-                            <!--    'column_alias': 'listing__window_start'}               -->
+                            <!-- col1 =                                                   -->
+                            <!--   {'class': 'SqlSelectColumn',                           -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_99),  -->
+                            <!--    'column_alias': 'listing__window_start'}              -->
                             <!-- col2 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_102),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_100),  -->
                             <!--    'column_alias': 'listing__window_end'}                 -->
                             <!-- col3 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                           -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_99),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_97),  -->
                             <!--    'column_alias': 'listing'}                            -->
-                            <!-- col4 =                                                    -->
-                            <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_100),  -->
-                            <!--    'column_alias': 'listing__capacity'}                   -->
+                            <!-- col4 =                                                   -->
+                            <!--   {'class': 'SqlSelectColumn',                           -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_98),  -->
+                            <!--    'column_alias': 'listing__capacity'}                  -->
                             <!-- col5 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                           -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_97),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_95),  -->
                             <!--    'column_alias': 'bookings'}                           -->
                             <!-- from_source = SqlSelectStatementNode(node_id=ss_3) -->
                             <!-- join_0 =                                                  -->
@@ -114,7 +114,7 @@
                             <!--    'right_source': SqlSelectStatementNode(node_id=ss_4),  -->
                             <!--    'right_source_alias': 'subq_4',                        -->
                             <!--    'join_type': SqlJoinType.LEFT_OUTER,                   -->
-                            <!--    'on_condition': SqlLogicalExpression(node_id=lo_1)}    -->
+                            <!--    'on_condition': SqlLogicalExpression(node_id=lo_2)}    -->
                             <!-- where = None -->
                             <SqlSelectStatementNode>
                                 <!-- description =                               -->

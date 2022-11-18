@@ -31,12 +31,14 @@ FROM (
     (
       subq_12.listing = listings_src_10019.listing_id
     ) AND (
-      subq_12.metric_time >= listings_src_10019.active_from
-    ) AND (
       (
-        subq_12.metric_time < listings_src_10019.active_to
-      ) OR (
-        listings_src_10019.active_to IS NULL
+        subq_12.metric_time >= listings_src_10019.active_from
+      ) AND (
+        (
+          subq_12.metric_time < listings_src_10019.active_to
+        ) OR (
+          listings_src_10019.active_to IS NULL
+        )
       )
     )
 ) subq_16

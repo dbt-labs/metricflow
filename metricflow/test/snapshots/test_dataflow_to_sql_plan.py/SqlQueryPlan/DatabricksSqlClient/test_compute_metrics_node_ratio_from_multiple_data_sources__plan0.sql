@@ -444,6 +444,12 @@ FROM (
     ON
       (
         (
+          subq_8.ds = subq_17.ds
+        ) OR (
+          (subq_8.ds IS NULL) AND (subq_17.ds IS NULL)
+        )
+      ) AND (
+        (
           subq_8.listing__country_latest = subq_17.listing__country_latest
         ) OR (
           (
@@ -451,12 +457,6 @@ FROM (
           ) AND (
             subq_17.listing__country_latest IS NULL
           )
-        )
-      ) AND (
-        (
-          subq_8.ds = subq_17.ds
-        ) OR (
-          (subq_8.ds IS NULL) AND (subq_17.ds IS NULL)
         )
       )
   ) subq_18

@@ -40,12 +40,14 @@ ON
   (
     subq_13.listing = subq_18.listing
   ) AND (
-    subq_13.metric_time >= subq_18.lux_listing__window_start
-  ) AND (
     (
-      subq_13.metric_time < subq_18.lux_listing__window_end
-    ) OR (
-      subq_18.lux_listing__window_end IS NULL
+      subq_13.metric_time >= subq_18.lux_listing__window_start
+    ) AND (
+      (
+        subq_13.metric_time < subq_18.lux_listing__window_end
+      ) OR (
+        subq_18.lux_listing__window_end IS NULL
+      )
     )
   )
 GROUP BY

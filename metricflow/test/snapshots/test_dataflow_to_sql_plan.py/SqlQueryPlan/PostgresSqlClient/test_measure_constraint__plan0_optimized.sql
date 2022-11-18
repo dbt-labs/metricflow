@@ -71,10 +71,8 @@ FROM (
   ) subq_31
   ON
     (
-      (
-        subq_27.metric_time = subq_31.metric_time
-      ) OR (
-        (subq_27.metric_time IS NULL) AND (subq_31.metric_time IS NULL)
-      )
+      subq_27.metric_time = subq_31.metric_time
+    ) OR (
+      (subq_27.metric_time IS NULL) AND (subq_31.metric_time IS NULL)
     )
 ) subq_33

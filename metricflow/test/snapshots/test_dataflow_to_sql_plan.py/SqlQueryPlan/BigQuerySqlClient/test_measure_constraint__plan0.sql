@@ -398,11 +398,9 @@ FROM (
     ) subq_14
     ON
       (
-        (
-          subq_10.metric_time = subq_14.metric_time
-        ) OR (
-          (subq_10.metric_time IS NULL) AND (subq_14.metric_time IS NULL)
-        )
+        subq_10.metric_time = subq_14.metric_time
+      ) OR (
+        (subq_10.metric_time IS NULL) AND (subq_14.metric_time IS NULL)
       )
   ) subq_15
 ) subq_16

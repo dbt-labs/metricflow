@@ -153,12 +153,14 @@ FROM (
             (
               subq_2.listing = subq_4.listing
             ) AND (
-              subq_2.metric_time >= subq_4.window_start
-            ) AND (
               (
-                subq_2.metric_time < subq_4.window_end
-              ) OR (
-                subq_4.window_end IS NULL
+                subq_2.metric_time >= subq_4.window_start
+              ) AND (
+                (
+                  subq_2.metric_time < subq_4.window_end
+                ) OR (
+                  subq_4.window_end IS NULL
+                )
               )
             )
         ) subq_5
