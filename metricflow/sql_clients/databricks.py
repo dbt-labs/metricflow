@@ -142,6 +142,13 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         """If there are no parameters, use None to prevent collision with `%` wildcard."""
         return None if bind_params == SqlBindParameters() else bind_params.param_dict
 
+    def _execute_stmt(
+        self, cursor: sql.client.Cursor, stmt: str, bind_params: SqlBindParameters = SqlBindParameters()
+    ) -> None:
+        """Execute SQL statement. Abstracted into a function that can be easily overridden for logging purposes."""
+        logger.info(f"Executing SQL statement: {stmt}")
+        cursor.execute(operation=stmt, parameters=self.params_or_none(bind_params))
+
     def _engine_specific_query_implementation(
         self,
         stmt: str,
@@ -152,8 +159,7 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         check_isolation_level(self, isolation_level)
         with self.get_connection() as connection:
             with connection.cursor() as cursor:
-                logger.info(f"Executing SQL statement: {stmt}")
-                cursor.execute(operation=stmt, parameters=self.params_or_none(bind_params))
+                self._execute_stmt(cursor=cursor, stmt=stmt, bind_params=bind_params)
                 logger.info("Fetching query results as PyArrow Table.")
                 pyarrow_df = cursor.fetchall_arrow()
 
@@ -176,8 +182,7 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         """Execute statement, returning nothing."""
         with self.get_connection(self.stmt_is_table_rename(stmt)) as connection:
             with connection.cursor() as cursor:
-                logger.info(f"Executing SQL statement: {stmt}")
-                cursor.execute(operation=stmt, parameters=self.params_or_none(bind_params))
+                self._execute_stmt(cursor=cursor, stmt=stmt, bind_params=bind_params)
 
     def _engine_specific_dry_run_implementation(self, stmt: str, bind_params: SqlBindParameters) -> None:
         """Check that query will run successfully without actually running the query, error if not."""
@@ -185,8 +190,7 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
 
         with self.get_connection(self.stmt_is_table_rename(stmt)) as connection:
             with connection.cursor() as cursor:
-                logger.info(f"Executing SQL statment: {stmt}")
-                cursor.execute(operation=stmt, parameters=self.params_or_none(bind_params))
+                self._execute_stmt(cursor=cursor, stmt=stmt, bind_params=bind_params)
 
                 # If the plan contains errors, they won't be raised. Parse results to find & raise errors.
                 result = cursor.fetchall_arrow()["plan"]
@@ -215,7 +219,9 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
                 for i in range(len(df.columns)):
                     # Format as "column_name column_type"
                     columns_to_insert.append(f"{columns[i]} {PANDAS_TO_SQL_DTYPES[str(df[columns[i]].dtype).lower()]}")
-                cursor.execute(f"CREATE TABLE IF NOT EXISTS {sql_table.sql} ({', '.join(columns_to_insert)})")
+                self._execute_stmt(
+                    cursor=cursor, stmt=f"CREATE TABLE IF NOT EXISTS {sql_table.sql} ({', '.join(columns_to_insert)})"
+                )
 
                 # Insert rows
                 values = ""
@@ -235,10 +241,10 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
 
                     values += (",\n" if values else "") + f"({cells})"
                     if chunk_size and len(values) == chunk_size:
-                        cursor.execute(f"INSERT INTO {sql_table.sql} VALUES {values}")
+                        self._execute_stmt(cursor=cursor, stmt=f"INSERT INTO {sql_table.sql} VALUES {values}")
                         values = ""
                 if values:
-                    cursor.execute(f"INSERT INTO {sql_table.sql} VALUES {values}")
+                    self._execute_stmt(cursor=cursor, stmt=f"INSERT INTO {sql_table.sql} VALUES {values}")
 
         logger.info(f"Created table '{sql_table.sql}' from a DataFrame in {time.time() - start_time:.2f}s")
 
