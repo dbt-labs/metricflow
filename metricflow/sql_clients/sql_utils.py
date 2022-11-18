@@ -175,7 +175,9 @@ def sync_execute(  # noqa: D
 
     result = async_sql_client.async_request_result(request_id)
     if result.exception:
-        raise SqlClientException("Got an exception when trying to execute a statement") from result.exception
+        raise SqlClientException(
+            f"Got an exception when trying to execute a statement: {result.exception}"
+        ) from result.exception
     return
 
 
@@ -195,6 +197,8 @@ def sync_query(  # noqa: D
 
     result = async_sql_client.async_request_result(request_id)
     if result.exception:
-        raise SqlClientException("Got an exception when trying to execute a statement") from result.exception
+        raise SqlClientException(
+            f"Got an exception when trying to execute a statement: {result.exception}"
+        ) from result.exception
     assert result.df is not None, "A dataframe should have been returned if there was no error"
     return result.df
