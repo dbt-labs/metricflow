@@ -145,6 +145,7 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
     def _execute_stmt(
         self, cursor: sql.client.Cursor, stmt: str, bind_params: SqlBindParameters = SqlBindParameters()
     ) -> None:
+        """Execute SQL statement. Abstracted into a function that can be easily overridden for logging purposes."""
         logger.info(f"Executing SQL statement: {stmt}")
         cursor.execute(operation=stmt, parameters=self.params_or_none(bind_params))
 
