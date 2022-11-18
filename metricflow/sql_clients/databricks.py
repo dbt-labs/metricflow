@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from ddtrace import tracer
 import logging
 import time
 from typing import Optional, ClassVar, Dict, Sequence
@@ -142,6 +143,20 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         """If there are no parameters, use None to prevent collision with `%` wildcard."""
         return None if bind_params == SqlBindParameters() else bind_params.param_dict
 
+    def _connect_and_execute_stmt(
+        self, stmt: str, bind_params: SqlBindParameters = SqlBindParameters(), fetch_results: bool = False
+    ) -> Optional[Table]:
+        with self.get_connection() as connection:
+            with connection.cursor() as cursor:
+                logger.info(f"Executing SQL statement: {stmt}")
+                with tracer.trace("DatabricksSqlClient.execute_stmt"):
+                    cursor.execute(operation=stmt, parameters=self.params_or_none(bind_params))
+                if fetch_results:
+                    logger.info("Fetching query results as PyArrow Table.")
+                    return cursor.fetchall_arrow()
+                return None
+    
+
     def _engine_specific_query_implementation(
         self,
         stmt: str,
@@ -150,13 +165,7 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         tags: SqlRequestTagSet = SqlRequestTagSet(),
     ) -> pd.DataFrame:
         check_isolation_level(self, isolation_level)
-        with self.get_connection() as connection:
-            with connection.cursor() as cursor:
-                logger.info(f"Executing SQL statement: {stmt}")
-                cursor.execute(operation=stmt, parameters=self.params_or_none(bind_params))
-                logger.info("Fetching query results as PyArrow Table.")
-                pyarrow_df = cursor.fetchall_arrow()
-
+        pyarrow_df = self._connect_and_execute_stmt(stmt=stmt, bind_params=bind_params, fetch_results=True)
         logger.info("Beginning conversion of PyArrow Table to pandas DataFrame.")
         pandas_df = pyarrow_df.to_pandas()
         logger.info("Completed conversion of PyArrow Table to pandas DataFrame.")
@@ -174,71 +183,63 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         tags: SqlRequestTagSet = SqlRequestTagSet(),
     ) -> None:
         """Execute statement, returning nothing."""
-        with self.get_connection(self.stmt_is_table_rename(stmt)) as connection:
-            with connection.cursor() as cursor:
-                logger.info(f"Executing SQL statement: {stmt}")
-                cursor.execute(operation=stmt, parameters=self.params_or_none(bind_params))
+        self._connect_and_execute_stmt(stmt=stmt, bind_params=bind_params)
 
     def _engine_specific_dry_run_implementation(self, stmt: str, bind_params: SqlBindParameters) -> None:
         """Check that query will run successfully without actually running the query, error if not."""
         stmt = f"EXPLAIN {stmt}"
+        pyarrow_df = self._connect_and_execute_stmt(stmt=stmt, bind_params=bind_params, fetch_results=True)
 
-        with self.get_connection(self.stmt_is_table_rename(stmt)) as connection:
-            with connection.cursor() as cursor:
-                logger.info(f"Executing SQL statment: {stmt}")
-                cursor.execute(operation=stmt, parameters=self.params_or_none(bind_params))
+        # If the plan contains errors, they won't be raised. Parse results to find & raise errors.
+        result = pyarrow_df["plan"]
+        str_result = str(result)
+        if SQL_WAREHOUSE_ERROR_KEY in str_result:
+            error = "".join([str(row) for row in result])
+            raise sql.exc.ServerOperationError(error)
 
-                # If the plan contains errors, they won't be raised. Parse results to find & raise errors.
-                result = cursor.fetchall_arrow()["plan"]
-                str_result = str(result)
-                if SQL_WAREHOUSE_ERROR_KEY in str_result:
-                    error = "".join([str(row) for row in result])
-                    raise sql.exc.ServerOperationError(error)
-
-                if CLUSTER_ERROR_KEY in str_result:
-                    error = str(result[0]).split("== Physical Plan ==")[1].split(";")[0]
-                    raise sql.exc.ServerOperationError(error)
+        if CLUSTER_ERROR_KEY in str_result:
+            error = str(result[0]).split("== Physical Plan ==")[1].split(";")[0]
+            raise sql.exc.ServerOperationError(error)
 
     def create_table_from_dataframe(  # noqa: D
         self, sql_table: SqlTable, df: pd.DataFrame, chunk_size: Optional[int] = None
     ) -> None:
         logger.info(f"Creating table '{sql_table.sql}' from a DataFrame with {df.shape[0]} row(s)")
         start_time = time.time()
-        with self.get_connection() as connection:
-            with connection.cursor() as cursor:
-                # Create table
-                # update dtypes to convert None to NA in boolean columns.
-                # This mirrors the SQLAlchemy schema detection logic in pandas.io.sql
-                df = df.convert_dtypes()
-                columns = df.columns
-                columns_to_insert = []
-                for i in range(len(df.columns)):
-                    # Format as "column_name column_type"
-                    columns_to_insert.append(f"{columns[i]} {PANDAS_TO_SQL_DTYPES[str(df[columns[i]].dtype).lower()]}")
-                cursor.execute(f"CREATE TABLE IF NOT EXISTS {sql_table.sql} ({', '.join(columns_to_insert)})")
+        # Create table
+        # update dtypes to convert None to NA in boolean columns.
+        # This mirrors the SQLAlchemy schema detection logic in pandas.io.sql
+        df = df.convert_dtypes()
+        columns = df.columns
+        columns_to_insert = []
+        for i in range(len(df.columns)):
+            # Format as "column_name column_type"
+            columns_to_insert.append(f"{columns[i]} {PANDAS_TO_SQL_DTYPES[str(df[columns[i]].dtype).lower()]}")
+        create_stmt = f"CREATE TABLE IF NOT EXISTS {sql_table.sql} ({', '.join(columns_to_insert)})"
+        self._connect_and_execute_stmt(stmt=create_stmt)
 
-                # Insert rows
+        # Insert rows
+        values = ""
+        for row in df.itertuples(index=False, name=None):
+            cells = ""
+            for cell in row:
+                cells += ", " if cells else ""
+                if pd.isnull(cell):
+                    # Databricks does not support None, NA, nan, or NaT
+                    cells += "null"
+                elif type(cell) in [str, pd.Timestamp]:
+                    # Wrap cell in quotes & escape existing single quotes
+                    escaped_cell = str(cell).replace("'", "\\'")
+                    cells += f"'{escaped_cell}'"
+                else:
+                    cells += str(cell)
+
+            values += (",\n" if values else "") + f"({cells})"
+            if chunk_size and len(values) == chunk_size:
+                self._connect_and_execute_stmt(stmt=f"INSERT INTO {sql_table.sql} VALUES {values}")
                 values = ""
-                for row in df.itertuples(index=False, name=None):
-                    cells = ""
-                    for cell in row:
-                        cells += ", " if cells else ""
-                        if pd.isnull(cell):
-                            # Databricks does not support None, NA, nan, or NaT
-                            cells += "null"
-                        elif type(cell) in [str, pd.Timestamp]:
-                            # Wrap cell in quotes & escape existing single quotes
-                            escaped_cell = str(cell).replace("'", "\\'")
-                            cells += f"'{escaped_cell}'"
-                        else:
-                            cells += str(cell)
-
-                    values += (",\n" if values else "") + f"({cells})"
-                    if chunk_size and len(values) == chunk_size:
-                        cursor.execute(f"INSERT INTO {sql_table.sql} VALUES {values}")
-                        values = ""
-                if values:
-                    cursor.execute(f"INSERT INTO {sql_table.sql} VALUES {values}")
+        if values:
+            self._connect_and_execute_stmt(stmt=f"INSERT INTO {sql_table.sql} VALUES {values}")
 
         logger.info(f"Created table '{sql_table.sql}' from a DataFrame in {time.time() - start_time:.2f}s")
 
