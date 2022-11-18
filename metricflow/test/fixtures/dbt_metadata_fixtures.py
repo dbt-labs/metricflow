@@ -18,15 +18,17 @@ def dbt_json_metrics() -> List[Dict[str, Any]]:  # type: ignore[misc]
     return [
         {
             "name": "num_domesticated_cats",
+            "description": "The number of domesticated breeds",
             "calculation_method": "count",
             "dimensions": ["breed", "origin", "max_age"],
             "timestamp": "created_at",
             "expression": "breed",
-            "filters": [{"field": "domesticated", "operation": "=", "value": "true"}],
+            "filters": [{"field": "domesticated", "operator": "=", "value": "true"}],
             "model": cats_model,
         },
         {
             "name": "num_cat_origins",
+            "description": "The number of distinct origins cats come from",
             "calculation_method": "count_distinct",
             "dimensions": ["breed", "max_age"],
             "timestamp": "created_at",
@@ -36,6 +38,7 @@ def dbt_json_metrics() -> List[Dict[str, Any]]:  # type: ignore[misc]
         },
         {
             "name": "sum_of_cats_max_age_not_useful",
+            "description": None,
             "calculation_method": "sum",
             "dimensions": ["breed", "origin"],
             "timestamp": "created_at",
@@ -45,6 +48,7 @@ def dbt_json_metrics() -> List[Dict[str, Any]]:  # type: ignore[misc]
         },
         {
             "name": "average_cat_breed_max_age",
+            "description": "The average max age for all cat breeds",
             "calculation_method": "average",
             "dimensions": ["breed", "origin"],
             "timestamp": "created_at",
@@ -54,6 +58,7 @@ def dbt_json_metrics() -> List[Dict[str, Any]]:  # type: ignore[misc]
         },
         {
             "name": "min_cat_breed_max_age",
+            "description": "The minimum max age for all cat breeds",
             "calculation_method": "min",
             "dimensions": ["breed", "origin"],
             "timestamp": "created_at",
@@ -63,6 +68,7 @@ def dbt_json_metrics() -> List[Dict[str, Any]]:  # type: ignore[misc]
         },
         {
             "name": "max_cat_breed_max_age",
+            "description": "The maximum max age for all cat breeds",
             "calculation_method": "max",
             "dimensions": ["breed", "origin"],
             "timestamp": "created_at",
@@ -72,10 +78,15 @@ def dbt_json_metrics() -> List[Dict[str, Any]]:  # type: ignore[misc]
         },
         {
             "name": "ratio_max_to_min_cat_breed_max_age",
+            "description": "The ratio of the max max age to the min max age",
             "calculation_method": "derived",
             "dimensions": None,
             "timestamp": "created_at",
             "expression": "(max_cat_breed_max_age / min_cat_breed_max_age)",
+            "dependsOn": [
+                "metricflow_tests.metric.max_cat_breed_max_age",
+                "metricflow_tests.metric.min_cat_breed_max_age",
+            ],
             "filters": None,
             "model": None,
         },
