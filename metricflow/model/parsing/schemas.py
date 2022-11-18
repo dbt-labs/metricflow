@@ -86,18 +86,13 @@ metric_input_measure_schema = {
 
 metric_input_schema = {
     "$id": "metric_input_schema",
-    "oneOf": [
-        {"type": "string"},
-        {
-            "type": "object",
-            "properties": {
-                "name": {"type": "string"},
-                "constraint": {"type": "string"},
-                "alias": {"type": "string"},
-            },
-            "additionalProperties": False,
-        },
-    ],
+    "type": "object",
+    "properties": {
+        "name": {"type": "string"},
+        "constraint": {"type": "string"},
+        "alias": {"type": "string"},
+    },
+    "additionalProperties": False,
 }
 
 metric_type_params_schema = {
