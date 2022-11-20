@@ -29,7 +29,7 @@ from metricflow.dataflow.dataflow_plan import (
     ValidityWindowJoinDescription,
 )
 from metricflow.instances import InstanceSet
-from metricflow.model.semantics.valid_join import DataSourceJoinValidator
+from metricflow.model.semantics.join_validator import DataSourceJoinValidator
 from metricflow.object_utils import pformat_big_objects
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
