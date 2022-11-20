@@ -274,11 +274,9 @@
                         "PRIMARY",
                         "UNIQUE",
                         "FOREIGN",
-                        "RENDER_ONLY",
                         "primary",
                         "unique",
-                        "foreign",
-                        "render_only"
+                        "foreign"
                     ]
                 }
             },

@@ -20,7 +20,7 @@ metric_types_enum_values += [x.lower() for x in metric_types_enum_values]
 mutability_type_values = ["IMMUTABLE", "APPEND_ONLY", "FULL_MUTATION", "DS_APPEND_ONLY"]
 mutability_type_values += [x.lower() for x in mutability_type_values]
 
-identifier_type_enum_values = ["PRIMARY", "UNIQUE", "FOREIGN", "RENDER_ONLY"]
+identifier_type_enum_values = ["PRIMARY", "UNIQUE", "FOREIGN"]
 identifier_type_enum_values += [x.lower() for x in identifier_type_enum_values]
 
 aggregation_type_values = ["SUM", "MIN", "MAX", "AVERAGE", "COUNT_DISTINCT", "BOOLEAN", "SUM_BOOLEAN", "COUNT"]

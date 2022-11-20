@@ -10,14 +10,11 @@ from metricflow.references import IdentifierReference, CompositeSubIdentifierRef
 
 
 class IdentifierType(ExtendedEnum):
-    """Defines uniqueness and completeness of identifier"""
+    """Defines uniqueness and the extent to which an identifier represents the common entity for a data source"""
 
     FOREIGN = "foreign"
     PRIMARY = "primary"
     UNIQUE = "unique"
-
-    # for identifiers that are only rendered, not joined on (used when rendering composite identifiers)
-    # RENDER_ONLY = "render_only" # DEPRECATED ? we shouldnt need in the new world?
 
 
 class CompositeSubIdentifier(HashableBaseModel):
