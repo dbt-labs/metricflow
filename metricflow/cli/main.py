@@ -759,7 +759,7 @@ def validate_configs(
         print("(To see warnings and future-errors, run again with flag `--show-all`)")
 
     # Skip linting validation for dbt cloud
-    if cfg.dbt_cloud_job_args is not None:
+    if cfg.dbt_cloud_configs is not None:
         lint_results = ModelValidationResults()
     else:
         # Lint Validation
@@ -778,8 +778,10 @@ def validate_configs(
     parsing_spinner = Halo(text="Building model from configs", spinner="dots")
     parsing_spinner.start()
 
-    if cfg.dbt_cloud_job_args is not None:
-        parsing_result = model_build_result_for_dbt_cloud_job(job_args=cfg.dbt_cloud_job_args)
+    if cfg.dbt_cloud_configs is not None:
+        parsing_result = model_build_result_for_dbt_cloud_job(
+            auth=cfg.dbt_cloud_configs.auth, job_id=cfg.dbt_cloud_configs.job_id
+        )
     else:
         parsing_result = model_build_result_from_config(handler=cfg.config, raise_issues_as_exceptions=False)
 

@@ -7,7 +7,7 @@ from metricflow.configuration.constants import CONFIG_MODEL_PATH
 from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.errors.errors import ModelCreationException
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.parsing.dbt_cloud_to_model import DbtCloudJobArgs, model_build_result_for_dbt_cloud_job
+from metricflow.model.parsing.dbt_cloud_to_model import model_build_result_for_dbt_cloud_job
 from metricflow.model.parsing.dir_to_model import ModelBuildResult, parse_directory_of_yaml_files_to_model
 from metricflow.sql_clients.common_client import not_empty
 
@@ -83,8 +83,7 @@ def build_user_configured_model_from_dbt_config(
 
 def build_user_configured_model_from_dbt_cloud(job_id: str, service_token: str) -> UserConfiguredModel:
     """Given dbt cloud params, create a UserConfiguredModel"""
-    job_args = DbtCloudJobArgs(auth=service_token, job_id=job_id)
-    return model_build_result_for_dbt_cloud_job(job_args=job_args).model
+    return model_build_result_for_dbt_cloud_job(auth=service_token, job_id=job_id).model
 
 
 def convert_to_datetime(datetime_str: Optional[str]) -> Optional[dt.datetime]:
