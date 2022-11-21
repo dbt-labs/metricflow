@@ -18,7 +18,7 @@ from metricflow.protocols.sql_client import (
     SqlEngineAttributes,
 )
 from metricflow.protocols.sql_client import SqlIsolationLevel
-from metricflow.protocols.sql_request import SqlRequestId, SqlRequestResult, SqlRequestTagSet
+from metricflow.protocols.sql_request import SqlRequestId, SqlRequestResult, SqlRequestTagSet, SqlJsonTag
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.async_request import SqlStatementCommentMetadata
 from metricflow.sql_clients.common_client import check_isolation_level
@@ -163,7 +163,8 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
         stmt: str,
         bind_params: SqlBindParameters,
         isolation_level: Optional[SqlIsolationLevel] = None,
-        tags: SqlRequestTagSet = SqlRequestTagSet(),
+        system_tags: SqlRequestTagSet = SqlRequestTagSet(),
+        extra_tags: SqlJsonTag = SqlJsonTag(),
     ) -> pd.DataFrame:
         """Sub-classes should implement this to query the engine."""
         pass
@@ -174,7 +175,8 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
         stmt: str,
         bind_params: SqlBindParameters,
         isolation_level: Optional[SqlIsolationLevel] = None,
-        tags: SqlRequestTagSet = SqlRequestTagSet(),
+        system_tags: SqlRequestTagSet = SqlRequestTagSet(),
+        extra_tags: SqlJsonTag = SqlJsonTag(),
     ) -> None:
         """Sub-classes should implement this to execute a statement that doesn't return results."""
         pass
@@ -238,7 +240,7 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
         self,
         statement: str,
         bind_parameters: SqlBindParameters = SqlBindParameters(),
-        tags: SqlRequestTagSet = SqlRequestTagSet(),
+        extra_tags: SqlJsonTag = SqlJsonTag(),
         isolation_level: Optional[SqlIsolationLevel] = None,
     ) -> SqlRequestId:
         check_isolation_level(self, isolation_level)
@@ -249,7 +251,7 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
                 request_id=request_id,
                 statement=statement,
                 bind_parameters=bind_parameters,
-                user_tags=tags,
+                extra_tags=extra_tags,
                 isolation_level=isolation_level,
             )
             self._request_id_to_thread[request_id] = thread
@@ -260,7 +262,7 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
         self,
         statement: str,
         bind_parameters: SqlBindParameters = SqlBindParameters(),
-        tags: SqlRequestTagSet = SqlRequestTagSet(),
+        extra_tags: SqlJsonTag = SqlJsonTag(),
         isolation_level: Optional[SqlIsolationLevel] = None,
     ) -> SqlRequestId:
         check_isolation_level(self, isolation_level)
@@ -271,7 +273,7 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
                 request_id=request_id,
                 statement=statement,
                 bind_parameters=bind_parameters,
-                user_tags=tags,
+                extra_tags=extra_tags,
                 is_query=False,
                 isolation_level=isolation_level,
             )
@@ -307,7 +309,7 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
             request_id: SqlRequestId,
             statement: str,
             bind_parameters: SqlBindParameters,
-            user_tags: SqlRequestTagSet,
+            extra_tags: SqlJsonTag = SqlJsonTag(),
             is_query: bool = True,
             isolation_level: Optional[SqlIsolationLevel] = None,
         ) -> None:
@@ -318,7 +320,7 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
                 request_id: The request ID associated with the statement.
                 statement: The statement to execute.
                 bind_parameters: The parameters to use for the statement.
-                user_tags: Tags that should be associated with the request for the statement.
+                extra_tags: Tags that should be associated with the request for the statement.
                 is_query: Whether the request is for .query (returns data) or .execute (does not return data)
                 isolation_level: The isolation level to use for the query.
             """
@@ -326,7 +328,7 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
             self._request_id = request_id
             self._statement = statement
             self._bind_parameters = bind_parameters
-            self._user_tags = user_tags
+            self._extra_tags = extra_tags
             self._result: Optional[SqlRequestResult] = None
             self._is_query = is_query
             self._isolation_level = isolation_level
@@ -334,10 +336,9 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
 
         def run(self) -> None:  # noqa: D
             start_time = time.time()
+            system_tags = SqlRequestTagSet().add_request_id(self._request_id)
             try:
-                statement = SqlStatementCommentMetadata.add_tag_metadata_as_comment(
-                    self._statement, self._user_tags.add_request_id(self._request_id)
-                )
+                statement = SqlStatementCommentMetadata.add_tag_metadata_as_comment(self._statement, system_tags)
                 logger.info(
                     f"Running {self._request_id} asynchronously:\n\n"
                     f"{textwrap.indent(self._statement, prefix=BaseSqlClientImplementation.INDENT)}\n"
@@ -352,7 +353,8 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
                         statement,
                         bind_params=self._bind_parameters,
                         isolation_level=self._isolation_level,
-                        tags=self._user_tags,
+                        system_tags=system_tags,
+                        extra_tags=self._extra_tags,
                     )
                     self._result = SqlRequestResult(df=df)
                 else:
@@ -360,7 +362,8 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
                         statement,
                         bind_params=self._bind_parameters,
                         isolation_level=self._isolation_level,
-                        tags=self._user_tags,
+                        system_tags=system_tags,
+                        extra_tags=self._extra_tags,
                     )
                     self._result = SqlRequestResult(df=pd.DataFrame())
                 logger.info(f"Successfully executed {self._request_id} in {time.time() - start_time:.2f}s")

@@ -21,7 +21,7 @@ from metricflow.configuration.constants import (
 from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.protocols.sql_client import SqlClient, SqlIsolationLevel
-from metricflow.protocols.sql_request import SqlRequestTagSet
+from metricflow.protocols.sql_request import SqlJsonTag
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.base_sql_client_implementation import SqlClientException
 from metricflow.sql_clients.big_query import BigQuerySqlClient
@@ -163,13 +163,13 @@ def sync_execute(  # noqa: D
     async_sql_client: AsyncSqlClient,
     statement: str,
     bind_parameters: SqlBindParameters = SqlBindParameters(),
-    sql_tags: SqlRequestTagSet = SqlRequestTagSet(),
+    extra_sql_tags: SqlJsonTag = SqlJsonTag(),
     isolation_level: Optional[SqlIsolationLevel] = None,
 ) -> None:
     request_id = async_sql_client.async_execute(
         statement=statement,
         bind_parameters=bind_parameters,
-        tags=sql_tags,
+        extra_tags=extra_sql_tags,
         isolation_level=isolation_level,
     )
 
@@ -185,13 +185,13 @@ def sync_query(  # noqa: D
     async_sql_client: AsyncSqlClient,
     statement: str,
     bind_parameters: SqlBindParameters = SqlBindParameters(),
-    sql_tags: SqlRequestTagSet = SqlRequestTagSet(),
+    extra_sql_tags: SqlJsonTag = SqlJsonTag(),
     isolation_level: Optional[SqlIsolationLevel] = None,
 ) -> pd.DataFrame:
     request_id = async_sql_client.async_query(
         statement=statement,
         bind_parameters=bind_parameters,
-        tags=sql_tags,
+        extra_tags=extra_sql_tags,
         isolation_level=isolation_level,
     )
 

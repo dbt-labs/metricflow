@@ -10,12 +10,12 @@ from databricks import sql
 
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlEngineAttributes, SqlEngine, SqlIsolationLevel
-from metricflow.protocols.sql_request import SqlRequestTagSet
+from metricflow.protocols.sql_request import SqlRequestTagSet, SqlJsonTag
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer, SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.sql.sql_bind_parameters import SqlColumnType
 from metricflow.sql_clients.base_sql_client_implementation import BaseSqlClientImplementation
 from metricflow.sql_clients.common_client import SqlDialect, check_isolation_level
-from metricflow.sql.sql_bind_parameters import SqlColumnType
 
 logger = logging.getLogger(__name__)
 
@@ -154,7 +154,8 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         stmt: str,
         bind_params: SqlBindParameters,
         isolation_level: Optional[SqlIsolationLevel] = None,
-        tags: SqlRequestTagSet = SqlRequestTagSet(),
+        system_tags: SqlRequestTagSet = SqlRequestTagSet(),
+        extra_tags: SqlJsonTag = SqlJsonTag(),
     ) -> pd.DataFrame:
         check_isolation_level(self, isolation_level)
         with self.get_connection() as connection:
@@ -177,7 +178,8 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         stmt: str,
         bind_params: SqlBindParameters,
         isolation_level: Optional[SqlIsolationLevel] = None,
-        tags: SqlRequestTagSet = SqlRequestTagSet(),
+        system_tags: SqlRequestTagSet = SqlRequestTagSet(),
+        extra_tags: SqlJsonTag = SqlJsonTag(),
     ) -> None:
         """Execute statement, returning nothing."""
         with self.get_connection(self.stmt_is_table_rename(stmt)) as connection:

@@ -4,7 +4,7 @@ from abc import abstractmethod
 from typing import Protocol, Sequence, Optional
 
 from metricflow.protocols.sql_client import SqlClient, SqlIsolationLevel
-from metricflow.protocols.sql_request import SqlRequestId, SqlRequestResult, SqlRequestTagSet
+from metricflow.protocols.sql_request import SqlRequestId, SqlRequestResult, SqlRequestTagSet, SqlJsonTag
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 
 
@@ -15,7 +15,7 @@ class AsyncSqlClient(SqlClient, Protocol):
         self,
         statement: str,
         bind_parameters: SqlBindParameters = SqlBindParameters(),
-        tags: SqlRequestTagSet = SqlRequestTagSet(),
+        extra_tags: SqlJsonTag = SqlJsonTag(),
         isolation_level: Optional[SqlIsolationLevel] = None,
     ) -> SqlRequestId:
         """Execute a query asynchronously."""
@@ -31,7 +31,7 @@ class AsyncSqlClient(SqlClient, Protocol):
         self,
         statement: str,
         bind_parameters: SqlBindParameters = SqlBindParameters(),
-        tags: SqlRequestTagSet = SqlRequestTagSet(),
+        extra_tags: SqlJsonTag = SqlJsonTag(),
         isolation_level: Optional[SqlIsolationLevel] = None,
     ) -> SqlRequestId:
         """Execute a statement that does not return values asynchronously."""
