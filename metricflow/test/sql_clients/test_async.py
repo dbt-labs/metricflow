@@ -1,7 +1,7 @@
+import json
 import logging
 import textwrap
 import time
-from collections import OrderedDict
 from typing import Optional
 
 import pytest
@@ -10,7 +10,7 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.object_utils import assert_values_exhausted
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.protocols.sql_client import SqlEngine
-from metricflow.protocols.sql_request import SqlRequestTagSet
+from metricflow.protocols.sql_request import SqlRequestTagSet, MF_EXTRA_TAGS_KEY, SqlJsonTag
 from metricflow.sql_clients.sql_utils import make_df
 from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
@@ -124,11 +124,11 @@ def test_request_tags(
 ) -> None:
     """Test whether request tags are appropriately used in queries to the SQL engine."""
     engine_type = async_sql_client.sql_engine_attributes.sql_engine_type
-
+    extra_tags = SqlJsonTag({"example_key": "example_value"})
     if engine_type is SqlEngine.SNOWFLAKE:
         request_id0 = async_sql_client.async_query(
             "SHOW PARAMETERS LIKE 'QUERY_TAG'",
-            tags=SqlRequestTagSet(tag_dict=OrderedDict({"example_key": "example_value"})),
+            extra_tags=extra_tags,
         )
         result0 = async_sql_client.async_request_result(request_id0)
         df = result0.df
@@ -136,7 +136,9 @@ def test_request_tags(
         assert result0.exception is None
 
         assert len(df.index) == 1
-        assert df.iloc[0]["value"] == '{"example_key": "example_value"}'
+        tag_json = json.loads(df.iloc[0]["value"])
+        assert MF_EXTRA_TAGS_KEY in tag_json
+        assert tag_json[MF_EXTRA_TAGS_KEY] == {"example_key": "example_value"}
     elif (
         engine_type is SqlEngine.DUCKDB
         or engine_type is SqlEngine.BIGQUERY

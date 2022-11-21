@@ -1,17 +1,21 @@
 from __future__ import annotations
 
+import logging
 import typing
 from collections import OrderedDict
 from dataclasses import dataclass
 from enum import Enum
 from operator import itemgetter
-from typing import Optional, Sequence, Dict
+from typing import Optional, Sequence, Dict, Any
 
 import pandas as pd
 from pydantic import Field
 
 from metricflow.model.objects.base import FrozenBaseModel
 from metricflow.object_utils import assert_exactly_one_arg_set
+
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -102,3 +106,31 @@ class SqlRequestTagKey(Enum):
     """Specific tags used by the system."""
 
     REQUEST_ID_KEY = "MF_REQUEST_ID"
+
+
+MF_SYSTEM_TAGS_KEY = "MF_SYSTEM_TAGS"
+MF_EXTRA_TAGS_KEY = "MF_EXTRA_TAGS"
+
+# Helps to reduce the need too have "ignore type" everywhere.
+JsonDict = Dict[str, Any]  # type: ignore [misc]
+
+
+class SqlJsonTag:
+    """Immutable object that represents a JSON object to be used for tagging SQL requests"""
+
+    def __init__(self, json_dict: Optional[JsonDict] = None) -> None:  # noqa: D
+        self._json_dict = OrderedDict(json_dict or {})
+
+    @property
+    def json_dict(self) -> JsonDict:  # noqa: D
+        return OrderedDict(self._json_dict)
+
+    def combine(self, other_tag: SqlJsonTag) -> SqlJsonTag:  # noqa: D
+        new_json_dict = OrderedDict(self._json_dict)
+        for k, v in other_tag._json_dict.items():
+            if k in new_json_dict:
+                logger.error(
+                    f"Conflict while combining tags. Conflict key: {k} Conflicting values: {v} and {new_json_dict[k]}"
+                )
+            new_json_dict[k] = v
+        return SqlJsonTag(new_json_dict)

@@ -9,7 +9,7 @@ from sqlalchemy.pool import StaticPool
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlEngine, SqlIsolationLevel
 from metricflow.protocols.sql_client import SqlEngineAttributes
-from metricflow.protocols.sql_request import SqlRequestTagSet
+from metricflow.protocols.sql_request import SqlRequestTagSet, SqlJsonTag
 from metricflow.sql.render.duckdb_renderer import DuckDbSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
@@ -84,7 +84,8 @@ class DuckDbSqlClient(SqlAlchemySqlClient):
         stmt: str,
         bind_params: SqlBindParameters,
         isolation_level: Optional[SqlIsolationLevel] = None,
-        tags: SqlRequestTagSet = SqlRequestTagSet(),
+        system_tags: SqlRequestTagSet = SqlRequestTagSet(),
+        extra_tags: SqlJsonTag = SqlJsonTag(),
     ) -> pd.DataFrame:
         with self._concurrency_lock:
             return super()._engine_specific_query_implementation(
@@ -96,7 +97,8 @@ class DuckDbSqlClient(SqlAlchemySqlClient):
         stmt: str,
         bind_params: SqlBindParameters,
         isolation_level: Optional[SqlIsolationLevel] = None,
-        tags: SqlRequestTagSet = SqlRequestTagSet(),
+        system_tags: SqlRequestTagSet = SqlRequestTagSet(),
+        extra_tags: SqlJsonTag = SqlJsonTag(),
     ) -> None:
         with self._concurrency_lock:
             return super()._engine_specific_execute_implementation(

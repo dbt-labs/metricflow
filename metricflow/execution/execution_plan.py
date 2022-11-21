@@ -14,7 +14,7 @@ from metricflow.dag.id_generation import EXEC_NODE_READ_SQL_QUERY, EXEC_NODE_WRI
 from metricflow.dag.mf_dag import DagNode, MetricFlowDag, NodeId, DisplayedProperty
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.async_sql_client import AsyncSqlClient
-from metricflow.protocols.sql_request import SqlRequestTagSet
+from metricflow.protocols.sql_request import SqlJsonTag
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.sql_utils import sync_execute, sync_query
 from metricflow.visitor import Visitable
@@ -98,14 +98,14 @@ class SelectSqlQueryToDataFrameTask(ExecutionPlanTask):
         sql_client: AsyncSqlClient,
         sql_query: str,
         execution_parameters: SqlBindParameters,
-        sql_tags: SqlRequestTagSet = SqlRequestTagSet(),
+        extra_sql_tags: SqlJsonTag = SqlJsonTag(),
         parent_nodes: Optional[List[ExecutionPlanTask]] = None,
     ) -> None:
 
         self._sql_client = sql_client
         self._sql_query = sql_query
         self._execution_parameters = execution_parameters
-        self._sql_tags = sql_tags
+        self._extra_sql_tags = extra_sql_tags
         super().__init__(task_id=self.create_unique_id(), parent_nodes=parent_nodes or [])
 
     @classmethod
@@ -128,7 +128,10 @@ class SelectSqlQueryToDataFrameTask(ExecutionPlanTask):
         start_time = time.time()
 
         df = sync_query(
-            self._sql_client, self._sql_query, bind_parameters=self.execution_parameters, sql_tags=self._sql_tags
+            self._sql_client,
+            self._sql_query,
+            bind_parameters=self.execution_parameters,
+            extra_sql_tags=self._extra_sql_tags,
         )
 
         end_time = time.time()
@@ -156,14 +159,14 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
         sql_query: str,
         execution_parameters: SqlBindParameters,
         output_table: SqlTable,
-        sql_tags: SqlRequestTagSet = SqlRequestTagSet(),
+        extra_sql_tags: SqlJsonTag = SqlJsonTag(),
         parent_nodes: Optional[List[ExecutionPlanTask]] = None,
     ) -> None:
         self._sql_client = sql_client
         self._sql_query = sql_query
         self._output_table = output_table
         self._execution_parameters = execution_parameters
-        self._sql_tags = sql_tags
+        self._extra_sql_tags = extra_sql_tags
         super().__init__(task_id=self.create_unique_id(), parent_nodes=parent_nodes or [])
 
     @classmethod
@@ -190,7 +193,10 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
         sql_query = self.sql_query
         assert sql_query
         sync_execute(
-            self._sql_client, sql_query.sql_query, bind_parameters=sql_query.bind_parameters, sql_tags=self._sql_tags
+            self._sql_client,
+            sql_query.sql_query,
+            bind_parameters=sql_query.bind_parameters,
+            extra_sql_tags=self._extra_sql_tags,
         )
 
         end_time = time.time()
