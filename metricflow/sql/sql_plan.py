@@ -134,6 +134,7 @@ class SqlSelectStatementNode(SqlQueryPlanNode):
         order_bys: Tuple[SqlOrderByDescription, ...],
         where: Optional[SqlExpressionNode] = None,
         limit: Optional[int] = None,
+        distinct: bool = False,
     ) -> None:
         self._description = description
         assert select_columns
@@ -145,6 +146,7 @@ class SqlSelectStatementNode(SqlQueryPlanNode):
         self._group_bys = group_bys
         self._where = where
         self._order_bys = order_bys
+        self._distinct = distinct
 
         if limit is not None:
             assert limit >= 0
@@ -173,6 +175,7 @@ class SqlSelectStatementNode(SqlQueryPlanNode):
             + [DisplayedProperty(f"group_by{i}", group_by) for i, group_by in enumerate(self._group_bys)]
             + [DisplayedProperty("where", self._where)]
             + [DisplayedProperty(f"order_by{i}", order_by) for i, order_by in enumerate(self._order_bys)]
+            + [DisplayedProperty("distinct", self._distinct)]
         )
 
     @property
@@ -202,6 +205,10 @@ class SqlSelectStatementNode(SqlQueryPlanNode):
     @property
     def order_bys(self) -> Tuple[SqlOrderByDescription, ...]:  # noqa: D
         return self._order_bys
+
+    @property
+    def distinct(self) -> bool:  # noqa: D
+        return self._distinct
 
     def accept(self, visitor: SqlQueryPlanNodeVisitor) -> VisitorOutputT:  # noqa: D
         return visitor.visit_select_statement_node(self)
