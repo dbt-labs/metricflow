@@ -27,14 +27,14 @@
             <!--   {'class': 'SqlSelectColumn',                           -->
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_13),  -->
             <!--    'column_alias': 'listing__country_latest'}            -->
-            <!-- col2 =                                                              -->
-            <!--   {'class': 'SqlSelectColumn',                                      -->
-            <!--    'expr': SqlFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
-            <!--    'column_alias': 'bookings'}                                      -->
-            <!-- col3 =                                                                         -->
-            <!--   {'class': 'SqlSelectColumn',                                                 -->
-            <!--    'expr': SqlFunctionExpression(node_id=fnc_1, sql_function=COUNT_DISTINCT),  -->
-            <!--    'column_alias': 'bookers'}                                                  -->
+            <!-- col2 =                                                                       -->
+            <!--   {'class': 'SqlSelectColumn',                                               -->
+            <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
+            <!--    'column_alias': 'bookings'}                                               -->
+            <!-- col3 =                                                                                  -->
+            <!--   {'class': 'SqlSelectColumn',                                                          -->
+            <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_1, sql_function=COUNT_DISTINCT),  -->
+            <!--    'column_alias': 'bookers'}                                                           -->
             <!-- from_source = SqlSelectStatementNode(node_id=ss_2) -->
             <!-- group_by0 =                                              -->
             <!--   {'class': 'SqlSelectColumn',                           -->

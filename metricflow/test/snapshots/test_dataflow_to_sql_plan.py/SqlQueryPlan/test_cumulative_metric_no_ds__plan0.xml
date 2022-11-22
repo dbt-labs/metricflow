@@ -11,10 +11,10 @@
         <SqlSelectStatementNode>
             <!-- description = Aggregate Measures -->
             <!-- node_id = ss_9 -->
-            <!-- col0 =                                                              -->
-            <!--   {'class': 'SqlSelectColumn',                                      -->
-            <!--    'expr': SqlFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
-            <!--    'column_alias': 'txn_revenue'}                                   -->
+            <!-- col0 =                                                                       -->
+            <!--   {'class': 'SqlSelectColumn',                                               -->
+            <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
+            <!--    'column_alias': 'txn_revenue'}                                            -->
             <!-- from_source = SqlSelectStatementNode(node_id=ss_8) -->
             <!-- where = None -->
             <SqlSelectStatementNode>

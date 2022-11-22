@@ -19,10 +19,10 @@
             <!--   {'class': 'SqlSelectColumn',                            -->
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_332),  -->
             <!--    'column_alias': 'is_instant'}                          -->
-            <!-- col1 =                                                              -->
-            <!--   {'class': 'SqlSelectColumn',                                      -->
-            <!--    'expr': SqlFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
-            <!--    'column_alias': 'bookings'}                                      -->
+            <!-- col1 =                                                                       -->
+            <!--   {'class': 'SqlSelectColumn',                                               -->
+            <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
+            <!--    'column_alias': 'bookings'}                                               -->
             <!-- from_source = SqlSelectStatementNode(node_id=ss_14) -->
             <!-- group_by0 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                            -->

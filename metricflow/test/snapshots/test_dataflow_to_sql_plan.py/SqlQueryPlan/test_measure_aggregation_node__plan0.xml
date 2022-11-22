@@ -2,22 +2,22 @@
     <SqlSelectStatementNode>
         <!-- description = Aggregate Measures -->
         <!-- node_id = ss_1 -->
-        <!-- col0 =                                                              -->
-        <!--   {'class': 'SqlSelectColumn',                                      -->
-        <!--    'expr': SqlFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
-        <!--    'column_alias': 'bookings'}                                      -->
-        <!-- col1 =                                                              -->
-        <!--   {'class': 'SqlSelectColumn',                                      -->
-        <!--    'expr': SqlFunctionExpression(node_id=fnc_1, sql_function=SUM),  -->
-        <!--    'column_alias': 'instant_bookings'}                              -->
-        <!-- col2 =                                                                         -->
-        <!--   {'class': 'SqlSelectColumn',                                                 -->
-        <!--    'expr': SqlFunctionExpression(node_id=fnc_2, sql_function=COUNT_DISTINCT),  -->
-        <!--    'column_alias': 'bookers'}                                                  -->
-        <!-- col3 =                                                                  -->
-        <!--   {'class': 'SqlSelectColumn',                                          -->
-        <!--    'expr': SqlFunctionExpression(node_id=fnc_3, sql_function=AVERAGE),  -->
-        <!--    'column_alias': 'average_booking_value'}                             -->
+        <!-- col0 =                                                                       -->
+        <!--   {'class': 'SqlSelectColumn',                                               -->
+        <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
+        <!--    'column_alias': 'bookings'}                                               -->
+        <!-- col1 =                                                                       -->
+        <!--   {'class': 'SqlSelectColumn',                                               -->
+        <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_1, sql_function=SUM),  -->
+        <!--    'column_alias': 'instant_bookings'}                                       -->
+        <!-- col2 =                                                                                  -->
+        <!--   {'class': 'SqlSelectColumn',                                                          -->
+        <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_2, sql_function=COUNT_DISTINCT),  -->
+        <!--    'column_alias': 'bookers'}                                                           -->
+        <!-- col3 =                                                                           -->
+        <!--   {'class': 'SqlSelectColumn',                                                   -->
+        <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_3, sql_function=AVERAGE),  -->
+        <!--    'column_alias': 'average_booking_value'}                                      -->
         <!-- from_source = SqlSelectStatementNode(node_id=ss_0) -->
         <!-- where = None -->
         <SqlSelectStatementNode>

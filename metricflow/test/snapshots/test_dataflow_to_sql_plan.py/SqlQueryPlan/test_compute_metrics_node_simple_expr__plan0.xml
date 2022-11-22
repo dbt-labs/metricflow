@@ -27,10 +27,10 @@
             <!--   {'class': 'SqlSelectColumn',                           -->
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10),  -->
             <!--    'column_alias': 'listing__country_latest'}            -->
-            <!-- col2 =                                                              -->
-            <!--   {'class': 'SqlSelectColumn',                                      -->
-            <!--    'expr': SqlFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
-            <!--    'column_alias': 'booking_value'}                                 -->
+            <!-- col2 =                                                                       -->
+            <!--   {'class': 'SqlSelectColumn',                                               -->
+            <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
+            <!--    'column_alias': 'booking_value'}                                          -->
             <!-- from_source = SqlSelectStatementNode(node_id=ss_2) -->
             <!-- group_by0 =                                              -->
             <!--   {'class': 'SqlSelectColumn',                           -->

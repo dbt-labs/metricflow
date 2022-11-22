@@ -107,10 +107,10 @@
             <!--   {'class': 'SqlSelectColumn',                          -->
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_1),  -->
             <!--    'column_alias': 'user'}                              -->
-            <!-- col1 =                                                              -->
-            <!--   {'class': 'SqlSelectColumn',                                      -->
-            <!--    'expr': SqlFunctionExpression(node_id=fnc_0, sql_function=MAX),  -->
-            <!--    'column_alias': 'ds__complete'}                                  -->
+            <!-- col1 =                                                                       -->
+            <!--   {'class': 'SqlSelectColumn',                                               -->
+            <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_0, sql_function=MAX),  -->
+            <!--    'column_alias': 'ds__complete'}                                           -->
             <!-- from_source = SqlSelectStatementNode(node_id=ss_10000) -->
             <!-- group_by0 =                                             -->
             <!--   {'class': 'SqlSelectColumn',                          -->
