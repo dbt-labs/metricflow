@@ -22,6 +22,9 @@ from metricflow.sql.sql_exprs import (
     SqlColumnReplacements,
     SqlCastToTimestampExpression,
     SqlBetweenExpression,
+    SqlWindowFunctionExpression,
+    SqlWindowFunction,
+    SqlWindowOrderByArg,
 )
 from metricflow.time.time_granularity import TimeGranularity
 
@@ -236,3 +239,32 @@ def test_between_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> No
         )
     ).sql
     assert actual == "a.col0 BETWEEN CAST('2020-01-01' AS TIMESTAMP) AND CAST('2020-01-10' AS TIMESTAMP)"
+
+
+def test_window_function_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D
+    actual = default_expr_renderer.render_sql_expr(
+        SqlWindowFunctionExpression(
+            sql_function=SqlWindowFunction.FIRST_VALUE,
+            sql_function_args=[SqlColumnReferenceExpression(SqlColumnReference("a", "col0"))],
+            partition_by_args=[
+                SqlColumnReferenceExpression(SqlColumnReference("b", "col0")),
+                SqlColumnReferenceExpression(SqlColumnReference("b", "col1")),
+            ],
+            order_by_args=[
+                SqlWindowOrderByArg(
+                    expr=SqlColumnReferenceExpression(SqlColumnReference("a", "col0")),
+                    descending=True,
+                    nulls_last=False,
+                ),
+                SqlWindowOrderByArg(
+                    expr=SqlColumnReferenceExpression(SqlColumnReference("b", "col0")),
+                    descending=False,
+                    nulls_last=True,
+                ),
+            ],
+        )
+    ).sql
+    assert (
+        actual
+        == "first_value(a.col0) OVER (PARTITION BY b.col0, b.col1 ORDER BY a.col0 DESC NULLS FIRST, b.col0 ASC NULLS LAST)"
+    )

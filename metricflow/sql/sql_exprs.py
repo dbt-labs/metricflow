@@ -22,6 +22,7 @@ from metricflow.dag.id_generation import (
     SQL_EXPR_DATE_TRUNC,
     SQL_EXPR_RATIO_COMPUTATION,
     SQL_EXPR_BETWEEN_PREFIX,
+    SQL_EXPR_WINDOW_FUNCTION_ID_PREFIX,
 )
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.visitor import Visitable, VisitorOutputT
@@ -113,7 +114,7 @@ class SqlExpressionTreeLineage:
     """Captures the lineage of an expression node - contains itself and all ancestor nodes."""
 
     string_exprs: Tuple[SqlStringExpression, ...] = ()
-    function_exprs: Tuple[SqlAggregateFunctionExpression, ...] = ()
+    function_exprs: Tuple[SqlFunctionExpression, ...] = ()
     column_reference_exprs: Tuple[SqlColumnReferenceExpression, ...] = ()
     column_alias_reference_exprs: Tuple[SqlColumnAliasReferenceExpression, ...] = ()
     other_exprs: Tuple[SqlExpressionNode, ...] = ()
@@ -214,6 +215,10 @@ class SqlExpressionNodeVisitor(Generic[VisitorOutputT], ABC):
 
     @abstractmethod
     def visit_between_expr(self, node: SqlBetweenExpression) -> VisitorOutputT:  # noqa: D
+        pass
+
+    @abstractmethod
+    def visit_window_function_expr(self, node: SqlWindowFunctionExpression) -> VisitorOutputT:  # noqa: D
         pass
 
 
@@ -774,6 +779,148 @@ class SqlAggregateFunctionExpression(SqlFunctionExpression):
         if not isinstance(other, SqlAggregateFunctionExpression):
             return False
         return self.sql_function == other.sql_function and self._parents_match(other)
+
+
+class SqlWindowFunction(Enum):
+    """Names of known SQL window functions like SUM(), RANK(), ROW_NUMBER()
+
+    Values are the SQL string to be used in rendering.
+    """
+
+    FIRST_VALUE = "first_value"
+    ROW_NUMBER = "row_number"
+
+
+@dataclass(frozen=True)
+class SqlWindowOrderByArg:
+    """In window functions, the ORDER BY clause can accept an expr, ordering, null ranking."""
+
+    expr: SqlExpressionNode
+    descending: Optional[bool] = None
+    nulls_last: Optional[bool] = None
+
+    @property
+    def suffix(self) -> str:
+        """Helper to build suffix to append to {expr}{suffix}"""
+        result = []
+        if self.descending is not None:
+            result.append("DESC" if self.descending else "ASC")
+        if self.nulls_last is not None:
+            result.append("NULLS LAST" if self.nulls_last else "NULLS FIRST")
+        return " ".join(result)
+
+
+class SqlWindowFunctionExpression(SqlFunctionExpression):
+    """A window function expression like SUM(foo) OVER bar"""
+
+    def __init__(
+        self,
+        sql_function: SqlWindowFunction,
+        sql_function_args: Optional[List[SqlExpressionNode]] = None,
+        partition_by_args: Optional[List[SqlExpressionNode]] = None,
+        order_by_args: Optional[List[SqlWindowOrderByArg]] = None,
+    ) -> None:
+        """Constructor.
+
+        Args:
+            sql_function: The function that this represents.
+            sql_function_args: The arguments that should go into the function. e.g. for "CONCAT(a, b)", the arg
+                               expressions should be "a" and "b".
+            partition_by_args: The arguments to partition the rows. e.g. PARTITION BY expr1, expr2,
+                               the args are "expr1", "expr2".
+            order_by_args: The expr to order the partitions by.
+        """
+        self._sql_function = sql_function
+        self._sql_function_args = sql_function_args
+        self._partition_by_args = partition_by_args
+        self._order_by_args = order_by_args
+        parent_nodes = []
+        if sql_function_args:
+            parent_nodes.extend(sql_function_args)
+        if partition_by_args:
+            parent_nodes.extend(partition_by_args)
+        if order_by_args:
+            parent_nodes.extend([x.expr for x in order_by_args])
+        super().__init__(node_id=self.create_unique_id(), parent_nodes=parent_nodes)
+
+    @classmethod
+    def id_prefix(cls) -> str:  # noqa: D
+        return SQL_EXPR_WINDOW_FUNCTION_ID_PREFIX
+
+    @property
+    def requires_parenthesis(self) -> bool:  # noqa: D
+        return False
+
+    def accept(self, visitor: SqlExpressionNodeVisitor) -> VisitorOutputT:  # noqa: D
+        return visitor.visit_window_function_expr(self)
+
+    @property
+    def description(self) -> str:  # noqa: D
+        return f"{self._sql_function.value} Window Function Expression"
+
+    @property
+    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
+        return (
+            super().displayed_properties
+            + [DisplayedProperty("function", self.sql_function)]
+            + [DisplayedProperty("argument", x) for x in self.sql_function_args]
+            + [DisplayedProperty("partition_by_argument", x) for x in self.partition_by_args]
+            + [DisplayedProperty("order_by_argument", x) for x in self.order_by_args]
+        )
+
+    @property
+    def sql_function(self) -> SqlWindowFunction:  # noqa: D
+        return self._sql_function
+
+    @property
+    def sql_function_args(self) -> List[SqlExpressionNode]:  # noqa: D
+        return self._sql_function_args or []
+
+    @property
+    def partition_by_args(self) -> List[SqlExpressionNode]:  # noqa: D
+        return self._partition_by_args or []
+
+    @property
+    def order_by_args(self) -> List[SqlWindowOrderByArg]:  # noqa: D
+        return self._order_by_args or []
+
+    def __repr__(self) -> str:  # noqa: D
+        return f"{self.__class__.__name__}(node_id={self.node_id}, sql_function={self.sql_function.name})"
+
+    def rewrite(  # noqa: D
+        self,
+        column_replacements: Optional[SqlColumnReplacements] = None,
+        should_render_table_alias: Optional[bool] = None,
+    ) -> SqlExpressionNode:
+        return SqlWindowFunctionExpression(
+            sql_function=self.sql_function,
+            sql_function_args=[
+                x.rewrite(column_replacements, should_render_table_alias) for x in self.sql_function_args
+            ],
+            partition_by_args=[
+                x.rewrite(column_replacements, should_render_table_alias) for x in self.partition_by_args
+            ],
+            order_by_args=[
+                SqlWindowOrderByArg(
+                    expr=x.expr.rewrite(column_replacements, should_render_table_alias),
+                    descending=x.descending,
+                    nulls_last=x.nulls_last,
+                )
+                for x in self.order_by_args
+            ],
+        )
+
+    @property
+    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D
+        return SqlExpressionTreeLineage.combine(
+            tuple(x.lineage for x in self.parent_nodes) + (SqlExpressionTreeLineage(function_exprs=(self,)),)
+        )
+
+    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
+        if not isinstance(other, SqlWindowFunctionExpression):
+            return False
+        order_by_matches = all(x == y for x, y in itertools.zip_longest(self.order_by_args, other.order_by_args))
+        return self.sql_function == other.sql_function and order_by_matches and self._parents_match(other)
 
 
 class SqlNullExpression(SqlExpressionNode):
