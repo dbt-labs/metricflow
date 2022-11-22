@@ -10,7 +10,7 @@ from metricflow.sql.sql_exprs import (
     SqlColumnReference,
     SqlComparisonExpression,
     SqlComparison,
-    SqlFunctionExpression,
+    SqlAggregateFunctionExpression,
     SqlFunction,
     SqlNullExpression,
     SqlLogicalExpression,
@@ -72,7 +72,7 @@ def test_require_parenthesis(default_expr_renderer: DefaultSqlExpressionRenderer
 
 def test_function_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D
     actual = default_expr_renderer.render_sql_expr(
-        SqlFunctionExpression(
+        SqlAggregateFunctionExpression(
             sql_function=SqlFunction.SUM,
             sql_function_args=[
                 SqlColumnReferenceExpression(SqlColumnReference("my_table", "a")),
@@ -86,7 +86,7 @@ def test_function_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> N
 def test_distinct_agg_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:
     """Distinct aggregation functions require the insertion of the DISTINCT keyword in the rendered function expr"""
     actual = default_expr_renderer.render_sql_expr(
-        SqlFunctionExpression(
+        SqlAggregateFunctionExpression(
             sql_function=SqlFunction.COUNT_DISTINCT,
             sql_function_args=[
                 SqlColumnReferenceExpression(SqlColumnReference("my_table", "a")),
@@ -100,11 +100,11 @@ def test_distinct_agg_expr(default_expr_renderer: DefaultSqlExpressionRenderer) 
 
 def test_nested_function_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D
     actual = default_expr_renderer.render_sql_expr(
-        SqlFunctionExpression(
+        SqlAggregateFunctionExpression(
             sql_function=SqlFunction.CONCAT,
             sql_function_args=[
                 SqlColumnReferenceExpression(SqlColumnReference("my_table", "a")),
-                SqlFunctionExpression(
+                SqlAggregateFunctionExpression(
                     sql_function=SqlFunction.CONCAT,
                     sql_function_args=[
                         SqlColumnReferenceExpression(SqlColumnReference("my_table", "b")),
@@ -191,7 +191,7 @@ def test_date_trunc_expr(default_expr_renderer: DefaultSqlExpressionRenderer) ->
 def test_ratio_computation_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D
     actual = default_expr_renderer.render_sql_expr(
         SqlRatioComputationExpression(
-            numerator=SqlFunctionExpression(
+            numerator=SqlAggregateFunctionExpression(
                 SqlFunction.SUM, sql_function_args=[SqlStringExpression(sql_expr="1", requires_parenthesis=False)]
             ),
             denominator=SqlColumnReferenceExpression(SqlColumnReference(column_name="divide_by_me", table_alias="a")),

@@ -113,7 +113,7 @@ class SqlExpressionTreeLineage:
     """Captures the lineage of an expression node - contains itself and all ancestor nodes."""
 
     string_exprs: Tuple[SqlStringExpression, ...] = ()
-    function_exprs: Tuple[SqlFunctionExpression, ...] = ()
+    function_exprs: Tuple[SqlAggregateFunctionExpression, ...] = ()
     column_reference_exprs: Tuple[SqlColumnReferenceExpression, ...] = ()
     column_alias_reference_exprs: Tuple[SqlColumnAliasReferenceExpression, ...] = ()
     other_exprs: Tuple[SqlExpressionNode, ...] = ()
@@ -177,7 +177,7 @@ class SqlExpressionNodeVisitor(Generic[VisitorOutputT], ABC):
         pass
 
     @abstractmethod
-    def visit_function_expr(self, node: SqlFunctionExpression) -> VisitorOutputT:  # noqa: D
+    def visit_function_expr(self, node: SqlAggregateFunctionExpression) -> VisitorOutputT:  # noqa: D
         pass
 
     @abstractmethod
@@ -688,14 +688,20 @@ class SqlFunction(Enum):
 
 
 class SqlFunctionExpression(SqlExpressionNode):
-    """A function expression like SUM(1)."""
+    """Denotes a function expression in SQL."""
+
+    pass
+
+
+class SqlAggregateFunctionExpression(SqlFunctionExpression):
+    """An aggregate function expression like SUM(1)."""
 
     @staticmethod
     def from_aggregation_type(
         aggregation_type: AggregationType, sql_column_expression: SqlColumnReferenceExpression
-    ) -> SqlFunctionExpression:
+    ) -> SqlAggregateFunctionExpression:
         """Given the aggregation type, return an SQL function expression that does that aggregation on the given col."""
-        return SqlFunctionExpression(
+        return SqlAggregateFunctionExpression(
             sql_function=SqlFunction.from_aggregation_type(aggregation_type=aggregation_type),
             sql_function_args=[sql_column_expression],
         )
@@ -751,7 +757,7 @@ class SqlFunctionExpression(SqlExpressionNode):
         column_replacements: Optional[SqlColumnReplacements] = None,
         should_render_table_alias: Optional[bool] = None,
     ) -> SqlExpressionNode:
-        return SqlFunctionExpression(
+        return SqlAggregateFunctionExpression(
             sql_function=self.sql_function,
             sql_function_args=[
                 x.rewrite(column_replacements, should_render_table_alias) for x in self.sql_function_args
@@ -765,7 +771,7 @@ class SqlFunctionExpression(SqlExpressionNode):
         )
 
     def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
-        if not isinstance(other, SqlFunctionExpression):
+        if not isinstance(other, SqlAggregateFunctionExpression):
             return False
         return self.sql_function == other.sql_function and self._parents_match(other)
 
@@ -1094,7 +1100,7 @@ class SqlRatioComputationExpression(SqlExpressionNode):
     """Node for expressing Ratio metrics to allow for appropriate casting to float/double in each engine
 
     In future we might wish to break this up into a set of nodes, e.g., SqlCastExpression and SqlMathExpression
-    or even add CAST to SqlFunctionExpression. However, at this time the only mathematical operation we encode
+    or even add CAST to SqlAggregateFunctionExpression. However, at this time the only mathematical operation we encode
     is division, and we only use that for ratios. Similarly, the only times we do typecasting are when we are
     coercing timestamps (already handled) or computing ratio metrics.
     """

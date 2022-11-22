@@ -9,7 +9,7 @@ from metricflow.sql.sql_exprs import (
     SqlComparisonExpression,
     SqlComparison,
     SqlStringLiteralExpression,
-    SqlFunctionExpression,
+    SqlAggregateFunctionExpression,
     SqlFunction,
     SqlStringExpression,
 )
@@ -56,7 +56,7 @@ def base_select_statement() -> SqlSelectStatementNode:
         description="src3",
         select_columns=(
             SqlSelectColumn(
-                expr=SqlFunctionExpression(
+                expr=SqlAggregateFunctionExpression(
                     sql_function=SqlFunction.SUM,
                     sql_function_args=[
                         SqlColumnReferenceExpression(
@@ -220,7 +220,7 @@ def join_select_statement() -> SqlSelectStatementNode:
         description="query",
         select_columns=(
             SqlSelectColumn(
-                expr=SqlFunctionExpression(
+                expr=SqlAggregateFunctionExpression(
                     sql_function=SqlFunction.SUM,
                     sql_function_args=[
                         SqlColumnReferenceExpression(
@@ -391,7 +391,7 @@ def colliding_select_statement() -> SqlSelectStatementNode:
         description="query",
         select_columns=(
             SqlSelectColumn(
-                expr=SqlFunctionExpression(
+                expr=SqlAggregateFunctionExpression(
                     sql_function=SqlFunction.SUM,
                     sql_function_args=[
                         SqlColumnReferenceExpression(
@@ -572,7 +572,7 @@ def reduce_all_join_select_statement() -> SqlSelectStatementNode:
         description="query",
         select_columns=(
             SqlSelectColumn(
-                expr=SqlFunctionExpression(
+                expr=SqlAggregateFunctionExpression(
                     sql_function=SqlFunction.SUM,
                     sql_function_args=[
                         SqlColumnReferenceExpression(

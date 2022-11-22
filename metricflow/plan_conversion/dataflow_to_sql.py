@@ -89,7 +89,7 @@ from metricflow.sql.sql_exprs import (
     SqlDateTruncExpression,
     SqlStringLiteralExpression,
     SqlBetweenExpression,
-    SqlFunctionExpression,
+    SqlAggregateFunctionExpression,
 )
 from metricflow.sql.sql_plan import (
     SqlQueryPlan,
@@ -1168,7 +1168,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             aggregation_state=AggregationState.COMPLETE,
         ).column_name
         time_dimension_select_column = SqlSelectColumn(
-            expr=SqlFunctionExpression.from_aggregation_type(
+            expr=SqlAggregateFunctionExpression.from_aggregation_type(
                 node.agg_by_function,
                 SqlColumnReferenceExpression(
                     SqlColumnReference(

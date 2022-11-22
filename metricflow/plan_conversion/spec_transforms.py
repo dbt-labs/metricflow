@@ -14,7 +14,7 @@ from metricflow.sql.sql_exprs import (
     SqlComparison,
     SqlColumnReferenceExpression,
     SqlColumnReference,
-    SqlFunctionExpression,
+    SqlAggregateFunctionExpression,
     SqlFunction,
 )
 from metricflow.sql.sql_plan import SqlSelectColumn
@@ -50,7 +50,7 @@ def _make_coalesced_expr(table_aliases: Sequence[str], column_alias: str) -> Sql
                     )
                 )
             )
-        return SqlFunctionExpression(
+        return SqlAggregateFunctionExpression(
             sql_function=SqlFunction.COALESCE,
             sql_function_args=columns_to_coalesce,
         )

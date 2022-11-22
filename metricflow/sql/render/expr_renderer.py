@@ -17,7 +17,7 @@ from metricflow.sql.sql_exprs import (
     SqlComparisonExpression,
     SqlExpressionNode,
     SqlFunction,
-    SqlFunctionExpression,
+    SqlAggregateFunctionExpression,
     SqlNullExpression,
     SqlLogicalExpression,
     SqlStringLiteralExpression,
@@ -107,7 +107,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
             execution_parameters=combined_params,
         )
 
-    def visit_function_expr(self, node: SqlFunctionExpression) -> SqlExpressionRenderResult:  # noqa: D
+    def visit_function_expr(self, node: SqlAggregateFunctionExpression) -> SqlExpressionRenderResult:  # noqa: D
         """Render a function call like CONCAT(a, b)"""
         args_rendered = [self.render_sql_expr(x) for x in node.sql_function_args]
         combined_params = SqlBindParameters()

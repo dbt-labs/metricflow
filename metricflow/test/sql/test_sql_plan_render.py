@@ -12,7 +12,7 @@ from metricflow.sql.sql_exprs import (
     SqlColumnReference,
     SqlComparisonExpression,
     SqlComparison,
-    SqlFunctionExpression,
+    SqlAggregateFunctionExpression,
     SqlFunction,
 )
 from metricflow.sql.sql_plan import (
@@ -44,7 +44,9 @@ def test_component_rendering(
     # Test single SELECT column
     select_columns = [
         SqlSelectColumn(
-            expr=SqlFunctionExpression(sql_function=SqlFunction.SUM, sql_function_args=[SqlStringExpression("1")]),
+            expr=SqlAggregateFunctionExpression(
+                sql_function=SqlFunction.SUM, sql_function_args=[SqlStringExpression("1")]
+            ),
             column_alias="bookings",
         ),
     ]
