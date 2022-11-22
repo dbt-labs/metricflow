@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import logging
 from dataclasses import dataclass
 from typing import Optional
 
@@ -8,6 +9,8 @@ import pandas as pd
 
 from metricflow.dataclass_serialization import SerializableDataclass
 from metricflow.time.time_granularity import TimeGranularity
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -19,14 +22,10 @@ class TimeRangeConstraint(SerializableDataclass):
 
     def __post_init__(self) -> None:  # noqa: D
         if self.start_time > self.end_time:
-            raise RuntimeError(
-                f"start_time must not be > end_time. start_time={self.start_time} end_time={self.end_time}"
-            )
+            logger.warning(f"start_time must not be > end_time. start_time={self.start_time} end_time={self.end_time}")
 
         if self.start_time < TimeRangeConstraint.ALL_TIME_BEGIN():
-            raise RuntimeError(
-                f"start_time={self.start_time} exceeds the limits of {TimeRangeConstraint.ALL_TIME_BEGIN()}"
-            )
+            logger.warning(f"start_time={self.start_time} exceeds the limits of {TimeRangeConstraint.ALL_TIME_BEGIN()}")
 
         if self.end_time > TimeRangeConstraint.ALL_TIME_END():
             raise RuntimeError(f"end_time={self.end_time} exceeds the limits of {TimeRangeConstraint.ALL_TIME_END()}")
