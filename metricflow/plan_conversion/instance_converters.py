@@ -15,6 +15,7 @@ from metricflow.instances import (
     MdoInstance,
     DimensionInstance,
     IdentifierInstance,
+    ExtraInstance,
     MetricInstance,
     MeasureInstance,
     InstanceSet,
@@ -87,12 +88,16 @@ class CreateSelectColumnsForInstances(InstanceSetTransform[SelectColumnSet]):
         identifier_cols = list(
             chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.identifier_instances])
         )
+        extra_cols = list(
+            chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.extra_instances])
+        )
         return SelectColumnSet(
             metric_columns=metric_cols,
             measure_columns=measure_cols,
             dimension_columns=dimension_cols,
             time_dimension_columns=time_dimension_cols,
             identifier_columns=identifier_cols,
+            extra_columns=extra_cols,
         )
 
     def _make_sql_column_expression(
@@ -234,12 +239,16 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
         identifier_cols = list(
             chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.identifier_instances])
         )
+        extra_cols = list(
+            chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.extra_instances])
+        )
         return SelectColumnSet(
             metric_columns=metric_cols,
             measure_columns=measure_cols,
             dimension_columns=dimension_cols,
             time_dimension_columns=time_dimension_cols,
             identifier_columns=identifier_cols,
+            extra_columns=extra_cols,
         )
 
 
@@ -436,6 +445,7 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
             time_dimension_instances=tuple(time_dimension_instances_with_additional_link),
             identifier_instances=tuple(identifier_instances_with_additional_link),
             metric_instances=(),
+            extra_instances=(),
         )
 
 
@@ -477,6 +487,7 @@ class FilterLinkableInstancesWithLeadingLink(InstanceSetTransform[InstanceSet]):
             time_dimension_instances=filtered_time_dimension_instances,
             identifier_instances=filtered_identifier_instances,
             metric_instances=instance_set.metric_instances,
+            extra_instances=instance_set.extra_instances,
         )
         return output
 
@@ -535,6 +546,7 @@ class FilterElements(InstanceSetTransform[InstanceSet]):
             ),
             identifier_instances=tuple(x for x in instance_set.identifier_instances if self._should_pass(x.spec)),
             metric_instances=tuple(x for x in instance_set.metric_instances if self._should_pass(x.spec)),
+            extra_instances=tuple(x for x in instance_set.extra_instances if self._should_pass(x.spec)),
         )
         return output
 
@@ -573,6 +585,7 @@ class ChangeMeasureAggregationState(InstanceSetTransform[InstanceSet]):
             time_dimension_instances=instance_set.time_dimension_instances,
             identifier_instances=instance_set.identifier_instances,
             metric_instances=instance_set.metric_instances,
+            extra_instances=instance_set.extra_instances,
         )
 
 
@@ -626,6 +639,7 @@ class AliasAggregatedMeasures(InstanceSetTransform[InstanceSet]):
             time_dimension_instances=instance_set.time_dimension_instances,
             identifier_instances=instance_set.identifier_instances,
             metric_instances=instance_set.metric_instances,
+            extra_instances=instance_set.extra_instances,
         )
 
 
@@ -642,6 +656,7 @@ class AddMetrics(InstanceSetTransform[InstanceSet]):
             time_dimension_instances=instance_set.time_dimension_instances,
             identifier_instances=instance_set.identifier_instances,
             metric_instances=instance_set.metric_instances + tuple(self._metric_instances),
+            extra_instances=instance_set.extra_instances,
         )
 
 
@@ -655,6 +670,7 @@ class RemoveMeasures(InstanceSetTransform[InstanceSet]):
             time_dimension_instances=instance_set.time_dimension_instances,
             identifier_instances=instance_set.identifier_instances,
             metric_instances=instance_set.metric_instances,
+            extra_instances=instance_set.extra_instances,
         )
 
 
@@ -668,6 +684,7 @@ class RemoveMetrics(InstanceSetTransform[InstanceSet]):
             time_dimension_instances=instance_set.time_dimension_instances,
             identifier_instances=instance_set.identifier_instances,
             metric_instances=(),
+            extra_instances=instance_set.extra_instances,
         )
 
 
@@ -745,12 +762,24 @@ class ChangeAssociatedColumns(InstanceSetTransform[InstanceSet]):
                 )
             )
 
+        output_extra_instances = []
+        for input_extra_instance in instance_set.extra_instances:
+            output_extra_instances.append(
+                ExtraInstance(
+                    associated_columns=(
+                        self._column_association_resolver.resolve_extra_spec(extra_spec=input_extra_instance.spec),
+                    ),
+                    spec=input_extra_instance.spec,
+                )
+            )
+
         return InstanceSet(
             measure_instances=tuple(output_measure_instances),
             dimension_instances=tuple(output_dimension_instances),
             time_dimension_instances=tuple(output_time_dimension_instances),
             identifier_instances=tuple(output_identifier_instances),
             metric_instances=tuple(output_metric_instances),
+            extra_instances=tuple(output_extra_instances),
         )
 
 

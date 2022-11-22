@@ -11,6 +11,7 @@ from metricflow.column_assoc import ColumnAssociation
 from metricflow.dataclass_serialization import SerializableDataclass
 from metricflow.references import ElementReference
 from metricflow.specs import (
+    ExtraSpec,
     MeasureSpec,
     DimensionSpec,
     IdentifierSpec,
@@ -171,6 +172,12 @@ class MetricInstance(MdoInstance[MetricSpec], SerializableDataclass):  # noqa: D
     defined_from: Tuple[MetricModelReference, ...]
 
 
+@dataclass(frozen=True)
+class ExtraInstance(MdoInstance[ExtraSpec], SerializableDataclass):  # noqa: D
+    associated_columns: Tuple[ColumnAssociation, ...]
+    spec: ExtraSpec
+
+
 # Output type of transform function
 TransformOutputT = TypeVar("TransformOutputT")
 
@@ -200,6 +207,7 @@ class InstanceSet(SerializableDataclass):
     time_dimension_instances: Tuple[TimeDimensionInstance, ...] = ()
     identifier_instances: Tuple[IdentifierInstance, ...] = ()
     metric_instances: Tuple[MetricInstance, ...] = ()
+    extra_instances: Tuple[ExtraInstance, ...] = ()
 
     def transform(self, transform_function: InstanceSetTransform[TransformOutputT]) -> TransformOutputT:  # noqa: D
         return transform_function.transform(self)
@@ -215,6 +223,7 @@ class InstanceSet(SerializableDataclass):
         time_dimension_instances: List[TimeDimensionInstance] = []
         identifier_instances: List[IdentifierInstance] = []
         metric_instances: List[MetricInstance] = []
+        extra_instances: List[ExtraInstance] = []
 
         for instance_set in instance_sets:
             for measure_instance in instance_set.measure_instances:
@@ -232,6 +241,9 @@ class InstanceSet(SerializableDataclass):
             for metric_instance in instance_set.metric_instances:
                 if metric_instance.spec not in {x.spec for x in metric_instances}:
                     metric_instances.append(metric_instance)
+            for extra_instance in instance_set.extra_instances:
+                if extra_instance.spec not in {x.spec for x in extra_instances}:
+                    extra_instances.append(extra_instance)
 
         return InstanceSet(
             measure_instances=tuple(measure_instances),
@@ -239,6 +251,7 @@ class InstanceSet(SerializableDataclass):
             time_dimension_instances=tuple(time_dimension_instances),
             identifier_instances=tuple(identifier_instances),
             metric_instances=tuple(metric_instances),
+            extra_instances=tuple(extra_instances),
         )
 
     @property
@@ -249,4 +262,5 @@ class InstanceSet(SerializableDataclass):
             time_dimension_specs=tuple(x.spec for x in self.time_dimension_instances),
             identifier_specs=tuple(x.spec for x in self.identifier_instances),
             metric_specs=tuple(x.spec for x in self.metric_instances),
+            extra_specs=tuple(x.spec for x in self.extra_instances),
         )
