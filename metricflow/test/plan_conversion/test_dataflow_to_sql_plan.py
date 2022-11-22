@@ -7,6 +7,7 @@ from metricflow.aggregation_properties import AggregationType
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan import (
+    AppendRowNumberColumnNode,
     DataflowPlan,
     WriteToResultDataframeNode,
     FilterElementsNode,
@@ -1495,4 +1496,23 @@ def test_metric_with_measures_from_multiple_sources_no_dimensions(  # noqa: D
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+def test_append_row_number_column_node(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    consistent_id_object_repository: ConsistentIdObjectRepository,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
+    sql_client: SqlClient,
+) -> None:
+    """Tests converting a dataflow plan to a SQL query plan using a AppendRowNumberColumnNode."""
+    measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
+    append_row_number_column_node = AppendRowNumberColumnNode[DataSourceDataSet](parent_node=measure_source_node)
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=append_row_number_column_node,
     )
