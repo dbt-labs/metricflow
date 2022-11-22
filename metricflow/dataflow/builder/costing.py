@@ -32,6 +32,7 @@ from metricflow.dataflow.dataflow_plan import (
     WriteToResultTableNode,
     SemiAdditiveJoinNode,
     MetricTimeDimensionTransformNode,
+    AppendRowNumberColumnNode,
 )
 
 
@@ -161,3 +162,8 @@ class DefaultCostFunction(
         # Add number of joins to the cost.
         node_cost = DefaultCost(num_joins=1)
         return DefaultCost.sum(parent_costs + [node_cost])
+
+    def visit_append_row_number_column_node(  # noqa: D
+        self, node: AppendRowNumberColumnNode[SourceDataSetT]
+    ) -> DefaultCost:
+        return DefaultCost.sum([x.accept(self) for x in node.parent_nodes])

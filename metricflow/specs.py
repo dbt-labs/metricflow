@@ -124,6 +124,10 @@ class ExtraSpec(InstanceSpec):
     def qualified_name(self) -> str:  # noqa: D
         return self.element_name
 
+    @staticmethod
+    def from_name(name: str) -> ExtraSpec:  # noqa: D
+        return ExtraSpec(element_name=name)
+
 
 @dataclass(frozen=True)
 class LinkableInstanceSpec(InstanceSpec):

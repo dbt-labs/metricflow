@@ -688,6 +688,47 @@ class RemoveMetrics(InstanceSetTransform[InstanceSet]):
         )
 
 
+class CreateSqlColumnReferencesForInstances(InstanceSetTransform[Tuple[SqlColumnReferenceExpression, ...]]):
+    """Create select column expressions that will express all instances in the set.
+
+    It assumes that the column names of the instances are represented by the supplied column association resolver and
+    come from the given table alias.
+    """
+
+    def __init__(
+        self,
+        table_alias: str,
+        column_resolver: ColumnAssociationResolver,
+    ) -> None:
+        """Initializer.
+
+        Args:
+            table_alias: the table alias to select columns from
+            column_resolver: resolver to name columns.
+        """
+        self._table_alias = table_alias
+        self._column_resolver = column_resolver
+
+    def transform(self, instance_set: InstanceSet) -> Tuple[SqlColumnReferenceExpression, ...]:  # noqa: D
+        column_names = [
+            col.column_name
+            for col in (
+                chain.from_iterable(
+                    [x.column_associations(self._column_resolver) for x in instance_set.spec_set.all_specs]
+                )
+            )
+        ]
+        return tuple(
+            SqlColumnReferenceExpression(
+                SqlColumnReference(
+                    table_alias=self._table_alias,
+                    column_name=column_name,
+                ),
+            )
+            for column_name in column_names
+        )
+
+
 class ChangeAssociatedColumns(InstanceSetTransform[InstanceSet]):
     """Change the columns associated with instances to the one specified by the resolver."""
 
