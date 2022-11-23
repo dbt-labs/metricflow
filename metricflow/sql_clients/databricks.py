@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import Optional, ClassVar, Dict, Sequence
+from typing import Optional, ClassVar, Dict, Sequence, Callable
 
 import pandas as pd
 import sqlalchemy
@@ -14,6 +14,7 @@ from metricflow.protocols.sql_request import SqlRequestTagSet, SqlJsonTag
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer, SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_bind_parameters import SqlColumnType
+from metricflow.sql_clients.async_request import CombinedSqlTags
 from metricflow.sql_clients.base_sql_client_implementation import BaseSqlClientImplementation
 from metricflow.sql_clients.common_client import SqlDialect, check_isolation_level
 
@@ -269,5 +270,5 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         stmt_uppercased = stmt.upper()
         return SQL_RENAME in stmt_uppercased and SQL_ALTER_TABLE in stmt_uppercased
 
-    def cancel_request(self, pattern_tag_set: SqlRequestTagSet) -> int:  # noqa: D
+    def cancel_request(self, match_function: Callable[[CombinedSqlTags], bool]) -> int:  # noqa: D
         raise NotImplementedError

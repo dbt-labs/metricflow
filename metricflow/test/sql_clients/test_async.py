@@ -2,7 +2,6 @@ import json
 import logging
 import textwrap
 import time
-from typing import Optional
 
 import pytest
 
@@ -10,7 +9,8 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.object_utils import assert_values_exhausted
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.protocols.sql_client import SqlEngine
-from metricflow.protocols.sql_request import SqlRequestTagSet, MF_EXTRA_TAGS_KEY, SqlJsonTag
+from metricflow.protocols.sql_request import MF_EXTRA_TAGS_KEY, SqlJsonTag
+from metricflow.sql_clients.async_request import CombinedSqlTags
 from metricflow.sql_clients.sql_utils import make_df
 from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
@@ -66,18 +66,50 @@ def test_cancel_request(  # noqa: D
     )
 
     num_attempts = 3
-
+    cancel_using_request_id_successful = False
     for attempt_num in range(num_attempts):
-        if try_cancel_request(async_sql_client, table_with_1000_rows, table_with_100_rows, attempt_num):
-            return
+        if try_cancel_request(
+            async_sql_client=async_sql_client,
+            table_with_1000_rows=table_with_1000_rows,
+            table_with_100_rows=table_with_100_rows,
+            attempt_num=attempt_num,
+            cancel_using_extra_tag=False,
+        ):
+            cancel_using_request_id_successful = True
+            break
 
-    assert False, f"Was not able to cancel a request after {num_attempts} attempts"
+    assert (
+        cancel_using_request_id_successful
+    ), f"Was not able to cancel a request using the request ID after {num_attempts} attempts"
+
+    cancel_using_extra_tag_successful = False
+    for attempt_num in range(num_attempts - 1):
+        if try_cancel_request(
+            async_sql_client=async_sql_client,
+            table_with_1000_rows=table_with_1000_rows,
+            table_with_100_rows=table_with_100_rows,
+            attempt_num=attempt_num,
+            cancel_using_extra_tag=True,
+        ):
+            cancel_using_extra_tag_successful = True
+            break
+
+    assert (
+        cancel_using_extra_tag_successful
+    ), f"Was not able to cancel a request using the extra tag after {num_attempts} attempts"
 
 
 def try_cancel_request(
-    async_sql_client: AsyncSqlClient, table_with_1000_rows: SqlTable, table_with_100_rows: SqlTable, attempt_num: int
+    async_sql_client: AsyncSqlClient,
+    table_with_1000_rows: SqlTable,
+    table_with_100_rows: SqlTable,
+    attempt_num: int,
+    cancel_using_extra_tag: bool,
 ) -> bool:
     """Try to cancel a query and return True if successful."""
+    extra_tag_key = "example_key"
+    extra_tag_value = "example_value"
+
     request_id = async_sql_client.async_execute(
         textwrap.dedent(
             f"""
@@ -87,24 +119,39 @@ def try_cancel_request(
             CROSS JOIN {table_with_1000_rows.sql} c
             CROSS JOIN {table_with_100_rows.sql} d
             """
-        )
+        ),
+        extra_tags=SqlJsonTag({extra_tag_key: extra_tag_value}),
     )
     # Need to wait a little bit as some clients like BQ doesn't show the query as running right away.
     start_time = time.time()
-    num_cancelled: Optional[int] = None
+    num_cancelled = 0
     while time.time() - start_time < 30:
         time.sleep(1)
-        num_cancelled = async_sql_client.cancel_request(SqlRequestTagSet.create_from_request_id(request_id))
+
+        if cancel_using_extra_tag:
+
+            def _match_function(combined_tags: CombinedSqlTags) -> bool:
+                return combined_tags.extra_tag.json_dict.get(extra_tag_key) == extra_tag_value
+
+            num_cancelled = async_sql_client.cancel_request(_match_function)
+        else:
+
+            def _match_function(combined_tags: CombinedSqlTags) -> bool:
+                return combined_tags.system_tags.request_id == request_id
+
+            num_cancelled = async_sql_client.cancel_request(_match_function)
+
         if num_cancelled > 0:
             break
 
     result_exception = async_sql_client.async_request_result(request_id).exception
-    if result_exception is not None and num_cancelled == 1:
+    if result_exception is not None and num_cancelled >= 1:
+        assert num_cancelled == 1, f"Should have cancelled exactly 1 query, but instead cancelled {num_cancelled}"
         return True
 
     logger.warning(
-        f"Cancellation did not occur on attempt #{attempt_num}. This may be okay as SQL engines do not guarantee "
-        f"cancellation requests: num_cancelled={num_cancelled} result_exception={result_exception}"
+        f"Cancellation did not occur successfully on attempt #{attempt_num}. This may be okay as SQL engines do not "
+        f"guarantee cancellation requests: num_cancelled={num_cancelled} result_exception={result_exception}"
     )
     return False
 

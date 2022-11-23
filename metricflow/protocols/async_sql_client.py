@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Protocol, Sequence, Optional
+from typing import Protocol, Sequence, Optional, Callable
 
 from metricflow.protocols.sql_client import SqlClient, SqlIsolationLevel
-from metricflow.protocols.sql_request import SqlRequestId, SqlRequestResult, SqlRequestTagSet, SqlJsonTag
+from metricflow.protocols.sql_request import SqlRequestId, SqlRequestResult, SqlJsonTag
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.sql_clients.async_request import CombinedSqlTags
 
 
 class AsyncSqlClient(SqlClient, Protocol):
@@ -38,10 +39,11 @@ class AsyncSqlClient(SqlClient, Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    def cancel_request(self, pattern_tag_set: SqlRequestTagSet) -> int:
-        """Make a best-effort at canceling requests that have a superset of the given tags.
+    def cancel_request(self, match_function: Callable[[CombinedSqlTags], bool]) -> int:
+        """Make a best-effort at canceling requests with tags that match the supplied function.
 
-        Returns the number of cancellation commands sent.
+        The function arguments are the tags associated with the query, and should return a bool indicating whether
+        the given query should be cancelled. Returns the number of cancellation commands sent.
         """
         raise NotImplementedError
 

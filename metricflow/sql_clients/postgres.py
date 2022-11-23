@@ -1,6 +1,6 @@
 import logging
 import textwrap
-from typing import ClassVar, Mapping, Optional, Sequence, Union
+from typing import ClassVar, Mapping, Optional, Sequence, Union, Callable
 
 import sqlalchemy
 
@@ -9,7 +9,7 @@ from metricflow.protocols.sql_client import SqlEngineAttributes
 from metricflow.protocols.sql_request import SqlRequestTagSet
 from metricflow.sql.render.postgres import PostgresSQLSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
-from metricflow.sql_clients.async_request import SqlStatementCommentMetadata
+from metricflow.sql_clients.async_request import SqlStatementCommentMetadata, CombinedSqlTags
 from metricflow.sql_clients.common_client import SqlDialect, not_empty
 from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
 
@@ -96,7 +96,7 @@ class PostgresSqlClient(SqlAlchemySqlClient):
         for request_id in self.active_requests():
             self.cancel_request(SqlRequestTagSet.create_from_request_id(request_id))
 
-    def cancel_request(self, pattern_tag_set: SqlRequestTagSet) -> int:  # noqa: D
+    def cancel_request(self, match_function: Callable[[CombinedSqlTags], bool]) -> int:  # noqa: D
         result = self.query(
             textwrap.dedent(
                 """\
@@ -111,10 +111,10 @@ class PostgresSqlClient(SqlAlchemySqlClient):
         num_cancelled_queries = 0
 
         for query_id, query_text in result.values:
-            tag_set = SqlStatementCommentMetadata.parse_tag_metadata_in_comments(query_text)
+            parsed_tags = SqlStatementCommentMetadata.parse_tag_metadata_in_comments(query_text)
 
             # Check for a match where the query's tag
-            if tag_set and pattern_tag_set.is_subset_of(tag_set):
+            if match_function(parsed_tags):
                 logger.info(f"Cancelling query ID: {query_id}")
                 self.execute(f"SELECT pg_cancel_backend({query_id});")
                 num_cancelled_queries += 1
