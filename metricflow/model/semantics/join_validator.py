@@ -105,9 +105,20 @@ class DataSourceJoinValidator:
         if right_identifier is None:
             return False
 
+        left_data_source = self._data_source_semantics.get_by_reference(left_data_source_reference)
+        right_data_source = self._data_source_semantics.get_by_reference(right_data_source_reference)
+        assert left_data_source, "Type refinement. If you see this error something has refactored wrongly"
+        assert right_data_source, "Type refinement. If you see this error something has refactored wrongly"
+
+        if left_data_source.has_validity_dimensions and right_data_source.has_validity_dimensions:
+            # We cannot join two data sources with validity dimensions due to concerns with unexpected fanout
+            # due to the key structure of these data sources. Applying multi-stage validity window filters can
+            # also lead to unexpected removal of interim join keys. Note this will need to be updated if we enable
+            # measures in such data sources, since those will need to be converted to a different type of data source
+            # to support measure computation.
+            return False
+
         if right_identifier.type is IdentifierType.NATURAL:
-            right_data_source = self._data_source_semantics.get_by_reference(right_data_source_reference)
-            assert right_data_source, "Type refinement. If you see this error something has refactored wrongly"
             if not right_data_source.has_validity_dimensions:
                 # There is no way to refine this to a single row per key, so we cannot support this join
                 return False

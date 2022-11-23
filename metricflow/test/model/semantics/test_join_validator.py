@@ -276,13 +276,13 @@ def test_natural_identifier_data_source_validation(scd_semantic_model: SemanticM
     """
     natural_user_data_source = scd_semantic_model.data_source_semantics.get("primary_accounts")
     primary_user_data_source = scd_semantic_model.data_source_semantics.get("users_latest")
-    foreign_user_data_source = scd_semantic_model.data_source_semantics.get("listings")
+    foreign_user_data_source = scd_semantic_model.data_source_semantics.get("bookings_source")
     unique_user_data_source = scd_semantic_model.data_source_semantics.get("companies")
     user_identifier_reference = IdentifierReference(element_name="user")
     join_validator = DataSourceJoinValidator(data_source_semantics=scd_semantic_model.data_source_semantics)
     # Type refinement
     assert natural_user_data_source, "Could not find `primary_accounts` data source in scd model!"
-    assert foreign_user_data_source, "Could not find `listings` data source in scd model!"
+    assert foreign_user_data_source, "Could not find `bookings_source` data source in scd model!"
     assert primary_user_data_source, "Could not find `users_latest` data source in scd model!"
     assert unique_user_data_source, "Could not find `companies` data source in scd model!"
 
@@ -351,7 +351,7 @@ def test_natural_identifier_instance_set_validation(
     """
     natural_user_instance_set = consistent_id_object_repository.scd_model_data_sets["primary_accounts"].instance_set
     primary_user_instance_set = consistent_id_object_repository.scd_model_data_sets["users_latest"].instance_set
-    foreign_user_instance_set = consistent_id_object_repository.scd_model_data_sets["listings"].instance_set
+    foreign_user_instance_set = consistent_id_object_repository.scd_model_data_sets["bookings_source"].instance_set
     unique_user_instance_set = consistent_id_object_repository.scd_model_data_sets["companies"].instance_set
     user_identifier_reference = IdentifierReference(element_name="user")
     join_validator = DataSourceJoinValidator(data_source_semantics=scd_semantic_model.data_source_semantics)
