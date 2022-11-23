@@ -23,15 +23,15 @@ LEFT OUTER JOIN (
   -- Pass Only Elements:
   --   ['user__home_state_latest', 'window_start', 'window_end', 'listing']
   SELECT
-    listings_src_10019.active_from AS window_start
-    , listings_src_10019.active_to AS window_end
-    , listings_src_10019.listing_id AS listing
-    , users_latest_src_10023.home_state_latest AS user__home_state_latest
-  FROM ***************************.dim_listings listings_src_10019
+    listings_src_10020.active_from AS window_start
+    , listings_src_10020.active_to AS window_end
+    , listings_src_10020.listing_id AS listing
+    , users_latest_src_10024.home_state_latest AS user__home_state_latest
+  FROM ***************************.dim_listings listings_src_10020
   LEFT OUTER JOIN
-    ***************************.dim_users_latest users_latest_src_10023
+    ***************************.dim_users_latest users_latest_src_10024
   ON
-    listings_src_10019.user_id = users_latest_src_10023.user_id
+    listings_src_10020.user_id = users_latest_src_10024.user_id
 ) subq_18
 ON
   (

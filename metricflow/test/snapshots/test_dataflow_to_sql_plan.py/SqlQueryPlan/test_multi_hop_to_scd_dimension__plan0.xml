@@ -433,7 +433,7 @@
                             <!--   {'class': 'SqlSelectColumn',                            -->
                             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_153),  -->
                             <!--    'column_alias': 'lux_listing__is_confirmed_lux'}       -->
-                            <!-- from_source = SqlSelectStatementNode(node_id=ss_10020) -->
+                            <!-- from_source = SqlSelectStatementNode(node_id=ss_10021) -->
                             <!-- join_0 =                                                    -->
                             <!--   {'class': 'SqlJoinDescription',                           -->
                             <!--    'right_source': SqlSelectStatementNode(node_id=ss_6),    -->
@@ -443,25 +443,25 @@
                             <!-- where = None -->
                             <SqlSelectStatementNode>
                                 <!-- description = Read Elements From Data Source 'lux_listing_mapping' -->
-                                <!-- node_id = ss_10020 -->
+                                <!-- node_id = ss_10021 -->
                                 <!-- col0 =                                                      -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10384),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10391),  -->
                                 <!--    'column_alias': 'listing'}                               -->
                                 <!-- col1 =                                                      -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10385),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10392),  -->
                                 <!--    'column_alias': 'lux_listing'}                           -->
                                 <!-- col2 =                                                      -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10386),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10393),  -->
                                 <!--    'column_alias': 'listing__lux_listing'}                  -->
-                                <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10016) -->
+                                <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10017) -->
                                 <!-- where = None -->
                                 <SqlTableFromClauseNode>
                                     <!-- description =                                                       -->
                                     <!--   Read from ***************************.dim_lux_listing_id_mapping  -->
-                                    <!-- node_id = tfc_10016 -->
+                                    <!-- node_id = tfc_10017 -->
                                     <!-- table_id = ***************************.dim_lux_listing_id_mapping -->
                                 </SqlTableFromClauseNode>
                             </SqlSelectStatementNode>
@@ -584,14 +584,14 @@
                                 <!--   {'class': 'SqlSelectColumn',                            -->
                                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_126),  -->
                                 <!--    'column_alias': 'lux_listing__is_confirmed_lux'}       -->
-                                <!-- from_source = SqlSelectStatementNode(node_id=ss_10021) -->
+                                <!-- from_source = SqlSelectStatementNode(node_id=ss_10022) -->
                                 <!-- where = None -->
                                 <SqlSelectStatementNode>
                                     <!-- description = Read Elements From Data Source 'lux_listings' -->
-                                    <!-- node_id = ss_10021 -->
+                                    <!-- node_id = ss_10022 -->
                                     <!-- col0 =                                                      -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10387),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10394),  -->
                                     <!--    'column_alias': 'window_start'}                          -->
                                     <!-- col1 =                                                -->
                                     <!--   {'class': 'SqlSelectColumn',                        -->
@@ -611,7 +611,7 @@
                                     <!--    'column_alias': 'window_start__year'}              -->
                                     <!-- col5 =                                                      -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10392),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10399),  -->
                                     <!--    'column_alias': 'window_end'}                            -->
                                     <!-- col6 =                                                -->
                                     <!--   {'class': 'SqlSelectColumn',                        -->
@@ -631,11 +631,11 @@
                                     <!--    'column_alias': 'window_end__year'}                -->
                                     <!-- col10 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10397),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10404),  -->
                                     <!--    'column_alias': 'is_confirmed_lux'}                      -->
                                     <!-- col11 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10398),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10405),  -->
                                     <!--    'column_alias': 'lux_listing__window_start'}             -->
                                     <!-- col12 =                                                -->
                                     <!--   {'class': 'SqlSelectColumn',                         -->
@@ -655,7 +655,7 @@
                                     <!--    'column_alias': 'lux_listing__window_start__year'}  -->
                                     <!-- col16 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10403),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10410),  -->
                                     <!--    'column_alias': 'lux_listing__window_end'}               -->
                                     <!-- col17 =                                               -->
                                     <!--   {'class': 'SqlSelectColumn',                        -->
@@ -675,17 +675,17 @@
                                     <!--    'column_alias': 'lux_listing__window_end__year'}   -->
                                     <!-- col21 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10408),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10415),  -->
                                     <!--    'column_alias': 'lux_listing__is_confirmed_lux'}         -->
                                     <!-- col22 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10409),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10416),  -->
                                     <!--    'column_alias': 'lux_listing'}                           -->
-                                    <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10017) -->
+                                    <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10018) -->
                                     <!-- where = None -->
                                     <SqlTableFromClauseNode>
                                         <!-- description = Read from ***************************.dim_lux_listings -->
-                                        <!-- node_id = tfc_10017 -->
+                                        <!-- node_id = tfc_10018 -->
                                         <!-- table_id = ***************************.dim_lux_listings -->
                                     </SqlTableFromClauseNode>
                                 </SqlSelectStatementNode>
