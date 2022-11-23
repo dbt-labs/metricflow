@@ -274,34 +274,22 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
         """Initializer. The DataSourceSemanticsAccessor is needed for getting the original model definition."""
         self._data_source_semantics = data_source_semantics
 
-    def _get_validity_dimensions_for_data_source(
+    def _get_validity_window_dimensions_for_data_source(
         self, data_source_name: str
     ) -> Optional[Tuple[_DimensionValidityParams, _DimensionValidityParams]]:
         """Returns a 2-tuple (start, end) of validity window dimensions info, if any exist in the data source"""
         data_source = self._data_source_semantics.get(data_source_name=data_source_name)
         assert data_source, f"Could not find data source with name {data_source_name} after data set conversion!"
 
-        validity_dims = [dim for dim in data_source.dimensions if dim.validity_params is not None]
+        start_dim = data_source.validity_start_dimension
+        end_dim = data_source.validity_end_dimension
 
-        if not validity_dims:
+        # We do this instead of relying on has_validity_dimensions because this also does type refinement
+        if not start_dim or not end_dim:
             return None
 
-        start_dims = [dim for dim in validity_dims if dim.validity_params and dim.validity_params.is_start]
-        end_dims = [dim for dim in validity_dims if dim.validity_params and dim.validity_params.is_end]
-        assert len(start_dims) == 1, (
-            f"Error, found more than one validity window start dimension in data source `{data_source_name}`. "
-            f"This should have been blocked by model validation! Start dims: `{start_dims}`"
-        )
-        assert len(end_dims) == 1, (
-            f"Error, found more than one validity window end dimension in data source `{data_source_name}`. "
-            f"This should have been blocked by model validation! End dims: `{end_dims}`"
-        )
-        start_dim = start_dims[0]
-        end_dim = end_dims[0]
-
-        # TODO: clean up type_params optional state for Dimension (time dimension?) objects
-        assert start_dim.type_params, "Typechecker hint - validity info cannot exist without the type params"
-        assert end_dim.type_params, "Typechecker hint - validity info cannot exist without the type params"
+        assert start_dim.type_params, "Typechecker hint - validity info cannot exist without type params"
+        assert end_dim.type_params, "Typechecker hint - validity info cannot exist without type params"
 
         return (
             _DimensionValidityParams(
@@ -313,7 +301,7 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
         )
 
     def transform(self, instance_set: InstanceSet) -> Optional[ValidityWindowJoinDescription]:
-        """Return find the Time Dimension specs defining a validity window, if any, and return it
+        """Find the Time Dimension specs defining a validity window, if any, and return it
 
         This currently throws an exception if more than one such window is found, and effectively prevents
         us from processing a dataset composed of a join between two SCD data sources. This restriction is in
@@ -324,7 +312,7 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
             instance_set.time_dimension_instances, lambda x: x.origin_data_source_reference.data_source_name
         )
         for data_source_name in instances_by_data_source:
-            validity_dims = self._get_validity_dimensions_for_data_source(data_source_name=data_source_name)
+            validity_dims = self._get_validity_window_dimensions_for_data_source(data_source_name=data_source_name)
             if validity_dims is None:
                 continue
 

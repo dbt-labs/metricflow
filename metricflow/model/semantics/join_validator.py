@@ -108,8 +108,7 @@ class DataSourceJoinValidator:
         if right_identifier.type is IdentifierType.NATURAL:
             right_data_source = self._data_source_semantics.get_by_reference(right_data_source_reference)
             assert right_data_source, "Type refinement. If you see this error something has refactored wrongly"
-            validity_dims = [dim for dim in right_data_source.dimensions if dim.validity_params is not None]
-            if not validity_dims:
+            if not right_data_source.has_validity_dimensions:
                 # There is no way to refine this to a single row per key, so we cannot support this join
                 return False
 
