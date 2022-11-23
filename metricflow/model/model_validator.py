@@ -11,8 +11,9 @@ from metricflow.model.validations.dimension_const import DimensionConsistencyRul
 from metricflow.model.validations.element_const import ElementConsistencyRule
 from metricflow.model.validations.identifiers import (
     IdentifierConfigRule,
-    OnePrimaryIdentifierPerDataSourceRule,
     IdentifierConsistencyRule,
+    NaturalIdentifierConfigurationRule,
+    OnePrimaryIdentifierPerDataSourceRule,
 )
 from metricflow.model.validations.materializations import ValidMaterializationRule
 from metricflow.model.validations.measures import (
@@ -48,6 +49,7 @@ class ModelValidator:
         ElementConsistencyRule(),
         IdentifierConfigRule(),
         IdentifierConsistencyRule(),
+        NaturalIdentifierConfigurationRule(),
         OnePrimaryIdentifierPerDataSourceRule(),
         MeasureConstraintAliasesRule(),
         MetricMeasuresRule(),

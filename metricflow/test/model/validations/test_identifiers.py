@@ -1,20 +1,27 @@
 import copy
 import re
+import textwrap
 from typing import Callable
 
 import pytest
 
 from metricflow.aggregation_properties import AggregationType
 from metricflow.model.model_validator import ModelValidator
+from metricflow.model.objects.common import YamlConfigFile
 from metricflow.model.objects.data_source import DataSource, Mutability, MutabilityType
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from metricflow.model.objects.elements.identifier import IdentifierType, Identifier, CompositeSubIdentifier
 from metricflow.model.objects.elements.measure import Measure
 from metricflow.model.objects.metric import MetricType, MetricTypeParams
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from metricflow.model.parsing.dir_to_model import parse_yaml_files_to_validation_ready_model
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.object_utils import flatten_nested_sequence
-from metricflow.test.model.validations.helpers import data_source_with_guaranteed_meta, metric_with_guaranteed_meta
+from metricflow.test.model.validations.helpers import (
+    data_source_with_guaranteed_meta,
+    metric_with_guaranteed_meta,
+    base_model_file,
+)
 from metricflow.test.test_utils import find_data_source_with
 from metricflow.time.time_granularity import TimeGranularity
 
@@ -242,3 +249,61 @@ def test_mismatched_identifier(simple_model__pre_transforms: UserConfiguredModel
     )
 
     assert error_count == 1
+
+
+def test_multiple_natural_identifiers() -> None:
+    """Test validation enforcing that a single data source cannot have more than one natural identifier"""
+    yaml_contents = textwrap.dedent(
+        """\
+        data_source:
+          name: too_many_natural_identifiers
+          sql_table: some_schema.natural_identifier_table
+          identifiers:
+            - name: natural_key_one
+              type: natural
+            - name: natural_key_two
+              type: natural
+          dimensions:
+            - name: country
+              type: categorical
+            - name: window_start
+              type: time
+              type_params:
+                time_granularity: day
+                validity_params:
+                  is_start: true
+            - name: window_end
+              type: time
+              type_params:
+                time_granularity: day
+                validity_params:
+                  is_end: true
+        """
+    )
+    natural_identifier_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+    model = parse_yaml_files_to_validation_ready_model([base_model_file(), natural_identifier_file])
+
+    with pytest.raises(ModelValidationException, match="can have at most one natural identifier"):
+        ModelValidator().checked_validations(model.model)
+
+
+def test_natural_identifier_used_in_wrong_context() -> None:
+    """Test validation enforcing that a single data source cannot have more than one natural identifier"""
+    yaml_contents = textwrap.dedent(
+        """\
+        data_source:
+          name: random_natural_identifier
+          sql_table: some_schema.random_natural_identifier_table
+          identifiers:
+            - name: natural_key
+              type: natural
+          dimensions:
+            - name: country
+              type: categorical
+        """
+    )
+    natural_identifier_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+    model = parse_yaml_files_to_validation_ready_model([base_model_file(), natural_identifier_file])
+
+    with pytest.raises(ModelValidationException, match="use of `natural` identifiers is currently supported only in"):
+        ModelValidator().checked_validations(model.model)
