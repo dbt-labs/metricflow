@@ -274,9 +274,11 @@
                         "PRIMARY",
                         "UNIQUE",
                         "FOREIGN",
+                        "NATURAL",
                         "primary",
                         "unique",
-                        "foreign"
+                        "foreign",
+                        "natural"
                     ]
                 }
             },

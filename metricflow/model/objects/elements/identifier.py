@@ -13,6 +13,7 @@ class IdentifierType(ExtendedEnum):
     """Defines uniqueness and the extent to which an identifier represents the common entity for a data source"""
 
     FOREIGN = "foreign"
+    NATURAL = "natural"
     PRIMARY = "primary"
     UNIQUE = "unique"
 
@@ -73,3 +74,16 @@ class Identifier(HashableBaseModel, ModelWithMetadataParsing):
     @property
     def reference(self) -> IdentifierReference:  # noqa: D
         return IdentifierReference(element_name=self.name)
+
+    @property
+    def is_linkable_identifier_type(self) -> bool:
+        """Indicates whether or not this identifier can be used as a linkable identifier type for joins
+
+        That is, can you use the identifier as a linkable element in multi-hop dundered syntax. For example,
+        the country dimension in the listings data source can be linked via listing__country, because listing
+        is the primary key.
+
+        At the moment, you may only request things accessible via primary, unique, or natural keys, with natural
+        keys reserved for SCD Type II style data sources.
+        """
+        return self.type in (IdentifierType.PRIMARY, IdentifierType.UNIQUE, IdentifierType.NATURAL)
