@@ -134,3 +134,6 @@ class SqlJsonTag:
                 )
             new_json_dict[k] = v
         return SqlJsonTag(new_json_dict)
+
+    def __repr__(self) -> str:  # noqa: D
+        return f"{self.__class__.__name__}(json_dict={self._json_dict})"

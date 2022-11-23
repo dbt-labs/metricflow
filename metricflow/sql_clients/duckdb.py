@@ -1,6 +1,6 @@
 import logging
 import threading
-from typing import ClassVar, Optional, Sequence
+from typing import ClassVar, Optional, Sequence, Callable
 
 import pandas as pd
 import sqlalchemy
@@ -13,6 +13,7 @@ from metricflow.protocols.sql_request import SqlRequestTagSet, SqlJsonTag
 from metricflow.sql.render.duckdb_renderer import DuckDbSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.sql_clients.async_request import CombinedSqlTags
 from metricflow.sql_clients.common_client import SqlDialect
 from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
 
@@ -119,7 +120,7 @@ class DuckDbSqlClient(SqlAlchemySqlClient):
                 chunk_size=chunk_size,
             )
 
-    def cancel_request(self, pattern_tag_set: SqlRequestTagSet) -> int:  # noqa: D
+    def cancel_request(self, match_function: Callable[[CombinedSqlTags], bool]) -> int:  # noqa: D
         raise NotImplementedError
 
     def list_tables(self, schema_name: str) -> Sequence[str]:  # noqa: D

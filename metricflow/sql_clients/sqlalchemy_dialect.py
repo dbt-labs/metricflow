@@ -4,7 +4,7 @@ import logging
 import time
 from abc import ABC
 from contextlib import contextmanager
-from typing import Iterator, Optional, Mapping, Union, Sequence, Set
+from typing import Iterator, Optional, Mapping, Union, Sequence, Set, Callable
 
 import pandas as pd
 import sqlalchemy
@@ -13,6 +13,7 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlIsolationLevel
 from metricflow.protocols.sql_request import SqlRequestTagSet, SqlJsonTag
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.sql_clients.async_request import CombinedSqlTags
 from metricflow.sql_clients.base_sql_client_implementation import BaseSqlClientImplementation
 from metricflow.sql_clients.common_client import check_isolation_level
 
@@ -168,5 +169,5 @@ class SqlAlchemySqlClient(BaseSqlClientImplementation, ABC):
         if errors:
             raise ValueError(f"Found errors in the URL: {url}\n" + "\n".join(errors))
 
-    def cancel_request(self, pattern_tag_set: SqlRequestTagSet) -> int:  # noqa: D
+    def cancel_request(self, match_function: Callable[[CombinedSqlTags], bool]) -> int:  # noqa: D
         raise NotImplementedError

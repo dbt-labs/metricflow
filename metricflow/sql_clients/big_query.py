@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import ClassVar, Optional, Dict
+from typing import ClassVar, Optional, Dict, Callable
 from typing import Sequence
 
 import google.oauth2.service_account
@@ -13,11 +13,10 @@ from metricflow.protocols.sql_client import SqlEngine, SqlIsolationLevel
 from metricflow.protocols.sql_client import (
     SqlEngineAttributes,
 )
-from metricflow.protocols.sql_request import SqlRequestTagSet
 from metricflow.sql.render.big_query import BigQuerySqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql_clients.async_request import SqlStatementCommentMetadata
+from metricflow.sql_clients.async_request import SqlStatementCommentMetadata, CombinedSqlTags
 from metricflow.sql_clients.common_client import SqlDialect
 from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
 
@@ -135,7 +134,7 @@ class BigQuerySqlClient(SqlAlchemySqlClient):
     def cancel_submitted_queries(self) -> None:  # noqa: D
         raise NotImplementedError
 
-    def cancel_request(self, pattern_tag_set: SqlRequestTagSet) -> int:  # noqa: D
+    def cancel_request(self, match_function: Callable[[CombinedSqlTags], bool]) -> int:  # noqa: D
         job: QueryJob
         canceled_job_ids = []
         # Couldn't find where these states were defined in the BQ libraries.
@@ -145,10 +144,10 @@ class BigQuerySqlClient(SqlAlchemySqlClient):
                 state_filter=state,
                 # Considering putting a creation_time_min filter as well.
             ):
-                tag_set = SqlStatementCommentMetadata.parse_tag_metadata_in_comments(job.query)
+                parsed_tags = SqlStatementCommentMetadata.parse_tag_metadata_in_comments(job.query)
 
                 # A job can move from the pending to the running state during iteration, so dedupe.
-                if tag_set and pattern_tag_set.is_subset_of(tag_set) and job.job_id not in canceled_job_ids:
+                if match_function(parsed_tags) and job.job_id not in canceled_job_ids:
                     logger.info(f"Canceling BQ job ID: {job.job_id}")
                     canceled_job_ids.append(job.job_id)
                     self._bq_client.cancel_job(job.job_id)

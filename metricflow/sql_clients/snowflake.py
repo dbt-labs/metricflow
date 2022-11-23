@@ -6,7 +6,7 @@ import threading
 import urllib.parse
 from collections import OrderedDict
 from contextlib import contextmanager
-from typing import ClassVar, Optional, Dict, Iterator, List, Tuple, Any, Set, Sequence
+from typing import ClassVar, Optional, Dict, Iterator, List, Tuple, Any, Set, Sequence, Callable
 
 import pandas as pd
 import sqlalchemy
@@ -24,9 +24,12 @@ from metricflow.protocols.sql_request import (
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql_clients.async_request import SqlStatementCommentMetadata
+from metricflow.sql_clients.async_request import SqlStatementCommentMetadata, CombinedSqlTags
 from metricflow.sql_clients.common_client import SqlDialect, not_empty, check_isolation_level
 from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
+
+
+logger = logging.getLogger(__name__)
 
 
 class SnowflakeEngineAttributes:
@@ -54,9 +57,6 @@ class SnowflakeEngineAttributes:
 
     # MetricFlow attributes
     sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer] = DefaultSqlQueryPlanRenderer()
-
-
-logger = logging.getLogger(__name__)
 
 
 class SnowflakeSqlClient(SqlAlchemySqlClient):
@@ -289,7 +289,7 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
                     logger.info(f"Cancelling queries associated with session id: {session_id}")
                     conn.execute(f"SELECT SYSTEM$cancel_all_queries({session_id})")
 
-    def cancel_request(self, pattern_tag_set: SqlRequestTagSet) -> int:  # noqa: D
+    def cancel_request(self, match_function: Callable[[CombinedSqlTags], bool]) -> int:  # noqa: D
         # Running queries have an end_time set to the epoch time:
         # https://docs.snowflake.com/en/sql-reference/functions/query_history.html
         # Using '1970-01-01' to avoid timezone issues.
@@ -303,10 +303,11 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
             """
         )
         num_cancelled_queries = 0
+        logger.info(f"Found {len(result.values)} queries to examine for cancelling")
         for query_id, query_text in result.values:
-            tag_set = SqlStatementCommentMetadata.parse_tag_metadata_in_comments(query_text)
-
-            if tag_set and pattern_tag_set.is_subset_of(tag_set):
+            parsed_tags = SqlStatementCommentMetadata.parse_tag_metadata_in_comments(query_text)
+            logger.info(f"Tags for {query_id} are: {parsed_tags}")
+            if match_function(parsed_tags):
                 logger.info(f"Cancelling query ID: {query_id}")
                 self.execute(f"SELECT SYSTEM$CANCEL_QUERY('{query_id}')")
                 num_cancelled_queries += 1
