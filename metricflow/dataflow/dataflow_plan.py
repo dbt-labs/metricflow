@@ -240,18 +240,18 @@ class JoinToBaseOutputNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
 
     def __init__(
         self,
-        parent_node: BaseOutput[SourceDataSetT],
+        left_node: BaseOutput[SourceDataSetT],
         join_targets: List[JoinDescription[SourceDataSetT]],
         node_id: Optional[NodeId] = None,
     ) -> None:
         """Constructor.
 
         Args:
-            parent_node: node with standard output
+            left_node: node with standard output
             join_targets: other sources that should be joined to this node.
             node_id: Override the node ID with this value
         """
-        self._left_node = parent_node
+        self._left_node = left_node
         self._join_targets = join_targets
 
         # Doing a list comprehension throws a type error, so doing it this way.

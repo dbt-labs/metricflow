@@ -810,7 +810,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         unaggregated_measure_node: BaseOutput[SqlDataSetT]
         if len(join_targets) > 0:
             filtered_measures_with_joined_elements = JoinToBaseOutputNode[SqlDataSetT](
-                parent_node=filtered_measure_or_time_range_node,
+                left_node=filtered_measure_or_time_range_node,
                 join_targets=join_targets,
             )
 

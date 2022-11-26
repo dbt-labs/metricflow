@@ -60,7 +60,7 @@ def test_costing(consistent_id_object_repository: ConsistentIdObjectRepository) 
     )
 
     join_node = JoinToBaseOutputNode[DataSourceDataSet](
-        parent_node=bookings_filtered,
+        left_node=bookings_filtered,
         join_targets=[
             JoinDescription(
                 join_node=listings_filtered,
