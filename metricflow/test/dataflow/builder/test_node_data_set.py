@@ -104,7 +104,7 @@ def test_joined_node_data_set(
     revenue_node = consistent_id_object_repository.simple_model_read_nodes["revenue"]
     users_node = consistent_id_object_repository.simple_model_read_nodes["users_latest"]
     join_node = JoinToBaseOutputNode(
-        parent_node=revenue_node,
+        left_node=revenue_node,
         join_targets=[
             JoinDescription(
                 join_node=users_node,

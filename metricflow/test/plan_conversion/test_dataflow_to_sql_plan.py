@@ -318,7 +318,7 @@ def test_single_join_node(  # noqa: D
     )
 
     join_node = JoinToBaseOutputNode[DataSourceDataSet](
-        parent_node=filtered_measure_node,
+        left_node=filtered_measure_node,
         join_targets=[
             JoinDescription(
                 join_node=filtered_dimension_node,
@@ -370,7 +370,7 @@ def test_multi_join_node(
     )
 
     join_node = JoinToBaseOutputNode[DataSourceDataSet](
-        parent_node=filtered_measure_node,
+        left_node=filtered_measure_node,
         join_targets=[
             JoinDescription(
                 join_node=filtered_dimension_node,
@@ -432,7 +432,7 @@ def test_compute_metrics_node(
     )
 
     join_node = JoinToBaseOutputNode[DataSourceDataSet](
-        parent_node=filtered_measure_node,
+        left_node=filtered_measure_node,
         join_targets=[
             JoinDescription(
                 join_node=filtered_dimension_node,
@@ -494,7 +494,7 @@ def test_compute_metrics_node_simple_expr(
     )
 
     join_node = JoinToBaseOutputNode[DataSourceDataSet](
-        parent_node=filtered_measure_node,
+        left_node=filtered_measure_node,
         join_targets=[
             JoinDescription(
                 join_node=filtered_dimension_node,
@@ -579,7 +579,7 @@ def test_compute_metrics_node_ratio_from_single_data_source(
     )
 
     join_node = JoinToBaseOutputNode[DataSourceDataSet](
-        parent_node=filtered_measures_node,
+        left_node=filtered_measures_node,
         join_targets=[
             JoinDescription(
                 join_node=filtered_dimension_node,

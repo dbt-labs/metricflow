@@ -244,7 +244,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                 multi_hop_join_candidates.append(
                     MultiHopJoinCandidate(
                         node_with_multi_hop_elements=JoinToBaseOutputNode(
-                            parent_node=first_node_that_could_be_joined,
+                            left_node=first_node_that_could_be_joined,
                             join_targets=[
                                 JoinDescription(
                                     join_node=filtered_joinable_node,
