@@ -41,6 +41,7 @@ from metricflow.specs import (
     TimeDimensionSpec,
     SpecWhereClauseConstraint,
     LinkableSpecSet,
+    InstanceSpecSet,
 )
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
@@ -180,7 +181,9 @@ def test_filter_node(  # noqa: D
         element_name="bookings",
     )
     source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
-    filter_node = FilterElementsNode[DataSourceDataSet](parent_node=source_node, include_specs=[measure_spec])
+    filter_node = FilterElementsNode[DataSourceDataSet](
+        parent_node=source_node, include_specs=InstanceSpecSet(measure_specs=(measure_spec,))
+    )
 
     convert_and_check(
         request=request,
@@ -206,7 +209,8 @@ def test_filter_with_where_constraint_node(  # noqa: D
 
     ds_spec = TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.DAY)
     filter_node = FilterElementsNode[DataSourceDataSet](
-        parent_node=source_node, include_specs=[measure_spec, ds_spec]
+        parent_node=source_node,
+        include_specs=InstanceSpecSet(measure_specs=(measure_spec,), time_dimension_specs=(ds_spec,)),
     )  # need to include ds_spec because where constraint operates on ds
     where_constraint_node = WhereConstraintNode[DataSourceDataSet](
         parent_node=filter_node,
@@ -263,7 +267,7 @@ def test_measure_aggregation_node(  # noqa: D
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     filtered_measure_node = FilterElementsNode[DataSourceDataSet](
         parent_node=measure_source_node,
-        include_specs=measure_specs,
+        include_specs=InstanceSpecSet(measure_specs=tuple(measure_specs)),
     )
 
     aggregated_measure_node = AggregateMeasuresNode[DataSourceDataSet](
@@ -293,7 +297,11 @@ def test_single_join_node(  # noqa: D
     identifier_spec = LinklessIdentifierSpec.from_element_name(element_name="listing")
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     filtered_measure_node = FilterElementsNode[DataSourceDataSet](
-        parent_node=measure_source_node, include_specs=[measure_spec, identifier_spec]
+        parent_node=measure_source_node,
+        include_specs=InstanceSpecSet(
+            measure_specs=(measure_spec,),
+            identifier_specs=(identifier_spec,),
+        ),
     )
 
     dimension_spec = DimensionSpec(
@@ -302,7 +310,11 @@ def test_single_join_node(  # noqa: D
     )
     dimension_source_node = consistent_id_object_repository.simple_model_read_nodes["listings_latest"]
     filtered_dimension_node = FilterElementsNode[DataSourceDataSet](
-        parent_node=dimension_source_node, include_specs=[identifier_spec, dimension_spec]
+        parent_node=dimension_source_node,
+        include_specs=InstanceSpecSet(
+            identifier_specs=(identifier_spec,),
+            dimension_specs=(dimension_spec,),
+        ),
     )
 
     join_node = JoinToBaseOutputNode[DataSourceDataSet](
@@ -340,7 +352,8 @@ def test_multi_join_node(
     identifier_spec = LinklessIdentifierSpec.from_element_name(element_name="listing")
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     filtered_measure_node = FilterElementsNode[DataSourceDataSet](
-        parent_node=measure_source_node, include_specs=[measure_spec, identifier_spec]
+        parent_node=measure_source_node,
+        include_specs=InstanceSpecSet(measure_specs=(measure_spec,), identifier_specs=(identifier_spec,)),
     )
 
     dimension_spec = DimensionSpec(
@@ -349,7 +362,11 @@ def test_multi_join_node(
     )
     dimension_source_node = consistent_id_object_repository.simple_model_read_nodes["listings_latest"]
     filtered_dimension_node = FilterElementsNode[DataSourceDataSet](
-        parent_node=dimension_source_node, include_specs=[identifier_spec, dimension_spec]
+        parent_node=dimension_source_node,
+        include_specs=InstanceSpecSet(
+            identifier_specs=(identifier_spec,),
+            dimension_specs=(dimension_spec,),
+        ),
     )
 
     join_node = JoinToBaseOutputNode[DataSourceDataSet](
@@ -394,7 +411,11 @@ def test_compute_metrics_node(
     metric_input_measure_specs = (MetricInputMeasureSpec(measure_spec=measure_spec),)
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     filtered_measure_node = FilterElementsNode[DataSourceDataSet](
-        parent_node=measure_source_node, include_specs=[measure_spec, identifier_spec]
+        parent_node=measure_source_node,
+        include_specs=InstanceSpecSet(
+            measure_specs=(measure_spec,),
+            identifier_specs=(identifier_spec,),
+        ),
     )
 
     dimension_spec = DimensionSpec(
@@ -403,7 +424,11 @@ def test_compute_metrics_node(
     )
     dimension_source_node = consistent_id_object_repository.simple_model_read_nodes["listings_latest"]
     filtered_dimension_node = FilterElementsNode[DataSourceDataSet](
-        parent_node=dimension_source_node, include_specs=[identifier_spec, dimension_spec]
+        parent_node=dimension_source_node,
+        include_specs=InstanceSpecSet(
+            identifier_specs=(identifier_spec,),
+            dimension_specs=(dimension_spec,),
+        ),
     )
 
     join_node = JoinToBaseOutputNode[DataSourceDataSet](
@@ -451,7 +476,8 @@ def test_compute_metrics_node_simple_expr(
     metric_input_measure_specs = (MetricInputMeasureSpec(measure_spec=measure_spec),)
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     filtered_measure_node = FilterElementsNode[DataSourceDataSet](
-        parent_node=measure_source_node, include_specs=[measure_spec, identifier_spec]
+        parent_node=measure_source_node,
+        include_specs=InstanceSpecSet(measure_specs=(measure_spec,), identifier_specs=(identifier_spec,)),
     )
 
     dimension_spec = DimensionSpec(
@@ -460,7 +486,11 @@ def test_compute_metrics_node_simple_expr(
     )
     dimension_source_node = consistent_id_object_repository.simple_model_read_nodes["listings_latest"]
     filtered_dimension_node = FilterElementsNode[DataSourceDataSet](
-        parent_node=dimension_source_node, include_specs=[identifier_spec, dimension_spec]
+        parent_node=dimension_source_node,
+        include_specs=InstanceSpecSet(
+            identifier_specs=(identifier_spec,),
+            dimension_specs=(dimension_spec,),
+        ),
     )
 
     join_node = JoinToBaseOutputNode[DataSourceDataSet](
@@ -529,7 +559,10 @@ def test_compute_metrics_node_ratio_from_single_data_source(
     )
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     filtered_measures_node = FilterElementsNode[DataSourceDataSet](
-        parent_node=measure_source_node, include_specs=[numerator_spec, denominator_spec, identifier_spec]
+        parent_node=measure_source_node,
+        include_specs=InstanceSpecSet(
+            measure_specs=(numerator_spec, denominator_spec), identifier_specs=(identifier_spec,)
+        ),
     )
 
     dimension_spec = DimensionSpec(
@@ -538,7 +571,11 @@ def test_compute_metrics_node_ratio_from_single_data_source(
     )
     dimension_source_node = consistent_id_object_repository.simple_model_read_nodes["listings_latest"]
     filtered_dimension_node = FilterElementsNode[DataSourceDataSet](
-        parent_node=dimension_source_node, include_specs=[identifier_spec, dimension_spec]
+        parent_node=dimension_source_node,
+        include_specs=InstanceSpecSet(
+            identifier_specs=(identifier_spec,),
+            dimension_specs=(dimension_spec,),
+        ),
     )
 
     join_node = JoinToBaseOutputNode[DataSourceDataSet](
@@ -634,7 +671,12 @@ def test_order_by_node(
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
 
     filtered_measure_node = FilterElementsNode[DataSourceDataSet](
-        parent_node=measure_source_node, include_specs=[measure_spec, dimension_spec, time_dimension_spec]
+        parent_node=measure_source_node,
+        include_specs=InstanceSpecSet(
+            measure_specs=(measure_spec,),
+            dimension_specs=(dimension_spec,),
+            time_dimension_specs=(time_dimension_spec,),
+        ),
     )
 
     aggregated_measure_node = AggregateMeasuresNode[DataSourceDataSet](
@@ -756,12 +798,16 @@ def test_constrain_time_range_node(
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     filtered_measure_node = FilterElementsNode(
         parent_node=measure_source_node,
-        include_specs=[
-            MeasureSpec(
-                element_name="bookings",
+        include_specs=InstanceSpecSet(
+            measure_specs=(
+                MeasureSpec(
+                    element_name="bookings",
+                ),
             ),
-            TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.DAY),
-        ],
+            time_dimension_specs=(
+                TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.DAY),
+            ),
+        ),
     )
     metric_time_node = MetricTimeDimensionTransformNode(
         parent_node=filtered_measure_node,

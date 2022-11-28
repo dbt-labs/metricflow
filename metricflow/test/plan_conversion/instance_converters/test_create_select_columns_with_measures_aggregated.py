@@ -6,7 +6,7 @@ from metricflow.plan_conversion.instance_converters import (
     FilterElements,
 )
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
-from metricflow.specs import MeasureSpec, MetricInputMeasureSpec
+from metricflow.specs import MeasureSpec, MetricInputMeasureSpec, InstanceSpecSet
 from metricflow.sql.sql_exprs import (
     SqlFunction,
     SqlAggregateFunctionExpression,
@@ -22,10 +22,10 @@ def __get_filtered_measure_instance_set(
     """Gets an InstanceSet consisting of only the measure instance matching the given name and data source"""
     dataset = object_repo.simple_model_data_sets[data_source_name]
     instance_set = dataset.instance_set
-    include_specs = [
+    include_specs = tuple(
         instance.spec for instance in instance_set.measure_instances if instance.spec.element_name == measure_name
-    ]
-    return FilterElements(include_specs=include_specs).transform(instance_set)
+    )
+    return FilterElements(include_specs=InstanceSpecSet(measure_specs=include_specs)).transform(instance_set)
 
 
 def test_sum_aggregation(

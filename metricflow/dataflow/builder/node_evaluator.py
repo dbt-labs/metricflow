@@ -230,7 +230,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                         == linkless_identifier_spec_in_node
                     )
                     needed_linkable_spec_in_node = (
-                        needed_linkable_spec.without_first_identifier_link() in linkable_specs_in_right_node
+                        needed_linkable_spec.without_first_identifier_link in linkable_specs_in_right_node
                     )
                     if required_identifier_matches_data_set_identifier and needed_linkable_spec_in_node:
                         satisfiable_linkable_specs.append(needed_linkable_spec)

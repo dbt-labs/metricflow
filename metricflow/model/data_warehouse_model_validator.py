@@ -7,7 +7,7 @@ from functools import partial
 from math import floor
 from time import perf_counter
 import traceback
-from typing import Callable, DefaultDict, Dict, List, Optional, Sequence, Tuple
+from typing import Callable, DefaultDict, Dict, List, Optional, Sequence, Tuple, TypeVar
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import BaseOutput, FilterElementsNode
@@ -39,7 +39,7 @@ from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanCon
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.specs import DimensionSpec, LinkableInstanceSpec, MeasureSpec
+from metricflow.specs import DimensionSpec, LinkableInstanceSpec, MeasureSpec, InstanceSpecSet
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 
 
@@ -86,11 +86,14 @@ class DataWarehouseValidationTask:
     on_fail_subtasks: List[DataWarehouseValidationTask] = field(default_factory=lambda: [])
 
 
+LinkableInstanceSpecT = TypeVar("LinkableInstanceSpecT", bound=LinkableInstanceSpec)
+
+
 class DataWarehouseTaskBuilder:
     """Task builder for standard data warehouse validation tasks"""
 
     @staticmethod
-    def _remove_identifier_link_specs(specs: Tuple[LinkableInstanceSpec, ...]) -> Tuple[LinkableInstanceSpec, ...]:
+    def _remove_identifier_link_specs(specs: Tuple[LinkableInstanceSpecT, ...]) -> Tuple[LinkableInstanceSpecT, ...]:
         """For the purposes of data warehouse validation, specs with identifier_links are unnecesary"""
         return tuple(spec for spec in specs if not spec.identifier_links)
 
@@ -147,7 +150,9 @@ class DataWarehouseTaskBuilder:
         for data_source in model.data_sources:
             source_node = cls._data_source_nodes(render_tools=render_tools, data_source=data_source)[0]
             spec = DimensionSpec.from_name(name=f"validation_dim_for_{data_source.name}")
-            filter_elements_node = FilterElementsNode(parent_node=source_node, include_specs=[spec])
+            filter_elements_node = FilterElementsNode(
+                parent_node=source_node, include_specs=InstanceSpecSet(dimension_specs=(spec,))
+            )
 
             tasks.append(
                 DataWarehouseValidationTask(
@@ -192,11 +197,36 @@ class DataWarehouseTaskBuilder:
 
             data_source_sub_tasks: List[DataWarehouseValidationTask] = []
             dataset = render_tools.converter.create_sql_source_data_set(data_source)
-            data_source_specs = DataWarehouseTaskBuilder._remove_identifier_link_specs(
-                dataset.instance_set.spec_set.dimension_specs + dataset.instance_set.spec_set.time_dimension_specs
+
+            dimension_specs = DataWarehouseTaskBuilder._remove_identifier_link_specs(
+                dataset.instance_set.spec_set.dimension_specs
             )
-            for spec in data_source_specs:
-                filter_elements_node = FilterElementsNode(parent_node=source_node, include_specs=[spec])
+
+            spec_filter_tuples = []
+            for spec in dimension_specs:
+                spec_filter_tuples.append(
+                    (
+                        spec,
+                        FilterElementsNode(
+                            parent_node=source_node, include_specs=InstanceSpecSet(dimension_specs=(spec,))
+                        ),
+                    )
+                )
+
+            time_dimension_specs = DataWarehouseTaskBuilder._remove_identifier_link_specs(
+                dataset.instance_set.spec_set.time_dimension_specs
+            )
+            for spec in time_dimension_specs:
+                spec_filter_tuples.append(
+                    (
+                        spec,
+                        FilterElementsNode(
+                            parent_node=source_node, include_specs=InstanceSpecSet(time_dimension_specs=(spec,))
+                        ),
+                    )
+                )
+
+            for spec, filter_elements_node in spec_filter_tuples:
                 data_source_sub_tasks.append(
                     DataWarehouseValidationTask(
                         query_and_params_callable=partial(
@@ -217,7 +247,13 @@ class DataWarehouseTaskBuilder:
                     )
                 )
 
-            filter_elements_node = FilterElementsNode(parent_node=source_node, include_specs=data_source_specs)
+            filter_elements_node = FilterElementsNode(
+                parent_node=source_node,
+                include_specs=InstanceSpecSet(
+                    dimension_specs=dimension_specs,
+                    time_dimension_specs=time_dimension_specs,
+                ),
+            )
             tasks.append(
                 DataWarehouseValidationTask(
                     query_and_params_callable=partial(
@@ -264,7 +300,9 @@ class DataWarehouseTaskBuilder:
                 dataset.instance_set.spec_set.identifier_specs
             )
             for spec in data_source_specs:
-                filter_elements_node = FilterElementsNode(parent_node=source_node, include_specs=[spec])
+                filter_elements_node = FilterElementsNode(
+                    parent_node=source_node, include_specs=InstanceSpecSet(identifier_specs=(spec,))
+                )
                 data_source_sub_tasks.append(
                     DataWarehouseValidationTask(
                         query_and_params_callable=partial(
@@ -285,7 +323,12 @@ class DataWarehouseTaskBuilder:
                     )
                 )
 
-            filter_elements_node = FilterElementsNode(parent_node=source_node, include_specs=data_source_specs)
+            filter_elements_node = FilterElementsNode(
+                parent_node=source_node,
+                include_specs=InstanceSpecSet(
+                    identifier_specs=tuple(data_source_specs),
+                ),
+            )
             tasks.append(
                 DataWarehouseValidationTask(
                     query_and_params_callable=partial(
@@ -345,7 +388,12 @@ class DataWarehouseTaskBuilder:
                 obtained_source_node = source_node_by_measure_spec.get(spec)
                 assert obtained_source_node, f"Unable to find generated source node for measure: {spec.element_name}"
 
-                filter_elements_node = FilterElementsNode(parent_node=obtained_source_node, include_specs=[spec])
+                filter_elements_node = FilterElementsNode(
+                    parent_node=obtained_source_node,
+                    include_specs=InstanceSpecSet(
+                        measure_specs=(spec,),
+                    ),
+                )
                 source_node_to_sub_task[obtained_source_node].append(
                     DataWarehouseValidationTask(
                         query_and_params_callable=partial(
@@ -367,7 +415,9 @@ class DataWarehouseTaskBuilder:
                 )
 
             for measure_specs, source_node in measure_specs_source_node_pair:
-                filter_elements_node = FilterElementsNode(parent_node=source_node, include_specs=measure_specs)
+                filter_elements_node = FilterElementsNode(
+                    parent_node=source_node, include_specs=InstanceSpecSet(measure_specs=measure_specs)
+                )
                 tasks.append(
                     DataWarehouseValidationTask(
                         query_and_params_callable=partial(
