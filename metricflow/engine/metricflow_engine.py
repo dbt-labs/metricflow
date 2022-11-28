@@ -15,6 +15,7 @@ from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilde
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import DataflowPlan
+from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import SourceScanOptimizer
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
@@ -459,7 +460,9 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         if mf_query_request.output_table is not None:
             output_table = SqlTable.from_string(mf_query_request.output_table)
 
-        dataflow_plan = self._dataflow_plan_builder.build_plan(query_spec, output_table)
+        dataflow_plan = self._dataflow_plan_builder.build_plan(
+            query_spec=query_spec, output_sql_table=output_table, optimizers=(SourceScanOptimizer[DataSourceDataSet](),)
+        )
 
         if len(dataflow_plan.sink_output_nodes) > 1:
             raise NotImplementedError(
