@@ -36,6 +36,7 @@ from metricflow.specs import (
     LinklessIdentifierSpec,
     LinkableInstanceSpec,
     IdentifierReference,
+    InstanceSpecSet,
 )
 from metricflow.sql.sql_exprs import (
     SqlColumnReferenceExpression,
@@ -339,8 +340,8 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
                 for spec in specs
                 if spec.element_name == end_dim.dimension_name and spec.time_granularity == end_dim.time_granularity
             ]
-            linkless_start_specs = {spec.without_identifier_links() for spec in start_specs}
-            linkless_end_specs = {spec.without_identifier_links() for spec in end_specs}
+            linkless_start_specs = {spec.without_identifier_links for spec in start_specs}
+            linkless_end_specs = {spec.without_identifier_links for spec in end_specs}
             assert len(linkless_start_specs) == 1 and len(linkless_end_specs) == 1, (
                 f"Did not find exactly one pair of specs from data source `{data_source_name}` matching the validity "
                 f"window end points defined in the data source. This means we cannot process an SCD join, because we "
@@ -497,8 +498,8 @@ class FilterElements(InstanceSetTransform[InstanceSet]):
 
     def __init__(  # noqa: D
         self,
-        include_specs: Optional[Sequence[InstanceSpec]] = None,
-        exclude_specs: Optional[Sequence[InstanceSpec]] = None,
+        include_specs: Optional[InstanceSpecSet] = None,
+        exclude_specs: Optional[InstanceSpecSet] = None,
     ) -> None:
         """Constructor.
 
@@ -513,23 +514,23 @@ class FilterElements(InstanceSetTransform[InstanceSet]):
     def _should_pass(self, element_spec: InstanceSpec) -> bool:  # noqa: D
         # TODO: Use better matching function
         if self._include_specs:
-            return any(x == element_spec for x in self._include_specs)
+            return any(x == element_spec for x in self._include_specs.all_specs)
         elif self._exclude_specs:
-            return not any(x == element_spec for x in self._exclude_specs)
+            return not any(x == element_spec for x in self._exclude_specs.all_specs)
         assert False
 
     def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D
         # Sanity check to make sure the specs are in the instance set
 
         if self._include_specs:
-            for include_spec in self._include_specs:
+            for include_spec in self._include_specs.all_specs:
                 if include_spec not in instance_set.spec_set.all_specs:
                     raise RuntimeError(
                         f"Include spec {include_spec} is not in the spec set {instance_set.spec_set} - "
                         f"check if this node was constructed correctly."
                     )
         elif self._exclude_specs:
-            for exclude_spec in self._exclude_specs:
+            for exclude_spec in self._exclude_specs.all_specs:
                 if exclude_spec not in instance_set.spec_set.all_specs:
                     raise RuntimeError(
                         f"Exclude spec {exclude_spec} is not in the spec set {instance_set.spec_set} - "

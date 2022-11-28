@@ -19,7 +19,7 @@ from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.protocols.semantics import DataSourceSemanticsAccessor
 from metricflow.references import TimeDimensionReference, IdentifierReference
 from metricflow.spec_set_transforms import ToElementNameSet
-from metricflow.specs import InstanceSpec, LinkableInstanceSpec, LinklessIdentifierSpec
+from metricflow.specs import LinkableInstanceSpec, LinklessIdentifierSpec, InstanceSpecSet
 
 SqlDataSetT = TypeVar("SqlDataSetT", bound=SqlDataSet)
 
@@ -225,10 +225,12 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
 
                 # filter measures out of joinable_node
                 specs = data_set_of_second_node_that_can_be_joined.instance_set.spec_set
-                pass_specs = InstanceSpec.merge(
-                    specs.dimension_specs + specs.identifier_specs + specs.time_dimension_specs
+                filtered_joinable_node = FilterElementsNode(
+                    parent_node=second_node_that_could_be_joined,
+                    include_specs=InstanceSpecSet.create_from_linkable_specs(
+                        specs.dimension_specs + specs.identifier_specs + specs.time_dimension_specs
+                    ),
                 )
-                filtered_joinable_node = FilterElementsNode(second_node_that_could_be_joined, pass_specs)
 
                 join_on_partition_dimensions = self._partition_resolver.resolve_partition_dimension_joins(
                     start_node_spec_set=data_set_of_first_node_that_could_be_joined.instance_set.spec_set,

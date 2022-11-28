@@ -9,6 +9,7 @@ from typing import List, TypeVar, Generic, Optional, Sequence, Tuple, Union
 
 import jinja2
 
+from metricflow.aggregation_properties import AggregationType
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dag.id_generation import (
     DATAFLOW_NODE_AGGREGATE_MEASURES_ID_PREFIX,
@@ -34,17 +35,16 @@ from metricflow.dataflow.builder.partitions import (
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.dataset import DataSet
 from metricflow.model.objects.metric import CumulativeMetricWindow
-from metricflow.aggregation_properties import AggregationType
 from metricflow.object_utils import pformat_big_objects
 from metricflow.references import TimeDimensionReference
 from metricflow.specs import (
     MetricInputMeasureSpec,
     OrderBySpec,
-    InstanceSpec,
     MetricSpec,
     LinklessIdentifierSpec,
     TimeDimensionSpec,
     SpecWhereClauseConstraint,
+    InstanceSpecSet,
 )
 from metricflow.sql.sql_plan import SqlJoinType
 from metricflow.time.time_granularity import TimeGranularity
@@ -824,7 +824,7 @@ class FilterElementsNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
     def __init__(  # noqa: D
         self,
         parent_node: BaseOutput[SourceDataSetT],
-        include_specs: Sequence[InstanceSpec],
+        include_specs: InstanceSpecSet,
         replace_description: Optional[str] = None,
     ) -> None:
         self._include_specs = include_specs
@@ -836,9 +836,9 @@ class FilterElementsNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
         return DATAFLOW_NODE_PASS_FILTER_ELEMENTS_ID_PREFIX
 
     @property
-    def include_specs(self) -> List[InstanceSpec]:
+    def include_specs(self) -> InstanceSpecSet:
         """Returns the specs for the elements that it should pass."""
-        return list(self._include_specs)
+        return self._include_specs
 
     def accept(self, visitor: DataflowPlanNodeVisitor[SourceDataSetT, VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_pass_elements_filter_node(self)
@@ -849,7 +849,7 @@ class FilterElementsNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
             return self._replace_description
 
         formatted_str = textwrap.indent(
-            pformat_big_objects([x.qualified_name for x in self._include_specs]), prefix="  "
+            pformat_big_objects([x.qualified_name for x in self._include_specs.all_specs]), prefix="  "
         )
         return f"Pass Only Elements:\n{formatted_str}"
 
@@ -858,7 +858,7 @@ class FilterElementsNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
         additional_properties = []
         if not self._replace_description:
             additional_properties = [
-                DisplayedProperty("include_spec", include_spec) for include_spec in self._include_specs
+                DisplayedProperty("include_spec", include_spec) for include_spec in self._include_specs.all_specs
             ]
         return super().displayed_properties + additional_properties
 

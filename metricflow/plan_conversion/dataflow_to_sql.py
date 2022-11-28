@@ -429,7 +429,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             table_alias_to_instance_set[right_data_set_alias] = right_data_set_instance_set_after_join
 
         from_data_set_output_instance_set = from_data_set.instance_set.transform(
-            FilterElements(include_specs=from_data_set.instance_set.spec_set.all_specs)
+            FilterElements(include_specs=from_data_set.instance_set.spec_set)
         )
 
         # Change the aggregation state for the measures to be partially aggregated if it was previously aggregated

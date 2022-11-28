@@ -40,9 +40,9 @@ from metricflow.dataflow.dataflow_plan_to_text import dataflow_dag_as_text
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
-from metricflow.model.spec_converters import WhereConstraintConverter
 from metricflow.model.objects.metric import MetricType, CumulativeMetricWindow
 from metricflow.model.semantic_model import SemanticModel
+from metricflow.model.spec_converters import WhereConstraintConverter
 from metricflow.object_utils import pformat_big_objects, assert_exactly_one_arg_set
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.node_processor import PreDimensionJoinNodeProcessor
@@ -57,7 +57,6 @@ from metricflow.specs import (
     MeasureSpec,
     TimeDimensionSpec,
     IdentifierSpec,
-    InstanceSpec,
     DimensionSpec,
     OrderBySpec,
     NonAdditiveDimensionSpec,
@@ -65,6 +64,7 @@ from metricflow.specs import (
     LinkableSpecSet,
     ColumnAssociationResolver,
     LinklessIdentifierSpec,
+    InstanceSpecSet,
 )
 from metricflow.sql.sql_plan import SqlJoinType
 from metricflow.time.time_granularity import TimeGranularity
@@ -276,7 +276,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
 
         distinct_values_node = FilterElementsNode(
             parent_node=metrics_output_node,
-            include_specs=[linkable_spec],
+            include_specs=InstanceSpecSet.create_from_linkable_specs((linkable_spec,)),
         )
 
         sink_node = self.build_sink_node_from_metrics_output_node(
@@ -660,8 +660,13 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         else:
             return FilterElementsNode(
                 parent_node=JoinAggregatedMeasuresByGroupByColumnsNode(parent_nodes=output_nodes),
-                include_specs=LinkableInstanceSpec.merge(
-                    queried_linkable_specs.as_tuple, tuple(x.post_aggregation_spec for x in metric_input_measure_specs)
+                include_specs=InstanceSpecSet.merge(
+                    (
+                        queried_linkable_specs.as_instance_set,
+                        InstanceSpecSet(
+                            measure_specs=tuple(x.post_aggregation_spec for x in metric_input_measure_specs)
+                        ),
+                    )
                 ),
             )
 
@@ -739,7 +744,12 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         # Only get the required measure and the local linkable instances so that aggregations work correctly.
         filtered_measure_source_node = FilterElementsNode[SqlDataSetT](
             parent_node=measure_recipe.measure_node,
-            include_specs=InstanceSpec.merge(measure_specs, measure_recipe.required_local_linkable_specs),
+            include_specs=InstanceSpecSet.merge(
+                (
+                    InstanceSpecSet(measure_specs=measure_specs),
+                    InstanceSpecSet.create_from_linkable_specs(measure_recipe.required_local_linkable_specs),
+                )
+            ),
         )
 
         time_range_node: Optional[JoinOverTimeRangeNode[SqlDataSetT]] = None
@@ -782,10 +792,10 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             # link when filtering before the join.
             # e.g. if the node is used to satisfy "user_id__country", then the node must have the identifier
             # "user_id" and the "country" dimension so that it can be joined to the measure node.
-            include_specs.extend([x.without_first_identifier_link() for x in join_recipe.satisfiable_linkable_specs])
+            include_specs.extend([x.without_first_identifier_link for x in join_recipe.satisfiable_linkable_specs])
             filtered_node_to_join = FilterElementsNode[SqlDataSetT](
                 parent_node=join_recipe.node_to_join,
-                include_specs=include_specs,
+                include_specs=InstanceSpecSet.create_from_linkable_specs(include_specs),
             )
             join_targets.append(
                 JoinDescription(
@@ -804,12 +814,15 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 join_targets=join_targets,
             )
 
-            specs_to_keep_after_join: List[InstanceSpec] = list(measure_specs)
-            specs_to_keep_after_join.extend(required_linkable_specs.as_tuple)
+            specs_to_keep_after_join = InstanceSpecSet.merge(
+                (
+                    InstanceSpecSet(measure_specs=measure_specs),
+                    required_linkable_specs.as_instance_set,
+                )
+            )
 
             after_join_filtered_node = FilterElementsNode[SqlDataSetT](
-                parent_node=filtered_measures_with_joined_elements,
-                include_specs=specs_to_keep_after_join,
+                parent_node=filtered_measures_with_joined_elements, include_specs=specs_to_keep_after_join
             )
             unaggregated_measure_node = after_join_filtered_node
         else:
@@ -863,7 +876,9 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             # e.g. for "bookings" by "ds" where "is_instant", "is_instant" should not be in the results.
             pre_aggregate_node = FilterElementsNode[SqlDataSetT](
                 parent_node=pre_aggregate_node,
-                include_specs=measure_specs + queried_linkable_specs.as_tuple,
+                include_specs=InstanceSpecSet.merge(
+                    (InstanceSpecSet(measure_specs=measure_specs), queried_linkable_specs.as_instance_set)
+                ),
             )
         return AggregateMeasuresNode[SqlDataSetT](
             parent_node=pre_aggregate_node,

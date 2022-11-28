@@ -13,7 +13,7 @@ from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanCon
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.specs import TimeDimensionSpec, TimeDimensionReference
+from metricflow.specs import TimeDimensionSpec, TimeDimensionReference, InstanceSpecSet
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.time.time_granularity import TimeGranularity
@@ -71,8 +71,12 @@ def test_view_sql_generated_at_a_node(
     # Show SQL and spec set at a filter node.
     filter_elements_node = FilterElementsNode(
         parent_node=metric_time_node,
-        include_specs=(
-            TimeDimensionSpec(element_name="metric_time", identifier_links=(), time_granularity=TimeGranularity.DAY),
+        include_specs=InstanceSpecSet(
+            time_dimension_specs=(
+                TimeDimensionSpec(
+                    element_name="metric_time", identifier_links=(), time_granularity=TimeGranularity.DAY
+                ),
+            ),
         ),
     )
     sql_plan_at_filter_elements_node = to_sql_plan_converter.convert_to_sql_query_plan(
