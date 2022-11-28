@@ -657,6 +657,44 @@ class InstanceSpecSet(SerializableDataclass):
             metadata_specs=tuple(itertools.chain.from_iterable([x.metadata_specs for x in others])),
         )
 
+    def dedupe(self) -> InstanceSpecSet:
+        """De-duplicates repeated elements.
+
+        TBD: Have merge de-duplicate instead.
+        """
+        metric_specs_deduped = []
+        for metric_spec in self.metric_specs:
+            if metric_spec not in metric_specs_deduped:
+                metric_specs_deduped.append(metric_spec)
+
+        measure_specs_deduped = []
+        for measure_spec in self.measure_specs:
+            if measure_spec not in measure_specs_deduped:
+                measure_specs_deduped.append(measure_spec)
+
+        dimension_specs_deduped = []
+        for dimension_spec in self.dimension_specs:
+            if dimension_spec not in dimension_specs_deduped:
+                dimension_specs_deduped.append(dimension_spec)
+
+        time_dimension_specs_deduped = []
+        for time_dimension_spec in self.time_dimension_specs:
+            if time_dimension_spec not in time_dimension_specs_deduped:
+                time_dimension_specs_deduped.append(time_dimension_spec)
+
+        identifier_specs_deduped = []
+        for identifier_spec in self.identifier_specs:
+            if identifier_spec not in identifier_specs_deduped:
+                identifier_specs_deduped.append(identifier_spec)
+
+        return InstanceSpecSet(
+            metric_specs=tuple(metric_specs_deduped),
+            measure_specs=tuple(measure_specs_deduped),
+            dimension_specs=tuple(dimension_specs_deduped),
+            time_dimension_specs=tuple(time_dimension_specs_deduped),
+            identifier_specs=tuple(identifier_specs_deduped),
+        )
+
     @property
     def linkable_specs(self) -> Sequence[LinkableInstanceSpec]:
         """All linkable specs in this set."""
