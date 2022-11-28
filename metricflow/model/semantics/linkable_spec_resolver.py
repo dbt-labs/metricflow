@@ -12,7 +12,7 @@ from metricflow.model.objects.elements.dimension import DimensionType, Dimension
 from metricflow.model.objects.elements.identifier import IdentifierType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
-from metricflow.model.semantics.valid_join import DataSourceJoinValidator
+from metricflow.model.semantics.join_validator import DataSourceJoinValidator
 from metricflow.object_utils import pformat_big_objects, flatten_nested_sequence
 from metricflow.protocols.semantics import DataSourceSemanticsAccessor
 from metricflow.references import MeasureReference

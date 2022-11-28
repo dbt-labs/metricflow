@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import List
 
-from metricflow.instances import DataSourceReference, DataSourceElementReference, InstanceSet
+from metricflow.instances import DataSourceReference, DataSourceElementReference, IdentifierInstance, InstanceSet
 from metricflow.model.objects.elements.identifier import IdentifierType
 from metricflow.object_utils import pformat_big_objects
 from metricflow.protocols.semantics import DataSourceSemanticsAccessor
@@ -91,7 +92,7 @@ class DataSourceJoinValidator:
         identifier_reference: IdentifierReference,
     ) -> DataSourceReference:
         """Return the data source where the identifier was defined in the instance set."""
-        matching_instances = []
+        matching_instances: List[IdentifierInstance] = []
         for identifier_instance in instance_set.identifier_instances:
             assert len(identifier_instance.defined_from) == 1
             if (
