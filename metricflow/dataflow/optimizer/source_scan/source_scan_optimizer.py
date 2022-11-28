@@ -27,6 +27,7 @@ from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
 )
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_dag_as_text
+from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOptimizer
 from metricflow.dataflow.optimizer.source_scan.cm_branch_combiner import (
     ComputeMetricsBranchCombiner,
     ComputeMetricsBranchCombinerResult,
@@ -61,7 +62,9 @@ class BranchCombinationResult(Generic[SourceDataSetT]):
 
 
 class SourceScanOptimizer(
-    Generic[SourceDataSetT], DataflowPlanNodeVisitor[SourceDataSetT, OptimizeBranchResult[SourceDataSetT]]
+    Generic[SourceDataSetT],
+    DataflowPlanNodeVisitor[SourceDataSetT, OptimizeBranchResult[SourceDataSetT]],
+    DataflowPlanOptimizer[SourceDataSetT],
 ):
     """Reduces the number of scans (ReadSqlSourceNodes) in a dataflow plan.
 
@@ -114,7 +117,7 @@ class SourceScanOptimizer(
     """
 
     def __init__(self) -> None:  # noqa: D
-        self._log_level = logging.ERROR
+        self._log_level = logging.DEBUG
 
     def _log_visit_node_type(self, node: DataflowPlanNode[SourceDataSetT]) -> None:
         logger.log(level=self._log_level, msg=f"Visiting {node}")

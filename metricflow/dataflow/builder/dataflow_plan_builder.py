@@ -37,6 +37,7 @@ from metricflow.dataflow.dataflow_plan import (
     SinkOutput,
 )
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_dag_as_text
+from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOptimizer
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
@@ -134,6 +135,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         self,
         query_spec: MetricFlowQuerySpec,
         output_sql_table: Optional[SqlTable] = None,
+        optimizers: Sequence[DataflowPlanOptimizer[SqlDataSetT]] = (),
     ) -> DataflowPlan[SqlDataSetT]:
         """Generate a plan for reading the results of a query with the given spec into a dataframe or table"""
         metrics_output_node = self._build_metrics_output_node(
@@ -152,7 +154,12 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
 
         plan_id = IdGeneratorRegistry.for_class(DataflowPlanBuilder).create_id(DATAFLOW_PLAN_PREFIX)
 
-        return DataflowPlan(plan_id=plan_id, sink_output_nodes=[sink_node])
+        plan = DataflowPlan(plan_id=plan_id, sink_output_nodes=[sink_node])
+        for optimizer in optimizers:
+            logger.info(f"Applying {optimizer.__class__.__name__}")
+            plan = optimizer.optimize(plan)
+
+        return plan
 
     def _build_metrics_output_node(
         self,
