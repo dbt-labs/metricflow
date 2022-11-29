@@ -69,7 +69,7 @@ FROM (
 ) subq_1
 LEFT OUTER JOIN (
   -- Pass Only Elements:
-  --   ['listing', 'country_latest']
+  --   ['country_latest', 'listing']
   SELECT
     subq_2.listing
     , subq_2.country_latest
@@ -115,7 +115,7 @@ ON
   subq_1.listing = subq_3.listing
 LEFT OUTER JOIN (
   -- Pass Only Elements:
-  --   ['listing', 'country_latest']
+  --   ['country_latest', 'listing']
   SELECT
     subq_4.listing
     , subq_4.country_latest

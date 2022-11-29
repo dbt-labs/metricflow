@@ -1,6 +1,6 @@
 -- Join Aggregated Measures with Standard Outputs
 -- Pass Only Elements:
---   ['listing__country_latest', 'ds', 'bookings', 'views']
+--   ['bookings', 'views', 'listing__country_latest', 'ds']
 -- Compute Metrics via Expressions
 SELECT
   subq_28.ds AS ds

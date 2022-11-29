@@ -68,7 +68,7 @@ FROM (
 ) subq_1
 LEFT OUTER JOIN (
   -- Pass Only Elements:
-  --   ['listing', 'country_latest']
+  --   ['country_latest', 'listing']
   SELECT
     subq_2.listing
     , subq_2.country_latest

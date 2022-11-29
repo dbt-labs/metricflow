@@ -351,7 +351,7 @@
                     <SqlSelectStatementNode>
                         <!-- description =                                                             -->
                         <!--   Pass Only Elements:                                                     -->
-                        <!--     ['listing', 'window_start', 'window_end', 'user__home_state_latest']  -->
+                        <!--     ['user__home_state_latest', 'window_start', 'window_end', 'listing']  -->
                         <!-- node_id = ss_8 -->
                         <!-- col0 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
@@ -654,7 +654,6 @@
                                 <!--   Pass Only Elements:            -->
                                 <!--     ['home_state_latest',        -->
                                 <!--      'user__home_state_latest',  -->
-                                <!--      'user',                     -->
                                 <!--      'ds',                       -->
                                 <!--      'ds__week',                 -->
                                 <!--      'ds__month',                -->
@@ -664,7 +663,8 @@
                                 <!--      'user__ds__week',           -->
                                 <!--      'user__ds__month',          -->
                                 <!--      'user__ds__quarter',        -->
-                                <!--      'user__ds__year']           -->
+                                <!--      'user__ds__year',           -->
+                                <!--      'user']                     -->
                                 <!-- node_id = ss_6 -->
                                 <!-- col0 =                                                    -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->

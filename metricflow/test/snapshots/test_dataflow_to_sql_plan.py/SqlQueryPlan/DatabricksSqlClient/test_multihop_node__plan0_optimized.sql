@@ -10,7 +10,7 @@ FROM ***************************.account_month_txns account_month_txns_src_10010
 LEFT OUTER JOIN (
   -- Join Standard Outputs
   -- Pass Only Elements:
-  --   ['account_id', 'ds_partitioned', 'customer_id__customer_name']
+  --   ['customer_id__customer_name', 'ds_partitioned', 'account_id']
   SELECT
     bridge_table_src_10011.ds_partitioned AS ds_partitioned
     , bridge_table_src_10011.account_id AS account_id

@@ -5,7 +5,7 @@ SELECT
   , CAST(subq_19.bookings AS FLOAT64) / CAST(NULLIF(subq_19.views, 0) AS FLOAT64) AS bookings_per_view
 FROM (
   -- Pass Only Elements:
-  --   ['listing__country_latest', 'ds', 'bookings', 'views']
+  --   ['bookings', 'views', 'listing__country_latest', 'ds']
   SELECT
     subq_18.ds
     , subq_18.listing__country_latest
@@ -160,7 +160,7 @@ FROM (
           ) subq_2
           LEFT OUTER JOIN (
             -- Pass Only Elements:
-            --   ['listing', 'country_latest']
+            --   ['country_latest', 'listing']
             SELECT
               subq_4.listing
               , subq_4.country_latest
@@ -350,7 +350,7 @@ FROM (
           ) subq_11
           LEFT OUTER JOIN (
             -- Pass Only Elements:
-            --   ['listing', 'country_latest']
+            --   ['country_latest', 'listing']
             SELECT
               subq_13.listing
               , subq_13.country_latest

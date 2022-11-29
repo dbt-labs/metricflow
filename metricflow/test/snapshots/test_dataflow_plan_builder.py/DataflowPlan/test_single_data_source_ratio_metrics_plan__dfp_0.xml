@@ -86,16 +86,16 @@
                         <FilterElementsNode>
                             <!-- description =                      -->
                             <!--   Pass Only Elements:              -->
-                            <!--     ['listing', 'country_latest']  -->
+                            <!--     ['country_latest', 'listing']  -->
                             <!-- node_id = pfe_1 -->
-                            <!-- include_spec =                         -->
-                            <!--   {'class': 'LinklessIdentifierSpec',  -->
-                            <!--    'element_name': 'listing',          -->
-                            <!--    'identifier_links': ()}             -->
                             <!-- include_spec =                        -->
                             <!--   {'class': 'DimensionSpec',          -->
                             <!--    'element_name': 'country_latest',  -->
                             <!--    'identifier_links': ()}            -->
+                            <!-- include_spec =                         -->
+                            <!--   {'class': 'LinklessIdentifierSpec',  -->
+                            <!--    'element_name': 'listing',          -->
+                            <!--    'identifier_links': ()}             -->
                             <MetricTimeDimensionTransformNode>
                                 <!-- description = Metric Time Dimension 'ds' -->
                                 <!-- node_id = sma_10004 -->

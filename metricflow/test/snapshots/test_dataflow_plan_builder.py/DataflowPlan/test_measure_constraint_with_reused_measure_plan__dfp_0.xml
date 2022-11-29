@@ -13,13 +13,8 @@
             <FilterElementsNode>
                 <!-- description =                                                                     -->
                 <!--   Pass Only Elements:                                                             -->
-                <!--     ['metric_time', 'booking_value_with_is_instant_constraint', 'booking_value']  -->
+                <!--     ['booking_value_with_is_instant_constraint', 'booking_value', 'metric_time']  -->
                 <!-- node_id = pfe_3 -->
-                <!-- include_spec =                               -->
-                <!--   {'class': 'TimeDimensionSpec',             -->
-                <!--    'element_name': 'metric_time',            -->
-                <!--    'identifier_links': (),                   -->
-                <!--    'time_granularity': TimeGranularity.DAY}  -->
                 <!-- include_spec =                                                  -->
                 <!--   {'class': 'MeasureSpec',                                      -->
                 <!--    'element_name': 'booking_value_with_is_instant_constraint',  -->
@@ -28,6 +23,11 @@
                 <!--   {'class': 'MeasureSpec',               -->
                 <!--    'element_name': 'booking_value',      -->
                 <!--    'non_additive_dimension_spec': None}  -->
+                <!-- include_spec =                               -->
+                <!--   {'class': 'TimeDimensionSpec',             -->
+                <!--    'element_name': 'metric_time',            -->
+                <!--    'identifier_links': (),                   -->
+                <!--    'time_granularity': TimeGranularity.DAY}  -->
                 <JoinAggregatedMeasuresByGroupByColumnsNode>
                     <!-- description = Join Aggregated Measures with Standard Outputs -->
                     <!-- node_id = jamgc_0 -->

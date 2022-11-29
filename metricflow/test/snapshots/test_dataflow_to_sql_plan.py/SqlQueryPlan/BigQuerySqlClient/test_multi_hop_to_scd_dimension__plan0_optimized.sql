@@ -21,10 +21,10 @@ FROM (
 LEFT OUTER JOIN (
   -- Join Standard Outputs
   -- Pass Only Elements:
-  --   ['listing',
+  --   ['lux_listing__is_confirmed_lux',
   --    'lux_listing__window_start',
   --    'lux_listing__window_end',
-  --    'lux_listing__is_confirmed_lux']
+  --    'listing']
   SELECT
     lux_listings_src_10021.valid_from AS lux_listing__window_start
     , lux_listings_src_10021.valid_to AS lux_listing__window_end

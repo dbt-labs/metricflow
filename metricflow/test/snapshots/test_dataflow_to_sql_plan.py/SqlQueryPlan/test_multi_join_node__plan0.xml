@@ -253,7 +253,7 @@
         <SqlSelectStatementNode>
             <!-- description =                      -->
             <!--   Pass Only Elements:              -->
-            <!--     ['listing', 'country_latest']  -->
+            <!--     ['country_latest', 'listing']  -->
             <!-- node_id = ss_1 -->
             <!-- col0 =                                                  -->
             <!--   {'class': 'SqlSelectColumn',                          -->
@@ -408,7 +408,7 @@
         <SqlSelectStatementNode>
             <!-- description =                      -->
             <!--   Pass Only Elements:              -->
-            <!--     ['listing', 'country_latest']  -->
+            <!--     ['country_latest', 'listing']  -->
             <!-- node_id = ss_2 -->
             <!-- col0 =                                                  -->
             <!--   {'class': 'SqlSelectColumn',                          -->

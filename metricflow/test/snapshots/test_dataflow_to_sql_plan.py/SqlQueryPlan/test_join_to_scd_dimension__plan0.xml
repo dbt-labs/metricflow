@@ -372,7 +372,7 @@
                             <SqlSelectStatementNode>
                                 <!-- description =                                              -->
                                 <!--   Pass Only Elements:                                      -->
-                                <!--     ['listing', 'window_start', 'window_end', 'capacity']  -->
+                                <!--     ['capacity', 'window_start', 'window_end', 'listing']  -->
                                 <!-- node_id = ss_4 -->
                                 <!-- col0 =                                                   -->
                                 <!--   {'class': 'SqlSelectColumn',                           -->

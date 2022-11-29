@@ -23,7 +23,7 @@ FROM (
         , subq_2.txn_count AS txn_count
       FROM (
         -- Pass Only Elements:
-        --   ['txn_count', 'account_id', 'ds_partitioned']
+        --   ['txn_count', 'ds_partitioned', 'account_id']
         SELECT
           subq_1.ds_partitioned
           , subq_1.account_id
@@ -93,7 +93,7 @@ FROM (
       ) subq_2
       LEFT OUTER JOIN (
         -- Pass Only Elements:
-        --   ['account_id', 'ds_partitioned', 'customer_id__customer_name']
+        --   ['customer_id__customer_name', 'ds_partitioned', 'account_id']
         SELECT
           subq_6.ds_partitioned
           , subq_6.account_id
@@ -149,7 +149,6 @@ FROM (
             --    'customer_atomic_weight',
             --    'customer_id__customer_name',
             --    'customer_id__customer_atomic_weight',
-            --    'customer_id',
             --    'ds_partitioned',
             --    'ds_partitioned__week',
             --    'ds_partitioned__month',
@@ -159,7 +158,8 @@ FROM (
             --    'customer_id__ds_partitioned__week',
             --    'customer_id__ds_partitioned__month',
             --    'customer_id__ds_partitioned__quarter',
-            --    'customer_id__ds_partitioned__year']
+            --    'customer_id__ds_partitioned__year',
+            --    'customer_id']
             SELECT
               subq_4.ds_partitioned
               , subq_4.ds_partitioned__week

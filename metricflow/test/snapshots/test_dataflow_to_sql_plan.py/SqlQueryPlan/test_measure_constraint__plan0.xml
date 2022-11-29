@@ -15,7 +15,7 @@
         <SqlSelectStatementNode>
             <!-- description =                                                              -->
             <!--   Pass Only Elements:                                                      -->
-            <!--     ['metric_time', 'average_booking_value', 'bookings', 'booking_value']  -->
+            <!--     ['average_booking_value', 'bookings', 'booking_value', 'metric_time']  -->
             <!-- node_id = ss_20 -->
             <!-- col0 =                                                    -->
             <!--   {'class': 'SqlSelectColumn',                            -->
@@ -621,7 +621,7 @@
                                     <SqlSelectStatementNode>
                                         <!-- description =                     -->
                                         <!--   Pass Only Elements:             -->
-                                        <!--     ['listing', 'is_lux_latest']  -->
+                                        <!--     ['is_lux_latest', 'listing']  -->
                                         <!-- node_id = ss_10 -->
                                         <!-- col0 =                                                    -->
                                         <!--   {'class': 'SqlSelectColumn',                            -->

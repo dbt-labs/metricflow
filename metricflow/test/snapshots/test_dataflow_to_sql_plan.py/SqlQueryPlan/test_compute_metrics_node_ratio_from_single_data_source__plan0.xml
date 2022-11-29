@@ -297,7 +297,7 @@
                 <SqlSelectStatementNode>
                     <!-- description =                      -->
                     <!--   Pass Only Elements:              -->
-                    <!--     ['listing', 'country_latest']  -->
+                    <!--     ['country_latest', 'listing']  -->
                     <!-- node_id = ss_1 -->
                     <!-- col0 =                                                  -->
                     <!--   {'class': 'SqlSelectColumn',                          -->

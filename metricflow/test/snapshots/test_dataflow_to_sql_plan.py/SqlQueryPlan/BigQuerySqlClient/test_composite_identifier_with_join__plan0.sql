@@ -86,7 +86,7 @@ FROM (
       ) subq_2
       LEFT OUTER JOIN (
         -- Pass Only Elements:
-        --   ['user_team', 'country']
+        --   ['country', 'user_team']
         SELECT
           subq_3.user_team___team_id
           , subq_3.user_team___user_id

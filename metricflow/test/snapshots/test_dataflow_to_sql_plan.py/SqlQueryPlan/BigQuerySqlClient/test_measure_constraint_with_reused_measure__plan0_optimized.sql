@@ -1,6 +1,6 @@
 -- Join Aggregated Measures with Standard Outputs
 -- Pass Only Elements:
---   ['metric_time', 'booking_value_with_is_instant_constraint', 'booking_value']
+--   ['booking_value_with_is_instant_constraint', 'booking_value', 'metric_time']
 -- Compute Metrics via Expressions
 SELECT
   subq_17.metric_time AS metric_time
