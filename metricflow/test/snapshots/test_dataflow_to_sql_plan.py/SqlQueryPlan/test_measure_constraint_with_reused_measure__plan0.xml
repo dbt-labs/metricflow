@@ -15,7 +15,7 @@
         <SqlSelectStatementNode>
             <!-- description =                                                                     -->
             <!--   Pass Only Elements:                                                             -->
-            <!--     ['metric_time', 'booking_value_with_is_instant_constraint', 'booking_value']  -->
+            <!--     ['booking_value_with_is_instant_constraint', 'booking_value', 'metric_time']  -->
             <!-- node_id = ss_16 -->
             <!-- col0 =                                                    -->
             <!--   {'class': 'SqlSelectColumn',                            -->

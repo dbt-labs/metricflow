@@ -108,7 +108,7 @@ FROM (
           ) subq_2
           LEFT OUTER JOIN (
             -- Pass Only Elements:
-            --   ['listing', 'window_start', 'window_end', 'capacity']
+            --   ['capacity', 'window_start', 'window_end', 'listing']
             SELECT
               subq_3.window_start
               , subq_3.window_end

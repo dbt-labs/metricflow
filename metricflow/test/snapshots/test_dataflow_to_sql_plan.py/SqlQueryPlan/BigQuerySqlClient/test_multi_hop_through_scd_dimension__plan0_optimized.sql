@@ -21,7 +21,7 @@ FROM (
 LEFT OUTER JOIN (
   -- Join Standard Outputs
   -- Pass Only Elements:
-  --   ['listing', 'window_start', 'window_end', 'user__home_state_latest']
+  --   ['user__home_state_latest', 'window_start', 'window_end', 'listing']
   SELECT
     listings_src_10019.active_from AS window_start
     , listings_src_10019.active_to AS window_end

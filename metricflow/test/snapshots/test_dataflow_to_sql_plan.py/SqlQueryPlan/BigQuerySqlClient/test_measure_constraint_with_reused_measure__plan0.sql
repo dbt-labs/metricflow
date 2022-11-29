@@ -4,7 +4,7 @@ SELECT
   , CAST(subq_11.booking_value_with_is_instant_constraint AS FLOAT64) / CAST(NULLIF(subq_11.booking_value, 0) AS FLOAT64) AS instant_booking_value_ratio
 FROM (
   -- Pass Only Elements:
-  --   ['metric_time', 'booking_value_with_is_instant_constraint', 'booking_value']
+  --   ['booking_value_with_is_instant_constraint', 'booking_value', 'metric_time']
   SELECT
     subq_10.metric_time
     , subq_10.booking_value_with_is_instant_constraint

@@ -78,7 +78,7 @@
                     <SqlSelectStatementNode>
                         <!-- description =                                             -->
                         <!--   Pass Only Elements:                                     -->
-                        <!--     ['identity_verifications', 'user', 'ds_partitioned']  -->
+                        <!--     ['identity_verifications', 'ds_partitioned', 'user']  -->
                         <!-- node_id = ss_8 -->
                         <!-- col0 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
@@ -343,7 +343,7 @@
                     <SqlSelectStatementNode>
                         <!-- description =                                 -->
                         <!--   Pass Only Elements:                         -->
-                        <!--     ['user', 'ds_partitioned', 'home_state']  -->
+                        <!--     ['home_state', 'ds_partitioned', 'user']  -->
                         <!-- node_id = ss_9 -->
                         <!-- col0 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->

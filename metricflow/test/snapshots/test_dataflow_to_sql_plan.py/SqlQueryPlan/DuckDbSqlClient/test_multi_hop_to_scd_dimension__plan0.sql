@@ -98,10 +98,10 @@ FROM (
       ) subq_2
       LEFT OUTER JOIN (
         -- Pass Only Elements:
-        --   ['listing',
+        --   ['lux_listing__is_confirmed_lux',
         --    'lux_listing__window_start',
         --    'lux_listing__window_end',
-        --    'lux_listing__is_confirmed_lux']
+        --    'listing']
         SELECT
           subq_6.lux_listing__window_start
           , subq_6.lux_listing__window_end
@@ -136,7 +136,6 @@ FROM (
             -- Pass Only Elements:
             --   ['is_confirmed_lux',
             --    'lux_listing__is_confirmed_lux',
-            --    'lux_listing',
             --    'window_start',
             --    'window_start__week',
             --    'window_start__month',
@@ -156,7 +155,8 @@ FROM (
             --    'lux_listing__window_end__week',
             --    'lux_listing__window_end__month',
             --    'lux_listing__window_end__quarter',
-            --    'lux_listing__window_end__year']
+            --    'lux_listing__window_end__year',
+            --    'lux_listing']
             SELECT
               subq_4.window_start
               , subq_4.window_start__week

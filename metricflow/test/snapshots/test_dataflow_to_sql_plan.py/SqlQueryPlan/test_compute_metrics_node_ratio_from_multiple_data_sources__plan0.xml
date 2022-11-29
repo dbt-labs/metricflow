@@ -19,7 +19,7 @@
         <SqlSelectStatementNode>
             <!-- description =                                               -->
             <!--   Pass Only Elements:                                       -->
-            <!--     ['listing__country_latest', 'ds', 'bookings', 'views']  -->
+            <!--     ['bookings', 'views', 'listing__country_latest', 'ds']  -->
             <!-- node_id = ss_22 -->
             <!-- col0 =                                                    -->
             <!--   {'class': 'SqlSelectColumn',                            -->
@@ -576,7 +576,7 @@
                             <SqlSelectStatementNode>
                                 <!-- description =                      -->
                                 <!--   Pass Only Elements:              -->
-                                <!--     ['listing', 'country_latest']  -->
+                                <!--     ['country_latest', 'listing']  -->
                                 <!-- node_id = ss_10 -->
                                 <!-- col0 =                                                    -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
@@ -1223,7 +1223,7 @@
                             <SqlSelectStatementNode>
                                 <!-- description =                      -->
                                 <!--   Pass Only Elements:              -->
-                                <!--     ['listing', 'country_latest']  -->
+                                <!--     ['country_latest', 'listing']  -->
                                 <!-- node_id = ss_17 -->
                                 <!-- col0 =                                                    -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->

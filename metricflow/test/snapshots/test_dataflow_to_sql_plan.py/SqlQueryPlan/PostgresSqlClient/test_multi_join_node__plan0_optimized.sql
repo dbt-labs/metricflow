@@ -19,7 +19,7 @@ FROM (
 LEFT OUTER JOIN (
   -- Read Elements From Data Source 'listings_latest'
   -- Pass Only Elements:
-  --   ['listing', 'country_latest']
+  --   ['country_latest', 'listing']
   SELECT
     listing_id AS listing
     , country AS country_latest
@@ -30,7 +30,7 @@ ON
 LEFT OUTER JOIN (
   -- Read Elements From Data Source 'listings_latest'
   -- Pass Only Elements:
-  --   ['listing', 'country_latest']
+  --   ['country_latest', 'listing']
   SELECT
     listing_id AS listing
     , country AS country_latest

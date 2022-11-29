@@ -78,7 +78,7 @@
                     <SqlSelectStatementNode>
                         <!-- description =                                      -->
                         <!--   Pass Only Elements:                              -->
-                        <!--     ['txn_count', 'account_id', 'ds_partitioned']  -->
+                        <!--     ['txn_count', 'ds_partitioned', 'account_id']  -->
                         <!-- node_id = ss_4 -->
                         <!-- col0 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
@@ -327,7 +327,7 @@
                     <SqlSelectStatementNode>
                         <!-- description =                                                       -->
                         <!--   Pass Only Elements:                                               -->
-                        <!--     ['account_id', 'ds_partitioned', 'customer_id__customer_name']  -->
+                        <!--     ['customer_id__customer_name', 'ds_partitioned', 'account_id']  -->
                         <!-- node_id = ss_7 -->
                         <!-- col0 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
@@ -520,7 +520,6 @@
                                 <!--      'customer_atomic_weight',                -->
                                 <!--      'customer_id__customer_name',            -->
                                 <!--      'customer_id__customer_atomic_weight',   -->
-                                <!--      'customer_id',                           -->
                                 <!--      'ds_partitioned',                        -->
                                 <!--      'ds_partitioned__week',                  -->
                                 <!--      'ds_partitioned__month',                 -->
@@ -530,7 +529,8 @@
                                 <!--      'customer_id__ds_partitioned__week',     -->
                                 <!--      'customer_id__ds_partitioned__month',    -->
                                 <!--      'customer_id__ds_partitioned__quarter',  -->
-                                <!--      'customer_id__ds_partitioned__year']     -->
+                                <!--      'customer_id__ds_partitioned__year',     -->
+                                <!--      'customer_id']                           -->
                                 <!-- node_id = ss_5 -->
                                 <!-- col0 =                                                    -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->

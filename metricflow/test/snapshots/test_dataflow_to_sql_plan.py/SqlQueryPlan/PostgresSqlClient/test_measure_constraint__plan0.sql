@@ -4,7 +4,7 @@ SELECT
   , average_booking_value * bookings / NULLIF(booking_value, 0) AS lux_booking_value_rate_expr
 FROM (
   -- Pass Only Elements:
-  --   ['metric_time', 'average_booking_value', 'bookings', 'booking_value']
+  --   ['average_booking_value', 'bookings', 'booking_value', 'metric_time']
   SELECT
     subq_15.metric_time
     , subq_15.bookings
@@ -176,7 +176,7 @@ FROM (
               ) subq_2
               LEFT OUTER JOIN (
                 -- Pass Only Elements:
-                --   ['listing', 'is_lux_latest']
+                --   ['is_lux_latest', 'listing']
                 SELECT
                   subq_4.listing
                   , subq_4.is_lux_latest

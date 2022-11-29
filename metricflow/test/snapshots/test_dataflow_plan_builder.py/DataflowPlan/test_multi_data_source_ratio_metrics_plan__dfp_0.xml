@@ -13,8 +13,16 @@
             <FilterElementsNode>
                 <!-- description =                                                        -->
                 <!--   Pass Only Elements:                                                -->
-                <!--     ['listing__country_latest', 'metric_time', 'bookings', 'views']  -->
+                <!--     ['bookings', 'views', 'listing__country_latest', 'metric_time']  -->
                 <!-- node_id = pfe_6 -->
+                <!-- include_spec =                           -->
+                <!--   {'class': 'MeasureSpec',               -->
+                <!--    'element_name': 'bookings',           -->
+                <!--    'non_additive_dimension_spec': None}  -->
+                <!-- include_spec =                           -->
+                <!--   {'class': 'MeasureSpec',               -->
+                <!--    'element_name': 'views',              -->
+                <!--    'non_additive_dimension_spec': None}  -->
                 <!-- include_spec =                                            -->
                 <!--   {'class': 'DimensionSpec',                              -->
                 <!--    'element_name': 'country_latest',                      -->
@@ -25,14 +33,6 @@
                 <!--    'element_name': 'metric_time',            -->
                 <!--    'identifier_links': (),                   -->
                 <!--    'time_granularity': TimeGranularity.DAY}  -->
-                <!-- include_spec =                           -->
-                <!--   {'class': 'MeasureSpec',               -->
-                <!--    'element_name': 'bookings',           -->
-                <!--    'non_additive_dimension_spec': None}  -->
-                <!-- include_spec =                           -->
-                <!--   {'class': 'MeasureSpec',               -->
-                <!--    'element_name': 'views',              -->
-                <!--    'non_additive_dimension_spec': None}  -->
                 <JoinAggregatedMeasuresByGroupByColumnsNode>
                     <!-- description = Join Aggregated Measures with Standard Outputs -->
                     <!-- node_id = jamgc_0 -->
@@ -105,16 +105,16 @@
                                 <FilterElementsNode>
                                     <!-- description =                      -->
                                     <!--   Pass Only Elements:              -->
-                                    <!--     ['listing', 'country_latest']  -->
+                                    <!--     ['country_latest', 'listing']  -->
                                     <!-- node_id = pfe_1 -->
-                                    <!-- include_spec =                         -->
-                                    <!--   {'class': 'LinklessIdentifierSpec',  -->
-                                    <!--    'element_name': 'listing',          -->
-                                    <!--    'identifier_links': ()}             -->
                                     <!-- include_spec =                        -->
                                     <!--   {'class': 'DimensionSpec',          -->
                                     <!--    'element_name': 'country_latest',  -->
                                     <!--    'identifier_links': ()}            -->
+                                    <!-- include_spec =                         -->
+                                    <!--   {'class': 'LinklessIdentifierSpec',  -->
+                                    <!--    'element_name': 'listing',          -->
+                                    <!--    'identifier_links': ()}             -->
                                     <MetricTimeDimensionTransformNode>
                                         <!-- description = Metric Time Dimension 'ds' -->
                                         <!-- node_id = sma_10004 -->
@@ -199,16 +199,16 @@
                                 <FilterElementsNode>
                                     <!-- description =                      -->
                                     <!--   Pass Only Elements:              -->
-                                    <!--     ['listing', 'country_latest']  -->
+                                    <!--     ['country_latest', 'listing']  -->
                                     <!-- node_id = pfe_4 -->
-                                    <!-- include_spec =                         -->
-                                    <!--   {'class': 'LinklessIdentifierSpec',  -->
-                                    <!--    'element_name': 'listing',          -->
-                                    <!--    'identifier_links': ()}             -->
                                     <!-- include_spec =                        -->
                                     <!--   {'class': 'DimensionSpec',          -->
                                     <!--    'element_name': 'country_latest',  -->
                                     <!--    'identifier_links': ()}            -->
+                                    <!-- include_spec =                         -->
+                                    <!--   {'class': 'LinklessIdentifierSpec',  -->
+                                    <!--    'element_name': 'listing',          -->
+                                    <!--    'identifier_links': ()}             -->
                                     <MetricTimeDimensionTransformNode>
                                         <!-- description = Metric Time Dimension 'ds' -->
                                         <!-- node_id = sma_10004 -->

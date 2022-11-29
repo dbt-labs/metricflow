@@ -98,7 +98,7 @@ FROM (
       ) subq_2
       LEFT OUTER JOIN (
         -- Pass Only Elements:
-        --   ['listing', 'window_start', 'window_end', 'user__home_state_latest']
+        --   ['user__home_state_latest', 'window_start', 'window_end', 'listing']
         SELECT
           subq_6.window_start
           , subq_6.window_end
@@ -180,7 +180,6 @@ FROM (
             -- Pass Only Elements:
             --   ['home_state_latest',
             --    'user__home_state_latest',
-            --    'user',
             --    'ds',
             --    'ds__week',
             --    'ds__month',
@@ -190,7 +189,8 @@ FROM (
             --    'user__ds__week',
             --    'user__ds__month',
             --    'user__ds__quarter',
-            --    'user__ds__year']
+            --    'user__ds__year',
+            --    'user']
             SELECT
               subq_4.ds
               , subq_4.ds__week
