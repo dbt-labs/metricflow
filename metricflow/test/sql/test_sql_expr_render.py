@@ -24,7 +24,7 @@ from metricflow.sql.sql_exprs import (
     SqlBetweenExpression,
     SqlWindowFunctionExpression,
     SqlWindowFunction,
-    SqlWindowOrderByArg,
+    SqlWindowOrderByArgument,
 )
 from metricflow.time.time_granularity import TimeGranularity
 
@@ -251,12 +251,12 @@ def test_window_function_expr(default_expr_renderer: DefaultSqlExpressionRendere
                 SqlColumnReferenceExpression(SqlColumnReference("b", "col1")),
             ],
             order_by_args=[
-                SqlWindowOrderByArg(
+                SqlWindowOrderByArgument(
                     expr=SqlColumnReferenceExpression(SqlColumnReference("a", "col0")),
                     descending=True,
                     nulls_last=False,
                 ),
-                SqlWindowOrderByArg(
+                SqlWindowOrderByArgument(
                     expr=SqlColumnReferenceExpression(SqlColumnReference("b", "col0")),
                     descending=False,
                     nulls_last=True,

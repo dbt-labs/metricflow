@@ -72,7 +72,7 @@ class ColumnAssociationResolver(ABC):
         pass
 
     @abstractmethod
-    def resolve_extra_spec(self, extra_spec: ExtraSpec) -> ColumnAssociation:  # noqa: D
+    def resolve_metadata_spec(self, metadata_spec: MetadataSpec) -> ColumnAssociation:  # noqa: D
         pass
 
 
@@ -112,21 +112,21 @@ class InstanceSpec(SerializableDataclass):
 
 
 @dataclass(frozen=True)
-class ExtraSpec(InstanceSpec):
+class MetadataSpec(InstanceSpec):
     """A specification for a specification that is built during the dataflow plan and not defined in config."""
 
     element_name: str
 
     def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
-        return (resolver.resolve_extra_spec(self),)
+        return (resolver.resolve_metadata_spec(self),)
 
     @property
     def qualified_name(self) -> str:  # noqa: D
         return self.element_name
 
     @staticmethod
-    def from_name(name: str) -> ExtraSpec:  # noqa: D
-        return ExtraSpec(element_name=name)
+    def from_name(name: str) -> MetadataSpec:  # noqa: D
+        return MetadataSpec(element_name=name)
 
 
 @dataclass(frozen=True)
@@ -598,7 +598,7 @@ class InstanceSpecSet(SerializableDataclass):
     dimension_specs: Tuple[DimensionSpec, ...] = ()
     identifier_specs: Tuple[IdentifierSpec, ...] = ()
     time_dimension_specs: Tuple[TimeDimensionSpec, ...] = ()
-    extra_specs: Tuple[ExtraSpec, ...] = ()
+    metadata_specs: Tuple[MetadataSpec, ...] = ()
 
     def merge(self, others: Sequence[InstanceSpecSet]) -> InstanceSpecSet:
         """Merge all sets into one set, without de-duplication."""
@@ -611,7 +611,8 @@ class InstanceSpecSet(SerializableDataclass):
             + tuple(itertools.chain.from_iterable([x.identifier_specs for x in others])),
             time_dimension_specs=self.time_dimension_specs
             + tuple(itertools.chain.from_iterable([x.time_dimension_specs for x in others])),
-            extra_specs=self.extra_specs + tuple(itertools.chain.from_iterable([x.extra_specs for x in others])),
+            metadata_specs=self.metadata_specs
+            + tuple(itertools.chain.from_iterable([x.metadata_specs for x in others])),
         )
 
     @property
@@ -628,7 +629,7 @@ class InstanceSpecSet(SerializableDataclass):
                 self.time_dimension_specs,
                 self.identifier_specs,
                 self.metric_specs,
-                self.extra_specs,
+                self.metadata_specs,
             )
         )
 

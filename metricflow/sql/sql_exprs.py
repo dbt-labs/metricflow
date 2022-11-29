@@ -792,7 +792,7 @@ class SqlWindowFunction(Enum):
 
 
 @dataclass(frozen=True)
-class SqlWindowOrderByArg:
+class SqlWindowOrderByArgument:
     """In window functions, the ORDER BY clause can accept an expr, ordering, null ranking."""
 
     expr: SqlExpressionNode
@@ -818,7 +818,7 @@ class SqlWindowFunctionExpression(SqlFunctionExpression):
         sql_function: SqlWindowFunction,
         sql_function_args: Optional[List[SqlExpressionNode]] = None,
         partition_by_args: Optional[List[SqlExpressionNode]] = None,
-        order_by_args: Optional[List[SqlWindowOrderByArg]] = None,
+        order_by_args: Optional[List[SqlWindowOrderByArgument]] = None,
     ) -> None:
         """Constructor.
 
@@ -881,7 +881,7 @@ class SqlWindowFunctionExpression(SqlFunctionExpression):
         return self._partition_by_args or []
 
     @property
-    def order_by_args(self) -> List[SqlWindowOrderByArg]:  # noqa: D
+    def order_by_args(self) -> List[SqlWindowOrderByArgument]:  # noqa: D
         return self._order_by_args or []
 
     def __repr__(self) -> str:  # noqa: D
@@ -901,7 +901,7 @@ class SqlWindowFunctionExpression(SqlFunctionExpression):
                 x.rewrite(column_replacements, should_render_table_alias) for x in self.partition_by_args
             ],
             order_by_args=[
-                SqlWindowOrderByArg(
+                SqlWindowOrderByArgument(
                     expr=x.expr.rewrite(column_replacements, should_render_table_alias),
                     descending=x.descending,
                     nulls_last=x.nulls_last,
@@ -919,8 +919,11 @@ class SqlWindowFunctionExpression(SqlFunctionExpression):
     def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
         if not isinstance(other, SqlWindowFunctionExpression):
             return False
-        order_by_matches = all(x == y for x, y in itertools.zip_longest(self.order_by_args, other.order_by_args))
-        return self.sql_function == other.sql_function and order_by_matches and self._parents_match(other)
+        return (
+            self.sql_function == other.sql_function
+            and self.order_by_args == other.order_by_args
+            and self._parents_match(other)
+        )
 
 
 class SqlNullExpression(SqlExpressionNode):
@@ -1247,7 +1250,7 @@ class SqlRatioComputationExpression(SqlExpressionNode):
     """Node for expressing Ratio metrics to allow for appropriate casting to float/double in each engine
 
     In future we might wish to break this up into a set of nodes, e.g., SqlCastExpression and SqlMathExpression
-    or even add CAST to SqlAggregateFunctionExpression. However, at this time the only mathematical operation we encode
+    or even add CAST to SqlFunctionExpression. However, at this time the only mathematical operation we encode
     is division, and we only use that for ratios. Similarly, the only times we do typecasting are when we are
     coercing timestamps (already handled) or computing ratio metrics.
     """
