@@ -131,7 +131,9 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         )
 
     def build_plan(
-        self, query_spec: MetricFlowQuerySpec, output_sql_table: Optional[SqlTable] = None
+        self,
+        query_spec: MetricFlowQuerySpec,
+        output_sql_table: Optional[SqlTable] = None,
     ) -> DataflowPlan[SqlDataSetT]:
         """Generate a plan for reading the results of a query with the given spec into a dataframe or table"""
         metrics_output_node = self._build_metrics_output_node(

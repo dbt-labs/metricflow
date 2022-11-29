@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
+import logging
 import textwrap
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import List, TypeVar, Generic, Optional, Sequence, Tuple, Union
+from typing import List, TypeVar, Generic, Optional, Sequence, Tuple, Union, Type
 
 import jinja2
 
@@ -50,8 +51,11 @@ from metricflow.sql.sql_plan import SqlJoinType
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.visitor import Visitable, VisitorOutputT
 
+logger = logging.getLogger(__name__)
+
 # The type of data set that is flowing out of the source nodes
 SourceDataSetT = TypeVar("SourceDataSetT", bound=DataSet)
+NodeSelfT = TypeVar("NodeSelfT", bound="DataflowPlanNode")
 
 
 class DataflowPlanNode(Generic[SourceDataSetT], DagNode, Visitable, ABC):
@@ -79,7 +83,28 @@ class DataflowPlanNode(Generic[SourceDataSetT], DagNode, Visitable, ABC):
     @abstractmethod
     def accept(self, visitor: DataflowPlanNodeVisitor[SourceDataSetT, VisitorOutputT]) -> VisitorOutputT:
         """Called when a visitor needs to visit this node."""
-        pass
+        raise NotImplementedError
+
+    @abstractmethod
+    def functionally_identical(self, other_node: DataflowPlanNode[SourceDataSetT]) -> bool:
+        """Returns true if this node the same functionality as the other node.
+
+        In other words, this returns true if  all parameters (aside from parent_nodes) are the same.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def with_new_parents(self: NodeSelfT, new_parent_nodes: Sequence[BaseOutput[SourceDataSetT]]) -> NodeSelfT:
+        """Creates a node with the same behavior as this node, but with a different set of parents
+
+        typing.Self would be useful here, but not available in Python 3.8.
+        """
+        raise NotImplementedError
+
+    @property
+    def node_type(self) -> Type:  # noqa: D
+        # TODO: Remove.
+        return self.__class__
 
 
 class DataflowPlanNodeVisitor(Generic[SourceDataSetT, VisitorOutputT], ABC):
@@ -213,6 +238,15 @@ class ReadSqlSourceNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
             DisplayedProperty("data_set", self.data_set),
         ]
 
+    def functionally_identical(self, other_node: DataflowPlanNode[SourceDataSetT]) -> bool:  # noqa: D
+        return isinstance(other_node, self.__class__) and other_node.data_set == self.data_set
+
+    def with_new_parents(  # noqa: D
+        self, new_parent_nodes: Sequence[BaseOutput[SourceDataSetT]]
+    ) -> ReadSqlSourceNode[SourceDataSetT]:
+        assert len(new_parent_nodes) == 0
+        return ReadSqlSourceNode[SourceDataSetT](data_set=self.data_set)
+
 
 @dataclass(frozen=True)
 class ValidityWindowJoinDescription:
@@ -286,6 +320,44 @@ class JoinToBaseOutputNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
             for i, join_description in enumerate(self._join_targets)
         ]
 
+    def functionally_identical(self, other_node: DataflowPlanNode[SourceDataSetT]) -> bool:  # noqa: D
+        if not isinstance(other_node, self.__class__) or len(self.join_targets) != len(other_node.join_targets):
+            return False
+
+        for i in range(len(self.join_targets)):
+            if (
+                self.join_targets[i].join_on_identifier != other_node.join_targets[i].join_on_identifier
+                or self.join_targets[i].join_on_partition_dimensions
+                != other_node.join_targets[i].join_on_partition_dimensions
+                or self.join_targets[i].join_on_partition_time_dimensions
+                != other_node.join_targets[i].join_on_partition_time_dimensions
+                or self.join_targets[i].validity_window != other_node.join_targets[i].validity_window
+            ):
+                return False
+        return True
+
+    def with_new_parents(  # noqa: D
+        self, new_parent_nodes: Sequence[BaseOutput[SourceDataSetT]]
+    ) -> JoinToBaseOutputNode[SourceDataSetT]:
+        assert len(new_parent_nodes) > 1
+        new_left_node = new_parent_nodes[0]
+        new_join_nodes = new_parent_nodes[1:]
+        assert len(new_join_nodes) == len(self._join_targets)
+
+        return JoinToBaseOutputNode[SourceDataSetT](
+            left_node=new_left_node,
+            join_targets=[
+                JoinDescription(
+                    join_node=new_join_nodes[i],
+                    join_on_identifier=old_join_target.join_on_identifier,
+                    join_on_partition_dimensions=old_join_target.join_on_partition_dimensions,
+                    join_on_partition_time_dimensions=old_join_target.join_on_partition_time_dimensions,
+                    validity_window=old_join_target.validity_window,
+                )
+                for i, old_join_target in enumerate(self._join_targets)
+            ],
+        )
+
 
 class JoinOverTimeRangeNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
     """A node that allows for cumulative metric computation by doing a self join across a cumulative date range."""
@@ -302,8 +374,6 @@ class JoinOverTimeRangeNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT])
 
         Args:
             parent_node: node with standard output
-            metric_time_dimension_reference: the name of the virtual time dimension used in queries to refer to the
-            time dimension that each measure should be aggregated by.
             window: time window to join over
             grain_to_date: indicates time range should start from the beginning of this time granularity
             (eg month to day)
@@ -350,6 +420,25 @@ class JoinOverTimeRangeNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT])
     @property
     def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
         return super().displayed_properties
+
+    def functionally_identical(self, other_node: DataflowPlanNode[SourceDataSetT]) -> bool:  # noqa: D
+        return (
+            isinstance(other_node, self.__class__)
+            and other_node.grain_to_date == self.grain_to_date
+            and other_node.window == self.window
+            and other_node.time_range_constraint == self.time_range_constraint
+        )
+
+    def with_new_parents(  # noqa: D
+        self, new_parent_nodes: Sequence[BaseOutput[SourceDataSetT]]
+    ) -> JoinOverTimeRangeNode[SourceDataSetT]:
+        assert len(new_parent_nodes) == 1
+        return JoinOverTimeRangeNode[SourceDataSetT](
+            parent_node=new_parent_nodes[0],
+            window=self.window,
+            grain_to_date=self.grain_to_date,
+            time_range_constraint=self.time_range_constraint,
+        )
 
 
 class AggregatedMeasuresOutput(Generic[SourceDataSetT], BaseOutput[SourceDataSetT], ABC):
@@ -405,6 +494,21 @@ class AggregateMeasuresNode(Generic[SourceDataSetT], AggregatedMeasuresOutput[So
         """
         return self._metric_input_measure_specs
 
+    def functionally_identical(self, other_node: DataflowPlanNode[SourceDataSetT]) -> bool:  # noqa: D
+        return (
+            isinstance(other_node, self.__class__)
+            and other_node.metric_input_measure_specs == self.metric_input_measure_specs
+        )
+
+    def with_new_parents(  # noqa: D
+        self, new_parent_nodes: Sequence[BaseOutput[SourceDataSetT]]
+    ) -> AggregateMeasuresNode[SourceDataSetT]:
+        assert len(new_parent_nodes) == 1
+        return AggregateMeasuresNode[SourceDataSetT](
+            parent_node=new_parent_nodes[0],
+            metric_input_measure_specs=self.metric_input_measure_specs,
+        )
+
 
 class JoinAggregatedMeasuresByGroupByColumnsNode(Generic[SourceDataSetT], AggregatedMeasuresOutput[SourceDataSetT]):
     """A node that joins aggregated measures with group by elements.
@@ -448,6 +552,16 @@ class JoinAggregatedMeasuresByGroupByColumnsNode(Generic[SourceDataSetT], Aggreg
         return super().displayed_properties + [
             DisplayedProperty("Join aggregated measure nodes: ", f"{[node.node_id for node in self.parent_nodes]}")
         ]
+
+    def functionally_identical(self, other_node: DataflowPlanNode[SourceDataSetT]) -> bool:  # noqa: D
+        return isinstance(other_node, self.__class__)
+
+    def with_new_parents(  # noqa: D
+        self, new_parent_nodes: Sequence[BaseOutput[SourceDataSetT]]
+    ) -> JoinAggregatedMeasuresByGroupByColumnsNode[SourceDataSetT]:
+        return JoinAggregatedMeasuresByGroupByColumnsNode[SourceDataSetT](
+            parent_nodes=new_parent_nodes,
+        )
 
 
 class SemiAdditiveJoinNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
@@ -561,6 +675,31 @@ class SemiAdditiveJoinNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
     def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
         return super().displayed_properties
 
+    def functionally_identical(self, other_node: DataflowPlanNode[SourceDataSetT]) -> bool:  # noqa: D
+        if not isinstance(other_node, self.__class__):
+            return False
+
+        return (
+            isinstance(other_node, self.__class__)
+            and other_node.identifier_specs == self.identifier_specs
+            and other_node.time_dimension_spec == self.time_dimension_spec
+            and other_node.agg_by_function == self.agg_by_function
+            and other_node.queried_time_dimension_spec == self.queried_time_dimension_spec
+        )
+
+    def with_new_parents(  # noqa: D
+        self, new_parent_nodes: Sequence[BaseOutput[SourceDataSetT]]
+    ) -> SemiAdditiveJoinNode[SourceDataSetT]:
+        assert len(new_parent_nodes) == 1
+
+        return SemiAdditiveJoinNode[SourceDataSetT](
+            parent_node=new_parent_nodes[0],
+            identifier_specs=self.identifier_specs,
+            time_dimension_spec=self.time_dimension_spec,
+            agg_by_function=self.agg_by_function,
+            queried_time_dimension_spec=self.queried_time_dimension_spec,
+        )
+
 
 class ComputedMetricsOutput(Generic[SourceDataSetT], BaseOutput[SourceDataSetT], ABC):
     """A node that outputs data that contains metrics computed from measures."""
@@ -608,6 +747,24 @@ class ComputeMetricsNode(Generic[SourceDataSetT], ComputedMetricsOutput[SourceDa
     def parent_node(self) -> BaseOutput:  # noqa: D
         return self._parent_node
 
+    def functionally_identical(self, other_node: DataflowPlanNode[SourceDataSetT]) -> bool:  # noqa: D
+        if not isinstance(other_node, self.__class__):
+            return False
+
+        if other_node.metric_specs != self.metric_specs:
+            return False
+
+        return isinstance(other_node, self.__class__) and other_node.metric_specs == self.metric_specs
+
+    def with_new_parents(  # noqa: D
+        self, new_parent_nodes: Sequence[BaseOutput[SourceDataSetT]]
+    ) -> ComputeMetricsNode[SourceDataSetT]:
+        assert len(new_parent_nodes) == 1
+        return ComputeMetricsNode[SourceDataSetT](
+            parent_node=new_parent_nodes[0],
+            metric_specs=self.metric_specs,
+        )
+
 
 class OrderByLimitNode(Generic[SourceDataSetT], ComputedMetricsOutput[SourceDataSetT]):
     """A node that re-orders the input data with a limit."""
@@ -627,9 +784,8 @@ class OrderByLimitNode(Generic[SourceDataSetT], ComputedMetricsOutput[SourceData
         """
         self._order_by_specs = order_by_specs
         self._limit = limit
-        self._metrics_output_node = parent_node
         self._parent_node = parent_node
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=[self._metrics_output_node])
+        super().__init__(node_id=self.create_unique_id(), parent_nodes=[self._parent_node])
 
     @classmethod
     def id_prefix(cls) -> str:  # noqa: D
@@ -665,6 +821,24 @@ class OrderByLimitNode(Generic[SourceDataSetT], ComputedMetricsOutput[SourceData
     @property
     def parent_node(self) -> Union[BaseOutput[SourceDataSetT], ComputedMetricsOutput[SourceDataSetT]]:  # noqa: D
         return self._parent_node
+
+    def functionally_identical(self, other_node: DataflowPlanNode[SourceDataSetT]) -> bool:  # noqa: D
+        return (
+            isinstance(other_node, self.__class__)
+            and other_node.order_by_specs == self.order_by_specs
+            and other_node.limit == self.limit
+        )
+
+    def with_new_parents(  # noqa: D
+        self, new_parent_nodes: Sequence[BaseOutput[SourceDataSetT]]
+    ) -> OrderByLimitNode[SourceDataSetT]:
+        assert len(new_parent_nodes) == 1
+
+        return OrderByLimitNode[SourceDataSetT](
+            parent_node=new_parent_nodes[0],
+            order_by_specs=self.order_by_specs,
+            limit=self.limit,
+        )
 
 
 class MetricTimeDimensionTransformNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
@@ -713,6 +887,21 @@ class MetricTimeDimensionTransformNode(Generic[SourceDataSetT], BaseOutput[Sourc
     def parent_node(self) -> BaseOutput[SourceDataSetT]:  # noqa: D
         return self._parent_node
 
+    def functionally_identical(self, other_node: DataflowPlanNode[SourceDataSetT]) -> bool:  # noqa: D
+        return (
+            isinstance(other_node, self.__class__)
+            and other_node.aggregation_time_dimension_reference == self.aggregation_time_dimension_reference
+        )
+
+    def with_new_parents(  # noqa: D
+        self, new_parent_nodes: Sequence[BaseOutput[SourceDataSetT]]
+    ) -> MetricTimeDimensionTransformNode[SourceDataSetT]:
+        assert len(new_parent_nodes) == 1
+        return MetricTimeDimensionTransformNode(
+            parent_node=new_parent_nodes[0],
+            aggregation_time_dimension_reference=self.aggregation_time_dimension_reference,
+        )
+
 
 class SinkNodeVisitor(Generic[SourceDataSetT, VisitorOutputT], ABC):
     """Similar to DataflowPlanNodeVisitor, but only for sink nodes."""
@@ -748,7 +937,7 @@ class SinkOutput(Generic[SourceDataSetT], DataflowPlanNode[SourceDataSetT], ABC)
 class WriteToResultDataframeNode(Generic[SourceDataSetT], SinkOutput[SourceDataSetT]):
     """A node where incoming data gets written to a dataframe."""
 
-    def __init__(self, parent_node: BaseOutput) -> None:  # noqa: D
+    def __init__(self, parent_node: BaseOutput[SourceDataSetT]) -> None:  # noqa: D
         self._parent_node = parent_node
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[parent_node])
 
@@ -772,6 +961,15 @@ class WriteToResultDataframeNode(Generic[SourceDataSetT], SinkOutput[SourceDataS
         self, visitor: SinkNodeVisitor[SourceDataSetT, VisitorOutputT]
     ) -> VisitorOutputT:
         return visitor.visit_write_to_result_dataframe_node(self)
+
+    def functionally_identical(self, other_node: DataflowPlanNode[SourceDataSetT]) -> bool:  # noqa: D
+        return isinstance(other_node, self.__class__)
+
+    def with_new_parents(  # noqa: D
+        self, new_parent_nodes: Sequence[BaseOutput[SourceDataSetT]]
+    ) -> WriteToResultDataframeNode[SourceDataSetT]:
+        assert len(new_parent_nodes) == 1
+        return WriteToResultDataframeNode[SourceDataSetT](parent_node=new_parent_nodes[0])
 
 
 class WriteToResultTableNode(Generic[SourceDataSetT], SinkOutput[SourceDataSetT]):
@@ -817,6 +1015,17 @@ class WriteToResultTableNode(Generic[SourceDataSetT], SinkOutput[SourceDataSetT]
     def output_sql_table(self) -> SqlTable:  # noqa: D
         return self._output_sql_table
 
+    def functionally_identical(self, other_node: DataflowPlanNode[SourceDataSetT]) -> bool:  # noqa: D
+        return isinstance(other_node, self.__class__) and other_node.output_sql_table == self.output_sql_table
+
+    def with_new_parents(  # noqa: D
+        self, new_parent_nodes: Sequence[BaseOutput[SourceDataSetT]]
+    ) -> WriteToResultTableNode:
+        return WriteToResultTableNode[SourceDataSetT](
+            parent_node=new_parent_nodes[0],
+            output_sql_table=self.output_sql_table,
+        )
+
 
 class FilterElementsNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
     """Only passes the listed elements."""
@@ -829,6 +1038,7 @@ class FilterElementsNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
     ) -> None:
         self._include_specs = include_specs
         self._replace_description = replace_description
+        self._parent_node = parent_node
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[parent_node])
 
     @classmethod
@@ -863,9 +1073,21 @@ class FilterElementsNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
         return super().displayed_properties + additional_properties
 
     @property
-    def parent_node(self) -> DataflowPlanNode:  # noqa: D
-        assert len(self.parent_nodes) == 1
-        return self.parent_nodes[0]
+    def parent_node(self) -> BaseOutput[SourceDataSetT]:  # noqa: D
+        return self._parent_node
+
+    def functionally_identical(self, other_node: DataflowPlanNode[SourceDataSetT]) -> bool:  # noqa: D
+        return isinstance(other_node, self.__class__) and other_node.include_specs == self.include_specs
+
+    def with_new_parents(  # noqa: D
+        self, new_parent_nodes: Sequence[BaseOutput[SourceDataSetT]]
+    ) -> FilterElementsNode[SourceDataSetT]:
+        assert len(new_parent_nodes) == 1
+        return FilterElementsNode[SourceDataSetT](
+            parent_node=new_parent_nodes[0],
+            include_specs=self.include_specs,
+            replace_description=self._replace_description,
+        )
 
 
 class WhereConstraintNode(AggregatedMeasuresOutput[SourceDataSetT]):
@@ -902,13 +1124,25 @@ class WhereConstraintNode(AggregatedMeasuresOutput[SourceDataSetT]):
     def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
         return super().displayed_properties + [DisplayedProperty("where_condition", self.where)]
 
+    def functionally_identical(self, other_node: DataflowPlanNode[SourceDataSetT]) -> bool:  # noqa: D
+        return isinstance(other_node, self.__class__) and other_node.where == self.where
+
+    def with_new_parents(  # noqa: D
+        self, new_parent_nodes: Sequence[BaseOutput[SourceDataSetT]]
+    ) -> WhereConstraintNode[SourceDataSetT]:
+        assert len(new_parent_nodes) == 1
+        return WhereConstraintNode(
+            parent_node=new_parent_nodes[0],
+            where_constraint=self.where,
+        )
+
 
 class CombineMetricsNode(Generic[SourceDataSetT], ComputedMetricsOutput[SourceDataSetT]):
     """Combines metrics from different nodes into a single output"""
 
     def __init__(  # noqa: D
         self,
-        parent_nodes: Sequence[ComputedMetricsOutput[SourceDataSetT]],
+        parent_nodes: Sequence[Union[BaseOutput, ComputedMetricsOutput[SourceDataSetT]]],
         join_type: SqlJoinType = SqlJoinType.FULL_OUTER,
     ) -> None:
         self._join_type = join_type
@@ -929,6 +1163,18 @@ class CombineMetricsNode(Generic[SourceDataSetT], ComputedMetricsOutput[SourceDa
     def join_type(self) -> SqlJoinType:
         """The type of join used for combining metrics."""
         return self._join_type
+
+    def functionally_identical(self, other_node: DataflowPlanNode[SourceDataSetT]) -> bool:  # noqa: D
+        return isinstance(other_node, self.__class__) and other_node.join_type == self.join_type
+
+    def with_new_parents(  # noqa: D
+        self, new_parent_nodes: Sequence[BaseOutput[SourceDataSetT]]
+    ) -> CombineMetricsNode[SourceDataSetT]:
+        assert len(new_parent_nodes) == 1
+        return CombineMetricsNode(
+            parent_nodes=new_parent_nodes,
+            join_type=self.join_type,
+        )
 
 
 class ConstrainTimeRangeNode(AggregatedMeasuresOutput[SourceDataSetT], BaseOutput[SourceDataSetT]):
@@ -976,6 +1222,18 @@ class ConstrainTimeRangeNode(AggregatedMeasuresOutput[SourceDataSetT], BaseOutpu
             DisplayedProperty("time_range_end", self.time_range_constraint.end_time.isoformat()),
         ]
 
+    def functionally_identical(self, other_node: DataflowPlanNode[SourceDataSetT]) -> bool:  # noqa: D
+        return isinstance(other_node, self.__class__) and self.time_range_constraint == other_node.time_range_constraint
+
+    def with_new_parents(  # noqa: D
+        self, new_parent_nodes: Sequence[BaseOutput[SourceDataSetT]]
+    ) -> ConstrainTimeRangeNode[SourceDataSetT]:
+        assert len(new_parent_nodes) == 1
+        return ConstrainTimeRangeNode[SourceDataSetT](
+            parent_node=new_parent_nodes[0],
+            time_range_constraint=self.time_range_constraint,
+        )
+
 
 class DataflowPlan(Generic[SourceDataSetT], MetricFlowDag[SinkOutput[SourceDataSetT]]):
     """Describes the flow of metric data as it goes from source nodes to sink nodes in the graph."""
@@ -992,5 +1250,5 @@ class DataflowPlan(Generic[SourceDataSetT], MetricFlowDag[SinkOutput[SourceDataS
 
     @property
     def sink_output_node(self) -> SinkOutput[SourceDataSetT]:  # noqa: D
-        assert len(self._sink_output_nodes) == 1
+        assert len(self._sink_output_nodes) == 1, f"Only 1 sink node supported. Got: {self._sink_output_nodes}"
         return self._sink_output_nodes[0]
