@@ -22,6 +22,8 @@ from metricflow.dataflow.dataflow_plan import (
     SemiAdditiveJoinNode,
 )
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
+from metricflow.dataset.data_source_adapter import DataSourceDataSet
+from metricflow.dataset.dataset import DataSet
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
@@ -45,16 +47,15 @@ from metricflow.specs import (
 )
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY
-from metricflow.time.time_granularity import TimeGranularity
-from metricflow.dataset.data_source_adapter import DataSourceDataSet
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.plan_utils import assert_plan_snapshot_text_equal
 from metricflow.test.sql.compare_sql_plan import assert_rendered_sql_from_plan_equal
 from metricflow.test.sql.compare_sql_plan import assert_sql_plan_text_equal
 from metricflow.test.test_utils import as_datetime
+from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY
+from metricflow.time.time_granularity import TimeGranularity
 
 
 @pytest.fixture(scope="session")
@@ -1533,6 +1534,29 @@ def test_metric_with_measures_from_multiple_sources_no_dimensions(  # noqa: D
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings_per_listing"),),
         )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+def test_common_data_source(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
+    sql_client: SqlClient,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings"), MetricSpec(element_name="booking_value")),
+            dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
+        ),
     )
 
     convert_and_check(
