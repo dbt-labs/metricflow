@@ -1,0 +1,27 @@
+<DataflowPlan>
+    <WriteToResultDataframeNode>
+        <!-- description = Write to Dataframe -->
+        <!-- node_id = wrd_0 -->
+        <FilterElementsNode>
+            <!-- description =                      -->
+            <!--   Pass Only Elements:              -->
+            <!--     ['bookings', 'booking_value']  -->
+            <!-- node_id = pfe_2 -->
+            <!-- include_spec =                           -->
+            <!--   {'class': 'MeasureSpec',               -->
+            <!--    'element_name': 'bookings',           -->
+            <!--    'non_additive_dimension_spec': None}  -->
+            <!-- include_spec =                           -->
+            <!--   {'class': 'MeasureSpec',               -->
+            <!--    'element_name': 'booking_value',      -->
+            <!--    'non_additive_dimension_spec': None}  -->
+            <ReadSqlSourceNode>
+                <!-- description =                                                                           -->
+                <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                <!-- node_id = rss_0 -->
+                <!-- data_set =                                                                    -->
+                <!--   DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+            </ReadSqlSourceNode>
+        </FilterElementsNode>
+    </WriteToResultDataframeNode>
+</DataflowPlan>

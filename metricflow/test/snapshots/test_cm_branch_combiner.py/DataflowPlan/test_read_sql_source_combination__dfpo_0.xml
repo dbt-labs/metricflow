@@ -1,0 +1,13 @@
+<DataflowPlan>
+    <WriteToResultDataframeNode>
+        <!-- description = Write to Dataframe -->
+        <!-- node_id = wrd_0 -->
+        <ReadSqlSourceNode>
+            <!-- description =                                                                           -->
+            <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+            <!-- node_id = rss_0 -->
+            <!-- data_set =                                                                    -->
+            <!--   DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+        </ReadSqlSourceNode>
+    </WriteToResultDataframeNode>
+</DataflowPlan>
