@@ -19,10 +19,10 @@
             <!--   {'class': 'SqlSelectColumn',                            -->
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_272),  -->
             <!--    'column_alias': 'user__home_state'}                    -->
-            <!-- col1 =                                                              -->
-            <!--   {'class': 'SqlSelectColumn',                                      -->
-            <!--    'expr': SqlFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
-            <!--    'column_alias': 'identity_verifications'}                        -->
+            <!-- col1 =                                                                       -->
+            <!--   {'class': 'SqlSelectColumn',                                               -->
+            <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
+            <!--    'column_alias': 'identity_verifications'}                                 -->
             <!-- from_source = SqlSelectStatementNode(node_id=ss_11) -->
             <!-- group_by0 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                            -->

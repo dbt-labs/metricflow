@@ -27,10 +27,10 @@
             <!--   {'class': 'SqlSelectColumn',                           -->
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_51),  -->
             <!--    'column_alias': 'user_team___user_id'}                -->
-            <!-- col2 =                                                              -->
-            <!--   {'class': 'SqlSelectColumn',                                      -->
-            <!--    'expr': SqlFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
-            <!--    'column_alias': 'messages'}                                      -->
+            <!-- col2 =                                                                       -->
+            <!--   {'class': 'SqlSelectColumn',                                               -->
+            <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
+            <!--    'column_alias': 'messages'}                                               -->
             <!-- from_source = SqlSelectStatementNode(node_id=ss_2) -->
             <!-- group_by0 =                                              -->
             <!--   {'class': 'SqlSelectColumn',                           -->

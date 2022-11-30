@@ -71,6 +71,10 @@ class ColumnAssociationResolver(ABC):
     def resolve_identifier_spec(self, identifier_spec: IdentifierSpec) -> Tuple[ColumnAssociation, ...]:  # noqa: D
         pass
 
+    @abstractmethod
+    def resolve_metadata_spec(self, metadata_spec: MetadataSpec) -> ColumnAssociation:  # noqa: D
+        pass
+
 
 @dataclass(frozen=True)
 class InstanceSpec(SerializableDataclass):
@@ -105,6 +109,24 @@ class InstanceSpec(SerializableDataclass):
     def qualified_name(self) -> str:
         """Return the qualified name of this spec. e.g. "user_id__country"."""
         raise NotImplementedError()
+
+
+@dataclass(frozen=True)
+class MetadataSpec(InstanceSpec):
+    """A specification for a specification that is built during the dataflow plan and not defined in config."""
+
+    element_name: str
+
+    def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
+        return (resolver.resolve_metadata_spec(self),)
+
+    @property
+    def qualified_name(self) -> str:  # noqa: D
+        return self.element_name
+
+    @staticmethod
+    def from_name(name: str) -> MetadataSpec:  # noqa: D
+        return MetadataSpec(element_name=name)
 
 
 @dataclass(frozen=True)
@@ -576,17 +598,21 @@ class InstanceSpecSet(SerializableDataclass):
     dimension_specs: Tuple[DimensionSpec, ...] = ()
     identifier_specs: Tuple[IdentifierSpec, ...] = ()
     time_dimension_specs: Tuple[TimeDimensionSpec, ...] = ()
+    metadata_specs: Tuple[MetadataSpec, ...] = ()
 
     def merge(self, others: Sequence[InstanceSpecSet]) -> InstanceSpecSet:
         """Merge all sets into one set, without de-duplication."""
         return InstanceSpecSet(
             metric_specs=self.metric_specs + tuple(itertools.chain.from_iterable([x.metric_specs for x in others])),
+            measure_specs=self.measure_specs + tuple(itertools.chain.from_iterable([x.measure_specs for x in others])),
             dimension_specs=self.dimension_specs
             + tuple(itertools.chain.from_iterable([x.dimension_specs for x in others])),
             identifier_specs=self.identifier_specs
             + tuple(itertools.chain.from_iterable([x.identifier_specs for x in others])),
             time_dimension_specs=self.time_dimension_specs
             + tuple(itertools.chain.from_iterable([x.time_dimension_specs for x in others])),
+            metadata_specs=self.metadata_specs
+            + tuple(itertools.chain.from_iterable([x.metadata_specs for x in others])),
         )
 
     @property
@@ -603,6 +629,7 @@ class InstanceSpecSet(SerializableDataclass):
                 self.time_dimension_specs,
                 self.identifier_specs,
                 self.metric_specs,
+                self.metadata_specs,
             )
         )
 

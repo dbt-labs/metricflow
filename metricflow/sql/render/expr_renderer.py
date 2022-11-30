@@ -17,7 +17,7 @@ from metricflow.sql.sql_exprs import (
     SqlComparisonExpression,
     SqlExpressionNode,
     SqlFunction,
-    SqlFunctionExpression,
+    SqlAggregateFunctionExpression,
     SqlNullExpression,
     SqlLogicalExpression,
     SqlStringLiteralExpression,
@@ -28,6 +28,7 @@ from metricflow.sql.sql_exprs import (
     SqlRatioComputationExpression,
     SqlColumnAliasReferenceExpression,
     SqlBetweenExpression,
+    SqlWindowFunctionExpression,
 )
 from metricflow.time.time_granularity import TimeGranularity
 
@@ -107,7 +108,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
             execution_parameters=combined_params,
         )
 
-    def visit_function_expr(self, node: SqlFunctionExpression) -> SqlExpressionRenderResult:  # noqa: D
+    def visit_function_expr(self, node: SqlAggregateFunctionExpression) -> SqlExpressionRenderResult:  # noqa: D
         """Render a function call like CONCAT(a, b)"""
         args_rendered = [self.render_sql_expr(x) for x in node.sql_function_args]
         combined_params = SqlBindParameters()
@@ -270,4 +271,46 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         return SqlExpressionRenderResult(
             sql=f"{rendered_column_arg.sql} BETWEEN {rendered_start_expr.sql} AND {rendered_end_expr.sql}",
             execution_parameters=execution_parameters,
+        )
+
+    def visit_window_function_expr(self, node: SqlWindowFunctionExpression) -> SqlExpressionRenderResult:  # noqa: D
+        sql_function_args_rendered = [self.render_sql_expr(x) for x in node.sql_function_args]
+        partition_by_args_rendered = [self.render_sql_expr(x) for x in node.partition_by_args]
+        order_by_args_rendered = {self.render_sql_expr(x.expr): x for x in node.order_by_args}
+
+        combined_params = SqlBindParameters()
+        args_rendered = []
+        if sql_function_args_rendered:
+            args_rendered.extend(sql_function_args_rendered)
+        if partition_by_args_rendered:
+            args_rendered.extend(partition_by_args_rendered)
+        if order_by_args_rendered:
+            args_rendered.extend(list(order_by_args_rendered.keys()))
+        for arg_rendered in args_rendered:
+            combined_params.update(arg_rendered.execution_parameters)
+
+        sql_function_args_string = ", ".join([x.sql for x in sql_function_args_rendered])
+        partition_by_args_string = (
+            ("PARTITION BY " + ", ".join([x.sql for x in partition_by_args_rendered]))
+            if partition_by_args_rendered
+            else ""
+        )
+        order_by_args_string = (
+            (
+                "ORDER BY "
+                + ", ".join(
+                    [
+                        rendered_result.sql + (f" {x.suffix}" if x.suffix else "")
+                        for rendered_result, x in order_by_args_rendered.items()
+                    ]
+                )
+            )
+            if order_by_args_rendered
+            else ""
+        )
+
+        window_string = " ".join(filter(bool, [partition_by_args_string, order_by_args_string]))
+        return SqlExpressionRenderResult(
+            sql=f"{node.sql_function.value}({sql_function_args_string}) OVER ({window_string})",
+            execution_parameters=combined_params,
         )

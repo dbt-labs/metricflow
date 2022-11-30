@@ -27,10 +27,10 @@
             <!--   {'class': 'SqlSelectColumn',                                -->
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_183),      -->
             <!--    'column_alias': 'listing__lux_listing__is_confirmed_lux'}  -->
-            <!-- col2 =                                                              -->
-            <!--   {'class': 'SqlSelectColumn',                                      -->
-            <!--    'expr': SqlFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
-            <!--    'column_alias': 'bookings'}                                      -->
+            <!-- col2 =                                                                       -->
+            <!--   {'class': 'SqlSelectColumn',                                               -->
+            <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
+            <!--    'column_alias': 'bookings'}                                               -->
             <!-- from_source = SqlSelectStatementNode(node_id=ss_10) -->
             <!-- group_by0 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                            -->

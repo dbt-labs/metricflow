@@ -9,7 +9,7 @@ from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.specs import MeasureSpec, MetricInputMeasureSpec
 from metricflow.sql.sql_exprs import (
     SqlFunction,
-    SqlFunctionExpression,
+    SqlAggregateFunctionExpression,
 )
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 
@@ -46,7 +46,7 @@ def test_sum_aggregation(
     assert len(select_column_set.measure_columns) == 1
     measure_column = select_column_set.measure_columns[0]
     expr = measure_column.expr
-    assert isinstance(expr, SqlFunctionExpression)
+    assert isinstance(expr, SqlAggregateFunctionExpression)
     assert expr.sql_function == SqlFunction.SUM
 
 
@@ -68,7 +68,7 @@ def test_sum_boolean_aggregation(
     assert len(select_column_set.measure_columns) == 1
     measure_column = select_column_set.measure_columns[0]
     expr = measure_column.expr
-    assert isinstance(expr, SqlFunctionExpression)
+    assert isinstance(expr, SqlAggregateFunctionExpression)
     # The SUM_BOOLEAN aggregation type is transformed to SUM at model parsing time
     assert expr.sql_function == SqlFunction.SUM
 
@@ -91,7 +91,7 @@ def test_avg_aggregation(
     assert len(select_column_set.measure_columns) == 1
     measure_column = select_column_set.measure_columns[0]
     expr = measure_column.expr
-    assert isinstance(expr, SqlFunctionExpression)
+    assert isinstance(expr, SqlAggregateFunctionExpression)
     assert expr.sql_function == SqlFunction.AVERAGE
 
 
@@ -113,7 +113,7 @@ def test_count_distinct_aggregation(
     assert len(select_column_set.measure_columns) == 1
     measure_column = select_column_set.measure_columns[0]
     expr = measure_column.expr
-    assert isinstance(expr, SqlFunctionExpression)
+    assert isinstance(expr, SqlAggregateFunctionExpression)
     assert expr.sql_function == SqlFunction.COUNT_DISTINCT
 
 
@@ -135,7 +135,7 @@ def test_max_aggregation(
     assert len(select_column_set.measure_columns) == 1
     measure_column = select_column_set.measure_columns[0]
     expr = measure_column.expr
-    assert isinstance(expr, SqlFunctionExpression)
+    assert isinstance(expr, SqlAggregateFunctionExpression)
     assert expr.sql_function == SqlFunction.MAX
 
 
@@ -157,7 +157,7 @@ def test_min_aggregation(
     assert len(select_column_set.measure_columns) == 1
     measure_column = select_column_set.measure_columns[0]
     expr = measure_column.expr
-    assert isinstance(expr, SqlFunctionExpression)
+    assert isinstance(expr, SqlAggregateFunctionExpression)
     assert expr.sql_function == SqlFunction.MIN
 
 
@@ -179,6 +179,6 @@ def test_aliased_sum(
     assert len(select_column_set.measure_columns) == 1
     measure_column = select_column_set.measure_columns[0]
     expr = measure_column.expr
-    assert isinstance(expr, SqlFunctionExpression)
+    assert isinstance(expr, SqlAggregateFunctionExpression)
     assert expr.sql_function == SqlFunction.SUM
     assert measure_column.column_alias == "bvalue"

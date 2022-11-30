@@ -15,6 +15,7 @@ from metricflow.instances import (
     MdoInstance,
     DimensionInstance,
     IdentifierInstance,
+    MetadataInstance,
     MetricInstance,
     MeasureInstance,
     InstanceSet,
@@ -39,7 +40,7 @@ from metricflow.specs import (
 from metricflow.sql.sql_exprs import (
     SqlColumnReferenceExpression,
     SqlColumnReference,
-    SqlFunctionExpression,
+    SqlAggregateFunctionExpression,
 )
 from metricflow.sql.sql_plan import SqlSelectColumn
 from metricflow.time.time_granularity import TimeGranularity
@@ -87,12 +88,16 @@ class CreateSelectColumnsForInstances(InstanceSetTransform[SelectColumnSet]):
         identifier_cols = list(
             chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.identifier_instances])
         )
+        metadata_cols = list(
+            chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.metadata_instances])
+        )
         return SelectColumnSet(
             metric_columns=metric_cols,
             measure_columns=measure_cols,
             dimension_columns=dimension_cols,
             time_dimension_columns=time_dimension_cols,
             identifier_columns=identifier_cols,
+            metadata_columns=metadata_cols,
         )
 
     def _make_sql_column_expression(
@@ -205,7 +210,7 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
             SqlColumnReference(self._table_alias, column_name_in_table)
         )
 
-        expression_to_aggregate_measure = SqlFunctionExpression.from_aggregation_type(
+        expression_to_aggregate_measure = SqlAggregateFunctionExpression.from_aggregation_type(
             aggregation_type=aggregation_type, sql_column_expression=expression_to_get_measure
         )
 
@@ -234,12 +239,16 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
         identifier_cols = list(
             chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.identifier_instances])
         )
+        metadata_cols = list(
+            chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.metadata_instances])
+        )
         return SelectColumnSet(
             metric_columns=metric_cols,
             measure_columns=measure_cols,
             dimension_columns=dimension_cols,
             time_dimension_columns=time_dimension_cols,
             identifier_columns=identifier_cols,
+            metadata_columns=metadata_cols,
         )
 
 
@@ -436,6 +445,7 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
             time_dimension_instances=tuple(time_dimension_instances_with_additional_link),
             identifier_instances=tuple(identifier_instances_with_additional_link),
             metric_instances=(),
+            metadata_instances=(),
         )
 
 
@@ -477,6 +487,7 @@ class FilterLinkableInstancesWithLeadingLink(InstanceSetTransform[InstanceSet]):
             time_dimension_instances=filtered_time_dimension_instances,
             identifier_instances=filtered_identifier_instances,
             metric_instances=instance_set.metric_instances,
+            metadata_instances=instance_set.metadata_instances,
         )
         return output
 
@@ -535,6 +546,7 @@ class FilterElements(InstanceSetTransform[InstanceSet]):
             ),
             identifier_instances=tuple(x for x in instance_set.identifier_instances if self._should_pass(x.spec)),
             metric_instances=tuple(x for x in instance_set.metric_instances if self._should_pass(x.spec)),
+            metadata_instances=tuple(x for x in instance_set.metadata_instances if self._should_pass(x.spec)),
         )
         return output
 
@@ -573,6 +585,7 @@ class ChangeMeasureAggregationState(InstanceSetTransform[InstanceSet]):
             time_dimension_instances=instance_set.time_dimension_instances,
             identifier_instances=instance_set.identifier_instances,
             metric_instances=instance_set.metric_instances,
+            metadata_instances=instance_set.metadata_instances,
         )
 
 
@@ -626,6 +639,7 @@ class AliasAggregatedMeasures(InstanceSetTransform[InstanceSet]):
             time_dimension_instances=instance_set.time_dimension_instances,
             identifier_instances=instance_set.identifier_instances,
             metric_instances=instance_set.metric_instances,
+            metadata_instances=instance_set.metadata_instances,
         )
 
 
@@ -642,6 +656,7 @@ class AddMetrics(InstanceSetTransform[InstanceSet]):
             time_dimension_instances=instance_set.time_dimension_instances,
             identifier_instances=instance_set.identifier_instances,
             metric_instances=instance_set.metric_instances + tuple(self._metric_instances),
+            metadata_instances=instance_set.metadata_instances,
         )
 
 
@@ -655,6 +670,7 @@ class RemoveMeasures(InstanceSetTransform[InstanceSet]):
             time_dimension_instances=instance_set.time_dimension_instances,
             identifier_instances=instance_set.identifier_instances,
             metric_instances=instance_set.metric_instances,
+            metadata_instances=instance_set.metadata_instances,
         )
 
 
@@ -668,6 +684,48 @@ class RemoveMetrics(InstanceSetTransform[InstanceSet]):
             time_dimension_instances=instance_set.time_dimension_instances,
             identifier_instances=instance_set.identifier_instances,
             metric_instances=(),
+            metadata_instances=instance_set.metadata_instances,
+        )
+
+
+class CreateSqlColumnReferencesForInstances(InstanceSetTransform[Tuple[SqlColumnReferenceExpression, ...]]):
+    """Create select column expressions that will express all instances in the set.
+
+    It assumes that the column names of the instances are represented by the supplied column association resolver and
+    come from the given table alias.
+    """
+
+    def __init__(
+        self,
+        table_alias: str,
+        column_resolver: ColumnAssociationResolver,
+    ) -> None:
+        """Initializer.
+
+        Args:
+            table_alias: the table alias to select columns from
+            column_resolver: resolver to name columns.
+        """
+        self._table_alias = table_alias
+        self._column_resolver = column_resolver
+
+    def transform(self, instance_set: InstanceSet) -> Tuple[SqlColumnReferenceExpression, ...]:  # noqa: D
+        column_names = [
+            col.column_name
+            for col in (
+                chain.from_iterable(
+                    [x.column_associations(self._column_resolver) for x in instance_set.spec_set.all_specs]
+                )
+            )
+        ]
+        return tuple(
+            SqlColumnReferenceExpression(
+                SqlColumnReference(
+                    table_alias=self._table_alias,
+                    column_name=column_name,
+                ),
+            )
+            for column_name in column_names
         )
 
 
@@ -745,12 +803,26 @@ class ChangeAssociatedColumns(InstanceSetTransform[InstanceSet]):
                 )
             )
 
+        output_metadata_instances = []
+        for input_metadata_instance in instance_set.metadata_instances:
+            output_metadata_instances.append(
+                MetadataInstance(
+                    associated_columns=(
+                        self._column_association_resolver.resolve_metadata_spec(
+                            metadata_spec=input_metadata_instance.spec
+                        ),
+                    ),
+                    spec=input_metadata_instance.spec,
+                )
+            )
+
         return InstanceSet(
             measure_instances=tuple(output_measure_instances),
             dimension_instances=tuple(output_dimension_instances),
             time_dimension_instances=tuple(output_time_dimension_instances),
             identifier_instances=tuple(output_identifier_instances),
             metric_instances=tuple(output_metric_instances),
+            metadata_instances=tuple(output_metadata_instances),
         )
 
 

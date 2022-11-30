@@ -103,10 +103,10 @@
         <SqlSelectStatementNode>
             <!-- description = Filter row on MIN(ds) -->
             <!-- node_id = ss_0 -->
-            <!-- col0 =                                                              -->
-            <!--   {'class': 'SqlSelectColumn',                                      -->
-            <!--    'expr': SqlFunctionExpression(node_id=fnc_0, sql_function=MIN),  -->
-            <!--    'column_alias': 'ds__complete'}                                  -->
+            <!-- col0 =                                                                       -->
+            <!--   {'class': 'SqlSelectColumn',                                               -->
+            <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_0, sql_function=MIN),  -->
+            <!--    'column_alias': 'ds__complete'}                                           -->
             <!-- from_source = SqlSelectStatementNode(node_id=ss_10000) -->
             <!-- group_by0 =                                             -->
             <!--   {'class': 'SqlSelectColumn',                          -->

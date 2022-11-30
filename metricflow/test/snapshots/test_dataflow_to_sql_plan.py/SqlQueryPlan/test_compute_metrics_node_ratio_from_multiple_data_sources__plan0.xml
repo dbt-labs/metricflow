@@ -77,10 +77,10 @@
                     <!--   {'class': 'SqlSelectColumn',                            -->
                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_327),  -->
                     <!--    'column_alias': 'listing__country_latest'}             -->
-                    <!-- col2 =                                                              -->
-                    <!--   {'class': 'SqlSelectColumn',                                      -->
-                    <!--    'expr': SqlFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
-                    <!--    'column_alias': 'bookings'}                                      -->
+                    <!-- col2 =                                                                       -->
+                    <!--   {'class': 'SqlSelectColumn',                                               -->
+                    <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
+                    <!--    'column_alias': 'bookings'}                                               -->
                     <!-- from_source = SqlSelectStatementNode(node_id=ss_12) -->
                     <!-- group_by0 =                                               -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
@@ -896,10 +896,10 @@
                     <!--   {'class': 'SqlSelectColumn',                            -->
                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_412),  -->
                     <!--    'column_alias': 'listing__country_latest'}             -->
-                    <!-- col2 =                                                              -->
-                    <!--   {'class': 'SqlSelectColumn',                                      -->
-                    <!--    'expr': SqlFunctionExpression(node_id=fnc_1, sql_function=SUM),  -->
-                    <!--    'column_alias': 'views'}                                         -->
+                    <!-- col2 =                                                                       -->
+                    <!--   {'class': 'SqlSelectColumn',                                               -->
+                    <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_1, sql_function=SUM),  -->
+                    <!--    'column_alias': 'views'}                                                  -->
                     <!-- from_source = SqlSelectStatementNode(node_id=ss_19) -->
                     <!-- group_by0 =                                               -->
                     <!--   {'class': 'SqlSelectColumn',                            -->

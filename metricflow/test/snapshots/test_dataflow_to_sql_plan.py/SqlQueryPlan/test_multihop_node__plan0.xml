@@ -19,10 +19,10 @@
             <!--   {'class': 'SqlSelectColumn',                                -->
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_158),      -->
             <!--    'column_alias': 'account_id__customer_id__customer_name'}  -->
-            <!-- col1 =                                                              -->
-            <!--   {'class': 'SqlSelectColumn',                                      -->
-            <!--    'expr': SqlFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
-            <!--    'column_alias': 'txn_count'}                                     -->
+            <!-- col1 =                                                                       -->
+            <!--   {'class': 'SqlSelectColumn',                                               -->
+            <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
+            <!--    'column_alias': 'txn_count'}                                              -->
             <!-- from_source = SqlSelectStatementNode(node_id=ss_9) -->
             <!-- group_by0 =                                                   -->
             <!--   {'class': 'SqlSelectColumn',                                -->

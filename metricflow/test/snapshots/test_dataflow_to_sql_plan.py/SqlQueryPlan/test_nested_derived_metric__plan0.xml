@@ -15,10 +15,10 @@
         <SqlSelectStatementNode>
             <!-- description = Combine Metrics -->
             <!-- node_id = ss_25 -->
-            <!-- col0 =                                                                   -->
-            <!--   {'class': 'SqlSelectColumn',                                           -->
-            <!--    'expr': SqlFunctionExpression(node_id=fnc_6, sql_function=COALESCE),  -->
-            <!--    'column_alias': 'metric_time'}                                        -->
+            <!-- col0 =                                                                            -->
+            <!--   {'class': 'SqlSelectColumn',                                                    -->
+            <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_6, sql_function=COALESCE),  -->
+            <!--    'column_alias': 'metric_time'}                                                 -->
             <!-- col1 =                                                    -->
             <!--   {'class': 'SqlSelectColumn',                            -->
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_467),  -->
@@ -61,10 +61,10 @@
                 <SqlSelectStatementNode>
                     <!-- description = Combine Metrics -->
                     <!-- node_id = ss_15 -->
-                    <!-- col0 =                                                                   -->
-                    <!--   {'class': 'SqlSelectColumn',                                           -->
-                    <!--    'expr': SqlFunctionExpression(node_id=fnc_2, sql_function=COALESCE),  -->
-                    <!--    'column_alias': 'metric_time'}                                        -->
+                    <!-- col0 =                                                                            -->
+                    <!--   {'class': 'SqlSelectColumn',                                                    -->
+                    <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_2, sql_function=COALESCE),  -->
+                    <!--    'column_alias': 'metric_time'}                                                 -->
                     <!-- col1 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_341),  -->
@@ -101,10 +101,10 @@
                             <!--   {'class': 'SqlSelectColumn',                            -->
                             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_278),  -->
                             <!--    'column_alias': 'metric_time'}                         -->
-                            <!-- col1 =                                                              -->
-                            <!--   {'class': 'SqlSelectColumn',                                      -->
-                            <!--    'expr': SqlFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
-                            <!--    'column_alias': 'referred_bookings'}                             -->
+                            <!-- col1 =                                                                       -->
+                            <!--   {'class': 'SqlSelectColumn',                                               -->
+                            <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
+                            <!--    'column_alias': 'referred_bookings'}                                      -->
                             <!-- from_source = SqlSelectStatementNode(node_id=ss_8) -->
                             <!-- group_by0 =                                               -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
@@ -565,10 +565,10 @@
                             <!--   {'class': 'SqlSelectColumn',                            -->
                             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_336),  -->
                             <!--    'column_alias': 'metric_time'}                         -->
-                            <!-- col1 =                                                              -->
-                            <!--   {'class': 'SqlSelectColumn',                                      -->
-                            <!--    'expr': SqlFunctionExpression(node_id=fnc_1, sql_function=SUM),  -->
-                            <!--    'column_alias': 'bookings'}                                      -->
+                            <!-- col1 =                                                                       -->
+                            <!--   {'class': 'SqlSelectColumn',                                               -->
+                            <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_1, sql_function=SUM),  -->
+                            <!--    'column_alias': 'bookings'}                                               -->
                             <!-- from_source = SqlSelectStatementNode(node_id=ss_12) -->
                             <!-- group_by0 =                                               -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
@@ -1031,10 +1031,10 @@
                     <!--   {'class': 'SqlSelectColumn',                            -->
                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_401),  -->
                     <!--    'column_alias': 'metric_time'}                         -->
-                    <!-- col1 =                                                              -->
-                    <!--   {'class': 'SqlSelectColumn',                                      -->
-                    <!--    'expr': SqlFunctionExpression(node_id=fnc_3, sql_function=SUM),  -->
-                    <!--    'column_alias': 'instant_bookings'}                              -->
+                    <!-- col1 =                                                                       -->
+                    <!--   {'class': 'SqlSelectColumn',                                               -->
+                    <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_3, sql_function=SUM),  -->
+                    <!--    'column_alias': 'instant_bookings'}                                       -->
                     <!-- from_source = SqlSelectStatementNode(node_id=ss_18) -->
                     <!-- group_by0 =                                               -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
@@ -1495,10 +1495,10 @@
                     <!--   {'class': 'SqlSelectColumn',                            -->
                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_459),  -->
                     <!--    'column_alias': 'metric_time'}                         -->
-                    <!-- col1 =                                                              -->
-                    <!--   {'class': 'SqlSelectColumn',                                      -->
-                    <!--    'expr': SqlFunctionExpression(node_id=fnc_4, sql_function=SUM),  -->
-                    <!--    'column_alias': 'bookings'}                                      -->
+                    <!-- col1 =                                                                       -->
+                    <!--   {'class': 'SqlSelectColumn',                                               -->
+                    <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_4, sql_function=SUM),  -->
+                    <!--    'column_alias': 'bookings'}                                               -->
                     <!-- from_source = SqlSelectStatementNode(node_id=ss_22) -->
                     <!-- group_by0 =                                               -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
