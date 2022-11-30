@@ -28,11 +28,9 @@ from metricflow.dataflow.dataflow_plan import (
     JoinOverTimeRangeNode,
     SemiAdditiveJoinNode,
     MetricTimeDimensionTransformNode,
-    AppendRowNumberColumnNode,
 )
 from metricflow.dataset.dataset import DataSet
 from metricflow.instances import (
-    MetadataInstance,
     InstanceSet,
     MetricInstance,
     MetricModelReference,
@@ -40,7 +38,6 @@ from metricflow.instances import (
 )
 from metricflow.model.objects.metric import MetricType
 from metricflow.model.semantic_model import SemanticModel
-from metricflow.model.validations.unique_valid_name import MetricFlowReservedKeywords
 from metricflow.object_utils import assert_values_exhausted
 from metricflow.plan_conversion.instance_converters import (
     AliasAggregatedMeasures,
@@ -49,7 +46,6 @@ from metricflow.plan_conversion.instance_converters import (
     AddMetrics,
     CreateSelectColumnsForInstances,
     CreateSelectColumnsWithMeasuresAggregated,
-    CreateSqlColumnReferencesForInstances,
     create_select_columns_for_instance_sets,
     AddLinkToLinkableElements,
     FilterElements,
@@ -75,7 +71,6 @@ from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlEngineAttributes, SqlEngine
 from metricflow.specs import (
     ColumnAssociationResolver,
-    MetadataSpec,
     MetricSpec,
     TimeDimensionSpec,
     MeasureSpec,
@@ -95,9 +90,6 @@ from metricflow.sql.sql_exprs import (
     SqlStringLiteralExpression,
     SqlBetweenExpression,
     SqlAggregateFunctionExpression,
-    SqlWindowFunction,
-    SqlWindowFunctionExpression,
-    SqlWindowOrderByArgument,
 )
 from metricflow.sql.sql_plan import (
     SqlQueryPlan,
@@ -1267,61 +1259,6 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 from_source=from_data_set.sql_select_node,
                 from_source_alias=from_data_set_alias,
                 joins_descs=(sql_join_desc,),
-                group_bys=(),
-                where=None,
-                order_bys=(),
-            ),
-        )
-
-    def visit_append_row_number_column_node(self, node: AppendRowNumberColumnNode) -> SqlDataSet:
-        """Appends a row number identifier column to the data set."""
-        input_data_set: SqlDataSet = node.parent_node.accept(self)
-        input_data_set_alias = self._next_unique_table_alias()
-
-        row_number_spec = MetadataSpec.from_name(MetricFlowReservedKeywords.ROW_NUMBER.value)
-        row_number_spec_column_name = self._column_association_resolver.resolve_metadata_spec(row_number_spec)
-
-        input_sql_column_references = input_data_set.instance_set.transform(
-            CreateSqlColumnReferencesForInstances(input_data_set_alias, self._column_association_resolver)
-        )
-        # Build enumerated column using ROW_NUMBER function
-        row_number_select_column = SqlSelectColumn(
-            expr=SqlWindowFunctionExpression(
-                sql_function=SqlWindowFunction.ROW_NUMBER,
-                order_by_args=[SqlWindowOrderByArgument(expr=x) for x in input_sql_column_references],
-            ),
-            column_alias=row_number_spec_column_name.column_name,
-        )
-
-        # Build output instance set
-        output_metadata_instances = list(input_data_set.instance_set.metadata_instances)
-        output_metadata_instances.append(
-            MetadataInstance(
-                associated_columns=(row_number_spec_column_name,),
-                spec=row_number_spec,
-            )
-        )
-        output_instance_set = InstanceSet(
-            measure_instances=input_data_set.instance_set.measure_instances,
-            dimension_instances=input_data_set.instance_set.dimension_instances,
-            time_dimension_instances=input_data_set.instance_set.time_dimension_instances,
-            identifier_instances=input_data_set.instance_set.identifier_instances,
-            metric_instances=input_data_set.instance_set.metric_instances,
-            metadata_instances=tuple(output_metadata_instances),
-        )
-        output_instance_set = ChangeAssociatedColumns(self._column_association_resolver).transform(output_instance_set)
-
-        sql_select_columns = input_data_set.instance_set.transform(
-            CreateSelectColumnsForInstances(input_data_set_alias, self._column_association_resolver)
-        ).as_tuple() + (row_number_select_column,)
-        return SqlDataSet(
-            instance_set=output_instance_set,
-            sql_select_node=SqlSelectStatementNode(
-                description=node.description,
-                select_columns=sql_select_columns,
-                from_source=input_data_set.sql_select_node,
-                from_source_alias=input_data_set_alias,
-                joins_descs=(),
                 group_bys=(),
                 where=None,
                 order_bys=(),

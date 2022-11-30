@@ -35,7 +35,6 @@ class MetricFlowReservedKeywords(enum.Enum):
     """Enumeration of reserved keywords with helper for accessing the reason they are reserved"""
 
     METRIC_TIME = "metric_time"
-    ROW_NUMBER = "mf_row_number"
 
     @staticmethod
     def get_reserved_reason(keyword: MetricFlowReservedKeywords) -> str:
@@ -45,8 +44,6 @@ class MetricFlowReservedKeywords(enum.Enum):
                 "Used as the query input for creating time series metrics from measures with "
                 "different time dimension names."
             )
-        elif keyword is MetricFlowReservedKeywords.ROW_NUMBER:
-            return "Used by the framework to denote as a column name for row number column."
         else:
             assert_values_exhausted(keyword)
 

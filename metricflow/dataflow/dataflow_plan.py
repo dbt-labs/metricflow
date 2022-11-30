@@ -25,7 +25,6 @@ from metricflow.dag.id_generation import (
     DATAFLOW_NODE_COMBINE_METRICS_ID_PREFIX,
     DATAFLOW_NODE_CONSTRAIN_TIME_RANGE_ID_PREFIX,
     DATAFLOW_NODE_SET_MEASURE_AGGREGATION_TIME,
-    DATAFLOW_NODE_APPEND_ROW_NUMBER_COLUMN_PREFIX,
 )
 from metricflow.dag.mf_dag import DagNode, DisplayedProperty, MetricFlowDag, NodeId
 from metricflow.dataflow.builder.partitions import (
@@ -158,12 +157,6 @@ class DataflowPlanNodeVisitor(Generic[SourceDataSetT, VisitorOutputT], ABC):
     @abstractmethod
     def visit_metric_time_dimension_transform_node(  # noqa: D
         self, node: MetricTimeDimensionTransformNode[SourceDataSetT]
-    ) -> VisitorOutputT:
-        pass
-
-    @abstractmethod
-    def visit_append_row_number_column_node(  # noqa: D
-        self, node: AppendRowNumberColumnNode[SourceDataSetT]
     ) -> VisitorOutputT:
         pass
 
@@ -982,43 +975,6 @@ class ConstrainTimeRangeNode(AggregatedMeasuresOutput[SourceDataSetT], BaseOutpu
             DisplayedProperty("time_range_start", self.time_range_constraint.start_time.isoformat()),
             DisplayedProperty("time_range_end", self.time_range_constraint.end_time.isoformat()),
         ]
-
-
-class AppendRowNumberColumnNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
-    """A node transforms the input data set so that it contains the row number.
-
-    The metric time dimension is used later to aggregate all measures in the data set.
-
-    Input: a data set
-
-    Output: a data set with the addition of an primary identifier that delegates the row number.
-    """
-
-    def __init__(  # noqa: D
-        self,
-        parent_node: BaseOutput[SourceDataSetT],
-    ) -> None:
-        self._parent_node = parent_node
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=[parent_node])
-
-    @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
-        return DATAFLOW_NODE_APPEND_ROW_NUMBER_COLUMN_PREFIX
-
-    def accept(self, visitor: DataflowPlanNodeVisitor[SourceDataSetT, VisitorOutputT]) -> VisitorOutputT:  # noqa: D
-        return visitor.visit_append_row_number_column_node(self)
-
-    @property
-    def description(self) -> str:  # noqa: D
-        return "Append row number column"
-
-    @property
-    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
-        return super().displayed_properties
-
-    @property
-    def parent_node(self) -> BaseOutput[SourceDataSetT]:  # noqa: D
-        return self._parent_node
 
 
 class DataflowPlan(Generic[SourceDataSetT], MetricFlowDag[SinkOutput[SourceDataSetT]]):
