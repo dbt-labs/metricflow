@@ -12,6 +12,7 @@ import pandas as pd
 import sqlalchemy
 from sqlalchemy.exc import ProgrammingError
 
+from metricflow.sql.render.snowflake import SnowflakeSqlQueryPlanRenderer
 from metricflow.protocols.sql_client import SqlEngine, SqlIsolationLevel
 from metricflow.protocols.sql_client import SqlEngineAttributes
 from metricflow.protocols.sql_request import (
@@ -21,7 +22,6 @@ from metricflow.protocols.sql_request import (
     MF_EXTRA_TAGS_KEY,
     SqlJsonTag,
 )
-from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.async_request import SqlStatementCommentMetadata, CombinedSqlTags
@@ -56,7 +56,7 @@ class SnowflakeEngineAttributes:
     random_function_name: ClassVar[str] = "RANDOM"
 
     # MetricFlow attributes
-    sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer] = DefaultSqlQueryPlanRenderer()
+    sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer] = SnowflakeSqlQueryPlanRenderer()
 
 
 class SnowflakeSqlClient(SqlAlchemySqlClient):

@@ -4,9 +4,11 @@ from metricflow.sql.render.expr_renderer import (
     SqlExpressionRenderResult,
 )
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
+from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_exprs import (
     SqlCastToTimestampExpression,
     SqlDateTruncExpression,
+    SqlGenerateUuidExpression,
     SqlTimeDeltaExpression,
 )
 from metricflow.time.time_granularity import TimeGranularity
@@ -55,6 +57,12 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
         return SqlExpressionRenderResult(
             sql=f"DATE_SUB(CAST({column.sql} AS DATETIME), INTERVAL {node.count} {node.granularity.value})",
             execution_parameters=column.execution_parameters,
+        )
+
+    def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> SqlExpressionRenderResult:  # noqa: D
+        return SqlExpressionRenderResult(
+            sql="GENERATE_UUID()",
+            execution_parameters=SqlBindParameters(),
         )
 
 

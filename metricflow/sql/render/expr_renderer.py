@@ -17,6 +17,7 @@ from metricflow.sql.sql_exprs import (
     SqlComparisonExpression,
     SqlExpressionNode,
     SqlFunction,
+    SqlGenerateUuidExpression,
     SqlAggregateFunctionExpression,
     SqlNullExpression,
     SqlLogicalExpression,
@@ -313,4 +314,10 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         return SqlExpressionRenderResult(
             sql=f"{node.sql_function.value}({sql_function_args_string}) OVER ({window_string})",
             execution_parameters=combined_params,
+        )
+
+    def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> SqlExpressionRenderResult:  # noqa: D
+        return SqlExpressionRenderResult(
+            sql="UUID()",
+            execution_parameters=SqlBindParameters(),
         )
