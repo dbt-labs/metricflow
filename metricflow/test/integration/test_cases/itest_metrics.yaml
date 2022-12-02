@@ -164,7 +164,7 @@ integration_test:
       SUM(b.booking_value) AS instant_booking_value
       , b.ds AS metric_time
     FROM {{ source_schema }}.fct_bookings b
-    JOIN {{ source_schema }}.dim_listings_latest l
+    LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest l
       ON l.listing_id = b.listing_id
     WHERE
       b.is_instant
@@ -337,7 +337,7 @@ integration_test:
 ---
 integration_test:
   name: ratio_primary_ident
-  description: Test ratio metric from a single data source.
+  description: Test ratio metric joined on primary identifier.
   model: SIMPLE_MODEL
   metrics: ["bookings_per_listing"]
   group_bys: ["metric_time"]
