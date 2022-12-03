@@ -4,17 +4,17 @@ import traceback
 from typing import List, Tuple, Type
 
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode
-from metricflow.model.dbt_transformations.dbt_transform_rule import (
-    DbtTransformRule,
-    DbtTransformationResult,
-    DbtTransformedObjects,
+from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
+    DbtMappingRule,
+    DbtMappingResults,
+    MappedObjects,
 )
-from metricflow.model.dbt_transformations.dbt_metric_model_to_data_source_rules import (
+from metricflow.model.dbt_mapping_rules.dbt_metric_model_to_data_source_rules import (
     DbtMapToDataSourceName,
     DbtMapToDataSourceDescription,
     DbtMapDataSourceSqlTable,
 )
-from metricflow.model.dbt_transformations.dbt_metric_to_metrics_rules import (
+from metricflow.model.dbt_mapping_rules.dbt_metric_to_metrics_rules import (
     DbtToMetricName,
     DbtToMetricDescription,
     DbtToMetricType,
@@ -22,12 +22,12 @@ from metricflow.model.dbt_transformations.dbt_metric_to_metrics_rules import (
     DbtToMetricConstraint,
     DbtToDerivedMetricTypeParams,
 )
-from metricflow.model.dbt_transformations.dbt_metric_to_dimensions_rules import (
+from metricflow.model.dbt_mapping_rules.dbt_metric_to_dimensions_rules import (
     DbtDimensionsToDimensions,
     DbtTimestampToDimension,
     DbtFiltersToDimensions,
 )
-from metricflow.model.dbt_transformations.dbt_metric_to_measure import (
+from metricflow.model.dbt_mapping_rules.dbt_metric_to_measure import (
     DbtToMeasureName,
     DbtToMeasureExpr,
     DbtToMeasureAgg,
@@ -42,7 +42,7 @@ from metricflow.model.validations.validator_helpers import ModelValidationResult
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_RULES: Tuple[DbtTransformRule, ...] = (
+DEFAULT_RULES: Tuple[DbtMappingRule, ...] = (
     # Build data sources
     DbtMapToDataSourceName(),
     DbtMapToDataSourceDescription(),
@@ -66,12 +66,12 @@ DEFAULT_RULES: Tuple[DbtTransformRule, ...] = (
 )
 
 
-class DbtTransformer:
-    """Handles transforming a dbt Manifest into a UserConfiguredModel"""
+class DbtConverter:
+    """Handles converting a list of dbt MetricNodes into a UserConfiguredModel"""
 
     def __init__(  # noqa: D
         self,
-        rules: Tuple[DbtTransformRule, ...] = DEFAULT_RULES,
+        rules: Tuple[DbtMappingRule, ...] = DEFAULT_RULES,
         data_source_class: Type[DataSource] = DataSource,
         metric_class: Type[Metric] = Metric,
         materialization_class: Type[Materialization] = Materialization,
@@ -81,21 +81,21 @@ class DbtTransformer:
         self.metric_class = metric_class
         self.materialization_class = materialization_class
 
-    def transform(self, dbt_metrics: Tuple[MetricNode, ...]) -> DbtTransformationResult:
+    def _map_dbt_to_metricflow(self, dbt_metrics: Tuple[MetricNode, ...]) -> DbtMappingResults:
         """Using a series of rules transforms dbt metrics into a mapped dict representing UserConfiguredModel objects"""
-        transformed_objects = DbtTransformedObjects()
+        mapped_objects = MappedObjects()
         validation_results = ModelValidationResults()
 
         for rule in self.rules:
-            transformation_rule_issues = rule.run(dbt_metrics=dbt_metrics, objects=transformed_objects)
-            validation_results = ModelValidationResults.merge([validation_results, transformation_rule_issues])
+            mapping_rule_issues = rule.run(dbt_metrics=dbt_metrics, objects=mapped_objects)
+            validation_results = ModelValidationResults.merge([validation_results, mapping_rule_issues])
 
-        return DbtTransformationResult(transformed_objects=transformed_objects, validation_results=validation_results)
+        return DbtMappingResults(mapped_objects=mapped_objects, validation_results=validation_results)
 
-    def build(self, transformed_objects: DbtTransformedObjects) -> ModelBuildResult:
+    def _build_metricflow_model(self, mapped_objects: MappedObjects) -> ModelBuildResult:
         """Takes in a map of dicts representing UserConfiguredModel objects, and builds a UserConfiguredModel"""
         # we don't want to modify the passed in objects, so we decopy them
-        copied_objects = deepcopy(transformed_objects)
+        copied_objects = deepcopy(mapped_objects)
 
         # Move dimensions, identifiers, and measures on to their respective data sources
         for data_source_name, dimensions_map in copied_objects.dimensions.items():
@@ -148,17 +148,17 @@ class DbtTransformer:
             issues=ModelValidationResults.from_issues_sequence(issues=issues),
         )
 
-    def transform_and_build(self, dbt_metrics: Tuple[MetricNode, ...]) -> ModelBuildResult:
+    def convert(self, dbt_metrics: Tuple[MetricNode, ...]) -> ModelBuildResult:
         """Builds a UserConfiguredModel from dbt MetricNodes"""
-        transformation_result = self.transform(dbt_metrics=dbt_metrics)
+        mapping_result = self._map_dbt_to_metricflow(dbt_metrics=dbt_metrics)
 
-        if transformation_result.validation_results.has_blocking_issues:
+        if mapping_result.validation_results.has_blocking_issues:
             return ModelBuildResult(
-                model=UserConfiguredModel(data_sources=[], metrics=[]), issues=transformation_result.validation_results
+                model=UserConfiguredModel(data_sources=[], metrics=[]), issues=mapping_result.validation_results
             )
 
-        build_result = self.build(transformed_objects=transformation_result.transformed_objects)
+        build_result = self._build_metricflow_model(mapped_objects=mapping_result.mapped_objects)
         return ModelBuildResult(
             build_result.model,
-            ModelValidationResults.merge([transformation_result.validation_results, build_result.issues]),
+            ModelValidationResults.merge([mapping_result.validation_results, build_result.issues]),
         )

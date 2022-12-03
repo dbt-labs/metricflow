@@ -2,9 +2,9 @@ import traceback
 from typing import Dict, List, Tuple
 
 from dbt_metadata_client.dbt_metadata_api_schema import MetricFilter, MetricNode
-from metricflow.model.dbt_transformations.dbt_transform_rule import (
-    DbtTransformRule,
-    DbtTransformedObjects,
+from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
+    DbtMappingRule,
+    MappedObjects,
     assert_essential_metric_properties,
 )
 from metricflow.model.objects.constraints.where import WhereClauseConstraint
@@ -23,11 +23,11 @@ CALC_METHOD_TO_METRIC_TYPE: Dict[str, MetricType] = {
 }
 
 
-class DbtToMetricName(DbtTransformRule):
+class DbtToMetricName(DbtMappingRule):
     """Rule for mapping dbt metric names to metric names"""
 
     @staticmethod
-    def run(dbt_metrics: Tuple[MetricNode, ...], objects: DbtTransformedObjects) -> ModelValidationResults:  # noqa: D
+    def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
         issues: List[ValidationIssue] = []
         for metric in dbt_metrics:
             try:
@@ -42,11 +42,11 @@ class DbtToMetricName(DbtTransformRule):
         return ModelValidationResults.from_issues_sequence(issues=issues)
 
 
-class DbtToMetricDescription(DbtTransformRule):
+class DbtToMetricDescription(DbtMappingRule):
     """Rule for mapping dbt metric descriptions to metric descriptions"""
 
     @staticmethod
-    def run(dbt_metrics: Tuple[MetricNode, ...], objects: DbtTransformedObjects) -> ModelValidationResults:  # noqa: D
+    def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
         issues: List[ValidationIssue] = []
         for metric in dbt_metrics:
             try:
@@ -63,11 +63,11 @@ class DbtToMetricDescription(DbtTransformRule):
         return ModelValidationResults.from_issues_sequence(issues=issues)
 
 
-class DbtToMetricType(DbtTransformRule):
+class DbtToMetricType(DbtMappingRule):
     """Rule for mapping dbt metric calculation_methods to metric types"""
 
     @staticmethod
-    def run(dbt_metrics: Tuple[MetricNode, ...], objects: DbtTransformedObjects) -> ModelValidationResults:  # noqa: D
+    def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
         issues: List[ValidationIssue] = []
         for metric in dbt_metrics:
             try:
@@ -82,14 +82,14 @@ class DbtToMetricType(DbtTransformRule):
         return ModelValidationResults.from_issues_sequence(issues=issues)
 
 
-class DbtToMeasureProxyMetricTypeParams(DbtTransformRule):
+class DbtToMeasureProxyMetricTypeParams(DbtMappingRule):
     """Rule for mapping non-derived dbt metric names to metric measure inputs
 
     WARNING: This will clobber any other type_params for the metric
     """
 
     @staticmethod
-    def run(dbt_metrics: Tuple[MetricNode, ...], objects: DbtTransformedObjects) -> ModelValidationResults:  # noqa: d
+    def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: d
         issues: List[ValidationIssue] = []
         for metric in dbt_metrics:
             try:
@@ -108,7 +108,7 @@ class DbtToMeasureProxyMetricTypeParams(DbtTransformRule):
         return ModelValidationResults.from_issues_sequence(issues=issues)
 
 
-class DbtToDerivedMetricTypeParams(DbtTransformRule):
+class DbtToDerivedMetricTypeParams(DbtMappingRule):
     """Rule for mapping derived dbt metric depends_on & expression to metric expression and metric inputs
 
     WARNING: This will clobber any other type_params for the metric
@@ -116,7 +116,7 @@ class DbtToDerivedMetricTypeParams(DbtTransformRule):
     """
 
     @staticmethod
-    def run(dbt_metrics: Tuple[MetricNode, ...], objects: DbtTransformedObjects) -> ModelValidationResults:  # noqa: D
+    def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
         issues: List[ValidationIssue] = []
         for metric in dbt_metrics:
             try:
@@ -146,7 +146,7 @@ class DbtToDerivedMetricTypeParams(DbtTransformRule):
         return ModelValidationResults.from_issues_sequence(issues=issues)
 
 
-class DbtToMetricConstraint(DbtTransformRule):
+class DbtToMetricConstraint(DbtMappingRule):
     """Rule for mapping dbt metric filters to metric w"""
 
     @staticmethod
@@ -165,7 +165,7 @@ class DbtToMetricConstraint(DbtTransformRule):
         return WhereClauseConstraint(where=" AND ".join(clauses), linkable_names=[filter.field for filter in filters])
 
     @staticmethod
-    def run(dbt_metrics: Tuple[MetricNode, ...], objects: DbtTransformedObjects) -> ModelValidationResults:  # noqa: D
+    def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
         issues: List[ValidationIssue] = []
         for metric in dbt_metrics:
             try:

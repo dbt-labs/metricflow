@@ -1,34 +1,34 @@
 from typing import Tuple
 
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode
-from metricflow.model.dbt_transformer import DbtTransformer
-from metricflow.model.dbt_transformations.dbt_metric_to_dimensions_rules import (
+from metricflow.model.dbt_converter import DbtConverter
+from metricflow.model.dbt_mapping_rules.dbt_metric_to_dimensions_rules import (
     DbtDimensionsToDimensions,
     DbtTimestampToDimension,
     DbtFiltersToDimensions,
 )
-from metricflow.model.dbt_transformations.dbt_metric_to_metrics_rules import CALC_METHOD_TO_METRIC_TYPE
-from metricflow.model.dbt_transformations.dbt_transform_rule import DbtTransformedObjects, DbtTransformRule
+from metricflow.model.dbt_mapping_rules.dbt_metric_to_metrics_rules import CALC_METHOD_TO_METRIC_TYPE
+from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import MappedObjects, DbtMappingRule
 from metricflow.model.objects.elements.dimension import DimensionType
 from metricflow.model.objects.metric import MetricType
 
 
 def test_dbt_metric_to_dimensions_rules_skip_derived_metrics(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
     derived_metrics = tuple(dbt_metric for dbt_metric in dbt_metrics if dbt_metric.calculation_method == "derived")
-    rules: Tuple[DbtTransformRule, ...] = (
+    rules: Tuple[DbtMappingRule, ...] = (
         DbtDimensionsToDimensions(),
         DbtTimestampToDimension(),
         DbtFiltersToDimensions(),
     )
-    transformer = DbtTransformer(rules=rules)
-    result = transformer.transform(dbt_metrics=derived_metrics)
+    converter = DbtConverter(rules=rules)
+    result = converter._map_dbt_to_metricflow(dbt_metrics=derived_metrics)
     assert (
-        len(result.transformed_objects.dimensions.keys()) == 0
+        len(result.mapped_objects.dimensions.keys()) == 0
     ), "Derived dbt metrics created dimensions, and they shouldn't"
 
 
 def test_dbt_dimensions_to_dimensions(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
-    objects = DbtTransformedObjects()
+    objects = MappedObjects()
     issues = DbtDimensionsToDimensions().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
         not issues.has_blocking_issues
@@ -44,7 +44,7 @@ def test_dbt_dimensions_to_dimensions(dbt_metrics: Tuple[MetricNode, ...]) -> No
 def test_dbt_dimensions_to_dimensions_no_issues_when_no_dimensions(  # noqa: D
     dbt_metrics: Tuple[MetricNode, ...]
 ) -> None:
-    objects = DbtTransformedObjects()
+    objects = MappedObjects()
     dbt_metrics[0].dimensions = None
     issues = DbtDimensionsToDimensions().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
@@ -53,7 +53,7 @@ def test_dbt_dimensions_to_dimensions_no_issues_when_no_dimensions(  # noqa: D
 
 
 def test_dbt_timestamp_to_dimension(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
-    objects = DbtTransformedObjects()
+    objects = MappedObjects()
     issues = DbtTimestampToDimension().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
         not issues.has_blocking_issues
@@ -70,7 +70,7 @@ def test_dbt_timestamp_to_dimension(dbt_metrics: Tuple[MetricNode, ...]) -> None
 
 
 def test_dbt_timestamp_to_dimension_missing_timestamp_issue(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
-    objects = DbtTransformedObjects()
+    objects = MappedObjects()
     dbt_metrics[0].timestamp = None
     issues = DbtTimestampToDimension().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
@@ -79,7 +79,7 @@ def test_dbt_timestamp_to_dimension_missing_timestamp_issue(dbt_metrics: Tuple[M
 
 
 def test_dbt_filters_to_dimensions(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
-    objects = DbtTransformedObjects()
+    objects = MappedObjects()
     issues = DbtFiltersToDimensions().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
         not issues.has_blocking_issues
@@ -93,7 +93,7 @@ def test_dbt_filters_to_dimensions(dbt_metrics: Tuple[MetricNode, ...]) -> None:
 
 
 def test_dbt_filters_to_dimensions_no_filters_okay(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
-    objects = DbtTransformedObjects()
+    objects = MappedObjects()
     dbt_metrics[0].filters = None
     issues = DbtFiltersToDimensions().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (

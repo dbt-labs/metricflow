@@ -1,7 +1,7 @@
 from typing import Tuple
 
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode
-from metricflow.model.dbt_transformations.dbt_metric_to_metrics_rules import (
+from metricflow.model.dbt_mapping_rules.dbt_metric_to_metrics_rules import (
     DbtToMetricName,
     DbtToMetricType,
     DbtToMetricDescription,
@@ -9,13 +9,13 @@ from metricflow.model.dbt_transformations.dbt_metric_to_metrics_rules import (
     DbtToDerivedMetricTypeParams,
     DbtToMeasureProxyMetricTypeParams,
 )
-from metricflow.model.dbt_transformations.dbt_metric_to_metrics_rules import CALC_METHOD_TO_METRIC_TYPE
-from metricflow.model.dbt_transformations.dbt_transform_rule import DbtTransformedObjects
+from metricflow.model.dbt_mapping_rules.dbt_metric_to_metrics_rules import CALC_METHOD_TO_METRIC_TYPE
+from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import MappedObjects
 from metricflow.model.objects.metric import MetricType
 
 
 def test_dbt_to_metric_name(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
-    objects = DbtTransformedObjects()
+    objects = MappedObjects()
     issues = DbtToMetricName().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
         not issues.has_blocking_issues
@@ -30,7 +30,7 @@ def test_dbt_to_metric_name(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noq
 
 
 def test_dbt_to_metric_name_requires_name(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
-    objects = DbtTransformedObjects()
+    objects = MappedObjects()
     dbt_metrics[0].name = None
     issues = DbtToMetricName().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
@@ -39,7 +39,7 @@ def test_dbt_to_metric_name_requires_name(dbt_metrics: Tuple[MetricNode, ...]) -
 
 
 def test_dbt_to_metric_type(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
-    objects = DbtTransformedObjects()
+    objects = MappedObjects()
     issues = DbtToMetricType().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
         not issues.has_blocking_issues
@@ -54,7 +54,7 @@ def test_dbt_to_metric_type(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noq
 
 
 def test_dbt_to_metric_type_requires_calculation_method(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
-    objects = DbtTransformedObjects()
+    objects = MappedObjects()
     dbt_metrics[0].calculation_method = None
     issues = DbtToMetricType().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
@@ -63,7 +63,7 @@ def test_dbt_to_metric_type_requires_calculation_method(dbt_metrics: Tuple[Metri
 
 
 def test_dbt_to_metric_description(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
-    objects = DbtTransformedObjects()
+    objects = MappedObjects()
     issues = DbtToMetricDescription().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
         not issues.has_blocking_issues
@@ -80,7 +80,7 @@ def test_dbt_to_metric_description(dbt_metrics: Tuple[MetricNode, ...]) -> None:
 
 
 def test_dbt_to_metric_description_doesnt_require_description(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
-    objects = DbtTransformedObjects()
+    objects = MappedObjects()
     dbt_metrics[0].description = None
     issues = DbtToMetricDescription().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
@@ -92,7 +92,7 @@ def test_dbt_to_metric_description_doesnt_require_description(dbt_metrics: Tuple
 
 
 def test_dbt_to_metric_constraint(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
-    objects = DbtTransformedObjects()
+    objects = MappedObjects()
     issues = DbtToMetricConstraint().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
         not issues.has_blocking_issues
@@ -109,7 +109,7 @@ def test_dbt_to_metric_constraint(dbt_metrics: Tuple[MetricNode, ...]) -> None: 
 
 
 def test_dbt_to_metric_constraint_doesnt_require_filters(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
-    objects = DbtTransformedObjects()
+    objects = MappedObjects()
     dbt_metrics[0].filters = None
     issues = DbtToMetricConstraint().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
@@ -121,7 +121,7 @@ def test_dbt_to_metric_constraint_doesnt_require_filters(dbt_metrics: Tuple[Metr
 
 
 def test_dbt_to_derived_metric_type_params(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
-    objects = DbtTransformedObjects()
+    objects = MappedObjects()
     issues = DbtToDerivedMetricTypeParams().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
         not issues.has_blocking_issues
@@ -142,7 +142,7 @@ def test_dbt_to_derived_metric_type_params(dbt_metrics: Tuple[MetricNode, ...]) 
 
 
 def test_dbt_to_derived_metric_type_params_requires_expression(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
-    objects = DbtTransformedObjects()
+    objects = MappedObjects()
     for dbt_metric in dbt_metrics:
         if CALC_METHOD_TO_METRIC_TYPE[dbt_metric.calculation_method] == MetricType.DERIVED:
             dbt_metric.expression = None
@@ -153,7 +153,7 @@ def test_dbt_to_derived_metric_type_params_requires_expression(dbt_metrics: Tupl
 
 
 def test_dbt_to_derived_metric_type_params_requires_depends_on(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
-    objects = DbtTransformedObjects()
+    objects = MappedObjects()
     for dbt_metric in dbt_metrics:
         if CALC_METHOD_TO_METRIC_TYPE[dbt_metric.calculation_method] == MetricType.DERIVED:
             dbt_metric.depends_on = None
@@ -164,7 +164,7 @@ def test_dbt_to_derived_metric_type_params_requires_depends_on(dbt_metrics: Tupl
 
 
 def test_dbt_to_measure_proxy_metric_type_params(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
-    objects = DbtTransformedObjects()
+    objects = MappedObjects()
     issues = DbtToMeasureProxyMetricTypeParams().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
         not issues.has_blocking_issues
@@ -185,7 +185,7 @@ def test_dbt_to_measure_proxy_metric_type_params(dbt_metrics: Tuple[MetricNode, 
 
 
 def test_dbt_to_measure_proxy_metric_type_params_requires_name(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
-    objects = DbtTransformedObjects()
+    objects = MappedObjects()
     for dbt_metric in dbt_metrics:
         if CALC_METHOD_TO_METRIC_TYPE[dbt_metric.calculation_method] != MetricType.DERIVED:
             dbt_metric.name = None

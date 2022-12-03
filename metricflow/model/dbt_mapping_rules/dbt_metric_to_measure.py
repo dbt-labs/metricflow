@@ -3,14 +3,14 @@ from typing import Dict, List, Tuple
 
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode
 from metricflow.aggregation_properties import AggregationType
-from metricflow.model.dbt_transformations.dbt_transform_rule import (
-    DbtTransformRule,
-    DbtTransformedObjects,
+from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
+    DbtMappingRule,
+    MappedObjects,
     assert_essential_metric_properties,
 )
 from metricflow.model.objects.metric import MetricType
 from metricflow.model.validations.validator_helpers import ModelValidationResults, ValidationIssue, ValidationError
-from metricflow.model.dbt_transformations.dbt_metric_to_metrics_rules import CALC_METHOD_TO_METRIC_TYPE
+from metricflow.model.dbt_mapping_rules.dbt_metric_to_metrics_rules import CALC_METHOD_TO_METRIC_TYPE
 
 CALC_METHOD_TO_MEASURE_TYPE: Dict[str, AggregationType] = {
     "count": AggregationType.COUNT,
@@ -23,11 +23,11 @@ CALC_METHOD_TO_MEASURE_TYPE: Dict[str, AggregationType] = {
 }
 
 
-class DbtToMeasureName(DbtTransformRule):
+class DbtToMeasureName(DbtMappingRule):
     """Rule for mapping non-derived dbt metric names to data source measure names"""
 
     @staticmethod
-    def run(dbt_metrics: Tuple[MetricNode, ...], objects: DbtTransformedObjects) -> ModelValidationResults:  # noqa: D
+    def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
         issues: List[ValidationIssue] = []
         for metric in dbt_metrics:
             try:
@@ -43,11 +43,11 @@ class DbtToMeasureName(DbtTransformRule):
         return ModelValidationResults.from_issues_sequence(issues=issues)
 
 
-class DbtToMeasureAgg(DbtTransformRule):
+class DbtToMeasureAgg(DbtMappingRule):
     """Rule for mapping non-derived dbt metric calculation method to data source measure agg"""
 
     @staticmethod
-    def run(dbt_metrics: Tuple[MetricNode, ...], objects: DbtTransformedObjects) -> ModelValidationResults:  # noqa: D
+    def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
         issues: List[ValidationIssue] = []
         for metric in dbt_metrics:
             try:
@@ -65,11 +65,11 @@ class DbtToMeasureAgg(DbtTransformRule):
         return ModelValidationResults.from_issues_sequence(issues=issues)
 
 
-class DbtToMeasureExpr(DbtTransformRule):
+class DbtToMeasureExpr(DbtMappingRule):
     """Rule for mapping non-derived dbt metric expression to data source measure expression"""
 
     @staticmethod
-    def run(dbt_metrics: Tuple[MetricNode, ...], objects: DbtTransformedObjects) -> ModelValidationResults:  # noqa: D
+    def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
         issues: List[ValidationIssue] = []
         for metric in dbt_metrics:
             try:
@@ -86,11 +86,11 @@ class DbtToMeasureExpr(DbtTransformRule):
         return ModelValidationResults.from_issues_sequence(issues=issues)
 
 
-class DbtToMeasureAggTimeDimension(DbtTransformRule):
+class DbtToMeasureAggTimeDimension(DbtMappingRule):
     """Rule for mapping non-derived dbt metric timestamp to data source measure agg_time_dimension"""
 
     @staticmethod
-    def run(dbt_metrics: Tuple[MetricNode, ...], objects: DbtTransformedObjects) -> ModelValidationResults:  # noqa: D
+    def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
         issues: List[ValidationIssue] = []
         for metric in dbt_metrics:
             try:

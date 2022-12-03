@@ -3,9 +3,9 @@ from typing import List, Tuple
 
 from dateutil.parser import parse, ParserError
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode, MetricFilter
-from metricflow.model.dbt_transformations.dbt_transform_rule import (
-    DbtTransformRule,
-    DbtTransformedObjects,
+from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
+    DbtMappingRule,
+    MappedObjects,
     assert_metric_model_name,
 )
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
@@ -13,11 +13,11 @@ from metricflow.time.time_granularity import TimeGranularity
 from metricflow.model.validations.validator_helpers import ModelValidationResults, ValidationIssue, ValidationError
 
 
-class DbtDimensionsToDimensions(DbtTransformRule):
+class DbtDimensionsToDimensions(DbtMappingRule):
     """Rule for mapping dbt metric dimensions to data source dimensions"""
 
     @staticmethod
-    def run(dbt_metrics: Tuple[MetricNode, ...], objects: DbtTransformedObjects) -> ModelValidationResults:  # noqa: D
+    def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
         issues: List[ValidationIssue] = []
         for metric in dbt_metrics:
             # Skip metrics which don't have dimensions or a model to attach them to
@@ -38,11 +38,11 @@ class DbtDimensionsToDimensions(DbtTransformRule):
         return ModelValidationResults.from_issues_sequence(issues=issues)
 
 
-class DbtTimestampToDimension(DbtTransformRule):
+class DbtTimestampToDimension(DbtMappingRule):
     """Rule for mapping dbt metric timestamps to data source dimensions"""
 
     @staticmethod
-    def run(dbt_metrics: Tuple[MetricNode, ...], objects: DbtTransformedObjects) -> ModelValidationResults:  # noqa: D
+    def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
         issues: List[ValidationIssue] = []
         for metric in dbt_metrics:
             # Creating dimensions only matters if there is a data source (model) to attach them too
@@ -66,7 +66,7 @@ class DbtTimestampToDimension(DbtTransformRule):
         return ModelValidationResults.from_issues_sequence(issues=issues)
 
 
-class DbtFiltersToDimensions(DbtTransformRule):
+class DbtFiltersToDimensions(DbtMappingRule):
     """Rule for mapping dbt metric filters to data source dimensions"""
 
     @staticmethod
@@ -109,7 +109,7 @@ class DbtFiltersToDimensions(DbtTransformRule):
             )
 
     @staticmethod
-    def run(dbt_metrics: Tuple[MetricNode, ...], objects: DbtTransformedObjects) -> ModelValidationResults:  # noqa D
+    def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa D
         issues: List[ValidationIssue] = []
         for metric in dbt_metrics:
             # Skip if a metric doesn't have filters or a model

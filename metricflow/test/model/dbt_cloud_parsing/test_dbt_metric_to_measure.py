@@ -1,35 +1,33 @@
 from typing import Tuple
 
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode
-from metricflow.model.dbt_transformations.dbt_metric_to_measure import (
+from metricflow.model.dbt_mapping_rules.dbt_metric_to_measure import (
     DbtToMeasureName,
     DbtToMeasureAgg,
     DbtToMeasureAggTimeDimension,
     DbtToMeasureExpr,
 )
-from metricflow.model.dbt_transformations.dbt_metric_to_metrics_rules import CALC_METHOD_TO_METRIC_TYPE
-from metricflow.model.dbt_transformations.dbt_transform_rule import DbtTransformedObjects, DbtTransformRule
-from metricflow.model.dbt_transformer import DbtTransformer
+from metricflow.model.dbt_mapping_rules.dbt_metric_to_metrics_rules import CALC_METHOD_TO_METRIC_TYPE
+from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import MappedObjects, DbtMappingRule
+from metricflow.model.dbt_converter import DbtConverter
 from metricflow.model.objects.metric import MetricType
 
 
 def test_dbt_metric_to_measure_rules_skip_derived_metrics(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
     derived_metrics = tuple(dbt_metric for dbt_metric in dbt_metrics if dbt_metric.calculation_method == "derived")
-    rules: Tuple[DbtTransformRule, ...] = (
+    rules: Tuple[DbtMappingRule, ...] = (
         DbtToMeasureName(),
         DbtToMeasureAgg(),
         DbtToMeasureAggTimeDimension(),
         DbtToMeasureExpr(),
     )
-    transformer = DbtTransformer(rules=rules)
-    result = transformer.transform(dbt_metrics=derived_metrics)
-    assert (
-        len(result.transformed_objects.dimensions.keys()) == 0
-    ), "Derived dbt metrics created measures, and they shouldn't"
+    converter = DbtConverter(rules=rules)
+    result = converter._map_dbt_to_metricflow(dbt_metrics=derived_metrics)
+    assert len(result.mapped_objects.dimensions.keys()) == 0, "Derived dbt metrics created measures, and they shouldn't"
 
 
 def test_dbt_to_measure_name(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
-    objects = DbtTransformedObjects()
+    objects = MappedObjects()
     issues = DbtToMeasureName().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
         not issues.has_blocking_issues
@@ -45,7 +43,7 @@ def test_dbt_to_measure_name(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # no
 
 
 def test_dbt_to_measure_name_requires_name(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
-    objects = DbtTransformedObjects()
+    objects = MappedObjects()
     dbt_metrics[0].name = None
     issues = DbtToMeasureName().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
@@ -54,7 +52,7 @@ def test_dbt_to_measure_name_requires_name(dbt_metrics: Tuple[MetricNode, ...]) 
 
 
 def test_dbt_to_measure_agg(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
-    objects = DbtTransformedObjects()
+    objects = MappedObjects()
     issues = DbtToMeasureAgg().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
         not issues.has_blocking_issues
@@ -70,7 +68,7 @@ def test_dbt_to_measure_agg(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noq
 
 
 def test_dbt_to_measure_agg_requires_calculation_method(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
-    objects = DbtTransformedObjects()
+    objects = MappedObjects()
     dbt_metrics[0].calculation_method = None
     issues = DbtToMeasureAgg().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
@@ -79,7 +77,7 @@ def test_dbt_to_measure_agg_requires_calculation_method(dbt_metrics: Tuple[Metri
 
 
 def test_dbt_to_measure_agg_time_dimension(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
-    objects = DbtTransformedObjects()
+    objects = MappedObjects()
     issues = DbtToMeasureAggTimeDimension().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
         not issues.has_blocking_issues
@@ -95,7 +93,7 @@ def test_dbt_to_measure_agg_time_dimension(dbt_metrics: Tuple[MetricNode, ...]) 
 
 
 def test_dbt_to_measure_agg_time_dimension_requires_timestamp(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
-    objects = DbtTransformedObjects()
+    objects = MappedObjects()
     dbt_metrics[0].timestamp = None
     issues = DbtToMeasureAggTimeDimension().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
@@ -104,7 +102,7 @@ def test_dbt_to_measure_agg_time_dimension_requires_timestamp(dbt_metrics: Tuple
 
 
 def test_dbt_to_measure_expr(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
-    objects = DbtTransformedObjects()
+    objects = MappedObjects()
     issues = DbtToMeasureExpr().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
         not issues.has_blocking_issues
@@ -120,7 +118,7 @@ def test_dbt_to_measure_expr(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # no
 
 
 def test_dbt_to_measure_expr_requires_expression(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
-    objects = DbtTransformedObjects()
+    objects = MappedObjects()
     dbt_metrics[0].expression = None
     issues = DbtToMeasureExpr().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
