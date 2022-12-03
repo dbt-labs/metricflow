@@ -112,7 +112,7 @@ class SourceScanOptimizer(
     well.
 
     This traverses the dataflow plan using DFS. When visiting a node (current_node), it first runs the optimization
-    process on the parent branches, tries to create a more optimal version of the current_node with those optimized
+    process on the parent branches, then tries to create a more optimal version of the current_node with those optimized
     parents.
     """
 
@@ -121,24 +121,6 @@ class SourceScanOptimizer(
 
     def _log_visit_node_type(self, node: DataflowPlanNode[SourceDataSetT]) -> None:
         logger.log(level=self._log_level, msg=f"Visiting {node}")
-
-    def _log_combine_status(
-        self,
-        left_branch: DataflowPlanNode[SourceDataSetT],
-        right_branch: DataflowPlanNode[SourceDataSetT],
-        combine_failure_reason: Optional[str] = None,
-    ) -> None:
-        if combine_failure_reason is None:
-            prefix = "Combined branch:"
-        else:
-            prefix = f"Because {combine_failure_reason}, unable to combine branch:"
-        logger.log(
-            level=self._log_level,
-            msg=f"{prefix}\n\n"
-            f"{dataflow_dag_as_text(left_branch)}\n\n"
-            f"with branch:\n\n"
-            f"{dataflow_dag_as_text(right_branch)}\n\n",
-        )
 
     def _default_base_output_handler(
         self,
@@ -238,6 +220,12 @@ class SourceScanOptimizer(
     def _combine_branches(
         left_branches: Sequence[BaseOutput[SourceDataSetT]], right_branch: BaseOutput[SourceDataSetT]
     ) -> Sequence[BranchCombinationResult]:
+        """Combine the right branch with one of the left branches.
+
+        This is intended to be used in a loop where the goal is to combine a set of branches with each other in the most
+        optimal way. This should be the case if the combination of branches is commutative e.g. if combining branches
+        (a + b) + c is the same as a + (b + c).
+        """
         results = []
         combined = False
         for left_branch in left_branches:

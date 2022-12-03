@@ -110,11 +110,19 @@ class ComputeMetricsBranchCombiner(
     the AggregatedMeasuresNode to produce values for the measure that is different from the original branches. The logic
     to determine whether this is possible for each node type is encapsulated into the handler for each node type.
 
+    In general, the questions to consider for combination are:
+
+    * For nodes with no parents, can you combine the corresponding left and right nodes to produce an output
+    that is has the same linkable specs, but a superset of the measures / metrics?
+    * For other nodes, does a set of inputs that have the same linkable specs as the inputs to the left and right nodes
+    but a superset of measures / metrics produce an output that superset of measures / metrics (with the same values)
+    as the left and right nodes?
+
     The visitor traverses the dataflow plan via DFS, recursively combining the parent nodes first and combining the
     current node. During each step, current_left_node and current_right node always points to nodes that should be
     correlated between the two branches. If the structure is different or if combination can't happen due to node
-    differences between the branches, ComputeMetricsBranchCombinerResult() is propagated up to the result at the
-    root node.
+    differences between the branches, a ComputeMetricsBranchCombinerResult (indicating that combination not possible)
+    is propagated up to the result at the root node.
     """
 
     def __init__(self, left_branch_node: BaseOutput[SourceDataSetT]) -> None:  # noqa: D
@@ -128,13 +136,13 @@ class ComputeMetricsBranchCombiner(
         self,
         left_node: DataflowPlanNode[SourceDataSetT],
         right_node: DataflowPlanNode[SourceDataSetT],
-        combine_failure_reason: Optional[str] = None,
+        combine_failure_reason: str,
     ) -> None:
-        if combine_failure_reason is None:
-            prefix = "Combined nodes:"
-        else:
-            prefix = f"Because {combine_failure_reason}, unable to combine nodes:"
-        logger.log(level=self._log_level, msg=f"{prefix} left_node={left_node} right_node={right_node}")
+        logger.log(
+            level=self._log_level,
+            msg=f"Because {combine_failure_reason}, unable to combine nodes "
+            f"left_node={left_node} right_node={right_node}",
+        )
 
     def _log_combine_success(
         self,
@@ -302,11 +310,7 @@ class ComputeMetricsBranchCombiner(
         )
         return ComputeMetricsBranchCombinerResult(combined_node)
 
-    def visit_order_by_limit_node(  # noqa: D
-        self, node: OrderByLimitNode[SourceDataSetT]
-    ) -> ComputeMetricsBranchCombinerResult:
-        self._log_visit_node_type(node)
-        current_right_node = node
+    def _handle_unsupported_node(self, current_right_node: DataflowPlanNode) -> ComputeMetricsBranchCombinerResult:
         self._log_combine_failure(
             left_node=self._current_left_node,
             right_node=current_right_node,
@@ -315,6 +319,12 @@ class ComputeMetricsBranchCombiner(
             ),
         )
         return ComputeMetricsBranchCombinerResult()
+
+    def visit_order_by_limit_node(  # noqa: D
+        self, node: OrderByLimitNode[SourceDataSetT]
+    ) -> ComputeMetricsBranchCombinerResult:
+        self._log_visit_node_type(node)
+        return self._handle_unsupported_node(node)
 
     def visit_where_constraint_node(  # noqa: D
         self, node: WhereConstraintNode[SourceDataSetT]
@@ -326,29 +336,13 @@ class ComputeMetricsBranchCombiner(
         self, node: WriteToResultDataframeNode[SourceDataSetT]
     ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
-        current_right_node = node
-        self._log_combine_failure(
-            left_node=self._current_left_node,
-            right_node=current_right_node,
-            combine_failure_reason=(
-                f"right node is of type {current_right_node.__class__.__name__} which is not yet handled"
-            ),
-        )
-        return ComputeMetricsBranchCombinerResult()
+        return self._handle_unsupported_node(node)
 
     def visit_write_to_result_table_node(  # noqa: D
         self, node: WriteToResultTableNode[SourceDataSetT]
     ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
-        current_right_node = node
-        self._log_combine_failure(
-            left_node=self._current_left_node,
-            right_node=current_right_node,
-            combine_failure_reason=(
-                f"right node is of type {current_right_node.__class__.__name__} which is not yet handled"
-            ),
-        )
-        return ComputeMetricsBranchCombinerResult()
+        return self._handle_unsupported_node(node)
 
     def visit_pass_elements_filter_node(  # noqa: D
         self, node: FilterElementsNode[SourceDataSetT]
@@ -402,15 +396,7 @@ class ComputeMetricsBranchCombiner(
         self, node: CombineMetricsNode[SourceDataSetT]
     ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
-        current_right_node = node
-        self._log_combine_failure(
-            left_node=self._current_left_node,
-            right_node=current_right_node,
-            combine_failure_reason=(
-                f"right node is of type {current_right_node.__class__.__name__} which is not yet handled"
-            ),
-        )
-        return ComputeMetricsBranchCombinerResult()
+        return self._handle_unsupported_node(node)
 
     def visit_constrain_time_range_node(  # noqa: D
         self, node: ConstrainTimeRangeNode[SourceDataSetT]

@@ -157,7 +157,10 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         plan = DataflowPlan(plan_id=plan_id, sink_output_nodes=[sink_node])
         for optimizer in optimizers:
             logger.info(f"Applying {optimizer.__class__.__name__}")
-            plan = optimizer.optimize(plan)
+            try:
+                plan = optimizer.optimize(plan)
+            except Exception:
+                logger.exception(f"Got an exception applying {optimizer.__class__.__name__}")
 
         return plan
 
