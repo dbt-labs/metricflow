@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Generic, Optional, List, Sequence
 
 from metricflow.dataflow.dataflow_plan import (
+    AddGeneratedUuidColumnNode,
     SourceDataSetT,
     DataflowPlanNodeVisitor,
     MetricTimeDimensionTransformNode,
@@ -426,5 +427,11 @@ class ComputeMetricsBranchCombiner(
     def visit_join_to_time_spine_node(  # noqa: D
         self, node: JoinToTimeSpineNode[SourceDataSetT]
     ) -> ComputeMetricsBranchCombinerResult[SourceDataSetT]:
+        self._log_visit_node_type(node)
+        return self._default_handler(node)
+
+    def visit_add_generated_uuid_column_node(  # noqa: D
+        self, node: AddGeneratedUuidColumnNode[SourceDataSetT]
+    ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)

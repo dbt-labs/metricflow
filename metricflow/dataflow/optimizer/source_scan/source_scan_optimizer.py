@@ -4,6 +4,7 @@ from typing import Generic, List, Optional, Sequence
 
 from metricflow.dag.id_generation import IdGeneratorRegistry, OPTIMIZED_DATAFLOW_PLAN_PREFIX
 from metricflow.dataflow.dataflow_plan import (
+    AddGeneratedUuidColumnNode,
     SourceDataSetT,
     DataflowPlanNodeVisitor,
     BaseOutput,
@@ -331,6 +332,12 @@ class SourceScanOptimizer(
 
     def visit_metric_time_dimension_transform_node(  # noqa: D
         self, node: MetricTimeDimensionTransformNode[SourceDataSetT]
+    ) -> OptimizeBranchResult[SourceDataSetT]:
+        self._log_visit_node_type(node)
+        return self._default_base_output_handler(node)
+
+    def visit_add_generated_uuid_column_node(  # noqa: D
+        self, node: AddGeneratedUuidColumnNode[SourceDataSetT]
     ) -> OptimizeBranchResult[SourceDataSetT]:
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)

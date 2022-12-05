@@ -13,6 +13,7 @@ import jinja2
 from metricflow.aggregation_properties import AggregationType
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dag.id_generation import (
+    DATAFLOW_NODE_ADD_UUID_COLUMN_PREFIX,
     DATAFLOW_NODE_AGGREGATE_MEASURES_ID_PREFIX,
     DATAFLOW_NODE_SEMI_ADDITIVE_JOIN_ID_PREFIX,
     DATAFLOW_NODE_COMPUTE_METRICS_ID_PREFIX,
@@ -188,6 +189,12 @@ class DataflowPlanNodeVisitor(Generic[SourceDataSetT, VisitorOutputT], ABC):
 
     @abstractmethod
     def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode[SourceDataSetT]) -> VisitorOutputT:  # noqa: D
+        pass
+
+    @abstractmethod
+    def visit_add_generated_uuid_column_node(  # noqa: D
+        self, node: AddGeneratedUuidColumnNode[SourceDataSetT]
+    ) -> VisitorOutputT:
         pass
 
 
@@ -1338,6 +1345,42 @@ class ConstrainTimeRangeNode(AggregatedMeasuresOutput[SourceDataSetT], BaseOutpu
             parent_node=new_parent_nodes[0],
             time_range_constraint=self.time_range_constraint,
         )
+
+
+class AddGeneratedUuidColumnNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
+    """Adds a UUID column."""
+
+    def __init__(self, parent_node: BaseOutput[SourceDataSetT]) -> None:  # noqa: D
+        super().__init__(node_id=self.create_unique_id(), parent_nodes=[parent_node])
+
+    @classmethod
+    def id_prefix(cls) -> str:  # noqa: D
+        return DATAFLOW_NODE_ADD_UUID_COLUMN_PREFIX
+
+    def accept(self, visitor: DataflowPlanNodeVisitor[SourceDataSetT, VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+        return visitor.visit_add_generated_uuid_column_node(self)
+
+    @property
+    def description(self) -> str:  # noqa: D
+        return "Adds an internally generated UUID column"
+
+    @property
+    def parent_node(self) -> DataflowPlanNode:  # noqa: D
+        assert len(self.parent_nodes) == 1
+        return self.parent_nodes[0]
+
+    @property
+    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
+        return super().displayed_properties
+
+    def functionally_identical(self, other_node: DataflowPlanNode[SourceDataSetT]) -> bool:  # noqa: D
+        return isinstance(other_node, self.__class__)
+
+    def with_new_parents(  # noqa: D
+        self, new_parent_nodes: Sequence[BaseOutput[SourceDataSetT]]
+    ) -> AddGeneratedUuidColumnNode[SourceDataSetT]:
+        assert len(new_parent_nodes) == 1
+        return AddGeneratedUuidColumnNode(parent_node=new_parent_nodes[0])
 
 
 class DataflowPlan(Generic[SourceDataSetT], MetricFlowDag[SinkOutput[SourceDataSetT]]):
