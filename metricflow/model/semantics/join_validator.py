@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List
+from typing import List, Dict, Optional, Tuple
 
 from metricflow.instances import DataSourceReference, DataSourceElementReference, IdentifierInstance, InstanceSet
 from metricflow.model.objects.elements.identifier import IdentifierType
@@ -16,6 +16,23 @@ class DataSourceIdentifierJoinType:
 
     left_identifier_type: IdentifierType
     right_identifier_type: IdentifierType
+
+
+@dataclass(frozen=True)
+class DataSourceIdentifierJoin:
+    """Link between an identifier and a DataSourceIdentifierJoinType."""
+
+    identifier_reference: IdentifierReference
+    join_type: DataSourceIdentifierJoinType
+
+
+@dataclass(frozen=True)
+class DataSourceJoin:
+    """Links between two data sources and the valid way to join them."""
+
+    left_data_source_reference: DataSourceReference
+    right_data_source_reference: DataSourceReference
+    identifier_joins: List[DataSourceIdentifierJoin]
 
 
 class DataSourceJoinValidator:
@@ -58,13 +75,97 @@ class DataSourceJoinValidator:
     def __init__(self, data_source_semantics: DataSourceSemanticsAccessor) -> None:  # noqa: D
         self._data_source_semantics = data_source_semantics
 
-    def is_valid_data_source_join(
+    def get_joinable_data_sources(
+        self, left_data_source_reference: DataSourceReference, include_multi_hop: bool = False
+    ) -> Dict[str, DataSourceJoin]:
+        """List all data sources that can join to given data source, and the identifiers to join them (max 2-hop joins)."""
+        data_source = self._data_source_semantics.get_by_reference(data_source_reference=left_data_source_reference)
+        assert data_source is not None
+
+        data_source_joins: Dict[str, DataSourceJoin] = {}
+        for identifier in data_source.identifiers:
+            # Verify single-hop joins
+            identifier_reference = IdentifierReference(element_name=identifier.name)
+            joinable_data_source_references = self._get_new_joinable_data_sources_for_identifier(
+                left_data_source_reference=left_data_source_reference,
+                known_data_source_joins=data_source_joins,
+                identifier_reference=identifier_reference,
+            )
+            for (joinable_data_source_reference, join_type) in joinable_data_source_references:
+                data_source_joins[joinable_data_source_reference.data_source_name] = DataSourceJoin(
+                    left_data_source_reference=left_data_source_reference,
+                    right_data_source_reference=joinable_data_source_reference,
+                    identifier_joins=[
+                        DataSourceIdentifierJoin(identifier_reference=identifier_reference, join_type=join_type)
+                    ],
+                )
+
+                if not include_multi_hop:
+                    continue
+
+                # Verify multi-hop joins
+                joinable_data_source = self._data_source_semantics.get_by_reference(
+                    data_source_reference=joinable_data_source_reference
+                )
+                assert joinable_data_source is not None
+                for secondary_identifier in joinable_data_source.identifiers:
+                    secondary_identifier_reference = IdentifierReference(element_name=secondary_identifier.name)
+                    secondary_joinable_data_source_references = self._get_new_joinable_data_sources_for_identifier(
+                        left_data_source_reference=joinable_data_source_reference,
+                        known_data_source_joins=data_source_joins,
+                        identifier_reference=secondary_identifier_reference,
+                    )
+                    for (
+                        secondary_joinable_data_source_reference,
+                        secondary_join_type,
+                    ) in secondary_joinable_data_source_references:
+                        data_source_joins[secondary_joinable_data_source_reference.data_source_name] = DataSourceJoin(
+                            left_data_source_reference=left_data_source_reference,
+                            right_data_source_reference=secondary_joinable_data_source_reference,
+                            identifier_joins=[
+                                DataSourceIdentifierJoin(
+                                    identifier_reference=identifier_reference, join_type=join_type
+                                ),
+                                DataSourceIdentifierJoin(
+                                    identifier_reference=secondary_identifier_reference, join_type=secondary_join_type
+                                ),
+                            ],
+                        )
+
+        return data_source_joins
+
+    def _get_new_joinable_data_sources_for_identifier(
+        self,
+        left_data_source_reference: DataSourceReference,
+        known_data_source_joins: Dict[str, DataSourceJoin],
+        identifier_reference: IdentifierReference,
+    ) -> List[Tuple[DataSourceReference, DataSourceIdentifierJoinType]]:
+        new_joinable_data_sources: List[Tuple[DataSourceReference, DataSourceIdentifierJoinType]] = []
+        identifier_data_sources = self._data_source_semantics.get_data_sources_for_identifier(
+            identifier_reference=identifier_reference
+        )
+        for identifier_data_source in identifier_data_sources:
+            if identifier_data_source.name in known_data_source_joins:
+                continue
+
+            right_data_source_reference = DataSourceReference(data_source_name=identifier_data_source.name)
+            valid_join_type = self.get_valid_data_source_identifier_join_type(
+                left_data_source_reference=left_data_source_reference,
+                right_data_source_reference=right_data_source_reference,
+                on_identifier_reference=identifier_reference,
+            )
+            if valid_join_type is not None:
+                new_joinable_data_sources.append((right_data_source_reference, valid_join_type))
+
+        return new_joinable_data_sources
+
+    def get_valid_data_source_identifier_join_type(
         self,
         left_data_source_reference: DataSourceReference,
         right_data_source_reference: DataSourceReference,
         on_identifier_reference: IdentifierReference,
-    ) -> bool:
-        """Return true if we should allow a join with the given parameters to resolve a query."""
+    ) -> Optional[DataSourceIdentifierJoinType]:
+        """Get valid join type used to join data sources on given identifier, if exists."""
         left_identifier = self._data_source_semantics.get_identifier_in_data_source(
             DataSourceElementReference.create_from_references(left_data_source_reference, on_identifier_reference)
         )
@@ -72,19 +173,33 @@ class DataSourceJoinValidator:
         right_identifier = self._data_source_semantics.get_identifier_in_data_source(
             DataSourceElementReference.create_from_references(right_data_source_reference, on_identifier_reference)
         )
-        if left_identifier is None:
-            return False
-        if right_identifier is None:
-            return False
+        if left_identifier is None or right_identifier is None:
+            return None
 
         join_type = DataSourceIdentifierJoinType(left_identifier.type, right_identifier.type)
 
         if join_type in DataSourceJoinValidator._VALID_IDENTIFIER_JOINS:
-            return True
+            return join_type
         elif join_type in DataSourceJoinValidator._INVALID_IDENTIFIER_JOINS:
-            return False
+            return None
 
         raise RuntimeError(f"Join type not handled: {join_type}")
+
+    def is_valid_data_source_join(
+        self,
+        left_data_source_reference: DataSourceReference,
+        right_data_source_reference: DataSourceReference,
+        on_identifier_reference: IdentifierReference,
+    ) -> bool:
+        """Return true if we should allow a join with the given parameters to resolve a query."""
+        return (
+            self.get_valid_data_source_identifier_join_type(
+                left_data_source_reference=left_data_source_reference,
+                right_data_source_reference=right_data_source_reference,
+                on_identifier_reference=on_identifier_reference,
+            )
+            is not None
+        )
 
     @staticmethod
     def _data_source_of_identifier_in_instance_set(
