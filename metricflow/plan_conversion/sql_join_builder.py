@@ -3,7 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple, TypeVar
 
-from metricflow.dataflow.dataflow_plan import JoinDescription, JoinOverTimeRangeNode
+from metricflow.dataflow.dataflow_plan import JoinConversionEventsNode, JoinDescription, JoinOverTimeRangeNode
+from metricflow.model.objects.metric import CumulativeMetricWindow
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.sql_expression_builders import make_coalesced_expr
 from metricflow.sql.sql_plan import SqlExpressionNode, SqlJoinDescription, SqlJoinType, SqlSelectStatementNode
@@ -18,6 +19,7 @@ from metricflow.sql.sql_exprs import (
     SqlLogicalOperator,
     SqlTimeDeltaExpression,
 )
+from metricflow.time.time_granularity import TimeGranularity
 
 SqlDataSetT = TypeVar("SqlDataSetT", bound=SqlDataSet)
 
@@ -411,6 +413,93 @@ class SqlQueryPlanJoinBuilder:
         )
 
     @staticmethod
+    def _make_time_range_window_join_condition(
+        base_data_set: AnnotatedSqlDataSet,
+        time_comparison_dataset: AnnotatedSqlDataSet,
+        window: Optional[CumulativeMetricWindow] = None,
+        grain_to_date: Optional[TimeGranularity] = None,
+    ) -> SqlLogicalExpression:
+        """Helper to generate a renderable SqlExpression for expressing a time range window join condition.
+
+        The output will render the following expression:
+
+            a.ds <= b.ds AND a.ds > b.ds - <window>
+            If no window is present we join across all time -> "a.ds <= b.ds"
+        """
+        base_column_expr = SqlColumnReferenceExpression(
+            SqlColumnReference(
+                table_alias=base_data_set.alias,
+                column_name=base_data_set.metric_time_column_name,
+            )
+        )
+        time_comparison_column_expr = SqlColumnReferenceExpression(
+            SqlColumnReference(
+                table_alias=time_comparison_dataset.alias,
+                column_name=time_comparison_dataset.metric_time_column_name,
+            )
+        )
+
+        # Comparison expression against the endpoint of the cumulative time range,
+        # meaning the base metrc time must always be BEFORE the comparison metric time
+        end_of_range_comparison_expression = SqlComparisonExpression(
+            left_expr=base_column_expr,
+            comparison=SqlComparison.LESS_THAN_OR_EQUALS,
+            right_expr=time_comparison_column_expr,
+        )
+
+        comparison_expressions: List[SqlComparisonExpression] = [end_of_range_comparison_expression]
+        if window:
+            start_of_range_comparison_expr = SqlComparisonExpression(
+                left_expr=base_column_expr,
+                comparison=SqlComparison.GREATER_THAN,
+                right_expr=SqlTimeDeltaExpression(
+                    arg=time_comparison_column_expr,
+                    count=window.count,
+                    granularity=window.granularity,
+                ),
+            )
+            comparison_expressions.append(start_of_range_comparison_expr)
+        elif grain_to_date:
+            start_of_range_comparison_expr = SqlComparisonExpression(
+                left_expr=base_column_expr,
+                comparison=SqlComparison.GREATER_THAN_OR_EQUALS,
+                right_expr=SqlDateTruncExpression(arg=time_comparison_column_expr, time_granularity=grain_to_date),
+            )
+            comparison_expressions.append(start_of_range_comparison_expr)
+
+        return SqlLogicalExpression(
+            operator=SqlLogicalOperator.AND,
+            args=tuple(comparison_expressions),
+        )
+
+    @staticmethod
+    def make_join_conversion_join_description(
+        node: JoinConversionEventsNode[SqlDataSetT],
+        base_data_set: AnnotatedSqlDataSet,
+        conversion_data_set: AnnotatedSqlDataSet,
+        column_equality_descriptions: Sequence[ColumnEqualityDescription],
+    ) -> SqlJoinDescription:
+        """Make a join description for joining base-to-conversion data sets.
+
+        A successful conversion is when a conversion event occurs after a corresponding base event
+        under the condition of being within the time range and other conditions (such as constant properties).
+        This builds the join description to satisfy all those conditions.
+        """
+        window_condition = SqlQueryPlanJoinBuilder._make_time_range_window_join_condition(
+            base_data_set=base_data_set,
+            time_comparison_dataset=conversion_data_set,
+            window=node.window,
+        )
+        return SqlQueryPlanJoinBuilder.make_sql_join_description(
+            right_source_node=conversion_data_set.data_set.sql_select_node,
+            left_source_alias=base_data_set.alias,
+            right_source_alias=conversion_data_set.alias,
+            column_equality_descriptions=column_equality_descriptions,
+            join_type=SqlJoinType.INNER,
+            additional_on_conditions=(window_condition,),
+        )
+
+    @staticmethod
     def make_cumulative_metric_time_range_join_description(
         node: JoinOverTimeRangeNode[SqlDataSetT],
         metric_data_set: AnnotatedSqlDataSet,
@@ -421,53 +510,11 @@ class SqlQueryPlanJoinBuilder:
         Cumulative metrics must be joined against a time spine in a backward-looking fashion, with
         a range determined by a time window (delta against metric_time) and optional cumulative grain.
         """
-
-        # Build an expression like "a.ds <= b.ds AND a.ds >= b.ds - <window>
-        # If no window is present we join across all time -> "a.ds <= b.ds"
-        metric_time_column_expr = SqlColumnReferenceExpression(
-            SqlColumnReference(
-                table_alias=metric_data_set.alias,
-                column_name=metric_data_set.metric_time_column_name,
-            )
-        )
-        time_spine_column_expr = SqlColumnReferenceExpression(
-            SqlColumnReference(
-                table_alias=time_spine_data_set.alias,
-                column_name=time_spine_data_set.metric_time_column_name,
-            )
-        )
-
-        # Comparison expression against the endpoint of the cumulative time range,
-        # meaning the metric time must always be BEFORE the time spine time
-        end_of_range_comparison_expression = SqlComparisonExpression(
-            left_expr=metric_time_column_expr,
-            comparison=SqlComparison.LESS_THAN_OR_EQUALS,
-            right_expr=time_spine_column_expr,
-        )
-
-        comparison_expressions: List[SqlComparisonExpression] = [end_of_range_comparison_expression]
-        if node.window:
-            start_of_range_comparison_expr = SqlComparisonExpression(
-                left_expr=metric_time_column_expr,
-                comparison=SqlComparison.GREATER_THAN,
-                right_expr=SqlTimeDeltaExpression(
-                    arg=time_spine_column_expr,
-                    count=node.window.count,
-                    granularity=node.window.granularity,
-                ),
-            )
-            comparison_expressions.append(start_of_range_comparison_expr)
-        elif node.grain_to_date:
-            start_of_range_comparison_expr = SqlComparisonExpression(
-                left_expr=metric_time_column_expr,
-                comparison=SqlComparison.GREATER_THAN_OR_EQUALS,
-                right_expr=SqlDateTruncExpression(arg=time_spine_column_expr, time_granularity=node.grain_to_date),
-            )
-            comparison_expressions.append(start_of_range_comparison_expr)
-
-        cumulative_join_condition = SqlLogicalExpression(
-            operator=SqlLogicalOperator.AND,
-            args=tuple(comparison_expressions),
+        cumulative_join_condition = SqlQueryPlanJoinBuilder._make_time_range_window_join_condition(
+            base_data_set=metric_data_set,
+            time_comparison_dataset=time_spine_data_set,
+            window=node.window,
+            grain_to_date=node.grain_to_date,
         )
 
         return SqlJoinDescription(

@@ -12,6 +12,7 @@ from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNodeVisitor,
     MetricTimeDimensionTransformNode,
     SemiAdditiveJoinNode,
+    JoinConversionEventsNode,
     JoinOverTimeRangeNode,
     ConstrainTimeRangeNode,
     CombineMetricsNode,
@@ -109,6 +110,9 @@ class ReadSqlSourceNodeCounter(Generic[SourceDataSetT], DataflowPlanNodeVisitor[
         return self._sum_parents(node)
 
     def visit_add_generated_uuid_column_node(self, node: AddGeneratedUuidColumnNode[SourceDataSetT]) -> int:  # noqa :D
+        return self._sum_parents(node)
+
+    def visit_join_conversion_events_node(self, node: JoinConversionEventsNode[SourceDataSetT]) -> int:  # noqa: D
         return self._sum_parents(node)
 
     def count_source_nodes(self, dataflow_plan: DataflowPlan[SourceDataSetT]) -> int:  # noqa: D
