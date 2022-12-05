@@ -11,6 +11,7 @@ from metricflow.dataflow.dataflow_plan import (
     MetricTimeDimensionTransformNode,
     SemiAdditiveJoinNode,
     JoinOverTimeRangeNode,
+    JoinConversionEventsNode,
     ConstrainTimeRangeNode,
     CombineMetricsNode,
     FilterElementsNode,
@@ -432,6 +433,12 @@ class ComputeMetricsBranchCombiner(
 
     def visit_add_generated_uuid_column_node(  # noqa: D
         self, node: AddGeneratedUuidColumnNode[SourceDataSetT]
+    ) -> ComputeMetricsBranchCombinerResult:
+        self._log_visit_node_type(node)
+        return self._default_handler(node)
+
+    def visit_join_conversion_events_node(  # noqa: D
+        self, node: JoinConversionEventsNode[SourceDataSetT]
     ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)

@@ -10,6 +10,7 @@ from metricflow.dataflow.dataflow_plan import (
     BaseOutput,
     ReadSqlSourceNode,
     JoinToBaseOutputNode,
+    JoinConversionEventsNode,
     JoinAggregatedMeasuresByGroupByColumnsNode,
     AggregateMeasuresNode,
     ComputeMetricsNode,
@@ -338,6 +339,12 @@ class SourceScanOptimizer(
 
     def visit_add_generated_uuid_column_node(  # noqa: D
         self, node: AddGeneratedUuidColumnNode[SourceDataSetT]
+    ) -> OptimizeBranchResult[SourceDataSetT]:
+        self._log_visit_node_type(node)
+        return self._default_base_output_handler(node)
+
+    def visit_join_conversion_events_node(  # noqa: D
+        self, node: JoinConversionEventsNode[SourceDataSetT]
     ) -> OptimizeBranchResult[SourceDataSetT]:
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)

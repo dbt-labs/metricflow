@@ -24,6 +24,7 @@ from metricflow.dataflow.dataflow_plan import (
     ComputeMetricsNode,
     AggregateMeasuresNode,
     JoinAggregatedMeasuresByGroupByColumnsNode,
+    JoinConversionEventsNode,
     JoinOverTimeRangeNode,
     JoinToBaseOutputNode,
     ReadSqlSourceNode,
@@ -171,3 +172,12 @@ class DefaultCostFunction(
         self, node: AddGeneratedUuidColumnNode[SourceDataSetT]
     ) -> DefaultCost:
         return DefaultCost.sum([x.accept(self) for x in node.parent_nodes])
+
+    def visit_join_conversion_events_node(  # noqa: D
+        self, node: JoinConversionEventsNode[SourceDataSetT]
+    ) -> DefaultCost:
+        parent_costs = [x.accept(self) for x in node.parent_nodes]
+
+        # Add number of joins to the cost.
+        node_cost = DefaultCost(num_joins=1, num_aggregations=1)
+        return DefaultCost.sum(parent_costs + [node_cost])

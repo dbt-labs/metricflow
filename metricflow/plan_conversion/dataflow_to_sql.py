@@ -17,6 +17,7 @@ from metricflow.dataflow.dataflow_plan import (
     ComputeMetricsNode,
     AggregateMeasuresNode,
     JoinAggregatedMeasuresByGroupByColumnsNode,
+    JoinConversionEventsNode,
     JoinToBaseOutputNode,
     ReadSqlSourceNode,
     BaseOutput,
@@ -51,6 +52,7 @@ from metricflow.plan_conversion.instance_converters import (
     AddMetrics,
     CreateSelectColumnsForInstances,
     CreateSelectColumnsWithMeasuresAggregated,
+    CreateSqlColumnReferencesForInstances,
     create_select_columns_for_instance_sets,
     AddLinkToLinkableElements,
     FilterElements,
@@ -75,6 +77,7 @@ from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlEngineAttributes, SqlEngine
 from metricflow.specs import (
     ColumnAssociationResolver,
+    InstanceSpecSet,
     MetadataSpec,
     MetricSpec,
     TimeDimensionSpec,
@@ -96,6 +99,10 @@ from metricflow.sql.sql_exprs import (
     SqlStringLiteralExpression,
     SqlBetweenExpression,
     SqlFunctionExpression,
+    SqlAggregateFunctionExpression,
+    SqlWindowFunctionExpression,
+    SqlWindowFunction,
+    SqlWindowOrderByArgument,
 )
 from metricflow.sql.sql_plan import (
     SqlQueryPlan,
@@ -1408,6 +1415,149 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 + (gen_uuid_sql_select_column,),
                 from_source=input_data_set.sql_select_node,
                 from_source_alias=input_data_set_alias,
+                joins_descs=(),
+                group_bys=(),
+                where=None,
+                order_bys=(),
+            ),
+        )
+
+    def visit_join_conversion_events_node(self, node: JoinConversionEventsNode) -> SqlDataSet:
+        """Builds a resulting data set with all valid conversion events.
+
+        This node takes the conversion and base data set and joins them against an entity and
+        a valid time range to get successful conversions. It then deduplicates opportunities
+        via the window function `first_value` to take the closest opportunity to the
+        corresponding conversion. Then it returns a data set with each row representing a
+        successful conversion. Duplication may exist in the result due to a single base event
+        being able to link to multiple conversion events.
+        """
+        base_data_set: SqlDataSet = node.base_node.accept(self)
+        base_data_set_alias = self._next_unique_table_alias()
+
+        conversion_data_set: SqlDataSet = node.conversion_node.accept(self)
+        conversion_data_set_alias = self._next_unique_table_alias()
+
+        base_time_dimension_column_name = self._column_association_resolver.resolve_time_dimension_spec(
+            node.base_time_dimension_spec
+        ).column_name
+        conversion_time_dimension_column_name = self._column_association_resolver.resolve_time_dimension_spec(
+            node.conversion_time_dimension_spec
+        ).column_name
+        entity_column_name = self._column_association_resolver.resolve_identifier_spec(node.entity_spec)[0].column_name
+
+        # Builds the join conditions that is required for a successful conversion
+        sql_join_description = SqlQueryPlanJoinBuilder.make_join_conversion_join_description(
+            node=node,
+            base_data_set=AnnotatedSqlDataSet(
+                data_set=base_data_set,
+                alias=base_data_set_alias,
+                _metric_time_column_name=base_time_dimension_column_name,
+            ),
+            conversion_data_set=AnnotatedSqlDataSet(
+                data_set=conversion_data_set,
+                alias=conversion_data_set_alias,
+                _metric_time_column_name=conversion_time_dimension_column_name,
+            ),
+            column_equality_descriptions=(
+                ColumnEqualityDescription(
+                    left_column_alias=entity_column_name,
+                    right_column_alias=entity_column_name,
+                ),  # add constant property here
+            ),
+        )
+
+        # Builds the first_value window function columns
+        base_sql_column_references = base_data_set.instance_set.transform(
+            CreateSqlColumnReferencesForInstances(base_data_set_alias, self._column_association_resolver)
+        )
+        partition_by_columns = (entity_column_name, conversion_time_dimension_column_name)  # add constant property here
+        base_sql_select_columns = tuple(
+            SqlSelectColumn(
+                expr=SqlWindowFunctionExpression(
+                    sql_function=SqlWindowFunction.FIRST_VALUE,
+                    sql_function_args=[
+                        SqlColumnReferenceExpression(
+                            SqlColumnReference(
+                                table_alias=base_data_set_alias,
+                                column_name=base_sql_column_reference.col_ref.column_name,
+                            ),
+                        )
+                    ],
+                    partition_by_args=[
+                        SqlColumnReferenceExpression(
+                            SqlColumnReference(
+                                table_alias=conversion_data_set_alias,
+                                column_name=column,
+                            ),
+                        )
+                        for column in partition_by_columns
+                    ],
+                    order_by_args=[
+                        SqlWindowOrderByArgument(
+                            expr=SqlColumnReferenceExpression(
+                                SqlColumnReference(
+                                    table_alias=base_data_set_alias,
+                                    column_name=base_time_dimension_column_name,
+                                ),
+                            ),
+                            descending=True,
+                        )
+                    ],
+                ),
+                column_alias=base_sql_column_reference.col_ref.column_name,
+            )
+            for base_sql_column_reference in base_sql_column_references
+        )
+
+        conversion_data_set_output_instance_set = conversion_data_set.instance_set.transform(
+            FilterElements(include_specs=InstanceSpecSet(measure_specs=(node.conversion_measure_spec,)))
+        )
+
+        # Deduplicate the fanout results
+        conversion_primary_key_select_columns = tuple(
+            SqlSelectColumn(
+                expr=SqlColumnReferenceExpression(
+                    SqlColumnReference(
+                        table_alias=conversion_data_set_alias,
+                        column_name=spec.column_associations(self._column_association_resolver)[0].column_name,
+                    ),
+                ),
+                column_alias=spec.column_associations(self._column_association_resolver)[0].column_name,
+            )
+            for spec in node.conversion_primary_key_specs
+        )
+        additional_conversion_select_columns = conversion_data_set_output_instance_set.transform(
+            CreateSelectColumnsForInstances(conversion_data_set_alias, self._column_association_resolver)
+        ).as_tuple()
+        deduped_sql_select_node = SqlSelectStatementNode(
+            description=f"Dedupe the fanout on {node.conversion_primary_key_specs} in the conversion data set",
+            select_columns=base_sql_select_columns
+            + conversion_primary_key_select_columns
+            + additional_conversion_select_columns,
+            from_source=base_data_set.sql_select_node,
+            from_source_alias=base_data_set_alias,
+            joins_descs=(sql_join_description,),
+            group_bys=(),
+            where=None,
+            order_bys=(),
+            distinct=True,
+        )
+
+        # Returns the original dataset with all the successful conversion
+        output_data_set_alias = self._next_unique_table_alias()
+        output_instance_set = ChangeAssociatedColumns(self._column_association_resolver).transform(
+            InstanceSet.merge([conversion_data_set_output_instance_set, base_data_set.instance_set])
+        )
+        return SqlDataSet(
+            instance_set=output_instance_set,
+            sql_select_node=SqlSelectStatementNode(
+                description=node.description,
+                select_columns=output_instance_set.transform(
+                    CreateSelectColumnsForInstances(output_data_set_alias, self._column_association_resolver)
+                ).as_tuple(),
+                from_source=deduped_sql_select_node,
+                from_source_alias=output_data_set_alias,
                 joins_descs=(),
                 group_bys=(),
                 where=None,
