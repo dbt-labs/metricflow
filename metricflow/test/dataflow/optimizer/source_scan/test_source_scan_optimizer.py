@@ -7,6 +7,7 @@ from _pytest.fixtures import FixtureRequest
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan import (
+    AddGeneratedUuidColumnNode,
     SourceDataSetT,
     DataflowPlanNodeVisitor,
     MetricTimeDimensionTransformNode,
@@ -105,6 +106,9 @@ class ReadSqlSourceNodeCounter(Generic[SourceDataSetT], DataflowPlanNodeVisitor[
         return self._sum_parents(node)
 
     def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode[SourceDataSetT]) -> int:  # noqa: D
+        return self._sum_parents(node)
+
+    def visit_add_generated_uuid_column_node(self, node: AddGeneratedUuidColumnNode[SourceDataSetT]) -> int:  # noqa :D
         return self._sum_parents(node)
 
     def count_source_nodes(self, dataflow_plan: DataflowPlan[SourceDataSetT]) -> int:  # noqa: D

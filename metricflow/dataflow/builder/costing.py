@@ -14,6 +14,7 @@ from dataclasses import dataclass
 from typing import Any, Sequence, Generic
 
 from metricflow.dataflow.dataflow_plan import (
+    AddGeneratedUuidColumnNode,
     DataflowPlanNode,
     SourceDataSetT,
     DataflowPlanNodeVisitor,
@@ -165,3 +166,8 @@ class DefaultCostFunction(
 
     def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode[SourceDataSetT]) -> DefaultCost:  # noqa: D
         return DefaultCost.sum([x.accept(self) for x in node.parent_nodes] + [DefaultCost(num_joins=1)])
+
+    def visit_add_generated_uuid_column_node(  # noqa: D
+        self, node: AddGeneratedUuidColumnNode[SourceDataSetT]
+    ) -> DefaultCost:
+        return DefaultCost.sum([x.accept(self) for x in node.parent_nodes])
