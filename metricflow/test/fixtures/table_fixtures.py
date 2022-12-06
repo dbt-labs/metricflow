@@ -113,6 +113,7 @@ def create_simple_model_tables(mf_test_session_state: MetricFlowTestSessionState
                 ("u0004114", "l3141592", "2020-01-02", "2020-01-02"),
                 ("u1612112", "l2718281", "2020-01-02", "2020-01-02"),
                 ("u0004114", "", "2020-01-02", "2020-01-02"),
+                ("u0004114", "l7891283-incomplete", "2020-01-02", "2020-01-02"),
             ],
         ),
     )
@@ -130,6 +131,7 @@ def create_simple_model_tables(mf_test_session_state: MetricFlowTestSessionState
                 ("l2718281", cote_divoire, 4, False, "u0005432", "2020-01-02"),
                 ("l9658588-incomplete", "us", None, None, "u1004114", "2020-01-02"),
                 ("l8912456-incomplete", None, None, None, "u1004114", "2020-01-02"),
+                ("l7891283-incomplete", "ca", None, False, "u1004114", "2020-01-02"),
             ],
         ),
     )
@@ -153,6 +155,7 @@ def create_simple_model_tables(mf_test_session_state: MetricFlowTestSessionState
                 ("l9658588-incomplete", None, None, None, "u1004114", "2020-01-01", "2020-01-02"),
                 ("l9658588-incomplete", "us", None, None, "u1004114", "2020-01-02", None),
                 ("l8912456-incomplete", None, None, None, "u1004114", "2020-01-02", None),
+                ("l7891283-incomplete", "ca", None, False, "u1004114", "2020-01-02", None),
             ],
         ),
     )

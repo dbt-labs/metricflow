@@ -598,7 +598,7 @@ integration_test:
 ---
 integration_test:
   name: three_metrics_with_null_dimension_values
-  description: Tests querying three metrics with a dimension having NULL values
+  description: Tests querying three metrics with a dimension having NULL values and the on clause COALESCE behavior
   model: SIMPLE_MODEL
   metrics: ["bookings", "views", "listings"]
   group_bys: ["listing__is_lux_latest", "listing__country_latest"]
@@ -638,4 +638,4 @@ integration_test:
       FROM {{ source_schema }}.dim_listings_latest
       GROUP BY 1,2
     ) li
-    ON bk.is_lux = li.is_lux AND bk.country = li.country
+    ON COALESCE(bk.is_lux, vw.is_lux) = li.is_lux AND COALESCE(bk.country, vw.country) = li.country
