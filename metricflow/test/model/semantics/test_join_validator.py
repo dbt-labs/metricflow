@@ -135,7 +135,6 @@ def test_foreign_target_data_source_join_validation(simple_semantic_model: Seman
     user_identifier_reference = IdentifierReference(element_name="user")
     join_validator = DataSourceJoinValidator(data_source_semantics=simple_semantic_model.data_source_semantics)
 
-    # add type tests here!ß
     foreign_foreign = join_validator.is_valid_data_source_join(
         left_data_source_reference=data_source_references[IdentifierType.FOREIGN],
         right_data_source_reference=data_source_references[IdentifierType.FOREIGN],
