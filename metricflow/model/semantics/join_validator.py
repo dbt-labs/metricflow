@@ -119,6 +119,11 @@ class DataSourceJoinValidator:
                         secondary_joinable_data_source_reference,
                         secondary_join_type,
                     ) in secondary_joinable_data_source_references:
+                        if (
+                            secondary_joinable_data_source_reference.data_source_name
+                            == left_data_source_reference.data_source_name
+                        ):
+                            continue
                         data_source_joins[secondary_joinable_data_source_reference.data_source_name] = DataSourceJoin(
                             left_data_source_reference=left_data_source_reference,
                             right_data_source_reference=secondary_joinable_data_source_reference,
@@ -145,7 +150,10 @@ class DataSourceJoinValidator:
             identifier_reference=identifier_reference
         )
         for identifier_data_source in identifier_data_sources:
-            if identifier_data_source.name in known_data_source_joins:
+            if (
+                identifier_data_source.name == left_data_source_reference.data_source_name
+                or identifier_data_source.name in known_data_source_joins
+            ):
                 continue
 
             right_data_source_reference = DataSourceReference(data_source_name=identifier_data_source.name)

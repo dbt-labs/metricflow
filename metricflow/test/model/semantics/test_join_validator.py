@@ -3,7 +3,12 @@ from typing import Dict, Sequence
 from metricflow.instances import DataSourceReference
 from metricflow.model.objects.elements.identifier import IdentifierType
 from metricflow.model.semantic_model import SemanticModel
-from metricflow.model.semantics.join_validator import DataSourceIdentifierJoinType, DataSourceJoinValidator
+from metricflow.model.semantics.join_validator import (
+    DataSourceIdentifierJoinType,
+    DataSourceJoinValidator,
+    DataSourceJoin,
+    DataSourceIdentifierJoin,
+)
 from metricflow.object_utils import assert_values_exhausted
 from metricflow.references import IdentifierReference
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
@@ -130,6 +135,7 @@ def test_foreign_target_data_source_join_validation(simple_semantic_model: Seman
     user_identifier_reference = IdentifierReference(element_name="user")
     join_validator = DataSourceJoinValidator(data_source_semantics=simple_semantic_model.data_source_semantics)
 
+    # add type tests here!ß
     foreign_foreign = join_validator.is_valid_data_source_join(
         left_data_source_reference=data_source_references[IdentifierType.FOREIGN],
         right_data_source_reference=data_source_references[IdentifierType.FOREIGN],
@@ -265,4 +271,79 @@ def test_foreign_target_instance_set_join_validation(
     assert not any(results.values()), (
         f"All data source level joins against foreign targets should be invalid, but we found at least one "
         f"that was not! Incorrectly passing types: {[k for k,v in results.items() if v]}."
+    )
+
+
+def test_get_joinable_data_sources(multi_hop_join_semantic_model: SemanticModel) -> None:  # noqa: D
+    data_source_reference = DataSourceReference(data_source_name="account_month_txns")
+    join_validator = DataSourceJoinValidator(data_source_semantics=multi_hop_join_semantic_model.data_source_semantics)
+
+    # Single-hop
+    joinable_data_sources = join_validator.get_joinable_data_sources(left_data_source_reference=data_source_reference)
+    assert set(joinable_data_sources.keys()) == {"bridge_table"}
+    assert joinable_data_sources["bridge_table"] == DataSourceJoin(
+        left_data_source_reference=DataSourceReference(data_source_name="account_month_txns"),
+        right_data_source_reference=DataSourceReference(data_source_name="bridge_table"),
+        identifier_joins=[
+            DataSourceIdentifierJoin(
+                identifier_reference=IdentifierReference(element_name="account_id"),
+                join_type=DataSourceIdentifierJoinType(
+                    left_identifier_type=IdentifierType.PRIMARY, right_identifier_type=IdentifierType.PRIMARY
+                ),
+            )
+        ],
+    )
+
+    # 2-hop
+    joinable_data_sources = join_validator.get_joinable_data_sources(
+        left_data_source_reference=data_source_reference, include_multi_hop=True
+    )
+    assert set(joinable_data_sources.keys()) == {"bridge_table", "customer_other_data", "customer_table"}
+    assert joinable_data_sources["bridge_table"] == DataSourceJoin(
+        left_data_source_reference=DataSourceReference(data_source_name="account_month_txns"),
+        right_data_source_reference=DataSourceReference(data_source_name="bridge_table"),
+        identifier_joins=[
+            DataSourceIdentifierJoin(
+                identifier_reference=IdentifierReference(element_name="account_id"),
+                join_type=DataSourceIdentifierJoinType(
+                    left_identifier_type=IdentifierType.PRIMARY, right_identifier_type=IdentifierType.PRIMARY
+                ),
+            )
+        ],
+    )
+    assert joinable_data_sources["customer_other_data"] == DataSourceJoin(
+        left_data_source_reference=DataSourceReference(data_source_name="account_month_txns"),
+        right_data_source_reference=DataSourceReference(data_source_name="customer_other_data"),
+        identifier_joins=[
+            DataSourceIdentifierJoin(
+                identifier_reference=IdentifierReference(element_name="account_id"),
+                join_type=DataSourceIdentifierJoinType(
+                    left_identifier_type=IdentifierType.PRIMARY, right_identifier_type=IdentifierType.PRIMARY
+                ),
+            ),
+            DataSourceIdentifierJoin(
+                identifier_reference=IdentifierReference(element_name="customer_id"),
+                join_type=DataSourceIdentifierJoinType(
+                    left_identifier_type=IdentifierType.FOREIGN, right_identifier_type=IdentifierType.PRIMARY
+                ),
+            ),
+        ],
+    )
+    assert joinable_data_sources["customer_table"] == DataSourceJoin(
+        left_data_source_reference=DataSourceReference(data_source_name="account_month_txns"),
+        right_data_source_reference=DataSourceReference(data_source_name="customer_table"),
+        identifier_joins=[
+            DataSourceIdentifierJoin(
+                identifier_reference=IdentifierReference(element_name="account_id"),
+                join_type=DataSourceIdentifierJoinType(
+                    left_identifier_type=IdentifierType.PRIMARY, right_identifier_type=IdentifierType.PRIMARY
+                ),
+            ),
+            DataSourceIdentifierJoin(
+                identifier_reference=IdentifierReference(element_name="customer_id"),
+                join_type=DataSourceIdentifierJoinType(
+                    left_identifier_type=IdentifierType.FOREIGN, right_identifier_type=IdentifierType.PRIMARY
+                ),
+            ),
+        ],
     )
