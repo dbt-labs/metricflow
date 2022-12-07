@@ -57,3 +57,8 @@ data_source:
       type: foreign
       expr: host_id
       entity: user
+    # Hack around lack of support for entity/role functionality
+    # TODO: Remove this when full support for entity/role/primary role references is available
+    - name: user
+      type: foreign
+      expr: guest_id

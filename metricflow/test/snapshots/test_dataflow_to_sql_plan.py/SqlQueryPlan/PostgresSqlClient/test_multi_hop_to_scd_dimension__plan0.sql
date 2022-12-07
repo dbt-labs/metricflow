@@ -58,6 +58,7 @@ FROM (
             , subq_0.listing
             , subq_0.guest
             , subq_0.host
+            , subq_0.user
             , subq_0.is_instant
             , subq_0.bookings
             , subq_0.instant_bookings
@@ -92,6 +93,7 @@ FROM (
               , bookings_source_src_10018.listing_id AS listing
               , bookings_source_src_10018.guest_id AS guest
               , bookings_source_src_10018.host_id AS host
+              , bookings_source_src_10018.guest_id AS user
             FROM ***************************.fct_bookings bookings_source_src_10018
           ) subq_0
         ) subq_1

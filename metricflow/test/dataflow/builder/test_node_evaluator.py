@@ -681,8 +681,7 @@ def test_node_evaluator_with_invalid_multi_hop_scd(
 ) -> None:
     """Tests the case where the joined node is reached via an illegal SCD <-> SCD join
 
-    This should fail with an exception, since such joins are not currently supported and we do not yet filter out
-    unsupported SCD <-> SCD join paths from the possible set of join recipes.
+    This will return an empty result because the linkable spec is not joinable in this model.
     """
     linkable_specs = [DimensionSpec.from_name("listing__user__account_type")]
     node_evaluator = make_multihop_node_evaluator(
@@ -692,10 +691,22 @@ def test_node_evaluator_with_invalid_multi_hop_scd(
         time_spine_source=time_spine_source,
     )
 
-    with pytest.raises(
-        AssertionError, match="Found more than 1 set of validity window specs in the input instance set"
-    ):
-        node_evaluator.evaluate_node(
-            required_linkable_specs=linkable_specs,
-            start_node=consistent_id_object_repository.scd_model_read_nodes["bookings_source"],
-        )
+    evaluation = node_evaluator.evaluate_node(
+        required_linkable_specs=linkable_specs,
+        start_node=consistent_id_object_repository.scd_model_read_nodes["bookings_source"],
+    )
+
+    assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
+        local_linkable_specs=(),
+        joinable_linkable_specs=(),
+        join_recipes=(),
+        unjoinable_linkable_specs=(
+            DimensionSpec(
+                element_name="account_type",
+                identifier_links=(
+                    IdentifierReference(element_name="listing"),
+                    IdentifierReference(element_name="user"),
+                ),
+            ),
+        ),
+    )
