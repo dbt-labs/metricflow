@@ -145,36 +145,36 @@ FROM (
           FROM (
             -- Read Elements From Data Source 'listings'
             SELECT
-              listings_src_10019.active_from AS window_start
-              , DATE_TRUNC(listings_src_10019.active_from, isoweek) AS window_start__week
-              , DATE_TRUNC(listings_src_10019.active_from, month) AS window_start__month
-              , DATE_TRUNC(listings_src_10019.active_from, quarter) AS window_start__quarter
-              , DATE_TRUNC(listings_src_10019.active_from, isoyear) AS window_start__year
-              , listings_src_10019.active_to AS window_end
-              , DATE_TRUNC(listings_src_10019.active_to, isoweek) AS window_end__week
-              , DATE_TRUNC(listings_src_10019.active_to, month) AS window_end__month
-              , DATE_TRUNC(listings_src_10019.active_to, quarter) AS window_end__quarter
-              , DATE_TRUNC(listings_src_10019.active_to, isoyear) AS window_end__year
-              , listings_src_10019.country
-              , listings_src_10019.is_lux
-              , listings_src_10019.capacity
-              , listings_src_10019.active_from AS listing__window_start
-              , DATE_TRUNC(listings_src_10019.active_from, isoweek) AS listing__window_start__week
-              , DATE_TRUNC(listings_src_10019.active_from, month) AS listing__window_start__month
-              , DATE_TRUNC(listings_src_10019.active_from, quarter) AS listing__window_start__quarter
-              , DATE_TRUNC(listings_src_10019.active_from, isoyear) AS listing__window_start__year
-              , listings_src_10019.active_to AS listing__window_end
-              , DATE_TRUNC(listings_src_10019.active_to, isoweek) AS listing__window_end__week
-              , DATE_TRUNC(listings_src_10019.active_to, month) AS listing__window_end__month
-              , DATE_TRUNC(listings_src_10019.active_to, quarter) AS listing__window_end__quarter
-              , DATE_TRUNC(listings_src_10019.active_to, isoyear) AS listing__window_end__year
-              , listings_src_10019.country AS listing__country
-              , listings_src_10019.is_lux AS listing__is_lux
-              , listings_src_10019.capacity AS listing__capacity
-              , listings_src_10019.listing_id AS listing
-              , listings_src_10019.user_id AS user
-              , listings_src_10019.user_id AS listing__user
-            FROM ***************************.dim_listings listings_src_10019
+              listings_src_10020.active_from AS window_start
+              , DATE_TRUNC(listings_src_10020.active_from, isoweek) AS window_start__week
+              , DATE_TRUNC(listings_src_10020.active_from, month) AS window_start__month
+              , DATE_TRUNC(listings_src_10020.active_from, quarter) AS window_start__quarter
+              , DATE_TRUNC(listings_src_10020.active_from, isoyear) AS window_start__year
+              , listings_src_10020.active_to AS window_end
+              , DATE_TRUNC(listings_src_10020.active_to, isoweek) AS window_end__week
+              , DATE_TRUNC(listings_src_10020.active_to, month) AS window_end__month
+              , DATE_TRUNC(listings_src_10020.active_to, quarter) AS window_end__quarter
+              , DATE_TRUNC(listings_src_10020.active_to, isoyear) AS window_end__year
+              , listings_src_10020.country
+              , listings_src_10020.is_lux
+              , listings_src_10020.capacity
+              , listings_src_10020.active_from AS listing__window_start
+              , DATE_TRUNC(listings_src_10020.active_from, isoweek) AS listing__window_start__week
+              , DATE_TRUNC(listings_src_10020.active_from, month) AS listing__window_start__month
+              , DATE_TRUNC(listings_src_10020.active_from, quarter) AS listing__window_start__quarter
+              , DATE_TRUNC(listings_src_10020.active_from, isoyear) AS listing__window_start__year
+              , listings_src_10020.active_to AS listing__window_end
+              , DATE_TRUNC(listings_src_10020.active_to, isoweek) AS listing__window_end__week
+              , DATE_TRUNC(listings_src_10020.active_to, month) AS listing__window_end__month
+              , DATE_TRUNC(listings_src_10020.active_to, quarter) AS listing__window_end__quarter
+              , DATE_TRUNC(listings_src_10020.active_to, isoyear) AS listing__window_end__year
+              , listings_src_10020.country AS listing__country
+              , listings_src_10020.is_lux AS listing__is_lux
+              , listings_src_10020.capacity AS listing__capacity
+              , listings_src_10020.listing_id AS listing
+              , listings_src_10020.user_id AS user
+              , listings_src_10020.user_id AS listing__user
+            FROM ***************************.dim_listings listings_src_10020
           ) subq_3
           LEFT OUTER JOIN (
             -- Pass Only Elements:
@@ -208,20 +208,20 @@ FROM (
             FROM (
               -- Read Elements From Data Source 'users_latest'
               SELECT
-                users_latest_src_10023.ds
-                , DATE_TRUNC(users_latest_src_10023.ds, isoweek) AS ds__week
-                , DATE_TRUNC(users_latest_src_10023.ds, month) AS ds__month
-                , DATE_TRUNC(users_latest_src_10023.ds, quarter) AS ds__quarter
-                , DATE_TRUNC(users_latest_src_10023.ds, isoyear) AS ds__year
-                , users_latest_src_10023.home_state_latest
-                , users_latest_src_10023.ds AS user__ds
-                , DATE_TRUNC(users_latest_src_10023.ds, isoweek) AS user__ds__week
-                , DATE_TRUNC(users_latest_src_10023.ds, month) AS user__ds__month
-                , DATE_TRUNC(users_latest_src_10023.ds, quarter) AS user__ds__quarter
-                , DATE_TRUNC(users_latest_src_10023.ds, isoyear) AS user__ds__year
-                , users_latest_src_10023.home_state_latest AS user__home_state_latest
-                , users_latest_src_10023.user_id AS user
-              FROM ***************************.dim_users_latest users_latest_src_10023
+                users_latest_src_10024.ds
+                , DATE_TRUNC(users_latest_src_10024.ds, isoweek) AS ds__week
+                , DATE_TRUNC(users_latest_src_10024.ds, month) AS ds__month
+                , DATE_TRUNC(users_latest_src_10024.ds, quarter) AS ds__quarter
+                , DATE_TRUNC(users_latest_src_10024.ds, isoyear) AS ds__year
+                , users_latest_src_10024.home_state_latest
+                , users_latest_src_10024.ds AS user__ds
+                , DATE_TRUNC(users_latest_src_10024.ds, isoweek) AS user__ds__week
+                , DATE_TRUNC(users_latest_src_10024.ds, month) AS user__ds__month
+                , DATE_TRUNC(users_latest_src_10024.ds, quarter) AS user__ds__quarter
+                , DATE_TRUNC(users_latest_src_10024.ds, isoyear) AS user__ds__year
+                , users_latest_src_10024.home_state_latest AS user__home_state_latest
+                , users_latest_src_10024.user_id AS user
+              FROM ***************************.dim_users_latest users_latest_src_10024
             ) subq_4
           ) subq_5
           ON

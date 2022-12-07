@@ -31,7 +31,7 @@ data_source:
 
   identifiers:
     - name: listing
-      type: primary
+      type: natural
       expr: listing_id
     - name: user
       type: foreign

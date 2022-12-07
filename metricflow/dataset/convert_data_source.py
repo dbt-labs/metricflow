@@ -18,7 +18,7 @@ from metricflow.instances import (
 )
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType
-from metricflow.model.objects.elements.identifier import Identifier, IdentifierType
+from metricflow.model.objects.elements.identifier import Identifier
 from metricflow.model.objects.elements.measure import Measure
 from metricflow.model.spec_converters import MeasureConverter
 from metricflow.specs import (
@@ -380,7 +380,7 @@ class DataSourceToDataSetConverter:
         # instances in the instance set. We'll create a different instance for each "possible_identifier_links".
         possible_identifier_links: List[Tuple[IdentifierReference, ...]] = [()]
         for identifier in data_source.identifiers:
-            if identifier.type in (IdentifierType.PRIMARY, IdentifierType.UNIQUE):
+            if identifier.is_linkable_identifier_type:
                 possible_identifier_links.append((identifier.reference,))
 
         # Handle dimensions

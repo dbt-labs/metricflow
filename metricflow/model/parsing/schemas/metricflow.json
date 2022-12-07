@@ -274,11 +274,11 @@
                         "PRIMARY",
                         "UNIQUE",
                         "FOREIGN",
-                        "RENDER_ONLY",
+                        "NATURAL",
                         "primary",
                         "unique",
                         "foreign",
-                        "render_only"
+                        "natural"
                     ]
                 }
             },

@@ -43,5 +43,5 @@ data_source:
 
   identifiers:
     - name: lux_listing
-      type: primary
+      type: natural
       expr: lux_listing_id

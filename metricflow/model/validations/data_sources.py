@@ -4,6 +4,7 @@ from metricflow.instances import DataSourceElementReference, DataSourceReference
 
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.elements.dimension import DimensionType
+from metricflow.model.objects.elements.identifier import IdentifierType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,
@@ -174,6 +175,35 @@ class DataSourceValidityWindowRule(ModelValidationRule):
                     f"Data source {data_source.name} has two validity param dimensions defined, but does not have "
                     f"exactly one each marked with is_start and is_end! Dimensions: {validity_param_dimension_names}. "
                     f"is_start dimensions: {start_dim_names}. is_end dimensions: {end_dim_names}. {requirements}"
+                ),
+            )
+            issues.append(error)
+
+        primary_or_unique_identifiers = [
+            identifier
+            for identifier in data_source.identifiers
+            if identifier.type in (IdentifierType.PRIMARY, IdentifierType.UNIQUE)
+        ]
+        if not any([identifier.type is IdentifierType.NATURAL for identifier in data_source.identifiers]):
+            error = ValidationError(
+                context=context,
+                message=(
+                    f"Data source {data_source.name} has validity param dimensions defined, but does not have an "
+                    f"identifier with type `natural` set. The natural key for this data source is what we use to "
+                    f"process a validity window join. Primary or unique identifiers, if any, might be suitable for "
+                    f"use as natural keys: ({[identifier.name for identifier in primary_or_unique_identifiers]})."
+                ),
+            )
+            issues.append(error)
+
+        if primary_or_unique_identifiers:
+            error = ValidationError(
+                context=context,
+                message=(
+                    f"Data source {data_source.name} has validity param dimensions defined and also has one or more "
+                    f"identifiers designated as `primary` or `unique`. This is not yet supported, as we do not "
+                    f"currently process joins against these key types for data sources with validity windows "
+                    f"specified."
                 ),
             )
             issues.append(error)

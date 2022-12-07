@@ -20,6 +20,7 @@ def _get_join_types_for_identifier_type(identifier_type: IdentifierType) -> Sequ
         identifier_type is IdentifierType.FOREIGN
         or identifier_type is IdentifierType.PRIMARY
         or identifier_type is IdentifierType.UNIQUE
+        or identifier_type is IdentifierType.NATURAL
     ):
         join_types = tuple(
             DataSourceIdentifierJoinType(left_identifier_type=identifier_type, right_identifier_type=join_type)
@@ -265,4 +266,147 @@ def test_foreign_target_instance_set_join_validation(
     assert not any(results.values()), (
         f"All data source level joins against foreign targets should be invalid, but we found at least one "
         f"that was not! Incorrectly passing types: {[k for k,v in results.items() if v]}."
+    )
+
+
+def test_natural_identifier_data_source_validation(scd_semantic_model: SemanticModel) -> None:
+    """Tests data source validation for NATURAL target identifier types
+
+    These tests rely on the scd_semantic_model, which makes extensive use of NATURAL key types.
+    """
+    natural_user_data_source = scd_semantic_model.data_source_semantics.get("primary_accounts")
+    primary_user_data_source = scd_semantic_model.data_source_semantics.get("users_latest")
+    foreign_user_data_source = scd_semantic_model.data_source_semantics.get("listings")
+    unique_user_data_source = scd_semantic_model.data_source_semantics.get("companies")
+    user_identifier_reference = IdentifierReference(element_name="user")
+    join_validator = DataSourceJoinValidator(data_source_semantics=scd_semantic_model.data_source_semantics)
+    # Type refinement
+    assert natural_user_data_source, "Could not find `primary_accounts` data source in scd model!"
+    assert foreign_user_data_source, "Could not find `listings` data source in scd model!"
+    assert primary_user_data_source, "Could not find `users_latest` data source in scd model!"
+    assert unique_user_data_source, "Could not find `companies` data source in scd model!"
+
+    # Valid cases
+    natural_primary = join_validator.is_valid_data_source_join(
+        left_data_source_reference=natural_user_data_source.reference,
+        right_data_source_reference=primary_user_data_source.reference,
+        on_identifier_reference=user_identifier_reference,
+    )
+    natural_unique = join_validator.is_valid_data_source_join(
+        left_data_source_reference=natural_user_data_source.reference,
+        right_data_source_reference=unique_user_data_source.reference,
+        on_identifier_reference=user_identifier_reference,
+    )
+    foreign_natural = join_validator.is_valid_data_source_join(
+        left_data_source_reference=foreign_user_data_source.reference,
+        right_data_source_reference=natural_user_data_source.reference,
+        on_identifier_reference=user_identifier_reference,
+    )
+    primary_natural = join_validator.is_valid_data_source_join(
+        left_data_source_reference=primary_user_data_source.reference,
+        right_data_source_reference=natural_user_data_source.reference,
+        on_identifier_reference=user_identifier_reference,
+    )
+    unique_natural = join_validator.is_valid_data_source_join(
+        left_data_source_reference=unique_user_data_source.reference,
+        right_data_source_reference=natural_user_data_source.reference,
+        on_identifier_reference=user_identifier_reference,
+    )
+    # Invalid cases
+    natural_foreign = join_validator.is_valid_data_source_join(
+        left_data_source_reference=natural_user_data_source.reference,
+        right_data_source_reference=foreign_user_data_source.reference,
+        on_identifier_reference=user_identifier_reference,
+    )
+    natural_natural = join_validator.is_valid_data_source_join(
+        left_data_source_reference=natural_user_data_source.reference,
+        right_data_source_reference=natural_user_data_source.reference,
+        on_identifier_reference=user_identifier_reference,
+    )
+
+    valid_joins = {
+        "natural to primary": natural_primary,
+        "natural to unique": natural_unique,
+        "foreign to natural": foreign_natural,
+        "primary to natural": primary_natural,
+        "unique to natural": unique_natural,
+    }
+    invalid_joins = {
+        "natural to foreign": natural_foreign,
+        "natural to natural": natural_natural,
+    }
+    assert all(valid_joins.values()) and not any(invalid_joins.values()), (
+        f"Found unexpected join validator results when validating joins involving natural key comparisons! Valid "
+        f"joins marked invalid: {[k for k,v in valid_joins.items() if not v]}. Invalid joins marked valid: "
+        f"{[k for k, v in invalid_joins.items() if v]}."
+    )
+
+
+def test_natural_identifier_instance_set_validation(
+    consistent_id_object_repository: ConsistentIdObjectRepository, scd_semantic_model: SemanticModel
+) -> None:
+    """Tests instance set validation for NATURAL target identifier types
+
+    These tests rely on the scd_semantic_model, which makes extensive use of NATURAL key types.
+    """
+    natural_user_instance_set = consistent_id_object_repository.scd_model_data_sets["primary_accounts"].instance_set
+    primary_user_instance_set = consistent_id_object_repository.scd_model_data_sets["users_latest"].instance_set
+    foreign_user_instance_set = consistent_id_object_repository.scd_model_data_sets["listings"].instance_set
+    unique_user_instance_set = consistent_id_object_repository.scd_model_data_sets["companies"].instance_set
+    user_identifier_reference = IdentifierReference(element_name="user")
+    join_validator = DataSourceJoinValidator(data_source_semantics=scd_semantic_model.data_source_semantics)
+
+    # Valid cases
+    natural_primary = join_validator.is_valid_instance_set_join(
+        left_instance_set=natural_user_instance_set,
+        right_instance_set=primary_user_instance_set,
+        on_identifier_reference=user_identifier_reference,
+    )
+    natural_unique = join_validator.is_valid_instance_set_join(
+        left_instance_set=natural_user_instance_set,
+        right_instance_set=unique_user_instance_set,
+        on_identifier_reference=user_identifier_reference,
+    )
+    foreign_natural = join_validator.is_valid_instance_set_join(
+        left_instance_set=foreign_user_instance_set,
+        right_instance_set=natural_user_instance_set,
+        on_identifier_reference=user_identifier_reference,
+    )
+    primary_natural = join_validator.is_valid_instance_set_join(
+        left_instance_set=primary_user_instance_set,
+        right_instance_set=natural_user_instance_set,
+        on_identifier_reference=user_identifier_reference,
+    )
+    unique_natural = join_validator.is_valid_instance_set_join(
+        left_instance_set=unique_user_instance_set,
+        right_instance_set=natural_user_instance_set,
+        on_identifier_reference=user_identifier_reference,
+    )
+    # Invalid cases
+    natural_foreign = join_validator.is_valid_instance_set_join(
+        left_instance_set=natural_user_instance_set,
+        right_instance_set=foreign_user_instance_set,
+        on_identifier_reference=user_identifier_reference,
+    )
+    natural_natural = join_validator.is_valid_instance_set_join(
+        left_instance_set=natural_user_instance_set,
+        right_instance_set=natural_user_instance_set,
+        on_identifier_reference=user_identifier_reference,
+    )
+
+    valid_joins = {
+        "natural to primary": natural_primary,
+        "natural to unique": natural_unique,
+        "foreign to natural": foreign_natural,
+        "primary to natural": primary_natural,
+        "unique to natural": unique_natural,
+    }
+    invalid_joins = {
+        "natural to foreign": natural_foreign,
+        "natural to natural": natural_natural,
+    }
+    assert all(valid_joins.values()) and not any(invalid_joins.values()), (
+        f"Found unexpected join validator results when validating joins involving natural key comparisons! Valid "
+        f"joins marked invalid: {[k for k,v in valid_joins.items() if not v]}. Invalid joins marked valid: "
+        f"{[k for k, v in invalid_joins.items() if v]}."
     )

@@ -390,14 +390,14 @@
                                 <!--   {'class': 'SqlSelectColumn',                           -->
                                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_86),  -->
                                 <!--    'column_alias': 'capacity'}                           -->
-                                <!-- from_source = SqlSelectStatementNode(node_id=ss_10019) -->
+                                <!-- from_source = SqlSelectStatementNode(node_id=ss_10020) -->
                                 <!-- where = None -->
                                 <SqlSelectStatementNode>
                                     <!-- description = Read Elements From Data Source 'listings' -->
-                                    <!-- node_id = ss_10019 -->
+                                    <!-- node_id = ss_10020 -->
                                     <!-- col0 =                                                      -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10355),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10362),  -->
                                     <!--    'column_alias': 'window_start'}                          -->
                                     <!-- col1 =                                                -->
                                     <!--   {'class': 'SqlSelectColumn',                        -->
@@ -417,7 +417,7 @@
                                     <!--    'column_alias': 'window_start__year'}              -->
                                     <!-- col5 =                                                      -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10360),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10367),  -->
                                     <!--    'column_alias': 'window_end'}                            -->
                                     <!-- col6 =                                                -->
                                     <!--   {'class': 'SqlSelectColumn',                        -->
@@ -437,19 +437,19 @@
                                     <!--    'column_alias': 'window_end__year'}                -->
                                     <!-- col10 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10365),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10372),  -->
                                     <!--    'column_alias': 'country'}                               -->
                                     <!-- col11 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10366),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10373),  -->
                                     <!--    'column_alias': 'is_lux'}                                -->
                                     <!-- col12 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10367),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10374),  -->
                                     <!--    'column_alias': 'capacity'}                              -->
                                     <!-- col13 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10368),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10375),  -->
                                     <!--    'column_alias': 'listing__window_start'}                 -->
                                     <!-- col14 =                                               -->
                                     <!--   {'class': 'SqlSelectColumn',                        -->
@@ -469,7 +469,7 @@
                                     <!--    'column_alias': 'listing__window_start__year'}     -->
                                     <!-- col18 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10373),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10380),  -->
                                     <!--    'column_alias': 'listing__window_end'}                   -->
                                     <!-- col19 =                                               -->
                                     <!--   {'class': 'SqlSelectColumn',                        -->
@@ -489,33 +489,33 @@
                                     <!--    'column_alias': 'listing__window_end__year'}       -->
                                     <!-- col23 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10378),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10385),  -->
                                     <!--    'column_alias': 'listing__country'}                      -->
                                     <!-- col24 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10379),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10386),  -->
                                     <!--    'column_alias': 'listing__is_lux'}                       -->
                                     <!-- col25 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10380),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10387),  -->
                                     <!--    'column_alias': 'listing__capacity'}                     -->
                                     <!-- col26 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10381),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10388),  -->
                                     <!--    'column_alias': 'listing'}                               -->
                                     <!-- col27 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10382),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10389),  -->
                                     <!--    'column_alias': 'user'}                                  -->
                                     <!-- col28 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10383),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10390),  -->
                                     <!--    'column_alias': 'listing__user'}                         -->
-                                    <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10015) -->
+                                    <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10016) -->
                                     <!-- where = None -->
                                     <SqlTableFromClauseNode>
                                         <!-- description = Read from ***************************.dim_listings -->
-                                        <!-- node_id = tfc_10015 -->
+                                        <!-- node_id = tfc_10016 -->
                                         <!-- table_id = ***************************.dim_listings -->
                                     </SqlTableFromClauseNode>
                                 </SqlSelectStatementNode>

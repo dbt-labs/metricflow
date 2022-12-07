@@ -26,15 +26,15 @@ LEFT OUTER JOIN (
   --    'lux_listing__window_end',
   --    'listing']
   SELECT
-    lux_listings_src_10021.valid_from AS lux_listing__window_start
-    , lux_listings_src_10021.valid_to AS lux_listing__window_end
-    , lux_listing_mapping_src_10020.listing_id AS listing
-    , lux_listings_src_10021.is_confirmed_lux AS lux_listing__is_confirmed_lux
-  FROM ***************************.dim_lux_listing_id_mapping lux_listing_mapping_src_10020
+    lux_listings_src_10022.valid_from AS lux_listing__window_start
+    , lux_listings_src_10022.valid_to AS lux_listing__window_end
+    , lux_listing_mapping_src_10021.listing_id AS listing
+    , lux_listings_src_10022.is_confirmed_lux AS lux_listing__is_confirmed_lux
+  FROM ***************************.dim_lux_listing_id_mapping lux_listing_mapping_src_10021
   LEFT OUTER JOIN
-    ***************************.dim_lux_listings lux_listings_src_10021
+    ***************************.dim_lux_listings lux_listings_src_10022
   ON
-    lux_listing_mapping_src_10020.lux_listing_id = lux_listings_src_10021.lux_listing_id
+    lux_listing_mapping_src_10021.lux_listing_id = lux_listings_src_10022.lux_listing_id
 ) subq_18
 ON
   (
