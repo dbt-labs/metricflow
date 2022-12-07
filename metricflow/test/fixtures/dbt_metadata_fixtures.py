@@ -13,6 +13,28 @@ def dbt_json_metrics() -> List[Dict[str, Any]]:  # type: ignore[misc]
         "description": "So many cats, all the cats",
         "schema": "animals",
         "database": "earth_data",
+        "columns": [
+            {
+                "name": "BREED",
+                "type": "TEXT",
+            },
+            {
+                "name": "ORIGIN",
+                "type": "TEXT",
+            },
+            {
+                "name": "MAX_AGE",
+                "type": "NUMBER",
+            },
+            {
+                "name": "CREATED_AT",
+                "type": "TIMESTAMP_TZ",
+            },
+            {
+                "name": "DOMESTICATED",
+                "type": "BOOLEAN",
+            },
+        ],
     }
 
     return [

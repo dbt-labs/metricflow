@@ -1,8 +1,8 @@
 import traceback
-from typing import List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from dateutil.parser import parse, ParserError
-from dbt_metadata_client.dbt_metadata_api_schema import MetricNode, MetricFilter
+from dbt_metadata_client.dbt_metadata_api_schema import CatalogColumn, MetricNode, MetricFilter
 from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
     DbtMappingRule,
     MappedObjects,
@@ -11,6 +11,40 @@ from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.model.validations.validator_helpers import ModelValidationResults, ValidationIssue, ValidationError
+
+
+DBT_COLUMN_TYPES_TO_DIMENSION_TYPES: Dict[str, DimensionType] = {
+    "DATE": DimensionType.TIME,
+    "TIMESTAMP_TZ": DimensionType.TIME,
+    "TIMESTAMP_NTZ": DimensionType.TIME,
+    "TEXT": DimensionType.CATEGORICAL,
+    "BOOLEAN": DimensionType.CATEGORICAL,
+    "NUMBER": DimensionType.CATEGORICAL,  # Measure?
+    "FLOAT": DimensionType.CATEGORICAL,  # Measure?
+}
+
+
+def dimension_for_dimension_in_columns(dimension_name: str, columns: List[CatalogColumn]) -> Optional[Dimension]:
+    """This function tries to build the dimension for a given dimension name in relation to the list of dbt CatalogColumns"""
+    # We uppercase the name because dbt stores the column names upper'd
+    uppered_name = dimension_name.upper()
+
+    for column in columns:
+        if uppered_name == column.name:
+            dim_type = DBT_COLUMN_TYPES_TO_DIMENSION_TYPES[column.type]
+            if dim_type == DimensionType.CATEGORICAL:
+                return Dimension(
+                    name=dimension_name,
+                    type=DimensionType.CATEGORICAL,
+                )
+            else:
+                return Dimension(
+                    name=dimension_name,
+                    type=DimensionType.TIME,
+                    type_params=DimensionTypeParams(is_primary=False, time_granularity=TimeGranularity.DAY),
+                )
+
+    return None
 
 
 class DbtDimensionsToDimensions(DbtMappingRule):
@@ -25,10 +59,16 @@ class DbtDimensionsToDimensions(DbtMappingRule):
                 try:
                     assert_metric_model_name(metric=metric)
                     for dimension in metric.dimensions:
-                        objects.dimensions[metric.model.name][dimension] = Dimension(
-                            name=dimension,
-                            type=DimensionType.CATEGORICAL,
-                        ).dict()
+                        built_dimension = dimension_for_dimension_in_columns(dimension, metric.model.columns)
+                        if built_dimension is not None:
+                            objects.dimensions[metric.model.name][built_dimension.name] = built_dimension.dict()
+                        else:
+                            issues.append(
+                                ValidationError(
+                                    message=f"Dimension `{dimension}` was not found in the dbt model's columns",
+                                    extra_detail=f"columns: {','.join([column.name for column in metric.model.columns])}",
+                                )
+                            )
 
                 except Exception as e:
                     issues.append(
