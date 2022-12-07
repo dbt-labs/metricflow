@@ -7,12 +7,127 @@ import textwrap
 import pytest
 
 from metricflow.errors.errors import UnableToSatisfyQueryError
-from metricflow.query.query_parser import MetricFlowQueryParser
+from metricflow.model.objects.common import YamlConfigFile
+from metricflow.plan_conversion.time_spine import TimeSpineSource
+from metricflow.test.fixtures.model_fixtures import query_parser_from_yaml
 
 logger = logging.getLogger(__name__)
 
 
-def test_nonexistent_metric(query_parser: MetricFlowQueryParser) -> None:  # noqa: D
+EXTENDED_BOOKINGS_YAML = textwrap.dedent(
+    """\
+    data_source:
+      name: bookings_source
+
+      sql_query: |
+        -- User Defined SQL Query
+        SELECT * FROM $bookings_source_table
+
+      measures:
+        - name: bookings
+          expr: "1"
+          agg: sum
+          create_metric: true
+        - name: instant_bookings
+          expr: is_instant
+          agg: sum_boolean
+          create_metric: true
+        - name: booking_value
+          agg: sum
+          create_metric: true
+        - name: max_booking_value
+          agg: max
+          expr: booking_value
+          create_metric: true
+        - name: min_booking_value
+          agg: min
+          expr: booking_value
+          create_metric: true
+        - name: bookers
+          expr: guest_id
+          agg: count_distinct
+          create_metric: true
+        - name: average_booking_value
+          expr: booking_value
+          agg: average
+          create_metric: true
+        - name: booking_payments
+          expr: booking_value
+          agg: sum
+          create_metric: true
+          agg_time_dimension: booking_paid_at
+        - name: referred_bookings
+          expr: referrer_id
+          agg: count
+          create_metric: true
+
+      dimensions:
+        - name: is_instant
+          type: categorical
+        - name: ds
+          type: time
+          type_params:
+            is_primary: True
+            time_granularity: day
+
+      identifiers:
+        - name: listing
+          type: foreign
+          expr: listing_id
+    """
+)
+
+LISTINGS_YAML = textwrap.dedent(
+    """\
+    data_source:
+      name: listings_latest
+      description: listings_latest
+      owners:
+        - support@transformdata.io
+
+      sql_table: schema.table
+
+      measures:
+        - name: listings
+          expr: 1
+          agg: sum
+
+      dimensions:
+        - name: ds
+          type: time
+          expr: created_at
+          type_params:
+            is_primary: True
+            time_granularity: day
+        - name: created_at
+          type: time
+          type_params:
+            time_granularity: day
+        - name: country_latest
+          type: categorical
+          expr: country
+        - name: capacity_latest
+          type: categorical
+          expr: capacity
+
+      identifiers:
+        - name: listing
+          type: primary
+          expr: listing_id
+        - name: user
+          type: foreign
+          expr: user_id
+
+      mutability:
+        type: immutable
+    """
+)
+
+
+def test_nonexistent_metric(time_spine_source: TimeSpineSource) -> None:  # noqa: D
+    bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=EXTENDED_BOOKINGS_YAML)
+    query_parser = query_parser_from_yaml([bookings_yaml_file], time_spine_source)
+
     with pytest.raises(UnableToSatisfyQueryError) as exception_info:
         query_parser.parse_and_validate_query(metric_names=["booking"], group_by_names=["is_instant"])
 
@@ -23,18 +138,21 @@ def test_nonexistent_metric(query_parser: MetricFlowQueryParser) -> None:  # noq
         
             Suggestions for 'booking':
                 ['bookings',
-                 'booking_fees',
                  'booking_value',
                  'instant_bookings',
                  'booking_payments',
-                 'max_booking_value']
+                 'max_booking_value',
+                 'min_booking_value']
             """
         ).rstrip()
         == str(exception_info.value)
     )
 
 
-def test_non_existent_group_by(query_parser: MetricFlowQueryParser) -> None:  # noqa: D
+def test_non_existent_group_by(time_spine_source: TimeSpineSource) -> None:  # noqa: D
+    bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=EXTENDED_BOOKINGS_YAML)
+    query_parser = query_parser_from_yaml([bookings_yaml_file], time_spine_source)
+
     with pytest.raises(UnableToSatisfyQueryError) as exception_info:
         query_parser.parse_and_validate_query(metric_names=["bookings"], group_by_names=["is_instan"])
 
@@ -51,7 +169,12 @@ def test_non_existent_group_by(query_parser: MetricFlowQueryParser) -> None:  # 
     )
 
 
-def test_invalid_group_by(query_parser: MetricFlowQueryParser) -> None:  # noqa: D
+def test_invalid_group_by(time_spine_source: TimeSpineSource) -> None:  # noqa: D
+    bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=EXTENDED_BOOKINGS_YAML)
+    listings_yaml_file = YamlConfigFile(filepath="inline_for_test_2", contents=LISTINGS_YAML)
+
+    query_parser = query_parser_from_yaml([bookings_yaml_file, listings_yaml_file], time_spine_source)
+
     with pytest.raises(UnableToSatisfyQueryError) as exception_info:
         query_parser.parse_and_validate_query(metric_names=["bookings"], group_by_names=["capacity_latest"])
 
