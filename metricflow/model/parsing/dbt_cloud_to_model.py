@@ -1,5 +1,5 @@
-from dbt_metadata_client.client import Client
-from dbt_metadata_client.dbt_metadata_api_schema import MetricNode
+from dbt_metadata_client.client import Client, Operation
+from dbt_metadata_client.dbt_metadata_api_schema import dbt_metadata_api_schema, MetricNode
 from metricflow.model.dbt_converter import DbtConverter
 from metricflow.model.model_transformer import ModelTransformer
 from metricflow.model.parsing.dir_to_model import ModelBuildResult
@@ -10,7 +10,31 @@ def get_dbt_cloud_metrics(auth: str, job_id: str) -> list[MetricNode]:
     """Builds the dbt Manifest object from the dbt project"""
 
     client = Client(api_token=auth)
-    return client.get_metrics(job_id=job_id)
+    query_op = Operation(dbt_metadata_api_schema.Query)
+    metrics = query_op.metrics(job_id=job_id)
+    # specify the attributes we need on metrics
+    metrics.calculation_method()
+    metrics.depends_on()
+    metrics.description()
+    metrics.dimensions()
+    metrics.expression()
+    metrics.filters()
+    metrics.name()
+    metrics.timestamp()
+    metrics.type()
+    model = metrics.model()
+    # specify the attributes we need on models
+    model.alias()
+    model.columns()
+    model.database()
+    model.description()
+    model.name()
+    model.schema()
+    model.type()
+
+    data = client.query_operation(operation=query_op)
+    metric_nodes: List[MetricNode] = (query_op + data).metrics
+    return metric_nodes
 
 
 def parse_dbt_cloud_metrics_to_model(dbt_metrics: List[MetricNode]) -> ModelBuildResult:
