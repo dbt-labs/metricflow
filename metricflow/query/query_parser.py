@@ -369,6 +369,11 @@ class MetricFlowQueryParser:
                 data_source_semantics=self._data_source_semantics,
                 where_constraint=parsed_where_constraint,
             )
+            where_time_specs = spec_where_constraint.linkable_spec_set.time_dimension_specs
+
+            self._time_granularity_solver.validate_time_granularity(
+                metric_references=metric_references, time_dimension_specs=where_time_specs
+            )
 
         return MetricFlowQuerySpec(
             metric_specs=metric_specs,

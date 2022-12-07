@@ -18,6 +18,7 @@ from metricflow.specs import (
 from metricflow.test.test_utils import as_datetime
 from metricflow.test.time.metric_time_dimension import MTD
 from metricflow.time.time_granularity import TimeGranularity
+from metricflow.time.time_granularity_solver import RequestTimeGranularityException
 from metricflow.test.fixtures.model_fixtures import query_parser_from_yaml
 
 logger = logging.getLogger(__name__)
@@ -238,6 +239,19 @@ def test_parse_and_validate_where_constraint_dims(time_spine_source: TimeSpineSo
         where_constraint_str="WHERE is_instant = '1'",
     )
     assert DimensionSpec(element_name="is_instant", identifier_links=()) not in query_spec.dimension_specs
+
+
+def test_parse_and_validate_where_constraint_metric_time(time_spine_source: TimeSpineSource) -> None:
+    """Test that granularity of metric_time reference in where constraint is at least that of the ds dimension."""
+    revenue_yaml_file = YamlConfigFile(filepath="inline_for_test_2", contents=REVENUE_YAML)
+
+    query_parser = query_parser_from_yaml([revenue_yaml_file], time_spine_source)
+    with pytest.raises(RequestTimeGranularityException):
+        query_parser.parse_and_validate_query(
+            metric_names=["revenue"],
+            group_by_names=[MTD],
+            where_constraint_str="WHERE metric_time__day > '2020-01-15'",
+        )
 
 
 def test_parse_and_validate_metric_constraint_dims(time_spine_source: TimeSpineSource) -> None:
