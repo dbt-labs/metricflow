@@ -21,7 +21,7 @@ EXTENDED_BOOKINGS_YAML = textwrap.dedent(
 
       sql_query: |
         -- User Defined SQL Query
-        SELECT * FROM $bookings_source_table
+        SELECT * FROM bookings_source_table
 
       measures:
         - name: bookings
@@ -55,7 +55,6 @@ EXTENDED_BOOKINGS_YAML = textwrap.dedent(
           expr: booking_value
           agg: sum
           create_metric: true
-          agg_time_dimension: booking_paid_at
         - name: referred_bookings
           expr: referrer_id
           agg: count

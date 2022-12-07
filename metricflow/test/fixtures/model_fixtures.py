@@ -11,6 +11,7 @@ import pytest
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, BaseOutput
 from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
+from metricflow.model.model_validator import ModelValidator
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.parsing.dir_to_model import (
@@ -52,8 +53,9 @@ def _data_set_to_source_nodes(
 def query_parser_from_yaml(
     yaml_contents: List[YamlConfigFile], time_spine_source: TimeSpineSource
 ) -> MetricFlowQueryParser:
-    """Given yaml files, return a query parser using default source nodes, resolvers and time_sp"""
+    """Given yaml files, return a query parser using default source nodes, resolvers and time spine source"""
     semantic_model = SemanticModel(parse_yaml_files_to_validation_ready_model(yaml_contents).model)
+    ModelValidator().checked_validations(semantic_model.user_configured_model)
     source_nodes = _data_set_to_source_nodes(semantic_model, create_data_sets(semantic_model))
     return MetricFlowQueryParser(
         model=semantic_model,

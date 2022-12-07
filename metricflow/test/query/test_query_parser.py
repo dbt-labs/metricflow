@@ -31,7 +31,7 @@ BOOKINGS_YAML = textwrap.dedent(
 
       sql_query: |
         -- User Defined SQL Query
-        SELECT * FROM $bookings_source_table
+        SELECT * FROM bookings_source_table
 
       measures:
         - name: bookings
@@ -66,7 +66,7 @@ REVENUE_YAML = textwrap.dedent(
 
       sql_query: |
         -- User Defined SQL Query
-        SELECT * FROM $fct_revenue_table
+        SELECT * FROM fct_revenue_table
 
       measures:
         - name: revenue
