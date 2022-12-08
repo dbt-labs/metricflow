@@ -92,10 +92,10 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         combined_params = SqlBindParameters()
 
         left_expr_rendered = self.render_sql_expr(node.left_expr)
-        combined_params.update(left_expr_rendered.execution_parameters)
+        combined_params = combined_params.combine(left_expr_rendered.execution_parameters)
 
         right_expr_rendered = self.render_sql_expr(node.right_expr)
-        combined_params.update(right_expr_rendered.execution_parameters)
+        combined_params = combined_params.combine(right_expr_rendered.execution_parameters)
 
         # To avoid issues with operator precedence, use parenthesis to group the left / right expressions if they
         # contain operators.
@@ -114,7 +114,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         args_rendered = [self.render_sql_expr(x) for x in node.sql_function_args]
         combined_params = SqlBindParameters()
         for arg_rendered in args_rendered:
-            combined_params.update(arg_rendered.execution_parameters)
+            combined_params = combined_params.combine(arg_rendered.execution_parameters)
 
         distinct_prefix = "DISTINCT " if SqlFunction.is_distinct_aggregation(node.sql_function) else ""
         args_string = ", ".join([x.sql for x in args_rendered])
@@ -145,7 +145,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         can_be_rendered_in_one_line = sum(len(x.expr.sql) for x in args_rendered) < 60
 
         for arg_rendered in args_rendered:
-            combined_parameters.update(arg_rendered.expr.execution_parameters)
+            combined_parameters.combine(arg_rendered.expr.execution_parameters)
             arg_sql = self._render_logical_arg(
                 arg_rendered.expr, arg_rendered.requires_parenthesis, render_in_one_line=can_be_rendered_in_one_line
             )
@@ -251,8 +251,8 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         denominator_sql = f"CAST(NULLIF({rendered_denominator.sql}, 0) AS {self.double_data_type})"
 
         execution_parameters = SqlBindParameters()
-        execution_parameters.update(rendered_numerator.execution_parameters)
-        execution_parameters.update(rendered_denominator.execution_parameters)
+        execution_parameters = execution_parameters.combine(rendered_numerator.execution_parameters)
+        execution_parameters = execution_parameters.combine(rendered_denominator.execution_parameters)
 
         return SqlExpressionRenderResult(
             sql=f"{numerator_sql} / {denominator_sql}",
@@ -264,14 +264,14 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         rendered_start_expr = self.render_sql_expr(node.start_expr)
         rendered_end_expr = self.render_sql_expr(node.end_expr)
 
-        execution_parameters = SqlBindParameters()
-        execution_parameters.update(rendered_column_arg.execution_parameters)
-        execution_parameters.update(rendered_start_expr.execution_parameters)
-        execution_parameters.update(rendered_end_expr.execution_parameters)
+        bind_parameters = SqlBindParameters()
+        bind_parameters = bind_parameters.combine(rendered_column_arg.execution_parameters)
+        bind_parameters = bind_parameters.combine(rendered_start_expr.execution_parameters)
+        bind_parameters = bind_parameters.combine(rendered_end_expr.execution_parameters)
 
         return SqlExpressionRenderResult(
             sql=f"{rendered_column_arg.sql} BETWEEN {rendered_start_expr.sql} AND {rendered_end_expr.sql}",
-            execution_parameters=execution_parameters,
+            execution_parameters=bind_parameters,
         )
 
     def visit_window_function_expr(self, node: SqlWindowFunctionExpression) -> SqlExpressionRenderResult:  # noqa: D
@@ -288,7 +288,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         if order_by_args_rendered:
             args_rendered.extend(list(order_by_args_rendered.keys()))
         for arg_rendered in args_rendered:
-            combined_params.update(arg_rendered.execution_parameters)
+            combined_params = combined_params.combine(arg_rendered.execution_parameters)
 
         sql_function_args_string = ", ".join([x.sql for x in sql_function_args_rendered])
         partition_by_args_string = (
