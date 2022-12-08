@@ -10,6 +10,7 @@ from metricflow.instances import DataSourceReference
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.elements.dimension import DimensionType, Dimension
 from metricflow.model.objects.elements.identifier import IdentifierType
+from metricflow.model.objects.metric import MetricType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.data_source_join_evaluator import DataSourceJoinEvaluator
@@ -412,8 +413,14 @@ class ValidLinkableSpecResolver:
         start_time = time.time()
         for metric in self._user_configured_model.metrics:
             linkable_sets_for_measure = []
-            for measure in metric.measure_references:
-                linkable_sets_for_measure.append(self._get_linkable_element_set_for_measure(measure))
+            if metric.type == MetricType.CONVERSION:
+                conversion_metric_params = metric.conversion_type_params
+                linkable_sets_for_measure.append(
+                    self._get_linkable_element_set_for_measure(conversion_metric_params.base_measure_reference)
+                )
+            else:
+                for measure in metric.measure_references:
+                    linkable_sets_for_measure.append(self._get_linkable_element_set_for_measure(measure))
 
             self._metric_to_linkable_element_sets[metric.name] = linkable_sets_for_measure
         logger.info(f"Building the [metric -> valid linkable element] index took: {time.time() - start_time:.2f}s")

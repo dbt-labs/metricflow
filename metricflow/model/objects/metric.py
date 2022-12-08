@@ -147,6 +147,16 @@ class ConversionTypeParams(HashableBaseModel):
     calculation: ConversionCalculationType = ConversionCalculationType.CONVERSION_RATE
     window: Optional[MetricTimeWindow]
 
+    @property
+    def base_measure_reference(self) -> MeasureReference:
+        """Return the measure reference associated with the base measure."""
+        return self.base_measure.measure_reference
+
+    @property
+    def conversion_measure_reference(self) -> MeasureReference:
+        """Return the measure reference associated with the conversion measure."""
+        return self.conversion_measure.measure_reference
+
 
 class MetricTypeParams(HashableBaseModel):
     """Type params add additional context to certain metric types (the context depends on the metric type)"""
@@ -224,3 +234,11 @@ class Metric(HashableBaseModel, ModelWithMetadataParsing):
                 values.extend(self.constraint.linkable_names)
         values.extend([m.element_name for m in self.measure_references])
         return hash_items(values)
+
+    @property
+    def conversion_type_params(self) -> ConversionTypeParams:
+        """Accessor for conversion type params, enforces that it's set."""
+        assert self.type == MetricType.CONVERSION, "Should only access this for a conversion metric."
+        if self.type_params.conversion_type_params is None:
+            raise ValueError("conversion_type_params is not defined.")
+        return self.type_params.conversion_type_params

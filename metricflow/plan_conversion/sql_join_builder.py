@@ -3,8 +3,14 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple, TypeVar
 
-from metricflow.dataflow.dataflow_plan import JoinConversionEventsNode, JoinDescription, JoinOverTimeRangeNode, JoinToTimeSpineNode
+from metricflow.dataflow.dataflow_plan import (
+    JoinConversionEventsNode,
+    JoinDescription,
+    JoinOverTimeRangeNode,
+    JoinToTimeSpineNode,
+)
 from metricflow.model.objects.metric import MetricTimeWindow
+from metricflow.object_utils import assert_exactly_one_arg_set
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.sql_expression_builders import make_coalesced_expr
 from metricflow.sql.sql_plan import SqlExpressionNode, SqlJoinDescription, SqlJoinType, SqlSelectStatementNode
@@ -426,6 +432,8 @@ class SqlQueryPlanJoinBuilder:
             a.ds <= b.ds AND a.ds > b.ds - <window>
             If no window is present we join across all time -> "a.ds <= b.ds"
         """
+        if window or grain_to_date:
+            assert_exactly_one_arg_set(window=window, grain_to_date=grain_to_date)
         base_column_expr = SqlColumnReferenceExpression(
             SqlColumnReference(
                 table_alias=base_data_set.alias,
@@ -490,7 +498,7 @@ class SqlQueryPlanJoinBuilder:
             time_comparison_dataset=conversion_data_set,
             window=node.window,
         )
-        return SqlQueryPlanJoinBuilder.make_sql_join_description(
+        return SqlQueryPlanJoinBuilder.make_column_equality_sql_join_description(
             right_source_node=conversion_data_set.data_set.sql_select_node,
             left_source_alias=base_data_set.alias,
             right_source_alias=conversion_data_set.alias,

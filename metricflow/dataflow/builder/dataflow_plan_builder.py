@@ -17,6 +17,7 @@ from metricflow.dataflow.builder.node_evaluator import (
     LinkableInstanceSatisfiabilityEvaluation,
 )
 from metricflow.dataflow.dataflow_plan import (
+    AddGeneratedUuidColumnNode,
     AggregateMeasuresNode,
     BaseOutput,
     CombineMetricsNode,
@@ -25,6 +26,7 @@ from metricflow.dataflow.dataflow_plan import (
     DataflowPlan,
     FilterElementsNode,
     JoinAggregatedMeasuresByGroupByColumnsNode,
+    JoinConversionEventsNode,
     JoinDescription,
     JoinOverTimeRangeNode,
     JoinToBaseOutputNode,
@@ -43,13 +45,16 @@ from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.model.objects.metric import MetricType, MetricTimeWindow
 from metricflow.model.semantic_model import SemanticModel
+from metricflow.instances import DataSourceReference
+from metricflow.model.validations.unique_valid_name import MetricFlowReservedKeywords
 from metricflow.object_utils import pformat_big_objects, assert_exactly_one_arg_set
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.node_processor import PreDimensionJoinNodeProcessor
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.time_spine import TimeSpineSource
-from metricflow.references import TimeDimensionReference
+from metricflow.references import MeasureReference, TimeDimensionReference
 from metricflow.specs import (
+    MetadataSpec,
     MetricSpec,
     MetricInputMeasureSpec,
     LinkableInstanceSpec,
@@ -57,6 +62,7 @@ from metricflow.specs import (
     MeasureSpec,
     TimeDimensionSpec,
     IdentifierSpec,
+    InstanceSpec,
     DimensionSpec,
     OrderBySpec,
     NonAdditiveDimensionSpec,
@@ -93,8 +99,8 @@ class MeasureRecipe(Generic[SqlDataSetT]):
 class MeasureSpecProperties:
     """Input dataclass for grouping properties of a sequence of MeasureSpecs."""
 
-    measure_specs: Sequence[MeasureSpec]
-    data_source_name: str
+    measure_specs: Tuple[MeasureSpec, ...]
+    data_source_reference: DataSourceReference
     agg_time_dimension: TimeDimensionReference
     non_additive_dimension_spec: Optional[NonAdditiveDimensionSpec] = None
 
@@ -163,6 +169,109 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
 
         return plan
 
+    def _build_aggregated_conversion_node(
+        self,
+        base_measure_spec: MetricInputMeasureSpec,
+        conversion_measure_spec: MetricInputMeasureSpec,
+        entity_spec: IdentifierSpec,
+        window: Optional[MetricTimeWindow],
+        queried_linkable_specs: LinkableSpecSet,
+        where_constraint: Optional[SpecWhereClauseConstraint] = None,
+        time_range_constraint: Optional[TimeRangeConstraint] = None,
+    ) -> BaseOutput[SqlDataSetT]:
+        """Builds a node that contains aggregated values of conversions and opportunities."""
+
+        # Gets the aggregated opportunities
+        base_measure_properties = self._build_measure_spec_properties((base_measure_spec,))
+        base_required_linkable_specs = self._build_required_linkable_specs(
+            queried_linkable_specs=queried_linkable_specs,
+            where_constraint=where_constraint,
+            non_additive_dimension_spec=base_measure_properties.non_additive_dimension_spec,
+        )
+        base_measure_recipe = self._find_measure_recipe(
+            measure_spec_properties=base_measure_properties,
+            time_range_constraint=time_range_constraint,
+            linkable_specs=base_required_linkable_specs.as_tuple,
+        )
+        logger.info(f"Recipe for base measure aggregation:\n{pformat_big_objects(measure_recipe=base_measure_recipe)}")
+        base_aggregated_measures_node = self.build_aggregated_measures(
+            metric_input_measure_specs=(base_measure_spec,),
+            queried_linkable_specs=queried_linkable_specs,
+            where_constraint=where_constraint,
+            time_range_constraint=time_range_constraint,
+            cumulative=False,
+            cumulative_window=None,
+            cumulative_grain_to_date=None,
+            measure_recipe=base_measure_recipe,
+        )
+
+        # Gets the successful conversions using JoinConversionEventsNode
+        conversion_measure_properties = self._build_measure_spec_properties((conversion_measure_spec,))
+        # The conversion events are joined by the base events which are already time constrained. However, this could
+        # be still be constrained, where we adjust the time range to the window size similar to cumulative, but
+        # adjusted in the opposite direction.
+        conversion_measure_recipe = self._find_measure_recipe(
+            measure_spec_properties=conversion_measure_properties,
+            time_range_constraint=None,
+            linkable_specs=(),
+        )
+        logger.info(
+            f"Recipe for conversion measure aggregation:\n{pformat_big_objects(measure_recipe=conversion_measure_recipe)}"
+        )
+
+        base_measure_node = base_measure_recipe.measure_node
+        conversion_measure_node = conversion_measure_recipe.measure_node
+
+        primary_key_specs: Tuple[InstanceSpec, ...] = tuple(
+            LinklessIdentifierSpec.from_reference(ref)
+            for ref in self._data_source_semantics.get_primary_key_identifiers_for_data_source(
+                conversion_measure_properties.data_source_reference
+            )
+        )
+        if len(primary_key_specs) == 0:
+            # If there are no primary keys in the data source, add a random UUID column as a temporal unique key.
+            logger.info("No primary keys available in data source, generating a UUID column.")
+            conversion_measure_node = AddGeneratedUuidColumnNode(parent_node=conversion_measure_node)
+            primary_key_specs = (MetadataSpec.from_name(MetricFlowReservedKeywords.MF_INTERNAL_UUID.value),)
+
+        # Get the agg time dimension for each measure
+        base_time_dimension_reference = self._data_source_semantics.get_agg_time_dimension_for_measure(
+            base_measure_spec.measure_spec.as_reference
+        )
+        conversion_time_dimension_reference = self._data_source_semantics.get_agg_time_dimension_for_measure(
+            conversion_measure_spec.measure_spec.as_reference
+        )
+        join_conversion_node = JoinConversionEventsNode[SqlDataSetT](
+            base_node=base_measure_node,
+            base_time_dimension_spec=TimeDimensionSpec.from_reference(base_time_dimension_reference),
+            conversion_node=conversion_measure_node,
+            conversion_measure_spec=conversion_measure_spec.measure_spec,
+            conversion_time_dimension_spec=TimeDimensionSpec.from_reference(conversion_time_dimension_reference),
+            conversion_primary_key_specs=primary_key_specs,
+            entity_spec=entity_spec,
+            window=window,
+        )
+        conversion_measure_recipe = MeasureRecipe(
+            measure_node=join_conversion_node,
+            required_local_linkable_specs=base_measure_recipe.required_local_linkable_specs,
+            join_linkable_instances_recipes=base_measure_recipe.join_linkable_instances_recipes,
+        )
+        conversion_aggregated_measures_node = self.build_aggregated_measures(
+            metric_input_measure_specs=(conversion_measure_spec,),
+            queried_linkable_specs=queried_linkable_specs,
+            where_constraint=where_constraint,
+            time_range_constraint=time_range_constraint,
+            cumulative=False,
+            cumulative_window=None,
+            cumulative_grain_to_date=None,
+            measure_recipe=conversion_measure_recipe,
+        )
+
+        # Combine the aggregated opportunities and conversion values
+        return JoinAggregatedMeasuresByGroupByColumnsNode(
+            parent_nodes=(base_aggregated_measures_node, conversion_aggregated_measures_node)
+        )
+
     def _build_metrics_output_node(
         self,
         metric_specs: Sequence[MetricSpec],
@@ -186,7 +295,66 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             metric_reference = metric_spec.as_reference
             metric = self._metric_semantics.get_metric(metric_reference)
 
-            if metric.type == MetricType.DERIVED:
+            if metric.type == MetricType.CONVERSION:
+                metric_input_measure_specs = self._metric_semantics.measures_for_metric(metric_reference)
+                assert len(metric_input_measure_specs) == 2, "Should be base and conversion measure exactly."
+
+                combined_where = where_constraint
+                if metric_spec.constraint:
+                    combined_where = (
+                        combined_where.combine(metric_spec.constraint) if combined_where else metric_spec.constraint
+                    )
+
+                def _get_matching_measure(
+                    measure_to_match: MeasureReference, measure_specs: Tuple[MetricInputMeasureSpec, ...]
+                ) -> MetricInputMeasureSpec:
+                    matched_measure = next(
+                        filter(
+                            lambda x: measure_to_match == x.measure_spec.as_reference,
+                            measure_specs,
+                        ),
+                        None,
+                    )
+                    assert matched_measure, f"Unable to find {measure_to_match} in {measure_specs}."
+                    return matched_measure
+
+                conversion_metric_params = metric.conversion_type_params
+                base_measure = _get_matching_measure(
+                    conversion_metric_params.base_measure_reference, metric_input_measure_specs
+                )
+                conversion_measure = _get_matching_measure(
+                    conversion_metric_params.conversion_measure_reference, metric_input_measure_specs
+                )
+
+                logger.info(
+                    f"For conversion metric {metric_spec},\n"
+                    f"base_measure is:\n{pformat_big_objects(base_measure=base_measure)}\n"
+                    f"conversion_measure is:\n{pformat_big_objects(conversion_measure=conversion_measure)}"
+                )
+                entity_spec = IdentifierSpec.from_name(conversion_metric_params.entity)
+                logger.info(
+                    f"For conversion metric {metric_spec},\n"
+                    f"base_measure is:\n{pformat_big_objects(base_measure=base_measure)}\n"
+                    f"conversion_measure is:\n{pformat_big_objects(conversion_measure=conversion_measure)}\n"
+                    f"entity is:\n{pformat_big_objects(entity_spec=entity_spec)}"
+                )
+                aggregated_measures_node = self._build_aggregated_conversion_node(
+                    base_measure_spec=base_measure,
+                    conversion_measure_spec=conversion_measure,
+                    queried_linkable_specs=queried_linkable_specs,
+                    where_constraint=combined_where,
+                    time_range_constraint=time_range_constraint,
+                    entity_spec=entity_spec,
+                    window=conversion_metric_params.window,
+                )
+                output_nodes.append(
+                    self.build_computed_metrics_node(
+                        metric_spec=metric_spec,
+                        aggregated_node=aggregated_measures_node,
+                    )
+                )
+                continue
+            elif metric.type == MetricType.DERIVED:
                 metric_input_specs = self._metric_semantics.metric_input_specs_for_metric(metric_reference)
                 logger.info(
                     f"For derived metric: {metric_spec}, needed metrics are:\n"
@@ -228,7 +396,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 )
                 compute_metrics_node = self.build_computed_metrics_node(
                     metric_spec=metric_spec,
-                    aggregated_measures_node=aggregated_measures_node,
+                    aggregated_node=aggregated_measures_node,
                 )
 
             if metric_spec.offset_window or metric_spec.offset_to_grain:
@@ -347,17 +515,22 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         """Returns true if any of the linkable specs requires a multi-hop join to realize."""
         return any(len(x.identifier_links) > 1 for x in linkable_specs)
 
-    def _get_data_source_names_for_measures(self, measure_names: Sequence[MeasureSpec]) -> Set[str]:
-        """Return the names of the data sources needed to compute the input measures
+    def _get_data_source_references_for_measures(
+        self, measure_names: Sequence[MeasureSpec]
+    ) -> Set[DataSourceReference]:
+        """Return the references of the data sources needed to compute the input measures
 
         This is a temporary method for use in assertion boundaries while we implement support for multiple data sources
         """
-        data_source_names: Set[str] = set()
+        data_source_references: Set[DataSourceReference] = set()
         for measure_name in measure_names:
-            data_source_names = data_source_names.union(
-                {d.name for d in self._data_source_semantics.get_data_sources_for_measure(measure_name.as_reference)}
+            data_source_references = data_source_references.union(
+                {
+                    d.reference
+                    for d in self._data_source_semantics.get_data_sources_for_measure(measure_name.as_reference)
+                }
             )
-        return data_source_names
+        return data_source_references
 
     def _sort_by_suitability(self, nodes: Sequence[BaseOutput[SqlDataSetT]]) -> Sequence[BaseOutput[SqlDataSetT]]:
         """Sort nodes by the cost, then by the number of linkable specs.
@@ -407,11 +580,14 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         ), "Non-additive dimension can only be a time dimension, if specified."
         return queried_time_dimension_spec
 
-    def _build_measure_spec_properties(self, measure_specs: Sequence[MeasureSpec]) -> MeasureSpecProperties:
+    def _build_measure_spec_properties(
+        self, metric_input_measure_specs: Sequence[MetricInputMeasureSpec]
+    ) -> MeasureSpecProperties:
         """Ensures that the group of MeasureSpecs has the same non_additive_dimension_spec and agg_time_dimension"""
+        measure_specs = tuple(x.measure_spec for x in metric_input_measure_specs)
         if len(measure_specs) == 0:
             raise ValueError("Cannot build MeasureParametersForRecipe when given an empty sequence of measure_specs.")
-        data_sources = self._get_data_source_names_for_measures(measure_specs)
+        data_sources = self._get_data_source_references_for_measures(measure_specs)
         if len(data_sources) > 1:
             raise ValueError(
                 f"Cannot find common properties for measures {measure_specs} coming from multiple "
@@ -432,7 +608,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 raise ValueError(f"measure_specs {measure_specs} do not have the same agg_time_dimension.")
         return MeasureSpecProperties(
             measure_specs=measure_specs,
-            data_source_name=data_sources.pop(),
+            data_source_reference=data_sources.pop(),
             agg_time_dimension=agg_time_dimension,
             non_additive_dimension_spec=non_additive_dimension_spec,
         )
@@ -442,13 +618,18 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         measure_spec_properties: MeasureSpecProperties,
         linkable_specs: Sequence[LinkableInstanceSpec],
         time_range_constraint: Optional[TimeRangeConstraint] = None,
-    ) -> Optional[MeasureRecipe]:
+    ) -> MeasureRecipe:
         """Find a recipe for getting measure_specs along with the linkable specs.
 
         Prior to calling this method we should always be checking that all input measure specs come from
         the same base data source, otherwise the internal conditions here will be impossible to satisfy
         """
         measure_specs = measure_spec_properties.measure_specs
+        logger.info(
+            f"Looking for a recipe to get:\n"
+            f"{pformat_big_objects(measure_specs=measure_specs, required_linkable_set=linkable_specs)}"
+        )
+        find_recipe_start_time = time.time()
         node_processor = PreDimensionJoinNodeProcessor(
             data_source_semantics=self._data_source_semantics,
             node_data_set_resolver=self._node_data_set_resolver,
@@ -571,7 +752,10 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 for x in evaluation.join_recipes
                 for y in x.join_on_partition_time_dimensions
             )
-
+            logger.info(
+                f"With {len(self._source_nodes)} source nodes, finding a recipe took "
+                f"{time.time() - find_recipe_start_time:.2f}s"
+            )
             return MeasureRecipe(
                 measure_node=node_with_lowest_cost,
                 required_local_linkable_specs=(
@@ -584,17 +768,19 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             )
 
         logger.error("No recipe could be constructed.")
-        return None
+        raise UnableToSatisfyQueryError(
+            f"Recipe not found for measure specs: {measure_specs} and linkable specs: {linkable_specs}"
+        )
 
     def build_computed_metrics_node(
         self,
         metric_spec: MetricSpec,
-        aggregated_measures_node: Union[AggregateMeasuresNode[SqlDataSetT], BaseOutput[SqlDataSetT]],
+        aggregated_node: Union[AggregateMeasuresNode[SqlDataSetT], BaseOutput[SqlDataSetT]],
     ) -> ComputeMetricsNode[SqlDataSetT]:
-        """Builds a ComputeMetricsNode from aggregated measures."""
+        """Builds a ComputeMetricsNode from aggregated node."""
 
         return ComputeMetricsNode[SqlDataSetT](
-            parent_node=aggregated_measures_node,
+            parent_node=aggregated_node,
             metric_specs=[metric_spec],
         )
 
@@ -607,6 +793,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         cumulative: Optional[bool] = False,
         cumulative_window: Optional[MetricTimeWindow] = None,
         cumulative_grain_to_date: Optional[TimeGranularity] = None,
+        measure_recipe: Optional[MeasureRecipe] = None,
     ) -> BaseOutput[SqlDataSetT]:
         """Returns a node where the measures are aggregated by the linkable specs and constrained appropriately.
 
@@ -665,6 +852,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                         cumulative=cumulative,
                         cumulative_window=cumulative_window,
                         cumulative_grain_to_date=cumulative_grain_to_date,
+                        measure_recipe=measure_recipe,
                     )
                 )
 
@@ -683,6 +871,24 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 ),
             )
 
+    def _build_required_linkable_specs(
+        self,
+        queried_linkable_specs: LinkableSpecSet,
+        where_constraint: Optional[SpecWhereClauseConstraint],
+        non_additive_dimension_spec: Optional[NonAdditiveDimensionSpec],
+    ) -> LinkableSpecSet:
+        """Builds a LinkableSpecSet containing all specs required to build the query."""
+        extraneous_linkable_specs = LinkableSpecSet()
+        if where_constraint:
+            extraneous_linkable_specs = LinkableSpecSet.merge(
+                (extraneous_linkable_specs, where_constraint.linkable_spec_set)
+            )
+        if non_additive_dimension_spec:
+            extraneous_linkable_specs = LinkableSpecSet.merge(
+                (extraneous_linkable_specs, non_additive_dimension_spec.linkable_specs)
+            )
+        return LinkableSpecSet.merge((queried_linkable_specs, extraneous_linkable_specs))
+
     def _build_aggregated_measures_from_measure_source_node(
         self,
         metric_input_measure_specs: Tuple[MetricInputMeasureSpec, ...],
@@ -692,12 +898,13 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         cumulative: Optional[bool] = False,
         cumulative_window: Optional[MetricTimeWindow] = None,
         cumulative_grain_to_date: Optional[TimeGranularity] = None,
+        measure_recipe: Optional[MeasureRecipe] = None,
     ) -> BaseOutput[SqlDataSetT]:
         metric_time_dimension_requested = self._metric_time_dimension_reference.element_name in [
             linkable_spec.element_name for linkable_spec in queried_linkable_specs.as_tuple
         ]
-        measure_specs = tuple(x.measure_spec for x in metric_input_measure_specs)
-        measure_properties = self._build_measure_spec_properties(measure_specs)
+        measure_properties = self._build_measure_spec_properties(metric_input_measure_specs)
+        measure_specs = measure_properties.measure_specs
         non_additive_dimension_spec = measure_properties.non_additive_dimension_spec
 
         cumulative_metric_adjusted_time_constraint: Optional[TimeRangeConstraint] = None
@@ -719,40 +926,20 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
 
         # Extraneous linkable specs are specs that are used in this phase that should not show up in the final result
         # unless it was already a requested spec in the query
-        extraneous_linkable_specs = LinkableSpecSet()
-        if where_constraint:
-            extraneous_linkable_specs = LinkableSpecSet.merge(
-                (extraneous_linkable_specs, where_constraint.linkable_spec_set)
-            )
-        if non_additive_dimension_spec:
-            extraneous_linkable_specs = LinkableSpecSet.merge(
-                (extraneous_linkable_specs, non_additive_dimension_spec.linkable_specs)
-            )
-
-        required_linkable_specs = LinkableSpecSet.merge((queried_linkable_specs, extraneous_linkable_specs))
-        logger.info(
-            f"Looking for a recipe to get:\n"
-            f"{pformat_big_objects(measure_specs=measure_specs, required_linkable_set=required_linkable_specs)}"
+        required_linkable_specs = self._build_required_linkable_specs(
+            queried_linkable_specs=queried_linkable_specs,
+            where_constraint=where_constraint,
+            non_additive_dimension_spec=non_additive_dimension_spec,
         )
 
-        find_recipe_start_time = time.time()
-        measure_recipe = self._find_measure_recipe(
-            measure_spec_properties=measure_properties,
-            time_range_constraint=cumulative_metric_adjusted_time_constraint or time_range_constraint,
-            linkable_specs=required_linkable_specs.as_tuple,
-        )
-        logger.info(
-            f"With {len(self._source_nodes)} source nodes, finding a recipe took "
-            f"{time.time() - find_recipe_start_time:.2f}s"
-        )
-
-        logger.info(f"Using recipe:\n{pformat_big_objects(measure_recipe=measure_recipe)}")
-
-        if not measure_recipe:
-            # TODO: Improve for better user understandability.
-            raise UnableToSatisfyQueryError(
-                f"Recipe not found for measure specs: {measure_specs} and linkable specs: {required_linkable_specs}"
+        if measure_recipe is None:
+            measure_recipe = self._find_measure_recipe(
+                measure_spec_properties=measure_properties,
+                time_range_constraint=cumulative_metric_adjusted_time_constraint or time_range_constraint,
+                linkable_specs=required_linkable_specs.as_tuple,
             )
+
+            logger.info(f"Using recipe:\n{pformat_big_objects(measure_recipe=measure_recipe)}")
 
         # Only get the required measure and the local linkable instances so that aggregations work correctly.
         filtered_measure_source_node = FilterElementsNode[SqlDataSetT](
@@ -881,8 +1068,8 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 queried_time_dimension_spec=queried_time_dimension_spec,
             )
 
-        if not extraneous_linkable_specs.is_subset_of(queried_linkable_specs):
-            # At this point, it's the case that the linkable specs in the extraneous specs are not a subset of the queried
+        if not required_linkable_specs.is_subset_of(queried_linkable_specs):
+            # At this point, it's the case that there are extraneous specs are not a subset of the queried
             # linkable specs. A filter is needed after, say, a where clause so that the linkable specs in the where clause don't
             # show up in the final result.
             #
