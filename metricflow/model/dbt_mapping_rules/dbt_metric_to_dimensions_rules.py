@@ -1,7 +1,6 @@
 import traceback
 from typing import Dict, List, Optional, Tuple
 
-from dateutil.parser import parse, ParserError
 from dbt_metadata_client.dbt_metadata_api_schema import CatalogColumn, MetricNode, MetricFilter
 from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
     DbtMappingRule,
@@ -110,57 +109,29 @@ class DbtFiltersToDimensions(DbtMappingRule):
     """Rule for mapping dbt metric filters to data source dimensions"""
 
     @staticmethod
-    def _filter_value_is_timestamp(filter_value: str) -> bool:
-        """Determines if a given dbt MetricFilter represents a TIME type dimension or not
-
-        Every dbt MetricFilter represents a dimension. However, we aren't given
-        direct information if should be a CATEGORICAL or TIME dimension. The
-        good news is that every filter includes a `value` to compare with. Thus
-        we can check if this is iso datetime parseable to see if it should be
-        considered a TIME type dimension
-        """
-        # filter values which represent date/time of some sort must start
-        # and end with single quotes
-        if filter_value.startswith("'") and filter_value.endswith("'"):
-            # remove the starting and ending '
-            potential_timestamp = filter_value.strip("'")
-            # dateutil.parser.parse will raise a ParseError if it can't parse the string
-            try:
-                parse(potential_timestamp)
-                return True
-            except ParserError:
-                return False
-        else:
-            return False
-
-    @staticmethod
-    def _dimension_from_filter(filter: MetricFilter) -> Dimension:
-        """Builds a dimension from a dbt MetricFilter assigning the appropriate type"""
-        if DbtFiltersToDimensions._filter_value_is_timestamp(filter.value):
-            return Dimension(
-                name=filter.field,
-                type=DimensionType.TIME,
-                type_params=DimensionTypeParams(is_primary=False, time_granularity=TimeGranularity.DAY),
-            )
-        else:
-            return Dimension(
-                name=filter.field,
-                type=DimensionType.CATEGORICAL,
-            )
-
-    @staticmethod
     def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa D
         issues: List[ValidationIssue] = []
         for metric in dbt_metrics:
             # Skip if a metric doesn't have filters or a model
             if metric.filters and metric.model:
                 try:
+                    assert_metric_model_name(metric=metric)
                     filters: List[MetricFilter] = metric.filters
                     for filter in filters:
-                        assert_metric_model_name(metric=metric)
-                        dimension = DbtFiltersToDimensions._dimension_from_filter(filter=filter)
-                        objects.dimensions[metric.model.name][filter.field] = dimension.dict()
-
+                        # try to build dimension from filter.field
+                        field_dimension = dimension_for_dimension_in_columns(
+                            dimension_name=filter.field,
+                            columns=metric.model.columns,
+                        )
+                        if field_dimension is not None:
+                            objects.dimensions[metric.model.name][field_dimension.name] = field_dimension.dict()
+                        else:
+                            issues.append(
+                                ValidationError(
+                                    message=f"Filter field `{filter.field}` was not found in the dbt model's columns",
+                                    extra_detail=f"columns: {','.join([column.name for column in metric.model.columns])}",
+                                )
+                            )
                 except Exception as e:
                     issues.append(
                         ValidationError(message=str(e), extra_detail="".join(traceback.format_tb(e.__traceback__)))
