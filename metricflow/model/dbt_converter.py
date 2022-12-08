@@ -1,7 +1,7 @@
 from copy import deepcopy
 import logging
 import traceback
-from typing import List, Tuple, Type
+from typing import Collection, FrozenSet, List, Tuple, Type
 
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode
 from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
@@ -42,41 +42,60 @@ from metricflow.model.validations.validator_helpers import ModelValidationResult
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_RULES: Tuple[DbtMappingRule, ...] = (
-    # Build data sources
-    DbtMapToDataSourceName(),
-    DbtMapToDataSourceDescription(),
-    DbtMapDataSourceSqlTable(),
-    # Build Metrics
-    DbtToMetricName(),
-    DbtToMetricDescription(),
-    DbtToMetricType(),
-    DbtToMeasureProxyMetricTypeParams(),
-    DbtToMetricConstraint(),
-    DbtToDerivedMetricTypeParams(),
-    # Build Dimensions
-    DbtDimensionsToDimensions(),
-    DbtTimestampToDimension(),
-    DbtFiltersToDimensions(),
-    # Build Measures
-    DbtToMeasureName(),
-    DbtToMeasureExpr(),
-    DbtToMeasureAgg(),
-    DbtToMeasureAggTimeDimension(),
+DEFAULT_RULES: FrozenSet[DbtMappingRule] = frozenset(
+    [
+        # Build data sources
+        DbtMapToDataSourceName(),
+        DbtMapToDataSourceDescription(),
+        DbtMapDataSourceSqlTable(),
+        # Build Metrics
+        DbtToMetricName(),
+        DbtToMetricDescription(),
+        DbtToMetricType(),
+        DbtToMeasureProxyMetricTypeParams(),
+        DbtToMetricConstraint(),
+        DbtToDerivedMetricTypeParams(),
+        # Build Dimensions
+        DbtDimensionsToDimensions(),
+        DbtTimestampToDimension(),
+        DbtFiltersToDimensions(),
+        # Build Measures
+        DbtToMeasureName(),
+        DbtToMeasureExpr(),
+        DbtToMeasureAgg(),
+        DbtToMeasureAggTimeDimension(),
+    ]
 )
 
 
 class DbtConverter:
-    """Handles converting a list of dbt MetricNodes into a UserConfiguredModel"""
+    """Handles converting a list of dbt MetricNodes into a MetricFlow Model
 
-    def __init__(  # noqa: D
+    A DbtConverter is a tool for converting dbt metrics into a MetricFlow Model.
+    It does so by operating DbtMappingRules which map dbt node properties to
+    MetricFlow Model properties. Once a DbtConverter is instantiated, the rules
+    for that DbtConverter are immutable. Additionally, rules are stored
+    UNORDERED. For clarity, the order of the rules is not guaranteed, and should
+    not be depended on. Any shuffling of a given set of rules should produce the
+    same MetricFlow model.
+    """
+
+    def __init__(
         self,
-        rules: Tuple[DbtMappingRule, ...] = DEFAULT_RULES,
+        rules: Collection[DbtMappingRule] = DEFAULT_RULES,
         data_source_class: Type[DataSource] = DataSource,
         metric_class: Type[Metric] = Metric,
         materialization_class: Type[Materialization] = Materialization,
     ) -> None:
-        self.rules = rules
+        """Initializer for DbtConverter class
+
+        Args:
+            rules: A collection of DbtMappingRules which get saved as a FrozenSet (immutable and unordered). Defaults to DEFAULT_RULES.
+            data_source_class: DataSource class to parse the mapped data sources to. Defaults to MetricFlow DataSource class.
+            metric_class: Metric class to parse the mapped metrics to. Defaults to MetricFlow Metric class.
+            materialization_class: Materialization class to parse the mapped materializations to. Defaults to MetricFlow Materialization class.
+        """
+        self._unordered_rules = frozenset(rules)
         self.data_source_class = data_source_class
         self.metric_class = metric_class
         self.materialization_class = materialization_class
@@ -86,7 +105,7 @@ class DbtConverter:
         mapped_objects = MappedObjects()
         validation_results = ModelValidationResults()
 
-        for rule in self.rules:
+        for rule in self._unordered_rules:
             mapping_rule_issues = rule.run(dbt_metrics=dbt_metrics, objects=mapped_objects)
             validation_results = ModelValidationResults.merge([validation_results, mapping_rule_issues])
 

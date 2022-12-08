@@ -12,7 +12,7 @@ TransformedObjectsValueType: TypeAlias = Any  # type: ignore[misc]
 
 
 @dataclass
-class MappedObjects:  # type: ignore[misc]
+class MappedObjects:
     """Model elements, and sub elements, mapped by element name path"""
 
     data_sources: DefaultDict[str, Dict[str, TransformedObjectsValueType]] = field(
@@ -65,10 +65,16 @@ def assert_essential_metric_properties(metric: MetricNode) -> None:
 
 
 class DbtMappingRule(ABC):
-    """Encapsulates logic for mapping a dbt manifest attributes to metricflow model element attributes."""
+    """Encapsulates logic for mapping a dbt manifest attributes to MetricFlow Model element attributes.
+
+    A given mapping rule should be irrespective of any and all other
+    DbtMappingRules. That is a rule should not depend on information in the
+    passedMappedObjects of `run` to run properly and should not depend on
+    another rule to clean things up.
+    """
 
     @staticmethod
     @abstractmethod
     def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:
-        """Take in a MappedObjects object, update it in place given the metrics and the rule, return any issues"""
+        """Take in a MappedObjects object, update it in place given the metrics as determined by the rule. Return any issues"""
         pass
