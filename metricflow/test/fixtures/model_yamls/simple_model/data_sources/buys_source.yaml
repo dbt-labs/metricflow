@@ -1,0 +1,30 @@
+---
+data_source:
+  name: buys_source
+  description: buys_source
+  owners:
+    - support@transformdata.io
+
+  sql_query: |
+    -- User Defined SQL Query
+    SELECT * FROM $buys_source_table
+
+  measures:
+    - name: buys
+      expr: 1
+      agg: count
+    - name: buyers
+      expr: user_id
+      agg: count_distinct
+
+  dimensions:
+    - name: ds
+      type: time
+      type_params:
+        is_primary: True
+        time_granularity: day
+
+  identifiers:
+    - name: user
+      type: foreign
+      expr: user_id
