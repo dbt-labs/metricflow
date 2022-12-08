@@ -7,10 +7,12 @@ from metricflow.aggregation_properties import AggregationType
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan import (
+    AddGeneratedUuidColumnNode,
     DataflowPlan,
     WriteToResultDataframeNode,
     FilterElementsNode,
     AggregateMeasuresNode,
+    JoinConversionEventsNode,
     JoinDescription,
     JoinToBaseOutputNode,
     ComputeMetricsNode,
@@ -26,6 +28,7 @@ from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.dataset.dataset import DataSet
 from metricflow.model.semantic_model import SemanticModel
+from metricflow.model.objects.metric import MetricTimeWindow
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.time_spine import TimeSpineSource
@@ -34,6 +37,7 @@ from metricflow.references import TimeDimensionReference, IdentifierReference
 from metricflow.specs import (
     DimensionSpec,
     IdentifierSpec,
+    MetadataSpec,
     MeasureSpec,
     MetricInputMeasureSpec,
     MetricSpec,
@@ -46,6 +50,7 @@ from metricflow.specs import (
     LinkableSpecSet,
     InstanceSpecSet,
 )
+from metricflow.model.validations.unique_valid_name import MetricFlowReservedKeywords
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
@@ -57,7 +62,6 @@ from metricflow.test.sql.compare_sql_plan import assert_sql_plan_text_equal
 from metricflow.test.test_utils import as_datetime
 from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY
 from metricflow.time.time_granularity import TimeGranularity
-from metricflow.model.objects.metric import MetricTimeWindow
 
 
 @pytest.fixture(scope="session")
@@ -1781,6 +1785,47 @@ def test_common_data_source(  # noqa: D
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+def test_join_conversion_events_node(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
+    sql_client: SqlClient,
+    consistent_id_object_repository: ConsistentIdObjectRepository,
+) -> None:
+    buys_source = AddGeneratedUuidColumnNode(
+        parent_node=consistent_id_object_repository.simple_model_read_nodes["buys_source"]
+    )
+    visits_source = consistent_id_object_repository.simple_model_read_nodes["visits_source"]
+
+    measure_spec = MeasureSpec(
+        element_name="buys",
+    )
+    base_time_dimension = TimeDimensionSpec.from_name("ds")
+    conversion_time_dimension = TimeDimensionSpec.from_name("ds")
+    window = MetricTimeWindow(count=7, granularity=TimeGranularity.DAY)
+    entity = IdentifierSpec.from_name("user")
+    conversion_primary_keys = (MetadataSpec.from_name(MetricFlowReservedKeywords.MF_INTERNAL_UUID.value),)
+    join_node = JoinConversionEventsNode[DataSourceDataSet](
+        base_node=visits_source,
+        base_time_dimension_spec=base_time_dimension,
+        conversion_node=buys_source,
+        conversion_measure_spec=measure_spec,
+        conversion_time_dimension_spec=conversion_time_dimension,
+        conversion_primary_key_specs=conversion_primary_keys,
+        entity_spec=entity,
+        window=window,
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=join_node,
     )
 
 

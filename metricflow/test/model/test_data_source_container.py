@@ -45,6 +45,7 @@ def test_get_names(new_data_source_semantics: DataSourceSemantics) -> None:  # n
         "home_state_latest",
         "is_instant",
         "is_lux_latest",
+        "referrer_id",
         "verification_type",
     ]
     assert sorted([d.element_name for d in new_data_source_semantics.get_dimension_references()]) == expected
@@ -59,6 +60,8 @@ def test_get_names(new_data_source_semantics: DataSourceSemantics) -> None:  # n
         "booking_value",
         "booking_value_p99",
         "bookings",
+        "buyers",
+        "buys",
         "current_account_balance_by_user",
         "discrete_booking_value_p99",
         "identity_verifications",
@@ -73,6 +76,8 @@ def test_get_names(new_data_source_semantics: DataSourceSemantics) -> None:  # n
         "total_account_balance_first_day",
         "txn_revenue",
         "views",
+        "visitors",
+        "visits",
     ]
     assert sorted([m.element_name for m in new_data_source_semantics.measure_references]) == expected
 
@@ -202,4 +207,4 @@ def test_get_data_sources_for_identifier(new_data_source_semantics: DataSourceSe
     linked_data_sources = new_data_source_semantics.get_data_sources_for_identifier(
         identifier_reference=identifier_reference
     )
-    assert len(linked_data_sources) == 9
+    assert len(linked_data_sources) == 11

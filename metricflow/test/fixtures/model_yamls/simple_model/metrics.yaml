@@ -682,3 +682,31 @@ metric:
       - name: bookings
         offset_window: 5 days
         alias: bookings_5_days_ago
+---
+metric:
+  name: visit_buy_conversion_rate
+  description: conversion rate on visits-buys on a 7 day window
+  owners:
+    - support@transformdata.io
+  type: conversion
+  type_params:
+    conversion_type_params:
+      base_measure: visits
+      conversion_measure: buys
+      window: 7 days
+      entity: user
+      calculation: conversion_rate
+---
+metric:
+  name: visit_buy_conversions
+  description: conversion count on visits-buys on a 7 day window
+  owners:
+    - support@transformdata.io
+  type: conversion
+  type_params:
+    conversion_type_params:
+      base_measure: visits
+      conversion_measure: buys
+      window: 7 days
+      entity: user
+      calculation: conversions

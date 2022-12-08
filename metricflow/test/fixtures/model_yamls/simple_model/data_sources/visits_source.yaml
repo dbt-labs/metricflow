@@ -1,0 +1,33 @@
+---
+data_source:
+  name: visits_source
+  description: visits_source
+  owners:
+    - support@transformdata.io
+
+  sql_query: |
+    -- User Defined SQL Query
+    SELECT * FROM $visits_source_table
+
+  measures:
+    - name: visits
+      expr: 1
+      agg: count
+    - name: visitors
+      expr: user_id
+      agg: count_distinct
+
+
+  dimensions:
+    - name: ds
+      type: time
+      type_params:
+        is_primary: True
+        time_granularity: day
+    - name: referrer_id
+      type: categorical
+
+  identifiers:
+    - name: user
+      type: foreign
+      expr: user_id

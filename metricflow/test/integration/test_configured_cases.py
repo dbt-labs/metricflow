@@ -19,6 +19,7 @@ from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_exprs import (
     SqlPercentileExpression,
     SqlPercentileExpressionArgument,
+    SqlGenerateUuidExpression,
     SqlTimeDeltaExpression,
     SqlColumnReferenceExpression,
     SqlColumnReference,
@@ -133,6 +134,11 @@ class CheckQueryHelpers:
     def double_data_type_name(self) -> str:
         """Return the name of the double data type for the relevant SQL engine"""
         return self._sql_client.sql_engine_attributes.double_data_type_name
+
+    def generate_random_uuid(self) -> str:
+        """Returns the generate random UUID SQL function."""
+        expr = SqlGenerateUuidExpression()
+        return self._sql_client.sql_engine_attributes.sql_query_plan_renderer.expr_renderer.render_sql_expr(expr).sql
 
 
 def filter_not_supported_features(
@@ -261,6 +267,7 @@ def test_case(
             render_percentile_expr=check_query_helpers.render_percentile_expr,
             mf_time_spine_source=time_spine_source.spine_table.sql,
             double_data_type_name=check_query_helpers.double_data_type_name,
+            generate_random_uuid=check_query_helpers.generate_random_uuid,
         )
     )
     # If we sort, it's effectively not checking the order whatever order that the output was would be overwritten.
