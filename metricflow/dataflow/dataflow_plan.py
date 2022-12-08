@@ -1405,7 +1405,7 @@ class JoinConversionEventsNode(Generic[SourceDataSetT], BaseOutput[SourceDataSet
         conversion_time_dimension_spec: TimeDimensionSpec,
         conversion_primary_key_specs: Tuple[InstanceSpec, ...],
         entity_spec: IdentifierSpec,
-        window: Optional[CumulativeMetricWindow] = None,
+        window: Optional[MetricTimeWindow] = None,
     ) -> None:
         """Constructor.
 
@@ -1465,7 +1465,7 @@ class JoinConversionEventsNode(Generic[SourceDataSetT], BaseOutput[SourceDataSet
         return self._entity_spec
 
     @property
-    def window(self) -> Optional[CumulativeMetricWindow]:  # noqa: D
+    def window(self) -> Optional[MetricTimeWindow]:  # noqa: D
         return self._window
 
     @property

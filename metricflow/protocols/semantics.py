@@ -129,6 +129,13 @@ class DataSourceSemanticsAccessor(Protocol):
         """Return all data sources associated with an identifier reference"""
         raise NotImplementedError
 
+    @abstractmethod
+    def get_primary_key_identifiers_for_data_source(
+        self, data_source_reference: DataSourceReference
+    ) -> List[IdentifierReference]:
+        """Returns all the primary identifier with the associated data source."""
+        raise NotImplementedError
+
 
 class MetricSemanticsAccessor(Protocol):
     """Protocol defining core interface for accessing semantic information about a set of metric objects

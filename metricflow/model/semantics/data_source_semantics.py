@@ -8,7 +8,7 @@ from metricflow.errors.errors import InvalidDataSourceError
 from metricflow.instances import DataSourceReference, DataSourceElementReference
 from metricflow.model.objects.data_source import DataSource, DataSourceOrigin
 from metricflow.model.objects.elements.dimension import Dimension
-from metricflow.model.objects.elements.identifier import Identifier
+from metricflow.model.objects.elements.identifier import Identifier, IdentifierType
 from metricflow.model.objects.elements.measure import Measure
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantics.data_source_container import PydanticDataSourceContainer
@@ -55,6 +55,7 @@ class DataSourceSemantics:
         self._data_source_to_aggregation_time_dimensions: Dict[
             DataSourceReference, ElementGrouper[TimeDimensionReference, MeasureSpec]
         ] = {}
+        self._data_source_primary_keys: Dict[DataSourceReference, List[IdentifierReference]] = defaultdict(list)
 
         # Add semantic tracking for data sources from configured_data_source_container
         for data_source in self._configured_data_source_container.values():
@@ -211,6 +212,8 @@ class DataSourceSemantics:
             self._identifier_ref_to_entity[ident.reference] = ident.entity
             self._entity_index[ident.entity].append(data_source)
             self._linkable_reference_index[ident.reference].append(data_source)
+            if ident.type == IdentifierType.PRIMARY:
+                self._data_source_primary_keys[data_source.reference].append(ident.reference)
 
     @property
     def data_source_references(self) -> Sequence[DataSourceReference]:  # noqa: D
@@ -230,3 +233,9 @@ class DataSourceSemantics:
         """Return all data sources associated with an identifier reference"""
         identifier_entity = self._identifier_ref_to_entity[identifier_reference]
         return set(self._entity_index[identifier_entity])
+
+    def get_primary_key_identifiers_for_data_source(
+        self, data_source_reference: DataSourceReference
+    ) -> List[IdentifierReference]:
+        """Returns a list of primary keys in the data source."""
+        return self._data_source_primary_keys.get(data_source_reference, [])

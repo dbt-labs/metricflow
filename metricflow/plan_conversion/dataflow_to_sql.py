@@ -40,7 +40,7 @@ from metricflow.instances import (
     MetricModelReference,
     TimeDimensionInstance,
 )
-from metricflow.model.objects.metric import MetricType
+from metricflow.model.objects.metric import ConversionCalculationType, MetricType
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.validations.unique_valid_name import MetricFlowReservedKeywords
 from metricflow.object_utils import assert_values_exhausted
@@ -720,6 +720,43 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             elif metric.type == MetricType.EXPR or metric.type == MetricType.DERIVED:
                 assert metric.type_params.expr
                 metric_expr = SqlStringExpression(sql_expr=metric.type_params.expr)
+            elif metric.type == MetricType.CONVERSION:
+                base_measure = metric.type_params.base_measure
+                conversion_measure = metric.type_params.conversion_measure
+                assert (
+                    base_measure is not None and conversion_measure is not None
+                ), "Missing base_measure or conversion_measure for conversion metric, this should have been caught in validation!"
+                base_measure_column = self._column_association_resolver.resolve_measure_spec(
+                    MeasureSpec(element_name=base_measure.post_aggregation_measure_reference.element_name)
+                ).column_name
+                conversion_measure_column = self._column_association_resolver.resolve_measure_spec(
+                    MeasureSpec(element_name=conversion_measure.post_aggregation_measure_reference.element_name)
+                ).column_name
+
+                calculation_type = metric.type_params.calculation
+                assert calculation_type
+                if calculation_type == ConversionCalculationType.CONVERSION_RATE:
+                    metric_expr = SqlRatioComputationExpression(
+                        numerator=SqlColumnReferenceExpression(
+                            SqlColumnReference(
+                                table_alias=from_data_set_alias,
+                                column_name=conversion_measure_column,
+                            )
+                        ),
+                        denominator=SqlColumnReferenceExpression(
+                            SqlColumnReference(
+                                table_alias=from_data_set_alias,
+                                column_name=base_measure_column,
+                            )
+                        ),
+                    )
+                elif calculation_type == ConversionCalculationType.CONVERSIONS:
+                    metric_expr = SqlColumnReferenceExpression(
+                        SqlColumnReference(
+                            table_alias=from_data_set_alias,
+                            column_name=conversion_measure_column,
+                        )
+                    )
             else:
                 assert_values_exhausted(metric.type)
 

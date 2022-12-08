@@ -337,6 +337,11 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
     def as_linkable_spec_set(self) -> LinkableSpecSet:  # noqa: D
         return LinkableSpecSet(time_dimension_specs=(self,))
 
+    @staticmethod
+    def from_reference(reference: TimeDimensionReference) -> TimeDimensionSpec:
+        """Initialize from a measure reference instance"""
+        return TimeDimensionSpec(identifier_links=(), element_name=reference.element_name)
+
 
 @dataclass(frozen=True)
 class NonAdditiveDimensionSpec(SerializableDataclass):

@@ -162,6 +162,20 @@ class MetricTypeParams(HashableBaseModel):
         """Return the measure reference, if any, associated with the metric input measure defined as the denominator"""
         return self.denominator.measure_reference if self.denominator else None
 
+    @property
+    def base_measure_reference(self) -> MeasureReference:
+        """Returns the base measure reference, raise error if None."""
+        if self.base_measure is None:
+            raise ValueError("base_measure is not defined in the type_params")
+        return self.base_measure.measure_reference
+
+    @property
+    def conversion_measure_reference(self) -> MeasureReference:
+        """Returns the conversion measure reference, raise error if None."""
+        if self.conversion_measure is None:
+            raise ValueError("conversion_measure is not defined in the type_params")
+        return self.conversion_measure.measure_reference
+
 
 class Metric(HashableBaseModel, ModelWithMetadataParsing):
     """Describes a metric"""
