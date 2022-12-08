@@ -1,18 +1,19 @@
+import datetime
 import logging
 import threading
-from collections import OrderedDict
-from typing import Set, Union
-import datetime
+from typing import Set, Union, Sequence
+
 import pandas as pd
 import pytest
+from sqlalchemy.exc import ProgrammingError
+
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.object_utils import assert_values_exhausted, random_id
+from metricflow.object_utils import assert_values_exhausted, random_id, SqlColumnType
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.sql_utils import make_df
 from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
-from sqlalchemy.exc import ProgrammingError
 
 logger = logging.getLogger(__name__)
 
@@ -39,8 +40,17 @@ def test_query(sql_client: SqlClient) -> None:  # noqa: D
 
 def test_query_with_execution_params(sql_client: SqlClient) -> None:
     """Test querying with execution parameters of all supported datatypes."""
-    for param in [2, "hi", 3.5, True, False, datetime.datetime(2022, 1, 1), datetime.date(2020, 12, 31)]:
-        sql_execution_params = SqlBindParameters(param_dict={"x": param})
+    params: Sequence[SqlColumnType] = [
+        2,
+        "hi",
+        3.5,
+        True,
+        False,
+        datetime.datetime(2022, 1, 1),
+        datetime.date(2020, 12, 31),
+    ]
+    for param in params:
+        sql_execution_params = SqlBindParameters.create_from_dict(({"x": param}))
         assert sql_execution_params.param_dict["x"] == param  # check that pydantic did not coerce type unexpectedly
 
         expr = f"SELECT {sql_client.render_execution_param_key('x')} as y"
@@ -70,8 +80,7 @@ def test_select_one_query(sql_client: SqlClient) -> None:  # noqa: D
 
 def test_failed_query_with_execution_params(sql_client: SqlClient) -> None:  # noqa: D
     expr = f"SELECT {sql_client.render_execution_param_key('x')}"
-    sql_execution_params = SqlBindParameters()
-    sql_execution_params.param_dict = OrderedDict([("x", "1")])
+    sql_execution_params = SqlBindParameters.create_from_dict({"x": 1})
 
     sql_client.query(expr, sql_bind_parameters=sql_execution_params)
     with pytest.raises(Exception):
@@ -217,18 +226,18 @@ def test_cancel_submitted_queries(  # noqa: D
 
 
 def test_update_params_with_same_item() -> None:  # noqa: D
-    bind_params0 = SqlBindParameters(param_dict=OrderedDict({"key": "value"}))
-    bind_params1 = SqlBindParameters(param_dict=OrderedDict({"key": "value"}))
+    bind_params0 = SqlBindParameters.create_from_dict({"key": "value"})
+    bind_params1 = SqlBindParameters.create_from_dict({"key": "value"})
 
-    bind_params0.update(bind_params1)
+    bind_params0.combine(bind_params1)
 
 
 def test_update_params_with_same_key_different_values() -> None:  # noqa: D
-    bind_params0 = SqlBindParameters(param_dict=OrderedDict({"key": "value0"}))
-    bind_params1 = SqlBindParameters(param_dict=OrderedDict({"key": "value1"}))
+    bind_params0 = SqlBindParameters.create_from_dict(({"key": "value0"}))
+    bind_params1 = SqlBindParameters.create_from_dict(({"key": "value1"}))
 
     with pytest.raises(RuntimeError):
-        bind_params0.update(bind_params1)
+        bind_params0.combine(bind_params1)
 
 
 def test_list_tables(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D

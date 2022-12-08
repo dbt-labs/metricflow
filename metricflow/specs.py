@@ -11,11 +11,10 @@ from __future__ import annotations
 
 import itertools
 from abc import ABC, abstractmethod
-from collections import OrderedDict
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple, TypeVar, Generic, Any
-from metricflow.aggregation_properties import AggregationType, AggregationState
 
+from metricflow.aggregation_properties import AggregationType, AggregationState
 from metricflow.column_assoc import ColumnAssociation
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dataclass_serialization import SerializableDataclass
@@ -582,21 +581,12 @@ class SpecWhereClauseConstraint(SerializableDataclass):
     def combine(self, other: SpecWhereClauseConstraint) -> SpecWhereClauseConstraint:  # noqa: D
         linkable_names = list(set(self.linkable_names).union(set(other.linkable_names)))
         where_condition = f"({self.where_condition}) AND ({other.where_condition})"
-        new_sql_values = OrderedDict(self.execution_parameters.param_dict)
-        for k, v in other.execution_parameters.param_dict.items():
-            if k in new_sql_values and v != new_sql_values[k]:
-                raise ValueError(
-                    f"Cannot combine with an execution parameter collision. Both where clauses have key ({k}),"
-                    f" but different values: ({v} != {new_sql_values[k]})"
-                )
-
-            new_sql_values[k] = v
 
         return SpecWhereClauseConstraint(
             where_condition=where_condition,
             linkable_names=tuple(linkable_names),
             linkable_spec_set=LinkableSpecSet.merge([self.linkable_spec_set, other.linkable_spec_set]),
-            execution_parameters=SqlBindParameters(param_dict=OrderedDict(new_sql_values)),
+            execution_parameters=self.execution_parameters.combine(other.execution_parameters),
         )
 
 

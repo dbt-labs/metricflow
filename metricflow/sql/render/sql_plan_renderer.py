@@ -89,7 +89,7 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
         for select_column in select_columns:
             expr_rendered = self.EXPR_RENDERER.render_sql_expr(select_column.expr)
             # Merge all execution parameters together. Similar pattern follows below.
-            params.update(expr_rendered.execution_parameters)
+            params = params.combine(expr_rendered.execution_parameters)
 
             column_select_str = f"{expr_rendered.sql} AS {select_column.column_alias}"
 
@@ -159,13 +159,13 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
         for join_description in join_descriptions:
             # Render the source for the join
             right_source_rendered = self._render_node(join_description.right_source)
-            params.update(right_source_rendered.execution_parameters)
+            params = params.combine(right_source_rendered.execution_parameters)
 
             # Render the on condition for the join
             on_condition_rendered: Optional[SqlExpressionRenderResult] = None
             if join_description.on_condition:
                 on_condition_rendered = self.EXPR_RENDERER.render_sql_expr(join_description.on_condition)
-                params.update(on_condition_rendered.execution_parameters)
+                params = params.combine(on_condition_rendered.execution_parameters)
 
             if join_description.right_source.is_table:
                 join_section_lines.append(join_description.join_type.value)
@@ -199,7 +199,7 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
         first = True
         for group_by_column in group_by_columns:
             group_by_expr_rendered = self.EXPR_RENDERER.render_sql_expr(group_by_column.expr)
-            params.update(group_by_expr_rendered.execution_parameters)
+            params = params.combine(group_by_expr_rendered.execution_parameters)
             if first:
                 first = False
                 group_by_section_lines.append("GROUP BY")
@@ -218,25 +218,25 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
 
         # Render "SELECT" column section
         select_section, select_params = self._render_select_columns_section(node.select_columns, len(node.parent_nodes))
-        combined_params.update(select_params)
+        combined_params = combined_params.combine(select_params)
 
         # Render "FROM" section
         from_section, from_params = self._render_from_section(node.from_source, node.from_source_alias)
-        combined_params.update(from_params)
+        combined_params = combined_params.combine(from_params)
 
         # Render "JOIN" section
         join_section, join_params = self._render_joins_section(node.join_descs)
-        combined_params.update(join_params)
+        combined_params = combined_params.combine(join_params)
 
         # Render "GROUP BY" section
         group_by_section, group_by_params = self._render_group_by_section(node.group_bys)
-        combined_params.update(group_by_params)
+        combined_params = combined_params.combine(group_by_params)
 
         # Render "WHERE" section
         where_section = None
         if node.where:
             where_render_result = self.EXPR_RENDERER.render_sql_expr(node.where)
-            combined_params.update(where_render_result.execution_parameters)
+            combined_params = combined_params.combine(where_render_result.execution_parameters)
             where_section = f"WHERE {where_render_result.sql}"
 
         # Render "ORDER BY" section
@@ -246,7 +246,7 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
             for order_by in node.order_bys:
                 order_by_render_result = self.EXPR_RENDERER.render_sql_expr(order_by.expr)
                 order_by_items.append(order_by_render_result.sql + (" DESC" if order_by.desc else ""))
-                combined_params.update(order_by_render_result.execution_parameters)
+                combined_params = combined_params.combine(order_by_render_result.execution_parameters)
 
             order_by_section = "ORDER BY " + ", ".join(order_by_items)
 
