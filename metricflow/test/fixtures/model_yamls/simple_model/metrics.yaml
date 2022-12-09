@@ -555,3 +555,17 @@ metric:
     metrics:
       - name: trailing_2_months_revenue
         alias: t2mr
+---
+metric:
+  name: booking_value_per_view
+  description: proportion of booking value per view, which allows us to test joins to listings with null values
+  owners:
+    - support@transformdata.io
+  type: derived
+  type_params:
+    expr: booking_value / NULLIF(views, 0)
+    metrics:
+      - name: booking_value
+      - name: views
+---
+
