@@ -7,7 +7,6 @@ from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
     MappedObjects,
     assert_essential_metric_properties,
 )
-from metricflow.model.objects.constraints.where import WhereClauseConstraint
 from metricflow.model.objects.metric import MetricInputMeasure, MetricInput, MetricType, MetricTypeParams
 from metricflow.model.validations.validator_helpers import ModelValidationResults, ValidationIssue, ValidationError
 
@@ -147,22 +146,13 @@ class DbtToDerivedMetricTypeParams(DbtMappingRule):
 
 
 class DbtToMetricConstraint(DbtMappingRule):
-    """Rule for mapping dbt metric filters to metric w"""
+    """Rule for mapping dbt metric filters to metric constraint
 
-    @staticmethod
-    def _build_where_clause_constraint(filters: List[MetricFilter]) -> WhereClauseConstraint:
-        """Builds an SQL 'where' statement from a list of dbt MetricFilters
-
-        Each dbt filter has a field, an operator, and a value. With these dbt
-        forms the individual statment '{field} {operator} {value}' and joins
-        them with an 'AND'. Thus we do the same.
-
-        Note:
-            TODO: We could probably replace this with whatever method dbt uses to
-            build the statement.
-        """
-        clauses = [f"{filter.field} {filter.operator} {filter.value}" for filter in filters]
-        return WhereClauseConstraint(where=" AND ".join(clauses), linkable_names=[filter.field for filter in filters])
+    With this rule we just build the SQL where constraint from the filters as
+    we'd define it in the YAML definition of a MetricFlow metric. This makes it
+    so that when we parse the mapped objects to MetricFlow model elements, the
+    constraint goes through the WhereClauseConstraint parser.
+    """
 
     @staticmethod
     def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
@@ -172,10 +162,9 @@ class DbtToMetricConstraint(DbtMappingRule):
                 # Filters are optional
                 if metric.filters:
                     assert_essential_metric_properties(metric=metric)
-                    objects.metrics[metric.name]["constraint"] = DbtToMetricConstraint._build_where_clause_constraint(
-                        metric.filters
-                    )
-
+                    filters: List[MetricFilter] = metric.filters
+                    clauses = [f"{filter.field} {filter.operator} {filter.value}" for filter in filters]
+                    objects.metrics[metric.name]["constraint"] = " AND ".join(clauses)
             except Exception as e:
                 issues.append(
                     ValidationError(message=str(e), extra_detail="".join(traceback.format_tb(e.__traceback__)))
