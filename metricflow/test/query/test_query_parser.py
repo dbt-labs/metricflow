@@ -157,3 +157,19 @@ def test_parse_and_validate_metric_constraint_dims(query_parser: MetricFlowQuery
             time_constraint_start=as_datetime("2020-01-15"),
             time_constraint_end=as_datetime("2020-02-15"),
         )
+
+
+def test_derived_metric_query_parsing(query_parser: MetricFlowQueryParser) -> None:
+    """Test derived metric inputs are properly validated."""
+
+    # check that no dimension query raises UnableToSatisfyQueryError
+    with pytest.raises(UnableToSatisfyQueryError):
+        query_parser.parse_and_validate_query(
+            metric_names=["trailing_2_months_revenue_sub_10"],
+            group_by_names=[],
+        )
+
+    query_parser.parse_and_validate_query(
+        metric_names=["trailing_2_months_revenue_sub_10"],
+        group_by_names=[MTD],
+    )

@@ -543,4 +543,15 @@ metric:
         alias: instant
       - name: bookings
 ---
-
+metric:
+  name: "trailing_2_months_revenue_sub_10"
+  description: |
+    Test derived metric with a cumulative metric
+  owners:
+    - support@transformdata.io
+  type: derived
+  type_params:
+    expr: t2mr - 10
+    metrics:
+      - name: trailing_2_months_revenue
+        alias: t2mr
