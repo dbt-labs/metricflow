@@ -5,7 +5,7 @@ from metricflow.sql.render.expr_renderer import (
 )
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql.sql_exprs import SqlGenerateUuidExpression
+from metricflow.sql.sql_exprs import SqlPercentileFunctionType, SqlPercentileExpression, SqlGenerateUuidExpression
 
 
 class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
@@ -15,6 +15,21 @@ class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     def double_data_type(self) -> str:
         """Custom double data type for the Redshift engine"""
         return "DOUBLE PRECISION"
+
+    def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
+        """Render a percentile expression for Redshift. Add additional over() syntax for window."""
+        arg_rendered = self.render_sql_expr(node.arg)
+        params = SqlBindParameters()
+        params.update(arg_rendered.execution_parameters)
+
+        function_val = (
+            "PERCENTILE_CONT" if node.function_type == SqlPercentileFunctionType.CONTINUOUS else "PERCENTILE_DISC"
+        )
+
+        return SqlExpressionRenderResult(
+            sql=f"{function_val}({node.percentile}) WITHIN GROUP (ORDER BY ({arg_rendered.sql})) OVER()",
+            execution_parameters=params,
+        )
 
     def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> SqlExpressionRenderResult:  # noqa: D
         """Generates a "good enough" random key to simulate a UUID.

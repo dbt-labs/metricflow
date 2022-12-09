@@ -14,6 +14,7 @@ from metricflow.sql.sql_exprs import (
     SqlExpressionNodeVisitor,
     SqlColumnReferenceExpression,
     SqlPercentileExpression,
+    SqlPercentileFunctionType,
     SqlStringExpression,
     SqlComparisonExpression,
     SqlExpressionNode,
@@ -127,7 +128,18 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
 
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
         """Render a percentile expression"""
-        pass
+        arg_rendered = self.render_sql_expr(node.arg)
+        params = SqlBindParameters()
+        params.update(arg_rendered.execution_parameters)
+
+        function_val = (
+            "PERCENTILE_CONT" if node.function_type == SqlPercentileFunctionType.CONTINUOUS else "PERCENTILE_DISC"
+        )
+
+        return SqlExpressionRenderResult(
+            sql=f"{function_val}({node.percentile}) WITHIN GROUP (ORDER BY ({arg_rendered.sql}))",
+            execution_parameters=params,
+        )
 
     def visit_null_expr(self, node: SqlNullExpression) -> SqlExpressionRenderResult:  # noqa: D
         return SqlExpressionRenderResult(
