@@ -1,7 +1,7 @@
 -- Combine Metrics
 SELECT
-  subq_10.bookings AS bookings
-  , subq_11.listings AS listings
+  MAX(subq_10.bookings) AS bookings
+  , MAX(subq_11.listings) AS listings
 FROM (
   -- Compute Metrics via Expressions
   SELECT

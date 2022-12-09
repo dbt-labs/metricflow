@@ -1,7 +1,7 @@
 -- Combine Metrics
 SELECT
-  subq_22.bookings AS bookings
-  , subq_23.listings AS listings
+  MAX(subq_22.bookings) AS bookings
+  , MAX(subq_23.listings) AS listings
 FROM (
   -- Read Elements From Data Source 'bookings_source'
   -- Metric Time Dimension 'ds'
