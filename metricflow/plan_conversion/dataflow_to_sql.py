@@ -933,7 +933,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             [set(x.instance_set.spec_set.linkable_specs) == set(linkable_specs) for x in parent_data_sets]
         ), "All parent nodes should have the same set of linkable instances since all values are coalesced."
         linkable_spec_set = parent_data_sets[0].instance_set.spec_set.transform(SelectOnlyLinkableSpecs())
-        use_cross_join = len(linkable_spec_set.all_specs) == 0
+        join_type = SqlJoinType.CROSS_JOIN if len(linkable_spec_set.all_specs) == 0 else node.join_type
 
         joins_descriptions = []
         parent_source_table_aliases = []
@@ -958,9 +958,9 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                         table_aliases_in_coalesce=parent_source_table_aliases[:i],
                         table_alias_on_right_equality=parent_source_table_aliases[i],
                     ).transform(linkable_spec_set)
-                    if not use_cross_join
+                    if join_type is not SqlJoinType.CROSS_JOIN
                     else None,
-                    join_type=node.join_type if not use_cross_join else SqlJoinType.CROSS_JOIN,
+                    join_type=join_type,
                 )
             )
 
