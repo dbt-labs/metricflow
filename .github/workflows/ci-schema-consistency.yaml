@@ -15,7 +15,7 @@ on:
 jobs:
   json-schema-consistency-check:
     name: Schema Consistency Check
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: Check-out the repo
         uses: actions/checkout@v3
@@ -30,7 +30,7 @@ jobs:
           path: |
             ${{ env.pythonLocation }}
             ~/.cache/pypoetry
-          key: ${{ env.pythonLocation }}-${{ hashFiles('poetry.lock') }}
+          key: ${{ env.pythonLocation }}-${{ hashFiles('poetry.lock') }}-ubuntu-latest-22.04
 
       - name: Install Poetry
         run: pip install poetry

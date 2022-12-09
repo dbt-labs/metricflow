@@ -10,7 +10,7 @@ on:
 jobs:
   metricflow-unit-tests-duckdb:
     name: MetricFlow Unit Tests - DuckDB
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ["3.8", "3.9"]
@@ -28,7 +28,7 @@ jobs:
           path: |
             ${{ env.pythonLocation }}
             ~/.cache/pypoetry
-          key: ${{ env.pythonLocation }}-${{ hashFiles('poetry.lock') }}
+          key: ${{ env.pythonLocation }}-${{ hashFiles('poetry.lock') }}-ubuntu-latest-22.04
 
       - name: Install Poetry
         run: pip install poetry
@@ -42,7 +42,7 @@ jobs:
           METRICFLOW_CLIENT_EMAIL: ci-tester@gmail.com
   metricflow-unit-tests-postgres:
     name: MetricFlow Unit Tests - PostgreSQL
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     services:
       postgres:
@@ -73,7 +73,7 @@ jobs:
           path: |
             ${{ env.pythonLocation }}
             ~/.cache/pypoetry
-          key: ${{ env.pythonLocation }}-${{ hashFiles('metricflow/poetry.lock') }}
+          key: ${{ env.pythonLocation }}-${{ hashFiles('poetry.lock') }}-ubuntu-latest-22.04
 
       - name: Install Poetry
         run: pip install poetry
@@ -88,7 +88,7 @@ jobs:
           MF_SQL_ENGINE_PASSWORD: postgres
   metricflow-unit-tests:
     name: MetricFlow Unit Tests
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     if: ${{ always() }}
     needs: [metricflow-unit-tests-duckdb, metricflow-unit-tests-postgres]
 
