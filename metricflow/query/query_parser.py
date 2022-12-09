@@ -227,8 +227,9 @@ class MetricFlowQueryParser:
         else:
             parsed_where_constraint = where_constraint
 
+        # Get metric references used for validations
+        # In a case of derived metric, all the input metrics would be here.
         metric_references = self._parse_metric_names(metric_names)
-        metric_specs = tuple(MetricSpec.from_reference(metric_reference) for metric_reference in metric_references)
 
         if time_constraint_start is None:
             time_constraint_start = TimeRangeConstraint.ALL_TIME_BEGIN()
@@ -371,7 +372,7 @@ class MetricFlowQueryParser:
             )
 
         return MetricFlowQuerySpec(
-            metric_specs=metric_specs,
+            metric_specs=tuple(MetricSpec.from_element_name(metric_name) for metric_name in metric_names),
             dimension_specs=requested_linkable_specs.dimension_specs,
             identifier_specs=requested_linkable_specs.identifier_specs,
             time_dimension_specs=time_dimension_specs,
@@ -502,7 +503,12 @@ class MetricFlowQueryParser:
                     f"Unknown metric: '{metric_name}'",
                     context=suggestions,
                 )
-            metric_references.append(metric_reference)
+            metric = self._metric_semantics.get_metric(metric_reference)
+            if metric.type == MetricType.DERIVED:
+                input_metrics = self._parse_metric_names([metric.name for metric in metric.input_metrics])
+                metric_references.extend(list(input_metrics))
+            else:
+                metric_references.append(metric_reference)
         return tuple(metric_references)
 
     def _parse_linkable_element_names(
