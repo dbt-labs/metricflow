@@ -13,6 +13,7 @@ from metricflow.dag.mf_dag import DagNode, DisplayedProperty, NodeId
 from metricflow.dag.id_generation import (
     SQL_EXPR_COLUMN_REFERENCE_ID_PREFIX,
     SQL_EXPR_FUNCTION_ID_PREFIX,
+    SQL_EXPR_PERCENTILE_ID_PREFIX,
     SQL_EXPR_STRING_ID_PREFIX,
     SQL_EXPR_COMPARISON_ID_PREFIX,
     SQL_EXPR_GENERATE_UUID_PREFIX,
@@ -180,6 +181,10 @@ class SqlExpressionNodeVisitor(Generic[VisitorOutputT], ABC):
 
     @abstractmethod
     def visit_function_expr(self, node: SqlAggregateFunctionExpression) -> VisitorOutputT:  # noqa: D
+        pass
+
+    @abstractmethod
+    def visit_percentile_expr(self, node: SqlPercentileExpression) -> VisitorOutputT:  # noqa: D
         pass
 
     @abstractmethod
@@ -784,6 +789,86 @@ class SqlAggregateFunctionExpression(SqlFunctionExpression):
         if not isinstance(other, SqlAggregateFunctionExpression):
             return False
         return self.sql_function == other.sql_function and self._parents_match(other)
+
+
+class SqlPercentileFunctionType(Enum):
+    """Type of percentile function used."""
+
+    DISCRETE = "discrete"
+    CONTINUOUS = "continuous"
+
+
+class SqlPercentileExpression(SqlFunctionExpression):
+    """An percentile aggregation expression."""
+
+    def __init__(self, arg: SqlExpressionNode, percentile: float, function_type: SqlPercentileFunctionType) -> None:
+        """Constructor.
+
+        Args:
+            arg: The expression that should go into the function. e.g. for "percentile_cont(col, 0.1)", the arg
+            expressions should be "col".
+            percentile: The percentile rank desired, in range [0,1).
+            function_type: The type of percentile function used, can be continous (uses interpolation) or
+            discrete (returns an element inside the set greater than percentile).
+        """
+        self.arg = arg
+        self.percentile = percentile
+        self.function_type = function_type
+
+        super().__init__(node_id=self.create_unique_id(), parent_nodes=[arg])
+
+    @classmethod
+    def id_prefix(cls) -> str:  # noqa: D
+        return SQL_EXPR_PERCENTILE_ID_PREFIX
+
+    @property
+    def requires_parenthesis(self) -> bool:  # noqa: D
+        return False
+
+    def accept(self, visitor: SqlExpressionNodeVisitor) -> VisitorOutputT:  # noqa: D
+        return visitor.visit_percentile_expr(self)
+
+    @property
+    def description(self) -> str:  # noqa: D
+        return f"{self.function_type.value} Percentile({self.percentile}) Expression"
+
+    @property
+    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
+        return (
+            super().displayed_properties
+            + [DisplayedProperty("argument", self.arg)]
+            + [DisplayedProperty("percentile", self.percentile)]
+            + [DisplayedProperty("function_type", self.function_type.value)]
+        )
+
+    def __repr__(self) -> str:  # noqa: D
+        return f"{self.__class__.__name__}(node_id={self.node_id}, percentile={self.percentile}, function_type={self.function_type})"
+
+    def rewrite(  # noqa: D
+        self,
+        column_replacements: Optional[SqlColumnReplacements] = None,
+        should_render_table_alias: Optional[bool] = None,
+    ) -> SqlExpressionNode:
+        return SqlPercentileExpression(
+            arg=self.arg.rewrite(column_replacements, should_render_table_alias),
+            percentile=self.percentile,
+            function_type=self.function_type,
+        )
+
+    @property
+    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D
+        return SqlExpressionTreeLineage.combine(
+            tuple(x.lineage for x in self.parent_nodes) + (SqlExpressionTreeLineage(function_exprs=(self,)),)
+        )
+
+    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
+        if not isinstance(other, SqlPercentileExpression):
+            return False
+        return (
+            self.percentile == other.percentile
+            and self.function_type == other.function_type
+            and self._parents_match(other)
+        )
 
 
 class SqlWindowFunction(Enum):

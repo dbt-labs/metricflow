@@ -13,6 +13,7 @@ from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_exprs import (
     SqlExpressionNodeVisitor,
     SqlColumnReferenceExpression,
+    SqlPercentileExpression,
     SqlStringExpression,
     SqlComparisonExpression,
     SqlExpressionNode,
@@ -123,6 +124,10 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
             sql=f"{node.sql_function.value}({distinct_prefix}{args_string})",
             execution_parameters=combined_params,
         )
+
+    def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
+        """Render a percentile expression"""
+        pass
 
     def visit_null_expr(self, node: SqlNullExpression) -> SqlExpressionRenderResult:  # noqa: D
         return SqlExpressionRenderResult(
