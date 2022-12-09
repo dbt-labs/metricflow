@@ -132,6 +132,23 @@ class DbtFiltersToDimensions(DbtMappingRule):
                                     extra_detail=f"columns: {','.join([column.name for column in metric.model.columns])}",
                                 )
                             )
+
+                        # try to build a dimension from filter.value
+                        # A `filter.value` can be a dimension, but doesn't have to be. If a
+                        # `filter.value` starts with a single quote, it's either a string or a
+                        # timestamp. Which then means a `filter.value` not beginning with a
+                        # single quote are either numbers, booleans, database functions, or a
+                        # column/dimension. Thus if a `filter.value` doesn't begin with a single
+                        # quote and matches a column name on the model, it's likely a dimension.
+                        # But it's not a match for a column on the model, it's likely a number,
+                        # boolean, function, etc and thus not a issue.
+                        if not filter.value.startswith("'"):
+                            value_dimension = dimension_for_dimension_in_columns(
+                                dimension_name=filter.value, columns=metric.model.columns
+                            )
+                            if value_dimension is not None:
+                                objects.dimensions[metric.model.name][value_dimension.name] = value_dimension.dict()
+
                 except Exception as e:
                     issues.append(
                         ValidationError(message=str(e), extra_detail="".join(traceback.format_tb(e.__traceback__)))
