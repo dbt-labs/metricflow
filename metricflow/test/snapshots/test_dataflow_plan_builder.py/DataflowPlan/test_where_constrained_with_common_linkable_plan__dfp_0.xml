@@ -27,7 +27,7 @@
                     <!--                                                                     'element_name': 'listing'},)},),  -->
                     <!--                          'time_dimension_specs': (),                                                  -->
                     <!--                          'identifier_specs': ()},                                                     -->
-                    <!--    'execution_parameters': {'class': 'SqlBindParameters', 'param_dict': {}}}                          -->
+                    <!--    'execution_parameters': {'class': 'SqlBindParameters', 'param_items': ()}}                         -->
                     <FilterElementsNode>
                         <!-- description =                                -->
                         <!--   Pass Only Elements:                        -->
