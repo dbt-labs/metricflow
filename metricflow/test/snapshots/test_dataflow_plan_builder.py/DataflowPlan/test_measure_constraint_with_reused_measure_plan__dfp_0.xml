@@ -52,17 +52,17 @@
                             <WhereConstraintNode>
                                 <!-- description = Constrain Output with WHERE -->
                                 <!-- node_id = wcc_0 -->
-                                <!-- where_condition =                                                             -->
-                                <!--   {'class': 'SpecWhereClauseConstraint',                                      -->
-                                <!--    'where_condition': 'is_instant',                                           -->
-                                <!--    'linkable_names': ('is_instant',),                                         -->
-                                <!--    'linkable_spec_set': {'class': 'LinkableSpecSet',                          -->
-                                <!--                          'dimension_specs': ({'class': 'DimensionSpec',       -->
-                                <!--                                               'element_name': 'is_instant',   -->
-                                <!--                                               'identifier_links': ()},),      -->
-                                <!--                          'time_dimension_specs': (),                          -->
-                                <!--                          'identifier_specs': ()},                             -->
-                                <!--    'execution_parameters': {'class': 'SqlBindParameters', 'param_dict': {}}}  -->
+                                <!-- where_condition =                                                              -->
+                                <!--   {'class': 'SpecWhereClauseConstraint',                                       -->
+                                <!--    'where_condition': 'is_instant',                                            -->
+                                <!--    'linkable_names': ('is_instant',),                                          -->
+                                <!--    'linkable_spec_set': {'class': 'LinkableSpecSet',                           -->
+                                <!--                          'dimension_specs': ({'class': 'DimensionSpec',        -->
+                                <!--                                               'element_name': 'is_instant',    -->
+                                <!--                                               'identifier_links': ()},),       -->
+                                <!--                          'time_dimension_specs': (),                           -->
+                                <!--                          'identifier_specs': ()},                              -->
+                                <!--    'execution_parameters': {'class': 'SqlBindParameters', 'param_items': ()}}  -->
                                 <FilterElementsNode>
                                     <!-- description =                                       -->
                                     <!--   Pass Only Elements:                               -->
