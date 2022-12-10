@@ -4,7 +4,11 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_exprs import (
     SqlCastToTimestampExpression,
+    SqlColumnReference,
+    SqlColumnReferenceExpression,
     SqlGenerateUuidExpression,
+    SqlPercentileExpression,
+    SqlPercentileFunctionType,
     SqlStringLiteralExpression,
 )
 from metricflow.sql.sql_plan import (
@@ -89,6 +93,49 @@ def test_generate_uuid(
             where=None,
             group_bys=(),
             order_bys=(),
+        ),
+        plan_id="plan0",
+        sql_client=sql_client,
+    )
+
+
+def test_percentile_expr(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    sql_client: SqlClient,
+) -> None:
+    """Tests rendering of the percentile expression in a query."""
+
+    select_columns = [
+        SqlSelectColumn(
+            expr=SqlPercentileExpression(
+                arg=SqlColumnReferenceExpression(SqlColumnReference("a", "col0")),
+                percentile=0.5,
+                function_type=SqlPercentileFunctionType.CONTINUOUS,
+            ),
+            column_alias="col0_percentile",
+        ),
+    ]
+
+    from_source = SqlTableFromClauseNode(sql_table=SqlTable(schema_name="foo", table_name="bar"))
+    from_source_alias = "a"
+    joins_descs: List[SqlJoinDescription] = []
+    where = None
+    group_bys: List[SqlSelectColumn] = []
+    order_bys: List[SqlOrderByDescription] = []
+
+    assert_rendered_sql_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        select_node=SqlSelectStatementNode(
+            description="Test Percentile Expression",
+            select_columns=tuple(select_columns),
+            from_source=from_source,
+            from_source_alias=from_source_alias,
+            joins_descs=tuple(joins_descs),
+            where=where,
+            group_bys=tuple(group_bys),
+            order_bys=tuple(order_bys),
         ),
         plan_id="plan0",
         sql_client=sql_client,
