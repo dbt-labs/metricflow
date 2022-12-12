@@ -24,14 +24,15 @@ from metricflow.cli.cli_context import CLIContext
 import metricflow.cli.custom_click_types as click_custom
 from metricflow.cli.tutorial import create_sample_data, gen_sample_model_configs, remove_sample_tables
 from metricflow.cli.utils import (
+    exception_handler,
+    generate_duckdb_demo_keys,
+    get_data_warehouse_config_link,
+    query_options,
+    start_end_time_options,
     MF_BIGQUERY_KEYS,
     MF_CONFIG_KEYS,
     MF_REDSHIFT_KEYS,
     MF_SNOWFLAKE_KEYS,
-    exception_handler,
-    query_options,
-    start_end_time_options,
-    generate_duckdb_demo_keys,
     MF_POSTGRESQL_KEYS,
     MF_DATABRICKS_KEYS,
 )
@@ -480,6 +481,7 @@ def list_dimensions(cfg: CLIContext, metric_names: List[str]) -> None:
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def health_checks(cfg: CLIContext) -> None:
     """Performs a health check against the DW provided in the configs."""
+    click.echo(f"For specifics on the health-checks, please visit {get_data_warehouse_config_link(cfg.config)}")
     spinner = Halo(
         text="🏥 Running health checks against your data warehouse... (This should not take longer than 30s for a successful connection)",
         spinner="dots",
