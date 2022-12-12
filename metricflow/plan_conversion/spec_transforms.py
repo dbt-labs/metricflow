@@ -70,6 +70,22 @@ class CreateOnConditionForCombiningMetrics(InstanceSpecSetTransform[SqlExpressio
     COALESCE(a.is_instant, b.is_instant) = c.is_instant
     AND COALESCE(a.ds, b.ds) = c.ds
 
+    This is necessary for cases where 3 or more subqueries will be linked via FULL OUTER JOINs. If that happens,
+    the set of join key from subquery 3 must be compared to the join keys from both subquery 1 and subquery 2,
+    otherwise duplicate rows might appear in the output.
+
+    For example:
+
+    table1: [('a', 10), ('b', 20)]
+    table2: [('a', 100), ('c', 200)]
+    table3: [('a', 1000), ('c', 2000)]
+
+    ->
+
+    output without COALESCE: [('a', 10, 100, 1000), ('c', NULL, 200, NULL), ('c', NULL, NULL, 2000)]
+    output with COALESCE: [('a', 10, 100, 1000), ('c', NULL, 200, 2000)]
+
+    The latter scenario consolidates the rows keyed by 'c' into a single entry.
     """
 
     def __init__(  # noqa: D

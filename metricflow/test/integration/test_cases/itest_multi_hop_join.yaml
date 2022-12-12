@@ -10,9 +10,9 @@ integration_test:
         ct.customer_name as account_id__customer_id__customer_name
         , SUM(am.txn_count) as txn_count
     FROM {{ source_schema }}.bridge_table bt
-    JOIN {{ source_schema }}.customer_table ct
+    LEFT OUTER JOIN {{ source_schema }}.customer_table ct
       ON ct.customer_id = bt.customer_id
-    JOIN {{ source_schema }}.account_month_txns am
+    LEFT OUTER JOIN {{ source_schema }}.account_month_txns am
       ON bt.account_id = am.account_id
     GROUP BY
       ct.customer_name
@@ -22,7 +22,11 @@ integration_test:
   description: Tests a query requesting mulitple multi-hop join dims that dont come from the same data source
   model: UNPARTITIONED_MULTI_HOP_JOIN_MODEL
   metrics: ["txn_count"]
-  group_bys: ["account_id__customer_id__customer_name", "account_id__customer_id__country"]
+  group_bys:
+    [
+      "account_id__customer_id__customer_name",
+      "account_id__customer_id__country",
+    ]
   check_query: |
     SELECT
       dim_src0.customer_name as account_id__customer_id__customer_name
@@ -52,16 +56,20 @@ integration_test:
   description: Tests a query requesting mulitple multi-hop join dims from the same source
   model: UNPARTITIONED_MULTI_HOP_JOIN_MODEL
   metrics: ["txn_count"]
-  group_bys: ["account_id__customer_id__customer_name", "account_id__customer_id__customer_atomic_weight"]
+  group_bys:
+    [
+      "account_id__customer_id__customer_name",
+      "account_id__customer_id__customer_atomic_weight",
+    ]
   check_query: |
     SELECT
       ct.customer_name as account_id__customer_id__customer_name
       , ct.customer_atomic_weight as account_id__customer_id__customer_atomic_weight
       , SUM(am.txn_count) as txn_count
     FROM {{ source_schema }}.bridge_table bt
-    JOIN {{ source_schema }}.customer_table ct
+    LEFT OUTER JOIN {{ source_schema }}.customer_table ct
       ON ct.customer_id = bt.customer_id
-    JOIN {{ source_schema }}.account_month_txns am
+    LEFT OUTER JOIN {{ source_schema }}.account_month_txns am
       ON bt.account_id = am.account_id
     GROUP BY
       ct.customer_name
@@ -72,7 +80,12 @@ integration_test:
   description: Tests a query with multihop and single hop join dimensions
   model: UNPARTITIONED_MULTI_HOP_JOIN_MODEL
   metrics: ["txn_count"]
-  group_bys: ["account_id__customer_id__customer_name", "account_id__customer_id__country", "account_id__extra_dim"]
+  group_bys:
+    [
+      "account_id__customer_id__customer_name",
+      "account_id__customer_id__country",
+      "account_id__extra_dim",
+    ]
   check_query: |
     SELECT
       dim_src0.customer_name as account_id__customer_id__customer_name
