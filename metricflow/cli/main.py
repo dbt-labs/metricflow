@@ -294,6 +294,13 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
     help="In the query output, show the query that was executed against the data warehouse",
 )
 @click.option(
+    "--show-dataflow-plan",
+    is_flag=True,
+    required=False,
+    default=False,
+    help="Display dataflow plan in explain output",
+)
+@click.option(
     "--display-plans",
     is_flag=True,
     required=False,
@@ -326,6 +333,7 @@ def query(
     as_table: Optional[str] = None,
     csv: Optional[click.utils.LazyFile] = None,
     explain: bool = False,
+    show_dataflow_plan: bool = False,
     display_plans: bool = False,
     decimals: int = DEFAULT_RESULT_DECIMAL_PLACES,
     show_sql_descriptions: bool = False,
@@ -363,22 +371,27 @@ def query(
             if not show_sql_descriptions
             else explain_result.rendered_sql.sql_query
         )
-        click.echo("🔎 Generated Dataflow Plan + SQL (remove --explain to see data):")
-        click.echo(
-            textwrap.indent(
-                jinja2.Template(
-                    textwrap.dedent(
-                        """\
-                        Metric Dataflow Plan:
-                            {{ plan_text | indent(4) }}
-                        """
-                    ),
-                    undefined=jinja2.StrictUndefined,
-                ).render(plan_text=dataflow_plan_as_text(explain_result.dataflow_plan)),
-                prefix="-- ",
+        if show_dataflow_plan:
+            click.echo("🔎 Generated Dataflow Plan + SQL (remove --explain to see data):")
+            click.echo(
+                textwrap.indent(
+                    jinja2.Template(
+                        textwrap.dedent(
+                            """\
+                            Metric Dataflow Plan:
+                                {{ plan_text | indent(4) }}
+                            """
+                        ),
+                        undefined=jinja2.StrictUndefined,
+                    ).render(plan_text=dataflow_plan_as_text(explain_result.dataflow_plan)),
+                    prefix="-- ",
+                )
             )
-        )
-        click.echo("")
+            click.echo("")
+        else:
+            click.echo(
+                "🔎 SQL (remove --explain to see data or add --show-dataflow-plan to see the generated dataflow plan):"
+            )
         click.echo(sql)
         if display_plans:
             svg_path = display_dag_as_svg(explain_result.dataflow_plan, cfg.config.dir_path)
