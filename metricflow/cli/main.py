@@ -176,6 +176,7 @@ def setup(cfg: CLIContext, restart: bool) -> None:
         textwrap.dedent(
             f"""\
             💻 {template_description}
+            If you are new to MetricFlow, we recommend you to run through our tutorial with `mf tutorial`\n
             Next steps:
               1. Review and fill out relevant fields.
               2. Run `mf health-checks` to validate the data warehouse connection.
