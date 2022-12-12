@@ -814,18 +814,18 @@ class SqlPercentileExpressionArgument:
 class SqlPercentileExpression(SqlFunctionExpression):
     """An percentile aggregation expression."""
 
-    def __init__(self, arg: SqlExpressionNode, percentile_args: SqlPercentileExpressionArgument) -> None:
+    def __init__(self, order_by_arg: SqlExpressionNode, percentile_args: SqlPercentileExpressionArgument) -> None:
         """Constructor.
 
         Args:
-            arg: The expression that should go into the function. e.g. for "percentile_cont(col, 0.1)", the arg
+            order_by_arg: The expression that should go into the function. e.g. for "percentile_cont(col, 0.1)", the arg
             expressions should be "col".
             percentile_args: Auxillary information including percentile value and type.
         """
-        self.arg = arg
-        self.percentile_args = percentile_args
+        self._order_by_arg = order_by_arg
+        self._percentile_args = percentile_args
 
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=[arg])
+        super().__init__(node_id=self.create_unique_id(), parent_nodes=[order_by_arg])
 
     @classmethod
     def id_prefix(cls) -> str:  # noqa: D
@@ -835,23 +835,31 @@ class SqlPercentileExpression(SqlFunctionExpression):
     def requires_parenthesis(self) -> bool:  # noqa: D
         return False
 
+    @property
+    def order_by_arg(self) -> SqlExpressionNode:  # noqa: D
+        return self._order_by_arg
+
+    @property
+    def percentile_args(self) -> SqlPercentileExpressionArgument:  # noqa: D
+        return self._percentile_args
+
     def accept(self, visitor: SqlExpressionNodeVisitor) -> VisitorOutputT:  # noqa: D
         return visitor.visit_percentile_expr(self)
 
     @property
     def description(self) -> str:  # noqa: D
-        return f"{self.percentile_args.function_type.value} Percentile({self.percentile_args.percentile}) Expression"
+        return f"{self._percentile_args.function_type.value} Percentile({self._percentile_args.percentile}) Expression"
 
     @property
     def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
         return (
             super().displayed_properties
-            + [DisplayedProperty("argument", self.arg)]
-            + [DisplayedProperty("percentile_args", self.percentile_args)]
+            + [DisplayedProperty("argument", self._order_by_arg)]
+            + [DisplayedProperty("percentile_args", self._percentile_args)]
         )
 
     def __repr__(self) -> str:  # noqa: D
-        return f"{self.__class__.__name__}(node_id={self.node_id}, percentile={self.percentile_args.percentile}, function_type={self.percentile_args.function_type.value})"
+        return f"{self.__class__.__name__}(node_id={self.node_id}, percentile={self._percentile_args.percentile}, function_type={self._percentile_args.function_type.value})"
 
     def rewrite(  # noqa: D
         self,
@@ -859,7 +867,8 @@ class SqlPercentileExpression(SqlFunctionExpression):
         should_render_table_alias: Optional[bool] = None,
     ) -> SqlExpressionNode:
         return SqlPercentileExpression(
-            arg=self.arg.rewrite(column_replacements, should_render_table_alias), percentile_args=self.percentile_args
+            order_by_arg=self._order_by_arg.rewrite(column_replacements, should_render_table_alias),
+            percentile_args=self._percentile_args,
         )
 
     @property
@@ -871,7 +880,7 @@ class SqlPercentileExpression(SqlFunctionExpression):
     def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
         if not isinstance(other, SqlPercentileExpression):
             return False
-        return self.percentile_args == other.percentile_args and self._parents_match(other)
+        return self._percentile_args == other._percentile_args and self._parents_match(other)
 
 
 class SqlWindowFunction(Enum):

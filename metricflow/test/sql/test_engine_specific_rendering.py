@@ -110,7 +110,7 @@ def test_percentile_expr(
     select_columns = [
         SqlSelectColumn(
             expr=SqlPercentileExpression(
-                arg=SqlColumnReferenceExpression(SqlColumnReference("a", "col0")),
+                order_by_arg=SqlColumnReferenceExpression(SqlColumnReference("a", "col0")),
                 percentile_args=SqlPercentileExpressionArgument(
                     percentile=0.5, function_type=SqlPercentileFunctionType.CONTINUOUS
                 ),

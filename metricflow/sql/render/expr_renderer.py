@@ -127,7 +127,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
 
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
         """Render a percentile expression"""
-        arg_rendered = self.render_sql_expr(node.arg)
+        arg_rendered = self.render_sql_expr(node.order_by_arg)
         params = SqlBindParameters()
         params.update(arg_rendered.execution_parameters)
 
