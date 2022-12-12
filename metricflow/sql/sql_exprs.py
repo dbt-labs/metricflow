@@ -798,22 +798,32 @@ class SqlPercentileFunctionType(Enum):
     CONTINUOUS = "continuous"
 
 
+@dataclass(frozen=True)
+class SqlPercentileExpressionArgument:
+    """Dataclass for holding percentile arguments"""
+
+    percentile: float
+    function_type: SqlPercentileFunctionType
+
+    @property
+    def function_name(self) -> str:
+        """Helper to build function name to use in rendering"""
+        return "PERCENTILE_CONT" if self.function_type == SqlPercentileFunctionType.CONTINUOUS else "PERCENTILE_DISC"
+
+
 class SqlPercentileExpression(SqlFunctionExpression):
     """An percentile aggregation expression."""
 
-    def __init__(self, arg: SqlExpressionNode, percentile: float, function_type: SqlPercentileFunctionType) -> None:
+    def __init__(self, arg: SqlExpressionNode, percentile_args: SqlPercentileExpressionArgument) -> None:
         """Constructor.
 
         Args:
             arg: The expression that should go into the function. e.g. for "percentile_cont(col, 0.1)", the arg
             expressions should be "col".
-            percentile: The percentile rank desired, in range [0,1).
-            function_type: The type of percentile function used, can be continous (uses interpolation) or
-            discrete (returns an element inside the set greater than percentile).
+            percentile_args: Auxillary information including percentile value and type.
         """
         self.arg = arg
-        self.percentile = percentile
-        self.function_type = function_type
+        self.percentile_args = percentile_args
 
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[arg])
 
@@ -830,19 +840,18 @@ class SqlPercentileExpression(SqlFunctionExpression):
 
     @property
     def description(self) -> str:  # noqa: D
-        return f"{self.function_type.value} Percentile({self.percentile}) Expression"
+        return f"{self.percentile_args.function_type.value} Percentile({self.percentile_args.percentile}) Expression"
 
     @property
     def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
         return (
             super().displayed_properties
             + [DisplayedProperty("argument", self.arg)]
-            + [DisplayedProperty("percentile", self.percentile)]
-            + [DisplayedProperty("function_type", self.function_type.value)]
+            + [DisplayedProperty("percentile_args", self.percentile_args)]
         )
 
     def __repr__(self) -> str:  # noqa: D
-        return f"{self.__class__.__name__}(node_id={self.node_id}, percentile={self.percentile}, function_type={self.function_type})"
+        return f"{self.__class__.__name__}(node_id={self.node_id}, percentile={self.percentile_args.percentile}, function_type={self.percentile_args.function_type.value})"
 
     def rewrite(  # noqa: D
         self,
@@ -850,9 +859,7 @@ class SqlPercentileExpression(SqlFunctionExpression):
         should_render_table_alias: Optional[bool] = None,
     ) -> SqlExpressionNode:
         return SqlPercentileExpression(
-            arg=self.arg.rewrite(column_replacements, should_render_table_alias),
-            percentile=self.percentile,
-            function_type=self.function_type,
+            arg=self.arg.rewrite(column_replacements, should_render_table_alias), percentile_args=self.percentile_args
         )
 
     @property
@@ -864,11 +871,7 @@ class SqlPercentileExpression(SqlFunctionExpression):
     def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
         if not isinstance(other, SqlPercentileExpression):
             return False
-        return (
-            self.percentile == other.percentile
-            and self.function_type == other.function_type
-            and self._parents_match(other)
-        )
+        return self.percentile_args == other.percentile_args and self._parents_match(other)
 
 
 class SqlWindowFunction(Enum):

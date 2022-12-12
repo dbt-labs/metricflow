@@ -10,7 +10,6 @@ from metricflow.sql.sql_exprs import (
     SqlDateTruncExpression,
     SqlGenerateUuidExpression,
     SqlPercentileExpression,
-    SqlPercentileFunctionType,
     SqlTimeDeltaExpression,
 )
 from metricflow.time.time_granularity import TimeGranularity
@@ -30,12 +29,11 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
         params = SqlBindParameters()
         params.update(arg_rendered.execution_parameters)
 
-        function_val = (
-            "PERCENTILE_CONT" if node.function_type == SqlPercentileFunctionType.CONTINUOUS else "PERCENTILE_DISC"
-        )
+        function_str = node.percentile_args.function_name
+        percentile = node.percentile_args.percentile
 
         return SqlExpressionRenderResult(
-            sql=f"{function_val}({arg_rendered.sql}, {node.percentile}) OVER()",
+            sql=f"{function_str}({arg_rendered.sql}, {percentile}) OVER()",
             execution_parameters=params,
         )
 

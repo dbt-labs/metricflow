@@ -8,6 +8,7 @@ from metricflow.sql.sql_exprs import (
     SqlColumnReferenceExpression,
     SqlGenerateUuidExpression,
     SqlPercentileExpression,
+    SqlPercentileExpressionArgument,
     SqlPercentileFunctionType,
     SqlStringLiteralExpression,
 )
@@ -110,8 +111,9 @@ def test_percentile_expr(
         SqlSelectColumn(
             expr=SqlPercentileExpression(
                 arg=SqlColumnReferenceExpression(SqlColumnReference("a", "col0")),
-                percentile=0.5,
-                function_type=SqlPercentileFunctionType.CONTINUOUS,
+                percentile_args=SqlPercentileExpressionArgument(
+                    percentile=0.5, function_type=SqlPercentileFunctionType.CONTINUOUS
+                ),
             ),
             column_alias="col0_percentile",
         ),

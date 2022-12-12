@@ -5,7 +5,7 @@ from metricflow.sql.render.expr_renderer import (
 )
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql.sql_exprs import SqlPercentileFunctionType, SqlPercentileExpression, SqlGenerateUuidExpression
+from metricflow.sql.sql_exprs import SqlPercentileExpression, SqlGenerateUuidExpression
 
 
 class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
@@ -22,12 +22,11 @@ class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         params = SqlBindParameters()
         params.update(arg_rendered.execution_parameters)
 
-        function_val = (
-            "PERCENTILE_CONT" if node.function_type == SqlPercentileFunctionType.CONTINUOUS else "PERCENTILE_DISC"
-        )
+        function_str = node.percentile_args.function_name
+        percentile = node.percentile_args.percentile
 
         return SqlExpressionRenderResult(
-            sql=f"{function_val}({node.percentile}) WITHIN GROUP (ORDER BY ({arg_rendered.sql})) OVER()",
+            sql=f"{function_str}({percentile}) WITHIN GROUP (ORDER BY ({arg_rendered.sql})) OVER()",
             execution_parameters=params,
         )
 
