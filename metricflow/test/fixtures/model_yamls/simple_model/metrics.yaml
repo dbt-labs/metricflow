@@ -569,7 +569,7 @@ metric:
     metrics:
       - name: bookings
       - name: bookings
-        offset_window: 14d
+        offset_window: 14 days
         alias: bookings_2_weeks_ago
 ---
 metric:
