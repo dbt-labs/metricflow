@@ -35,7 +35,7 @@
             <!-- join_0 =                                                    -->
             <!--   {'class': 'SqlJoinDescription',                           -->
             <!--    'right_source': SqlSelectStatementNode(node_id=ss_20),   -->
-            <!--    'right_source_alias': 'subq_20',                         -->
+            <!--    'right_source_alias': 'subq_16',                         -->
             <!--    'join_type': SqlJoinType.INNER,                          -->
             <!--    'on_condition': SqlComparisonExpression(node_id=cmp_1)}  -->
             <!-- join_1 =                                                    -->

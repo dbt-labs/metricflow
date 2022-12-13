@@ -1,6 +1,6 @@
 -- Combine Metrics
 SELECT
-  MAX(subq_22.bookings) AS bookings
+  MAX(subq_17.bookings) AS bookings
   , MAX(subq_23.listings) AS listings
 FROM (
   -- Read Elements From Data Source 'bookings_source'
@@ -17,7 +17,7 @@ FROM (
     SELECT * FROM ***************************.fct_bookings
   ) bookings_source_src_10001
   WHERE ds BETWEEN CAST('2020-01-01' AS TIMESTAMP) AND CAST('2020-01-01' AS TIMESTAMP)
-) subq_22
+) subq_17
 CROSS JOIN (
   -- Read Elements From Data Source 'listings_latest'
   -- Metric Time Dimension 'ds'

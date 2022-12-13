@@ -923,40 +923,42 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         OUTER JOIN context, because many engines do not support complex ON conditions or other techniques we might
         use to apply a sentinel value for NULL to NULL comparisons.
         """
-        # Sanity check that all parents have the same linkable specs.
-        parent_data_sets = [x.accept(self) for x in node.parent_nodes]
         assert (
-            len(parent_data_sets) > 1
+            len(node.parent_nodes) > 1
         ), "Shouldn't have a CombineMetricsNode in the dataflow plan if there's only 1 parent."
-        linkable_specs = parent_data_sets[0].instance_set.spec_set.linkable_specs
+
+        parent_data_sets: List[AnnotatedSqlDataSet] = []
+        table_alias_to_metric_specs: OrderedDict[str, Sequence[MetricSpec]] = OrderedDict()
+
+        for parent_node in node.parent_nodes:
+            parent_sql_data_set = parent_node.accept(self)
+            table_alias = self._next_unique_table_alias()
+            parent_data_sets.append(AnnotatedSqlDataSet(data_set=parent_sql_data_set, alias=table_alias))
+            table_alias_to_metric_specs[table_alias] = parent_sql_data_set.instance_set.spec_set.metric_specs
+
+        # Sanity check that all parents have the same linkable specs.
+        linkable_specs = parent_data_sets[0].data_set.instance_set.spec_set.linkable_specs
         assert all(
-            [set(x.instance_set.spec_set.linkable_specs) == set(linkable_specs) for x in parent_data_sets]
+            [set(x.data_set.instance_set.spec_set.linkable_specs) == set(linkable_specs) for x in parent_data_sets]
         ), "All parent nodes should have the same set of linkable instances since all values are coalesced."
-        linkable_spec_set = parent_data_sets[0].instance_set.spec_set.transform(SelectOnlyLinkableSpecs())
+        linkable_spec_set = parent_data_sets[0].data_set.instance_set.spec_set.transform(SelectOnlyLinkableSpecs())
         join_type = SqlJoinType.CROSS_JOIN if len(linkable_spec_set.all_specs) == 0 else node.join_type
 
         joins_descriptions = []
-        parent_source_table_aliases = []
-        table_alias_to_metric_specs: OrderedDict[str, Sequence[MetricSpec]] = OrderedDict()
-        for parent_data_set in parent_data_sets:
-            table_alias = self._next_unique_table_alias()
-            parent_source_table_aliases.append(table_alias)
-            table_alias_to_metric_specs[table_alias] = parent_data_set.instance_set.spec_set.metric_specs
-
         # Create the components of the join that combines metrics. Order doesn't
         # matter so we use the first element in the FROM clause and create join descriptions from
         # the rest.
-        from_alias = parent_source_table_aliases[0]
-        from_source = parent_data_sets[0].sql_select_node
-        for i in range(1, len(parent_source_table_aliases)):
+        from_alias = parent_data_sets[0].alias
+        from_source = parent_data_sets[0].data_set.sql_select_node
+        for i in range(1, len(parent_data_sets)):
             joins_descriptions.append(
                 SqlJoinDescription(
-                    right_source=parent_data_sets[i].sql_select_node,
-                    right_source_alias=parent_source_table_aliases[i],
+                    right_source=parent_data_sets[i].data_set.sql_select_node,
+                    right_source_alias=parent_data_sets[i].alias,
                     on_condition=CreateOnConditionForCombiningMetrics(
                         column_association_resolver=self._column_association_resolver,
-                        table_aliases_in_coalesce=parent_source_table_aliases[:i],
-                        table_alias_on_right_equality=parent_source_table_aliases[i],
+                        table_aliases_in_coalesce=[x.alias for x in parent_data_sets[:i]],
+                        table_alias_on_right_equality=parent_data_sets[i].alias,
                     ).transform(linkable_spec_set)
                     if join_type is not SqlJoinType.CROSS_JOIN
                     else None,
@@ -965,7 +967,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             )
 
         # We can merge all parent instances since the common linkable instances will be de-duped.
-        output_instance_set = InstanceSet.merge([x.instance_set for x in parent_data_sets])
+        output_instance_set = InstanceSet.merge([x.data_set.instance_set for x in parent_data_sets])
         output_instance_set = output_instance_set.transform(ChangeAssociatedColumns(self._column_association_resolver))
 
         metric_aggregation_type = AggregationType.MAX if node.join_type is SqlJoinType.FULL_OUTER else None
@@ -977,7 +979,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         linkable_select_column_set = linkable_spec_set.transform(
             CreateSelectCoalescedColumnsForLinkableSpecs(
                 column_association_resolver=self._column_association_resolver,
-                table_aliases=parent_source_table_aliases,
+                table_aliases=[x.alias for x in parent_data_sets],
             )
         )
         combined_select_column_set = linkable_select_column_set.merge(metric_select_column_set)

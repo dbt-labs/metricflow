@@ -5,8 +5,8 @@ SELECT
 FROM (
   -- Combine Metrics
   SELECT
-    COALESCE(subq_19.metric_time, subq_20.metric_time) AS metric_time
-    , subq_19.ref_bookings AS ref_bookings
+    COALESCE(subq_15.metric_time, subq_20.metric_time) AS metric_time
+    , subq_15.ref_bookings AS ref_bookings
     , subq_20.bookings AS bookings
   FROM (
     -- Aggregate Measures
@@ -29,7 +29,7 @@ FROM (
     ) subq_13
     GROUP BY
       metric_time
-  ) subq_19
+  ) subq_15
   INNER JOIN (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
@@ -48,10 +48,10 @@ FROM (
         -- User Defined SQL Query
         SELECT * FROM ***************************.fct_bookings
       ) bookings_source_src_10001
-    ) subq_17
+    ) subq_18
     GROUP BY
       metric_time
   ) subq_20
   ON
-    subq_19.metric_time = subq_20.metric_time
+    subq_15.metric_time = subq_20.metric_time
 ) subq_21
