@@ -9,6 +9,7 @@ from metricflow.sql.sql_exprs import (
     SqlCastToTimestampExpression,
     SqlDateTruncExpression,
     SqlGenerateUuidExpression,
+    SqlPercentileExpression,
     SqlTimeDeltaExpression,
 )
 from metricflow.time.time_granularity import TimeGranularity
@@ -21,6 +22,19 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
     def double_data_type(self) -> str:
         """Custom double data type for BigQuery engine"""
         return "FLOAT64"
+
+    def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
+        """Render a percentile expression"""
+        arg_rendered = self.render_sql_expr(node.order_by_arg)
+        params = arg_rendered.execution_parameters
+
+        function_str = node.percentile_args.function_name
+        percentile = node.percentile_args.percentile
+
+        return SqlExpressionRenderResult(
+            sql=f"{function_str}({arg_rendered.sql}, {percentile}) OVER()",
+            execution_parameters=params,
+        )
 
     def visit_cast_to_timestamp_expr(self, node: SqlCastToTimestampExpression) -> SqlExpressionRenderResult:
         """Casts the time value expression to DATETIME, as per standard BigQuery preferences."""
