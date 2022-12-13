@@ -27,5 +27,5 @@ data_source:
 
   identifiers:
     - name: user
-      type: primary
+      type: natural
       expr: user_id

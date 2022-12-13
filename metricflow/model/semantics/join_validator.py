@@ -21,13 +21,19 @@ class DataSourceIdentifierJoinType:
 class DataSourceJoinValidator:
     """Checks to see if a join between two data sources should be allowed."""
 
-    # Valid joins are the non-fanout joines.
+    # Valid joins are the non-fanout joins.
     _VALID_IDENTIFIER_JOINS = (
+        DataSourceIdentifierJoinType(
+            left_identifier_type=IdentifierType.PRIMARY, right_identifier_type=IdentifierType.NATURAL
+        ),
         DataSourceIdentifierJoinType(
             left_identifier_type=IdentifierType.PRIMARY, right_identifier_type=IdentifierType.PRIMARY
         ),
         DataSourceIdentifierJoinType(
             left_identifier_type=IdentifierType.PRIMARY, right_identifier_type=IdentifierType.UNIQUE
+        ),
+        DataSourceIdentifierJoinType(
+            left_identifier_type=IdentifierType.UNIQUE, right_identifier_type=IdentifierType.NATURAL
         ),
         DataSourceIdentifierJoinType(
             left_identifier_type=IdentifierType.UNIQUE, right_identifier_type=IdentifierType.PRIMARY
@@ -36,10 +42,19 @@ class DataSourceJoinValidator:
             left_identifier_type=IdentifierType.UNIQUE, right_identifier_type=IdentifierType.UNIQUE
         ),
         DataSourceIdentifierJoinType(
+            left_identifier_type=IdentifierType.FOREIGN, right_identifier_type=IdentifierType.NATURAL
+        ),
+        DataSourceIdentifierJoinType(
             left_identifier_type=IdentifierType.FOREIGN, right_identifier_type=IdentifierType.PRIMARY
         ),
         DataSourceIdentifierJoinType(
             left_identifier_type=IdentifierType.FOREIGN, right_identifier_type=IdentifierType.UNIQUE
+        ),
+        DataSourceIdentifierJoinType(
+            left_identifier_type=IdentifierType.NATURAL, right_identifier_type=IdentifierType.PRIMARY
+        ),
+        DataSourceIdentifierJoinType(
+            left_identifier_type=IdentifierType.NATURAL, right_identifier_type=IdentifierType.UNIQUE
         ),
     )
 
@@ -53,6 +68,14 @@ class DataSourceJoinValidator:
         DataSourceIdentifierJoinType(
             left_identifier_type=IdentifierType.FOREIGN, right_identifier_type=IdentifierType.FOREIGN
         ),
+        DataSourceIdentifierJoinType(
+            left_identifier_type=IdentifierType.NATURAL, right_identifier_type=IdentifierType.FOREIGN
+        ),
+        # Natural -> Natural joins are not allowed due to hidden fanout or missing value concerns with
+        # multiple validity windows in play
+        DataSourceIdentifierJoinType(
+            left_identifier_type=IdentifierType.NATURAL, right_identifier_type=IdentifierType.NATURAL
+        ),
     )
 
     def __init__(self, data_source_semantics: DataSourceSemanticsAccessor) -> None:  # noqa: D
@@ -64,7 +87,12 @@ class DataSourceJoinValidator:
         right_data_source_reference: DataSourceReference,
         on_identifier_reference: IdentifierReference,
     ) -> bool:
-        """Return true if we should allow a join with the given parameters to resolve a query."""
+        """Return true if we should allow a join with the given parameters to resolve a query.
+
+        This effectively asserts that the join is possible and is either not a fanout join or else can
+        be managed as a non-fanout join. For join targets using natural keys, which do not guarantee a
+        unique value set, this is done by requiring the presence of a validity window in the target data source.
+        """
         left_identifier = self._data_source_semantics.get_identifier_in_data_source(
             DataSourceElementReference.create_from_references(left_data_source_reference, on_identifier_reference)
         )
@@ -76,6 +104,24 @@ class DataSourceJoinValidator:
             return False
         if right_identifier is None:
             return False
+
+        left_data_source = self._data_source_semantics.get_by_reference(left_data_source_reference)
+        right_data_source = self._data_source_semantics.get_by_reference(right_data_source_reference)
+        assert left_data_source, "Type refinement. If you see this error something has refactored wrongly"
+        assert right_data_source, "Type refinement. If you see this error something has refactored wrongly"
+
+        if left_data_source.has_validity_dimensions and right_data_source.has_validity_dimensions:
+            # We cannot join two data sources with validity dimensions due to concerns with unexpected fanout
+            # due to the key structure of these data sources. Applying multi-stage validity window filters can
+            # also lead to unexpected removal of interim join keys. Note this will need to be updated if we enable
+            # measures in such data sources, since those will need to be converted to a different type of data source
+            # to support measure computation.
+            return False
+
+        if right_identifier.type is IdentifierType.NATURAL:
+            if not right_data_source.has_validity_dimensions:
+                # There is no way to refine this to a single row per key, so we cannot support this join
+                return False
 
         join_type = DataSourceIdentifierJoinType(left_identifier.type, right_identifier.type)
 

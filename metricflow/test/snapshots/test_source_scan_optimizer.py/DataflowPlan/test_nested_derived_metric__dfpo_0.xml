@@ -13,6 +13,7 @@
             <CombineMetricsNode>
                 <!-- description = Combine Metrics -->
                 <!-- node_id = cbm_2 -->
+                <!-- join type = SqlJoinType.INNER -->
                 <ComputeMetricsNode>
                     <!-- description = Compute Metrics via Expressions -->
                     <!-- node_id = cm_9 -->

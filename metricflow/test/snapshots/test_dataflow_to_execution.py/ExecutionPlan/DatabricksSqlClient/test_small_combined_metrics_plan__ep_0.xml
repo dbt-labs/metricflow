@@ -6,8 +6,8 @@
         <!--   -- Combine Metrics                                              -->
         <!--   SELECT                                                          -->
         <!--     COALESCE(subq_8.is_instant, subq_9.is_instant) AS is_instant  -->
-        <!--     , subq_8.bookings AS bookings                                 -->
-        <!--     , subq_9.booking_value AS booking_value                       -->
+        <!--     , MAX(subq_8.bookings) AS bookings                            -->
+        <!--     , MAX(subq_9.booking_value) AS booking_value                  -->
         <!--   FROM (                                                          -->
         <!--     -- Aggregate Measures                                         -->
         <!--     -- Compute Metrics via Expressions                            -->
@@ -49,5 +49,7 @@
         <!--   ) subq_9                                                        -->
         <!--   ON                                                              -->
         <!--     subq_8.is_instant = subq_9.is_instant                         -->
+        <!--   GROUP BY                                                        -->
+        <!--     COALESCE(subq_8.is_instant, subq_9.is_instant)                -->
     </SelectSqlQueryToDataFrameTask>
 </ExecutionPlan>

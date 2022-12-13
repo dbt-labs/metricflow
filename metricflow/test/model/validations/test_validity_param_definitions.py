@@ -17,7 +17,7 @@ def test_validity_window_configuration() -> None:
           sql_table: some_schema.scd_table
           identifiers:
             - name: scd_key
-              type: primary
+              type: natural
           dimensions:
             - name: country
               type: categorical
@@ -55,7 +55,7 @@ def test_validity_window_must_have_a_start() -> None:
           sql_table: some_schema.scd_table
           identifiers:
             - name: scd_key
-              type: primary
+              type: natural
           dimensions:
             - name: country
               type: categorical
@@ -83,7 +83,7 @@ def test_validity_window_must_have_an_end() -> None:
           sql_table: some_schema.scd_table
           identifiers:
             - name: scd_key
-              type: primary
+              type: natural
           dimensions:
             - name: country
               type: categorical
@@ -114,7 +114,7 @@ def test_validity_window_uses_two_dimensions() -> None:
           sql_table: some_schema.scd_table
           identifiers:
             - name: scd_key
-              type: primary
+              type: natural
           dimensions:
             - name: country
               type: categorical
@@ -143,7 +143,7 @@ def test_two_dimension_validity_windows_must_not_overload_start_and_end() -> Non
           sql_table: some_schema.scd_table
           identifiers:
             - name: scd_key
-              type: primary
+              type: natural
           dimensions:
             - name: country
               type: categorical
@@ -178,7 +178,7 @@ def test_multiple_validity_windows_are_invalid() -> None:
           sql_table: some_schema.scd_table
           identifiers:
             - name: scd_key
-              type: primary
+              type: natural
           dimensions:
             - name: country
               type: categorical
@@ -225,7 +225,7 @@ def test_empty_validity_windows_are_invalid() -> None:
           sql_table: some_schema.scd_table
           identifiers:
             - name: scd_key
-              type: primary
+              type: natural
           dimensions:
             - name: country
               type: categorical
@@ -264,7 +264,7 @@ def test_measures_are_prevented() -> None:
           sql_table: some_schema.scd_table
           identifiers:
             - name: scd_key
-              type: primary
+              type: natural
           dimensions:
             - name: country
               type: categorical
@@ -291,4 +291,81 @@ def test_measures_are_prevented() -> None:
     model = parse_yaml_files_to_validation_ready_model([base_model_file(), validity_window_file])
 
     with pytest.raises(ModelValidationException, match="has both measures and validity param dimensions defined"):
+        ModelValidator().checked_validations(model.model)
+
+
+def test_validity_window_must_have_a_natural_key() -> None:
+    """Tests validation asserting that data sources with validity windows use an identifier with type NATURAL"""
+
+    yaml_contents = textwrap.dedent(
+        """\
+        data_source:
+          name: scd_data_source
+          sql_table: some_schema.scd_table
+          identifiers:
+            - name: scd_key
+              type: unique
+          dimensions:
+            - name: country
+              type: categorical
+            - name: window_start
+              type: time
+              type_params:
+                time_granularity: day
+                validity_params:
+                  is_start: true
+            - name: window_end
+              type: time
+              type_params:
+                time_granularity: day
+                validity_params:
+                  is_end: true
+        """
+    )
+    validity_window_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+    model = parse_yaml_files_to_validation_ready_model([base_model_file(), validity_window_file])
+
+    with pytest.raises(ModelValidationException, match="does not have an identifier with type `natural` set"):
+        ModelValidator().checked_validations(model.model)
+
+
+def test_validity_window_does_not_use_primary_key() -> None:
+    """Tests validation asserting that data sources with validity windows do not use primary keys
+
+    This is useful because we currently do not support joins against SCD-style data sources without using the
+    validity window filter, and so enabling a primary key would be confusing. Subsequent changes may add support
+    for this in which case we should of course remove this validation requirement.
+    """
+
+    yaml_contents = textwrap.dedent(
+        """\
+        data_source:
+          name: scd_data_source
+          sql_table: some_schema.scd_table
+          identifiers:
+            - name: scd_primary_key
+              type: primary
+            - name: scd_key
+              type: natural
+          dimensions:
+            - name: country
+              type: categorical
+            - name: window_start
+              type: time
+              type_params:
+                time_granularity: day
+                validity_params:
+                  is_start: true
+            - name: window_end
+              type: time
+              type_params:
+                time_granularity: day
+                validity_params:
+                  is_end: true
+        """
+    )
+    validity_window_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+    model = parse_yaml_files_to_validation_ready_model([base_model_file(), validity_window_file])
+
+    with pytest.raises(ModelValidationException, match="has one or more identifiers designated as `primary`"):
         ModelValidator().checked_validations(model.model)

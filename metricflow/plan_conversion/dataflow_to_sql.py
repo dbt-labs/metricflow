@@ -4,7 +4,7 @@ import logging
 from collections import OrderedDict
 from typing import Generic, List, Optional, Sequence, TypeVar, Union
 
-from metricflow.aggregation_properties import AggregationState
+from metricflow.aggregation_properties import AggregationState, AggregationType
 from metricflow.column_assoc import ColumnAssociation, SingleColumnCorrelationKey
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dag.id_generation import IdGeneratorRegistry
@@ -851,7 +851,9 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         )
 
     def _make_select_columns_for_metrics(
-        self, table_alias_to_metric_specs: OrderedDict[str, Sequence[MetricSpec]]
+        self,
+        table_alias_to_metric_specs: OrderedDict[str, Sequence[MetricSpec]],
+        aggregation_type: Optional[AggregationType],
     ) -> List[SqlSelectColumn]:
         """Creates select columns that get the given metric using the given table alias.
 
@@ -867,20 +869,60 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         for table_alias, metric_specs in table_alias_to_metric_specs.items():
             for metric_spec in metric_specs:
                 metric_column_name = self._column_association_resolver.resolve_metric_spec(metric_spec).column_name
+                column_reference_expression = SqlColumnReferenceExpression(
+                    col_ref=SqlColumnReference(
+                        table_alias=table_alias,
+                        column_name=metric_column_name,
+                    )
+                )
+                if aggregation_type:
+                    select_expression: SqlExpressionNode = SqlAggregateFunctionExpression.from_aggregation_type(
+                        aggregation_type=aggregation_type, sql_column_expression=column_reference_expression
+                    )
+                else:
+                    select_expression = column_reference_expression
+
                 select_columns.append(
                     SqlSelectColumn(
-                        expr=SqlColumnReferenceExpression(
-                            col_ref=SqlColumnReference(
-                                table_alias=table_alias,
-                                column_name=metric_column_name,
-                            )
-                        ),
+                        expr=select_expression,
                         column_alias=metric_column_name,
                     )
                 )
         return select_columns
 
-    def visit_combine_metrics_node(self, node: CombineMetricsNode[SqlDataSetT]) -> SqlDataSet:  # noqa: D
+    def visit_combine_metrics_node(self, node: CombineMetricsNode[SqlDataSetT]) -> SqlDataSet:
+        """Join computed metric datasets together to return a single dataset containing all metrics
+
+        This node may exist in one of two situations: when metrics need to be combined in order to produce a single
+        dataset with all required inputs for a derived metric (in which case the join type is INNER), or when
+        metrics need to be combined in order to produce a single dataset of output for downstream consumption by
+        the end user, in which case we will use FULL OUTER JOIN.
+
+        In the case of a multi-data-source FULL OUTER JOIN the join key will be a coalesced set of all previously
+        seen dimension values. For example:
+            FROM (
+              ...
+            ) subq_9
+            FULL OUTER JOIN (
+              ...
+            ) subq_10
+            ON
+              subq_9.is_instant = subq_10.is_instant
+              AND subq_9.ds = subq_10.ds
+            FULL OUTER JOIN (
+              ...
+            ) subq_11
+            ON
+              COALESCE(subq_9.is_instant, subq_10.is_instant) = subq_11.is_instant
+              AND COALESCE(subq_9.ds, subq_10.ds) = subq_11.ds
+
+        Whenever these nodes are joined using a FULL OUTER JOIN, we must also do a subsequent re-aggregation pass to
+        deduplicate the dimension value outputs across different metrics. This can happen if one or more of the
+        dimensions contains a NULL value. In that case, the FULL OUTER JOIN condition will fail, because NULL = NULL
+        returns NULL. Unfortunately, there's no way to do a robust NULL-safe comparison across engines in a FULL
+        OUTER JOIN context, because many engines do not support complex ON conditions or other techniques we might
+        use to apply a sentinel value for NULL to NULL comparisons.
+        """
         # Sanity check that all parents have the same linkable specs.
         parent_data_sets = [x.accept(self) for x in node.parent_nodes]
         assert (
@@ -893,26 +935,6 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         linkable_spec_set = parent_data_sets[0].instance_set.spec_set.transform(SelectOnlyLinkableSpecs())
         use_cross_join = len(linkable_spec_set.all_specs) == 0
 
-        # Create a FULL OUTER join where the join key is all previous dimension values from all sources coalesced.
-        #
-        # e.g.
-        #
-        # FROM (
-        #   ...
-        # ) subq_9
-        # FULL OUTER JOIN (
-        #   ...
-        # ) subq_10
-        # ON
-        #   subq_9.is_instant = subq_10.is_instant
-        #   AND subq_9.ds = subq_10.ds
-        # FULL OUTER JOIN (
-        #   ...
-        # ) subq_11
-        # ON
-        #   COALESCE(subq_9.is_instant, subq_10.is_instant) = subq_11.is_instant
-        #   AND COALESCE(subq_9.ds, subq_10.ds) = subq_11.ds
-
         joins_descriptions = []
         parent_source_table_aliases = []
         table_alias_to_metric_specs: OrderedDict[str, Sequence[MetricSpec]] = OrderedDict()
@@ -921,7 +943,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             parent_source_table_aliases.append(table_alias)
             table_alias_to_metric_specs[table_alias] = parent_data_set.instance_set.spec_set.metric_specs
 
-        # Create the components of the FULL OUTER JOIN that combines metrics. Order doesn't
+        # Create the components of the join that combines metrics. Order doesn't
         # matter so we use the first element in the FROM clause and create join descriptions from
         # the rest.
         from_alias = parent_source_table_aliases[0]
@@ -946,8 +968,11 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         output_instance_set = InstanceSet.merge([x.instance_set for x in parent_data_sets])
         output_instance_set = output_instance_set.transform(ChangeAssociatedColumns(self._column_association_resolver))
 
+        metric_aggregation_type = AggregationType.MAX if node.join_type is SqlJoinType.FULL_OUTER else None
         metric_select_column_set = SelectColumnSet(
-            metric_columns=self._make_select_columns_for_metrics(table_alias_to_metric_specs)
+            metric_columns=self._make_select_columns_for_metrics(
+                table_alias_to_metric_specs, aggregation_type=metric_aggregation_type
+            )
         )
         linkable_select_column_set = linkable_spec_set.transform(
             CreateSelectCoalescedColumnsForLinkableSpecs(
@@ -965,7 +990,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 from_source=from_source,
                 from_source_alias=from_alias,
                 joins_descs=tuple(joins_descriptions),
-                group_bys=(),
+                group_bys=linkable_select_column_set.as_tuple() if node.join_type is SqlJoinType.FULL_OUTER else (),
                 where=None,
                 order_bys=(),
             ),

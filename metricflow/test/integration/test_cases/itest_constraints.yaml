@@ -4,7 +4,7 @@ integration_test:
   description: Query a metric with a constraint that was requested as a dimension
   model: SIMPLE_MODEL
   metrics: ["booking_value"]
-  group_bys: ["metric_time","is_instant"]
+  group_bys: ["metric_time", "is_instant"]
   where_constraint: "is_instant"
   check_query: |
     SELECT  SUM(booking_value) AS booking_value
@@ -42,7 +42,7 @@ integration_test:
     SELECT SUM(booking_value) AS booking_value
       , is_instant
     FROM  {{ source_schema }}.fct_bookings b
-    JOIN  {{ source_schema }}.dim_listings_latest l ON b.listing_id = l.listing_id
+    LEFT OUTER JOIN  {{ source_schema }}.dim_listings_latest l ON b.listing_id = l.listing_id
     WHERE l.country = 'us'
     GROUP BY  is_instant
 ---
@@ -58,9 +58,8 @@ integration_test:
       , ds AS metric_time
     FROM  {{ source_schema }}.fct_bookings b
     WHERE ds = '2020-01-01'
-    GROUP BY 
+    GROUP BY
       ds
-
 ---
 integration_test:
   name: test_time_constraint_with_addition_dimension
@@ -74,7 +73,7 @@ integration_test:
     SELECT  SUM(booking_value) AS booking_value
       , ds AS metric_time
     FROM  {{ source_schema }}.fct_bookings b
-    WHERE is_instant 
+    WHERE is_instant
       and ds = '2020-01-01'
     GROUP BY ds
 ---
@@ -83,14 +82,14 @@ integration_test:
   description: Test a time constraint with a boolean
   model: SIMPLE_MODEL
   metrics: ["booking_value"]
-  group_bys: ["metric_time","is_instant"]
+  group_bys: ["metric_time", "is_instant"]
   where_constraint: "is_instant"
   check_query: |
     SELECT  SUM(booking_value) AS booking_value
       , is_instant
       , ds AS metric_time
     FROM  {{ source_schema }}.fct_bookings b
-    WHERE is_instant 
+    WHERE is_instant
     GROUP BY ds
       ,is_instant
 ---
@@ -105,10 +104,9 @@ integration_test:
     SELECT  SUM(b.booking_value) AS booking_value
       , b.ds AS metric_time
     FROM  {{ source_schema }}.fct_bookings b
-    JOIN  {{ source_schema }}.dim_listings_latest l ON b.listing_id = l.listing_id
+    LEFT OUTER JOIN  {{ source_schema }}.dim_listings_latest l ON b.listing_id = l.listing_id
     WHERE l.capacity >= 4
     GROUP BY  b.ds
-
 ---
 integration_test:
   name: test_time_constraint_on_time_dimension_with_an_expression
@@ -123,7 +121,6 @@ integration_test:
     FROM  {{source_schema}}.dim_listings_latest l
     WHERE {{ render_time_constraint("created_at", "2020-01-01", "2021-01-01") }}
     GROUP BY  created_at
-
 ---
 integration_test:
   name: test_metric_time_in_where

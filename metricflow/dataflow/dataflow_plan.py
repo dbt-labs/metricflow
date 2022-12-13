@@ -1160,6 +1160,17 @@ class CombineMetricsNode(Generic[SourceDataSetT], ComputedMetricsOutput[SourceDa
         return "Combine Metrics"
 
     @property
+    def displayed_properties(self) -> List[DisplayedProperty]:
+        """Prints details about the join types and how the node will behave"""
+        custom_properties = [DisplayedProperty("join type", self.join_type)]
+        if self.join_type is SqlJoinType.FULL_OUTER:
+            custom_properties.append(
+                DisplayedProperty("de-duplication method", "post-join aggregation across all dimensions")
+            )
+
+        return super().displayed_properties + custom_properties
+
+    @property
     def join_type(self) -> SqlJoinType:
         """The type of join used for combining metrics."""
         return self._join_type

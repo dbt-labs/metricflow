@@ -15,6 +15,7 @@ from metricflow.dag.id_generation import (
     SQL_EXPR_FUNCTION_ID_PREFIX,
     SQL_EXPR_STRING_ID_PREFIX,
     SQL_EXPR_COMPARISON_ID_PREFIX,
+    SQL_EXPR_GENERATE_UUID_PREFIX,
     SQL_EXPR_NULL_PREFIX,
     SQL_EXPR_LOGICAL_OPERATOR_PREFIX,
     SQL_EXPR_STRING_LITERAL_PREFIX,
@@ -223,6 +224,10 @@ class SqlExpressionNodeVisitor(Generic[VisitorOutputT], ABC):
 
     @abstractmethod
     def visit_window_function_expr(self, node: SqlWindowFunctionExpression) -> VisitorOutputT:  # noqa: D
+        pass
+
+    @abstractmethod
+    def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> VisitorOutputT:  # noqa: D
         pass
 
 
@@ -1374,3 +1379,50 @@ class SqlBetweenExpression(SqlExpressionNode):
         if not isinstance(other, SqlBetweenExpression):
             return False
         return self._parents_match(other)
+
+
+class SqlGenerateUuidExpression(SqlExpressionNode):
+    """Renders a sql to generate a random uuid, is non-deterministic.."""
+
+    def __init__(self) -> None:  # noqa: D
+        super().__init__(node_id=self.create_unique_id(), parent_nodes=[])
+
+    @classmethod
+    def id_prefix(cls) -> str:  # noqa: D
+        return SQL_EXPR_GENERATE_UUID_PREFIX
+
+    def accept(self, visitor: SqlExpressionNodeVisitor) -> VisitorOutputT:  # noqa: D
+        return visitor.visit_generate_uuid_expr(self)
+
+    @property
+    def description(self) -> str:  # noqa: D
+        return "Generate a universally unique identifier"
+
+    @property
+    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
+        return super().displayed_properties
+
+    @property
+    def requires_parenthesis(self) -> bool:  # noqa: D
+        return False
+
+    @property
+    def execution_parameters(self) -> SqlBindParameters:  # noqa: D
+        return SqlBindParameters()
+
+    def __repr__(self) -> str:  # noqa: D
+        return f"{self.__class__.__name__}(node_id={self.node_id})"
+
+    def rewrite(  # noqa: D
+        self,
+        column_replacements: Optional[SqlColumnReplacements] = None,
+        should_render_table_alias: Optional[bool] = None,
+    ) -> SqlExpressionNode:
+        return self
+
+    @property
+    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D
+        return SqlExpressionTreeLineage(other_exprs=(self,))
+
+    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
+        return False

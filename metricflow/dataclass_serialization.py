@@ -90,6 +90,7 @@ def _is_supported_field_type_in_serializable_dataclass(field_type: Type) -> bool
         or issubclass(field_type, float)
         or issubclass(field_type, str)
         or issubclass(field_type, datetime.datetime)
+        or issubclass(field_type, datetime.date)
         or issubclass(field_type, datetime.timedelta)
         or issubclass(field_type, BaseModel)
     )

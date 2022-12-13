@@ -11,14 +11,22 @@ import pytest
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, BaseOutput
 from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
+from metricflow.model.model_validator import ModelValidator
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.parsing.dir_to_model import parse_directory_of_yaml_files_to_model
+from metricflow.model.parsing.dir_to_model import (
+    parse_directory_of_yaml_files_to_model,
+    parse_yaml_files_to_validation_ready_model,
+)
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.test.fixtures.id_fixtures import IdNumberSpace, patch_id_generators_helper
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
+from metricflow.model.objects.common import YamlConfigFile
+from metricflow.plan_conversion.time_spine import TimeSpineSource
+from metricflow.query.query_parser import MetricFlowQueryParser
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +48,24 @@ def _data_set_to_source_nodes(
 ) -> Sequence[BaseOutput[DataSourceDataSet]]:
     source_node_builder = SourceNodeBuilder(semantic_model)
     return source_node_builder.create_from_data_sets(list(data_sets.values()))
+
+
+def query_parser_from_yaml(
+    yaml_contents: List[YamlConfigFile], time_spine_source: TimeSpineSource
+) -> MetricFlowQueryParser:
+    """Given yaml files, return a query parser using default source nodes, resolvers and time spine source"""
+    semantic_model = SemanticModel(parse_yaml_files_to_validation_ready_model(yaml_contents).model)
+    ModelValidator().checked_validations(semantic_model.user_configured_model)
+    source_nodes = _data_set_to_source_nodes(semantic_model, create_data_sets(semantic_model))
+    return MetricFlowQueryParser(
+        model=semantic_model,
+        source_nodes=source_nodes,
+        node_output_resolver=DataflowPlanNodeOutputDataSetResolver(
+            column_association_resolver=DefaultColumnAssociationResolver(semantic_model),
+            semantic_model=semantic_model,
+            time_spine_source=time_spine_source,
+        ),
+    )
 
 
 @dataclass(frozen=True)

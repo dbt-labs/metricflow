@@ -1,5 +1,11 @@
-from metricflow.sql.render.expr_renderer import DefaultSqlExpressionRenderer, SqlExpressionRenderer
+from metricflow.sql.render.expr_renderer import (
+    DefaultSqlExpressionRenderer,
+    SqlExpressionRenderer,
+    SqlExpressionRenderResult,
+)
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
+from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.sql.sql_exprs import SqlGenerateUuidExpression
 
 
 class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
@@ -9,6 +15,19 @@ class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     def double_data_type(self) -> str:
         """Custom double data type for the Redshift engine"""
         return "DOUBLE PRECISION"
+
+    def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> SqlExpressionRenderResult:  # noqa: D
+        """Generates a "good enough" random key to simulate a UUID.
+
+        NOTE: This is a temporary hacky solution as redshift does not have any UUID generation function.
+
+        Proposed solutions that requires more thinking:
+            - create a python UDF (Could we insert this without needing additional permissions?)
+        """
+        return SqlExpressionRenderResult(
+            sql="CONCAT(CAST(RANDOM()*100000000 AS INT)::VARCHAR,CAST(RANDOM()*100000000 AS INT)::VARCHAR)",
+            execution_parameters=SqlBindParameters(),
+        )
 
 
 class RedshiftSqlQueryPlanRenderer(DefaultSqlQueryPlanRenderer):
