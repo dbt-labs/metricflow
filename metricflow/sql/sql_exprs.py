@@ -812,7 +812,7 @@ class SqlPercentileExpressionArgument:
 
 
 class SqlPercentileExpression(SqlFunctionExpression):
-    """An percentile aggregation expression."""
+    """A percentile aggregation expression."""
 
     def __init__(self, order_by_arg: SqlExpressionNode, percentile_args: SqlPercentileExpressionArgument) -> None:
         """Constructor.
