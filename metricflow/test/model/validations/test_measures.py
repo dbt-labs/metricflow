@@ -4,7 +4,11 @@ import re
 import pytest
 from metricflow.aggregation_properties import AggregationType
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
-from metricflow.model.objects.elements.measure import Measure, NonAdditiveDimensionParameters
+from metricflow.model.objects.elements.measure import (
+    Measure,
+    MeasureAggregationParameters,
+    NonAdditiveDimensionParameters,
+)
 from metricflow.model.objects.metric import Metric, MetricInputMeasure, MetricType, MetricTypeParams
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.model_validator import ModelValidator
@@ -332,3 +336,90 @@ def test_count_measure_with_distinct_expr(simple_model__pre_transforms: UserConf
     assert (
         actual_error.find(expected_error_substring) != -1
     ), f"Expected error {expected_error_substring} not found in error string! Instead got {actual_error}"
+
+
+def test_percentile_measure_missing_agg_params(simple_model__pre_transforms: UserConfiguredModel) -> None:
+    """Tests that all measures with COUNT agg should have expr provided."""
+    model = copy.deepcopy(simple_model__pre_transforms)
+    data_source = find_data_source_with(model, lambda ds: ds.name == "bookings_source")[0]
+    invalid_measure_1 = Measure(
+        name="bad_measure_1",
+        agg=AggregationType.PERCENTILE,
+        agg_time_dimension="ds",
+    )
+    invalid_measure_2 = Measure(
+        name="bad_measure_2",
+        agg=AggregationType.PERCENTILE,
+        agg_time_dimension="ds",
+        agg_params=MeasureAggregationParameters(),
+    )
+
+    invalid_measure_3 = Measure(
+        name="bad_measure_3",
+        agg=AggregationType.SUM,
+        agg_time_dimension="ds",
+        agg_params=MeasureAggregationParameters(percentile=0.3),
+    )
+    data_source.measures.extend([invalid_measure_1, invalid_measure_2, invalid_measure_3])  # type: ignore
+
+    build = ModelValidator().validate_model(model)
+    expected_error_substring_1 = (
+        "Measure 'bad_measure_1' uses a PERCENTILE aggregation, which requires agg_params.percentile to be provided."
+    )
+    expected_error_substring_2 = (
+        "Measure 'bad_measure_2' uses a PERCENTILE aggregation, which requires agg_params.percentile to be provided."
+    )
+
+    expected_error_substring_3 = (
+        "Measure 'bad_measure_3' with aggregation 'sum' uses agg_params only relevant to Percentile measures."
+    )
+
+    missing_error_strings = set()
+    for expected_str in [expected_error_substring_1, expected_error_substring_2, expected_error_substring_3]:
+        if not any(actual_str.as_readable_str().find(expected_str) != -1 for actual_str in build.issues.errors):
+            missing_error_strings.add(expected_str)
+    assert (
+        len(missing_error_strings) == 0
+    ), f"Failed to match one or more expected errors: {missing_error_strings} in {set([x.as_readable_str() for x in build.issues.errors])}"
+
+
+def test_percentile_measure_bad_percentile_values(simple_model__pre_transforms: UserConfiguredModel) -> None:
+    """Tests that all measures with COUNT agg should have expr provided."""
+    model = copy.deepcopy(simple_model__pre_transforms)
+    data_source = find_data_source_with(model, lambda ds: ds.name == "bookings_source")[0]
+    invalid_measure_1 = Measure(
+        name="bad_measure_1",
+        agg=AggregationType.PERCENTILE,
+        agg_time_dimension="ds",
+        agg_params=MeasureAggregationParameters(percentile=1),
+    )
+    invalid_measure_2 = Measure(
+        name="bad_measure_2",
+        agg=AggregationType.PERCENTILE,
+        agg_time_dimension="ds",
+        agg_params=MeasureAggregationParameters(percentile=-2.0),
+    )
+    data_source.measures.extend([invalid_measure_1, invalid_measure_2])  # type: ignore
+
+    build = ModelValidator().validate_model(model)
+    expected_error_substring_1 = (
+        "Percentile aggregation parameter for measure 'bad_measure_1' is '1.0', but"
+        + "must be between 0 and 1 (non-inclusive). For example, to indicate the 65th percentile value, set 'percentile: 0.65'. "
+        + "For percentile values of 0, please use MIN, for percentile values of 1, please use MAX."
+    )
+    expected_error_substring_2 = (
+        "Percentile aggregation parameter for measure 'bad_measure_2' is '-2.0', but"
+        + "must be between 0 and 1 (non-inclusive). For example, to indicate the 65th percentile value, set 'percentile: 0.65'. "
+        + "For percentile values of 0, please use MIN, for percentile values of 1, please use MAX."
+    )
+
+    missing_error_strings = set()
+    for expected_str in [
+        expected_error_substring_1,
+        expected_error_substring_2,
+    ]:
+        if not any(actual_str.as_readable_str().find(expected_str) != -1 for actual_str in build.issues.errors):
+            missing_error_strings.add(expected_str)
+    assert (
+        len(missing_error_strings) == 0
+    ), f"Failed to match one or more expected errors: {missing_error_strings} in {set([x.as_readable_str() for x in build.issues.errors])}"
