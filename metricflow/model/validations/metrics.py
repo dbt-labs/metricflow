@@ -3,7 +3,7 @@ from typing import List
 
 from metricflow.errors.errors import ParsingException
 from metricflow.instances import MetricModelReference
-from metricflow.model.objects.metric import Metric, MetricType, CumulativeMetricWindow
+from metricflow.model.objects.metric import Metric, MetricType, MetricTimeWindow
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.unique_valid_name import UniqueAndValidNameRule
 from metricflow.model.validations.validator_helpers import (
@@ -38,7 +38,7 @@ class CumulativeMetricRule(ModelValidationRule):
 
             if metric.type_params.window:
                 try:
-                    _, _ = CumulativeMetricWindow.parse(metric.type_params.window.to_string())
+                    _, _ = MetricTimeWindow.parse(metric.type_params.window.to_string())
                 except ParsingException as e:
                     issues.append(
                         ValidationError(
@@ -123,3 +123,5 @@ class DerivedMetricRule(ModelValidationRule):
         for metric in model.metrics or []:
             issues += DerivedMetricRule._validate_alias_collision(metric=metric)
         return issues
+
+    # validate that only one of window / grain to date offset is specified for each metric

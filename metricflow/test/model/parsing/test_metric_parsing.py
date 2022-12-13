@@ -2,7 +2,7 @@ import textwrap
 
 from metricflow.model.objects.common import YamlConfigFile
 from metricflow.model.objects.constraints.where import WhereClauseConstraint
-from metricflow.model.objects.metric import CumulativeMetricWindow, MetricInput, MetricInputMeasure, MetricType
+from metricflow.model.objects.metric import MetricTimeWindow, MetricInput, MetricInputMeasure, MetricType
 from metricflow.model.parsing.dir_to_model import parse_yaml_files_to_model
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
@@ -229,7 +229,7 @@ def test_cumulative_window_metric_parsing() -> None:
     assert metric.name == "cumulative_test"
     assert metric.type is MetricType.CUMULATIVE
     assert metric.type_params.measures == [MetricInputMeasure(name="cumulative_measure")]
-    assert metric.type_params.window == CumulativeMetricWindow(count=7, granularity=TimeGranularity.DAY)
+    assert metric.type_params.window == MetricTimeWindow(count=7, granularity=TimeGranularity.DAY)
 
 
 def test_grain_to_date_metric_parsing() -> None:
@@ -256,6 +256,83 @@ def test_grain_to_date_metric_parsing() -> None:
     assert metric.type_params.measures == [MetricInputMeasure(name="cumulative_measure")]
     assert metric.type_params.window is None
     assert metric.type_params.grain_to_date is TimeGranularity.WEEK
+
+
+def test_derived_metric_offset_window_parsing() -> None:
+    """Test for parsing a derived metric with an offset window."""
+    yaml_contents = textwrap.dedent(
+        """\
+        metric:
+          name: derived_offset_test
+          type: derived
+          type_params:
+            expr: bookings / bookings_2_weeks_ago
+            metrics:
+              - name: bookings
+              - name: bookings
+                offset_window: 14d
+                alias: bookings_2_weeks_ago
+        """
+    )
+    file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+
+    build_result = parse_yaml_files_to_model(files=[file])
+
+    assert len(build_result.model.metrics) == 1
+    metric = build_result.model.metrics[0]
+    assert metric.name == "derived_offset_test"
+    assert metric.type is MetricType.DERIVED
+    assert len(metric.type_params.metrics) == 2
+    metric1, metric2 = metric.type_params.metrics
+    assert metric1.offset_window is None
+    assert metric2.offset_window == MetricTimeWindow(count=14, granularity=TimeGranularity.DAY)
+    assert metric1.alias is None
+    assert metric2.alias == "bookings_2_weeks_ago"
+    assert metric.type_params.expr == "bookings / bookings_2_weeks_ago"
+
+
+# metric:
+#   name: "bookings_growth_since_start_of_month"
+#   description: |
+#     percentage growth of bookings since the start of the month,
+#     used to test derived metrics with an offset_to_grain_to_date.
+#   owners:
+#     - support@transformdata.io
+#   type: derived
+#   type_params:
+#     expr: bookings / bookings_at_start_of_month
+#     metrics:
+#       - name: bookings
+#       - name: bookings
+#         offset_to_grain_to_date: month
+#         alias: bookings_at_start_of_month
+
+
+def test_derive_metric_offset_to_grain_to_date_parsing() -> None:
+    """Test for parsing a derived metric with an offset to grain to date."""
+    raise NotImplementedError
+    # yaml_contents = textwrap.dedent(
+    #     """\
+    #     metric:
+    #       name: grain_to_date_test
+    #       type: cumulative
+    #       type_params:
+    #         measures:
+    #           - cumulative_measure
+    #         grain_to_date: "week"
+    #     """
+    # )
+    # file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+
+    # build_result = parse_yaml_files_to_model(files=[file])
+
+    # assert len(build_result.model.metrics) == 1
+    # metric = build_result.model.metrics[0]
+    # assert metric.name == "grain_to_date_test"
+    # assert metric.type is MetricType.CUMULATIVE
+    # assert metric.type_params.measures == [MetricInputMeasure(name="cumulative_measure")]
+    # assert metric.type_params.window is None
+    # assert metric.type_params.grain_to_date is TimeGranularity.WEEK
 
 
 def test_constraint_metric_parsing() -> None:

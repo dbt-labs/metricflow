@@ -41,7 +41,7 @@ from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOp
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
-from metricflow.model.objects.metric import MetricType, CumulativeMetricWindow
+from metricflow.model.objects.metric import MetricType, MetricTimeWindow
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.spec_converters import WhereConstraintConverter
 from metricflow.object_utils import pformat_big_objects, assert_exactly_one_arg_set
@@ -604,7 +604,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         where_constraint: Optional[SpecWhereClauseConstraint] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         cumulative: Optional[bool] = False,
-        cumulative_window: Optional[CumulativeMetricWindow] = None,
+        cumulative_window: Optional[MetricTimeWindow] = None,
         cumulative_grain_to_date: Optional[TimeGranularity] = None,
     ) -> BaseOutput[SqlDataSetT]:
         """Returns a node where the measures are aggregated by the linkable specs and constrained appropriately.
@@ -689,7 +689,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         where_constraint: Optional[SpecWhereClauseConstraint] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         cumulative: Optional[bool] = False,
-        cumulative_window: Optional[CumulativeMetricWindow] = None,
+        cumulative_window: Optional[MetricTimeWindow] = None,
         cumulative_grain_to_date: Optional[TimeGranularity] = None,
     ) -> BaseOutput[SqlDataSetT]:
         metric_time_dimension_requested = self._metric_time_dimension_reference.element_name in [
