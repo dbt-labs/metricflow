@@ -19,8 +19,7 @@ class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
         """Render a percentile expression for Redshift. Add additional over() syntax for window."""
         arg_rendered = self.render_sql_expr(node.order_by_arg)
-        params = SqlBindParameters()
-        params.update(arg_rendered.execution_parameters)
+        params = arg_rendered.execution_parameters
 
         function_str = node.percentile_args.function_name
         percentile = node.percentile_args.percentile
