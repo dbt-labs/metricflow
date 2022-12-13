@@ -71,6 +71,12 @@ class MetricInput(HashableBaseModel):
     name: str
     constraint: Optional[WhereClauseConstraint]
     alias: Optional[str]
+    offset_window: Optional[str]
+    offset_to_grain_to_date: Optional[TimeGranularity]
+    # config parsing
+    # docs for configs
+    # validations for configs
+    # SQL rendering
 
 
 class CumulativeMetricWindow(PydanticCustomInputParser, HashableBaseModel):

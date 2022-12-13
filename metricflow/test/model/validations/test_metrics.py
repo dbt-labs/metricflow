@@ -180,6 +180,7 @@ def test_generated_metrics_only() -> None:  # noqa:D
     )
 
 
+# Add test here
 def test_derived_metric() -> None:  # noqa: D
     measure_name = "foo"
     model_validator = ModelValidator()

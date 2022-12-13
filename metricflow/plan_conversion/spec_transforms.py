@@ -72,6 +72,7 @@ class CreateOnConditionForCombiningMetrics(InstanceSpecSetTransform[SqlExpressio
 
     """
 
+    # here
     def __init__(  # noqa: D
         self,
         column_association_resolver: ColumnAssociationResolver,
@@ -82,16 +83,21 @@ class CreateOnConditionForCombiningMetrics(InstanceSpecSetTransform[SqlExpressio
         self._table_aliases_in_coalesce = table_aliases_in_coalesce
         self._table_alias_on_right_equality = table_alias_on_right_equality
 
+    # here
     def _make_equality_expr(self, column_alias: str) -> SqlExpressionNode:
+        left_expr = _make_coalesced_expr(self._table_aliases_in_coalesce, column_alias)
+        right_expr = SqlColumnReferenceExpression(
+            col_ref=SqlColumnReference(
+                table_alias=self._table_alias_on_right_equality,
+                column_name=column_alias,
+            )
+        )
+        # if either has offset window, build date_add expr
+        # if either has offset grain to date, build date_trunc expr
         return SqlComparisonExpression(
-            left_expr=_make_coalesced_expr(self._table_aliases_in_coalesce, column_alias),
+            left_expr=left_expr,
             comparison=SqlComparison.EQUALS,
-            right_expr=SqlColumnReferenceExpression(
-                col_ref=SqlColumnReference(
-                    table_alias=self._table_alias_on_right_equality,
-                    column_name=column_alias,
-                )
-            ),
+            right_expr=right_expr,
         )
 
     def transform(self, spec_set: InstanceSpecSet) -> SqlExpressionNode:  # noqa: D

@@ -286,6 +286,7 @@ def test_constraint_metric_parsing() -> None:
     )
 
 
+# Add test here
 def test_derived_metric_input_parsing() -> None:
     """Test for parsing derived metrics with metric_input properties"""
     yaml_contents = textwrap.dedent(
