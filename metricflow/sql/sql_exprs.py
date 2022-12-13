@@ -26,6 +26,7 @@ from metricflow.dag.id_generation import (
     SQL_EXPR_BETWEEN_PREFIX,
     SQL_EXPR_WINDOW_FUNCTION_ID_PREFIX,
 )
+from metricflow.model.objects.elements.measure import MeasureAggregationParameters
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.visitor import Visitable, VisitorOutputT
 from metricflow.time.time_granularity import TimeGranularity
@@ -693,6 +694,16 @@ class SqlFunction(Enum):
             return SqlFunction.MIN
         elif aggregation_type is AggregationType.SUM:
             return SqlFunction.SUM
+        elif aggregation_type is AggregationType.PERCENTILE:
+            raise RuntimeError(
+                f"Unhandled aggregation type {aggregation_type} - this should have been handled in percentile"
+                "aggregation node."
+            )
+        elif aggregation_type is AggregationType.MEDIAN:
+            raise RuntimeError(
+                f"Unhandled aggregation type {aggregation_type} - this should have been transformed to PERCENTILE "
+                "during model parsing."
+            )
         elif (
             aggregation_type is AggregationType.SUM_BOOLEAN
             or aggregation_type is AggregationType.BOOLEAN
@@ -714,6 +725,22 @@ class SqlFunctionExpression(SqlExpressionNode):
     def is_aggregate_function(self) -> bool:
         """Returns whether this is an aggregate function."""
         pass
+
+
+def build_expression_from_aggregation_type(
+    aggregation_type: AggregationType,
+    sql_column_expression: SqlColumnReferenceExpression,
+    agg_params: MeasureAggregationParameters = None,
+) -> SqlFunctionExpression:
+    """Returns sql function expression depending on aggregation type."""
+
+    if aggregation_type is AggregationType.PERCENTILE:
+        assert agg_params is not None, "Agg_params is none, which should have been caught in validation"
+        return SqlPercentileExpression(
+            sql_column_expression, SqlPercentileExpressionArgument.from_aggregation_parameters(agg_params)
+        )
+    else:
+        return SqlAggregateFunctionExpression.from_aggregation_type(aggregation_type, sql_column_expression)
 
 
 class SqlAggregateFunctionExpression(SqlFunctionExpression):
@@ -816,6 +843,16 @@ class SqlPercentileExpressionArgument:
 
     percentile: float
     function_type: SqlPercentileFunctionType
+
+    @staticmethod
+    def from_aggregation_parameters(agg_params: MeasureAggregationParameters) -> SqlPercentileExpressionArgument:
+        """Given the measure parameters, returns a SqlPercentileExpressionArgument with the corresponding percentile args."""
+        if not agg_params.percentile:
+            raise RuntimeError("Percentile value is none - this should have been caught during model parsing.")
+        return SqlPercentileExpressionArgument(
+            agg_params.percentile,
+            SqlPercentileFunctionType.DISCRETE if agg_params.disc else SqlPercentileFunctionType.CONTINUOUS,
+        )
 
     @property
     def function_name(self) -> str:

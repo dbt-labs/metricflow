@@ -16,6 +16,8 @@ class AggregationType(ExtendedEnum):
     BOOLEAN = "boolean"
     SUM_BOOLEAN = "sum_boolean"
     AVERAGE = "average"
+    PERCENTILE = "percentile"
+    MEDIAN = "median"
 
     COUNT = "count"
     # AVERAGE = "average"  not yet implemented ...requires us to keep track of two quantities, count and sum
@@ -45,6 +47,8 @@ class AggregationType(ExtendedEnum):
             or self is AggregationType.COUNT_DISTINCT
             or self is AggregationType.BOOLEAN
             or self is AggregationType.AVERAGE
+            or self is AggregationType.PERCENTILE
+            or self is AggregationType.MEDIAN
         ):
             return False
         else:
