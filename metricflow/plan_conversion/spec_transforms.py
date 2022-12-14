@@ -17,7 +17,9 @@ from metricflow.sql.sql_exprs import (
     SqlAggregateFunctionExpression,
     SqlFunction,
 )
+from metricflow.sql.sql_plan import SqlJoinTimeOffset, MetricTimeOffset
 from metricflow.sql.sql_plan import SqlSelectColumn
+from metricflow.sql.sql_exprs import SqlDateTruncExpression, SqlTimeDeltaExpression
 
 
 def _make_coalesced_expr(table_aliases: Sequence[str], column_alias: str) -> SqlExpressionNode:
@@ -88,33 +90,48 @@ class CreateOnConditionForCombiningMetrics(InstanceSpecSetTransform[SqlExpressio
     The latter scenario consolidates the rows keyed by 'c' into a single entry.
     """
 
-    # here
     def __init__(  # noqa: D
         self,
         column_association_resolver: ColumnAssociationResolver,
         table_aliases_in_coalesce: Sequence[str],
         table_alias_on_right_equality: str,
+        offset: SqlJoinTimeOffset = SqlJoinTimeOffset(),
     ) -> None:
         self._column_association_resolver = column_association_resolver
         self._table_aliases_in_coalesce = table_aliases_in_coalesce
         self._table_alias_on_right_equality = table_alias_on_right_equality
+        self._offset = offset
 
-    # here
-    def _make_equality_expr(self, column_alias: str) -> SqlExpressionNode:
-        left_expr = _make_coalesced_expr(self._table_aliases_in_coalesce, column_alias)
-        right_expr = SqlColumnReferenceExpression(
+    def _make_equality_expr(
+        self, column_alias: str, offset: SqlJoinTimeOffset = SqlJoinTimeOffset()
+    ) -> SqlExpressionNode:
+        left_expr: SqlExpressionNode = _make_coalesced_expr(self._table_aliases_in_coalesce, column_alias)
+        right_expr: SqlExpressionNode = SqlColumnReferenceExpression(
             col_ref=SqlColumnReference(
                 table_alias=self._table_alias_on_right_equality,
                 column_name=column_alias,
             )
         )
-        # if either has offset window, build date_add expr
-        # if either has offset grain to date, build date_trunc expr
+        if offset.left_offset:
+            left_expr = self._offset_sql_expr(sql_expr=left_expr, offset=offset.left_offset)
+        if offset.right_offset:
+            right_expr = self._offset_sql_expr(sql_expr=right_expr, offset=offset.right_offset)
         return SqlComparisonExpression(
             left_expr=left_expr,
             comparison=SqlComparison.EQUALS,
             right_expr=right_expr,
         )
+
+    def _offset_sql_expr(self, sql_expr: SqlExpressionNode, offset: MetricTimeOffset) -> SqlExpressionNode:
+        # Should I do some validation here to confirm this column is metric_time?
+        if offset.offset_window:
+            offset_expr: SqlExpressionNode = SqlTimeDeltaExpression(
+                arg=sql_expr, count=offset.offset_window.count, granularity=offset.offset_window.granularity
+            )
+        elif offset.offset_to_grain_to_date:
+            offset_expr = SqlDateTruncExpression(time_granularity=offset.offset_to_grain_to_date, arg=sql_expr)
+
+        return offset_expr
 
     def transform(self, spec_set: InstanceSpecSet) -> SqlExpressionNode:  # noqa: D
         equality_exprs = []

@@ -15,6 +15,7 @@ from metricflow.specs import (
     OrderBySpec,
     OutputColumnNameOverride,
 )
+from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.test.test_utils import as_datetime
 from metricflow.test.time.metric_time_dimension import MTD
 from metricflow.time.time_granularity import TimeGranularity
@@ -284,3 +285,9 @@ def test_derived_metric_query_parsing(query_parser: MetricFlowQueryParser) -> No
         metric_names=["trailing_2_months_revenue_sub_10"],
         group_by_names=[MTD],
     )
+
+
+# TODO: make sure error is raised if no time dim for these metrics
+def test_derived_metric_with_offset_parsing() -> None:
+    """Test that querying derived metrics with a time offset requires a time dimension."""
+    raise NotImplementedError

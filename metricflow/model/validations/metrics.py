@@ -113,8 +113,8 @@ class DerivedMetricRule(ModelValidationRule):
         return issues
 
     @staticmethod
-    @validate_safely(whats_being_done="checking that input metric time window params are valid")
-    def _validate_time_window_params(metric: Metric) -> List[ValidationIssueType]:
+    @validate_safely(whats_being_done="checking that input metric time offset params are valid")
+    def _validate_time_offset_params(metric: Metric) -> List[ValidationIssueType]:
         issues: List[ValidationIssueType] = []
 
         for input_metric in metric.input_metrics or []:
@@ -141,5 +141,5 @@ class DerivedMetricRule(ModelValidationRule):
         issues += DerivedMetricRule._validate_input_metrics_exist(model=model)
         for metric in model.metrics or []:
             issues += DerivedMetricRule._validate_alias_collision(metric=metric)
-            issues += DerivedMetricRule._validate_time_window_params(metric=metric)
+            issues += DerivedMetricRule._validate_time_offset_params(metric=metric)
         return issues

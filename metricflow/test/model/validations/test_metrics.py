@@ -248,7 +248,7 @@ def test_derived_metric() -> None:  # noqa: D
                     ),
                 ),
                 metric_with_guaranteed_meta(
-                    name="has_both_time_window_params_on_same_input_metric",
+                    name="has_both_time_offset_params_on_same_input_metric",
                     type=MetricType.DERIVED,
                     type_params=MetricTypeParams(
                         expr="random_metric * 2",

@@ -1425,6 +1425,14 @@ def test_nested_derived_metric(  # noqa: D
     )
 
 
+def test_derived_metric_with_offset_window() -> None:  # noqa: D
+    raise NotImplementedError
+
+
+def test_derived_metric_with_offset_to_grain_to_date() -> None:  # noqa: D
+    raise NotImplementedError
+
+
 def test_join_to_scd_dimension(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,

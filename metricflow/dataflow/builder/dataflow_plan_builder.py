@@ -209,8 +209,6 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                     )
                 )
             else:
-                metric_input_measure_specs = self._metric_semantics.measures_for_metric(metric_reference)
-
                 logger.info(
                     f"For {metric_spec}, needed measures are:\n"
                     f"{pformat_big_objects(metric_input_measure_specs=metric_input_measure_specs)}"

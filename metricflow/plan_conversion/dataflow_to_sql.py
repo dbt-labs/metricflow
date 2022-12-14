@@ -957,6 +957,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                         column_association_resolver=self._column_association_resolver,
                         table_aliases_in_coalesce=parent_source_table_aliases[:i],
                         table_alias_on_right_equality=parent_source_table_aliases[i],
+                        offset=node.join_offset,
                     ).transform(linkable_spec_set)
                     if not use_cross_join
                     else None,
