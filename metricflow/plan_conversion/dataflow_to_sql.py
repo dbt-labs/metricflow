@@ -936,35 +936,39 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             parent_data_sets.append(AnnotatedSqlDataSet(data_set=parent_sql_data_set, alias=table_alias))
             table_alias_to_metric_specs[table_alias] = parent_sql_data_set.instance_set.spec_set.metric_specs
 
-        # Sanity check that all parents have the same linkable specs.
-        linkable_specs = parent_data_sets[0].data_set.instance_set.spec_set.linkable_specs
+        # When we create the components of the join that combines metrics it will be one of INNER, FULL OUTER,
+        # or CROSS JOIN. Order doesn't matter for these join types, so we will use the first element in the FROM
+        # clause and create join descriptions from the rest.
+        from_data_set = parent_data_sets[0]
+        join_data_sets = parent_data_sets[1:]
+
+        # Sanity check that all parents have the same linkable specs before building the join descriptions.
+        linkable_specs = from_data_set.data_set.instance_set.spec_set.linkable_specs
         assert all(
-            [set(x.data_set.instance_set.spec_set.linkable_specs) == set(linkable_specs) for x in parent_data_sets]
+            [set(x.data_set.instance_set.spec_set.linkable_specs) == set(linkable_specs) for x in join_data_sets]
         ), "All parent nodes should have the same set of linkable instances since all values are coalesced."
-        linkable_spec_set = parent_data_sets[0].data_set.instance_set.spec_set.transform(SelectOnlyLinkableSpecs())
+
+        linkable_spec_set = from_data_set.data_set.instance_set.spec_set.transform(SelectOnlyLinkableSpecs())
         join_type = SqlJoinType.CROSS_JOIN if len(linkable_spec_set.all_specs) == 0 else node.join_type
 
         joins_descriptions = []
-        # Create the components of the join that combines metrics. Order doesn't
-        # matter so we use the first element in the FROM clause and create join descriptions from
-        # the rest.
-        from_alias = parent_data_sets[0].alias
-        from_source = parent_data_sets[0].data_set.sql_select_node
-        for i in range(1, len(parent_data_sets)):
+        aliases_seen = [from_data_set.alias]
+        for join_data_set in join_data_sets:
             joins_descriptions.append(
                 SqlJoinDescription(
-                    right_source=parent_data_sets[i].data_set.sql_select_node,
-                    right_source_alias=parent_data_sets[i].alias,
+                    right_source=join_data_set.data_set.sql_select_node,
+                    right_source_alias=join_data_set.alias,
                     on_condition=CreateOnConditionForCombiningMetrics(
                         column_association_resolver=self._column_association_resolver,
-                        table_aliases_in_coalesce=[x.alias for x in parent_data_sets[:i]],
-                        table_alias_on_right_equality=parent_data_sets[i].alias,
+                        table_aliases_in_coalesce=aliases_seen,
+                        table_alias_on_right_equality=join_data_set.alias,
                     ).transform(linkable_spec_set)
                     if join_type is not SqlJoinType.CROSS_JOIN
                     else None,
                     join_type=join_type,
                 )
             )
+            aliases_seen.append(join_data_set.alias)
 
         # We can merge all parent instances since the common linkable instances will be de-duped.
         output_instance_set = InstanceSet.merge([x.data_set.instance_set for x in parent_data_sets])
@@ -989,8 +993,8 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             sql_select_node=SqlSelectStatementNode(
                 description=node.description,
                 select_columns=combined_select_column_set.as_tuple(),
-                from_source=from_source,
-                from_source_alias=from_alias,
+                from_source=from_data_set.data_set.sql_select_node,
+                from_source_alias=from_data_set.alias,
                 joins_descs=tuple(joins_descriptions),
                 group_bys=linkable_select_column_set.as_tuple() if node.join_type is SqlJoinType.FULL_OUTER else (),
                 where=None,
