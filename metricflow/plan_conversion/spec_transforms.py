@@ -159,7 +159,7 @@ class CreateOnConditionForCombiningMetrics(InstanceSpecSetTransform[SqlExpressio
 
             equality_exprs.append(self._make_equality_expr(column_alias=column_association.column_name))
         assert len(equality_exprs) > 0
-
+        print("join exprs:", equality_exprs)
         if len(equality_exprs) == 1:
             return equality_exprs[0]
         else:

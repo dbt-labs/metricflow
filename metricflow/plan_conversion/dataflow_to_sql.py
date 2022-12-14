@@ -618,6 +618,8 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
     def visit_compute_metrics_node(self, node: ComputeMetricsNode) -> SqlDataSet:
         """Generates the query that realizes the behavior of ComputeMetricsNode."""
+        print("visiting compute metrics node. parent:", node.parent_node)
+
         from_data_set: SqlDataSet = node.parent_node.accept(self)
         from_data_set_alias = self._next_unique_table_alias()
 
@@ -705,6 +707,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             elif metric.type == MetricType.EXPR or metric.type == MetricType.DERIVED:
                 assert metric.type_params.expr
                 metric_expr = SqlStringExpression(sql_expr=metric.type_params.expr)
+                print(metric_expr)
             else:
                 assert_values_exhausted(metric.type)
 
@@ -923,8 +926,12 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         OUTER JOIN context, because many engines do not support complex ON conditions or other techniques we might
         use to apply a sentinel value for NULL to NULL comparisons.
         """
+        print("visiting combined metrics node")
+        # Get rid of join_offset on this class; needs to be more flexible
+
         # Sanity check that all parents have the same linkable specs.
         parent_data_sets = [x.accept(self) for x in node.parent_nodes]
+        metric_specs = [parent_node.metric_specs for parent_node in node.parent_nodes]
         assert (
             len(parent_data_sets) > 1
         ), "Shouldn't have a CombineMetricsNode in the dataflow plan if there's only 1 parent."
@@ -948,6 +955,9 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         # the rest.
         from_alias = parent_source_table_aliases[0]
         from_source = parent_data_sets[0].sql_select_node
+        from_metric_spec = metric_specs[0][0]
+        # Need to map correct offset to correct alias!
+        # Will this SQL actually give us what we want even? Test real examples.
         for i in range(1, len(parent_source_table_aliases)):
             joins_descriptions.append(
                 SqlJoinDescription(
@@ -957,7 +967,8 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                         column_association_resolver=self._column_association_resolver,
                         table_aliases_in_coalesce=parent_source_table_aliases[:i],
                         table_alias_on_right_equality=parent_source_table_aliases[i],
-                        offset=node.join_offset,
+                        left_offset=MetricTimeOffset(),
+                        right_offset=MetricTimeOffset(),
                     ).transform(linkable_spec_set)
                     if not use_cross_join
                     else None,
