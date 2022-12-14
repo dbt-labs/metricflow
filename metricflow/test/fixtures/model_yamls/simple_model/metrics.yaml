@@ -568,4 +568,22 @@ metric:
       - name: booking_value
       - name: views
 ---
-
+metric:
+  name: "median_booking_value"
+  description: "median booking value"
+  owners:
+    - support@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+      - median_booking_value
+---
+metric:
+  name: "booking_value_p99"
+  description: "p99 booking value"
+  owners:
+    - support@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+      - booking_value_p99
