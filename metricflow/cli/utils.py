@@ -29,6 +29,7 @@ from metricflow.configuration.constants import (
     CONFIG_DWH_ACCESS_TOKEN,
     CONFIG_DBT_REPO,
 )
+from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.sql_clients.common_client import SqlDialect
 
 logger = logging.getLogger(__name__)
@@ -105,6 +106,19 @@ def generate_duckdb_demo_keys(config_dir: str) -> Tuple[ConfigKey, ...]:
         ConfigKey(key=CONFIG_DWH_DIALECT, value="duckdb"),
         ConfigKey(key=CONFIG_DWH_SCHEMA, value="mf_demo"),
     )
+
+
+# Data Warehouse link retriever
+def get_data_warehouse_config_link(handler: YamlFileHandler) -> str:
+    """Returns the URL to the docs on data warehouse specific configurations."""
+    dialect = handler.get_value(CONFIG_DWH_DIALECT) or ""
+    url_map = {
+        SqlDialect.SNOWFLAKE.value: "dw-snowflake",
+        SqlDialect.BIGQUERY.value: "dw-bigquery",
+        SqlDialect.DATABRICKS.value: "dw-databricks",
+        SqlDialect.REDSHIFT.value: "dw-redshift",
+    }
+    return f"https://docs.transform.co/docs/deployment/integrations/dw/{url_map.get(dialect, '')}"
 
 
 # Click Options

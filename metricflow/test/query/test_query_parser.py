@@ -90,6 +90,33 @@ REVENUE_YAML = textwrap.dedent(
     """
 )
 
+METRICS_YAML = textwrap.dedent(
+    """\
+    ---
+    metric:
+      name: revenue_cumulative
+      description: Cumulative metric for revenue for testing purposes
+      owners:
+        - support@transformdata.io
+      type: cumulative
+      type_params:
+        measures:
+          - bookings
+        window: 7 days
+    ---
+    metric:
+      name: revenue_sub_10
+      description: Derived cumulative metric for revenue for testing purposes
+      owners:
+        - support@transformdata.io
+      type: derived
+      type_params:
+        expr: revenue_cumulative - 10
+        metrics:
+          - name: revenue_cumulative
+    """
+)
+
 
 def test_query_parser(time_spine_source: TimeSpineSource) -> None:  # noqa: D
     bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=BOOKINGS_YAML)
@@ -271,18 +298,21 @@ def test_parse_and_validate_metric_constraint_dims(time_spine_source: TimeSpineS
         )
 
 
-def test_derived_metric_query_parsing(query_parser: MetricFlowQueryParser) -> None:
+def test_derived_metric_query_parsing(time_spine_source: TimeSpineSource) -> None:
     """Test derived metric inputs are properly validated."""
 
+    bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=BOOKINGS_YAML)
+    metrics_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=METRICS_YAML)
+    query_parser = query_parser_from_yaml([bookings_yaml_file, metrics_yaml_file], time_spine_source)
     # check that no dimension query raises UnableToSatisfyQueryError
     with pytest.raises(UnableToSatisfyQueryError):
         query_parser.parse_and_validate_query(
-            metric_names=["trailing_2_months_revenue_sub_10"],
+            metric_names=["revenue_sub_10"],
             group_by_names=[],
         )
 
     query_parser.parse_and_validate_query(
-        metric_names=["trailing_2_months_revenue_sub_10"],
+        metric_names=["revenue_sub_10"],
         group_by_names=[MTD],
     )
 
