@@ -9,7 +9,9 @@
             <!--   {'class': 'MetricSpec',                                     -->
             <!--    'element_name': 'instant_plus_non_referred_bookings_pct',  -->
             <!--    'constraint': None,                                        -->
-            <!--    'alias': None}                                             -->
+            <!--    'alias': None,                                             -->
+            <!--    'offset_window': None,                                     -->
+            <!--    'offset_to_grain_to_date': None}                           -->
             <CombineMetricsNode>
                 <!-- description = Combine Metrics -->
                 <!-- node_id = cbm_1 -->
@@ -21,7 +23,9 @@
                     <!--   {'class': 'MetricSpec',                        -->
                     <!--    'element_name': 'non_referred_bookings_pct',  -->
                     <!--    'constraint': None,                           -->
-                    <!--    'alias': 'non_referred'}                      -->
+                    <!--    'alias': 'non_referred',                      -->
+                    <!--    'offset_window': None,                        -->
+                    <!--    'offset_to_grain_to_date': None}              -->
                     <CombineMetricsNode>
                         <!-- description = Combine Metrics -->
                         <!-- node_id = cbm_0 -->
@@ -33,7 +37,9 @@
                             <!--   {'class': 'MetricSpec',                -->
                             <!--    'element_name': 'referred_bookings',  -->
                             <!--    'constraint': None,                   -->
-                            <!--    'alias': 'ref_bookings'}              -->
+                            <!--    'alias': 'ref_bookings',              -->
+                            <!--    'offset_window': None,                -->
+                            <!--    'offset_to_grain_to_date': None}      -->
                             <AggregateMeasuresNode>
                                 <!-- description = Aggregate Measures -->
                                 <!-- node_id = am_0 -->
@@ -69,11 +75,13 @@
                         <ComputeMetricsNode>
                             <!-- description = Compute Metrics via Expressions -->
                             <!-- node_id = cm_1 -->
-                            <!-- metric_spec =                   -->
-                            <!--   {'class': 'MetricSpec',       -->
-                            <!--    'element_name': 'bookings',  -->
-                            <!--    'constraint': None,          -->
-                            <!--    'alias': None}               -->
+                            <!-- metric_spec =                        -->
+                            <!--   {'class': 'MetricSpec',            -->
+                            <!--    'element_name': 'bookings',       -->
+                            <!--    'constraint': None,               -->
+                            <!--    'alias': None,                    -->
+                            <!--    'offset_window': None,            -->
+                            <!--    'offset_to_grain_to_date': None}  -->
                             <AggregateMeasuresNode>
                                 <!-- description = Aggregate Measures -->
                                 <!-- node_id = am_1 -->
@@ -115,7 +123,9 @@
                     <!--   {'class': 'MetricSpec',               -->
                     <!--    'element_name': 'instant_bookings',  -->
                     <!--    'constraint': None,                  -->
-                    <!--    'alias': 'instant'}                  -->
+                    <!--    'alias': 'instant',                  -->
+                    <!--    'offset_window': None,               -->
+                    <!--    'offset_to_grain_to_date': None}     -->
                     <AggregateMeasuresNode>
                         <!-- description = Aggregate Measures -->
                         <!-- node_id = am_2 -->
@@ -151,11 +161,13 @@
                 <ComputeMetricsNode>
                     <!-- description = Compute Metrics via Expressions -->
                     <!-- node_id = cm_4 -->
-                    <!-- metric_spec =                   -->
-                    <!--   {'class': 'MetricSpec',       -->
-                    <!--    'element_name': 'bookings',  -->
-                    <!--    'constraint': None,          -->
-                    <!--    'alias': None}               -->
+                    <!-- metric_spec =                        -->
+                    <!--   {'class': 'MetricSpec',            -->
+                    <!--    'element_name': 'bookings',       -->
+                    <!--    'constraint': None,               -->
+                    <!--    'alias': None,                    -->
+                    <!--    'offset_window': None,            -->
+                    <!--    'offset_to_grain_to_date': None}  -->
                     <AggregateMeasuresNode>
                         <!-- description = Aggregate Measures -->
                         <!-- node_id = am_3 -->
