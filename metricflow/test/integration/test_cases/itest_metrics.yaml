@@ -670,4 +670,4 @@ integration_test:
       ON c.listing_id = d.listing_id
       GROUP BY 2
     ) vw
-    ON bk.is_lux = vw.is_lux
+    ON bk.is_lux = vw.is_lux OR (bk.is_lux IS NULL AND vw.is_lux IS NULL)

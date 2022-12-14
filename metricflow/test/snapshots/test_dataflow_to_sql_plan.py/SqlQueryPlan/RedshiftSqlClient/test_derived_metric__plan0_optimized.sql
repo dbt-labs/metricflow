@@ -53,5 +53,9 @@ FROM (
       metric_time
   ) subq_20
   ON
-    subq_15.metric_time = subq_20.metric_time
+    (
+      subq_15.metric_time = subq_20.metric_time
+    ) OR (
+      (subq_15.metric_time IS NULL) AND (subq_20.metric_time IS NULL)
+    )
 ) subq_21

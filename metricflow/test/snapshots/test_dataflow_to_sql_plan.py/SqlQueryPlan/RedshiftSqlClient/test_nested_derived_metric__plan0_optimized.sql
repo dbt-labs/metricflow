@@ -65,7 +65,11 @@ FROM (
           metric_time
       ) subq_32
       ON
-        subq_27.metric_time = subq_32.metric_time
+        (
+          subq_27.metric_time = subq_32.metric_time
+        ) OR (
+          (subq_27.metric_time IS NULL) AND (subq_32.metric_time IS NULL)
+        )
     ) subq_33
   ) subq_34
   INNER JOIN (
@@ -91,7 +95,11 @@ FROM (
       metric_time
   ) subq_39
   ON
-    subq_34.metric_time = subq_39.metric_time
+    (
+      subq_34.metric_time = subq_39.metric_time
+    ) OR (
+      (subq_34.metric_time IS NULL) AND (subq_39.metric_time IS NULL)
+    )
   INNER JOIN (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
@@ -115,5 +123,9 @@ FROM (
       metric_time
   ) subq_44
   ON
-    COALESCE(subq_34.metric_time, subq_39.metric_time) = subq_44.metric_time
+    (
+      subq_34.metric_time = subq_44.metric_time
+    ) OR (
+      (subq_34.metric_time IS NULL) AND (subq_44.metric_time IS NULL)
+    )
 ) subq_45

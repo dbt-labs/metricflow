@@ -275,5 +275,9 @@ FROM (
     ) subq_8
   ) subq_9
   ON
-    subq_4.metric_time = subq_9.metric_time
+    (
+      subq_4.metric_time = subq_9.metric_time
+    ) OR (
+      (subq_4.metric_time IS NULL) AND (subq_9.metric_time IS NULL)
+    )
 ) subq_10

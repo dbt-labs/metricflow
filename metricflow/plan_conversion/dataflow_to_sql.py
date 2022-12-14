@@ -951,23 +951,46 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         linkable_spec_set = from_data_set.data_set.instance_set.spec_set.transform(SelectOnlyLinkableSpecs())
         join_type = SqlJoinType.CROSS_JOIN if len(linkable_spec_set.all_specs) == 0 else node.join_type
 
-        joins_descriptions = []
+        joins_descriptions: List[SqlJoinDescription] = []
+        # TODO: refactor this loop into SqlQueryPlanJoinBuilder
         aliases_seen = [from_data_set.alias]
         for join_data_set in join_data_sets:
-            joins_descriptions.append(
-                SqlJoinDescription(
-                    right_source=join_data_set.data_set.sql_select_node,
-                    right_source_alias=join_data_set.alias,
-                    on_condition=CreateOnConditionForCombiningMetrics(
-                        column_association_resolver=self._column_association_resolver,
-                        table_aliases_in_coalesce=aliases_seen,
-                        table_alias_on_right_equality=join_data_set.alias,
-                    ).transform(linkable_spec_set)
-                    if join_type is not SqlJoinType.CROSS_JOIN
-                    else None,
-                    join_type=join_type,
+            if join_type is SqlJoinType.FULL_OUTER:
+                joins_descriptions.append(
+                    SqlJoinDescription(
+                        right_source=join_data_set.data_set.sql_select_node,
+                        right_source_alias=join_data_set.alias,
+                        on_condition=CreateOnConditionForCombiningMetrics(
+                            column_association_resolver=self._column_association_resolver,
+                            table_aliases_in_coalesce=aliases_seen,
+                            table_alias_on_right_equality=join_data_set.alias,
+                        ).transform(linkable_spec_set),
+                        join_type=join_type,
+                    )
                 )
-            )
+            else:
+                column_associations = [
+                    x.column_associations(self._column_association_resolver) for x in linkable_spec_set.all_specs
+                ]
+                assert all(
+                    [len(associations) == 1 for associations in column_associations]
+                ), "Found more than 1 column association for a join key in the combine metrics node!"
+                column_names = [associations[0].column_name for associations in column_associations]
+                column_equality_descriptions = [
+                    ColumnEqualityDescription(
+                        left_column_alias=name, right_column_alias=name, treat_nulls_as_equal=True
+                    )
+                    for name in column_names
+                ]
+                joins_descriptions.append(
+                    SqlQueryPlanJoinBuilder.make_sql_join_description(
+                        right_source_node=join_data_set.data_set.sql_select_node,
+                        left_source_alias=from_data_set.alias,
+                        right_source_alias=join_data_set.alias,
+                        column_equality_descriptions=column_equality_descriptions,
+                        join_type=join_type,
+                    )
+                )
             aliases_seen.append(join_data_set.alias)
 
         # We can merge all parent instances since the common linkable instances will be de-duped.

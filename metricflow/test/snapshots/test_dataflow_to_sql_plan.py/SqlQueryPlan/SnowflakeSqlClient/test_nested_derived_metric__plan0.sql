@@ -287,7 +287,11 @@ FROM (
         ) subq_8
       ) subq_9
       ON
-        subq_4.metric_time = subq_9.metric_time
+        (
+          subq_4.metric_time = subq_9.metric_time
+        ) OR (
+          (subq_4.metric_time IS NULL) AND (subq_9.metric_time IS NULL)
+        )
     ) subq_10
   ) subq_11
   INNER JOIN (
@@ -424,7 +428,11 @@ FROM (
     ) subq_15
   ) subq_16
   ON
-    subq_11.metric_time = subq_16.metric_time
+    (
+      subq_11.metric_time = subq_16.metric_time
+    ) OR (
+      (subq_11.metric_time IS NULL) AND (subq_16.metric_time IS NULL)
+    )
   INNER JOIN (
     -- Compute Metrics via Expressions
     SELECT
@@ -559,5 +567,9 @@ FROM (
     ) subq_20
   ) subq_21
   ON
-    COALESCE(subq_11.metric_time, subq_16.metric_time) = subq_21.metric_time
+    (
+      subq_11.metric_time = subq_21.metric_time
+    ) OR (
+      (subq_11.metric_time IS NULL) AND (subq_21.metric_time IS NULL)
+    )
 ) subq_22
