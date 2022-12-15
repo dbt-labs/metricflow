@@ -932,13 +932,13 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         uses_time_offset = False
         for parent_node in node.parent_nodes:
             if isinstance(parent_node, ComputeMetricsNode):
-                if len(parent_node.metric_specs) > 1:
-                    raise RuntimeError("Unable to combine metrics with offset when parent node has multiple metrics.")
-                input_metric_specs.extend(parent_node.metric_specs)
                 uses_time_offset = uses_time_offset or any(
                     (metric_spec.offset_window or metric_spec.offset_to_grain_to_date)
                     for metric_spec in parent_node.metric_specs
                 )
+                if len(parent_node.metric_specs) > 1:
+                    raise RuntimeError("Unable to combine metrics with offset when parent node has multiple metrics.")
+                input_metric_specs.extend(parent_node.metric_specs)
 
         # If using time offset, the FROM data set needs to be time spine.
         from_data_set: Optional[SqlDataSet] = None
