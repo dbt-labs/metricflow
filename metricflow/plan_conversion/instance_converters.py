@@ -41,7 +41,7 @@ from metricflow.specs import (
 from metricflow.sql.sql_exprs import (
     SqlColumnReferenceExpression,
     SqlColumnReference,
-    build_expression_from_aggregation_type,
+    SqlFunctionExpression,
 )
 from metricflow.sql.sql_plan import SqlSelectColumn
 from metricflow.time.time_granularity import TimeGranularity
@@ -211,7 +211,7 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
             SqlColumnReference(self._table_alias, column_name_in_table)
         )
 
-        expression_to_aggregate_measure = build_expression_from_aggregation_type(
+        expression_to_aggregate_measure = SqlFunctionExpression.build_expression_from_aggregation_type(
             aggregation_type=aggregation_type,
             sql_column_expression=expression_to_get_measure,
             agg_params=measure.agg_params,

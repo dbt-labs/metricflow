@@ -458,14 +458,22 @@ class PercentileAggregationRule(ModelValidationRule):
                 elif (
                     measure.agg != AggregationType.PERCENTILE
                     and measure.agg_params
-                    and (measure.agg_params.percentile or measure.agg_params.disc)
+                    and (measure.agg_params.percentile or measure.agg_params.use_discrete_percentile)
                 ):
+                    wrong_params = []
+                    if measure.agg_params.percentile:
+                        wrong_params.append("percentile")
+                    if measure.agg_params.use_discrete_percentile:
+                        wrong_params.append("use_discrete_percentile")
+
+                    wrong_params_str = ", ".join(wrong_params)
+
                     issues.append(
                         ValidationError(
                             context=context,
                             message=(
                                 f"Measure '{measure.name}' with aggregation '{measure.agg.value}' uses agg_params "
-                                "only relevant to Percentile measures."
+                                f"({wrong_params_str}) only relevant to Percentile measures."
                             ),
                         )
                     )

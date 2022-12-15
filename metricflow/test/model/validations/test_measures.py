@@ -339,7 +339,7 @@ def test_count_measure_with_distinct_expr(simple_model__pre_transforms: UserConf
 
 
 def test_percentile_measure_missing_agg_params(simple_model__pre_transforms: UserConfiguredModel) -> None:
-    """Tests that all measures with COUNT agg should have expr provided."""
+    """Tests that only measures with PERCENTILE agg should have percentile and discrete provided."""
     model = copy.deepcopy(simple_model__pre_transforms)
     data_source = find_data_source_with(model, lambda ds: ds.name == "bookings_source")[0]
     invalid_measure_1 = Measure(
@@ -370,9 +370,7 @@ def test_percentile_measure_missing_agg_params(simple_model__pre_transforms: Use
         "Measure 'bad_measure_2' uses a PERCENTILE aggregation, which requires agg_params.percentile to be provided."
     )
 
-    expected_error_substring_3 = (
-        "Measure 'bad_measure_3' with aggregation 'sum' uses agg_params only relevant to Percentile measures."
-    )
+    expected_error_substring_3 = "Measure 'bad_measure_3' with aggregation 'sum' uses agg_params (percentile) only relevant to Percentile measures."
 
     missing_error_strings = set()
     for expected_str in [expected_error_substring_1, expected_error_substring_2, expected_error_substring_3]:
@@ -384,7 +382,8 @@ def test_percentile_measure_missing_agg_params(simple_model__pre_transforms: Use
 
 
 def test_percentile_measure_bad_percentile_values(simple_model__pre_transforms: UserConfiguredModel) -> None:
-    """Tests that all measures with COUNT agg should have expr provided."""
+    """Tests that all measures with PERCENTILE agg should have the correct percentile value range."""
+
     model = copy.deepcopy(simple_model__pre_transforms)
     data_source = find_data_source_with(model, lambda ds: ds.name == "bookings_source")[0]
     invalid_measure_1 = Measure(

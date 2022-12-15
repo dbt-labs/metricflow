@@ -24,7 +24,7 @@ class MeasureAggregationParameters(HashableBaseModel):
     """Describes parameters for aggregations"""
 
     percentile: Optional[float] = None
-    disc: bool = False
+    use_discrete_percentile: bool = False
 
 
 class Measure(HashableBaseModel, ModelWithMetadataParsing):

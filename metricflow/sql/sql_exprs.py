@@ -726,21 +726,21 @@ class SqlFunctionExpression(SqlExpressionNode):
         """Returns whether this is an aggregate function."""
         pass
 
+    @staticmethod
+    def build_expression_from_aggregation_type(
+        aggregation_type: AggregationType,
+        sql_column_expression: SqlColumnReferenceExpression,
+        agg_params: MeasureAggregationParameters = None,
+    ) -> SqlFunctionExpression:
+        """Returns sql function expression depending on aggregation type."""
 
-def build_expression_from_aggregation_type(
-    aggregation_type: AggregationType,
-    sql_column_expression: SqlColumnReferenceExpression,
-    agg_params: MeasureAggregationParameters = None,
-) -> SqlFunctionExpression:
-    """Returns sql function expression depending on aggregation type."""
-
-    if aggregation_type is AggregationType.PERCENTILE:
-        assert agg_params is not None, "Agg_params is none, which should have been caught in validation"
-        return SqlPercentileExpression(
-            sql_column_expression, SqlPercentileExpressionArgument.from_aggregation_parameters(agg_params)
-        )
-    else:
-        return SqlAggregateFunctionExpression.from_aggregation_type(aggregation_type, sql_column_expression)
+        if aggregation_type is AggregationType.PERCENTILE:
+            assert agg_params is not None, "Agg_params is none, which should have been caught in validation"
+            return SqlPercentileExpression(
+                sql_column_expression, SqlPercentileExpressionArgument.from_aggregation_parameters(agg_params)
+            )
+        else:
+            return SqlAggregateFunctionExpression.from_aggregation_type(aggregation_type, sql_column_expression)
 
 
 class SqlAggregateFunctionExpression(SqlFunctionExpression):
@@ -851,7 +851,9 @@ class SqlPercentileExpressionArgument:
             raise RuntimeError("Percentile value is none - this should have been caught during model parsing.")
         return SqlPercentileExpressionArgument(
             agg_params.percentile,
-            SqlPercentileFunctionType.DISCRETE if agg_params.disc else SqlPercentileFunctionType.CONTINUOUS,
+            SqlPercentileFunctionType.DISCRETE
+            if agg_params.use_discrete_percentile
+            else SqlPercentileFunctionType.CONTINUOUS,
         )
 
     @property

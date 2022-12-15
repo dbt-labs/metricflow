@@ -203,7 +203,7 @@ aggregation_type_params_schema = {
     "type": "object",
     "properties": {
         "percentile": {"type": "number"},
-        "disc": {"type": "boolean"},
+        "use_discrete_percentile": {"type": "boolean"},
     },
     "additionalProperties": False,
 }

@@ -5,11 +5,11 @@
             "$id": "aggregation_type_params_schema",
             "additionalProperties": false,
             "properties": {
-                "disc": {
-                    "type": "boolean"
-                },
                 "percentile": {
                     "type": "number"
+                },
+                "use_discrete_percentile": {
+                    "type": "boolean"
                 }
             },
             "type": "object"
