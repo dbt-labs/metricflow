@@ -17,7 +17,7 @@ from metricflow.sql.sql_exprs import (
     SqlAggregateFunctionExpression,
     SqlFunction,
 )
-from metricflow.sql.sql_plan import SqlJoinTimeOffset, MetricTimeOffset
+from metricflow.sql.sql_plan import MetricTimeOffset
 from metricflow.sql.sql_plan import SqlSelectColumn
 from metricflow.sql.sql_exprs import SqlDateTruncExpression, SqlTimeDeltaExpression
 
@@ -95,16 +95,14 @@ class CreateOnConditionForCombiningMetrics(InstanceSpecSetTransform[SqlExpressio
         column_association_resolver: ColumnAssociationResolver,
         table_aliases_in_coalesce: Sequence[str],
         table_alias_on_right_equality: str,
-        offset: SqlJoinTimeOffset = SqlJoinTimeOffset(),
+        right_time_offset: MetricTimeOffset = MetricTimeOffset(),
     ) -> None:
         self._column_association_resolver = column_association_resolver
         self._table_aliases_in_coalesce = table_aliases_in_coalesce
         self._table_alias_on_right_equality = table_alias_on_right_equality
-        self._offset = offset
+        self._right_time_offset = right_time_offset
 
-    def _make_equality_expr(
-        self, column_alias: str, offset: SqlJoinTimeOffset = SqlJoinTimeOffset()
-    ) -> SqlExpressionNode:
+    def _make_equality_expr(self, column_alias: str) -> SqlExpressionNode:
         left_expr: SqlExpressionNode = _make_coalesced_expr(self._table_aliases_in_coalesce, column_alias)
         right_expr: SqlExpressionNode = SqlColumnReferenceExpression(
             col_ref=SqlColumnReference(
@@ -112,10 +110,11 @@ class CreateOnConditionForCombiningMetrics(InstanceSpecSetTransform[SqlExpressio
                 column_name=column_alias,
             )
         )
-        if offset.left_offset:
-            left_expr = self._offset_sql_expr(sql_expr=left_expr, offset=offset.left_offset)
-        if offset.right_offset:
-            right_expr = self._offset_sql_expr(sql_expr=right_expr, offset=offset.right_offset)
+
+        if self._right_time_offset:
+            # We apply a date manipulation to the left side of the join to offset the data on the right side.
+            # e.g., "DATE_SUB(t1.ds, 1, day) = t2.ds" will result in t2 values offset by 1 day.
+            left_expr = self._offset_sql_expr(sql_expr=left_expr, offset=self._right_time_offset)
         return SqlComparisonExpression(
             left_expr=left_expr,
             comparison=SqlComparison.EQUALS,
@@ -125,13 +124,13 @@ class CreateOnConditionForCombiningMetrics(InstanceSpecSetTransform[SqlExpressio
     def _offset_sql_expr(self, sql_expr: SqlExpressionNode, offset: MetricTimeOffset) -> SqlExpressionNode:
         # Should I do some validation here to confirm this column is metric_time?
         if offset.offset_window:
-            offset_expr: SqlExpressionNode = SqlTimeDeltaExpression(
+            sql_expr = SqlTimeDeltaExpression(
                 arg=sql_expr, count=offset.offset_window.count, granularity=offset.offset_window.granularity
             )
         elif offset.offset_to_grain_to_date:
-            offset_expr = SqlDateTruncExpression(time_granularity=offset.offset_to_grain_to_date, arg=sql_expr)
+            sql_expr = SqlDateTruncExpression(time_granularity=offset.offset_to_grain_to_date, arg=sql_expr)
 
-        return offset_expr
+        return sql_expr
 
     def transform(self, spec_set: InstanceSpecSet) -> SqlExpressionNode:  # noqa: D
         equality_exprs = []
@@ -159,7 +158,6 @@ class CreateOnConditionForCombiningMetrics(InstanceSpecSetTransform[SqlExpressio
 
             equality_exprs.append(self._make_equality_expr(column_alias=column_association.column_name))
         assert len(equality_exprs) > 0
-        print("join exprs:", equality_exprs)
         if len(equality_exprs) == 1:
             return equality_exprs[0]
         else:

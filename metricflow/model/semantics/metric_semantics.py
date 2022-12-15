@@ -121,11 +121,16 @@ class MetricSemantics:  # noqa: D
 
         return tuple(input_measure_specs)
 
-    def contains_cumulative_metric(self, metric_references: Sequence[MetricReference]) -> bool:
-        """Returns true if any of the specs correspond to a cumulative metric."""
+    def contains_cumulative_time_offset_metric(self, metric_references: Sequence[MetricReference]) -> bool:
+        """Returns true if any of the specs correspond to a cumulative metric or a derived metric with time offset."""
         for metric_reference in metric_references:
-            if self.get_metric(metric_reference).type == MetricType.CUMULATIVE:
+            metric = self.get_metric(metric_reference)
+            if metric.type == MetricType.CUMULATIVE:
                 return True
+            elif metric.type == MetricType.DERIVED:
+                for input_metric in metric.type_params.metrics or []:
+                    if input_metric.offset_window or input_metric.offset_to_grain_to_date:
+                        return True
         return False
 
     def metric_input_specs_for_metric(self, metric_reference: MetricReference) -> Tuple[MetricSpec, ...]:

@@ -47,7 +47,7 @@ from metricflow.specs import (
     SpecWhereClauseConstraint,
     InstanceSpecSet,
 )
-from metricflow.sql.sql_plan import SqlJoinType, SqlJoinTimeOffset
+from metricflow.sql.sql_plan import SqlJoinType
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.visitor import Visitable, VisitorOutputT
 
@@ -1144,10 +1144,8 @@ class CombineMetricsNode(Generic[SourceDataSetT], ComputedMetricsOutput[SourceDa
         self,
         parent_nodes: Sequence[Union[BaseOutput, ComputedMetricsOutput[SourceDataSetT]]],
         join_type: SqlJoinType = SqlJoinType.FULL_OUTER,
-        join_offset: SqlJoinTimeOffset = SqlJoinTimeOffset(),
     ) -> None:
         self._join_type = join_type
-        self._join_offset = join_offset
         super().__init__(node_id=self.create_unique_id(), parent_nodes=list(parent_nodes))
 
     @classmethod
@@ -1177,23 +1175,14 @@ class CombineMetricsNode(Generic[SourceDataSetT], ComputedMetricsOutput[SourceDa
         """The type of join used for combining metrics."""
         return self._join_type
 
-    @property
-    def join_offset(self) -> SqlJoinTimeOffset:
-        """Describes how to offset time when joining metrics, if applicable."""
-        return self._join_offset
-
     def functionally_identical(self, other_node: DataflowPlanNode[SourceDataSetT]) -> bool:  # noqa: D
-        return (
-            isinstance(other_node, self.__class__)
-            and other_node.join_type == self.join_type
-            and other_node.join_offset == self.join_offset
-        )
+        return isinstance(other_node, self.__class__) and other_node.join_type == self.join_type
 
     def with_new_parents(  # noqa: D
         self, new_parent_nodes: Sequence[BaseOutput[SourceDataSetT]]
     ) -> CombineMetricsNode[SourceDataSetT]:
         assert len(new_parent_nodes) == 1
-        return CombineMetricsNode(parent_nodes=new_parent_nodes, join_type=self.join_type, join_offset=self.join_offset)
+        return CombineMetricsNode(parent_nodes=new_parent_nodes, join_type=self.join_type)
 
 
 class ConstrainTimeRangeNode(AggregatedMeasuresOutput[SourceDataSetT], BaseOutput[SourceDataSetT]):

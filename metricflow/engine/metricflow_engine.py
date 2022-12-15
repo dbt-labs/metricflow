@@ -425,7 +425,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         )
         logger.info(f"Query spec is:\n{pformat_big_objects(query_spec)}")
 
-        if self._semantic_model.metric_semantics.contains_cumulative_metric(
+        if self._semantic_model.metric_semantics.contains_cumulative_time_offset_metric(
             tuple(m.as_reference for m in query_spec.metric_specs)
         ):
             self._time_spine_table_builder.create_if_necessary()
@@ -440,7 +440,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             if not mf_query_request.time_constraint_end:
                 time_constraint_end = self._time_source.get_time()
                 logger.warning(
-                    "A end time has not be supplied while querying for cumulative metrics. To avoid an excessive "
+                    "An end time has not be supplied while querying for cumulative metrics. To avoid an excessive "
                     f"number of rows, the end time will be changed to {time_constraint_end.isoformat()}"
                 )
                 time_constraint_updated = True

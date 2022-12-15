@@ -116,16 +116,8 @@ class MetricTimeOffset:
     Only one offset should be set for one metric, not both. Validated in model validations.
     """
 
-    offset_window: Optional[MetricTimeWindow]
-    offset_to_grain_to_date: Optional[TimeGranularity]
-
-
-@dataclass(frozen=True)
-class SqlJoinTimeOffset:
-    """Time offset applied to each side of a join condition."""
-
-    left_offset: Optional[MetricTimeOffset] = None
-    right_offset: Optional[MetricTimeOffset] = None
+    offset_window: Optional[MetricTimeWindow] = None
+    offset_to_grain_to_date: Optional[TimeGranularity] = None
 
 
 class SqlJoinType(Enum):

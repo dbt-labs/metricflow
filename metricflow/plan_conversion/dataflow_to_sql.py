@@ -100,6 +100,7 @@ from metricflow.sql.sql_plan import (
     SqlJoinType,
     SqlQueryPlanNode,
     SqlTableFromClauseNode,
+    MetricTimeOffset,
 )
 from metricflow.time.time_constants import ISO8601_PYTHON_FORMAT
 
@@ -618,8 +619,6 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
     def visit_compute_metrics_node(self, node: ComputeMetricsNode) -> SqlDataSet:
         """Generates the query that realizes the behavior of ComputeMetricsNode."""
-        print("visiting compute metrics node. parent:", node.parent_node)
-
         from_data_set: SqlDataSet = node.parent_node.accept(self)
         from_data_set_alias = self._next_unique_table_alias()
 
@@ -926,12 +925,47 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         OUTER JOIN context, because many engines do not support complex ON conditions or other techniques we might
         use to apply a sentinel value for NULL to NULL comparisons.
         """
-        print("visiting combined metrics node")
-        # Get rid of join_offset on this class; needs to be more flexible
-
         # Sanity check that all parents have the same linkable specs.
         parent_data_sets = [x.accept(self) for x in node.parent_nodes]
-        metric_specs = [parent_node.metric_specs for parent_node in node.parent_nodes]
+
+        input_metric_specs: List[MetricSpec] = []
+        uses_time_offset = False
+        for parent_node in node.parent_nodes:
+            if isinstance(parent_node, ComputeMetricsNode):
+                if len(parent_node.metric_specs) > 1:
+                    raise RuntimeError("Unable to combine metrics with offset when parent node has multiple metrics.")
+                input_metric_specs.extend(parent_node.metric_specs)
+                uses_time_offset = uses_time_offset or any(
+                    (metric_spec.offset_window or metric_spec.offset_to_grain_to_date)
+                    for metric_spec in parent_node.metric_specs
+                )
+
+        # If using time offset, the FROM data set needs to be time spine.
+        from_data_set: Optional[SqlDataSet] = None
+        from_alias: Optional[str] = None
+        if uses_time_offset:
+            metric_time_dimension_spec: Optional[TimeDimensionSpec] = None
+            metric_time_dimension_instance: Optional[TimeDimensionInstance] = None
+            for parent_data_set in parent_data_sets:
+                for instance in parent_data_set.metric_time_dimension_instances:
+                    if len(instance.spec.identifier_links) == 0:
+                        metric_time_dimension_instance = instance
+                        metric_time_dimension_spec = instance.spec
+                        break
+            assert metric_time_dimension_spec  # shouldn't be able to query this without time dim
+            assert metric_time_dimension_instance
+            metric_time_dimension_column_name = self.column_association_resolver.resolve_time_dimension_spec(
+                metric_time_dimension_spec
+            ).column_name
+            from_alias = self._next_unique_table_alias()
+            from_data_set = _make_time_spine_data_set(
+                metric_time_dimension_instance=metric_time_dimension_instance,
+                metric_time_dimension_column_name=metric_time_dimension_column_name,
+                time_spine_source=self._time_spine_source,
+                time_spine_table_alias=from_alias,
+                # TODO: figure out how to get time_range_constraint here and pass it
+            )
+
         assert (
             len(parent_data_sets) > 1
         ), "Shouldn't have a CombineMetricsNode in the dataflow plan if there's only 1 parent."
@@ -953,12 +987,17 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         # Create the components of the join that combines metrics. Order doesn't
         # matter so we use the first element in the FROM clause and create join descriptions from
         # the rest.
-        from_alias = parent_source_table_aliases[0]
-        from_source = parent_data_sets[0].sql_select_node
-        from_metric_spec = metric_specs[0][0]
-        # Need to map correct offset to correct alias!
-        # Will this SQL actually give us what we want even? Test real examples.
+        from_data_set = from_data_set or parent_data_sets[0]
+        from_alias = from_alias or parent_source_table_aliases[0]
         for i in range(1, len(parent_source_table_aliases)):
+            if input_metric_specs:
+                input_metric_spec = input_metric_specs[i if uses_time_offset else (i - 1)]
+                right_time_offset = MetricTimeOffset(
+                    offset_window=input_metric_spec.offset_window,
+                    offset_to_grain_to_date=input_metric_spec.offset_to_grain_to_date,
+                )
+            else:
+                right_time_offset = MetricTimeOffset()
             joins_descriptions.append(
                 SqlJoinDescription(
                     right_source=parent_data_sets[i].sql_select_node,
@@ -967,8 +1006,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                         column_association_resolver=self._column_association_resolver,
                         table_aliases_in_coalesce=parent_source_table_aliases[:i],
                         table_alias_on_right_equality=parent_source_table_aliases[i],
-                        left_offset=MetricTimeOffset(),
-                        right_offset=MetricTimeOffset(),
+                        right_time_offset=right_time_offset,
                     ).transform(linkable_spec_set)
                     if not use_cross_join
                     else None,
@@ -999,7 +1037,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             sql_select_node=SqlSelectStatementNode(
                 description=node.description,
                 select_columns=combined_select_column_set.as_tuple(),
-                from_source=from_source,
+                from_source=from_data_set.sql_select_node,
                 from_source_alias=from_alias,
                 joins_descs=tuple(joins_descriptions),
                 group_bys=linkable_select_column_set.as_tuple() if node.join_type is SqlJoinType.FULL_OUTER else (),

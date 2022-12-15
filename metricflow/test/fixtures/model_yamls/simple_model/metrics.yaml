@@ -565,7 +565,7 @@ metric:
     - support@transformdata.io
   type: derived
   type_params:
-    expr: bookings / bookings_2_weeks_ago
+    expr: (bookings - bookings_2_weeks_ago) / bookings_2_weeks_ago
     metrics:
       - name: bookings
       - name: bookings
