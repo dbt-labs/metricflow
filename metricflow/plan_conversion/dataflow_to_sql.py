@@ -946,9 +946,8 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
         # If using time offset, the FROM data set needs to be time spine.
         from_data_set: Optional[SqlDataSet] = None
-        from_alias: Optional[str] = None
+        from_alias: str = ""
         if uses_time_offset:
-            input_metric_specs_per_data_set.insert(0, [])
             metric_time_dimension_spec: Optional[TimeDimensionSpec] = None
             metric_time_dimension_instance: Optional[TimeDimensionInstance] = None
             for parent_data_set in parent_data_sets:
@@ -983,36 +982,39 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         use_cross_join = len(linkable_spec_set.all_specs) == 0
 
         joins_descriptions = []
-        parent_source_table_aliases = []
         table_alias_to_metric_specs: OrderedDict[str, Sequence[MetricSpec]] = OrderedDict()
+        parent_aliases_to_data_sets: OrderedDict[str, SqlDataSet] = OrderedDict()
         for parent_data_set in parent_data_sets:
             table_alias = self._next_unique_table_alias()
-            parent_source_table_aliases.append(table_alias)
+            parent_aliases_to_data_sets[table_alias] = parent_data_set
             table_alias_to_metric_specs[table_alias] = parent_data_set.instance_set.spec_set.metric_specs
 
         # Create the components of the join that combines metrics. Order doesn't
         # matter so we use the first element in the FROM clause and create join descriptions from
         # the rest.
-        from_data_set = from_data_set or parent_data_sets[0]
-        from_alias = from_alias or parent_source_table_aliases[0]
-        for i in range(1, len(parent_source_table_aliases)):
-            input_metric_specs = input_metric_specs_per_data_set[i - 1]
+        join_aliases_to_data_sets = parent_aliases_to_data_sets
+        if not from_data_set:
+            from_alias, from_data_set = join_aliases_to_data_sets.popitem(last=False)
+            assert from_alias
+        join_aliases = list(join_aliases_to_data_sets.keys())
+        for i, join_alias in enumerate(join_aliases):
+            join_data_set = join_aliases_to_data_sets[join_alias]
+            input_metric_specs = input_metric_specs_per_data_set[i]
+            right_time_offset = MetricTimeOffset()
             if input_metric_specs:
-                input_metric_spec = input_metric_specs[0]  # only one allowed for now
+                input_metric_spec = input_metric_specs[0]  # only one allowed for now - will fix
                 right_time_offset = MetricTimeOffset(
                     offset_window=input_metric_spec.offset_window,
                     offset_to_grain_to_date=input_metric_spec.offset_to_grain_to_date,
                 )
-            else:
-                right_time_offset = MetricTimeOffset()
             joins_descriptions.append(
                 SqlJoinDescription(
-                    right_source=parent_data_sets[i].sql_select_node,
-                    right_source_alias=parent_source_table_aliases[i],
+                    right_source=join_data_set.sql_select_node,
+                    right_source_alias=join_alias,
                     on_condition=CreateOnConditionForCombiningMetrics(
                         column_association_resolver=self._column_association_resolver,
-                        table_aliases_in_coalesce=parent_source_table_aliases[:i],
-                        table_alias_on_right_equality=parent_source_table_aliases[i],
+                        table_aliases_in_coalesce=[from_alias] + join_aliases[:i],
+                        table_alias_on_right_equality=join_aliases[i],
                         right_time_offset=right_time_offset,
                     ).transform(linkable_spec_set)
                     if not use_cross_join
@@ -1034,7 +1036,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         linkable_select_column_set = linkable_spec_set.transform(
             CreateSelectCoalescedColumnsForLinkableSpecs(
                 column_association_resolver=self._column_association_resolver,
-                table_aliases=parent_source_table_aliases,
+                table_aliases=[from_alias] + join_aliases,
             )
         )
         combined_select_column_set = linkable_select_column_set.merge(metric_select_column_set)

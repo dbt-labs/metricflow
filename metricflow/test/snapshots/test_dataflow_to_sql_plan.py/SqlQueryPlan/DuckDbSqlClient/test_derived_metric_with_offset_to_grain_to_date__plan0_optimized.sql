@@ -5,10 +5,16 @@ SELECT
 FROM (
   -- Combine Metrics
   SELECT
-    COALESCE(subq_19.metric_time, subq_20.metric_time) AS metric_time
-    , subq_19.bookings AS bookings
-    , subq_20.bookings_at_start_of_month AS bookings_at_start_of_month
+    COALESCE(subq_20.metric_time, subq_21.metric_time, subq_22.metric_time) AS metric_time
+    , subq_21.bookings AS bookings
+    , subq_22.bookings_at_start_of_month AS bookings_at_start_of_month
   FROM (
+    -- Date Spine
+    SELECT
+      ds AS metric_time
+    FROM ***************************.mf_time_spine subq_20
+  ) subq_20
+  INNER JOIN (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
@@ -26,10 +32,12 @@ FROM (
         -- User Defined SQL Query
         SELECT * FROM ***************************.fct_bookings
       ) bookings_source_src_10001
-    ) subq_13
+    ) subq_14
     GROUP BY
       metric_time
-  ) subq_19
+  ) subq_21
+  ON
+    subq_20.metric_time = subq_21.metric_time
   INNER JOIN (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
@@ -48,10 +56,10 @@ FROM (
         -- User Defined SQL Query
         SELECT * FROM ***************************.fct_bookings
       ) bookings_source_src_10001
-    ) subq_17
+    ) subq_18
     GROUP BY
       metric_time
-  ) subq_20
+  ) subq_22
   ON
-    subq_19.metric_time = subq_20.metric_time
-) subq_21
+    DATE_TRUNC('month', COALESCE(subq_20.metric_time, subq_21.metric_time)) = subq_22.metric_time
+) subq_23

@@ -202,6 +202,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                     time_range_constraint=time_range_constraint,
                     combine_metrics_join_type=SqlJoinType.INNER,
                 )
+                # TODO: How to know if we need to offset & join to time spine if only one metric? Should we even support that?
                 compute_metrics_nodes.append(
                     ComputeMetricsNode[SqlDataSetT](
                         parent_node=compute_metric_node,

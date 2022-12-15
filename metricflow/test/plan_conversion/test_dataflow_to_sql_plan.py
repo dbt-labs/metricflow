@@ -1445,7 +1445,6 @@ def test_derived_metric_with_offset_window(  # noqa: D
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
     )
-    # optimizer failures
 
 
 def test_derived_metric_with_offset_to_grain_to_date(  # noqa: D
@@ -1469,7 +1468,6 @@ def test_derived_metric_with_offset_to_grain_to_date(  # noqa: D
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
     )
-    # optimizer failures
 
 
 def test_join_to_scd_dimension(

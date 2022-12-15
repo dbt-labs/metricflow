@@ -1,14 +1,20 @@
 -- Compute Metrics via Expressions
 SELECT
   metric_time
-  , bookings / bookings_2_weeks_ago AS bookings_growth_2_weeks
+  , (bookings - bookings_2_weeks_ago) / bookings_2_weeks_ago AS bookings_growth_2_weeks
 FROM (
   -- Combine Metrics
   SELECT
-    COALESCE(subq_19.metric_time, subq_20.metric_time) AS metric_time
-    , subq_19.bookings AS bookings
-    , subq_20.bookings_2_weeks_ago AS bookings_2_weeks_ago
+    COALESCE(subq_20.metric_time, subq_21.metric_time, subq_22.metric_time) AS metric_time
+    , subq_21.bookings AS bookings
+    , subq_22.bookings_2_weeks_ago AS bookings_2_weeks_ago
   FROM (
+    -- Date Spine
+    SELECT
+      ds AS metric_time
+    FROM ***************************.mf_time_spine subq_20
+  ) subq_20
+  INNER JOIN (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
@@ -26,10 +32,12 @@ FROM (
         -- User Defined SQL Query
         SELECT * FROM ***************************.fct_bookings
       ) bookings_source_src_10001
-    ) subq_13
+    ) subq_14
     GROUP BY
       metric_time
-  ) subq_19
+  ) subq_21
+  ON
+    subq_20.metric_time = subq_21.metric_time
   INNER JOIN (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
@@ -48,10 +56,10 @@ FROM (
         -- User Defined SQL Query
         SELECT * FROM ***************************.fct_bookings
       ) bookings_source_src_10001
-    ) subq_17
+    ) subq_18
     GROUP BY
       metric_time
-  ) subq_20
+  ) subq_22
   ON
-    subq_19.metric_time = subq_20.metric_time
-) subq_21
+    COALESCE(subq_20.metric_time, subq_21.metric_time) - INTERVAL 14 day = subq_22.metric_time
+) subq_23
