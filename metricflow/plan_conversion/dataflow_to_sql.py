@@ -706,7 +706,6 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             elif metric.type == MetricType.EXPR or metric.type == MetricType.DERIVED:
                 assert metric.type_params.expr
                 metric_expr = SqlStringExpression(sql_expr=metric.type_params.expr)
-                print(metric_expr)
             else:
                 assert_values_exhausted(metric.type)
 
@@ -928,22 +927,28 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         # Sanity check that all parents have the same linkable specs.
         parent_data_sets = [x.accept(self) for x in node.parent_nodes]
 
-        input_metric_specs: List[MetricSpec] = []
+        input_metric_specs_per_data_set: List[List[MetricSpec]] = []
         uses_time_offset = False
         for parent_node in node.parent_nodes:
             if isinstance(parent_node, ComputeMetricsNode):
-                uses_time_offset = uses_time_offset or any(
-                    (metric_spec.offset_window or metric_spec.offset_to_grain_to_date)
-                    for metric_spec in parent_node.metric_specs
-                )
+                if not uses_time_offset:
+                    uses_time_offset = any(
+                        (metric_spec.offset_window or metric_spec.offset_to_grain_to_date)
+                        for metric_spec in parent_node.metric_specs
+                    )
+                # TODO: handle case with multiple input metrics on one parent node
+                # need to split into multiple join clauses if any of them use time offset
                 if len(parent_node.metric_specs) > 1:
                     raise RuntimeError("Unable to combine metrics with offset when parent node has multiple metrics.")
-                input_metric_specs.extend(parent_node.metric_specs)
+                input_metric_specs_per_data_set.append(parent_node.metric_specs)
+            else:
+                input_metric_specs_per_data_set.append([])
 
         # If using time offset, the FROM data set needs to be time spine.
         from_data_set: Optional[SqlDataSet] = None
         from_alias: Optional[str] = None
         if uses_time_offset:
+            input_metric_specs_per_data_set.insert(0, [])
             metric_time_dimension_spec: Optional[TimeDimensionSpec] = None
             metric_time_dimension_instance: Optional[TimeDimensionInstance] = None
             for parent_data_set in parent_data_sets:
@@ -952,7 +957,8 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                         metric_time_dimension_instance = instance
                         metric_time_dimension_spec = instance.spec
                         break
-            assert metric_time_dimension_spec  # shouldn't be able to query this without time dim
+            # shouldn't be able to query a time offset metric without time dim (not enforced yet)
+            assert metric_time_dimension_spec
             assert metric_time_dimension_instance
             metric_time_dimension_column_name = self.column_association_resolver.resolve_time_dimension_spec(
                 metric_time_dimension_spec
@@ -963,7 +969,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 metric_time_dimension_column_name=metric_time_dimension_column_name,
                 time_spine_source=self._time_spine_source,
                 time_spine_table_alias=from_alias,
-                # TODO: figure out how to get time_range_constraint here and pass it
+                # TODO: figure out how to get time constraint for query here and pass it in
             )
 
         assert (
@@ -990,8 +996,9 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         from_data_set = from_data_set or parent_data_sets[0]
         from_alias = from_alias or parent_source_table_aliases[0]
         for i in range(1, len(parent_source_table_aliases)):
+            input_metric_specs = input_metric_specs_per_data_set[i - 1]
             if input_metric_specs:
-                input_metric_spec = input_metric_specs[i if uses_time_offset else (i - 1)]
+                input_metric_spec = input_metric_specs[0]  # only one allowed for now
                 right_time_offset = MetricTimeOffset(
                     offset_window=input_metric_spec.offset_window,
                     offset_to_grain_to_date=input_metric_spec.offset_to_grain_to_date,

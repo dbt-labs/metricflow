@@ -121,7 +121,7 @@ class MetricSemantics:  # noqa: D
 
         return tuple(input_measure_specs)
 
-    def contains_cumulative_time_offset_metric(self, metric_references: Sequence[MetricReference]) -> bool:
+    def contains_cumulative_or_time_offset_metric(self, metric_references: Sequence[MetricReference]) -> bool:
         """Returns true if any of the specs correspond to a cumulative metric or a derived metric with time offset."""
         for metric_reference in metric_references:
             metric = self.get_metric(metric_reference)

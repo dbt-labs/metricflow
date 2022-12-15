@@ -176,7 +176,7 @@ class MetricSemanticsAccessor(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    def contains_cumulative_time_offset_metric(self, metric_references: Sequence[MetricReference]) -> bool:
+    def contains_cumulative_or_time_offset_metric(self, metric_references: Sequence[MetricReference]) -> bool:
         """Returns true if any of the specs correspond to a cumulative metric or a derived metric with time offset."""
         raise NotImplementedError
 

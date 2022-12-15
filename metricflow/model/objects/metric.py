@@ -97,7 +97,7 @@ class MetricTimeWindow(PydanticCustomInputParser, HashableBaseModel):
         parts = window.split(" ")
         if len(parts) != 2:
             raise ParsingException(
-                f"Invalid window ({window}) in metric. Should be of the form `<count> <granularity>`, ie `28 days`",
+                f"Invalid window ({window}) in metric. Should be of the form `<count> <granularity>`, e.g., `28 days`",
             )
 
         granularity = parts[1]

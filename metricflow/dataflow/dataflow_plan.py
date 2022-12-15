@@ -1182,7 +1182,10 @@ class CombineMetricsNode(Generic[SourceDataSetT], ComputedMetricsOutput[SourceDa
         self, new_parent_nodes: Sequence[BaseOutput[SourceDataSetT]]
     ) -> CombineMetricsNode[SourceDataSetT]:
         assert len(new_parent_nodes) == 1
-        return CombineMetricsNode(parent_nodes=new_parent_nodes, join_type=self.join_type)
+        return CombineMetricsNode(
+            parent_nodes=new_parent_nodes,
+            join_type=self.join_type,
+        )
 
 
 class ConstrainTimeRangeNode(AggregatedMeasuresOutput[SourceDataSetT], BaseOutput[SourceDataSetT]):
