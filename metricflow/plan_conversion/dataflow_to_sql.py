@@ -57,7 +57,6 @@ from metricflow.plan_conversion.select_column_gen import (
     SelectColumnSet,
 )
 from metricflow.plan_conversion.spec_transforms import (
-    make_coalesced_expr,
     CreateSelectCoalescedColumnsForLinkableSpecs,
     SelectOnlyLinkableSpecs,
 )
@@ -80,10 +79,6 @@ from metricflow.sql.optimizer.optimization_levels import (
     SqlQueryOptimizerConfiguration,
 )
 from metricflow.sql.sql_exprs import (
-    SqlComparison,
-    SqlComparisonExpression,
-    SqlLogicalExpression,
-    SqlLogicalOperator,
     SqlExpressionNode,
     SqlColumnReferenceExpression,
     SqlColumnReference,
@@ -894,52 +889,6 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 )
         return select_columns
 
-    @staticmethod
-    def _make_equality_expression_for_full_outer_join(
-        table_aliases_in_coalesce: Sequence[str], right_table_alias: str, column_alias: str
-    ) -> SqlExpressionNode:
-        """Creates an expression that can go in the ON condition when coalescing join keys with a FULL OUTER JOIN.
-
-        e.g.
-
-        dimension_specs = ["is_instant", "ds"]
-        table_aliases_in_coalesce = ["a", "b"]
-        table_alias_on_right_equality = ["c"]
-
-        ->
-
-        COALESCE(a.is_instant, b.is_instant) = c.is_instant
-        AND COALESCE(a.ds, b.ds) = c.ds
-
-        This is necessary for cases where 3 or more subqueries will be linked via FULL OUTER JOINs. If that happens,
-        the set of join keys from subquery 3 must be compared to the join keys from both subquery 1 and subquery 2,
-        otherwise duplicate rows might appear in the output.
-
-        For example:
-
-        table1: [('a', 10), ('b', 20)]
-        table2: [('a', 100), ('c', 200)]
-        table3: [('a', 1000), ('c', 2000)]
-
-        ->
-
-        output without COALESCE: [('a', 10, 100, 1000), ('c', NULL, 200, NULL), ('c', NULL, NULL, 2000)]
-        output with COALESCE: [('a', 10, 100, 1000), ('c', NULL, 200, 2000)]
-
-        The latter scenario consolidates the rows keyed by 'c' into a single entry.
-        """
-
-        return SqlComparisonExpression(
-            left_expr=make_coalesced_expr(table_aliases_in_coalesce, column_alias),
-            comparison=SqlComparison.EQUALS,
-            right_expr=SqlColumnReferenceExpression(
-                col_ref=SqlColumnReference(
-                    table_alias=right_table_alias,
-                    column_name=column_alias,
-                )
-            ),
-        )
-
     def visit_combine_metrics_node(self, node: CombineMetricsNode[SqlDataSetT]) -> SqlDataSet:
         """Join computed metric datasets together to return a single dataset containing all metrics
 
@@ -1012,42 +961,15 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         column_names = [associations[0].column_name for associations in column_associations]
         aliases_seen = [from_data_set.alias]
         for join_data_set in join_data_sets:
-            if join_type is SqlJoinType.FULL_OUTER:
-                equality_exprs = [
-                    DataflowToSqlQueryPlanConverter._make_equality_expression_for_full_outer_join(
-                        aliases_seen, join_data_set.alias, colname
-                    )
-                    for colname in column_names
-                ]
-                on_condition = (
-                    SqlLogicalExpression(operator=SqlLogicalOperator.AND, args=tuple(equality_exprs))
-                    if len(equality_exprs) > 1
-                    else equality_exprs[0]
+            joins_descriptions.append(
+                SqlQueryPlanJoinBuilder.make_combine_metrics_join_description(
+                    from_data_set=from_data_set,
+                    join_data_set=join_data_set,
+                    join_type=join_type,
+                    column_names=column_names,
+                    aliases_seen=aliases_seen,
                 )
-                joins_descriptions.append(
-                    SqlJoinDescription(
-                        right_source=join_data_set.data_set.sql_select_node,
-                        right_source_alias=join_data_set.alias,
-                        on_condition=on_condition,
-                        join_type=join_type,
-                    )
-                )
-            else:
-                column_equality_descriptions = [
-                    ColumnEqualityDescription(
-                        left_column_alias=name, right_column_alias=name, treat_nulls_as_equal=True
-                    )
-                    for name in column_names
-                ]
-                joins_descriptions.append(
-                    SqlQueryPlanJoinBuilder.make_sql_join_description(
-                        right_source_node=join_data_set.data_set.sql_select_node,
-                        left_source_alias=from_data_set.alias,
-                        right_source_alias=join_data_set.alias,
-                        column_equality_descriptions=column_equality_descriptions,
-                        join_type=join_type,
-                    )
-                )
+            )
             aliases_seen.append(join_data_set.alias)
 
         # We can merge all parent instances since the common linkable instances will be de-duped.
