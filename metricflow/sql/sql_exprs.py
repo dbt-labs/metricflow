@@ -31,10 +31,6 @@ from metricflow.visitor import Visitable, VisitorOutputT
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.object_utils import assert_values_exhausted, flatten_nested_sequence
 
-# Check here for useful expr nodes
-# Use date trunc expr
-# add date add expr
-
 
 class SqlExpressionNode(DagNode, Generic[VisitorOutputT], Visitable, ABC):
     """An SQL expression like my_table.my_column, CONCAT(a, b) or 1 + 1 that evaluates to a value."""

@@ -15,7 +15,6 @@ from metricflow.specs import (
     OrderBySpec,
     OutputColumnNameOverride,
 )
-from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.test.test_utils import as_datetime
 from metricflow.test.time.metric_time_dimension import MTD
 from metricflow.time.time_granularity import TimeGranularity

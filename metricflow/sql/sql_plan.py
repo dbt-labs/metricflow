@@ -113,7 +113,7 @@ class MetricTimeOffset:
     2022-01-04  | 4        | 2                   | 1
     2022-01-05  | 5        | 3                   | 1
 
-    Only one offset should be set for one metric, not both. Validated in model validations.
+    Only one offset should be set per input metric, not both. Validated in model validations.
     """
 
     offset_window: Optional[MetricTimeWindow] = None

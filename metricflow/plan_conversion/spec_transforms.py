@@ -104,25 +104,23 @@ class CreateOnConditionForCombiningMetrics(InstanceSpecSetTransform[SqlExpressio
 
     def _make_equality_expr(self, column_alias: str) -> SqlExpressionNode:
         left_expr: SqlExpressionNode = _make_coalesced_expr(self._table_aliases_in_coalesce, column_alias)
-        right_expr: SqlExpressionNode = SqlColumnReferenceExpression(
-            col_ref=SqlColumnReference(
-                table_alias=self._table_alias_on_right_equality,
-                column_name=column_alias,
-            )
-        )
-
         if self._right_time_offset:
             # We apply a date manipulation to the left side of the join to offset the data on the right side.
             # e.g., "DATE_SUB(t1.ds, 1, day) = t2.ds" will result in t2 values offset by 1 day.
-            left_expr = self._offset_sql_expr(sql_expr=left_expr, offset=self._right_time_offset)
+            left_expr = self._offset_time_expr(sql_expr=left_expr, offset=self._right_time_offset)
         return SqlComparisonExpression(
             left_expr=left_expr,
             comparison=SqlComparison.EQUALS,
-            right_expr=right_expr,
+            right_expr=SqlColumnReferenceExpression(
+                col_ref=SqlColumnReference(
+                    table_alias=self._table_alias_on_right_equality,
+                    column_name=column_alias,
+                )
+            ),
         )
 
-    def _offset_sql_expr(self, sql_expr: SqlExpressionNode, offset: MetricTimeOffset) -> SqlExpressionNode:
-        # Should I do some validation here to confirm this column is metric_time?
+    def _offset_time_expr(self, sql_expr: SqlExpressionNode, offset: MetricTimeOffset) -> SqlExpressionNode:
+        # TODO: need to validate that this is a time expression?
         if offset.offset_window:
             sql_expr = SqlTimeDeltaExpression(
                 arg=sql_expr, count=offset.offset_window.count, granularity=offset.offset_window.granularity
@@ -158,6 +156,7 @@ class CreateOnConditionForCombiningMetrics(InstanceSpecSetTransform[SqlExpressio
 
             equality_exprs.append(self._make_equality_expr(column_alias=column_association.column_name))
         assert len(equality_exprs) > 0
+
         if len(equality_exprs) == 1:
             return equality_exprs[0]
         else:

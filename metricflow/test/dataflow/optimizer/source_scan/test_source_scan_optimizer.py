@@ -239,7 +239,7 @@ def test_constrained_metric_not_combined(  # noqa: D
     )
 
 
-# Do I need to do something with optimizer?
+# TODO: add tests here
 def test_derived_metric(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,

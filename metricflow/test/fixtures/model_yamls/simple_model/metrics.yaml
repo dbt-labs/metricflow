@@ -587,21 +587,22 @@ metric:
       - name: bookings
         offset_to_grain_to_date: month
         alias: bookings_at_start_of_month
-# ---
-# metric:
-#   name: "month_start_compared_to_1_month_prior"
-#   description: |
-#     percentage growth of bookings compared to bookings 2 weeks prior,
-#     used to test derived metrics with an offset_window.
-#   owners:
-#     - support@transformdata.io
-#   type: derived
-#   type_params:
-#     expr: month_start_bookings / bookings_1_month_ago
-#     metrics:
-#       - name: bookings
-#         offset_to_grain_to_date: month
-#         alias: month_start_bookings
-#       - name: bookings
-#         offset_window: 1 month
-#         alias: bookings_1_month_ago
+---
+# TODO: write tests for this combo offset metric
+metric:
+  name: "month_start_compared_to_1_month_prior"
+  description: |
+    percentage growth of bookings compared to bookings 2 weeks prior,
+    used to test derived metrics with an offset_window.
+  owners:
+    - support@transformdata.io
+  type: derived
+  type_params:
+    expr: month_start_bookings / bookings_1_month_ago
+    metrics:
+      - name: bookings
+        offset_to_grain_to_date: month
+        alias: month_start_bookings
+      - name: bookings
+        offset_window: 1 month
+        alias: bookings_1_month_ago

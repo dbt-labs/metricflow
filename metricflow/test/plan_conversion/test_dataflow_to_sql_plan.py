@@ -129,26 +129,26 @@ def convert_and_check(
         sql_client=sql_client,
     )
 
-    # # Generate plans with optimizers
-    # sql_query_plan = dataflow_to_sql_converter.convert_to_sql_query_plan(
-    #     sql_engine_attributes=sql_client.sql_engine_attributes,
-    #     sql_query_plan_id="plan0_optimized",
-    #     dataflow_plan_node=node,
-    #     optimization_level=SqlQueryOptimizationLevel.O4,
-    # )
+    # Generate plans with optimizers
+    sql_query_plan = dataflow_to_sql_converter.convert_to_sql_query_plan(
+        sql_engine_attributes=sql_client.sql_engine_attributes,
+        sql_query_plan_id="plan0_optimized",
+        dataflow_plan_node=node,
+        optimization_level=SqlQueryOptimizationLevel.O4,
+    )
 
-    # display_graph_if_requested(
-    #     request=request,
-    #     mf_test_session_state=mf_test_session_state,
-    #     dag_graph=sql_query_plan,
-    # )
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=sql_query_plan,
+    )
 
-    # assert_rendered_sql_from_plan_equal(
-    #     request=request,
-    #     mf_test_session_state=mf_test_session_state,
-    #     sql_query_plan=sql_query_plan,
-    #     sql_client=sql_client,
-    # )
+    assert_rendered_sql_from_plan_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        sql_query_plan=sql_query_plan,
+        sql_client=sql_client,
+    )
 
 
 def test_source_node(  # noqa: D
@@ -1378,7 +1378,6 @@ def test_measure_constraint_with_single_expr_and_alias(  # noqa: D
     )
 
 
-# Add test here
 def test_derived_metric(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1446,7 +1445,7 @@ def test_derived_metric_with_offset_window(  # noqa: D
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
     )
-    assert 0  # not working yet
+    # optimizer failures
 
 
 def test_derived_metric_with_offset_to_grain_to_date(  # noqa: D
@@ -1470,7 +1469,7 @@ def test_derived_metric_with_offset_to_grain_to_date(  # noqa: D
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
     )
-    assert 0  # not working yet
+    # optimizer failures
 
 
 def test_join_to_scd_dimension(
