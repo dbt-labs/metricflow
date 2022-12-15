@@ -967,7 +967,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                     join_data_set=join_data_set,
                     join_type=join_type,
                     column_names=column_names,
-                    aliases_seen=aliases_seen,
+                    table_aliases_for_coalesce=aliases_seen,
                 )
             )
             aliases_seen.append(join_data_set.alias)

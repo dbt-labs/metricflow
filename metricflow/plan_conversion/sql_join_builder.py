@@ -4,8 +4,8 @@ from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple, TypeVar
 
 from metricflow.dataflow.dataflow_plan import JoinDescription, JoinOverTimeRangeNode
-from metricflow.plan_conversion.spec_transforms import make_coalesced_expr
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
+from metricflow.plan_conversion.sql_expression_builders import make_coalesced_expr
 from metricflow.sql.sql_plan import SqlExpressionNode, SqlJoinDescription, SqlJoinType, SqlSelectStatementNode
 from metricflow.sql.sql_exprs import (
     SqlColumnReference,
@@ -317,7 +317,7 @@ class SqlQueryPlanJoinBuilder:
         join_data_set: AnnotatedSqlDataSet,
         join_type: SqlJoinType,
         column_names: Sequence[str],
-        aliases_seen: Sequence[str],
+        table_aliases_for_coalesce: Sequence[str],
     ) -> SqlJoinDescription:
         """Creates the sql join description for combining two separate metrics output datasets
 
@@ -331,9 +331,12 @@ class SqlQueryPlanJoinBuilder:
         the relevant join type for
         """
         if join_type is SqlJoinType.FULL_OUTER:
+            assert (
+                len(column_names) > 0
+            ), "Attempting to do a FULL OUTER JOIN to combine metrics, but no columns were provided for join keys!"
             equality_exprs = [
                 SqlQueryPlanJoinBuilder._make_equality_expression_for_full_outer_join(
-                    aliases_seen, join_data_set.alias, colname
+                    table_aliases_for_coalesce, join_data_set.alias, colname
                 )
                 for colname in column_names
             ]

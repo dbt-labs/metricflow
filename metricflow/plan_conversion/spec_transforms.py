@@ -1,55 +1,13 @@
 from typing import Sequence, List
 
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
+from metricflow.plan_conversion.sql_expression_builders import make_coalesced_expr
 from metricflow.specs import (
     InstanceSpecSetTransform,
     InstanceSpecSet,
     ColumnAssociationResolver,
 )
-from metricflow.sql.sql_exprs import (
-    SqlExpressionNode,
-    SqlColumnReferenceExpression,
-    SqlColumnReference,
-    SqlAggregateFunctionExpression,
-    SqlFunction,
-)
 from metricflow.sql.sql_plan import SqlSelectColumn
-
-
-def make_coalesced_expr(table_aliases: Sequence[str], column_alias: str) -> SqlExpressionNode:
-    """Makes a coalesced expression of the given column from the given table aliases.
-
-    e.g.
-
-    table_aliases = ["a", "b"]
-    column_alias = "is_instant"
-
-    ->
-
-    COALESCE(a.is_instant, b.is_instant)
-    """
-    if len(table_aliases) == 1:
-        return SqlColumnReferenceExpression(
-            col_ref=SqlColumnReference(
-                table_alias=table_aliases[0],
-                column_name=column_alias,
-            )
-        )
-    else:
-        columns_to_coalesce: List[SqlExpressionNode] = []
-        for table_alias in table_aliases:
-            columns_to_coalesce.append(
-                SqlColumnReferenceExpression(
-                    col_ref=SqlColumnReference(
-                        table_alias=table_alias,
-                        column_name=column_alias,
-                    )
-                )
-            )
-        return SqlAggregateFunctionExpression(
-            sql_function=SqlFunction.COALESCE,
-            sql_function_args=columns_to_coalesce,
-        )
 
 
 class CreateSelectCoalescedColumnsForLinkableSpecs(InstanceSpecSetTransform[SelectColumnSet]):
