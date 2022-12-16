@@ -936,8 +936,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                         (metric_spec.offset_window or metric_spec.offset_to_grain_to_date)
                         for metric_spec in parent_node.metric_specs
                     )
-                # TODO: handle case with multiple input metrics on one parent node
-                # need to split into multiple join clauses if any of them use time offset
+                # TODO: prevent optimizer from sending multiple metrics here
                 if len(parent_node.metric_specs) > 1:
                     raise RuntimeError("Unable to combine metrics with offset when parent node has multiple metrics.")
                 input_metric_specs_per_data_set.append(parent_node.metric_specs)
@@ -1010,6 +1009,9 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                     right_source_alias=join_alias,
                     on_condition=CreateOnConditionForCombiningMetrics(
                         column_association_resolver=self._column_association_resolver,
+                        # TODO: if we're offsetting metric_time for one of the metrics, we probably
+                        # shouldn't include that metric's metric_time in the coalesce
+                        # But how does that impact joins on other columns?
                         table_aliases_in_coalesce=[from_alias] + join_aliases[:i],
                         table_alias_on_right_equality=join_aliases[i],
                         right_time_offset=right_time_offset,
