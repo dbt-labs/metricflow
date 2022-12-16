@@ -315,8 +315,9 @@ def test_derived_metric_query_parsing(time_spine_source: TimeSpineSource) -> Non
     """Test derived metric inputs are properly validated."""
 
     bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=BOOKINGS_YAML)
+    revelue_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=REVENUE_YAML)
     metrics_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=METRICS_YAML)
-    query_parser = query_parser_from_yaml([bookings_yaml_file, metrics_yaml_file], time_spine_source)
+    query_parser = query_parser_from_yaml([bookings_yaml_file, revelue_yaml_file, metrics_yaml_file], time_spine_source)
     # check that no dimension query raises UnableToSatisfyQueryError
     with pytest.raises(UnableToSatisfyQueryError):
         query_parser.parse_and_validate_query(
@@ -330,7 +331,7 @@ def test_derived_metric_query_parsing(time_spine_source: TimeSpineSource) -> Non
     )
 
 
-# TODO: make sure error is raised if no time dim for these metrics
+# TODO: actually raise this errors
 def test_derived_metric_with_offset_parsing(time_spine_source: TimeSpineSource) -> None:
     """Test that querying derived metrics with a time offset requires a time dimension."""
     bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=BOOKINGS_YAML)
