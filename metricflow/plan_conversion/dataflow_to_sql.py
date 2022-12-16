@@ -948,19 +948,16 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         from_data_set: Optional[SqlDataSet] = None
         from_alias: str = ""
         if uses_time_offset:
-            metric_time_dimension_spec: Optional[TimeDimensionSpec] = None
             metric_time_dimension_instance: Optional[TimeDimensionInstance] = None
             for parent_data_set in parent_data_sets:
                 for instance in parent_data_set.metric_time_dimension_instances:
                     if len(instance.spec.identifier_links) == 0:
                         metric_time_dimension_instance = instance
-                        metric_time_dimension_spec = instance.spec
                         break
             # shouldn't be able to query a time offset metric without time dim (not enforced yet)
-            assert metric_time_dimension_spec
             assert metric_time_dimension_instance
             metric_time_dimension_column_name = self.column_association_resolver.resolve_time_dimension_spec(
-                metric_time_dimension_spec
+                metric_time_dimension_instance.spec
             ).column_name
             from_alias = self._next_unique_table_alias()
             from_data_set = _make_time_spine_data_set(

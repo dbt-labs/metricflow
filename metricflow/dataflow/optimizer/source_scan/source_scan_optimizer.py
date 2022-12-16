@@ -256,8 +256,6 @@ class SourceScanOptimizer(
     def visit_combine_metrics_node(  # noqa: D
         self, node: CombineMetricsNode[SourceDataSetT]
     ) -> OptimizeBranchResult[SourceDataSetT]:
-        # TODO: see what needs doing here
-
         self._log_visit_node_type(node)
         # The parent node of the CombineMetricsNode can be either ComputeMetricsNodes or CombineMetricsNodes
 
