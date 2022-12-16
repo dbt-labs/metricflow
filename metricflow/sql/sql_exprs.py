@@ -146,6 +146,10 @@ class SqlExpressionTreeLineage:
     def contains_ambiguous_exprs(self) -> bool:  # noqa: D
         return self.contains_string_exprs or self.contains_column_alias_exprs
 
+    @property
+    def contains_aggregate_exprs(self) -> bool:  # noqa: D
+        return any(x.is_aggregate_function for x in self.function_exprs)
+
 
 class SqlColumnReplacements:
     """When re-writing column references in expressions, this storing the mapping."""
@@ -705,7 +709,11 @@ class SqlFunction(Enum):
 class SqlFunctionExpression(SqlExpressionNode):
     """Denotes a function expression in SQL."""
 
-    pass
+    @property
+    @abstractmethod
+    def is_aggregate_function(self) -> bool:
+        """Returns whether this is an aggregate function."""
+        pass
 
 
 class SqlAggregateFunctionExpression(SqlFunctionExpression):
@@ -778,6 +786,10 @@ class SqlAggregateFunctionExpression(SqlFunctionExpression):
                 x.rewrite(column_replacements, should_render_table_alias) for x in self.sql_function_args
             ],
         )
+
+    @property
+    def is_aggregate_function(self) -> bool:  # noqa: D
+        return True
 
     @property
     def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D
@@ -870,6 +882,10 @@ class SqlPercentileExpression(SqlFunctionExpression):
             order_by_arg=self._order_by_arg.rewrite(column_replacements, should_render_table_alias),
             percentile_args=self._percentile_args,
         )
+
+    @property
+    def is_aggregate_function(self) -> bool:  # noqa: D
+        return True
 
     @property
     def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D
@@ -985,6 +1001,10 @@ class SqlWindowFunctionExpression(SqlFunctionExpression):
     @property
     def order_by_args(self) -> List[SqlWindowOrderByArgument]:  # noqa: D
         return self._order_by_args or []
+
+    @property
+    def is_aggregate_function(self) -> bool:  # noqa: D
+        return False
 
     def __repr__(self) -> str:  # noqa: D
         return f"{self.__class__.__name__}(node_id={self.node_id}, sql_function={self.sql_function.name})"
