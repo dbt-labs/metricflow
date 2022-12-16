@@ -100,7 +100,7 @@ METRICS_YAML = textwrap.dedent(
       type: cumulative
       type_params:
         measures:
-          - bookings
+          - revenue
         window: 7 days
     ---
     metric:
@@ -113,6 +113,20 @@ METRICS_YAML = textwrap.dedent(
         expr: revenue_cumulative - 10
         metrics:
           - name: revenue_cumulative
+    ---
+    metric:
+      name: revenue_growth_2_weeks
+      description: Percentage growth of revenue compared to revenue 2 weeks prior
+      owners:
+        - support@transformdata.io
+      type: derived
+      type_params:
+        expr: (revenue - revenue_2_weeks_ago) / revenue_2_weeks_ago
+        metrics:
+          - name: revenue
+          - name: revenue
+            offset_window: 14 days
+            alias: revenue_2_weeks_ago
     """
 )
 
@@ -317,6 +331,20 @@ def test_derived_metric_query_parsing(time_spine_source: TimeSpineSource) -> Non
 
 
 # TODO: make sure error is raised if no time dim for these metrics
-def test_derived_metric_with_offset_parsing() -> None:
+def test_derived_metric_with_offset_parsing(time_spine_source: TimeSpineSource) -> None:
     """Test that querying derived metrics with a time offset requires a time dimension."""
-    raise NotImplementedError
+    bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=BOOKINGS_YAML)
+    bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=REVENUE_YAML)
+    metrics_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=METRICS_YAML)
+    query_parser = query_parser_from_yaml([bookings_yaml_file, metrics_yaml_file], time_spine_source)
+    # check that no dimension query raises UnableToSatisfyQueryError
+    with pytest.raises(UnableToSatisfyQueryError):
+        query_parser.parse_and_validate_query(
+            metric_names=["revenue_growth_2_weeks"],
+            group_by_names=[],
+        )
+
+    query_parser.parse_and_validate_query(
+        metric_names=["revenue_growth_2_weeks"],
+        group_by_names=[MTD],
+    )
