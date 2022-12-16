@@ -119,7 +119,7 @@ integration_test:
   group_bys: ["metric_time"]
   check_query: |
     SELECT
-      PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY booking_value) AS booking_value_p99
+      {{ render_percentile_expr("booking_value", 0.99, False) }} AS booking_value_p99
       , ds AS metric_time
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
@@ -134,7 +134,7 @@ integration_test:
   group_bys: ["metric_time"]
   check_query: |
     SELECT
-      PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY booking_value) AS median_booking_value
+      {{ render_percentile_expr("booking_value", 0.5, False) }} AS median_booking_value
       , ds AS metric_time
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
