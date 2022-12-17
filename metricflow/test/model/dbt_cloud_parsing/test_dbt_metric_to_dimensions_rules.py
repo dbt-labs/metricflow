@@ -7,8 +7,11 @@ from metricflow.model.dbt_mapping_rules.dbt_metric_to_dimensions_rules import (
     DbtTimestampToDimension,
     DbtFiltersToDimensions,
 )
-from metricflow.model.dbt_mapping_rules.dbt_metric_to_metrics_rules import CALC_METHOD_TO_METRIC_TYPE
-from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import MappedObjects, DbtMappingRule
+from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
+    MappedObjects,
+    DbtMappingRule,
+    get_and_assert_calc_method_mapping,
+)
 from metricflow.model.objects.elements.dimension import DimensionType
 from metricflow.model.objects.metric import MetricType
 
@@ -34,7 +37,8 @@ def test_dbt_dimensions_to_dimensions(dbt_metrics: Tuple[MetricNode, ...]) -> No
         not issues.has_blocking_issues
     ), f"DbtDimensionsToDimensions raised blocking issues when it shouldn't have: {issues.to_pretty_json()}"
     for dbt_metric in dbt_metrics:
-        if CALC_METHOD_TO_METRIC_TYPE[dbt_metric.calculation_method] != MetricType.DERIVED:
+        metric_type = get_and_assert_calc_method_mapping(dbt_metric=dbt_metric)
+        if metric_type != MetricType.DERIVED:
             for dimension in dbt_metric.dimensions:
                 assert (
                     objects.dimensions[dbt_metric.model.name].get(dimension) is not None
@@ -59,7 +63,8 @@ def test_dbt_timestamp_to_dimension(dbt_metrics: Tuple[MetricNode, ...]) -> None
         not issues.has_blocking_issues
     ), f"DbtTimestampToDimension raised blocking issues when it shouldn't have: {issues.to_pretty_json()}"
     for dbt_metric in dbt_metrics:
-        if CALC_METHOD_TO_METRIC_TYPE[dbt_metric.calculation_method] != MetricType.DERIVED:
+        metric_type = get_and_assert_calc_method_mapping(dbt_metric=dbt_metric)
+        if metric_type != MetricType.DERIVED:
             # each dbt metric timestamp creates 1 dimension, and a dbt metric must have exactly one timestamp
             assert (
                 len(objects.dimensions[dbt_metric.model.name].keys()) == 1
@@ -85,7 +90,8 @@ def test_dbt_filters_to_dimensions(dbt_metrics: Tuple[MetricNode, ...]) -> None:
         not issues.has_blocking_issues
     ), f"DbtFiltersToDimension raised blocking issues when it shouldn't have: {issues.to_pretty_json()}"
     for dbt_metric in dbt_metrics:
-        if CALC_METHOD_TO_METRIC_TYPE[dbt_metric.calculation_method] != MetricType.DERIVED and dbt_metric.filters:
+        metric_type = get_and_assert_calc_method_mapping(dbt_metric=dbt_metric)
+        if metric_type != MetricType.DERIVED and dbt_metric.filters:
             # as many dimensions should be created as their are filters
             assert len(objects.dimensions[dbt_metric.model.name].keys()) == len(
                 dbt_metric.filters

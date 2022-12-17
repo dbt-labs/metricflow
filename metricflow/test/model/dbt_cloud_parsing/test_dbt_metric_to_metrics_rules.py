@@ -9,8 +9,7 @@ from metricflow.model.dbt_mapping_rules.dbt_metric_to_metrics_rules import (
     DbtToDerivedMetricTypeParams,
     DbtToMeasureProxyMetricTypeParams,
 )
-from metricflow.model.dbt_mapping_rules.dbt_metric_to_metrics_rules import CALC_METHOD_TO_METRIC_TYPE
-from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import MappedObjects
+from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import MappedObjects, get_and_assert_calc_method_mapping
 from metricflow.model.objects.metric import MetricType
 
 
@@ -127,7 +126,8 @@ def test_dbt_to_derived_metric_type_params(dbt_metrics: Tuple[MetricNode, ...]) 
         not issues.has_blocking_issues
     ), f"DbtToDerivedMetricTypeParams raised blocking issues when it shouldn't have: {issues.to_pretty_json()}"
     for dbt_metric in dbt_metrics:
-        if CALC_METHOD_TO_METRIC_TYPE[dbt_metric.calculation_method] == MetricType.DERIVED:
+        metric_type = get_and_assert_calc_method_mapping(dbt_metric=dbt_metric)
+        if metric_type == MetricType.DERIVED:
             assert (
                 objects.metrics.get(dbt_metric.name) is not None
             ), f"DbtToDerivedMetricTypeParams didn't create the metric `{dbt_metric.name}`"
@@ -144,7 +144,8 @@ def test_dbt_to_derived_metric_type_params(dbt_metrics: Tuple[MetricNode, ...]) 
 def test_dbt_to_derived_metric_type_params_requires_expression(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
     objects = MappedObjects()
     for dbt_metric in dbt_metrics:
-        if CALC_METHOD_TO_METRIC_TYPE[dbt_metric.calculation_method] == MetricType.DERIVED:
+        metric_type = get_and_assert_calc_method_mapping(dbt_metric=dbt_metric)
+        if metric_type == MetricType.DERIVED:
             dbt_metric.expression = None
     issues = DbtToDerivedMetricTypeParams().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
@@ -155,7 +156,8 @@ def test_dbt_to_derived_metric_type_params_requires_expression(dbt_metrics: Tupl
 def test_dbt_to_derived_metric_type_params_requires_depends_on(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
     objects = MappedObjects()
     for dbt_metric in dbt_metrics:
-        if CALC_METHOD_TO_METRIC_TYPE[dbt_metric.calculation_method] == MetricType.DERIVED:
+        metric_type = get_and_assert_calc_method_mapping(dbt_metric=dbt_metric)
+        if metric_type == MetricType.DERIVED:
             dbt_metric.depends_on = None
     issues = DbtToDerivedMetricTypeParams().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
@@ -170,7 +172,8 @@ def test_dbt_to_measure_proxy_metric_type_params(dbt_metrics: Tuple[MetricNode, 
         not issues.has_blocking_issues
     ), f"DbtToDerivedMetricTypeParams raised blocking issues when it shouldn't have: {issues.to_pretty_json()}"
     for dbt_metric in dbt_metrics:
-        if CALC_METHOD_TO_METRIC_TYPE[dbt_metric.calculation_method] != MetricType.DERIVED:
+        metric_type = get_and_assert_calc_method_mapping(dbt_metric=dbt_metric)
+        if metric_type != MetricType.DERIVED:
             assert (
                 objects.metrics.get(dbt_metric.name) is not None
             ), f"DbtToMeasureProxyMetricTypeParams didn't create the metric `{dbt_metric.name}`"
@@ -187,7 +190,8 @@ def test_dbt_to_measure_proxy_metric_type_params(dbt_metrics: Tuple[MetricNode, 
 def test_dbt_to_measure_proxy_metric_type_params_requires_name(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
     objects = MappedObjects()
     for dbt_metric in dbt_metrics:
-        if CALC_METHOD_TO_METRIC_TYPE[dbt_metric.calculation_method] != MetricType.DERIVED:
+        metric_type = get_and_assert_calc_method_mapping(dbt_metric=dbt_metric)
+        if metric_type != MetricType.DERIVED:
             dbt_metric.name = None
     issues = DbtToMeasureProxyMetricTypeParams().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (

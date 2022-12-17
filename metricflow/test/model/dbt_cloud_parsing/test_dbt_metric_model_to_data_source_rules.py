@@ -7,8 +7,11 @@ from metricflow.model.dbt_mapping_rules.dbt_metric_model_to_data_source_rules im
     DbtMapToDataSourceDescription,
     DbtMapDataSourceSqlTable,
 )
-from metricflow.model.dbt_mapping_rules.dbt_metric_to_metrics_rules import CALC_METHOD_TO_METRIC_TYPE
-from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import MappedObjects, DbtMappingRule
+from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
+    MappedObjects,
+    DbtMappingRule,
+    get_and_assert_calc_method_mapping,
+)
 from metricflow.model.objects.metric import MetricType
 
 
@@ -35,7 +38,8 @@ def test_dbt_map_to_data_source_name(dbt_metrics: Tuple[MetricNode, ...]) -> Non
         not issues.has_blocking_issues
     ), f"DbtMapToDataSourceName raised blocking issues when it shouldn't: {issues.to_pretty_json()}"
     for dbt_metric in dbt_metrics:
-        if CALC_METHOD_TO_METRIC_TYPE[dbt_metric.calculation_method] != MetricType.DERIVED:
+        metric_type = get_and_assert_calc_method_mapping(dbt_metric=dbt_metric)
+        if metric_type != MetricType.DERIVED:
             assert (
                 objects.data_sources[dbt_metric.model.name].get("name") is not None
             ), "Expected data source to have name, got `None`"
@@ -59,7 +63,8 @@ def test_dbt_map_to_data_source_description(dbt_metrics: Tuple[MetricNode, ...])
         not issues.has_blocking_issues
     ), f"DbtMapToDataSourceDescription raised blocking issues when it shouldn't: {issues.to_pretty_json()}"
     for dbt_metric in dbt_metrics:
-        if CALC_METHOD_TO_METRIC_TYPE[dbt_metric.calculation_method] != MetricType.DERIVED:
+        metric_type = get_and_assert_calc_method_mapping(dbt_metric=dbt_metric)
+        if metric_type != MetricType.DERIVED:
             assert (
                 objects.data_sources[dbt_metric.model.name]["description"] == dbt_metric.model.description
             ), f"Got description `{objects.data_sources[dbt_metric.model.name]['description']}`, but expected `{dbt_metric.model.description}`"
@@ -83,7 +88,8 @@ def test_dbt_map_data_source_sql_table(dbt_metrics: Tuple[MetricNode, ...]) -> N
         not issues.has_blocking_issues
     ), f"DbtMapToDataSourceSqlTable raised blocking issues when it shouldn't have: {issues.to_pretty_json()}"
     for dbt_metric in dbt_metrics:
-        if CALC_METHOD_TO_METRIC_TYPE[dbt_metric.calculation_method] != MetricType.DERIVED:
+        metric_type = get_and_assert_calc_method_mapping(dbt_metric=dbt_metric)
+        if metric_type != MetricType.DERIVED:
             assert (
                 objects.data_sources[dbt_metric.model.name]["sql_table"]
                 == f"{dbt_metric.model.database}.{dbt_metric.model.schema}.{dbt_metric.model.name}"

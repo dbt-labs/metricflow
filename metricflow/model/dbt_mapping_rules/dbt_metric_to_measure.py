@@ -7,10 +7,10 @@ from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
     DbtMappingRule,
     MappedObjects,
     assert_essential_metric_properties,
+    get_and_assert_calc_method_mapping,
 )
 from metricflow.model.objects.metric import MetricType
 from metricflow.model.validations.validator_helpers import ModelValidationResults, ValidationIssue, ValidationError
-from metricflow.model.dbt_mapping_rules.dbt_metric_to_metrics_rules import CALC_METHOD_TO_METRIC_TYPE
 
 CALC_METHOD_TO_MEASURE_TYPE: Dict[str, AggregationType] = {
     "count": AggregationType.COUNT,
@@ -32,7 +32,8 @@ class DbtToMeasureName(DbtMappingRule):
         for metric in dbt_metrics:
             try:
                 assert_essential_metric_properties(metric=metric)
-                if CALC_METHOD_TO_METRIC_TYPE[metric.calculation_method] != MetricType.DERIVED:
+                metric_type = get_and_assert_calc_method_mapping(dbt_metric=metric)
+                if metric_type != MetricType.DERIVED:
                     objects.measures[metric.model.name][metric.name]["name"] = metric.name
 
             except Exception as e:
@@ -52,7 +53,8 @@ class DbtToMeasureAgg(DbtMappingRule):
         for metric in dbt_metrics:
             try:
                 assert_essential_metric_properties(metric=metric)
-                if CALC_METHOD_TO_METRIC_TYPE[metric.calculation_method] != MetricType.DERIVED:
+                metric_type = get_and_assert_calc_method_mapping(dbt_metric=metric)
+                if metric_type != MetricType.DERIVED:
                     objects.measures[metric.model.name][metric.name]["agg"] = CALC_METHOD_TO_MEASURE_TYPE[
                         metric.calculation_method
                     ]
@@ -74,7 +76,8 @@ class DbtToMeasureExpr(DbtMappingRule):
         for metric in dbt_metrics:
             try:
                 assert_essential_metric_properties(metric=metric)
-                if CALC_METHOD_TO_METRIC_TYPE[metric.calculation_method] != MetricType.DERIVED:
+                metric_type = get_and_assert_calc_method_mapping(dbt_metric=metric)
+                if metric_type != MetricType.DERIVED:
                     assert metric.expression, f"Expected an `expression` for `{metric.name}` metric, got `None`"
                     objects.measures[metric.model.name][metric.name]["expr"] = metric.expression
 
@@ -95,7 +98,8 @@ class DbtToMeasureAggTimeDimension(DbtMappingRule):
         for metric in dbt_metrics:
             try:
                 assert_essential_metric_properties(metric=metric)
-                if CALC_METHOD_TO_METRIC_TYPE[metric.calculation_method] != MetricType.DERIVED:
+                metric_type = get_and_assert_calc_method_mapping(dbt_metric=metric)
+                if metric_type != MetricType.DERIVED:
                     assert metric.timestamp, f"Expected a `timestamp` for `{metric.name}` metric, got `None`"
                     objects.measures[metric.model.name][metric.name]["agg_time_dimension"] = metric.timestamp
 

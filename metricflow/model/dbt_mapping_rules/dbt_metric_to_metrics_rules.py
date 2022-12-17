@@ -1,25 +1,15 @@
 import traceback
-from typing import Dict, List, Tuple
+from typing import List, Tuple
 
 from dbt_metadata_client.dbt_metadata_api_schema import MetricFilter, MetricNode
 from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
     DbtMappingRule,
     MappedObjects,
     assert_essential_metric_properties,
+    get_and_assert_calc_method_mapping,
 )
 from metricflow.model.objects.metric import MetricInputMeasure, MetricInput, MetricType, MetricTypeParams
 from metricflow.model.validations.validator_helpers import ModelValidationResults, ValidationIssue, ValidationError
-
-
-CALC_METHOD_TO_METRIC_TYPE: Dict[str, MetricType] = {
-    "count": MetricType.MEASURE_PROXY,
-    "count_distinct": MetricType.MEASURE_PROXY,
-    "sum": MetricType.MEASURE_PROXY,
-    "average": MetricType.MEASURE_PROXY,
-    "min": MetricType.MEASURE_PROXY,
-    "max": MetricType.MEASURE_PROXY,
-    "derived": MetricType.DERIVED,
-}
 
 
 class DbtToMetricName(DbtMappingRule):
@@ -71,7 +61,8 @@ class DbtToMetricType(DbtMappingRule):
         for metric in dbt_metrics:
             try:
                 assert_essential_metric_properties(metric=metric)
-                objects.metrics[metric.name]["type"] = CALC_METHOD_TO_METRIC_TYPE[metric.calculation_method]
+                metric_type = get_and_assert_calc_method_mapping(dbt_metric=metric)
+                objects.metrics[metric.name]["type"] = metric_type
 
             except Exception as e:
                 issues.append(
@@ -94,7 +85,8 @@ class DbtToMeasureProxyMetricTypeParams(DbtMappingRule):
             try:
                 assert_essential_metric_properties(metric=metric)
                 # We only do this for MEASURE_PROXY metrics
-                if CALC_METHOD_TO_METRIC_TYPE[metric.calculation_method] == MetricType.MEASURE_PROXY:
+                metric_type = get_and_assert_calc_method_mapping(dbt_metric=metric)
+                if metric_type == MetricType.MEASURE_PROXY:
                     objects.metrics[metric.name]["type_params"] = MetricTypeParams(
                         measure=MetricInputMeasure(name=metric.name)
                     ).dict()
@@ -119,10 +111,8 @@ class DbtToDerivedMetricTypeParams(DbtMappingRule):
         issues: List[ValidationIssue] = []
         for metric in dbt_metrics:
             try:
-                if (
-                    metric.calculation_method
-                    and CALC_METHOD_TO_METRIC_TYPE[metric.calculation_method] == MetricType.DERIVED
-                ):
+                metric_type = get_and_assert_calc_method_mapping(dbt_metric=metric)
+                if metric_type == MetricType.DERIVED:
                     assert metric.expression, f"Expected an `expression` for `{metric.name}` metric, got `None`"
                     assert (
                         metric.depends_on is not None and len(metric.depends_on) > 0

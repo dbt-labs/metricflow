@@ -7,8 +7,11 @@ from metricflow.model.dbt_mapping_rules.dbt_metric_to_measure import (
     DbtToMeasureAggTimeDimension,
     DbtToMeasureExpr,
 )
-from metricflow.model.dbt_mapping_rules.dbt_metric_to_metrics_rules import CALC_METHOD_TO_METRIC_TYPE
-from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import MappedObjects, DbtMappingRule
+from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
+    MappedObjects,
+    DbtMappingRule,
+    get_and_assert_calc_method_mapping,
+)
 from metricflow.model.dbt_converter import DbtConverter
 from metricflow.model.objects.metric import MetricType
 
@@ -33,7 +36,8 @@ def test_dbt_to_measure_name(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # no
         not issues.has_blocking_issues
     ), f"DbtToMeasureName raised blocking issues when it shouldn't have: {issues.to_pretty_json()}"
     for dbt_metric in dbt_metrics:
-        if CALC_METHOD_TO_METRIC_TYPE[dbt_metric.calculation_method] != MetricType.DERIVED:
+        metric_type = get_and_assert_calc_method_mapping(dbt_metric=dbt_metric)
+        if metric_type != MetricType.DERIVED:
             assert (
                 objects.measures[dbt_metric.model.name].get(dbt_metric.name) is not None
             ), f"DbtToMeasureName didn't create the measure `{dbt_metric.name}` for data source `{dbt_metric.model.name}`"
@@ -58,7 +62,8 @@ def test_dbt_to_measure_agg(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noq
         not issues.has_blocking_issues
     ), f"DbtToMeasure raised blocking issues when it shouldn't have: {issues.to_pretty_json()}"
     for dbt_metric in dbt_metrics:
-        if CALC_METHOD_TO_METRIC_TYPE[dbt_metric.calculation_method] != MetricType.DERIVED:
+        metric_type = get_and_assert_calc_method_mapping(dbt_metric=dbt_metric)
+        if metric_type != MetricType.DERIVED:
             assert (
                 objects.measures[dbt_metric.model.name].get(dbt_metric.name) is not None
             ), f"DbtToMeasureAgg didn't create the measure `{dbt_metric.name}` for data source `{dbt_metric.model.name}`"
@@ -83,7 +88,8 @@ def test_dbt_to_measure_agg_time_dimension(dbt_metrics: Tuple[MetricNode, ...]) 
         not issues.has_blocking_issues
     ), f"DbtToMeasure raised blocking issues when it shouldn't have: {issues.to_pretty_json()}"
     for dbt_metric in dbt_metrics:
-        if CALC_METHOD_TO_METRIC_TYPE[dbt_metric.calculation_method] != MetricType.DERIVED:
+        metric_type = get_and_assert_calc_method_mapping(dbt_metric=dbt_metric)
+        if metric_type != MetricType.DERIVED:
             assert (
                 objects.measures[dbt_metric.model.name].get(dbt_metric.name) is not None
             ), f"DbtToMeasureAggTimeDimension didn't create the measure `{dbt_metric.name}` for data source `{dbt_metric.model.name}`"
@@ -108,7 +114,8 @@ def test_dbt_to_measure_expr(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # no
         not issues.has_blocking_issues
     ), f"DbtToMeasureExpr raised blocking issues when it shouldn't have: {issues.to_pretty_json()}"
     for dbt_metric in dbt_metrics:
-        if CALC_METHOD_TO_METRIC_TYPE[dbt_metric.calculation_method] != MetricType.DERIVED:
+        metric_type = get_and_assert_calc_method_mapping(dbt_metric=dbt_metric)
+        if metric_type != MetricType.DERIVED:
             assert (
                 objects.measures[dbt_metric.model.name].get(dbt_metric.name) is not None
             ), f"DbtToMeasureExpr didn't create the measure `{dbt_metric.name}` for data source `{dbt_metric.model.name}`"
