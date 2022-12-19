@@ -100,6 +100,19 @@ class DataSourceJoinValidator:
     def __init__(self, data_source_semantics: DataSourceSemanticsAccessor) -> None:  # noqa: D
         self._data_source_semantics = data_source_semantics
 
+    def get_joinable_data_sources(
+        self, left_data_source_reference: DataSourceReference, include_multi_hop: bool = False
+    ) -> Dict[str, DataSourceLink]:
+        """List all data sources that can join to given data source, and the identifiers to join them (max 2-hop joins)."""
+        data_source_joins: Dict[str, DataSourceLink] = {}
+        self._get_remaining_hops_of_joinable_data_sources(
+            left_data_source_reference=left_data_source_reference,
+            parent_data_source_to_join_paths={left_data_source_reference: []},
+            known_data_source_joins=data_source_joins,
+            join_hops_remaining=(MAX_JOIN_HOPS if include_multi_hop else 1),
+        )
+        return data_source_joins
+
     def _get_remaining_hops_of_joinable_data_sources(
         self,
         left_data_source_reference: DataSourceReference,
@@ -159,25 +172,13 @@ class DataSourceJoinValidator:
         for join_path in join_paths_to_visit:
             assert len(join_path) > 0
             right_data_sources_to_join_paths[join_path[-1].right_data_source_reference] = join_path
+
         self._get_remaining_hops_of_joinable_data_sources(
             left_data_source_reference=left_data_source_reference,
             parent_data_source_to_join_paths=right_data_sources_to_join_paths,
             known_data_source_joins=known_data_source_joins,
             join_hops_remaining=join_hops_remaining,
         )
-
-    def get_joinable_data_sources(
-        self, left_data_source_reference: DataSourceReference, include_multi_hop: bool = False
-    ) -> Dict[str, DataSourceLink]:
-        """List all data sources that can join to given data source, and the identifiers to join them (max 2-hop joins)."""
-        data_source_joins: Dict[str, DataSourceLink] = {}
-        self._get_remaining_hops_of_joinable_data_sources(
-            left_data_source_reference=left_data_source_reference,
-            parent_data_source_to_join_paths={left_data_source_reference: []},
-            known_data_source_joins=data_source_joins,
-            join_hops_remaining=(MAX_JOIN_HOPS if include_multi_hop else 1),
-        )
-        return data_source_joins
 
     def get_valid_data_source_identifier_join_type(
         self,
