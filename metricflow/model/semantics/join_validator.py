@@ -8,7 +8,6 @@ from metricflow.model.objects.elements.identifier import IdentifierType
 from metricflow.object_utils import pformat_big_objects
 from metricflow.protocols.semantics import DataSourceSemanticsAccessor
 from metricflow.references import IdentifierReference
-from metricflow.model.objects.data_source import DataSource
 
 MAX_JOIN_HOPS = 2
 
@@ -103,13 +102,11 @@ class DataSourceJoinValidator:
 
     def _get_remaining_hops_of_joinable_data_sources(
         self,
-        left_data_source: DataSource,
+        left_data_source_reference: DataSourceReference,
         parent_data_source_to_join_paths: Dict[DataSourceReference, List[DataSourceIdentifierJoin]],
         known_data_source_joins: Dict[str, DataSourceLink],
         join_hops_remaining: int,
     ) -> None:
-        left_data_source_reference = DataSourceReference(data_source_name=left_data_source.name)
-
         for parent_data_source_reference, parent_join_path in parent_data_source_to_join_paths.items():
             parent_data_source = self._data_source_semantics.get_by_reference(
                 data_source_reference=parent_data_source_reference
@@ -163,7 +160,7 @@ class DataSourceJoinValidator:
             assert len(join_path) > 0
             right_data_sources_to_join_paths[join_path[-1].right_data_source_reference] = join_path
         self._get_remaining_hops_of_joinable_data_sources(
-            left_data_source=left_data_source,
+            left_data_source_reference=left_data_source_reference,
             parent_data_source_to_join_paths=right_data_sources_to_join_paths,
             known_data_source_joins=known_data_source_joins,
             join_hops_remaining=join_hops_remaining,
@@ -173,14 +170,9 @@ class DataSourceJoinValidator:
         self, left_data_source_reference: DataSourceReference, include_multi_hop: bool = False
     ) -> Dict[str, DataSourceLink]:
         """List all data sources that can join to given data source, and the identifiers to join them (max 2-hop joins)."""
-        left_data_source = self._data_source_semantics.get_by_reference(
-            data_source_reference=left_data_source_reference
-        )
-        assert left_data_source is not None
-
         data_source_joins: Dict[str, DataSourceLink] = {}
         self._get_remaining_hops_of_joinable_data_sources(
-            left_data_source=left_data_source,
+            left_data_source_reference=left_data_source_reference,
             parent_data_source_to_join_paths={left_data_source_reference: []},
             known_data_source_joins=data_source_joins,
             join_hops_remaining=(MAX_JOIN_HOPS if include_multi_hop else 1),
