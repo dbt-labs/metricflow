@@ -641,3 +641,33 @@ integration_test:
     ) li
     ON COALESCE(bk.is_lux, vw.is_lux) = li.is_lux AND COALESCE(bk.country, vw.country) = li.country
     GROUP BY 4,5
+---
+integration_test:
+  name: derived_metrics_with_null_dimension_values
+  description: Tests querying a derived metric with multiple inputs that link to dimension(s) with null values
+  model: SIMPLE_MODEL
+  metrics: [booking_value_per_view]
+  group_bys: [listing__is_lux_latest]
+  check_query: |
+    SELECT
+      bk.booking_value / NULLIF(vw.views, 0) AS booking_value_per_view
+      , bk.is_lux AS listing__is_lux_latest
+    FROM (
+      SELECT
+        SUM(a.booking_value) AS booking_value
+        ,b.is_lux
+      FROM {{ source_schema }}.fct_bookings a
+      LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest b
+      ON a.listing_id = b.listing_id
+      GROUP BY 2
+    ) bk
+    INNER JOIN (
+      SELECT
+        SUM(1) AS views
+        ,d.is_lux
+      FROM {{ source_schema }}.fct_views c
+      LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest d
+      ON c.listing_id = d.listing_id
+      GROUP BY 2
+    ) vw
+    ON bk.is_lux = vw.is_lux OR (bk.is_lux IS NULL AND vw.is_lux IS NULL)

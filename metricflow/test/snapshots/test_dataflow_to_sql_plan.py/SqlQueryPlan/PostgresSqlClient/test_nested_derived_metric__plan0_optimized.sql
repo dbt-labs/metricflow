@@ -5,9 +5,9 @@ SELECT
 FROM (
   -- Combine Metrics
   SELECT
-    COALESCE(subq_42.metric_time, subq_43.metric_time, subq_44.metric_time) AS metric_time
-    , subq_42.non_referred AS non_referred
-    , subq_43.instant AS instant
+    COALESCE(subq_34.metric_time, subq_39.metric_time, subq_44.metric_time) AS metric_time
+    , subq_34.non_referred AS non_referred
+    , subq_39.instant AS instant
     , subq_44.bookings AS bookings
   FROM (
     -- Compute Metrics via Expressions
@@ -17,8 +17,8 @@ FROM (
     FROM (
       -- Combine Metrics
       SELECT
-        COALESCE(subq_31.metric_time, subq_32.metric_time) AS metric_time
-        , subq_31.ref_bookings AS ref_bookings
+        COALESCE(subq_27.metric_time, subq_32.metric_time) AS metric_time
+        , subq_27.ref_bookings AS ref_bookings
         , subq_32.bookings AS bookings
       FROM (
         -- Aggregate Measures
@@ -41,7 +41,7 @@ FROM (
         ) subq_25
         GROUP BY
           metric_time
-      ) subq_31
+      ) subq_27
       INNER JOIN (
         -- Aggregate Measures
         -- Compute Metrics via Expressions
@@ -60,14 +60,18 @@ FROM (
             -- User Defined SQL Query
             SELECT * FROM ***************************.fct_bookings
           ) bookings_source_src_10001
-        ) subq_29
+        ) subq_30
         GROUP BY
           metric_time
       ) subq_32
       ON
-        subq_31.metric_time = subq_32.metric_time
+        (
+          subq_27.metric_time = subq_32.metric_time
+        ) OR (
+          (subq_27.metric_time IS NULL) AND (subq_32.metric_time IS NULL)
+        )
     ) subq_33
-  ) subq_42
+  ) subq_34
   INNER JOIN (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
@@ -86,12 +90,16 @@ FROM (
         -- User Defined SQL Query
         SELECT * FROM ***************************.fct_bookings
       ) bookings_source_src_10001
-    ) subq_36
+    ) subq_37
     GROUP BY
       metric_time
-  ) subq_43
+  ) subq_39
   ON
-    subq_42.metric_time = subq_43.metric_time
+    (
+      subq_34.metric_time = subq_39.metric_time
+    ) OR (
+      (subq_34.metric_time IS NULL) AND (subq_39.metric_time IS NULL)
+    )
   INNER JOIN (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
@@ -110,10 +118,14 @@ FROM (
         -- User Defined SQL Query
         SELECT * FROM ***************************.fct_bookings
       ) bookings_source_src_10001
-    ) subq_40
+    ) subq_42
     GROUP BY
       metric_time
   ) subq_44
   ON
-    COALESCE(subq_42.metric_time, subq_43.metric_time) = subq_44.metric_time
+    (
+      subq_34.metric_time = subq_44.metric_time
+    ) OR (
+      (subq_34.metric_time IS NULL) AND (subq_44.metric_time IS NULL)
+    )
 ) subq_45

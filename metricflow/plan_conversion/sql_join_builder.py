@@ -5,6 +5,7 @@ from typing import List, Optional, Sequence, Tuple, TypeVar
 
 from metricflow.dataflow.dataflow_plan import JoinDescription, JoinOverTimeRangeNode
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
+from metricflow.plan_conversion.sql_expression_builders import make_coalesced_expr
 from metricflow.sql.sql_plan import SqlExpressionNode, SqlJoinDescription, SqlJoinType, SqlSelectStatementNode
 from metricflow.sql.sql_exprs import (
     SqlColumnReference,
@@ -308,6 +309,105 @@ class SqlQueryPlanJoinBuilder:
 
         return SqlLogicalExpression(
             operator=SqlLogicalOperator.AND, args=(window_start_condition, window_end_condition)
+        )
+
+    @staticmethod
+    def make_combine_metrics_join_description(
+        from_data_set: AnnotatedSqlDataSet,
+        join_data_set: AnnotatedSqlDataSet,
+        join_type: SqlJoinType,
+        column_names: Sequence[str],
+        table_aliases_for_coalesce: Sequence[str],
+    ) -> SqlJoinDescription:
+        """Creates the sql join description for combining two separate metrics output datasets
+
+        These might be combined in service of producing complete output for end user consumption, in which
+        case the join type will be FULL OUTER in order to ensure all rows are included. In this case, the
+        join must account for all past table aliases seen in prior joins in order to produce the final
+        coalesce expression for processing the join correctly.
+
+        Metric data sets might also be combined to serve as inputs to a derived metric, in which case the
+        join type will not be a FULL OUTER, and we should use null-safe column equality comparisons with
+        the relevant join type for
+        """
+        if join_type is SqlJoinType.FULL_OUTER:
+            assert (
+                len(column_names) > 0
+            ), "Attempting to do a FULL OUTER JOIN to combine metrics, but no columns were provided for join keys!"
+            equality_exprs = [
+                SqlQueryPlanJoinBuilder._make_equality_expression_for_full_outer_join(
+                    table_aliases_for_coalesce, join_data_set.alias, colname
+                )
+                for colname in column_names
+            ]
+            on_condition = (
+                SqlLogicalExpression(operator=SqlLogicalOperator.AND, args=tuple(equality_exprs))
+                if len(equality_exprs) > 1
+                else equality_exprs[0]
+            )
+            return SqlJoinDescription(
+                right_source=join_data_set.data_set.sql_select_node,
+                right_source_alias=join_data_set.alias,
+                on_condition=on_condition,
+                join_type=join_type,
+            )
+        else:
+            column_equality_descriptions = [
+                ColumnEqualityDescription(left_column_alias=name, right_column_alias=name, treat_nulls_as_equal=True)
+                for name in column_names
+            ]
+            return SqlQueryPlanJoinBuilder.make_sql_join_description(
+                right_source_node=join_data_set.data_set.sql_select_node,
+                left_source_alias=from_data_set.alias,
+                right_source_alias=join_data_set.alias,
+                column_equality_descriptions=column_equality_descriptions,
+                join_type=join_type,
+            )
+
+    @staticmethod
+    def _make_equality_expression_for_full_outer_join(
+        table_aliases_in_coalesce: Sequence[str], right_table_alias: str, column_alias: str
+    ) -> SqlExpressionNode:
+        """Creates an expression that can go in the ON condition when coalescing join keys with a FULL OUTER JOIN.
+
+        e.g.
+
+        dimension_specs = ["is_instant", "ds"]
+        table_aliases_in_coalesce = ["a", "b"]
+        table_alias_on_right_equality = ["c"]
+
+        ->
+
+        COALESCE(a.is_instant, b.is_instant) = c.is_instant
+        AND COALESCE(a.ds, b.ds) = c.ds
+
+        This is necessary for cases where 3 or more subqueries will be linked via FULL OUTER JOINs. If that happens,
+        the set of join keys from subquery 3 must be compared to the join keys from both subquery 1 and subquery 2,
+        otherwise duplicate rows might appear in the output.
+
+        For example:
+
+        table1: [('a', 10), ('b', 20)]
+        table2: [('a', 100), ('c', 200)]
+        table3: [('a', 1000), ('c', 2000)]
+
+        ->
+
+        output without COALESCE: [('a', 10, 100, 1000), ('c', NULL, 200, NULL), ('c', NULL, NULL, 2000)]
+        output with COALESCE: [('a', 10, 100, 1000), ('c', NULL, 200, 2000)]
+
+        The latter scenario consolidates the rows keyed by 'c' into a single entry.
+        """
+
+        return SqlComparisonExpression(
+            left_expr=make_coalesced_expr(table_aliases_in_coalesce, column_alias),
+            comparison=SqlComparison.EQUALS,
+            right_expr=SqlColumnReferenceExpression(
+                col_ref=SqlColumnReference(
+                    table_alias=right_table_alias,
+                    column_name=column_alias,
+                )
+            ),
         )
 
     @staticmethod
