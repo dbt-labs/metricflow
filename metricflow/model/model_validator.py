@@ -39,7 +39,7 @@ logger = logging.getLogger(__name__)
 
 class ModelValidator:
     """A Validator that acts on UserConfiguredModel"""
-
+    # Invoke the correct rule manually in the validation tests
     DEFAULT_RULES = (
         PercentileAggregationRule(),
         DerivedMetricRule(),

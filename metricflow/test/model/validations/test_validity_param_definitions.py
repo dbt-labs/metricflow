@@ -70,6 +70,7 @@ def test_validity_window_must_have_a_start() -> None:
     validity_window_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
     model = parse_yaml_files_to_validation_ready_model([base_model_file(), validity_window_file])
 
+    #foo bar test commit
     with pytest.raises(ModelValidationException, match="has 1 dimensions defined with validity params"):
         ModelValidator().checked_validations(model.model)
 
