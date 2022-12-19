@@ -10,6 +10,7 @@ from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.model.validations.validator_helpers import ModelValidationResults, ValidationIssue, ValidationError
+from metricflow.model.objects.constraints.where import WhereClauseConstraint
 
 
 DBT_COLUMN_TYPES_TO_DIMENSION_TYPES: Dict[str, DimensionType] = {
@@ -106,7 +107,13 @@ class DbtTimestampToDimension(DbtMappingRule):
 
 
 class DbtFiltersToDimensions(DbtMappingRule):
-    """Rule for mapping dbt metric filters to data source dimensions"""
+    """Rule for mapping dbt metric filters to data source dimensions
+
+    To get the dimensions from a dbt metric's filters we:
+    1. build each filter into an SQL clause
+    2. parse the clause with MetricFlow's WhereClauseConstraint's parser
+    3. use built WhereClauseConstraint's linkable names to make dimensions
+    """
 
     @staticmethod
     def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa D
@@ -118,36 +125,23 @@ class DbtFiltersToDimensions(DbtMappingRule):
                     assert_metric_model_name(metric=metric)
                     filters: List[MetricFilter] = metric.filters
                     for filter in filters:
-                        # try to build dimension from filter.field
-                        field_dimension = dimension_for_dimension_in_columns(
-                            dimension_name=filter.field,
-                            columns=metric.model.columns,
-                        )
-                        if field_dimension is not None:
-                            objects.dimensions[metric.model.name][field_dimension.name] = field_dimension.dict()
-                        else:
-                            issues.append(
-                                ValidationError(
-                                    message=f"Filter field `{filter.field}` was not found in the dbt model's columns",
-                                    extra_detail=f"columns: {','.join([column.name for column in metric.model.columns])}",
+                        # build the MetricFlow where clause for the filter
+                        where_clause = f"{filter.field} {filter.operator} {filter.value}"
+                        mf_where_clause_obj = WhereClauseConstraint.parse(s=where_clause)
+                        for linkable_name in mf_where_clause_obj.linkable_names:
+                            # Attempt to build a dimension for the linkable name
+                            found_dimension = dimension_for_dimension_in_columns(
+                                dimension_name=linkable_name, columns=metric.model.columns
+                            )
+                            if found_dimension is not None:
+                                objects.dimensions[metric.model.name][found_dimension.name] = found_dimension.dict()
+                            else:
+                                issues.append(
+                                    ValidationError(
+                                        message=f"A filter on metric `{metric.name}` referenced a dimension {linkable_name} which was not found in the metric's model's columns",
+                                        extra_detail=f"filter: {filter}\ncolumns: {','.join([column.name for column in metric.model.columns])}",
+                                    )
                                 )
-                            )
-
-                        # try to build a dimension from filter.value
-                        # A `filter.value` can be a dimension, but doesn't have to be. If a
-                        # `filter.value` starts with a single quote, it's either a string or a
-                        # timestamp. Which then means a `filter.value` not beginning with a
-                        # single quote are either numbers, booleans, database functions, or a
-                        # column/dimension. Thus if a `filter.value` doesn't begin with a single
-                        # quote and matches a column name on the model, it's likely a dimension.
-                        # But it's not a match for a column on the model, it's likely a number,
-                        # boolean, function, etc and thus not a issue.
-                        if not filter.value.startswith("'"):
-                            value_dimension = dimension_for_dimension_in_columns(
-                                dimension_name=filter.value, columns=metric.model.columns
-                            )
-                            if value_dimension is not None:
-                                objects.dimensions[metric.model.name][value_dimension.name] = value_dimension.dict()
 
                 except Exception as e:
                     issues.append(

@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Any, Dict, Tuple
 
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode
 from metricflow.model.dbt_converter import DbtConverter
@@ -83,28 +83,37 @@ def test_dbt_timestamp_to_dimension_missing_timestamp_issue(dbt_metrics: Tuple[M
     ), f"DbtTimestampToDimension didn't raise blocking issues when it should have: {issues.to_pretty_json()}"
 
 
-def test_dbt_filters_to_dimensions(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
+def test_dbt_filters_to_dimensions(  # type: ignore[misc]  # noqa: D
+    num_domesticated_cats_metric: Dict[str, Any],
+    num_cats_with_max_age_close_to_average_age_metric: Dict[str, Any],
+) -> None:
     objects = MappedObjects()
-    issues = DbtFiltersToDimensions().run(dbt_metrics=dbt_metrics, objects=objects)
+    simple_filter_metric = MetricNode(json_data=num_domesticated_cats_metric)
+    issues = DbtFiltersToDimensions().run(dbt_metrics=(simple_filter_metric,), objects=objects)
     assert (
         not issues.has_blocking_issues
     ), f"DbtFiltersToDimension raised blocking issues when it shouldn't have: {issues.to_pretty_json()}"
-    for dbt_metric in dbt_metrics:
-        metric_type = get_and_assert_calc_method_mapping(dbt_metric=dbt_metric)
-        if metric_type != MetricType.DERIVED and dbt_metric.filters:
-            # as many dimensions should be created as their are filters
-            assert len(objects.dimensions[dbt_metric.model.name].keys()) == len(
-                dbt_metric.filters
-            ), f"DbtFiltersToDimensions should have created as many dimensions as filters. We expected {len(dbt_metric.filters)}, but {len(objects.dimensions[dbt_metric.model.name].keys())} were created"
+    assert len(objects.dimensions[simple_filter_metric.model.name].keys()) == 1
 
-
-def test_dbt_filters_to_dimensions_no_filters_okay(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
     objects = MappedObjects()
-    dbt_metrics[0].filters = None
-    issues = DbtFiltersToDimensions().run(dbt_metrics=dbt_metrics, objects=objects)
+    complex_filter_metric = MetricNode(json_data=num_cats_with_max_age_close_to_average_age_metric)
+    issues = DbtFiltersToDimensions().run(dbt_metrics=(complex_filter_metric,), objects=objects)
+    assert (
+        not issues.has_blocking_issues
+    ), f"DbtFiltersToDimension raised blocking issues when it shouldn't have: {issues.to_pretty_json()}"
+    assert len(objects.dimensions[complex_filter_metric.model.name].keys()) == 2
+
+
+def test_dbt_filters_to_dimensions_no_filters_okay(  # type: ignore[misc]  # noqa: D
+    num_domesticated_cats_metric: Dict[str, Any]
+) -> None:
+    objects = MappedObjects()
+    none_filter_metric = MetricNode(json_data=num_domesticated_cats_metric)
+    none_filter_metric.filters = None
+    issues = DbtFiltersToDimensions().run(dbt_metrics=(none_filter_metric,), objects=objects)
     assert (
         not issues.has_blocking_issues
     ), f"DbtFiltersToDimension raised blocking issues when it shouldn't have: {issues.to_pretty_json()}"
     assert (
-        objects.dimensions.get(dbt_metrics[0].model.name) is None
-    ), f"No filters should have been created, but {len(objects.dimensions[dbt_metrics[0].model.name].keys())} were created"
+        objects.dimensions.get(none_filter_metric.model.name) is None
+    ), f"No filters should have been created, but {len(objects.dimensions[none_filter_metric.model.name].keys())} were created"
