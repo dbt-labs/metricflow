@@ -279,7 +279,6 @@ def test_get_joinable_data_sources(multi_hop_join_semantic_model: SemanticModel)
     join_validator = DataSourceJoinValidator(data_source_semantics=multi_hop_join_semantic_model.data_source_semantics)
 
     # Single-hop
-    print("\n\nsingle hop:")
     joinable_data_sources = join_validator.get_joinable_data_sources(left_data_source_reference=data_source_reference)
     assert set(joinable_data_sources.keys()) == {"bridge_table"}
     assert joinable_data_sources["bridge_table"] == DataSourceLink(
@@ -296,7 +295,6 @@ def test_get_joinable_data_sources(multi_hop_join_semantic_model: SemanticModel)
     )
 
     # 2-hop
-    print("\n\nmulti hop:")
     joinable_data_sources = join_validator.get_joinable_data_sources(
         left_data_source_reference=data_source_reference, include_multi_hop=True
     )
@@ -317,7 +315,7 @@ def test_get_joinable_data_sources(multi_hop_join_semantic_model: SemanticModel)
         left_data_source_reference=DataSourceReference(data_source_name="account_month_txns"),
         join_path=[
             DataSourceIdentifierJoin(
-                right_data_source_reference=DataSourceReference(data_source_name=""),  # ??
+                right_data_source_reference=DataSourceReference(data_source_name="bridge_table"),
                 identifier_reference=IdentifierReference(element_name="account_id"),
                 join_type=DataSourceIdentifierJoinType(
                     left_identifier_type=IdentifierType.PRIMARY, right_identifier_type=IdentifierType.PRIMARY
@@ -336,7 +334,7 @@ def test_get_joinable_data_sources(multi_hop_join_semantic_model: SemanticModel)
         left_data_source_reference=DataSourceReference(data_source_name="account_month_txns"),
         join_path=[
             DataSourceIdentifierJoin(
-                right_data_source_reference=DataSourceReference(data_source_name=""),  # ??
+                right_data_source_reference=DataSourceReference(data_source_name="bridge_table"),
                 identifier_reference=IdentifierReference(element_name="account_id"),
                 join_type=DataSourceIdentifierJoinType(
                     left_identifier_type=IdentifierType.PRIMARY, right_identifier_type=IdentifierType.PRIMARY
