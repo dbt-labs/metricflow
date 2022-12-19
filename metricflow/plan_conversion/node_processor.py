@@ -12,8 +12,7 @@ from metricflow.dataflow.dataflow_plan import (
     FilterElementsNode,
     JoinDescription,
 )
-from metricflow.model.semantics.metric_semantics import MAX_JOIN_HOPS
-from metricflow.model.semantics.join_validator import DataSourceJoinValidator
+from metricflow.model.semantics.join_validator import DataSourceJoinValidator, MAX_JOIN_HOPS
 from metricflow.object_utils import pformat_big_objects
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.protocols.semantics import DataSourceSemanticsAccessor

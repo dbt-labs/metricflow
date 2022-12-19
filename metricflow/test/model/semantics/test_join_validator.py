@@ -6,7 +6,7 @@ from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.semantics.join_validator import (
     DataSourceIdentifierJoinType,
     DataSourceJoinValidator,
-    DataSourceJoin,
+    DataSourceLink,
     DataSourceIdentifierJoin,
 )
 from metricflow.object_utils import assert_values_exhausted
@@ -279,13 +279,14 @@ def test_get_joinable_data_sources(multi_hop_join_semantic_model: SemanticModel)
     join_validator = DataSourceJoinValidator(data_source_semantics=multi_hop_join_semantic_model.data_source_semantics)
 
     # Single-hop
+    print("\n\nsingle hop:")
     joinable_data_sources = join_validator.get_joinable_data_sources(left_data_source_reference=data_source_reference)
     assert set(joinable_data_sources.keys()) == {"bridge_table"}
-    assert joinable_data_sources["bridge_table"] == DataSourceJoin(
+    assert joinable_data_sources["bridge_table"] == DataSourceLink(
         left_data_source_reference=DataSourceReference(data_source_name="account_month_txns"),
-        right_data_source_reference=DataSourceReference(data_source_name="bridge_table"),
-        identifier_joins=[
+        join_path=[
             DataSourceIdentifierJoin(
+                right_data_source_reference=DataSourceReference(data_source_name="bridge_table"),
                 identifier_reference=IdentifierReference(element_name="account_id"),
                 join_type=DataSourceIdentifierJoinType(
                     left_identifier_type=IdentifierType.PRIMARY, right_identifier_type=IdentifierType.PRIMARY
@@ -295,15 +296,16 @@ def test_get_joinable_data_sources(multi_hop_join_semantic_model: SemanticModel)
     )
 
     # 2-hop
+    print("\n\nmulti hop:")
     joinable_data_sources = join_validator.get_joinable_data_sources(
         left_data_source_reference=data_source_reference, include_multi_hop=True
     )
     assert set(joinable_data_sources.keys()) == {"bridge_table", "customer_other_data", "customer_table"}
-    assert joinable_data_sources["bridge_table"] == DataSourceJoin(
+    assert joinable_data_sources["bridge_table"] == DataSourceLink(
         left_data_source_reference=DataSourceReference(data_source_name="account_month_txns"),
-        right_data_source_reference=DataSourceReference(data_source_name="bridge_table"),
-        identifier_joins=[
+        join_path=[
             DataSourceIdentifierJoin(
+                right_data_source_reference=DataSourceReference(data_source_name="bridge_table"),
                 identifier_reference=IdentifierReference(element_name="account_id"),
                 join_type=DataSourceIdentifierJoinType(
                     left_identifier_type=IdentifierType.PRIMARY, right_identifier_type=IdentifierType.PRIMARY
@@ -311,17 +313,18 @@ def test_get_joinable_data_sources(multi_hop_join_semantic_model: SemanticModel)
             )
         ],
     )
-    assert joinable_data_sources["customer_other_data"] == DataSourceJoin(
+    assert joinable_data_sources["customer_other_data"] == DataSourceLink(
         left_data_source_reference=DataSourceReference(data_source_name="account_month_txns"),
-        right_data_source_reference=DataSourceReference(data_source_name="customer_other_data"),
-        identifier_joins=[
+        join_path=[
             DataSourceIdentifierJoin(
+                right_data_source_reference=DataSourceReference(data_source_name=""),  # ??
                 identifier_reference=IdentifierReference(element_name="account_id"),
                 join_type=DataSourceIdentifierJoinType(
                     left_identifier_type=IdentifierType.PRIMARY, right_identifier_type=IdentifierType.PRIMARY
                 ),
             ),
             DataSourceIdentifierJoin(
+                right_data_source_reference=DataSourceReference(data_source_name="customer_other_data"),
                 identifier_reference=IdentifierReference(element_name="customer_id"),
                 join_type=DataSourceIdentifierJoinType(
                     left_identifier_type=IdentifierType.FOREIGN, right_identifier_type=IdentifierType.PRIMARY
@@ -329,17 +332,18 @@ def test_get_joinable_data_sources(multi_hop_join_semantic_model: SemanticModel)
             ),
         ],
     )
-    assert joinable_data_sources["customer_table"] == DataSourceJoin(
+    assert joinable_data_sources["customer_table"] == DataSourceLink(
         left_data_source_reference=DataSourceReference(data_source_name="account_month_txns"),
-        right_data_source_reference=DataSourceReference(data_source_name="customer_table"),
-        identifier_joins=[
+        join_path=[
             DataSourceIdentifierJoin(
+                right_data_source_reference=DataSourceReference(data_source_name=""),  # ??
                 identifier_reference=IdentifierReference(element_name="account_id"),
                 join_type=DataSourceIdentifierJoinType(
                     left_identifier_type=IdentifierType.PRIMARY, right_identifier_type=IdentifierType.PRIMARY
                 ),
             ),
             DataSourceIdentifierJoin(
+                right_data_source_reference=DataSourceReference(data_source_name="customer_table"),
                 identifier_reference=IdentifierReference(element_name="customer_id"),
                 join_type=DataSourceIdentifierJoinType(
                     left_identifier_type=IdentifierType.FOREIGN, right_identifier_type=IdentifierType.PRIMARY
