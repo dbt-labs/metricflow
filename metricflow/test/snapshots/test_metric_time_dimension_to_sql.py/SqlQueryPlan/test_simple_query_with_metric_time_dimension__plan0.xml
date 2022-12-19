@@ -4,16 +4,16 @@
         <!-- node_id = ss_15 -->
         <!-- col0 =                                                                            -->
         <!--   {'class': 'SqlSelectColumn',                                                    -->
-        <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_2, sql_function=COALESCE),  -->
+        <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_4, sql_function=COALESCE),  -->
         <!--    'column_alias': 'metric_time'}                                                 -->
-        <!-- col1 =                                                    -->
-        <!--   {'class': 'SqlSelectColumn',                            -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_334),  -->
-        <!--    'column_alias': 'bookings'}                            -->
-        <!-- col2 =                                                    -->
-        <!--   {'class': 'SqlSelectColumn',                            -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_335),  -->
-        <!--    'column_alias': 'booking_payments'}                    -->
+        <!-- col1 =                                                                       -->
+        <!--   {'class': 'SqlSelectColumn',                                               -->
+        <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_2, sql_function=MAX),  -->
+        <!--    'column_alias': 'bookings'}                                               -->
+        <!-- col2 =                                                                       -->
+        <!--   {'class': 'SqlSelectColumn',                                               -->
+        <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_3, sql_function=MAX),  -->
+        <!--    'column_alias': 'booking_payments'}                                       -->
         <!-- from_source = SqlSelectStatementNode(node_id=ss_10) -->
         <!-- join_0 =                                                    -->
         <!--   {'class': 'SqlJoinDescription',                           -->
@@ -21,6 +21,10 @@
         <!--    'right_source_alias': 'subq_9',                          -->
         <!--    'join_type': SqlJoinType.FULL_OUTER,                     -->
         <!--    'on_condition': SqlComparisonExpression(node_id=cmp_0)}  -->
+        <!-- group_by0 =                                                                       -->
+        <!--   {'class': 'SqlSelectColumn',                                                    -->
+        <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_4, sql_function=COALESCE),  -->
+        <!--    'column_alias': 'metric_time'}                                                 -->
         <!-- where = None -->
         <SqlSelectStatementNode>
             <!-- description = Compute Metrics via Expressions -->

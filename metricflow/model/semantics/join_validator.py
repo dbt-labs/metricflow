@@ -38,13 +38,19 @@ class DataSourceJoin:
 class DataSourceJoinValidator:
     """Checks to see if a join between two data sources should be allowed."""
 
-    # Valid joins are the non-fanout joines.
+    # Valid joins are the non-fanout joins.
     _VALID_IDENTIFIER_JOINS = (
+        DataSourceIdentifierJoinType(
+            left_identifier_type=IdentifierType.PRIMARY, right_identifier_type=IdentifierType.NATURAL
+        ),
         DataSourceIdentifierJoinType(
             left_identifier_type=IdentifierType.PRIMARY, right_identifier_type=IdentifierType.PRIMARY
         ),
         DataSourceIdentifierJoinType(
             left_identifier_type=IdentifierType.PRIMARY, right_identifier_type=IdentifierType.UNIQUE
+        ),
+        DataSourceIdentifierJoinType(
+            left_identifier_type=IdentifierType.UNIQUE, right_identifier_type=IdentifierType.NATURAL
         ),
         DataSourceIdentifierJoinType(
             left_identifier_type=IdentifierType.UNIQUE, right_identifier_type=IdentifierType.PRIMARY
@@ -53,10 +59,19 @@ class DataSourceJoinValidator:
             left_identifier_type=IdentifierType.UNIQUE, right_identifier_type=IdentifierType.UNIQUE
         ),
         DataSourceIdentifierJoinType(
+            left_identifier_type=IdentifierType.FOREIGN, right_identifier_type=IdentifierType.NATURAL
+        ),
+        DataSourceIdentifierJoinType(
             left_identifier_type=IdentifierType.FOREIGN, right_identifier_type=IdentifierType.PRIMARY
         ),
         DataSourceIdentifierJoinType(
             left_identifier_type=IdentifierType.FOREIGN, right_identifier_type=IdentifierType.UNIQUE
+        ),
+        DataSourceIdentifierJoinType(
+            left_identifier_type=IdentifierType.NATURAL, right_identifier_type=IdentifierType.PRIMARY
+        ),
+        DataSourceIdentifierJoinType(
+            left_identifier_type=IdentifierType.NATURAL, right_identifier_type=IdentifierType.UNIQUE
         ),
     )
 
@@ -69,6 +84,14 @@ class DataSourceJoinValidator:
         ),
         DataSourceIdentifierJoinType(
             left_identifier_type=IdentifierType.FOREIGN, right_identifier_type=IdentifierType.FOREIGN
+        ),
+        DataSourceIdentifierJoinType(
+            left_identifier_type=IdentifierType.NATURAL, right_identifier_type=IdentifierType.FOREIGN
+        ),
+        # Natural -> Natural joins are not allowed due to hidden fanout or missing value concerns with
+        # multiple validity windows in play
+        DataSourceIdentifierJoinType(
+            left_identifier_type=IdentifierType.NATURAL, right_identifier_type=IdentifierType.NATURAL
         ),
     )
 
@@ -183,6 +206,24 @@ class DataSourceJoinValidator:
         )
         if left_identifier is None or right_identifier is None:
             return None
+
+        left_data_source = self._data_source_semantics.get_by_reference(left_data_source_reference)
+        right_data_source = self._data_source_semantics.get_by_reference(right_data_source_reference)
+        assert left_data_source, "Type refinement. If you see this error something has refactored wrongly"
+        assert right_data_source, "Type refinement. If you see this error something has refactored wrongly"
+
+        if left_data_source.has_validity_dimensions and right_data_source.has_validity_dimensions:
+            # We cannot join two data sources with validity dimensions due to concerns with unexpected fanout
+            # due to the key structure of these data sources. Applying multi-stage validity window filters can
+            # also lead to unexpected removal of interim join keys. Note this will need to be updated if we enable
+            # measures in such data sources, since those will need to be converted to a different type of data source
+            # to support measure computation.
+            return None
+
+        if right_identifier.type is IdentifierType.NATURAL:
+            if not right_data_source.has_validity_dimensions:
+                # There is no way to refine this to a single row per key, so we cannot support this join
+                return None
 
         join_type = DataSourceIdentifierJoinType(left_identifier.type, right_identifier.type)
 

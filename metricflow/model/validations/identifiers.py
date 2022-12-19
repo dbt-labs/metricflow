@@ -96,6 +96,61 @@ class IdentifierConfigRule(ModelValidationRule):
         return issues
 
 
+class NaturalIdentifierConfigurationRule(ModelValidationRule):
+    """Ensures that identifiers marked as IdentifierType.NATURAL are configured correctly"""
+
+    @staticmethod
+    @validate_safely(
+        whats_being_done=(
+            "checking that each data source has no more than one natural identifier, and that "
+            "natural identifiers are used in the appropriate contexts"
+        )
+    )
+    def _validate_data_source_natural_identifiers(data_source: DataSource) -> List[ValidationIssue]:
+        issues: List[ValidationIssue] = []
+        context = DataSourceContext(
+            file_context=FileContext.from_metadata(metadata=data_source.metadata),
+            data_source=DataSourceReference(data_source_name=data_source.name),
+        )
+
+        natural_identifier_names = set(
+            [identifier.name for identifier in data_source.identifiers if identifier.type is IdentifierType.NATURAL]
+        )
+        if len(natural_identifier_names) > 1:
+            error = ValidationError(
+                context=context,
+                message=f"Data sources can have at most one natural identifier, but data source "
+                f"`{data_source.name}` has {len(natural_identifier_names)} distinct natural identifiers set! "
+                f"{natural_identifier_names}.",
+            )
+            issues.append(error)
+        if natural_identifier_names and not [dim for dim in data_source.dimensions if dim.validity_params]:
+            error = ValidationError(
+                context=context,
+                message=f"The use of `natural` identifiers is currently supported only in conjunction with a validity "
+                f"window defined in the set of time dimensions associated with the data source. Data source "
+                f"`{data_source.name}` uses a natural identifier ({natural_identifier_names}) but does not define a "
+                f"validity window!",
+            )
+            issues.append(error)
+
+        return issues
+
+    @staticmethod
+    @validate_safely(
+        whats_being_done="checking that identifiers marked as IdentifierType.NATURAL are properly configured"
+    )
+    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:
+        """Validate identifiers marked as IdentifierType.NATURAL"""
+        issues: List[ValidationIssue] = []
+        for data_source in model.data_sources:
+            issues += NaturalIdentifierConfigurationRule._validate_data_source_natural_identifiers(
+                data_source=data_source
+            )
+
+        return issues
+
+
 class OnePrimaryIdentifierPerDataSourceRule(ModelValidationRule):
     """Ensures that each data source has only one primary identifier"""
 

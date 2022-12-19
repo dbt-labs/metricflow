@@ -1,8 +1,8 @@
 -- Combine Metrics
 SELECT
   COALESCE(subq_8.metric_time, subq_9.metric_time) AS metric_time
-  , subq_8.bookings AS bookings
-  , subq_9.booking_value AS booking_value
+  , MAX(subq_8.bookings) AS bookings
+  , MAX(subq_9.booking_value) AS booking_value
 FROM (
   -- Compute Metrics via Expressions
   SELECT
@@ -271,3 +271,5 @@ FULL OUTER JOIN (
 ) subq_9
 ON
   subq_8.metric_time = subq_9.metric_time
+GROUP BY
+  COALESCE(subq_8.metric_time, subq_9.metric_time)

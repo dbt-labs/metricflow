@@ -26,7 +26,6 @@ integration_test:
     ON b.ds <= a.ds AND b.ds > {{ render_date_sub("a", "ds", 2, TimeGranularity.MONTH) }}
     GROUP BY a.ds
     ORDER BY a.ds
-
 ---
 integration_test:
   name: windowed_cumulative_metric_with_joined_dim
@@ -53,14 +52,13 @@ integration_test:
         , u.home_state_latest as user__home_state_latest
         , m.created_at AS ds
       FROM {{ source_schema }}.fct_revenue m
-      INNER JOIN {{ source_schema }}.dim_users_latest u
+      LEFT OUTER JOIN {{ source_schema }}.dim_users_latest u
       ON m.user_id = u.user_id
       GROUP BY m.created_at, m.revenue, u.home_state_latest
     ) b
     ON b.ds <= a.ds AND b.ds > {{ render_date_sub("a", "ds", 2, TimeGranularity.MONTH) }}
     GROUP BY a.ds, user__home_state_latest
     ORDER by a.ds, user__home_state_latest
-
 ---
 integration_test:
   name: cumulative_metric_by_ds
@@ -88,7 +86,6 @@ integration_test:
     ON b.created_at <= a.ds
     GROUP BY a.ds
     ORDER by a.ds
-
 ---
 integration_test:
   name: cumulative_metric_without_ds
@@ -99,7 +96,6 @@ integration_test:
     SELECT
       SUM(revenue) AS revenue_all_time
     FROM {{ source_schema }}.fct_revenue
-
 ---
 integration_test:
   name: multiple_cumulative_metrics
@@ -155,7 +151,6 @@ integration_test:
     ) b
     ON a.ds = b.ds
     ORDER BY a.ds
-
 ---
 integration_test:
   name: windowed_cumulative_metric_by_time_dimension_with_granularity
@@ -184,7 +179,6 @@ integration_test:
     ON b.ds <= a.ds AND b.ds > {{ render_date_sub("a", "ds", 2, TimeGranularity.MONTH) }}
     GROUP BY a.ds
     ORDER BY a.ds
-
 ---
 integration_test:
   name: cumulative_metric_by_ds_and_limited_time
@@ -212,7 +206,6 @@ integration_test:
     ON b.created_at <= a.ds
     GROUP BY a.ds
     ORDER by a.ds
-
 ---
 integration_test:
   name: non_additive_cumulative_metric_by_ds
@@ -240,9 +233,6 @@ integration_test:
     ON b.ds <= a.ds AND b.ds > {{ render_date_sub("a", "ds", 2, TimeGranularity.DAY) }}
     GROUP BY a.ds
     ORDER BY a.ds
-
-
-
 ---
 integration_test:
   name: non_additive_cumulative_metric_by_ds_and_limited_time
@@ -270,7 +260,6 @@ integration_test:
     ON b.ds <= a.ds AND b.ds > {{ render_date_sub("a", "ds", 2, TimeGranularity.DAY) }}
     GROUP BY a.ds
     ORDER BY a.ds
-
 ---
 integration_test:
   name: grain_to_date_cumulative_metric
@@ -299,8 +288,6 @@ integration_test:
     ON b.ds <= a.ds AND b.ds >= {{ render_date_trunc("a.ds", TimeGranularity.MONTH) }}
     GROUP BY a.ds
     ORDER BY a.ds
-
-
 ---
 integration_test:
   name: cumulative_metric_by_ds_with_granularity

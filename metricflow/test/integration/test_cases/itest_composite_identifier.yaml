@@ -50,7 +50,7 @@ integration_test:
       , m.team_id AS user_team___team_id
       , m.user_id AS user_team___user_id
     FROM {{ source_schema }}.fct_messages m
-    JOIN {{ source_schema }}.fct_users u
+    LEFT OUTER JOIN {{ source_schema }}.fct_users u
       ON m.team_id = u.team_id
       AND m.user_id = u.id
     GROUP BY
@@ -72,7 +72,7 @@ integration_test:
       , m.team_id AS user_team___team_id
       , m.user_id AS user_team___user_id
     FROM {{ source_schema }}.fct_messages m
-    JOIN {{ source_schema }}.fct_users u
+    LEFT OUTER JOIN {{ source_schema }}.fct_users u
       ON m.team_id = u.team_id
       AND m.user_id = u.id
     GROUP BY
@@ -94,7 +94,7 @@ integration_test:
       , m.team_id AS user_team___team_id
       , m.user_id AS user_team___user_id
     FROM {{ source_schema }}.fct_messages m
-    JOIN {{ source_schema }}.fct_users u
+    LEFT OUTER JOIN {{ source_schema }}.fct_users u
       ON m.team_id = u.team_id
       AND m.user_id = u.id
     GROUP BY
@@ -113,10 +113,10 @@ integration_test:
       SUM(1) AS messages
       , fum.user_element as user_team__user_id__user_element
     FROM {{ source_schema }}.fct_messages m
-    JOIN {{ source_schema }}.fct_users fu
+    LEFT OUTER JOIN {{ source_schema }}.fct_users fu
       ON m.team_id = fu.team_id
       AND m.user_id = fu.id
-    JOIN {{ source_schema }}.fct_users_more fum
+    LEFT OUTER JOIN {{ source_schema }}.fct_users_more fum
       ON fum.id = fu.id
     GROUP BY
       fum.user_element
@@ -132,10 +132,10 @@ integration_test:
       SUM(1) AS messages
       , fum.user_element as user_team__user_composite_ident_2__user_element
     FROM {{ source_schema }}.fct_messages m
-    JOIN {{ source_schema }}.fct_users fu
+    LEFT OUTER JOIN {{ source_schema }}.fct_users fu
       ON m.team_id = fu.team_id
       AND m.user_id = fu.id
-    JOIN {{ source_schema }}.fct_users_more fum
+    LEFT OUTER JOIN {{ source_schema }}.fct_users_more fum
       ON fum.id = fu.id
     GROUP BY
       fum.user_element

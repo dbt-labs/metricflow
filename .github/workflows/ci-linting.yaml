@@ -30,7 +30,7 @@ jobs:
           path: |
             ${{ env.pythonLocation }}
             ~/.cache
-          key: ${{ env.pythonLocation }}-${{ hashFiles('.pre-commit-config.yaml') }}
+          key: ${{ env.pythonLocation }}-${{ hashFiles('.pre-commit-config.yaml') }}-ubuntu-latest-22.04
 
       - name: Install deps
         run: pip install pre-commit

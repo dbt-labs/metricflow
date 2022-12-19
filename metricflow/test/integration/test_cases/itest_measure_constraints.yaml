@@ -137,7 +137,7 @@ integration_test:
         CAST(SUM(account_balance) AS {{ double_data_type_name }}) AS total_account_balance_first_day
         , fa_west_filtered.ds
       FROM (
-        SELECT 
+        SELECT
           fa_west.ds
           , fa_west.ds AS metric_time
           , user_id AS user
@@ -163,7 +163,7 @@ integration_test:
         CAST(SUM(account_balance) AS {{ double_data_type_name }}) AS total_account_balance_first_day
         , fa_east_filtered.ds
       FROM (
-        SELECT 
+        SELECT
           fa_east.ds
           , fa_east.ds AS metric_time
           , user_id AS user

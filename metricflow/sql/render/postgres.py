@@ -4,7 +4,11 @@ from metricflow.sql.render.expr_renderer import (
     SqlExpressionRenderResult,
 )
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
-from metricflow.sql.sql_exprs import SqlTimeDeltaExpression
+from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.sql.sql_exprs import (
+    SqlGenerateUuidExpression,
+    SqlTimeDeltaExpression,
+)
 from metricflow.time.time_granularity import TimeGranularity
 
 
@@ -32,6 +36,12 @@ class PostgresSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         return SqlExpressionRenderResult(
             sql=f"{arg_rendered.sql} - MAKE_INTERVAL({granularity.value}s => {count})",
             execution_parameters=arg_rendered.execution_parameters,
+        )
+
+    def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> SqlExpressionRenderResult:  # noqa: D
+        return SqlExpressionRenderResult(
+            sql="GEN_RANDOM_UUID()",
+            execution_parameters=SqlBindParameters(),
         )
 
 

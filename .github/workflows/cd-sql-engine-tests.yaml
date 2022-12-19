@@ -27,7 +27,7 @@ jobs:
           path: |
             ${{ env.pythonLocation }}
             ~/.cache/pypoetry
-          key: ${{ env.pythonLocation }}-${{ hashFiles('metricflow/poetry.lock') }}
+          key: ${{ env.pythonLocation }}-${{ hashFiles('poetry.lock') }}-ubuntu-latest-22.04
 
       - name: Install Poetry
         run: pip install poetry
@@ -60,7 +60,7 @@ jobs:
           path: |
             ${{ env.pythonLocation }}
             ~/.cache/pypoetry
-          key: ${{ env.pythonLocation }}-${{ hashFiles('metricflow/poetry.lock') }}
+          key: ${{ env.pythonLocation }}-${{ hashFiles('poetry.lock') }}-ubuntu-latest-22.04
 
       - name: Install Poetry
         run: pip install poetry
@@ -93,7 +93,7 @@ jobs:
           path: |
             ${{ env.pythonLocation }}
             ~/.cache/pypoetry
-          key: ${{ env.pythonLocation }}-${{ hashFiles('metricflow/poetry.lock') }}
+          key: ${{ env.pythonLocation }}-${{ hashFiles('poetry.lock') }}-ubuntu-latest-22.04
 
       - name: Install Poetry
         run: pip install poetry
@@ -126,7 +126,7 @@ jobs:
           path: |
             ${{ env.pythonLocation }}
             ~/.cache/pypoetry
-          key: ${{ env.pythonLocation }}-${{ hashFiles('metricflow/poetry.lock') }}
+          key: ${{ env.pythonLocation }}-${{ hashFiles('poetry.lock') }}-ubuntu-latest-22.04
 
       - name: Install Poetry
         run: pip install poetry
@@ -174,7 +174,7 @@ jobs:
           path: |
             ${{ env.pythonLocation }}
             ~/.cache/pypoetry
-          key: ${{ env.pythonLocation }}-${{ hashFiles('metricflow/poetry.lock') }}
+          key: ${{ env.pythonLocation }}-${{ hashFiles('poetry.lock') }}-ubuntu-latest-22.04
 
       - name: Install Poetry
         run: pip install poetry

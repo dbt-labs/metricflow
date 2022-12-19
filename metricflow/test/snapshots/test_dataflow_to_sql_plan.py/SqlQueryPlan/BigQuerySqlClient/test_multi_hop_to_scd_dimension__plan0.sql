@@ -58,6 +58,7 @@ FROM (
             , subq_0.listing
             , subq_0.guest
             , subq_0.host
+            , subq_0.user
             , subq_0.is_instant
             , subq_0.bookings
             , subq_0.instant_bookings
@@ -92,6 +93,7 @@ FROM (
               , bookings_source_src_10018.listing_id AS listing
               , bookings_source_src_10018.guest_id AS guest
               , bookings_source_src_10018.host_id AS host
+              , bookings_source_src_10018.guest_id AS user
             FROM ***************************.fct_bookings bookings_source_src_10018
           ) subq_0
         ) subq_1
@@ -127,10 +129,10 @@ FROM (
           FROM (
             -- Read Elements From Data Source 'lux_listing_mapping'
             SELECT
-              lux_listing_mapping_src_10020.listing_id AS listing
-              , lux_listing_mapping_src_10020.lux_listing_id AS lux_listing
-              , lux_listing_mapping_src_10020.lux_listing_id AS listing__lux_listing
-            FROM ***************************.dim_lux_listing_id_mapping lux_listing_mapping_src_10020
+              lux_listing_mapping_src_10021.listing_id AS listing
+              , lux_listing_mapping_src_10021.lux_listing_id AS lux_listing
+              , lux_listing_mapping_src_10021.lux_listing_id AS listing__lux_listing
+            FROM ***************************.dim_lux_listing_id_mapping lux_listing_mapping_src_10021
           ) subq_3
           LEFT OUTER JOIN (
             -- Pass Only Elements:
@@ -184,30 +186,30 @@ FROM (
             FROM (
               -- Read Elements From Data Source 'lux_listings'
               SELECT
-                lux_listings_src_10021.valid_from AS window_start
-                , DATE_TRUNC(lux_listings_src_10021.valid_from, isoweek) AS window_start__week
-                , DATE_TRUNC(lux_listings_src_10021.valid_from, month) AS window_start__month
-                , DATE_TRUNC(lux_listings_src_10021.valid_from, quarter) AS window_start__quarter
-                , DATE_TRUNC(lux_listings_src_10021.valid_from, isoyear) AS window_start__year
-                , lux_listings_src_10021.valid_to AS window_end
-                , DATE_TRUNC(lux_listings_src_10021.valid_to, isoweek) AS window_end__week
-                , DATE_TRUNC(lux_listings_src_10021.valid_to, month) AS window_end__month
-                , DATE_TRUNC(lux_listings_src_10021.valid_to, quarter) AS window_end__quarter
-                , DATE_TRUNC(lux_listings_src_10021.valid_to, isoyear) AS window_end__year
-                , lux_listings_src_10021.is_confirmed_lux
-                , lux_listings_src_10021.valid_from AS lux_listing__window_start
-                , DATE_TRUNC(lux_listings_src_10021.valid_from, isoweek) AS lux_listing__window_start__week
-                , DATE_TRUNC(lux_listings_src_10021.valid_from, month) AS lux_listing__window_start__month
-                , DATE_TRUNC(lux_listings_src_10021.valid_from, quarter) AS lux_listing__window_start__quarter
-                , DATE_TRUNC(lux_listings_src_10021.valid_from, isoyear) AS lux_listing__window_start__year
-                , lux_listings_src_10021.valid_to AS lux_listing__window_end
-                , DATE_TRUNC(lux_listings_src_10021.valid_to, isoweek) AS lux_listing__window_end__week
-                , DATE_TRUNC(lux_listings_src_10021.valid_to, month) AS lux_listing__window_end__month
-                , DATE_TRUNC(lux_listings_src_10021.valid_to, quarter) AS lux_listing__window_end__quarter
-                , DATE_TRUNC(lux_listings_src_10021.valid_to, isoyear) AS lux_listing__window_end__year
-                , lux_listings_src_10021.is_confirmed_lux AS lux_listing__is_confirmed_lux
-                , lux_listings_src_10021.lux_listing_id AS lux_listing
-              FROM ***************************.dim_lux_listings lux_listings_src_10021
+                lux_listings_src_10022.valid_from AS window_start
+                , DATE_TRUNC(lux_listings_src_10022.valid_from, isoweek) AS window_start__week
+                , DATE_TRUNC(lux_listings_src_10022.valid_from, month) AS window_start__month
+                , DATE_TRUNC(lux_listings_src_10022.valid_from, quarter) AS window_start__quarter
+                , DATE_TRUNC(lux_listings_src_10022.valid_from, isoyear) AS window_start__year
+                , lux_listings_src_10022.valid_to AS window_end
+                , DATE_TRUNC(lux_listings_src_10022.valid_to, isoweek) AS window_end__week
+                , DATE_TRUNC(lux_listings_src_10022.valid_to, month) AS window_end__month
+                , DATE_TRUNC(lux_listings_src_10022.valid_to, quarter) AS window_end__quarter
+                , DATE_TRUNC(lux_listings_src_10022.valid_to, isoyear) AS window_end__year
+                , lux_listings_src_10022.is_confirmed_lux
+                , lux_listings_src_10022.valid_from AS lux_listing__window_start
+                , DATE_TRUNC(lux_listings_src_10022.valid_from, isoweek) AS lux_listing__window_start__week
+                , DATE_TRUNC(lux_listings_src_10022.valid_from, month) AS lux_listing__window_start__month
+                , DATE_TRUNC(lux_listings_src_10022.valid_from, quarter) AS lux_listing__window_start__quarter
+                , DATE_TRUNC(lux_listings_src_10022.valid_from, isoyear) AS lux_listing__window_start__year
+                , lux_listings_src_10022.valid_to AS lux_listing__window_end
+                , DATE_TRUNC(lux_listings_src_10022.valid_to, isoweek) AS lux_listing__window_end__week
+                , DATE_TRUNC(lux_listings_src_10022.valid_to, month) AS lux_listing__window_end__month
+                , DATE_TRUNC(lux_listings_src_10022.valid_to, quarter) AS lux_listing__window_end__quarter
+                , DATE_TRUNC(lux_listings_src_10022.valid_to, isoyear) AS lux_listing__window_end__year
+                , lux_listings_src_10022.is_confirmed_lux AS lux_listing__is_confirmed_lux
+                , lux_listings_src_10022.lux_listing_id AS lux_listing
+              FROM ***************************.dim_lux_listings lux_listings_src_10022
             ) subq_4
           ) subq_5
           ON

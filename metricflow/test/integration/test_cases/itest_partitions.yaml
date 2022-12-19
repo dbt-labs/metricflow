@@ -26,7 +26,7 @@ integration_test:
       SUM(1) AS identity_verifications
       , dim.home_state AS user__home_state
     FROM {{ source_schema }}.fct_id_verifications fct
-    JOIN {{ source_schema }}.dim_users dim
+    LEFT OUTER JOIN {{ source_schema }}.dim_users dim
       ON fct.user_id = dim.user_id
         AND fct.ds_partitioned = dim.ds_partitioned
     GROUP BY
@@ -44,7 +44,7 @@ integration_test:
       , fct.ds_partitioned AS ds_partitioned
       , dim.home_state AS user__home_state
     FROM {{ source_schema }}.fct_id_verifications fct
-    JOIN {{ source_schema }}.dim_users dim
+    LEFT OUTER JOIN {{ source_schema }}.dim_users dim
       ON fct.user_id = dim.user_id
         AND fct.ds_partitioned = dim.ds_partitioned
     GROUP BY
@@ -62,7 +62,7 @@ integration_test:
       SUM(1) AS identity_verifications
       , dim.home_state_latest AS user__home_state_latest
     FROM {{ source_schema }}.fct_id_verifications fct
-    JOIN {{ source_schema }}.dim_users_latest dim
+    LEFT OUTER JOIN {{ source_schema }}.dim_users_latest dim
       ON fct.user_id = dim.user_id
     GROUP BY
       dim.home_state_latest
@@ -80,7 +80,7 @@ integration_test:
       , fct.ds_partitioned AS ds_partitioned
       , dim.home_state AS user__home_state
     FROM {{ source_schema }}.fct_id_verifications fct
-    JOIN {{ source_schema }}.dim_users dim
+    LEFT OUTER JOIN {{ source_schema }}.dim_users dim
       ON fct.user_id = dim.user_id
         AND fct.ds_partitioned = dim.ds_partitioned
         WHERE {{ render_time_constraint("fct.ds_partitioned", "2020-01-01", "2020-01-01") }}

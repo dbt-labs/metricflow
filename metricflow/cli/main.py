@@ -24,14 +24,15 @@ from metricflow.cli.cli_context import CLIContext
 import metricflow.cli.custom_click_types as click_custom
 from metricflow.cli.tutorial import create_sample_data, gen_sample_model_configs, remove_sample_tables
 from metricflow.cli.utils import (
+    exception_handler,
+    generate_duckdb_demo_keys,
+    get_data_warehouse_config_link,
+    query_options,
+    start_end_time_options,
     MF_BIGQUERY_KEYS,
     MF_CONFIG_KEYS,
     MF_REDSHIFT_KEYS,
     MF_SNOWFLAKE_KEYS,
-    exception_handler,
-    query_options,
-    start_end_time_options,
-    generate_duckdb_demo_keys,
     MF_POSTGRESQL_KEYS,
     MF_DATABRICKS_KEYS,
 )
@@ -175,6 +176,7 @@ def setup(cfg: CLIContext, restart: bool) -> None:
         textwrap.dedent(
             f"""\
             💻 {template_description}
+            If you are new to MetricFlow, we recommend you to run through our tutorial with `mf tutorial`\n
             Next steps:
               1. Review and fill out relevant fields.
               2. Run `mf health-checks` to validate the data warehouse connection.
@@ -292,6 +294,13 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
     help="In the query output, show the query that was executed against the data warehouse",
 )
 @click.option(
+    "--show-dataflow-plan",
+    is_flag=True,
+    required=False,
+    default=False,
+    help="Display dataflow plan in explain output",
+)
+@click.option(
     "--display-plans",
     is_flag=True,
     required=False,
@@ -324,6 +333,7 @@ def query(
     as_table: Optional[str] = None,
     csv: Optional[click.utils.LazyFile] = None,
     explain: bool = False,
+    show_dataflow_plan: bool = False,
     display_plans: bool = False,
     decimals: int = DEFAULT_RESULT_DECIMAL_PLACES,
     show_sql_descriptions: bool = False,
@@ -361,22 +371,27 @@ def query(
             if not show_sql_descriptions
             else explain_result.rendered_sql.sql_query
         )
-        click.echo("🔎 Generated Dataflow Plan + SQL (remove --explain to see data):")
-        click.echo(
-            textwrap.indent(
-                jinja2.Template(
-                    textwrap.dedent(
-                        """\
-                        Metric Dataflow Plan:
-                            {{ plan_text | indent(4) }}
-                        """
-                    ),
-                    undefined=jinja2.StrictUndefined,
-                ).render(plan_text=dataflow_plan_as_text(explain_result.dataflow_plan)),
-                prefix="-- ",
+        if show_dataflow_plan:
+            click.echo("🔎 Generated Dataflow Plan + SQL (remove --explain to see data):")
+            click.echo(
+                textwrap.indent(
+                    jinja2.Template(
+                        textwrap.dedent(
+                            """\
+                            Metric Dataflow Plan:
+                                {{ plan_text | indent(4) }}
+                            """
+                        ),
+                        undefined=jinja2.StrictUndefined,
+                    ).render(plan_text=dataflow_plan_as_text(explain_result.dataflow_plan)),
+                    prefix="-- ",
+                )
             )
-        )
-        click.echo("")
+            click.echo("")
+        else:
+            click.echo(
+                "🔎 SQL (remove --explain to see data or add --show-dataflow-plan to see the generated dataflow plan):"
+            )
         click.echo(sql)
         if display_plans:
             svg_path = display_dag_as_svg(explain_result.dataflow_plan, cfg.config.dir_path)
@@ -480,6 +495,7 @@ def list_dimensions(cfg: CLIContext, metric_names: List[str]) -> None:
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def health_checks(cfg: CLIContext) -> None:
     """Performs a health check against the DW provided in the configs."""
+    click.echo(f"For specifics on the health-checks, please visit {get_data_warehouse_config_link(cfg.config)}")
     spinner = Halo(
         text="🏥 Running health checks against your data warehouse... (This should not take longer than 30s for a successful connection)",
         spinner="dots",

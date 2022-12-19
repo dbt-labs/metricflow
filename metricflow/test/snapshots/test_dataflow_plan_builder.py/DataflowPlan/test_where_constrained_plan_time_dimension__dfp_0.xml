@@ -38,7 +38,7 @@
                         <!--                                                    'identifier_links': (),                      -->
                         <!--                                                    'time_granularity': TimeGranularity.DAY},),  -->
                         <!--                          'identifier_specs': ()},                                               -->
-                        <!--    'execution_parameters': {'class': 'SqlBindParameters', 'param_dict': {}}}                    -->
+                        <!--    'execution_parameters': {'class': 'SqlBindParameters', 'param_items': ()}}                   -->
                         <FilterElementsNode>
                             <!-- description =                                  -->
                             <!--   Pass Only Elements:                          -->

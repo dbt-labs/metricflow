@@ -48,6 +48,8 @@ def create_simple_model_tables(mf_test_session_state: MetricFlowTestSessionState
         ("u0004114", "u0003141", "l2718281", 241.14, True, "2020-01-02", "2020-01-02", "2020-01-03", None),
         ("u0004114", "u0003141", "l3141592", 799.99, False, "2020-01-02", "2020-01-02", "2020-01-03", None),
         ("u0005432", "u0003452", "l2718281", 319.85, True, "2020-01-02", "2020-01-02", "2020-01-03", "u0003452"),
+        ("u0004114", "u1004114", "l9658588-incomplete", 0.0, False, "2020-01-02", "2020-01-02", "2020-01-03", None),
+        ("u0004114", "u1004114", "l8912456-incomplete", 0.0, False, "2020-01-02", "2020-01-02", "2020-01-03", None),
         ("u0003452", "u0005432", "l3141592", 519.89, False, "2020-01-02", "2020-01-02", "2020-01-03", "u0003141"),
         ("u0003452", "u0004114", "l5948301", 332.23, False, "2020-01-02", "2020-01-02", "2020-01-03", "u0003141"),
         ("u1003452", "u1004114", "no_such_listing", 0.0, False, "2020-01-02", "2020-01-02", "2020-01-03", None),
@@ -110,6 +112,8 @@ def create_simple_model_tables(mf_test_session_state: MetricFlowTestSessionState
                 ("u0004114", "l2718281", "2020-01-02", "2020-01-02"),
                 ("u0004114", "l3141592", "2020-01-02", "2020-01-02"),
                 ("u1612112", "l2718281", "2020-01-02", "2020-01-02"),
+                ("u0004114", "", "2020-01-02", "2020-01-02"),
+                ("u0004114", "l7891283-incomplete", "2020-01-02", "2020-01-02"),
             ],
         ),
     )
@@ -125,6 +129,9 @@ def create_simple_model_tables(mf_test_session_state: MetricFlowTestSessionState
                 ("l3141592", "us", 3, True, "u0004114", "2020-01-01"),
                 ("l5948301", "us", 5, True, "u0004114", "2020-01-02"),
                 ("l2718281", cote_divoire, 4, False, "u0005432", "2020-01-02"),
+                ("l9658588-incomplete", "us", None, None, "u1004114", "2020-01-02"),
+                ("l8912456-incomplete", None, None, None, "u1004114", "2020-01-02"),
+                ("l7891283-incomplete", "ca", None, False, "u1004114", "2020-01-02"),
             ],
         ),
     )
@@ -145,6 +152,10 @@ def create_simple_model_tables(mf_test_session_state: MetricFlowTestSessionState
                 # This cote_divoire property changed hands to a person from Maryland who considers it not lux
                 ("l2718281", cote_divoire, 4, False, "u0003154", "2020-01-02", None),
                 ("l5948301", "us", 5, True, "u0004114", "2020-01-02", None),
+                ("l9658588-incomplete", None, None, None, "u1004114", "2020-01-01", "2020-01-02"),
+                ("l9658588-incomplete", "us", None, None, "u1004114", "2020-01-02", None),
+                ("l8912456-incomplete", None, None, None, "u1004114", "2020-01-02", None),
+                ("l7891283-incomplete", "ca", None, False, "u1004114", "2020-01-02", None),
             ],
         ),
     )
