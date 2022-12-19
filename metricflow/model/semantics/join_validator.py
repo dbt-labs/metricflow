@@ -25,7 +25,7 @@ class DataSourceIdentifierJoin:
     """How to join one data source onto another, using a specific identifer and join type."""
 
     right_data_source_reference: DataSourceReference
-    identifier_reference: IdentifierReference  # do we need both identifier names? with the prefix? or is the local name enough?
+    identifier_reference: IdentifierReference
     join_type: DataSourceIdentifierJoinType
 
 
@@ -103,7 +103,7 @@ class DataSourceJoinValidator:
     def get_joinable_data_sources(
         self, left_data_source_reference: DataSourceReference, include_multi_hop: bool = False
     ) -> Dict[str, DataSourceLink]:
-        """List all data sources that can join to given data source, and the identifiers to join them (max 2-hop joins)."""
+        """List all data sources that can join to given data source, and the identifiers to join them."""
         data_source_joins: Dict[str, DataSourceLink] = {}
         self._get_remaining_hops_of_joinable_data_sources(
             left_data_source_reference=left_data_source_reference,
@@ -126,8 +126,9 @@ class DataSourceJoinValidator:
             )
             assert parent_data_source is not None
 
-            # Get all joinable data sources in this hop before recursing
-            join_paths_to_visit: List[List[DataSourceIdentifierJoin]] = []
+            # We'll get all joinable data sources in this hop before recursing to ensure we find the most
+            # efficient path to each data source.
+            join_paths_to_visit_next: List[List[DataSourceIdentifierJoin]] = []
             for identifier in parent_data_source.identifiers:
                 identifier_reference = IdentifierReference(element_name=identifier.name)
                 identifier_data_sources = self._data_source_semantics.get_data_sources_for_identifier(
@@ -159,7 +160,7 @@ class DataSourceJoinValidator:
                             join_type=valid_join_type,
                         )
                     ]
-                    join_paths_to_visit.append(join_path_for_data_source)
+                    join_paths_to_visit_next.append(join_path_for_data_source)
                     known_data_source_joins[right_data_source_reference.data_source_name] = DataSourceLink(
                         left_data_source_reference=left_data_source_reference, join_path=join_path_for_data_source
                     )
@@ -169,7 +170,7 @@ class DataSourceJoinValidator:
             return
 
         right_data_sources_to_join_paths: Dict[DataSourceReference, List[DataSourceIdentifierJoin]] = {}
-        for join_path in join_paths_to_visit:
+        for join_path in join_paths_to_visit_next:
             assert len(join_path) > 0
             right_data_sources_to_join_paths[join_path[-1].right_data_source_reference] = join_path
 
