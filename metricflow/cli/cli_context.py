@@ -1,9 +1,17 @@
+from dataclasses import dataclass
 import logging
 from logging.handlers import TimedRotatingFileHandler
 from typing import Dict, Optional
 
 from metricflow.configuration.config_handler import ConfigHandler
-from metricflow.configuration.constants import CONFIG_DBT_PROFILE, CONFIG_DBT_REPO, CONFIG_DBT_TARGET, CONFIG_DWH_SCHEMA
+from metricflow.configuration.constants import (
+    CONFIG_DBT_CLOUD_JOB_ID,
+    CONFIG_DBT_CLOUD_SERVICE_TOKEN,
+    CONFIG_DBT_PROFILE,
+    CONFIG_DBT_REPO,
+    CONFIG_DBT_TARGET,
+    CONFIG_DWH_SCHEMA,
+)
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.engine.utils import build_user_configured_model_from_config, build_user_configured_model_from_dbt_config
 from metricflow.errors.errors import SqlClientCreationException, MetricFlowInitException
@@ -13,6 +21,14 @@ from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.sql_clients.sql_utils import make_sql_client_from_config
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class DbtCloudConfigs:
+    """Data class for easier handling of dbt cloud config values"""
+
+    auth: str
+    job_id: str
 
 
 class CLIContext:
@@ -26,6 +42,8 @@ class CLIContext:
         self._semantic_model: Optional[SemanticModel] = None
         self._mf_system_schema: Optional[str] = None
         self._model_path_is_for_dbt: Optional[bool] = None
+        self._use_dbt_cloud: Optional[bool] = None
+        self._dbt_cloud_configs: Optional[DbtCloudConfigs] = None
         self.config = ConfigHandler()
         self._configure_logging()
 
@@ -112,6 +130,24 @@ class CLIContext:
             self._model_path_is_for_dbt = config_value.lower() in ["yes", "y", "true", "t", "1"]
 
         return self._model_path_is_for_dbt
+
+    @property
+    def dbt_cloud_configs(self) -> Optional[DbtCloudConfigs]:  # noqa: D
+        if self._dbt_cloud_configs is None:
+            job_id = self.config.get_value(key=CONFIG_DBT_CLOUD_JOB_ID) or ""
+            service_token = self.config.get_value(key=CONFIG_DBT_CLOUD_SERVICE_TOKEN) or ""
+            # If one of them is set, that means there is at least a partial dbt cloud setup
+            if job_id != "" or service_token != "":
+                # now we assert them both, because if one is missing, we want to give an appropriate error
+                assert (
+                    job_id != ""
+                ), f"Incomplete dbt cloud config detected. The config `{CONFIG_DBT_CLOUD_JOB_ID}` was not set."
+                assert (
+                    service_token != ""
+                ), f"Incomplete dbt cloud config detected. The config `{CONFIG_DBT_CLOUD_SERVICE_TOKEN}` was not set."
+                self._dbt_cloud_configs = DbtCloudConfigs(auth=service_token, job_id=job_id)
+
+        return self._dbt_cloud_configs
 
     @property
     def user_configured_model(self) -> UserConfiguredModel:  # noqa: D

@@ -34,7 +34,7 @@ jobs:
         run: pip install poetry
 
       - name: Install Metricflow
-        run: poetry install
+        run: poetry install -E dbt-cloud
 
       - name: Run MetricFlow Unit tests suites
         run: poetry run pytest metricflow/test
@@ -79,7 +79,7 @@ jobs:
         run: pip install poetry
 
       - name: Install Deps
-        run: cd metricflow && poetry install
+        run: cd metricflow && poetry install -E dbt-cloud
 
       - name: Run MetricFlow unit tests with PostgreSQL configs
         run: poetry run pytest metricflow/test/
