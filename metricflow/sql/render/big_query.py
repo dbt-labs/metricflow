@@ -25,16 +25,7 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
 
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
         """Render a percentile expression"""
-        arg_rendered = self.render_sql_expr(node.order_by_arg)
-        params = arg_rendered.execution_parameters
-
-        function_str = node.percentile_args.function_name
-        percentile = node.percentile_args.percentile
-
-        return SqlExpressionRenderResult(
-            sql=f"{function_str}({arg_rendered.sql}, {percentile}) OVER()",
-            execution_parameters=params,
-        )
+        raise RuntimeError("Percentile aggregations not yet supported for BigQuery.")
 
     def visit_cast_to_timestamp_expr(self, node: SqlCastToTimestampExpression) -> SqlExpressionRenderResult:
         """Casts the time value expression to DATETIME, as per standard BigQuery preferences."""
