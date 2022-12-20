@@ -952,9 +952,6 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             else:
                 input_metric_specs_per_data_set.append([])
 
-        # TODO:
-        # test with
-
         # If using time offset, the FROM data set needs to be time spine.
         from_data_set: Optional[SqlDataSet] = None
         from_alias: str = ""
