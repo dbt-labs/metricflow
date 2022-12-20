@@ -154,7 +154,7 @@ FROM (
             ) subq_1
           ) subq_2
           GROUP BY
-            subq_2.metric_time
+            metric_time
         ) subq_3
       ) subq_4
       INNER JOIN (
@@ -291,7 +291,7 @@ FROM (
             ) subq_6
           ) subq_7
           GROUP BY
-            subq_7.metric_time
+            metric_time
         ) subq_8
       ) subq_9
       ON
@@ -436,7 +436,7 @@ FROM (
         ) subq_13
       ) subq_14
       GROUP BY
-        subq_14.metric_time
+        metric_time
     ) subq_15
   ) subq_16
   ON
@@ -579,7 +579,7 @@ FROM (
         ) subq_18
       ) subq_19
       GROUP BY
-        subq_19.metric_time
+        metric_time
     ) subq_20
   ) subq_21
   ON

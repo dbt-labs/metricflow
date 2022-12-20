@@ -250,5 +250,5 @@ FROM (
     ) subq_8
   ) subq_9
   GROUP BY
-    subq_9.is_instant
+    is_instant
 ) subq_10

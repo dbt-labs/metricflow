@@ -12,6 +12,7 @@ from metricflow.sql.sql_exprs import (
     SqlPercentileExpression,
     SqlTimeDeltaExpression,
 )
+from metricflow.sql.sql_plan import SqlSelectColumn
 from metricflow.time.time_granularity import TimeGranularity
 
 
@@ -22,6 +23,23 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
     def double_data_type(self) -> str:
         """Custom double data type for BigQuery engine"""
         return "FLOAT64"
+
+    def render_group_by_expr(self, group_by_column: SqlSelectColumn) -> SqlExpressionRenderResult:
+        """Custom rendering of group by column expressions
+
+        BigQuery requires group bys to be referenced by alias, rather than duplicating the expression from the SELECT
+
+        e.g.,
+          SELECT COALESCE(x, y) AS x_or_y, SUM(1)
+          FROM source_table
+          GROUP BY x_or_y
+
+        By default we would render GROUP BY COALESCE(x, y) on that last line, and BigQuery will throw an exception
+        """
+        return SqlExpressionRenderResult(
+            sql=group_by_column.column_alias,
+            execution_parameters=group_by_column.expr.execution_parameters,
+        )
 
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
         """Render a percentile expression"""

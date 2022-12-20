@@ -241,7 +241,7 @@ FROM (
         ) subq_6
       ) subq_7
       GROUP BY
-        subq_7.listing__country_latest
+        listing__country_latest
     ) subq_8
   ) subq_9
 ) subq_10

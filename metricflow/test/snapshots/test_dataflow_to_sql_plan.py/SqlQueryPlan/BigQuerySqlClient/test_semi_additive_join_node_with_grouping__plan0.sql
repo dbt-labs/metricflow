@@ -52,7 +52,7 @@ INNER JOIN (
     ) accounts_source_src_10000
   ) subq_1
   GROUP BY
-    subq_1.user
+    user
 ) subq_2
 ON
   (subq_0.ds = subq_2.ds__complete) AND (subq_0.user = subq_2.user)

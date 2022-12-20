@@ -82,8 +82,8 @@ FROM (
       ) subq_0
     ) subq_1
     GROUP BY
-      subq_1.ds
-      , subq_1.is_instant
+      ds
+      , is_instant
   ) subq_2
 ) subq_3
 ORDER BY subq_3.ds, subq_3.bookings DESC

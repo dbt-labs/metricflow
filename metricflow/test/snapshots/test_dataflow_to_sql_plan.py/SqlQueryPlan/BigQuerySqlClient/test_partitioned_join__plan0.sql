@@ -150,5 +150,5 @@ FROM (
     ) subq_5
   ) subq_6
   GROUP BY
-    subq_6.user__home_state
+    user__home_state
 ) subq_7

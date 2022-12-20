@@ -52,7 +52,7 @@ INNER JOIN (
     ) accounts_source_src_10000
   ) subq_1
   GROUP BY
-    subq_1.ds__week
+    ds__week
 ) subq_2
 ON
   subq_0.ds = subq_2.ds__complete

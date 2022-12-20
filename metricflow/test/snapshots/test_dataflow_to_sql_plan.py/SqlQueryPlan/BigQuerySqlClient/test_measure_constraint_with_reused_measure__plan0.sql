@@ -160,7 +160,7 @@ FROM (
         ) subq_3
       ) subq_4
       GROUP BY
-        subq_4.metric_time
+        metric_time
     ) subq_5
     INNER JOIN (
       -- Aggregate Measures
@@ -291,7 +291,7 @@ FROM (
         ) subq_7
       ) subq_8
       GROUP BY
-        subq_8.metric_time
+        metric_time
     ) subq_9
     ON
       (
