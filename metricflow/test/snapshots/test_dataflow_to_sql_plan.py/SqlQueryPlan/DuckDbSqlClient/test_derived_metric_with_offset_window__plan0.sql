@@ -283,5 +283,5 @@ FROM (
     ) subq_7
   ) subq_10
   ON
-    COALESCE(subq_8.metric_time, subq_9.metric_time) - INTERVAL 14 day = subq_10.metric_time
+    subq_9.metric_time - INTERVAL 14 day = subq_10.metric_time
 ) subq_11

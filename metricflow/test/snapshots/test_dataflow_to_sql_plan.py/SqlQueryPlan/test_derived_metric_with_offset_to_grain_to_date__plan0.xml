@@ -4,7 +4,7 @@
         <!-- node_id = ss_17 -->
         <!-- col0 =                                                    -->
         <!--   {'class': 'SqlSelectColumn',                            -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_350),  -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_349),  -->
         <!--    'column_alias': 'metric_time'}                         -->
         <!-- col1 =                                                                                                                        -->
         <!--   {'class': 'SqlSelectColumn',                                                                                                -->
@@ -17,15 +17,15 @@
             <!-- node_id = ss_16 -->
             <!-- col0 =                                                                            -->
             <!--   {'class': 'SqlSelectColumn',                                                    -->
-            <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_3, sql_function=COALESCE),  -->
+            <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_2, sql_function=COALESCE),  -->
             <!--    'column_alias': 'metric_time'}                                                 -->
             <!-- col1 =                                                    -->
             <!--   {'class': 'SqlSelectColumn',                            -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_345),  -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_344),  -->
             <!--    'column_alias': 'bookings'}                            -->
             <!-- col2 =                                                    -->
             <!--   {'class': 'SqlSelectColumn',                            -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_346),  -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_345),  -->
             <!--    'column_alias': 'bookings_at_start_of_month'}          -->
             <!-- from_source = SqlSelectStatementNode(node_id=ss_15) -->
             <!-- join_0 =                                                    -->

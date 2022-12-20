@@ -61,5 +61,5 @@ FROM (
       metric_time
   ) subq_22
   ON
-    COALESCE(subq_20.metric_time, subq_21.metric_time) - INTERVAL 14 day = subq_22.metric_time
+    subq_21.metric_time - INTERVAL 14 day = subq_22.metric_time
 ) subq_23

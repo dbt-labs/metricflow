@@ -61,5 +61,5 @@ FROM (
       metric_time
   ) subq_22
   ON
-    DATE_TRUNC('month', COALESCE(subq_20.metric_time, subq_21.metric_time)) = subq_22.metric_time
+    DATE_TRUNC('month', subq_21.metric_time) = subq_22.metric_time
 ) subq_23

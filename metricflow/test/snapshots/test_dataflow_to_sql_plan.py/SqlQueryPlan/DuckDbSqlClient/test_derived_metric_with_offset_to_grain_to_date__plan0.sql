@@ -283,5 +283,5 @@ FROM (
     ) subq_7
   ) subq_10
   ON
-    DATE_TRUNC('month', COALESCE(subq_8.metric_time, subq_9.metric_time)) = subq_10.metric_time
+    DATE_TRUNC('month', subq_9.metric_time) = subq_10.metric_time
 ) subq_11

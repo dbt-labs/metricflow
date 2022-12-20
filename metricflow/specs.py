@@ -650,6 +650,17 @@ class InstanceSpecSet(SerializableDataclass):
             metadata_specs=tuple(itertools.chain.from_iterable([x.metadata_specs for x in others])),
         )
 
+    def intersection(self, other: InstanceSpecSet) -> InstanceSpecSet:
+        """Find intersection between two sets."""
+        return InstanceSpecSet(
+            metric_specs=tuple(set(self.metric_specs).intersection(other.metric_specs)),
+            measure_specs=tuple(set(self.measure_specs).intersection(other.measure_specs)),
+            dimension_specs=tuple(set(self.dimension_specs).intersection(other.dimension_specs)),
+            identifier_specs=tuple(set(self.identifier_specs).intersection(other.identifier_specs)),
+            time_dimension_specs=tuple(set(self.time_dimension_specs).intersection(other.time_dimension_specs)),
+            metadata_specs=tuple(set(self.metadata_specs).intersection(other.metadata_specs)),
+        )
+
     def dedupe(self) -> InstanceSpecSet:
         """De-duplicates repeated elements.
 
