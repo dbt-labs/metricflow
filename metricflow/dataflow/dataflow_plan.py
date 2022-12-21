@@ -1144,8 +1144,10 @@ class CombineMetricsNode(Generic[SourceDataSetT], ComputedMetricsOutput[SourceDa
         self,
         parent_nodes: Sequence[Union[BaseOutput, ComputedMetricsOutput[SourceDataSetT]]],
         join_type: SqlJoinType = SqlJoinType.FULL_OUTER,
+        time_range_constraint: Optional[TimeRangeConstraint] = None,
     ) -> None:
         self._join_type = join_type
+        self._time_range_constraint = time_range_constraint
         super().__init__(node_id=self.create_unique_id(), parent_nodes=list(parent_nodes))
 
     @classmethod
@@ -1174,6 +1176,11 @@ class CombineMetricsNode(Generic[SourceDataSetT], ComputedMetricsOutput[SourceDa
     def join_type(self) -> SqlJoinType:
         """The type of join used for combining metrics."""
         return self._join_type
+
+    @property
+    def time_range_constraint(self) -> Optional[TimeRangeConstraint]:
+        """Time range constraint that should be applied if joining to time spine is needed."""
+        return self._time_range_constraint
 
     def functionally_identical(self, other_node: DataflowPlanNode[SourceDataSetT]) -> bool:  # noqa: D
         return isinstance(other_node, self.__class__) and other_node.join_type == self.join_type

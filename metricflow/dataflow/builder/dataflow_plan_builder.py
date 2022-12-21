@@ -248,6 +248,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         return CombineMetricsNode[SqlDataSetT](
             parent_nodes=compute_metrics_nodes,
             join_type=combine_metrics_join_type,
+            time_range_constraint=time_range_constraint,
         )
 
     def build_plan_for_distinct_values(
