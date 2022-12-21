@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import logging
-from collections import OrderedDict
-from typing import Generic, List, Optional, Sequence, TypeVar, Union
+from collections import OrderedDict, defaultdict
+from typing import Generic, List, Optional, Sequence, TypeVar, Union, Dict
 
 from metricflow.aggregation_properties import AggregationState, AggregationType
 from metricflow.column_assoc import ColumnAssociation, SingleColumnCorrelationKey
@@ -924,8 +924,31 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         OUTER JOIN context, because many engines do not support complex ON conditions or other techniques we might
         use to apply a sentinel value for NULL to NULL comparisons.
         """
-        # Sanity check that all parents have the same linkable specs.
-        parent_data_sets = [x.accept(self) for x in node.parent_nodes]
+        parent_data_sets: List[SqlDataSet] = [parent_node.accept(self) for parent_node in node.parent_nodes]
+        uses_time_offset = False
+        input_metric_specs: Dict[str, Sequence[MetricSpec]] = defaultdict(list)
+        parent_aliases_to_data_sets: OrderedDict[str, SqlDataSet] = OrderedDict()
+        table_alias_to_metric_specs: OrderedDict[str, Sequence[MetricSpec]] = OrderedDict()
+        for i, parent_node in enumerate(node.parent_nodes):
+            parent_data_set = parent_data_sets[i]
+            table_alias = self._next_unique_table_alias()
+            parent_data_sets.append(parent_data_set)
+
+            # If metric is derived, get input metrics.
+            if isinstance(parent_node, ComputeMetricsNode):
+                if not uses_time_offset:
+                    uses_time_offset = any(
+                        (metric_spec.offset_window or metric_spec.offset_to_grain_to_date)
+                        for metric_spec in parent_node.metric_specs
+                    )
+                # TODO: prevent optimizer from sending multiple metrics here when offset is used for 1 or more
+                if len(parent_node.metric_specs) > 1:
+                    raise RuntimeError("Unable to combine metrics with offset when parent node has multiple metrics.")
+                input_metric_specs[table_alias] = parent_node.metric_specs
+
+            parent_aliases_to_data_sets[table_alias] = parent_data_set
+            table_alias_to_metric_specs[table_alias] = parent_data_set.instance_set.spec_set.metric_specs
+
         assert (
             len(parent_data_sets) > 1
         ), "Shouldn't have a CombineMetricsNode in the dataflow plan if there's only 1 parent."
@@ -936,23 +959,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         linkable_spec_set = parent_data_sets[0].instance_set.spec_set.transform(SelectOnlyLinkableSpecs())
         use_cross_join = len(linkable_spec_set.all_specs) == 0
 
-        input_metric_specs_per_data_set: List[List[MetricSpec]] = []
-        uses_time_offset = False
-        for parent_node in node.parent_nodes:
-            if isinstance(parent_node, ComputeMetricsNode):
-                if not uses_time_offset:
-                    uses_time_offset = any(
-                        (metric_spec.offset_window or metric_spec.offset_to_grain_to_date)
-                        for metric_spec in parent_node.metric_specs
-                    )
-                # TODO: prevent optimizer from sending multiple metrics here when offset is used for 1 or more
-                if len(parent_node.metric_specs) > 1:
-                    raise RuntimeError("Unable to combine metrics with offset when parent node has multiple metrics.")
-                input_metric_specs_per_data_set.append(parent_node.metric_specs)
-            else:
-                input_metric_specs_per_data_set.append([])
-
-        # If using time offset, the FROM data set needs to be time spine.
+        # If using time offset, use time spine as the FROM data set.
         from_data_set: Optional[SqlDataSet] = None
         from_alias: str = ""
         from_clause_linkable_spec_set = linkable_spec_set
@@ -963,8 +970,12 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                     if len(instance.spec.identifier_links) == 0:
                         metric_time_dimension_instance = instance
                         break
-            # shouldn't be able to query a time offset metric without time dim (not enforced yet)
-            assert metric_time_dimension_instance
+                if metric_time_dimension_instance:
+                    break
+            # TODO: implement this validation :P
+            assert (
+                metric_time_dimension_instance
+            ), "Can't query offset metric without a time dimension. Validations should have prevented this."
             metric_time_dimension_column_name = self.column_association_resolver.resolve_time_dimension_spec(
                 metric_time_dimension_instance.spec
             ).column_name
@@ -976,17 +987,9 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 time_spine_table_alias=from_alias,
                 time_range_constraint=node.time_range_constraint,
             )
-            # If FROM table is time spine, won't have same linkable specs as the other data sets.
+            # Time spine won't have same linkable specs as the other data sets.
             time_spine_linkable_spec_set = from_data_set.instance_set.spec_set.transform(SelectOnlyLinkableSpecs())
             from_clause_linkable_spec_set = time_spine_linkable_spec_set.intersection(linkable_spec_set)
-
-        joins_descriptions = []
-        table_alias_to_metric_specs: OrderedDict[str, Sequence[MetricSpec]] = OrderedDict()
-        parent_aliases_to_data_sets: OrderedDict[str, SqlDataSet] = OrderedDict()
-        for parent_data_set in parent_data_sets:
-            table_alias = self._next_unique_table_alias()
-            parent_aliases_to_data_sets[table_alias] = parent_data_set
-            table_alias_to_metric_specs[table_alias] = parent_data_set.instance_set.spec_set.metric_specs
 
         # Create the components of the join that combines metrics. Order doesn't
         # matter so we use the first element in the FROM clause and create join descriptions from
@@ -994,15 +997,16 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         join_aliases_to_data_sets = parent_aliases_to_data_sets
         if not from_data_set:
             from_alias, from_data_set = join_aliases_to_data_sets.popitem(last=False)
-            assert from_alias
+            # assert from_alias and from_data_set
         join_aliases = list(join_aliases_to_data_sets.keys())
+        joins_descriptions = []
         for i, join_alias in enumerate(join_aliases):
             joining_to_time_spine = uses_time_offset and i == 0
             join_data_set = join_aliases_to_data_sets[join_alias]
-            input_metric_specs = input_metric_specs_per_data_set[i]
+            join_metric_specs = input_metric_specs[join_alias]
             right_time_offset = MetricTimeOffset()
-            if input_metric_specs:
-                input_metric_spec = input_metric_specs[0]  # only one allowed for now - will fix
+            if join_metric_specs:
+                input_metric_spec = join_metric_specs[0]  # only one allowed, should error otherwise
                 right_time_offset = MetricTimeOffset(
                     offset_window=input_metric_spec.offset_window,
                     offset_to_grain_to_date=input_metric_spec.offset_to_grain_to_date,

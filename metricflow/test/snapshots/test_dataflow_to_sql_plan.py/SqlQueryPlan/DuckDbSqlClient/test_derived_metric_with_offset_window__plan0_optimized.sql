@@ -5,15 +5,15 @@ SELECT
 FROM (
   -- Combine Metrics
   SELECT
-    COALESCE(subq_20.metric_time, subq_21.metric_time, subq_22.metric_time) AS metric_time
-    , subq_21.bookings AS bookings
-    , subq_22.bookings_2_weeks_ago AS bookings_2_weeks_ago
+    COALESCE(subq_22.metric_time, subq_20.metric_time, subq_21.metric_time) AS metric_time
+    , subq_20.bookings AS bookings
+    , subq_21.bookings_2_weeks_ago AS bookings_2_weeks_ago
   FROM (
     -- Date Spine
     SELECT
       ds AS metric_time
-    FROM ***************************.mf_time_spine subq_20
-  ) subq_20
+    FROM ***************************.mf_time_spine subq_22
+  ) subq_22
   INNER JOIN (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
@@ -35,9 +35,9 @@ FROM (
     ) subq_14
     GROUP BY
       metric_time
-  ) subq_21
+  ) subq_20
   ON
-    subq_20.metric_time = subq_21.metric_time
+    subq_22.metric_time = subq_20.metric_time
   INNER JOIN (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
@@ -59,7 +59,7 @@ FROM (
     ) subq_18
     GROUP BY
       metric_time
-  ) subq_22
+  ) subq_21
   ON
-    subq_21.metric_time - INTERVAL 14 day = subq_22.metric_time
+    subq_20.metric_time - INTERVAL 14 day = subq_21.metric_time
 ) subq_23

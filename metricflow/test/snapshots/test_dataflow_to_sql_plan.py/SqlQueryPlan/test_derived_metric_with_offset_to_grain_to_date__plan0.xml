@@ -31,13 +31,13 @@
             <!-- join_0 =                                                    -->
             <!--   {'class': 'SqlJoinDescription',                           -->
             <!--    'right_source': SqlSelectStatementNode(node_id=ss_10),   -->
-            <!--    'right_source_alias': 'subq_9',                          -->
+            <!--    'right_source_alias': 'subq_8',                          -->
             <!--    'join_type': SqlJoinType.INNER,                          -->
             <!--    'on_condition': SqlComparisonExpression(node_id=cmp_0)}  -->
             <!-- join_1 =                                                    -->
             <!--   {'class': 'SqlJoinDescription',                           -->
             <!--    'right_source': SqlSelectStatementNode(node_id=ss_14),   -->
-            <!--    'right_source_alias': 'subq_10',                         -->
+            <!--    'right_source_alias': 'subq_9',                          -->
             <!--    'join_type': SqlJoinType.INNER,                          -->
             <!--    'on_condition': SqlComparisonExpression(node_id=cmp_1)}  -->
             <!-- where = None -->
