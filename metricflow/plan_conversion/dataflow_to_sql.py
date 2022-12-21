@@ -972,7 +972,6 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                         break
                 if metric_time_dimension_instance:
                     break
-            # TODO: implement this validation :P
             assert (
                 metric_time_dimension_instance
             ), "Can't query offset metric without a time dimension. Validations should have prevented this."
@@ -997,7 +996,6 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         join_aliases_to_data_sets = parent_aliases_to_data_sets
         if not from_data_set:
             from_alias, from_data_set = join_aliases_to_data_sets.popitem(last=False)
-            # assert from_alias and from_data_set
         join_aliases = list(join_aliases_to_data_sets.keys())
         joins_descriptions = []
         for i, join_alias in enumerate(join_aliases):

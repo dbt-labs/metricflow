@@ -81,6 +81,9 @@ REVENUE_YAML = textwrap.dedent(
           type_params:
             is_primary: True
             time_granularity: month
+        - name: country
+          type: categorical
+          expr: country
 
       identifiers:
         - name: user
@@ -318,33 +321,48 @@ def test_derived_metric_query_parsing(time_spine_source: TimeSpineSource) -> Non
     revelue_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=REVENUE_YAML)
     metrics_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=METRICS_YAML)
     query_parser = query_parser_from_yaml([bookings_yaml_file, revelue_yaml_file, metrics_yaml_file], time_spine_source)
-    # check that no dimension query raises UnableToSatisfyQueryError
+    # Attempt to query with no dimension
     with pytest.raises(UnableToSatisfyQueryError):
         query_parser.parse_and_validate_query(
             metric_names=["revenue_sub_10"],
             group_by_names=[],
         )
 
+    # Attempt to query with non-time dimension
+    with pytest.raises(UnableToSatisfyQueryError):
+        query_parser.parse_and_validate_query(
+            metric_names=["revenue_sub_10"],
+            group_by_names=["country"],
+        )
+
+    # Query with time dimension
     query_parser.parse_and_validate_query(
         metric_names=["revenue_sub_10"],
         group_by_names=[MTD],
     )
 
 
-# TODO: actually raise this errors
 def test_derived_metric_with_offset_parsing(time_spine_source: TimeSpineSource) -> None:
     """Test that querying derived metrics with a time offset requires a time dimension."""
     bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=BOOKINGS_YAML)
     bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=REVENUE_YAML)
     metrics_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=METRICS_YAML)
     query_parser = query_parser_from_yaml([bookings_yaml_file, metrics_yaml_file], time_spine_source)
-    # check that no dimension query raises UnableToSatisfyQueryError
+    # Attempt to query with no dimension
     with pytest.raises(UnableToSatisfyQueryError):
         query_parser.parse_and_validate_query(
             metric_names=["revenue_growth_2_weeks"],
             group_by_names=[],
         )
 
+    # Attempt to query with non-time dimension
+    with pytest.raises(UnableToSatisfyQueryError):
+        query_parser.parse_and_validate_query(
+            metric_names=["revenue_growth_2_weeks"],
+            group_by_names=["country"],
+        )
+
+    # Query with time dimension
     query_parser.parse_and_validate_query(
         metric_names=["revenue_growth_2_weeks"],
         group_by_names=[MTD],
