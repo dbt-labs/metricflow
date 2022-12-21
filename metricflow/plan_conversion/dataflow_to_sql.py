@@ -974,7 +974,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 metric_time_dimension_column_name=metric_time_dimension_column_name,
                 time_spine_source=self._time_spine_source,
                 time_spine_table_alias=from_alias,
-                # TODO: figure out how to get time constraint for query here and pass it in
+                time_range_constraint=node.time_range_constraint,
             )
             # If FROM table is time spine, won't have same linkable specs as the other data sets.
             time_spine_linkable_spec_set = from_data_set.instance_set.spec_set.transform(SelectOnlyLinkableSpecs())
