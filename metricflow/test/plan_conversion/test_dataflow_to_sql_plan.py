@@ -548,7 +548,7 @@ def test_join_to_time_spine_node_with_offset_window(  # noqa: D
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
-    # Get a working plan order with time dim
+    """Tests JoinToTimeSpineNode for a single metric with offset_window."""
     measure_spec = MeasureSpec(element_name="booking_value")
     identifier_spec = LinklessIdentifierSpec.from_element_name(element_name="listing")
     dimension_spec = TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.DAY)
@@ -604,14 +604,14 @@ def test_join_to_time_spine_node_with_offset_window(  # noqa: D
     )
 
 
-def test_join_to_time_spine_node_with_offset_to_grain_to_date(  # noqa: D
+def test_join_to_time_spine_node_with_offset_to_grain_to_date(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
-    # Get a working plan order with time dim
+    """Tests JoinToTimeSpineNode for a single metric with offset_to_grain_to_date."""
     measure_spec = MeasureSpec(element_name="booking_value")
     identifier_spec = LinklessIdentifierSpec.from_element_name(element_name="listing")
     dimension_spec = TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.DAY)

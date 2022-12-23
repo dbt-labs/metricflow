@@ -9,7 +9,9 @@
             <!--   {'class': 'MetricSpec',                -->
             <!--    'element_name': 'bookings_per_view',  -->
             <!--    'constraint': None,                   -->
-            <!--    'alias': None}                        -->
+            <!--    'alias': None,                        -->
+            <!--    'offset_window': None,                -->
+            <!--    'offset_to_grain_to_date': None}      -->
             <FilterElementsNode>
                 <!-- description =                                                        -->
                 <!--   Pass Only Elements:                                                -->

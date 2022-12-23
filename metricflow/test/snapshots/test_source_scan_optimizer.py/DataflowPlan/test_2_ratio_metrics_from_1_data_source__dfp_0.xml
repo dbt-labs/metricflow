@@ -14,7 +14,9 @@
                 <!--   {'class': 'MetricSpec',                  -->
                 <!--    'element_name': 'bookings_per_booker',  -->
                 <!--    'constraint': None,                     -->
-                <!--    'alias': None}                          -->
+                <!--    'alias': None,                          -->
+                <!--    'offset_window': None,                  -->
+                <!--    'offset_to_grain_to_date': None}        -->
                 <AggregateMeasuresNode>
                     <!-- description = Aggregate Measures -->
                     <!-- node_id = am_0 -->
@@ -58,7 +60,9 @@
                 <!--   {'class': 'MetricSpec',                  -->
                 <!--    'element_name': 'bookings_per_dollar',  -->
                 <!--    'constraint': None,                     -->
-                <!--    'alias': None}                          -->
+                <!--    'alias': None,                          -->
+                <!--    'offset_window': None,                  -->
+                <!--    'offset_to_grain_to_date': None}        -->
                 <AggregateMeasuresNode>
                     <!-- description = Aggregate Measures -->
                     <!-- node_id = am_1 -->

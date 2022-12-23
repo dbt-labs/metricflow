@@ -9,7 +9,9 @@
             <!--   {'class': 'MetricSpec',                        -->
             <!--    'element_name': 'trailing_2_months_revenue',  -->
             <!--    'constraint': None,                           -->
-            <!--    'alias': None}                                -->
+            <!--    'alias': None,                                -->
+            <!--    'offset_window': None,                        -->
+            <!--    'offset_to_grain_to_date': None}              -->
             <AggregateMeasuresNode>
                 <!-- description = Aggregate Measures -->
                 <!-- node_id = am_0 -->
