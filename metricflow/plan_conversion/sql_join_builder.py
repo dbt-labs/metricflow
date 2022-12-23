@@ -18,39 +18,8 @@ from metricflow.sql.sql_exprs import (
     SqlLogicalOperator,
     SqlTimeDeltaExpression,
 )
-from metricflow.model.objects.metric import MetricTimeWindow
-from metricflow.time.time_granularity import TimeGranularity
 
 SqlDataSetT = TypeVar("SqlDataSetT", bound=SqlDataSet)
-
-
-@dataclass(frozen=True)
-class MetricTimeOffset:
-    """Describes how to offset time in a join condition. Used to compare metrics within a derived metric.
-
-    Ex:
-    ```
-    metrics:
-    - name: bookings
-        offset_window: 2 days
-        alias: bookings_2_days_ago
-    - name: bookings
-        offset_to_grain_to_date: month
-        alias: bookings_at_start_of_month
-    ```
-    Given the above metric inputs for a derived metric config, query results might look like:
-    metric_time | bookings | bookings_2_days_ago | bookings_at_start_of_month
-    -----------------------------------------------------------------------
-    2022-01-01  | 1        |                     | 1
-    2022-01-02  | 2        |                     | 1
-    2022-01-03  | 3        | 1                   | 1
-    2022-01-04  | 4        | 2                   | 1
-    2022-01-05  | 5        | 3                   | 1
-    Only one offset should be set for one metric, not both. Validated in model validations.
-    """
-
-    offset_window: Optional[MetricTimeWindow]
-    offset_to_grain_to_date: Optional[TimeGranularity]
 
 
 @dataclass(frozen=True)
