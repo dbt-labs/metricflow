@@ -18,8 +18,39 @@ from metricflow.sql.sql_exprs import (
     SqlLogicalOperator,
     SqlTimeDeltaExpression,
 )
+from metricflow.model.objects.metric import MetricTimeWindow
+from metricflow.time.time_granularity import TimeGranularity
 
 SqlDataSetT = TypeVar("SqlDataSetT", bound=SqlDataSet)
+
+
+@dataclass(frozen=True)
+class MetricTimeOffset:
+    """Describes how to offset time in a join condition. Used to compare metrics within a derived metric.
+
+    Ex:
+    ```
+    metrics:
+    - name: bookings
+        offset_window: 2 days
+        alias: bookings_2_days_ago
+    - name: bookings
+        offset_to_grain_to_date: month
+        alias: bookings_at_start_of_month
+    ```
+    Given the above metric inputs for a derived metric config, query results might look like:
+    metric_time | bookings | bookings_2_days_ago | bookings_at_start_of_month
+    -----------------------------------------------------------------------
+    2022-01-01  | 1        |                     | 1
+    2022-01-02  | 2        |                     | 1
+    2022-01-03  | 3        | 1                   | 1
+    2022-01-04  | 4        | 2                   | 1
+    2022-01-05  | 5        | 3                   | 1
+    Only one offset should be set for one metric, not both. Validated in model validations.
+    """
+
+    offset_window: Optional[MetricTimeWindow]
+    offset_to_grain_to_date: Optional[TimeGranularity]
 
 
 @dataclass(frozen=True)
@@ -60,7 +91,7 @@ class SqlQueryPlanJoinBuilder:
     """Helper class for constructing various join components in a SqlQueryPlan"""
 
     @staticmethod
-    def make_sql_join_description(
+    def make_column_equality_sql_join_description(
         right_source_node: SqlSelectStatementNode,
         left_source_alias: str,
         right_source_alias: str,
@@ -209,7 +240,7 @@ class SqlQueryPlanJoinBuilder:
             left_data_set=left_data_set, right_data_set=right_data_set, join_description=join_description
         )
 
-        return SqlQueryPlanJoinBuilder.make_sql_join_description(
+        return SqlQueryPlanJoinBuilder.make_column_equality_sql_join_description(
             right_source_node=right_data_set.data_set.sql_select_node,
             left_source_alias=left_data_set.alias,
             right_source_alias=right_data_set.alias,
@@ -356,7 +387,7 @@ class SqlQueryPlanJoinBuilder:
                 ColumnEqualityDescription(left_column_alias=name, right_column_alias=name, treat_nulls_as_equal=True)
                 for name in column_names
             ]
-            return SqlQueryPlanJoinBuilder.make_sql_join_description(
+            return SqlQueryPlanJoinBuilder.make_column_equality_sql_join_description(
                 right_source_node=join_data_set.data_set.sql_select_node,
                 left_source_alias=from_data_set.alias,
                 right_source_alias=join_data_set.alias,
