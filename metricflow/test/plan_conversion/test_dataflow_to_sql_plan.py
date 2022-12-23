@@ -541,6 +541,68 @@ def test_compute_metrics_node_simple_expr(
     )
 
 
+def test_join_to_time_spine_node_without_offset(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
+    consistent_id_object_repository: ConsistentIdObjectRepository,
+    sql_client: SqlClient,
+) -> None:
+    """Tests JoinToTimeSpineNode for a single metric with offset_window."""
+    measure_spec = MeasureSpec(element_name="booking_value")
+    identifier_spec = LinklessIdentifierSpec.from_element_name(element_name="listing")
+    dimension_spec = TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.DAY)
+    metric_input_measure_specs = (MetricInputMeasureSpec(measure_spec=measure_spec),)
+    measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
+    filtered_measure_node = FilterElementsNode[DataSourceDataSet](
+        parent_node=measure_source_node,
+        include_specs=InstanceSpecSet(
+            measure_specs=(measure_spec,), identifier_specs=(identifier_spec,), dimension_specs=(dimension_spec,)
+        ),
+    )
+    metric_time_node = MetricTimeDimensionTransformNode(
+        parent_node=filtered_measure_node,
+        aggregation_time_dimension_reference=TimeDimensionReference(element_name="ds"),
+    )
+    aggregated_measures_node = AggregateMeasuresNode[DataSourceDataSet](
+        parent_node=metric_time_node, metric_input_measure_specs=metric_input_measure_specs
+    )
+    metric_spec = MetricSpec(element_name="booking_fees")
+    compute_metrics_node = ComputeMetricsNode[DataSourceDataSet](
+        parent_node=aggregated_measures_node, metric_specs=[metric_spec]
+    )
+    join_to_time_spine_node = JoinToTimeSpineNode(
+        parent_node=compute_metrics_node,
+        time_range_constraint=TimeRangeConstraint(
+            start_time=as_datetime("2020-01-01"), end_time=as_datetime("2021-01-01")
+        ),
+    )
+
+    sink_node = WriteToResultDataframeNode[DataSourceDataSet](join_to_time_spine_node)
+    dataflow_plan = DataflowPlan("plan0", sink_output_nodes=[sink_node])
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=dataflow_plan,
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=join_to_time_spine_node,
+    )
+
+
 def test_join_to_time_spine_node_with_offset_window(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -666,6 +728,9 @@ def test_join_to_time_spine_node_with_offset_to_grain_to_date(
         sql_client=sql_client,
         node=join_to_time_spine_node,
     )
+
+
+# TODO: write test case for both offset window and offset to grain to date once allowed via derived metrics
 
 
 def test_compute_metrics_node_ratio_from_single_data_source(
