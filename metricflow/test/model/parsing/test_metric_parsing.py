@@ -258,6 +258,74 @@ def test_grain_to_date_metric_parsing() -> None:
     assert metric.type_params.grain_to_date is TimeGranularity.WEEK
 
 
+def test_derived_metric_offset_window_parsing() -> None:
+    """Test for parsing a derived metric with an offset window."""
+    yaml_contents = textwrap.dedent(
+        """\
+        metric:
+          name: derived_offset_test
+          type: derived
+          type_params:
+            expr: bookings / bookings_2_weeks_ago
+            metrics:
+              - name: bookings
+              - name: bookings
+                offset_window: 14 days
+                alias: bookings_2_weeks_ago
+        """
+    )
+    file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+
+    build_result = parse_yaml_files_to_model(files=[file])
+
+    assert len(build_result.issues.all_issues) == 0
+    assert len(build_result.model.metrics) == 1
+    metric = build_result.model.metrics[0]
+    assert metric.name == "derived_offset_test"
+    assert metric.type is MetricType.DERIVED
+    assert metric.type_params.metrics and len(metric.type_params.metrics) == 2
+    metric1, metric2 = metric.type_params.metrics
+    assert metric1.offset_window is None
+    assert metric2.offset_window == MetricTimeWindow(count=14, granularity=TimeGranularity.DAY)
+    assert metric1.alias is None
+    assert metric2.alias == "bookings_2_weeks_ago"
+    assert metric.type_params.expr == "bookings / bookings_2_weeks_ago"
+
+
+def test_derive_metric_offset_to_grain_to_date_parsing() -> None:
+    """Test for parsing a derived metric with an offset to grain to date."""
+    yaml_contents = textwrap.dedent(
+        """\
+        metric:
+          name: derived_offset_to_grain_to_date_test
+          type: derived
+          type_params:
+            expr: bookings / bookings_at_start_of_month
+            metrics:
+              - name: bookings
+              - name: bookings
+                offset_to_grain_to_date: month
+                alias: bookings_at_start_of_month
+        """
+    )
+    file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+
+    build_result = parse_yaml_files_to_model(files=[file])
+
+    assert len(build_result.issues.all_issues) == 0
+    assert len(build_result.model.metrics) == 1
+    metric = build_result.model.metrics[0]
+    assert metric.name == "derived_offset_to_grain_to_date_test"
+    assert metric.type is MetricType.DERIVED
+    assert metric.type_params.metrics and len(metric.type_params.metrics) == 2
+    metric1, metric2 = metric.type_params.metrics
+    assert metric1.offset_to_grain_to_date is None
+    assert metric2.offset_to_grain_to_date == TimeGranularity.MONTH
+    assert metric1.alias is None
+    assert metric2.alias == "bookings_at_start_of_month"
+    assert metric.type_params.expr == "bookings / bookings_at_start_of_month"
+
+
 def test_constraint_metric_parsing() -> None:
     """Test for parsing a metric specification with a constraint included"""
     yaml_contents = textwrap.dedent(
