@@ -25,6 +25,7 @@ from metricflow.dataflow.dataflow_plan import (
     MetricTimeDimensionTransformNode,
     DataflowPlan,
     DataflowPlanNode,
+    JoinToTimeSpineNode,
 )
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_dag_as_text
 from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOptimizer
@@ -357,3 +358,9 @@ class SourceScanOptimizer(
             plan_id=plan_id,
             sink_output_nodes=[dataflow_plan.sink_output_node],
         )
+
+    def visit_join_to_time_spine_node(  # noqa: D
+        self, node: JoinToTimeSpineNode[SourceDataSetT]
+    ) -> OptimizeBranchResult[SourceDataSetT]:
+        self._log_visit_node_type(node)
+        return self._default_base_output_handler(node)

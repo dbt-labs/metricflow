@@ -28,6 +28,7 @@ from metricflow.dataflow.dataflow_plan import (
     JoinOverTimeRangeNode,
     SemiAdditiveJoinNode,
     MetricTimeDimensionTransformNode,
+    JoinToTimeSpineNode,
 )
 from metricflow.dataset.dataset import DataSet
 from metricflow.instances import (
@@ -1297,3 +1298,6 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 order_bys=(),
             ),
         )
+
+    def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode[SourceDataSetT]) -> SqlDataSet:  # noqa: D
+        raise NotImplementedError

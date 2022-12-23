@@ -32,6 +32,7 @@ from metricflow.dataflow.dataflow_plan import (
     WriteToResultTableNode,
     SemiAdditiveJoinNode,
     MetricTimeDimensionTransformNode,
+    JoinToTimeSpineNode,
 )
 
 
@@ -161,3 +162,6 @@ class DefaultCostFunction(
         # Add number of joins to the cost.
         node_cost = DefaultCost(num_joins=1)
         return DefaultCost.sum(parent_costs + [node_cost])
+
+    def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode[SourceDataSetT]) -> DefaultCost:  # noqa: D
+        return DefaultCost.sum([x.accept(self) for x in node.parent_nodes])

@@ -24,6 +24,7 @@ from metricflow.dataflow.dataflow_plan import (
     ReadSqlSourceNode,
     BaseOutput,
     DataflowPlanNode,
+    JoinToTimeSpineNode,
 )
 from metricflow.dataflow.optimizer.source_scan.matching_linkable_specs import MatchingLinkableSpecsTransform
 from metricflow.specs import InstanceSpecSet
@@ -419,5 +420,11 @@ class ComputeMetricsBranchCombiner(
     def visit_metric_time_dimension_transform_node(  # noqa: D
         self, node: MetricTimeDimensionTransformNode[SourceDataSetT]
     ) -> ComputeMetricsBranchCombinerResult:
+        self._log_visit_node_type(node)
+        return self._default_handler(node)
+
+    def visit_join_to_time_spine_node(  # noqa: D
+        self, node: JoinToTimeSpineNode[SourceDataSetT]
+    ) -> ComputeMetricsBranchCombinerResult[SourceDataSetT]:
         self._log_visit_node_type(node)
         return self._default_handler(node)
