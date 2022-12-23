@@ -718,9 +718,9 @@ class JoinToTimeSpineNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT], A
     def __init__(
         self,
         parent_node: BaseOutput[SourceDataSetT],
-        time_range_constraint: Optional[TimeRangeConstraint],
-        offset_window: Optional[MetricTimeWindow],
-        offset_to_grain_to_date: Optional[TimeGranularity],
+        time_range_constraint: Optional[TimeRangeConstraint] = None,
+        offset_window: Optional[MetricTimeWindow] = None,
+        offset_to_grain_to_date: Optional[TimeGranularity] = None,
     ) -> None:  # noqa: D
         """Constructor.
 
@@ -732,8 +732,8 @@ class JoinToTimeSpineNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT], A
 
         Passing both offset_window and offset_to_grain_to_date not allowed.
         """
-        assert (
-            not offset_window and offset_to_grain_to_date
+        assert not (
+            offset_window and offset_to_grain_to_date
         ), "Can't set both offset_window and offset_to_grain_to_date when joining to time spine. Choose one or the other."
         self._parent_node = parent_node
         self._offset_window = offset_window

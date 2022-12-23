@@ -29,6 +29,7 @@ from metricflow.references import (
 )
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.time.time_granularity import TimeGranularity
+from metricflow.model.objects.metric import MetricTimeWindow
 
 
 class ColumnAssociationResolver(ABC):
@@ -405,6 +406,8 @@ class MetricSpec(InstanceSpec):  # noqa: D
     element_name: str
     constraint: Optional[SpecWhereClauseConstraint] = None
     alias: Optional[str] = None
+    offset_window: Optional[MetricTimeWindow] = None
+    offset_to_grain_to_date: Optional[TimeGranularity] = None
 
     @staticmethod
     def from_element_name(element_name: str) -> MetricSpec:  # noqa: D
