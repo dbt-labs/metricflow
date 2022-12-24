@@ -407,7 +407,7 @@ class MetricSpec(InstanceSpec):  # noqa: D
     constraint: Optional[SpecWhereClauseConstraint] = None
     alias: Optional[str] = None
     offset_window: Optional[MetricTimeWindow] = None
-    offset_to_grain_to_date: Optional[TimeGranularity] = None
+    offset_to_grain: Optional[TimeGranularity] = None
 
     @staticmethod
     def from_element_name(element_name: str) -> MetricSpec:  # noqa: D

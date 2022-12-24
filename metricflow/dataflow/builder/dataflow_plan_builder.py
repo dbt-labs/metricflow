@@ -205,12 +205,12 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                     ),
                     metric_specs=[metric_spec],
                 )
-                if metric_spec.offset_window or metric_spec.offset_to_grain_to_date:
+                if metric_spec.offset_window or metric_spec.offset_to_grain:
                     join_to_time_spine_node = JoinToTimeSpineNode(
                         parent_node=compute_metrics_node,
                         time_range_constraint=time_range_constraint,
                         offset_window=metric_spec.offset_window,
-                        offset_to_grain_to_date=metric_spec.offset_to_grain_to_date,
+                        offset_to_grain=metric_spec.offset_to_grain,
                     )
                     output_nodes.append(join_to_time_spine_node)
                 else:
