@@ -16,7 +16,7 @@
                 <!--    'constraint': None,               -->
                 <!--    'alias': None,                    -->
                 <!--    'offset_window': None,            -->
-                <!--    'offset_to_grain_to_date': None}  -->
+                <!--    'offset_to_grain': None}  -->
                 <AggregateMeasuresNode>
                     <!-- description = Aggregate Measures -->
                     <!-- node_id = am_3 -->
@@ -58,7 +58,7 @@
                 <!--    'constraint': None,                           -->
                 <!--    'alias': None,                                -->
                 <!--    'offset_window': None,                        -->
-                <!--    'offset_to_grain_to_date': None}              -->
+                <!--    'offset_to_grain': None}              -->
                 <ComputeMetricsNode>
                     <!-- description = Compute Metrics via Expressions -->
                     <!-- node_id = cm_7 -->
@@ -68,14 +68,14 @@
                     <!--    'constraint': None,                   -->
                     <!--    'alias': 'ref_bookings',              -->
                     <!--    'offset_window': None,                -->
-                    <!--    'offset_to_grain_to_date': None}      -->
+                    <!--    'offset_to_grain': None}      -->
                     <!-- metric_spec =                        -->
                     <!--   {'class': 'MetricSpec',            -->
                     <!--    'element_name': 'bookings',       -->
                     <!--    'constraint': None,               -->
                     <!--    'alias': None,                    -->
                     <!--    'offset_window': None,            -->
-                    <!--    'offset_to_grain_to_date': None}  -->
+                    <!--    'offset_to_grain': None}  -->
                     <AggregateMeasuresNode>
                         <!-- description = Aggregate Measures -->
                         <!-- node_id = am_6 -->

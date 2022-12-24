@@ -7,7 +7,7 @@
             <!-- node_id = jts_0 -->
             <!-- time_range_constraint = [2020-01-01T00:00:00, 2021-01-01T00:00:00] -->
             <!-- offset_window = None -->
-            <!-- offset_to_grain_to_date = TimeGranularity.MONTH -->
+            <!-- offset_to_grain = TimeGranularity.MONTH -->
             <ComputeMetricsNode>
                 <!-- description = Compute Metrics via Expressions -->
                 <!-- node_id = cm_0 -->
@@ -17,32 +17,32 @@
                 <!--    'constraint': None,               -->
                 <!--    'alias': None,                    -->
                 <!--    'offset_window': None,            -->
-                <!--    'offset_to_grain_to_date': None}  -->
+                <!--    'offset_to_grain': None}  -->
                 <AggregateMeasuresNode>
                     <!-- description = Aggregate Measures -->
                     <!-- node_id = am_0 -->
-                    <MetricTimeDimensionTransformNode>
-                        <!-- description = Metric Time Dimension 'ds' -->
-                        <!-- node_id = sma_0 -->
-                        <!-- aggregation_time_dimension = ds -->
-                        <FilterElementsNode>
-                            <!-- description =                           -->
-                            <!--   Pass Only Elements:                   -->
-                            <!--     ['booking_value', 'ds', 'listing']  -->
-                            <!-- node_id = pfe_0 -->
-                            <!-- include_spec =                           -->
-                            <!--   {'class': 'MeasureSpec',               -->
-                            <!--    'element_name': 'booking_value',      -->
-                            <!--    'non_additive_dimension_spec': None}  -->
-                            <!-- include_spec =                               -->
-                            <!--   {'class': 'TimeDimensionSpec',             -->
-                            <!--    'element_name': 'ds',                     -->
-                            <!--    'identifier_links': (),                   -->
-                            <!--    'time_granularity': TimeGranularity.DAY}  -->
-                            <!-- include_spec =                         -->
-                            <!--   {'class': 'LinklessIdentifierSpec',  -->
-                            <!--    'element_name': 'listing',          -->
-                            <!--    'identifier_links': ()}             -->
+                    <FilterElementsNode>
+                        <!-- description =                                    -->
+                        <!--   Pass Only Elements:                            -->
+                        <!--     ['booking_value', 'metric_time', 'listing']  -->
+                        <!-- node_id = pfe_0 -->
+                        <!-- include_spec =                           -->
+                        <!--   {'class': 'MeasureSpec',               -->
+                        <!--    'element_name': 'booking_value',      -->
+                        <!--    'non_additive_dimension_spec': None}  -->
+                        <!-- include_spec =                               -->
+                        <!--   {'class': 'TimeDimensionSpec',             -->
+                        <!--    'element_name': 'metric_time',            -->
+                        <!--    'identifier_links': (),                   -->
+                        <!--    'time_granularity': TimeGranularity.DAY}  -->
+                        <!-- include_spec =                         -->
+                        <!--   {'class': 'LinklessIdentifierSpec',  -->
+                        <!--    'element_name': 'listing',          -->
+                        <!--    'identifier_links': ()}             -->
+                        <MetricTimeDimensionTransformNode>
+                            <!-- description = Metric Time Dimension 'ds' -->
+                            <!-- node_id = sma_0 -->
+                            <!-- aggregation_time_dimension = ds -->
                             <ReadSqlSourceNode>
                                 <!-- description =                                                                           -->
                                 <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
@@ -50,8 +50,8 @@
                                 <!-- data_set =                                                                    -->
                                 <!--   DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
                             </ReadSqlSourceNode>
-                        </FilterElementsNode>
-                    </MetricTimeDimensionTransformNode>
+                        </MetricTimeDimensionTransformNode>
+                    </FilterElementsNode>
                 </AggregateMeasuresNode>
             </ComputeMetricsNode>
         </JoinToTimeSpineNode>
