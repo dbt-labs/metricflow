@@ -28,4 +28,4 @@ LEFT OUTER JOIN (
     , listing_id
 ) subq_10
 ON
-  subq_11.metric_time = subq_10.metric_time
+  DATE_TRUNC('month', subq_11.metric_time) = subq_10.metric_time

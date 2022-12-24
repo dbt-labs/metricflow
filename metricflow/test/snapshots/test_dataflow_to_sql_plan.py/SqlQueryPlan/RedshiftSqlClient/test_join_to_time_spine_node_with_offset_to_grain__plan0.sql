@@ -1,8 +1,8 @@
 -- Join to Time Spine Dataset
 SELECT
-  subq_5.metric_time AS metric_time
-  , subq_4.listing AS listing
-  , subq_4.booking_fees AS booking_fees
+  time_spine_alias.metric_time AS metric_time
+  , parent_alias.listing AS listing
+  , parent_alias.booking_fees AS booking_fees
 FROM (
   -- Date Spine
   SELECT
@@ -148,4 +148,4 @@ LEFT OUTER JOIN (
   ) subq_3
 ) subq_4
 ON
-  subq_5.metric_time - INTERVAL 10 day = subq_4.metric_time
+  DATE_TRUNC('month', subq_5.metric_time) = subq_4.metric_time

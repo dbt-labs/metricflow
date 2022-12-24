@@ -1365,8 +1365,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             metadata_instances=parent_data_set.instance_set.metadata_instances,
         )
         table_alias_to_instance_set = OrderedDict(
-            time_spine_alias=time_spine_dataset.instance_set,
-            parent_alias=non_metric_time_parent_instance_set,
+            {time_spine_alias: time_spine_dataset.instance_set, parent_alias: non_metric_time_parent_instance_set}
         )
 
         return SqlDataSet(

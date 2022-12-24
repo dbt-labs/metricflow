@@ -1,8 +1,8 @@
 -- Join to Time Spine Dataset
 SELECT
-  time_spine_alias.metric_time AS metric_time
-  , parent_alias.listing AS listing
-  , parent_alias.booking_fees AS booking_fees
+  subq_5.metric_time AS metric_time
+  , subq_4.listing AS listing
+  , subq_4.booking_fees AS booking_fees
 FROM (
   -- Date Spine
   SELECT
