@@ -101,11 +101,11 @@ class ReadSqlSourceNodeCounter(Generic[SourceDataSetT], DataflowPlanNodeVisitor[
     ) -> int:
         return self._sum_parents(node)
 
-    def count_source_nodes(self, dataflow_plan: DataflowPlan[SourceDataSetT]) -> int:  # noqa: D
-        return dataflow_plan.sink_output_node.accept(self)
-
     def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode[SourceDataSetT]) -> int:  # noqa: D
         return self._sum_parents(node)
+
+    def count_source_nodes(self, dataflow_plan: DataflowPlan[SourceDataSetT]) -> int:  # noqa: D
+        return dataflow_plan.sink_output_node.accept(self)
 
 
 def check_optimization(  # noqa: D

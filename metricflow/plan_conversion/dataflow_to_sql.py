@@ -1337,6 +1337,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             )
         elif node.offset_to_grain_to_date:
             left_expr = SqlDateTruncExpression(time_granularity=node.offset_to_grain_to_date, arg=left_expr)
+
         join_description = SqlJoinDescription(
             right_source=parent_data_set.sql_select_node,
             right_source_alias=parent_alias,
