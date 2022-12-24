@@ -1351,11 +1351,31 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             join_type=SqlJoinType.LEFT_OUTER,  # TODO: test other join types
         )
 
+        # Use metric_time instance from time spine, all instances EXCEPT metric_time from parent data set.
+        non_metric_time_parent_instance_set = InstanceSet(
+            measure_instances=parent_data_set.instance_set.measure_instances,
+            dimension_instances=parent_data_set.instance_set.dimension_instances,
+            time_dimension_instances=tuple(
+                time_dimension_instance
+                for time_dimension_instance in parent_data_set.instance_set.time_dimension_instances
+                if time_dimension_instance.spec.element_name != DataSet.metric_time_dimension_reference().element_name
+            ),
+            identifier_instances=parent_data_set.instance_set.identifier_instances,
+            metric_instances=parent_data_set.instance_set.metric_instances,
+            metadata_instances=parent_data_set.instance_set.metadata_instances,
+        )
+        table_alias_to_instance_set = OrderedDict(
+            time_spine_alias=time_spine_dataset.instance_set,
+            parent_alias=non_metric_time_parent_instance_set,
+        )
+
         return SqlDataSet(
-            instance_set=InstanceSet.merge([time_spine_dataset.instance_set, parent_data_set.instance_set]),
+            instance_set=InstanceSet.merge(list(table_alias_to_instance_set.values())),
             sql_select_node=SqlSelectStatementNode(
                 description=node.description,
-                select_columns=parent_data_set.sql_select_node.select_columns,
+                select_columns=create_select_columns_for_instance_sets(
+                    self._column_association_resolver, table_alias_to_instance_set
+                ),
                 from_source=time_spine_dataset.sql_select_node,
                 from_source_alias=time_spine_alias,
                 joins_descs=(join_description,),
