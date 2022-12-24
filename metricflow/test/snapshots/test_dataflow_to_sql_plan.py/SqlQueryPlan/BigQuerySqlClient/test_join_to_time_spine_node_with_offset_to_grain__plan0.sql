@@ -148,4 +148,4 @@ LEFT OUTER JOIN (
   ) subq_3
 ) subq_4
 ON
-  DATE_SUB(CAST(subq_5.metric_time AS DATETIME), INTERVAL 10 day) = subq_4.metric_time
+  DATE_TRUNC(subq_5.metric_time, month) = subq_4.metric_time

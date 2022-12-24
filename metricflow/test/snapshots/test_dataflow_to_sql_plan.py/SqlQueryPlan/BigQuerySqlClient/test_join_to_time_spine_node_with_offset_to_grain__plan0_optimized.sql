@@ -8,7 +8,7 @@ FROM (
   SELECT
     ds AS metric_time
   FROM ***************************.mf_time_spine subq_11
-  WHERE ds BETWEEN CAST('2020-01-01' AS TIMESTAMP) AND CAST('2021-01-01' AS TIMESTAMP)
+  WHERE ds BETWEEN CAST('2020-01-01' AS DATETIME) AND CAST('2021-01-01' AS DATETIME)
 ) subq_11
 LEFT OUTER JOIN (
   -- Compute Metrics via Expressions
@@ -31,9 +31,9 @@ LEFT OUTER JOIN (
       SELECT * FROM ***************************.fct_bookings
     ) bookings_source_src_10001
     GROUP BY
-      ds
-      , listing_id
+      metric_time
+      , listing
   ) subq_9
 ) subq_10
 ON
-  subq_11.metric_time = subq_10.metric_time
+  DATE_TRUNC(subq_11.metric_time, month) = subq_10.metric_time
