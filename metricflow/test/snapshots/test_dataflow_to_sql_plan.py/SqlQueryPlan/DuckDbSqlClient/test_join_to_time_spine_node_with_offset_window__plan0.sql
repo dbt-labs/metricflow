@@ -6,9 +6,9 @@ SELECT
 FROM (
   -- Date Spine
   SELECT
-    subq_5.ds AS metric_time
-  FROM ***************************.mf_time_spine subq_5
-  WHERE subq_5.ds BETWEEN CAST('2020-01-01' AS TIMESTAMP) AND CAST('2021-01-01' AS TIMESTAMP)
+    subq_6.ds AS metric_time
+  FROM ***************************.mf_time_spine subq_6
+  WHERE subq_6.ds BETWEEN CAST('2020-01-01' AS TIMESTAMP) AND CAST('2021-01-01' AS TIMESTAMP)
 ) subq_5
 LEFT OUTER JOIN (
   -- Compute Metrics via Expressions
