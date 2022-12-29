@@ -1309,8 +1309,10 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         metric_time_dimension_instance: Optional[TimeDimensionInstance] = None
         for instance in parent_data_set.metric_time_dimension_instances:
             if len(instance.spec.identifier_links) == 0:
-                metric_time_dimension_instance = instance
-                break
+                if not metric_time_dimension_instance or (
+                    instance.spec.time_granularity < metric_time_dimension_instance.spec.time_granularity
+                ):
+                    metric_time_dimension_instance = instance
         assert (
             metric_time_dimension_instance
         ), "Can't query offset metric without a time dimension. Validations should have prevented this."
