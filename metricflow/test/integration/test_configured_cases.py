@@ -106,7 +106,7 @@ class CheckQueryHelpers:
         ).sql
 
     def render_percentile_expr(self, expr: str, percentile: float, use_discrete_percentile: bool) -> str:
-        """Return the percentile call that can be used for ."""
+        """Return the percentile call that can be used for computing a percentile aggregation."""
         percentile_type = (
             SqlPercentileFunctionType.DISCRETE if use_discrete_percentile else SqlPercentileFunctionType.CONTINUOUS
         )
