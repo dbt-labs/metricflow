@@ -16,6 +16,9 @@ from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_exprs import (
+    SqlPercentileExpression,
+    SqlPercentileExpressionArgument,
+    SqlPercentileFunctionType,
     SqlTimeDeltaExpression,
     SqlColumnReferenceExpression,
     SqlColumnReference,
@@ -102,6 +105,22 @@ class CheckQueryHelpers:
             renderable_expr
         ).sql
 
+    def render_percentile_expr(self, expr: str, percentile: float, use_discrete_percentile: bool) -> str:
+        """Return the percentile call that can be used for computing a percentile aggregation."""
+        percentile_type = (
+            SqlPercentileFunctionType.DISCRETE if use_discrete_percentile else SqlPercentileFunctionType.CONTINUOUS
+        )
+        renderable_expr = SqlPercentileExpression(
+            order_by_arg=SqlStringExpression(
+                sql_expr=expr,
+                requires_parenthesis=False,
+            ),
+            percentile_args=SqlPercentileExpressionArgument(percentile=percentile, function_type=percentile_type),
+        )
+        return self._sql_client.sql_engine_attributes.sql_query_plan_renderer.expr_renderer.render_sql_expr(
+            renderable_expr
+        ).sql
+
     @property
     def double_data_type_name(self) -> str:
         """Return the name of the double data type for the relevant SQL engine"""
@@ -119,6 +138,9 @@ def filter_not_supported_features(
                 not_supported_features.append(required_feature)
         elif required_feature is RequiredDwEngineFeatures.FULL_OUTER_JOIN:
             if not sql_client.sql_engine_attributes.full_outer_joins_supported:
+                not_supported_features.append(required_feature)
+        elif required_feature is RequiredDwEngineFeatures.PERCENTILE_AGGREGATION:
+            if not sql_client.sql_engine_attributes.percentile_aggregation_supported:
                 not_supported_features.append(required_feature)
         else:
             assert_values_exhausted(required_feature)
@@ -200,6 +222,7 @@ def test_case(
                 TimeGranularity=TimeGranularity,
                 render_date_sub=check_query_helpers.render_date_sub,
                 render_date_trunc=check_query_helpers.render_date_trunc,
+                render_percentile_expr=check_query_helpers.render_percentile_expr,
                 mf_time_spine_source=time_spine_source.spine_table.sql,
                 double_data_type_name=check_query_helpers.double_data_type_name,
             )
@@ -218,6 +241,7 @@ def test_case(
             TimeGranularity=TimeGranularity,
             render_date_sub=check_query_helpers.render_date_sub,
             render_date_trunc=check_query_helpers.render_date_trunc,
+            render_percentile_expr=check_query_helpers.render_percentile_expr,
             mf_time_spine_source=time_spine_source.spine_table.sql,
             double_data_type_name=check_query_helpers.double_data_type_name,
         )

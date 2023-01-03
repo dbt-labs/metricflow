@@ -32,6 +32,7 @@ class RequiredDwEngineFeatures(Enum):
 
     DATE_TRUNC = "DATE_TRUNC"
     FULL_OUTER_JOIN = "FULL_OUTER_JOIN"
+    PERCENTILE_AGGREGATION = "PERCENTILE_AGGREGATION"
 
     def __repr__(self) -> str:  # noqa: D
         return f"{self.__class__.__name__}.{self.name}"
