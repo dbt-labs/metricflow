@@ -115,7 +115,7 @@ integration_test:
   name: percentile_agg
   description: Tests PERCENTILE aggregation
   model: SIMPLE_MODEL
-  required_features: ["PERCENTILE_AGGREGATION"]
+  required_features: ["CONTINUOUS_PERCENTILE_AGGREGATION"]
   metrics: ["booking_value_p99"]
   group_bys: ["metric_time"]
   check_query: |
@@ -131,7 +131,7 @@ integration_test:
   name: median_agg
   description: Tests MEDIAN aggregation
   model: SIMPLE_MODEL
-  required_features: ["PERCENTILE_AGGREGATION"]
+  required_features: ["CONTINUOUS_PERCENTILE_AGGREGATION"]
   metrics: ["median_booking_value"]
   group_bys: ["metric_time"]
   check_query: |

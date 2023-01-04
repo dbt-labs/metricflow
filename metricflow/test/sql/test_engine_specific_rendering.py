@@ -107,7 +107,7 @@ def test_percentile_expr(
     sql_client: SqlClient,
 ) -> None:
     """Tests rendering of the percentile expression in a query."""
-    if not sql_client.sql_engine_attributes.percentile_aggregation_supported:
+    if not sql_client.sql_engine_attributes.continuous_percentile_aggregation_supported:
         pytest.skip("Warehouse does not support percentile expressions")
 
     select_columns = [

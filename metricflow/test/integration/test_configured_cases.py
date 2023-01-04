@@ -139,8 +139,17 @@ def filter_not_supported_features(
         elif required_feature is RequiredDwEngineFeatures.FULL_OUTER_JOIN:
             if not sql_client.sql_engine_attributes.full_outer_joins_supported:
                 not_supported_features.append(required_feature)
-        elif required_feature is RequiredDwEngineFeatures.PERCENTILE_AGGREGATION:
-            if not sql_client.sql_engine_attributes.percentile_aggregation_supported:
+        elif required_feature is RequiredDwEngineFeatures.CONTINUOUS_PERCENTILE_AGGREGATION:
+            if not sql_client.sql_engine_attributes.continuous_percentile_aggregation_supported:
+                not_supported_features.append(required_feature)
+        elif required_feature is RequiredDwEngineFeatures.DISCRETE_PERCENTILE_AGGREGATION:
+            if not sql_client.sql_engine_attributes.discrete_percentile_aggregation_supported:
+                not_supported_features.append(required_feature)
+        elif required_feature is RequiredDwEngineFeatures.APPROXIMATE_CONTINUOUS_PERCENTILE_AGGREGATION:
+            if not sql_client.sql_engine_attributes.approximate_continuous_percentile_aggregation_supported:
+                not_supported_features.append(required_feature)
+        elif required_feature is RequiredDwEngineFeatures.APPROXIMATE_DISCRETE_PERCENTILE_AGGREGATION:
+            if not sql_client.sql_engine_attributes.approximate_discrete_percentile_aggregation_supported:
                 not_supported_features.append(required_feature)
         else:
             assert_values_exhausted(required_feature)
