@@ -1,3 +1,4 @@
+from metricflow.object_utils import assert_values_exhausted
 from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
     SqlExpressionRenderer,
@@ -20,15 +21,22 @@ class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         """Render a percentile expression for Redshift. Add additional over() syntax for window."""
         arg_rendered = self.render_sql_expr(node.order_by_arg)
         params = arg_rendered.execution_parameters
-
-        if node.percentile_args.function_type == SqlPercentileFunctionType.DISCRETE:
-            raise RuntimeError(
-                "Redshift SQL Engine does not yet support discrete percentile"
-                "aggregation functions. Please disable the use_discrete_percentile flag in all measures."
-            )
-
-        function_str = node.percentile_args.function_name
         percentile = node.percentile_args.percentile
+
+        if node.percentile_args.function_type is SqlPercentileFunctionType.CONTINUOUS:
+            function_str = "PERCENTILE_CONT"
+        elif node.percentile_args.function_type is SqlPercentileFunctionType.DISCRETE:
+            raise RuntimeError(
+                "Discrete percentile aggregate not supported for Redshift. Use continuous or approximate discrete percentile in all measures."
+            )
+        elif node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS:
+            raise RuntimeError(
+                "Approximate continuous percentile aggregate not supported for Redshift. Use continuous or approximate discrete percentile in all measures."
+            )
+        elif node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_DISCRETE:
+            function_str = "APPROXIMATE PERCENTILE_DISC"
+        else:
+            assert_values_exhausted(node.percentile_args.function_type)
 
         return SqlExpressionRenderResult(
             sql=f"{function_str}({percentile}) WITHIN GROUP (ORDER BY ({arg_rendered.sql}))",

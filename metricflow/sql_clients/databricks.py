@@ -11,7 +11,8 @@ from databricks import sql
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlEngineAttributes, SqlEngine, SqlIsolationLevel
 from metricflow.protocols.sql_request import SqlRequestTagSet, SqlJsonTag
-from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer, SqlQueryPlanRenderer
+from metricflow.sql.render.databricks import DatabricksSqlQueryPlanRenderer
+from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_bind_parameters import SqlColumnType
 from metricflow.sql_clients.async_request import CombinedSqlTags
@@ -62,7 +63,7 @@ class DatabricksEngineAttributes:
     timestamp_type_name: ClassVar[Optional[str]] = "TIMESTAMP"
     random_function_name: ClassVar[str] = "RANDOM"
     # MetricFlow attributes
-    sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer] = DefaultSqlQueryPlanRenderer()
+    sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer] = DatabricksSqlQueryPlanRenderer()
 
 
 class DatabricksSqlClient(BaseSqlClientImplementation):

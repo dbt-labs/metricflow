@@ -835,6 +835,8 @@ class SqlPercentileFunctionType(Enum):
 
     DISCRETE = "discrete"
     CONTINUOUS = "continuous"
+    APPROXIMATE_DISCRETE = "approximate_discrete"
+    APPROXIMATE_CONTINUOUS = "approximate_continuous"
 
 
 @dataclass(frozen=True)
