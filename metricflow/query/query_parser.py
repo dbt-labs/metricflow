@@ -6,7 +6,11 @@ import time
 from dataclasses import dataclass
 from typing import List, Optional, Tuple, Dict, Sequence
 
-import fuzzywuzzy.fuzz
+import warnings
+
+with warnings.catch_warnings():
+    warnings.filterwarnings("ignore", category=UserWarning)
+    import fuzzywuzzy.fuzz
 import fuzzywuzzy.process
 
 from metricflow.constraints.time_constraint import TimeRangeConstraint
