@@ -16,7 +16,7 @@ from metricflow.model.objects.elements.dimension import Dimension, DimensionType
 from metricflow.model.objects.elements.identifier import Identifier, IdentifierType
 from metricflow.model.objects.elements.measure import Measure
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
-from metricflow.protocols.sql_client import SqlClient
+from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.model.validations.helpers import data_source_with_guaranteed_meta
@@ -43,19 +43,21 @@ def dw_backed_warehouse_validation_model(
 def test_build_data_source_tasks(
     mf_test_session_state: MetricFlowTestSessionState,
     data_warehouse_validation_model: UserConfiguredModel,
-    sql_client: SqlClient,
+    async_sql_client: AsyncSqlClient,
 ) -> None:  # noqa:D
     tasks = DataWarehouseTaskBuilder.gen_data_source_tasks(
         model=data_warehouse_validation_model,
-        sql_client=sql_client,
+        sql_client=async_sql_client,
         system_schema=mf_test_session_state.mf_system_schema,
     )
     assert len(tasks) == len(data_warehouse_validation_model.data_sources)
 
 
-def test_task_runner(sql_client: SqlClient, mf_test_session_state: MetricFlowTestSessionState) -> None:  # noqa: D
+def test_task_runner(  # noqa: D
+    async_sql_client: AsyncSqlClient, mf_test_session_state: MetricFlowTestSessionState
+) -> None:
     dw_validator = DataWarehouseModelValidator(
-        sql_client=sql_client, system_schema=mf_test_session_state.mf_system_schema
+        sql_client=async_sql_client, system_schema=mf_test_session_state.mf_system_schema
     )
 
     def good_query() -> Tuple[str, SqlBindParameters]:
@@ -83,13 +85,13 @@ def test_task_runner(sql_client: SqlClient, mf_test_session_state: MetricFlowTes
 
 def test_validate_data_sources(  # noqa: D
     dw_backed_warehouse_validation_model: UserConfiguredModel,
-    sql_client: SqlClient,
+    async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
     model = deepcopy(dw_backed_warehouse_validation_model)
 
     dw_validator = DataWarehouseModelValidator(
-        sql_client=sql_client, system_schema=mf_test_session_state.mf_system_schema
+        sql_client=async_sql_client, system_schema=mf_test_session_state.mf_system_schema
     )
 
     issues = dw_validator.validate_data_sources(model)
@@ -112,12 +114,12 @@ def test_validate_data_sources(  # noqa: D
 
 def test_build_dimension_tasks(  # noqa: D
     data_warehouse_validation_model: UserConfiguredModel,
-    sql_client: SqlClient,
+    async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
     tasks = DataWarehouseTaskBuilder.gen_dimension_tasks(
         model=data_warehouse_validation_model,
-        sql_client=sql_client,
+        sql_client=async_sql_client,
         system_schema=mf_test_session_state.mf_system_schema,
     )
     # on data source query with all dimensions
@@ -128,13 +130,13 @@ def test_build_dimension_tasks(  # noqa: D
 
 def test_validate_dimensions(  # noqa: D
     dw_backed_warehouse_validation_model: UserConfiguredModel,
-    sql_client: SqlClient,
+    async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
     model = deepcopy(dw_backed_warehouse_validation_model)
 
     dw_validator = DataWarehouseModelValidator(
-        sql_client=sql_client, system_schema=mf_test_session_state.mf_system_schema
+        sql_client=async_sql_client, system_schema=mf_test_session_state.mf_system_schema
     )
 
     issues = dw_validator.validate_dimensions(model)
@@ -152,12 +154,12 @@ def test_validate_dimensions(  # noqa: D
 
 def test_build_identifiers_tasks(  # noqa: D
     data_warehouse_validation_model: UserConfiguredModel,
-    sql_client: SqlClient,
+    async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
     tasks = DataWarehouseTaskBuilder.gen_identifier_tasks(
         model=data_warehouse_validation_model,
-        sql_client=sql_client,
+        sql_client=async_sql_client,
         system_schema=mf_test_session_state.mf_system_schema,
     )
     assert len(tasks) == 1  # on data source query with all identifiers
@@ -166,13 +168,13 @@ def test_build_identifiers_tasks(  # noqa: D
 
 def test_validate_identifiers(  # noqa: D
     dw_backed_warehouse_validation_model: UserConfiguredModel,
-    sql_client: SqlClient,
+    async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
     model = deepcopy(dw_backed_warehouse_validation_model)
 
     dw_validator = DataWarehouseModelValidator(
-        sql_client=sql_client, system_schema=mf_test_session_state.mf_system_schema
+        sql_client=async_sql_client, system_schema=mf_test_session_state.mf_system_schema
     )
 
     issues = dw_validator.validate_identifiers(model)
@@ -190,12 +192,12 @@ def test_validate_identifiers(  # noqa: D
 
 def test_build_measure_tasks(  # noqa: D
     data_warehouse_validation_model: UserConfiguredModel,
-    sql_client: SqlClient,
+    async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
     tasks = DataWarehouseTaskBuilder.gen_measure_tasks(
         model=data_warehouse_validation_model,
-        sql_client=sql_client,
+        sql_client=async_sql_client,
         system_schema=mf_test_session_state.mf_system_schema,
     )
     assert len(tasks) == 1  # on data source query with all measures
@@ -204,13 +206,13 @@ def test_build_measure_tasks(  # noqa: D
 
 def test_validate_measures(  # noqa: D
     dw_backed_warehouse_validation_model: UserConfiguredModel,
-    sql_client: SqlClient,
+    async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
     model = deepcopy(dw_backed_warehouse_validation_model)
 
     dw_validator = DataWarehouseModelValidator(
-        sql_client=sql_client, system_schema=mf_test_session_state.mf_system_schema
+        sql_client=async_sql_client, system_schema=mf_test_session_state.mf_system_schema
     )
 
     issues = dw_validator.validate_measures(model)
@@ -229,13 +231,13 @@ def test_validate_measures(  # noqa: D
 def test_build_metric_tasks(  # noqa: D
     request: FixtureRequest,
     data_warehouse_validation_model: UserConfiguredModel,
-    sql_client: SqlClient,
+    async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
     tasks = DataWarehouseTaskBuilder.gen_metric_tasks(
         model=data_warehouse_validation_model,
         system_schema=mf_test_session_state.mf_system_schema,
-        sql_client=sql_client,
+        sql_client=async_sql_client,
     )
     assert len(tasks) == 1
     (query_string, _params) = tasks[0].query_and_params_callable()
@@ -249,18 +251,18 @@ def test_build_metric_tasks(  # noqa: D
         incomparable_strings_replacement_function=make_schema_replacement_function(
             system_schema=mf_test_session_state.mf_system_schema, source_schema=mf_test_session_state.mf_source_schema
         ),
-        additional_sub_directories_for_snapshots=(sql_client.__class__.__name__,),
+        additional_sub_directories_for_snapshots=(async_sql_client.__class__.__name__,),
     )
 
 
 def test_validate_metrics(  # noqa: D
     dw_backed_warehouse_validation_model: UserConfiguredModel,
-    sql_client: SqlClient,
+    async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
     model = deepcopy(dw_backed_warehouse_validation_model)
     dw_validator = DataWarehouseModelValidator(
-        sql_client=sql_client, system_schema=mf_test_session_state.mf_system_schema
+        sql_client=async_sql_client, system_schema=mf_test_session_state.mf_system_schema
     )
 
     issues = dw_validator.validate_metrics(model)
@@ -283,7 +285,7 @@ def test_validate_metrics(  # noqa: D
 
     # Validate new metric created by proxy causes an issue (because the column used doesn't exist)
     dw_validator = DataWarehouseModelValidator(
-        sql_client=sql_client, system_schema=mf_test_session_state.mf_system_schema
+        sql_client=async_sql_client, system_schema=mf_test_session_state.mf_system_schema
     )
     issues = dw_validator.validate_metrics(model)
     assert len(issues.all_issues) == 1

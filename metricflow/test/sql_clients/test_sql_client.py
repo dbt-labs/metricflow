@@ -1,18 +1,19 @@
+import datetime
 import logging
 import threading
-from collections import OrderedDict
-from typing import Set, Union
+from typing import Set, Union, Sequence
 
 import pandas as pd
 import pytest
+from sqlalchemy.exc import ProgrammingError
+
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.object_utils import assert_values_exhausted, random_id
-from metricflow.protocols.sql_client import SqlClient, SupportedSqlEngine
+from metricflow.object_utils import assert_values_exhausted, random_id, SqlColumnType
+from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.sql_utils import make_df
 from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
-from sqlalchemy.exc import ProgrammingError
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +22,7 @@ def _random_table() -> str:
     return f"test_table_{random_id()}"
 
 
-def _select_x_as_y(sql_client: SqlClient, x: int = 1, y: str = "y") -> str:  # noqa: D
+def _select_x_as_y(x: int = 1, y: str = "y") -> str:  # noqa: D
     return f"SELECT {x} AS {y}"
 
 
@@ -33,19 +34,42 @@ def _check_1col(df: pd.DataFrame, col: str = "y", vals: Set[Union[int, str]] = {
 
 
 def test_query(sql_client: SqlClient) -> None:  # noqa: D
-    df = sql_client.query(_select_x_as_y(sql_client))
+    df = sql_client.query(_select_x_as_y())
     _check_1col(df)
 
 
-def test_query_with_execution_params(sql_client: SqlClient) -> None:  # noqa: D
-    expr = f"SELECT {sql_client.render_execution_param_key('x')} as y"
-    sql_execution_params = SqlBindParameters()
-    sql_execution_params.param_dict = OrderedDict([("x", "1")])
-    df = sql_client.query(expr, sql_bind_parameters=sql_execution_params)
-    assert isinstance(df, pd.DataFrame)
-    assert df.shape == (1, 1)
-    assert df.columns.tolist() == ["y"]
-    assert set(df["y"]) == {"1"}
+def test_query_with_execution_params(sql_client: SqlClient) -> None:
+    """Test querying with execution parameters of all supported datatypes."""
+    params: Sequence[SqlColumnType] = [
+        2,
+        "hi",
+        3.5,
+        True,
+        False,
+        datetime.datetime(2022, 1, 1),
+        datetime.date(2020, 12, 31),
+    ]
+    for param in params:
+        sql_execution_params = SqlBindParameters.create_from_dict(({"x": param}))
+        assert sql_execution_params.param_dict["x"] == param  # check that pydantic did not coerce type unexpectedly
+
+        expr = f"SELECT {sql_client.render_execution_param_key('x')} as y"
+        df = sql_client.query(expr, sql_bind_parameters=sql_execution_params)
+        assert isinstance(df, pd.DataFrame)
+        assert df.shape == (1, 1)
+        assert df.columns.tolist() == ["y"]
+
+        # Some engines convert some types to str; convert everything to str for comparison
+        str_param = str(param)
+        str_result = str(df["y"][0])
+        # Some engines use JSON bool syntax (i.e., True -> 'true')
+        if isinstance(param, bool):
+            assert str_result in [str_param, str_param.lower()]
+        # Some engines add decimals to datetime milliseconds; trim here
+        elif isinstance(param, datetime.datetime):
+            assert str_result[: len(str_param)] == str_param
+        else:
+            assert str_result == str_param
 
 
 def test_select_one_query(sql_client: SqlClient) -> None:  # noqa: D
@@ -56,8 +80,7 @@ def test_select_one_query(sql_client: SqlClient) -> None:  # noqa: D
 
 def test_failed_query_with_execution_params(sql_client: SqlClient) -> None:  # noqa: D
     expr = f"SELECT {sql_client.render_execution_param_key('x')}"
-    sql_execution_params = SqlBindParameters()
-    sql_execution_params.param_dict = OrderedDict([("x", "1")])
+    sql_execution_params = SqlBindParameters.create_from_dict({"x": 1})
 
     sql_client.query(expr, sql_bind_parameters=sql_execution_params)
     with pytest.raises(Exception):
@@ -66,7 +89,7 @@ def test_failed_query_with_execution_params(sql_client: SqlClient) -> None:  # n
 
 def test_create_table(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D
     sql_table = SqlTable(schema_name=mf_test_session_state.mf_source_schema, table_name=_random_table())
-    sql_client.create_table_as_select(sql_table, _select_x_as_y(sql_client))
+    sql_client.create_table_as_select(sql_table, _select_x_as_y())
     df = sql_client.query(f"SELECT * FROM {sql_table.sql}")
     _check_1col(df)
 
@@ -95,7 +118,7 @@ def test_create_table_from_dataframe(  # noqa: D
 
 def test_table_exists(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D
     sql_table = SqlTable(schema_name=mf_test_session_state.mf_source_schema, table_name=_random_table())
-    sql_client.create_table_as_select(sql_table, _select_x_as_y(sql_client))
+    sql_client.create_table_as_select(sql_table, _select_x_as_y())
     assert sql_client.table_exists(sql_table)
 
 
@@ -144,28 +167,37 @@ def test_dry_run_of_bad_query_raises_exception(sql_client: SqlClient) -> None:  
 def _issue_sleep_query(sql_client: SqlClient, sleep_time: int) -> None:
     """Issue a query that sleeps for a given number of seconds"""
     engine_type = sql_client.sql_engine_attributes.sql_engine_type
-    if engine_type == SupportedSqlEngine.SNOWFLAKE:
+    if engine_type is SqlEngine.SNOWFLAKE:
         sql_client.execute(f"CALL system$wait({sleep_time}, 'SECONDS')")
-    elif engine_type in (SupportedSqlEngine.BIGQUERY, SupportedSqlEngine.REDSHIFT, SupportedSqlEngine.DATABRICKS):
+    elif (
+        engine_type is SqlEngine.DUCKDB
+        or engine_type is SqlEngine.BIGQUERY
+        or engine_type is SqlEngine.REDSHIFT
+        or engine_type is SqlEngine.DATABRICKS
+        or engine_type is SqlEngine.POSTGRES
+        or engine_type is SqlEngine.MYSQL
+    ):
         raise RuntimeError(f"Sleep yet not supported with {engine_type}")
-
-    assert_values_exhausted(engine_type)
+    else:
+        assert_values_exhausted(engine_type)
 
 
 def _supports_sleep_query(sql_client: SqlClient) -> bool:
     """Returns true if the given SQL client is supported by _issue_sleep_query()"""
     engine_type = sql_client.sql_engine_attributes.sql_engine_type
-    if engine_type == SupportedSqlEngine.SNOWFLAKE:
+    if engine_type is SqlEngine.SNOWFLAKE:
         return True
-    elif engine_type in (
-        SupportedSqlEngine.DUCKDB,
-        SupportedSqlEngine.BIGQUERY,
-        SupportedSqlEngine.REDSHIFT,
-        SupportedSqlEngine.DATABRICKS,
+    elif (
+        engine_type is SqlEngine.DUCKDB
+        or engine_type is SqlEngine.BIGQUERY
+        or engine_type is SqlEngine.REDSHIFT
+        or engine_type is SqlEngine.DATABRICKS
+        or engine_type is SqlEngine.POSTGRES
+        or engine_type is SqlEngine.MYSQL
     ):
         return False
-
-    assert_values_exhausted(engine_type)
+    else:
+        assert_values_exhausted(engine_type)
 
 
 def test_cancel_submitted_queries(  # noqa: D
@@ -189,20 +221,31 @@ def test_cancel_submitted_queries(  # noqa: D
     timer_task = threading.Timer(0.5, cancel_submitted_queries)
     timer_task.start()
     with pytest.raises(ProgrammingError):
-        if sql_client.sql_engine_attributes.sql_engine_type == SupportedSqlEngine.SNOWFLAKE:
+        if sql_client.sql_engine_attributes.sql_engine_type == SqlEngine.SNOWFLAKE:
             _issue_sleep_query(sql_client, 5)
 
 
 def test_update_params_with_same_item() -> None:  # noqa: D
-    bind_params0 = SqlBindParameters(param_dict=OrderedDict({"key": "value"}))
-    bind_params1 = SqlBindParameters(param_dict=OrderedDict({"key": "value"}))
+    bind_params0 = SqlBindParameters.create_from_dict({"key": "value"})
+    bind_params1 = SqlBindParameters.create_from_dict({"key": "value"})
 
-    bind_params0.update(bind_params1)
+    bind_params0.combine(bind_params1)
 
 
 def test_update_params_with_same_key_different_values() -> None:  # noqa: D
-    bind_params0 = SqlBindParameters(param_dict=OrderedDict({"key": "value0"}))
-    bind_params1 = SqlBindParameters(param_dict=OrderedDict({"key": "value1"}))
+    bind_params0 = SqlBindParameters.create_from_dict(({"key": "value0"}))
+    bind_params1 = SqlBindParameters.create_from_dict(({"key": "value1"}))
 
     with pytest.raises(RuntimeError):
-        bind_params0.update(bind_params1)
+        bind_params0.combine(bind_params1)
+
+
+def test_list_tables(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D
+    source_schema = mf_test_session_state.mf_source_schema
+    sql_table = SqlTable(schema_name=source_schema, table_name=_random_table())
+    table_count_before_create = len(sql_client.list_tables(source_schema))
+    sql_client.create_table_as_select(sql_table, _select_x_as_y())
+    table_list = sql_client.list_tables(source_schema)
+    table_count_after_create = len(table_list)
+    assert table_count_after_create == table_count_before_create + 1
+    assert len([x for x in table_list if x == sql_table.table_name]) == 1

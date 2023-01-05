@@ -28,7 +28,10 @@ from metricflow.configuration.constants import (
     CONFIG_DWH_HTTP_PATH,
     CONFIG_DWH_ACCESS_TOKEN,
     CONFIG_DBT_REPO,
+    CONFIG_DBT_CLOUD_JOB_ID,
+    CONFIG_DBT_CLOUD_SERVICE_TOKEN,
 )
+from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.sql_clients.common_client import SqlDialect
 
 logger = logging.getLogger(__name__)
@@ -45,6 +48,14 @@ MF_CONFIG_KEYS = (
     ConfigKey(
         key=CONFIG_DBT_REPO,
         comment=f"If set to `True`, MetricFlow will interpret the value of `{CONFIG_MODEL_PATH}` to point to dbt configs",
+    ),
+    ConfigKey(
+        key=CONFIG_DBT_CLOUD_JOB_ID,
+        comment="The ID of a dbt cloud job to build the model from",
+    ),
+    ConfigKey(
+        key=CONFIG_DBT_CLOUD_SERVICE_TOKEN,
+        comment="The dbt service token to access the metadata for the dbt cloud job. Needs a minimum of Metadata API access for the desired dbt job's project.",
     ),
 )
 # BigQuery config keys
@@ -105,6 +116,19 @@ def generate_duckdb_demo_keys(config_dir: str) -> Tuple[ConfigKey, ...]:
         ConfigKey(key=CONFIG_DWH_DIALECT, value="duckdb"),
         ConfigKey(key=CONFIG_DWH_SCHEMA, value="mf_demo"),
     )
+
+
+# Data Warehouse link retriever
+def get_data_warehouse_config_link(handler: YamlFileHandler) -> str:
+    """Returns the URL to the docs on data warehouse specific configurations."""
+    dialect = handler.get_value(CONFIG_DWH_DIALECT) or ""
+    url_map = {
+        SqlDialect.SNOWFLAKE.value: "dw-snowflake",
+        SqlDialect.BIGQUERY.value: "dw-bigquery",
+        SqlDialect.DATABRICKS.value: "dw-databricks",
+        SqlDialect.REDSHIFT.value: "dw-redshift",
+    }
+    return f"https://docs.transform.co/docs/deployment/integrations/dw/{url_map.get(dialect, '')}"
 
 
 # Click Options

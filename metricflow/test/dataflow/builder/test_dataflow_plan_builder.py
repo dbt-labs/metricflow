@@ -6,6 +6,7 @@ from _pytest.fixtures import FixtureRequest
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
+from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.specs import (
     MetricFlowQuerySpec,
@@ -23,6 +24,7 @@ from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.plan_utils import assert_plan_snapshot_text_equal
 from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY, MTD, MTD_SPEC_MONTH
+from metricflow.time.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -574,6 +576,36 @@ def test_measure_constraint_with_reused_measure_plan(
             dimension_specs=(),
             time_dimension_specs=(MTD_SPEC_DAY,),
         ),
+    )
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=dataflow_plan,
+    )
+
+
+def test_common_data_source(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
+) -> None:
+    """Tests a simple plan getting a metric and a local dimension."""
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings"), MetricSpec(element_name="booking_value")),
+            dimension_specs=(
+                DataSet.metric_time_dimension_spec(TimeGranularity.DAY),
+                DimensionSpec(element_name="country_latest", identifier_links=(IdentifierReference("listing"),)),
+            ),
+        )
     )
 
     assert_plan_snapshot_text_equal(

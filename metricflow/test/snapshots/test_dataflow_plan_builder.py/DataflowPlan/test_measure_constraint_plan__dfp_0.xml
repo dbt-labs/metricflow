@@ -5,17 +5,16 @@
         <ComputeMetricsNode>
             <!-- description = Compute Metrics via Expressions -->
             <!-- node_id = cm_0 -->
-            <!-- metric_spec = MetricSpec(element_name='lux_booking_value_rate_expr') -->
+            <!-- metric_spec =                                      -->
+            <!--   {'class': 'MetricSpec',                          -->
+            <!--    'element_name': 'lux_booking_value_rate_expr',  -->
+            <!--    'constraint': None,                             -->
+            <!--    'alias': None}                                  -->
             <FilterElementsNode>
                 <!-- description =                                                              -->
                 <!--   Pass Only Elements:                                                      -->
-                <!--     ['metric_time', 'average_booking_value', 'bookings', 'booking_value']  -->
+                <!--     ['average_booking_value', 'bookings', 'booking_value', 'metric_time']  -->
                 <!-- node_id = pfe_5 -->
-                <!-- include_spec =                               -->
-                <!--   {'class': 'TimeDimensionSpec',             -->
-                <!--    'element_name': 'metric_time',            -->
-                <!--    'identifier_links': (),                   -->
-                <!--    'time_granularity': TimeGranularity.DAY}  -->
                 <!-- include_spec =                               -->
                 <!--   {'class': 'MeasureSpec',                   -->
                 <!--    'element_name': 'average_booking_value',  -->
@@ -28,6 +27,11 @@
                 <!--   {'class': 'MeasureSpec',               -->
                 <!--    'element_name': 'booking_value',      -->
                 <!--    'non_additive_dimension_spec': None}  -->
+                <!-- include_spec =                               -->
+                <!--   {'class': 'TimeDimensionSpec',             -->
+                <!--    'element_name': 'metric_time',            -->
+                <!--    'identifier_links': (),                   -->
+                <!--    'time_granularity': TimeGranularity.DAY}  -->
                 <JoinAggregatedMeasuresByGroupByColumnsNode>
                     <!-- description = Join Aggregated Measures with Standard Outputs -->
                     <!-- node_id = jamgc_0 -->
@@ -67,7 +71,7 @@
                                 <!--                                                                     'element_name': 'listing'},)},),  -->
                                 <!--                          'time_dimension_specs': (),                                                  -->
                                 <!--                          'identifier_specs': ()},                                                     -->
-                                <!--    'execution_parameters': {'class': 'SqlBindParameters', 'param_dict': {}}}                          -->
+                                <!--    'execution_parameters': {'class': 'SqlBindParameters', 'param_items': ()}}                         -->
                                 <FilterElementsNode>
                                     <!-- description =                                                                       -->
                                     <!--   Pass Only Elements:                                                               -->
@@ -101,7 +105,8 @@
                                         <!--                           'element_name': 'listing',          -->
                                         <!--                           'identifier_links': ()},            -->
                                         <!--    'join_on_partition_dimensions': (),                        -->
-                                        <!--    'join_on_partition_time_dimensions': ()}                   -->
+                                        <!--    'join_on_partition_time_dimensions': (),                   -->
+                                        <!--    'validity_window': None}                                   -->
                                         <FilterElementsNode>
                                             <!-- description =                                                        -->
                                             <!--   Pass Only Elements:                                                -->
@@ -140,16 +145,16 @@
                                         <FilterElementsNode>
                                             <!-- description =                     -->
                                             <!--   Pass Only Elements:             -->
-                                            <!--     ['listing', 'is_lux_latest']  -->
+                                            <!--     ['is_lux_latest', 'listing']  -->
                                             <!-- node_id = pfe_1 -->
-                                            <!-- include_spec =                         -->
-                                            <!--   {'class': 'LinklessIdentifierSpec',  -->
-                                            <!--    'element_name': 'listing',          -->
-                                            <!--    'identifier_links': ()}             -->
                                             <!-- include_spec =                       -->
                                             <!--   {'class': 'DimensionSpec',         -->
                                             <!--    'element_name': 'is_lux_latest',  -->
                                             <!--    'identifier_links': ()}           -->
+                                            <!-- include_spec =                         -->
+                                            <!--   {'class': 'LinklessIdentifierSpec',  -->
+                                            <!--    'element_name': 'listing',          -->
+                                            <!--    'identifier_links': ()}             -->
                                             <MetricTimeDimensionTransformNode>
                                                 <!-- description = Metric Time Dimension 'ds' -->
                                                 <!-- node_id = sma_10004 -->

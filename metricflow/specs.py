@@ -11,17 +11,22 @@ from __future__ import annotations
 
 import itertools
 from abc import ABC, abstractmethod
-from collections import OrderedDict
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple, TypeVar, Generic, Any
-from metricflow.aggregation_properties import AggregationType, AggregationState
 
+from metricflow.aggregation_properties import AggregationType, AggregationState
 from metricflow.column_assoc import ColumnAssociation
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dataclass_serialization import SerializableDataclass
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
-from metricflow.object_utils import assert_exactly_one_arg_set, hash_strings
-from metricflow.references import DimensionReference, MeasureReference, TimeDimensionReference, IdentifierReference
+from metricflow.object_utils import assert_exactly_one_arg_set, hash_items
+from metricflow.references import (
+    DimensionReference,
+    MeasureReference,
+    MetricReference,
+    TimeDimensionReference,
+    IdentifierReference,
+)
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.time.time_granularity import TimeGranularity
 
@@ -65,6 +70,10 @@ class ColumnAssociationResolver(ABC):
     def resolve_identifier_spec(self, identifier_spec: IdentifierSpec) -> Tuple[ColumnAssociation, ...]:  # noqa: D
         pass
 
+    @abstractmethod
+    def resolve_metadata_spec(self, metadata_spec: MetadataSpec) -> ColumnAssociation:  # noqa: D
+        pass
+
 
 @dataclass(frozen=True)
 class InstanceSpec(SerializableDataclass):
@@ -101,8 +110,29 @@ class InstanceSpec(SerializableDataclass):
         raise NotImplementedError()
 
 
+SelfTypeT = TypeVar("SelfTypeT", bound="LinkableInstanceSpec")
+
+
 @dataclass(frozen=True)
-class LinkableInstanceSpec(InstanceSpec):
+class MetadataSpec(InstanceSpec):
+    """A specification for a specification that is built during the dataflow plan and not defined in config."""
+
+    element_name: str
+
+    def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
+        return (resolver.resolve_metadata_spec(self),)
+
+    @property
+    def qualified_name(self) -> str:  # noqa: D
+        return self.element_name
+
+    @staticmethod
+    def from_name(name: str) -> MetadataSpec:  # noqa: D
+        return MetadataSpec(element_name=name)
+
+
+@dataclass(frozen=True)
+class LinkableInstanceSpec(InstanceSpec, ABC):
     """Generally a dimension or identifier that may be specified using identifier links.
 
     For example, user_id__country -> LinkableElementSpec(element_name="country", identifier_links=["user_id"]
@@ -113,11 +143,13 @@ class LinkableInstanceSpec(InstanceSpec):
     """A list representing the join path of identifiers to get to this element."""
     identifier_links: Tuple[IdentifierReference, ...]
 
-    def without_first_identifier_link(self) -> LinkableInstanceSpec:
+    @property
+    def without_first_identifier_link(self: SelfTypeT) -> SelfTypeT:
         """e.g. user_id__device_id__platform -> device_id__platform"""
         raise NotImplementedError()
 
-    def without_identifier_links(self) -> LinkableInstanceSpec:  # noqa: D
+    @property
+    def without_identifier_links(self: SelfTypeT) -> SelfTypeT:  # noqa: D
         """e.g. user_id__device_id__platform -> platform"""
         raise NotImplementedError()
 
@@ -136,17 +168,23 @@ class LinkableInstanceSpec(InstanceSpec):
             identifier_link_names=tuple(x.element_name for x in self.identifier_links), element_name=self.element_name
         ).qualified_name
 
+    @property
+    def as_linkable_spec_set(self) -> LinkableSpecSet:  # noqa: D
+        raise NotImplementedError
+
 
 @dataclass(frozen=True)
 class IdentifierSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
     def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
         return resolver.resolve_identifier_spec(self)
 
-    def without_first_identifier_link(self) -> LinkableInstanceSpec:  # noqa: D
+    @property
+    def without_first_identifier_link(self) -> IdentifierSpec:  # noqa: D
         assert len(self.identifier_links) > 0, f"Spec does not have any identifier links: {self}"
         return IdentifierSpec(element_name=self.element_name, identifier_links=self.identifier_links[1:])
 
-    def without_identifier_links(self) -> LinklessIdentifierSpec:  # noqa: D
+    @property
+    def without_identifier_links(self) -> IdentifierSpec:  # noqa: D
         return LinklessIdentifierSpec.from_element_name(self.element_name)
 
     @property
@@ -176,6 +214,10 @@ class IdentifierSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
     @property
     def reference(self) -> IdentifierReference:  # noqa: D
         return IdentifierReference(element_name=self.element_name)
+
+    @property
+    def as_linkable_spec_set(self) -> LinkableSpecSet:  # noqa: D
+        return LinkableSpecSet(identifier_specs=(self,))
 
 
 @dataclass(frozen=True)
@@ -211,11 +253,13 @@ class DimensionSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
     def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
         return (resolver.resolve_dimension_spec(self),)
 
-    def without_first_identifier_link(self) -> LinkableInstanceSpec:  # noqa: D
+    @property
+    def without_first_identifier_link(self) -> DimensionSpec:  # noqa: D
         assert len(self.identifier_links) > 0, f"Spec does not have any identifier links: {self}"
         return DimensionSpec(element_name=self.element_name, identifier_links=self.identifier_links[1:])
 
-    def without_identifier_links(self) -> LinkableInstanceSpec:  # noqa: D
+    @property
+    def without_identifier_links(self) -> DimensionSpec:  # noqa: D
         return DimensionSpec(element_name=self.element_name, identifier_links=())
 
     @staticmethod
@@ -235,6 +279,10 @@ class DimensionSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
     def reference(self) -> DimensionReference:  # noqa: D
         return DimensionReference(element_name=self.element_name)
 
+    @property
+    def as_linkable_spec_set(self) -> LinkableSpecSet:  # noqa: D
+        return LinkableSpecSet(dimension_specs=(self,))
+
 
 DEFAULT_TIME_GRANULARITY = TimeGranularity.DAY
 
@@ -246,7 +294,8 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
     def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
         return (resolver.resolve_time_dimension_spec(self),)
 
-    def without_first_identifier_link(self) -> LinkableInstanceSpec:  # noqa: D
+    @property
+    def without_first_identifier_link(self) -> TimeDimensionSpec:  # noqa: D
         assert len(self.identifier_links) > 0, f"Spec does not have any identifier links: {self}"
         return TimeDimensionSpec(
             element_name=self.element_name,
@@ -254,8 +303,9 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
             time_granularity=self.time_granularity,
         )
 
-    def without_identifier_links(self) -> LinklessIdentifierSpec:  # noqa: D
-        return LinklessIdentifierSpec.from_element_name(self.element_name)
+    @property
+    def without_identifier_links(self) -> TimeDimensionSpec:  # noqa: D
+        return TimeDimensionSpec.from_name(self.element_name)
 
     @staticmethod
     def from_name(name: str) -> TimeDimensionSpec:  # noqa: D
@@ -282,6 +332,10 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
             time_granularity=self.time_granularity,
         ).qualified_name
 
+    @property
+    def as_linkable_spec_set(self) -> LinkableSpecSet:  # noqa: D
+        return LinkableSpecSet(time_dimension_specs=(self,))
+
 
 @dataclass(frozen=True)
 class NonAdditiveDimensionSpec(SerializableDataclass):
@@ -300,7 +354,7 @@ class NonAdditiveDimensionSpec(SerializableDataclass):
         """Returns the hash value used for grouping equivalent params."""
         values = [self.window_choice.name, self.name]
         values.extend(sorted(self.window_groupings))
-        return hash_strings(values)
+        return hash_items(values)
 
     @property
     def linkable_specs(self) -> LinkableSpecSet:  # noqa: D
@@ -349,6 +403,12 @@ class MeasureSpec(InstanceSpec):  # noqa: D
 class MetricSpec(InstanceSpec):  # noqa: D
     # Time-over-time could go here
     element_name: str
+    constraint: Optional[SpecWhereClauseConstraint] = None
+    alias: Optional[str] = None
+
+    @staticmethod
+    def from_element_name(element_name: str) -> MetricSpec:  # noqa: D
+        return MetricSpec(element_name=element_name)
 
     def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
         return (resolver.resolve_metric_spec(self),)
@@ -356,6 +416,23 @@ class MetricSpec(InstanceSpec):  # noqa: D
     @property
     def qualified_name(self) -> str:  # noqa: D
         return self.element_name
+
+    @property
+    def as_reference(self) -> MetricReference:  # noqa: D
+        return MetricReference(element_name=self.element_name)
+
+    @staticmethod
+    def from_reference(reference: MetricReference) -> MetricSpec:
+        """Initialize from a metric reference instance"""
+        return MetricSpec(element_name=reference.element_name)
+
+    @property
+    def alias_spec(self) -> MetricSpec:
+        """Returns a MetricSpec represneting the alias state."""
+        return MetricSpec(
+            element_name=self.alias or self.element_name,
+            constraint=self.constraint,
+        )
 
 
 @dataclass(frozen=True)
@@ -471,6 +548,24 @@ class LinkableSpecSet(SerializableDataclass):
     def is_subset_of(self, other_set: LinkableSpecSet) -> bool:  # noqa: D
         return set(self.as_tuple).issubset(set(other_set.as_tuple))
 
+    @property
+    def as_instance_set(self) -> InstanceSpecSet:  # noqa: D
+        return InstanceSpecSet(
+            dimension_specs=self.dimension_specs,
+            time_dimension_specs=self.time_dimension_specs,
+            identifier_specs=self.identifier_specs,
+        )
+
+    def difference(self, other: LinkableSpecSet) -> LinkableSpecSet:  # noqa: D
+        return LinkableSpecSet(
+            dimension_specs=tuple(set(self.dimension_specs) - set(other.dimension_specs)),
+            time_dimension_specs=tuple(set(self.time_dimension_specs) - set(other.time_dimension_specs)),
+            identifier_specs=tuple(set(self.identifier_specs) - set(other.identifier_specs)),
+        )
+
+    def __len__(self) -> int:  # noqa: D
+        return len(self.dimension_specs) + len(self.time_dimension_specs) + len(self.identifier_specs)
+
 
 @dataclass(frozen=True)
 class SpecWhereClauseConstraint(SerializableDataclass):
@@ -486,21 +581,12 @@ class SpecWhereClauseConstraint(SerializableDataclass):
     def combine(self, other: SpecWhereClauseConstraint) -> SpecWhereClauseConstraint:  # noqa: D
         linkable_names = list(set(self.linkable_names).union(set(other.linkable_names)))
         where_condition = f"({self.where_condition}) AND ({other.where_condition})"
-        new_sql_values = OrderedDict(self.execution_parameters.param_dict)
-        for k, v in other.execution_parameters.param_dict.items():
-            if k in new_sql_values and v != new_sql_values[k]:
-                raise ValueError(
-                    f"Cannot combine with an execution parameter collision. Both where clauses have key ({k}),"
-                    f" but different values: ({v} != {new_sql_values[k]})"
-                )
-
-            new_sql_values[k] = v
 
         return SpecWhereClauseConstraint(
             where_condition=where_condition,
             linkable_names=tuple(linkable_names),
             linkable_spec_set=LinkableSpecSet.merge([self.linkable_spec_set, other.linkable_spec_set]),
-            execution_parameters=SqlBindParameters(param_dict=OrderedDict(new_sql_values)),
+            execution_parameters=self.execution_parameters.combine(other.execution_parameters),
         )
 
 
@@ -547,17 +633,56 @@ class InstanceSpecSet(SerializableDataclass):
     dimension_specs: Tuple[DimensionSpec, ...] = ()
     identifier_specs: Tuple[IdentifierSpec, ...] = ()
     time_dimension_specs: Tuple[TimeDimensionSpec, ...] = ()
+    metadata_specs: Tuple[MetadataSpec, ...] = ()
 
-    def merge(self, others: Sequence[InstanceSpecSet]) -> InstanceSpecSet:
+    @staticmethod
+    def merge(others: Sequence[InstanceSpecSet]) -> InstanceSpecSet:
         """Merge all sets into one set, without de-duplication."""
         return InstanceSpecSet(
-            metric_specs=self.metric_specs + tuple(itertools.chain.from_iterable([x.metric_specs for x in others])),
-            dimension_specs=self.dimension_specs
-            + tuple(itertools.chain.from_iterable([x.dimension_specs for x in others])),
-            identifier_specs=self.identifier_specs
-            + tuple(itertools.chain.from_iterable([x.identifier_specs for x in others])),
-            time_dimension_specs=self.time_dimension_specs
-            + tuple(itertools.chain.from_iterable([x.time_dimension_specs for x in others])),
+            metric_specs=tuple(itertools.chain.from_iterable([x.metric_specs for x in others])),
+            measure_specs=tuple(itertools.chain.from_iterable([x.measure_specs for x in others])),
+            dimension_specs=tuple(itertools.chain.from_iterable([x.dimension_specs for x in others])),
+            identifier_specs=tuple(itertools.chain.from_iterable([x.identifier_specs for x in others])),
+            time_dimension_specs=tuple(itertools.chain.from_iterable([x.time_dimension_specs for x in others])),
+            metadata_specs=tuple(itertools.chain.from_iterable([x.metadata_specs for x in others])),
+        )
+
+    def dedupe(self) -> InstanceSpecSet:
+        """De-duplicates repeated elements.
+
+        TBD: Have merge de-duplicate instead.
+        """
+        metric_specs_deduped = []
+        for metric_spec in self.metric_specs:
+            if metric_spec not in metric_specs_deduped:
+                metric_specs_deduped.append(metric_spec)
+
+        measure_specs_deduped = []
+        for measure_spec in self.measure_specs:
+            if measure_spec not in measure_specs_deduped:
+                measure_specs_deduped.append(measure_spec)
+
+        dimension_specs_deduped = []
+        for dimension_spec in self.dimension_specs:
+            if dimension_spec not in dimension_specs_deduped:
+                dimension_specs_deduped.append(dimension_spec)
+
+        time_dimension_specs_deduped = []
+        for time_dimension_spec in self.time_dimension_specs:
+            if time_dimension_spec not in time_dimension_specs_deduped:
+                time_dimension_specs_deduped.append(time_dimension_spec)
+
+        identifier_specs_deduped = []
+        for identifier_spec in self.identifier_specs:
+            if identifier_spec not in identifier_specs_deduped:
+                identifier_specs_deduped.append(identifier_spec)
+
+        return InstanceSpecSet(
+            metric_specs=tuple(metric_specs_deduped),
+            measure_specs=tuple(measure_specs_deduped),
+            dimension_specs=tuple(dimension_specs_deduped),
+            time_dimension_specs=tuple(time_dimension_specs_deduped),
+            identifier_specs=tuple(identifier_specs_deduped),
         )
 
     @property
@@ -574,11 +699,16 @@ class InstanceSpecSet(SerializableDataclass):
                 self.time_dimension_specs,
                 self.identifier_specs,
                 self.metric_specs,
+                self.metadata_specs,
             )
         )
 
     def transform(self, transform_function: InstanceSpecSetTransform[TransformOutputT]) -> TransformOutputT:  # noqa: D
         return transform_function.transform(self)
+
+    @staticmethod
+    def create_from_linkable_specs(linkable_specs: Sequence[LinkableInstanceSpec]) -> InstanceSpecSet:  # noqa: D
+        return InstanceSpecSet.merge(tuple(x.as_linkable_spec_set.as_instance_set for x in linkable_specs))
 
 
 @dataclass(frozen=True)

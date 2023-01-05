@@ -4,15 +4,19 @@ import logging
 import time
 from abc import ABC
 from contextlib import contextmanager
-from typing import Iterator, List, Optional, Mapping, Union, Sequence, Set
+from typing import Iterator, Optional, Mapping, Union, Sequence, Set, Callable
 
 import pandas as pd
 import sqlalchemy
 from sqlalchemy import inspect
 
 from metricflow.dataflow.sql_table import SqlTable
+from metricflow.protocols.sql_client import SqlIsolationLevel
+from metricflow.protocols.sql_request import SqlRequestTagSet, SqlJsonTag
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.sql_clients.async_request import CombinedSqlTags
 from metricflow.sql_clients.base_sql_client_implementation import BaseSqlClientImplementation
+from metricflow.sql_clients.common_client import check_isolation_level
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +26,7 @@ class SqlAlchemySqlClient(BaseSqlClientImplementation, ABC):
 
     def __init__(self, engine: sqlalchemy.engine.Engine) -> None:  # noqa: D
         self._engine = engine
+        super().__init__()
 
     @staticmethod
     def build_engine_url(  # noqa: D
@@ -75,31 +80,61 @@ class SqlAlchemySqlClient(BaseSqlClientImplementation, ABC):
             pool_pre_ping=True,
         )
 
+
     def list_tables(self, schema_name: str) -> List[str]:  # noqa: D
         insp = inspect(self._engine)
         return insp.get_table_names(schema=schema_name)
 
+
     @contextmanager
-    def engine_connection(self, engine: sqlalchemy.engine.Engine) -> Iterator[sqlalchemy.engine.Connection]:
+    def _engine_connection(
+        self,
+        engine: sqlalchemy.engine.Engine,
+        isolation_level: Optional[SqlIsolationLevel] = None,
+        system_tags: SqlRequestTagSet = SqlRequestTagSet(),
+        extra_tags: SqlJsonTag = SqlJsonTag(),
+    ) -> Iterator[sqlalchemy.engine.Connection]:
         """Context Manager for providing a configured connection."""
-        conn = engine.connect()
+        check_isolation_level(self, isolation_level)
+
+        if isolation_level is not None:
+            # Passing isolation_level=None will throw an error in some engines.
+            conn = engine.connect().execution_options(isolation_level=isolation_level.value)
+        else:
+            conn = engine.connect()
         try:
             yield conn
         finally:
             conn.close()
 
-    def _engine_specific_query_implementation(  # noqa: D
-        self, stmt: str, bind_params: SqlBindParameters
+    def _engine_specific_query_implementation(
+        self,
+        stmt: str,
+        bind_params: SqlBindParameters,
+        isolation_level: Optional[SqlIsolationLevel] = None,
+        system_tags: SqlRequestTagSet = SqlRequestTagSet(),
+        extra_tags: SqlJsonTag = SqlJsonTag(),
     ) -> pd.DataFrame:
-        with self.engine_connection(self._engine) as conn:
+        with self._engine_connection(
+            self._engine, isolation_level=isolation_level, system_tags=system_tags, extra_tags=extra_tags
+        ) as conn:
             return pd.read_sql_query(sqlalchemy.text(stmt), conn, params=bind_params.param_dict)
 
-    def _engine_specific_execute_implementation(self, stmt: str, bind_params: SqlBindParameters) -> None:  # noqa: D
-        with self.engine_connection(self._engine) as conn:
+    def _engine_specific_execute_implementation(
+        self,
+        stmt: str,
+        bind_params: SqlBindParameters,
+        isolation_level: Optional[SqlIsolationLevel] = None,
+        system_tags: SqlRequestTagSet = SqlRequestTagSet(),
+        extra_tags: SqlJsonTag = SqlJsonTag(),
+    ) -> None:
+        with self._engine_connection(
+            self._engine, isolation_level=isolation_level, system_tags=system_tags, extra_tags=extra_tags
+        ) as conn:
             conn.execute(sqlalchemy.text(stmt), bind_params.param_dict)
 
     def _engine_specific_dry_run_implementation(self, stmt: str, bind_params: SqlBindParameters) -> None:  # noqa: D
-        with self.engine_connection(self._engine) as conn:
+        with self._engine_connection(self._engine) as conn:
             s = "EXPLAIN " + stmt
             conn.execute(sqlalchemy.text(s), bind_params.param_dict)
 
@@ -108,7 +143,7 @@ class SqlAlchemySqlClient(BaseSqlClientImplementation, ABC):
     ) -> None:
         logger.info(f"Creating table '{sql_table.sql}' from a DataFrame with {df.shape[0]} row(s)")
         start_time = time.time()
-        with self.engine_connection(self._engine) as conn:
+        with self._engine_connection(self._engine) as conn:
             pd.io.sql.to_sql(
                 frame=df,
                 name=sql_table.table_name,
@@ -137,3 +172,6 @@ class SqlAlchemySqlClient(BaseSqlClientImplementation, ABC):
 
         if errors:
             raise ValueError(f"Found errors in the URL: {url}\n" + "\n".join(errors))
+
+    def cancel_request(self, match_function: Callable[[CombinedSqlTags], bool]) -> int:  # noqa: D
+        raise NotImplementedError

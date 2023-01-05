@@ -1,0 +1,23 @@
+---
+data_source:
+  name: companies
+  description: If a user is a company / business, this defines the mapping.
+  owners:
+    - support@transformdata.io
+
+  sql_table: $dim_companies_table
+
+  dimensions:
+    - name: company_name
+      type: categorical
+
+  identifiers:
+    - name: company
+      type: primary
+      expr: company_id
+    - name: user
+      type: unique
+      expr: user_id
+
+  mutability:
+    type: immutable

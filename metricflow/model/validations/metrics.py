@@ -5,6 +5,7 @@ from metricflow.errors.errors import ParsingException
 from metricflow.instances import MetricModelReference
 from metricflow.model.objects.metric import Metric, MetricType, CumulativeMetricWindow
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from metricflow.model.validations.unique_valid_name import UniqueAndValidNameRule
 from metricflow.model.validations.validator_helpers import (
     FileContext,
     MetricContext,
@@ -60,4 +61,65 @@ class CumulativeMetricRule(ModelValidationRule):
         for metric in model.metrics or []:
             issues += CumulativeMetricRule._validate_cumulative_sum_metric_params(metric=metric)
 
+        return issues
+
+
+class DerivedMetricRule(ModelValidationRule):
+    """Checks that derived metrics are configured properly"""
+
+    @staticmethod
+    @validate_safely(whats_being_done="checking that the alias set are not unique and distinct")
+    def _validate_alias_collision(metric: Metric) -> List[ValidationIssueType]:
+        issues: List[ValidationIssueType] = []
+
+        if metric.type == MetricType.DERIVED:
+            metric_context = MetricContext(
+                file_context=FileContext.from_metadata(metadata=metric.metadata),
+                metric=MetricModelReference(metric_name=metric.name),
+            )
+            used_names = {input_metric.name for input_metric in metric.input_metrics}
+            for input_metric in metric.input_metrics:
+                if input_metric.alias:
+                    issues += UniqueAndValidNameRule.check_valid_name(input_metric.alias, metric_context)
+                    if input_metric.alias in used_names:
+                        issues.append(
+                            ValidationError(
+                                context=metric_context,
+                                message=f"Alias '{input_metric.alias}' for input metric: '{input_metric.name}' is already being used. Please choose another alias.",
+                            )
+                        )
+                        used_names.add(input_metric.alias)
+        return issues
+
+    @staticmethod
+    @validate_safely(whats_being_done="checking that the input metrics exist")
+    def _validate_input_metrics_exist(model: UserConfiguredModel) -> List[ValidationIssueType]:
+        issues: List[ValidationIssueType] = []
+
+        all_metrics = {m.name for m in model.metrics}
+        for metric in model.metrics:
+            if metric.type == MetricType.DERIVED:
+                for input_metric in metric.input_metrics:
+                    if input_metric.name not in all_metrics:
+                        issues.append(
+                            ValidationError(
+                                context=MetricContext(
+                                    file_context=FileContext.from_metadata(metadata=metric.metadata),
+                                    metric=MetricModelReference(metric_name=metric.name),
+                                ),
+                                message=f"For metric: {metric.name}, input metric: '{input_metric.name}' does not exist as a configured metric in the model.",
+                            )
+                        )
+        return issues
+
+    @staticmethod
+    @validate_safely(
+        whats_being_done="running model validation ensuring derived metrics properties are configured properly"
+    )
+    def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
+        issues: List[ValidationIssueType] = []
+
+        issues += DerivedMetricRule._validate_input_metrics_exist(model=model)
+        for metric in model.metrics or []:
+            issues += DerivedMetricRule._validate_alias_collision(metric=metric)
         return issues

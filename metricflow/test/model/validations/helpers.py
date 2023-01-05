@@ -1,14 +1,48 @@
+import textwrap
 from typing import List, Optional, Sequence
 
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.engine.models import Dimension
-from metricflow.model.objects.common import FileSlice, Metadata
+from metricflow.model.objects.common import FileSlice, Metadata, YamlConfigFile
 from metricflow.model.objects.constraints.where import WhereClauseConstraint
 from metricflow.model.objects.data_source import DataSource, DataSourceOrigin, Mutability
 from metricflow.model.objects.elements.identifier import Identifier
 from metricflow.model.objects.elements.measure import Measure
 from metricflow.model.objects.materialization import Materialization, MaterializationDestination
 from metricflow.model.objects.metric import Metric, MetricType, MetricTypeParams
+
+
+def base_model_file() -> YamlConfigFile:
+    """Returns a YamlConfigFile with the inputs for a basic valid model
+
+    This is useful to seed a simple error-free model, which can easily be extended with YAML inputs
+    containing specific validation triggers.
+    """
+    yaml_contents = textwrap.dedent(
+        """\
+        data_source:
+          name: sample_data_source
+          sql_table: some_schema.source_table
+          identifiers:
+            - name: example_identifier
+              type: primary
+              role: test_role
+              entity: other_identifier
+              expr: example_id
+          measures:
+            - name: num_sample_rows
+              agg: sum
+              expr: 1
+              create_metric: true
+          dimensions:
+            - name: ds
+              type: time
+              type_params:
+                time_granularity: day
+                is_primary: true
+        """
+    )
+    return YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
 
 
 def default_meta() -> Metadata:

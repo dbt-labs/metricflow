@@ -10,7 +10,7 @@ FROM (
   -- Read Elements From Data Source 'id_verifications'
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements:
-  --   ['identity_verifications', 'user', 'ds_partitioned']
+  --   ['identity_verifications', 'ds_partitioned', 'user']
   SELECT
     ds_partitioned
     , user_id AS user

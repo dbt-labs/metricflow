@@ -32,7 +32,8 @@ INNER JOIN (
   -- Read Elements From Data Source 'accounts_source'
   -- Filter row on MIN(ds)
   SELECT
-    MIN(ds) AS ds__complete
+    DATE_TRUNC('week', ds) AS ds__week
+    , MIN(ds) AS ds__complete
   FROM (
     -- User Defined SQL Query
     SELECT * FROM ***************************.fct_accounts

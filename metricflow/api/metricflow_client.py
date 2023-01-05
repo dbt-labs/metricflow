@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-
 from typing import Dict, List, Optional
 
 from metricflow.configuration.config_handler import ConfigHandler
@@ -20,7 +19,7 @@ from metricflow.model.model_validator import ModelValidator
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.validations.validator_helpers import ModelValidationResults
-from metricflow.protocols.sql_client import SqlClient
+from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql_clients.common_client import not_empty
 from metricflow.sql_clients.sql_utils import make_sql_client_from_config
@@ -54,7 +53,7 @@ class MetricFlowClient:
 
     def __init__(
         self,
-        sql_client: SqlClient,
+        sql_client: AsyncSqlClient,
         user_configured_model: UserConfiguredModel,
         system_schema: str,
     ):

@@ -13,8 +13,12 @@ from metricflow.plan_conversion.column_resolver import (
     DefaultColumnAssociationResolver,
 )
 from metricflow.plan_conversion.time_spine import TimeSpineSource
+from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_exprs import (
+    SqlPercentileExpression,
+    SqlPercentileExpressionArgument,
+    SqlPercentileFunctionType,
     SqlTimeDeltaExpression,
     SqlColumnReferenceExpression,
     SqlColumnReference,
@@ -101,6 +105,22 @@ class CheckQueryHelpers:
             renderable_expr
         ).sql
 
+    def render_percentile_expr(self, expr: str, percentile: float, use_discrete_percentile: bool) -> str:
+        """Return the percentile call that can be used for computing a percentile aggregation."""
+        percentile_type = (
+            SqlPercentileFunctionType.DISCRETE if use_discrete_percentile else SqlPercentileFunctionType.CONTINUOUS
+        )
+        renderable_expr = SqlPercentileExpression(
+            order_by_arg=SqlStringExpression(
+                sql_expr=expr,
+                requires_parenthesis=False,
+            ),
+            percentile_args=SqlPercentileExpressionArgument(percentile=percentile, function_type=percentile_type),
+        )
+        return self._sql_client.sql_engine_attributes.sql_query_plan_renderer.expr_renderer.render_sql_expr(
+            renderable_expr
+        ).sql
+
     @property
     def double_data_type_name(self) -> str:
         """Return the name of the double data type for the relevant SQL engine"""
@@ -118,6 +138,9 @@ def filter_not_supported_features(
                 not_supported_features.append(required_feature)
         elif required_feature is RequiredDwEngineFeatures.FULL_OUTER_JOIN:
             if not sql_client.sql_engine_attributes.full_outer_joins_supported:
+                not_supported_features.append(required_feature)
+        elif required_feature is RequiredDwEngineFeatures.PERCENTILE_AGGREGATION:
+            if not sql_client.sql_engine_attributes.percentile_aggregation_supported:
                 not_supported_features.append(required_feature)
         else:
             assert_values_exhausted(required_feature)
@@ -138,18 +161,20 @@ def test_case(
     unpartitioned_multi_hop_join_semantic_model: SemanticModel,
     multi_hop_join_semantic_model: SemanticModel,
     extended_date_semantic_model: SemanticModel,
-    sql_client: SqlClient,
+    scd_semantic_model: SemanticModel,
+    async_sql_client: AsyncSqlClient,
     create_simple_model_tables: bool,
     create_message_source_tables: bool,
     create_bridge_table: bool,
     create_extended_date_model_tables: bool,
+    create_scd_model_tables: bool,
     time_spine_source: TimeSpineSource,
 ) -> None:
     """Runs all integration tests configured in the test case YAML directory."""
     case = CONFIGURED_INTEGRATION_TESTS_REPOSITORY.get_test_case(name)
     logger.info(f"Running integration test case: '{case.name}' from file '{case.file_path}'")
 
-    missing_required_features = filter_not_supported_features(sql_client, case.required_features)
+    missing_required_features = filter_not_supported_features(async_sql_client, case.required_features)
     if missing_required_features:
         pytest.skip(f"DW does not support {missing_required_features}")
 
@@ -166,6 +191,8 @@ def test_case(
         semantic_model = multi_hop_join_semantic_model
     elif case.model is IntegrationTestModel.EXTENDED_DATE_MODEL:
         semantic_model = extended_date_semantic_model
+    elif case.model is IntegrationTestModel.SCD_MODEL:
+        semantic_model = scd_semantic_model
     else:
         assert_values_exhausted(case.model)
 
@@ -173,14 +200,14 @@ def test_case(
 
     engine = MetricFlowEngine(
         semantic_model=semantic_model,
-        sql_client=sql_client,
+        sql_client=async_sql_client,
         column_association_resolver=DefaultColumnAssociationResolver(semantic_model),
         time_source=ConfigurableTimeSource(as_datetime("2021-01-04")),
         time_spine_source=time_spine_source,
         system_schema=mf_test_session_state.mf_system_schema,
     )
 
-    check_query_helpers = CheckQueryHelpers(sql_client)
+    check_query_helpers = CheckQueryHelpers(async_sql_client)
 
     query_result = engine.query(
         MetricFlowQueryRequest.create_with_random_request_id(
@@ -195,6 +222,7 @@ def test_case(
                 TimeGranularity=TimeGranularity,
                 render_date_sub=check_query_helpers.render_date_sub,
                 render_date_trunc=check_query_helpers.render_date_trunc,
+                render_percentile_expr=check_query_helpers.render_percentile_expr,
                 mf_time_spine_source=time_spine_source.spine_table.sql,
                 double_data_type_name=check_query_helpers.double_data_type_name,
             )
@@ -206,13 +234,14 @@ def test_case(
 
     actual = query_result.result_df
 
-    expected = sql_client.query(
+    expected = async_sql_client.query(
         jinja2.Template(case.check_query, undefined=jinja2.StrictUndefined,).render(
             source_schema=mf_test_session_state.mf_source_schema,
             render_time_constraint=check_query_helpers.render_time_constraint,
             TimeGranularity=TimeGranularity,
             render_date_sub=check_query_helpers.render_date_sub,
             render_date_trunc=check_query_helpers.render_date_trunc,
+            render_percentile_expr=check_query_helpers.render_percentile_expr,
             mf_time_spine_source=time_spine_source.spine_table.sql,
             double_data_type_name=check_query_helpers.double_data_type_name,
         )

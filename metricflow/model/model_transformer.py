@@ -4,9 +4,11 @@ import logging
 from typing import Sequence
 
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from metricflow.model.transformations.add_input_metric_measures import AddInputMetricMeasuresRule
 from metricflow.model.transformations.agg_time_dimension import SetMeasureAggregationTimeDimensionRule
 from metricflow.model.transformations.boolean_measure import BooleanMeasureAggregationRule
 from metricflow.model.transformations.convert_count import ConvertCountToSumRule
+from metricflow.model.transformations.convert_median import ConvertMedianToPercentileRule
 from metricflow.model.transformations.identifiers import CompositeIdentifierExpressionRule
 from metricflow.model.transformations.names import LowerCaseNamesRule
 from metricflow.model.transformations.proxy_measure import CreateProxyMeasureRule
@@ -31,6 +33,8 @@ class ModelTransformer:
         BooleanMeasureAggregationRule(),
         CompositeIdentifierExpressionRule(),
         ConvertCountToSumRule(),
+        ConvertMedianToPercentileRule(),
+        AddInputMetricMeasuresRule(),
     )
 
     @staticmethod

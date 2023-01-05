@@ -23,7 +23,7 @@ FROM (
         , subq_2.identity_verifications AS identity_verifications
       FROM (
         -- Pass Only Elements:
-        --   ['identity_verifications', 'user', 'ds_partitioned']
+        --   ['identity_verifications', 'ds_partitioned', 'user']
         SELECT
           subq_1.ds_partitioned
           , subq_1.user
@@ -97,7 +97,7 @@ FROM (
       ) subq_2
       LEFT OUTER JOIN (
         -- Pass Only Elements:
-        --   ['user', 'ds_partitioned', 'home_state']
+        --   ['home_state', 'ds_partitioned', 'user']
         SELECT
           subq_3.ds_partitioned
           , subq_3.user
@@ -150,5 +150,5 @@ FROM (
     ) subq_5
   ) subq_6
   GROUP BY
-    subq_6.user__home_state
+    user__home_state
 ) subq_7

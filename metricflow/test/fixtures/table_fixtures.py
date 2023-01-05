@@ -48,8 +48,11 @@ def create_simple_model_tables(mf_test_session_state: MetricFlowTestSessionState
         ("u0004114", "u0003141", "l2718281", 241.14, True, "2020-01-02", "2020-01-02", "2020-01-03", None),
         ("u0004114", "u0003141", "l3141592", 799.99, False, "2020-01-02", "2020-01-02", "2020-01-03", None),
         ("u0005432", "u0003452", "l2718281", 319.85, True, "2020-01-02", "2020-01-02", "2020-01-03", "u0003452"),
+        ("u0004114", "u1004114", "l9658588-incomplete", 0.0, False, "2020-01-02", "2020-01-02", "2020-01-03", None),
+        ("u0004114", "u1004114", "l8912456-incomplete", 0.0, False, "2020-01-02", "2020-01-02", "2020-01-03", None),
         ("u0003452", "u0005432", "l3141592", 519.89, False, "2020-01-02", "2020-01-02", "2020-01-03", "u0003141"),
         ("u0003452", "u0004114", "l5948301", 332.23, False, "2020-01-02", "2020-01-02", "2020-01-03", "u0003141"),
+        ("u1003452", "u1004114", "no_such_listing", 0.0, False, "2020-01-02", "2020-01-02", "2020-01-03", None),
         ("u0003452", "u0004114", "l5948301", 0.0, False, "2020-01-03", "2020-01-03", "2020-01-04", None),
     ]
     create_table(
@@ -109,6 +112,8 @@ def create_simple_model_tables(mf_test_session_state: MetricFlowTestSessionState
                 ("u0004114", "l2718281", "2020-01-02", "2020-01-02"),
                 ("u0004114", "l3141592", "2020-01-02", "2020-01-02"),
                 ("u1612112", "l2718281", "2020-01-02", "2020-01-02"),
+                ("u0004114", "", "2020-01-02", "2020-01-02"),
+                ("u0004114", "l7891283-incomplete", "2020-01-02", "2020-01-02"),
             ],
         ),
     )
@@ -124,23 +129,33 @@ def create_simple_model_tables(mf_test_session_state: MetricFlowTestSessionState
                 ("l3141592", "us", 3, True, "u0004114", "2020-01-01"),
                 ("l5948301", "us", 5, True, "u0004114", "2020-01-02"),
                 ("l2718281", cote_divoire, 4, False, "u0005432", "2020-01-02"),
+                ("l9658588-incomplete", "us", None, None, "u1004114", "2020-01-02"),
+                ("l8912456-incomplete", None, None, None, "u1004114", "2020-01-02"),
+                ("l7891283-incomplete", "ca", None, False, "u1004114", "2020-01-02"),
             ],
         ),
     )
 
+    # The dim_listings table is an SCD type II table in the style of a dbt snapshot with two columns setting the
+    # the range of time when this row was "active", with a NULL value for "active_to" meaning it's still current
     create_table(
         sql_client=sql_client,
         sql_table=SqlTable(schema_name=schema, table_name="dim_listings"),
         df=make_df(
             sql_client=sql_client,
-            columns=["listing_id", "country", "capacity", "is_lux", DEFAULT_DS],
-            time_columns={DEFAULT_DS},
+            columns=["listing_id", "country", "capacity", "is_lux", "user_id", "active_from", "active_to"],
+            time_columns={"active_from", "active_to"},
             data=[
-                ("l3141592", "us", 2, True, "2020-01-01"),
-                ("l2718281", cote_divoire, 4, True, "2020-01-01"),
-                ("l3141592", "us", 3, True, "2020-01-02"),
-                ("l2718281", cote_divoire, 4, False, "2020-01-02"),
-                ("l5948301", "us", 5, True, "2020-01-02"),
+                ("l3141592", "us", 2, True, "u0004114", "2020-01-01", "2020-01-02"),
+                ("l2718281", cote_divoire, 4, True, "u0005432", "2020-01-01", "2020-01-02"),
+                ("l3141592", "us", 3, True, "u0004114", "2020-01-02", None),
+                # This cote_divoire property changed hands to a person from Maryland who considers it not lux
+                ("l2718281", cote_divoire, 4, False, "u0003154", "2020-01-02", None),
+                ("l5948301", "us", 5, True, "u0004114", "2020-01-02", None),
+                ("l9658588-incomplete", None, None, None, "u1004114", "2020-01-01", "2020-01-02"),
+                ("l9658588-incomplete", "us", None, None, "u1004114", "2020-01-02", None),
+                ("l8912456-incomplete", None, None, None, "u1004114", "2020-01-02", None),
+                ("l7891283-incomplete", "ca", None, False, "u1004114", "2020-01-02", None),
             ],
         ),
     )
@@ -231,6 +246,23 @@ def create_simple_model_tables(mf_test_session_state: MetricFlowTestSessionState
             data=[
                 ("l3141592", "ll_001"),
                 ("l5948301", "LUX_TEST_ID"),
+                ("l2718281", "ll_002"),
+            ],
+        ),
+    )
+
+    create_table(
+        sql_client=sql_client,
+        sql_table=SqlTable(schema_name=schema, table_name="dim_lux_listings"),
+        df=make_df(
+            sql_client=sql_client,
+            columns=["lux_listing_id", "is_confirmed_lux", "valid_from", "valid_to"],
+            time_columns={"valid_from", "valid_to"},
+            data=[
+                ("ll_001", True, "2020-01-01", None),
+                ("LUX_TEST_ID", True, "2020-01-02", None),
+                ("ll_002", True, "2020-01-01", "2020-01-02"),
+                ("ll_002", False, "2020-01-02", None),
             ],
         ),
     )
@@ -276,7 +308,38 @@ def create_simple_model_tables(mf_test_session_state: MetricFlowTestSessionState
         ),
     )
 
+    create_table(
+        sql_client=sql_client,
+        sql_table=SqlTable(schema_name=schema, table_name="dim_primary_accounts"),
+        df=make_df(
+            sql_client=sql_client,
+            columns=["user_id", "account_type", "set_as_primary", "removed_as_primary"],
+            time_columns={"set_as_primary", "removed_as_primary"},
+            data=[
+                ("u0004114", "savings", "2020-01-01", "2020-01-02"),
+                ("u1612112", "checking", "2020-01-01", "2020-01-01"),
+                ("u0005432", "savings", "2020-01-02", "2020-01-03"),
+                ("u0003452", "checking", "2020-01-01", None),
+                ("u0003154", "checking", "2020-01-01", None),
+                ("u0003141", "checking", "2020-01-01", None),
+                ("u0004114", "savings", "2020-01-02", None),
+                ("u1612112", "checking", "2020-01-02", "2020-01-02"),
+                ("u0005432", "checking", "2020-01-03", None),
+            ],
+        ),
+    )
+
     return True
+
+
+@pytest.fixture(scope="session")
+def create_scd_model_tables(create_simple_model_tables: bool) -> bool:
+    """This fixture ensures the scd tables are created when necessary
+
+    The SCD model relies on the simple model tables, so we simply depend on that fixture and return it here.
+    If, at any point, we decide to diverge from the simple model we can update this fixture independently.
+    """
+    return create_simple_model_tables
 
 
 @pytest.fixture(scope="session")

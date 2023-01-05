@@ -14,6 +14,7 @@ from metricflow.specs import (
     DimensionSpec,
     LinklessIdentifierSpec,
     MetricInputMeasureSpec,
+    InstanceSpecSet,
 )
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 
@@ -29,31 +30,37 @@ def test_costing(consistent_id_object_repository: ConsistentIdObjectRepository) 
     )
     bookings_filtered = FilterElementsNode[DataSourceDataSet](
         parent_node=bookings_node,
-        include_specs=[
-            bookings_spec,
-            IdentifierSpec(
-                element_name="listing",
-                identifier_links=(),
+        include_specs=InstanceSpecSet(
+            measure_specs=(bookings_spec,),
+            identifier_specs=(
+                IdentifierSpec(
+                    element_name="listing",
+                    identifier_links=(),
+                ),
             ),
-        ],
+        ),
     )
 
     listings_filtered = FilterElementsNode[DataSourceDataSet](
         parent_node=listings_node,
-        include_specs=[
-            DimensionSpec(
-                element_name="country_latest",
-                identifier_links=(),
+        include_specs=InstanceSpecSet(
+            dimension_specs=(
+                DimensionSpec(
+                    element_name="country_latest",
+                    identifier_links=(),
+                ),
             ),
-            IdentifierSpec(
-                element_name="listing",
-                identifier_links=(),
+            identifier_specs=(
+                IdentifierSpec(
+                    element_name="listing",
+                    identifier_links=(),
+                ),
             ),
-        ],
+        ),
     )
 
     join_node = JoinToBaseOutputNode[DataSourceDataSet](
-        parent_node=bookings_filtered,
+        left_node=bookings_filtered,
         join_targets=[
             JoinDescription(
                 join_node=listings_filtered,

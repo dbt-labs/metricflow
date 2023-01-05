@@ -9,7 +9,7 @@ from metricflow.sql.sql_exprs import (
     SqlComparisonExpression,
     SqlComparison,
     SqlStringLiteralExpression,
-    SqlFunctionExpression,
+    SqlAggregateFunctionExpression,
     SqlFunction,
     SqlStringExpression,
 )
@@ -56,7 +56,7 @@ def base_select_statement() -> SqlSelectStatementNode:
         description="src3",
         select_columns=(
             SqlSelectColumn(
-                expr=SqlFunctionExpression(
+                expr=SqlAggregateFunctionExpression(
                     sql_function=SqlFunction.SUM,
                     sql_function_args=[
                         SqlColumnReferenceExpression(
@@ -220,7 +220,7 @@ def join_select_statement() -> SqlSelectStatementNode:
         description="query",
         select_columns=(
             SqlSelectColumn(
-                expr=SqlFunctionExpression(
+                expr=SqlAggregateFunctionExpression(
                     sql_function=SqlFunction.SUM,
                     sql_function_args=[
                         SqlColumnReferenceExpression(
@@ -391,7 +391,7 @@ def colliding_select_statement() -> SqlSelectStatementNode:
         description="query",
         select_columns=(
             SqlSelectColumn(
-                expr=SqlFunctionExpression(
+                expr=SqlAggregateFunctionExpression(
                     sql_function=SqlFunction.SUM,
                     sql_function_args=[
                         SqlColumnReferenceExpression(
@@ -572,7 +572,7 @@ def reduce_all_join_select_statement() -> SqlSelectStatementNode:
         description="query",
         select_columns=(
             SqlSelectColumn(
-                expr=SqlFunctionExpression(
+                expr=SqlAggregateFunctionExpression(
                     sql_function=SqlFunction.SUM,
                     sql_function_args=[
                         SqlColumnReferenceExpression(
@@ -766,5 +766,291 @@ def test_reduce_all_join_sources(
         request=request,
         mf_test_session_state=mf_test_session_state,
         sql_plan_node=sub_query_reducer.optimize(reduce_all_join_select_statement),
+        plan_id="after_reducing",
+    )
+
+
+@pytest.fixture
+def reducing_join_statement() -> SqlSelectStatementNode:
+    """SELECT statement used to build test cases.
+
+    -- query
+    SELECT
+      src2.bookings AS bookings
+      , src3.listings AS listings
+    FROM (
+      -- src2
+      SELECT
+        SUM(src1.bookings) AS bookings
+      FROM (
+        -- src1
+        SELECT
+          1 AS bookings
+        FROM demo.fct_bookings src0
+      ) src1
+    ) src2
+    CROSS JOIN (
+      -- src4
+      SELECT
+        SUM(src4.listings) AS listings
+      FROM demo.fct_listings src4
+    ) src3
+    """
+    return SqlSelectStatementNode(
+        description="query",
+        select_columns=(
+            SqlSelectColumn(
+                expr=SqlColumnReferenceExpression(
+                    col_ref=SqlColumnReference(table_alias="src2", column_name="bookings")
+                ),
+                column_alias="bookings",
+            ),
+            SqlSelectColumn(
+                expr=SqlColumnReferenceExpression(
+                    col_ref=SqlColumnReference(table_alias="src3", column_name="listings")
+                ),
+                column_alias="listings",
+            ),
+        ),
+        from_source=SqlSelectStatementNode(
+            description="src2",
+            select_columns=(
+                SqlSelectColumn(
+                    expr=SqlAggregateFunctionExpression(
+                        sql_function=SqlFunction.SUM,
+                        sql_function_args=[
+                            SqlColumnReferenceExpression(
+                                col_ref=SqlColumnReference(table_alias="src1", column_name="bookings")
+                            )
+                        ],
+                    ),
+                    column_alias="bookings",
+                ),
+            ),
+            from_source=SqlSelectStatementNode(
+                description="src1",
+                select_columns=(
+                    SqlSelectColumn(
+                        expr=SqlStringExpression(sql_expr="1", requires_parenthesis=False, used_columns=()),
+                        column_alias="bookings",
+                    ),
+                ),
+                from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
+                from_source_alias="src0",
+                joins_descs=(),
+                where=None,
+                group_bys=(),
+                order_bys=(),
+                limit=None,
+            ),
+            from_source_alias="src1",
+            joins_descs=(),
+            where=None,
+            group_bys=(),
+            order_bys=(),
+            limit=None,
+        ),
+        from_source_alias="src2",
+        joins_descs=(
+            SqlJoinDescription(
+                right_source=SqlSelectStatementNode(
+                    description="src4",
+                    select_columns=(
+                        SqlSelectColumn(
+                            expr=SqlAggregateFunctionExpression(
+                                sql_function=SqlFunction.SUM,
+                                sql_function_args=[
+                                    SqlColumnReferenceExpression(
+                                        col_ref=SqlColumnReference(table_alias="src4", column_name="listings")
+                                    )
+                                ],
+                            ),
+                            column_alias="listings",
+                        ),
+                    ),
+                    from_source=SqlTableFromClauseNode(
+                        sql_table=SqlTable(schema_name="demo", table_name="fct_listings")
+                    ),
+                    from_source_alias="src4",
+                    joins_descs=(),
+                    where=None,
+                    group_bys=(),
+                    order_bys=(),
+                    limit=None,
+                ),
+                right_source_alias="src3",
+                on_condition=None,
+                join_type=SqlJoinType.CROSS_JOIN,
+            ),
+        ),
+        group_bys=(),
+        where=None,
+        order_bys=(),
+        limit=None,
+    )
+
+
+def test_reducing_join_statement(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    reducing_join_statement: SqlSelectStatementNode,
+) -> None:
+    """Tests a case where a join query should not reduced an aggregate"""
+    assert_default_rendered_sql_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        sql_plan_node=reducing_join_statement,
+        plan_id="before_reducing",
+    )
+
+    sub_query_reducer = SqlRewritingSubQueryReducer()
+
+    assert_default_rendered_sql_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        sql_plan_node=sub_query_reducer.optimize(reducing_join_statement),
+        plan_id="after_reducing",
+    )
+
+
+@pytest.fixture
+def reducing_join_left_node_statement() -> SqlSelectStatementNode:
+    """SELECT statement used to build test cases.
+
+    -- query
+    SELECT
+      src2.bookings AS bookings
+      , src3.listings AS listings
+    FROM (
+      -- src2
+      SELECT
+        SUM(src1.bookings) AS bookings
+      FROM (
+        -- src1
+        SELECT
+          1 AS bookings
+        FROM demo.fct_bookings src0
+      ) src1
+    ) src2
+    CROSS JOIN (
+      -- src4
+      SELECT
+        SUM(src4.listings) AS listings
+      FROM demo.fct_listings src4
+    ) src3
+    """
+    return SqlSelectStatementNode(
+        description="query",
+        select_columns=(
+            SqlSelectColumn(
+                expr=SqlColumnReferenceExpression(
+                    col_ref=SqlColumnReference(table_alias="src2", column_name="bookings")
+                ),
+                column_alias="bookings",
+            ),
+            SqlSelectColumn(
+                expr=SqlColumnReferenceExpression(
+                    col_ref=SqlColumnReference(table_alias="src3", column_name="listings")
+                ),
+                column_alias="listings",
+            ),
+        ),
+        from_source=SqlSelectStatementNode(
+            description="src4",
+            select_columns=(
+                SqlSelectColumn(
+                    expr=SqlAggregateFunctionExpression(
+                        sql_function=SqlFunction.SUM,
+                        sql_function_args=[
+                            SqlColumnReferenceExpression(
+                                col_ref=SqlColumnReference(table_alias="src4", column_name="listings")
+                            )
+                        ],
+                    ),
+                    column_alias="listings",
+                ),
+            ),
+            from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_listings")),
+            from_source_alias="src4",
+            joins_descs=(),
+            where=None,
+            group_bys=(),
+            order_bys=(),
+            limit=None,
+        ),
+        from_source_alias="src2",
+        joins_descs=(
+            SqlJoinDescription(
+                right_source=SqlSelectStatementNode(
+                    description="src2",
+                    select_columns=(
+                        SqlSelectColumn(
+                            expr=SqlAggregateFunctionExpression(
+                                sql_function=SqlFunction.SUM,
+                                sql_function_args=[
+                                    SqlColumnReferenceExpression(
+                                        col_ref=SqlColumnReference(table_alias="src1", column_name="bookings")
+                                    )
+                                ],
+                            ),
+                            column_alias="bookings",
+                        ),
+                    ),
+                    from_source=SqlSelectStatementNode(
+                        description="src1",
+                        select_columns=(
+                            SqlSelectColumn(
+                                expr=SqlStringExpression(sql_expr="1", requires_parenthesis=False, used_columns=()),
+                                column_alias="bookings",
+                            ),
+                        ),
+                        from_source=SqlTableFromClauseNode(
+                            sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")
+                        ),
+                        from_source_alias="src0",
+                        joins_descs=(),
+                        where=None,
+                        group_bys=(),
+                        order_bys=(),
+                        limit=None,
+                    ),
+                    from_source_alias="src1",
+                    joins_descs=(),
+                    where=None,
+                    group_bys=(),
+                    order_bys=(),
+                    limit=None,
+                ),
+                right_source_alias="src3",
+                on_condition=None,
+                join_type=SqlJoinType.CROSS_JOIN,
+            ),
+        ),
+        group_bys=(),
+        where=None,
+        order_bys=(),
+        limit=None,
+    )
+
+
+def test_reducing_join_left_node_statement(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    reducing_join_left_node_statement: SqlSelectStatementNode,
+) -> None:
+    """Tests a case where a join query should not reduced an aggregate"""
+    assert_default_rendered_sql_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        sql_plan_node=reducing_join_left_node_statement,
+        plan_id="before_reducing",
+    )
+
+    sub_query_reducer = SqlRewritingSubQueryReducer()
+
+    assert_default_rendered_sql_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        sql_plan_node=sub_query_reducer.optimize(reducing_join_left_node_statement),
         plan_id="after_reducing",
     )

@@ -5,7 +5,7 @@ SELECT
   , CAST(subq_19.bookings AS DOUBLE PRECISION) / CAST(NULLIF(subq_19.views, 0) AS DOUBLE PRECISION) AS bookings_per_view
 FROM (
   -- Pass Only Elements:
-  --   ['listing__country_latest', 'ds', 'bookings', 'views']
+  --   ['bookings', 'views', 'listing__country_latest', 'ds']
   SELECT
     subq_18.ds
     , subq_18.listing__country_latest
@@ -100,6 +100,8 @@ FROM (
                 , subq_0.bookers
                 , subq_0.average_booking_value
                 , subq_0.referred_bookings
+                , subq_0.median_booking_value
+                , subq_0.booking_value_p99
               FROM (
                 -- Read Elements From Data Source 'bookings_source'
                 SELECT
@@ -112,6 +114,8 @@ FROM (
                   , bookings_source_src_10001.booking_value AS average_booking_value
                   , bookings_source_src_10001.booking_value AS booking_payments
                   , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
+                  , bookings_source_src_10001.booking_value AS median_booking_value
+                  , bookings_source_src_10001.booking_value AS booking_value_p99
                   , bookings_source_src_10001.is_instant
                   , bookings_source_src_10001.ds
                   , DATE_TRUNC('week', bookings_source_src_10001.ds) AS ds__week
@@ -160,7 +164,7 @@ FROM (
           ) subq_2
           LEFT OUTER JOIN (
             -- Pass Only Elements:
-            --   ['listing', 'country_latest']
+            --   ['country_latest', 'listing']
             SELECT
               subq_4.listing
               , subq_4.country_latest
@@ -350,7 +354,7 @@ FROM (
           ) subq_11
           LEFT OUTER JOIN (
             -- Pass Only Elements:
-            --   ['listing', 'country_latest']
+            --   ['country_latest', 'listing']
             SELECT
               subq_13.listing
               , subq_13.country_latest
@@ -444,6 +448,12 @@ FROM (
     ON
       (
         (
+          subq_8.ds = subq_17.ds
+        ) OR (
+          (subq_8.ds IS NULL) AND (subq_17.ds IS NULL)
+        )
+      ) AND (
+        (
           subq_8.listing__country_latest = subq_17.listing__country_latest
         ) OR (
           (
@@ -451,12 +461,6 @@ FROM (
           ) AND (
             subq_17.listing__country_latest IS NULL
           )
-        )
-      ) AND (
-        (
-          subq_8.ds = subq_17.ds
-        ) OR (
-          (subq_8.ds IS NULL) AND (subq_17.ds IS NULL)
         )
       )
   ) subq_18

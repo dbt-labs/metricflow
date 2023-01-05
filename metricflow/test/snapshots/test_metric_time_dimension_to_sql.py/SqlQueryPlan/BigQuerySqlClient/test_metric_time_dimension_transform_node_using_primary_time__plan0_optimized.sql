@@ -53,6 +53,8 @@ SELECT
   , guest_id AS bookers
   , booking_value AS average_booking_value
   , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
+  , booking_value AS median_booking_value
+  , booking_value AS booking_value_p99
 FROM (
   -- User Defined SQL Query
   SELECT * FROM ***************************.fct_bookings

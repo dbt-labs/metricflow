@@ -19,14 +19,18 @@ from metricflow.configuration.constants import (
     CONFIG_DWH_HTTP_PATH,
 )
 from metricflow.configuration.yaml_handler import YamlFileHandler
-from metricflow.protocols.sql_client import SqlClient
+from metricflow.protocols.async_sql_client import AsyncSqlClient
+from metricflow.protocols.sql_client import SqlClient, SqlIsolationLevel
+from metricflow.protocols.sql_request import SqlJsonTag
+from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.sql_clients.base_sql_client_implementation import SqlClientException
 from metricflow.sql_clients.big_query import BigQuerySqlClient
 from metricflow.sql_clients.common_client import SqlDialect, not_empty
+from metricflow.sql_clients.databricks import DatabricksSqlClient
 from metricflow.sql_clients.duckdb import DuckDbSqlClient
 from metricflow.sql_clients.postgres import PostgresSqlClient
 from metricflow.sql_clients.redshift import RedshiftSqlClient
 from metricflow.sql_clients.snowflake import SnowflakeSqlClient
-from metricflow.sql_clients.databricks import DatabricksSqlClient
 
 
 def make_df(  # type: ignore [misc]
@@ -59,7 +63,7 @@ def make_df(  # type: ignore [misc]
     )
 
 
-def make_sql_client(url: str, password: str) -> SqlClient:
+def make_sql_client(url: str, password: str) -> AsyncSqlClient:
     """Build SQL client based on env configs. Used only in tests."""
     dialect_protocol = make_url(url.split(";")[0]).drivername.split("+")
     dialect = SqlDialect(dialect_protocol[0])
@@ -82,7 +86,7 @@ def make_sql_client(url: str, password: str) -> SqlClient:
         raise ValueError(f"Unknown dialect: `{dialect}` in URL {url}")
 
 
-def make_sql_client_from_config(handler: YamlFileHandler) -> SqlClient:
+def make_sql_client_from_config(handler: YamlFileHandler) -> AsyncSqlClient:
     """Construct a SqlClient given a yaml file config."""
 
     url = handler.url
@@ -153,3 +157,48 @@ def make_sql_client_from_config(handler: YamlFileHandler) -> SqlClient:
     else:
         supported_dialects = [x.value for x in SqlDialect]
         raise ValueError(f"Invalid dialect '{dialect}', must be one of {supported_dialects} in {url}")
+
+
+def sync_execute(  # noqa: D
+    async_sql_client: AsyncSqlClient,
+    statement: str,
+    bind_parameters: SqlBindParameters = SqlBindParameters(),
+    extra_sql_tags: SqlJsonTag = SqlJsonTag(),
+    isolation_level: Optional[SqlIsolationLevel] = None,
+) -> None:
+    request_id = async_sql_client.async_execute(
+        statement=statement,
+        bind_parameters=bind_parameters,
+        extra_tags=extra_sql_tags,
+        isolation_level=isolation_level,
+    )
+
+    result = async_sql_client.async_request_result(request_id)
+    if result.exception:
+        raise SqlClientException(
+            f"Got an exception when trying to execute a statement: {result.exception}"
+        ) from result.exception
+    return
+
+
+def sync_query(  # noqa: D
+    async_sql_client: AsyncSqlClient,
+    statement: str,
+    bind_parameters: SqlBindParameters = SqlBindParameters(),
+    extra_sql_tags: SqlJsonTag = SqlJsonTag(),
+    isolation_level: Optional[SqlIsolationLevel] = None,
+) -> pd.DataFrame:
+    request_id = async_sql_client.async_query(
+        statement=statement,
+        bind_parameters=bind_parameters,
+        extra_tags=extra_sql_tags,
+        isolation_level=isolation_level,
+    )
+
+    result = async_sql_client.async_request_result(request_id)
+    if result.exception:
+        raise SqlClientException(
+            f"Got an exception when trying to execute a statement: {result.exception}"
+        ) from result.exception
+    assert result.df is not None, "A dataframe should have been returned if there was no error"
+    return result.df

@@ -9,6 +9,7 @@ from metricflow.column_assoc import (
 )
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.specs import (
+    MetadataSpec,
     MetricSpec,
     MeasureSpec,
     DimensionSpec,
@@ -108,4 +109,10 @@ class DefaultColumnAssociationResolver(ColumnAssociationResolver):
                 ).qualified_name,
                 single_column_correlation_key=SingleColumnCorrelationKey(),
             ),
+        )
+
+    def resolve_metadata_spec(self, metadata_spec: MetadataSpec) -> ColumnAssociation:  # noqa: D
+        return ColumnAssociation(
+            column_name=metadata_spec.element_name,
+            single_column_correlation_key=SingleColumnCorrelationKey(),
         )

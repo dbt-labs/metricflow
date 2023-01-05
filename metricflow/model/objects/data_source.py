@@ -61,9 +61,7 @@ class DataSource(HashableBaseModel, ModelWithMetadataParsing):
     measures: Sequence[Measure] = []
     dimensions: Sequence[Dimension] = []
 
-    mutability: Mutability = Mutability(
-        type=MutabilityType.FULL_MUTATION, type_params=MutabilityTypeParams(update_cron="0 0,12 * * *")
-    )
+    mutability: Mutability = Mutability(type=MutabilityType.FULL_MUTATION)
 
     origin: DataSourceOrigin = DataSourceOrigin.SOURCE
     metadata: Optional[Metadata]
@@ -102,6 +100,33 @@ class DataSource(HashableBaseModel, ModelWithMetadataParsing):
                 return ident
 
         raise ValueError(f"No identifier with name ({identifier_reference}) in data source with name ({self.name})")
+
+    @property
+    def has_validity_dimensions(self) -> bool:
+        """Returns True if there are validity params set on one or more dimensions"""
+        return any([dim.validity_params is not None for dim in self.dimensions])
+
+    @property
+    def validity_start_dimension(self) -> Optional[Dimension]:
+        """Returns the validity window start dimension, if one is set"""
+        validity_start_dims = [dim for dim in self.dimensions if dim.validity_params and dim.validity_params.is_start]
+        if not validity_start_dims:
+            return None
+        assert (
+            len(validity_start_dims) == 1
+        ), "Found more than one validity start dimension. This should have been blocked in validation!"
+        return validity_start_dims[0]
+
+    @property
+    def validity_end_dimension(self) -> Optional[Dimension]:
+        """Returns the validity window end dimension, if one is set"""
+        validity_end_dims = [dim for dim in self.dimensions if dim.validity_params and dim.validity_params.is_end]
+        if not validity_end_dims:
+            return None
+        assert (
+            len(validity_end_dims) == 1
+        ), "Found more than one validity end dimension. This should have been blocked in validation!"
+        return validity_end_dims[0]
 
     @property
     def partitions(self) -> List[Dimension]:  # noqa: D

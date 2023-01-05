@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from enum import Enum
 
-from metricflow.object_utils import ExtendedEnum
+from metricflow.object_utils import ExtendedEnum, assert_values_exhausted
 
 
 class AggregationType(ExtendedEnum):
@@ -16,6 +16,8 @@ class AggregationType(ExtendedEnum):
     BOOLEAN = "boolean"
     SUM_BOOLEAN = "sum_boolean"
     AVERAGE = "average"
+    PERCENTILE = "percentile"
+    MEDIAN = "median"
 
     COUNT = "count"
     # AVERAGE = "average"  not yet implemented ...requires us to keep track of two quantities, count and sum
@@ -33,6 +35,24 @@ class AggregationType(ExtendedEnum):
             AggregationType.BOOLEAN,
             AggregationType.COUNT,
         )
+
+    @property
+    def is_additive(self) -> bool:
+        """Indicates that if you sum values over a dimension grouping, you will still get an accurate result for this metric."""
+        if self is AggregationType.SUM or self is AggregationType.SUM_BOOLEAN or self is AggregationType.COUNT:
+            return True
+        elif (
+            self is AggregationType.MIN
+            or self is AggregationType.MAX
+            or self is AggregationType.COUNT_DISTINCT
+            or self is AggregationType.BOOLEAN
+            or self is AggregationType.AVERAGE
+            or self is AggregationType.PERCENTILE
+            or self is AggregationType.MEDIAN
+        ):
+            return False
+        else:
+            assert_values_exhausted(self)
 
     @property
     def fill_nulls_with_0(self) -> bool:

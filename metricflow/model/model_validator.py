@@ -6,23 +6,25 @@ from typing import List, Sequence
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.parsing.dir_to_model import ModelBuildResult
 from metricflow.model.validations.agg_time_dimension import AggregationTimeDimensionRule
-from metricflow.model.validations.data_sources import DataSourceTimeDimensionWarningsRule
+from metricflow.model.validations.data_sources import DataSourceTimeDimensionWarningsRule, DataSourceValidityWindowRule
 from metricflow.model.validations.dimension_const import DimensionConsistencyRule
 from metricflow.model.validations.element_const import ElementConsistencyRule
 from metricflow.model.validations.identifiers import (
     IdentifierConfigRule,
-    OnePrimaryIdentifierPerDataSourceRule,
     IdentifierConsistencyRule,
+    NaturalIdentifierConfigurationRule,
+    OnePrimaryIdentifierPerDataSourceRule,
 )
 from metricflow.model.validations.materializations import ValidMaterializationRule
 from metricflow.model.validations.measures import (
+    PercentileAggregationRule,
     CountAggregationExprRule,
     DataSourceMeasuresUniqueRule,
     MeasureConstraintAliasesRule,
     MetricMeasuresRule,
     MeasuresNonAdditiveDimensionRule,
 )
-from metricflow.model.validations.metrics import CumulativeMetricRule
+from metricflow.model.validations.metrics import CumulativeMetricRule, DerivedMetricRule
 from metricflow.model.validations.non_empty import NonEmptyRule
 from metricflow.model.validations.reserved_keywords import ReservedKeywordsRule
 from metricflow.model.validations.unique_valid_name import UniqueAndValidNameRule
@@ -39,13 +41,17 @@ class ModelValidator:
     """A Validator that acts on UserConfiguredModel"""
 
     DEFAULT_RULES = (
+        PercentileAggregationRule(),
+        DerivedMetricRule(),
         CountAggregationExprRule(),
         DataSourceMeasuresUniqueRule(),
         DataSourceTimeDimensionWarningsRule(),
+        DataSourceValidityWindowRule(),
         DimensionConsistencyRule(),
         ElementConsistencyRule(),
         IdentifierConfigRule(),
         IdentifierConsistencyRule(),
+        NaturalIdentifierConfigurationRule(),
         OnePrimaryIdentifierPerDataSourceRule(),
         MeasureConstraintAliasesRule(),
         MetricMeasuresRule(),

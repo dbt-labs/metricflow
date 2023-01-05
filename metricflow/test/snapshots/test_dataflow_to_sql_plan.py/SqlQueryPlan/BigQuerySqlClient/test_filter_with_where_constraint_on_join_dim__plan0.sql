@@ -95,6 +95,8 @@ FROM (
                 , subq_0.bookers
                 , subq_0.average_booking_value
                 , subq_0.referred_bookings
+                , subq_0.median_booking_value
+                , subq_0.booking_value_p99
               FROM (
                 -- Read Elements From Data Source 'bookings_source'
                 SELECT
@@ -107,6 +109,8 @@ FROM (
                   , bookings_source_src_10001.booking_value AS average_booking_value
                   , bookings_source_src_10001.booking_value AS booking_payments
                   , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
+                  , bookings_source_src_10001.booking_value AS median_booking_value
+                  , bookings_source_src_10001.booking_value AS booking_value_p99
                   , bookings_source_src_10001.is_instant
                   , bookings_source_src_10001.ds
                   , DATE_TRUNC(bookings_source_src_10001.ds, isoweek) AS ds__week
@@ -155,7 +159,7 @@ FROM (
           ) subq_2
           LEFT OUTER JOIN (
             -- Pass Only Elements:
-            --   ['listing', 'country_latest']
+            --   ['country_latest', 'listing']
             SELECT
               subq_4.listing
               , subq_4.country_latest
@@ -246,5 +250,5 @@ FROM (
     ) subq_8
   ) subq_9
   GROUP BY
-    subq_9.is_instant
+    is_instant
 ) subq_10

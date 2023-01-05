@@ -10,7 +10,7 @@ from metricflow.sql.sql_exprs import (
     SqlColumnReference,
     SqlComparisonExpression,
     SqlComparison,
-    SqlFunctionExpression,
+    SqlAggregateFunctionExpression,
     SqlFunction,
     SqlNullExpression,
     SqlLogicalExpression,
@@ -22,6 +22,9 @@ from metricflow.sql.sql_exprs import (
     SqlColumnReplacements,
     SqlCastToTimestampExpression,
     SqlBetweenExpression,
+    SqlWindowFunctionExpression,
+    SqlWindowFunction,
+    SqlWindowOrderByArgument,
 )
 from metricflow.time.time_granularity import TimeGranularity
 
@@ -72,7 +75,7 @@ def test_require_parenthesis(default_expr_renderer: DefaultSqlExpressionRenderer
 
 def test_function_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D
     actual = default_expr_renderer.render_sql_expr(
-        SqlFunctionExpression(
+        SqlAggregateFunctionExpression(
             sql_function=SqlFunction.SUM,
             sql_function_args=[
                 SqlColumnReferenceExpression(SqlColumnReference("my_table", "a")),
@@ -86,7 +89,7 @@ def test_function_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> N
 def test_distinct_agg_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:
     """Distinct aggregation functions require the insertion of the DISTINCT keyword in the rendered function expr"""
     actual = default_expr_renderer.render_sql_expr(
-        SqlFunctionExpression(
+        SqlAggregateFunctionExpression(
             sql_function=SqlFunction.COUNT_DISTINCT,
             sql_function_args=[
                 SqlColumnReferenceExpression(SqlColumnReference("my_table", "a")),
@@ -100,11 +103,11 @@ def test_distinct_agg_expr(default_expr_renderer: DefaultSqlExpressionRenderer) 
 
 def test_nested_function_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D
     actual = default_expr_renderer.render_sql_expr(
-        SqlFunctionExpression(
+        SqlAggregateFunctionExpression(
             sql_function=SqlFunction.CONCAT,
             sql_function_args=[
                 SqlColumnReferenceExpression(SqlColumnReference("my_table", "a")),
-                SqlFunctionExpression(
+                SqlAggregateFunctionExpression(
                     sql_function=SqlFunction.CONCAT,
                     sql_function_args=[
                         SqlColumnReferenceExpression(SqlColumnReference("my_table", "b")),
@@ -191,7 +194,7 @@ def test_date_trunc_expr(default_expr_renderer: DefaultSqlExpressionRenderer) ->
 def test_ratio_computation_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D
     actual = default_expr_renderer.render_sql_expr(
         SqlRatioComputationExpression(
-            numerator=SqlFunctionExpression(
+            numerator=SqlAggregateFunctionExpression(
                 SqlFunction.SUM, sql_function_args=[SqlStringExpression(sql_expr="1", requires_parenthesis=False)]
             ),
             denominator=SqlColumnReferenceExpression(SqlColumnReference(column_name="divide_by_me", table_alias="a")),
@@ -236,3 +239,32 @@ def test_between_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> No
         )
     ).sql
     assert actual == "a.col0 BETWEEN CAST('2020-01-01' AS TIMESTAMP) AND CAST('2020-01-10' AS TIMESTAMP)"
+
+
+def test_window_function_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D
+    actual = default_expr_renderer.render_sql_expr(
+        SqlWindowFunctionExpression(
+            sql_function=SqlWindowFunction.FIRST_VALUE,
+            sql_function_args=[SqlColumnReferenceExpression(SqlColumnReference("a", "col0"))],
+            partition_by_args=[
+                SqlColumnReferenceExpression(SqlColumnReference("b", "col0")),
+                SqlColumnReferenceExpression(SqlColumnReference("b", "col1")),
+            ],
+            order_by_args=[
+                SqlWindowOrderByArgument(
+                    expr=SqlColumnReferenceExpression(SqlColumnReference("a", "col0")),
+                    descending=True,
+                    nulls_last=False,
+                ),
+                SqlWindowOrderByArgument(
+                    expr=SqlColumnReferenceExpression(SqlColumnReference("b", "col0")),
+                    descending=False,
+                    nulls_last=True,
+                ),
+            ],
+        )
+    ).sql
+    assert (
+        actual
+        == "first_value(a.col0) OVER (PARTITION BY b.col0, b.col1 ORDER BY a.col0 DESC NULLS FIRST, b.col0 ASC NULLS LAST)"
+    )

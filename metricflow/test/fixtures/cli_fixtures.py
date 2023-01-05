@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+from typing import Sequence
+
 import click
 import pytest
-
 from click.testing import CliRunner, Result
-from typing import Sequence
 
 from metricflow.cli.cli_context import CLIContext
 from metricflow.engine.metricflow_engine import MetricFlowEngine
@@ -12,7 +12,7 @@ from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
-from metricflow.protocols.sql_client import SqlClient
+from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.test_utils import as_datetime
 from metricflow.test.time.configurable_time_source import ConfigurableTimeSource
@@ -20,7 +20,7 @@ from metricflow.test.time.configurable_time_source import ConfigurableTimeSource
 
 @pytest.fixture
 def cli_context(  # noqa: D
-    sql_client: SqlClient,
+    async_sql_client: AsyncSqlClient,
     simple_user_configured_model: UserConfiguredModel,
     time_spine_source: TimeSpineSource,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -29,7 +29,7 @@ def cli_context(  # noqa: D
     semantic_model = SemanticModel(simple_user_configured_model)
     mf_engine = MetricFlowEngine(
         semantic_model=semantic_model,
-        sql_client=sql_client,
+        sql_client=async_sql_client,
         column_association_resolver=DefaultColumnAssociationResolver(semantic_model=semantic_model),
         time_source=ConfigurableTimeSource(as_datetime("2020-01-01")),
         time_spine_source=time_spine_source,
@@ -37,7 +37,7 @@ def cli_context(  # noqa: D
     )
     context = CLIContext()
     context._mf = mf_engine
-    context._sql_client = sql_client
+    context._sql_client = async_sql_client
     context._user_configured_model = simple_user_configured_model
     context._semantic_model = semantic_model
     context._mf_system_schema = mf_test_session_state.mf_system_schema

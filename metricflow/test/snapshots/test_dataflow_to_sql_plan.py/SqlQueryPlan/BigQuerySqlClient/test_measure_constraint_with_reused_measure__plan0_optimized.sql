@@ -1,6 +1,6 @@
 -- Join Aggregated Measures with Standard Outputs
 -- Pass Only Elements:
---   ['metric_time', 'booking_value_with_is_instant_constraint', 'booking_value']
+--   ['booking_value_with_is_instant_constraint', 'booking_value', 'metric_time']
 -- Compute Metrics via Expressions
 SELECT
   subq_17.metric_time AS metric_time
@@ -49,9 +49,7 @@ INNER JOIN (
 ) subq_21
 ON
   (
-    (
-      subq_17.metric_time = subq_21.metric_time
-    ) OR (
-      (subq_17.metric_time IS NULL) AND (subq_21.metric_time IS NULL)
-    )
+    subq_17.metric_time = subq_21.metric_time
+  ) OR (
+    (subq_17.metric_time IS NULL) AND (subq_21.metric_time IS NULL)
   )

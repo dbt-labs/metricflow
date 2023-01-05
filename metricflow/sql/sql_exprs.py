@@ -13,8 +13,10 @@ from metricflow.dag.mf_dag import DagNode, DisplayedProperty, NodeId
 from metricflow.dag.id_generation import (
     SQL_EXPR_COLUMN_REFERENCE_ID_PREFIX,
     SQL_EXPR_FUNCTION_ID_PREFIX,
+    SQL_EXPR_PERCENTILE_ID_PREFIX,
     SQL_EXPR_STRING_ID_PREFIX,
     SQL_EXPR_COMPARISON_ID_PREFIX,
+    SQL_EXPR_GENERATE_UUID_PREFIX,
     SQL_EXPR_NULL_PREFIX,
     SQL_EXPR_LOGICAL_OPERATOR_PREFIX,
     SQL_EXPR_STRING_LITERAL_PREFIX,
@@ -22,7 +24,9 @@ from metricflow.dag.id_generation import (
     SQL_EXPR_DATE_TRUNC,
     SQL_EXPR_RATIO_COMPUTATION,
     SQL_EXPR_BETWEEN_PREFIX,
+    SQL_EXPR_WINDOW_FUNCTION_ID_PREFIX,
 )
+from metricflow.model.objects.elements.measure import MeasureAggregationParameters
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.visitor import Visitable, VisitorOutputT
 from metricflow.time.time_granularity import TimeGranularity
@@ -143,6 +147,10 @@ class SqlExpressionTreeLineage:
     def contains_ambiguous_exprs(self) -> bool:  # noqa: D
         return self.contains_string_exprs or self.contains_column_alias_exprs
 
+    @property
+    def contains_aggregate_exprs(self) -> bool:  # noqa: D
+        return any(x.is_aggregate_function for x in self.function_exprs)
+
 
 class SqlColumnReplacements:
     """When re-writing column references in expressions, this storing the mapping."""
@@ -177,7 +185,11 @@ class SqlExpressionNodeVisitor(Generic[VisitorOutputT], ABC):
         pass
 
     @abstractmethod
-    def visit_function_expr(self, node: SqlFunctionExpression) -> VisitorOutputT:  # noqa: D
+    def visit_function_expr(self, node: SqlAggregateFunctionExpression) -> VisitorOutputT:  # noqa: D
+        pass
+
+    @abstractmethod
+    def visit_percentile_expr(self, node: SqlPercentileExpression) -> VisitorOutputT:  # noqa: D
         pass
 
     @abstractmethod
@@ -214,6 +226,14 @@ class SqlExpressionNodeVisitor(Generic[VisitorOutputT], ABC):
 
     @abstractmethod
     def visit_between_expr(self, node: SqlBetweenExpression) -> VisitorOutputT:  # noqa: D
+        pass
+
+    @abstractmethod
+    def visit_window_function_expr(self, node: SqlWindowFunctionExpression) -> VisitorOutputT:  # noqa: D
+        pass
+
+    @abstractmethod
+    def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> VisitorOutputT:  # noqa: D
         pass
 
 
@@ -674,24 +694,64 @@ class SqlFunction(Enum):
             return SqlFunction.MIN
         elif aggregation_type is AggregationType.SUM:
             return SqlFunction.SUM
-        elif aggregation_type is AggregationType.SUM_BOOLEAN or aggregation_type is AggregationType.BOOLEAN:
+        elif aggregation_type is AggregationType.PERCENTILE:
             raise RuntimeError(
-                f"Unhandled boolean aggregation type {aggregation_type} - this should have been transformed to SUM "
+                f"Unhandled aggregation type {aggregation_type} - this should have been handled in percentile"
+                "aggregation node."
+            )
+        elif aggregation_type is AggregationType.MEDIAN:
+            raise RuntimeError(
+                f"Unhandled aggregation type {aggregation_type} - this should have been transformed to PERCENTILE "
                 "during model parsing."
             )
-
-        assert_values_exhausted(aggregation_type)
+        elif (
+            aggregation_type is AggregationType.SUM_BOOLEAN
+            or aggregation_type is AggregationType.BOOLEAN
+            or aggregation_type is AggregationType.COUNT
+        ):
+            raise RuntimeError(
+                f"Unhandled aggregation type {aggregation_type} - this should have been transformed to SUM "
+                "during model parsing."
+            )
+        else:
+            assert_values_exhausted(aggregation_type)
 
 
 class SqlFunctionExpression(SqlExpressionNode):
-    """A function expression like SUM(1)."""
+    """Denotes a function expression in SQL."""
+
+    @property
+    @abstractmethod
+    def is_aggregate_function(self) -> bool:
+        """Returns whether this is an aggregate function."""
+        pass
+
+    @staticmethod
+    def build_expression_from_aggregation_type(
+        aggregation_type: AggregationType,
+        sql_column_expression: SqlColumnReferenceExpression,
+        agg_params: MeasureAggregationParameters = None,
+    ) -> SqlFunctionExpression:
+        """Returns sql function expression depending on aggregation type."""
+
+        if aggregation_type is AggregationType.PERCENTILE:
+            assert agg_params is not None, "Agg_params is none, which should have been caught in validation"
+            return SqlPercentileExpression(
+                sql_column_expression, SqlPercentileExpressionArgument.from_aggregation_parameters(agg_params)
+            )
+        else:
+            return SqlAggregateFunctionExpression.from_aggregation_type(aggregation_type, sql_column_expression)
+
+
+class SqlAggregateFunctionExpression(SqlFunctionExpression):
+    """An aggregate function expression like SUM(1)."""
 
     @staticmethod
     def from_aggregation_type(
         aggregation_type: AggregationType, sql_column_expression: SqlColumnReferenceExpression
-    ) -> SqlFunctionExpression:
+    ) -> SqlAggregateFunctionExpression:
         """Given the aggregation type, return an SQL function expression that does that aggregation on the given col."""
-        return SqlFunctionExpression(
+        return SqlAggregateFunctionExpression(
             sql_function=SqlFunction.from_aggregation_type(aggregation_type=aggregation_type),
             sql_function_args=[sql_column_expression],
         )
@@ -747,10 +807,267 @@ class SqlFunctionExpression(SqlExpressionNode):
         column_replacements: Optional[SqlColumnReplacements] = None,
         should_render_table_alias: Optional[bool] = None,
     ) -> SqlExpressionNode:
-        return SqlFunctionExpression(
+        return SqlAggregateFunctionExpression(
             sql_function=self.sql_function,
             sql_function_args=[
                 x.rewrite(column_replacements, should_render_table_alias) for x in self.sql_function_args
+            ],
+        )
+
+    @property
+    def is_aggregate_function(self) -> bool:  # noqa: D
+        return True
+
+    @property
+    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D
+        return SqlExpressionTreeLineage.combine(
+            tuple(x.lineage for x in self.parent_nodes) + (SqlExpressionTreeLineage(function_exprs=(self,)),)
+        )
+
+    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
+        if not isinstance(other, SqlAggregateFunctionExpression):
+            return False
+        return self.sql_function == other.sql_function and self._parents_match(other)
+
+
+class SqlPercentileFunctionType(Enum):
+    """Type of percentile function used."""
+
+    DISCRETE = "discrete"
+    CONTINUOUS = "continuous"
+
+
+@dataclass(frozen=True)
+class SqlPercentileExpressionArgument:
+    """Dataclass for holding percentile arguments"""
+
+    percentile: float
+    function_type: SqlPercentileFunctionType
+
+    @staticmethod
+    def from_aggregation_parameters(agg_params: MeasureAggregationParameters) -> SqlPercentileExpressionArgument:
+        """Given the measure parameters, returns a SqlPercentileExpressionArgument with the corresponding percentile args."""
+        if not agg_params.percentile:
+            raise RuntimeError("Percentile value is none - this should have been caught during model parsing.")
+        return SqlPercentileExpressionArgument(
+            agg_params.percentile,
+            SqlPercentileFunctionType.DISCRETE
+            if agg_params.use_discrete_percentile
+            else SqlPercentileFunctionType.CONTINUOUS,
+        )
+
+    @property
+    def function_name(self) -> str:
+        """Helper to build function name to use in rendering"""
+        return "PERCENTILE_CONT" if self.function_type == SqlPercentileFunctionType.CONTINUOUS else "PERCENTILE_DISC"
+
+
+class SqlPercentileExpression(SqlFunctionExpression):
+    """A percentile aggregation expression."""
+
+    def __init__(self, order_by_arg: SqlExpressionNode, percentile_args: SqlPercentileExpressionArgument) -> None:
+        """Constructor.
+
+        Args:
+            order_by_arg: The expression that should go into the function. e.g. for "percentile_cont(col, 0.1)", the arg
+            expressions should be "col".
+            percentile_args: Auxillary information including percentile value and type.
+        """
+        self._order_by_arg = order_by_arg
+        self._percentile_args = percentile_args
+
+        super().__init__(node_id=self.create_unique_id(), parent_nodes=[order_by_arg])
+
+    @classmethod
+    def id_prefix(cls) -> str:  # noqa: D
+        return SQL_EXPR_PERCENTILE_ID_PREFIX
+
+    @property
+    def requires_parenthesis(self) -> bool:  # noqa: D
+        return False
+
+    @property
+    def order_by_arg(self) -> SqlExpressionNode:  # noqa: D
+        return self._order_by_arg
+
+    @property
+    def percentile_args(self) -> SqlPercentileExpressionArgument:  # noqa: D
+        return self._percentile_args
+
+    def accept(self, visitor: SqlExpressionNodeVisitor) -> VisitorOutputT:  # noqa: D
+        return visitor.visit_percentile_expr(self)
+
+    @property
+    def description(self) -> str:  # noqa: D
+        return f"{self._percentile_args.function_type.value} Percentile({self._percentile_args.percentile}) Expression"
+
+    @property
+    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
+        return (
+            super().displayed_properties
+            + [DisplayedProperty("argument", self._order_by_arg)]
+            + [DisplayedProperty("percentile_args", self._percentile_args)]
+        )
+
+    def __repr__(self) -> str:  # noqa: D
+        return f"{self.__class__.__name__}(node_id={self.node_id}, percentile={self._percentile_args.percentile}, function_type={self._percentile_args.function_type.value})"
+
+    def rewrite(  # noqa: D
+        self,
+        column_replacements: Optional[SqlColumnReplacements] = None,
+        should_render_table_alias: Optional[bool] = None,
+    ) -> SqlExpressionNode:
+        return SqlPercentileExpression(
+            order_by_arg=self._order_by_arg.rewrite(column_replacements, should_render_table_alias),
+            percentile_args=self._percentile_args,
+        )
+
+    @property
+    def is_aggregate_function(self) -> bool:  # noqa: D
+        return True
+
+    @property
+    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D
+        return SqlExpressionTreeLineage.combine(
+            tuple(x.lineage for x in self.parent_nodes) + (SqlExpressionTreeLineage(function_exprs=(self,)),)
+        )
+
+    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
+        if not isinstance(other, SqlPercentileExpression):
+            return False
+        return self._percentile_args == other._percentile_args and self._parents_match(other)
+
+
+class SqlWindowFunction(Enum):
+    """Names of known SQL window functions like SUM(), RANK(), ROW_NUMBER()
+
+    Values are the SQL string to be used in rendering.
+    """
+
+    FIRST_VALUE = "first_value"
+    ROW_NUMBER = "row_number"
+
+
+@dataclass(frozen=True)
+class SqlWindowOrderByArgument:
+    """In window functions, the ORDER BY clause can accept an expr, ordering, null ranking."""
+
+    expr: SqlExpressionNode
+    descending: Optional[bool] = None
+    nulls_last: Optional[bool] = None
+
+    @property
+    def suffix(self) -> str:
+        """Helper to build suffix to append to {expr}{suffix}"""
+        result = []
+        if self.descending is not None:
+            result.append("DESC" if self.descending else "ASC")
+        if self.nulls_last is not None:
+            result.append("NULLS LAST" if self.nulls_last else "NULLS FIRST")
+        return " ".join(result)
+
+
+class SqlWindowFunctionExpression(SqlFunctionExpression):
+    """A window function expression like SUM(foo) OVER bar"""
+
+    def __init__(
+        self,
+        sql_function: SqlWindowFunction,
+        sql_function_args: Optional[List[SqlExpressionNode]] = None,
+        partition_by_args: Optional[List[SqlExpressionNode]] = None,
+        order_by_args: Optional[List[SqlWindowOrderByArgument]] = None,
+    ) -> None:
+        """Constructor.
+
+        Args:
+            sql_function: The function that this represents.
+            sql_function_args: The arguments that should go into the function. e.g. for "CONCAT(a, b)", the arg
+                               expressions should be "a" and "b".
+            partition_by_args: The arguments to partition the rows. e.g. PARTITION BY expr1, expr2,
+                               the args are "expr1", "expr2".
+            order_by_args: The expr to order the partitions by.
+        """
+        self._sql_function = sql_function
+        self._sql_function_args = sql_function_args
+        self._partition_by_args = partition_by_args
+        self._order_by_args = order_by_args
+        parent_nodes = []
+        if sql_function_args:
+            parent_nodes.extend(sql_function_args)
+        if partition_by_args:
+            parent_nodes.extend(partition_by_args)
+        if order_by_args:
+            parent_nodes.extend([x.expr for x in order_by_args])
+        super().__init__(node_id=self.create_unique_id(), parent_nodes=parent_nodes)
+
+    @classmethod
+    def id_prefix(cls) -> str:  # noqa: D
+        return SQL_EXPR_WINDOW_FUNCTION_ID_PREFIX
+
+    @property
+    def requires_parenthesis(self) -> bool:  # noqa: D
+        return False
+
+    def accept(self, visitor: SqlExpressionNodeVisitor) -> VisitorOutputT:  # noqa: D
+        return visitor.visit_window_function_expr(self)
+
+    @property
+    def description(self) -> str:  # noqa: D
+        return f"{self._sql_function.value} Window Function Expression"
+
+    @property
+    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
+        return (
+            super().displayed_properties
+            + [DisplayedProperty("function", self.sql_function)]
+            + [DisplayedProperty("argument", x) for x in self.sql_function_args]
+            + [DisplayedProperty("partition_by_argument", x) for x in self.partition_by_args]
+            + [DisplayedProperty("order_by_argument", x) for x in self.order_by_args]
+        )
+
+    @property
+    def sql_function(self) -> SqlWindowFunction:  # noqa: D
+        return self._sql_function
+
+    @property
+    def sql_function_args(self) -> List[SqlExpressionNode]:  # noqa: D
+        return self._sql_function_args or []
+
+    @property
+    def partition_by_args(self) -> List[SqlExpressionNode]:  # noqa: D
+        return self._partition_by_args or []
+
+    @property
+    def order_by_args(self) -> List[SqlWindowOrderByArgument]:  # noqa: D
+        return self._order_by_args or []
+
+    @property
+    def is_aggregate_function(self) -> bool:  # noqa: D
+        return False
+
+    def __repr__(self) -> str:  # noqa: D
+        return f"{self.__class__.__name__}(node_id={self.node_id}, sql_function={self.sql_function.name})"
+
+    def rewrite(  # noqa: D
+        self,
+        column_replacements: Optional[SqlColumnReplacements] = None,
+        should_render_table_alias: Optional[bool] = None,
+    ) -> SqlExpressionNode:
+        return SqlWindowFunctionExpression(
+            sql_function=self.sql_function,
+            sql_function_args=[
+                x.rewrite(column_replacements, should_render_table_alias) for x in self.sql_function_args
+            ],
+            partition_by_args=[
+                x.rewrite(column_replacements, should_render_table_alias) for x in self.partition_by_args
+            ],
+            order_by_args=[
+                SqlWindowOrderByArgument(
+                    expr=x.expr.rewrite(column_replacements, should_render_table_alias),
+                    descending=x.descending,
+                    nulls_last=x.nulls_last,
+                )
+                for x in self.order_by_args
             ],
         )
 
@@ -761,9 +1078,13 @@ class SqlFunctionExpression(SqlExpressionNode):
         )
 
     def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
-        if not isinstance(other, SqlFunctionExpression):
+        if not isinstance(other, SqlWindowFunctionExpression):
             return False
-        return self.sql_function == other.sql_function and self._parents_match(other)
+        return (
+            self.sql_function == other.sql_function
+            and self.order_by_args == other.order_by_args
+            and self._parents_match(other)
+        )
 
 
 class SqlNullExpression(SqlExpressionNode):
@@ -1210,3 +1531,50 @@ class SqlBetweenExpression(SqlExpressionNode):
         if not isinstance(other, SqlBetweenExpression):
             return False
         return self._parents_match(other)
+
+
+class SqlGenerateUuidExpression(SqlExpressionNode):
+    """Renders a sql to generate a random uuid, is non-deterministic.."""
+
+    def __init__(self) -> None:  # noqa: D
+        super().__init__(node_id=self.create_unique_id(), parent_nodes=[])
+
+    @classmethod
+    def id_prefix(cls) -> str:  # noqa: D
+        return SQL_EXPR_GENERATE_UUID_PREFIX
+
+    def accept(self, visitor: SqlExpressionNodeVisitor) -> VisitorOutputT:  # noqa: D
+        return visitor.visit_generate_uuid_expr(self)
+
+    @property
+    def description(self) -> str:  # noqa: D
+        return "Generate a universally unique identifier"
+
+    @property
+    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
+        return super().displayed_properties
+
+    @property
+    def requires_parenthesis(self) -> bool:  # noqa: D
+        return False
+
+    @property
+    def execution_parameters(self) -> SqlBindParameters:  # noqa: D
+        return SqlBindParameters()
+
+    def __repr__(self) -> str:  # noqa: D
+        return f"{self.__class__.__name__}(node_id={self.node_id})"
+
+    def rewrite(  # noqa: D
+        self,
+        column_replacements: Optional[SqlColumnReplacements] = None,
+        should_render_table_alias: Optional[bool] = None,
+    ) -> SqlExpressionNode:
+        return self
+
+    @property
+    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D
+        return SqlExpressionTreeLineage(other_exprs=(self,))
+
+    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
+        return False

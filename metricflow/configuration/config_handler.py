@@ -10,9 +10,8 @@ class ConfigHandler(YamlFileHandler):
 
     def __init__(self) -> None:  # noqa: D
         # Create config directory if not exist
-        if not os.path.exists(self.dir_path):
-            dir_path = pathlib.Path(self.dir_path)
-            dir_path.mkdir(parents=True)
+        dir_path = pathlib.Path(self.dir_path)
+        dir_path.mkdir(parents=True, exist_ok=True)
         super().__init__(yaml_file_path=self.file_path)
 
     @property

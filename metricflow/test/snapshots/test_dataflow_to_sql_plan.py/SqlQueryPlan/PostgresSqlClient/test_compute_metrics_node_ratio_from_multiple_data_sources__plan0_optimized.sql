@@ -1,6 +1,6 @@
 -- Join Aggregated Measures with Standard Outputs
 -- Pass Only Elements:
---   ['listing__country_latest', 'ds', 'bookings', 'views']
+--   ['bookings', 'views', 'listing__country_latest', 'ds']
 -- Compute Metrics via Expressions
 SELECT
   subq_28.ds AS ds
@@ -71,6 +71,12 @@ INNER JOIN (
 ON
   (
     (
+      subq_28.ds = subq_37.ds
+    ) OR (
+      (subq_28.ds IS NULL) AND (subq_37.ds IS NULL)
+    )
+  ) AND (
+    (
       subq_28.listing__country_latest = subq_37.listing__country_latest
     ) OR (
       (
@@ -78,11 +84,5 @@ ON
       ) AND (
         subq_37.listing__country_latest IS NULL
       )
-    )
-  ) AND (
-    (
-      subq_28.ds = subq_37.ds
-    ) OR (
-      (subq_28.ds IS NULL) AND (subq_37.ds IS NULL)
     )
   )

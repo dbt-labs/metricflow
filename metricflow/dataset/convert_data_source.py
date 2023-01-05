@@ -18,7 +18,7 @@ from metricflow.instances import (
 )
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType
-from metricflow.model.objects.elements.identifier import Identifier, IdentifierType
+from metricflow.model.objects.elements.identifier import Identifier
 from metricflow.model.objects.elements.measure import Measure
 from metricflow.model.spec_converters import MeasureConverter
 from metricflow.specs import (
@@ -177,7 +177,6 @@ class DataSourceToDataSetConverter:
         self,
         data_source_name: str,
         measures: Sequence[Measure],
-        measure_time_dimension_spec: TimeDimensionSpec,
         table_alias: str,
     ) -> Tuple[Sequence[MeasureInstance], Sequence[SqlSelectColumn]]:
         # Convert all elements to instances
@@ -353,26 +352,6 @@ class DataSourceToDataSetConverter:
                 )
         return identifier_instances, select_columns
 
-    @staticmethod
-    def _find_primary_time_dimension(data_source: DataSource) -> TimeDimensionSpec:
-        # If a data source has measures, it should have a primary time dimension. Find it and use it to set the time
-        # dimension for the measure.
-        primary_time_dimensions = [dimension for dimension in data_source.dimensions if dimension.is_primary_time]
-        assert len(primary_time_dimensions) == 1, (
-            f"Data source ({data_source}) with measures should have exactly 1 primary time dimension, found "
-            f"{len(primary_time_dimensions)}: {primary_time_dimensions}."
-        )
-        primary_time_dimension = primary_time_dimensions[0]
-        assert (
-            primary_time_dimension.type_params and primary_time_dimension.type_params.time_granularity
-        ), f"Primary time dimension missing time granularity: {primary_time_dimension}"
-
-        return TimeDimensionSpec(
-            element_name=primary_time_dimension.reference.element_name,
-            identifier_links=(),
-            time_granularity=primary_time_dimension.type_params.time_granularity,
-        )
-
     def create_sql_source_data_set(self, data_source: DataSource) -> DataSourceDataSet:
         """Create an SQL source data set from a data source in the model."""
 
@@ -387,11 +366,9 @@ class DataSourceToDataSetConverter:
 
         # Handle measures
         if len(data_source.measures) > 0:
-            primary_time_dimension = self._find_primary_time_dimension(data_source)
             measure_instances, select_columns = self._convert_measures(
                 data_source_name=data_source.name,
                 measures=data_source.measures,
-                measure_time_dimension_spec=primary_time_dimension,
                 table_alias=from_source_alias,
             )
             all_measure_instances.extend(measure_instances)
@@ -403,7 +380,7 @@ class DataSourceToDataSetConverter:
         # instances in the instance set. We'll create a different instance for each "possible_identifier_links".
         possible_identifier_links: List[Tuple[IdentifierReference, ...]] = [()]
         for identifier in data_source.identifiers:
-            if identifier.type in (IdentifierType.PRIMARY, IdentifierType.UNIQUE):
+            if identifier.is_linkable_identifier_type:
                 possible_identifier_links.append((identifier.reference,))
 
         # Handle dimensions

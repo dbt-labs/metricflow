@@ -529,3 +529,46 @@ def test_data_source_dimension_metadata_parsing() -> None:
       """
     )
     assert dimension.metadata.file_slice.content == expected_metadata_content
+
+
+def test_data_source_dimension_validity_params_parsing() -> None:
+    """Test for parsing dimension validity info out of a data source specification"""
+    yaml_contents = textwrap.dedent(
+        """\
+        data_source:
+          name: scd_parsing_test
+          mutability:
+            type: immutable
+          sql_table: some_schema.source_table
+          dimensions:
+            - name: start_time_dimension
+              type: time
+              type_params:
+                time_granularity: day
+                validity_params:
+                  is_start: True
+            - name: end_time_dimension
+              type: time
+              type_params:
+                time_granularity: day
+                validity_params:
+                  is_end: True
+        """
+    )
+    file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+
+    build_result = parse_yaml_files_to_model(files=[file])
+
+    assert len(build_result.model.data_sources) == 1
+    data_source = build_result.model.data_sources[0]
+    assert len(data_source.dimensions) == 2
+    start_dimension = data_source.dimensions[0]
+    assert start_dimension.type_params is not None
+    assert start_dimension.type_params.validity_params is not None
+    assert start_dimension.type_params.validity_params.is_start is True
+    assert start_dimension.type_params.validity_params.is_end is False
+    end_dimension = data_source.dimensions[1]
+    assert end_dimension.type_params is not None
+    assert end_dimension.type_params.validity_params is not None
+    assert end_dimension.type_params.validity_params.is_start is False
+    assert end_dimension.type_params.validity_params.is_end is True
