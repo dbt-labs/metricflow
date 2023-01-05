@@ -458,13 +458,19 @@ class PercentileAggregationRule(ModelValidationRule):
                 elif (
                     measure.agg != AggregationType.PERCENTILE
                     and measure.agg_params
-                    and (measure.agg_params.percentile or measure.agg_params.use_discrete_percentile)
+                    and (
+                        measure.agg_params.percentile
+                        or measure.agg_params.use_discrete_percentile
+                        or measure.agg_params.use_approximate_percentile
+                    )
                 ):
                     wrong_params = []
                     if measure.agg_params.percentile:
                         wrong_params.append("percentile")
                     if measure.agg_params.use_discrete_percentile:
                         wrong_params.append("use_discrete_percentile")
+                    if measure.agg_params.use_approximate_percentile:
+                        wrong_params.append("use_approximate_percentile")
 
                     wrong_params_str = ", ".join(wrong_params)
 

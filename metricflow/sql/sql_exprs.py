@@ -851,17 +851,21 @@ class SqlPercentileExpressionArgument:
         """Given the measure parameters, returns a SqlPercentileExpressionArgument with the corresponding percentile args."""
         if not agg_params.percentile:
             raise RuntimeError("Percentile value is none - this should have been caught during model parsing.")
+        flags_to_function_type = {
+            (False, False): SqlPercentileFunctionType.CONTINUOUS,
+            (True, False): SqlPercentileFunctionType.DISCRETE,
+            (False, True): SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS,
+            (True, True): SqlPercentileFunctionType.APPROXIMATE_DISCRETE,
+        }
+
+        percentile_function_type = flags_to_function_type[
+            (agg_params.use_discrete_percentile, agg_params.use_approximate_percentile)
+        ]
+
         return SqlPercentileExpressionArgument(
             agg_params.percentile,
-            SqlPercentileFunctionType.DISCRETE
-            if agg_params.use_discrete_percentile
-            else SqlPercentileFunctionType.CONTINUOUS,
+            percentile_function_type,
         )
-
-    @property
-    def function_name(self) -> str:
-        """Helper to build function name to use in rendering"""
-        return "PERCENTILE_CONT" if self.function_type == SqlPercentileFunctionType.CONTINUOUS else "PERCENTILE_DISC"
 
 
 class SqlPercentileExpression(SqlFunctionExpression):

@@ -28,4 +28,5 @@ class ConvertMedianToPercentileRule(ModelTransformRule):
                             )
                     measure.agg_params.percentile = MEDIAN_PERCENTILE
                     measure.agg_params.use_discrete_percentile = False
+                    # let's not set use_approximate_percentile to be false due to valid performance reasons
         return model
