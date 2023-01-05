@@ -31,7 +31,8 @@ FROM (
 INNER JOIN (
   -- Filter row on MIN(ds)
   SELECT
-    MIN(subq_1.ds) AS ds__complete
+    subq_1.ds__week
+    , MIN(subq_1.ds) AS ds__complete
   FROM (
     -- Read Elements From Data Source 'accounts_source'
     SELECT
