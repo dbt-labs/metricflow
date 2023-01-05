@@ -80,12 +80,10 @@ class SqlAlchemySqlClient(BaseSqlClientImplementation, ABC):
             pool_pre_ping=True,
         )
 
-
     def list_tables(self, schema_name: str) -> List[str]:  # noqa: D
         insp = inspect(self._engine)
         return insp.get_table_names(schema=schema_name)
-
-
+        
     @contextmanager
     def _engine_connection(
         self,
