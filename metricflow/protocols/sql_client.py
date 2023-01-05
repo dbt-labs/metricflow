@@ -2,16 +2,17 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from enum import Enum
-from typing import ClassVar, Dict, Optional, Protocol
+from typing import ClassVar, Dict, Optional, Protocol, Sequence
+
+from pandas import DataFrame
 
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from pandas import DataFrame
 
 
-class SupportedSqlEngine(Enum):
-    """Enumeration of DB engines currently supported by MetricFlow"""
+class SqlEngine(Enum):
+    """Enumeration of SQL engines, including ones that are not yet supported."""
 
     BIGQUERY = "BigQuery"
     DUCKDB = "DuckDB"
@@ -19,6 +20,21 @@ class SupportedSqlEngine(Enum):
     POSTGRES = "Postgres"
     SNOWFLAKE = "Snowflake"
     DATABRICKS = "Databricks"
+
+    # Not yet supported.
+    MYSQL = "MySQL"
+
+
+class SqlIsolationLevel(Enum):
+    """Describes the isolation levels used to execute SQL queries. Values are passed as options to SQLAlchemy."""
+
+    READ_UNCOMMITTED = "READ_UNCOMMITTED"
+    READ_COMMITTED = "READ_COMMITTED"
+    REPEATABLE_READ = "REPEATABLE_READ"
+    SNAPSHOT = "SNAPSHOT"
+    # Unique to Databricks.
+    WRITE_SERIALIZABLE = "WRITE_SERIALIZABLE"
+    SERIALIZABLE = "SERIALIZABLE"
 
 
 class SqlClient(Protocol):
@@ -98,6 +114,11 @@ class SqlClient(Protocol):
         raise NotImplementedError
 
     @abstractmethod
+    def list_tables(self, schema_name: str) -> Sequence[str]:
+        """List the tables in the given schema"""
+        raise NotImplementedError
+
+    @abstractmethod
     def table_exists(self, sql_table: SqlTable) -> bool:
         """Determines whether or not the given table exists in the data warehouse"""
         raise NotImplementedError
@@ -163,9 +184,12 @@ class SqlEngineAttributes(Protocol):
     caused by changes to the protocol itself when inheritance is used.
     """
 
-    sql_engine_type: ClassVar[SupportedSqlEngine]
+    sql_engine_type: ClassVar[SqlEngine]
 
     # SQL Engine capabilities
+    # The isolation levels supported as options through the SqlClient API. This may be a subset of the isolation levels
+    # supported by the engine until implementation / testing is complete.
+    supported_isolation_levels: ClassVar[Sequence[SqlIsolationLevel]]
     date_trunc_supported: ClassVar[bool]
     full_outer_joins_supported: ClassVar[bool]
     indexes_supported: ClassVar[bool]
@@ -173,10 +197,12 @@ class SqlEngineAttributes(Protocol):
     timestamp_type_supported: ClassVar[bool]
     timestamp_to_string_comparison_supported: ClassVar[bool]
     cancel_submitted_queries_supported: ClassVar[bool]
+    percentile_aggregation_supported: ClassVar[bool]
 
     # SQL Dialect replacement strings
     double_data_type_name: ClassVar[str]
     timestamp_type_name: ClassVar[Optional[str]]
+    random_function_name: ClassVar[str]
 
     # MetricFlow attributes
     sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer]

@@ -1,157 +1,29 @@
-from __future__ import annotations
-
 import logging
 from collections import defaultdict
 from copy import deepcopy
-from typing import Dict, List, Set, Optional, Sequence, Tuple, FrozenSet
+from typing import Dict, List, Optional, Set, Sequence
 
-from metricflow.errors.errors import (
-    DuplicateMetricError,
-    MetricNotFoundError,
-    NonExistentMeasureError,
-    InvalidDataSourceError,
-)
-from metricflow.instances import DataSourceReference, DataSourceElementReference
 from metricflow.aggregation_properties import AggregationType
+from metricflow.errors.errors import InvalidDataSourceError
+from metricflow.instances import DataSourceReference, DataSourceElementReference
 from metricflow.model.objects.data_source import DataSource, DataSourceOrigin
 from metricflow.model.objects.elements.dimension import Dimension
 from metricflow.model.objects.elements.identifier import Identifier
 from metricflow.model.objects.elements.measure import Measure
-from metricflow.model.objects.metric import Metric, MetricType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantics.data_source_container import PydanticDataSourceContainer
 from metricflow.model.semantics.element_group import ElementGrouper
-from metricflow.model.semantics.linkable_spec_resolver import (
-    ValidLinkableSpecResolver,
-    LinkableElementProperties,
-)
-from metricflow.model.spec_converters import MeasureConverter, WhereConstraintConverter
+from metricflow.model.spec_converters import MeasureConverter
 from metricflow.references import (
-    DimensionReference,
-    IdentifierReference,
-    LinkableElementReference,
     MeasureReference,
     TimeDimensionReference,
+    DimensionReference,
+    LinkableElementReference,
+    IdentifierReference,
 )
-from metricflow.specs import (
-    LinkableInstanceSpec,
-    MeasureSpec,
-    MetricInputMeasureSpec,
-    MetricSpec,
-    NonAdditiveDimensionSpec,
-)
+from metricflow.specs import NonAdditiveDimensionSpec, MeasureSpec
 
 logger = logging.getLogger(__name__)
-
-MAX_JOIN_HOPS = 2
-
-
-class MetricSemantics:  # noqa: D
-    def __init__(  # noqa: D
-        self, user_configured_model: UserConfiguredModel, data_source_semantics: DataSourceSemantics
-    ) -> None:
-        self._user_configured_model = user_configured_model
-        self._metrics: Dict[MetricSpec, Metric] = {}
-        self._data_source_semantics = data_source_semantics
-
-        # Dict from the name of the metric to the hash.
-        self._metric_hashes: Dict[MetricSpec, str] = {}
-
-        for metric in self._user_configured_model.metrics:
-            self.add_metric(metric)
-
-        self._linkable_spec_resolver = ValidLinkableSpecResolver(
-            user_configured_model=self._user_configured_model,
-            max_identifier_links=MAX_JOIN_HOPS,
-        )
-
-    def element_specs_for_metrics(
-        self,
-        metric_specs: List[MetricSpec],
-        with_any_property: FrozenSet[LinkableElementProperties] = LinkableElementProperties.all_properties(),
-        without_any_property: FrozenSet[LinkableElementProperties] = frozenset(),
-    ) -> List[LinkableInstanceSpec]:
-        """Dimensions common to all metrics requested (intersection)"""
-
-        all_linkable_specs = self._linkable_spec_resolver.get_linkable_elements_for_metrics(
-            metric_specs=metric_specs,
-            with_any_of=with_any_property,
-            without_any_of=without_any_property,
-        ).as_spec_set
-
-        return sorted(all_linkable_specs.as_tuple, key=lambda x: x.qualified_name)
-
-    def get_metrics(self, metric_names: List[MetricSpec]) -> List[Metric]:  # noqa: D
-        res = []
-        for metric_name in metric_names:
-            if metric_name not in self._metrics:
-                raise MetricNotFoundError(f"Unable to find metric `{metric_name}`. Perhaps it has not been registered")
-            res.append(self._metrics[metric_name])
-
-        return res
-
-    @property
-    def metric_names(self) -> List[MetricSpec]:  # noqa: D
-        return list(self._metrics.keys())
-
-    def get_metric(self, metric_name: MetricSpec) -> Metric:  # noqa:D
-        if metric_name not in self._metrics:
-            raise MetricNotFoundError(f"Unable to find metric `{metric_name}`. Perhaps it has not been registered")
-        return self._metrics[metric_name]
-
-    def add_metric(self, metric: Metric) -> None:
-        """Add metric, validating presence of required measures"""
-        metric_spec = MetricSpec(element_name=metric.name)
-        if metric_spec in self._metrics:
-            raise DuplicateMetricError(f"Metric `{metric.name}` has already been registered")
-        for measure_reference in metric.measure_references:
-            if measure_reference not in self._data_source_semantics.measure_references:
-                raise NonExistentMeasureError(
-                    f"Metric `{metric.name}` references measure `{measure_reference}` which has not been registered"
-                )
-        self._metrics[metric_spec] = metric
-        self._metric_hashes[metric_spec] = metric.definition_hash
-
-    @property
-    def valid_hashes(self) -> Set[str]:
-        """Return all of the hashes of the metric definitions."""
-        return set(self._metric_hashes.values())
-
-    def measures_for_metric(self, metric_spec: MetricSpec) -> Tuple[MetricInputMeasureSpec, ...]:
-        """Return the measure specs required to compute the metric."""
-        metric = self.get_metric(metric_spec)
-        input_measure_specs: List[MetricInputMeasureSpec] = []
-
-        for input_measure in metric.input_measures:
-            spec_constraint = (
-                WhereConstraintConverter.convert_to_spec_where_constraint(
-                    data_source_semantics=self._data_source_semantics,
-                    where_constraint=input_measure.constraint,
-                )
-                if input_measure.constraint is not None
-                else None
-            )
-            measure_spec = MeasureSpec(
-                element_name=input_measure.name,
-                non_additive_dimension_spec=self._data_source_semantics.non_additive_dimension_specs_by_measure.get(
-                    input_measure.measure_reference
-                ),
-            )
-            spec = MetricInputMeasureSpec(
-                measure_spec=measure_spec,
-                constraint=spec_constraint,
-                alias=input_measure.alias,
-            )
-            input_measure_specs.append(spec)
-
-        return tuple(input_measure_specs)
-
-    def contains_cumulative_metric(self, metric_specs: Sequence[MetricSpec]) -> bool:
-        """Returns true if any of the specs correspond to a cumulative metric."""
-        for metric_spec in metric_specs:
-            if self.get_metric(metric_spec).type == MetricType.CUMULATIVE:
-                return True
-        return False
 
 
 class DataSourceSemantics:

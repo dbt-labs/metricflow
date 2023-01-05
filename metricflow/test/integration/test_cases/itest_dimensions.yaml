@@ -11,9 +11,9 @@ integration_test:
       , u.home_state_latest AS user__home_state_latest
       , l.is_lux AS listing__is_lux_latest
     FROM {{ source_schema }}.fct_views v
-    JOIN {{ source_schema }}.dim_listings_latest l
+    LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest l
       ON l.listing_id = v.listing_id
-    JOIN {{ source_schema }}.dim_users_latest u
+    LEFT OUTER JOIN {{ source_schema }}.dim_users_latest u
       ON u.user_id = v.user_id
     GROUP BY
       u.home_state_latest
@@ -61,9 +61,9 @@ integration_test:
       , u.home_state_latest AS user__home_state_latest
       , v.listing_id AS listing
     FROM {{ source_schema }}.fct_views v
-    JOIN {{ source_schema }}.dim_listings_latest l
+    LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest l
       ON l.listing_id = v.listing_id
-    JOIN {{ source_schema }}.dim_users_latest u
+    LEFT OUTER JOIN {{ source_schema }}.dim_users_latest u
       ON u.user_id = v.user_id
     GROUP BY
       v.listing_id
@@ -96,10 +96,9 @@ integration_test:
       , u.home_state AS user__home_state
       , v.ds AS metric_time
     FROM {{ source_schema }}.fct_id_verifications v
-    JOIN {{ source_schema }}.dim_users u
+    LEFT OUTER JOIN {{ source_schema }}.dim_users u
       ON u.user_id = v.user_id
       AND u.ds = v.ds
     GROUP BY
       v.ds
       , u.home_state
-

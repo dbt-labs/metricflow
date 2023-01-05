@@ -10,11 +10,13 @@ from typing import List, Sequence, Optional, Tuple
 import jinja2
 import pandas as pd
 
-from metricflow.protocols.sql_client import SqlClient
-from metricflow.dag.mf_dag import DagNode, MetricFlowDag, NodeId, DisplayedProperty
 from metricflow.dag.id_generation import EXEC_NODE_READ_SQL_QUERY, EXEC_NODE_WRITE_TO_TABLE
+from metricflow.dag.mf_dag import DagNode, MetricFlowDag, NodeId, DisplayedProperty
 from metricflow.dataflow.sql_table import SqlTable
+from metricflow.protocols.async_sql_client import AsyncSqlClient
+from metricflow.protocols.sql_request import SqlJsonTag
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.sql_clients.sql_utils import sync_execute, sync_query
 from metricflow.visitor import Visitable
 
 logger = logging.getLogger(__name__)
@@ -93,15 +95,17 @@ class SelectSqlQueryToDataFrameTask(ExecutionPlanTask):
 
     def __init__(  # noqa: D
         self,
-        sql_client: SqlClient,
+        sql_client: AsyncSqlClient,
         sql_query: str,
         execution_parameters: SqlBindParameters,
+        extra_sql_tags: SqlJsonTag = SqlJsonTag(),
         parent_nodes: Optional[List[ExecutionPlanTask]] = None,
     ) -> None:
 
         self._sql_client = sql_client
         self._sql_query = sql_query
         self._execution_parameters = execution_parameters
+        self._extra_sql_tags = extra_sql_tags
         super().__init__(task_id=self.create_unique_id(), parent_nodes=parent_nodes or [])
 
     @classmethod
@@ -122,7 +126,14 @@ class SelectSqlQueryToDataFrameTask(ExecutionPlanTask):
 
     def execute(self) -> TaskExecutionResult:  # noqa: D
         start_time = time.time()
-        df = self._sql_client.query(stmt=self._sql_query, sql_bind_parameters=self.execution_parameters)
+
+        df = sync_query(
+            self._sql_client,
+            self._sql_query,
+            bind_parameters=self.execution_parameters,
+            extra_sql_tags=self._extra_sql_tags,
+        )
+
         end_time = time.time()
         return TaskExecutionResult(
             start_time=start_time, end_time=end_time, sql=self._sql_query, bind_params=self.execution_parameters, df=df
@@ -144,16 +155,18 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
 
     def __init__(  # noqa: D
         self,
-        sql_client: SqlClient,
+        sql_client: AsyncSqlClient,
         sql_query: str,
         execution_parameters: SqlBindParameters,
         output_table: SqlTable,
+        extra_sql_tags: SqlJsonTag = SqlJsonTag(),
         parent_nodes: Optional[List[ExecutionPlanTask]] = None,
     ) -> None:
         self._sql_client = sql_client
         self._sql_query = sql_query
         self._output_table = output_table
         self._execution_parameters = execution_parameters
+        self._extra_sql_tags = extra_sql_tags
         super().__init__(task_id=self.create_unique_id(), parent_nodes=parent_nodes or [])
 
     @classmethod
@@ -177,11 +190,15 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
         logger.info(f"Dropping table {self._output_table} in case it already exists")
         self._sql_client.drop_table(self._output_table)
         logger.info(f"Creating table {self._output_table} using a SELECT query")
-        self._sql_client.create_table_as_select(
-            self._output_table,
-            select_query=self._sql_query,
-            sql_bind_parameters=self._execution_parameters,
+        sql_query = self.sql_query
+        assert sql_query
+        sync_execute(
+            self._sql_client,
+            sql_query.sql_query,
+            bind_parameters=sql_query.bind_parameters,
+            extra_sql_tags=self._extra_sql_tags,
         )
+
         end_time = time.time()
         return TaskExecutionResult(start_time=start_time, end_time=end_time, sql=self._sql_query)
 

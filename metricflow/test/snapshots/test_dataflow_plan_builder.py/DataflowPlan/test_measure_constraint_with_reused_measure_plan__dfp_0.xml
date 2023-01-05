@@ -5,17 +5,16 @@
         <ComputeMetricsNode>
             <!-- description = Compute Metrics via Expressions -->
             <!-- node_id = cm_0 -->
-            <!-- metric_spec = MetricSpec(element_name='instant_booking_value_ratio') -->
+            <!-- metric_spec =                                      -->
+            <!--   {'class': 'MetricSpec',                          -->
+            <!--    'element_name': 'instant_booking_value_ratio',  -->
+            <!--    'constraint': None,                             -->
+            <!--    'alias': None}                                  -->
             <FilterElementsNode>
                 <!-- description =                                                                     -->
                 <!--   Pass Only Elements:                                                             -->
-                <!--     ['metric_time', 'booking_value_with_is_instant_constraint', 'booking_value']  -->
+                <!--     ['booking_value_with_is_instant_constraint', 'booking_value', 'metric_time']  -->
                 <!-- node_id = pfe_3 -->
-                <!-- include_spec =                               -->
-                <!--   {'class': 'TimeDimensionSpec',             -->
-                <!--    'element_name': 'metric_time',            -->
-                <!--    'identifier_links': (),                   -->
-                <!--    'time_granularity': TimeGranularity.DAY}  -->
                 <!-- include_spec =                                                  -->
                 <!--   {'class': 'MeasureSpec',                                      -->
                 <!--    'element_name': 'booking_value_with_is_instant_constraint',  -->
@@ -24,6 +23,11 @@
                 <!--   {'class': 'MeasureSpec',               -->
                 <!--    'element_name': 'booking_value',      -->
                 <!--    'non_additive_dimension_spec': None}  -->
+                <!-- include_spec =                               -->
+                <!--   {'class': 'TimeDimensionSpec',             -->
+                <!--    'element_name': 'metric_time',            -->
+                <!--    'identifier_links': (),                   -->
+                <!--    'time_granularity': TimeGranularity.DAY}  -->
                 <JoinAggregatedMeasuresByGroupByColumnsNode>
                     <!-- description = Join Aggregated Measures with Standard Outputs -->
                     <!-- node_id = jamgc_0 -->
@@ -48,17 +52,17 @@
                             <WhereConstraintNode>
                                 <!-- description = Constrain Output with WHERE -->
                                 <!-- node_id = wcc_0 -->
-                                <!-- where_condition =                                                             -->
-                                <!--   {'class': 'SpecWhereClauseConstraint',                                      -->
-                                <!--    'where_condition': 'is_instant',                                           -->
-                                <!--    'linkable_names': ('is_instant',),                                         -->
-                                <!--    'linkable_spec_set': {'class': 'LinkableSpecSet',                          -->
-                                <!--                          'dimension_specs': ({'class': 'DimensionSpec',       -->
-                                <!--                                               'element_name': 'is_instant',   -->
-                                <!--                                               'identifier_links': ()},),      -->
-                                <!--                          'time_dimension_specs': (),                          -->
-                                <!--                          'identifier_specs': ()},                             -->
-                                <!--    'execution_parameters': {'class': 'SqlBindParameters', 'param_dict': {}}}  -->
+                                <!-- where_condition =                                                              -->
+                                <!--   {'class': 'SpecWhereClauseConstraint',                                       -->
+                                <!--    'where_condition': 'is_instant',                                            -->
+                                <!--    'linkable_names': ('is_instant',),                                          -->
+                                <!--    'linkable_spec_set': {'class': 'LinkableSpecSet',                           -->
+                                <!--                          'dimension_specs': ({'class': 'DimensionSpec',        -->
+                                <!--                                               'element_name': 'is_instant',    -->
+                                <!--                                               'identifier_links': ()},),       -->
+                                <!--                          'time_dimension_specs': (),                           -->
+                                <!--                          'identifier_specs': ()},                              -->
+                                <!--    'execution_parameters': {'class': 'SqlBindParameters', 'param_items': ()}}  -->
                                 <FilterElementsNode>
                                     <!-- description =                                       -->
                                     <!--   Pass Only Elements:                               -->

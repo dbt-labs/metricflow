@@ -4,10 +4,11 @@ import pytest
 
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantics.data_source_container import PydanticDataSourceContainer
-from metricflow.model.semantics.linkable_spec_resolver import LinkableElementProperties
-from metricflow.model.semantics.semantic_containers import DataSourceSemantics, MetricSemantics
+from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
+from metricflow.model.semantics.data_source_semantics import DataSourceSemantics
+from metricflow.model.semantics.metric_semantics import MetricSemantics
 from metricflow.references import IdentifierReference, MeasureReference
-from metricflow.specs import MetricSpec
+from metricflow.references import MetricReference
 
 logger = logging.getLogger(__name__)
 
@@ -54,6 +55,7 @@ def test_get_names(new_data_source_semantics: DataSourceSemantics) -> None:  # n
         "bookers",
         "booking_payments",
         "booking_value",
+        "booking_value_p99",
         "bookings",
         "current_account_balance_by_user",
         "identity_verifications",
@@ -61,6 +63,7 @@ def test_get_names(new_data_source_semantics: DataSourceSemantics) -> None:  # n
         "largest_listing",
         "listings",
         "max_booking_value",
+        "median_booking_value",
         "min_booking_value",
         "referred_bookings",
         "smallest_listing",
@@ -113,7 +116,7 @@ def test_elements_for_metric(new_metric_semantics: MetricSemantics) -> None:  # 
         [
             x.qualified_name
             for x in new_metric_semantics.element_specs_for_metrics(
-                [MetricSpec(element_name="views")],
+                [MetricReference(element_name="views")],
                 without_any_property=frozenset({LinkableElementProperties.DERIVED_TIME_GRANULARITY}),
             )
         ]
@@ -157,7 +160,7 @@ def test_elements_for_metric(new_metric_semantics: MetricSemantics) -> None:  # 
     }
 
     local_specs = new_metric_semantics.element_specs_for_metrics(
-        metric_specs=[MetricSpec(element_name="views")],
+        metric_references=[MetricReference(element_name="views")],
         with_any_property=frozenset({LinkableElementProperties.LOCAL}),
         without_any_property=frozenset({LinkableElementProperties.DERIVED_TIME_GRANULARITY}),
     )
@@ -175,7 +178,7 @@ def test_local_linked_elements_for_metric(new_metric_semantics: MetricSemantics)
         [
             x.qualified_name
             for x in new_metric_semantics.element_specs_for_metrics(
-                [MetricSpec(element_name="listings")],
+                [MetricReference(element_name="listings")],
                 with_any_property=frozenset({LinkableElementProperties.LOCAL_LINKED}),
                 without_any_property=frozenset({LinkableElementProperties.DERIVED_TIME_GRANULARITY}),
             )

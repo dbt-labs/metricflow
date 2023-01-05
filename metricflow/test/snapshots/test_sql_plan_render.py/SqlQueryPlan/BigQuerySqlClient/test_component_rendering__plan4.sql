@@ -13,4 +13,4 @@ LEFT OUTER JOIN
 ON
   a.user_id = c.user_id
 GROUP BY
-  b.country
+  user__country

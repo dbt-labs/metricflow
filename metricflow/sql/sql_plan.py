@@ -97,6 +97,7 @@ class SqlJoinType(Enum):
     LEFT_OUTER = "LEFT OUTER JOIN"
     FULL_OUTER = "FULL OUTER JOIN"
     INNER = "INNER JOIN"
+    CROSS_JOIN = "CROSS JOIN"
 
     def __repr__(self) -> str:  # noqa: D
         return f"{self.__class__.__name__}.{self.name}"
@@ -109,8 +110,8 @@ class SqlJoinDescription:
     # The source that goes on the right side of the JOIN keyword.
     right_source: SqlQueryPlanNode
     right_source_alias: str
-    on_condition: SqlExpressionNode
     join_type: SqlJoinType
+    on_condition: Optional[SqlExpressionNode] = None
 
 
 @dataclass(frozen=True)

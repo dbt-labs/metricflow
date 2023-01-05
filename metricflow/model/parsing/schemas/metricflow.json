@@ -1,6 +1,19 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "definitions": {
+        "aggregation_type_params_schema": {
+            "$id": "aggregation_type_params_schema",
+            "additionalProperties": false,
+            "properties": {
+                "percentile": {
+                    "type": "number"
+                },
+                "use_discrete_percentile": {
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
         "composite_sub_identifier_schema": {
             "$id": "composite_sub_identifier_schema",
             "additionalProperties": false,
@@ -215,6 +228,9 @@
                         "quarter",
                         "year"
                     ]
+                },
+                "validity_params": {
+                    "$ref": "#/definitions/validity_params_schema"
                 }
             },
             "required": [
@@ -271,11 +287,11 @@
                         "PRIMARY",
                         "UNIQUE",
                         "FOREIGN",
-                        "RENDER_ONLY",
+                        "NATURAL",
                         "primary",
                         "unique",
                         "foreign",
-                        "render_only"
+                        "natural"
                     ]
                 }
             },
@@ -321,6 +337,9 @@
                 "increase_is_good": {
                     "type": "boolean"
                 },
+                "private": {
+                    "type": "boolean"
+                },
                 "tags": {
                     "items": {
                         "type": "string"
@@ -332,6 +351,9 @@
                         "string",
                         "integer"
                     ]
+                },
+                "unit": {
+                    "type": "string"
                 },
                 "value_format": {
                     "type": "string"
@@ -466,6 +488,8 @@
                         "BOOLEAN",
                         "SUM_BOOLEAN",
                         "COUNT",
+                        "PERCENTILE",
+                        "MEDIAN",
                         "sum",
                         "min",
                         "max",
@@ -473,8 +497,13 @@
                         "count_distinct",
                         "boolean",
                         "sum_boolean",
-                        "count"
+                        "count",
+                        "percentile",
+                        "median"
                     ]
+                },
+                "agg_params": {
+                    "$ref": "#/definitions/aggregation_type_params_schema"
                 },
                 "agg_time_dimension": {
                     "pattern": "(?!.*__).*^[a-z][a-z0-9_]*[a-z0-9]$",
@@ -563,10 +592,12 @@
                         "RATIO",
                         "EXPR",
                         "CUMULATIVE",
+                        "DERIVED",
                         "measure_proxy",
                         "ratio",
                         "expr",
-                        "cumulative"
+                        "cumulative",
+                        "derived"
                     ]
                 },
                 "type_params": {
@@ -606,6 +637,22 @@
                 }
             ]
         },
+        "metric_input_schema": {
+            "$id": "metric_input_schema",
+            "additionalProperties": false,
+            "properties": {
+                "alias": {
+                    "type": "string"
+                },
+                "constraint": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "metric_type_params": {
             "$id": "metric_type_params",
             "additionalProperties": false,
@@ -628,6 +675,12 @@
                 "measures": {
                     "items": {
                         "$ref": "#/definitions/metric_input_measure_schema"
+                    },
+                    "type": "array"
+                },
+                "metrics": {
+                    "items": {
+                        "$ref": "#/definitions/metric_input_schema"
                     },
                     "type": "array"
                 },
@@ -709,6 +762,19 @@
             "required": [
                 "name"
             ],
+            "type": "object"
+        },
+        "validity_params_schema": {
+            "$id": "validity_params_schema",
+            "additionalProperties": false,
+            "properties": {
+                "is_end": {
+                    "type": "boolean"
+                },
+                "is_start": {
+                    "type": "boolean"
+                }
+            },
             "type": "object"
         }
     },

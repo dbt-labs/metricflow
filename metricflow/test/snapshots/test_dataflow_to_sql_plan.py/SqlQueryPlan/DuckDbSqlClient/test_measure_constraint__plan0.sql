@@ -4,7 +4,7 @@ SELECT
   , average_booking_value * bookings / NULLIF(booking_value, 0) AS lux_booking_value_rate_expr
 FROM (
   -- Pass Only Elements:
-  --   ['metric_time', 'average_booking_value', 'bookings', 'booking_value']
+  --   ['average_booking_value', 'bookings', 'booking_value', 'metric_time']
   SELECT
     subq_15.metric_time
     , subq_15.bookings
@@ -116,6 +116,8 @@ FROM (
                     , subq_0.bookers
                     , subq_0.average_booking_value
                     , subq_0.referred_bookings
+                    , subq_0.median_booking_value
+                    , subq_0.booking_value_p99
                   FROM (
                     -- Read Elements From Data Source 'bookings_source'
                     SELECT
@@ -128,6 +130,8 @@ FROM (
                       , bookings_source_src_10001.booking_value AS average_booking_value
                       , bookings_source_src_10001.booking_value AS booking_payments
                       , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
+                      , bookings_source_src_10001.booking_value AS median_booking_value
+                      , bookings_source_src_10001.booking_value AS booking_value_p99
                       , bookings_source_src_10001.is_instant
                       , bookings_source_src_10001.ds
                       , DATE_TRUNC('week', bookings_source_src_10001.ds) AS ds__week
@@ -176,7 +180,7 @@ FROM (
               ) subq_2
               LEFT OUTER JOIN (
                 -- Pass Only Elements:
-                --   ['listing', 'is_lux_latest']
+                --   ['is_lux_latest', 'listing']
                 SELECT
                   subq_4.listing
                   , subq_4.is_lux_latest
@@ -335,6 +339,8 @@ FROM (
             , subq_11.bookers
             , subq_11.average_booking_value
             , subq_11.referred_bookings
+            , subq_11.median_booking_value
+            , subq_11.booking_value_p99
           FROM (
             -- Read Elements From Data Source 'bookings_source'
             SELECT
@@ -347,6 +353,8 @@ FROM (
               , bookings_source_src_10001.booking_value AS average_booking_value
               , bookings_source_src_10001.booking_value AS booking_payments
               , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
+              , bookings_source_src_10001.booking_value AS median_booking_value
+              , bookings_source_src_10001.booking_value AS booking_value_p99
               , bookings_source_src_10001.is_instant
               , bookings_source_src_10001.ds
               , DATE_TRUNC('week', bookings_source_src_10001.ds) AS ds__week
@@ -398,11 +406,9 @@ FROM (
     ) subq_14
     ON
       (
-        (
-          subq_10.metric_time = subq_14.metric_time
-        ) OR (
-          (subq_10.metric_time IS NULL) AND (subq_14.metric_time IS NULL)
-        )
+        subq_10.metric_time = subq_14.metric_time
+      ) OR (
+        (subq_10.metric_time IS NULL) AND (subq_14.metric_time IS NULL)
       )
   ) subq_15
 ) subq_16

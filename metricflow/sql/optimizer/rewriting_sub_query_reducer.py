@@ -145,9 +145,10 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
     def _is_simple_source(node: SqlSelectStatementNode) -> bool:
         """Returns true if the node is simple.
 
-        Simple is defined as having no JOINs, WHERE, GROUP BYs, ORDER BYs, LIMIT and there are no strings in the column
+        Simple is defined as having no JOINs, WHERE, GROUP BYs, ORDER BYs, LIMIT, AGG functions, and there are no strings in the column
         select. Strings are avoided so that the child node doesn't use the string expression in a group by or cause
-        aliasing issues when used in the child query.
+        aliasing issues when used in the child query. Aggregate functions are avoided due to the nature of applying on grouped rows which
+        is essentially the effect as group bys and should be treated in here as such.
 
         e.g.
 
@@ -180,6 +181,8 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
             if select_column.expr.lineage.contains_string_exprs:
                 return False
             if select_column.expr.lineage.contains_column_alias_exprs:
+                return False
+            if select_column.expr.lineage.contains_aggregate_exprs:
                 return False
         return (
             len(node.parent_nodes) <= 1
@@ -455,7 +458,9 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
                 SqlJoinDescription(
                     right_source=join_select_node.from_source,
                     right_source_alias=join_select_node.from_source_alias,
-                    on_condition=join_desc.on_condition.rewrite(column_replacements),
+                    on_condition=join_desc.on_condition.rewrite(column_replacements)
+                    if join_desc.on_condition
+                    else None,
                     join_type=join_desc.join_type,
                 )
             )
@@ -472,7 +477,9 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
                 SqlJoinDescription(
                     right_source=x.right_source,
                     right_source_alias=x.right_source_alias,
-                    on_condition=x.on_condition.rewrite(column_replacements=column_replacements),
+                    on_condition=x.on_condition.rewrite(column_replacements=column_replacements)
+                    if x.on_condition
+                    else None,
                     join_type=x.join_type,
                 )
                 for x in new_join_descs
@@ -500,7 +507,9 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
                 SqlJoinDescription(
                     right_source=x.right_source,
                     right_source_alias=x.right_source_alias,
-                    on_condition=x.on_condition.rewrite(column_replacements=column_replacements),
+                    on_condition=x.on_condition.rewrite(column_replacements=column_replacements)
+                    if x.on_condition
+                    else None,
                     join_type=x.join_type,
                 )
                 for x in new_join_descs

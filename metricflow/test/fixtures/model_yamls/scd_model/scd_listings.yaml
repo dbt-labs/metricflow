@@ -1,0 +1,38 @@
+---
+data_source:
+  name: listings
+  description: SCD Type II table of listings history
+  owners:
+    - support@transformdata.io
+
+  sql_table: $listings_table
+
+  dimensions:
+    - name: window_start
+      type: time
+      expr: active_from
+      type_params:
+        time_granularity: day
+        validity_params:
+          is_start: True
+    - name: window_end
+      type: time
+      expr: active_to
+      type_params:
+        time_granularity: day
+        validity_params:
+          is_end: True
+    - name: country
+      type: categorical
+    - name: is_lux
+      type: categorical
+    - name: capacity
+      type: categorical
+
+  identifiers:
+    - name: listing
+      type: natural
+      expr: listing_id
+    - name: user
+      type: foreign
+      expr: user_id

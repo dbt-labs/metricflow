@@ -155,6 +155,27 @@ def parse_yaml_file_paths_to_model(
                 " try manually typing up the problem file instead of copy and pasting"
             ) from e
 
+    return parse_yaml_files_to_validation_ready_model(
+        yaml_config_files=yaml_config_files,
+        apply_pre_transformations=apply_pre_transformations,
+        apply_post_transformations=apply_post_transformations,
+        raise_issues_as_exceptions=raise_issues_as_exceptions,
+    )
+
+
+def parse_yaml_files_to_validation_ready_model(
+    yaml_config_files: List[YamlConfigFile],
+    apply_pre_transformations: Optional[bool] = True,
+    apply_post_transformations: Optional[bool] = True,
+    raise_issues_as_exceptions: bool = True,
+) -> ModelBuildResult:
+    """Parse and transform the given set of in-memory YamlConfigFiles to a UserConfigured model
+
+    This model result is, by default, validation-ready, although different callsites (mainly in testing)
+    might wish to override the transformation state.
+
+    TODO: Restructure this module and provide an improved API for managing these different input types
+    """
     build_result = parse_yaml_files_to_model(yaml_config_files)
     model = build_result.model
     assert model

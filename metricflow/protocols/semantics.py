@@ -18,8 +18,15 @@ from metricflow.model.objects.elements.identifier import Identifier
 from metricflow.model.objects.elements.measure import Measure
 from metricflow.model.objects.metric import Metric
 from metricflow.model.semantics.element_group import ElementGrouper
-from metricflow.model.semantics.linkable_spec_resolver import LinkableElementProperties
-from metricflow.references import DimensionReference, IdentifierReference, MeasureReference, TimeDimensionReference
+from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
+from metricflow.references import (
+    DimensionReference,
+    IdentifierReference,
+    MeasureReference,
+    TimeDimensionReference,
+    MetricReference,
+)
+
 from metricflow.specs import (
     LinkableInstanceSpec,
     MeasureSpec,
@@ -135,7 +142,7 @@ class MetricSemanticsAccessor(Protocol):
     @abstractmethod
     def element_specs_for_metrics(
         self,
-        metric_specs: List[MetricSpec],
+        metric_references: List[MetricReference],
         with_any_property: FrozenSet[LinkableElementProperties] = LinkableElementProperties.all_properties(),
         without_any_property: FrozenSet[LinkableElementProperties] = frozenset(),
     ) -> List[LinkableInstanceSpec]:
@@ -143,18 +150,18 @@ class MetricSemanticsAccessor(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    def get_metrics(self, metric_names: List[MetricSpec]) -> List[Metric]:
+    def get_metrics(self, metric_references: List[MetricReference]) -> List[Metric]:
         """Retrieve the Metric model objects associated with the provided metric specs"""
         raise NotImplementedError
 
     @property
     @abstractmethod
-    def metric_names(self) -> List[MetricSpec]:
-        """Return the metric specs"""
+    def metric_references(self) -> List[MetricReference]:
+        """Return the metric references"""
         raise NotImplementedError
 
     @abstractmethod
-    def get_metric(self, metric_name: MetricSpec) -> Metric:  # noqa:D
+    def get_metric(self, metric_reference: MetricReference) -> Metric:  # noqa:D
         raise NotImplementedError
 
     @property
@@ -164,11 +171,16 @@ class MetricSemanticsAccessor(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    def measures_for_metric(self, metric_spec: MetricSpec) -> Tuple[MetricInputMeasureSpec, ...]:
+    def measures_for_metric(self, metric_reference: MetricReference) -> Tuple[MetricInputMeasureSpec, ...]:
         """Return the measure specs required to compute the metric."""
         raise NotImplementedError
 
     @abstractmethod
-    def contains_cumulative_metric(self, metric_specs: Sequence[MetricSpec]) -> bool:
+    def contains_cumulative_metric(self, metric_references: Sequence[MetricReference]) -> bool:
         """Returns true if any of the specs correspond to a cumulative metric."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def metric_input_specs_for_metric(self, metric_spec: MetricReference) -> Tuple[MetricSpec, ...]:
+        """Returns the metric input specs required to compute the metric."""
         raise NotImplementedError

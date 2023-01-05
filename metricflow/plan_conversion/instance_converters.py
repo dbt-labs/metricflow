@@ -4,14 +4,18 @@ from __future__ import annotations
 
 import logging
 from collections import OrderedDict
+from dataclasses import dataclass
 from itertools import chain
-from typing import List, Sequence, Optional, Dict, Tuple
+from more_itertools import bucket
+from typing import Dict, List, Optional, Sequence, Tuple
 
 from metricflow.aggregation_properties import AggregationState
+from metricflow.dataflow.dataflow_plan import ValidityWindowJoinDescription
 from metricflow.instances import (
     MdoInstance,
     DimensionInstance,
     IdentifierInstance,
+    MetadataInstance,
     MetricInstance,
     MeasureInstance,
     InstanceSet,
@@ -32,6 +36,7 @@ from metricflow.specs import (
     LinklessIdentifierSpec,
     LinkableInstanceSpec,
     IdentifierReference,
+    InstanceSpecSet,
 )
 from metricflow.sql.sql_exprs import (
     SqlColumnReferenceExpression,
@@ -39,6 +44,7 @@ from metricflow.sql.sql_exprs import (
     SqlFunctionExpression,
 )
 from metricflow.sql.sql_plan import SqlSelectColumn
+from metricflow.time.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -83,12 +89,16 @@ class CreateSelectColumnsForInstances(InstanceSetTransform[SelectColumnSet]):
         identifier_cols = list(
             chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.identifier_instances])
         )
+        metadata_cols = list(
+            chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.metadata_instances])
+        )
         return SelectColumnSet(
             metric_columns=metric_cols,
             measure_columns=measure_cols,
             dimension_columns=dimension_cols,
             time_dimension_columns=time_dimension_cols,
             identifier_columns=identifier_cols,
+            metadata_columns=metadata_cols,
         )
 
     def _make_sql_column_expression(
@@ -201,8 +211,10 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
             SqlColumnReference(self._table_alias, column_name_in_table)
         )
 
-        expression_to_aggregate_measure = SqlFunctionExpression.from_aggregation_type(
-            aggregation_type=aggregation_type, sql_column_expression=expression_to_get_measure
+        expression_to_aggregate_measure = SqlFunctionExpression.build_expression_from_aggregation_type(
+            aggregation_type=aggregation_type,
+            sql_column_expression=expression_to_get_measure,
+            agg_params=measure.agg_params,
         )
 
         # Get the output column name from the measure/alias
@@ -230,13 +242,122 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
         identifier_cols = list(
             chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.identifier_instances])
         )
+        metadata_cols = list(
+            chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.metadata_instances])
+        )
         return SelectColumnSet(
             metric_columns=metric_cols,
             measure_columns=measure_cols,
             dimension_columns=dimension_cols,
             time_dimension_columns=time_dimension_cols,
             identifier_columns=identifier_cols,
+            metadata_columns=metadata_cols,
         )
+
+
+@dataclass(frozen=True)
+class _DimensionValidityParams:
+    """Helper dataclass for managing dimension validity properties"""
+
+    dimension_name: str
+    time_granularity: TimeGranularity
+
+
+class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[ValidityWindowJoinDescription]]):
+    """Create and return a ValidityWindowJoinDescription based on the given InstanceSet
+
+    During join resolution we need to determine whether or not a given data set represents a
+    Type II SCD dataset - i.e., one with a validity window defined on each row. This requires
+    checking the set of dimension instances and determining whether or not those originate from
+    an SCD source, and extracting validity window information accordingly.
+    """
+
+    def __init__(self, data_source_semantics: DataSourceSemanticsAccessor) -> None:
+        """Initializer. The DataSourceSemanticsAccessor is needed for getting the original model definition."""
+        self._data_source_semantics = data_source_semantics
+
+    def _get_validity_window_dimensions_for_data_source(
+        self, data_source_name: str
+    ) -> Optional[Tuple[_DimensionValidityParams, _DimensionValidityParams]]:
+        """Returns a 2-tuple (start, end) of validity window dimensions info, if any exist in the data source"""
+        data_source = self._data_source_semantics.get(data_source_name=data_source_name)
+        assert data_source, f"Could not find data source with name {data_source_name} after data set conversion!"
+
+        start_dim = data_source.validity_start_dimension
+        end_dim = data_source.validity_end_dimension
+
+        # We do this instead of relying on has_validity_dimensions because this also does type refinement
+        if not start_dim or not end_dim:
+            return None
+
+        assert start_dim.type_params, "Typechecker hint - validity info cannot exist without type params"
+        assert end_dim.type_params, "Typechecker hint - validity info cannot exist without type params"
+
+        return (
+            _DimensionValidityParams(
+                dimension_name=start_dim.name, time_granularity=start_dim.type_params.time_granularity
+            ),
+            _DimensionValidityParams(
+                dimension_name=end_dim.name, time_granularity=end_dim.type_params.time_granularity
+            ),
+        )
+
+    def transform(self, instance_set: InstanceSet) -> Optional[ValidityWindowJoinDescription]:
+        """Find the Time Dimension specs defining a validity window, if any, and return it
+
+        This currently throws an exception if more than one such window is found, and effectively prevents
+        us from processing a dataset composed of a join between two SCD data sources. This restriction is in
+        place as a temporary simplification - if there is need for this feature we can enable it.
+        """
+        data_source_to_window: Dict[str, ValidityWindowJoinDescription] = {}
+        instances_by_data_source = bucket(
+            instance_set.time_dimension_instances, lambda x: x.origin_data_source_reference.data_source_name
+        )
+        for data_source_name in instances_by_data_source:
+            validity_dims = self._get_validity_window_dimensions_for_data_source(data_source_name=data_source_name)
+            if validity_dims is None:
+                continue
+
+            start_dim, end_dim = validity_dims
+            specs = {instance.spec for instance in instances_by_data_source[data_source_name]}
+            start_specs = [
+                spec
+                for spec in specs
+                if spec.element_name == start_dim.dimension_name and spec.time_granularity == start_dim.time_granularity
+            ]
+            end_specs = [
+                spec
+                for spec in specs
+                if spec.element_name == end_dim.dimension_name and spec.time_granularity == end_dim.time_granularity
+            ]
+            linkless_start_specs = {spec.without_identifier_links for spec in start_specs}
+            linkless_end_specs = {spec.without_identifier_links for spec in end_specs}
+            assert len(linkless_start_specs) == 1 and len(linkless_end_specs) == 1, (
+                f"Did not find exactly one pair of specs from data source `{data_source_name}` matching the validity "
+                f"window end points defined in the data source. This means we cannot process an SCD join, because we "
+                f"require exactly one validity window to be specified for the query! The window in the data source "
+                f"is defined by start dimension `{start_dim}` and end dimension `{end_dim}`. We found "
+                f"{len(linkless_start_specs)} linkless specs for window start ({linkless_start_specs}) and "
+                f"{len(linkless_end_specs)} linkless specs for window end ({linkless_end_specs})."
+            )
+            # SCD join targets are joined as dimension links in much the same was as partitions are joined. Therefore,
+            # we treat this like a partition time column join and take the dimension spec with the shortest set of
+            # identifier links so that the subquery uses the correct reference in the ON statement
+            start_specs = sorted(start_specs, key=lambda x: len(x.identifier_links))
+            end_specs = sorted(end_specs, key=lambda x: len(x.identifier_links))
+            data_source_to_window[data_source_name] = ValidityWindowJoinDescription(
+                window_start_dimension=start_specs[0], window_end_dimension=end_specs[0]
+            )
+
+        assert len(data_source_to_window) < 2, (
+            f"Found more than 1 set of validity window specs in the input instance set. This is not currently "
+            f"supported, as joins between SCD data sources are not yet allowed! {data_source_to_window}"
+        )
+
+        if data_source_to_window:
+            return list(data_source_to_window.values())[0]
+
+        return None
 
 
 class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
@@ -315,6 +436,7 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
             time_dimension_instances=tuple(time_dimension_instances_with_additional_link),
             identifier_instances=tuple(identifier_instances_with_additional_link),
             metric_instances=(),
+            metadata_instances=(),
         )
 
 
@@ -356,6 +478,7 @@ class FilterLinkableInstancesWithLeadingLink(InstanceSetTransform[InstanceSet]):
             time_dimension_instances=filtered_time_dimension_instances,
             identifier_instances=filtered_identifier_instances,
             metric_instances=instance_set.metric_instances,
+            metadata_instances=instance_set.metadata_instances,
         )
         return output
 
@@ -365,8 +488,8 @@ class FilterElements(InstanceSetTransform[InstanceSet]):
 
     def __init__(  # noqa: D
         self,
-        include_specs: Optional[Sequence[InstanceSpec]] = None,
-        exclude_specs: Optional[Sequence[InstanceSpec]] = None,
+        include_specs: Optional[InstanceSpecSet] = None,
+        exclude_specs: Optional[InstanceSpecSet] = None,
     ) -> None:
         """Constructor.
 
@@ -381,23 +504,23 @@ class FilterElements(InstanceSetTransform[InstanceSet]):
     def _should_pass(self, element_spec: InstanceSpec) -> bool:  # noqa: D
         # TODO: Use better matching function
         if self._include_specs:
-            return any(x == element_spec for x in self._include_specs)
+            return any(x == element_spec for x in self._include_specs.all_specs)
         elif self._exclude_specs:
-            return not any(x == element_spec for x in self._exclude_specs)
+            return not any(x == element_spec for x in self._exclude_specs.all_specs)
         assert False
 
     def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D
         # Sanity check to make sure the specs are in the instance set
 
         if self._include_specs:
-            for include_spec in self._include_specs:
+            for include_spec in self._include_specs.all_specs:
                 if include_spec not in instance_set.spec_set.all_specs:
                     raise RuntimeError(
                         f"Include spec {include_spec} is not in the spec set {instance_set.spec_set} - "
                         f"check if this node was constructed correctly."
                     )
         elif self._exclude_specs:
-            for exclude_spec in self._exclude_specs:
+            for exclude_spec in self._exclude_specs.all_specs:
                 if exclude_spec not in instance_set.spec_set.all_specs:
                     raise RuntimeError(
                         f"Exclude spec {exclude_spec} is not in the spec set {instance_set.spec_set} - "
@@ -414,6 +537,7 @@ class FilterElements(InstanceSetTransform[InstanceSet]):
             ),
             identifier_instances=tuple(x for x in instance_set.identifier_instances if self._should_pass(x.spec)),
             metric_instances=tuple(x for x in instance_set.metric_instances if self._should_pass(x.spec)),
+            metadata_instances=tuple(x for x in instance_set.metadata_instances if self._should_pass(x.spec)),
         )
         return output
 
@@ -452,6 +576,7 @@ class ChangeMeasureAggregationState(InstanceSetTransform[InstanceSet]):
             time_dimension_instances=instance_set.time_dimension_instances,
             identifier_instances=instance_set.identifier_instances,
             metric_instances=instance_set.metric_instances,
+            metadata_instances=instance_set.metadata_instances,
         )
 
 
@@ -505,6 +630,7 @@ class AliasAggregatedMeasures(InstanceSetTransform[InstanceSet]):
             time_dimension_instances=instance_set.time_dimension_instances,
             identifier_instances=instance_set.identifier_instances,
             metric_instances=instance_set.metric_instances,
+            metadata_instances=instance_set.metadata_instances,
         )
 
 
@@ -521,6 +647,7 @@ class AddMetrics(InstanceSetTransform[InstanceSet]):
             time_dimension_instances=instance_set.time_dimension_instances,
             identifier_instances=instance_set.identifier_instances,
             metric_instances=instance_set.metric_instances + tuple(self._metric_instances),
+            metadata_instances=instance_set.metadata_instances,
         )
 
 
@@ -534,6 +661,62 @@ class RemoveMeasures(InstanceSetTransform[InstanceSet]):
             time_dimension_instances=instance_set.time_dimension_instances,
             identifier_instances=instance_set.identifier_instances,
             metric_instances=instance_set.metric_instances,
+            metadata_instances=instance_set.metadata_instances,
+        )
+
+
+class RemoveMetrics(InstanceSetTransform[InstanceSet]):
+    """Remove metrics from the instance set."""
+
+    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D
+        return InstanceSet(
+            measure_instances=instance_set.measure_instances,
+            dimension_instances=instance_set.dimension_instances,
+            time_dimension_instances=instance_set.time_dimension_instances,
+            identifier_instances=instance_set.identifier_instances,
+            metric_instances=(),
+            metadata_instances=instance_set.metadata_instances,
+        )
+
+
+class CreateSqlColumnReferencesForInstances(InstanceSetTransform[Tuple[SqlColumnReferenceExpression, ...]]):
+    """Create select column expressions that will express all instances in the set.
+
+    It assumes that the column names of the instances are represented by the supplied column association resolver and
+    come from the given table alias.
+    """
+
+    def __init__(
+        self,
+        table_alias: str,
+        column_resolver: ColumnAssociationResolver,
+    ) -> None:
+        """Initializer.
+
+        Args:
+            table_alias: the table alias to select columns from
+            column_resolver: resolver to name columns.
+        """
+        self._table_alias = table_alias
+        self._column_resolver = column_resolver
+
+    def transform(self, instance_set: InstanceSet) -> Tuple[SqlColumnReferenceExpression, ...]:  # noqa: D
+        column_names = [
+            col.column_name
+            for col in (
+                chain.from_iterable(
+                    [x.column_associations(self._column_resolver) for x in instance_set.spec_set.all_specs]
+                )
+            )
+        ]
+        return tuple(
+            SqlColumnReferenceExpression(
+                SqlColumnReference(
+                    table_alias=self._table_alias,
+                    column_name=column_name,
+                ),
+            )
+            for column_name in column_names
         )
 
 
@@ -611,12 +794,26 @@ class ChangeAssociatedColumns(InstanceSetTransform[InstanceSet]):
                 )
             )
 
+        output_metadata_instances = []
+        for input_metadata_instance in instance_set.metadata_instances:
+            output_metadata_instances.append(
+                MetadataInstance(
+                    associated_columns=(
+                        self._column_association_resolver.resolve_metadata_spec(
+                            metadata_spec=input_metadata_instance.spec
+                        ),
+                    ),
+                    spec=input_metadata_instance.spec,
+                )
+            )
+
         return InstanceSet(
             measure_instances=tuple(output_measure_instances),
             dimension_instances=tuple(output_dimension_instances),
             time_dimension_instances=tuple(output_time_dimension_instances),
             identifier_instances=tuple(output_identifier_instances),
             metric_instances=tuple(output_metric_instances),
+            metadata_instances=tuple(output_metadata_instances),
         )
 
 

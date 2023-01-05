@@ -11,7 +11,7 @@ from metricflow.model.objects.base import (
     PydanticCustomInputParser,
     PydanticParseableValueType,
 )
-from metricflow.object_utils import ExtendedEnum, hash_strings
+from metricflow.object_utils import ExtendedEnum, hash_items
 from metricflow.references import MeasureReference
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.time.time_granularity import string_to_time_granularity
@@ -24,6 +24,7 @@ class MetricType(ExtendedEnum):
     RATIO = "ratio"
     EXPR = "expr"
     CUMULATIVE = "cumulative"
+    DERIVED = "derived"
 
 
 class MetricInputMeasure(PydanticCustomInputParser, HashableBaseModel):
@@ -62,6 +63,14 @@ class MetricInputMeasure(PydanticCustomInputParser, HashableBaseModel):
     def post_aggregation_measure_reference(self) -> MeasureReference:
         """Property accessor to get the MeasureReference with the aliased name, if appropriate"""
         return MeasureReference(element_name=self.alias or self.name)
+
+
+class MetricInput(HashableBaseModel):
+    """Provides a pointer to a metric along with the additional properties used on that metric."""
+
+    name: str
+    constraint: Optional[WhereClauseConstraint]
+    alias: Optional[str]
 
 
 class CumulativeMetricWindow(PydanticCustomInputParser, HashableBaseModel):
@@ -129,6 +138,7 @@ class MetricTypeParams(HashableBaseModel):
     expr: Optional[str]
     window: Optional[CumulativeMetricWindow]
     grain_to_date: Optional[TimeGranularity]
+    metrics: Optional[List[MetricInput]]
 
     @property
     def numerator_measure_reference(self) -> Optional[MeasureReference]:
@@ -171,6 +181,11 @@ class Metric(HashableBaseModel, ModelWithMetadataParsing):
         return [x.measure_reference for x in self.input_measures]
 
     @property
+    def input_metrics(self) -> List[MetricInput]:
+        """Return the associated input metrics for this metric"""
+        return self.type_params.metrics or []
+
+    @property
     def definition_hash(self) -> str:  # noqa: D
         values: List[str] = [self.name, self.type_params.expr or ""]
         if self.constraint:
@@ -178,4 +193,4 @@ class Metric(HashableBaseModel, ModelWithMetadataParsing):
             if self.constraint.linkable_names:
                 values.extend(self.constraint.linkable_names)
         values.extend([m.element_name for m in self.measure_references])
-        return hash_strings(values)
+        return hash_items(values)

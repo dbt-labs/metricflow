@@ -164,7 +164,7 @@ integration_test:
       SUM(b.booking_value) AS instant_booking_value
       , b.ds AS metric_time
     FROM {{ source_schema }}.fct_bookings b
-    JOIN {{ source_schema }}.dim_listings_latest l
+    LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest l
       ON l.listing_id = b.listing_id
     WHERE
       b.is_instant
@@ -203,26 +203,26 @@ integration_test:
     ON a.ds = b.ds
 ---
 integration_test:
- name: min_measure_proxy
- description: Test measure_proxy metric with a min.
- model: SIMPLE_MODEL
- metrics: ["min_booking_value"]
- group_bys: []
- check_query: |
-   SELECT
-     min(booking_value) AS min_booking_value
-   FROM {{ source_schema }}.fct_bookings
+  name: min_measure_proxy
+  description: Test measure_proxy metric with a min.
+  model: SIMPLE_MODEL
+  metrics: ["min_booking_value"]
+  group_bys: []
+  check_query: |
+    SELECT
+      min(booking_value) AS min_booking_value
+    FROM {{ source_schema }}.fct_bookings
 ---
 integration_test:
- name: max_measure_proxy
- description: Test measure_proxy metric with a max.
- model: SIMPLE_MODEL
- metrics: ["max_booking_value"]
- group_bys: []
- check_query: |
-   SELECT
-     max(booking_value) AS max_booking_value
-   FROM {{ source_schema }}.fct_bookings
+  name: max_measure_proxy
+  description: Test measure_proxy metric with a max.
+  model: SIMPLE_MODEL
+  metrics: ["max_booking_value"]
+  group_bys: []
+  check_query: |
+    SELECT
+      max(booking_value) AS max_booking_value
+    FROM {{ source_schema }}.fct_bookings
 ---
 integration_test:
   name: count_distinct
@@ -337,7 +337,7 @@ integration_test:
 ---
 integration_test:
   name: ratio_primary_ident
-  description: Test ratio metric from a single data source.
+  description: Test ratio metric joined on primary identifier.
   model: SIMPLE_MODEL
   metrics: ["bookings_per_listing"]
   group_bys: ["metric_time"]
@@ -430,7 +430,7 @@ integration_test:
     Tests query with 3 metrics, and also checks an optimizing issue when there is a expression metric that is joined.
   model: SIMPLE_MODEL
   required_features: ["FULL_OUTER_JOIN"]
-  metrics: ["bookings", "bookings_per_booker", "booking_value",]
+  metrics: ["bookings", "bookings_per_booker", "booking_value"]
   group_bys: ["metric_time"]
   check_query: |
     SELECT
@@ -487,3 +487,187 @@ integration_test:
         booking_paid_at
     ) b
     ON a.metric_time = b.metric_time
+---
+integration_test:
+  name: derived_metric
+  description: Tests a derived metric query
+  model: SIMPLE_MODEL
+  metrics: ["non_referred_bookings_pct"]
+  group_bys: ["metric_time"]
+  check_query: |
+    SELECT
+      (bookings - ref_bookings) / CAST(bookings AS {{ double_data_type_name }}) AS non_referred_bookings_pct
+      , metric_time
+    FROM (
+      SELECT
+        SUM(CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END) AS ref_bookings
+        , SUM(1) AS bookings
+        , ds AS metric_time
+      FROM {{ source_schema }}.fct_bookings
+      GROUP BY
+        ds
+    ) a
+---
+integration_test:
+  name: derived_metric_ratio
+  description: Tests a ratio metric defined as a derived metric
+  model: SIMPLE_MODEL
+  metrics: ["bookings_per_lux_listing_derived"]
+  group_bys: ["metric_time"]
+  check_query: |
+    SELECT
+      bookings / CAST(NULLIF(lux_listings, 0) AS {{ double_data_type_name }}) AS bookings_per_lux_listing_derived
+      , a.metric_time
+    FROM (
+      SELECT
+        SUM(1) AS bookings
+        , ds AS metric_time
+      FROM {{ source_schema }}.fct_bookings
+      GROUP BY
+        ds
+    ) a
+    INNER JOIN (
+      SELECT
+        SUM(1) AS lux_listings
+        , created_at AS metric_time
+      FROM {{ source_schema }}.dim_listings_latest
+      WHERE is_lux
+      GROUP BY
+        created_at
+    ) b
+    ON a.metric_time = b.metric_time
+---
+integration_test:
+  name: nested_derived_metric
+  description: Tests a nested derived metric
+  model: SIMPLE_MODEL
+  metrics: ["instant_plus_non_referred_bookings_pct"]
+  group_bys: ["metric_time"]
+  check_query: |
+    SELECT
+      (instant_bookings / CAST(bookings AS {{ double_data_type_name }})) + ((bookings - ref_bookings) / CAST(bookings AS {{ double_data_type_name }})) AS instant_plus_non_referred_bookings_pct
+      , metric_time
+    FROM (
+      SELECT
+        SUM(CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END) AS ref_bookings
+        , SUM(CASE WHEN is_instant THEN 1 ELSE 0 END) AS instant_bookings
+        , SUM(1) AS bookings
+        , ds AS metric_time
+      FROM {{ source_schema }}.fct_bookings
+      GROUP BY
+        ds
+    ) a
+---
+integration_test:
+  name: two_metrics_with_null_dimension_values
+  description: Tests querying two metrics with a dimension having a NULL values
+  model: SIMPLE_MODEL
+  metrics: ["bookings", "views"]
+  group_bys:
+    ["metric_time", "listing__is_lux_latest", "listing__country_latest"]
+  check_query: |
+    SELECT
+      MAX(bk.bookings) AS bookings
+      ,MAX(vw.views) AS views
+      ,COALESCE(bk.metric_time, vw.metric_time) AS metric_time
+      ,COALESCE(bk.is_lux, vw.is_lux) AS listing__is_lux_latest
+      ,COALESCE(bk.country, vw.country) AS listing__country_latest
+    FROM (
+      SELECT
+        a.ds AS metric_time
+        ,b.is_lux
+        ,b.country
+        ,SUM(1) AS bookings
+      FROM {{ source_schema }}.fct_bookings a
+      LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest b
+      ON a.listing_id = b.listing_id
+      GROUP BY 1,2,3
+    ) bk
+    FULL OUTER JOIN (
+      SELECT
+        c.ds AS metric_time
+        ,d.is_lux
+        ,d.country
+        ,SUM(1) AS views
+        FROM {{ source_schema }}.fct_views c
+        LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest d
+        ON c.listing_id = d.listing_id
+        GROUP BY 1,2,3
+    ) vw
+    ON bk.metric_time = vw.metric_time AND bk.is_lux = vw.is_lux AND bk.country = vw.country
+    GROUP BY 3,4,5
+---
+integration_test:
+  name: three_metrics_with_null_dimension_values
+  description: Tests querying three metrics with a dimension having NULL values and the on clause COALESCE behavior
+  model: SIMPLE_MODEL
+  metrics: ["bookings", "views", "listings"]
+  group_bys: ["listing__is_lux_latest", "listing__country_latest"]
+  check_query: |
+    SELECT
+      MAX(bk.bookings) AS bookings
+      ,MAX(vw.views) AS views
+      ,MAX(li.listings) AS listings
+      ,COALESCE(bk.is_lux, vw.is_lux, li.is_lux) AS listing__is_lux_latest
+      ,COALESCE(bk.country, vw.country, li.country) AS listing__country_latest
+    FROM (
+      SELECT
+        b.is_lux
+        ,b.country
+        ,SUM(1) AS bookings
+      FROM {{ source_schema }}.fct_bookings a
+      LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest b
+      ON a.listing_id = b.listing_id
+      GROUP BY 1,2
+    ) bk
+    FULL OUTER JOIN (
+      SELECT
+        d.is_lux
+        ,d.country
+        ,SUM(1) AS views
+        FROM {{ source_schema }}.fct_views c
+        LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest d
+        ON c.listing_id = d.listing_id
+        GROUP BY 1,2
+    ) vw
+    ON bk.is_lux = vw.is_lux AND bk.country = vw.country
+    FULL OUTER JOIN (
+      SELECT
+        is_lux
+        ,country
+        ,SUM(1) AS listings
+      FROM {{ source_schema }}.dim_listings_latest
+      GROUP BY 1,2
+    ) li
+    ON COALESCE(bk.is_lux, vw.is_lux) = li.is_lux AND COALESCE(bk.country, vw.country) = li.country
+    GROUP BY 4,5
+---
+integration_test:
+  name: derived_metrics_with_null_dimension_values
+  description: Tests querying a derived metric with multiple inputs that link to dimension(s) with null values
+  model: SIMPLE_MODEL
+  metrics: [booking_value_per_view]
+  group_bys: [listing__is_lux_latest]
+  check_query: |
+    SELECT
+      bk.booking_value / NULLIF(vw.views, 0) AS booking_value_per_view
+      , bk.is_lux AS listing__is_lux_latest
+    FROM (
+      SELECT
+        SUM(a.booking_value) AS booking_value
+        ,b.is_lux
+      FROM {{ source_schema }}.fct_bookings a
+      LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest b
+      ON a.listing_id = b.listing_id
+      GROUP BY 2
+    ) bk
+    INNER JOIN (
+      SELECT
+        SUM(1) AS views
+        ,d.is_lux
+      FROM {{ source_schema }}.fct_views c
+      LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest d
+      ON c.listing_id = d.listing_id
+      GROUP BY 2
+    ) vw
+    ON bk.is_lux = vw.is_lux OR (bk.is_lux IS NULL AND vw.is_lux IS NULL)

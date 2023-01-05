@@ -5,7 +5,7 @@ SELECT
 FROM (
   -- Join Aggregated Measures with Standard Outputs
   -- Pass Only Elements:
-  --   ['metric_time', 'average_booking_value', 'bookings', 'booking_value']
+  --   ['average_booking_value', 'bookings', 'booking_value', 'metric_time']
   SELECT
     subq_27.metric_time AS metric_time
     , subq_27.bookings AS bookings
@@ -71,10 +71,8 @@ FROM (
   ) subq_31
   ON
     (
-      (
-        subq_27.metric_time = subq_31.metric_time
-      ) OR (
-        (subq_27.metric_time IS NULL) AND (subq_31.metric_time IS NULL)
-      )
+      subq_27.metric_time = subq_31.metric_time
+    ) OR (
+      (subq_27.metric_time IS NULL) AND (subq_31.metric_time IS NULL)
     )
 ) subq_33

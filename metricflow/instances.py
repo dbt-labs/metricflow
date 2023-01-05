@@ -9,7 +9,9 @@ from typing import List, TypeVar, Generic, Tuple
 from metricflow.aggregation_properties import AggregationState
 from metricflow.column_assoc import ColumnAssociation
 from metricflow.dataclass_serialization import SerializableDataclass
+from metricflow.references import ElementReference
 from metricflow.specs import (
+    MetadataSpec,
     MeasureSpec,
     DimensionSpec,
     IdentifierSpec,
@@ -42,10 +44,26 @@ class DataSourceReference(ModelReference):
 
 @dataclass(frozen=True)
 class DataSourceElementReference(ModelReference):
-    """A reference to an element definition in a data source definition in the model."""
+    """A reference to an element definition in a data source definition in the model.
+
+    TODO: Fields should be *Reference objects.
+    """
 
     data_source_name: str
     element_name: str
+
+    @staticmethod
+    def create_from_references(  # noqa: D
+        data_source_reference: DataSourceReference, element_reference: ElementReference
+    ) -> DataSourceElementReference:
+        return DataSourceElementReference(
+            data_source_name=data_source_reference.data_source_name,
+            element_name=element_reference.element_name,
+        )
+
+    @property
+    def data_source_reference(self) -> DataSourceReference:  # noqa: D
+        return DataSourceReference(self.data_source_name)
 
     def is_from(self, ref: DataSourceReference) -> bool:
         """Returns true if this reference is from the same data source as the supplied reference."""
@@ -103,6 +121,24 @@ class DataSourceElementInstance(SerializableDataclass):  # noqa: D
     # This instance is derived from something defined in a data source.
     defined_from: Tuple[DataSourceElementReference, ...]
 
+    @property
+    def origin_data_source_reference(self) -> DataSourceElementReference:
+        """Property to grab the element reference pointing to the origin data source for this element instance
+
+        By convention this is the zeroth element in the Tuple. At this time these tuples are always of exactly
+        length 1, so the simple assertions here work.
+
+        TODO: make this a required input value, rather than a derived property on these objects
+        """
+        if len(self.defined_from) != 1:
+            raise ValueError(
+                f"DataSourceElementInstances should have exactly one entry in the `defined_from` property, because "
+                f"otherwise there is no way to ensure that the first element is always the origin data source! Found "
+                f"{len(self.defined_from)} elements in this particular instance: {self.defined_from}."
+            )
+
+        return self.defined_from[0]
+
 
 @dataclass(frozen=True)
 class MeasureInstance(MdoInstance[MeasureSpec], DataSourceElementInstance):  # noqa: D
@@ -136,6 +172,12 @@ class MetricInstance(MdoInstance[MetricSpec], SerializableDataclass):  # noqa: D
     defined_from: Tuple[MetricModelReference, ...]
 
 
+@dataclass(frozen=True)
+class MetadataInstance(MdoInstance[MetadataSpec], SerializableDataclass):  # noqa: D
+    associated_columns: Tuple[ColumnAssociation, ...]
+    spec: MetadataSpec
+
+
 # Output type of transform function
 TransformOutputT = TypeVar("TransformOutputT")
 
@@ -165,6 +207,7 @@ class InstanceSet(SerializableDataclass):
     time_dimension_instances: Tuple[TimeDimensionInstance, ...] = ()
     identifier_instances: Tuple[IdentifierInstance, ...] = ()
     metric_instances: Tuple[MetricInstance, ...] = ()
+    metadata_instances: Tuple[MetadataInstance, ...] = ()
 
     def transform(self, transform_function: InstanceSetTransform[TransformOutputT]) -> TransformOutputT:  # noqa: D
         return transform_function.transform(self)
@@ -180,6 +223,7 @@ class InstanceSet(SerializableDataclass):
         time_dimension_instances: List[TimeDimensionInstance] = []
         identifier_instances: List[IdentifierInstance] = []
         metric_instances: List[MetricInstance] = []
+        metadata_instances: List[MetadataInstance] = []
 
         for instance_set in instance_sets:
             for measure_instance in instance_set.measure_instances:
@@ -197,6 +241,9 @@ class InstanceSet(SerializableDataclass):
             for metric_instance in instance_set.metric_instances:
                 if metric_instance.spec not in {x.spec for x in metric_instances}:
                     metric_instances.append(metric_instance)
+            for metadata_instance in instance_set.metadata_instances:
+                if metadata_instance.spec not in {x.spec for x in metadata_instances}:
+                    metadata_instances.append(metadata_instance)
 
         return InstanceSet(
             measure_instances=tuple(measure_instances),
@@ -204,6 +251,7 @@ class InstanceSet(SerializableDataclass):
             time_dimension_instances=tuple(time_dimension_instances),
             identifier_instances=tuple(identifier_instances),
             metric_instances=tuple(metric_instances),
+            metadata_instances=tuple(metadata_instances),
         )
 
     @property
@@ -214,4 +262,5 @@ class InstanceSet(SerializableDataclass):
             time_dimension_specs=tuple(x.spec for x in self.time_dimension_instances),
             identifier_specs=tuple(x.spec for x in self.identifier_instances),
             metric_specs=tuple(x.spec for x in self.metric_instances),
+            metadata_specs=tuple(x.spec for x in self.metadata_instances),
         )

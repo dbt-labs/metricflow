@@ -1,3 +1,4 @@
+from __future__ import annotations
 import itertools
 import logging
 import pprint
@@ -8,8 +9,9 @@ from collections import OrderedDict
 from collections.abc import Mapping
 from dataclasses import is_dataclass, fields
 from enum import Enum
+import datetime
 from hashlib import sha1
-from typing import Sequence, TypeVar, Tuple, NoReturn, Type, Any, List
+from typing import Sequence, TypeVar, Tuple, NoReturn, Type, Any, List, Union
 
 from metricflow.model.objects.base import HashableBaseModel
 
@@ -20,7 +22,7 @@ def assert_exactly_one_arg_set(**kwargs) -> None:  # type: ignore
     """Throws an assertion error if 0 or more than 1 argument is not None."""
     num_set = 0
     for value in kwargs.values():
-        if value:
+        if value is not None:
             num_set += 1
 
     assert num_set == 1, f"{num_set} argument(s) set instead of 1 in arguments: {kwargs}"
@@ -151,8 +153,21 @@ def random_id() -> str:
     return "".join(random.choices(filtered_alphabet, k=8))
 
 
-def assert_values_exhausted(value: Enum) -> NoReturn:
+def assert_values_exhausted(value: NoReturn) -> NoReturn:
     """Helper method to allow MyPy to guarantee an exhaustive switch through an enumeration or literal
+
+    DO NOT MODIFY THE TYPE SIGNATURE OF THIS FUNCTION UNLESS MYPY CHANGES HOW IT HANDLES THINGS
+
+    To use this function correctly you MUST do an exhaustive switch through ALL values, using `is` for comparison
+    (doing x == SomeEnum.VALUE will not work, nor will `x in (SomeEnum.VALUE_1, SomeEnum.VALUE_2)`).
+
+    If mypy raises an error of the form:
+      `x has incompatible type SomeEnum; expected NoReturn`
+    the switch is not constructed correctly. Fix your switch statement to use `is` for all comparisons.
+
+    If mypy raises an error of the form
+      `x has incompatible type Union[Literal...]` expected NoReturn`
+    the switch statement is non-exhaustive, and the values listed in the error message need to be accounted for.
 
     See https://mypy.readthedocs.io/en/stable/literal_types.html#exhaustiveness-checks
     For an enum example, see issue:
@@ -161,11 +176,11 @@ def assert_values_exhausted(value: Enum) -> NoReturn:
     assert False, f"Should be unreachable, but got {value}"
 
 
-def hash_strings(strings: Sequence[str]) -> str:
+def hash_items(items: Sequence[SqlColumnType]) -> str:
     """Produces a hash from a list of strings."""
     hash_builder = sha1()
-    for s in strings:
-        hash_builder.update(s.encode("utf-8"))
+    for item in items:
+        hash_builder.update(str(item).encode("utf-8"))
     return hash_builder.hexdigest()
 
 
@@ -197,3 +212,7 @@ class ExtendedEnum(Enum):
     def list_names(cls) -> List[str]:
         """List valid names within this enum class"""
         return list(cls.__members__.keys())
+
+
+# Supported SQL column types (not comprehensive).
+SqlColumnType = Union[str, int, float, datetime.datetime, datetime.date, bool]

@@ -9,6 +9,8 @@ SELECT
   , booking_value AS average_booking_value
   , booking_value AS booking_payments
   , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
+  , booking_value AS median_booking_value
+  , booking_value AS booking_value_p99
   , is_instant
   , ds
   , DATE_TRUNC('week', ds) AS ds__week

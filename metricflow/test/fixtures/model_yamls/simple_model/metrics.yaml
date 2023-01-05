@@ -230,6 +230,8 @@ metric:
     tags:
       - "Finance"
       - "Monthly"
+    private: true
+    unit: "dollars"
   type_params:
     measures:
       - txn_revenue
@@ -496,3 +498,92 @@ metric:
   type_params:
     measures:
       - referred_bookings
+---
+metric:
+  name: "non_referred_bookings_pct"
+  description: "percentage of bookings that are not made through a referral"
+  owners:
+    - support@transformdata.io
+  type: derived
+  type_params:
+    expr: (bookings - ref_bookings) * 1.0 / bookings
+    metrics:
+      - name: referred_bookings
+        alias: ref_bookings
+      - name: bookings
+---
+metric:
+  name: bookings_per_lux_listing_derived
+  description: Bookings divided by listings - using derived metric type
+  owners:
+    - support@transformdata.io
+  type: derived
+  type_params:
+    expr: bookings * 1.0 / NULLIF(lux_listing, 0)
+    metrics:
+      - name: bookings
+      - name: listings
+        alias: lux_listing
+        constraint: is_lux_latest
+---
+metric:
+  name: "instant_plus_non_referred_bookings_pct"
+  description: |
+    percentage of bookings that are not made through a referral + instant booking pct,
+    used to test nested derived metrics.
+  owners:
+    - support@transformdata.io
+  type: derived
+  type_params:
+    expr: non_referred + (instant * 1.0 / bookings)
+    metrics:
+      - name: non_referred_bookings_pct
+        alias: non_referred
+      - name: instant_bookings
+        alias: instant
+      - name: bookings
+---
+metric:
+  name: "trailing_2_months_revenue_sub_10"
+  description: |
+    Test derived metric with a cumulative metric
+  owners:
+    - support@transformdata.io
+  type: derived
+  type_params:
+    expr: t2mr - 10
+    metrics:
+      - name: trailing_2_months_revenue
+        alias: t2mr
+---
+metric:
+  name: booking_value_per_view
+  description: proportion of booking value per view, which allows us to test joins to listings with null values
+  owners:
+    - support@transformdata.io
+  type: derived
+  type_params:
+    expr: booking_value / NULLIF(views, 0)
+    metrics:
+      - name: booking_value
+      - name: views
+---
+metric:
+  name: "median_booking_value"
+  description: "median booking value"
+  owners:
+    - support@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+      - median_booking_value
+---
+metric:
+  name: "booking_value_p99"
+  description: "p99 booking value"
+  owners:
+    - support@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+      - booking_value_p99

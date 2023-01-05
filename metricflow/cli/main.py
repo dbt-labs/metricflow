@@ -24,14 +24,15 @@ from metricflow.cli.cli_context import CLIContext
 import metricflow.cli.custom_click_types as click_custom
 from metricflow.cli.tutorial import create_sample_data, gen_sample_model_configs, remove_sample_tables
 from metricflow.cli.utils import (
+    exception_handler,
+    generate_duckdb_demo_keys,
+    get_data_warehouse_config_link,
+    query_options,
+    start_end_time_options,
     MF_BIGQUERY_KEYS,
     MF_CONFIG_KEYS,
     MF_REDSHIFT_KEYS,
     MF_SNOWFLAKE_KEYS,
-    exception_handler,
-    query_options,
-    start_end_time_options,
-    generate_duckdb_demo_keys,
     MF_POSTGRESQL_KEYS,
     MF_DATABRICKS_KEYS,
 )
@@ -49,7 +50,7 @@ from metricflow.inference.runner import InferenceProgressReporter, InferenceRunn
 from metricflow.model.data_warehouse_model_validator import DataWarehouseModelValidator
 from metricflow.model.model_validator import ModelValidator
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
-from metricflow.protocols.sql_client import SupportedSqlEngine
+from metricflow.protocols.sql_client import SqlEngine
 from metricflow.engine.utils import model_build_result_from_config, path_to_models
 from metricflow.model.parsing.config_linter import ConfigLinter
 from metricflow.model.validations.validator_helpers import ModelValidationResults
@@ -175,6 +176,7 @@ def setup(cfg: CLIContext, restart: bool) -> None:
         textwrap.dedent(
             f"""\
             💻 {template_description}
+            If you are new to MetricFlow, we recommend you to run through our tutorial with `mf tutorial`\n
             Next steps:
               1. Review and fill out relevant fields.
               2. Run `mf health-checks` to validate the data warehouse connection.
@@ -258,8 +260,7 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
 
     # Seed sample model file
     model_path = os.path.join(cfg.config.dir_path, "sample_models")
-    if not os.path.exists(model_path):
-        pathlib.Path(model_path).mkdir(parents=True)
+    pathlib.Path(model_path).mkdir(parents=True, exist_ok=True)
     click.echo(f"🤖 Attempting to generate model configs to your local filesystem in '{str(model_path)}'.")
     spinner = Halo(text="Dropping tables...", spinner="dots")
     spinner.start()
@@ -291,6 +292,13 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
     required=False,
     default=False,
     help="In the query output, show the query that was executed against the data warehouse",
+)
+@click.option(
+    "--show-dataflow-plan",
+    is_flag=True,
+    required=False,
+    default=False,
+    help="Display dataflow plan in explain output",
 )
 @click.option(
     "--display-plans",
@@ -325,6 +333,7 @@ def query(
     as_table: Optional[str] = None,
     csv: Optional[click.utils.LazyFile] = None,
     explain: bool = False,
+    show_dataflow_plan: bool = False,
     display_plans: bool = False,
     decimals: int = DEFAULT_RESULT_DECIMAL_PLACES,
     show_sql_descriptions: bool = False,
@@ -362,22 +371,27 @@ def query(
             if not show_sql_descriptions
             else explain_result.rendered_sql.sql_query
         )
-        click.echo("🔎 Generated Dataflow Plan + SQL (remove --explain to see data):")
-        click.echo(
-            textwrap.indent(
-                jinja2.Template(
-                    textwrap.dedent(
-                        """\
-                        Metric Dataflow Plan:
-                            {{ plan_text | indent(4) }}
-                        """
-                    ),
-                    undefined=jinja2.StrictUndefined,
-                ).render(plan_text=dataflow_plan_as_text(explain_result.dataflow_plan)),
-                prefix="-- ",
+        if show_dataflow_plan:
+            click.echo("🔎 Generated Dataflow Plan + SQL (remove --explain to see data):")
+            click.echo(
+                textwrap.indent(
+                    jinja2.Template(
+                        textwrap.dedent(
+                            """\
+                            Metric Dataflow Plan:
+                                {{ plan_text | indent(4) }}
+                            """
+                        ),
+                        undefined=jinja2.StrictUndefined,
+                    ).render(plan_text=dataflow_plan_as_text(explain_result.dataflow_plan)),
+                    prefix="-- ",
+                )
             )
-        )
-        click.echo("")
+            click.echo("")
+        else:
+            click.echo(
+                "🔎 SQL (remove --explain to see data or add --show-dataflow-plan to see the generated dataflow plan):"
+            )
         click.echo(sql)
         if display_plans:
             svg_path = display_dag_as_svg(explain_result.dataflow_plan, cfg.config.dir_path)
@@ -481,6 +495,7 @@ def list_dimensions(cfg: CLIContext, metric_names: List[str]) -> None:
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def health_checks(cfg: CLIContext) -> None:
     """Performs a health check against the DW provided in the configs."""
+    click.echo(f"For specifics on the health-checks, please visit {get_data_warehouse_config_link(cfg.config)}")
     spinner = Halo(
         text="🏥 Running health checks against your data warehouse... (This should not take longer than 30s for a successful connection)",
         spinner="dots",
@@ -758,22 +773,34 @@ def validate_configs(
     if not show_all:
         print("(To see warnings and future-errors, run again with flag `--show-all`)")
 
-    # Lint Validation
-    lint_spinner = Halo(text="Checking for YAML format issues", spinner="dots")
-    lint_spinner.start()
-
-    lint_results = ConfigLinter().lint_dir(path_to_models(handler=cfg.config))
-    if not lint_results.has_blocking_issues:
-        lint_spinner.succeed(f"🎉 Successfully linted config YAML files ({lint_results.summary()})")
+    # Skip linting validation for dbt cloud
+    if cfg.dbt_cloud_configs is not None:
+        lint_results = ModelValidationResults()
     else:
-        lint_spinner.fail(f"Breaking issues found in config YAML files ({lint_results.summary()})")
-        _print_issues(lint_results, show_non_blocking=show_all, verbose=verbose_issues)
-        return
+        # Lint Validation
+        lint_spinner = Halo(text="Checking for YAML format issues", spinner="dots")
+        lint_spinner.start()
+
+        lint_results = ConfigLinter().lint_dir(path_to_models(handler=cfg.config))
+        if not lint_results.has_blocking_issues:
+            lint_spinner.succeed(f"🎉 Successfully linted config YAML files ({lint_results.summary()})")
+        else:
+            lint_spinner.fail(f"Breaking issues found in config YAML files ({lint_results.summary()})")
+            _print_issues(lint_results, show_non_blocking=show_all, verbose=verbose_issues)
+            return
 
     # Parsing Validation
     parsing_spinner = Halo(text="Building model from configs", spinner="dots")
     parsing_spinner.start()
-    parsing_result = model_build_result_from_config(handler=cfg.config, raise_issues_as_exceptions=False)
+
+    if cfg.dbt_cloud_configs is not None:
+        from metricflow.model.parsing.dbt_cloud_to_model import model_build_result_for_dbt_cloud_job
+
+        parsing_result = model_build_result_for_dbt_cloud_job(
+            auth=cfg.dbt_cloud_configs.auth, job_id=cfg.dbt_cloud_configs.job_id
+        )
+    else:
+        parsing_result = model_build_result_from_config(handler=cfg.config, raise_issues_as_exceptions=False)
 
     if not parsing_result.issues.has_blocking_issues:
         parsing_spinner.succeed(f"🎉 Successfully built model from configs ({parsing_result.issues.summary()})")
@@ -943,7 +970,7 @@ def infer(
         " If you find any bugs or feel like something is not behaving as it should, feel free to open an issue on the Metricflow Github repo: https://github.com/transform-data/metricflow/issues \n"
     )
 
-    if cfg.sql_client.sql_engine_attributes.sql_engine_type is not SupportedSqlEngine.SNOWFLAKE:
+    if cfg.sql_client.sql_engine_attributes.sql_engine_type is not SqlEngine.SNOWFLAKE:
         click.echo(
             "Data Source Inference is currently only supported for Snowflake. "
             "We will add support for all the other warehouses before it becomes a "

@@ -22,6 +22,8 @@ from metricflow.dataflow.dataflow_plan import (
     SemiAdditiveJoinNode,
 )
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
+from metricflow.dataset.data_source_adapter import DataSourceDataSet
+from metricflow.dataset.dataset import DataSet
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
@@ -41,19 +43,19 @@ from metricflow.specs import (
     TimeDimensionSpec,
     SpecWhereClauseConstraint,
     LinkableSpecSet,
+    InstanceSpecSet,
 )
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY
-from metricflow.time.time_granularity import TimeGranularity
-from metricflow.dataset.data_source_adapter import DataSourceDataSet
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.plan_utils import assert_plan_snapshot_text_equal
 from metricflow.test.sql.compare_sql_plan import assert_rendered_sql_from_plan_equal
 from metricflow.test.sql.compare_sql_plan import assert_sql_plan_text_equal
 from metricflow.test.test_utils import as_datetime
+from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY
+from metricflow.time.time_granularity import TimeGranularity
 
 
 @pytest.fixture(scope="session")
@@ -76,6 +78,18 @@ def multihop_dataflow_to_sql_converter(  # noqa: D
     return DataflowToSqlQueryPlanConverter[DataSourceDataSet](
         column_association_resolver=DefaultColumnAssociationResolver(multi_hop_join_semantic_model),
         semantic_model=multi_hop_join_semantic_model,
+        time_spine_source=time_spine_source,
+    )
+
+
+@pytest.fixture(scope="session")
+def scd_dataflow_to_sql_converter(  # noqa: D
+    scd_semantic_model: SemanticModel,
+    time_spine_source: TimeSpineSource,
+) -> DataflowToSqlQueryPlanConverter[DataSourceDataSet]:
+    return DataflowToSqlQueryPlanConverter[DataSourceDataSet](
+        column_association_resolver=DefaultColumnAssociationResolver(scd_semantic_model),
+        semantic_model=scd_semantic_model,
         time_spine_source=time_spine_source,
     )
 
@@ -168,7 +182,9 @@ def test_filter_node(  # noqa: D
         element_name="bookings",
     )
     source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
-    filter_node = FilterElementsNode[DataSourceDataSet](parent_node=source_node, include_specs=[measure_spec])
+    filter_node = FilterElementsNode[DataSourceDataSet](
+        parent_node=source_node, include_specs=InstanceSpecSet(measure_specs=(measure_spec,))
+    )
 
     convert_and_check(
         request=request,
@@ -194,7 +210,8 @@ def test_filter_with_where_constraint_node(  # noqa: D
 
     ds_spec = TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.DAY)
     filter_node = FilterElementsNode[DataSourceDataSet](
-        parent_node=source_node, include_specs=[measure_spec, ds_spec]
+        parent_node=source_node,
+        include_specs=InstanceSpecSet(measure_specs=(measure_spec,), time_dimension_specs=(ds_spec,)),
     )  # need to include ds_spec because where constraint operates on ds
     where_constraint_node = WhereConstraintNode[DataSourceDataSet](
         parent_node=filter_node,
@@ -251,7 +268,7 @@ def test_measure_aggregation_node(  # noqa: D
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     filtered_measure_node = FilterElementsNode[DataSourceDataSet](
         parent_node=measure_source_node,
-        include_specs=measure_specs,
+        include_specs=InstanceSpecSet(measure_specs=tuple(measure_specs)),
     )
 
     aggregated_measure_node = AggregateMeasuresNode[DataSourceDataSet](
@@ -281,7 +298,11 @@ def test_single_join_node(  # noqa: D
     identifier_spec = LinklessIdentifierSpec.from_element_name(element_name="listing")
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     filtered_measure_node = FilterElementsNode[DataSourceDataSet](
-        parent_node=measure_source_node, include_specs=[measure_spec, identifier_spec]
+        parent_node=measure_source_node,
+        include_specs=InstanceSpecSet(
+            measure_specs=(measure_spec,),
+            identifier_specs=(identifier_spec,),
+        ),
     )
 
     dimension_spec = DimensionSpec(
@@ -290,11 +311,15 @@ def test_single_join_node(  # noqa: D
     )
     dimension_source_node = consistent_id_object_repository.simple_model_read_nodes["listings_latest"]
     filtered_dimension_node = FilterElementsNode[DataSourceDataSet](
-        parent_node=dimension_source_node, include_specs=[identifier_spec, dimension_spec]
+        parent_node=dimension_source_node,
+        include_specs=InstanceSpecSet(
+            identifier_specs=(identifier_spec,),
+            dimension_specs=(dimension_spec,),
+        ),
     )
 
     join_node = JoinToBaseOutputNode[DataSourceDataSet](
-        parent_node=filtered_measure_node,
+        left_node=filtered_measure_node,
         join_targets=[
             JoinDescription(
                 join_node=filtered_dimension_node,
@@ -328,7 +353,8 @@ def test_multi_join_node(
     identifier_spec = LinklessIdentifierSpec.from_element_name(element_name="listing")
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     filtered_measure_node = FilterElementsNode[DataSourceDataSet](
-        parent_node=measure_source_node, include_specs=[measure_spec, identifier_spec]
+        parent_node=measure_source_node,
+        include_specs=InstanceSpecSet(measure_specs=(measure_spec,), identifier_specs=(identifier_spec,)),
     )
 
     dimension_spec = DimensionSpec(
@@ -337,11 +363,15 @@ def test_multi_join_node(
     )
     dimension_source_node = consistent_id_object_repository.simple_model_read_nodes["listings_latest"]
     filtered_dimension_node = FilterElementsNode[DataSourceDataSet](
-        parent_node=dimension_source_node, include_specs=[identifier_spec, dimension_spec]
+        parent_node=dimension_source_node,
+        include_specs=InstanceSpecSet(
+            identifier_specs=(identifier_spec,),
+            dimension_specs=(dimension_spec,),
+        ),
     )
 
     join_node = JoinToBaseOutputNode[DataSourceDataSet](
-        parent_node=filtered_measure_node,
+        left_node=filtered_measure_node,
         join_targets=[
             JoinDescription(
                 join_node=filtered_dimension_node,
@@ -382,7 +412,11 @@ def test_compute_metrics_node(
     metric_input_measure_specs = (MetricInputMeasureSpec(measure_spec=measure_spec),)
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     filtered_measure_node = FilterElementsNode[DataSourceDataSet](
-        parent_node=measure_source_node, include_specs=[measure_spec, identifier_spec]
+        parent_node=measure_source_node,
+        include_specs=InstanceSpecSet(
+            measure_specs=(measure_spec,),
+            identifier_specs=(identifier_spec,),
+        ),
     )
 
     dimension_spec = DimensionSpec(
@@ -391,11 +425,15 @@ def test_compute_metrics_node(
     )
     dimension_source_node = consistent_id_object_repository.simple_model_read_nodes["listings_latest"]
     filtered_dimension_node = FilterElementsNode[DataSourceDataSet](
-        parent_node=dimension_source_node, include_specs=[identifier_spec, dimension_spec]
+        parent_node=dimension_source_node,
+        include_specs=InstanceSpecSet(
+            identifier_specs=(identifier_spec,),
+            dimension_specs=(dimension_spec,),
+        ),
     )
 
     join_node = JoinToBaseOutputNode[DataSourceDataSet](
-        parent_node=filtered_measure_node,
+        left_node=filtered_measure_node,
         join_targets=[
             JoinDescription(
                 join_node=filtered_dimension_node,
@@ -439,7 +477,8 @@ def test_compute_metrics_node_simple_expr(
     metric_input_measure_specs = (MetricInputMeasureSpec(measure_spec=measure_spec),)
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     filtered_measure_node = FilterElementsNode[DataSourceDataSet](
-        parent_node=measure_source_node, include_specs=[measure_spec, identifier_spec]
+        parent_node=measure_source_node,
+        include_specs=InstanceSpecSet(measure_specs=(measure_spec,), identifier_specs=(identifier_spec,)),
     )
 
     dimension_spec = DimensionSpec(
@@ -448,11 +487,15 @@ def test_compute_metrics_node_simple_expr(
     )
     dimension_source_node = consistent_id_object_repository.simple_model_read_nodes["listings_latest"]
     filtered_dimension_node = FilterElementsNode[DataSourceDataSet](
-        parent_node=dimension_source_node, include_specs=[identifier_spec, dimension_spec]
+        parent_node=dimension_source_node,
+        include_specs=InstanceSpecSet(
+            identifier_specs=(identifier_spec,),
+            dimension_specs=(dimension_spec,),
+        ),
     )
 
     join_node = JoinToBaseOutputNode[DataSourceDataSet](
-        parent_node=filtered_measure_node,
+        left_node=filtered_measure_node,
         join_targets=[
             JoinDescription(
                 join_node=filtered_dimension_node,
@@ -517,7 +560,10 @@ def test_compute_metrics_node_ratio_from_single_data_source(
     )
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     filtered_measures_node = FilterElementsNode[DataSourceDataSet](
-        parent_node=measure_source_node, include_specs=[numerator_spec, denominator_spec, identifier_spec]
+        parent_node=measure_source_node,
+        include_specs=InstanceSpecSet(
+            measure_specs=(numerator_spec, denominator_spec), identifier_specs=(identifier_spec,)
+        ),
     )
 
     dimension_spec = DimensionSpec(
@@ -526,11 +572,15 @@ def test_compute_metrics_node_ratio_from_single_data_source(
     )
     dimension_source_node = consistent_id_object_repository.simple_model_read_nodes["listings_latest"]
     filtered_dimension_node = FilterElementsNode[DataSourceDataSet](
-        parent_node=dimension_source_node, include_specs=[identifier_spec, dimension_spec]
+        parent_node=dimension_source_node,
+        include_specs=InstanceSpecSet(
+            identifier_specs=(identifier_spec,),
+            dimension_specs=(dimension_spec,),
+        ),
     )
 
     join_node = JoinToBaseOutputNode[DataSourceDataSet](
-        parent_node=filtered_measures_node,
+        left_node=filtered_measures_node,
         join_targets=[
             JoinDescription(
                 join_node=filtered_dimension_node,
@@ -622,7 +672,12 @@ def test_order_by_node(
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
 
     filtered_measure_node = FilterElementsNode[DataSourceDataSet](
-        parent_node=measure_source_node, include_specs=[measure_spec, dimension_spec, time_dimension_spec]
+        parent_node=measure_source_node,
+        include_specs=InstanceSpecSet(
+            measure_specs=(measure_spec,),
+            dimension_specs=(dimension_spec,),
+            time_dimension_specs=(time_dimension_spec,),
+        ),
     )
 
     aggregated_measure_node = AggregateMeasuresNode[DataSourceDataSet](
@@ -744,12 +799,16 @@ def test_constrain_time_range_node(
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     filtered_measure_node = FilterElementsNode(
         parent_node=measure_source_node,
-        include_specs=[
-            MeasureSpec(
-                element_name="bookings",
+        include_specs=InstanceSpecSet(
+            measure_specs=(
+                MeasureSpec(
+                    element_name="bookings",
+                ),
             ),
-            TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.DAY),
-        ],
+            time_dimension_specs=(
+                TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.DAY),
+            ),
+        ),
     )
     metric_time_node = MetricTimeDimensionTransformNode(
         parent_node=filtered_measure_node,
@@ -1308,6 +1367,196 @@ def test_measure_constraint_with_single_expr_and_alias(  # noqa: D
             metric_specs=(MetricSpec(element_name="double_counted_delayed_bookings"),),
             time_dimension_specs=(MTD_SPEC_DAY,),
         )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+def test_derived_metric(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
+    sql_client: SqlClient,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="non_referred_bookings_pct"),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+def test_nested_derived_metric(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
+    sql_client: SqlClient,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="instant_plus_non_referred_bookings_pct"),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+def test_join_to_scd_dimension(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    scd_dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
+    scd_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
+    sql_client: SqlClient,
+) -> None:
+    """Tests conversion of a plan using a dimension with a validity window inside a measure constraint"""
+    dataflow_plan = scd_dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="family_bookings"),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
+        ),
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=scd_dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+def test_multi_hop_through_scd_dimension(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    scd_dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
+    scd_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
+    sql_client: SqlClient,
+) -> None:
+    """Tests conversion of a plan using a dimension that is reached through an SCD table"""
+    dataflow_plan = scd_dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings"),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
+            dimension_specs=(DimensionSpec.from_name(name="listing__user__home_state_latest"),),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=scd_dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+def test_multi_hop_to_scd_dimension(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    scd_dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
+    scd_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
+    sql_client: SqlClient,
+) -> None:
+    """Tests conversion of a plan using an SCD dimension that is reached through another table"""
+    dataflow_plan = scd_dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings"),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
+            dimension_specs=(DimensionSpec.from_name(name="listing__lux_listing__is_confirmed_lux"),),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=scd_dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+def test_multiple_metrics_no_dimensions(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
+    sql_client: SqlClient,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings"), MetricSpec(element_name="listings")),
+            time_range_constraint=TimeRangeConstraint(
+                start_time=as_datetime("2020-01-01"), end_time=as_datetime("2020-01-01")
+            ),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+def test_metric_with_measures_from_multiple_sources_no_dimensions(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
+    sql_client: SqlClient,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings_per_listing"),),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+def test_common_data_source(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
+    sql_client: SqlClient,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings"), MetricSpec(element_name="booking_value")),
+            dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
+        ),
     )
 
     convert_and_check(

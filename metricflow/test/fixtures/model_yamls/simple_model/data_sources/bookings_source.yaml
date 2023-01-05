@@ -37,6 +37,14 @@ data_source:
     - name: referred_bookings
       expr: referrer_id
       agg: count
+    - name: median_booking_value
+      expr: booking_value
+      agg: median
+    - name: booking_value_p99
+      expr: booking_value
+      agg: percentile
+      agg_params:
+        percentile: 0.99
 
 
   dimensions:

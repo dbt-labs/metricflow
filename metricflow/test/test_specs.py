@@ -51,17 +51,17 @@ def test_merge_specs(dimension_spec: DimensionSpec, identifier_spec: IdentifierS
 
 
 def test_dimension_without_first_identifier_link(dimension_spec: DimensionSpec) -> None:  # noqa: D
-    assert dimension_spec.without_first_identifier_link() == DimensionSpec(
+    assert dimension_spec.without_first_identifier_link == DimensionSpec(
         element_name="platform", identifier_links=(IdentifierReference(element_name="device_id"),)
     )
 
 
 def test_dimension_without_identifier_links(dimension_spec: DimensionSpec) -> None:  # noqa: D
-    assert dimension_spec.without_identifier_links() == DimensionSpec(element_name="platform", identifier_links=())
+    assert dimension_spec.without_identifier_links == DimensionSpec(element_name="platform", identifier_links=())
 
 
 def test_time_dimension_without_first_identifier_link(time_dimension_spec: TimeDimensionSpec) -> None:  # noqa: D
-    assert time_dimension_spec.without_first_identifier_link() == TimeDimensionSpec(
+    assert time_dimension_spec.without_first_identifier_link == TimeDimensionSpec(
         element_name="signup_ts",
         identifier_links=(),
         time_granularity=TimeGranularity.DAY,
@@ -69,21 +69,22 @@ def test_time_dimension_without_first_identifier_link(time_dimension_spec: TimeD
 
 
 def test_time_dimension_without_identifier_links(time_dimension_spec: TimeDimensionSpec) -> None:  # noqa: D
-    assert time_dimension_spec.without_identifier_links() == LinklessIdentifierSpec(
+    assert time_dimension_spec.without_identifier_links == TimeDimensionSpec(
         element_name="signup_ts",
         identifier_links=(),
+        time_granularity=time_dimension_spec.time_granularity,
     )
 
 
 def test_identifier_without_first_identifier_link(identifier_spec: IdentifierSpec) -> None:  # noqa: D
-    assert identifier_spec.without_first_identifier_link() == IdentifierSpec(
+    assert identifier_spec.without_first_identifier_link == IdentifierSpec(
         element_name="user_id",
         identifier_links=(),
     )
 
 
 def test_identifier_without_identifier_links(identifier_spec: IdentifierSpec) -> None:  # noqa: D
-    assert identifier_spec.without_identifier_links() == IdentifierSpec(
+    assert identifier_spec.without_identifier_links == IdentifierSpec(
         element_name="user_id",
         identifier_links=(),
     )
@@ -106,7 +107,7 @@ def test_merge_spec_set() -> None:  # noqa: D
     spec_set1 = InstanceSpecSet(metric_specs=(MetricSpec(element_name="bookings"),))
     spec_set2 = InstanceSpecSet(dimension_specs=(DimensionSpec(element_name="is_instant", identifier_links=()),))
 
-    assert spec_set1.merge([spec_set2]) == InstanceSpecSet(
+    assert InstanceSpecSet.merge((spec_set1, spec_set2)) == InstanceSpecSet(
         metric_specs=(MetricSpec(element_name="bookings"),),
         dimension_specs=(DimensionSpec(element_name="is_instant", identifier_links=()),),
     )

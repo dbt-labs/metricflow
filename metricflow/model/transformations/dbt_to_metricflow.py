@@ -65,7 +65,9 @@ class DbtManifestTransformer:
         dimension should be primary for
         """
         if not self._time_dimension_stats:
-            self._time_dimension_stats = self.collect_time_dimension_stats(dbt_metrics=self.manifest.metrics.values())
+            self._time_dimension_stats = self.collect_time_dimension_stats(
+                dbt_metrics=list(self.manifest.metrics.values())
+            )
 
         return self._time_dimension_stats
 
@@ -73,7 +75,8 @@ class DbtManifestTransformer:
         """Returns a DbtModelNode based on the `DbtMetric.model`
 
         `DbtMetric.model` string values should either be a model name, or a
-        dbt [ref] (https://docs.getdbt.com/reference/dbt-jinja-functions/ref) object for a model. A dbt `ref` contains either one or two
+        dbt [ref] (https://docs.getdbt.com/reference/dbt-jinja-functions/ref)
+        object for a model. A dbt `ref` contains either one or two
         strings. If two strings are specified, the first is the target package
         and the second is the target model. If only one string is specified
         then it represents the target model.
@@ -108,7 +111,7 @@ class DbtManifestTransformer:
             node = self.manifest.resolve_ref(
                 target_model_name=target_model,
                 target_model_package=target_package,
-                current_project=self.manifest.metadata.project_id,
+                current_project=self.manifest.metadata.project_id or "",
                 node_package=dbt_metric.package_name,
             )
             assert isinstance(
@@ -339,7 +342,7 @@ class DbtManifestTransformer:
         # dimenson for the data source that is built for the `DbtMetric.model`
         time_stats_for_metric_models: Dict[str, Dict[str, int]] = {}
         for dbt_metric in dbt_metrics:
-            if dbt_metric.calculation_method != "derived":
+            if dbt_metric.calculation_method != "derived" and dbt_metric.model is not None:
                 if dbt_metric.timestamp not in time_dimensions:
                     time_dimensions[dbt_metric.timestamp] = []
 

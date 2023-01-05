@@ -9,39 +9,47 @@ from typing import Optional, List, Sequence
 
 import pandas as pd
 
-from metricflow.configuration.constants import CONFIG_DBT_REPO, CONFIG_DWH_SCHEMA
+from metricflow.configuration.constants import (
+    CONFIG_DBT_CLOUD_JOB_ID,
+    CONFIG_DBT_CLOUD_SERVICE_TOKEN,
+    CONFIG_DBT_PROFILE,
+    CONFIG_DBT_REPO,
+    CONFIG_DBT_TARGET,
+    CONFIG_DWH_SCHEMA,
+)
 from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import DataflowPlan
+from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import SourceScanOptimizer
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
+from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.engine.models import Dimension, Materialization, Metric
 from metricflow.engine.time_source import ServerTimeSource
-from metricflow.engine.utils import build_user_configured_model_from_config, build_user_configured_model_from_dbt_config
+from metricflow.engine.utils import build_user_configured_model_from_config, build_user_configured_model_from_dbt_cloud
+from metricflow.errors.errors import ExecutionException, MaterializationNotFoundError
 from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
 from metricflow.execution.execution_plan_to_text import execution_plan_to_text
 from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.model.semantic_model import SemanticModel
-from metricflow.model.semantics.linkable_spec_resolver import LinkableElementProperties
+from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.object_utils import pformat_big_objects, random_id
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_execution import DataflowToExecutionPlanConverter
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.time_spine import TimeSpineSource, TimeSpineTableBuilder
-from metricflow.protocols.sql_client import SqlClient
+from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.query.query_parser import MetricFlowQueryParser
-from metricflow.specs import ColumnAssociationResolver
-from metricflow.specs import MetricSpec, MetricFlowQuerySpec
+from metricflow.references import MetricReference
+from metricflow.specs import ColumnAssociationResolver, MetricFlowQuerySpec
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
-from metricflow.time.time_source import TimeSource
-from metricflow.dataset.data_source_adapter import DataSourceDataSet
-from metricflow.errors.errors import ExecutionException, MaterializationNotFoundError
-from metricflow.sql_clients.sql_utils import make_sql_client_from_config
 from metricflow.sql_clients.common_client import not_empty
+from metricflow.sql_clients.sql_utils import make_sql_client_from_config
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
+from metricflow.time.time_source import TimeSource
 
 logger = logging.getLogger(__name__)
 _telemetry_reporter = TelemetryReporter(report_levels_higher_or_equal_to=TelemetryLevel.USAGE)
@@ -275,8 +283,30 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
         # Ideally we should put this getting of of CONFIG_DBT_REPO in a helper
         dbt_repo = handler.get_value(CONFIG_DBT_REPO) or ""
+        dbt_cloud_job_id = handler.get_value(CONFIG_DBT_CLOUD_JOB_ID) or ""
         if dbt_repo.lower() in ["yes", "y", "true", "t", "1"]:
-            semantic_model = SemanticModel(build_user_configured_model_from_dbt_config(handler))
+            # This import results in eventually importing dbt, and dbt is an
+            # optional dep meaning it isn't guaranteed to be installed. If the
+            # import is at the top ofthe file MetricFlow will blow up if dbt
+            # isn't installed. Thus by importing it here, we only run into the
+            # exception if this conditional is hit without dbt installed
+            from metricflow.engine.utils import build_user_configured_model_from_dbt_config
+
+            dbt_profile = handler.get_value(CONFIG_DBT_PROFILE)
+            dbt_target = handler.get_value(CONFIG_DBT_TARGET)
+
+            semantic_model = SemanticModel(
+                build_user_configured_model_from_dbt_config(handler=handler, profile=dbt_profile, target=dbt_target)
+            )
+        elif dbt_cloud_job_id != "":
+            dbt_cloud_service_token = handler.get_value(CONFIG_DBT_CLOUD_SERVICE_TOKEN) or ""
+            assert dbt_cloud_service_token != "", "A dbt cloud service token is required for using MF with dbt cloud"
+
+            semantic_model = SemanticModel(
+                build_user_configured_model_from_dbt_cloud(
+                    job_id=dbt_cloud_job_id, service_token=dbt_cloud_service_token
+                )
+            )
         else:
             semantic_model = SemanticModel(build_user_configured_model_from_config(handler))
         system_schema = not_empty(handler.get_value(CONFIG_DWH_SCHEMA), CONFIG_DWH_SCHEMA, handler.url)
@@ -289,7 +319,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     def __init__(
         self,
         semantic_model: SemanticModel,
-        sql_client: SqlClient,
+        sql_client: AsyncSqlClient,
         system_schema: str,
         time_source: TimeSource = ServerTimeSource(),
         column_association_resolver: Optional[ColumnAssociationResolver] = None,
@@ -412,7 +442,9 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         )
         logger.info(f"Query spec is:\n{pformat_big_objects(query_spec)}")
 
-        if self._semantic_model.metric_semantics.contains_cumulative_metric(query_spec.metric_specs):
+        if self._semantic_model.metric_semantics.contains_cumulative_metric(
+            tuple(m.as_reference for m in query_spec.metric_specs)
+        ):
             self._time_spine_table_builder.create_if_necessary()
             time_constraint_updated = False
             if not mf_query_request.time_constraint_start:
@@ -445,7 +477,9 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         if mf_query_request.output_table is not None:
             output_table = SqlTable.from_string(mf_query_request.output_table)
 
-        dataflow_plan = self._dataflow_plan_builder.build_plan(query_spec, output_table)
+        dataflow_plan = self._dataflow_plan_builder.build_plan(
+            query_spec=query_spec, output_sql_table=output_table, optimizers=(SourceScanOptimizer[DataSourceDataSet](),)
+        )
 
         if len(dataflow_plan.sink_output_nodes) > 1:
             raise NotImplementedError(
@@ -470,7 +504,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         return [
             Dimension(name=dim.qualified_name)
             for dim in self._semantic_model.metric_semantics.element_specs_for_metrics(
-                metric_specs=[MetricSpec(element_name=mname) for mname in metric_names],
+                metric_references=[MetricReference(element_name=mname) for mname in metric_names],
                 without_any_property=frozenset(
                     {
                         LinkableElementProperties.IDENTIFIER,
@@ -492,8 +526,8 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def list_metrics(self) -> List[Metric]:  # noqa: D
-        metric_specs = self._semantic_model.metric_semantics.metric_names
-        metrics = self._semantic_model.metric_semantics.get_metrics(metric_specs)
+        metric_references = self._semantic_model.metric_semantics.metric_references
+        metrics = self._semantic_model.metric_semantics.get_metrics(metric_references)
         return [
             Metric(
                 name=metric.name,

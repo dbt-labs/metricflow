@@ -1,0 +1,140 @@
+---
+integration_test:
+  name: simple_scd_grouped_metric
+  description: Tests selecting a simple metric grouped by an SCD dimension
+  model: SCD_MODEL
+  metrics: ["bookings"]
+  group_bys: ["metric_time", "listing__capacity"]
+  check_query: |
+    SELECT
+      a.ds AS metric_time
+      , b.capacity AS listing__capacity
+      , SUM(1) AS bookings
+    FROM {{ source_schema }}.fct_bookings a
+    LEFT OUTER JOIN {{ source_schema }}.dim_listings b
+    ON a.listing_id = b.listing_id
+      AND a.ds >= b.active_from AND (a.ds < b.active_to OR b.active_to is NULL)
+    GROUP BY
+      listing__capacity, metric_time
+---
+integration_test:
+  name: basic_scd_constrained_metric
+  description: Tests selecting an SCD-constrained metric with a separate group by
+  model: SCD_MODEL
+  metrics: ["family_bookings"]
+  group_bys: ["metric_time", "is_instant"]
+  check_query: |
+    SELECT
+      a.ds AS metric_time
+      , a.is_instant
+      , SUM(1) AS family_bookings
+    FROM {{ source_schema }}.fct_bookings a
+    LEFT OUTER JOIN {{ source_schema }}.dim_listings b
+    ON a.listing_id = b.listing_id
+      AND a.ds >= b.active_from AND (a.ds < b.active_to OR b.active_to is NULL)
+    WHERE b.capacity >= 3
+    GROUP BY
+      is_instant
+      , metric_time
+---
+integration_test:
+  name: scd_constrained_metric_with_nulls
+  description: |
+    Tests selecting an SCD-constrained metric with a group by where the constraint allows
+    NULL values for the dimension. This means any missed rows in the join will be included
+    there. In this query, the group by includes the constraint dimension, so the nulls
+    are highlighted in the result output. However, if we did not group by the constraint dimension
+    the results would be silently incorrect, as the is_instant count would be off by one in the output.
+  model: SCD_MODEL
+  metrics: ["potentially_lux_bookings"]
+  group_bys: ["metric_time", "is_instant", "listing__is_lux"]
+  check_query: |
+    SELECT
+      a.ds AS metric_time
+      , a.is_instant
+      , b.is_lux AS listing__is_lux
+      , SUM(1) AS potentially_lux_bookings
+    FROM {{ source_schema }}.fct_bookings a
+    LEFT OUTER JOIN {{ source_schema }}.dim_listings b
+    ON a.listing_id = b.listing_id
+      AND a.ds >= b.active_from AND (a.ds < b.active_to OR b.active_to is NULL)
+    WHERE b.is_lux OR b.is_lux IS NULL
+    GROUP BY
+      is_instant
+      , metric_time
+      , listing__is_lux
+---
+integration_test:
+  name: scd_grouped_metric_with_second_dim
+  description: |
+    Tests selecting a metric grouped by a non-SCD dimension along with an SCD-dimension. This allows us to
+    test that the joins are rendered correctly across different data source types, and continue to produce
+    correct output.
+  model: SCD_MODEL
+  metrics: ["bookings"]
+  group_bys:
+    ["metric_time", "listing__is_lux", "listing__user__home_state_latest"]
+  check_query: |
+    SELECT
+      a.ds AS metric_time
+      , b.is_lux AS listing__is_lux
+      , c.home_state_latest AS listing__user__home_state_latest
+      , SUM(1) AS bookings
+    FROM {{ source_schema }}.fct_bookings a
+    LEFT OUTER JOIN {{ source_schema }}.dim_listings b
+    ON a.listing_id = b.listing_id
+        AND a.ds >= b.active_from AND (a.ds < b.active_to OR b.active_to is NULL)
+    LEFT OUTER JOIN {{ source_schema }}.dim_users_latest c
+    ON b.user_id = c.user_id
+    GROUP BY
+      metric_time
+      , listing__is_lux
+      , listing__user__home_state_latest
+---
+integration_test:
+  name: scd_multi_hop_groupby_through_scd
+  description: |
+    Tests selecting a metric grouped by a non-SCD dimension reached through an SCD data source. This allows us to
+    test that the joins are rendered correctly for this multi-hop case, and that the SCD is filtered down to an ID
+    mapping from the correct date.
+  model: SCD_MODEL
+  metrics: ["bookings"]
+  group_bys: ["metric_time", "listing__user__home_state_latest"]
+  check_query: |
+    SELECT
+      a.ds AS metric_time
+      , c.home_state_latest AS listing__user__home_state_latest
+      , SUM(1) AS bookings
+    FROM {{ source_schema }}.fct_bookings a
+    LEFT OUTER JOIN {{ source_schema }}.dim_listings b
+    ON a.listing_id = b.listing_id
+        AND a.ds >= b.active_from AND (a.ds < b.active_to OR b.active_to is NULL)
+    LEFT OUTER JOIN {{ source_schema }}.dim_users_latest c
+    ON b.user_id = c.user_id
+    GROUP BY
+      metric_time
+      , listing__user__home_state_latest
+---
+integration_test:
+  name: scd_multi_hop_groupby_to_scd
+  description: |
+    Tests selecting a metric grouped by an SCD dimension reached through a standard SCD data source. This allows us to
+    test that the joins are rendered correctly for this multi-hop case, and that the SCD is filtered down to an ID
+    mapping from the correct date.
+  model: SCD_MODEL
+  metrics: ["bookings"]
+  group_bys: ["metric_time", "listing__lux_listing__is_confirmed_lux"]
+  check_query: |
+    SELECT
+      a.ds AS metric_time
+      , c.is_confirmed_lux AS listing__lux_listing__is_confirmed_lux
+      , SUM(1) AS bookings
+    FROM {{ source_schema }}.fct_bookings a
+    LEFT OUTER JOIN {{ source_schema }}.dim_lux_listing_id_mapping b
+    ON a.listing_id = b.listing_id
+    LEFT OUTER JOIN {{ source_schema }}.dim_lux_listings c
+    ON b.lux_listing_id = c.lux_listing_id
+        AND a.ds >= c.valid_from AND (a.ds < c.valid_to OR c.valid_to is NULL)
+    GROUP BY
+      metric_time
+      , listing__lux_listing__is_confirmed_lux

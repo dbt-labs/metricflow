@@ -11,14 +11,22 @@ import pytest
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, BaseOutput
 from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
+from metricflow.model.model_validator import ModelValidator
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.parsing.dir_to_model import parse_directory_of_yaml_files_to_model
+from metricflow.model.parsing.dir_to_model import (
+    parse_directory_of_yaml_files_to_model,
+    parse_yaml_files_to_validation_ready_model,
+)
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.test.fixtures.id_fixtures import IdNumberSpace, patch_id_generators_helper
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
+from metricflow.model.objects.common import YamlConfigFile
+from metricflow.plan_conversion.time_spine import TimeSpineSource
+from metricflow.query.query_parser import MetricFlowQueryParser
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +50,24 @@ def _data_set_to_source_nodes(
     return source_node_builder.create_from_data_sets(list(data_sets.values()))
 
 
+def query_parser_from_yaml(
+    yaml_contents: List[YamlConfigFile], time_spine_source: TimeSpineSource
+) -> MetricFlowQueryParser:
+    """Given yaml files, return a query parser using default source nodes, resolvers and time spine source"""
+    semantic_model = SemanticModel(parse_yaml_files_to_validation_ready_model(yaml_contents).model)
+    ModelValidator().checked_validations(semantic_model.user_configured_model)
+    source_nodes = _data_set_to_source_nodes(semantic_model, create_data_sets(semantic_model))
+    return MetricFlowQueryParser(
+        model=semantic_model,
+        source_nodes=source_nodes,
+        node_output_resolver=DataflowPlanNodeOutputDataSetResolver(
+            column_association_resolver=DefaultColumnAssociationResolver(semantic_model),
+            semantic_model=semantic_model,
+            time_spine_source=time_spine_source,
+        ),
+    )
+
+
 @dataclass(frozen=True)
 class ConsistentIdObjectRepository:
     """Stores all objects that should have consistent IDs in tests."""
@@ -56,12 +82,17 @@ class ConsistentIdObjectRepository:
     composite_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]]
     composite_model_source_nodes: Sequence[BaseOutput[DataSourceDataSet]]
 
+    scd_model_data_sets: OrderedDict[str, DataSourceDataSet]
+    scd_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]]
+    scd_model_source_nodes: Sequence[BaseOutput[DataSourceDataSet]]
+
 
 @pytest.fixture(scope="session")
 def consistent_id_object_repository(
     simple_semantic_model: SemanticModel,
     multi_hop_join_semantic_model: SemanticModel,
     composite_identifier_semantic_model: SemanticModel,
+    scd_semantic_model: SemanticModel,
 ) -> ConsistentIdObjectRepository:  # noqa: D
     """Create objects that have incremental numeric IDs with a consistent value.
 
@@ -73,6 +104,7 @@ def consistent_id_object_repository(
         sm_data_sets = create_data_sets(simple_semantic_model)
         multihop_data_sets = create_data_sets(multi_hop_join_semantic_model)
         composite_data_sets = create_data_sets(composite_identifier_semantic_model)
+        scd_data_sets = create_data_sets(scd_semantic_model)
 
         return ConsistentIdObjectRepository(
             simple_model_data_sets=sm_data_sets,
@@ -83,6 +115,11 @@ def consistent_id_object_repository(
             composite_model_read_nodes=_data_set_to_read_nodes(composite_data_sets),
             composite_model_source_nodes=_data_set_to_source_nodes(
                 composite_identifier_semantic_model, composite_data_sets
+            ),
+            scd_model_data_sets=scd_data_sets,
+            scd_model_read_nodes=_data_set_to_read_nodes(scd_data_sets),
+            scd_model_source_nodes=_data_set_to_source_nodes(
+                semantic_model=scd_semantic_model, data_sets=scd_data_sets
             ),
         )
 
@@ -116,6 +153,7 @@ def template_mapping(mf_test_session_state: MetricFlowTestSessionState) -> Dict[
         "bookings_source_table": f"{schema}.fct_bookings",
         "views_source_table": f"{schema}.fct_views",
         "listings_latest_table": f"{schema}.dim_listings_latest",
+        "listings_table": f"{schema}.dim_listings",
         "listings_latest": f"{schema}.dim_listings_latest_table",
         "dim_listings_latest_table": f"{schema}.dim_listings_latest",
         "users_latest_table": f"{schema}.dim_users_latest",
@@ -123,12 +161,14 @@ def template_mapping(mf_test_session_state: MetricFlowTestSessionState) -> Dict[
         "fct_id_verifications_table": f"{schema}.fct_id_verifications",
         "fct_revenue_table": f"{schema}.fct_revenue",
         "dim_lux_listing_id_mapping_table": f"{schema}.dim_lux_listing_id_mapping",
+        "dim_lux_listings_table": f"{schema}.dim_lux_listings",
         "thorium_table": f"{schema}.thorium",
         "osmium_table": f"{schema}.osmium",
         "dysprosium_table": f"{schema}.dysprosium",
         "dim_companies_table": f"{schema}.dim_companies",
         "source_schema": schema,
         "accounts_source_table": f"{schema}.fct_accounts",
+        "primary_accounts_table": f"{schema}.dim_primary_accounts",
     }
 
 
@@ -235,6 +275,15 @@ def extended_date_semantic_model(mf_test_session_state: MetricFlowTestSessionSta
     model_build_result = parse_directory_of_yaml_files_to_model(
         os.path.join(os.path.dirname(__file__), "model_yamls/extended_date_model"),
         template_mapping=template_mapping,
+    )
+    return SemanticModel(model_build_result.model)
+
+
+@pytest.fixture(scope="session")
+def scd_semantic_model(template_mapping: Dict[str, str]) -> SemanticModel:
+    """Initialize semantic model for SCD tests"""
+    model_build_result = parse_directory_of_yaml_files_to_model(
+        os.path.join(os.path.dirname(__file__), "model_yamls/scd_model"), template_mapping=template_mapping
     )
     return SemanticModel(model_build_result.model)
 
