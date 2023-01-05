@@ -93,5 +93,5 @@ FROM (
     ) subq_1
   ) subq_2
   GROUP BY
-    subq_2.listing__country_latest
+    listing__country_latest
 ) subq_3

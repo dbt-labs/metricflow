@@ -142,7 +142,7 @@ FROM (
         ) subq_1
       ) subq_2
       GROUP BY
-        subq_2.metric_time
+        metric_time
     ) subq_3
   ) subq_4
   INNER JOIN (
@@ -279,7 +279,7 @@ FROM (
         ) subq_6
       ) subq_7
       GROUP BY
-        subq_7.metric_time
+        metric_time
     ) subq_8
   ) subq_9
   ON

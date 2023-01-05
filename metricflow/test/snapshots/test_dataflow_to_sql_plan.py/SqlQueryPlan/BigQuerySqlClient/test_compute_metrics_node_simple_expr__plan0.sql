@@ -128,6 +128,6 @@ FROM (
       subq_1.listing = subq_3.listing
   ) subq_4
   GROUP BY
-    subq_4.listing
-    , subq_4.listing__country_latest
+    listing
+    , listing__country_latest
 ) subq_5

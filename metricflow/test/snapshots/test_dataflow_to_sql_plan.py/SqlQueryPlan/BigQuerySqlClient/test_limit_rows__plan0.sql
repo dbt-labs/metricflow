@@ -136,7 +136,7 @@ FROM (
       ) subq_1
     ) subq_2
     GROUP BY
-      subq_2.ds
+      ds
   ) subq_3
 ) subq_4
 LIMIT 1

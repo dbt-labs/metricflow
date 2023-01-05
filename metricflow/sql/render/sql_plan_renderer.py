@@ -198,7 +198,7 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
         params = SqlBindParameters()
         first = True
         for group_by_column in group_by_columns:
-            group_by_expr_rendered = self.EXPR_RENDERER.render_sql_expr(group_by_column.expr)
+            group_by_expr_rendered = self.EXPR_RENDERER.render_group_by_expr(group_by_column)
             params = params.combine(group_by_expr_rendered.execution_parameters)
             if first:
                 first = False

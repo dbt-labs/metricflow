@@ -171,5 +171,5 @@ FROM (
     ) subq_7
   ) subq_8
   GROUP BY
-    subq_8.metric_time
+    metric_time
 ) subq_9

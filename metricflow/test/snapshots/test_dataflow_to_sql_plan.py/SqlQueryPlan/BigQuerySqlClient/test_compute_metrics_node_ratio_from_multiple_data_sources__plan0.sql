@@ -252,8 +252,8 @@ FROM (
         ) subq_6
       ) subq_7
       GROUP BY
-        subq_7.ds
-        , subq_7.listing__country_latest
+        ds
+        , listing__country_latest
     ) subq_8
     INNER JOIN (
       -- Aggregate Measures
@@ -442,8 +442,8 @@ FROM (
         ) subq_15
       ) subq_16
       GROUP BY
-        subq_16.ds
-        , subq_16.listing__country_latest
+        ds
+        , listing__country_latest
     ) subq_17
     ON
       (
