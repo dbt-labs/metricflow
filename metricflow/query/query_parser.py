@@ -205,6 +205,36 @@ class MetricFlowQueryParser:
                 context=suggestion_sections,
             )
 
+    def _construct_metric_specs_for_query(
+        self, metric_references: Tuple[MetricReference, ...]
+    ) -> Tuple[MetricSpec, ...]:
+        """Populate MetricSpecs
+
+        Construct MetricSpecs in the preaggregated state to pass into the DataflowPlanBuilder.
+
+        NOTE: Currently, we populate only the metrics provided in the query, but with derived metrics,
+        there are nested metrics that do not get populated here, but rather in the MetricSemantic during
+        the builder process. This is a process that should be refined altogther.
+        """
+        metric_specs = []
+        for metric_reference in metric_references:
+            metric = self._metric_semantics.get_metric(metric_reference)
+            metric_where_constraint: Optional[SpecWhereClauseConstraint] = None
+            if metric.constraint:
+                # add constraint to MetricSpec
+                metric_where_constraint = WhereConstraintConverter.convert_to_spec_where_constraint(
+                    self._data_source_semantics, metric.constraint
+                )
+            # TODO: Directly initializing Spec object instead of using a factory method since
+            #       importing WhereConstraintConverter is a problem in specs.py
+            metric_specs.append(
+                MetricSpec(
+                    element_name=metric_reference.element_name,
+                    constraint=metric_where_constraint,
+                )
+            )
+        return tuple(metric_specs)
+
     def _parse_and_validate_query(
         self,
         metric_names: Sequence[str],
@@ -230,7 +260,6 @@ class MetricFlowQueryParser:
         # Get metric references used for validations
         # In a case of derived metric, all the input metrics would be here.
         metric_references = self._parse_metric_names(metric_names)
-
         if time_constraint_start is None:
             time_constraint_start = TimeRangeConstraint.ALL_TIME_BEGIN()
         elif time_constraint_start < TimeRangeConstraint.ALL_TIME_BEGIN():
@@ -376,8 +405,11 @@ class MetricFlowQueryParser:
                 metric_references=metric_references, time_dimension_specs=where_time_specs
             )
 
+        base_metric_references = self._parse_metric_names(metric_names, traverse_metric_inputs=False)
+        metric_specs = self._construct_metric_specs_for_query(base_metric_references)
+
         return MetricFlowQuerySpec(
-            metric_specs=tuple(MetricSpec.from_element_name(metric_name) for metric_name in metric_names),
+            metric_specs=metric_specs,
             dimension_specs=requested_linkable_specs.dimension_specs,
             identifier_specs=requested_linkable_specs.identifier_specs,
             time_dimension_specs=time_dimension_specs,
@@ -485,7 +517,9 @@ class MetricFlowQueryParser:
         else:
             return None
 
-    def _parse_metric_names(self, metric_names: Sequence[str]) -> Tuple[MetricReference, ...]:
+    def _parse_metric_names(
+        self, metric_names: Sequence[str], traverse_metric_inputs: bool = True
+    ) -> Tuple[MetricReference, ...]:
         """Converts metric names into metric names. An exception is thrown if the name is invalid."""
 
         # The config must be lower-case, so we lower case for case-insensitivity against query inputs from the user.
@@ -508,12 +542,12 @@ class MetricFlowQueryParser:
                     f"Unknown metric: '{metric_name}'",
                     context=suggestions,
                 )
-            metric = self._metric_semantics.get_metric(metric_reference)
-            if metric.type == MetricType.DERIVED:
-                input_metrics = self._parse_metric_names([metric.name for metric in metric.input_metrics])
-                metric_references.extend(list(input_metrics))
-            else:
-                metric_references.append(metric_reference)
+            metric_references.append(metric_reference)
+            if traverse_metric_inputs:
+                metric = self._metric_semantics.get_metric(metric_reference)
+                if metric.type == MetricType.DERIVED:
+                    input_metrics = self._parse_metric_names([metric.name for metric in metric.input_metrics])
+                    metric_references.extend(list(input_metrics))
         return tuple(metric_references)
 
     def _parse_linkable_element_names(
