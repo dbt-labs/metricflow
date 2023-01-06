@@ -45,6 +45,25 @@ data_source:
       agg: percentile
       agg_params:
         percentile: 0.99
+    - name: discrete_booking_value_p99
+      expr: booking_value
+      agg: percentile
+      agg_params:
+        percentile: 0.99
+        use_discrete_percentile: true
+    - name: approximate_continuous_booking_value_p99
+      expr: booking_value
+      agg: percentile
+      agg_params:
+        percentile: 0.99
+        use_approximate_percentile: true
+    - name: approximate_discrete_booking_value_p99
+      expr: booking_value
+      agg: percentile
+      agg_params:
+        percentile: 0.99
+        use_discrete_percentile: true
+        use_approximate_percentile: true
 
 
   dimensions:

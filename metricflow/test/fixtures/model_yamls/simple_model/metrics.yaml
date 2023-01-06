@@ -587,3 +587,33 @@ metric:
   type_params:
     measures:
       - booking_value_p99
+---
+metric:
+  name: "discrete_booking_value_p99"
+  description: "discrete p99 booking value"
+  owners:
+    - support@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+      - discrete_booking_value_p99
+---
+metric:
+  name: "approximate_continuous_booking_value_p99"
+  description: "approximate continuous p99 booking value"
+  owners:
+    - support@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+      - approximate_continuous_booking_value_p99
+---
+metric:
+  name: "approximate_discrete_booking_value_p99"
+  description: "approximate discrete p99 booking value"
+  owners:
+    - support@transformdata.io
+  type: measure_proxy
+  type_params:
+    measures:
+      - approximate_discrete_booking_value_p99

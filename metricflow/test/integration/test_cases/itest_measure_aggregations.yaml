@@ -112,8 +112,8 @@ integration_test:
       ds
 ---
 integration_test:
-  name: percentile_agg
-  description: Tests PERCENTILE aggregation
+  name: continuous_percentile_agg
+  description: Tests continuous PERCENTILE aggregation
   model: SIMPLE_MODEL
   required_features: ["CONTINUOUS_PERCENTILE_AGGREGATION"]
   metrics: ["booking_value_p99"]
@@ -125,7 +125,51 @@ integration_test:
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds
-
+---
+integration_test:
+  name: discrete_percentile_agg
+  description: Tests discrete PERCENTILE aggregation
+  model: SIMPLE_MODEL
+  required_features: ["DISCRETE_PERCENTILE_AGGREGATION"]
+  metrics: ["discrete_booking_value_p99"]
+  group_bys: ["metric_time"]
+  check_query: |
+    SELECT
+      {{ render_percentile_expr("booking_value", 0.99, True, False) }} AS discrete_booking_value_p99
+      , ds AS metric_time
+    FROM {{ source_schema }}.fct_bookings
+    GROUP BY
+      ds
+---
+integration_test:
+  name: approximate_continuous_percentile_agg
+  description: Tests approximate continuous PERCENTILE aggregation
+  model: SIMPLE_MODEL
+  required_features: ["APPROXIMATE_CONTINUOUS_PERCENTILE_AGGREGATION"]
+  metrics: ["approximate_continuous_booking_value_p99"]
+  group_bys: ["metric_time"]
+  check_query: |
+    SELECT
+      {{ render_percentile_expr("booking_value", 0.99, False, True) }} AS approximate_continuous_booking_value_p99
+      , ds AS metric_time
+    FROM {{ source_schema }}.fct_bookings
+    GROUP BY
+      ds
+---
+integration_test:
+  name: approximate_discrete_percentile_agg
+  description: Tests approximate discrete PERCENTILE aggregation
+  model: SIMPLE_MODEL
+  required_features: ["APPROXIMATE_DISCRETE_PERCENTILE_AGGREGATION"]
+  metrics: ["approximate_discrete_booking_value_p99"]
+  group_bys: ["metric_time"]
+  check_query: |
+    SELECT
+      {{ render_percentile_expr("booking_value", 0.99, True, True) }} AS approximate_discrete_booking_value_p99
+      , ds AS metric_time
+    FROM {{ source_schema }}.fct_bookings
+    GROUP BY
+      ds
 ---
 integration_test:
   name: median_agg
