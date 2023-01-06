@@ -220,11 +220,11 @@
                                 <!-- node_id = ss_10010 -->
                                 <!-- col0 =                                                      -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10201),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10204),  -->
                                 <!--    'column_alias': 'txn_count'}                             -->
                                 <!-- col1 =                                                      -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10202),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10205),  -->
                                 <!--    'column_alias': 'ds_partitioned'}                        -->
                                 <!-- col2 =                                                -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
@@ -244,7 +244,7 @@
                                 <!--    'column_alias': 'ds_partitioned__year'}            -->
                                 <!-- col6 =                                                      -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10207),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10210),  -->
                                 <!--    'column_alias': 'ds'}                                    -->
                                 <!-- col7 =                                                -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
@@ -264,11 +264,11 @@
                                 <!--    'column_alias': 'ds__year'}                        -->
                                 <!-- col11 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10212),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10215),  -->
                                 <!--    'column_alias': 'account_month'}                         -->
                                 <!-- col12 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10213),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10216),  -->
                                 <!--    'column_alias': 'account_id__ds_partitioned'}            -->
                                 <!-- col13 =                                                 -->
                                 <!--   {'class': 'SqlSelectColumn',                          -->
@@ -288,7 +288,7 @@
                                 <!--    'column_alias': 'account_id__ds_partitioned__year'}  -->
                                 <!-- col17 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10218),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10221),  -->
                                 <!--    'column_alias': 'account_id__ds'}                        -->
                                 <!-- col18 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
@@ -308,11 +308,11 @@
                                 <!--    'column_alias': 'account_id__ds__year'}            -->
                                 <!-- col22 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10223),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10226),  -->
                                 <!--    'column_alias': 'account_id__account_month'}             -->
                                 <!-- col23 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10224),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10227),  -->
                                 <!--    'column_alias': 'account_id'}                            -->
                                 <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10006) -->
                                 <!-- where = None -->
@@ -447,11 +447,11 @@
                                 <!-- node_id = ss_10011 -->
                                 <!-- col0 =                                                      -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10225),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10228),  -->
                                 <!--    'column_alias': 'extra_dim'}                             -->
                                 <!-- col1 =                                                      -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10226),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10229),  -->
                                 <!--    'column_alias': 'ds_partitioned'}                        -->
                                 <!-- col2 =                                                -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
@@ -471,11 +471,11 @@
                                 <!--    'column_alias': 'ds_partitioned__year'}            -->
                                 <!-- col6 =                                                      -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10231),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10234),  -->
                                 <!--    'column_alias': 'account_id__extra_dim'}                 -->
                                 <!-- col7 =                                                      -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10232),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10235),  -->
                                 <!--    'column_alias': 'account_id__ds_partitioned'}            -->
                                 <!-- col8 =                                                  -->
                                 <!--   {'class': 'SqlSelectColumn',                          -->
@@ -495,15 +495,15 @@
                                 <!--    'column_alias': 'account_id__ds_partitioned__year'}  -->
                                 <!-- col12 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10237),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10240),  -->
                                 <!--    'column_alias': 'account_id'}                            -->
                                 <!-- col13 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10238),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10241),  -->
                                 <!--    'column_alias': 'customer_id'}                           -->
                                 <!-- col14 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10239),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10242),  -->
                                 <!--    'column_alias': 'account_id__customer_id'}               -->
                                 <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10007) -->
                                 <!-- where = None -->
@@ -599,15 +599,15 @@
                                     <!-- node_id = ss_10013 -->
                                     <!-- col0 =                                                      -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10247),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10250),  -->
                                     <!--    'column_alias': 'customer_name'}                         -->
                                     <!-- col1 =                                                      -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10248),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10251),  -->
                                     <!--    'column_alias': 'customer_atomic_weight'}                -->
                                     <!-- col2 =                                                      -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10249),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10252),  -->
                                     <!--    'column_alias': 'ds_partitioned'}                        -->
                                     <!-- col3 =                                                -->
                                     <!--   {'class': 'SqlSelectColumn',                        -->
@@ -627,15 +627,15 @@
                                     <!--    'column_alias': 'ds_partitioned__year'}            -->
                                     <!-- col7 =                                                      -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10254),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10257),  -->
                                     <!--    'column_alias': 'customer_id__customer_name'}            -->
                                     <!-- col8 =                                                      -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10255),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10258),  -->
                                     <!--    'column_alias': 'customer_id__customer_atomic_weight'}   -->
                                     <!-- col9 =                                                      -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10256),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10259),  -->
                                     <!--    'column_alias': 'customer_id__ds_partitioned'}           -->
                                     <!-- col10 =                                                  -->
                                     <!--   {'class': 'SqlSelectColumn',                           -->
@@ -655,7 +655,7 @@
                                     <!--    'column_alias': 'customer_id__ds_partitioned__year'}  -->
                                     <!-- col14 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10261),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10264),  -->
                                     <!--    'column_alias': 'customer_id'}                           -->
                                     <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10009) -->
                                     <!-- where = None -->

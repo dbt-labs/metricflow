@@ -96,6 +96,9 @@ FROM (
                 , subq_0.referred_bookings
                 , subq_0.median_booking_value
                 , subq_0.booking_value_p99
+                , subq_0.discrete_booking_value_p99
+                , subq_0.approximate_continuous_booking_value_p99
+                , subq_0.approximate_discrete_booking_value_p99
               FROM (
                 -- Read Elements From Data Source 'bookings_source'
                 SELECT
@@ -110,6 +113,9 @@ FROM (
                   , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
                   , bookings_source_src_10001.booking_value AS median_booking_value
                   , bookings_source_src_10001.booking_value AS booking_value_p99
+                  , bookings_source_src_10001.booking_value AS discrete_booking_value_p99
+                  , bookings_source_src_10001.booking_value AS approximate_continuous_booking_value_p99
+                  , bookings_source_src_10001.booking_value AS approximate_discrete_booking_value_p99
                   , bookings_source_src_10001.is_instant
                   , bookings_source_src_10001.ds
                   , DATE_TRUNC(bookings_source_src_10001.ds, isoweek) AS ds__week
@@ -230,6 +236,9 @@ FROM (
             , subq_6.referred_bookings
             , subq_6.median_booking_value
             , subq_6.booking_value_p99
+            , subq_6.discrete_booking_value_p99
+            , subq_6.approximate_continuous_booking_value_p99
+            , subq_6.approximate_discrete_booking_value_p99
           FROM (
             -- Read Elements From Data Source 'bookings_source'
             SELECT
@@ -244,6 +253,9 @@ FROM (
               , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
               , bookings_source_src_10001.booking_value AS median_booking_value
               , bookings_source_src_10001.booking_value AS booking_value_p99
+              , bookings_source_src_10001.booking_value AS discrete_booking_value_p99
+              , bookings_source_src_10001.booking_value AS approximate_continuous_booking_value_p99
+              , bookings_source_src_10001.booking_value AS approximate_discrete_booking_value_p99
               , bookings_source_src_10001.is_instant
               , bookings_source_src_10001.ds
               , DATE_TRUNC(bookings_source_src_10001.ds, isoweek) AS ds__week
