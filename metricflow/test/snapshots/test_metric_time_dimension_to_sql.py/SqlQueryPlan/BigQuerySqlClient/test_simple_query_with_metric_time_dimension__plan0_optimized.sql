@@ -1,7 +1,7 @@
 -- Combine Metrics
 SELECT
-  COALESCE(subq_18.metric_time, subq_19.metric_time) AS metric_time
-  , MAX(subq_18.bookings) AS bookings
+  COALESCE(subq_14.metric_time, subq_19.metric_time) AS metric_time
+  , MAX(subq_14.bookings) AS bookings
   , MAX(subq_19.booking_payments) AS booking_payments
 FROM (
   -- Aggregate Measures
@@ -24,7 +24,7 @@ FROM (
   ) subq_12
   GROUP BY
     metric_time
-) subq_18
+) subq_14
 FULL OUTER JOIN (
   -- Read Elements From Data Source 'bookings_source'
   -- Metric Time Dimension 'booking_paid_at'
@@ -43,6 +43,6 @@ FULL OUTER JOIN (
     metric_time
 ) subq_19
 ON
-  subq_18.metric_time = subq_19.metric_time
+  subq_14.metric_time = subq_19.metric_time
 GROUP BY
   metric_time

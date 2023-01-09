@@ -5,9 +5,9 @@ SELECT
 FROM (
   -- Combine Metrics
   SELECT
-    COALESCE(subq_19.metric_time, subq_20.metric_time, subq_21.metric_time) AS metric_time
-    , subq_19.non_referred AS non_referred
-    , subq_20.instant AS instant
+    COALESCE(subq_11.metric_time, subq_16.metric_time, subq_21.metric_time) AS metric_time
+    , subq_11.non_referred AS non_referred
+    , subq_16.instant AS instant
     , subq_21.bookings AS bookings
   FROM (
     -- Compute Metrics via Expressions
@@ -17,8 +17,8 @@ FROM (
     FROM (
       -- Combine Metrics
       SELECT
-        COALESCE(subq_8.metric_time, subq_9.metric_time) AS metric_time
-        , subq_8.ref_bookings AS ref_bookings
+        COALESCE(subq_4.metric_time, subq_9.metric_time) AS metric_time
+        , subq_4.ref_bookings AS ref_bookings
         , subq_9.bookings AS bookings
       FROM (
         -- Compute Metrics via Expressions
@@ -91,6 +91,8 @@ FROM (
                 , subq_0.bookers
                 , subq_0.average_booking_value
                 , subq_0.referred_bookings
+                , subq_0.median_booking_value
+                , subq_0.booking_value_p99
               FROM (
                 -- Read Elements From Data Source 'bookings_source'
                 SELECT
@@ -103,6 +105,8 @@ FROM (
                   , bookings_source_src_10001.booking_value AS average_booking_value
                   , bookings_source_src_10001.booking_value AS booking_payments
                   , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
+                  , bookings_source_src_10001.booking_value AS median_booking_value
+                  , bookings_source_src_10001.booking_value AS booking_value_p99
                   , bookings_source_src_10001.is_instant
                   , bookings_source_src_10001.ds
                   , DATE_TRUNC(bookings_source_src_10001.ds, isoweek) AS ds__week
@@ -150,80 +154,82 @@ FROM (
             ) subq_1
           ) subq_2
           GROUP BY
-            subq_2.metric_time
+            metric_time
         ) subq_3
-      ) subq_8
+      ) subq_4
       INNER JOIN (
         -- Compute Metrics via Expressions
         SELECT
-          subq_7.metric_time
-          , subq_7.bookings
+          subq_8.metric_time
+          , subq_8.bookings
         FROM (
           -- Aggregate Measures
           SELECT
-            subq_6.metric_time
-            , SUM(subq_6.bookings) AS bookings
+            subq_7.metric_time
+            , SUM(subq_7.bookings) AS bookings
           FROM (
             -- Pass Only Elements:
             --   ['bookings', 'metric_time']
             SELECT
-              subq_5.metric_time
-              , subq_5.bookings
+              subq_6.metric_time
+              , subq_6.bookings
             FROM (
               -- Metric Time Dimension 'ds'
               SELECT
-                subq_4.ds
-                , subq_4.ds__week
-                , subq_4.ds__month
-                , subq_4.ds__quarter
-                , subq_4.ds__year
-                , subq_4.ds_partitioned
-                , subq_4.ds_partitioned__week
-                , subq_4.ds_partitioned__month
-                , subq_4.ds_partitioned__quarter
-                , subq_4.ds_partitioned__year
-                , subq_4.booking_paid_at
-                , subq_4.booking_paid_at__week
-                , subq_4.booking_paid_at__month
-                , subq_4.booking_paid_at__quarter
-                , subq_4.booking_paid_at__year
-                , subq_4.create_a_cycle_in_the_join_graph__ds
-                , subq_4.create_a_cycle_in_the_join_graph__ds__week
-                , subq_4.create_a_cycle_in_the_join_graph__ds__month
-                , subq_4.create_a_cycle_in_the_join_graph__ds__quarter
-                , subq_4.create_a_cycle_in_the_join_graph__ds__year
-                , subq_4.create_a_cycle_in_the_join_graph__ds_partitioned
-                , subq_4.create_a_cycle_in_the_join_graph__ds_partitioned__week
-                , subq_4.create_a_cycle_in_the_join_graph__ds_partitioned__month
-                , subq_4.create_a_cycle_in_the_join_graph__ds_partitioned__quarter
-                , subq_4.create_a_cycle_in_the_join_graph__ds_partitioned__year
-                , subq_4.create_a_cycle_in_the_join_graph__booking_paid_at
-                , subq_4.create_a_cycle_in_the_join_graph__booking_paid_at__week
-                , subq_4.create_a_cycle_in_the_join_graph__booking_paid_at__month
-                , subq_4.create_a_cycle_in_the_join_graph__booking_paid_at__quarter
-                , subq_4.create_a_cycle_in_the_join_graph__booking_paid_at__year
-                , subq_4.ds AS metric_time
-                , subq_4.ds__week AS metric_time__week
-                , subq_4.ds__month AS metric_time__month
-                , subq_4.ds__quarter AS metric_time__quarter
-                , subq_4.ds__year AS metric_time__year
-                , subq_4.listing
-                , subq_4.guest
-                , subq_4.host
-                , subq_4.create_a_cycle_in_the_join_graph
-                , subq_4.create_a_cycle_in_the_join_graph__listing
-                , subq_4.create_a_cycle_in_the_join_graph__guest
-                , subq_4.create_a_cycle_in_the_join_graph__host
-                , subq_4.is_instant
-                , subq_4.create_a_cycle_in_the_join_graph__is_instant
-                , subq_4.bookings
-                , subq_4.instant_bookings
-                , subq_4.booking_value
-                , subq_4.max_booking_value
-                , subq_4.min_booking_value
-                , subq_4.bookers
-                , subq_4.average_booking_value
-                , subq_4.referred_bookings
+                subq_5.ds
+                , subq_5.ds__week
+                , subq_5.ds__month
+                , subq_5.ds__quarter
+                , subq_5.ds__year
+                , subq_5.ds_partitioned
+                , subq_5.ds_partitioned__week
+                , subq_5.ds_partitioned__month
+                , subq_5.ds_partitioned__quarter
+                , subq_5.ds_partitioned__year
+                , subq_5.booking_paid_at
+                , subq_5.booking_paid_at__week
+                , subq_5.booking_paid_at__month
+                , subq_5.booking_paid_at__quarter
+                , subq_5.booking_paid_at__year
+                , subq_5.create_a_cycle_in_the_join_graph__ds
+                , subq_5.create_a_cycle_in_the_join_graph__ds__week
+                , subq_5.create_a_cycle_in_the_join_graph__ds__month
+                , subq_5.create_a_cycle_in_the_join_graph__ds__quarter
+                , subq_5.create_a_cycle_in_the_join_graph__ds__year
+                , subq_5.create_a_cycle_in_the_join_graph__ds_partitioned
+                , subq_5.create_a_cycle_in_the_join_graph__ds_partitioned__week
+                , subq_5.create_a_cycle_in_the_join_graph__ds_partitioned__month
+                , subq_5.create_a_cycle_in_the_join_graph__ds_partitioned__quarter
+                , subq_5.create_a_cycle_in_the_join_graph__ds_partitioned__year
+                , subq_5.create_a_cycle_in_the_join_graph__booking_paid_at
+                , subq_5.create_a_cycle_in_the_join_graph__booking_paid_at__week
+                , subq_5.create_a_cycle_in_the_join_graph__booking_paid_at__month
+                , subq_5.create_a_cycle_in_the_join_graph__booking_paid_at__quarter
+                , subq_5.create_a_cycle_in_the_join_graph__booking_paid_at__year
+                , subq_5.ds AS metric_time
+                , subq_5.ds__week AS metric_time__week
+                , subq_5.ds__month AS metric_time__month
+                , subq_5.ds__quarter AS metric_time__quarter
+                , subq_5.ds__year AS metric_time__year
+                , subq_5.listing
+                , subq_5.guest
+                , subq_5.host
+                , subq_5.create_a_cycle_in_the_join_graph
+                , subq_5.create_a_cycle_in_the_join_graph__listing
+                , subq_5.create_a_cycle_in_the_join_graph__guest
+                , subq_5.create_a_cycle_in_the_join_graph__host
+                , subq_5.is_instant
+                , subq_5.create_a_cycle_in_the_join_graph__is_instant
+                , subq_5.bookings
+                , subq_5.instant_bookings
+                , subq_5.booking_value
+                , subq_5.max_booking_value
+                , subq_5.min_booking_value
+                , subq_5.bookers
+                , subq_5.average_booking_value
+                , subq_5.referred_bookings
+                , subq_5.median_booking_value
+                , subq_5.booking_value_p99
               FROM (
                 -- Read Elements From Data Source 'bookings_source'
                 SELECT
@@ -236,6 +242,8 @@ FROM (
                   , bookings_source_src_10001.booking_value AS average_booking_value
                   , bookings_source_src_10001.booking_value AS booking_payments
                   , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
+                  , bookings_source_src_10001.booking_value AS median_booking_value
+                  , bookings_source_src_10001.booking_value AS booking_value_p99
                   , bookings_source_src_10001.is_instant
                   , bookings_source_src_10001.ds
                   , DATE_TRUNC(bookings_source_src_10001.ds, isoweek) AS ds__week
@@ -279,88 +287,94 @@ FROM (
                   -- User Defined SQL Query
                   SELECT * FROM ***************************.fct_bookings
                 ) bookings_source_src_10001
-              ) subq_4
-            ) subq_5
-          ) subq_6
+              ) subq_5
+            ) subq_6
+          ) subq_7
           GROUP BY
-            subq_6.metric_time
-        ) subq_7
+            metric_time
+        ) subq_8
       ) subq_9
       ON
-        subq_8.metric_time = subq_9.metric_time
+        (
+          subq_4.metric_time = subq_9.metric_time
+        ) OR (
+          (subq_4.metric_time IS NULL) AND (subq_9.metric_time IS NULL)
+        )
     ) subq_10
-  ) subq_19
+  ) subq_11
   INNER JOIN (
     -- Compute Metrics via Expressions
     SELECT
-      subq_14.metric_time
-      , subq_14.instant_bookings AS instant
+      subq_15.metric_time
+      , subq_15.instant_bookings AS instant
     FROM (
       -- Aggregate Measures
       SELECT
-        subq_13.metric_time
-        , SUM(subq_13.instant_bookings) AS instant_bookings
+        subq_14.metric_time
+        , SUM(subq_14.instant_bookings) AS instant_bookings
       FROM (
         -- Pass Only Elements:
         --   ['instant_bookings', 'metric_time']
         SELECT
-          subq_12.metric_time
-          , subq_12.instant_bookings
+          subq_13.metric_time
+          , subq_13.instant_bookings
         FROM (
           -- Metric Time Dimension 'ds'
           SELECT
-            subq_11.ds
-            , subq_11.ds__week
-            , subq_11.ds__month
-            , subq_11.ds__quarter
-            , subq_11.ds__year
-            , subq_11.ds_partitioned
-            , subq_11.ds_partitioned__week
-            , subq_11.ds_partitioned__month
-            , subq_11.ds_partitioned__quarter
-            , subq_11.ds_partitioned__year
-            , subq_11.booking_paid_at
-            , subq_11.booking_paid_at__week
-            , subq_11.booking_paid_at__month
-            , subq_11.booking_paid_at__quarter
-            , subq_11.booking_paid_at__year
-            , subq_11.create_a_cycle_in_the_join_graph__ds
-            , subq_11.create_a_cycle_in_the_join_graph__ds__week
-            , subq_11.create_a_cycle_in_the_join_graph__ds__month
-            , subq_11.create_a_cycle_in_the_join_graph__ds__quarter
-            , subq_11.create_a_cycle_in_the_join_graph__ds__year
-            , subq_11.create_a_cycle_in_the_join_graph__ds_partitioned
-            , subq_11.create_a_cycle_in_the_join_graph__ds_partitioned__week
-            , subq_11.create_a_cycle_in_the_join_graph__ds_partitioned__month
-            , subq_11.create_a_cycle_in_the_join_graph__ds_partitioned__quarter
-            , subq_11.create_a_cycle_in_the_join_graph__ds_partitioned__year
-            , subq_11.create_a_cycle_in_the_join_graph__booking_paid_at
-            , subq_11.create_a_cycle_in_the_join_graph__booking_paid_at__week
-            , subq_11.create_a_cycle_in_the_join_graph__booking_paid_at__month
-            , subq_11.create_a_cycle_in_the_join_graph__booking_paid_at__quarter
-            , subq_11.create_a_cycle_in_the_join_graph__booking_paid_at__year
-            , subq_11.ds AS metric_time
-            , subq_11.ds__week AS metric_time__week
-            , subq_11.ds__month AS metric_time__month
-            , subq_11.ds__quarter AS metric_time__quarter
-            , subq_11.ds__year AS metric_time__year
-            , subq_11.listing
-            , subq_11.guest
-            , subq_11.host
-            , subq_11.create_a_cycle_in_the_join_graph
-            , subq_11.create_a_cycle_in_the_join_graph__listing
-            , subq_11.create_a_cycle_in_the_join_graph__guest
-            , subq_11.create_a_cycle_in_the_join_graph__host
-            , subq_11.is_instant
-            , subq_11.create_a_cycle_in_the_join_graph__is_instant
-            , subq_11.bookings
-            , subq_11.instant_bookings
-            , subq_11.booking_value
-            , subq_11.max_booking_value
-            , subq_11.min_booking_value
-            , subq_11.bookers
-            , subq_11.average_booking_value
-            , subq_11.referred_bookings
+            subq_12.ds
+            , subq_12.ds__week
+            , subq_12.ds__month
+            , subq_12.ds__quarter
+            , subq_12.ds__year
+            , subq_12.ds_partitioned
+            , subq_12.ds_partitioned__week
+            , subq_12.ds_partitioned__month
+            , subq_12.ds_partitioned__quarter
+            , subq_12.ds_partitioned__year
+            , subq_12.booking_paid_at
+            , subq_12.booking_paid_at__week
+            , subq_12.booking_paid_at__month
+            , subq_12.booking_paid_at__quarter
+            , subq_12.booking_paid_at__year
+            , subq_12.create_a_cycle_in_the_join_graph__ds
+            , subq_12.create_a_cycle_in_the_join_graph__ds__week
+            , subq_12.create_a_cycle_in_the_join_graph__ds__month
+            , subq_12.create_a_cycle_in_the_join_graph__ds__quarter
+            , subq_12.create_a_cycle_in_the_join_graph__ds__year
+            , subq_12.create_a_cycle_in_the_join_graph__ds_partitioned
+            , subq_12.create_a_cycle_in_the_join_graph__ds_partitioned__week
+            , subq_12.create_a_cycle_in_the_join_graph__ds_partitioned__month
+            , subq_12.create_a_cycle_in_the_join_graph__ds_partitioned__quarter
+            , subq_12.create_a_cycle_in_the_join_graph__ds_partitioned__year
+            , subq_12.create_a_cycle_in_the_join_graph__booking_paid_at
+            , subq_12.create_a_cycle_in_the_join_graph__booking_paid_at__week
+            , subq_12.create_a_cycle_in_the_join_graph__booking_paid_at__month
+            , subq_12.create_a_cycle_in_the_join_graph__booking_paid_at__quarter
+            , subq_12.create_a_cycle_in_the_join_graph__booking_paid_at__year
+            , subq_12.ds AS metric_time
+            , subq_12.ds__week AS metric_time__week
+            , subq_12.ds__month AS metric_time__month
+            , subq_12.ds__quarter AS metric_time__quarter
+            , subq_12.ds__year AS metric_time__year
+            , subq_12.listing
+            , subq_12.guest
+            , subq_12.host
+            , subq_12.create_a_cycle_in_the_join_graph
+            , subq_12.create_a_cycle_in_the_join_graph__listing
+            , subq_12.create_a_cycle_in_the_join_graph__guest
+            , subq_12.create_a_cycle_in_the_join_graph__host
+            , subq_12.is_instant
+            , subq_12.create_a_cycle_in_the_join_graph__is_instant
+            , subq_12.bookings
+            , subq_12.instant_bookings
+            , subq_12.booking_value
+            , subq_12.max_booking_value
+            , subq_12.min_booking_value
+            , subq_12.bookers
+            , subq_12.average_booking_value
+            , subq_12.referred_bookings
+            , subq_12.median_booking_value
+            , subq_12.booking_value_p99
           FROM (
             -- Read Elements From Data Source 'bookings_source'
             SELECT
@@ -373,6 +387,8 @@ FROM (
               , bookings_source_src_10001.booking_value AS average_booking_value
               , bookings_source_src_10001.booking_value AS booking_payments
               , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
+              , bookings_source_src_10001.booking_value AS median_booking_value
+              , bookings_source_src_10001.booking_value AS booking_value_p99
               , bookings_source_src_10001.is_instant
               , bookings_source_src_10001.ds
               , DATE_TRUNC(bookings_source_src_10001.ds, isoweek) AS ds__week
@@ -416,86 +432,92 @@ FROM (
               -- User Defined SQL Query
               SELECT * FROM ***************************.fct_bookings
             ) bookings_source_src_10001
-          ) subq_11
-        ) subq_12
-      ) subq_13
+          ) subq_12
+        ) subq_13
+      ) subq_14
       GROUP BY
-        subq_13.metric_time
-    ) subq_14
-  ) subq_20
+        metric_time
+    ) subq_15
+  ) subq_16
   ON
-    subq_19.metric_time = subq_20.metric_time
+    (
+      subq_11.metric_time = subq_16.metric_time
+    ) OR (
+      (subq_11.metric_time IS NULL) AND (subq_16.metric_time IS NULL)
+    )
   INNER JOIN (
     -- Compute Metrics via Expressions
     SELECT
-      subq_18.metric_time
-      , subq_18.bookings
+      subq_20.metric_time
+      , subq_20.bookings
     FROM (
       -- Aggregate Measures
       SELECT
-        subq_17.metric_time
-        , SUM(subq_17.bookings) AS bookings
+        subq_19.metric_time
+        , SUM(subq_19.bookings) AS bookings
       FROM (
         -- Pass Only Elements:
         --   ['bookings', 'metric_time']
         SELECT
-          subq_16.metric_time
-          , subq_16.bookings
+          subq_18.metric_time
+          , subq_18.bookings
         FROM (
           -- Metric Time Dimension 'ds'
           SELECT
-            subq_15.ds
-            , subq_15.ds__week
-            , subq_15.ds__month
-            , subq_15.ds__quarter
-            , subq_15.ds__year
-            , subq_15.ds_partitioned
-            , subq_15.ds_partitioned__week
-            , subq_15.ds_partitioned__month
-            , subq_15.ds_partitioned__quarter
-            , subq_15.ds_partitioned__year
-            , subq_15.booking_paid_at
-            , subq_15.booking_paid_at__week
-            , subq_15.booking_paid_at__month
-            , subq_15.booking_paid_at__quarter
-            , subq_15.booking_paid_at__year
-            , subq_15.create_a_cycle_in_the_join_graph__ds
-            , subq_15.create_a_cycle_in_the_join_graph__ds__week
-            , subq_15.create_a_cycle_in_the_join_graph__ds__month
-            , subq_15.create_a_cycle_in_the_join_graph__ds__quarter
-            , subq_15.create_a_cycle_in_the_join_graph__ds__year
-            , subq_15.create_a_cycle_in_the_join_graph__ds_partitioned
-            , subq_15.create_a_cycle_in_the_join_graph__ds_partitioned__week
-            , subq_15.create_a_cycle_in_the_join_graph__ds_partitioned__month
-            , subq_15.create_a_cycle_in_the_join_graph__ds_partitioned__quarter
-            , subq_15.create_a_cycle_in_the_join_graph__ds_partitioned__year
-            , subq_15.create_a_cycle_in_the_join_graph__booking_paid_at
-            , subq_15.create_a_cycle_in_the_join_graph__booking_paid_at__week
-            , subq_15.create_a_cycle_in_the_join_graph__booking_paid_at__month
-            , subq_15.create_a_cycle_in_the_join_graph__booking_paid_at__quarter
-            , subq_15.create_a_cycle_in_the_join_graph__booking_paid_at__year
-            , subq_15.ds AS metric_time
-            , subq_15.ds__week AS metric_time__week
-            , subq_15.ds__month AS metric_time__month
-            , subq_15.ds__quarter AS metric_time__quarter
-            , subq_15.ds__year AS metric_time__year
-            , subq_15.listing
-            , subq_15.guest
-            , subq_15.host
-            , subq_15.create_a_cycle_in_the_join_graph
-            , subq_15.create_a_cycle_in_the_join_graph__listing
-            , subq_15.create_a_cycle_in_the_join_graph__guest
-            , subq_15.create_a_cycle_in_the_join_graph__host
-            , subq_15.is_instant
-            , subq_15.create_a_cycle_in_the_join_graph__is_instant
-            , subq_15.bookings
-            , subq_15.instant_bookings
-            , subq_15.booking_value
-            , subq_15.max_booking_value
-            , subq_15.min_booking_value
-            , subq_15.bookers
-            , subq_15.average_booking_value
-            , subq_15.referred_bookings
+            subq_17.ds
+            , subq_17.ds__week
+            , subq_17.ds__month
+            , subq_17.ds__quarter
+            , subq_17.ds__year
+            , subq_17.ds_partitioned
+            , subq_17.ds_partitioned__week
+            , subq_17.ds_partitioned__month
+            , subq_17.ds_partitioned__quarter
+            , subq_17.ds_partitioned__year
+            , subq_17.booking_paid_at
+            , subq_17.booking_paid_at__week
+            , subq_17.booking_paid_at__month
+            , subq_17.booking_paid_at__quarter
+            , subq_17.booking_paid_at__year
+            , subq_17.create_a_cycle_in_the_join_graph__ds
+            , subq_17.create_a_cycle_in_the_join_graph__ds__week
+            , subq_17.create_a_cycle_in_the_join_graph__ds__month
+            , subq_17.create_a_cycle_in_the_join_graph__ds__quarter
+            , subq_17.create_a_cycle_in_the_join_graph__ds__year
+            , subq_17.create_a_cycle_in_the_join_graph__ds_partitioned
+            , subq_17.create_a_cycle_in_the_join_graph__ds_partitioned__week
+            , subq_17.create_a_cycle_in_the_join_graph__ds_partitioned__month
+            , subq_17.create_a_cycle_in_the_join_graph__ds_partitioned__quarter
+            , subq_17.create_a_cycle_in_the_join_graph__ds_partitioned__year
+            , subq_17.create_a_cycle_in_the_join_graph__booking_paid_at
+            , subq_17.create_a_cycle_in_the_join_graph__booking_paid_at__week
+            , subq_17.create_a_cycle_in_the_join_graph__booking_paid_at__month
+            , subq_17.create_a_cycle_in_the_join_graph__booking_paid_at__quarter
+            , subq_17.create_a_cycle_in_the_join_graph__booking_paid_at__year
+            , subq_17.ds AS metric_time
+            , subq_17.ds__week AS metric_time__week
+            , subq_17.ds__month AS metric_time__month
+            , subq_17.ds__quarter AS metric_time__quarter
+            , subq_17.ds__year AS metric_time__year
+            , subq_17.listing
+            , subq_17.guest
+            , subq_17.host
+            , subq_17.create_a_cycle_in_the_join_graph
+            , subq_17.create_a_cycle_in_the_join_graph__listing
+            , subq_17.create_a_cycle_in_the_join_graph__guest
+            , subq_17.create_a_cycle_in_the_join_graph__host
+            , subq_17.is_instant
+            , subq_17.create_a_cycle_in_the_join_graph__is_instant
+            , subq_17.bookings
+            , subq_17.instant_bookings
+            , subq_17.booking_value
+            , subq_17.max_booking_value
+            , subq_17.min_booking_value
+            , subq_17.bookers
+            , subq_17.average_booking_value
+            , subq_17.referred_bookings
+            , subq_17.median_booking_value
+            , subq_17.booking_value_p99
           FROM (
             -- Read Elements From Data Source 'bookings_source'
             SELECT
@@ -508,6 +530,8 @@ FROM (
               , bookings_source_src_10001.booking_value AS average_booking_value
               , bookings_source_src_10001.booking_value AS booking_payments
               , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
+              , bookings_source_src_10001.booking_value AS median_booking_value
+              , bookings_source_src_10001.booking_value AS booking_value_p99
               , bookings_source_src_10001.is_instant
               , bookings_source_src_10001.ds
               , DATE_TRUNC(bookings_source_src_10001.ds, isoweek) AS ds__week
@@ -551,13 +575,17 @@ FROM (
               -- User Defined SQL Query
               SELECT * FROM ***************************.fct_bookings
             ) bookings_source_src_10001
-          ) subq_15
-        ) subq_16
-      ) subq_17
+          ) subq_17
+        ) subq_18
+      ) subq_19
       GROUP BY
-        subq_17.metric_time
-    ) subq_18
+        metric_time
+    ) subq_20
   ) subq_21
   ON
-    COALESCE(subq_19.metric_time, subq_20.metric_time) = subq_21.metric_time
+    (
+      subq_11.metric_time = subq_21.metric_time
+    ) OR (
+      (subq_11.metric_time IS NULL) AND (subq_21.metric_time IS NULL)
+    )
 ) subq_22

@@ -103,7 +103,11 @@
         <SqlSelectStatementNode>
             <!-- description = Filter row on MIN(ds) -->
             <!-- node_id = ss_0 -->
-            <!-- col0 =                                                                       -->
+            <!-- col0 =                                                  -->
+            <!--   {'class': 'SqlSelectColumn',                          -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_1),  -->
+            <!--    'column_alias': 'ds__week'}                          -->
+            <!-- col1 =                                                                       -->
             <!--   {'class': 'SqlSelectColumn',                                               -->
             <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_0, sql_function=MIN),  -->
             <!--    'column_alias': 'ds__complete'}                                           -->

@@ -35,7 +35,7 @@ from metricflow.dataflow.builder.partitions import (
 )
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.dataset import DataSet
-from metricflow.model.objects.metric import CumulativeMetricWindow
+from metricflow.model.objects.metric import MetricTimeWindow
 from metricflow.object_utils import pformat_big_objects
 from metricflow.references import TimeDimensionReference
 from metricflow.specs import (
@@ -365,7 +365,7 @@ class JoinOverTimeRangeNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT])
     def __init__(
         self,
         parent_node: BaseOutput[SourceDataSetT],
-        window: Optional[CumulativeMetricWindow],
+        window: Optional[MetricTimeWindow],
         grain_to_date: Optional[TimeGranularity],
         node_id: Optional[NodeId] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
@@ -414,7 +414,7 @@ class JoinOverTimeRangeNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT])
         return self._parent_node
 
     @property
-    def window(self) -> Optional[CumulativeMetricWindow]:  # noqa: D
+    def window(self) -> Optional[MetricTimeWindow]:  # noqa: D
         return self._window
 
     @property

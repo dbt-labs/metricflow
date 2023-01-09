@@ -214,5 +214,5 @@ FROM (
     ) subq_8
   ) subq_9
   GROUP BY
-    subq_9.account_id__customer_id__customer_name
+    account_id__customer_id__customer_name
 ) subq_10

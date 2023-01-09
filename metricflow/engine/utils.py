@@ -80,6 +80,13 @@ def build_user_configured_model_from_dbt_config(
     return model_build_result_from_dbt_config(handler=handler, profile=profile, target=target).model
 
 
+def build_user_configured_model_from_dbt_cloud(job_id: str, service_token: str) -> UserConfiguredModel:
+    """Given dbt cloud params, create a UserConfiguredModel"""
+    from metricflow.model.parsing.dbt_cloud_to_model import model_build_result_for_dbt_cloud_job
+
+    return model_build_result_for_dbt_cloud_job(auth=service_token, job_id=job_id).model
+
+
 def convert_to_datetime(datetime_str: Optional[str]) -> Optional[dt.datetime]:
     """Callback to convert string to datetime given as an iso8601 timestamp."""
     if datetime_str is None:

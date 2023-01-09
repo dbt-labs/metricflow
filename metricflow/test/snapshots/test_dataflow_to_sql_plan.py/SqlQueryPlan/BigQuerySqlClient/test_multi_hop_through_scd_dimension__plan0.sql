@@ -247,6 +247,6 @@ FROM (
     ) subq_8
   ) subq_9
   GROUP BY
-    subq_9.metric_time
-    , subq_9.listing__user__home_state_latest
+    metric_time
+    , listing__user__home_state_latest
 ) subq_10

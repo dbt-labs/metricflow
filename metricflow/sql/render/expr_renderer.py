@@ -32,6 +32,7 @@ from metricflow.sql.sql_exprs import (
     SqlBetweenExpression,
     SqlWindowFunctionExpression,
 )
+from metricflow.sql.sql_plan import SqlSelectColumn
 from metricflow.time.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
@@ -51,6 +52,14 @@ class SqlExpressionRenderer(SqlExpressionNodeVisitor[SqlExpressionRenderResult],
     def render_sql_expr(self, sql_expr: SqlExpressionNode) -> SqlExpressionRenderResult:
         """Render the given expression to a string."""
         return sql_expr.accept(self)
+
+    def render_group_by_expr(self, group_by_column: SqlSelectColumn) -> SqlExpressionRenderResult:
+        """Render the input group by column to a string.
+
+        This allows for engine-level overrides of the group by rendering behavior, since some engines only support
+        rendering group by columns based on aliases.
+        """
+        return self.render_sql_expr(sql_expr=group_by_column.expr)
 
     @property
     def double_data_type(self) -> str:

@@ -2,7 +2,7 @@ import textwrap
 
 from metricflow.model.objects.common import YamlConfigFile
 from metricflow.model.objects.constraints.where import WhereClauseConstraint
-from metricflow.model.objects.metric import CumulativeMetricWindow, MetricInput, MetricInputMeasure, MetricType
+from metricflow.model.objects.metric import MetricTimeWindow, MetricInput, MetricInputMeasure, MetricType
 from metricflow.model.parsing.dir_to_model import parse_yaml_files_to_model
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
@@ -229,7 +229,7 @@ def test_cumulative_window_metric_parsing() -> None:
     assert metric.name == "cumulative_test"
     assert metric.type is MetricType.CUMULATIVE
     assert metric.type_params.measures == [MetricInputMeasure(name="cumulative_measure")]
-    assert metric.type_params.window == CumulativeMetricWindow(count=7, granularity=TimeGranularity.DAY)
+    assert metric.type_params.window == MetricTimeWindow(count=7, granularity=TimeGranularity.DAY)
 
 
 def test_grain_to_date_metric_parsing() -> None:

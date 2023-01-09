@@ -28,6 +28,8 @@ from metricflow.configuration.constants import (
     CONFIG_DWH_HTTP_PATH,
     CONFIG_DWH_ACCESS_TOKEN,
     CONFIG_DBT_REPO,
+    CONFIG_DBT_CLOUD_JOB_ID,
+    CONFIG_DBT_CLOUD_SERVICE_TOKEN,
 )
 from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.sql_clients.common_client import SqlDialect
@@ -46,6 +48,14 @@ MF_CONFIG_KEYS = (
     ConfigKey(
         key=CONFIG_DBT_REPO,
         comment=f"If set to `True`, MetricFlow will interpret the value of `{CONFIG_MODEL_PATH}` to point to dbt configs",
+    ),
+    ConfigKey(
+        key=CONFIG_DBT_CLOUD_JOB_ID,
+        comment="The ID of a dbt cloud job to build the model from",
+    ),
+    ConfigKey(
+        key=CONFIG_DBT_CLOUD_SERVICE_TOKEN,
+        comment="The dbt service token to access the metadata for the dbt cloud job. Needs a minimum of Metadata API access for the desired dbt job's project.",
     ),
 )
 # BigQuery config keys

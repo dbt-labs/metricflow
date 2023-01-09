@@ -73,7 +73,7 @@ class MetricInput(HashableBaseModel):
     alias: Optional[str]
 
 
-class CumulativeMetricWindow(PydanticCustomInputParser, HashableBaseModel):
+class MetricTimeWindow(PydanticCustomInputParser, HashableBaseModel):
     """Describes the window of time the metric should be accumulated over. ie '1 day', '2 weeks', etc"""
 
     count: int
@@ -83,21 +83,21 @@ class CumulativeMetricWindow(PydanticCustomInputParser, HashableBaseModel):
         return f"{self.count} {self.granularity.value}"
 
     @classmethod
-    def _from_yaml_value(cls, input: PydanticParseableValueType) -> CumulativeMetricWindow:
-        """Parses a CumulativeMetricWindow from a string input found in a user provided model specification
+    def _from_yaml_value(cls, input: PydanticParseableValueType) -> MetricTimeWindow:
+        """Parses a MetricTimeWindow from a string input found in a user provided model specification
 
-        The CumulativeMetricWindow is always expected to be provided as a string in user-defined YAML configs.
+        The MetricTimeWindow is always expected to be provided as a string in user-defined YAML configs.
         """
         if isinstance(input, str):
-            return CumulativeMetricWindow.parse(input)
+            return MetricTimeWindow.parse(input)
         else:
             raise ValueError(
-                f"CumulativeMetricWindow inputs from model configs are expected to always be of type string, but got "
+                f"MetricTimeWindow inputs from model configs are expected to always be of type string, but got "
                 f"type {type(input)} with value: {input}"
             )
 
     @staticmethod
-    def parse(window: str) -> CumulativeMetricWindow:
+    def parse(window: str) -> MetricTimeWindow:
         """Returns window values if parsing succeeds, None otherwise
 
         Output of the form: (<time unit count>, <time granularity>, <error message>) - error message is None if window is formatted properly
@@ -122,7 +122,7 @@ class CumulativeMetricWindow(PydanticCustomInputParser, HashableBaseModel):
         if not count.isdigit():
             raise ParsingException(f"Invalid count ({count}) in cumulative metric window string: ({window})")
 
-        return CumulativeMetricWindow(
+        return MetricTimeWindow(
             count=int(count),
             granularity=string_to_time_granularity(granularity),
         )
@@ -136,7 +136,7 @@ class MetricTypeParams(HashableBaseModel):
     numerator: Optional[MetricInputMeasure]
     denominator: Optional[MetricInputMeasure]
     expr: Optional[str]
-    window: Optional[CumulativeMetricWindow]
+    window: Optional[MetricTimeWindow]
     grain_to_date: Optional[TimeGranularity]
     metrics: Optional[List[MetricInput]]
 

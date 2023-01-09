@@ -110,3 +110,34 @@ integration_test:
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds
+---
+integration_test:
+  name: percentile_agg
+  description: Tests PERCENTILE aggregation
+  model: SIMPLE_MODEL
+  required_features: ["PERCENTILE_AGGREGATION"]
+  metrics: ["booking_value_p99"]
+  group_bys: ["metric_time"]
+  check_query: |
+    SELECT
+      {{ render_percentile_expr("booking_value", 0.99, False) }} AS booking_value_p99
+      , ds AS metric_time
+    FROM {{ source_schema }}.fct_bookings
+    GROUP BY
+      ds
+
+---
+integration_test:
+  name: median_agg
+  description: Tests MEDIAN aggregation
+  model: SIMPLE_MODEL
+  required_features: ["PERCENTILE_AGGREGATION"]
+  metrics: ["median_booking_value"]
+  group_bys: ["metric_time"]
+  check_query: |
+    SELECT
+      {{ render_percentile_expr("booking_value", 0.5, False) }} AS median_booking_value
+      , ds AS metric_time
+    FROM {{ source_schema }}.fct_bookings
+    GROUP BY
+      ds

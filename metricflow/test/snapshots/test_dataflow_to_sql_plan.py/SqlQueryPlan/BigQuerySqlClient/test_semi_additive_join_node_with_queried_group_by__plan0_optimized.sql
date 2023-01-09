@@ -32,13 +32,14 @@ INNER JOIN (
   -- Read Elements From Data Source 'accounts_source'
   -- Filter row on MIN(ds)
   SELECT
-    MIN(ds) AS ds__complete
+    DATE_TRUNC(ds, isoweek) AS ds__week
+    , MIN(ds) AS ds__complete
   FROM (
     -- User Defined SQL Query
     SELECT * FROM ***************************.fct_accounts
   ) accounts_source_src_10000
   GROUP BY
-    DATE_TRUNC(ds, isoweek)
+    ds__week
 ) subq_5
 ON
   subq_3.ds = subq_5.ds__complete
