@@ -65,16 +65,6 @@ class MetricInputMeasure(PydanticCustomInputParser, HashableBaseModel):
         return MeasureReference(element_name=self.alias or self.name)
 
 
-class MetricInput(HashableBaseModel):
-    """Provides a pointer to a metric along with the additional properties used on that metric."""
-
-    name: str
-    constraint: Optional[WhereClauseConstraint]
-    alias: Optional[str]
-    offset_window: Optional[MetricTimeWindow]
-    offset_to_grain: Optional[TimeGranularity]
-
-
 class MetricTimeWindow(PydanticCustomInputParser, HashableBaseModel):
     """Describes the window of time the metric should be accumulated over, e.g., '1 day', '2 weeks', etc"""
 
@@ -128,6 +118,16 @@ class MetricTimeWindow(PydanticCustomInputParser, HashableBaseModel):
             count=int(count),
             granularity=string_to_time_granularity(granularity),
         )
+
+
+class MetricInput(HashableBaseModel):
+    """Provides a pointer to a metric along with the additional properties used on that metric."""
+
+    name: str
+    constraint: Optional[WhereClauseConstraint]
+    alias: Optional[str]
+    offset_window: Optional[MetricTimeWindow]
+    offset_to_grain: Optional[TimeGranularity]
 
 
 class MetricTypeParams(HashableBaseModel):
