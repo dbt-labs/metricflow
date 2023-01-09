@@ -12,7 +12,7 @@ class DatabricksSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     """Expression renderer for the Databricks engine."""
 
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
-        """Render a percentile expression for Databricks. Add additional over() syntax for window."""
+        """Render a percentile expression for Databricks."""
         arg_rendered = self.render_sql_expr(node.order_by_arg)
         params = arg_rendered.execution_parameters
         percentile = node.percentile_args.percentile

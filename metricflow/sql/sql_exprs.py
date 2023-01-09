@@ -6,7 +6,7 @@ import itertools
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from typing import List, Generic, Sequence, Optional, Tuple, Dict
+from typing import List, Generic, Mapping, Sequence, Optional, Tuple, Dict
 
 from metricflow.aggregation_properties import AggregationType
 from metricflow.dag.mf_dag import DagNode, DisplayedProperty, NodeId
@@ -839,6 +839,10 @@ class SqlPercentileFunctionType(Enum):
     APPROXIMATE_CONTINUOUS = "approximate_continuous"
 
 
+UseDiscretePercentile = bool  # type aliases need to be declared at module level
+UseApproximatePercentile = bool
+
+
 @dataclass(frozen=True)
 class SqlPercentileExpressionArgument:
     """Dataclass for holding percentile arguments"""
@@ -851,7 +855,10 @@ class SqlPercentileExpressionArgument:
         """Given the measure parameters, returns a SqlPercentileExpressionArgument with the corresponding percentile args."""
         if not agg_params.percentile:
             raise RuntimeError("Percentile value is none - this should have been caught during model parsing.")
-        flags_to_function_type = {
+
+        flags_to_function_type: Mapping[
+            Tuple[UseDiscretePercentile, UseApproximatePercentile], SqlPercentileFunctionType
+        ] = {
             (False, False): SqlPercentileFunctionType.CONTINUOUS,
             (True, False): SqlPercentileFunctionType.DISCRETE,
             (False, True): SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS,
