@@ -23,7 +23,18 @@ mutability_type_values += [x.lower() for x in mutability_type_values]
 identifier_type_enum_values = ["PRIMARY", "UNIQUE", "FOREIGN", "NATURAL"]
 identifier_type_enum_values += [x.lower() for x in identifier_type_enum_values]
 
-aggregation_type_values = ["SUM", "MIN", "MAX", "AVERAGE", "COUNT_DISTINCT", "BOOLEAN", "SUM_BOOLEAN", "COUNT"]
+aggregation_type_values = [
+    "SUM",
+    "MIN",
+    "MAX",
+    "AVERAGE",
+    "COUNT_DISTINCT",
+    "BOOLEAN",
+    "SUM_BOOLEAN",
+    "COUNT",
+    "PERCENTILE",
+    "MEDIAN",
+]
 aggregation_type_values += [x.lower() for x in aggregation_type_values]
 
 window_aggregation_type_values = ["MIN", "MAX"]
@@ -92,7 +103,7 @@ metric_input_schema = {
         "constraint": {"type": "string"},
         "alias": {"type": "string"},
         "offset_window": {"type": "string"},
-        "offset_to_grain_to_date": {"type": "string"},
+        "offset_to_grain": {"type": "string"},
     },
     "additionalProperties": False,
 }
@@ -189,6 +200,16 @@ non_additive_dimension_schema = {
     "required": ["name"],
 }
 
+aggregation_type_params_schema = {
+    "$id": "aggregation_type_params_schema",
+    "type": "object",
+    "properties": {
+        "percentile": {"type": "number"},
+        "use_discrete_percentile": {"type": "boolean"},
+    },
+    "additionalProperties": False,
+}
+
 measure_schema = {
     "$id": "measure_schema",
     "type": "object",
@@ -203,6 +224,7 @@ measure_schema = {
             "pattern": TRANSFORM_OBJECT_NAME_PATTERN,
         },
         "expr": {"type": ["string", "integer", "boolean"]},
+        "agg_params": {"$ref": "aggregation_type_params_schema"},
         "create_metric": {"type": "boolean"},
         "create_metric_display_name": {"type": "string"},
         "non_additive_dimension": {
@@ -360,6 +382,7 @@ schema_store = {
     dimension_schema["$id"]: dimension_schema,
     validity_params_schema["$id"]: validity_params_schema,
     dimension_type_params_schema["$id"]: dimension_type_params_schema,
+    aggregation_type_params_schema["$id"]: aggregation_type_params_schema,
     mutability_schema["$id"]: mutability_schema,
     mutability_type_params_schema["$id"]: mutability_type_params_schema,
     composite_sub_identifier_schema["$id"]: composite_sub_identifier_schema,

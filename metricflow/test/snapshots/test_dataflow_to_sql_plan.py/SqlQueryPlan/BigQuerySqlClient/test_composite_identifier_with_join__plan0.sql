@@ -149,7 +149,7 @@ FROM (
     ) subq_5
   ) subq_6
   GROUP BY
-    subq_6.user_team___team_id
-    , subq_6.user_team___user_id
-    , subq_6.user_team__country
+    user_team___team_id
+    , user_team___user_id
+    , user_team__country
 ) subq_7

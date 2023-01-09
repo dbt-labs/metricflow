@@ -243,7 +243,7 @@ def test_derived_metric() -> None:  # noqa: D
                         expr="random_metric / random_metric3",
                         metrics=[
                             MetricInput(name="random_metric", offset_window="3 weeks"),
-                            MetricInput(name="random_metric", offset_to_grain_to_date="month", alias="random_metric3"),
+                            MetricInput(name="random_metric", offset_to_grain="month", alias="random_metric3"),
                         ],
                     ),
                 ),
@@ -252,9 +252,7 @@ def test_derived_metric() -> None:  # noqa: D
                     type=MetricType.DERIVED,
                     type_params=MetricTypeParams(
                         expr="random_metric * 2",
-                        metrics=[
-                            MetricInput(name="random_metric", offset_window="3 weeks", offset_to_grain_to_date="month")
-                        ],
+                        metrics=[MetricInput(name="random_metric", offset_window="3 weeks", offset_to_grain="month")],
                     ),
                 ),
             ],
@@ -265,7 +263,7 @@ def test_derived_metric() -> None:  # noqa: D
     assert len(build_issues) == 3
     expected_substr1 = "is already being used. Please choose another alias"
     expected_substr2 = "does not exist as a configured metric in the model"
-    expected_substr3 = "Both offset_window and offset_to_grain_to_date set"
+    expected_substr3 = "Both offset_window and offset_to_grain set"
     missing_error_strings = set()
     for expected_str in [expected_substr1, expected_substr2, expected_substr3]:
         if not any(actual_str.as_readable_str().find(expected_str) != -1 for actual_str in build_issues):

@@ -233,6 +233,6 @@ FROM (
     ) subq_8
   ) subq_9
   GROUP BY
-    subq_9.metric_time
-    , subq_9.listing__lux_listing__is_confirmed_lux
+    metric_time
+    , listing__lux_listing__is_confirmed_lux
 ) subq_10

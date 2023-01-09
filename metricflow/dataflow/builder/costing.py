@@ -164,4 +164,4 @@ class DefaultCostFunction(
         return DefaultCost.sum(parent_costs + [node_cost])
 
     def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode[SourceDataSetT]) -> DefaultCost:  # noqa: D
-        return DefaultCost.sum([x.accept(self) for x in node.parent_nodes])
+        return DefaultCost.sum([x.accept(self) for x in node.parent_nodes] + [DefaultCost(num_joins=1)])

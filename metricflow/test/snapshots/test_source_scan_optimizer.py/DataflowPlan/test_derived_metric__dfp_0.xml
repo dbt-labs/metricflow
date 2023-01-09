@@ -11,7 +11,7 @@
             <!--    'constraint': None,                           -->
             <!--    'alias': None,                                -->
             <!--    'offset_window': None,                        -->
-            <!--    'offset_to_grain_to_date': None}              -->
+            <!--    'offset_to_grain': None}                      -->
             <CombineMetricsNode>
                 <!-- description = Combine Metrics -->
                 <!-- node_id = cbm_0 -->
@@ -25,7 +25,7 @@
                     <!--    'constraint': None,                   -->
                     <!--    'alias': 'ref_bookings',              -->
                     <!--    'offset_window': None,                -->
-                    <!--    'offset_to_grain_to_date': None}      -->
+                    <!--    'offset_to_grain': None}              -->
                     <AggregateMeasuresNode>
                         <!-- description = Aggregate Measures -->
                         <!-- node_id = am_0 -->
@@ -61,13 +61,13 @@
                 <ComputeMetricsNode>
                     <!-- description = Compute Metrics via Expressions -->
                     <!-- node_id = cm_1 -->
-                    <!-- metric_spec =                        -->
-                    <!--   {'class': 'MetricSpec',            -->
-                    <!--    'element_name': 'bookings',       -->
-                    <!--    'constraint': None,               -->
-                    <!--    'alias': None,                    -->
-                    <!--    'offset_window': None,            -->
-                    <!--    'offset_to_grain_to_date': None}  -->
+                    <!-- metric_spec =                   -->
+                    <!--   {'class': 'MetricSpec',       -->
+                    <!--    'element_name': 'bookings',  -->
+                    <!--    'constraint': None,          -->
+                    <!--    'alias': None,               -->
+                    <!--    'offset_window': None,       -->
+                    <!--    'offset_to_grain': None}     -->
                     <AggregateMeasuresNode>
                         <!-- description = Aggregate Measures -->
                         <!-- node_id = am_1 -->

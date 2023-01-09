@@ -68,6 +68,6 @@ FROM (
     ) subq_1
   ) subq_2
   GROUP BY
-    subq_2.user_team___team_id
-    , subq_2.user_team___user_id
+    user_team___team_id
+    , user_team___user_id
 ) subq_3

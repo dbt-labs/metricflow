@@ -118,14 +118,14 @@ class DerivedMetricRule(ModelValidationRule):
         issues: List[ValidationIssueType] = []
 
         for input_metric in metric.input_metrics or []:
-            if input_metric.offset_window and input_metric.offset_to_grain_to_date:
+            if input_metric.offset_window and input_metric.offset_to_grain:
                 issues.append(
                     ValidationError(
                         context=MetricContext(
                             file_context=FileContext.from_metadata(metadata=metric.metadata),
                             metric=MetricModelReference(metric_name=metric.name),
                         ),
-                        message=f"Both offset_window and offset_to_grain_to_date set for derived metric on input metric '{input_metric.name}'. Please set one or the other.",
+                        message=f"Both offset_window and offset_to_grain set for derived metric on input metric '{input_metric.name}'. Please set one or the other.",
                     )
                 )
 

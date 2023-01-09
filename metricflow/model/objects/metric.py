@@ -72,7 +72,7 @@ class MetricInput(HashableBaseModel):
     constraint: Optional[WhereClauseConstraint]
     alias: Optional[str]
     offset_window: Optional[MetricTimeWindow]
-    offset_to_grain_to_date: Optional[TimeGranularity]
+    offset_to_grain: Optional[TimeGranularity]
 
 
 class MetricTimeWindow(PydanticCustomInputParser, HashableBaseModel):

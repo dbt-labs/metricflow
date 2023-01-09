@@ -147,7 +147,7 @@ class MetricSemantics:  # noqa: D
                 constraint=spec_constraint,
                 alias=input_metric.alias,
                 offset_window=input_metric.offset_window,
-                offset_to_grain_to_date=input_metric.offset_to_grain_to_date,
+                offset_to_grain=input_metric.offset_to_grain,
             )
             input_metric_specs.append(spec)
         return tuple(input_metric_specs)

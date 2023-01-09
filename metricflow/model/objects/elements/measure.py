@@ -20,6 +20,13 @@ class NonAdditiveDimensionParameters(HashableBaseModel):
     window_groupings: List[str] = []
 
 
+class MeasureAggregationParameters(HashableBaseModel):
+    """Describes parameters for aggregations"""
+
+    percentile: Optional[float] = None
+    use_discrete_percentile: bool = False
+
+
 class Measure(HashableBaseModel, ModelWithMetadataParsing):
     """Describes a measure"""
 
@@ -28,6 +35,7 @@ class Measure(HashableBaseModel, ModelWithMetadataParsing):
     description: Optional[str]
     create_metric: Optional[bool]
     expr: Optional[str] = None
+    agg_params: Optional[MeasureAggregationParameters]
     metadata: Optional[Metadata]
     non_additive_dimension: Optional[NonAdditiveDimensionParameters] = None
 

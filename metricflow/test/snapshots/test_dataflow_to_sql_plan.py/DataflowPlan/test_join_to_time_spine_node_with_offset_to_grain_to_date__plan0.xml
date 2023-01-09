@@ -7,7 +7,7 @@
             <!-- node_id = jts_0 -->
             <!-- time_range_constraint = [2020-01-01T00:00:00, 2021-01-01T00:00:00] -->
             <!-- offset_window = None -->
-            <!-- offset_to_grain_to_date = TimeGranularity.MONTH -->
+            <!-- offset_to_grain = TimeGranularity.MONTH -->
             <ComputeMetricsNode>
                 <!-- description = Compute Metrics via Expressions -->
                 <!-- node_id = cm_0 -->
@@ -17,7 +17,7 @@
                 <!--    'constraint': None,               -->
                 <!--    'alias': None,                    -->
                 <!--    'offset_window': None,            -->
-                <!--    'offset_to_grain_to_date': None}  -->
+                <!--    'offset_to_grain': None}  -->
                 <AggregateMeasuresNode>
                     <!-- description = Aggregate Measures -->
                     <!-- node_id = am_0 -->

@@ -1,5 +1,6 @@
 from _pytest.fixtures import FixtureRequest
 from typing import List
+import pytest
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_exprs import (
@@ -106,6 +107,8 @@ def test_percentile_expr(
     sql_client: SqlClient,
 ) -> None:
     """Tests rendering of the percentile expression in a query."""
+    if not sql_client.sql_engine_attributes.percentile_aggregation_supported:
+        pytest.skip("Warehouse does not support percentile expressions")
 
     select_columns = [
         SqlSelectColumn(

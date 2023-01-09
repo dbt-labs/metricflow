@@ -720,7 +720,7 @@ class JoinToTimeSpineNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT], A
         parent_node: BaseOutput[SourceDataSetT],
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         offset_window: Optional[MetricTimeWindow] = None,
-        offset_to_grain_to_date: Optional[TimeGranularity] = None,
+        offset_to_grain: Optional[TimeGranularity] = None,
     ) -> None:  # noqa: D
         """Constructor.
 
@@ -728,16 +728,16 @@ class JoinToTimeSpineNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT], A
             parent_node: Node that returns desired dataset to join to time spine.
             time_range_constraint: Time range to constrain the time spine to.
             offset_window: Time window to offset the parent dataset by when joining to time spine.
-            offset_to_grain_to_date: Granularity period to offset the parent dataset to when joining to time spine.
+            offset_to_grain: Granularity period to offset the parent dataset to when joining to time spine.
 
-        Passing both offset_window and offset_to_grain_to_date not allowed.
+        Passing both offset_window and offset_to_grain not allowed.
         """
         assert not (
-            offset_window and offset_to_grain_to_date
-        ), "Can't set both offset_window and offset_to_grain_to_date when joining to time spine. Choose one or the other."
+            offset_window and offset_to_grain
+        ), "Can't set both offset_window and offset_to_grain when joining to time spine. Choose one or the other."
         self._parent_node = parent_node
         self._offset_window = offset_window
-        self._offset_to_grain_to_date = offset_to_grain_to_date
+        self._offset_to_grain = offset_to_grain
         self._time_range_constraint = time_range_constraint
 
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[self._parent_node])
@@ -757,9 +757,9 @@ class JoinToTimeSpineNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT], A
         return self._offset_window
 
     @property
-    def offset_to_grain_to_date(self) -> Optional[TimeGranularity]:  # noqa: D
+    def offset_to_grain(self) -> Optional[TimeGranularity]:  # noqa: D
         """Time range constraint to apply when querying time spine table."""
-        return self._offset_to_grain_to_date
+        return self._offset_to_grain
 
     def accept(self, visitor: DataflowPlanNodeVisitor[SourceDataSetT, VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_join_to_time_spine_node(self)
@@ -773,7 +773,7 @@ class JoinToTimeSpineNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT], A
         return super().displayed_properties + [
             DisplayedProperty("time_range_constraint", self._time_range_constraint),
             DisplayedProperty("offset_window", self._offset_window),
-            DisplayedProperty("offset_to_grain_to_date", self._offset_to_grain_to_date),
+            DisplayedProperty("offset_to_grain", self._offset_to_grain),
         ]
 
     @property
@@ -785,7 +785,7 @@ class JoinToTimeSpineNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT], A
             isinstance(other_node, self.__class__)
             and other_node.time_range_constraint == self.time_range_constraint
             and other_node.offset_window == self.offset_window
-            and other_node.offset_to_grain_to_date == self.offset_to_grain_to_date
+            and other_node.offset_to_grain == self.offset_to_grain
         )
 
     def with_new_parents(  # noqa: D
@@ -797,7 +797,7 @@ class JoinToTimeSpineNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT], A
             parent_node=new_parent_nodes[0],
             time_range_constraint=self.time_range_constraint,
             offset_window=self._offset_window,
-            offset_to_grain_to_date=self._offset_to_grain_to_date,
+            offset_to_grain=self._offset_to_grain,
         )
 
 

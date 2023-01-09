@@ -292,19 +292,19 @@ def test_derived_metric_offset_window_parsing() -> None:
     assert metric.type_params.expr == "bookings / bookings_2_weeks_ago"
 
 
-def test_derive_metric_offset_to_grain_to_date_parsing() -> None:
+def test_derive_metric_offset_to_grain_parsing() -> None:
     """Test for parsing a derived metric with an offset to grain to date."""
     yaml_contents = textwrap.dedent(
         """\
         metric:
-          name: derived_offset_to_grain_to_date_test
+          name: derived_offset_to_grain_test
           type: derived
           type_params:
             expr: bookings / bookings_at_start_of_month
             metrics:
               - name: bookings
               - name: bookings
-                offset_to_grain_to_date: month
+                offset_to_grain: month
                 alias: bookings_at_start_of_month
         """
     )
@@ -315,12 +315,12 @@ def test_derive_metric_offset_to_grain_to_date_parsing() -> None:
     assert len(build_result.issues.all_issues) == 0
     assert len(build_result.model.metrics) == 1
     metric = build_result.model.metrics[0]
-    assert metric.name == "derived_offset_to_grain_to_date_test"
+    assert metric.name == "derived_offset_to_grain_test"
     assert metric.type is MetricType.DERIVED
     assert metric.type_params.metrics and len(metric.type_params.metrics) == 2
     metric1, metric2 = metric.type_params.metrics
-    assert metric1.offset_to_grain_to_date is None
-    assert metric2.offset_to_grain_to_date == TimeGranularity.MONTH
+    assert metric1.offset_to_grain is None
+    assert metric2.offset_to_grain == TimeGranularity.MONTH
     assert metric1.alias is None
     assert metric2.alias == "bookings_at_start_of_month"
     assert metric.type_params.expr == "bookings / bookings_at_start_of_month"

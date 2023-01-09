@@ -5,7 +5,7 @@ from metricflow.sql.render.expr_renderer import (
 )
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql.sql_exprs import SqlPercentileExpression, SqlGenerateUuidExpression
+from metricflow.sql.sql_exprs import SqlPercentileExpression, SqlGenerateUuidExpression, SqlPercentileFunctionType
 
 
 class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
@@ -21,11 +21,17 @@ class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         arg_rendered = self.render_sql_expr(node.order_by_arg)
         params = arg_rendered.execution_parameters
 
+        if node.percentile_args.function_type == SqlPercentileFunctionType.DISCRETE:
+            raise RuntimeError(
+                "Redshift SQL Engine does not yet support discrete percentile"
+                "aggregation functions. Please disable the use_discrete_percentile flag in all measures."
+            )
+
         function_str = node.percentile_args.function_name
         percentile = node.percentile_args.percentile
 
         return SqlExpressionRenderResult(
-            sql=f"{function_str}({percentile}) WITHIN GROUP (ORDER BY ({arg_rendered.sql})) OVER()",
+            sql=f"{function_str}({percentile}) WITHIN GROUP (ORDER BY ({arg_rendered.sql}))",
             execution_parameters=params,
         )
 
