@@ -90,9 +90,9 @@ from metricflow.sql.sql_exprs import (
     SqlTimeDeltaExpression,
     SqlStringLiteralExpression,
     SqlBetweenExpression,
-    SqlAggregateFunctionExpression,
     SqlComparisonExpression,
     SqlComparison,
+    SqlFunctionExpression,
 )
 from metricflow.sql.sql_plan import (
     SqlQueryPlan,
@@ -878,7 +878,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                     )
                 )
                 if aggregation_type:
-                    select_expression: SqlExpressionNode = SqlAggregateFunctionExpression.from_aggregation_type(
+                    select_expression: SqlExpressionNode = SqlFunctionExpression.build_expression_from_aggregation_type(
                         aggregation_type=aggregation_type, sql_column_expression=column_reference_expression
                     )
                 else:
@@ -1204,9 +1204,9 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             aggregation_state=AggregationState.COMPLETE,
         ).column_name
         time_dimension_select_column = SqlSelectColumn(
-            expr=SqlAggregateFunctionExpression.from_aggregation_type(
-                node.agg_by_function,
-                SqlColumnReferenceExpression(
+            expr=SqlFunctionExpression.build_expression_from_aggregation_type(
+                aggregation_type=node.agg_by_function,
+                sql_column_expression=SqlColumnReferenceExpression(
                     SqlColumnReference(
                         table_alias=inner_join_data_set_alias,
                         column_name=time_dimension_column_name,
@@ -1268,7 +1268,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         # Construct SelectNode for Row filtering
         row_filter_sql_select_node = SqlSelectStatementNode(
             description=f"Filter row on {node.agg_by_function.name}({time_dimension_column_name})",
-            select_columns=tuple(identifier_select_columns) + (time_dimension_select_column,),
+            select_columns=row_filter_group_bys + (time_dimension_select_column,),
             from_source=from_data_set.sql_select_node,
             from_source_alias=inner_join_data_set_alias,
             joins_descs=(),

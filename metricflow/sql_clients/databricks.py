@@ -55,6 +55,7 @@ class DatabricksEngineAttributes:
     timestamp_to_string_comparison_supported: ClassVar[bool] = True
     # So far the only clear way to cancel a query is through the Databricks UI.
     cancel_submitted_queries_supported: ClassVar[bool] = False
+    percentile_aggregation_supported: ClassVar[bool] = True
 
     # SQL Dialect replacement strings
     double_data_type_name: ClassVar[str] = "DOUBLE"

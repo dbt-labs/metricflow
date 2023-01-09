@@ -12,6 +12,7 @@ from metricflow.sql.sql_exprs import (
     SqlPercentileExpression,
     SqlTimeDeltaExpression,
 )
+from metricflow.sql.sql_plan import SqlSelectColumn
 from metricflow.time.time_granularity import TimeGranularity
 
 
@@ -23,18 +24,26 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
         """Custom double data type for BigQuery engine"""
         return "FLOAT64"
 
+    def render_group_by_expr(self, group_by_column: SqlSelectColumn) -> SqlExpressionRenderResult:
+        """Custom rendering of group by column expressions
+
+        BigQuery requires group bys to be referenced by alias, rather than duplicating the expression from the SELECT
+
+        e.g.,
+          SELECT COALESCE(x, y) AS x_or_y, SUM(1)
+          FROM source_table
+          GROUP BY x_or_y
+
+        By default we would render GROUP BY COALESCE(x, y) on that last line, and BigQuery will throw an exception
+        """
+        return SqlExpressionRenderResult(
+            sql=group_by_column.column_alias,
+            execution_parameters=group_by_column.expr.execution_parameters,
+        )
+
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
         """Render a percentile expression"""
-        arg_rendered = self.render_sql_expr(node.order_by_arg)
-        params = arg_rendered.execution_parameters
-
-        function_str = node.percentile_args.function_name
-        percentile = node.percentile_args.percentile
-
-        return SqlExpressionRenderResult(
-            sql=f"{function_str}({arg_rendered.sql}, {percentile}) OVER()",
-            execution_parameters=params,
-        )
+        raise RuntimeError("Percentile aggregations not yet supported for BigQuery.")
 
     def visit_cast_to_timestamp_expr(self, node: SqlCastToTimestampExpression) -> SqlExpressionRenderResult:
         """Casts the time value expression to DATETIME, as per standard BigQuery preferences."""

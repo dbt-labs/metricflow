@@ -74,6 +74,8 @@ FROM (
           , subq_0.bookers
           , subq_0.average_booking_value
           , subq_0.referred_bookings
+          , subq_0.median_booking_value
+          , subq_0.booking_value_p99
         FROM (
           -- Read Elements From Data Source 'bookings_source'
           SELECT
@@ -86,6 +88,8 @@ FROM (
             , bookings_source_src_10001.booking_value AS average_booking_value
             , bookings_source_src_10001.booking_value AS booking_payments
             , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
+            , bookings_source_src_10001.booking_value AS median_booking_value
+            , bookings_source_src_10001.booking_value AS booking_value_p99
             , bookings_source_src_10001.is_instant
             , bookings_source_src_10001.ds
             , DATE_TRUNC(bookings_source_src_10001.ds, isoweek) AS ds__week
@@ -133,7 +137,7 @@ FROM (
       ) subq_1
     ) subq_2
     GROUP BY
-      subq_2.metric_time
+      metric_time
   ) subq_3
 ) subq_4
 FULL OUTER JOIN (
@@ -212,6 +216,8 @@ FULL OUTER JOIN (
             , bookings_source_src_10001.booking_value AS average_booking_value
             , bookings_source_src_10001.booking_value AS booking_payments
             , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
+            , bookings_source_src_10001.booking_value AS median_booking_value
+            , bookings_source_src_10001.booking_value AS booking_value_p99
             , bookings_source_src_10001.is_instant
             , bookings_source_src_10001.ds
             , DATE_TRUNC(bookings_source_src_10001.ds, isoweek) AS ds__week
@@ -259,10 +265,10 @@ FULL OUTER JOIN (
       ) subq_6
     ) subq_7
     GROUP BY
-      subq_7.metric_time
+      metric_time
   ) subq_8
 ) subq_9
 ON
   subq_4.metric_time = subq_9.metric_time
 GROUP BY
-  COALESCE(subq_4.metric_time, subq_9.metric_time)
+  metric_time

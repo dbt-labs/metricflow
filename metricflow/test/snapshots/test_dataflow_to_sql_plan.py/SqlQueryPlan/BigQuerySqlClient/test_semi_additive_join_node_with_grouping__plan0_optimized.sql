@@ -39,7 +39,7 @@ INNER JOIN (
     SELECT * FROM ***************************.fct_accounts
   ) accounts_source_src_10000
   GROUP BY
-    user_id
+    user
 ) subq_5
 ON
   (subq_3.ds = subq_5.ds__complete) AND (subq_3.user = subq_5.user)

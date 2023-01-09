@@ -46,5 +46,5 @@ FROM (
     ) subq_1
   ) subq_3
   GROUP BY
-    subq_3.ds__month
+    ds__month
 ) subq_4

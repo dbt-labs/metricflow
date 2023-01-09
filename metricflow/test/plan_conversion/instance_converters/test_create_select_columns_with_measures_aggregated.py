@@ -10,6 +10,7 @@ from metricflow.specs import MeasureSpec, MetricInputMeasureSpec, InstanceSpecSe
 from metricflow.sql.sql_exprs import (
     SqlFunction,
     SqlAggregateFunctionExpression,
+    SqlPercentileExpression,
 )
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 
@@ -182,3 +183,25 @@ def test_aliased_sum(
     assert isinstance(expr, SqlAggregateFunctionExpression)
     assert expr.sql_function == SqlFunction.SUM
     assert measure_column.column_alias == "bvalue"
+
+
+def test_percentile_aggregation(
+    consistent_id_object_repository: ConsistentIdObjectRepository,
+    simple_semantic_model: SemanticModel,
+) -> None:
+    """Checks for function expression handling for booking_value, a percentile type metric in the simple model"""
+    measure_name = "booking_value_p99"
+    instance_set = __get_filtered_measure_instance_set("bookings_source", measure_name, consistent_id_object_repository)
+
+    select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
+        __SOURCE_TABLE_ALIAS,
+        DefaultColumnAssociationResolver(simple_semantic_model),
+        simple_semantic_model.data_source_semantics,
+        (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="booking_value_p99")),),
+    ).transform(instance_set=instance_set)
+
+    assert len(select_column_set.measure_columns) == 1
+    measure_column = select_column_set.measure_columns[0]
+    expr = measure_column.expr
+    assert isinstance(expr, SqlPercentileExpression)
+    assert expr.percentile_args.percentile == 0.99
