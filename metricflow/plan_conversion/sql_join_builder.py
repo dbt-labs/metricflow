@@ -60,7 +60,7 @@ class SqlQueryPlanJoinBuilder:
     """Helper class for constructing various join components in a SqlQueryPlan"""
 
     @staticmethod
-    def make_sql_join_description(
+    def make_column_equality_sql_join_description(
         right_source_node: SqlSelectStatementNode,
         left_source_alias: str,
         right_source_alias: str,
@@ -209,7 +209,7 @@ class SqlQueryPlanJoinBuilder:
             left_data_set=left_data_set, right_data_set=right_data_set, join_description=join_description
         )
 
-        return SqlQueryPlanJoinBuilder.make_sql_join_description(
+        return SqlQueryPlanJoinBuilder.make_column_equality_sql_join_description(
             right_source_node=right_data_set.data_set.sql_select_node,
             left_source_alias=left_data_set.alias,
             right_source_alias=right_data_set.alias,
@@ -356,7 +356,7 @@ class SqlQueryPlanJoinBuilder:
                 ColumnEqualityDescription(left_column_alias=name, right_column_alias=name, treat_nulls_as_equal=True)
                 for name in column_names
             ]
-            return SqlQueryPlanJoinBuilder.make_sql_join_description(
+            return SqlQueryPlanJoinBuilder.make_column_equality_sql_join_description(
                 right_source_node=join_data_set.data_set.sql_select_node,
                 left_source_alias=from_data_set.alias,
                 right_source_alias=join_data_set.alias,

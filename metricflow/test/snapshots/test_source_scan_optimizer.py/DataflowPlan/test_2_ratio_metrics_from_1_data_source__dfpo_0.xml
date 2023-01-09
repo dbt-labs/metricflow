@@ -9,12 +9,16 @@
             <!--   {'class': 'MetricSpec',                  -->
             <!--    'element_name': 'bookings_per_booker',  -->
             <!--    'constraint': None,                     -->
-            <!--    'alias': None}                          -->
+            <!--    'alias': None,                          -->
+            <!--    'offset_window': None,                  -->
+            <!--    'offset_to_grain': None}                -->
             <!-- metric_spec =                              -->
             <!--   {'class': 'MetricSpec',                  -->
             <!--    'element_name': 'bookings_per_dollar',  -->
             <!--    'constraint': None,                     -->
-            <!--    'alias': None}                          -->
+            <!--    'alias': None,                          -->
+            <!--    'offset_window': None,                  -->
+            <!--    'offset_to_grain': None}                -->
             <AggregateMeasuresNode>
                 <!-- description = Aggregate Measures -->
                 <!-- node_id = am_4 -->

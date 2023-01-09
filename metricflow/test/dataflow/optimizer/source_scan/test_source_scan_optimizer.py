@@ -26,6 +26,7 @@ from metricflow.dataflow.dataflow_plan import (
     ReadSqlSourceNode,
     DataflowPlanNode,
     DataflowPlan,
+    JoinToTimeSpineNode,
 )
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import SourceScanOptimizer
@@ -98,6 +99,9 @@ class ReadSqlSourceNodeCounter(Generic[SourceDataSetT], DataflowPlanNodeVisitor[
     def visit_metric_time_dimension_transform_node(  # noqa: D
         self, node: MetricTimeDimensionTransformNode[SourceDataSetT]
     ) -> int:
+        return self._sum_parents(node)
+
+    def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode[SourceDataSetT]) -> int:  # noqa: D
         return self._sum_parents(node)
 
     def count_source_nodes(self, dataflow_plan: DataflowPlan[SourceDataSetT]) -> int:  # noqa: D
