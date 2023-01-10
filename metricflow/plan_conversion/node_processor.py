@@ -12,8 +12,7 @@ from metricflow.dataflow.dataflow_plan import (
     FilterElementsNode,
     JoinDescription,
 )
-from metricflow.model.semantics.metric_semantics import MAX_JOIN_HOPS
-from metricflow.model.semantics.join_validator import DataSourceJoinValidator
+from metricflow.model.semantics.data_source_join_evaluator import DataSourceJoinEvaluator, MAX_JOIN_HOPS
 from metricflow.object_utils import pformat_big_objects
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.protocols.semantics import DataSourceSemanticsAccessor
@@ -85,7 +84,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
         self._node_data_set_resolver = node_data_set_resolver
         self._partition_resolver = PartitionJoinResolver(data_source_semantics)
         self._data_source_semantics = data_source_semantics
-        self._join_validator = DataSourceJoinValidator(data_source_semantics)
+        self._join_evaluator = DataSourceJoinEvaluator(data_source_semantics)
 
     def add_time_range_constraint(
         self,
@@ -216,7 +215,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                 # The first and second nodes are joined by this identifier
                 identifier_reference_to_join_first_and_second_nodes = desired_linkable_spec.identifier_links[1]
 
-                if not self._join_validator.is_valid_instance_set_join(
+                if not self._join_evaluator.is_valid_instance_set_join(
                     left_instance_set=data_set_of_first_node_that_could_be_joined.instance_set,
                     right_instance_set=data_set_of_second_node_that_can_be_joined.instance_set,
                     on_identifier_reference=identifier_reference_to_join_first_and_second_nodes,
