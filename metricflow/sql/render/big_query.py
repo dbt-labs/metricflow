@@ -1,4 +1,5 @@
 from fractions import Fraction
+
 from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
     SqlExpressionRenderer,
@@ -62,7 +63,8 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
                 execution_parameters=params,
             )
         raise RuntimeError(
-            "Only approximate continous percentile aggregations are supported for BigQuery. Set use_approximate_percentile and disable use_discrete_percentile in all measures"
+            "Only approximate continous percentile aggregations are supported for BigQuery. Set "
+            + "use_approximate_percentile and disable use_discrete_percentile in all percentile measures."
         )
 
     def visit_cast_to_timestamp_expr(self, node: SqlCastToTimestampExpression) -> SqlExpressionRenderResult:

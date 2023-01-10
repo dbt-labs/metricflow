@@ -18,7 +18,7 @@ class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         return "DOUBLE PRECISION"
 
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
-        """Render a percentile expression for Redshift. Add additional over() syntax for window."""
+        """Render a percentile expression for Redshift."""
         arg_rendered = self.render_sql_expr(node.order_by_arg)
         params = arg_rendered.execution_parameters
         percentile = node.percentile_args.percentile
@@ -27,11 +27,13 @@ class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
             function_str = "PERCENTILE_CONT"
         elif node.percentile_args.function_type is SqlPercentileFunctionType.DISCRETE:
             raise RuntimeError(
-                "Discrete percentile aggregate not supported for Redshift. Use continuous or approximate discrete percentile in all measures."
+                "Discrete percentile aggregate not supported for Redshift. Use "
+                + "continuous or approximate discrete percentile in all percentile measures."
             )
         elif node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS:
             raise RuntimeError(
-                "Approximate continuous percentile aggregate not supported for Redshift. Use continuous or approximate discrete percentile in all measures."
+                "Approximate continuous percentile aggregate not supported for Redshift. Use "
+                + "continuous or approximate discrete percentile in all percentile measures."
             )
         elif node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_DISCRETE:
             function_str = "APPROXIMATE PERCENTILE_DISC"

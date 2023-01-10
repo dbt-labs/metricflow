@@ -23,7 +23,8 @@ class DatabricksSqlExpressionRenderer(DefaultSqlExpressionRenderer):
             function_str = "PERCENTILE_DISC"
         elif node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS:
             raise RuntimeError(
-                "Approximate continuous percentile aggregate not supported for Snowflake. Set use_discrete_percentile to true and/or use_approximate_percentile to false in all measures."
+                "Approximate continuous percentile aggregate not supported for Databricks. Set "
+                + "use_discrete_percentile to true and/or use_approximate_percentile to false in all percentile measures."
             )
         elif node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_DISCRETE:
             return SqlExpressionRenderResult(

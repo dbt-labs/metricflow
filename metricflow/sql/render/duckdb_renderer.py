@@ -60,7 +60,8 @@ class DuckDbSqlExpressionRenderer(DefaultSqlExpressionRenderer):
             )
         elif node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_DISCRETE:
             raise RuntimeError(
-                "Approximate discrete percentile aggregate not supported for DuckDB. Set use_discrete_percentile and/or use_approximate_percentile to false in all measures."
+                "Approximate discrete percentile aggregatew not supported for DuckDB. Set "
+                + "use_discrete_percentile and/or use_approximate_percentile to false in all percentile measures."
             )
         else:
             assert_values_exhausted(node.percentile_args.function_type)

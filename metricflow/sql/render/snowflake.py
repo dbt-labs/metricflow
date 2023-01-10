@@ -19,7 +19,7 @@ class SnowflakeSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         )
 
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
-        """Render a percentile expression for Snowflake. Add additional over() syntax for window."""
+        """Render a percentile expression for Snowflake."""
         arg_rendered = self.render_sql_expr(node.order_by_arg)
         params = arg_rendered.execution_parameters
         percentile = node.percentile_args.percentile
@@ -35,7 +35,8 @@ class SnowflakeSqlExpressionRenderer(DefaultSqlExpressionRenderer):
             )
         elif node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_DISCRETE:
             raise RuntimeError(
-                "Approximate discrete percentile aggregate not supported for Snowflake. Set use_discrete_percentile and/or use_approximate_percentile to false in all measures."
+                "Approximate discrete percentile aggregate not supported for Snowflake. Set "
+                + "use_discrete_percentile and/or use_approximate_percentile to false in all percentile measures."
             )
         else:
             assert_values_exhausted(node.percentile_args.function_type)
