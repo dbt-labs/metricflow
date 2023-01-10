@@ -274,7 +274,7 @@ def test_foreign_target_instance_set_join_validation(
     )
 
 
-def test_get_joinable_data_sources(multi_hop_join_semantic_model: SemanticModel) -> None:  # noqa: D
+def test_get_joinable_data_sources_single_hop(multi_hop_join_semantic_model: SemanticModel) -> None:  # noqa: D
     data_source_reference = DataSourceReference(data_source_name="account_month_txns")
     join_evaluator = DataSourceJoinEvaluator(data_source_semantics=multi_hop_join_semantic_model.data_source_semantics)
 
@@ -293,6 +293,11 @@ def test_get_joinable_data_sources(multi_hop_join_semantic_model: SemanticModel)
             )
         ],
     )
+
+
+def test_get_joinable_data_sources_multi_hop(multi_hop_join_semantic_model: SemanticModel) -> None:  # noqa: D
+    data_source_reference = DataSourceReference(data_source_name="account_month_txns")
+    join_evaluator = DataSourceJoinEvaluator(data_source_semantics=multi_hop_join_semantic_model.data_source_semantics)
 
     # 2-hop
     joinable_data_sources = join_evaluator.get_joinable_data_sources(
