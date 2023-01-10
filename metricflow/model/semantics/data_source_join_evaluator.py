@@ -120,6 +120,7 @@ class DataSourceJoinEvaluator:
         known_data_source_joins: Dict[str, DataSourceLink],
         join_hops_remaining: int,
     ) -> None:
+        assert join_hops_remaining > 0, "No join hops remaining. This is unexpected with proper use of this method."
         for parent_data_source_reference, parent_join_path in parent_data_source_to_join_paths.items():
             parent_data_source = self._data_source_semantics.get_by_reference(
                 data_source_reference=parent_data_source_reference
