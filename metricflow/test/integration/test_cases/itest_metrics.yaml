@@ -671,3 +671,88 @@ integration_test:
       GROUP BY 2
     ) vw
     ON bk.is_lux = vw.is_lux OR (bk.is_lux IS NULL AND vw.is_lux IS NULL)
+---
+integration_test:
+  name: derived_metric_with_offset_window
+  description: Tests a derived metric query with an offset_window
+  model: SIMPLE_MODEL
+  metrics: ["bookings_growth_2_weeks"]
+  group_bys: ["metric_time"]
+  # this should be wrong & fail; correct later
+  check_query: |
+    SELECT
+      (bookings - ref_bookings) / CAST(bookings AS {{ double_data_type_name }}) AS non_referred_bookings_pct
+      , metric_time
+    FROM (
+      SELECT
+        SUM(CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END) AS ref_bookings
+        , SUM(1) AS bookings
+        , ds AS metric_time
+      FROM {{ source_schema }}.fct_bookings
+      GROUP BY
+        ds
+    ) a
+---
+integration_test:
+  name: derived_metric_with_offset_to_grain
+  description: Tests a derived metric query with an offset_to_grain
+  model: SIMPLE_MODEL
+  metrics: ["bookings_growth_since_start_of_month"]
+  group_bys: ["metric_time"]
+  # this should be wrong & fail; correct later
+  check_query: |
+    SELECT
+      (bookings - ref_bookings) / CAST(bookings AS {{ double_data_type_name }}) AS non_referred_bookings_pct
+      , metric_time
+    FROM (
+      SELECT
+        SUM(CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END) AS ref_bookings
+        , SUM(1) AS bookings
+        , ds AS metric_time
+      FROM {{ source_schema }}.fct_bookings
+      GROUP BY
+        ds
+    ) a
+---
+integration_test:
+  name: derived_metric_with_offset_window_and_offset_to_grain
+  description: Tests a derived metric query with 2 input metrics, one with an offset_window and one with an offset_to_grain
+  model: SIMPLE_MODEL
+  metrics: ["bookings_month_start_compared_to_1_month_prior"]
+  group_bys: ["metric_time"]
+  # this should be wrong & fail; correct later
+  check_query: |
+    SELECT
+      (bookings - ref_bookings) / CAST(bookings AS {{ double_data_type_name }}) AS non_referred_bookings_pct
+      , metric_time
+    FROM (
+      SELECT
+        SUM(CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END) AS ref_bookings
+        , SUM(1) AS bookings
+        , ds AS metric_time
+      FROM {{ source_schema }}.fct_bookings
+      GROUP BY
+        ds
+    ) a
+---
+integration_test:
+  name: derived_metric_offset_with_one_metric_input
+  description: Tests a derived metric offset query with only one input metric
+  model: SIMPLE_MODEL
+  metrics: ["bookings_5_day_lag"]
+  group_bys: ["metric_time"]
+  # this should be wrong & fail; correct later
+  check_query: |
+    SELECT
+      (bookings - ref_bookings) / CAST(bookings AS {{ double_data_type_name }}) AS non_referred_bookings_pct
+      , metric_time
+    FROM (
+      SELECT
+        SUM(CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END) AS ref_bookings
+        , SUM(1) AS bookings
+        , ds AS metric_time
+      FROM {{ source_schema }}.fct_bookings
+      GROUP BY
+        ds
+    ) a
+    
