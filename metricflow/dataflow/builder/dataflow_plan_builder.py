@@ -21,7 +21,6 @@ from metricflow.dataflow.dataflow_plan import (
     BaseOutput,
     CombineMetricsNode,
     ComputeMetricsNode,
-    ComputedMetricsOutput,
     ConstrainTimeRangeNode,
     DataflowPlan,
     FilterElementsNode,
@@ -35,13 +34,14 @@ from metricflow.dataflow.dataflow_plan import (
     WriteToResultTableNode,
     SemiAdditiveJoinNode,
     SinkOutput,
+    JoinToTimeSpineNode,
 )
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_dag_as_text
 from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOptimizer
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
-from metricflow.model.objects.metric import MetricType, CumulativeMetricWindow
+from metricflow.model.objects.metric import MetricType, MetricTimeWindow
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.spec_converters import WhereConstraintConverter
 from metricflow.object_utils import pformat_big_objects, assert_exactly_one_arg_set
@@ -171,7 +171,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         where_constraint: Optional[SpecWhereClauseConstraint] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         combine_metrics_join_type: SqlJoinType = SqlJoinType.FULL_OUTER,
-    ) -> ComputedMetricsOutput[SqlDataSetT]:
+    ) -> BaseOutput[SqlDataSetT]:
         """Builds a computed metrics output node.
 
         Args:
@@ -181,7 +181,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             time_range_constraint: Time range constraint used to compute the metric.
             combine_metrics_join_type: The join used when combining the computed metrics.
         """
-        compute_metrics_nodes: List[ComputedMetricsOutput[SqlDataSetT]] = []
+        output_nodes: List[BaseOutput[SqlDataSetT]] = []
         for metric_spec in metric_specs:
             logger.info(f"Generating compute metrics node for {metric_spec}")
             metric_reference = metric_spec.as_reference
@@ -195,19 +195,26 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                     f"{pformat_big_objects(metric_input_specs=metric_input_specs)}"
                 )
 
-                compute_metric_node = self._build_metrics_output_node(
-                    metric_specs=metric_input_specs,
-                    queried_linkable_specs=queried_linkable_specs,
-                    where_constraint=where_constraint,
-                    time_range_constraint=time_range_constraint,
-                    combine_metrics_join_type=SqlJoinType.INNER,
+                compute_metrics_node = ComputeMetricsNode[SqlDataSetT](
+                    parent_node=self._build_metrics_output_node(
+                        metric_specs=metric_input_specs,
+                        queried_linkable_specs=queried_linkable_specs,
+                        where_constraint=where_constraint,
+                        time_range_constraint=time_range_constraint,
+                        combine_metrics_join_type=SqlJoinType.INNER,
+                    ),
+                    metric_specs=[metric_spec],
                 )
-                compute_metrics_nodes.append(
-                    ComputeMetricsNode[SqlDataSetT](
-                        parent_node=compute_metric_node,
-                        metric_specs=[metric_spec],
+                if metric_spec.offset_window or metric_spec.offset_to_grain:
+                    join_to_time_spine_node = JoinToTimeSpineNode(
+                        parent_node=compute_metrics_node,
+                        time_range_constraint=time_range_constraint,
+                        offset_window=metric_spec.offset_window,
+                        offset_to_grain=metric_spec.offset_to_grain,
                     )
-                )
+                    output_nodes.append(join_to_time_spine_node)
+                else:
+                    output_nodes.append(compute_metrics_node)
             else:
                 metric_input_measure_specs = self._metric_semantics.measures_for_metric(metric_reference)
 
@@ -237,17 +244,17 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                         metric.type_params.grain_to_date if metric.type == MetricType.CUMULATIVE else None
                     ),
                 )
-                compute_metrics_nodes.append(
+                output_nodes.append(
                     self.build_computed_metrics_node(
                         metric_spec=metric_spec,
                         aggregated_measures_node=aggregated_measures_node,
                     )
                 )
-        if len(compute_metrics_nodes) == 1:
-            return compute_metrics_nodes[0]
+        if len(output_nodes) == 1:
+            return output_nodes[0]
 
         return CombineMetricsNode[SqlDataSetT](
-            parent_nodes=compute_metrics_nodes,
+            parent_nodes=output_nodes,
             join_type=combine_metrics_join_type,
         )
 
@@ -604,7 +611,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         where_constraint: Optional[SpecWhereClauseConstraint] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         cumulative: Optional[bool] = False,
-        cumulative_window: Optional[CumulativeMetricWindow] = None,
+        cumulative_window: Optional[MetricTimeWindow] = None,
         cumulative_grain_to_date: Optional[TimeGranularity] = None,
     ) -> BaseOutput[SqlDataSetT]:
         """Returns a node where the measures are aggregated by the linkable specs and constrained appropriately.
@@ -689,7 +696,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         where_constraint: Optional[SpecWhereClauseConstraint] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         cumulative: Optional[bool] = False,
-        cumulative_window: Optional[CumulativeMetricWindow] = None,
+        cumulative_window: Optional[MetricTimeWindow] = None,
         cumulative_grain_to_date: Optional[TimeGranularity] = None,
     ) -> BaseOutput[SqlDataSetT]:
         metric_time_dimension_requested = self._metric_time_dimension_reference.element_name in [

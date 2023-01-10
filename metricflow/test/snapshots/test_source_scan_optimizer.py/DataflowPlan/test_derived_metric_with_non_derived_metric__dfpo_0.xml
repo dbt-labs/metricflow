@@ -14,7 +14,9 @@
                 <!--   {'class': 'MetricSpec',            -->
                 <!--    'element_name': 'booking_value',  -->
                 <!--    'constraint': None,               -->
-                <!--    'alias': None}                    -->
+                <!--    'alias': None,                    -->
+                <!--    'offset_window': None,            -->
+                <!--    'offset_to_grain': None}          -->
                 <AggregateMeasuresNode>
                     <!-- description = Aggregate Measures -->
                     <!-- node_id = am_3 -->
@@ -54,7 +56,9 @@
                 <!--   {'class': 'MetricSpec',                        -->
                 <!--    'element_name': 'non_referred_bookings_pct',  -->
                 <!--    'constraint': None,                           -->
-                <!--    'alias': None}                                -->
+                <!--    'alias': None,                                -->
+                <!--    'offset_window': None,                        -->
+                <!--    'offset_to_grain': None}                      -->
                 <ComputeMetricsNode>
                     <!-- description = Compute Metrics via Expressions -->
                     <!-- node_id = cm_7 -->
@@ -62,12 +66,16 @@
                     <!--   {'class': 'MetricSpec',                -->
                     <!--    'element_name': 'referred_bookings',  -->
                     <!--    'constraint': None,                   -->
-                    <!--    'alias': 'ref_bookings'}              -->
+                    <!--    'alias': 'ref_bookings',              -->
+                    <!--    'offset_window': None,                -->
+                    <!--    'offset_to_grain': None}              -->
                     <!-- metric_spec =                   -->
                     <!--   {'class': 'MetricSpec',       -->
                     <!--    'element_name': 'bookings',  -->
                     <!--    'constraint': None,          -->
-                    <!--    'alias': None}               -->
+                    <!--    'alias': None,               -->
+                    <!--    'offset_window': None,       -->
+                    <!--    'offset_to_grain': None}     -->
                     <AggregateMeasuresNode>
                         <!-- description = Aggregate Measures -->
                         <!-- node_id = am_6 -->

@@ -21,7 +21,9 @@
             <!--    'metric_spec': {'class': 'MetricSpec',       -->
             <!--                    'element_name': 'bookings',  -->
             <!--                    'constraint': None,          -->
-            <!--                    'alias': None},              -->
+            <!--                    'alias': None,               -->
+            <!--                    'offset_window': None,       -->
+            <!--                    'offset_to_grain': None},    -->
             <!--    'dimension_spec': None,                      -->
             <!--    'time_dimension_spec': None,                 -->
             <!--    'identifier_spec': None}                     -->
@@ -33,7 +35,9 @@
                 <!--   {'class': 'MetricSpec',       -->
                 <!--    'element_name': 'bookings',  -->
                 <!--    'constraint': None,          -->
-                <!--    'alias': None}               -->
+                <!--    'alias': None,               -->
+                <!--    'offset_window': None,       -->
+                <!--    'offset_to_grain': None}     -->
                 <AggregateMeasuresNode>
                     <!-- description = Aggregate Measures -->
                     <!-- node_id = am_0 -->

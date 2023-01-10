@@ -9,7 +9,9 @@
             <!--   {'class': 'MetricSpec',                        -->
             <!--    'element_name': 'non_referred_bookings_pct',  -->
             <!--    'constraint': None,                           -->
-            <!--    'alias': None}                                -->
+            <!--    'alias': None,                                -->
+            <!--    'offset_window': None,                        -->
+            <!--    'offset_to_grain': None}                      -->
             <CombineMetricsNode>
                 <!-- description = Combine Metrics -->
                 <!-- node_id = cbm_0 -->
@@ -21,7 +23,9 @@
                     <!--   {'class': 'MetricSpec',                -->
                     <!--    'element_name': 'referred_bookings',  -->
                     <!--    'constraint': None,                   -->
-                    <!--    'alias': 'ref_bookings'}              -->
+                    <!--    'alias': 'ref_bookings',              -->
+                    <!--    'offset_window': None,                -->
+                    <!--    'offset_to_grain': None}              -->
                     <AggregateMeasuresNode>
                         <!-- description = Aggregate Measures -->
                         <!-- node_id = am_0 -->
@@ -61,7 +65,9 @@
                     <!--   {'class': 'MetricSpec',       -->
                     <!--    'element_name': 'bookings',  -->
                     <!--    'constraint': None,          -->
-                    <!--    'alias': None}               -->
+                    <!--    'alias': None,               -->
+                    <!--    'offset_window': None,       -->
+                    <!--    'offset_to_grain': None}     -->
                     <AggregateMeasuresNode>
                         <!-- description = Aggregate Measures -->
                         <!-- node_id = am_1 -->

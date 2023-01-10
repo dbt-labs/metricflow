@@ -21,7 +21,15 @@ install:
 # Testing and linting
 .PHONY: test
 test:
-	poetry run pytest metricflow/test/
+	poetry run pytest metricflow/test/ --ignore metricflow/test/model/dbt_cloud_parsing
+
+.PHONY: test-dbt
+test-dbt:
+	poetry run pytest metricflow/test/model/dbt_cloud_parsing
+
+.PHONY: test-all
+test-all:
+	poetry run pytest metricflow/test
 
 .PHONY: test-postgresql
 test-postgresql:

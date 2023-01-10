@@ -27,6 +27,7 @@ from metricflow.dag.id_generation import (
     DATAFLOW_NODE_COMBINE_METRICS_ID_PREFIX,
     DATAFLOW_NODE_CONSTRAIN_TIME_RANGE_ID_PREFIX,
     DATAFLOW_NODE_SET_MEASURE_AGGREGATION_TIME,
+    DATAFLOW_NODE_JOIN_TO_TIME_SPINE_ID_PREFIX,
 )
 from metricflow.dag.mf_dag import DagNode, DisplayedProperty, MetricFlowDag, NodeId
 from metricflow.dataflow.builder.partitions import (
@@ -35,7 +36,7 @@ from metricflow.dataflow.builder.partitions import (
 )
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.dataset import DataSet
-from metricflow.model.objects.metric import CumulativeMetricWindow
+from metricflow.model.objects.metric import MetricTimeWindow
 from metricflow.object_utils import pformat_big_objects
 from metricflow.references import TimeDimensionReference
 from metricflow.specs import (
@@ -183,6 +184,10 @@ class DataflowPlanNodeVisitor(Generic[SourceDataSetT, VisitorOutputT], ABC):
     def visit_metric_time_dimension_transform_node(  # noqa: D
         self, node: MetricTimeDimensionTransformNode[SourceDataSetT]
     ) -> VisitorOutputT:
+        pass
+
+    @abstractmethod
+    def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode[SourceDataSetT]) -> VisitorOutputT:  # noqa: D
         pass
 
 
@@ -365,7 +370,7 @@ class JoinOverTimeRangeNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT])
     def __init__(
         self,
         parent_node: BaseOutput[SourceDataSetT],
-        window: Optional[CumulativeMetricWindow],
+        window: Optional[MetricTimeWindow],
         grain_to_date: Optional[TimeGranularity],
         node_id: Optional[NodeId] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
@@ -414,7 +419,7 @@ class JoinOverTimeRangeNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT])
         return self._parent_node
 
     @property
-    def window(self) -> Optional[CumulativeMetricWindow]:  # noqa: D
+    def window(self) -> Optional[MetricTimeWindow]:  # noqa: D
         return self._window
 
     @property
@@ -705,6 +710,95 @@ class ComputedMetricsOutput(Generic[SourceDataSetT], BaseOutput[SourceDataSetT],
     """A node that outputs data that contains metrics computed from measures."""
 
     pass
+
+
+class JoinToTimeSpineNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT], ABC):
+    """Join parent dataset to time spine dataset."""
+
+    def __init__(
+        self,
+        parent_node: BaseOutput[SourceDataSetT],
+        time_range_constraint: Optional[TimeRangeConstraint] = None,
+        offset_window: Optional[MetricTimeWindow] = None,
+        offset_to_grain: Optional[TimeGranularity] = None,
+    ) -> None:  # noqa: D
+        """Constructor.
+
+        Args:
+            parent_node: Node that returns desired dataset to join to time spine.
+            time_range_constraint: Time range to constrain the time spine to.
+            offset_window: Time window to offset the parent dataset by when joining to time spine.
+            offset_to_grain: Granularity period to offset the parent dataset to when joining to time spine.
+
+        Passing both offset_window and offset_to_grain not allowed.
+        """
+        assert not (
+            offset_window and offset_to_grain
+        ), "Can't set both offset_window and offset_to_grain when joining to time spine. Choose one or the other."
+        self._parent_node = parent_node
+        self._offset_window = offset_window
+        self._offset_to_grain = offset_to_grain
+        self._time_range_constraint = time_range_constraint
+
+        super().__init__(node_id=self.create_unique_id(), parent_nodes=[self._parent_node])
+
+    @classmethod
+    def id_prefix(cls) -> str:  # noqa: D
+        return DATAFLOW_NODE_JOIN_TO_TIME_SPINE_ID_PREFIX
+
+    @property
+    def time_range_constraint(self) -> Optional[TimeRangeConstraint]:  # noqa: D
+        """Time range constraint to apply when querying time spine table."""
+        return self._time_range_constraint
+
+    @property
+    def offset_window(self) -> Optional[MetricTimeWindow]:  # noqa: D
+        """Time range constraint to apply when querying time spine table."""
+        return self._offset_window
+
+    @property
+    def offset_to_grain(self) -> Optional[TimeGranularity]:  # noqa: D
+        """Time range constraint to apply when querying time spine table."""
+        return self._offset_to_grain
+
+    def accept(self, visitor: DataflowPlanNodeVisitor[SourceDataSetT, VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+        return visitor.visit_join_to_time_spine_node(self)
+
+    @property
+    def description(self) -> str:  # noqa: D
+        return """Join to Time Spine Dataset"""
+
+    @property
+    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
+        return super().displayed_properties + [
+            DisplayedProperty("time_range_constraint", self._time_range_constraint),
+            DisplayedProperty("offset_window", self._offset_window),
+            DisplayedProperty("offset_to_grain", self._offset_to_grain),
+        ]
+
+    @property
+    def parent_node(self) -> BaseOutput:  # noqa: D
+        return self._parent_node
+
+    def functionally_identical(self, other_node: DataflowPlanNode[SourceDataSetT]) -> bool:  # noqa: D
+        return (
+            isinstance(other_node, self.__class__)
+            and other_node.time_range_constraint == self.time_range_constraint
+            and other_node.offset_window == self.offset_window
+            and other_node.offset_to_grain == self.offset_to_grain
+        )
+
+    def with_new_parents(  # noqa: D
+        self, new_parent_nodes: Sequence[BaseOutput[SourceDataSetT]]
+    ) -> JoinToTimeSpineNode[SourceDataSetT]:
+        # Is this right? how is this method used?
+        assert len(new_parent_nodes) == 1
+        return JoinToTimeSpineNode[SourceDataSetT](
+            parent_node=new_parent_nodes[0],
+            time_range_constraint=self.time_range_constraint,
+            offset_window=self._offset_window,
+            offset_to_grain=self._offset_to_grain,
+        )
 
 
 class ComputeMetricsNode(Generic[SourceDataSetT], ComputedMetricsOutput[SourceDataSetT]):

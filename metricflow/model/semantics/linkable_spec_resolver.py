@@ -12,7 +12,7 @@ from metricflow.model.objects.elements.dimension import DimensionType, Dimension
 from metricflow.model.objects.elements.identifier import IdentifierType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
-from metricflow.model.semantics.join_validator import DataSourceJoinValidator
+from metricflow.model.semantics.data_source_join_evaluator import DataSourceJoinEvaluator
 from metricflow.object_utils import pformat_big_objects, flatten_nested_sequence
 from metricflow.protocols.semantics import DataSourceSemanticsAccessor
 from metricflow.references import MeasureReference
@@ -394,7 +394,7 @@ class ValidLinkableSpecResolver:
         self._user_configured_model = user_configured_model
         # Sort data sources by name for consistency in building derived objects.
         self._data_sources = sorted(self._user_configured_model.data_sources, key=lambda x: x.name)
-        self._join_validator = DataSourceJoinValidator(data_source_semantics)
+        self._join_evaluator = DataSourceJoinEvaluator(data_source_semantics)
 
         assert max_identifier_links >= 0
         self._max_identifier_links = max_identifier_links
@@ -499,7 +499,7 @@ class ValidLinkableSpecResolver:
         data_sources = self._identifier_to_data_source[identifier_reference.element_name]
         valid_data_sources = []
         for data_source in data_sources:
-            if self._join_validator.is_valid_data_source_join(
+            if self._join_evaluator.is_valid_data_source_join(
                 left_data_source_reference=left_data_source_reference,
                 right_data_source_reference=data_source.reference,
                 on_identifier_reference=identifier_reference,
