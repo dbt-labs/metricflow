@@ -4,6 +4,7 @@ from typing import ClassVar, Optional, Sequence, Callable
 
 import pandas as pd
 import sqlalchemy
+from sqlalchemy import inspect
 from sqlalchemy.pool import StaticPool
 
 from metricflow.dataflow.sql_table import SqlTable
@@ -126,4 +127,6 @@ class DuckDbSqlClient(SqlAlchemySqlClient):
 
     def list_tables(self, schema_name: str) -> Sequence[str]:  # noqa: D
         with self._concurrency_lock:
-            return self._engine.table_names(schema=schema_name)
+            insp = inspect(self._engine)
+            return insp.get_table_names(schema=schema_name)
+
