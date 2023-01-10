@@ -129,4 +129,3 @@ class DuckDbSqlClient(SqlAlchemySqlClient):
         with self._concurrency_lock:
             insp = inspect(self._engine)
             return insp.get_table_names(schema=schema_name)
-
