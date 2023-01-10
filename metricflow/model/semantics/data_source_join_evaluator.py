@@ -37,7 +37,7 @@ class DataSourceLink:
     join_path: List[DataSourceIdentifierJoin]
 
 
-class DataSourceJoinValidator:
+class DataSourceJoinEvaluator:
     """Checks to see if a join between two data sources should be allowed."""
 
     # Valid joins are the non-fanout joins.
@@ -218,9 +218,9 @@ class DataSourceJoinValidator:
 
         join_type = DataSourceIdentifierJoinType(left_identifier.type, right_identifier.type)
 
-        if join_type in DataSourceJoinValidator._VALID_IDENTIFIER_JOINS:
+        if join_type in DataSourceJoinEvaluator._VALID_IDENTIFIER_JOINS:
             return join_type
-        elif join_type in DataSourceJoinValidator._INVALID_IDENTIFIER_JOINS:
+        elif join_type in DataSourceJoinEvaluator._INVALID_IDENTIFIER_JOINS:
             return None
 
         raise RuntimeError(f"Join type not handled: {join_type}")
@@ -270,10 +270,10 @@ class DataSourceJoinValidator:
     ) -> bool:
         """Return true if the instance sets can be joined using the given identifier."""
         return self.is_valid_data_source_join(
-            left_data_source_reference=DataSourceJoinValidator._data_source_of_identifier_in_instance_set(
+            left_data_source_reference=DataSourceJoinEvaluator._data_source_of_identifier_in_instance_set(
                 instance_set=left_instance_set, identifier_reference=on_identifier_reference
             ),
-            right_data_source_reference=DataSourceJoinValidator._data_source_of_identifier_in_instance_set(
+            right_data_source_reference=DataSourceJoinEvaluator._data_source_of_identifier_in_instance_set(
                 instance_set=right_instance_set,
                 identifier_reference=on_identifier_reference,
             ),

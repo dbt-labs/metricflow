@@ -29,7 +29,7 @@ from metricflow.dataflow.dataflow_plan import (
     ValidityWindowJoinDescription,
 )
 from metricflow.instances import InstanceSet
-from metricflow.model.semantics.join_validator import DataSourceJoinValidator
+from metricflow.model.semantics.data_source_join_evaluator import DataSourceJoinEvaluator
 from metricflow.object_utils import pformat_big_objects
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
@@ -128,7 +128,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
         self._nodes_available_for_joins = nodes_available_for_joins
         self._node_data_set_resolver = node_data_set_resolver
         self._partition_resolver = PartitionJoinResolver(self._data_source_semantics)
-        self._join_validator = DataSourceJoinValidator(self._data_source_semantics)
+        self._join_evaluator = DataSourceJoinEvaluator(self._data_source_semantics)
 
     def _find_joinable_candidate_nodes_that_can_satisfy_linkable_specs(
         self,
@@ -193,7 +193,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                 assert len(identifier_instance_in_left_node.defined_from) == 1
                 assert len(identifier_instance_in_right_node.defined_from) == 1
 
-                if not self._join_validator.is_valid_data_source_join(
+                if not self._join_evaluator.is_valid_data_source_join(
                     left_data_source_reference=identifier_instance_in_left_node.defined_from[0].data_source_reference,
                     right_data_source_reference=identifier_instance_in_right_node.defined_from[0].data_source_reference,
                     on_identifier_reference=identifier_spec_in_right_node.reference,

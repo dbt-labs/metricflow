@@ -3,9 +3,9 @@ from typing import Dict, Sequence
 from metricflow.instances import DataSourceReference
 from metricflow.model.objects.elements.identifier import IdentifierType
 from metricflow.model.semantic_model import SemanticModel
-from metricflow.model.semantics.join_validator import (
+from metricflow.model.semantics.data_source_join_evaluator import (
     DataSourceIdentifierJoinType,
-    DataSourceJoinValidator,
+    DataSourceJoinEvaluator,
     DataSourceLink,
     DataSourceIdentifierJoin,
 )
@@ -43,7 +43,7 @@ def test_join_type_coverage() -> None:
     and triggering a test failure for types which are handled in a non-exhaustive fashion
     """
     all_join_types = set(
-        DataSourceJoinValidator._INVALID_IDENTIFIER_JOINS + DataSourceJoinValidator._VALID_IDENTIFIER_JOINS
+        DataSourceJoinEvaluator._INVALID_IDENTIFIER_JOINS + DataSourceJoinEvaluator._VALID_IDENTIFIER_JOINS
     )
     for identifier_type in IdentifierType:
         join_types = _get_join_types_for_identifier_type(identifier_type=identifier_type)
@@ -80,34 +80,34 @@ def test_distinct_target_data_source_join_validation(simple_semantic_model: Sema
     """
     data_source_references = __get_simple_model_user_data_source_references_by_type(simple_semantic_model)
     user_identifier_reference = IdentifierReference(element_name="user")
-    join_validator = DataSourceJoinValidator(data_source_semantics=simple_semantic_model.data_source_semantics)
+    join_evaluator = DataSourceJoinEvaluator(data_source_semantics=simple_semantic_model.data_source_semantics)
 
-    foreign_primary = join_validator.is_valid_data_source_join(
+    foreign_primary = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=data_source_references[IdentifierType.FOREIGN],
         right_data_source_reference=data_source_references[IdentifierType.PRIMARY],
         on_identifier_reference=user_identifier_reference,
     )
-    primary_primary = join_validator.is_valid_data_source_join(
+    primary_primary = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=data_source_references[IdentifierType.PRIMARY],
         right_data_source_reference=data_source_references[IdentifierType.PRIMARY],
         on_identifier_reference=user_identifier_reference,
     )
-    unique_primary = join_validator.is_valid_data_source_join(
+    unique_primary = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=data_source_references[IdentifierType.UNIQUE],
         right_data_source_reference=data_source_references[IdentifierType.PRIMARY],
         on_identifier_reference=user_identifier_reference,
     )
-    foreign_unique = join_validator.is_valid_data_source_join(
+    foreign_unique = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=data_source_references[IdentifierType.FOREIGN],
         right_data_source_reference=data_source_references[IdentifierType.UNIQUE],
         on_identifier_reference=user_identifier_reference,
     )
-    primary_unique = join_validator.is_valid_data_source_join(
+    primary_unique = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=data_source_references[IdentifierType.PRIMARY],
         right_data_source_reference=data_source_references[IdentifierType.UNIQUE],
         on_identifier_reference=user_identifier_reference,
     )
-    unique_unique = join_validator.is_valid_data_source_join(
+    unique_unique = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=data_source_references[IdentifierType.UNIQUE],
         right_data_source_reference=data_source_references[IdentifierType.UNIQUE],
         on_identifier_reference=user_identifier_reference,
@@ -134,19 +134,19 @@ def test_foreign_target_data_source_join_validation(simple_semantic_model: Seman
     """
     data_source_references = __get_simple_model_user_data_source_references_by_type(simple_semantic_model)
     user_identifier_reference = IdentifierReference(element_name="user")
-    join_validator = DataSourceJoinValidator(data_source_semantics=simple_semantic_model.data_source_semantics)
+    join_evaluator = DataSourceJoinEvaluator(data_source_semantics=simple_semantic_model.data_source_semantics)
 
-    foreign_foreign = join_validator.is_valid_data_source_join(
+    foreign_foreign = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=data_source_references[IdentifierType.FOREIGN],
         right_data_source_reference=data_source_references[IdentifierType.FOREIGN],
         on_identifier_reference=user_identifier_reference,
     )
-    primary_foreign = join_validator.is_valid_data_source_join(
+    primary_foreign = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=data_source_references[IdentifierType.PRIMARY],
         right_data_source_reference=data_source_references[IdentifierType.FOREIGN],
         on_identifier_reference=user_identifier_reference,
     )
-    unique_foreign = join_validator.is_valid_data_source_join(
+    unique_foreign = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=data_source_references[IdentifierType.UNIQUE],
         right_data_source_reference=data_source_references[IdentifierType.FOREIGN],
         on_identifier_reference=user_identifier_reference,
@@ -170,9 +170,9 @@ def test_data_source_join_validation_on_missing_identifier(simple_semantic_model
     no_listing_data_source = simple_semantic_model.data_source_semantics.get("id_verifications")
     assert no_listing_data_source, "Could not find data source `id_verifications` in the simple model!"
     listing_identifier_reference = IdentifierReference(element_name="listing")
-    join_validator = DataSourceJoinValidator(data_source_semantics=simple_semantic_model.data_source_semantics)
+    join_evaluator = DataSourceJoinEvaluator(data_source_semantics=simple_semantic_model.data_source_semantics)
 
-    assert not join_validator.is_valid_data_source_join(
+    assert not join_evaluator.is_valid_data_source_join(
         left_data_source_reference=no_listing_data_source.reference,
         right_data_source_reference=primary_listing_data_source.reference,
         on_identifier_reference=listing_identifier_reference,
@@ -190,34 +190,34 @@ def test_distinct_target_instance_set_join_validation(
     primary_user_instance_set = consistent_id_object_repository.simple_model_data_sets["users_latest"].instance_set
     unique_user_instance_set = consistent_id_object_repository.simple_model_data_sets["companies"].instance_set
     user_identifier_reference = IdentifierReference(element_name="user")
-    join_validator = DataSourceJoinValidator(data_source_semantics=simple_semantic_model.data_source_semantics)
+    join_evaluator = DataSourceJoinEvaluator(data_source_semantics=simple_semantic_model.data_source_semantics)
 
-    foreign_primary = join_validator.is_valid_instance_set_join(
+    foreign_primary = join_evaluator.is_valid_instance_set_join(
         left_instance_set=foreign_user_instance_set,
         right_instance_set=primary_user_instance_set,
         on_identifier_reference=user_identifier_reference,
     )
-    primary_primary = join_validator.is_valid_instance_set_join(
+    primary_primary = join_evaluator.is_valid_instance_set_join(
         left_instance_set=primary_user_instance_set,
         right_instance_set=primary_user_instance_set,
         on_identifier_reference=user_identifier_reference,
     )
-    unique_primary = join_validator.is_valid_instance_set_join(
+    unique_primary = join_evaluator.is_valid_instance_set_join(
         left_instance_set=unique_user_instance_set,
         right_instance_set=primary_user_instance_set,
         on_identifier_reference=user_identifier_reference,
     )
-    foreign_unique = join_validator.is_valid_instance_set_join(
+    foreign_unique = join_evaluator.is_valid_instance_set_join(
         left_instance_set=foreign_user_instance_set,
         right_instance_set=unique_user_instance_set,
         on_identifier_reference=user_identifier_reference,
     )
-    primary_unique = join_validator.is_valid_instance_set_join(
+    primary_unique = join_evaluator.is_valid_instance_set_join(
         left_instance_set=primary_user_instance_set,
         right_instance_set=unique_user_instance_set,
         on_identifier_reference=user_identifier_reference,
     )
-    unique_unique = join_validator.is_valid_instance_set_join(
+    unique_unique = join_evaluator.is_valid_instance_set_join(
         left_instance_set=unique_user_instance_set,
         right_instance_set=unique_user_instance_set,
         on_identifier_reference=user_identifier_reference,
@@ -245,19 +245,19 @@ def test_foreign_target_instance_set_join_validation(
     primary_user_instance_set = consistent_id_object_repository.simple_model_data_sets["users_latest"].instance_set
     unique_user_instance_set = consistent_id_object_repository.simple_model_data_sets["companies"].instance_set
     user_identifier_reference = IdentifierReference(element_name="user")
-    join_validator = DataSourceJoinValidator(data_source_semantics=simple_semantic_model.data_source_semantics)
+    join_evaluator = DataSourceJoinEvaluator(data_source_semantics=simple_semantic_model.data_source_semantics)
 
-    foreign_foreign = join_validator.is_valid_instance_set_join(
+    foreign_foreign = join_evaluator.is_valid_instance_set_join(
         left_instance_set=foreign_user_instance_set,
         right_instance_set=foreign_user_instance_set,
         on_identifier_reference=user_identifier_reference,
     )
-    primary_foreign = join_validator.is_valid_instance_set_join(
+    primary_foreign = join_evaluator.is_valid_instance_set_join(
         left_instance_set=primary_user_instance_set,
         right_instance_set=foreign_user_instance_set,
         on_identifier_reference=user_identifier_reference,
     )
-    unique_foreign = join_validator.is_valid_instance_set_join(
+    unique_foreign = join_evaluator.is_valid_instance_set_join(
         left_instance_set=unique_user_instance_set,
         right_instance_set=foreign_user_instance_set,
         on_identifier_reference=user_identifier_reference,
@@ -276,10 +276,10 @@ def test_foreign_target_instance_set_join_validation(
 
 def test_get_joinable_data_sources(multi_hop_join_semantic_model: SemanticModel) -> None:  # noqa: D
     data_source_reference = DataSourceReference(data_source_name="account_month_txns")
-    join_validator = DataSourceJoinValidator(data_source_semantics=multi_hop_join_semantic_model.data_source_semantics)
+    join_evaluator = DataSourceJoinEvaluator(data_source_semantics=multi_hop_join_semantic_model.data_source_semantics)
 
     # Single-hop
-    joinable_data_sources = join_validator.get_joinable_data_sources(left_data_source_reference=data_source_reference)
+    joinable_data_sources = join_evaluator.get_joinable_data_sources(left_data_source_reference=data_source_reference)
     assert set(joinable_data_sources.keys()) == {"bridge_table"}
     assert joinable_data_sources["bridge_table"] == DataSourceLink(
         left_data_source_reference=DataSourceReference(data_source_name="account_month_txns"),
@@ -295,7 +295,7 @@ def test_get_joinable_data_sources(multi_hop_join_semantic_model: SemanticModel)
     )
 
     # 2-hop
-    joinable_data_sources = join_validator.get_joinable_data_sources(
+    joinable_data_sources = join_evaluator.get_joinable_data_sources(
         left_data_source_reference=data_source_reference, include_multi_hop=True
     )
     assert set(joinable_data_sources.keys()) == {"bridge_table", "customer_other_data", "customer_table"}
@@ -361,7 +361,7 @@ def test_natural_identifier_data_source_validation(scd_semantic_model: SemanticM
     foreign_user_data_source = scd_semantic_model.data_source_semantics.get("bookings_source")
     unique_user_data_source = scd_semantic_model.data_source_semantics.get("companies")
     user_identifier_reference = IdentifierReference(element_name="user")
-    join_validator = DataSourceJoinValidator(data_source_semantics=scd_semantic_model.data_source_semantics)
+    join_evaluator = DataSourceJoinEvaluator(data_source_semantics=scd_semantic_model.data_source_semantics)
     # Type refinement
     assert natural_user_data_source, "Could not find `primary_accounts` data source in scd model!"
     assert foreign_user_data_source, "Could not find `bookings_source` data source in scd model!"
@@ -369,38 +369,38 @@ def test_natural_identifier_data_source_validation(scd_semantic_model: SemanticM
     assert unique_user_data_source, "Could not find `companies` data source in scd model!"
 
     # Valid cases
-    natural_primary = join_validator.is_valid_data_source_join(
+    natural_primary = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=natural_user_data_source.reference,
         right_data_source_reference=primary_user_data_source.reference,
         on_identifier_reference=user_identifier_reference,
     )
-    natural_unique = join_validator.is_valid_data_source_join(
+    natural_unique = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=natural_user_data_source.reference,
         right_data_source_reference=unique_user_data_source.reference,
         on_identifier_reference=user_identifier_reference,
     )
-    foreign_natural = join_validator.is_valid_data_source_join(
+    foreign_natural = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=foreign_user_data_source.reference,
         right_data_source_reference=natural_user_data_source.reference,
         on_identifier_reference=user_identifier_reference,
     )
-    primary_natural = join_validator.is_valid_data_source_join(
+    primary_natural = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=primary_user_data_source.reference,
         right_data_source_reference=natural_user_data_source.reference,
         on_identifier_reference=user_identifier_reference,
     )
-    unique_natural = join_validator.is_valid_data_source_join(
+    unique_natural = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=unique_user_data_source.reference,
         right_data_source_reference=natural_user_data_source.reference,
         on_identifier_reference=user_identifier_reference,
     )
     # Invalid cases
-    natural_foreign = join_validator.is_valid_data_source_join(
+    natural_foreign = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=natural_user_data_source.reference,
         right_data_source_reference=foreign_user_data_source.reference,
         on_identifier_reference=user_identifier_reference,
     )
-    natural_natural = join_validator.is_valid_data_source_join(
+    natural_natural = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=natural_user_data_source.reference,
         right_data_source_reference=natural_user_data_source.reference,
         on_identifier_reference=user_identifier_reference,
@@ -436,41 +436,41 @@ def test_natural_identifier_instance_set_validation(
     foreign_user_instance_set = consistent_id_object_repository.scd_model_data_sets["bookings_source"].instance_set
     unique_user_instance_set = consistent_id_object_repository.scd_model_data_sets["companies"].instance_set
     user_identifier_reference = IdentifierReference(element_name="user")
-    join_validator = DataSourceJoinValidator(data_source_semantics=scd_semantic_model.data_source_semantics)
+    join_evaluator = DataSourceJoinEvaluator(data_source_semantics=scd_semantic_model.data_source_semantics)
 
     # Valid cases
-    natural_primary = join_validator.is_valid_instance_set_join(
+    natural_primary = join_evaluator.is_valid_instance_set_join(
         left_instance_set=natural_user_instance_set,
         right_instance_set=primary_user_instance_set,
         on_identifier_reference=user_identifier_reference,
     )
-    natural_unique = join_validator.is_valid_instance_set_join(
+    natural_unique = join_evaluator.is_valid_instance_set_join(
         left_instance_set=natural_user_instance_set,
         right_instance_set=unique_user_instance_set,
         on_identifier_reference=user_identifier_reference,
     )
-    foreign_natural = join_validator.is_valid_instance_set_join(
+    foreign_natural = join_evaluator.is_valid_instance_set_join(
         left_instance_set=foreign_user_instance_set,
         right_instance_set=natural_user_instance_set,
         on_identifier_reference=user_identifier_reference,
     )
-    primary_natural = join_validator.is_valid_instance_set_join(
+    primary_natural = join_evaluator.is_valid_instance_set_join(
         left_instance_set=primary_user_instance_set,
         right_instance_set=natural_user_instance_set,
         on_identifier_reference=user_identifier_reference,
     )
-    unique_natural = join_validator.is_valid_instance_set_join(
+    unique_natural = join_evaluator.is_valid_instance_set_join(
         left_instance_set=unique_user_instance_set,
         right_instance_set=natural_user_instance_set,
         on_identifier_reference=user_identifier_reference,
     )
     # Invalid cases
-    natural_foreign = join_validator.is_valid_instance_set_join(
+    natural_foreign = join_evaluator.is_valid_instance_set_join(
         left_instance_set=natural_user_instance_set,
         right_instance_set=foreign_user_instance_set,
         on_identifier_reference=user_identifier_reference,
     )
-    natural_natural = join_validator.is_valid_instance_set_join(
+    natural_natural = join_evaluator.is_valid_instance_set_join(
         left_instance_set=natural_user_instance_set,
         right_instance_set=natural_user_instance_set,
         on_identifier_reference=user_identifier_reference,
