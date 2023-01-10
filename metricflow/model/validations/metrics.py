@@ -125,7 +125,7 @@ class DerivedMetricRule(ModelValidationRule):
                             file_context=FileContext.from_metadata(metadata=metric.metadata),
                             metric=MetricModelReference(metric_name=metric.name),
                         ),
-                        message=f"Both offset_window and offset_to_grain set for derived metric on input metric '{input_metric.name}'. Please set one or the other.",
+                        message=f"Both offset_window and offset_to_grain set for derived metric '{metric.name}' on input metric '{input_metric.name}'. Please set one or the other.",
                     )
                 )
 

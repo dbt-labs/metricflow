@@ -174,8 +174,8 @@ class MetricFlowQueryParser:
                 for input_metric in metric.type_params.metrics or []:
                     if input_metric.offset_window or input_metric.offset_to_grain:
                         raise UnableToSatisfyQueryError(
-                            f"Metric {metric.name} is a derived metric that contains input metrics with "
-                            "an offset_window or offset_to_grain which must be queried with the "
+                            f"Metric '{metric.name}' is a derived metric that contains input metrics with "
+                            "an `offset_window` or `offset_to_grain` which must be queried with the "
                             "dimension 'metric_time'."
                         )
 
