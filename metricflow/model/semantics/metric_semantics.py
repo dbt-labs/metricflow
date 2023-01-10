@@ -11,11 +11,10 @@ from metricflow.model.semantics.linkable_element_properties import LinkableEleme
 from metricflow.model.spec_converters import WhereConstraintConverter
 from metricflow.references import MetricReference
 from metricflow.specs import MetricSpec, LinkableInstanceSpec, MetricInputMeasureSpec, MeasureSpec
+from metricflow.model.semantics.data_source_join_evaluator import MAX_JOIN_HOPS
 
 
 logger = logging.getLogger(__name__)
-
-MAX_JOIN_HOPS = 2
 
 
 class MetricSemantics:  # noqa: D
