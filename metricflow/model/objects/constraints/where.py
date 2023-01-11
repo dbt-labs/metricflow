@@ -4,7 +4,7 @@ import logging
 import re
 from typing import List, Optional, Dict, Any
 
-from moz_sql_parser import parse as moz_parse
+from mo_sql_parsing import parse as mo_parse
 
 from metricflow.errors.errors import ConstraintParseException
 from metricflow.model.objects.base import HashableBaseModel, PydanticCustomInputParser, PydanticParseableValueType
@@ -69,7 +69,7 @@ class WhereClauseConstraint(PydanticCustomInputParser, HashableBaseModel):
         # where_str = "WHERE is_instant" yields -> {'select': {'value': '_'}, 'from': '_', 'where': 'is_instant'}
         # where_str = "WHERE is_instant AND country = 'vanuatu' AND is_lux or ds < '2020-01-02'" yields ->
         # {'select': {'value': '_'}, 'from': '_', 'where': {'or': [{'and': ['is_instant', {'eq': ['country', {'literal': 'vanuatu'}]}, 'is_lux']}, {'lt': ['ds', {'literal': '2020-01-02'}]}]}}
-        parsed = moz_parse(f"select _ from _ {where_str}")
+        parsed = mo_parse(f"select _ from _ {where_str}")
         if "where" not in parsed:
             raise ConstraintParseException(parsed)
 
