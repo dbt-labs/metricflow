@@ -652,6 +652,12 @@
                 },
                 "name": {
                     "type": "string"
+                },
+                "offset_to_grain": {
+                    "type": "string"
+                },
+                "offset_window": {
+                    "type": "string"
                 }
             },
             "type": "object"
