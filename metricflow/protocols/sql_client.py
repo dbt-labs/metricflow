@@ -197,7 +197,10 @@ class SqlEngineAttributes(Protocol):
     timestamp_type_supported: ClassVar[bool]
     timestamp_to_string_comparison_supported: ClassVar[bool]
     cancel_submitted_queries_supported: ClassVar[bool]
-    percentile_aggregation_supported: ClassVar[bool]
+    continuous_percentile_aggregation_supported: ClassVar[bool]
+    discrete_percentile_aggregation_supported: ClassVar[bool]
+    approximate_continuous_percentile_aggregation_supported: ClassVar[bool]
+    approximate_discrete_percentile_aggregation_supported: ClassVar[bool]
 
     # SQL Dialect replacement strings
     double_data_type_name: ClassVar[str]

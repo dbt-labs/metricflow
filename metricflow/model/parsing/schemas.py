@@ -206,6 +206,7 @@ aggregation_type_params_schema = {
     "properties": {
         "percentile": {"type": "number"},
         "use_discrete_percentile": {"type": "boolean"},
+        "use_approximate_percentile": {"type": "boolean"},
     },
     "additionalProperties": False,
 }

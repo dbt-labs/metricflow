@@ -7,6 +7,7 @@ import pytest
 from dateutil import parser
 
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowQueryRequest
+from metricflow.model.objects.elements.measure import MeasureAggregationParameters
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.object_utils import assert_values_exhausted
 from metricflow.plan_conversion.column_resolver import (
@@ -18,7 +19,6 @@ from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_exprs import (
     SqlPercentileExpression,
     SqlPercentileExpressionArgument,
-    SqlPercentileFunctionType,
     SqlTimeDeltaExpression,
     SqlColumnReferenceExpression,
     SqlColumnReference,
@@ -105,17 +105,25 @@ class CheckQueryHelpers:
             renderable_expr
         ).sql
 
-    def render_percentile_expr(self, expr: str, percentile: float, use_discrete_percentile: bool) -> str:
+    def render_percentile_expr(
+        self, expr: str, percentile: float, use_discrete_percentile: bool, use_approximate_percentile: bool
+    ) -> str:
         """Return the percentile call that can be used for computing a percentile aggregation."""
-        percentile_type = (
-            SqlPercentileFunctionType.DISCRETE if use_discrete_percentile else SqlPercentileFunctionType.CONTINUOUS
+
+        percentile_args = SqlPercentileExpressionArgument.from_aggregation_parameters(
+            MeasureAggregationParameters(
+                percentile=percentile,
+                use_discrete_percentile=use_discrete_percentile,
+                use_approximate_percentile=use_approximate_percentile,
+            )
         )
+
         renderable_expr = SqlPercentileExpression(
             order_by_arg=SqlStringExpression(
                 sql_expr=expr,
                 requires_parenthesis=False,
             ),
-            percentile_args=SqlPercentileExpressionArgument(percentile=percentile, function_type=percentile_type),
+            percentile_args=percentile_args,
         )
         return self._sql_client.sql_engine_attributes.sql_query_plan_renderer.expr_renderer.render_sql_expr(
             renderable_expr
@@ -139,8 +147,17 @@ def filter_not_supported_features(
         elif required_feature is RequiredDwEngineFeatures.FULL_OUTER_JOIN:
             if not sql_client.sql_engine_attributes.full_outer_joins_supported:
                 not_supported_features.append(required_feature)
-        elif required_feature is RequiredDwEngineFeatures.PERCENTILE_AGGREGATION:
-            if not sql_client.sql_engine_attributes.percentile_aggregation_supported:
+        elif required_feature is RequiredDwEngineFeatures.CONTINUOUS_PERCENTILE_AGGREGATION:
+            if not sql_client.sql_engine_attributes.continuous_percentile_aggregation_supported:
+                not_supported_features.append(required_feature)
+        elif required_feature is RequiredDwEngineFeatures.DISCRETE_PERCENTILE_AGGREGATION:
+            if not sql_client.sql_engine_attributes.discrete_percentile_aggregation_supported:
+                not_supported_features.append(required_feature)
+        elif required_feature is RequiredDwEngineFeatures.APPROXIMATE_CONTINUOUS_PERCENTILE_AGGREGATION:
+            if not sql_client.sql_engine_attributes.approximate_continuous_percentile_aggregation_supported:
+                not_supported_features.append(required_feature)
+        elif required_feature is RequiredDwEngineFeatures.APPROXIMATE_DISCRETE_PERCENTILE_AGGREGATION:
+            if not sql_client.sql_engine_attributes.approximate_discrete_percentile_aggregation_supported:
                 not_supported_features.append(required_feature)
         else:
             assert_values_exhausted(required_feature)

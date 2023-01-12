@@ -26,6 +26,11 @@ class ConvertMedianToPercentileRule(ModelTransformRule):
                                 f"'{measure.agg_params.percentile}', a conflicting value. Please remove the parameter "
                                 "or set to '0.5'."
                             )
+                        if measure.agg_params.use_discrete_percentile:
+                            raise ModelTransformError(
+                                f"Measure '{measure.name}' uses a MEDIAN aggregation, while use_discrete_percentile"
+                                f"is set to true. Please remove the parameter or set to False."
+                            )
                     measure.agg_params.percentile = MEDIAN_PERCENTILE
-                    measure.agg_params.use_discrete_percentile = False
+                    # let's not set use_approximate_percentile to be false due to valid performance reasons
         return model
