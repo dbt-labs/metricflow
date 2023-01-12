@@ -57,7 +57,7 @@ class DatabricksEngineAttributes:
     # So far the only clear way to cancel a query is through the Databricks UI.
     cancel_submitted_queries_supported: ClassVar[bool] = False
     continuous_percentile_aggregation_supported: ClassVar[bool] = True
-    discrete_percentile_aggregation_supported: ClassVar[bool] = True
+    discrete_percentile_aggregation_supported: ClassVar[bool] = False
     approximate_continuous_percentile_aggregation_supported: ClassVar[bool] = False
     approximate_discrete_percentile_aggregation_supported: ClassVar[bool] = True
 
