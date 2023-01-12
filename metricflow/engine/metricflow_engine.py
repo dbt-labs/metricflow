@@ -442,7 +442,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         )
         logger.info(f"Query spec is:\n{pformat_big_objects(query_spec)}")
 
-        if self._semantic_model.metric_semantics.contains_cumulative_metric(
+        if self._semantic_model.metric_semantics.contains_cumulative_or_time_offset_metric(
             tuple(m.as_reference for m in query_spec.metric_specs)
         ):
             self._time_spine_table_builder.create_if_necessary()

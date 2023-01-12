@@ -38,7 +38,7 @@ class CumulativeMetricRule(ModelValidationRule):
 
             if metric.type_params.window:
                 try:
-                    _, _ = MetricTimeWindow.parse(metric.type_params.window.to_string())
+                    MetricTimeWindow.parse(metric.type_params.window.to_string())
                 except ParsingException as e:
                     issues.append(
                         ValidationError(
@@ -113,6 +113,25 @@ class DerivedMetricRule(ModelValidationRule):
         return issues
 
     @staticmethod
+    @validate_safely(whats_being_done="checking that input metric time offset params are valid")
+    def _validate_time_offset_params(metric: Metric) -> List[ValidationIssueType]:
+        issues: List[ValidationIssueType] = []
+
+        for input_metric in metric.input_metrics or []:
+            if input_metric.offset_window and input_metric.offset_to_grain:
+                issues.append(
+                    ValidationError(
+                        context=MetricContext(
+                            file_context=FileContext.from_metadata(metadata=metric.metadata),
+                            metric=MetricModelReference(metric_name=metric.name),
+                        ),
+                        message=f"Both offset_window and offset_to_grain set for derived metric '{metric.name}' on input metric '{input_metric.name}'. Please set one or the other.",
+                    )
+                )
+
+        return issues
+
+    @staticmethod
     @validate_safely(
         whats_being_done="running model validation ensuring derived metrics properties are configured properly"
     )
@@ -122,4 +141,5 @@ class DerivedMetricRule(ModelValidationRule):
         issues += DerivedMetricRule._validate_input_metrics_exist(model=model)
         for metric in model.metrics or []:
             issues += DerivedMetricRule._validate_alias_collision(metric=metric)
+            issues += DerivedMetricRule._validate_time_offset_params(metric=metric)
         return issues
