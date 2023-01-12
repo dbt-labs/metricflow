@@ -678,20 +678,41 @@ integration_test:
   model: SIMPLE_MODEL
   metrics: ["bookings_growth_2_weeks"]
   group_bys: ["metric_time"]
-  # this should be wrong & fail; correct later
   check_query: |
     SELECT
-      (bookings - ref_bookings) / CAST(bookings AS {{ double_data_type_name }}) AS non_referred_bookings_pct
-      , metric_time
+      metric_time
+      , (bookings - bookings_2_weeks_ago) / bookings_2_weeks_ago AS bookings_growth_2_weeks
     FROM (
       SELECT
-        SUM(CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END) AS ref_bookings
-        , SUM(1) AS bookings
-        , ds AS metric_time
-      FROM {{ source_schema }}.fct_bookings
-      GROUP BY
-        ds
-    ) a
+        COALESCE(a.metric_time, b.metric_time) AS metric_time
+        , a.bookings AS bookings
+        , b.bookings_2_weeks_ago AS bookings_2_weeks_ago
+      FROM (
+        SELECT
+          ds AS metric_time
+          , SUM(1) AS bookings
+        FROM {{ source_schema }}.fct_bookings
+        GROUP BY
+          metric_time
+      ) a
+      INNER JOIN (
+        SELECT
+          c.ds AS metric_time
+          , d.bookings_2_weeks_ago AS bookings_2_weeks_ago
+        FROM {{ source_schema }}.mf_time_spine c
+        LEFT OUTER JOIN (
+          SELECT
+            ds AS metric_time
+            , SUM(1) AS bookings_2_weeks_ago
+          FROM {{ source_schema }}.fct_bookings
+          GROUP BY
+            metric_time
+        ) d
+        ON c.ds - INTERVAL 14 day = d.metric_time
+      ) b
+      ON a.metric_time = b.metric_time
+    ) e
+
 ---
 integration_test:
   name: derived_metric_with_offset_to_grain
@@ -699,20 +720,41 @@ integration_test:
   model: SIMPLE_MODEL
   metrics: ["bookings_growth_since_start_of_month"]
   group_bys: ["metric_time"]
-  # this should be wrong & fail; correct later
   check_query: |
     SELECT
-      (bookings - ref_bookings) / CAST(bookings AS {{ double_data_type_name }}) AS non_referred_bookings_pct
-      , metric_time
+      metric_time
+      , (bookings - bookings_at_start_of_month) / bookings_at_start_of_month AS bookings_growth_since_start_of_month
     FROM (
       SELECT
-        SUM(CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END) AS ref_bookings
-        , SUM(1) AS bookings
-        , ds AS metric_time
-      FROM {{ source_schema }}.fct_bookings
-      GROUP BY
-        ds
-    ) a
+        COALESCE(a.metric_time, b.metric_time) AS metric_time
+        , a.bookings AS bookings
+        , b.bookings_at_start_of_month AS bookings_at_start_of_month
+      FROM (
+        SELECT
+          ds AS metric_time
+          , SUM(1) AS bookings
+        FROM {{ source_schema }}.fct_bookings
+        GROUP BY
+          metric_time
+      ) a
+      INNER JOIN (
+        SELECT
+          c.ds AS metric_time
+          , d.bookings_at_start_of_month AS bookings_at_start_of_month
+        FROM {{ source_schema }}.mf_time_spine c
+        LEFT OUTER JOIN (
+          SELECT
+            ds AS metric_time
+            , SUM(1) AS bookings_at_start_of_month
+          FROM {{ source_schema }}.fct_bookings
+          GROUP BY
+            metric_time
+        ) d
+        ON DATE_TRUNC('month', c.ds) = d.metric_time
+      ) b
+      ON a.metric_time = b.metric_time
+    ) e
+    
 ---
 integration_test:
   name: derived_metric_with_offset_window_and_offset_to_grain
@@ -720,20 +762,48 @@ integration_test:
   model: SIMPLE_MODEL
   metrics: ["bookings_month_start_compared_to_1_month_prior"]
   group_bys: ["metric_time"]
-  # this should be wrong & fail; correct later
   check_query: |
     SELECT
-      (bookings - ref_bookings) / CAST(bookings AS {{ double_data_type_name }}) AS non_referred_bookings_pct
-      , metric_time
+      metric_time
+      , month_start_bookings / bookings_1_month_ago AS bookings_month_start_compared_to_1_month_prior
     FROM (
       SELECT
-        SUM(CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END) AS ref_bookings
-        , SUM(1) AS bookings
-        , ds AS metric_time
-      FROM {{ source_schema }}.fct_bookings
-      GROUP BY
-        ds
-    ) a
+        COALESCE(a.metric_time, b.metric_time) AS metric_time
+        , a.bookings_1_month_ago
+        , b.month_start_bookings
+      FROM (
+        SELECT
+          g.ds AS metric_time
+          , f.bookings AS bookings_1_month_ago
+        FROM {{ source_schema }}.mf_time_spine g
+        LEFT OUTER JOIN (
+          SELECT
+            ds AS metric_time
+            , SUM(1) AS bookings
+          FROM {{ source_schema }}.fct_bookings
+          GROUP BY
+            metric_time
+        ) f
+        ON g.ds - INTERVAL 1 month = f.metric_time
+      ) a
+      INNER JOIN (
+        SELECT
+          c.ds AS metric_time
+          , d.bookings AS month_start_bookings
+        FROM {{ source_schema }}.mf_time_spine c
+        LEFT OUTER JOIN (
+          SELECT
+            ds AS metric_time
+            , SUM(1) AS bookings
+          FROM {{ source_schema }}.fct_bookings
+          GROUP BY
+            metric_time
+        ) d
+        ON DATE_TRUNC('month', c.ds) = d.metric_time
+      ) b
+      ON a.metric_time = b.metric_time
+    ) e
+    
 ---
 integration_test:
   name: derived_metric_offset_with_one_metric_input
@@ -744,15 +814,15 @@ integration_test:
   # this should be wrong & fail; correct later
   check_query: |
     SELECT
-      (bookings - ref_bookings) / CAST(bookings AS {{ double_data_type_name }}) AS non_referred_bookings_pct
-      , metric_time
-    FROM (
+      a.ds AS metric_time
+      , b.bookings_5_day_lag
+    FROM {{ source_schema }}.mf_time_spine a
+    LEFT OUTER JOIN (
       SELECT
-        SUM(CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END) AS ref_bookings
-        , SUM(1) AS bookings
-        , ds AS metric_time
+        ds AS metric_time
+        , SUM(1) AS bookings_5_day_lag
       FROM {{ source_schema }}.fct_bookings
       GROUP BY
-        ds
-    ) a
-    
+        metric_time
+    ) b
+    ON a.ds - INTERVAL 5 day = b.metric_time
