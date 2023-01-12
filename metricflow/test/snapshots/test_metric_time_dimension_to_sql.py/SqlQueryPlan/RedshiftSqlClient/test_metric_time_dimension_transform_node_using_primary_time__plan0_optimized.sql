@@ -55,6 +55,9 @@ SELECT
   , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
   , booking_value AS median_booking_value
   , booking_value AS booking_value_p99
+  , booking_value AS discrete_booking_value_p99
+  , booking_value AS approximate_continuous_booking_value_p99
+  , booking_value AS approximate_discrete_booking_value_p99
 FROM (
   -- User Defined SQL Query
   SELECT * FROM ***************************.fct_bookings

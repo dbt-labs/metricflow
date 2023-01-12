@@ -11,7 +11,8 @@ from databricks import sql
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlEngineAttributes, SqlEngine, SqlIsolationLevel
 from metricflow.protocols.sql_request import SqlRequestTagSet, SqlJsonTag
-from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer, SqlQueryPlanRenderer
+from metricflow.sql.render.databricks import DatabricksSqlQueryPlanRenderer
+from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_bind_parameters import SqlColumnType
 from metricflow.sql_clients.async_request import CombinedSqlTags
@@ -55,14 +56,17 @@ class DatabricksEngineAttributes:
     timestamp_to_string_comparison_supported: ClassVar[bool] = True
     # So far the only clear way to cancel a query is through the Databricks UI.
     cancel_submitted_queries_supported: ClassVar[bool] = False
-    percentile_aggregation_supported: ClassVar[bool] = True
+    continuous_percentile_aggregation_supported: ClassVar[bool] = True
+    discrete_percentile_aggregation_supported: ClassVar[bool] = False
+    approximate_continuous_percentile_aggregation_supported: ClassVar[bool] = False
+    approximate_discrete_percentile_aggregation_supported: ClassVar[bool] = True
 
     # SQL Dialect replacement strings
     double_data_type_name: ClassVar[str] = "DOUBLE"
     timestamp_type_name: ClassVar[Optional[str]] = "TIMESTAMP"
     random_function_name: ClassVar[str] = "RANDOM"
     # MetricFlow attributes
-    sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer] = DefaultSqlQueryPlanRenderer()
+    sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer] = DatabricksSqlQueryPlanRenderer()
 
 
 class DatabricksSqlClient(BaseSqlClientImplementation):

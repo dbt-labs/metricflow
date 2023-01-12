@@ -1,3 +1,5 @@
+from fractions import Fraction
+
 from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
     SqlExpressionRenderer,
@@ -10,6 +12,7 @@ from metricflow.sql.sql_exprs import (
     SqlDateTruncExpression,
     SqlGenerateUuidExpression,
     SqlPercentileExpression,
+    SqlPercentileFunctionType,
     SqlTimeDeltaExpression,
 )
 from metricflow.sql.sql_plan import SqlSelectColumn
@@ -42,8 +45,27 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
         )
 
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
-        """Render a percentile expression"""
-        raise RuntimeError("Percentile aggregations not yet supported for BigQuery.")
+        """Render a percentile expression for BigQuery.
+
+        Use the fraction class to determine numerator and denominator for offset and quantile.
+        For example - 0.5 or median would be 1/2 - generate two quantiles and pick the 1-indexed value
+        from the result list [min, median, max].
+        """
+        if node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS:
+            arg_rendered = self.render_sql_expr(node.order_by_arg)
+            params = arg_rendered.execution_parameters
+            percentile = node.percentile_args.percentile
+
+            fraction = Fraction(percentile).limit_denominator()
+
+            return SqlExpressionRenderResult(
+                sql=f"APPROX_QUANTILES({arg_rendered.sql}, {fraction.denominator})[OFFSET({fraction.numerator})]",
+                execution_parameters=params,
+            )
+        raise RuntimeError(
+            "Only approximate continous percentile aggregations are supported for BigQuery. Set "
+            + "use_approximate_percentile and disable use_discrete_percentile in all percentile measures."
+        )
 
     def visit_cast_to_timestamp_expr(self, node: SqlCastToTimestampExpression) -> SqlExpressionRenderResult:
         """Casts the time value expression to DATETIME, as per standard BigQuery preferences."""

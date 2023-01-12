@@ -25,6 +25,7 @@ class MeasureAggregationParameters(HashableBaseModel):
 
     percentile: Optional[float] = None
     use_discrete_percentile: bool = False
+    use_approximate_percentile: bool = False
 
 
 class Measure(HashableBaseModel, ModelWithMetadataParsing):

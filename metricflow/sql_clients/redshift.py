@@ -38,7 +38,10 @@ class RedshiftEngineAttributes:
     timestamp_type_supported: ClassVar[bool] = True
     timestamp_to_string_comparison_supported: ClassVar[bool] = True
     cancel_submitted_queries_supported: ClassVar[bool] = True
-    percentile_aggregation_supported: ClassVar[bool] = True
+    continuous_percentile_aggregation_supported: ClassVar[bool] = True
+    discrete_percentile_aggregation_supported: ClassVar[bool] = False
+    approximate_continuous_percentile_aggregation_supported: ClassVar[bool] = False
+    approximate_discrete_percentile_aggregation_supported: ClassVar[bool] = True
 
     # SQL Dialect replacement strings
     double_data_type_name: ClassVar[str] = "DOUBLE PRECISION"

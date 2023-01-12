@@ -455,16 +455,37 @@ class PercentileAggregationRule(ModelValidationRule):
                                 ),
                             )
                         )
-                elif (
-                    measure.agg != AggregationType.PERCENTILE
-                    and measure.agg_params
-                    and (measure.agg_params.percentile or measure.agg_params.use_discrete_percentile)
+                elif measure.agg == AggregationType.MEDIAN:
+                    if measure.agg_params:
+                        if measure.agg_params.percentile is not None and measure.agg_params.percentile != 0.5:
+                            issues.append(
+                                ValidationError(
+                                    context=context,
+                                    message=f"Measure '{measure.name}' uses a MEDIAN aggregation, while percentile is set to "
+                                    f"'{measure.agg_params.percentile}', a conflicting value. Please remove the parameter "
+                                    "or set to '0.5'.",
+                                )
+                            )
+                        if measure.agg_params.use_discrete_percentile:
+                            issues.append(
+                                ValidationError(
+                                    context=context,
+                                    message=f"Measure '{measure.name}' uses a MEDIAN aggregation, while use_discrete_percentile"
+                                    f"is set to true. Please remove the parameter or set to False.",
+                                )
+                            )
+                elif measure.agg_params and (
+                    measure.agg_params.percentile
+                    or measure.agg_params.use_discrete_percentile
+                    or measure.agg_params.use_approximate_percentile
                 ):
                     wrong_params = []
                     if measure.agg_params.percentile:
                         wrong_params.append("percentile")
                     if measure.agg_params.use_discrete_percentile:
                         wrong_params.append("use_discrete_percentile")
+                    if measure.agg_params.use_approximate_percentile:
+                        wrong_params.append("use_approximate_percentile")
 
                     wrong_params_str = ", ".join(wrong_params)
 

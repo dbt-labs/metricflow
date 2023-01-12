@@ -51,6 +51,8 @@ def test_get_names(new_data_source_semantics: DataSourceSemantics) -> None:  # n
 
     expected = [
         "account_balance",
+        "approximate_continuous_booking_value_p99",
+        "approximate_discrete_booking_value_p99",
         "average_booking_value",
         "bookers",
         "booking_payments",
@@ -58,6 +60,7 @@ def test_get_names(new_data_source_semantics: DataSourceSemantics) -> None:  # n
         "booking_value_p99",
         "bookings",
         "current_account_balance_by_user",
+        "discrete_booking_value_p99",
         "identity_verifications",
         "instant_bookings",
         "largest_listing",

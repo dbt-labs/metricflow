@@ -8,6 +8,9 @@
                 "percentile": {
                     "type": "number"
                 },
+                "use_approximate_percentile": {
+                    "type": "boolean"
+                },
                 "use_discrete_percentile": {
                     "type": "boolean"
                 }

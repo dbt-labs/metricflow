@@ -36,7 +36,10 @@ class DuckDbEngineAttributes:
     timestamp_to_string_comparison_supported: ClassVar[bool] = True
     # Cancelling should be possible, but not yet implemented.
     cancel_submitted_queries_supported: ClassVar[bool] = False
-    percentile_aggregation_supported: ClassVar[bool] = True
+    continuous_percentile_aggregation_supported: ClassVar[bool] = True
+    discrete_percentile_aggregation_supported: ClassVar[bool] = True
+    approximate_continuous_percentile_aggregation_supported: ClassVar[bool] = True
+    approximate_discrete_percentile_aggregation_supported: ClassVar[bool] = False
 
     # SQL Dialect replacement strings
     double_data_type_name: ClassVar[str] = "DOUBLE"
