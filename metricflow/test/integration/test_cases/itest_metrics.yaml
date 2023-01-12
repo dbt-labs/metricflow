@@ -680,39 +680,32 @@ integration_test:
   group_bys: ["metric_time"]
   check_query: |
     SELECT
-      metric_time
+      COALESCE(a.metric_time, b.metric_time) AS metric_time
       , (bookings - bookings_2_weeks_ago) / bookings_2_weeks_ago AS bookings_growth_2_weeks
     FROM (
       SELECT
-        COALESCE(a.metric_time, b.metric_time) AS metric_time
-        , a.bookings AS bookings
-        , b.bookings_2_weeks_ago AS bookings_2_weeks_ago
-      FROM (
+        ds AS metric_time
+        , SUM(1) AS bookings
+      FROM {{ source_schema }}.fct_bookings
+      GROUP BY
+        metric_time
+    ) a
+    INNER JOIN (
+      SELECT
+        c.ds AS metric_time
+        , d.bookings_2_weeks_ago AS bookings_2_weeks_ago
+      FROM {{ source_schema }}.mf_time_spine c
+      LEFT OUTER JOIN (
         SELECT
           ds AS metric_time
-          , SUM(1) AS bookings
+          , SUM(1) AS bookings_2_weeks_ago
         FROM {{ source_schema }}.fct_bookings
         GROUP BY
           metric_time
-      ) a
-      INNER JOIN (
-        SELECT
-          c.ds AS metric_time
-          , d.bookings_2_weeks_ago AS bookings_2_weeks_ago
-        FROM {{ source_schema }}.mf_time_spine c
-        LEFT OUTER JOIN (
-          SELECT
-            ds AS metric_time
-            , SUM(1) AS bookings_2_weeks_ago
-          FROM {{ source_schema }}.fct_bookings
-          GROUP BY
-            metric_time
-        ) d
-        ON c.ds - INTERVAL 14 day = d.metric_time
-      ) b
-      ON a.metric_time = b.metric_time
-    ) e
-
+      ) d
+      ON c.ds - INTERVAL 14 day = d.metric_time
+    ) b
+    ON a.metric_time = b.metric_time
 ---
 integration_test:
   name: derived_metric_with_offset_to_grain
@@ -722,39 +715,32 @@ integration_test:
   group_bys: ["metric_time"]
   check_query: |
     SELECT
-      metric_time
+      COALESCE(a.metric_time, b.metric_time) AS metric_time
       , (bookings - bookings_at_start_of_month) / bookings_at_start_of_month AS bookings_growth_since_start_of_month
     FROM (
       SELECT
-        COALESCE(a.metric_time, b.metric_time) AS metric_time
-        , a.bookings AS bookings
-        , b.bookings_at_start_of_month AS bookings_at_start_of_month
-      FROM (
+        ds AS metric_time
+        , SUM(1) AS bookings
+      FROM {{ source_schema }}.fct_bookings
+      GROUP BY
+        metric_time
+    ) a
+    INNER JOIN (
+      SELECT
+        c.ds AS metric_time
+        , d.bookings_at_start_of_month AS bookings_at_start_of_month
+      FROM {{ source_schema }}.mf_time_spine c
+      LEFT OUTER JOIN (
         SELECT
           ds AS metric_time
-          , SUM(1) AS bookings
+          , SUM(1) AS bookings_at_start_of_month
         FROM {{ source_schema }}.fct_bookings
         GROUP BY
           metric_time
-      ) a
-      INNER JOIN (
-        SELECT
-          c.ds AS metric_time
-          , d.bookings_at_start_of_month AS bookings_at_start_of_month
-        FROM {{ source_schema }}.mf_time_spine c
-        LEFT OUTER JOIN (
-          SELECT
-            ds AS metric_time
-            , SUM(1) AS bookings_at_start_of_month
-          FROM {{ source_schema }}.fct_bookings
-          GROUP BY
-            metric_time
-        ) d
-        ON DATE_TRUNC('month', c.ds) = d.metric_time
-      ) b
-      ON a.metric_time = b.metric_time
-    ) e
-    
+      ) d
+      ON DATE_TRUNC('month', c.ds) = d.metric_time
+    ) b
+    ON a.metric_time = b.metric_time    
 ---
 integration_test:
   name: derived_metric_with_offset_window_and_offset_to_grain
@@ -764,46 +750,39 @@ integration_test:
   group_bys: ["metric_time"]
   check_query: |
     SELECT
-      metric_time
+      COALESCE(a.metric_time, b.metric_time) AS metric_time
       , month_start_bookings / bookings_1_month_ago AS bookings_month_start_compared_to_1_month_prior
     FROM (
       SELECT
-        COALESCE(a.metric_time, b.metric_time) AS metric_time
-        , a.bookings_1_month_ago
-        , b.month_start_bookings
-      FROM (
+        g.ds AS metric_time
+        , f.bookings AS bookings_1_month_ago
+      FROM {{ source_schema }}.mf_time_spine g
+      LEFT OUTER JOIN (
         SELECT
-          g.ds AS metric_time
-          , f.bookings AS bookings_1_month_ago
-        FROM {{ source_schema }}.mf_time_spine g
-        LEFT OUTER JOIN (
-          SELECT
-            ds AS metric_time
-            , SUM(1) AS bookings
-          FROM {{ source_schema }}.fct_bookings
-          GROUP BY
-            metric_time
-        ) f
-        ON g.ds - INTERVAL 1 month = f.metric_time
-      ) a
-      INNER JOIN (
+          ds AS metric_time
+          , SUM(1) AS bookings
+        FROM {{ source_schema }}.fct_bookings
+        GROUP BY
+          metric_time
+      ) f
+      ON g.ds - INTERVAL 1 month = f.metric_time
+    ) a
+    INNER JOIN (
+      SELECT
+        c.ds AS metric_time
+        , d.bookings AS month_start_bookings
+      FROM {{ source_schema }}.mf_time_spine c
+      LEFT OUTER JOIN (
         SELECT
-          c.ds AS metric_time
-          , d.bookings AS month_start_bookings
-        FROM {{ source_schema }}.mf_time_spine c
-        LEFT OUTER JOIN (
-          SELECT
-            ds AS metric_time
-            , SUM(1) AS bookings
-          FROM {{ source_schema }}.fct_bookings
-          GROUP BY
-            metric_time
-        ) d
-        ON DATE_TRUNC('month', c.ds) = d.metric_time
-      ) b
-      ON a.metric_time = b.metric_time
-    ) e
-    
+          ds AS metric_time
+          , SUM(1) AS bookings
+        FROM {{ source_schema }}.fct_bookings
+        GROUP BY
+          metric_time
+      ) d
+      ON DATE_TRUNC('month', c.ds) = d.metric_time
+    ) b
+    ON a.metric_time = b.metric_time    
 ---
 integration_test:
   name: derived_metric_offset_with_one_metric_input
