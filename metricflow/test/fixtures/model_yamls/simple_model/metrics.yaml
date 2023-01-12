@@ -589,7 +589,7 @@ metric:
       - booking_value_p99
 ---
 metric:
- name: "discrete_booking_value_p99"
+  name: "discrete_booking_value_p99"
   description: "discrete p99 booking value"
   owners:
     - support@transformdata.io
