@@ -1765,3 +1765,95 @@ def test_common_data_source(  # noqa: D
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
     )
+
+
+def test_derived_metric_with_offset_window(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
+    sql_client: SqlClient,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings_growth_2_weeks"),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+def test_derived_metric_with_offset_to_grain(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
+    sql_client: SqlClient,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings_growth_since_start_of_month"),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+def test_derived_metric_with_offset_window_and_offset_to_grain(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
+    sql_client: SqlClient,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings_month_start_compared_to_1_month_prior"),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+def test_derived_metric_with_one_input_metric(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
+    sql_client: SqlClient,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings_5_day_lag"),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
