@@ -703,7 +703,7 @@ integration_test:
         GROUP BY
           metric_time
       ) d
-      ON c.ds - INTERVAL 14 day = d.metric_time
+      ON {{ render_date_sub("C", "ds", 14, TimeGranularity.DAY) }} = d.metric_time
     ) b
     ON a.metric_time = b.metric_time
 ---
@@ -765,7 +765,7 @@ integration_test:
         GROUP BY
           metric_time
       ) f
-      ON g.ds - INTERVAL 1 month = f.metric_time
+      ON {{ render_date_sub("g", "ds", 1, TimeGranularity.MONTH) }} = f.metric_time
     ) a
     INNER JOIN (
       SELECT
@@ -790,7 +790,6 @@ integration_test:
   model: SIMPLE_MODEL
   metrics: ["bookings_5_day_lag"]
   group_bys: ["metric_time"]
-  # this should be wrong & fail; correct later
   check_query: |
     SELECT
       a.ds AS metric_time
@@ -804,4 +803,4 @@ integration_test:
       GROUP BY
         metric_time
     ) b
-    ON a.ds - INTERVAL 5 day = b.metric_time
+    ON {{ render_date_sub("a", "ds", 5, TimeGranularity.DAY) }} = b.metric_time
