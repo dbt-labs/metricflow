@@ -738,7 +738,7 @@ integration_test:
         GROUP BY
           metric_time
       ) d
-      ON DATE_TRUNC('month', c.ds) = d.metric_time
+      ON {{ render_date_trunc("c.ds", TimeGranularity.MONTH) }} = d.metric_time
     ) b
     ON a.metric_time = b.metric_time    
 ---
@@ -780,7 +780,7 @@ integration_test:
         GROUP BY
           metric_time
       ) d
-      ON DATE_TRUNC('month', c.ds) = d.metric_time
+      ON {{ render_date_trunc("c.ds", TimeGranularity.MONTH) }} = d.metric_time
     ) b
     ON a.metric_time = b.metric_time    
 ---
