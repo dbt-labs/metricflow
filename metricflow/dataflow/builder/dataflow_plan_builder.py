@@ -43,7 +43,6 @@ from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.model.objects.metric import MetricType, MetricTimeWindow
 from metricflow.model.semantic_model import SemanticModel
-from metricflow.model.spec_converters import WhereConstraintConverter
 from metricflow.object_utils import pformat_big_objects, assert_exactly_one_arg_set
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.node_processor import PreDimensionJoinNodeProcessor
@@ -186,7 +185,6 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             logger.info(f"Generating compute metrics node for {metric_spec}")
             metric_reference = metric_spec.as_reference
             metric = self._metric_semantics.get_metric(metric_reference)
-            metric_input_measure_specs = self._metric_semantics.measures_for_metric(metric_reference)
 
             if metric.type == MetricType.DERIVED:
                 metric_input_specs = self._metric_semantics.metric_input_specs_for_metric(metric_reference)
@@ -213,12 +211,6 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                     f"{pformat_big_objects(metric_input_measure_specs=metric_input_measure_specs)}"
                 )
                 combined_where = where_constraint
-                if metric.constraint:
-                    metric_constraint = WhereConstraintConverter.convert_to_spec_where_constraint(
-                        self._data_source_semantics, metric.constraint
-                    )
-                    combined_where = combined_where.combine(metric_constraint) if combined_where else metric_constraint
-
                 if metric_spec.constraint:
                     combined_where = (
                         combined_where.combine(metric_spec.constraint) if combined_where else metric_spec.constraint
@@ -249,6 +241,9 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 output_nodes.append(join_to_time_spine_node)
             else:
                 output_nodes.append(compute_metrics_node)
+
+        assert len(output_nodes) > 0, "ComputeMetricsNode was not properly constructed"
+
         if len(output_nodes) == 1:
             return output_nodes[0]
 

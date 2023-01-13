@@ -52,13 +52,23 @@
             <ComputeMetricsNode>
                 <!-- description = Compute Metrics via Expressions -->
                 <!-- node_id = cm_3 -->
-                <!-- metric_spec =                                -->
-                <!--   {'class': 'MetricSpec',                    -->
-                <!--    'element_name': 'instant_booking_value',  -->
-                <!--    'constraint': None,                       -->
-                <!--    'alias': None,                            -->
-                <!--    'offset_window': None,                    -->
-                <!--    'offset_to_grain': None}                  -->
+                <!-- metric_spec =                                                                               -->
+                <!--   {'class': 'MetricSpec',                                                                   -->
+                <!--    'element_name': 'instant_booking_value',                                                 -->
+                <!--    'constraint': {'class': 'SpecWhereClauseConstraint',                                     -->
+                <!--                   'where_condition': 'is_instant',                                          -->
+                <!--                   'linkable_names': ('is_instant',),                                        -->
+                <!--                   'linkable_spec_set': {'class': 'LinkableSpecSet',                         -->
+                <!--                                         'dimension_specs': ({'class': 'DimensionSpec',      -->
+                <!--                                                              'element_name': 'is_instant',  -->
+                <!--                                                              'identifier_links': ()},),     -->
+                <!--                                         'time_dimension_specs': (),                         -->
+                <!--                                         'identifier_specs': ()},                            -->
+                <!--                   'execution_parameters': {'class': 'SqlBindParameters',                    -->
+                <!--                                            'param_items': ()}},                             -->
+                <!--    'alias': None,                                                                           -->
+                <!--    'offset_window': None,                                                                   -->
+                <!--    'offset_to_grain': None}                                                                 -->
                 <AggregateMeasuresNode>
                     <!-- description = Aggregate Measures -->
                     <!-- node_id = am_3 -->

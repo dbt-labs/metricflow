@@ -33,11 +33,14 @@ from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import Sour
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.dataset.dataset import DataSet
 from metricflow.specs import (
-    MetricFlowQuerySpec,
-    MetricSpec,
     DimensionSpec,
     IdentifierReference,
+    LinkableSpecSet,
+    MetricFlowQuerySpec,
+    MetricSpec,
+    SpecWhereClauseConstraint,
 )
+from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.plan_utils import assert_plan_snapshot_text_equal
@@ -235,7 +238,25 @@ def test_constrained_metric_not_combined(  # noqa: D
         mf_test_session_state=mf_test_session_state,
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="booking_value"), MetricSpec(element_name="instant_booking_value")),
+            metric_specs=(
+                MetricSpec(element_name="booking_value"),
+                MetricSpec(
+                    element_name="instant_booking_value",
+                    constraint=SpecWhereClauseConstraint(
+                        where_condition="is_instant",
+                        linkable_names=("is_instant",),
+                        linkable_spec_set=LinkableSpecSet(
+                            dimension_specs=(
+                                DimensionSpec(
+                                    element_name="is_instant",
+                                    identifier_links=(),
+                                ),
+                            )
+                        ),
+                        execution_parameters=SqlBindParameters(),
+                    ),
+                ),
+            ),
             dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
         ),
         expected_num_sources_in_unoptimized=2,

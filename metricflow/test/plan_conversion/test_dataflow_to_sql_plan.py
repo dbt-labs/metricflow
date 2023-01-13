@@ -1633,7 +1633,24 @@ def test_join_to_scd_dimension(
     """Tests conversion of a plan using a dimension with a validity window inside a measure constraint"""
     dataflow_plan = scd_dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="family_bookings"),),
+            metric_specs=(
+                MetricSpec(
+                    element_name="family_bookings",
+                    constraint=SpecWhereClauseConstraint(
+                        where_condition="listing__capacity > 2",
+                        linkable_names=("listing__capacity",),
+                        linkable_spec_set=LinkableSpecSet(
+                            dimension_specs=(
+                                DimensionSpec(
+                                    element_name="capacity",
+                                    identifier_links=(IdentifierReference(element_name="listing"),),
+                                ),
+                            ),
+                        ),
+                        execution_parameters=SqlBindParameters(),
+                    ),
+                ),
+            ),
             time_dimension_specs=(MTD_SPEC_DAY,),
         ),
     )
