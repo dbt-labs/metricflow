@@ -671,3 +671,136 @@ integration_test:
       GROUP BY 2
     ) vw
     ON bk.is_lux = vw.is_lux OR (bk.is_lux IS NULL AND vw.is_lux IS NULL)
+---
+integration_test:
+  name: derived_metric_with_offset_window
+  description: Tests a derived metric query with an offset_window
+  model: SIMPLE_MODEL
+  metrics: ["bookings_growth_2_weeks"]
+  group_bys: ["metric_time"]
+  check_query: |
+    SELECT
+      COALESCE(a.metric_time, b.metric_time) AS metric_time
+      , (bookings - bookings_2_weeks_ago) / bookings_2_weeks_ago AS bookings_growth_2_weeks
+    FROM (
+      SELECT
+        ds AS metric_time
+        , SUM(1) AS bookings
+      FROM {{ source_schema }}.fct_bookings
+      GROUP BY
+        metric_time
+    ) a
+    INNER JOIN (
+      SELECT
+        c.ds AS metric_time
+        , d.bookings_2_weeks_ago AS bookings_2_weeks_ago
+      FROM {{ source_schema }}.mf_time_spine c
+      LEFT OUTER JOIN (
+        SELECT
+          ds AS metric_time
+          , SUM(1) AS bookings_2_weeks_ago
+        FROM {{ source_schema }}.fct_bookings
+        GROUP BY
+          metric_time
+      ) d
+      ON {{ render_date_sub("C", "ds", 14, TimeGranularity.DAY) }} = d.metric_time
+    ) b
+    ON a.metric_time = b.metric_time
+---
+integration_test:
+  name: derived_metric_with_offset_to_grain
+  description: Tests a derived metric query with an offset_to_grain
+  model: SIMPLE_MODEL
+  metrics: ["bookings_growth_since_start_of_month"]
+  group_bys: ["metric_time"]
+  check_query: |
+    SELECT
+      COALESCE(a.metric_time, b.metric_time) AS metric_time
+      , (bookings - bookings_at_start_of_month) / bookings_at_start_of_month AS bookings_growth_since_start_of_month
+    FROM (
+      SELECT
+        ds AS metric_time
+        , SUM(1) AS bookings
+      FROM {{ source_schema }}.fct_bookings
+      GROUP BY
+        metric_time
+    ) a
+    INNER JOIN (
+      SELECT
+        c.ds AS metric_time
+        , d.bookings_at_start_of_month AS bookings_at_start_of_month
+      FROM {{ source_schema }}.mf_time_spine c
+      LEFT OUTER JOIN (
+        SELECT
+          ds AS metric_time
+          , SUM(1) AS bookings_at_start_of_month
+        FROM {{ source_schema }}.fct_bookings
+        GROUP BY
+          metric_time
+      ) d
+      ON {{ render_date_trunc("c.ds", TimeGranularity.MONTH) }} = d.metric_time
+    ) b
+    ON a.metric_time = b.metric_time    
+---
+integration_test:
+  name: derived_metric_with_offset_window_and_offset_to_grain
+  description: Tests a derived metric query with 2 input metrics, one with an offset_window and one with an offset_to_grain
+  model: SIMPLE_MODEL
+  metrics: ["bookings_month_start_compared_to_1_month_prior"]
+  group_bys: ["metric_time"]
+  check_query: |
+    SELECT
+      COALESCE(a.metric_time, b.metric_time) AS metric_time
+      , month_start_bookings / bookings_1_month_ago AS bookings_month_start_compared_to_1_month_prior
+    FROM (
+      SELECT
+        g.ds AS metric_time
+        , f.bookings AS bookings_1_month_ago
+      FROM {{ source_schema }}.mf_time_spine g
+      LEFT OUTER JOIN (
+        SELECT
+          ds AS metric_time
+          , SUM(1) AS bookings
+        FROM {{ source_schema }}.fct_bookings
+        GROUP BY
+          metric_time
+      ) f
+      ON {{ render_date_sub("g", "ds", 1, TimeGranularity.MONTH) }} = f.metric_time
+    ) a
+    INNER JOIN (
+      SELECT
+        c.ds AS metric_time
+        , d.bookings AS month_start_bookings
+      FROM {{ source_schema }}.mf_time_spine c
+      LEFT OUTER JOIN (
+        SELECT
+          ds AS metric_time
+          , SUM(1) AS bookings
+        FROM {{ source_schema }}.fct_bookings
+        GROUP BY
+          metric_time
+      ) d
+      ON {{ render_date_trunc("c.ds", TimeGranularity.MONTH) }} = d.metric_time
+    ) b
+    ON a.metric_time = b.metric_time    
+---
+integration_test:
+  name: derived_metric_offset_with_one_metric_input
+  description: Tests a derived metric offset query with only one input metric
+  model: SIMPLE_MODEL
+  metrics: ["bookings_5_day_lag"]
+  group_bys: ["metric_time"]
+  check_query: |
+    SELECT
+      a.ds AS metric_time
+      , b.bookings_5_day_lag
+    FROM {{ source_schema }}.mf_time_spine a
+    LEFT OUTER JOIN (
+      SELECT
+        ds AS metric_time
+        , SUM(1) AS bookings_5_day_lag
+      FROM {{ source_schema }}.fct_bookings
+      GROUP BY
+        metric_time
+    ) b
+    ON {{ render_date_sub("a", "ds", 5, TimeGranularity.DAY) }} = b.metric_time

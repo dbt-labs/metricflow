@@ -163,8 +163,8 @@ class MetricFlowQueryParser:
         finally:
             logger.info(f"Parsing the query took: {time.time() - start_time:.2f}s")
 
-    def _validate_no_dimension_query_for_metric(self, metric_references: Sequence[MetricReference]) -> None:
-        """Validate if all requested metrics are queryable without any dimensions."""
+    def _validate_no_time_dimension_query(self, metric_references: Sequence[MetricReference]) -> None:
+        """Validate if all requested metrics are queryable without a time dimension."""
         for metric_reference in metric_references:
             metric = self._metric_semantics.get_metric(metric_reference)
             if metric.type == MetricType.CUMULATIVE:
@@ -174,6 +174,14 @@ class MetricFlowQueryParser:
                         f"Metric {metric.name} is a cumulative metric specified with a window/grain_to_date "
                         f"which must be queried with the dimension 'metric_time'.",
                     )
+            elif metric.type == MetricType.DERIVED:
+                for input_metric in metric.type_params.metrics or []:
+                    if input_metric.offset_window or input_metric.offset_to_grain:
+                        raise UnableToSatisfyQueryError(
+                            f"Metric '{metric.name}' is a derived metric that contains input metrics with "
+                            "an `offset_window` or `offset_to_grain` which must be queried with the "
+                            "dimension 'metric_time'."
+                        )
 
     def _validate_linkable_specs(
         self,
@@ -307,9 +315,6 @@ class MetricFlowQueryParser:
             # If the time constraint is all time, just ignore and not render
             time_constraint = None
 
-        if len(group_by_names) == 0:
-            self._validate_no_dimension_query_for_metric(metric_references=metric_references)
-
         requested_linkable_specs = self._parse_linkable_element_names(group_by_names, metric_references)
         partial_time_dimension_spec_replacements = (
             self._time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
@@ -327,6 +332,8 @@ class MetricFlowQueryParser:
         time_dimension_specs = requested_linkable_specs.time_dimension_specs + tuple(
             time_dimension_spec for _, time_dimension_spec in partial_time_dimension_spec_replacements.items()
         )
+        if len(time_dimension_specs) == 0:
+            self._validate_no_time_dimension_query(metric_references=metric_references)
 
         self._time_granularity_solver.validate_time_granularity(metric_references, time_dimension_specs)
 

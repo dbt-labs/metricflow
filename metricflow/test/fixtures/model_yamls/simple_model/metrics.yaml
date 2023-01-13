@@ -617,3 +617,68 @@ metric:
   type_params:
     measures:
       - approximate_discrete_booking_value_p99
+---
+metric:
+  name: "bookings_growth_2_weeks"
+  description: |
+    percentage growth of bookings compared to bookings 2 weeks prior,
+    used to test derived metrics with an offset_window.
+  owners:
+    - support@transformdata.io
+  type: derived
+  type_params:
+    expr: (bookings - bookings_2_weeks_ago) / bookings_2_weeks_ago
+    metrics:
+      - name: bookings
+      - name: bookings
+        offset_window: 14 days
+        alias: bookings_2_weeks_ago
+---
+metric:
+  name: "bookings_growth_since_start_of_month"
+  description: |
+    percentage growth of bookings since the start of the month,
+    used to test derived metrics with an offset_to_grain.
+  owners:
+    - support@transformdata.io
+  type: derived
+  type_params:
+    expr: (bookings - bookings_at_start_of_month) / bookings_at_start_of_month
+    metrics:
+      - name: bookings
+      - name: bookings
+        offset_to_grain: month
+        alias: bookings_at_start_of_month
+---
+metric:
+  name: "bookings_month_start_compared_to_1_month_prior"
+  description: |
+    percentage growth of bookings compared to bookings 2 weeks prior,
+    used to test derived metrics with an offset_window.
+  owners:
+    - support@transformdata.io
+  type: derived
+  type_params:
+    expr: month_start_bookings / bookings_1_month_ago
+    metrics:
+      - name: bookings
+        offset_to_grain: month
+        alias: month_start_bookings
+      - name: bookings
+        offset_window: 1 month
+        alias: bookings_1_month_ago
+---
+metric:
+  name: "bookings_5_day_lag"
+  description: |
+    number of bookings 5 days ago. used to test derived metric offset
+    with only one input metric.
+  owners:
+    - support@transformdata.io
+  type: derived
+  type_params:
+    expr: bookings_5_days_ago
+    metrics:
+      - name: bookings
+        offset_window: 5 days
+        alias: bookings_5_days_ago

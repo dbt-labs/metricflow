@@ -65,16 +65,8 @@ class MetricInputMeasure(PydanticCustomInputParser, HashableBaseModel):
         return MeasureReference(element_name=self.alias or self.name)
 
 
-class MetricInput(HashableBaseModel):
-    """Provides a pointer to a metric along with the additional properties used on that metric."""
-
-    name: str
-    constraint: Optional[WhereClauseConstraint]
-    alias: Optional[str]
-
-
 class MetricTimeWindow(PydanticCustomInputParser, HashableBaseModel):
-    """Describes the window of time the metric should be accumulated over. ie '1 day', '2 weeks', etc"""
+    """Describes the window of time the metric should be accumulated over, e.g., '1 day', '2 weeks', etc"""
 
     count: int
     granularity: TimeGranularity
@@ -105,7 +97,7 @@ class MetricTimeWindow(PydanticCustomInputParser, HashableBaseModel):
         parts = window.split(" ")
         if len(parts) != 2:
             raise ParsingException(
-                f"Invalid window ({window}) in cumulative metric. Should be of the form `<count> <granularity>`, ie `28 days`",
+                f"Invalid window ({window}) in cumulative metric. Should be of the form `<count> <granularity>`, e.g., `28 days`",
             )
 
         granularity = parts[1]
@@ -126,6 +118,16 @@ class MetricTimeWindow(PydanticCustomInputParser, HashableBaseModel):
             count=int(count),
             granularity=string_to_time_granularity(granularity),
         )
+
+
+class MetricInput(HashableBaseModel):
+    """Provides a pointer to a metric along with the additional properties used on that metric."""
+
+    name: str
+    constraint: Optional[WhereClauseConstraint]
+    alias: Optional[str]
+    offset_window: Optional[MetricTimeWindow]
+    offset_to_grain: Optional[TimeGranularity]
 
 
 class MetricTypeParams(HashableBaseModel):

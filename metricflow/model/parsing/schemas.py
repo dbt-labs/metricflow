@@ -102,6 +102,8 @@ metric_input_schema = {
         "name": {"type": "string"},
         "constraint": {"type": "string"},
         "alias": {"type": "string"},
+        "offset_window": {"type": "string"},
+        "offset_to_grain": {"type": "string"},
     },
     "additionalProperties": False,
 }

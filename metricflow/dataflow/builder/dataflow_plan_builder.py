@@ -203,16 +203,6 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                     ),
                     metric_specs=[metric_spec],
                 )
-                if metric_spec.offset_window or metric_spec.offset_to_grain:
-                    join_to_time_spine_node = JoinToTimeSpineNode(
-                        parent_node=compute_metrics_node,
-                        time_range_constraint=time_range_constraint,
-                        offset_window=metric_spec.offset_window,
-                        offset_to_grain=metric_spec.offset_to_grain,
-                    )
-                    output_nodes.append(join_to_time_spine_node)
-                else:
-                    output_nodes.append(compute_metrics_node)
             else:
                 metric_input_measure_specs = self._metric_semantics.measures_for_metric(metric_reference)
 
@@ -236,12 +226,21 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                         metric.type_params.grain_to_date if metric.type == MetricType.CUMULATIVE else None
                     ),
                 )
-                output_nodes.append(
-                    self.build_computed_metrics_node(
-                        metric_spec=metric_spec,
-                        aggregated_measures_node=aggregated_measures_node,
-                    )
+                compute_metrics_node = self.build_computed_metrics_node(
+                    metric_spec=metric_spec,
+                    aggregated_measures_node=aggregated_measures_node,
                 )
+
+            if metric_spec.offset_window or metric_spec.offset_to_grain:
+                join_to_time_spine_node = JoinToTimeSpineNode(
+                    parent_node=compute_metrics_node,
+                    time_range_constraint=time_range_constraint,
+                    offset_window=metric_spec.offset_window,
+                    offset_to_grain=metric_spec.offset_to_grain,
+                )
+                output_nodes.append(join_to_time_spine_node)
+            else:
+                output_nodes.append(compute_metrics_node)
 
         assert len(output_nodes) > 0, "ComputeMetricsNode was not properly constructed"
 

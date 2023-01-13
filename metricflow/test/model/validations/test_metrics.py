@@ -236,16 +236,36 @@ def test_derived_metric() -> None:  # noqa: D
                     type=MetricType.DERIVED,
                     type_params=MetricTypeParams(expr="notexist * 2", metrics=[MetricInput(name="notexist")]),
                 ),
+                metric_with_guaranteed_meta(
+                    name="has_valid_time_window_params",
+                    type=MetricType.DERIVED,
+                    type_params=MetricTypeParams(
+                        expr="random_metric / random_metric3",
+                        metrics=[
+                            MetricInput(name="random_metric", offset_window="3 weeks"),
+                            MetricInput(name="random_metric", offset_to_grain="month", alias="random_metric3"),
+                        ],
+                    ),
+                ),
+                metric_with_guaranteed_meta(
+                    name="has_both_time_offset_params_on_same_input_metric",
+                    type=MetricType.DERIVED,
+                    type_params=MetricTypeParams(
+                        expr="random_metric * 2",
+                        metrics=[MetricInput(name="random_metric", offset_window="3 weeks", offset_to_grain="month")],
+                    ),
+                ),
             ],
             materializations=[],
         )
     )
     build_issues = result.issues.errors
-    assert len(build_issues) == 2
+    assert len(build_issues) == 3
     expected_substr1 = "is already being used. Please choose another alias"
     expected_substr2 = "does not exist as a configured metric in the model"
+    expected_substr3 = "Both offset_window and offset_to_grain set"
     missing_error_strings = set()
-    for expected_str in [expected_substr1, expected_substr2]:
+    for expected_str in [expected_substr1, expected_substr2, expected_substr3]:
         if not any(actual_str.as_readable_str().find(expected_str) != -1 for actual_str in build_issues):
             missing_error_strings.add(expected_str)
     assert (
