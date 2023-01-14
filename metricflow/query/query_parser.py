@@ -6,8 +6,6 @@ import time
 from dataclasses import dataclass
 from typing import List, Optional, Tuple, Dict, Sequence
 
-import fuzzywuzzy.process
-
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import BaseOutput
@@ -44,6 +42,7 @@ from metricflow.time.time_granularity_solver import (
 
 logging.captureWarnings(True)
 import fuzzywuzzy.fuzz  # noqa: E402
+import fuzzywuzzy.process  # noqa: E402
 
 logging.captureWarnings(False)
 
