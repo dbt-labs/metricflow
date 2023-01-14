@@ -20,16 +20,13 @@ repos:
         verbose: true
         additional_dependencies:
           [
+            dbt-core,
+            pytest,
             "sqlalchemy<2.0",
             sqlalchemy2-stubs,
-            types-flask,
-            types-requests,
-            types-PyYAML,
-            types-jinja2,
             types-attrs,
-            types-tabulate,
-            pytest,
-            python-dateutil,
+            types-jinja2,
             types-python-dateutil,
-            dbt-core,
+            types-PyYAML,
+            types-tabulate,
           ]
