@@ -12,7 +12,7 @@ repos:
         verbose: true
 
   - repo: https://github.com/pre-commit/mirrors-mypy # configured via mypy.ini
-    rev: v0.931
+    rev: v0.942
     hooks: # passing args: [] ensures we do not silently ignore imports (default) and instead explicitly configure in mypy.ini
       - id: mypy
         name: mypy_metricflow
