@@ -1,0 +1,6 @@
+kind: Fixes
+body: Fixes type error in BigQuerySqlExpressionRenderer
+time: 2023-05-17T16:38:39.190547-07:00
+custom:
+  Author: tlento
+  Issue: "536"

@@ -93,9 +93,11 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
         if node.grain_to_date:
             granularity = node.granularity
             if granularity == TimeGranularity.WEEK or granularity == TimeGranularity.YEAR:
-                granularity.value = "ISO" + granularity.value.upper()
+                granularity_value = "ISO" + granularity.value.upper()
+            else:
+                granularity_value = granularity.value
             return SqlExpressionRenderResult(
-                sql=f"DATE_TRUNC({column.sql}, {granularity.value})",
+                sql=f"DATE_TRUNC({column.sql}, {granularity_value})",
                 bind_parameters=column.bind_parameters,
             )
 
