@@ -26,7 +26,7 @@ FROM (
       --   ['average_booking_value', 'bookings', 'listing__is_lux_latest', 'metric_time']
       SELECT
         subq_19.metric_time AS metric_time
-        , listings_latest_src_10004.is_lux AS listing__is_lux_latest
+        , listings_latest_src_10005.is_lux AS listing__is_lux_latest
         , subq_19.bookings AS bookings
         , subq_19.average_booking_value AS average_booking_value
       FROM (
@@ -45,9 +45,9 @@ FROM (
         ) bookings_source_src_10001
       ) subq_19
       LEFT OUTER JOIN
-        ***************************.dim_listings_latest listings_latest_src_10004
+        ***************************.dim_listings_latest listings_latest_src_10005
       ON
-        subq_19.listing = listings_latest_src_10004.listing_id
+        subq_19.listing = listings_latest_src_10005.listing_id
     ) subq_24
     WHERE listing__is_lux_latest
     GROUP BY

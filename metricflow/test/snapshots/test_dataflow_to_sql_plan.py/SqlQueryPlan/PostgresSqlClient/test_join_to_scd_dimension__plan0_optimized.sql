@@ -12,7 +12,7 @@ FROM (
   --   ['bookings', 'listing__capacity', 'metric_time']
   SELECT
     subq_12.metric_time AS metric_time
-    , listings_src_10020.capacity AS listing__capacity
+    , listings_src_10022.capacity AS listing__capacity
     , subq_12.bookings AS bookings
   FROM (
     -- Read Elements From Data Source 'bookings_source'
@@ -23,21 +23,21 @@ FROM (
       ds AS metric_time
       , listing_id AS listing
       , 1 AS bookings
-    FROM ***************************.fct_bookings bookings_source_src_10018
+    FROM ***************************.fct_bookings bookings_source_src_10020
   ) subq_12
   LEFT OUTER JOIN
-    ***************************.dim_listings listings_src_10020
+    ***************************.dim_listings listings_src_10022
   ON
     (
-      subq_12.listing = listings_src_10020.listing_id
+      subq_12.listing = listings_src_10022.listing_id
     ) AND (
       (
-        subq_12.metric_time >= listings_src_10020.active_from
+        subq_12.metric_time >= listings_src_10022.active_from
       ) AND (
         (
-          subq_12.metric_time < listings_src_10020.active_to
+          subq_12.metric_time < listings_src_10022.active_to
         ) OR (
-          listings_src_10020.active_to IS NULL
+          listings_src_10022.active_to IS NULL
         )
       )
     )

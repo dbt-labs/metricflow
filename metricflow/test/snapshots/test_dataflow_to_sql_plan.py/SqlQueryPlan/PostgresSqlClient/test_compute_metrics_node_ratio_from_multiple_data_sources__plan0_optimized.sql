@@ -13,7 +13,7 @@ FROM (
   -- Aggregate Measures
   SELECT
     subq_22.ds AS ds
-    , listings_latest_src_10004.country AS listing__country_latest
+    , listings_latest_src_10005.country AS listing__country_latest
     , SUM(subq_22.bookings) AS bookings
   FROM (
     -- Read Elements From Data Source 'bookings_source'
@@ -30,12 +30,12 @@ FROM (
     ) bookings_source_src_10001
   ) subq_22
   LEFT OUTER JOIN
-    ***************************.dim_listings_latest listings_latest_src_10004
+    ***************************.dim_listings_latest listings_latest_src_10005
   ON
-    subq_22.listing = listings_latest_src_10004.listing_id
+    subq_22.listing = listings_latest_src_10005.listing_id
   GROUP BY
     subq_22.ds
-    , listings_latest_src_10004.country
+    , listings_latest_src_10005.country
 ) subq_28
 INNER JOIN (
   -- Join Standard Outputs
@@ -44,7 +44,7 @@ INNER JOIN (
   -- Aggregate Measures
   SELECT
     subq_31.ds AS ds
-    , listings_latest_src_10004.country AS listing__country_latest
+    , listings_latest_src_10005.country AS listing__country_latest
     , SUM(subq_31.views) AS views
   FROM (
     -- Read Elements From Data Source 'views_source'
@@ -58,15 +58,15 @@ INNER JOIN (
     FROM (
       -- User Defined SQL Query
       SELECT user_id, listing_id, ds, ds_partitioned FROM ***************************.fct_views
-    ) views_source_src_10009
+    ) views_source_src_10010
   ) subq_31
   LEFT OUTER JOIN
-    ***************************.dim_listings_latest listings_latest_src_10004
+    ***************************.dim_listings_latest listings_latest_src_10005
   ON
-    subq_31.listing = listings_latest_src_10004.listing_id
+    subq_31.listing = listings_latest_src_10005.listing_id
   GROUP BY
     subq_31.ds
-    , listings_latest_src_10004.country
+    , listings_latest_src_10005.country
 ) subq_37
 ON
   (

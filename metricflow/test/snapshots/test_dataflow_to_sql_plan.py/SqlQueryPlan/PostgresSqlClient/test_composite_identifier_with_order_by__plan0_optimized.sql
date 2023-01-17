@@ -14,7 +14,7 @@ FROM (
     team_id AS user_team___team_id
     , user_id AS user_team___user_id
     , 1 AS messages
-  FROM ***************************.fct_messages messages_source_src_10015
+  FROM ***************************.fct_messages messages_source_src_10017
 ) subq_7
 GROUP BY
   user_team___team_id

@@ -31,17 +31,17 @@ FROM (
       FROM (
         -- Read Elements From Data Source 'revenue'
         SELECT
-          revenue_src_10006.revenue AS txn_revenue
-          , revenue_src_10006.created_at AS ds
-          , DATE_TRUNC('week', revenue_src_10006.created_at) AS ds__week
-          , DATE_TRUNC('month', revenue_src_10006.created_at) AS ds__month
-          , DATE_TRUNC('quarter', revenue_src_10006.created_at) AS ds__quarter
-          , DATE_TRUNC('year', revenue_src_10006.created_at) AS ds__year
-          , revenue_src_10006.user_id AS user
+          revenue_src_10007.revenue AS txn_revenue
+          , revenue_src_10007.created_at AS ds
+          , DATE_TRUNC('week', revenue_src_10007.created_at) AS ds__week
+          , DATE_TRUNC('month', revenue_src_10007.created_at) AS ds__month
+          , DATE_TRUNC('quarter', revenue_src_10007.created_at) AS ds__quarter
+          , DATE_TRUNC('year', revenue_src_10007.created_at) AS ds__year
+          , revenue_src_10007.user_id AS user
         FROM (
           -- User Defined SQL Query
           SELECT * FROM ***************************.fct_revenue
-        ) revenue_src_10006
+        ) revenue_src_10007
       ) subq_0
     ) subq_1
   ) subq_3

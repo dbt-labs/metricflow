@@ -9,4 +9,4 @@ SELECT
 FROM (
   -- User Defined SQL Query
   SELECT * FROM ***************************.fct_revenue
-) revenue_src_10006
+) revenue_src_10007

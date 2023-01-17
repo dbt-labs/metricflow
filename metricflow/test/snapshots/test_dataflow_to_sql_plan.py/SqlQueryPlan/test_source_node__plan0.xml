@@ -216,6 +216,7 @@
         <!--    'column_alias': 'create_a_cycle_in_the_join_graph__host'}  -->
         <!-- from_source = SqlSelectQueryFromClauseNode(node_id=tfc_10001) -->
         <!-- where = None -->
+        <!-- distinct = False -->
         <SqlSelectQueryFromClauseNode>
             <!-- description = Read From a Select Query -->
             <!-- node_id = tfc_10001 -->

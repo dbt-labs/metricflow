@@ -52,24 +52,24 @@ FROM (
           -- Read Elements From Data Source 'messages_source'
           SELECT
             1 AS messages
-            , messages_source_src_10015.ds
-            , DATE_TRUNC('week', messages_source_src_10015.ds) AS ds__week
-            , DATE_TRUNC('month', messages_source_src_10015.ds) AS ds__month
-            , DATE_TRUNC('quarter', messages_source_src_10015.ds) AS ds__quarter
-            , DATE_TRUNC('year', messages_source_src_10015.ds) AS ds__year
-            , messages_source_src_10015.team_id
-            , messages_source_src_10015.ds AS user_id__ds
-            , DATE_TRUNC('week', messages_source_src_10015.ds) AS user_id__ds__week
-            , DATE_TRUNC('month', messages_source_src_10015.ds) AS user_id__ds__month
-            , DATE_TRUNC('quarter', messages_source_src_10015.ds) AS user_id__ds__quarter
-            , DATE_TRUNC('year', messages_source_src_10015.ds) AS user_id__ds__year
-            , messages_source_src_10015.team_id AS user_id__team_id
-            , messages_source_src_10015.user_id
-            , messages_source_src_10015.team_id AS user_team___team_id
-            , messages_source_src_10015.user_id AS user_team___user_id
-            , messages_source_src_10015.team_id AS user_id__user_team___team_id
-            , messages_source_src_10015.user_id AS user_id__user_team___user_id
-          FROM ***************************.fct_messages messages_source_src_10015
+            , messages_source_src_10017.ds
+            , DATE_TRUNC('week', messages_source_src_10017.ds) AS ds__week
+            , DATE_TRUNC('month', messages_source_src_10017.ds) AS ds__month
+            , DATE_TRUNC('quarter', messages_source_src_10017.ds) AS ds__quarter
+            , DATE_TRUNC('year', messages_source_src_10017.ds) AS ds__year
+            , messages_source_src_10017.team_id
+            , messages_source_src_10017.ds AS user_id__ds
+            , DATE_TRUNC('week', messages_source_src_10017.ds) AS user_id__ds__week
+            , DATE_TRUNC('month', messages_source_src_10017.ds) AS user_id__ds__month
+            , DATE_TRUNC('quarter', messages_source_src_10017.ds) AS user_id__ds__quarter
+            , DATE_TRUNC('year', messages_source_src_10017.ds) AS user_id__ds__year
+            , messages_source_src_10017.team_id AS user_id__team_id
+            , messages_source_src_10017.user_id
+            , messages_source_src_10017.team_id AS user_team___team_id
+            , messages_source_src_10017.user_id AS user_team___user_id
+            , messages_source_src_10017.team_id AS user_id__user_team___team_id
+            , messages_source_src_10017.user_id AS user_id__user_team___user_id
+          FROM ***************************.fct_messages messages_source_src_10017
         ) subq_0
       ) subq_1
     ) subq_2

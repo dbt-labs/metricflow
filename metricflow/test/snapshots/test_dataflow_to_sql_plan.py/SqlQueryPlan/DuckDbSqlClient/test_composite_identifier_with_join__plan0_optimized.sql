@@ -6,7 +6,7 @@
 SELECT
   subq_10.user_team___team_id AS user_team___team_id
   , subq_10.user_team___user_id AS user_team___user_id
-  , users_source_src_10017.country AS user_team__country
+  , users_source_src_10019.country AS user_team__country
   , SUM(subq_10.messages) AS messages
 FROM (
   -- Read Elements From Data Source 'messages_source'
@@ -17,17 +17,17 @@ FROM (
     team_id AS user_team___team_id
     , user_id AS user_team___user_id
     , 1 AS messages
-  FROM ***************************.fct_messages messages_source_src_10015
+  FROM ***************************.fct_messages messages_source_src_10017
 ) subq_10
 LEFT OUTER JOIN
-  ***************************.fct_users users_source_src_10017
+  ***************************.fct_users users_source_src_10019
 ON
   (
-    subq_10.user_team___team_id = users_source_src_10017.team_id
+    subq_10.user_team___team_id = users_source_src_10019.team_id
   ) AND (
-    subq_10.user_team___user_id = users_source_src_10017.id
+    subq_10.user_team___user_id = users_source_src_10019.id
   )
 GROUP BY
   subq_10.user_team___team_id
   , subq_10.user_team___user_id
-  , users_source_src_10017.country
+  , users_source_src_10019.country

@@ -11,7 +11,7 @@ SELECT
 FROM (
   -- User Defined SQL Query
   SELECT * FROM ***************************.fct_revenue
-) revenue_src_10006
+) revenue_src_10007
 WHERE created_at BETWEEN CAST('2019-12-01' AS TIMESTAMP) AND CAST('2020-01-01' AS TIMESTAMP)
 GROUP BY
   DATE_TRUNC('month', created_at)

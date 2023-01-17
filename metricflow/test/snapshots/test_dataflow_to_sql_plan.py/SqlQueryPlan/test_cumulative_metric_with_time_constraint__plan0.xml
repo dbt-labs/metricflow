@@ -1,192 +1,198 @@
 <SqlQueryPlan>
     <SqlSelectStatementNode>
         <!-- description = Compute Metrics via Expressions -->
-        <!-- node_id = ss_13 -->
+        <!-- node_id = ss_15 -->
         <!-- col0 =                                                    -->
         <!--   {'class': 'SqlSelectColumn',                            -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_282),  -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_309),  -->
         <!--    'column_alias': 'ds__month'}                           -->
         <!-- col1 =                                                    -->
         <!--   {'class': 'SqlSelectColumn',                            -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_283),  -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_310),  -->
         <!--    'column_alias': 'trailing_2_months_revenue'}           -->
-        <!-- from_source = SqlSelectStatementNode(node_id=ss_12) -->
+        <!-- from_source = SqlSelectStatementNode(node_id=ss_14) -->
         <!-- where = None -->
+        <!-- distinct = False -->
         <SqlSelectStatementNode>
             <!-- description = Aggregate Measures -->
-            <!-- node_id = ss_12 -->
+            <!-- node_id = ss_14 -->
             <!-- col0 =                                                    -->
             <!--   {'class': 'SqlSelectColumn',                            -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_281),  -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_308),  -->
             <!--    'column_alias': 'ds__month'}                           -->
             <!-- col1 =                                                                       -->
             <!--   {'class': 'SqlSelectColumn',                                               -->
             <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
             <!--    'column_alias': 'txn_revenue'}                                            -->
-            <!-- from_source = SqlSelectStatementNode(node_id=ss_11) -->
+            <!-- from_source = SqlSelectStatementNode(node_id=ss_13) -->
             <!-- group_by0 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                            -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_281),  -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_308),  -->
             <!--    'column_alias': 'ds__month'}                           -->
             <!-- where = None -->
+            <!-- distinct = False -->
             <SqlSelectStatementNode>
                 <!-- description =                     -->
                 <!--   Pass Only Elements:             -->
                 <!--     ['txn_revenue', 'ds__month']  -->
-                <!-- node_id = ss_11 -->
+                <!-- node_id = ss_13 -->
                 <!-- col0 =                                                    -->
                 <!--   {'class': 'SqlSelectColumn',                            -->
-                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_279),  -->
+                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_306),  -->
                 <!--    'column_alias': 'ds__month'}                           -->
                 <!-- col1 =                                                    -->
                 <!--   {'class': 'SqlSelectColumn',                            -->
-                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_278),  -->
+                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_305),  -->
                 <!--    'column_alias': 'txn_revenue'}                         -->
-                <!-- from_source = SqlSelectStatementNode(node_id=ss_10) -->
+                <!-- from_source = SqlSelectStatementNode(node_id=ss_12) -->
                 <!-- where = None -->
+                <!-- distinct = False -->
                 <SqlSelectStatementNode>
                     <!-- description =                                                         -->
                     <!--   Constrain Time Range to [2019-12-01T00:00:00, 2020-01-01T00:00:00]  -->
-                    <!-- node_id = ss_10 -->
+                    <!-- node_id = ss_12 -->
                     <!-- col0 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_267),  -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_294),  -->
                     <!--    'column_alias': 'ds'}                                  -->
                     <!-- col1 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_268),  -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_295),  -->
                     <!--    'column_alias': 'ds__week'}                            -->
                     <!-- col2 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_269),  -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_296),  -->
                     <!--    'column_alias': 'ds__month'}                           -->
                     <!-- col3 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_270),  -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_297),  -->
                     <!--    'column_alias': 'ds__quarter'}                         -->
                     <!-- col4 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_271),  -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_298),  -->
                     <!--    'column_alias': 'ds__year'}                            -->
                     <!-- col5 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_272),  -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_299),  -->
                     <!--    'column_alias': 'metric_time'}                         -->
                     <!-- col6 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_273),  -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_300),  -->
                     <!--    'column_alias': 'metric_time__week'}                   -->
                     <!-- col7 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_274),  -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_301),  -->
                     <!--    'column_alias': 'metric_time__month'}                  -->
                     <!-- col8 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_275),  -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_302),  -->
                     <!--    'column_alias': 'metric_time__quarter'}                -->
                     <!-- col9 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_276),  -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_303),  -->
                     <!--    'column_alias': 'metric_time__year'}                   -->
                     <!-- col10 =                                                   -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_277),  -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_304),  -->
                     <!--    'column_alias': 'user'}                                -->
                     <!-- col11 =                                                   -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_266),  -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_293),  -->
                     <!--    'column_alias': 'txn_revenue'}                         -->
-                    <!-- from_source = SqlSelectStatementNode(node_id=ss_9) -->
+                    <!-- from_source = SqlSelectStatementNode(node_id=ss_11) -->
                     <!-- where = SqlBetweenExpression(node_id=betw_1) -->
+                    <!-- distinct = False -->
                     <SqlSelectStatementNode>
                         <!-- description = Metric Time Dimension 'ds' -->
-                        <!-- node_id = ss_9 -->
+                        <!-- node_id = ss_11 -->
                         <!-- col0 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
-                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_254),  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_281),  -->
                         <!--    'column_alias': 'ds'}                                  -->
                         <!-- col1 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
-                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_255),  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_282),  -->
                         <!--    'column_alias': 'ds__week'}                            -->
                         <!-- col2 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
-                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_256),  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_283),  -->
                         <!--    'column_alias': 'ds__month'}                           -->
                         <!-- col3 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
-                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_257),  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_284),  -->
                         <!--    'column_alias': 'ds__quarter'}                         -->
                         <!-- col4 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
-                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_258),  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_285),  -->
                         <!--    'column_alias': 'ds__year'}                            -->
                         <!-- col5 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
-                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_259),  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_286),  -->
                         <!--    'column_alias': 'metric_time'}                         -->
                         <!-- col6 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
-                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_260),  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_287),  -->
                         <!--    'column_alias': 'metric_time__week'}                   -->
                         <!-- col7 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
-                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_261),  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_288),  -->
                         <!--    'column_alias': 'metric_time__month'}                  -->
                         <!-- col8 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
-                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_262),  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_289),  -->
                         <!--    'column_alias': 'metric_time__quarter'}                -->
                         <!-- col9 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
-                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_263),  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_290),  -->
                         <!--    'column_alias': 'metric_time__year'}                   -->
                         <!-- col10 =                                                   -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
-                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_264),  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_291),  -->
                         <!--    'column_alias': 'user'}                                -->
                         <!-- col11 =                                                   -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
-                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_253),  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_280),  -->
                         <!--    'column_alias': 'txn_revenue'}                         -->
-                        <!-- from_source = SqlSelectStatementNode(node_id=ss_10006) -->
+                        <!-- from_source = SqlSelectStatementNode(node_id=ss_10007) -->
                         <!-- where = None -->
+                        <!-- distinct = False -->
                         <SqlSelectStatementNode>
                             <!-- description = Read Elements From Data Source 'revenue' -->
-                            <!-- node_id = ss_10006 -->
+                            <!-- node_id = ss_10007 -->
                             <!-- col0 =                                                      -->
                             <!--   {'class': 'SqlSelectColumn',                              -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10126),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10133),  -->
                             <!--    'column_alias': 'txn_revenue'}                           -->
                             <!-- col1 =                                                      -->
                             <!--   {'class': 'SqlSelectColumn',                              -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10127),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10134),  -->
                             <!--    'column_alias': 'ds'}                                    -->
                             <!-- col2 =                                                -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10060),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10064),  -->
                             <!--    'column_alias': 'ds__week'}                        -->
                             <!-- col3 =                                                -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10061),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10065),  -->
                             <!--    'column_alias': 'ds__month'}                       -->
                             <!-- col4 =                                                -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10062),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10066),  -->
                             <!--    'column_alias': 'ds__quarter'}                     -->
                             <!-- col5 =                                                -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10063),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10067),  -->
                             <!--    'column_alias': 'ds__year'}                        -->
                             <!-- col6 =                                                      -->
                             <!--   {'class': 'SqlSelectColumn',                              -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10132),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10139),  -->
                             <!--    'column_alias': 'user'}                                  -->
-                            <!-- from_source = SqlSelectQueryFromClauseNode(node_id=tfc_10002) -->
+                            <!-- from_source = SqlSelectQueryFromClauseNode(node_id=tfc_10003) -->
                             <!-- where = None -->
+                            <!-- distinct = False -->
                             <SqlSelectQueryFromClauseNode>
                                 <!-- description = Read From a Select Query -->
-                                <!-- node_id = tfc_10002 -->
+                                <!-- node_id = tfc_10003 -->
                             </SqlSelectQueryFromClauseNode>
                         </SqlSelectStatementNode>
                     </SqlSelectStatementNode>

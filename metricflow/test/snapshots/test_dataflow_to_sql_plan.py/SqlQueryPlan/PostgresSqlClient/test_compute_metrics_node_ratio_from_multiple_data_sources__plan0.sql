@@ -218,38 +218,38 @@ FROM (
                 -- Read Elements From Data Source 'listings_latest'
                 SELECT
                   1 AS listings
-                  , listings_latest_src_10004.capacity AS largest_listing
-                  , listings_latest_src_10004.capacity AS smallest_listing
-                  , listings_latest_src_10004.created_at AS ds
-                  , DATE_TRUNC('week', listings_latest_src_10004.created_at) AS ds__week
-                  , DATE_TRUNC('month', listings_latest_src_10004.created_at) AS ds__month
-                  , DATE_TRUNC('quarter', listings_latest_src_10004.created_at) AS ds__quarter
-                  , DATE_TRUNC('year', listings_latest_src_10004.created_at) AS ds__year
-                  , listings_latest_src_10004.created_at
-                  , DATE_TRUNC('week', listings_latest_src_10004.created_at) AS created_at__week
-                  , DATE_TRUNC('month', listings_latest_src_10004.created_at) AS created_at__month
-                  , DATE_TRUNC('quarter', listings_latest_src_10004.created_at) AS created_at__quarter
-                  , DATE_TRUNC('year', listings_latest_src_10004.created_at) AS created_at__year
-                  , listings_latest_src_10004.country AS country_latest
-                  , listings_latest_src_10004.is_lux AS is_lux_latest
-                  , listings_latest_src_10004.capacity AS capacity_latest
-                  , listings_latest_src_10004.created_at AS listing__ds
-                  , DATE_TRUNC('week', listings_latest_src_10004.created_at) AS listing__ds__week
-                  , DATE_TRUNC('month', listings_latest_src_10004.created_at) AS listing__ds__month
-                  , DATE_TRUNC('quarter', listings_latest_src_10004.created_at) AS listing__ds__quarter
-                  , DATE_TRUNC('year', listings_latest_src_10004.created_at) AS listing__ds__year
-                  , listings_latest_src_10004.created_at AS listing__created_at
-                  , DATE_TRUNC('week', listings_latest_src_10004.created_at) AS listing__created_at__week
-                  , DATE_TRUNC('month', listings_latest_src_10004.created_at) AS listing__created_at__month
-                  , DATE_TRUNC('quarter', listings_latest_src_10004.created_at) AS listing__created_at__quarter
-                  , DATE_TRUNC('year', listings_latest_src_10004.created_at) AS listing__created_at__year
-                  , listings_latest_src_10004.country AS listing__country_latest
-                  , listings_latest_src_10004.is_lux AS listing__is_lux_latest
-                  , listings_latest_src_10004.capacity AS listing__capacity_latest
-                  , listings_latest_src_10004.listing_id AS listing
-                  , listings_latest_src_10004.user_id AS user
-                  , listings_latest_src_10004.user_id AS listing__user
-                FROM ***************************.dim_listings_latest listings_latest_src_10004
+                  , listings_latest_src_10005.capacity AS largest_listing
+                  , listings_latest_src_10005.capacity AS smallest_listing
+                  , listings_latest_src_10005.created_at AS ds
+                  , DATE_TRUNC('week', listings_latest_src_10005.created_at) AS ds__week
+                  , DATE_TRUNC('month', listings_latest_src_10005.created_at) AS ds__month
+                  , DATE_TRUNC('quarter', listings_latest_src_10005.created_at) AS ds__quarter
+                  , DATE_TRUNC('year', listings_latest_src_10005.created_at) AS ds__year
+                  , listings_latest_src_10005.created_at
+                  , DATE_TRUNC('week', listings_latest_src_10005.created_at) AS created_at__week
+                  , DATE_TRUNC('month', listings_latest_src_10005.created_at) AS created_at__month
+                  , DATE_TRUNC('quarter', listings_latest_src_10005.created_at) AS created_at__quarter
+                  , DATE_TRUNC('year', listings_latest_src_10005.created_at) AS created_at__year
+                  , listings_latest_src_10005.country AS country_latest
+                  , listings_latest_src_10005.is_lux AS is_lux_latest
+                  , listings_latest_src_10005.capacity AS capacity_latest
+                  , listings_latest_src_10005.created_at AS listing__ds
+                  , DATE_TRUNC('week', listings_latest_src_10005.created_at) AS listing__ds__week
+                  , DATE_TRUNC('month', listings_latest_src_10005.created_at) AS listing__ds__month
+                  , DATE_TRUNC('quarter', listings_latest_src_10005.created_at) AS listing__ds__quarter
+                  , DATE_TRUNC('year', listings_latest_src_10005.created_at) AS listing__ds__year
+                  , listings_latest_src_10005.created_at AS listing__created_at
+                  , DATE_TRUNC('week', listings_latest_src_10005.created_at) AS listing__created_at__week
+                  , DATE_TRUNC('month', listings_latest_src_10005.created_at) AS listing__created_at__month
+                  , DATE_TRUNC('quarter', listings_latest_src_10005.created_at) AS listing__created_at__quarter
+                  , DATE_TRUNC('year', listings_latest_src_10005.created_at) AS listing__created_at__year
+                  , listings_latest_src_10005.country AS listing__country_latest
+                  , listings_latest_src_10005.is_lux AS listing__is_lux_latest
+                  , listings_latest_src_10005.capacity AS listing__capacity_latest
+                  , listings_latest_src_10005.listing_id AS listing
+                  , listings_latest_src_10005.user_id AS user
+                  , listings_latest_src_10005.user_id AS listing__user
+                FROM ***************************.dim_listings_latest listings_latest_src_10005
               ) subq_3
             ) subq_4
           ) subq_5
@@ -326,35 +326,35 @@ FROM (
                 -- Read Elements From Data Source 'views_source'
                 SELECT
                   1 AS views
-                  , views_source_src_10009.ds
-                  , DATE_TRUNC('week', views_source_src_10009.ds) AS ds__week
-                  , DATE_TRUNC('month', views_source_src_10009.ds) AS ds__month
-                  , DATE_TRUNC('quarter', views_source_src_10009.ds) AS ds__quarter
-                  , DATE_TRUNC('year', views_source_src_10009.ds) AS ds__year
-                  , views_source_src_10009.ds_partitioned
-                  , DATE_TRUNC('week', views_source_src_10009.ds_partitioned) AS ds_partitioned__week
-                  , DATE_TRUNC('month', views_source_src_10009.ds_partitioned) AS ds_partitioned__month
-                  , DATE_TRUNC('quarter', views_source_src_10009.ds_partitioned) AS ds_partitioned__quarter
-                  , DATE_TRUNC('year', views_source_src_10009.ds_partitioned) AS ds_partitioned__year
-                  , views_source_src_10009.ds AS create_a_cycle_in_the_join_graph__ds
-                  , DATE_TRUNC('week', views_source_src_10009.ds) AS create_a_cycle_in_the_join_graph__ds__week
-                  , DATE_TRUNC('month', views_source_src_10009.ds) AS create_a_cycle_in_the_join_graph__ds__month
-                  , DATE_TRUNC('quarter', views_source_src_10009.ds) AS create_a_cycle_in_the_join_graph__ds__quarter
-                  , DATE_TRUNC('year', views_source_src_10009.ds) AS create_a_cycle_in_the_join_graph__ds__year
-                  , views_source_src_10009.ds_partitioned AS create_a_cycle_in_the_join_graph__ds_partitioned
-                  , DATE_TRUNC('week', views_source_src_10009.ds_partitioned) AS create_a_cycle_in_the_join_graph__ds_partitioned__week
-                  , DATE_TRUNC('month', views_source_src_10009.ds_partitioned) AS create_a_cycle_in_the_join_graph__ds_partitioned__month
-                  , DATE_TRUNC('quarter', views_source_src_10009.ds_partitioned) AS create_a_cycle_in_the_join_graph__ds_partitioned__quarter
-                  , DATE_TRUNC('year', views_source_src_10009.ds_partitioned) AS create_a_cycle_in_the_join_graph__ds_partitioned__year
-                  , views_source_src_10009.listing_id AS listing
-                  , views_source_src_10009.user_id AS user
-                  , views_source_src_10009.user_id AS create_a_cycle_in_the_join_graph
-                  , views_source_src_10009.listing_id AS create_a_cycle_in_the_join_graph__listing
-                  , views_source_src_10009.user_id AS create_a_cycle_in_the_join_graph__user
+                  , views_source_src_10010.ds
+                  , DATE_TRUNC('week', views_source_src_10010.ds) AS ds__week
+                  , DATE_TRUNC('month', views_source_src_10010.ds) AS ds__month
+                  , DATE_TRUNC('quarter', views_source_src_10010.ds) AS ds__quarter
+                  , DATE_TRUNC('year', views_source_src_10010.ds) AS ds__year
+                  , views_source_src_10010.ds_partitioned
+                  , DATE_TRUNC('week', views_source_src_10010.ds_partitioned) AS ds_partitioned__week
+                  , DATE_TRUNC('month', views_source_src_10010.ds_partitioned) AS ds_partitioned__month
+                  , DATE_TRUNC('quarter', views_source_src_10010.ds_partitioned) AS ds_partitioned__quarter
+                  , DATE_TRUNC('year', views_source_src_10010.ds_partitioned) AS ds_partitioned__year
+                  , views_source_src_10010.ds AS create_a_cycle_in_the_join_graph__ds
+                  , DATE_TRUNC('week', views_source_src_10010.ds) AS create_a_cycle_in_the_join_graph__ds__week
+                  , DATE_TRUNC('month', views_source_src_10010.ds) AS create_a_cycle_in_the_join_graph__ds__month
+                  , DATE_TRUNC('quarter', views_source_src_10010.ds) AS create_a_cycle_in_the_join_graph__ds__quarter
+                  , DATE_TRUNC('year', views_source_src_10010.ds) AS create_a_cycle_in_the_join_graph__ds__year
+                  , views_source_src_10010.ds_partitioned AS create_a_cycle_in_the_join_graph__ds_partitioned
+                  , DATE_TRUNC('week', views_source_src_10010.ds_partitioned) AS create_a_cycle_in_the_join_graph__ds_partitioned__week
+                  , DATE_TRUNC('month', views_source_src_10010.ds_partitioned) AS create_a_cycle_in_the_join_graph__ds_partitioned__month
+                  , DATE_TRUNC('quarter', views_source_src_10010.ds_partitioned) AS create_a_cycle_in_the_join_graph__ds_partitioned__quarter
+                  , DATE_TRUNC('year', views_source_src_10010.ds_partitioned) AS create_a_cycle_in_the_join_graph__ds_partitioned__year
+                  , views_source_src_10010.listing_id AS listing
+                  , views_source_src_10010.user_id AS user
+                  , views_source_src_10010.user_id AS create_a_cycle_in_the_join_graph
+                  , views_source_src_10010.listing_id AS create_a_cycle_in_the_join_graph__listing
+                  , views_source_src_10010.user_id AS create_a_cycle_in_the_join_graph__user
                 FROM (
                   -- User Defined SQL Query
                   SELECT user_id, listing_id, ds, ds_partitioned FROM ***************************.fct_views
-                ) views_source_src_10009
+                ) views_source_src_10010
               ) subq_9
             ) subq_10
           ) subq_11
@@ -408,38 +408,38 @@ FROM (
                 -- Read Elements From Data Source 'listings_latest'
                 SELECT
                   1 AS listings
-                  , listings_latest_src_10004.capacity AS largest_listing
-                  , listings_latest_src_10004.capacity AS smallest_listing
-                  , listings_latest_src_10004.created_at AS ds
-                  , DATE_TRUNC('week', listings_latest_src_10004.created_at) AS ds__week
-                  , DATE_TRUNC('month', listings_latest_src_10004.created_at) AS ds__month
-                  , DATE_TRUNC('quarter', listings_latest_src_10004.created_at) AS ds__quarter
-                  , DATE_TRUNC('year', listings_latest_src_10004.created_at) AS ds__year
-                  , listings_latest_src_10004.created_at
-                  , DATE_TRUNC('week', listings_latest_src_10004.created_at) AS created_at__week
-                  , DATE_TRUNC('month', listings_latest_src_10004.created_at) AS created_at__month
-                  , DATE_TRUNC('quarter', listings_latest_src_10004.created_at) AS created_at__quarter
-                  , DATE_TRUNC('year', listings_latest_src_10004.created_at) AS created_at__year
-                  , listings_latest_src_10004.country AS country_latest
-                  , listings_latest_src_10004.is_lux AS is_lux_latest
-                  , listings_latest_src_10004.capacity AS capacity_latest
-                  , listings_latest_src_10004.created_at AS listing__ds
-                  , DATE_TRUNC('week', listings_latest_src_10004.created_at) AS listing__ds__week
-                  , DATE_TRUNC('month', listings_latest_src_10004.created_at) AS listing__ds__month
-                  , DATE_TRUNC('quarter', listings_latest_src_10004.created_at) AS listing__ds__quarter
-                  , DATE_TRUNC('year', listings_latest_src_10004.created_at) AS listing__ds__year
-                  , listings_latest_src_10004.created_at AS listing__created_at
-                  , DATE_TRUNC('week', listings_latest_src_10004.created_at) AS listing__created_at__week
-                  , DATE_TRUNC('month', listings_latest_src_10004.created_at) AS listing__created_at__month
-                  , DATE_TRUNC('quarter', listings_latest_src_10004.created_at) AS listing__created_at__quarter
-                  , DATE_TRUNC('year', listings_latest_src_10004.created_at) AS listing__created_at__year
-                  , listings_latest_src_10004.country AS listing__country_latest
-                  , listings_latest_src_10004.is_lux AS listing__is_lux_latest
-                  , listings_latest_src_10004.capacity AS listing__capacity_latest
-                  , listings_latest_src_10004.listing_id AS listing
-                  , listings_latest_src_10004.user_id AS user
-                  , listings_latest_src_10004.user_id AS listing__user
-                FROM ***************************.dim_listings_latest listings_latest_src_10004
+                  , listings_latest_src_10005.capacity AS largest_listing
+                  , listings_latest_src_10005.capacity AS smallest_listing
+                  , listings_latest_src_10005.created_at AS ds
+                  , DATE_TRUNC('week', listings_latest_src_10005.created_at) AS ds__week
+                  , DATE_TRUNC('month', listings_latest_src_10005.created_at) AS ds__month
+                  , DATE_TRUNC('quarter', listings_latest_src_10005.created_at) AS ds__quarter
+                  , DATE_TRUNC('year', listings_latest_src_10005.created_at) AS ds__year
+                  , listings_latest_src_10005.created_at
+                  , DATE_TRUNC('week', listings_latest_src_10005.created_at) AS created_at__week
+                  , DATE_TRUNC('month', listings_latest_src_10005.created_at) AS created_at__month
+                  , DATE_TRUNC('quarter', listings_latest_src_10005.created_at) AS created_at__quarter
+                  , DATE_TRUNC('year', listings_latest_src_10005.created_at) AS created_at__year
+                  , listings_latest_src_10005.country AS country_latest
+                  , listings_latest_src_10005.is_lux AS is_lux_latest
+                  , listings_latest_src_10005.capacity AS capacity_latest
+                  , listings_latest_src_10005.created_at AS listing__ds
+                  , DATE_TRUNC('week', listings_latest_src_10005.created_at) AS listing__ds__week
+                  , DATE_TRUNC('month', listings_latest_src_10005.created_at) AS listing__ds__month
+                  , DATE_TRUNC('quarter', listings_latest_src_10005.created_at) AS listing__ds__quarter
+                  , DATE_TRUNC('year', listings_latest_src_10005.created_at) AS listing__ds__year
+                  , listings_latest_src_10005.created_at AS listing__created_at
+                  , DATE_TRUNC('week', listings_latest_src_10005.created_at) AS listing__created_at__week
+                  , DATE_TRUNC('month', listings_latest_src_10005.created_at) AS listing__created_at__month
+                  , DATE_TRUNC('quarter', listings_latest_src_10005.created_at) AS listing__created_at__quarter
+                  , DATE_TRUNC('year', listings_latest_src_10005.created_at) AS listing__created_at__year
+                  , listings_latest_src_10005.country AS listing__country_latest
+                  , listings_latest_src_10005.is_lux AS listing__is_lux_latest
+                  , listings_latest_src_10005.capacity AS listing__capacity_latest
+                  , listings_latest_src_10005.listing_id AS listing
+                  , listings_latest_src_10005.user_id AS user
+                  , listings_latest_src_10005.user_id AS listing__user
+                FROM ***************************.dim_listings_latest listings_latest_src_10005
               ) subq_12
             ) subq_13
           ) subq_14

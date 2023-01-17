@@ -63,24 +63,24 @@ FROM (
             -- Read Elements From Data Source 'messages_source'
             SELECT
               1 AS messages
-              , messages_source_src_10015.ds
-              , DATE_TRUNC('week', messages_source_src_10015.ds) AS ds__week
-              , DATE_TRUNC('month', messages_source_src_10015.ds) AS ds__month
-              , DATE_TRUNC('quarter', messages_source_src_10015.ds) AS ds__quarter
-              , DATE_TRUNC('year', messages_source_src_10015.ds) AS ds__year
-              , messages_source_src_10015.team_id
-              , messages_source_src_10015.ds AS user_id__ds
-              , DATE_TRUNC('week', messages_source_src_10015.ds) AS user_id__ds__week
-              , DATE_TRUNC('month', messages_source_src_10015.ds) AS user_id__ds__month
-              , DATE_TRUNC('quarter', messages_source_src_10015.ds) AS user_id__ds__quarter
-              , DATE_TRUNC('year', messages_source_src_10015.ds) AS user_id__ds__year
-              , messages_source_src_10015.team_id AS user_id__team_id
-              , messages_source_src_10015.user_id
-              , messages_source_src_10015.team_id AS user_team___team_id
-              , messages_source_src_10015.user_id AS user_team___user_id
-              , messages_source_src_10015.team_id AS user_id__user_team___team_id
-              , messages_source_src_10015.user_id AS user_id__user_team___user_id
-            FROM ***************************.fct_messages messages_source_src_10015
+              , messages_source_src_10017.ds
+              , DATE_TRUNC('week', messages_source_src_10017.ds) AS ds__week
+              , DATE_TRUNC('month', messages_source_src_10017.ds) AS ds__month
+              , DATE_TRUNC('quarter', messages_source_src_10017.ds) AS ds__quarter
+              , DATE_TRUNC('year', messages_source_src_10017.ds) AS ds__year
+              , messages_source_src_10017.team_id
+              , messages_source_src_10017.ds AS user_id__ds
+              , DATE_TRUNC('week', messages_source_src_10017.ds) AS user_id__ds__week
+              , DATE_TRUNC('month', messages_source_src_10017.ds) AS user_id__ds__month
+              , DATE_TRUNC('quarter', messages_source_src_10017.ds) AS user_id__ds__quarter
+              , DATE_TRUNC('year', messages_source_src_10017.ds) AS user_id__ds__year
+              , messages_source_src_10017.team_id AS user_id__team_id
+              , messages_source_src_10017.user_id
+              , messages_source_src_10017.team_id AS user_team___team_id
+              , messages_source_src_10017.user_id AS user_team___user_id
+              , messages_source_src_10017.team_id AS user_id__user_team___team_id
+              , messages_source_src_10017.user_id AS user_id__user_team___user_id
+            FROM ***************************.fct_messages messages_source_src_10017
           ) subq_0
         ) subq_1
       ) subq_2
@@ -94,50 +94,50 @@ FROM (
         FROM (
           -- Read Elements From Data Source 'users_source'
           SELECT
-            users_source_src_10017.created_at AS ds
-            , DATE_TRUNC('week', users_source_src_10017.created_at) AS ds__week
-            , DATE_TRUNC('month', users_source_src_10017.created_at) AS ds__month
-            , DATE_TRUNC('quarter', users_source_src_10017.created_at) AS ds__quarter
-            , DATE_TRUNC('year', users_source_src_10017.created_at) AS ds__year
-            , users_source_src_10017.team_id
-            , users_source_src_10017.country
-            , users_source_src_10017.created_at AS user_id__ds
-            , DATE_TRUNC('week', users_source_src_10017.created_at) AS user_id__ds__week
-            , DATE_TRUNC('month', users_source_src_10017.created_at) AS user_id__ds__month
-            , DATE_TRUNC('quarter', users_source_src_10017.created_at) AS user_id__ds__quarter
-            , DATE_TRUNC('year', users_source_src_10017.created_at) AS user_id__ds__year
-            , users_source_src_10017.team_id AS user_id__team_id
-            , users_source_src_10017.country AS user_id__country
-            , users_source_src_10017.created_at AS user_composite_ident_2__ds
-            , DATE_TRUNC('week', users_source_src_10017.created_at) AS user_composite_ident_2__ds__week
-            , DATE_TRUNC('month', users_source_src_10017.created_at) AS user_composite_ident_2__ds__month
-            , DATE_TRUNC('quarter', users_source_src_10017.created_at) AS user_composite_ident_2__ds__quarter
-            , DATE_TRUNC('year', users_source_src_10017.created_at) AS user_composite_ident_2__ds__year
-            , users_source_src_10017.team_id AS user_composite_ident_2__team_id
-            , users_source_src_10017.country AS user_composite_ident_2__country
-            , users_source_src_10017.created_at AS user_team__ds
-            , DATE_TRUNC('week', users_source_src_10017.created_at) AS user_team__ds__week
-            , DATE_TRUNC('month', users_source_src_10017.created_at) AS user_team__ds__month
-            , DATE_TRUNC('quarter', users_source_src_10017.created_at) AS user_team__ds__quarter
-            , DATE_TRUNC('year', users_source_src_10017.created_at) AS user_team__ds__year
-            , users_source_src_10017.team_id AS user_team__team_id
-            , users_source_src_10017.country AS user_team__country
-            , users_source_src_10017.id AS user_id
-            , users_source_src_10017.ident_2 AS user_composite_ident_2___ident_2
-            , users_source_src_10017.id AS user_composite_ident_2___user_id
-            , users_source_src_10017.team_id AS user_team___team_id
-            , users_source_src_10017.id AS user_team___user_id
-            , users_source_src_10017.ident_2 AS user_id__user_composite_ident_2___ident_2
-            , users_source_src_10017.id AS user_id__user_composite_ident_2___user_id
-            , users_source_src_10017.team_id AS user_id__user_team___team_id
-            , users_source_src_10017.id AS user_id__user_team___user_id
-            , users_source_src_10017.id AS user_composite_ident_2__user_id
-            , users_source_src_10017.team_id AS user_composite_ident_2__user_team___team_id
-            , users_source_src_10017.id AS user_composite_ident_2__user_team___user_id
-            , users_source_src_10017.id AS user_team__user_id
-            , users_source_src_10017.ident_2 AS user_team__user_composite_ident_2___ident_2
-            , users_source_src_10017.id AS user_team__user_composite_ident_2___user_id
-          FROM ***************************.fct_users users_source_src_10017
+            users_source_src_10019.created_at AS ds
+            , DATE_TRUNC('week', users_source_src_10019.created_at) AS ds__week
+            , DATE_TRUNC('month', users_source_src_10019.created_at) AS ds__month
+            , DATE_TRUNC('quarter', users_source_src_10019.created_at) AS ds__quarter
+            , DATE_TRUNC('year', users_source_src_10019.created_at) AS ds__year
+            , users_source_src_10019.team_id
+            , users_source_src_10019.country
+            , users_source_src_10019.created_at AS user_id__ds
+            , DATE_TRUNC('week', users_source_src_10019.created_at) AS user_id__ds__week
+            , DATE_TRUNC('month', users_source_src_10019.created_at) AS user_id__ds__month
+            , DATE_TRUNC('quarter', users_source_src_10019.created_at) AS user_id__ds__quarter
+            , DATE_TRUNC('year', users_source_src_10019.created_at) AS user_id__ds__year
+            , users_source_src_10019.team_id AS user_id__team_id
+            , users_source_src_10019.country AS user_id__country
+            , users_source_src_10019.created_at AS user_composite_ident_2__ds
+            , DATE_TRUNC('week', users_source_src_10019.created_at) AS user_composite_ident_2__ds__week
+            , DATE_TRUNC('month', users_source_src_10019.created_at) AS user_composite_ident_2__ds__month
+            , DATE_TRUNC('quarter', users_source_src_10019.created_at) AS user_composite_ident_2__ds__quarter
+            , DATE_TRUNC('year', users_source_src_10019.created_at) AS user_composite_ident_2__ds__year
+            , users_source_src_10019.team_id AS user_composite_ident_2__team_id
+            , users_source_src_10019.country AS user_composite_ident_2__country
+            , users_source_src_10019.created_at AS user_team__ds
+            , DATE_TRUNC('week', users_source_src_10019.created_at) AS user_team__ds__week
+            , DATE_TRUNC('month', users_source_src_10019.created_at) AS user_team__ds__month
+            , DATE_TRUNC('quarter', users_source_src_10019.created_at) AS user_team__ds__quarter
+            , DATE_TRUNC('year', users_source_src_10019.created_at) AS user_team__ds__year
+            , users_source_src_10019.team_id AS user_team__team_id
+            , users_source_src_10019.country AS user_team__country
+            , users_source_src_10019.id AS user_id
+            , users_source_src_10019.ident_2 AS user_composite_ident_2___ident_2
+            , users_source_src_10019.id AS user_composite_ident_2___user_id
+            , users_source_src_10019.team_id AS user_team___team_id
+            , users_source_src_10019.id AS user_team___user_id
+            , users_source_src_10019.ident_2 AS user_id__user_composite_ident_2___ident_2
+            , users_source_src_10019.id AS user_id__user_composite_ident_2___user_id
+            , users_source_src_10019.team_id AS user_id__user_team___team_id
+            , users_source_src_10019.id AS user_id__user_team___user_id
+            , users_source_src_10019.id AS user_composite_ident_2__user_id
+            , users_source_src_10019.team_id AS user_composite_ident_2__user_team___team_id
+            , users_source_src_10019.id AS user_composite_ident_2__user_team___user_id
+            , users_source_src_10019.id AS user_team__user_id
+            , users_source_src_10019.ident_2 AS user_team__user_composite_ident_2___ident_2
+            , users_source_src_10019.id AS user_team__user_composite_ident_2___user_id
+          FROM ***************************.fct_users users_source_src_10019
         ) subq_3
       ) subq_4
       ON

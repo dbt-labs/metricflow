@@ -25,5 +25,5 @@ CROSS JOIN (
   -- Aggregate Measures
   SELECT
     SUM(1) AS listings
-  FROM ***************************.dim_listings_latest listings_latest_src_10004
+  FROM ***************************.dim_listings_latest listings_latest_src_10005
 ) subq_17

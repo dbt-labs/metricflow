@@ -17,6 +17,7 @@
         <!--    'column_alias': 'bookings'}                          -->
         <!-- from_source = SqlSelectStatementNode(node_id=ss_1) -->
         <!-- where = SqlBetweenExpression(node_id=betw_0) -->
+        <!-- distinct = False -->
         <SqlSelectStatementNode>
             <!-- description = Metric Time Dimension 'ds' -->
             <!-- node_id = ss_1 -->
@@ -34,6 +35,7 @@
             <!--    'column_alias': 'bookings'}                          -->
             <!-- from_source = SqlSelectStatementNode(node_id=ss_0) -->
             <!-- where = None -->
+            <!-- distinct = False -->
             <SqlSelectStatementNode>
                 <!-- description =           -->
                 <!--   Pass Only Elements:   -->
@@ -49,6 +51,7 @@
                 <!--    'column_alias': 'bookings'}                          -->
                 <!-- from_source = SqlSelectStatementNode(node_id=ss_10001) -->
                 <!-- where = None -->
+                <!-- distinct = False -->
                 <SqlSelectStatementNode>
                     <!-- description = Read Elements From Data Source 'bookings_source' -->
                     <!-- node_id = ss_10001 -->
@@ -266,6 +269,7 @@
                     <!--    'column_alias': 'create_a_cycle_in_the_join_graph__host'}  -->
                     <!-- from_source = SqlSelectQueryFromClauseNode(node_id=tfc_10001) -->
                     <!-- where = None -->
+                    <!-- distinct = False -->
                     <SqlSelectQueryFromClauseNode>
                         <!-- description = Read From a Select Query -->
                         <!-- node_id = tfc_10001 -->

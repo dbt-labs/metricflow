@@ -28,6 +28,6 @@ CROSS JOIN (
   -- Compute Metrics via Expressions
   SELECT
     SUM(1) AS listings
-  FROM ***************************.dim_listings_latest listings_latest_src_10004
+  FROM ***************************.dim_listings_latest listings_latest_src_10005
   WHERE created_at BETWEEN CAST('2020-01-01' AS TIMESTAMP) AND CAST('2020-01-01' AS TIMESTAMP)
 ) subq_23
