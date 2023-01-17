@@ -4,6 +4,7 @@ from jsonschema import RefResolver
 from metricflow.model.parsing.schema_validator import SchemaValidator
 
 from metricflow.model.parsing.schemas import (
+    conversion_type_params_schema,
     metric_schema,
     data_source_schema,
     materialization_schema,
@@ -100,6 +101,7 @@ schema_store = {
     derived_group_by_element_schema["$id"]: derived_group_by_element_schema,
     materialization_schema["$id"]: materialization_schema,
     # Sub-object schemas
+    conversion_type_params_schema["$id"]: conversion_type_params_schema,
     metric_input_measure_schema["$id"]: metric_input_measure_schema,
     metric_type_params_schema["$id"]: metric_type_params_schema,
     locked_metadata_schema["$id"]: locked_metadata_schema,

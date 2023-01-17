@@ -36,6 +36,38 @@
             },
             "type": "object"
         },
+        "conversion_type_params_schema": {
+            "$id": "conversion_type_params_schema",
+            "additionalProperties": false,
+            "properties": {
+                "base_measure": {
+                    "$ref": "#/definitions/metric_input_measure_schema"
+                },
+                "calculation": {
+                    "enum": [
+                        "CONVERSIONS",
+                        "CONVERSION_RATE",
+                        "conversions",
+                        "conversion_rate"
+                    ]
+                },
+                "conversion_measure": {
+                    "$ref": "#/definitions/metric_input_measure_schema"
+                },
+                "entity": {
+                    "type": "string"
+                },
+                "window": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "base_measure",
+                "conversion_measure",
+                "entity"
+            ],
+            "type": "object"
+        },
         "data_source": {
             "$id": "data_source",
             "additionalProperties": false,
@@ -596,11 +628,13 @@
                         "EXPR",
                         "CUMULATIVE",
                         "DERIVED",
+                        "CONVERSION",
                         "measure_proxy",
                         "ratio",
                         "expr",
                         "cumulative",
-                        "derived"
+                        "derived",
+                        "conversion"
                     ]
                 },
                 "type_params": {
@@ -666,6 +700,9 @@
             "$id": "metric_type_params",
             "additionalProperties": false,
             "properties": {
+                "conversion_type_params": {
+                    "$ref": "#/definitions/conversion_type_params_schema"
+                },
                 "denominator": {
                     "$ref": "#/definitions/metric_input_measure_schema"
                 },

@@ -14,8 +14,11 @@ materialization_location_values += materialization_location_tableau_values
 materialization_format_values = ["WIDE"]
 materialization_format_values += [x.lower() for x in materialization_format_values]
 
-metric_types_enum_values = ["MEASURE_PROXY", "RATIO", "EXPR", "CUMULATIVE", "DERIVED"]
+metric_types_enum_values = ["MEASURE_PROXY", "RATIO", "EXPR", "CUMULATIVE", "DERIVED", "CONVERSION"]
 metric_types_enum_values += [x.lower() for x in metric_types_enum_values]
+
+conversion_calculation_type_enum_values = ["CONVERSIONS", "CONVERSION_RATE"]
+conversion_calculation_type_enum_values += [x.lower() for x in conversion_calculation_type_enum_values]
 
 mutability_type_values = ["IMMUTABLE", "APPEND_ONLY", "FULL_MUTATION", "DS_APPEND_ONLY"]
 mutability_type_values += [x.lower() for x in mutability_type_values]
@@ -108,6 +111,20 @@ metric_input_schema = {
     "additionalProperties": False,
 }
 
+conversion_type_params_schema = {
+    "$id": "conversion_type_params_schema",
+    "type": "object",
+    "properties": {
+        "base_measure": {"$ref": "metric_input_measure_schema"},
+        "conversion_measure": {"$ref": "metric_input_measure_schema"},
+        "entity": {"type": "string"},
+        "calculation": {"enum": conversion_calculation_type_enum_values},
+        "window": {"type": "string"},
+    },
+    "additionalProperties": False,
+    "required": ["base_measure", "conversion_measure", "entity"],
+}
+
 metric_type_params_schema = {
     "$id": "metric_type_params",
     "type": "object",
@@ -126,6 +143,7 @@ metric_type_params_schema = {
             "type": "array",
             "items": {"$ref": "metric_input_schema"},
         },
+        "conversion_type_params": {"$ref": "conversion_type_params_schema"},
     },
     "additionalProperties": False,
 }
@@ -376,6 +394,7 @@ schema_store = {
     derived_group_by_element_schema["$id"]: derived_group_by_element_schema,
     materialization_schema["$id"]: materialization_schema,
     # Sub-object schemas
+    conversion_type_params_schema["$id"]: conversion_type_params_schema,
     metric_input_measure_schema["$id"]: metric_input_measure_schema,
     metric_type_params_schema["$id"]: metric_type_params_schema,
     identifier_schema["$id"]: identifier_schema,

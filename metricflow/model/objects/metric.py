@@ -25,6 +25,14 @@ class MetricType(ExtendedEnum):
     EXPR = "expr"
     CUMULATIVE = "cumulative"
     DERIVED = "derived"
+    CONVERSION = "conversion"
+
+
+class ConversionCalculationType(ExtendedEnum):
+    """Types of calculations for a conversion metric."""
+
+    CONVERSIONS = "conversions"
+    CONVERSION_RATE = "conversion_rate"
 
 
 class MetricInputMeasure(PydanticCustomInputParser, HashableBaseModel):
@@ -130,6 +138,16 @@ class MetricInput(HashableBaseModel):
     offset_to_grain: Optional[TimeGranularity]
 
 
+class ConversionTypeParams(HashableBaseModel):
+    """Type params to provide context for conversion metrics."""
+
+    base_measure: MetricInputMeasure
+    conversion_measure: MetricInputMeasure
+    entity: str
+    calculation: ConversionCalculationType = ConversionCalculationType.CONVERSION_RATE
+    window: Optional[MetricTimeWindow]
+
+
 class MetricTypeParams(HashableBaseModel):
     """Type params add additional context to certain metric types (the context depends on the metric type)"""
 
@@ -141,6 +159,7 @@ class MetricTypeParams(HashableBaseModel):
     window: Optional[MetricTimeWindow]
     grain_to_date: Optional[TimeGranularity]
     metrics: Optional[List[MetricInput]]
+    conversion_type_params: Optional[ConversionTypeParams]
 
     @property
     def numerator_measure_reference(self) -> Optional[MeasureReference]:
@@ -151,6 +170,13 @@ class MetricTypeParams(HashableBaseModel):
     def denominator_measure_reference(self) -> Optional[MeasureReference]:
         """Return the measure reference, if any, associated with the metric input measure defined as the denominator"""
         return self.denominator.measure_reference if self.denominator else None
+
+    @property
+    def conversion_params(self) -> ConversionTypeParams:
+        """Accessor for conversion type params, enforces that it's set."""
+        if self.conversion_type_params is None:
+            raise ValueError("conversion_type_params is not defined.")
+        return self.conversion_type_params
 
 
 class Metric(HashableBaseModel, ModelWithMetadataParsing):
@@ -174,7 +200,9 @@ class Metric(HashableBaseModel, ModelWithMetadataParsing):
             res.append(tp.numerator)
         if tp.denominator:
             res.append(tp.denominator)
-
+        if tp.conversion_type_params:
+            res.append(tp.conversion_type_params.base_measure)
+            res.append(tp.conversion_type_params.conversion_measure)
         return res
 
     @property
