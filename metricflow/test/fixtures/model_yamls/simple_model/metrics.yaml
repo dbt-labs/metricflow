@@ -643,7 +643,7 @@ metric:
     - support@transformdata.io
   type: derived
   type_params:
-    expr: (bookings - bookings_at_start_of_month) / bookings_at_start_of_month
+    expr: bookings - bookings_at_start_of_month
     metrics:
       - name: bookings
       - name: bookings
