@@ -107,7 +107,7 @@ class TimeGranularitySolver:
         named 'ds' with granularity DAY.
 
         The 'monthly_bookings' measure is in defined in the 'fct_bookings_monthly' data source. 'fct_bookings_monthly'
-        has a local time dimension named 'ds' with granularity DAY.
+        has a local time dimension named 'ds' with granularity MONTH.
 
         Then this would return [DAY, MONTH].
         """
