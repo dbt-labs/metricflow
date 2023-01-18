@@ -681,7 +681,7 @@ integration_test:
   check_query: |
     SELECT
       COALESCE(a.metric_time, b.metric_time) AS metric_time
-      , (bookings - bookings_2_weeks_ago) / bookings_2_weeks_ago AS bookings_growth_2_weeks
+      , bookings - bookings_2_weeks_ago AS bookings_growth_2_weeks
     FROM (
       SELECT
         ds AS metric_time
