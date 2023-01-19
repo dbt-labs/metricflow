@@ -36,6 +36,25 @@
             },
             "type": "object"
         },
+        "constant_property_input_schema": {
+            "$id": "constant_property_input_schema",
+            "additionalProperties": false,
+            "properties": {
+                "base_expr": {
+                    "type": "string"
+                },
+                "conversion_expr": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "name"
+            ],
+            "type": "object"
+        },
         "conversion_type_params_schema": {
             "$id": "conversion_type_params_schema",
             "additionalProperties": false,
@@ -50,6 +69,12 @@
                         "conversions",
                         "conversion_rate"
                     ]
+                },
+                "constant_properties": {
+                    "items": {
+                        "$ref": "#/definitions/constant_property_input_schema"
+                    },
+                    "type": "array"
                 },
                 "conversion_measure": {
                     "$ref": "#/definitions/metric_input_measure_schema"

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import List, Optional
+from pydantic import validator
+from typing import Any, List, Optional
 
 from metricflow.errors.errors import ParsingException
 from metricflow.model.objects.common import Metadata
@@ -138,6 +139,34 @@ class MetricInput(HashableBaseModel):
     offset_to_grain: Optional[TimeGranularity]
 
 
+class ConstantPropertyInput(HashableBaseModel):
+    """Input of a constant property used in conversion metrics."""
+
+    name: str
+    base_expr: Optional[str]
+    conversion_expr: Optional[str]
+
+    @validator("conversion_expr", "base_expr", always=True)
+    @classmethod
+    def default_expr_value(cls, value: Any, values: Any) -> str:  # type: ignore[misc]
+        """Defaulting the value of the constant property 'expr' value using pydantic validator
+
+        If a expr value is provided that is a string, that will become the value of expr.
+        If the provifed expr value is None, the expr value becomes the
+        name of the constant property.
+        """
+
+        if value is None:
+            if "name" not in values:
+                raise ValueError("Failed to default expr value because objects name value was not defined")
+            value = values["name"]
+
+        # guarantee value is string
+        if not isinstance(value, str):
+            raise ValueError(f"expr value should be a string (str) type, but got {type(value)} with value: {value}")
+        return value
+
+
 class ConversionTypeParams(HashableBaseModel):
     """Type params to provide context for conversion metrics."""
 
@@ -146,6 +175,7 @@ class ConversionTypeParams(HashableBaseModel):
     entity: str
     calculation: ConversionCalculationType = ConversionCalculationType.CONVERSION_RATE
     window: Optional[MetricTimeWindow]
+    constant_properties: Optional[List[ConstantPropertyInput]]
 
     @property
     def base_measure_reference(self) -> MeasureReference:
