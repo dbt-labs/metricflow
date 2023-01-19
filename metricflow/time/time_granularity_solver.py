@@ -107,7 +107,7 @@ class TimeGranularitySolver:
         named 'ds' with granularity DAY.
 
         The 'monthly_bookings' measure is in defined in the 'fct_bookings_monthly' data source. 'fct_bookings_monthly'
-        has a local time dimension named 'ds' with granularity DAY.
+        has a local time dimension named 'ds' with granularity MONTH.
 
         Then this would return [DAY, MONTH].
         """
@@ -153,17 +153,20 @@ class TimeGranularitySolver:
                         f"{min_granularity_for_querying}. Got {time_dimension_spec}"
                     )
 
-                # If there is a cumulative metric, granularity changes aren't supported.
+                # If there is a cumulative metric, granularity changes aren't supported. We need to check the granularity
+                # specified in the configs for the cumulative metric alone, since `min_granularity_for_querying` may not be supported.
                 for metric_reference in metric_references:
                     metric = self._semantic_model.metric_semantics.get_metric(metric_reference)
-                    if (
-                        metric.type == MetricType.CUMULATIVE
-                        and time_dimension_spec.time_granularity != min_granularity_for_querying
-                    ):
-                        raise RequestTimeGranularityException(
-                            f"For querying cumulative metric '{metric_reference.element_name}', the granularity of "
-                            f"'{time_dimension_spec.qualified_name}' must be {min_granularity_for_querying.name}"
+                    if metric.type == MetricType.CUMULATIVE:
+                        _, only_queryable_granularity = self.local_dimension_granularity_range(
+                            metric_references=[metric_reference],
+                            local_time_dimension_reference=time_dimension_spec.reference,
                         )
+                        if time_dimension_spec.time_granularity != only_queryable_granularity:
+                            raise RequestTimeGranularityException(
+                                f"For querying cumulative metric '{metric_reference.element_name}', the granularity of "
+                                f"'{time_dimension_spec.qualified_name}' must be {only_queryable_granularity.name}"
+                            )
 
         # TODO: Validate non-local time dimension granularities here instead of during plan building.
 

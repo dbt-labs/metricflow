@@ -140,6 +140,19 @@ def test_granularity_solution_for_day_and_month_metrics(  # noqa: D
     ) == {PARTIAL_PTD_SPEC: MTD_SPEC_MONTH}
 
 
+def test_granularity_error_for_cumulative_metric(  # noqa: D
+    time_granularity_solver: TimeGranularitySolver,
+) -> None:
+    with pytest.raises(RequestTimeGranularityException):
+        time_granularity_solver.validate_time_granularity(
+            metric_references=[
+                MetricReference(element_name="weekly_bookers"),
+                MetricReference(element_name="bookings_monthly"),
+            ],
+            time_dimension_specs=[MTD_SPEC_MONTH],
+        )
+
+
 def test_time_granularity_parameter(  # noqa: D
     time_granularity_solver: TimeGranularitySolver,
 ) -> None:
