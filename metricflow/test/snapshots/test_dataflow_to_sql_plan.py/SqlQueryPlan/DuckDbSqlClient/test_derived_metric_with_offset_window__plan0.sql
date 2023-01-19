@@ -1,7 +1,7 @@
 -- Compute Metrics via Expressions
 SELECT
   subq_13.metric_time
-  , (bookings - bookings_2_weeks_ago) / bookings_2_weeks_ago AS bookings_growth_2_weeks
+  , bookings - bookings_2_weeks_ago AS bookings_growth_2_weeks
 FROM (
   -- Combine Metrics
   SELECT

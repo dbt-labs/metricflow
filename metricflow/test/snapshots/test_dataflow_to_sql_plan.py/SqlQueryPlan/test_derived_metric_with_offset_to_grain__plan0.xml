@@ -6,10 +6,10 @@
         <!--   {'class': 'SqlSelectColumn',                            -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_365),  -->
         <!--    'column_alias': 'metric_time'}                         -->
-        <!-- col1 =                                                                                                                        -->
-        <!--   {'class': 'SqlSelectColumn',                                                                                                -->
-        <!--    'expr': SqlStringExpression(node_id=str_0 sql_expr=(bookings - bookings_at_start_of_month) / bookings_at_start_of_month),  -->
-        <!--    'column_alias': 'bookings_growth_since_start_of_month'}                                                                    -->
+        <!-- col1 =                                                                                         -->
+        <!--   {'class': 'SqlSelectColumn',                                                                 -->
+        <!--    'expr': SqlStringExpression(node_id=str_0 sql_expr=bookings - bookings_at_start_of_month),  -->
+        <!--    'column_alias': 'bookings_growth_since_start_of_month'}                                     -->
         <!-- from_source = SqlSelectStatementNode(node_id=ss_17) -->
         <!-- where = None -->
         <SqlSelectStatementNode>

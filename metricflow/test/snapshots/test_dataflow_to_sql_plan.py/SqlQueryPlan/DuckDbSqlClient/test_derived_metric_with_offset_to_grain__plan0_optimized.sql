@@ -1,7 +1,7 @@
 -- Compute Metrics via Expressions
 SELECT
   metric_time
-  , (bookings - bookings_at_start_of_month) / bookings_at_start_of_month AS bookings_growth_since_start_of_month
+  , bookings - bookings_at_start_of_month AS bookings_growth_since_start_of_month
 FROM (
   -- Combine Metrics
   SELECT
