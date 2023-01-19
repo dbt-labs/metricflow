@@ -38,7 +38,7 @@ from metricflow.dataflow.builder.partitions import (
 )
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.dataset import DataSet
-from metricflow.model.objects.metric import MetricTimeWindow
+from metricflow.model.objects.metric import ConstantPropertyInput, MetricTimeWindow
 from metricflow.object_utils import pformat_big_objects
 from metricflow.references import TimeDimensionReference
 from metricflow.specs import (
@@ -1405,6 +1405,7 @@ class JoinConversionEventsNode(Generic[SourceDataSetT], BaseOutput[SourceDataSet
         conversion_time_dimension_spec: TimeDimensionSpec,
         conversion_primary_key_specs: Tuple[InstanceSpec, ...],
         entity_spec: IdentifierSpec,
+        constant_properties: Optional[List[ConstantPropertyInput]] = None,
         window: Optional[MetricTimeWindow] = None,
     ) -> None:
         """Constructor.
@@ -1417,6 +1418,7 @@ class JoinConversionEventsNode(Generic[SourceDataSetT], BaseOutput[SourceDataSet
             conversion_time_dimension_spec: time dimension for the conversion events to compute against.
             conversion_primary_key_specs: primary_key(s) to uniquely identify each conversion event.
             entity_spec: the specific entity in which the conversion is happening for.
+            constant_properties: specific properties to hold constant when calculating conversions.
             window: time range bound for when a conversion is still considered valid (default: INF).
         """
         self._base_node = base_node
@@ -1427,6 +1429,7 @@ class JoinConversionEventsNode(Generic[SourceDataSetT], BaseOutput[SourceDataSet
         self._conversion_primary_key_specs = conversion_primary_key_specs
         self._entity_spec = entity_spec
         self._window = window
+        self._constant_properties = constant_properties
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[base_node, conversion_node])
 
     @classmethod
@@ -1469,6 +1472,10 @@ class JoinConversionEventsNode(Generic[SourceDataSetT], BaseOutput[SourceDataSet
         return self._window
 
     @property
+    def constant_properties(self) -> Optional[List[ConstantPropertyInput]]:  # noqa: D
+        return self._constant_properties
+
+    @property
     def description(self) -> str:  # noqa: D
         return f"""Find conversions for {self.entity_spec} within the range of {self.window.to_string() if self.window else 'INF'}"""
 
@@ -1494,6 +1501,7 @@ class JoinConversionEventsNode(Generic[SourceDataSetT], BaseOutput[SourceDataSet
             and other_node.conversion_primary_key_specs == self.conversion_primary_key_specs
             and other_node.entity_spec == self.entity_spec
             and other_node.window == self.window
+            and other_node.constant_properties == self.constant_properties
         )
 
     def with_new_parents(  # noqa: D
@@ -1509,6 +1517,7 @@ class JoinConversionEventsNode(Generic[SourceDataSetT], BaseOutput[SourceDataSet
             conversion_primary_key_specs=self.conversion_primary_key_specs,
             entity_spec=self.entity_spec,
             window=self.window,
+            constant_properties=self.constant_properties,
         )
 
 
