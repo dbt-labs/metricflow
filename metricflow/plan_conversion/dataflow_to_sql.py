@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from collections import OrderedDict
-from typing import Generic, List, Optional, Sequence, TypeVar, Union
+from typing import Generic, List, Optional, Sequence, TypeVar, Tuple, Union
 
 from metricflow.aggregation_properties import AggregationState, AggregationType
 from metricflow.column_assoc import ColumnAssociation, SingleColumnCorrelationKey
@@ -1498,7 +1498,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 ColumnEqualityDescription(
                     left_column_alias=entity_column_name,
                     right_column_alias=entity_column_name,
-                ),  # add constant property here
+                ),
             ),
         )
 
@@ -1506,7 +1506,9 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         base_sql_column_references = base_data_set.instance_set.transform(
             CreateSqlColumnReferencesForInstances(base_data_set_alias, self._column_association_resolver)
         )
-        partition_by_columns = (entity_column_name, conversion_time_dimension_column_name)  # add constant property here
+        partition_by_columns: Tuple[str, ...] = (entity_column_name, conversion_time_dimension_column_name)
+        if node.constant_properties:
+            partition_by_columns += tuple(x.conversion_expression for x in node.constant_properties)
         base_sql_select_columns = tuple(
             SqlSelectColumn(
                 expr=SqlWindowFunctionExpression(

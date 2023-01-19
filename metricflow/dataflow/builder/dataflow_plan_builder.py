@@ -43,7 +43,7 @@ from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOp
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
-from metricflow.model.objects.metric import MetricType, MetricTimeWindow
+from metricflow.model.objects.metric import ConstantPropertyInput, MetricType, MetricTimeWindow
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.instances import DataSourceReference
 from metricflow.model.validations.unique_valid_name import MetricFlowReservedKeywords
@@ -178,6 +178,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         queried_linkable_specs: LinkableSpecSet,
         where_constraint: Optional[SpecWhereClauseConstraint] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
+        constant_properties: Optional[List[ConstantPropertyInput]] = None,
     ) -> BaseOutput[SqlDataSetT]:
         """Builds a node that contains aggregated values of conversions and opportunities."""
 
@@ -250,6 +251,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             conversion_primary_key_specs=primary_key_specs,
             entity_spec=entity_spec,
             window=window,
+            constant_properties=constant_properties,
         )
         conversion_measure_recipe = MeasureRecipe(
             measure_node=join_conversion_node,
@@ -346,6 +348,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                     time_range_constraint=time_range_constraint,
                     entity_spec=entity_spec,
                     window=conversion_metric_params.window,
+                    constant_properties=conversion_metric_params.constant_properties,
                 )
                 output_nodes.append(
                     self.build_computed_metrics_node(

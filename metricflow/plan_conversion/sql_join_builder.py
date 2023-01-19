@@ -498,11 +498,21 @@ class SqlQueryPlanJoinBuilder:
             time_comparison_dataset=conversion_data_set,
             window=node.window,
         )
+
+        column_equality_descriptions = list(column_equality_descriptions)
+
+        for constant_property in node.constant_properties or []:
+            column_equality_descriptions.append(
+                ColumnEqualityDescription(
+                    left_column_alias=constant_property.base_expression,
+                    right_column_alias=constant_property.conversion_expression,
+                )
+            )
         return SqlQueryPlanJoinBuilder.make_column_equality_sql_join_description(
             right_source_node=conversion_data_set.data_set.sql_select_node,
             left_source_alias=base_data_set.alias,
             right_source_alias=conversion_data_set.alias,
-            column_equality_descriptions=column_equality_descriptions,
+            column_equality_descriptions=tuple(column_equality_descriptions),
             join_type=SqlJoinType.INNER,
             additional_on_conditions=(window_condition,),
         )

@@ -166,6 +166,20 @@ class ConstantPropertyInput(HashableBaseModel):
             raise ValueError(f"expr value should be a string (str) type, but got {type(value)} with value: {value}")
         return value
 
+    @property
+    def base_expression(self) -> str:
+        """Returns a non-empty string value of base_expr."""
+        if self.base_expr is None:
+            raise ValueError("base_expr is None")
+        return self.base_expr
+
+    @property
+    def conversion_expression(self) -> str:
+        """Returns a non-empty string value of conversion_expr."""
+        if self.conversion_expr is None:
+            raise ValueError("conversion_expr is None")
+        return self.conversion_expr
+
 
 class ConversionTypeParams(HashableBaseModel):
     """Type params to provide context for conversion metrics."""
