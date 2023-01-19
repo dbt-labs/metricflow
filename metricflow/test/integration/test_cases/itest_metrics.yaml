@@ -694,7 +694,7 @@ integration_test:
       SELECT
         c.ds AS metric_time
         , d.bookings_2_weeks_ago AS bookings_2_weeks_ago
-      FROM {{ source_schema }}.mf_time_spine c
+      FROM {{ mf_time_spine_source }} c
       LEFT OUTER JOIN (
         SELECT
           ds AS metric_time
@@ -729,7 +729,7 @@ integration_test:
       SELECT
         c.ds AS metric_time
         , d.bookings_at_start_of_month AS bookings_at_start_of_month
-      FROM {{ source_schema }}.mf_time_spine c
+      FROM {{ mf_time_spine_source }} c
       LEFT OUTER JOIN (
         SELECT
           ds AS metric_time
@@ -756,7 +756,7 @@ integration_test:
       SELECT
         g.ds AS metric_time
         , f.bookings AS bookings_1_month_ago
-      FROM {{ source_schema }}.mf_time_spine g
+      FROM {{ mf_time_spine_source }} g
       LEFT OUTER JOIN (
         SELECT
           ds AS metric_time
@@ -771,7 +771,7 @@ integration_test:
       SELECT
         c.ds AS metric_time
         , d.bookings AS month_start_bookings
-      FROM {{ source_schema }}.mf_time_spine c
+      FROM {{ mf_time_spine_source }} c
       LEFT OUTER JOIN (
         SELECT
           ds AS metric_time
@@ -794,7 +794,7 @@ integration_test:
     SELECT
       a.ds AS metric_time
       , b.bookings_5_day_lag
-    FROM {{ source_schema }}.mf_time_spine a
+    FROM {{ mf_time_spine_source }} a
     LEFT OUTER JOIN (
       SELECT
         ds AS metric_time
