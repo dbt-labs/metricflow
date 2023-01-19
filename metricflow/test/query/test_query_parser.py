@@ -130,6 +130,17 @@ METRICS_YAML = textwrap.dedent(
           - name: revenue
             offset_window: 14 days
             alias: revenue_2_weeks_ago
+    ---
+    metric:
+      name: revenue_cut_off
+      description: Test new granularity syntax with constraint
+      owners:
+        - support@transformdata.io
+      type: measure_proxy
+      type_params:
+        measure: revenue # Specify the measure you are creating a proxy for.
+      constraint: |
+        ds.granularity(day) > CAST('2000-01-01' AS TEXT)
     """
 )
 
@@ -366,4 +377,36 @@ def test_derived_metric_with_offset_parsing(time_spine_source: TimeSpineSource) 
     query_parser.parse_and_validate_query(
         metric_names=["revenue_growth_2_weeks"],
         group_by_names=[MTD],
+    )
+
+
+def test_query_parser_updated_granularity_syntax(time_spine_source: TimeSpineSource) -> None:  # noqa: D
+    bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=BOOKINGS_YAML)
+    query_parser = query_parser_from_yaml([bookings_yaml_file], time_spine_source)
+
+    with pytest.raises(RuntimeError):  # incorrect syntax
+        query_parser.parse_and_validate_query(
+            metric_names=["bookings"],
+            group_by_names=["is_instant", f"{MTD}.granularity(day"],
+            order=[f"{MTD}.granularity(day)"],
+        )
+
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=["bookings"],
+        group_by_names=["is_instant", f"{MTD}.granularity(day)"],
+        order=[f"{MTD}.granularity(day)"],
+    )
+
+    assert query_spec.metric_specs == (MetricSpec(element_name="bookings"),)
+    assert query_spec.dimension_specs == (DimensionSpec(element_name="is_instant", identifier_links=()),)
+    assert query_spec.time_dimension_specs == (
+        TimeDimensionSpec(element_name=MTD, identifier_links=(), time_granularity=TimeGranularity.DAY),
+    )
+    assert query_spec.order_by_specs == (
+        OrderBySpec(
+            time_dimension_spec=TimeDimensionSpec(
+                element_name=MTD, identifier_links=(), time_granularity=TimeGranularity.DAY
+            ),
+            descending=False,
+        ),
     )
