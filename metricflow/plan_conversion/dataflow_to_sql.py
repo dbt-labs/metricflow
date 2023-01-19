@@ -1349,7 +1349,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                     col_ref=SqlColumnReference(table_alias=parent_alias, column_name=metric_time_dimension_column_name)
                 ),
             ),
-            join_type=SqlJoinType.LEFT_OUTER,  # TODO: test other join types
+            join_type=SqlJoinType.INNER,
         )
 
         # Use metric_time instance from time spine, all instances EXCEPT metric_time from parent data set.
