@@ -1,6 +1,9 @@
 from __future__ import annotations
+from collections import OrderedDict
 
 import logging
+import re
+import typing
 from dataclasses import dataclass
 from typing import Optional, Tuple
 
@@ -9,6 +12,49 @@ from metricflow.time.time_granularity import TimeGranularity
 DUNDER = "__"
 
 logger = logging.getLogger(__name__)
+
+GRANULARITY_FUNCTION_NAME = "granularity"
+
+
+@dataclass(frozen=True)
+class StructuredModifiedSpecName:
+    """Spec that contains and parses data for a 'modified' or 'transformed' name.
+
+    This spec and parsing
+    can be used for dimensions and metrics, though currently it is only used for linkable specs and granularity.
+
+    Ex: revenue.granularity(week) ->
+    qualified_name = revenue
+    modifiers = {'granularity': 'week'}
+
+    user_id__country.pop(mom).trim() ->
+    qualified_name = user_id__country
+    modifiers = {'pop': 'mom', 'trim':''}
+    """
+
+    qualified_name: str
+    modifiers: typing.OrderedDict[str, str]
+
+    @staticmethod
+    def from_name(name_with_functions: str) -> StructuredModifiedSpecName:
+        """Helper function that splits a name that has 'functions' acting on it for the new syntax."""
+
+        function_pattern = r"(.*)\((.*)\)$"  # I wrote this regex so it might be wrong - tries to match things in format function_name(parameter).
+
+        modifier_parts = name_with_functions.split(".")
+        name = modifier_parts.pop(0)
+        modifiers = OrderedDict()
+        for part in modifier_parts:
+            function_match = re.fullmatch(function_pattern, part)
+            if not function_match:
+                raise RuntimeError(
+                    f"Modified name '{name_with_functions}', specifically modifier '{part}',"
+                    "does not follow function_name(parameter) syntax."
+                )
+
+            modifiers[function_match.group(1).lower()] = function_match.group(2).lower()
+
+        return StructuredModifiedSpecName(qualified_name=name, modifiers=modifiers)
 
 
 @dataclass(frozen=True)
@@ -27,7 +73,9 @@ class StructuredLinkableSpecName:
 
     @staticmethod
     def from_name(qualified_name: str) -> StructuredLinkableSpecName:
-        """Construct from a name e.g. listing__ds__month."""
+        """Construct from a name e.g. listing__ds__month. Modified to point to new version."""
+        if "." in qualified_name:
+            return StructuredLinkableSpecName.from_name_v2(qualified_name)
         name_parts = qualified_name.split(DUNDER)
 
         # No dunder, e.g. "ds"
@@ -50,6 +98,21 @@ class StructuredLinkableSpecName:
         # e.g. "messages__ds"
         else:
             return StructuredLinkableSpecName(tuple(name_parts[:-1]), name_parts[-1])
+
+    @staticmethod
+    def from_name_v2(modified_name: str) -> StructuredLinkableSpecName:
+        """Construct from a name with newer syntax. e.g. listing__ds.granularity(month)."""
+
+        structured_modified_spec = StructuredModifiedSpecName.from_name(modified_name)
+        linked_name = structured_modified_spec.qualified_name.split(DUNDER)
+
+        granularity_str = structured_modified_spec.modifiers.get(GRANULARITY_FUNCTION_NAME)
+
+        return StructuredLinkableSpecName(
+            identifier_link_names=tuple(linked_name[:-1]),
+            element_name=linked_name[-1],
+            time_granularity=TimeGranularity(granularity_str) if granularity_str else None,
+        )
 
     @property
     def qualified_name(self) -> str:
