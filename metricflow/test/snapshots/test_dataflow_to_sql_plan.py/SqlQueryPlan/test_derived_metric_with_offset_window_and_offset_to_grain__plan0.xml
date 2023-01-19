@@ -8,7 +8,7 @@
         <!--    'column_alias': 'metric_time'}                         -->
         <!-- col1 =                                                                                               -->
         <!--   {'class': 'SqlSelectColumn',                                                                       -->
-        <!--    'expr': SqlStringExpression(node_id=str_0 sql_expr=month_start_bookings / bookings_1_month_ago),  -->
+        <!--    'expr': SqlStringExpression(node_id=str_0 sql_expr=month_start_bookings - bookings_1_month_ago),  -->
         <!--    'column_alias': 'bookings_month_start_compared_to_1_month_prior'}                                 -->
         <!-- from_source = SqlSelectStatementNode(node_id=ss_19) -->
         <!-- where = None -->
@@ -51,7 +51,7 @@
                 <!--   {'class': 'SqlJoinDescription',                           -->
                 <!--    'right_source': SqlSelectStatementNode(node_id=ss_10),   -->
                 <!--    'right_source_alias': 'subq_4',                          -->
-                <!--    'join_type': SqlJoinType.LEFT_OUTER,                     -->
+                <!--    'join_type': SqlJoinType.INNER,                          -->
                 <!--    'on_condition': SqlComparisonExpression(node_id=cmp_0)}  -->
                 <!-- where = None -->
                 <SqlSelectStatementNode>
@@ -590,7 +590,7 @@
                 <!--   {'class': 'SqlJoinDescription',                           -->
                 <!--    'right_source': SqlSelectStatementNode(node_id=ss_16),   -->
                 <!--    'right_source_alias': 'subq_12',                         -->
-                <!--    'join_type': SqlJoinType.LEFT_OUTER,                     -->
+                <!--    'join_type': SqlJoinType.INNER,                          -->
                 <!--    'on_condition': SqlComparisonExpression(node_id=cmp_1)}  -->
                 <!-- where = None -->
                 <SqlSelectStatementNode>

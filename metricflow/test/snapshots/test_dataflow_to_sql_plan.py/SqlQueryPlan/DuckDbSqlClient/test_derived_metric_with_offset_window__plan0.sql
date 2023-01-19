@@ -162,7 +162,7 @@ FROM (
         subq_11.ds AS metric_time
       FROM ***************************.mf_time_spine subq_11
     ) subq_10
-    LEFT OUTER JOIN (
+    INNER JOIN (
       -- Compute Metrics via Expressions
       SELECT
         subq_8.metric_time
