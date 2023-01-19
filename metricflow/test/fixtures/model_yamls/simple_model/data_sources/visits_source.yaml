@@ -31,3 +31,6 @@ data_source:
     - name: user
       type: foreign
       expr: user_id
+    - name: session
+      type: foreign
+      expr: session_id

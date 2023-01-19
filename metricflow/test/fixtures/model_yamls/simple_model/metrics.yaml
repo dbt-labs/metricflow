@@ -710,3 +710,20 @@ metric:
       window: 7 days
       entity: user
       calculation: conversions
+---
+metric:
+  name: visit_buy_conversion_rate_by_session
+  description: conversion rate on visits-buys on a 7 day window held by a constant session_id
+  owners:
+    - support@transformdata.io
+  type: conversion
+  type_params:
+    conversion_type_params:
+      base_measure: visits
+      conversion_measure: buys
+      window: 7 days
+      entity: user
+      calculation: conversion_rate
+      constant_properties:
+        - name: session_id
+          base_expr: session

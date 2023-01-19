@@ -88,6 +88,8 @@ def test_get_names(new_data_source_semantics: DataSourceSemantics) -> None:  # n
         "host",
         "listing",
         "lux_listing",
+        "session",
+        "session_id",
         "user",
         "verification",
     ]

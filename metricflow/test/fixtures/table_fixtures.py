@@ -362,23 +362,23 @@ def create_simple_model_tables(mf_test_session_state: MetricFlowTestSessionState
 
     # Events data
     visits_data = [
-        ("u0004114", "2020-01-01", "fb_ad_1"),
-        ("u0004214", "2020-01-01", "fb_ad_2"),
-        ("u0003141", "2020-01-01", "homepage_1"),
-        ("u0003154", "2020-01-01", "homepage_2"),
-        ("u1612112", "2020-01-02", "homepage_1"),
-        ("u0042324", "2020-01-02", "homepage_1"),
-        ("u0005432", "2020-01-02", "fb_ad_3"),
-        ("u0003452", "2020-01-02", "fb_ad_1"),
-        ("u0003452", "2020-01-02", "user_2"),
-        ("u0042324", "2020-01-03", "fb_ad_1"),
-        ("u0005432", "2020-01-03", "google_ad_1"),
-        ("u0005472", "2020-01-03", "google_ad_2"),
-        ("u0005414", "2020-01-04", "google_ad_1"),
-        ("u0004114", "2020-01-06", "homepage_1"),
-        ("u0004114", "2020-01-07", "fb_ad_2"),
-        ("u0004117", "2020-01-10", "google_ad_1"),
-        ("u0003141", "2020-01-12", "user_1"),
+        ("u0004114", "2020-01-01", "fb_ad_1", "s1"),
+        ("u0004214", "2020-01-01", "fb_ad_2", "s2"),
+        ("u0003141", "2020-01-01", "homepage_1", "s3"),
+        ("u0003154", "2020-01-01", "homepage_2", "s4"),
+        ("u1612112", "2020-01-02", "homepage_1", "s5"),
+        ("u0042324", "2020-01-02", "homepage_1", "s6"),
+        ("u0005432", "2020-01-02", "fb_ad_3", "s7"),
+        ("u0003452", "2020-01-02", "fb_ad_1", "s8"),
+        ("u0003452", "2020-01-02", "user_2", "s8"),
+        ("u0042324", "2020-01-03", "fb_ad_1", "s9"),
+        ("u0005432", "2020-01-03", "google_ad_1", "s10"),
+        ("u0005472", "2020-01-03", "google_ad_2", "s11"),
+        ("u0005414", "2020-01-04", "google_ad_1", "s12"),
+        ("u0004114", "2020-01-06", "homepage_1", "s13"),
+        ("u0004114", "2020-01-07", "fb_ad_2", "s14"),
+        ("u0004117", "2020-01-10", "google_ad_1", "s15"),
+        ("u0003141", "2020-01-12", "user_1", "s16"),
     ]
 
     create_table(
@@ -386,22 +386,22 @@ def create_simple_model_tables(mf_test_session_state: MetricFlowTestSessionState
         sql_table=SqlTable(schema_name=schema, table_name="fct_visits"),
         df=make_df(
             sql_client=sql_client,
-            columns=["user_id", DEFAULT_DS, "referrer_id"],
+            columns=["user_id", DEFAULT_DS, "referrer_id", "session_id"],
             time_columns={DEFAULT_DS},
             data=visits_data,
         ),
     )
 
     buy_data = [
-        ("u0004114", "2020-01-02"),
-        ("u0042324", "2020-01-03"),
-        ("u0042324", "2020-01-03"),
-        ("u0005432", "2020-01-04"),
-        ("u1612112", "2020-01-07"),
-        ("u0004114", "2020-01-07"),
-        ("u0004117", "2020-01-10"),
-        ("u0003141", "2020-01-07"),
-        ("u0003452", "2020-01-04"),
+        ("u0004114", "2020-01-02", "s1"),
+        ("u0042324", "2020-01-03", "s6"),
+        ("u0042324", "2020-01-03", "s9"),
+        ("u0005432", "2020-01-04", "s7"),
+        ("u1612112", "2020-01-07", "s0"),
+        ("u0004114", "2020-01-07", "s14"),
+        ("u0004117", "2020-01-10", "s15"),
+        ("u0003141", "2020-01-07", "s3"),
+        ("u0003452", "2020-01-04", "s8"),
     ]
 
     create_table(
@@ -409,7 +409,7 @@ def create_simple_model_tables(mf_test_session_state: MetricFlowTestSessionState
         sql_table=SqlTable(schema_name=schema, table_name="fct_buys"),
         df=make_df(
             sql_client=sql_client,
-            columns=["user_id", DEFAULT_DS],
+            columns=["user_id", DEFAULT_DS, "session_id"],
             time_columns={DEFAULT_DS},
             data=buy_data,
         ),
