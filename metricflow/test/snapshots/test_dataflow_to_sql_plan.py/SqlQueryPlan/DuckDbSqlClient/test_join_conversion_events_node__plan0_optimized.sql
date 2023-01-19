@@ -6,6 +6,7 @@ SELECT
   , ds__quarter
   , ds__year
   , subq_7.user
+  , session
   , referrer_id
   , buys
   , visits
@@ -22,6 +23,7 @@ FROM (
     , first_value(subq_4.ds__quarter) OVER (PARTITION BY subq_6.user, subq_6.ds ORDER BY subq_4.ds DESC) AS ds__quarter
     , first_value(subq_4.ds__year) OVER (PARTITION BY subq_6.user, subq_6.ds ORDER BY subq_4.ds DESC) AS ds__year
     , first_value(subq_4.user) OVER (PARTITION BY subq_6.user, subq_6.ds ORDER BY subq_4.ds DESC) AS user
+    , first_value(subq_4.session) OVER (PARTITION BY subq_6.user, subq_6.ds ORDER BY subq_4.ds DESC) AS session
     , subq_6.mf_internal_uuid AS mf_internal_uuid
     , subq_6.buys AS buys
   FROM (
@@ -36,6 +38,7 @@ FROM (
       , DATE_TRUNC('year', ds) AS ds__year
       , referrer_id
       , user_id AS user
+      , session_id AS session
     FROM (
       -- User Defined SQL Query
       SELECT * FROM ***************************.fct_visits

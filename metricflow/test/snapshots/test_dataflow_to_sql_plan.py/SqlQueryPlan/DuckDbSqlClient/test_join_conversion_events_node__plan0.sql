@@ -6,6 +6,7 @@ SELECT
   , subq_3.ds__quarter
   , subq_3.ds__year
   , subq_3.user
+  , subq_3.session
   , subq_3.referrer_id
   , subq_3.buys
   , subq_3.visits
@@ -22,6 +23,7 @@ FROM (
     , first_value(subq_0.ds__quarter) OVER (PARTITION BY subq_2.user, subq_2.ds ORDER BY subq_0.ds DESC) AS ds__quarter
     , first_value(subq_0.ds__year) OVER (PARTITION BY subq_2.user, subq_2.ds ORDER BY subq_0.ds DESC) AS ds__year
     , first_value(subq_0.user) OVER (PARTITION BY subq_2.user, subq_2.ds ORDER BY subq_0.ds DESC) AS user
+    , first_value(subq_0.session) OVER (PARTITION BY subq_2.user, subq_2.ds ORDER BY subq_0.ds DESC) AS session
     , subq_2.mf_internal_uuid AS mf_internal_uuid
     , subq_2.buys AS buys
   FROM (
@@ -36,6 +38,7 @@ FROM (
       , DATE_TRUNC('year', visits_source_src_10011.ds) AS ds__year
       , visits_source_src_10011.referrer_id
       , visits_source_src_10011.user_id AS user
+      , visits_source_src_10011.session_id AS session
     FROM (
       -- User Defined SQL Query
       SELECT * FROM ***************************.fct_visits
@@ -50,6 +53,7 @@ FROM (
       , subq_1.ds__quarter
       , subq_1.ds__year
       , subq_1.user
+      , subq_1.session_id
       , subq_1.buys
       , subq_1.buyers
       , GEN_RANDOM_UUID() AS mf_internal_uuid
@@ -64,6 +68,7 @@ FROM (
         , DATE_TRUNC('quarter', buys_source_src_10002.ds) AS ds__quarter
         , DATE_TRUNC('year', buys_source_src_10002.ds) AS ds__year
         , buys_source_src_10002.user_id AS user
+        , buys_source_src_10002.session_id
       FROM (
         -- User Defined SQL Query
         SELECT * FROM ***************************.fct_buys
