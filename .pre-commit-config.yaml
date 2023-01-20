@@ -21,6 +21,7 @@ repos:
         additional_dependencies:
           [
             "dbt-core<1.4",
+            GitPython,
             more-itertools,
             pytest,
             "sqlalchemy<2.0",

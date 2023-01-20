@@ -93,9 +93,9 @@ def collect_yaml_config_file_paths(directory: str) -> List[str]:
         repo = git.Repo(directory, search_parent_directories=True)
         # repo.ignored returns a list of file paths which are the file paths
         # that should be ignored as a subset of the handed in file paths
-        ignored_files = repo.ignored(config_file_paths)
+        ignored_files = repo.ignored(*config_file_paths)
         config_file_paths = list(set(config_file_paths) - set(ignored_files))
-    except git.exc.InvalidGitRepositoryError:
+    except git.InvalidGitRepositoryError:
         pass
 
     return config_file_paths
