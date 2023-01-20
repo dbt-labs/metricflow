@@ -695,7 +695,7 @@ integration_test:
         c.ds AS metric_time
         , d.bookings_2_weeks_ago AS bookings_2_weeks_ago
       FROM {{ mf_time_spine_source }} c
-      LEFT OUTER JOIN (
+      INNER JOIN (
         SELECT
           ds AS metric_time
           , SUM(1) AS bookings_2_weeks_ago
@@ -732,7 +732,7 @@ integration_test:
         c.ds AS metric_time
         , d.bookings_at_start_of_month AS bookings_at_start_of_month
       FROM {{ mf_time_spine_source }} c
-      LEFT OUTER JOIN (
+      INNER JOIN (
         SELECT
           ds AS metric_time
           , SUM(1) AS bookings_at_start_of_month
