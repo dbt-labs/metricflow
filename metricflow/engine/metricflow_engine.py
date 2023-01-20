@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import datetime
 import logging
-import textwrap
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Optional, List, Sequence
@@ -33,6 +32,7 @@ from metricflow.errors.errors import ExecutionException, MaterializationNotFound
 from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
 from metricflow.execution.execution_plan_to_text import execution_plan_to_text
 from metricflow.execution.executor import SequentialPlanExecutor
+from metricflow.logging.formatting import indent_log_line
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.object_utils import pformat_big_objects, random_id
@@ -274,8 +274,6 @@ class AbstractMetricFlowEngine(ABC):
 class MetricFlowEngine(AbstractMetricFlowEngine):
     """Main entry point for queries."""
 
-    _LOGGING_INDENT = "   "
-
     @staticmethod
     def from_config(handler: YamlFileHandler) -> MetricFlowEngine:
         """Initialize MetricFlowEngine via yaml config file."""
@@ -398,10 +396,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def query(self, mf_request: MetricFlowQueryRequest) -> MetricFlowQueryResult:  # noqa: D
-        logger.info(
-            f"Starting query request:\n"
-            f"{textwrap.indent(pformat_big_objects(mf_request), prefix=MetricFlowEngine._LOGGING_INDENT)}"
-        )
+        logger.info(f"Starting query request:\n" f"{indent_log_line(pformat_big_objects(mf_request))}")
         explain_result = self._create_execution_plan(mf_request)
         execution_plan = explain_result.execution_plan
 

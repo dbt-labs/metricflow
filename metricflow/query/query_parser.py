@@ -69,9 +69,6 @@ class MetricFlowQueryParser:
     "user_id__country" is the "country" dimension that is retrieved by joining "user_id" to the measure data source.
     """
 
-    # Prefix to use for indents when logging.
-    _INDENT_PREFIX = "  "
-
     def __init__(  # noqa: D
         self,
         model: SemanticModel,

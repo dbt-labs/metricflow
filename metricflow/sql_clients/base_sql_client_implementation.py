@@ -12,7 +12,8 @@ import jinja2
 import pandas as pd
 
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.object_utils import random_id
+from metricflow.logging.formatting import indent_log_line
+from metricflow.object_utils import random_id, pformat_big_objects
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.protocols.sql_client import (
     SqlEngineAttributes,
@@ -34,8 +35,6 @@ class SqlClientException(Exception):
 
 class BaseSqlClientImplementation(ABC, AsyncSqlClient):
     """Abstract implementation that other SQL clients are based on."""
-
-    INDENT = "    "
 
     def __init__(self) -> None:  # noqa: D
         self._request_id_to_thread: Dict[SqlRequestId, BaseSqlClientImplementation.SqlRequestExecutorThread] = {}
@@ -82,6 +81,19 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
 
         return results
 
+    @staticmethod
+    def _format_run_query_log_message(statement: str, sql_bind_parameters: SqlBindParameters) -> str:
+        message = f"Running query:\n\n{indent_log_line(statement)}"
+        if len(sql_bind_parameters.param_dict) > 0:
+            message += (
+                f"\n"
+                f"\n"
+                f"with parameters:\n"
+                f"\n"
+                f"{indent_log_line(pformat_big_objects(sql_bind_parameters.param_dict))}"
+            )
+        return message
+
     def query(
         self,
         stmt: str,
@@ -96,11 +108,7 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
         """
 
         start = time.time()
-        logger.info(
-            f"Running query:"
-            f"\n\n{textwrap.indent(stmt, prefix=BaseSqlClientImplementation.INDENT)}\n"
-            + (f"\nwith parameters: {dict(sql_bind_parameters.param_dict)}" if sql_bind_parameters.param_dict else "")
-        )
+        logger.info(BaseSqlClientImplementation._format_run_query_log_message(stmt, sql_bind_parameters))
         df = self._engine_specific_query_implementation(stmt, sql_bind_parameters)
         if not isinstance(df, pd.DataFrame):
             raise RuntimeError(f"Expected query to return a DataFrame, got {type(df)}")
@@ -115,11 +123,7 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
     ) -> None:
 
         start = time.time()
-        logger.info(
-            f"Running query:"
-            f"\n\n{textwrap.indent(stmt, prefix=BaseSqlClientImplementation.INDENT)}\n"
-            + (f"\nwith parameters: {dict(sql_bind_parameters.param_dict)}" if sql_bind_parameters.param_dict else "")
-        )
+        logger.info(BaseSqlClientImplementation._format_run_query_log_message(stmt, sql_bind_parameters))
         self._engine_specific_execute_implementation(stmt, sql_bind_parameters)
         stop = time.time()
         logger.info(f"Finished running the query in {stop - start:.2f}s")
@@ -140,7 +144,7 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
         start = time.time()
         logger.info(
             f"Running dry_run of:"
-            f"\n\n{textwrap.indent(stmt, prefix=BaseSqlClientImplementation.INDENT)}\n"
+            f"\n\n{indent_log_line(stmt)}\n"
             + (f"\nwith parameters: {dict(sql_bind_parameters.param_dict)}" if sql_bind_parameters.param_dict else "")
         )
         results = self._engine_specific_dry_run_implementation(stmt, sql_bind_parameters)
@@ -344,15 +348,13 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
                 statement = SqlStatementCommentMetadata.add_tag_metadata_as_comment(
                     sql_statement=self._statement, combined_tags=combined_tags
                 )
+
                 logger.info(
-                    f"Running {self._request_id} asynchronously:\n\n"
-                    f"{textwrap.indent(self._statement, prefix=BaseSqlClientImplementation.INDENT)}\n"
-                    + (
-                        f"\nwith parameters: {dict(self._bind_parameters.param_dict)}"
-                        if self._bind_parameters.param_dict
-                        else ""
+                    BaseSqlClientImplementation._format_run_query_log_message(
+                        statement=self._statement, sql_bind_parameters=self._bind_parameters
                     )
                 )
+
                 if self._is_query:
                     df = self._sql_client._engine_specific_query_implementation(
                         statement,
