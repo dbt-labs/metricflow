@@ -627,7 +627,7 @@ metric:
     - support@transformdata.io
   type: derived
   type_params:
-    expr: (bookings - bookings_2_weeks_ago) / bookings_2_weeks_ago
+    expr: bookings - bookings_2_weeks_ago
     metrics:
       - name: bookings
       - name: bookings
@@ -643,7 +643,7 @@ metric:
     - support@transformdata.io
   type: derived
   type_params:
-    expr: (bookings - bookings_at_start_of_month) / bookings_at_start_of_month
+    expr: bookings - bookings_at_start_of_month
     metrics:
       - name: bookings
       - name: bookings
@@ -659,7 +659,7 @@ metric:
     - support@transformdata.io
   type: derived
   type_params:
-    expr: month_start_bookings / bookings_1_month_ago
+    expr: month_start_bookings - bookings_1_month_ago
     metrics:
       - name: bookings
         offset_to_grain: month

@@ -681,7 +681,7 @@ integration_test:
   check_query: |
     SELECT
       COALESCE(a.metric_time, b.metric_time) AS metric_time
-      , (bookings - bookings_2_weeks_ago) / bookings_2_weeks_ago AS bookings_growth_2_weeks
+      , bookings - bookings_2_weeks_ago AS bookings_growth_2_weeks
     FROM (
       SELECT
         ds AS metric_time
@@ -695,7 +695,7 @@ integration_test:
         c.ds AS metric_time
         , d.bookings_2_weeks_ago AS bookings_2_weeks_ago
       FROM {{ mf_time_spine_source }} c
-      LEFT OUTER JOIN (
+      INNER JOIN (
         SELECT
           ds AS metric_time
           , SUM(1) AS bookings_2_weeks_ago
@@ -716,7 +716,7 @@ integration_test:
   check_query: |
     SELECT
       COALESCE(a.metric_time, b.metric_time) AS metric_time
-      , (bookings - bookings_at_start_of_month) / bookings_at_start_of_month AS bookings_growth_since_start_of_month
+      , bookings - bookings_at_start_of_month AS bookings_growth_since_start_of_month
     FROM (
       SELECT
         ds AS metric_time
@@ -730,7 +730,7 @@ integration_test:
         c.ds AS metric_time
         , d.bookings_at_start_of_month AS bookings_at_start_of_month
       FROM {{ mf_time_spine_source }} c
-      LEFT OUTER JOIN (
+      INNER JOIN (
         SELECT
           ds AS metric_time
           , SUM(1) AS bookings_at_start_of_month
@@ -740,7 +740,7 @@ integration_test:
       ) d
       ON {{ render_date_trunc("c.ds", TimeGranularity.MONTH) }} = d.metric_time
     ) b
-    ON a.metric_time = b.metric_time    
+    ON a.metric_time = b.metric_time
 ---
 integration_test:
   name: derived_metric_with_offset_window_and_offset_to_grain
@@ -751,13 +751,13 @@ integration_test:
   check_query: |
     SELECT
       COALESCE(a.metric_time, b.metric_time) AS metric_time
-      , month_start_bookings / bookings_1_month_ago AS bookings_month_start_compared_to_1_month_prior
+      , month_start_bookings - bookings_1_month_ago AS bookings_month_start_compared_to_1_month_prior
     FROM (
       SELECT
         g.ds AS metric_time
         , f.bookings AS bookings_1_month_ago
       FROM {{ mf_time_spine_source }} g
-      LEFT OUTER JOIN (
+      INNER JOIN (
         SELECT
           ds AS metric_time
           , SUM(1) AS bookings
@@ -772,7 +772,7 @@ integration_test:
         c.ds AS metric_time
         , d.bookings AS month_start_bookings
       FROM {{ mf_time_spine_source }} c
-      LEFT OUTER JOIN (
+      INNER JOIN (
         SELECT
           ds AS metric_time
           , SUM(1) AS bookings
@@ -795,7 +795,7 @@ integration_test:
       a.ds AS metric_time
       , b.bookings_5_day_lag
     FROM {{ mf_time_spine_source }} a
-    LEFT OUTER JOIN (
+    INNER JOIN (
       SELECT
         ds AS metric_time
         , SUM(1) AS bookings_5_day_lag

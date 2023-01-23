@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple, TypeVar
 
-from metricflow.dataflow.dataflow_plan import JoinDescription, JoinOverTimeRangeNode
+from metricflow.dataflow.dataflow_plan import JoinDescription, JoinOverTimeRangeNode, JoinToTimeSpineNode
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.sql_expression_builders import make_coalesced_expr
 from metricflow.sql.sql_plan import SqlExpressionNode, SqlJoinDescription, SqlJoinType, SqlSelectStatementNode
@@ -474,5 +474,37 @@ class SqlQueryPlanJoinBuilder:
             right_source=metric_data_set.data_set.sql_select_node,
             right_source_alias=metric_data_set.alias,
             on_condition=cumulative_join_condition,
+            join_type=SqlJoinType.INNER,
+        )
+
+    @staticmethod
+    def make_join_to_time_spine_join_description(
+        node: JoinToTimeSpineNode,
+        time_spine_alias: str,
+        metric_time_dimension_column_name: str,
+        parent_sql_select_node: SqlSelectStatementNode,
+        parent_alias: str,
+    ) -> SqlJoinDescription:
+        """Build join expression used to join a metric to a time spine dataset."""
+        left_expr: SqlExpressionNode = SqlColumnReferenceExpression(
+            col_ref=SqlColumnReference(table_alias=time_spine_alias, column_name=metric_time_dimension_column_name)
+        )
+        if node.offset_window:
+            left_expr = SqlTimeDeltaExpression(
+                arg=left_expr, count=node.offset_window.count, granularity=node.offset_window.granularity
+            )
+        elif node.offset_to_grain:
+            left_expr = SqlDateTruncExpression(time_granularity=node.offset_to_grain, arg=left_expr)
+
+        return SqlJoinDescription(
+            right_source=parent_sql_select_node,
+            right_source_alias=parent_alias,
+            on_condition=SqlComparisonExpression(
+                left_expr=left_expr,
+                comparison=SqlComparison.EQUALS,
+                right_expr=SqlColumnReferenceExpression(
+                    col_ref=SqlColumnReference(table_alias=parent_alias, column_name=metric_time_dimension_column_name)
+                ),
+            ),
             join_type=SqlJoinType.INNER,
         )

@@ -8,7 +8,7 @@ FROM (
     subq_14.ds AS metric_time
     , subq_12.bookings_5_days_ago AS bookings_5_days_ago
   FROM ***************************.mf_time_spine subq_14
-  LEFT OUTER JOIN (
+  INNER JOIN (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT

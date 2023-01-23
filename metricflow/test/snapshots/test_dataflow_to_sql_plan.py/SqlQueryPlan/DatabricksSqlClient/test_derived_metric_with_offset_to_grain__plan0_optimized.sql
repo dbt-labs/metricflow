@@ -1,7 +1,7 @@
 -- Compute Metrics via Expressions
 SELECT
   metric_time
-  , (bookings - bookings_at_start_of_month) / bookings_at_start_of_month AS bookings_growth_since_start_of_month
+  , bookings - bookings_at_start_of_month AS bookings_growth_since_start_of_month
 FROM (
   -- Combine Metrics
   SELECT
@@ -36,7 +36,7 @@ FROM (
       subq_25.ds AS metric_time
       , subq_23.bookings_at_start_of_month AS bookings_at_start_of_month
     FROM ***************************.mf_time_spine subq_25
-    LEFT OUTER JOIN (
+    INNER JOIN (
       -- Aggregate Measures
       -- Compute Metrics via Expressions
       SELECT
