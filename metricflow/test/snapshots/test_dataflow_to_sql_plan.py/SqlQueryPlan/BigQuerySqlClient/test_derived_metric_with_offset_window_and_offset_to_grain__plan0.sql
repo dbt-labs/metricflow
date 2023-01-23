@@ -1,7 +1,7 @@
 -- Compute Metrics via Expressions
 SELECT
   subq_16.metric_time
-  , month_start_bookings / bookings_1_month_ago AS bookings_month_start_compared_to_1_month_prior
+  , month_start_bookings - bookings_1_month_ago AS bookings_month_start_compared_to_1_month_prior
 FROM (
   -- Combine Metrics
   SELECT
@@ -19,7 +19,7 @@ FROM (
         subq_6.ds AS metric_time
       FROM ***************************.mf_time_spine subq_6
     ) subq_5
-    LEFT OUTER JOIN (
+    INNER JOIN (
       -- Compute Metrics via Expressions
       SELECT
         subq_3.metric_time
@@ -176,7 +176,7 @@ FROM (
         subq_14.ds AS metric_time
       FROM ***************************.mf_time_spine subq_14
     ) subq_13
-    LEFT OUTER JOIN (
+    INNER JOIN (
       -- Compute Metrics via Expressions
       SELECT
         subq_11.metric_time

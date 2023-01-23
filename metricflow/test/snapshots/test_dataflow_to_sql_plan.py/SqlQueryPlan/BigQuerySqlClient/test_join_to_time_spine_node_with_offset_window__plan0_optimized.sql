@@ -10,7 +10,7 @@ FROM (
   FROM ***************************.mf_time_spine subq_13
   WHERE ds BETWEEN CAST('2020-01-01' AS DATETIME) AND CAST('2021-01-01' AS DATETIME)
 ) subq_12
-LEFT OUTER JOIN (
+INNER JOIN (
   -- Compute Metrics via Expressions
   SELECT
     metric_time
