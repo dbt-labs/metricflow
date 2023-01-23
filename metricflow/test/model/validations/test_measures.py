@@ -5,6 +5,13 @@ import pytest
 from metricflow.model.objects.common import YamlConfigFile
 from metricflow.model.model_validator import ModelValidator
 from metricflow.model.parsing.dir_to_model import parse_yaml_files_to_validation_ready_model
+from metricflow.model.validations.measures import (
+    CountAggregationExprRule,
+    DataSourceMeasuresUniqueRule,
+    MeasureConstraintAliasesRule,
+    MeasuresNonAdditiveDimensionRule,
+    MetricMeasuresRule,
+)
 from metricflow.model.validations.validator_helpers import ModelValidationException
 
 
@@ -32,8 +39,7 @@ def test_metric_missing_measure() -> None:
         ModelValidationException,
         match=f"Measure {measure_name} referenced in metric {metric_name} is not defined in the model!",
     ):
-
-        ModelValidator().checked_validations(model=model.model)
+        ModelValidator([MetricMeasuresRule()]).checked_validations(model=model.model)
 
 
 def test_measures_only_exist_in_one_data_source() -> None:  # noqa: D
@@ -100,7 +106,7 @@ def test_measures_only_exist_in_one_data_source() -> None:  # noqa: D
     )
     dup_measure_file = YamlConfigFile(filepath="inline_for_test_2", contents=yaml_contents_2)
     dup_model = parse_yaml_files_to_validation_ready_model([base_file, dup_measure_file])
-    build = ModelValidator().validate_model(dup_model.model)
+    build = ModelValidator([DataSourceMeasuresUniqueRule()]).validate_model(dup_model.model)
 
     if build.issues is not None:
         for issue in build.issues.all_issues:
@@ -151,7 +157,7 @@ def test_measure_alias_is_set_when_required() -> None:
     missing_alias_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
     model = parse_yaml_files_to_validation_ready_model([missing_alias_file])
 
-    build = ModelValidator().validate_model(model.model)
+    build = ModelValidator([MeasureConstraintAliasesRule()]).validate_model(model.model)
 
     assert len(build.issues.errors) == 1
     expected_error_substring = f"depends on multiple different constrained versions of measure {measure_name}"
@@ -200,7 +206,7 @@ def test_invalid_measure_alias_name() -> None:
     invalid_alias_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
     model = parse_yaml_files_to_validation_ready_model([invalid_alias_file])
 
-    build = ModelValidator().validate_model(model.model)
+    build = ModelValidator([MeasureConstraintAliasesRule()]).validate_model(model.model)
 
     assert len(build.issues.errors) == 1
     expected_error_substring = f"Invalid name `{invalid_alias}` - names should only consist of"
@@ -251,7 +257,7 @@ def test_measure_alias_measure_name_conflict() -> None:
     invalid_alias_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
     model = parse_yaml_files_to_validation_ready_model([invalid_alias_file])
 
-    build = ModelValidator().validate_model(model.model)
+    build = ModelValidator([MeasureConstraintAliasesRule()]).validate_model(model.model)
 
     assert len(build.issues.errors) == 1
     expected_error_substring = (
@@ -314,7 +320,7 @@ def test_reused_measure_alias() -> None:
     invalid_alias_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
     model = parse_yaml_files_to_validation_ready_model([invalid_alias_file])
 
-    build = ModelValidator().validate_model(model.model)
+    build = ModelValidator([MeasureConstraintAliasesRule()]).validate_model(model.model)
 
     assert len(build.issues.errors) == 1
     expected_error_substring = (
@@ -372,7 +378,7 @@ def test_reused_measure_alias_within_metric() -> None:
     invalid_alias_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
     model = parse_yaml_files_to_validation_ready_model([invalid_alias_file])
 
-    build = ModelValidator().validate_model(model.model)
+    build = ModelValidator([MeasureConstraintAliasesRule()]).validate_model(model.model)
 
     assert len(build.issues.errors) == 1
     expected_error_substring = (
@@ -438,7 +444,7 @@ def test_invalid_non_additive_dimension_properties() -> None:
         [invalid_dim_file], apply_post_transformations=False, raise_issues_as_exceptions=False
     )
 
-    build = ModelValidator().validate_model(model.model)
+    build = ModelValidator([MeasuresNonAdditiveDimensionRule()]).validate_model(model.model)
     expected_error_substring_1 = "that is not defined as a dimension in data source 'sample_data_source_2'."
     expected_error_substring_2 = "has a non_additive_dimension with an invalid 'window_groupings'"
     expected_error_substring_3 = "that is defined as a categorical dimension which is not supported."
@@ -489,7 +495,7 @@ def test_count_measure_missing_expr() -> None:
     missing_expr_file = YamlConfigFile(filepath="inline_for_test_2", contents=yaml_contents)
     model = parse_yaml_files_to_validation_ready_model([missing_expr_file], apply_post_transformations=False)
 
-    build = ModelValidator().validate_model(model.model)
+    build = ModelValidator([CountAggregationExprRule()]).validate_model(model.model)
     expected_error_substring = (
         "Measure 'bad_measure' uses a COUNT aggregation, which requires an expr to be provided. "
         "Provide 'expr: 1' if a count of all rows is desired."
@@ -535,7 +541,7 @@ def test_count_measure_with_distinct_expr() -> None:
     distinct_count_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
     model = parse_yaml_files_to_validation_ready_model([distinct_count_file], apply_post_transformations=False)
 
-    build = ModelValidator().validate_model(model.model)
+    build = ModelValidator([CountAggregationExprRule()]).validate_model(model.model)
     expected_error_substring = "Measure 'distinct_count' uses a 'count' aggregation with a DISTINCT expr"
 
     assert len(build.issues.errors) == 1

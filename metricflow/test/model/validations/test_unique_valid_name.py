@@ -35,7 +35,7 @@ def test_duplicate_data_source_name(simple_model__pre_transforms: UserConfigured
         ModelValidationException,
         match=rf"Can't use name `{duplicated_data_source.name}` for a data source when it was already used for a data source",
     ):
-        ModelValidator().checked_validations(model)
+        ModelValidator([UniqueAndValidNameRule()]).checked_validations(model)
 
 
 def test_duplicate_metric_name(simple_model__pre_transforms: UserConfiguredModel) -> None:  # noqa:D
@@ -46,7 +46,7 @@ def test_duplicate_metric_name(simple_model__pre_transforms: UserConfiguredModel
         ModelValidationException,
         match=rf"Can't use name `{duplicated_metric.name}` for a metric when it was already used for a metric",
     ):
-        ModelValidator().checked_validations(model)
+        ModelValidator([UniqueAndValidNameRule()]).checked_validations(model)
 
 
 def test_duplicate_materalization_name(simple_model__pre_transforms: UserConfiguredModel) -> None:  # noqa:D
@@ -57,7 +57,7 @@ def test_duplicate_materalization_name(simple_model__pre_transforms: UserConfigu
         ModelValidationException,
         match=rf"Can't use name `{duplicated_materialization.name}` for a materialization when it was already used for a materialization",
     ):
-        ModelValidator().checked_validations(model)
+        ModelValidator([UniqueAndValidNameRule()]).checked_validations(model)
 
 
 def test_top_level_metric_can_have_same_name_as_any_other_top_level_item(
@@ -71,8 +71,8 @@ def test_top_level_metric_can_have_same_name_as_any_other_top_level_item(
     model_data_source.data_sources[0].name = metric_name
     model_materialization.materializations[0].name = model_data_source.metrics[0].name
 
-    ModelValidator().checked_validations(model_data_source)
-    ModelValidator().checked_validations(model_materialization)
+    ModelValidator([UniqueAndValidNameRule()]).checked_validations(model_data_source)
+    ModelValidator([UniqueAndValidNameRule()]).checked_validations(model_materialization)
 
 
 def test_top_level_elements_cant_share_names_except_with_metrics(
@@ -86,7 +86,7 @@ def test_top_level_elements_cant_share_names_except_with_metrics(
         ModelValidationException,
         match=rf"Can't use name `{data_source_name}` for a materialization when it was already used for a data source",
     ):
-        ModelValidator().checked_validations(model_ds_and_mat)
+        ModelValidator([UniqueAndValidNameRule()]).checked_validations(model_ds_and_mat)
 
 
 """
@@ -115,7 +115,7 @@ def test_duplicate_measure_name(simple_model__pre_transforms: UserConfiguredMode
         ModelValidationException,
         match=rf"can't use name `{duplicated_measure.reference.element_name}` for a measure when it was already used for a measure",
     ):
-        ModelValidator().checked_validations(model)
+        ModelValidator([UniqueAndValidNameRule()]).checked_validations(model)
 
 
 def test_duplicate_dimension_name(simple_model__pre_transforms: UserConfiguredModel) -> None:  # noqa:D
@@ -133,7 +133,7 @@ def test_duplicate_dimension_name(simple_model__pre_transforms: UserConfiguredMo
         match=rf"can't use name `{duplicated_dimension.reference.element_name}` for a "
         rf"dimension when it was already used for a dimension",
     ):
-        ModelValidator().checked_validations(model)
+        ModelValidator([UniqueAndValidNameRule()]).checked_validations(model)
 
 
 def test_duplicate_identifier_name(simple_model__pre_transforms: UserConfiguredModel) -> None:  # noqa:D
@@ -150,7 +150,7 @@ def test_duplicate_identifier_name(simple_model__pre_transforms: UserConfiguredM
         ModelValidationException,
         match=rf"can't use name `{duplicated_identifier.reference.element_name}` for a identifier when it was already used for a identifier",
     ):
-        ModelValidator().checked_validations(model)
+        ModelValidator([UniqueAndValidNameRule()]).checked_validations(model)
 
 
 """

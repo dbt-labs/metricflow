@@ -6,6 +6,7 @@ from metricflow.model.model_validator import ModelValidator
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from metricflow.model.validations.element_const import ElementConsistencyRule
 from metricflow.model.validations.validator_helpers import DataSourceElementType, ModelValidationException
 from metricflow.test.test_utils import find_data_source_with
 
@@ -47,7 +48,7 @@ def test_cross_element_names(simple_model__pre_transforms: UserConfiguredModel) 
             f"types .*?DataSourceElementType.DIMENSION.*?DataSourceElementType.MEASURE.*? across the model"
         ),
     ):
-        ModelValidator().checked_validations(model)
+        ModelValidator([ElementConsistencyRule()]).checked_validations(model)
 
     model.data_sources[usable_ds_index] = ds_measure_x_identifier
     with pytest.raises(
@@ -57,7 +58,7 @@ def test_cross_element_names(simple_model__pre_transforms: UserConfiguredModel) 
             f"types .*?DataSourceElementType.IDENTIFIER.*?DataSourceElementType.MEASURE.*? across the model"
         ),
     ):
-        ModelValidator().checked_validations(model)
+        ModelValidator([ElementConsistencyRule()]).checked_validations(model)
 
     model.data_sources[usable_ds_index] = ds_dimension_x_identifier
     with pytest.raises(
@@ -67,4 +68,4 @@ def test_cross_element_names(simple_model__pre_transforms: UserConfiguredModel) 
             f"types .*?DataSourceElementType.DIMENSION.*?DataSourceElementType.IDENTIFIER.*? across the model"
         ),
     ):
-        ModelValidator().checked_validations(model)
+        ModelValidator([ElementConsistencyRule()]).checked_validations(model)

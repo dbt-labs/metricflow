@@ -8,6 +8,7 @@ from metricflow.model.objects.elements.identifier import Identifier, IdentifierT
 from metricflow.model.objects.elements.measure import Measure
 from metricflow.model.objects.metric import MetricInput, MetricType, MetricTypeParams
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from metricflow.model.validations.metrics import DerivedMetricRule
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.references import DimensionReference, IdentifierReference, TimeDimensionReference
 from metricflow.test.fixtures.table_fixtures import DEFAULT_DS
@@ -182,7 +183,7 @@ def test_generated_metrics_only() -> None:  # noqa:D
 
 def test_derived_metric() -> None:  # noqa: D
     measure_name = "foo"
-    model_validator = ModelValidator()
+    model_validator = ModelValidator([DerivedMetricRule()])
     result = model_validator.validate_model(
         UserConfiguredModel(
             data_sources=[

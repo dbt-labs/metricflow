@@ -15,6 +15,12 @@ from metricflow.model.objects.elements.measure import Measure
 from metricflow.model.objects.metric import MetricType, MetricTypeParams
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.parsing.dir_to_model import parse_yaml_files_to_validation_ready_model
+from metricflow.model.validations.identifiers import (
+    IdentifierConfigRule,
+    IdentifierConsistencyRule,
+    NaturalIdentifierConfigurationRule,
+    OnePrimaryIdentifierPerDataSourceRule,
+)
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.object_utils import flatten_nested_sequence
 from metricflow.test.model.validations.helpers import (
@@ -40,7 +46,7 @@ def test_data_source_cant_have_more_than_one_primary_identifier(
         identifier.type = IdentifierType.PRIMARY
         identifier_references.add(identifier.reference)
 
-    build = ModelValidator().validate_model(model)
+    build = ModelValidator([OnePrimaryIdentifierPerDataSourceRule()]).validate_model(model)
 
     future_issue = (
         f"Data sources can have only one primary identifier. The data source"
@@ -64,7 +70,7 @@ def test_invalid_composite_identifiers() -> None:  # noqa:D
         measure2_name = "metric_with_no_time_dim"
         identifier_name = "thorium"
         foreign_identifier_name = "composite_thorium"
-        model_validator = ModelValidator()
+        model_validator = ModelValidator([IdentifierConfigRule()])
         model_validator.checked_validations(
             UserConfiguredModel(
                 data_sources=[
@@ -114,7 +120,7 @@ def test_composite_identifiers_nonexistent_ref() -> None:  # noqa:D
         measure2_name = "metric_with_no_time_dim"
         identifier_name = "thorium"
         foreign_identifier_name = "composite_thorium"
-        model_validator = ModelValidator()
+        model_validator = ModelValidator([IdentifierConfigRule()])
         model_validator.checked_validations(
             UserConfiguredModel(
                 data_sources=[
@@ -165,7 +171,7 @@ def test_composite_identifiers_ref_and_name() -> None:  # noqa:D
         identifier_name = "thorium"
         foreign_identifier_name = "composite_thorium"
         foreign_identifier2_name = "shouldnt_have_both"
-        model_validator = ModelValidator()
+        model_validator = ModelValidator([IdentifierConfigRule()])
         model_validator.checked_validations(
             UserConfiguredModel(
                 data_sources=[
@@ -241,7 +247,7 @@ def test_mismatched_identifier(simple_model__pre_transforms: UserConfiguredModel
     )
     listings_latest.identifiers = flatten_nested_sequence([listings_latest.identifiers, [identifier_listings]])
 
-    build = ModelValidator().validate_model(model)
+    build = ModelValidator([IdentifierConsistencyRule()]).validate_model(model)
 
     expected_error_message_fragment = "does not have consistent sub-identifiers"
     error_count = len(
@@ -284,7 +290,7 @@ def test_multiple_natural_identifiers() -> None:
     model = parse_yaml_files_to_validation_ready_model([base_model_file(), natural_identifier_file])
 
     with pytest.raises(ModelValidationException, match="can have at most one natural identifier"):
-        ModelValidator().checked_validations(model.model)
+        ModelValidator([NaturalIdentifierConfigurationRule()]).checked_validations(model.model)
 
 
 def test_natural_identifier_used_in_wrong_context() -> None:
@@ -306,4 +312,4 @@ def test_natural_identifier_used_in_wrong_context() -> None:
     model = parse_yaml_files_to_validation_ready_model([base_model_file(), natural_identifier_file])
 
     with pytest.raises(ModelValidationException, match="use of `natural` identifiers is currently supported only in"):
-        ModelValidator().checked_validations(model.model)
+        ModelValidator([NaturalIdentifierConfigurationRule()]).checked_validations(model.model)

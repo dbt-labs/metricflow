@@ -3,6 +3,7 @@ import pytest
 from metricflow.model.model_validator import ModelValidator
 from metricflow.model.objects.elements.dimension import DimensionType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from metricflow.model.validations.agg_time_dimension import AggregationTimeDimensionRule
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.test.model.validations.test_unique_valid_name import copied_model
 from metricflow.test.test_utils import find_data_source_with
@@ -24,7 +25,7 @@ def test_invalid_aggregation_time_dimension(simple_user_configured_model: UserCo
             "in the data source"
         ),
     ):
-        model_validator = ModelValidator()
+        model_validator = ModelValidator([AggregationTimeDimensionRule()])
         model_validator.checked_validations(model)
 
 
@@ -41,7 +42,7 @@ def test_unset_aggregation_time_dimension(data_warehouse_validation_model: UserC
         ModelValidationException,
         match=("Aggregation time dimension for measure \\w+ is not set!"),
     ):
-        model_validator = ModelValidator()
+        model_validator = ModelValidator([AggregationTimeDimensionRule()])
         model_validator.checked_validations(model)
 
 
@@ -59,5 +60,5 @@ def test_missing_primary_time_ok_if_all_measures_have_agg_time_dim(
             assert dimension.type_params, f"Time dimension `{dimension.name}` is missing `type_params`"
             dimension.type_params.is_primary = False
 
-    model_validator = ModelValidator()
+    model_validator = ModelValidator([AggregationTimeDimensionRule()])
     model_validator.checked_validations(model)
