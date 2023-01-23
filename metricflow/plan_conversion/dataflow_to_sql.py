@@ -87,11 +87,8 @@ from metricflow.sql.sql_exprs import (
     SqlCastToTimestampExpression,
     SqlRatioComputationExpression,
     SqlDateTruncExpression,
-    SqlTimeDeltaExpression,
     SqlStringLiteralExpression,
     SqlBetweenExpression,
-    SqlComparisonExpression,
-    SqlComparison,
     SqlFunctionExpression,
 )
 from metricflow.sql.sql_plan import (
@@ -1329,27 +1326,12 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         )
 
         # Build join expression
-        left_expr: SqlExpressionNode = SqlColumnReferenceExpression(
-            col_ref=SqlColumnReference(table_alias=time_spine_alias, column_name=metric_time_dimension_column_name)
-        )
-        if node.offset_window:
-            left_expr = SqlTimeDeltaExpression(
-                arg=left_expr, count=node.offset_window.count, granularity=node.offset_window.granularity
-            )
-        elif node.offset_to_grain:
-            left_expr = SqlDateTruncExpression(time_granularity=node.offset_to_grain, arg=left_expr)
-
-        join_description = SqlJoinDescription(
-            right_source=parent_data_set.sql_select_node,
-            right_source_alias=parent_alias,
-            on_condition=SqlComparisonExpression(
-                left_expr=left_expr,
-                comparison=SqlComparison.EQUALS,
-                right_expr=SqlColumnReferenceExpression(
-                    col_ref=SqlColumnReference(table_alias=parent_alias, column_name=metric_time_dimension_column_name)
-                ),
-            ),
-            join_type=SqlJoinType.INNER,
+        join_description = SqlQueryPlanJoinBuilder.make_join_to_time_spine_join_description(
+            node=node,
+            time_spine_alias=time_spine_alias,
+            metric_time_dimension_column_name=metric_time_dimension_column_name,
+            parent_sql_select_node=parent_data_set.sql_select_node,
+            parent_alias=parent_alias,
         )
 
         # Use metric_time instance from time spine, all instances EXCEPT metric_time from parent data set.
