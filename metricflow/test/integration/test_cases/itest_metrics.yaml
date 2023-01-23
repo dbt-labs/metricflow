@@ -707,8 +707,6 @@ integration_test:
     ) b
     ON a.metric_time = b.metric_time
 ---
-# should grain be diff? since the first of the period will match the rest of the period, regardless if there is any data the rest of the period?
-# check out logic in join over time range node
 integration_test:
   name: derived_metric_with_offset_to_grain
   description: Tests a derived metric query with an offset_to_grain
