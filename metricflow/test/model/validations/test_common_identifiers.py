@@ -12,8 +12,8 @@ from metricflow.test.test_utils import find_data_source_with
 
 
 @pytest.mark.skip("TODO: re-enforce after validations improvements")
-def test_lonely_identifier_raises_issue(simple_model__pre_transforms: UserConfiguredModel) -> None:  # noqa: D
-    model = copy.deepcopy(simple_model__pre_transforms)
+def test_lonely_identifier_raises_issue(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa: D
+    model = copy.deepcopy(simple_model__with_primary_transforms)
     lonely_identifier_name = "hi_im_lonely"
 
     func: Callable[[DataSource], bool] = lambda data_source: len(data_source.identifiers) > 0

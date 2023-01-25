@@ -10,16 +10,16 @@ from metricflow.test.test_utils import (
 logger = logging.getLogger(__name__)
 
 
-def test_materialization_validation(simple_model__pre_transforms: UserConfiguredModel) -> None:  # noqa: D
-    ValidMaterializationRule.validate_model(simple_model__pre_transforms)
+def test_materialization_validation(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa: D
+    ValidMaterializationRule.validate_model(simple_model__with_primary_transforms)
 
 
-def test_identifier(simple_model__pre_transforms: UserConfiguredModel) -> None:  # noqa: D
+def test_identifier(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa: D
     assert (
         len(
             ValidMaterializationRule.validate_model(
                 model_with_materialization(
-                    simple_model__pre_transforms,
+                    simple_model__with_primary_transforms,
                     [
                         materialization_with_guaranteed_meta(
                             name="foobar",
@@ -34,12 +34,12 @@ def test_identifier(simple_model__pre_transforms: UserConfiguredModel) -> None: 
     )
 
 
-def test_invalid_metric_name(simple_model__pre_transforms: UserConfiguredModel) -> None:  # noqa: D
+def test_invalid_metric_name(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa: D
     assert (
         len(
             ValidMaterializationRule.validate_model(
                 model_with_materialization(
-                    simple_model__pre_transforms,
+                    simple_model__with_primary_transforms,
                     [
                         materialization_with_guaranteed_meta(
                             name="foobar",
@@ -54,12 +54,12 @@ def test_invalid_metric_name(simple_model__pre_transforms: UserConfiguredModel) 
     )
 
 
-def test_invalid_dimension_name(simple_model__pre_transforms: UserConfiguredModel) -> None:  # noqa: D
+def test_invalid_dimension_name(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa: D
     assert (
         len(
             ValidMaterializationRule.validate_model(
                 model_with_materialization(
-                    simple_model__pre_transforms,
+                    simple_model__with_primary_transforms,
                     [
                         materialization_with_guaranteed_meta(
                             name="foobar",
@@ -74,13 +74,13 @@ def test_invalid_dimension_name(simple_model__pre_transforms: UserConfiguredMode
     )
 
 
-def test_missing_primary_time_dimension(simple_model__pre_transforms: UserConfiguredModel) -> None:  # noqa: D
+def test_missing_primary_time_dimension(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa: D
     """Materializations should have the primary time dimension listed as a dimension"""
     assert (
         len(
             ValidMaterializationRule.validate_model(
                 model_with_materialization(
-                    simple_model__pre_transforms,
+                    simple_model__with_primary_transforms,
                     [
                         materialization_with_guaranteed_meta(
                             name="foobar",
@@ -95,12 +95,12 @@ def test_missing_primary_time_dimension(simple_model__pre_transforms: UserConfig
     )
 
 
-def test_valid_time_granularity(simple_model__pre_transforms: UserConfiguredModel) -> None:  # noqa: D
+def test_valid_time_granularity(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa: D
     assert (
         len(
             ValidMaterializationRule.validate_model(
                 model_with_materialization(
-                    simple_model__pre_transforms,
+                    simple_model__with_primary_transforms,
                     [
                         materialization_with_guaranteed_meta(
                             name="materialization_test_case",
@@ -115,12 +115,12 @@ def test_valid_time_granularity(simple_model__pre_transforms: UserConfiguredMode
     )
 
 
-def test_invalid_time_granularity(simple_model__pre_transforms: UserConfiguredModel) -> None:  # noqa: D
+def test_invalid_time_granularity(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa: D
     assert (
         len(
             ValidMaterializationRule.validate_model(
                 model_with_materialization(
-                    simple_model__pre_transforms,
+                    simple_model__with_primary_transforms,
                     [
                         materialization_with_guaranteed_meta(
                             name="materialization_test_case",

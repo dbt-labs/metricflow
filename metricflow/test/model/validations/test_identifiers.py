@@ -33,10 +33,10 @@ from metricflow.time.time_granularity import TimeGranularity
 
 
 def test_data_source_cant_have_more_than_one_primary_identifier(
-    simple_model__pre_transforms: UserConfiguredModel,
+    simple_model__with_primary_transforms: UserConfiguredModel,
 ) -> None:  # noqa: D
     """Add an additional primary identifier to a data source and assert that it cannot have two"""
-    model = copy.deepcopy(simple_model__pre_transforms)
+    model = copy.deepcopy(simple_model__with_primary_transforms)
     func: Callable[[DataSource], bool] = lambda data_source: len(data_source.identifiers) > 1
 
     multiple_identifier_data_source, _ = find_data_source_with(model, func)
@@ -216,13 +216,13 @@ def test_composite_identifiers_ref_and_name() -> None:  # noqa:D
         )
 
 
-def test_mismatched_identifier(simple_model__pre_transforms: UserConfiguredModel) -> None:  # noqa: D
+def test_mismatched_identifier(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa: D
     """Testing two mismatched identifiers in two data sources
 
     Add two identifiers with mismatched sub-identifiers to two data sources in the model
     Ensure that our composite identifiers rule catches this incompatibility
     """
-    model = copy.deepcopy(simple_model__pre_transforms)
+    model = copy.deepcopy(simple_model__with_primary_transforms)
 
     bookings_source, _ = find_data_source_with(
         model=model,

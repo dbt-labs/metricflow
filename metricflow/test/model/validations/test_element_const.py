@@ -15,8 +15,8 @@ def _categorical_dimensions(data_source: DataSource) -> Tuple[Dimension, ...]:
     return tuple(dim for dim in data_source.dimensions if dim.type == DimensionType.CATEGORICAL)
 
 
-def test_cross_element_names(simple_model__pre_transforms: UserConfiguredModel) -> None:  # noqa:D
-    model = copy.deepcopy(simple_model__pre_transforms)
+def test_cross_element_names(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa:D
+    model = copy.deepcopy(simple_model__with_primary_transforms)
 
     # ensure we have a usable data source for the test
     usable_ds, usable_ds_index = find_data_source_with(

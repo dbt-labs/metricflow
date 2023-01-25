@@ -16,8 +16,10 @@ class SliceNamesRule(ModelTransformRule):
         return model
 
 
-def test_can_configure_model_transform_rules(simple_model__pre_transforms: UserConfiguredModel) -> None:  # noqa: D
-    pre_model = simple_model__pre_transforms
+def test_can_configure_model_transform_rules(  # noqa: D
+    simple_model__with_primary_transforms: UserConfiguredModel,
+) -> None:
+    pre_model = simple_model__with_primary_transforms
     assert not all(len(x.name) == 3 for x in pre_model.data_sources)
 
     # Confirms that a custom transformation works `for ModelTransformer.transform`

@@ -253,7 +253,7 @@ def simple_user_configured_model(template_mapping: Dict[str, str]) -> UserConfig
 
 
 @pytest.fixture(scope="session")
-def simple_model__pre_transforms(template_mapping: Dict[str, str]) -> UserConfiguredModel:
+def simple_model__with_primary_transforms(template_mapping: Dict[str, str]) -> UserConfiguredModel:
     """Model used for tests pre-transformations."""
 
     model_build_result = parse_directory_of_yaml_files_to_model(
