@@ -17,3 +17,12 @@ def test_where_constraint_with_between() -> None:
     """Testing a where constraint with a BETWEEN expression"""
     parsed_where = WhereClauseConstraint.parse("WHERE ds < CURRENT_DATE() AND price BETWEEN min_price AND 1.50")
     assert set(parsed_where.linkable_names) == {"ds", "price", "min_price"}
+
+
+def test_where_constraint_escaped() -> None:
+    """Testing a where constraint with an escaped expression"""
+    parsed_where = WhereClauseConstraint.parse(
+        "WHERE {{ds.granularity(week)}} < CURRENT_DATE() AND {{price}} BETWEEN min_price AND 1.50"
+    )
+    assert set(parsed_where.linkable_names) == {"ds.granularity(week)", "price", "min_price"}
+    assert parsed_where.where == "ds__week < CURRENT_DATE() AND price BETWEEN min_price AND 1.50"

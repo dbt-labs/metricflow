@@ -354,6 +354,34 @@ def test_constraint_metric_parsing() -> None:
     )
 
 
+def test_escaped_constraint_metric_parsing() -> None:
+    """Test for parsing a metric specification with a constraint included"""
+    yaml_contents = textwrap.dedent(
+        """\
+        metric:
+          name: constraint_test
+          type: measure_proxy
+          type_params:
+            measures:
+              - input_measure
+          constraint: "{{some_dimension.granularity(month)}} > '2020.01.01'"
+        """
+    )
+    file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+
+    build_result = parse_yaml_files_to_model(files=[file])
+
+    assert len(build_result.model.metrics) == 1
+    metric = build_result.model.metrics[0]
+    assert metric.name == "constraint_test"
+    assert metric.type is MetricType.MEASURE_PROXY
+    assert metric.constraint == WhereClauseConstraint(
+        where="some_dimension__month > '2020.01.01'",
+        linkable_names=["some_dimension.granularity(month)"],
+        sql_params=SqlBindParameters(),
+    )
+
+
 def test_derived_metric_input_parsing() -> None:
     """Test for parsing derived metrics with metric_input properties"""
     yaml_contents = textwrap.dedent(

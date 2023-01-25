@@ -338,3 +338,55 @@ integration_test:
     ) b
     ON a.is_instant = b.is_instant
     GROUP BY a.is_instant
+---
+integration_test:
+  name: query_granularity_for_sum_day_new_syntax
+  description: Query a sum metric by time granularities.
+  model: EXTENDED_DATE_MODEL
+  required_features: ["DATE_TRUNC"]
+  metrics: ["bookings"]
+  group_bys: ["metric_time.granularity(day)"]
+  check_query: |
+    SELECT
+      SUM(booking) AS bookings
+      , {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time
+    FROM {{ source_schema }}.fct_bookings_extended
+    GROUP BY
+      ds
+---
+integration_test:
+  name: query_granularity_for_sum_week_new_syntax
+  description: Query a sum metric by time granularities.
+  model: EXTENDED_DATE_MODEL
+  required_features: ["DATE_TRUNC"]
+  metrics: ["bookings"]
+  group_bys: ["metric_time.granularity(week)"]
+  check_query: |
+    SELECT
+      SUM(booking) AS bookings
+      , {{ render_date_trunc("ds", TimeGranularity.WEEK) }} AS metric_time__week
+    FROM {{ source_schema }}.fct_bookings_extended
+    GROUP BY
+      metric_time__week
+---
+integration_test:
+  name: query_metric_with_new_granularity_escaped_where_constraint
+  description: Query a metric with a month-granularity time dimensions.
+  model: EXTENDED_DATE_MODEL
+  required_features: ["DATE_TRUNC"]
+  metrics: ["bookings"]
+  group_bys: ["metric_time__month"]
+  where_constraint: "{{ render_time_constraint('{{metric_time.granularity(month)}}', '2020-01-01', '2020-01-31') }}"
+  check_query: |
+    SELECT
+      metric_time__month
+      , SUM(bookings) AS bookings
+    FROM (
+      SELECT
+        {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS metric_time__month
+        , 1 AS bookings
+      FROM {{ source_schema }}.fct_bookings_extended
+    ) subq_2
+    WHERE {{ render_time_constraint("metric_time__month", "2020-01-01", "2020-01-31") }}
+    GROUP BY
+      metric_time__month

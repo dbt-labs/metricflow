@@ -410,3 +410,25 @@ def test_query_parser_updated_granularity_syntax(time_spine_source: TimeSpineSou
             descending=False,
         ),
     )
+
+
+def test_parse_and_validate_where_constraint_updated_granularity_syntax(time_spine_source: TimeSpineSource) -> None:
+    """Test that granularity of metric_time reference in where constraint is at least that of the ds dimension."""
+    revenue_yaml_file = YamlConfigFile(filepath="inline_for_test_2", contents=REVENUE_YAML)
+
+    query_parser = query_parser_from_yaml([revenue_yaml_file], time_spine_source)
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=["revenue"],
+        group_by_names=[MTD],
+        where_constraint_str="WHERE {{metric_time.granularity(month)}} > '2020-01-01' and country = 'vanuatu'",
+    )
+
+    assert query_spec.where_constraint and (
+        TimeDimensionSpec(element_name="metric_time", identifier_links=(), time_granularity=TimeGranularity.MONTH)
+        in query_spec.where_constraint.linkable_spec_set.time_dimension_specs
+    )
+
+    assert query_spec.where_constraint and (
+        DimensionSpec(element_name="country", identifier_links=())
+        in query_spec.where_constraint.linkable_spec_set.dimension_specs
+    )
