@@ -11,6 +11,7 @@ import pytest
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, BaseOutput
 from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
+from metricflow.model.model_transformer import ModelTransformer
 from metricflow.model.model_validator import ModelValidator
 from metricflow.model.objects.data_source import DataSource
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
@@ -258,10 +259,12 @@ def simple_model__pre_transforms(template_mapping: Dict[str, str]) -> UserConfig
     model_build_result = parse_directory_of_yaml_files_to_model(
         os.path.join(os.path.dirname(__file__), "model_yamls/simple_model"),
         template_mapping=template_mapping,
-        apply_pre_transformations=True,
-        apply_post_transformations=False,
+        apply_transformations=False,
     )
-    return model_build_result.model
+    transformed_model = ModelTransformer.transform(
+        model=model_build_result.model, ordered_rule_sequences=(ModelTransformer.PRIMARY_RULES,)
+    )
+    return transformed_model
 
 
 @pytest.fixture(scope="session")

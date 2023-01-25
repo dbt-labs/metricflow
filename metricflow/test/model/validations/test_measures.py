@@ -3,6 +3,7 @@ import textwrap
 
 import pytest
 from metricflow.model.objects.common import YamlConfigFile
+from metricflow.model.model_transformer import ModelTransformer
 from metricflow.model.model_validator import ModelValidator
 from metricflow.model.parsing.dir_to_model import parse_yaml_files_to_validation_ready_model
 from metricflow.model.validations.measures import (
@@ -440,11 +441,14 @@ def test_invalid_non_additive_dimension_properties() -> None:
         """
     )
     invalid_dim_file = YamlConfigFile(filepath="inline_for_test_2", contents=yaml_contents)
-    model = parse_yaml_files_to_validation_ready_model(
-        [invalid_dim_file], apply_post_transformations=False, raise_issues_as_exceptions=False
+    model_build_result = parse_yaml_files_to_validation_ready_model(
+        [invalid_dim_file], apply_transformations=False, raise_issues_as_exceptions=False
+    )
+    transformed_model = ModelTransformer.transform(
+        model=model_build_result.model, ordered_rule_sequences=(ModelTransformer.PRIMARY_RULES,)
     )
 
-    build = ModelValidator([MeasuresNonAdditiveDimensionRule()]).validate_model(model.model)
+    build = ModelValidator([MeasuresNonAdditiveDimensionRule()]).validate_model(transformed_model)
     expected_error_substring_1 = "that is not defined as a dimension in data source 'sample_data_source_2'."
     expected_error_substring_2 = "has a non_additive_dimension with an invalid 'window_groupings'"
     expected_error_substring_3 = "that is defined as a categorical dimension which is not supported."
@@ -493,9 +497,12 @@ def test_count_measure_missing_expr() -> None:
         """
     )
     missing_expr_file = YamlConfigFile(filepath="inline_for_test_2", contents=yaml_contents)
-    model = parse_yaml_files_to_validation_ready_model([missing_expr_file], apply_post_transformations=False)
+    model_build_result = parse_yaml_files_to_validation_ready_model([missing_expr_file], apply_transformations=False)
+    transformed_model = ModelTransformer.transform(
+        model=model_build_result.model, ordered_rule_sequences=(ModelTransformer.PRIMARY_RULES,)
+    )
 
-    build = ModelValidator([CountAggregationExprRule()]).validate_model(model.model)
+    build = ModelValidator([CountAggregationExprRule()]).validate_model(transformed_model)
     expected_error_substring = (
         "Measure 'bad_measure' uses a COUNT aggregation, which requires an expr to be provided. "
         "Provide 'expr: 1' if a count of all rows is desired."
@@ -539,9 +546,12 @@ def test_count_measure_with_distinct_expr() -> None:
         """
     )
     distinct_count_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
-    model = parse_yaml_files_to_validation_ready_model([distinct_count_file], apply_post_transformations=False)
+    model_build_result = parse_yaml_files_to_validation_ready_model([distinct_count_file], apply_transformations=False)
+    transformed_model = ModelTransformer.transform(
+        model=model_build_result.model, ordered_rule_sequences=(ModelTransformer.PRIMARY_RULES,)
+    )
 
-    build = ModelValidator([CountAggregationExprRule()]).validate_model(model.model)
+    build = ModelValidator([CountAggregationExprRule()]).validate_model(transformed_model)
     expected_error_substring = "Measure 'distinct_count' uses a 'count' aggregation with a DISTINCT expr"
 
     assert len(build.issues.errors) == 1
