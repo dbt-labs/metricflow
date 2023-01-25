@@ -8,6 +8,7 @@ from mo_sql_parsing import parse as mo_parse
 
 from metricflow.errors.errors import ConstraintParseException
 from metricflow.model.objects.base import HashableBaseModel, PydanticCustomInputParser, PydanticParseableValueType
+from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 
 logger = logging.getLogger(__name__)
@@ -60,8 +61,27 @@ class WhereClauseConstraint(PydanticCustomInputParser, HashableBaseModel):
 
         We are assuming here that if we needed to parse a string, we wouldn't have bind parameters.
         Because if we had bind-parameters, the string would have existing structure, and we wouldn't need to parse it.
+
+        Implements new functional syntax escape mechanism.
         """
         s = strip_where(s)
+
+        escaped_sections = list(set(strip_delimited(s)))  # includes {{ }}
+
+        excluded_names = set()
+        escaped_linkable_names = []
+
+        for escaped_section in escaped_sections:
+            escaped_name = (
+                escaped_section.replace("{{", "").replace("}}", "").strip()
+            )  # removes {{ and }} and strips whitespace around
+            new_name = StructuredLinkableSpecName.from_name(
+                escaped_name
+            ).qualified_name  # replace escaped_portion with qualified name, since qualified name is used for column names
+            s = s.replace(escaped_section, new_name)
+
+            excluded_names.add(new_name)
+            escaped_linkable_names.append(escaped_name)
 
         where_str = f"WHERE {s}"
         # to piggyback on moz sql parser we need a SELECT statement
@@ -77,15 +97,19 @@ class WhereClauseConstraint(PydanticCustomInputParser, HashableBaseModel):
         if isinstance(where, dict):
             if not len(where.keys()) == 1:
                 raise ConstraintParseException(f"expected parsed constraint to contain exactly one key; got {where}")
+            parsed_linkable_names = list(
+                filter(lambda x: x not in excluded_names, constraint_dimension_names_from_dict(where))
+            )
             return WhereClauseConstraint(
                 where=s,
-                linkable_names=constraint_dimension_names_from_dict(where),
+                linkable_names=escaped_linkable_names + parsed_linkable_names,
                 sql_params=SqlBindParameters(),
             )
         elif isinstance(where, str):
+            parsed_linkable_names = list(filter(lambda x: x not in excluded_names, [where.strip()]))
             return WhereClauseConstraint(
                 where=s,
-                linkable_names=[where.strip()],
+                linkable_names=escaped_linkable_names + parsed_linkable_names,
                 sql_params=SqlBindParameters(),
             )
         else:
@@ -99,6 +123,14 @@ def strip_where(s: str) -> str:
     """Removes WHERE from the beginning of the string, if present (regardless of case)"""
     # '^' tells the regex to only check the beginning of the string
     return re.sub("^where ", "", s, flags=re.IGNORECASE)
+
+
+def strip_delimited(s: str) -> List[str]:
+    """Finds all the portions of string that are escaped with the {{...}} syntax."""
+    # the '\{\{' and '\}\}' parts match the {{ and }}, respectively. { and } need to be escaped in regex.
+    # the .*? matches every possible character non-greedily, choosing the minimum match.
+    pattern = r"\{\{.*?\}\}"
+    return re.findall(pattern, s)
 
 
 def constraint_dimension_names_from_dict(where: Dict[str, Any]) -> List[str]:  # type: ignore[misc] # noqa: D
