@@ -183,10 +183,10 @@ def parse_yaml_files_to_validation_ready_model(
     build_issues = build_result.issues
     try:
         if apply_pre_transformations:
-            model = ModelTransformer.pre_validation_transform_model(model)
+            model = ModelTransformer.transform(model, ordered_rule_sequences=(ModelTransformer.PRIMARY_RULES,))
 
         if apply_post_transformations:
-            model = ModelTransformer.post_validation_transform_model(model)
+            model = ModelTransformer.transform(model, ordered_rule_sequences=(ModelTransformer.SECONDARY_RULES,))
     except Exception as e:
         transformation_issue_results = ModelValidationResults(errors=[ValidationError(message=str(e))])
         build_issues = ModelValidationResults.merge([build_issues, transformation_issue_results])
