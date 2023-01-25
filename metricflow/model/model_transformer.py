@@ -1,7 +1,7 @@
 import copy
 import logging
 
-from typing import Sequence
+from typing import Sequence, Tuple
 
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.transformations.add_input_metric_measures import AddInputMetricMeasuresRule
@@ -23,12 +23,12 @@ class ModelTransformer:
     Generally used to make it more convenient for the user to develop their model.
     """
 
-    DEFAULT_PRE_VALIDATION_RULES: Sequence[ModelTransformRule] = (
+    PRIMARY_RULES: Sequence[ModelTransformRule] = (
         LowerCaseNamesRule(),
         SetMeasureAggregationTimeDimensionRule(),
     )
 
-    DEFAULT_POST_VALIDATION_RULES: Sequence[ModelTransformRule] = (
+    SECONDARY_RULES: Sequence[ModelTransformRule] = (
         CreateProxyMeasureRule(),
         BooleanMeasureAggregationRule(),
         CompositeIdentifierExpressionRule(),
@@ -37,25 +37,49 @@ class ModelTransformer:
         AddInputMetricMeasuresRule(),
     )
 
+    DEFAULT_RULES: Tuple[Sequence[ModelTransformRule], ...] = (
+        PRIMARY_RULES,
+        SECONDARY_RULES,
+    )
+
     @staticmethod
-    def pre_validation_transform_model(
-        model: UserConfiguredModel, rules: Sequence[ModelTransformRule] = DEFAULT_PRE_VALIDATION_RULES
+    def transform(
+        model: UserConfiguredModel,
+        ordered_rule_sequences: Tuple[Sequence[ModelTransformRule], ...] = DEFAULT_RULES,
     ) -> UserConfiguredModel:
-        """Transform a model according to configured rules before validations are run."""
+        """Copies the passed in model, applies the rules to the new model, and then returns that model
+
+        It's important to note that some rules need to happen before or after other rules. Thus rules
+        are passed in as an ordered tuple of rule sequences. Primary rules are run first, and then
+        secondary rules. We don't currently have tertiary, quaternary, or etc currently, but this
+        system easily allows for it.
+        """
         model_copy = copy.deepcopy(model)
 
-        for transform_rule in rules:
-            model_copy = transform_rule.transform_model(model_copy)
+        for rule_sequence in ordered_rule_sequences:
+            for rule in rule_sequence:
+                model_copy = rule.transform_model(model_copy)
 
         return model_copy
+
+    @staticmethod
+    def pre_validation_transform_model(
+        model: UserConfiguredModel, rules: Sequence[ModelTransformRule] = PRIMARY_RULES
+    ) -> UserConfiguredModel:
+        """Transform a model according to configured rules before validations are run."""
+        logger.warning(
+            "DEPRECATION: `ModelTransformer.pre_validation_transform_model` is deprecated. Please use `ModelTransformer.transform` instead."
+        )
+
+        return ModelTransformer.transform(model=model, ordered_rule_sequences=(rules,))
 
     @staticmethod
     def post_validation_transform_model(
-        model: UserConfiguredModel, rules: Sequence[ModelTransformRule] = DEFAULT_POST_VALIDATION_RULES
+        model: UserConfiguredModel, rules: Sequence[ModelTransformRule] = SECONDARY_RULES
     ) -> UserConfiguredModel:
         """Transform a model according to configured rules after validations are run."""
-        model_copy = copy.deepcopy(model)
-        for transform_rule in rules:
-            model_copy = transform_rule.transform_model(model_copy)
+        logger.warning(
+            "DEPRECATION: `ModelTransformer.post_validation_transform_model` is deprecated. Please use `ModelTransformer.transform` instead."
+        )
 
-        return model_copy
+        return ModelTransformer.transform(model=model, ordered_rule_sequences=(rules,))
