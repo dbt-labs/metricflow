@@ -1,6 +1,7 @@
 import traceback
 from typing import List
 
+from metricflow.aggregation_properties import AggregationType
 from metricflow.errors.errors import ParsingException
 from metricflow.instances import MetricModelReference
 from metricflow.model.objects.metric import Metric, MetricType, MetricTimeWindow
@@ -14,6 +15,7 @@ from metricflow.model.validations.validator_helpers import (
     ValidationError,
     validate_safely,
 )
+from metricflow.references import MeasureReference
 
 
 class CumulativeMetricRule(ModelValidationRule):
@@ -142,4 +144,141 @@ class DerivedMetricRule(ModelValidationRule):
         for metric in model.metrics or []:
             issues += DerivedMetricRule._validate_alias_collision(metric=metric)
             issues += DerivedMetricRule._validate_time_offset_params(metric=metric)
+        return issues
+
+
+class ConversionMetricRule(ModelValidationRule):
+    """Checks that conversion metrics are configured properly"""
+
+    @staticmethod
+    @validate_safely(whats_being_done="checking that the params of metric are valid if it is a conversion metric")
+    def _validate_type_params(metric: Metric) -> List[ValidationIssueType]:
+        issues: List[ValidationIssueType] = []
+
+        if metric.type == MetricType.CONVERSION:
+            if metric.type_params.window:
+                try:
+                    _, _ = MetricTimeWindow.parse(metric.type_params.window.to_string())
+                except ParsingException as e:
+                    issues.append(
+                        ValidationError(
+                            context=MetricContext(
+                                file_context=FileContext.from_metadata(metadata=metric.metadata),
+                                metric=MetricModelReference(metric_name=metric.name),
+                            ),
+                            message="".join(traceback.format_exception_only(etype=type(e), value=e)),
+                            extra_detail="".join(traceback.format_tb(e.__traceback__)),
+                        )
+                    )
+        return issues
+
+    @staticmethod
+    @validate_safely(whats_being_done="checks that the entity exists in the base/conversion data source")
+    def _validate_entity_exists(model: UserConfiguredModel) -> List[ValidationIssueType]:
+        issues: List[ValidationIssueType] = []
+        for metric in model.metrics or []:
+            if metric.type == MetricType.CONVERSION:
+                if metric.type_params.entity is None:
+                    issues.append(
+                        ValidationError(
+                            context=MetricContext(
+                                file_context=FileContext.from_metadata(metadata=metric.metadata),
+                                metric=MetricModelReference(metric_name=metric.name),
+                            ),
+                            message=f"Entity must be set for conversion metrics, but not found in metric: {metric.name}.",
+                        )
+                    )
+                    continue
+
+                base_data_source = None
+                conversion_data_source = None
+                for data_source in model.data_sources:
+                    data_source_measures = {measure.reference for measure in data_source.measures}
+                    if metric.type_params.base_measure_reference in data_source_measures:
+                        base_data_source = data_source
+                    if metric.type_params.conversion_measure_reference in data_source_measures:
+                        conversion_data_source = data_source
+
+                assert (
+                    base_data_source
+                ), f"Unable to find data_source for measure: {metric.type_params.base_measure_reference.element_name}"
+                assert (
+                    conversion_data_source
+                ), f"Unable to find data_source for measure: {metric.type_params.conversion_measure_reference.element_name}"
+
+                if metric.type_params.entity not in {i.entity for i in base_data_source.identifiers}:
+                    issues.append(
+                        ValidationError(
+                            context=MetricContext(
+                                file_context=FileContext.from_metadata(metadata=metric.metadata),
+                                metric=MetricModelReference(metric_name=metric.name),
+                            ),
+                            message=f"Entity: {metric.type_params.entity} not found in base_data_source: {base_data_source.name}.",
+                        )
+                    )
+                if metric.type_params.entity not in {i.entity for i in conversion_data_source.identifiers}:
+                    issues.append(
+                        ValidationError(
+                            context=MetricContext(
+                                file_context=FileContext.from_metadata(metadata=metric.metadata),
+                                metric=MetricModelReference(metric_name=metric.name),
+                            ),
+                            message=f"Entity: {metric.type_params.entity} not found in conversion_data_source: {conversion_data_source.name}.",
+                        )
+                    )
+        return issues
+
+    @staticmethod
+    @validate_safely(whats_being_done="checks that the measures exist and are valid in the base/conversion data source")
+    def _validate_measures(metric: Metric, model: UserConfiguredModel) -> List[ValidationIssueType]:
+        issues: List[ValidationIssueType] = []
+        if metric.type == MetricType.CONVERSION:
+
+            def _validate_measure(measure_reference: MeasureReference) -> None:
+                measure = None
+                for data_source in model.data_sources:
+                    for mmeasure in data_source.measures:
+                        if mmeasure.reference == measure_reference:
+                            measure = mmeasure
+                            break
+
+                if measure is None:
+                    issues.append(
+                        ValidationError(
+                            context=MetricContext(
+                                file_context=FileContext.from_metadata(metadata=metric.metadata),
+                                metric=MetricModelReference(metric_name=metric.name),
+                            ),
+                            message=f"For metric: {metric.name} unable to find measure: {measure_reference.element_name}",
+                        )
+                    )
+                    return
+                if (
+                    measure.agg != AggregationType.COUNT
+                    and measure.agg != AggregationType.COUNT_DISTINCT
+                    and (measure.agg != AggregationType.SUM or measure.expr != "1")
+                ):
+                    issues.append(
+                        ValidationError(
+                            context=MetricContext(
+                                file_context=FileContext.from_metadata(metadata=metric.metadata),
+                                metric=MetricModelReference(metric_name=metric.name),
+                            ),
+                            message=f"For conversion metrics, the measure must be COUNT/SUM(1)/COUNT_DISTINCT. Measure: {measure.name} is agg type: {measure.agg}",
+                        )
+                    )
+
+            _validate_measure(metric.type_params.base_measure_reference)
+            _validate_measure(metric.type_params.conversion_measure_reference)
+        return issues
+
+    @staticmethod
+    @validate_safely(whats_being_done="running model validation ensuring conversion metrics are valid")
+    def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
+        issues: List[ValidationIssueType] = []
+        issues += ConversionMetricRule._validate_entity_exists(model=model)
+        for metric in model.metrics or []:
+            issues += ConversionMetricRule._validate_measures(metric=metric, model=model)
+            issues += ConversionMetricRule._validate_type_params(metric=metric)
+
         return issues

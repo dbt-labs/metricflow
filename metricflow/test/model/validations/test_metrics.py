@@ -272,3 +272,109 @@ def test_derived_metric() -> None:  # noqa: D
     assert (
         len(missing_error_strings) == 0
     ), f"Failed to match one or more expected errors: {missing_error_strings} in {set([x.as_readable_str() for x in build_issues])}"
+
+
+def test_conversion_metrics() -> None:  # noqa: D
+    base_measure_name = "base_measure"
+    conversion_measure_name = "conversion_measure"
+    entity = "entity"
+    invalid_entity = "bad"
+    invalid_measure = "invalid_measure"
+    window = "7 days"
+    model_validator = ModelValidator()
+    result = model_validator.validate_model(
+        UserConfiguredModel(
+            data_sources=[
+                data_source_with_guaranteed_meta(
+                    name="base",
+                    sql_query="SELECT * FROM bar",
+                    measures=[
+                        Measure(name=base_measure_name, agg=AggregationType.COUNT, agg_time_dimension="ds", expr="1"),
+                        Measure(name=invalid_measure, agg=AggregationType.MAX, agg_time_dimension="ds"),
+                    ],
+                    dimensions=[
+                        Dimension(
+                            name="ds",
+                            type=DimensionType.TIME,
+                            type_params=DimensionTypeParams(
+                                is_primary=True,
+                                time_granularity=TimeGranularity.DAY,
+                            ),
+                        ),
+                    ],
+                    mutability=Mutability(type=MutabilityType.IMMUTABLE),
+                    identifiers=[
+                        Identifier(name="identifier1", entity=entity, type=IdentifierType.PRIMARY),
+                    ],
+                ),
+                data_source_with_guaranteed_meta(
+                    name="conversion",
+                    sql_query="SELECT * FROM bar",
+                    measures=[
+                        Measure(
+                            name=conversion_measure_name, agg=AggregationType.COUNT, agg_time_dimension="ds", expr="1"
+                        )
+                    ],
+                    dimensions=[
+                        Dimension(
+                            name="ds",
+                            type=DimensionType.TIME,
+                            type_params=DimensionTypeParams(
+                                is_primary=True,
+                                time_granularity=TimeGranularity.DAY,
+                            ),
+                        ),
+                    ],
+                    mutability=Mutability(type=MutabilityType.IMMUTABLE),
+                    identifiers=[
+                        Identifier(name="identifier1", entity=entity, type=IdentifierType.PRIMARY),
+                    ],
+                ),
+            ],
+            metrics=[
+                metric_with_guaranteed_meta(
+                    name="proper_metric",
+                    type=MetricType.CONVERSION,
+                    type_params=MetricTypeParams(
+                        base_measure=base_measure_name,
+                        conversion_measure=conversion_measure_name,
+                        window=window,
+                        entity=entity,
+                    ),
+                ),
+                metric_with_guaranteed_meta(
+                    name="bad_measure_metric",
+                    type=MetricType.CONVERSION,
+                    type_params=MetricTypeParams(
+                        base_measure=invalid_measure,
+                        conversion_measure=conversion_measure_name,
+                        window=window,
+                        entity=entity,
+                    ),
+                ),
+                metric_with_guaranteed_meta(
+                    name="entity_doesnt_exist",
+                    type=MetricType.CONVERSION,
+                    type_params=MetricTypeParams(
+                        base_measure=base_measure_name,
+                        conversion_measure=conversion_measure_name,
+                        window=window,
+                        entity=invalid_entity,
+                    ),
+                ),
+            ],
+            materializations=[],
+        )
+    )
+    build_issues = result.issues.errors
+    assert len(build_issues) == 3
+    expected_substr1 = f"{invalid_entity} not found in base_data_source"
+    expected_substr2 = f"{invalid_entity} not found in conversion_data_source"
+    expected_substr3 = "the measure must be COUNT/SUM(1)/COUNT_DISTINCT"
+    missing_error_strings = set()
+    for expected_str in [expected_substr1, expected_substr2, expected_substr3]:
+        if not any(actual_str.as_readable_str().find(expected_str) != -1 for actual_str in build_issues):
+            missing_error_strings.add(expected_str)
+    assert (
+        len(missing_error_strings) == 0
+    ), f"Failed to match one or more expected errors: {missing_error_strings} in {set([x.as_readable_str() for x in build_issues])}"

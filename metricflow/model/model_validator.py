@@ -24,7 +24,7 @@ from metricflow.model.validations.measures import (
     MetricMeasuresRule,
     MeasuresNonAdditiveDimensionRule,
 )
-from metricflow.model.validations.metrics import CumulativeMetricRule, DerivedMetricRule
+from metricflow.model.validations.metrics import ConversionMetricRule, CumulativeMetricRule, DerivedMetricRule
 from metricflow.model.validations.non_empty import NonEmptyRule
 from metricflow.model.validations.reserved_keywords import ReservedKeywordsRule
 from metricflow.model.validations.unique_valid_name import UniqueAndValidNameRule
@@ -62,6 +62,7 @@ class ModelValidator:
         AggregationTimeDimensionRule(),
         ReservedKeywordsRule(),
         MeasuresNonAdditiveDimensionRule(),
+        ConversionMetricRule(),
     )
 
     def __init__(self, rules: Sequence[ModelValidationRule] = DEFAULT_RULES, max_workers: int = 1) -> None:
