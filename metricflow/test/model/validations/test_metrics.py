@@ -180,7 +180,7 @@ def test_generated_metrics_only() -> None:  # noqa:D
 def test_derived_metric() -> None:  # noqa: D
     measure_name = "foo"
     model_validator = ModelValidator([DerivedMetricRule()])
-    result = model_validator.validate_model(
+    model_issues = model_validator.validate_model(
         UserConfiguredModel(
             data_sources=[
                 data_source_with_guaranteed_meta(
@@ -255,7 +255,7 @@ def test_derived_metric() -> None:  # noqa: D
             ],
         )
     )
-    build_issues = result.issues.errors
+    build_issues = model_issues.errors
     assert len(build_issues) == 3
     expected_substr1 = "is already being used. Please choose another alias"
     expected_substr2 = "does not exist as a configured metric in the model"
