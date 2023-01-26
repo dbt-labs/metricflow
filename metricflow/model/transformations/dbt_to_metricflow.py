@@ -90,7 +90,7 @@ class DbtManifestTransformer:
         if dbt_metric.model is None:
             raise RuntimeError("Unable to resolve a model for a `DbtMetric.model` value of `None`")
 
-        target_model = None
+        target_model: Optional[str] = None
         target_package = None
 
         if dbt_metric.model[:4] == "ref(":
@@ -105,6 +105,8 @@ class DbtManifestTransformer:
                 ref_invalid_args(dbt_metric.name, ref_parts)
         else:
             target_model = dbt_metric.model
+
+        assert target_model is not None, "Failed to set `target_model`"
 
         hashed = hash((target_model, target_package, self.manifest.metadata.project_id, dbt_metric.package_name))
         if hashed not in self._resolved_dbt_model_refs:
