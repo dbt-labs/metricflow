@@ -8,9 +8,11 @@ from metricflow.test.model.validations.helpers import materialization_with_guara
 from metricflow.test.test_utils import model_with_materialization
 
 
-def test_can_configure_model_validator_rules(simple_model__pre_transforms: UserConfiguredModel) -> None:  # noqa: D
+def test_can_configure_model_validator_rules(  # noqa: D
+    simple_model__with_primary_transforms: UserConfiguredModel,
+) -> None:
     model = model_with_materialization(
-        simple_model__pre_transforms,
+        simple_model__with_primary_transforms,
         [
             materialization_with_guaranteed_meta(
                 name="foobar",

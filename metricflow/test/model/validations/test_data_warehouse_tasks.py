@@ -280,8 +280,7 @@ def test_validate_metrics(  # noqa: D
     )
     model.data_sources[0].measures = new_measures
     model.metrics = []
-    model = ModelTransformer.pre_validation_transform_model(model)
-    model = ModelTransformer.post_validation_transform_model(model)
+    model = ModelTransformer.transform(model)
 
     # Validate new metric created by proxy causes an issue (because the column used doesn't exist)
     dw_validator = DataWarehouseModelValidator(

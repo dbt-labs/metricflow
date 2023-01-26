@@ -40,6 +40,5 @@ def parse_dbt_project_to_model(
     """Parse dbt model files in the given directory to a UserConfiguredModel."""
     manifest = get_dbt_project_manifest(directory=directory, profile=profile, target=target)
     build_result = DbtManifestTransformer(manifest=manifest).build_user_configured_model()
-    transformed_model = ModelTransformer.pre_validation_transform_model(model=build_result.model)
-    transformed_model = ModelTransformer.post_validation_transform_model(model=transformed_model)
+    transformed_model = ModelTransformer.transform(model=build_result.model)
     return ModelBuildResult(model=transformed_model, issues=build_result.issues)

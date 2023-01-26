@@ -16,17 +16,13 @@ class SliceNamesRule(ModelTransformRule):
         return model
 
 
-def test_can_configure_model_transform_rules(simple_model__pre_transforms: UserConfiguredModel) -> None:  # noqa: D
-    pre_model = simple_model__pre_transforms
+def test_can_configure_model_transform_rules(  # noqa: D
+    simple_model__with_primary_transforms: UserConfiguredModel,
+) -> None:
+    pre_model = simple_model__with_primary_transforms
     assert not all(len(x.name) == 3 for x in pre_model.data_sources)
 
-    # Confirms that a custom transformation works for pre-validation transform
-    pre_model = ModelTransformer.pre_validation_transform_model(pre_model, rules=[SliceNamesRule()])
-    assert all(len(x.name) == 3 for x in pre_model.data_sources)
-
-    post_model = simple_model__pre_transforms
-    assert not all(len(x.name) == 3 for x in post_model.data_sources)
-
-    # Confirms that a custom transformation works for post-validation transform
-    post_model = ModelTransformer.post_validation_transform_model(post_model, rules=[SliceNamesRule()])
-    assert all(len(x.name) == 3 for x in post_model.data_sources)
+    # Confirms that a custom transformation works `for ModelTransformer.transform`
+    rules = [SliceNamesRule()]
+    transformed_model = ModelTransformer.transform(pre_model, ordered_rule_sequences=(rules,))
+    assert all(len(x.name) == 3 for x in transformed_model.data_sources)

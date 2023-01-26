@@ -104,8 +104,7 @@ def collect_yaml_config_file_paths(directory: str) -> List[str]:
 def parse_directory_of_yaml_files_to_model(
     directory: str,
     template_mapping: Optional[Dict[str, str]] = None,
-    apply_pre_transformations: Optional[bool] = True,
-    apply_post_transformations: Optional[bool] = True,
+    apply_transformations: Optional[bool] = True,
     raise_issues_as_exceptions: bool = True,
 ) -> ModelBuildResult:
     """Parse files in the given directory to a UserConfiguredModel.
@@ -116,8 +115,7 @@ def parse_directory_of_yaml_files_to_model(
     return parse_yaml_file_paths_to_model(
         file_paths=file_paths,
         template_mapping=template_mapping,
-        apply_pre_transformations=apply_pre_transformations,
-        apply_post_transformations=apply_post_transformations,
+        apply_transformations=apply_transformations,
         raise_issues_as_exceptions=raise_issues_as_exceptions,
     )
 
@@ -125,8 +123,7 @@ def parse_directory_of_yaml_files_to_model(
 def parse_yaml_file_paths_to_model(
     file_paths: List[str],
     template_mapping: Optional[Dict[str, str]] = None,
-    apply_pre_transformations: Optional[bool] = True,
-    apply_post_transformations: Optional[bool] = True,
+    apply_transformations: Optional[bool] = True,
     raise_issues_as_exceptions: bool = True,
 ) -> ModelBuildResult:
     """Parse files the given list of file paths to a UserConfiguredModel.
@@ -157,16 +154,14 @@ def parse_yaml_file_paths_to_model(
 
     return parse_yaml_files_to_validation_ready_model(
         yaml_config_files=yaml_config_files,
-        apply_pre_transformations=apply_pre_transformations,
-        apply_post_transformations=apply_post_transformations,
+        apply_transformations=apply_transformations,
         raise_issues_as_exceptions=raise_issues_as_exceptions,
     )
 
 
 def parse_yaml_files_to_validation_ready_model(
     yaml_config_files: List[YamlConfigFile],
-    apply_pre_transformations: Optional[bool] = True,
-    apply_post_transformations: Optional[bool] = True,
+    apply_transformations: Optional[bool] = True,
     raise_issues_as_exceptions: bool = True,
 ) -> ModelBuildResult:
     """Parse and transform the given set of in-memory YamlConfigFiles to a UserConfigured model
@@ -182,11 +177,8 @@ def parse_yaml_files_to_validation_ready_model(
 
     build_issues = build_result.issues
     try:
-        if apply_pre_transformations:
-            model = ModelTransformer.pre_validation_transform_model(model)
-
-        if apply_post_transformations:
-            model = ModelTransformer.post_validation_transform_model(model)
+        if apply_transformations:
+            model = ModelTransformer.transform(model)
     except Exception as e:
         transformation_issue_results = ModelValidationResults(errors=[ValidationError(message=str(e))])
         build_issues = ModelValidationResults.merge([build_issues, transformation_issue_results])
