@@ -6,6 +6,55 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [0.140.0] - 2023-01-12
+
+### Breaking Changes
+
+- Result layout is changing from one row per metric/null dimension valued pair to one row per null dimension value regardless of number of metrics in the query. This only affects queries for multiple metrics where the requested dimensions contain null values. See the description on the [relevant PR](https://github.com/transform-data/metricflow/pull/366) for more detailed information and an example illustrating how the output will change.
+- Updates to the required SqlClient protocol could cause typechecking failures for users injecting a custom SqlClient implementation into the MetricFlowClient
+- Version minimum changes in SQLAlchemy and snowflake-sqlalchemy could cause dependency conflicts when installed in python environments with libraries requiring an older version of either of these dependencies.
+
+### Added
+
+- Support for derived metrics - users can now define metrics based on expressions that use other metrics in the model as inputs. For example usage, see the description in the [initial PR](https://github.com/transform-data/metricflow/pull/281) (@WilliamDee)
+- Support for versioned dimension joins against a standard Slowly Changing Dimension snapshot table (SCD Type II dataset) - users can now define a data source representing a dimension-only data set with start and end time columns representing validitiy windows for the dimension values, and MetricFlow will automatically join measures to the valid row entry. For details on limitations and future steps please refer to the [initial PR](https://github.com/transform-data/metricflow/pull/276). Note we no longer use the `primary` key type, as support for a `natural` key type was added in a [follow-up PR](https://github.com/transform-data/metricflow/pull/358). (@tlento)
+- Support for percentile measure definitions (@kyleli626)
+- Support for querying metrics without grouping by dimensions (@WilliamDee)
+- Support for generating a MetricFlow model from a dbt cloud metric model (@QMalcolm)
+- A `cancel_request` API in the SQL client for canceling running queries, with the necessary support for SQL isolation levels and asynchronous query submission (@plypaul)
+- Support for passing in query tags for Snowflake queries (@plypaul)
+- DataFlowPlan optimization to reduce source table scans (@plypaul)
+- Internal API to enable developers to fetch joinable data source targets from an input data source (@courtneyholcomb)
+
+### Updated
+
+- Improved readability of validation error messages (@QMalcolm)
+- Made Postgres engine tests merge-blocking in CI to reduce cycle time on detecting engine-specific errors (@tlento)
+- Updated poetry and python versions in CI to align with our build process and verify all supported Python versions (@tlento)
+- Eliminated data source level primary time dimension requirement in cases where all measures have an aggregation time dimension set (@QMalcolm)
+- Extended support for typed values for bind parameters (@courtneyholcolm)
+- Removed the optional Python levenshtein package from build dependencies in order to streamline package version requirements (@plypaul)
+- Consolidated join validation logic to eliminate code duplication and speed development (@plypaul)
+- Factored join building logic out of DataflowToSqlQueryPlanBuilder to streamline development (@tlento)
+- Improved visibility on underlying errors thrown by sql client requests (@courtneyholcomb)
+- Updated SQLAlchemy and snowflake-sqlalchemy minimum version requirements to resolve a version incompatibility introduced with SQLAlchemy 1.4.42 (@tlento)
+- Added CI coverage for Databricks SQL Warehouse execution environments (@tlento)
+
+### Fixed
+
+- Resolved error encountered in Databricks whenever table rename methods were invoked (@courtneyholcomb)
+- Fixed bug with warehouse measure validation where an error would be inappropriately thrown when users with measure-specific agg_time_dimension configurations attempted to run the full validation suite (@WilliamDee)
+- Issue with parsing `explain` output for Databricks SQL warehouse configurations (@courtneyholcomb)
+- Floating point comparison errors in CI tests (@tlento)
+- Issue with incomplete time range constraint validation that could result in invalid queries(@plypaul)
+- Resolved GitHub upgrade warnings on use of deprecated APIs and node.js build versions (@tlento)
+- Resolved python-levenshtein optimization warning on CLI startup (@jzhu13)
+- Resolved SQLAlchemy warning about the impending deprecation of the `engine.table_names` method (@Jstein77)
+- Improved error message for queries with time range constraints which were too narrow for the chosen time granularity (@kyleli626)
+- Eliminate SQL rendering error in BigQuery which would intermittently produce invalid GROUP BY specifications (@tlento)
+
+
 ## [0.130.1] - 2022-10-19
 
 ### Added

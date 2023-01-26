@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "metricflow"
-version = "0.130.1"
+version = "0.140.0"
 description = "Translates a simple metric definition into reusable SQL and executes it against the SQL engine of your choice."
 authors = ["Transform <hello@transformdata.io>"]
 license = "AGPL-3.0-or-later"
