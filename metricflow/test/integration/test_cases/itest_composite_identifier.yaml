@@ -21,7 +21,7 @@ integration_test:
   model: COMPOSITE_IDENTIFIER_MODEL
   metrics: ["messages"]
   group_bys: ["user_team"]
-  order_bys: ["user_team"]
+  order_bys: ["user_team", "messages"]
   check_order: true
   check_query: |
     SELECT
@@ -35,6 +35,7 @@ integration_test:
     ORDER BY
       team_id
       , user_id
+      , messages
 ---
 integration_test:
   name: composite_key_join

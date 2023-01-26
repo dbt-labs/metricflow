@@ -5,7 +5,7 @@ integration_test:
   model: SIMPLE_MODEL
   metrics: ["booking_value"]
   group_bys: ["metric_time"]
-  order_bys: ["-booking_value"]
+  order_bys: ["-booking_value", "metric_time"]
   check_order: true
   check_query: |
     SELECT
@@ -15,7 +15,7 @@ integration_test:
     GROUP BY
       ds
     ORDER BY
-      booking_value DESC
+      booking_value DESC, metric_time
 ---
 integration_test:
   name: order_asc
@@ -23,7 +23,7 @@ integration_test:
   model: SIMPLE_MODEL
   metrics: ["booking_value"]
   group_bys: ["metric_time"]
-  order_bys: ["booking_value"]
+  order_bys: ["booking_value", "metric_time"]
   check_order: true
   check_query: |
     SELECT
@@ -33,7 +33,7 @@ integration_test:
     GROUP BY
       ds
     ORDER BY
-      booking_value
+      booking_value, metric_time
 ---
 integration_test:
   name: order_limit
@@ -41,7 +41,7 @@ integration_test:
   model: SIMPLE_MODEL
   metrics: ["booking_value"]
   group_bys: ["metric_time"]
-  order_bys: ["booking_value"]
+  order_bys: ["booking_value", "metric_time"]
   limit: 2
   check_order: true
   check_query: |
@@ -52,7 +52,7 @@ integration_test:
     GROUP BY
       ds
     ORDER BY
-      booking_value
+      booking_value, metric_time
     LIMIT 2
 ---
 integration_test:
@@ -62,7 +62,7 @@ integration_test:
   required_features: ["DATE_TRUNC"]
   metrics: ["booking_value"]
   group_bys: ["metric_time__month"]
-  order_bys: ["-metric_time__month"]
+  order_bys: ["-metric_time__month", "booking_value"]
   check_order: true
   check_query: |
     SELECT
@@ -72,4 +72,4 @@ integration_test:
     GROUP BY
       metric_time__month
     ORDER BY
-      metric_time__month DESC
+      metric_time__month DESC, booking_value
