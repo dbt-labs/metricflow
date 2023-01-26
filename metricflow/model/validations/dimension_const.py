@@ -9,7 +9,7 @@ from metricflow.model.validations.validator_helpers import (
     FileContext,
     ModelValidationRule,
     DimensionInvariants,
-    ValidationIssueType,
+    ValidationIssue,
     ValidationError,
     validate_safely,
 )
@@ -27,10 +27,10 @@ class DimensionConsistencyRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="running model validation ensuring dimension consistency")
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
+    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
         dimension_to_invariant: Dict[DimensionReference, DimensionInvariants] = {}
         time_dims_to_granularity: Dict[DimensionReference, TimeGranularity] = {}
-        issues: List[ValidationIssueType] = []
+        issues: List[ValidationIssue] = []
 
         for data_source in model.data_sources:
             issues += DimensionConsistencyRule._validate_data_source(
@@ -54,7 +54,7 @@ class DimensionConsistencyRule(ModelValidationRule):
         dimension: Dimension,
         time_dims_to_granularity: Dict[DimensionReference, TimeGranularity],
         data_source: DataSource,
-    ) -> List[ValidationIssueType]:
+    ) -> List[ValidationIssue]:
         """Checks that time dimensions of the same name that aren't primary have the same time granularity specifications
 
         Args:
@@ -63,7 +63,7 @@ class DimensionConsistencyRule(ModelValidationRule):
             data_source: the associated data source. Used for generated issue messages
         Throws: MdoValidationError if there is an inconsistent dimension in the data source.
         """
-        issues: List[ValidationIssueType] = []
+        issues: List[ValidationIssue] = []
         context = DataSourceElementContext(
             file_context=FileContext.from_metadata(metadata=data_source.metadata),
             data_source_element=DataSourceElementReference(
@@ -102,7 +102,7 @@ class DimensionConsistencyRule(ModelValidationRule):
         data_source: DataSource,
         dimension_to_invariant: Dict[DimensionReference, DimensionInvariants],
         update_invariant_dict: bool,
-    ) -> List[ValidationIssueType]:
+    ) -> List[ValidationIssue]:
         """Checks that the given data source has dimensions consistent with the given invariants.
 
         Args:
@@ -111,7 +111,7 @@ class DimensionConsistencyRule(ModelValidationRule):
             update_invariant_dict: whether to insert an entry into the dict if the given dimension name doesn't exist.
         Throws: MdoValidationError if there is an inconsistent dimension in the data source.
         """
-        issues: List[ValidationIssueType] = []
+        issues: List[ValidationIssue] = []
 
         for dimension in data_source.dimensions:
             dimension_invariant = dimension_to_invariant.get(dimension.reference)

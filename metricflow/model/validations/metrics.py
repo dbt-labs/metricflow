@@ -10,7 +10,7 @@ from metricflow.model.validations.validator_helpers import (
     FileContext,
     MetricContext,
     ModelValidationRule,
-    ValidationIssueType,
+    ValidationIssue,
     ValidationError,
     validate_safely,
 )
@@ -21,8 +21,8 @@ class CumulativeMetricRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking that the params of metric are valid if it is a cumulative sum metric")
-    def _validate_cumulative_sum_metric_params(metric: Metric) -> List[ValidationIssueType]:
-        issues: List[ValidationIssueType] = []
+    def _validate_cumulative_sum_metric_params(metric: Metric) -> List[ValidationIssue]:
+        issues: List[ValidationIssue] = []
 
         if metric.type == MetricType.CUMULATIVE:
             if metric.type_params.window and metric.type_params.grain_to_date:
@@ -55,8 +55,8 @@ class CumulativeMetricRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="running model validation ensuring cumulative sum metrics are valid")
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
-        issues: List[ValidationIssueType] = []
+    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
+        issues: List[ValidationIssue] = []
 
         for metric in model.metrics or []:
             issues += CumulativeMetricRule._validate_cumulative_sum_metric_params(metric=metric)
@@ -69,8 +69,8 @@ class DerivedMetricRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking that the alias set are not unique and distinct")
-    def _validate_alias_collision(metric: Metric) -> List[ValidationIssueType]:
-        issues: List[ValidationIssueType] = []
+    def _validate_alias_collision(metric: Metric) -> List[ValidationIssue]:
+        issues: List[ValidationIssue] = []
 
         if metric.type == MetricType.DERIVED:
             metric_context = MetricContext(
@@ -93,8 +93,8 @@ class DerivedMetricRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking that the input metrics exist")
-    def _validate_input_metrics_exist(model: UserConfiguredModel) -> List[ValidationIssueType]:
-        issues: List[ValidationIssueType] = []
+    def _validate_input_metrics_exist(model: UserConfiguredModel) -> List[ValidationIssue]:
+        issues: List[ValidationIssue] = []
 
         all_metrics = {m.name for m in model.metrics}
         for metric in model.metrics:
@@ -114,8 +114,8 @@ class DerivedMetricRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking that input metric time offset params are valid")
-    def _validate_time_offset_params(metric: Metric) -> List[ValidationIssueType]:
-        issues: List[ValidationIssueType] = []
+    def _validate_time_offset_params(metric: Metric) -> List[ValidationIssue]:
+        issues: List[ValidationIssue] = []
 
         for input_metric in metric.input_metrics or []:
             if input_metric.offset_window and input_metric.offset_to_grain:
@@ -135,8 +135,8 @@ class DerivedMetricRule(ModelValidationRule):
     @validate_safely(
         whats_being_done="running model validation ensuring derived metrics properties are configured properly"
     )
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
-        issues: List[ValidationIssueType] = []
+    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
+        issues: List[ValidationIssue] = []
 
         issues += DerivedMetricRule._validate_input_metrics_exist(model=model)
         for metric in model.metrics or []:

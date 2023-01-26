@@ -4,7 +4,7 @@ from dbt_semantic_interfaces.objects.user_configured_model import UserConfigured
 from metricflow.model.validations.validator_helpers import (
     ModelValidationRule,
     ValidationError,
-    ValidationIssueType,
+    ValidationIssue,
     validate_safely,
 )
 
@@ -14,8 +14,8 @@ class NonEmptyRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking that the model has data sources")
-    def _check_model_has_data_sources(model: UserConfiguredModel) -> List[ValidationIssueType]:
-        issues: List[ValidationIssueType] = []
+    def _check_model_has_data_sources(model: UserConfiguredModel) -> List[ValidationIssue]:
+        issues: List[ValidationIssue] = []
         if not model.data_sources:
             issues.append(
                 ValidationError(
@@ -26,8 +26,8 @@ class NonEmptyRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking that the model has metrics")
-    def _check_model_has_metrics(model: UserConfiguredModel) -> List[ValidationIssueType]:
-        issues: List[ValidationIssueType] = []
+    def _check_model_has_metrics(model: UserConfiguredModel) -> List[ValidationIssue]:
+        issues: List[ValidationIssue] = []
 
         # If we are going to generate measure proxy metrics that is sufficient as well
         create_measure_proxy_metrics = False
@@ -47,8 +47,8 @@ class NonEmptyRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely("running model validation rule ensuring metrics and data sources are defined")
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
-        issues: List[ValidationIssueType] = []
+    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
+        issues: List[ValidationIssue] = []
         issues += NonEmptyRule._check_model_has_data_sources(model=model)
         issues += NonEmptyRule._check_model_has_metrics(model=model)
         return issues

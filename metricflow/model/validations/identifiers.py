@@ -18,7 +18,6 @@ from metricflow.model.validations.validator_helpers import (
     ModelValidationRule,
     ValidationIssue,
     ValidationError,
-    ValidationIssueType,
     validate_safely,
     ValidationWarning,
 )
@@ -33,7 +32,7 @@ class IdentifierConfigRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="running model validation ensuring identifiers are valid")
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
+    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
         issues = []
         for data_source in model.data_sources:
             issues += IdentifierConfigRule._validate_data_source_identifiers(data_source=data_source)
@@ -41,9 +40,9 @@ class IdentifierConfigRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking that the data source's identifiers are valid")
-    def _validate_data_source_identifiers(data_source: DataSource) -> List[ValidationIssueType]:
+    def _validate_data_source_identifiers(data_source: DataSource) -> List[ValidationIssue]:
         """Checks validity of composite identifiers"""
-        issues: List[ValidationIssueType] = []
+        issues: List[ValidationIssue] = []
         for ident in data_source.identifiers:
             if ident.identifiers:
                 context = DataSourceElementContext(
@@ -227,8 +226,8 @@ class IdentifierConsistencyRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="running model validation to ensure identifiers have consistent sub-identifiers")
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
-        issues: List[ValidationIssueType] = []
+    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
+        issues: List[ValidationIssue] = []
         # build collection of sub-identifier contexts, keyed by identifier name
         identifier_to_sub_identifier_contexts: DefaultDict[str, List[SubIdentifierContext]] = defaultdict(list)
         all_contexts: List[SubIdentifierContext] = list(

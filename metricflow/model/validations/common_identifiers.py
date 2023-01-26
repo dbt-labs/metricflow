@@ -11,7 +11,7 @@ from metricflow.model.validations.validator_helpers import (
     ModelValidationRule,
     ValidationWarning,
     validate_safely,
-    ValidationIssueType,
+    ValidationIssue,
 )
 from metricflow.references import IdentifierReference
 
@@ -37,8 +37,8 @@ class CommonIdentifiersRule(ModelValidationRule):
         identifier: Identifier,
         data_source: DataSource,
         identifiers_to_data_sources: Dict[IdentifierReference, Set[str]],
-    ) -> List[ValidationIssueType]:
-        issues: List[ValidationIssueType] = []
+    ) -> List[ValidationIssue]:
+        issues: List[ValidationIssue] = []
         # If the identifier is the dict and if the set of data sources minus this data source is empty,
         # then we warn the user that their identifier will be unused in joins
         if (
@@ -63,7 +63,7 @@ class CommonIdentifiersRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="running model validation warning if identifiers are only one one data source")
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:
+    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:
         """Issues a warning for any identifier that is associated with only one data_source"""
         issues = []
 
