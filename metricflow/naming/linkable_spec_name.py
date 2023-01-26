@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from typing import Optional, Tuple
+from metricflow.dataclass_serialization import SerializableDataclass
 
 from metricflow.time.time_granularity import TimeGranularity
 
@@ -12,17 +13,25 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
+class MetricInputSpec(SerializableDataclass):
+    """Metric input object - currently only refers to names, but can add transformations later."""
+
+    metric_name: str
+
+
+@dataclass(frozen=True)
 class StructuredLinkableSpecName:
     """Parse a qualified name into different parts.
 
+    Used now as input class.
     e.g. listing__ds__week ->
     identifier_links: ["listing"]
     element_name: "ds"
     granularity: TimeGranularity.WEEK
     """
 
-    identifier_link_names: Tuple[str, ...]
     element_name: str
+    identifier_link_names: Tuple[str, ...] = ()
     time_granularity: Optional[TimeGranularity] = None
 
     @staticmethod
@@ -32,7 +41,7 @@ class StructuredLinkableSpecName:
 
         # No dunder, e.g. "ds"
         if len(name_parts) == 1:
-            return StructuredLinkableSpecName((), name_parts[0])
+            return StructuredLinkableSpecName(name_parts[0])
 
         associated_granularity = None
         granularity: TimeGranularity
@@ -44,12 +53,15 @@ class StructuredLinkableSpecName:
         if associated_granularity:
             #  e.g. "ds__month"
             if len(name_parts) == 2:
-                return StructuredLinkableSpecName((), name_parts[0], associated_granularity)
+                return StructuredLinkableSpecName(name_parts[0], (), associated_granularity)
             # e.g. "messages__ds__month"
-            return StructuredLinkableSpecName(tuple(name_parts[:-2]), name_parts[-2], associated_granularity)
+            return StructuredLinkableSpecName(name_parts[-2], tuple(name_parts[:-2]), associated_granularity)
         # e.g. "messages__ds"
         else:
-            return StructuredLinkableSpecName(tuple(name_parts[:-1]), name_parts[-1])
+            return StructuredLinkableSpecName(
+                name_parts[-1],
+                tuple(name_parts[:-1]),
+            )
 
     @property
     def qualified_name(self) -> str:
@@ -76,3 +88,17 @@ class StructuredLinkableSpecName:
             return DUNDER.join(self.identifier_link_names)
 
         return None
+
+
+@dataclass(frozen=True)
+class GroupByInputSpec(StructuredLinkableSpecName):
+    """Group by/dimension specific class to include structured runtime modifications."""
+
+    pass
+
+
+@dataclass(frozen=True)
+class OrderByInputSpec(StructuredLinkableSpecName):
+    """Order by specific class to include structured runtime modifications - namely desc or asc"""
+
+    descending: bool = False
