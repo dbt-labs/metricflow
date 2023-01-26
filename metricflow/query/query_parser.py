@@ -17,7 +17,12 @@ from metricflow.model.objects.elements.dimension import DimensionType
 from metricflow.model.objects.metric import MetricType
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.spec_converters import WhereConstraintConverter
-from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
+from metricflow.naming.linkable_spec_name import (
+    StructuredLinkableSpecName,
+    GroupByInputSpec,
+    MetricInputSpec,
+    OrderByInputSpec,
+)
 from metricflow.object_utils import pformat_big_objects
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.references import DimensionReference, IdentifierReference, MetricReference, TimeDimensionReference
@@ -264,7 +269,6 @@ class MetricFlowQueryParser:
             parsed_where_constraint = WhereClauseConstraint.parse(where_constraint_str)
         else:
             parsed_where_constraint = where_constraint
-
         # Get metric references used for validations
         # In a case of derived metric, all the input metrics would be here.
         metric_references = self._parse_metric_names(metric_names)
@@ -570,6 +574,7 @@ class MetricFlowQueryParser:
         identifier_specs = []
 
         for qualified_name in qualified_linkable_names:
+
             structured_name = StructuredLinkableSpecName.from_name(qualified_name)
             element_name = structured_name.element_name
             identifier_links = tuple(IdentifierReference(element_name=x) for x in structured_name.identifier_link_names)
@@ -757,5 +762,396 @@ class MetricFlowQueryParser:
                 )
             else:
                 raise InvalidQueryException(f"Order by item '{order_by_name}' references an element that is not known")
+
+        return tuple(order_by_specs)
+
+    def parse_and_validate_query_v2(
+        self,
+        metric_input_specs: Sequence[MetricInputSpec],
+        group_by_input_specs: Sequence[GroupByInputSpec],
+        limit: Optional[int] = None,
+        time_constraint_start: Optional[datetime.datetime] = None,
+        time_constraint_end: Optional[datetime.datetime] = None,
+        where_constraint: Optional[WhereClauseConstraint] = None,
+        where_constraint_str: Optional[str] = None,
+        order_specs: Optional[Sequence[OrderByInputSpec]] = None,
+        time_granularity: Optional[TimeGranularity] = None,
+    ) -> MetricFlowQuerySpec:
+        """Parse the query into spec objects, validating them in the process.
+
+        e.g. make sure that the given metric is a valid metric name.
+        """
+        start_time = time.time()
+        try:
+            return self._parse_and_validate_query_v2(
+                metric_input_specs=metric_input_specs,
+                group_by_input_specs=group_by_input_specs,
+                limit=limit,
+                time_constraint_start=time_constraint_start,
+                time_constraint_end=time_constraint_end,
+                where_constraint=where_constraint,
+                where_constraint_str=where_constraint_str,
+                order_specs=order_specs,
+                time_granularity=time_granularity,
+            )
+        finally:
+            logger.info(f"Parsing the query took: {time.time() - start_time:.2f}s")
+
+    def _parse_and_validate_query_v2(
+        self,
+        metric_input_specs: Sequence[MetricInputSpec],
+        group_by_input_specs: Sequence[GroupByInputSpec],
+        limit: Optional[int] = None,
+        time_constraint_start: Optional[datetime.datetime] = None,
+        time_constraint_end: Optional[datetime.datetime] = None,
+        where_constraint: Optional[WhereClauseConstraint] = None,
+        where_constraint_str: Optional[str] = None,
+        order_specs: Optional[Sequence[OrderByInputSpec]] = None,
+        time_granularity: Optional[TimeGranularity] = None,
+    ) -> MetricFlowQuerySpec:
+        assert not (
+            where_constraint and where_constraint_str
+        ), "Both where_constraint and where_constraint_str should not be set"
+
+        parsed_where_constraint: Optional[WhereClauseConstraint]
+        if where_constraint_str:
+            parsed_where_constraint = WhereClauseConstraint.parse(where_constraint_str)
+        else:
+            parsed_where_constraint = where_constraint
+        # Get metric references used for validations
+        # In a case of derived metric, all the input metrics would be here.
+        # Only uses name for now, but later versions of _parse_metric_names can take spec class not just string
+        metric_names = [spec.metric_name for spec in metric_input_specs]
+
+        metric_references = self._parse_metric_names(metric_names)
+
+        if time_constraint_start is None:
+            time_constraint_start = TimeRangeConstraint.ALL_TIME_BEGIN()
+        elif time_constraint_start < TimeRangeConstraint.ALL_TIME_BEGIN():
+            logger.warning(
+                f"Start time for the supplied time constraint {time_constraint_start.isoformat()} is <less> than the "
+                f"minimum allowed ('{TimeRangeConstraint.ALL_TIME_BEGIN().isoformat()}'). Changing to the minimum."
+            )
+            time_constraint_start = TimeRangeConstraint.ALL_TIME_BEGIN()
+        elif time_constraint_start > TimeRangeConstraint.ALL_TIME_END():
+            logger.warning(
+                f"Start time for the supplied time constraint {time_constraint_start.isoformat()} is > than the "
+                f"maximum allowed ('{TimeRangeConstraint.ALL_TIME_END().isoformat()}'). Changing to the maximum."
+            )
+            time_constraint_start = TimeRangeConstraint.ALL_TIME_END()
+
+        if time_constraint_end is None:
+            time_constraint_end = TimeRangeConstraint.ALL_TIME_END()
+        elif time_constraint_end > TimeRangeConstraint.ALL_TIME_END():
+            logger.warning(
+                f"End time for the supplied time constraint {time_constraint_end.isoformat()} is > than the "
+                f"maximum allowed ('{TimeRangeConstraint.ALL_TIME_END().isoformat()}'). Changing to the maximum."
+            )
+            time_constraint_end = TimeRangeConstraint.ALL_TIME_END()
+        elif time_constraint_end < TimeRangeConstraint.ALL_TIME_BEGIN():
+            logger.warning(
+                f"End time for the supplied time constraint {time_constraint_end.isoformat()} is less than the "
+                f"minimum allowed ('{TimeRangeConstraint.ALL_TIME_BEGIN().isoformat()}'). Changing to the minimum."
+            )
+            time_constraint_end = TimeRangeConstraint.ALL_TIME_BEGIN()
+
+        if time_constraint_end < time_constraint_start:
+            raise ValueError(
+                f"End of time constraint {time_constraint_end.isoformat()} is before start of time constraint "
+                f"{time_constraint_start.isoformat()}"
+            )
+
+        time_constraint: Optional[TimeRangeConstraint] = TimeRangeConstraint(
+            start_time=time_constraint_start, end_time=time_constraint_end
+        )
+        if time_constraint == TimeRangeConstraint.all_time():
+            # If the time constraint is all time, just ignore and not render
+            time_constraint = None
+
+        requested_linkable_specs = self._parse_linkable_element_specs(group_by_input_specs, metric_references)
+        partial_time_dimension_spec_replacements = (
+            self._time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
+                metric_references=metric_references,
+                partial_time_dimension_specs=requested_linkable_specs.partial_time_dimension_specs,
+                metric_time_dimension_reference=self._metric_time_dimension_reference,
+                time_granularity=time_granularity,
+            )
+        )
+
+        all_group_by_specs: List[StructuredLinkableSpecName] = list(group_by_input_specs)
+        if parsed_where_constraint is not None:
+            all_group_by_specs += [
+                StructuredLinkableSpecName.from_name(qualified_name=name)
+                for name in parsed_where_constraint.linkable_names
+            ]
+
+        time_dimension_specs = requested_linkable_specs.time_dimension_specs + tuple(
+            time_dimension_spec for _, time_dimension_spec in partial_time_dimension_spec_replacements.items()
+        )
+        if len(time_dimension_specs) == 0:
+            self._validate_no_time_dimension_query(metric_references=metric_references)
+
+        self._time_granularity_solver.validate_time_granularity(metric_references, time_dimension_specs)
+
+        order_by_specs = self._parse_order_by_specs(order_specs or [], partial_time_dimension_spec_replacements)
+
+        for metric_reference in metric_references:
+            metric = self._metric_semantics.get_metric(metric_reference)
+            if metric.constraint is not None:
+                metric_constraint_specs = [
+                    StructuredLinkableSpecName.from_name(qualified_name=name)
+                    for name in metric.constraint.linkable_names
+                ]
+                all_linkable_specs = self._parse_linkable_element_specs(
+                    linkable_specs=all_group_by_specs + metric_constraint_specs,
+                    metric_references=(metric_reference,),
+                )
+                self._validate_linkable_specs(
+                    metric_references=(metric_reference,),
+                    all_linkable_specs=all_linkable_specs,
+                    time_dimension_specs=time_dimension_specs,
+                )
+        all_linkable_specs = self._parse_linkable_element_specs(
+            linkable_specs=all_group_by_specs,
+            metric_references=metric_references,
+        )
+        self._validate_linkable_specs(
+            metric_references=metric_references,
+            all_linkable_specs=all_linkable_specs,
+            time_dimension_specs=time_dimension_specs,
+        )
+
+        self._validate_order_by_specs(
+            order_by_specs=order_by_specs,
+            metric_references=metric_references,
+            linkable_specs=LinkableSpecSet(
+                dimension_specs=requested_linkable_specs.dimension_specs,
+                time_dimension_specs=time_dimension_specs,
+                identifier_specs=requested_linkable_specs.identifier_specs,
+            ),
+        )
+
+        # Update constraints to be appropriate for the time granularity of the query.
+        if time_constraint:
+            logger.info(f"Time constraint before adjustment is {time_constraint}")
+            time_constraint = self._adjust_time_range_constraint(
+                metric_references=metric_references,
+                time_dimension_specs=time_dimension_specs,
+                time_range_constraint=time_constraint,
+            )
+            logger.info(f"Time constraint after adjustment is {time_constraint}")
+
+        # In some cases, the old framework does not use dundered suffixes in the output column name for the primary
+        # time dimension. We should aim to get rid of this logic.
+        output_column_name_overrides = []
+        if (
+            self._metric_time_dimension_specified_without_granularity(
+                requested_linkable_specs.partial_time_dimension_specs
+            )
+            and not time_granularity
+        ):
+            if self._metrics_have_same_time_granularities(metric_references=metric_references):
+                _, replace_with_time_dimension_spec = self._find_replacement_for_metric_time_dimension(
+                    partial_time_dimension_spec_replacements
+                )
+                output_column_name_overrides.append(
+                    OutputColumnNameOverride(
+                        time_dimension_spec=replace_with_time_dimension_spec,
+                        output_column_name=self._metric_time_dimension_reference.element_name,
+                    )
+                )
+
+        if limit is not None and limit < 0:
+            raise InvalidQueryException(f"Limit was specified as {limit}, which is < 0.")
+
+        spec_where_constraint: Optional[SpecWhereClauseConstraint] = None
+        if parsed_where_constraint:
+            spec_where_constraint = WhereConstraintConverter.convert_to_spec_where_constraint(
+                data_source_semantics=self._data_source_semantics,
+                where_constraint=parsed_where_constraint,
+            )
+            where_time_specs = spec_where_constraint.linkable_spec_set.time_dimension_specs
+
+            self._time_granularity_solver.validate_time_granularity(
+                metric_references=metric_references, time_dimension_specs=where_time_specs
+            )
+
+        return MetricFlowQuerySpec(
+            metric_specs=tuple(MetricSpec.from_element_name(metric_name) for metric_name in metric_names),
+            dimension_specs=requested_linkable_specs.dimension_specs,
+            identifier_specs=requested_linkable_specs.identifier_specs,
+            time_dimension_specs=time_dimension_specs,
+            order_by_specs=order_by_specs,
+            output_column_name_overrides=tuple(output_column_name_overrides),
+            time_range_constraint=time_constraint,
+            where_constraint=spec_where_constraint,
+            limit=limit,
+        )
+
+    def _parse_linkable_element_specs(
+        self, linkable_specs: Sequence[StructuredLinkableSpecName], metric_references: Sequence[MetricReference]
+    ) -> LinkableInstanceSpecs:
+        """Convert the linkable spec names into the respective specification objects."""
+
+        dimension_specs = []
+        time_dimension_specs = []
+        partial_time_dimension_specs = []
+        identifier_specs = []
+
+        for structured_name in linkable_specs:
+            element_name = structured_name.element_name
+            identifier_links = tuple(IdentifierReference(element_name=x) for x in structured_name.identifier_link_names)
+            # Create the spec based on the type of element referenced.
+            if TimeDimensionReference(element_name=element_name) in self._known_time_dimension_element_references:
+                if structured_name.time_granularity:
+                    time_dimension_specs.append(
+                        TimeDimensionSpec(
+                            element_name=element_name,
+                            identifier_links=identifier_links,
+                            time_granularity=structured_name.time_granularity,
+                        )
+                    )
+                else:
+                    partial_time_dimension_specs.append(
+                        PartialTimeDimensionSpec(
+                            element_name=element_name,
+                            identifier_links=identifier_links,
+                        )
+                    )
+            elif DimensionReference(element_name=element_name) in self._known_dimension_element_references:
+                dimension_specs.append(DimensionSpec(element_name=element_name, identifier_links=identifier_links))
+            elif IdentifierReference(element_name=element_name) in self._known_identifier_element_references:
+                identifier_specs.append(IdentifierSpec(element_name=element_name, identifier_links=identifier_links))
+            else:
+                valid_group_by_names_for_metrics = sorted(
+                    x.qualified_name for x in self._metric_semantics.element_specs_for_metrics(list(metric_references))
+                )
+                suggestions = {
+                    f"Suggestions for '{structured_name.qualified_name}'": pformat_big_objects(
+                        MetricFlowQueryParser._top_fuzzy_matches(
+                            item=structured_name.qualified_name,
+                            candidate_items=valid_group_by_names_for_metrics,
+                        )
+                    )
+                }
+                raise UnableToSatisfyQueryError(
+                    f"Unknown element name '{element_name}' in dimension name '{structured_name.qualified_name}'",
+                    context=suggestions,
+                )
+
+        return LinkableInstanceSpecs(
+            dimension_specs=tuple(dimension_specs),
+            time_dimension_specs=tuple(time_dimension_specs),
+            partial_time_dimension_specs=tuple(partial_time_dimension_specs),
+            identifier_specs=tuple(identifier_specs),
+        )
+
+    def _parse_order_by_specs(
+        self,
+        order_by_input_specs: Sequence[OrderByInputSpec],
+        time_dimension_spec_replacements: Dict[PartialTimeDimensionSpec, TimeDimensionSpec],
+    ) -> Tuple[OrderBySpec, ...]:
+        """time_dimension_spec_replacements is used to replace a partial spec from parsing the names to a full one."""
+        # TODO: Validate identifier links
+        # TODO: Validate order by items are in the query
+        order_by_specs: List[OrderBySpec] = []
+        for structured_name in order_by_input_specs:
+            if MetricReference(element_name=structured_name.element_name) in self._known_metric_names:
+                if structured_name.time_granularity:
+                    raise InvalidQueryException(
+                        f"Order by item '{structured_name.qualified_name}' references a metric but has a time granularity"
+                    )
+                if structured_name.identifier_link_names:
+                    raise InvalidQueryException(
+                        f"Order by item '{structured_name.qualified_name}' references a metric but has identifier links"
+                    )
+                order_by_specs.append(
+                    OrderBySpec(
+                        metric_spec=MetricSpec(element_name=structured_name.element_name),
+                        descending=structured_name.descending,
+                    )
+                )
+            elif (
+                DimensionReference(element_name=structured_name.element_name)
+                in self._known_dimension_element_references
+            ):
+                if structured_name.time_granularity:
+                    raise InvalidQueryException(
+                        f"Order by item '{structured_name.qualified_name}' references a categorical dimension but has a time "
+                        f"granularity"
+                    )
+                order_by_specs.append(
+                    OrderBySpec(
+                        dimension_spec=DimensionSpec(
+                            element_name=structured_name.element_name,
+                            identifier_links=tuple(
+                                IdentifierReference(element_name=x) for x in structured_name.identifier_link_names
+                            ),
+                        ),
+                        descending=structured_name.descending,
+                    )
+                )
+            elif (
+                TimeDimensionReference(element_name=structured_name.element_name)
+                in self._known_time_dimension_element_references
+            ):
+                identifier_links = tuple(
+                    IdentifierReference(element_name=x) for x in structured_name.identifier_link_names
+                )
+                if structured_name.time_granularity:
+                    order_by_specs.append(
+                        OrderBySpec(
+                            time_dimension_spec=TimeDimensionSpec(
+                                element_name=structured_name.element_name,
+                                identifier_links=identifier_links,
+                                time_granularity=structured_name.time_granularity,
+                            ),
+                            descending=structured_name.descending,
+                        )
+                    )
+                else:
+                    # If the time granularity for an order by wasn't specified, replace it with the same time
+                    # granularity as it was done for the requested dimensions.
+                    partial_time_dimension_spec = PartialTimeDimensionSpec(
+                        element_name=structured_name.element_name,
+                        identifier_links=identifier_links,
+                    )
+
+                    if partial_time_dimension_spec in time_dimension_spec_replacements:
+                        order_by_specs.append(
+                            OrderBySpec(
+                                time_dimension_spec=time_dimension_spec_replacements[partial_time_dimension_spec],
+                                descending=structured_name.descending,
+                            )
+                        )
+                    else:
+                        raise RequestTimeGranularityException(
+                            f"Order by item '{structured_name.qualified_name}' does not specify a time granularity and it does not "
+                            f"match a requested time dimension"
+                        )
+
+            elif (
+                IdentifierReference(element_name=structured_name.element_name)
+                in self._known_identifier_element_references
+            ):
+                if structured_name.time_granularity:
+                    raise InvalidQueryException(
+                        f"Order by item '{structured_name.qualified_name}' references an identifier but has a time granularity"
+                    )
+                order_by_specs.append(
+                    OrderBySpec(
+                        identifier_spec=IdentifierSpec(
+                            element_name=structured_name.element_name,
+                            identifier_links=tuple(
+                                IdentifierReference(element_name=x) for x in structured_name.identifier_link_names
+                            ),
+                        ),
+                        descending=structured_name.descending,
+                    )
+                )
+            else:
+                raise InvalidQueryException(
+                    f"Order by item '{structured_name.qualified_name}' references an element that is not known"
+                )
 
         return tuple(order_by_specs)
