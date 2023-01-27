@@ -20,7 +20,7 @@ repos:
         verbose: true
         additional_dependencies:
           [
-            sqlalchemy,
+            "sqlalchemy<2.0",
             sqlalchemy2-stubs,
             types-flask,
             types-requests,
