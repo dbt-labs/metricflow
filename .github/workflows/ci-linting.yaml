@@ -30,10 +30,10 @@ jobs:
           path: |
             ${{ env.pythonLocation }}
             ~/.cache
-          key: ${{ env.pythonLocation }}-${{ hashFiles('.pre-commit-config.yaml') }}-ubuntu-latest-22.04
+          key: ${{ env.pythonLocation }}-${{ hashFiles('.pre-commit-config.yaml', '.github/workflows/ci-linting.yaml') }}-ubuntu-latest-22.04
 
       - name: Install deps
-        run: pip install pre-commit
+        run: pip install "pre-commit>=2.18,<3"
 
       - name: Run Linter
         run: pre-commit run --show-diff-on-failure --color=always --all-files || (cat /home/runner/.cache/pre-commit/pre-commit.log && false)
