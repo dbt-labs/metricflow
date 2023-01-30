@@ -5,7 +5,6 @@ import pprint
 import random
 import string
 import textwrap
-from collections import OrderedDict
 from collections.abc import Mapping
 from dataclasses import is_dataclass, fields
 from enum import Enum
@@ -134,15 +133,6 @@ def flatten_nested_sequence(sequence_of_sequences: Sequence[Sequence[SequenceT]]
     e.g. ((1,2), (3,4)) -> (1, 2, 3, 4)
     """
     return tuple(itertools.chain.from_iterable(sequence_of_sequences))
-
-
-def flatten_and_dedupe(sequence_of_sequences: Sequence[Sequence[SequenceT]]) -> Tuple[SequenceT, ...]:
-    """Convert a nested sequence into a flattened tuple, with de-duping.
-
-    e.g. ((1,2), (2,3)) -> (1, 2, 3)
-    """
-    items = flatten_nested_sequence(sequence_of_sequences)
-    return tuple(OrderedDict.fromkeys(items))
 
 
 def random_id() -> str:
