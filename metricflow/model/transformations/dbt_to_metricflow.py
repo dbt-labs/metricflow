@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from operator import xor
 import traceback
 from typing import DefaultDict, Dict, List, Optional, Set
-from dbt.contracts.graph.parsed import ParsedMetric as DbtMetric, ParsedModelNode as DbtModelNode
+from dbt.contracts.graph.nodes import Metric as DbtMetric, ModelNode as DbtModelNode
 from dbt.contracts.graph.unparsed import MetricFilter as DbtMetricFilter
 from dbt.exceptions import ref_invalid_args
 from dbt.contracts.graph.manifest import Manifest as DbtManifest
@@ -155,7 +155,8 @@ class DbtManifestTransformer:
             dimensions.append(self._build_dimension(name=dimension, dbt_metric=dbt_metric))
 
         # Add DbtMetric.timestamp as a time dimension
-        dimensions.append(self._build_dimension(name=dbt_metric.timestamp, dbt_metric=dbt_metric))
+        if dbt_metric.timestamp is not None:
+            dimensions.append(self._build_dimension(name=dbt_metric.timestamp, dbt_metric=dbt_metric))
 
         # We need to deduplicate the filters because a field could be the same in
         # two filters. For example, if two filters exist for `amount`, one with
@@ -344,7 +345,11 @@ class DbtManifestTransformer:
         # dimenson for the data source that is built for the `DbtMetric.model`
         time_stats_for_metric_models: Dict[str, Dict[str, int]] = {}
         for dbt_metric in dbt_metrics:
-            if dbt_metric.calculation_method != "derived" and dbt_metric.model is not None:
+            if (
+                dbt_metric.calculation_method != "derived"
+                and dbt_metric.model is not None
+                and dbt_metric.timestamp is not None
+            ):
                 if dbt_metric.timestamp not in time_dimensions:
                     time_dimensions[dbt_metric.timestamp] = []
 
