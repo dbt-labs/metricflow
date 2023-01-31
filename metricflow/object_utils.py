@@ -2,8 +2,6 @@ from __future__ import annotations
 import itertools
 import logging
 import pprint
-import random
-import string
 import textwrap
 from collections.abc import Mapping
 from dataclasses import is_dataclass, fields
@@ -133,14 +131,6 @@ def flatten_nested_sequence(sequence_of_sequences: Sequence[Sequence[SequenceT]]
     e.g. ((1,2), (3,4)) -> (1, 2, 3, 4)
     """
     return tuple(itertools.chain.from_iterable(sequence_of_sequences))
-
-
-def random_id() -> str:
-    """Generates an 8-digit random alphanumeric string."""
-    alphabet = string.ascii_lowercase + string.digits
-    # Characters that go below the line are visually unappealing, so don't use those.
-    filtered_alphabet = [x for x in alphabet if x not in "gjpqy"]
-    return "".join(random.choices(filtered_alphabet, k=8))
 
 
 def assert_values_exhausted(value: NoReturn) -> NoReturn:
