@@ -170,7 +170,7 @@ FROM (
         FROM (
           -- Join to Time Spine Dataset
           SELECT
-            subq_7.metric_time__quarter AS metric_time__quarter
+            DATE_TRUNC('quarter', subq_7.metric_time) AS metric_time__quarter
             , subq_6.ds AS ds
             , subq_6.ds__week AS ds__week
             , subq_6.ds__month AS ds__month
@@ -226,10 +226,10 @@ FROM (
           FROM (
             -- Date Spine
             SELECT
-              DATE_TRUNC('quarter', subq_8.ds) AS metric_time__quarter
+              subq_8.ds AS metric_time
             FROM ***************************.mf_time_spine subq_8
             GROUP BY
-              DATE_TRUNC('quarter', subq_8.ds)
+              subq_8.ds
           ) subq_7
           INNER JOIN (
             -- Metric Time Dimension 'ds'
@@ -354,7 +354,7 @@ FROM (
             ) subq_5
           ) subq_6
           ON
-            subq_7.metric_time__quarter - INTERVAL 14 day = subq_6.metric_time__quarter
+            subq_7.metric_time - INTERVAL 14 day = subq_6.metric_time
         ) subq_9
       ) subq_10
       GROUP BY

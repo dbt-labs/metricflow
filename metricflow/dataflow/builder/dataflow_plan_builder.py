@@ -778,6 +778,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         )
 
         time_range_node: Optional[JoinOverTimeRangeNode[SqlDataSetT]] = None
+        # TODO: test join to time spine with cumulative
         if cumulative:
             time_range_node = JoinOverTimeRangeNode(
                 parent_node=filtered_measure_source_node,

@@ -15,21 +15,21 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      subq_19.metric_time__year AS metric_time__year
+      DATE_TRUNC('year', subq_19.metric_time) AS metric_time__year
       , SUM(subq_18.bookings) AS month_start_bookings
     FROM (
       -- Date Spine
       SELECT
-        DATE_TRUNC('year', ds) AS metric_time__year
+        ds AS metric_time
       FROM ***************************.mf_time_spine subq_20
       GROUP BY
-        DATE_TRUNC('year', ds)
+        ds
     ) subq_19
     INNER JOIN (
       -- Read Elements From Data Source 'bookings_source'
       -- Metric Time Dimension 'ds'
       SELECT
-        DATE_TRUNC('year', ds) AS metric_time__year
+        ds AS metric_time
         , 1 AS bookings
       FROM (
         -- User Defined SQL Query
@@ -37,9 +37,9 @@ FROM (
       ) bookings_source_src_10001
     ) subq_18
     ON
-      DATE_TRUNC('month', subq_19.metric_time__year) = subq_18.metric_time__year
+      DATE_TRUNC('month', subq_19.metric_time) = subq_18.metric_time
     GROUP BY
-      subq_19.metric_time__year
+      DATE_TRUNC('year', subq_19.metric_time)
   ) subq_24
   INNER JOIN (
     -- Join to Time Spine Dataset
@@ -48,21 +48,21 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      subq_27.metric_time__year AS metric_time__year
+      DATE_TRUNC('year', subq_27.metric_time) AS metric_time__year
       , SUM(subq_26.bookings) AS bookings_1_month_ago
     FROM (
       -- Date Spine
       SELECT
-        DATE_TRUNC('year', ds) AS metric_time__year
+        ds AS metric_time
       FROM ***************************.mf_time_spine subq_28
       GROUP BY
-        DATE_TRUNC('year', ds)
+        ds
     ) subq_27
     INNER JOIN (
       -- Read Elements From Data Source 'bookings_source'
       -- Metric Time Dimension 'ds'
       SELECT
-        DATE_TRUNC('year', ds) AS metric_time__year
+        ds AS metric_time
         , 1 AS bookings
       FROM (
         -- User Defined SQL Query
@@ -70,9 +70,9 @@ FROM (
       ) bookings_source_src_10001
     ) subq_26
     ON
-      subq_27.metric_time__year - INTERVAL 1 month = subq_26.metric_time__year
+      subq_27.metric_time - INTERVAL 1 month = subq_26.metric_time
     GROUP BY
-      subq_27.metric_time__year
+      DATE_TRUNC('year', subq_27.metric_time)
   ) subq_32
   ON
     (

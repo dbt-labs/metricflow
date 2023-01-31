@@ -9,9 +9,16 @@ FROM (
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
-    subq_11.ds AS metric_time
+    DATE_TRUNC('day', subq_10.metric_time) AS metric_time
     , SUM(subq_9.bookings) AS bookings_5_days_ago
-  FROM ***************************.mf_time_spine subq_11
+  FROM (
+    -- Date Spine
+    SELECT
+      ds AS metric_time
+    FROM ***************************.mf_time_spine subq_11
+    GROUP BY
+      ds
+  ) subq_10
   INNER JOIN (
     -- Read Elements From Data Source 'bookings_source'
     -- Metric Time Dimension 'ds'
@@ -24,7 +31,7 @@ FROM (
     ) bookings_source_src_10001
   ) subq_9
   ON
-    subq_11.ds - INTERVAL 5 day = subq_9.metric_time
+    subq_10.metric_time - INTERVAL 5 day = subq_9.metric_time
   GROUP BY
-    subq_11.ds
+    DATE_TRUNC('day', subq_10.metric_time)
 ) subq_15

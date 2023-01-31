@@ -194,6 +194,7 @@ def sync_query(  # noqa: D
         extra_tags=extra_sql_tags,
         isolation_level=isolation_level,
     )
+    print(statement)
 
     result = async_sql_client.async_request_result(request_id)
     if result.exception:

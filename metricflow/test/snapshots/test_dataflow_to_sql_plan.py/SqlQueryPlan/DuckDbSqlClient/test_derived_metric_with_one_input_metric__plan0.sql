@@ -21,7 +21,7 @@ FROM (
       FROM (
         -- Join to Time Spine Dataset
         SELECT
-          subq_2.metric_time AS metric_time
+          DATE_TRUNC('day', subq_2.metric_time) AS metric_time
           , subq_1.ds AS ds
           , subq_1.ds__week AS ds__week
           , subq_1.ds__month AS ds__month
@@ -79,6 +79,8 @@ FROM (
           SELECT
             subq_3.ds AS metric_time
           FROM ***************************.mf_time_spine subq_3
+          GROUP BY
+            subq_3.ds
         ) subq_2
         INNER JOIN (
           -- Metric Time Dimension 'ds'

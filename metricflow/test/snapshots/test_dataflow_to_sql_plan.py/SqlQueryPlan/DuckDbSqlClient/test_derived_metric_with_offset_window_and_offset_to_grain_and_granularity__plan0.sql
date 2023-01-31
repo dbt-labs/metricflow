@@ -27,7 +27,7 @@ FROM (
         FROM (
           -- Join to Time Spine Dataset
           SELECT
-            subq_2.metric_time__year AS metric_time__year
+            DATE_TRUNC('year', subq_2.metric_time) AS metric_time__year
             , subq_1.ds AS ds
             , subq_1.ds__week AS ds__week
             , subq_1.ds__month AS ds__month
@@ -83,10 +83,10 @@ FROM (
           FROM (
             -- Date Spine
             SELECT
-              DATE_TRUNC('year', subq_3.ds) AS metric_time__year
+              subq_3.ds AS metric_time
             FROM ***************************.mf_time_spine subq_3
             GROUP BY
-              DATE_TRUNC('year', subq_3.ds)
+              subq_3.ds
           ) subq_2
           INNER JOIN (
             -- Metric Time Dimension 'ds'
@@ -211,7 +211,7 @@ FROM (
             ) subq_0
           ) subq_1
           ON
-            DATE_TRUNC('month', subq_2.metric_time__year) = subq_1.metric_time__year
+            DATE_TRUNC('month', subq_2.metric_time) = subq_1.metric_time
         ) subq_4
       ) subq_5
       GROUP BY
@@ -237,7 +237,7 @@ FROM (
         FROM (
           -- Join to Time Spine Dataset
           SELECT
-            subq_10.metric_time__year AS metric_time__year
+            DATE_TRUNC('year', subq_10.metric_time) AS metric_time__year
             , subq_9.ds AS ds
             , subq_9.ds__week AS ds__week
             , subq_9.ds__month AS ds__month
@@ -293,10 +293,10 @@ FROM (
           FROM (
             -- Date Spine
             SELECT
-              DATE_TRUNC('year', subq_11.ds) AS metric_time__year
+              subq_11.ds AS metric_time
             FROM ***************************.mf_time_spine subq_11
             GROUP BY
-              DATE_TRUNC('year', subq_11.ds)
+              subq_11.ds
           ) subq_10
           INNER JOIN (
             -- Metric Time Dimension 'ds'
@@ -421,7 +421,7 @@ FROM (
             ) subq_8
           ) subq_9
           ON
-            subq_10.metric_time__year - INTERVAL 1 month = subq_9.metric_time__year
+            subq_10.metric_time - INTERVAL 1 month = subq_9.metric_time
         ) subq_12
       ) subq_13
       GROUP BY

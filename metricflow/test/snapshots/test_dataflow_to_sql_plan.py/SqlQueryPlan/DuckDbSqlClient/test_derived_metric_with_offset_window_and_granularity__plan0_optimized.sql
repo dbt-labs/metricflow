@@ -37,21 +37,21 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      subq_21.metric_time__quarter AS metric_time__quarter
+      DATE_TRUNC('quarter', subq_21.metric_time) AS metric_time__quarter
       , SUM(subq_20.bookings) AS bookings_2_weeks_ago
     FROM (
       -- Date Spine
       SELECT
-        DATE_TRUNC('quarter', ds) AS metric_time__quarter
+        ds AS metric_time
       FROM ***************************.mf_time_spine subq_22
       GROUP BY
-        DATE_TRUNC('quarter', ds)
+        ds
     ) subq_21
     INNER JOIN (
       -- Read Elements From Data Source 'bookings_source'
       -- Metric Time Dimension 'ds'
       SELECT
-        DATE_TRUNC('quarter', ds) AS metric_time__quarter
+        ds AS metric_time
         , 1 AS bookings
       FROM (
         -- User Defined SQL Query
@@ -59,9 +59,9 @@ FROM (
       ) bookings_source_src_10001
     ) subq_20
     ON
-      subq_21.metric_time__quarter - INTERVAL 14 day = subq_20.metric_time__quarter
+      subq_21.metric_time - INTERVAL 14 day = subq_20.metric_time
     GROUP BY
-      subq_21.metric_time__quarter
+      DATE_TRUNC('quarter', subq_21.metric_time)
   ) subq_26
   ON
     (
