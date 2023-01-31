@@ -631,7 +631,7 @@ def test_derived_metric_offset_window(  # noqa: D
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings_5_day_lag"),),
-            dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
+            time_dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
         )
     )
 
@@ -658,7 +658,7 @@ def test_derived_metric_offset_to_grain(  # noqa: D
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings_growth_since_start_of_month"),),
-            dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
+            time_dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
         )
     )
 
@@ -685,7 +685,7 @@ def test_derived_metric_offset_with_granularity(  # noqa: D
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings_5_day_lag"),),
-            dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.MONTH),),
+            time_dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.MONTH),),
         )
     )
 
