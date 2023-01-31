@@ -202,6 +202,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 sql_select_node=SqlSelectStatementNode(
                     description=description,
                     # This creates select expressions for all columns referenced in the instance set.
+                    # Add more select columns here
                     select_columns=(
                         SqlSelectColumn(
                             expr=SqlColumnReferenceExpression(
@@ -1306,10 +1307,8 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         metric_time_dimension_instance: Optional[TimeDimensionInstance] = None
         for instance in parent_data_set.metric_time_dimension_instances:
             if len(instance.spec.identifier_links) == 0:
-                # Use the instance with the lowest granularity
-                if not metric_time_dimension_instance or (
-                    instance.spec.time_granularity < metric_time_dimension_instance.spec.time_granularity
-                ):
+                # Use the instance with the requested granularity
+                if instance.spec.time_granularity == node._time_dimension_spec.time_granularity:
                     metric_time_dimension_instance = instance
         assert (
             metric_time_dimension_instance

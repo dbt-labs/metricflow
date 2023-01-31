@@ -595,6 +595,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         metric_input_measure_specs: Tuple[MetricInputMeasureSpec, ...],
         metric_spec: MetricSpec,
         queried_linkable_specs: LinkableSpecSet,
+        time_dimension_spec: Optional[TimeDimensionSpec] = None,
         where_constraint: Optional[SpecWhereClauseConstraint] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         cumulative: Optional[bool] = False,
@@ -751,8 +752,15 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
 
         join_to_time_spine_node: Optional[JoinToTimeSpineNode] = None
         if metric_spec.offset_window or metric_spec.offset_to_grain:
+            queried_time_dimension_spec: Optional[TimeDimensionSpec] = None
+            for linkable_spec in queried_linkable_specs.time_dimension_specs:
+                if linkable_spec.element_name == self._metric_time_dimension_reference.element_name:
+                    queried_time_dimension_spec = linkable_spec
+                    break
+            assert queried_time_dimension_spec, "Joining to time spine requires querying with a time dimension."
             join_to_time_spine_node = JoinToTimeSpineNode(
                 parent_node=measure_recipe.measure_node,
+                time_dimension_spec=queried_time_dimension_spec,
                 time_range_constraint=time_range_constraint,
                 offset_window=metric_spec.offset_window,
                 offset_to_grain=metric_spec.offset_to_grain,
@@ -866,9 +874,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         if non_additive_dimension_spec is not None:
             # Apply semi additive join on the node
             agg_time_dimension = measure_properties.agg_time_dimension
-            queried_time_dimension_spec: Optional[
-                TimeDimensionSpec
-            ] = self._find_non_additive_dimension_in_linkable_specs(
+            queried_time_dimension_spec = self._find_non_additive_dimension_in_linkable_specs(
                 agg_time_dimension=agg_time_dimension,
                 linkable_specs=queried_linkable_specs.as_tuple,
                 non_additive_dimension_spec=non_additive_dimension_spec,

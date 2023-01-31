@@ -1,33 +1,33 @@
 -- Compute Metrics via Expressions
 SELECT
-  subq_16.metric_time
+  subq_16.metric_time__year
   , month_start_bookings - bookings_1_month_ago AS bookings_month_start_compared_to_1_month_prior
 FROM (
   -- Combine Metrics
   SELECT
-    COALESCE(subq_7.metric_time, subq_15.metric_time) AS metric_time
+    COALESCE(subq_7.metric_time__year, subq_15.metric_time__year) AS metric_time__year
     , subq_7.month_start_bookings AS month_start_bookings
     , subq_15.bookings_1_month_ago AS bookings_1_month_ago
   FROM (
     -- Compute Metrics via Expressions
     SELECT
-      subq_6.metric_time
+      subq_6.metric_time__year
       , subq_6.bookings AS month_start_bookings
     FROM (
       -- Aggregate Measures
       SELECT
-        subq_5.metric_time
+        subq_5.metric_time__year
         , SUM(subq_5.bookings) AS bookings
       FROM (
         -- Pass Only Elements:
-        --   ['bookings', 'metric_time']
+        --   ['bookings', 'metric_time__year']
         SELECT
-          subq_4.metric_time
+          subq_4.metric_time__year
           , subq_4.bookings
         FROM (
           -- Join to Time Spine Dataset
           SELECT
-            subq_2.metric_time AS metric_time
+            subq_2.metric_time__year AS metric_time__year
             , subq_1.ds AS ds
             , subq_1.ds__week AS ds__week
             , subq_1.ds__month AS ds__month
@@ -83,8 +83,10 @@ FROM (
           FROM (
             -- Date Spine
             SELECT
-              subq_3.ds AS metric_time
+              DATE_TRUNC('year', subq_3.ds) AS metric_time__year
             FROM ***************************.mf_time_spine subq_3
+            GROUP BY
+              DATE_TRUNC('year', subq_3.ds)
           ) subq_2
           INNER JOIN (
             -- Metric Time Dimension 'ds'
@@ -209,33 +211,33 @@ FROM (
             ) subq_0
           ) subq_1
           ON
-            DATE_TRUNC('month', subq_2.metric_time) = subq_1.metric_time
+            DATE_TRUNC('month', subq_2.metric_time__year) = subq_1.metric_time__year
         ) subq_4
       ) subq_5
       GROUP BY
-        subq_5.metric_time
+        subq_5.metric_time__year
     ) subq_6
   ) subq_7
   INNER JOIN (
     -- Compute Metrics via Expressions
     SELECT
-      subq_14.metric_time
+      subq_14.metric_time__year
       , subq_14.bookings AS bookings_1_month_ago
     FROM (
       -- Aggregate Measures
       SELECT
-        subq_13.metric_time
+        subq_13.metric_time__year
         , SUM(subq_13.bookings) AS bookings
       FROM (
         -- Pass Only Elements:
-        --   ['bookings', 'metric_time']
+        --   ['bookings', 'metric_time__year']
         SELECT
-          subq_12.metric_time
+          subq_12.metric_time__year
           , subq_12.bookings
         FROM (
           -- Join to Time Spine Dataset
           SELECT
-            subq_10.metric_time AS metric_time
+            subq_10.metric_time__year AS metric_time__year
             , subq_9.ds AS ds
             , subq_9.ds__week AS ds__week
             , subq_9.ds__month AS ds__month
@@ -291,8 +293,10 @@ FROM (
           FROM (
             -- Date Spine
             SELECT
-              subq_11.ds AS metric_time
+              DATE_TRUNC('year', subq_11.ds) AS metric_time__year
             FROM ***************************.mf_time_spine subq_11
+            GROUP BY
+              DATE_TRUNC('year', subq_11.ds)
           ) subq_10
           INNER JOIN (
             -- Metric Time Dimension 'ds'
@@ -417,17 +421,21 @@ FROM (
             ) subq_8
           ) subq_9
           ON
-            subq_10.metric_time - INTERVAL 1 month = subq_9.metric_time
+            subq_10.metric_time__year - INTERVAL 1 month = subq_9.metric_time__year
         ) subq_12
       ) subq_13
       GROUP BY
-        subq_13.metric_time
+        subq_13.metric_time__year
     ) subq_14
   ) subq_15
   ON
     (
-      subq_7.metric_time = subq_15.metric_time
+      subq_7.metric_time__year = subq_15.metric_time__year
     ) OR (
-      (subq_7.metric_time IS NULL) AND (subq_15.metric_time IS NULL)
+      (
+        subq_7.metric_time__year IS NULL
+      ) AND (
+        subq_15.metric_time__year IS NULL
+      )
     )
 ) subq_16

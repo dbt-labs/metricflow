@@ -4,7 +4,7 @@
         <!-- node_id = ss_13 -->
         <!-- col0 =                                                    -->
         <!--   {'class': 'SqlSelectColumn',                            -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_296),  -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_347),  -->
         <!--    'column_alias': 'metric_time'}                         -->
         <!-- col1 =                                                                       -->
         <!--   {'class': 'SqlSelectColumn',                                               -->
@@ -13,84 +13,288 @@
         <!-- from_source = SqlSelectStatementNode(node_id=ss_12) -->
         <!-- where = None -->
         <SqlSelectStatementNode>
-            <!-- description = Join to Time Spine Dataset -->
+            <!-- description = Compute Metrics via Expressions -->
             <!-- node_id = ss_12 -->
             <!-- col0 =                                                    -->
             <!--   {'class': 'SqlSelectColumn',                            -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_294),  -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_345),  -->
             <!--    'column_alias': 'metric_time'}                         -->
             <!-- col1 =                                                    -->
             <!--   {'class': 'SqlSelectColumn',                            -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_295),  -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_346),  -->
             <!--    'column_alias': 'bookings_5_days_ago'}                 -->
             <!-- from_source = SqlSelectStatementNode(node_id=ss_11) -->
-            <!-- join_0 =                                                    -->
-            <!--   {'class': 'SqlJoinDescription',                           -->
-            <!--    'right_source': SqlSelectStatementNode(node_id=ss_10),   -->
-            <!--    'right_source_alias': 'subq_4',                          -->
-            <!--    'join_type': SqlJoinType.INNER,                          -->
-            <!--    'on_condition': SqlComparisonExpression(node_id=cmp_0)}  -->
             <!-- where = None -->
             <SqlSelectStatementNode>
-                <!-- description = Date Spine -->
+                <!-- description = Aggregate Measures -->
                 <!-- node_id = ss_11 -->
                 <!-- col0 =                                                    -->
                 <!--   {'class': 'SqlSelectColumn',                            -->
-                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_291),  -->
+                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_344),  -->
                 <!--    'column_alias': 'metric_time'}                         -->
-                <!-- from_source = SqlTableFromClauseNode(node_id=tfc_0) -->
-                <!-- where = None -->
-                <SqlTableFromClauseNode>
-                    <!-- description = Read from ***************************.mf_time_spine -->
-                    <!-- node_id = tfc_0 -->
-                    <!-- table_id = ***************************.mf_time_spine -->
-                </SqlTableFromClauseNode>
-            </SqlSelectStatementNode>
-            <SqlSelectStatementNode>
-                <!-- description = Compute Metrics via Expressions -->
-                <!-- node_id = ss_10 -->
-                <!-- col0 =                                                    -->
+                <!-- col1 =                                                                       -->
+                <!--   {'class': 'SqlSelectColumn',                                               -->
+                <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
+                <!--    'column_alias': 'bookings'}                                               -->
+                <!-- from_source = SqlSelectStatementNode(node_id=ss_10) -->
+                <!-- group_by0 =                                               -->
                 <!--   {'class': 'SqlSelectColumn',                            -->
-                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_289),  -->
+                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_344),  -->
                 <!--    'column_alias': 'metric_time'}                         -->
-                <!-- col1 =                                                    -->
-                <!--   {'class': 'SqlSelectColumn',                            -->
-                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_290),  -->
-                <!--    'column_alias': 'bookings_5_days_ago'}                 -->
-                <!-- from_source = SqlSelectStatementNode(node_id=ss_9) -->
                 <!-- where = None -->
                 <SqlSelectStatementNode>
-                    <!-- description = Aggregate Measures -->
-                    <!-- node_id = ss_9 -->
+                    <!-- description =                    -->
+                    <!--   Pass Only Elements:            -->
+                    <!--     ['bookings', 'metric_time']  -->
+                    <!-- node_id = ss_10 -->
                     <!-- col0 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_288),  -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_342),  -->
                     <!--    'column_alias': 'metric_time'}                         -->
-                    <!-- col1 =                                                                       -->
-                    <!--   {'class': 'SqlSelectColumn',                                               -->
-                    <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
-                    <!--    'column_alias': 'bookings'}                                               -->
-                    <!-- from_source = SqlSelectStatementNode(node_id=ss_8) -->
-                    <!-- group_by0 =                                               -->
+                    <!-- col1 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_288),  -->
-                    <!--    'column_alias': 'metric_time'}                         -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_341),  -->
+                    <!--    'column_alias': 'bookings'}                            -->
+                    <!-- from_source = SqlSelectStatementNode(node_id=ss_9) -->
                     <!-- where = None -->
                     <SqlSelectStatementNode>
-                        <!-- description =                    -->
-                        <!--   Pass Only Elements:            -->
-                        <!--     ['bookings', 'metric_time']  -->
-                        <!-- node_id = ss_8 -->
+                        <!-- description = Join to Time Spine Dataset -->
+                        <!-- node_id = ss_9 -->
                         <!-- col0 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
-                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_286),  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_288),  -->
                         <!--    'column_alias': 'metric_time'}                         -->
                         <!-- col1 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
-                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_285),  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_304),  -->
+                        <!--    'column_alias': 'ds'}                                  -->
+                        <!-- col2 =                                                    -->
+                        <!--   {'class': 'SqlSelectColumn',                            -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_305),  -->
+                        <!--    'column_alias': 'ds__week'}                            -->
+                        <!-- col3 =                                                    -->
+                        <!--   {'class': 'SqlSelectColumn',                            -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_306),  -->
+                        <!--    'column_alias': 'ds__month'}                           -->
+                        <!-- col4 =                                                    -->
+                        <!--   {'class': 'SqlSelectColumn',                            -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_307),  -->
+                        <!--    'column_alias': 'ds__quarter'}                         -->
+                        <!-- col5 =                                                    -->
+                        <!--   {'class': 'SqlSelectColumn',                            -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_308),  -->
+                        <!--    'column_alias': 'ds__year'}                            -->
+                        <!-- col6 =                                                    -->
+                        <!--   {'class': 'SqlSelectColumn',                            -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_309),  -->
+                        <!--    'column_alias': 'ds_partitioned'}                      -->
+                        <!-- col7 =                                                    -->
+                        <!--   {'class': 'SqlSelectColumn',                            -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_310),  -->
+                        <!--    'column_alias': 'ds_partitioned__week'}                -->
+                        <!-- col8 =                                                    -->
+                        <!--   {'class': 'SqlSelectColumn',                            -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_311),  -->
+                        <!--    'column_alias': 'ds_partitioned__month'}               -->
+                        <!-- col9 =                                                    -->
+                        <!--   {'class': 'SqlSelectColumn',                            -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_312),  -->
+                        <!--    'column_alias': 'ds_partitioned__quarter'}             -->
+                        <!-- col10 =                                                   -->
+                        <!--   {'class': 'SqlSelectColumn',                            -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_313),  -->
+                        <!--    'column_alias': 'ds_partitioned__year'}                -->
+                        <!-- col11 =                                                   -->
+                        <!--   {'class': 'SqlSelectColumn',                            -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_314),  -->
+                        <!--    'column_alias': 'booking_paid_at'}                     -->
+                        <!-- col12 =                                                   -->
+                        <!--   {'class': 'SqlSelectColumn',                            -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_315),  -->
+                        <!--    'column_alias': 'booking_paid_at__week'}               -->
+                        <!-- col13 =                                                   -->
+                        <!--   {'class': 'SqlSelectColumn',                            -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_316),  -->
+                        <!--    'column_alias': 'booking_paid_at__month'}              -->
+                        <!-- col14 =                                                   -->
+                        <!--   {'class': 'SqlSelectColumn',                            -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_317),  -->
+                        <!--    'column_alias': 'booking_paid_at__quarter'}            -->
+                        <!-- col15 =                                                   -->
+                        <!--   {'class': 'SqlSelectColumn',                            -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_318),  -->
+                        <!--    'column_alias': 'booking_paid_at__year'}               -->
+                        <!-- col16 =                                                     -->
+                        <!--   {'class': 'SqlSelectColumn',                              -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_319),    -->
+                        <!--    'column_alias': 'create_a_cycle_in_the_join_graph__ds'}  -->
+                        <!-- col17 =                                                           -->
+                        <!--   {'class': 'SqlSelectColumn',                                    -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_320),          -->
+                        <!--    'column_alias': 'create_a_cycle_in_the_join_graph__ds__week'}  -->
+                        <!-- col18 =                                                            -->
+                        <!--   {'class': 'SqlSelectColumn',                                     -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_321),           -->
+                        <!--    'column_alias': 'create_a_cycle_in_the_join_graph__ds__month'}  -->
+                        <!-- col19 =                                                              -->
+                        <!--   {'class': 'SqlSelectColumn',                                       -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_322),             -->
+                        <!--    'column_alias': 'create_a_cycle_in_the_join_graph__ds__quarter'}  -->
+                        <!-- col20 =                                                           -->
+                        <!--   {'class': 'SqlSelectColumn',                                    -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_323),          -->
+                        <!--    'column_alias': 'create_a_cycle_in_the_join_graph__ds__year'}  -->
+                        <!-- col21 =                                                                 -->
+                        <!--   {'class': 'SqlSelectColumn',                                          -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_324),                -->
+                        <!--    'column_alias': 'create_a_cycle_in_the_join_graph__ds_partitioned'}  -->
+                        <!-- col22 =                                                                       -->
+                        <!--   {'class': 'SqlSelectColumn',                                                -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_325),                      -->
+                        <!--    'column_alias': 'create_a_cycle_in_the_join_graph__ds_partitioned__week'}  -->
+                        <!-- col23 =                                                                        -->
+                        <!--   {'class': 'SqlSelectColumn',                                                 -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_326),                       -->
+                        <!--    'column_alias': 'create_a_cycle_in_the_join_graph__ds_partitioned__month'}  -->
+                        <!-- col24 =                                                                          -->
+                        <!--   {'class': 'SqlSelectColumn',                                                   -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_327),                         -->
+                        <!--    'column_alias': 'create_a_cycle_in_the_join_graph__ds_partitioned__quarter'}  -->
+                        <!-- col25 =                                                                       -->
+                        <!--   {'class': 'SqlSelectColumn',                                                -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_328),                      -->
+                        <!--    'column_alias': 'create_a_cycle_in_the_join_graph__ds_partitioned__year'}  -->
+                        <!-- col26 =                                                                  -->
+                        <!--   {'class': 'SqlSelectColumn',                                           -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_329),                 -->
+                        <!--    'column_alias': 'create_a_cycle_in_the_join_graph__booking_paid_at'}  -->
+                        <!-- col27 =                                                                        -->
+                        <!--   {'class': 'SqlSelectColumn',                                                 -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_330),                       -->
+                        <!--    'column_alias': 'create_a_cycle_in_the_join_graph__booking_paid_at__week'}  -->
+                        <!-- col28 =                                                                         -->
+                        <!--   {'class': 'SqlSelectColumn',                                                  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_331),                        -->
+                        <!--    'column_alias': 'create_a_cycle_in_the_join_graph__booking_paid_at__month'}  -->
+                        <!-- col29 =                                                                           -->
+                        <!--   {'class': 'SqlSelectColumn',                                                    -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_332),                          -->
+                        <!--    'column_alias': 'create_a_cycle_in_the_join_graph__booking_paid_at__quarter'}  -->
+                        <!-- col30 =                                                                        -->
+                        <!--   {'class': 'SqlSelectColumn',                                                 -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_333),                       -->
+                        <!--    'column_alias': 'create_a_cycle_in_the_join_graph__booking_paid_at__year'}  -->
+                        <!-- col31 =                                                   -->
+                        <!--   {'class': 'SqlSelectColumn',                            -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_334),  -->
+                        <!--    'column_alias': 'listing'}                             -->
+                        <!-- col32 =                                                   -->
+                        <!--   {'class': 'SqlSelectColumn',                            -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_335),  -->
+                        <!--    'column_alias': 'guest'}                               -->
+                        <!-- col33 =                                                   -->
+                        <!--   {'class': 'SqlSelectColumn',                            -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_336),  -->
+                        <!--    'column_alias': 'host'}                                -->
+                        <!-- col34 =                                                   -->
+                        <!--   {'class': 'SqlSelectColumn',                            -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_337),  -->
+                        <!--    'column_alias': 'create_a_cycle_in_the_join_graph'}    -->
+                        <!-- col35 =                                                          -->
+                        <!--   {'class': 'SqlSelectColumn',                                   -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_338),         -->
+                        <!--    'column_alias': 'create_a_cycle_in_the_join_graph__listing'}  -->
+                        <!-- col36 =                                                        -->
+                        <!--   {'class': 'SqlSelectColumn',                                 -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_339),       -->
+                        <!--    'column_alias': 'create_a_cycle_in_the_join_graph__guest'}  -->
+                        <!-- col37 =                                                       -->
+                        <!--   {'class': 'SqlSelectColumn',                                -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_340),      -->
+                        <!--    'column_alias': 'create_a_cycle_in_the_join_graph__host'}  -->
+                        <!-- col38 =                                                   -->
+                        <!--   {'class': 'SqlSelectColumn',                            -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_302),  -->
+                        <!--    'column_alias': 'is_instant'}                          -->
+                        <!-- col39 =                                                             -->
+                        <!--   {'class': 'SqlSelectColumn',                                      -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_303),            -->
+                        <!--    'column_alias': 'create_a_cycle_in_the_join_graph__is_instant'}  -->
+                        <!-- col40 =                                                   -->
+                        <!--   {'class': 'SqlSelectColumn',                            -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_289),  -->
                         <!--    'column_alias': 'bookings'}                            -->
-                        <!-- from_source = SqlSelectStatementNode(node_id=ss_7) -->
+                        <!-- col41 =                                                   -->
+                        <!--   {'class': 'SqlSelectColumn',                            -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_290),  -->
+                        <!--    'column_alias': 'instant_bookings'}                    -->
+                        <!-- col42 =                                                   -->
+                        <!--   {'class': 'SqlSelectColumn',                            -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_291),  -->
+                        <!--    'column_alias': 'booking_value'}                       -->
+                        <!-- col43 =                                                   -->
+                        <!--   {'class': 'SqlSelectColumn',                            -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_292),  -->
+                        <!--    'column_alias': 'max_booking_value'}                   -->
+                        <!-- col44 =                                                   -->
+                        <!--   {'class': 'SqlSelectColumn',                            -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_293),  -->
+                        <!--    'column_alias': 'min_booking_value'}                   -->
+                        <!-- col45 =                                                   -->
+                        <!--   {'class': 'SqlSelectColumn',                            -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_294),  -->
+                        <!--    'column_alias': 'bookers'}                             -->
+                        <!-- col46 =                                                   -->
+                        <!--   {'class': 'SqlSelectColumn',                            -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_295),  -->
+                        <!--    'column_alias': 'average_booking_value'}               -->
+                        <!-- col47 =                                                   -->
+                        <!--   {'class': 'SqlSelectColumn',                            -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_296),  -->
+                        <!--    'column_alias': 'referred_bookings'}                   -->
+                        <!-- col48 =                                                   -->
+                        <!--   {'class': 'SqlSelectColumn',                            -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_297),  -->
+                        <!--    'column_alias': 'median_booking_value'}                -->
+                        <!-- col49 =                                                   -->
+                        <!--   {'class': 'SqlSelectColumn',                            -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_298),  -->
+                        <!--    'column_alias': 'booking_value_p99'}                   -->
+                        <!-- col50 =                                                   -->
+                        <!--   {'class': 'SqlSelectColumn',                            -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_299),  -->
+                        <!--    'column_alias': 'discrete_booking_value_p99'}          -->
+                        <!-- col51 =                                                         -->
+                        <!--   {'class': 'SqlSelectColumn',                                  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_300),        -->
+                        <!--    'column_alias': 'approximate_continuous_booking_value_p99'}  -->
+                        <!-- col52 =                                                       -->
+                        <!--   {'class': 'SqlSelectColumn',                                -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_301),      -->
+                        <!--    'column_alias': 'approximate_discrete_booking_value_p99'}  -->
+                        <!-- from_source = SqlSelectStatementNode(node_id=ss_8) -->
+                        <!-- join_0 =                                                    -->
+                        <!--   {'class': 'SqlJoinDescription',                           -->
+                        <!--    'right_source': SqlSelectStatementNode(node_id=ss_7),    -->
+                        <!--    'right_source_alias': 'subq_1',                          -->
+                        <!--    'join_type': SqlJoinType.INNER,                          -->
+                        <!--    'on_condition': SqlComparisonExpression(node_id=cmp_0)}  -->
                         <!-- where = None -->
+                        <SqlSelectStatementNode>
+                            <!-- description = Date Spine -->
+                            <!-- node_id = ss_8 -->
+                            <!-- col0 =                                                    -->
+                            <!--   {'class': 'SqlSelectColumn',                            -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_285),  -->
+                            <!--    'column_alias': 'metric_time'}                         -->
+                            <!-- from_source = SqlTableFromClauseNode(node_id=tfc_0) -->
+                            <!-- where = None -->
+                            <SqlTableFromClauseNode>
+                                <!-- description = Read from ***************************.mf_time_spine -->
+                                <!-- node_id = tfc_0 -->
+                                <!-- table_id = ***************************.mf_time_spine -->
+                            </SqlTableFromClauseNode>
+                        </SqlSelectStatementNode>
                         <SqlSelectStatementNode>
                             <!-- description = Metric Time Dimension 'ds' -->
                             <!-- node_id = ss_7 -->

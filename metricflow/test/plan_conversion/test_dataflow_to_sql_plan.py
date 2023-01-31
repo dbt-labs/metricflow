@@ -55,7 +55,7 @@ from metricflow.test.plan_utils import assert_plan_snapshot_text_equal
 from metricflow.test.sql.compare_sql_plan import assert_rendered_sql_from_plan_equal
 from metricflow.test.sql.compare_sql_plan import assert_sql_plan_text_equal
 from metricflow.test.test_utils import as_datetime
-from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY
+from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_QUARTER, MTD_SPEC_YEAR, MTD_SPEC_WEEK
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.model.objects.metric import MetricTimeWindow
 
@@ -575,6 +575,7 @@ def test_join_to_time_spine_node_without_offset(  # noqa: D
     )
     join_to_time_spine_node = JoinToTimeSpineNode(
         parent_node=compute_metrics_node,
+        time_dimension_spec=MTD_SPEC_DAY,
         time_range_constraint=TimeRangeConstraint(
             start_time=as_datetime("2020-01-01"), end_time=as_datetime("2021-01-01")
         ),
@@ -638,6 +639,7 @@ def test_join_to_time_spine_node_with_offset_window(  # noqa: D
     )
     join_to_time_spine_node = JoinToTimeSpineNode(
         parent_node=compute_metrics_node,
+        time_dimension_spec=MTD_SPEC_DAY,
         time_range_constraint=TimeRangeConstraint(
             start_time=as_datetime("2020-01-01"), end_time=as_datetime("2021-01-01")
         ),
@@ -703,6 +705,7 @@ def test_join_to_time_spine_node_with_offset_to_grain(
     )
     join_to_time_spine_node = JoinToTimeSpineNode(
         parent_node=compute_metrics_node,
+        time_dimension_spec=MTD_SPEC_DAY,
         time_range_constraint=TimeRangeConstraint(
             start_time=as_datetime("2020-01-01"), end_time=as_datetime("2021-01-01")
         ),
@@ -735,7 +738,7 @@ def test_join_to_time_spine_node_with_offset_to_grain(
     )
 
 
-# TODO: write test case for both offset window and offset to grain to date once allowed via derived metrics
+# TODO: add more tests with different granularities
 
 
 def test_compute_metrics_node_ratio_from_single_data_source(
@@ -1807,6 +1810,29 @@ def test_derived_metric_with_offset_window(  # noqa: D
     )
 
 
+def test_derived_metric_with_offset_window_and_granularity(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
+    sql_client: SqlClient,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings_growth_2_weeks"),),
+            time_dimension_specs=(MTD_SPEC_QUARTER,),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
 def test_derived_metric_with_offset_to_grain(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1830,6 +1856,29 @@ def test_derived_metric_with_offset_to_grain(  # noqa: D
     )
 
 
+def test_derived_metric_with_offset_to_grain_and_granularity(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
+    sql_client: SqlClient,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings_growth_since_start_of_month"),),
+            time_dimension_specs=(MTD_SPEC_WEEK,),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
 def test_derived_metric_with_offset_window_and_offset_to_grain(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1841,6 +1890,29 @@ def test_derived_metric_with_offset_window_and_offset_to_grain(  # noqa: D
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings_month_start_compared_to_1_month_prior"),),
             time_dimension_specs=(MTD_SPEC_DAY,),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+def test_derived_metric_with_offset_window_and_offset_to_grain_and_granularity(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
+    sql_client: SqlClient,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings_month_start_compared_to_1_month_prior"),),
+            time_dimension_specs=(MTD_SPEC_YEAR,),
         )
     )
 
