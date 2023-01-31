@@ -217,6 +217,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                     )
                 aggregated_measures_node = self.build_aggregated_measures(
                     metric_input_measure_specs=metric_input_measure_specs,
+                    metric_spec=metric_spec,
                     queried_linkable_specs=queried_linkable_specs,
                     where_constraint=combined_where,
                     time_range_constraint=time_range_constraint,
@@ -231,16 +232,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                     aggregated_measures_node=aggregated_measures_node,
                 )
 
-            if metric_spec.offset_window or metric_spec.offset_to_grain:
-                join_to_time_spine_node = JoinToTimeSpineNode(
-                    parent_node=compute_metrics_node,
-                    time_range_constraint=time_range_constraint,
-                    offset_window=metric_spec.offset_window,
-                    offset_to_grain=metric_spec.offset_to_grain,
-                )
-                output_nodes.append(join_to_time_spine_node)
-            else:
-                output_nodes.append(compute_metrics_node)
+            output_nodes.append(compute_metrics_node)
 
         assert len(output_nodes) > 0, "ComputeMetricsNode was not properly constructed"
 
@@ -601,6 +593,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
     def build_aggregated_measures(
         self,
         metric_input_measure_specs: Tuple[MetricInputMeasureSpec, ...],
+        metric_spec: MetricSpec,
         queried_linkable_specs: LinkableSpecSet,
         where_constraint: Optional[SpecWhereClauseConstraint] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
@@ -659,6 +652,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 output_nodes.append(
                     self._build_aggregated_measures_from_measure_source_node(
                         metric_input_measure_specs=input_specs,
+                        metric_spec=metric_spec,
                         queried_linkable_specs=queried_linkable_specs,
                         where_constraint=node_where_constraint,
                         time_range_constraint=time_range_constraint,
@@ -686,6 +680,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
     def _build_aggregated_measures_from_measure_source_node(
         self,
         metric_input_measure_specs: Tuple[MetricInputMeasureSpec, ...],
+        metric_spec: MetricSpec,
         queried_linkable_specs: LinkableSpecSet,
         where_constraint: Optional[SpecWhereClauseConstraint] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
@@ -754,9 +749,18 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 f"Recipe not found for measure specs: {measure_specs} and linkable specs: {required_linkable_specs}"
             )
 
+        join_to_time_spine_node: Optional[JoinToTimeSpineNode] = None
+        if metric_spec.offset_window or metric_spec.offset_to_grain:
+            join_to_time_spine_node = JoinToTimeSpineNode(
+                parent_node=measure_recipe.measure_node,
+                time_range_constraint=time_range_constraint,
+                offset_window=metric_spec.offset_window,
+                offset_to_grain=metric_spec.offset_to_grain,
+            )
+
         # Only get the required measure and the local linkable instances so that aggregations work correctly.
         filtered_measure_source_node = FilterElementsNode[SqlDataSetT](
-            parent_node=measure_recipe.measure_node,
+            parent_node=join_to_time_spine_node or measure_recipe.measure_node,
             include_specs=InstanceSpecSet.merge(
                 (
                     InstanceSpecSet(measure_specs=measure_specs),
