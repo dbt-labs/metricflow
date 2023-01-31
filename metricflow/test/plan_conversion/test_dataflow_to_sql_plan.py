@@ -738,9 +738,6 @@ def test_join_to_time_spine_node_with_offset_to_grain(
     )
 
 
-# TODO: add more tests with different granularities
-
-
 def test_compute_metrics_node_ratio_from_single_data_source(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
