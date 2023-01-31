@@ -13,7 +13,8 @@ import pandas as pd
 
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.logging.formatting import indent_log_line
-from metricflow.object_utils import random_id, pformat_big_objects
+from metricflow.object_utils import pformat_big_objects
+from metricflow.random_id import random_id
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.protocols.sql_client import (
     SqlEngineAttributes,

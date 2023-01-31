@@ -2,7 +2,7 @@ import textwrap
 
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest
-from metricflow.object_utils import random_id
+from metricflow.random_id import random_id
 from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.integration.conftest import IntegrationTestHelpers
 
