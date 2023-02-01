@@ -1315,8 +1315,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             parent_alias=parent_alias,
         )
 
-        # Use metric_time instance from time spine with requested granularity, and all instances EXCEPT metric_time
-        # from parent data set.
+        # Use all instances EXCEPT metric_time from parent data set.
         non_metric_time_parent_instance_set = InstanceSet(
             measure_instances=parent_data_set.instance_set.measure_instances,
             dimension_instances=parent_data_set.instance_set.dimension_instances,
@@ -1329,6 +1328,8 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             metric_instances=parent_data_set.instance_set.metric_instances,
             metadata_instances=parent_data_set.instance_set.metadata_instances,
         )
+
+        # Add requested granularity to time spine specs & columns.
         time_dimension_instances: Tuple[TimeDimensionInstance, ...] = tuple()
         time_spine_select_columns: Tuple[SqlSelectColumn, ...] = tuple()
         for original_time_dim_instance in time_spine_dataset.instance_set.time_dimension_instances:

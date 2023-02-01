@@ -595,7 +595,6 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         metric_input_measure_specs: Tuple[MetricInputMeasureSpec, ...],
         metric_spec: MetricSpec,
         queried_linkable_specs: LinkableSpecSet,
-        time_dimension_spec: Optional[TimeDimensionSpec] = None,
         where_constraint: Optional[SpecWhereClauseConstraint] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         cumulative: Optional[bool] = False,
@@ -778,7 +777,6 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         )
 
         time_range_node: Optional[JoinOverTimeRangeNode[SqlDataSetT]] = None
-        # TODO: test join to time spine with cumulative
         if cumulative:
             time_range_node = JoinOverTimeRangeNode(
                 parent_node=filtered_measure_source_node,
