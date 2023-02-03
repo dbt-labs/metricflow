@@ -1,6 +1,6 @@
 -- Join to Time Spine Dataset
 SELECT
-  subq_5.metric_time AS metric_time
+  DATE_TRUNC('day', subq_5.metric_time) AS metric_time
   , subq_4.listing AS listing
   , subq_4.booking_fees AS booking_fees
 FROM (
@@ -9,6 +9,8 @@ FROM (
     subq_6.ds AS metric_time
   FROM ***************************.mf_time_spine subq_6
   WHERE subq_6.ds BETWEEN CAST('2020-01-01' AS TIMESTAMP) AND CAST('2021-01-01' AS TIMESTAMP)
+  GROUP BY
+    subq_6.ds
 ) subq_5
 INNER JOIN (
   -- Compute Metrics via Expressions

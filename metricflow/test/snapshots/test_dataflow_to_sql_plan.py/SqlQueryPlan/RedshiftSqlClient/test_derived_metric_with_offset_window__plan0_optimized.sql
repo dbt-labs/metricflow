@@ -32,34 +32,36 @@ FROM (
   ) subq_18
   INNER JOIN (
     -- Join to Time Spine Dataset
+    -- Pass Only Elements:
+    --   ['bookings', 'metric_time']
+    -- Aggregate Measures
+    -- Compute Metrics via Expressions
     SELECT
-      subq_25.ds AS metric_time
-      , subq_23.bookings_2_weeks_ago AS bookings_2_weeks_ago
-    FROM ***************************.mf_time_spine subq_25
-    INNER JOIN (
-      -- Aggregate Measures
-      -- Compute Metrics via Expressions
+      DATE_TRUNC('day', subq_21.metric_time) AS metric_time
+      , SUM(subq_20.bookings) AS bookings_2_weeks_ago
+    FROM (
+      -- Date Spine
       SELECT
-        metric_time
-        , SUM(bookings) AS bookings_2_weeks_ago
-      FROM (
-        -- Read Elements From Data Source 'bookings_source'
-        -- Metric Time Dimension 'ds'
-        -- Pass Only Elements:
-        --   ['bookings', 'metric_time']
-        SELECT
-          ds AS metric_time
-          , 1 AS bookings
-        FROM (
-          -- User Defined SQL Query
-          SELECT * FROM ***************************.fct_bookings
-        ) bookings_source_src_10001
-      ) subq_21
+        ds AS metric_time
+      FROM ***************************.mf_time_spine subq_22
       GROUP BY
-        metric_time
-    ) subq_23
+        ds
+    ) subq_21
+    INNER JOIN (
+      -- Read Elements From Data Source 'bookings_source'
+      -- Metric Time Dimension 'ds'
+      SELECT
+        ds AS metric_time
+        , 1 AS bookings
+      FROM (
+        -- User Defined SQL Query
+        SELECT * FROM ***************************.fct_bookings
+      ) bookings_source_src_10001
+    ) subq_20
     ON
-      DATEADD(day, -14, subq_25.ds) = subq_23.metric_time
+      DATEADD(day, -14, subq_21.metric_time) = subq_20.metric_time
+    GROUP BY
+      DATE_TRUNC('day', subq_21.metric_time)
   ) subq_26
   ON
     (
