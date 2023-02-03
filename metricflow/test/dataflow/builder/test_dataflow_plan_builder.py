@@ -620,3 +620,109 @@ def test_common_data_source(  # noqa: D
         mf_test_session_state=mf_test_session_state,
         dag_graph=dataflow_plan,
     )
+
+
+def test_derived_metric_offset_window(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
+) -> None:
+    """Tests a simple plan getting a metric and a local dimension."""
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings_5_day_lag"),),
+            time_dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
+        )
+    )
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=dataflow_plan,
+    )
+
+
+def test_derived_metric_offset_to_grain(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
+) -> None:
+    """Tests a simple plan getting a metric and a local dimension."""
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings_growth_since_start_of_month"),),
+            time_dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
+        )
+    )
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=dataflow_plan,
+    )
+
+
+def test_derived_metric_offset_with_granularity(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings_5_day_lag"),),
+            time_dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.MONTH),),
+        )
+    )
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=dataflow_plan,
+    )
+
+
+def test_derived_offset_cumulative_metric(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="every_2_days_bookers_2_days_ago"),),
+            time_dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
+        )
+    )
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=dataflow_plan,
+    )
