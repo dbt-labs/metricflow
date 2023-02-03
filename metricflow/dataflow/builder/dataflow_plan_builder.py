@@ -749,16 +749,26 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 f"Recipe not found for measure specs: {measure_specs} and linkable specs: {required_linkable_specs}"
             )
 
+        queried_time_dimension_spec: Optional[TimeDimensionSpec] = None
+        for linkable_spec in queried_linkable_specs.time_dimension_specs:
+            if linkable_spec.element_name == self._metric_time_dimension_reference.element_name:
+                queried_time_dimension_spec = linkable_spec
+                break
+
+        time_range_node: Optional[JoinOverTimeRangeNode[SqlDataSetT]] = None
+        if cumulative:
+            time_range_node = JoinOverTimeRangeNode(
+                parent_node=measure_recipe.measure_node,
+                window=cumulative_window,
+                grain_to_date=cumulative_grain_to_date,
+                time_range_constraint=time_range_constraint,
+            )
+
         join_to_time_spine_node: Optional[JoinToTimeSpineNode] = None
         if metric_spec.offset_window or metric_spec.offset_to_grain:
-            queried_time_dimension_spec: Optional[TimeDimensionSpec] = None
-            for linkable_spec in queried_linkable_specs.time_dimension_specs:
-                if linkable_spec.element_name == self._metric_time_dimension_reference.element_name:
-                    queried_time_dimension_spec = linkable_spec
-                    break
             assert queried_time_dimension_spec, "Joining to time spine requires querying with a time dimension."
             join_to_time_spine_node = JoinToTimeSpineNode(
-                parent_node=measure_recipe.measure_node,
+                parent_node=time_range_node or measure_recipe.measure_node,
                 time_dimension_spec=queried_time_dimension_spec,
                 time_range_constraint=time_range_constraint,
                 offset_window=metric_spec.offset_window,
@@ -767,7 +777,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
 
         # Only get the required measure and the local linkable instances so that aggregations work correctly.
         filtered_measure_source_node = FilterElementsNode[SqlDataSetT](
-            parent_node=join_to_time_spine_node or measure_recipe.measure_node,
+            parent_node=join_to_time_spine_node or time_range_node or measure_recipe.measure_node,
             include_specs=InstanceSpecSet.merge(
                 (
                     InstanceSpecSet(measure_specs=measure_specs),
@@ -776,18 +786,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             ),
         )
 
-        time_range_node: Optional[JoinOverTimeRangeNode[SqlDataSetT]] = None
-        if cumulative:
-            time_range_node = JoinOverTimeRangeNode(
-                parent_node=filtered_measure_source_node,
-                window=cumulative_window,
-                grain_to_date=cumulative_grain_to_date,
-                time_range_constraint=time_range_constraint,
-            )
-
-        filtered_measure_or_time_range_node = time_range_node or filtered_measure_source_node
         join_targets = []
-
         for join_recipe in measure_recipe.join_linkable_instances_recipes:
             # Figure out what elements to filter from the joined node.
 
@@ -834,7 +833,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         unaggregated_measure_node: BaseOutput[SqlDataSetT]
         if len(join_targets) > 0:
             filtered_measures_with_joined_elements = JoinToBaseOutputNode[SqlDataSetT](
-                left_node=filtered_measure_or_time_range_node,
+                left_node=filtered_measure_source_node,
                 join_targets=join_targets,
             )
 
@@ -850,7 +849,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             )
             unaggregated_measure_node = after_join_filtered_node
         else:
-            unaggregated_measure_node = filtered_measure_or_time_range_node
+            unaggregated_measure_node = filtered_measure_source_node
 
         cumulative_metric_constrained_node: Optional[ConstrainTimeRangeNode] = None
         if (
