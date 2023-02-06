@@ -749,10 +749,10 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 f"Recipe not found for measure specs: {measure_specs} and linkable specs: {required_linkable_specs}"
             )
 
-        requested_time_dimension_spec: Optional[TimeDimensionSpec] = None
+        metric_time_dimension_spec: Optional[TimeDimensionSpec] = None
         for linkable_spec in queried_linkable_specs.time_dimension_specs:
             if linkable_spec.element_name == self._metric_time_dimension_reference.element_name:
-                requested_time_dimension_spec = linkable_spec
+                metric_time_dimension_spec = linkable_spec
                 break
 
         time_range_node: Optional[JoinOverTimeRangeNode[SqlDataSetT]] = None
@@ -766,10 +766,10 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
 
         join_to_time_spine_node: Optional[JoinToTimeSpineNode] = None
         if metric_spec.offset_window or metric_spec.offset_to_grain:
-            assert requested_time_dimension_spec, "Joining to time spine requires querying with a time dimension."
+            assert metric_time_dimension_spec, "Joining to time spine requires querying with a time dimension."
             join_to_time_spine_node = JoinToTimeSpineNode(
                 parent_node=time_range_node or measure_recipe.measure_node,
-                time_dimension_spec=requested_time_dimension_spec,
+                time_dimension_spec=metric_time_dimension_spec,
                 time_range_constraint=time_range_constraint,
                 offset_window=metric_spec.offset_window,
                 offset_to_grain=metric_spec.offset_to_grain,

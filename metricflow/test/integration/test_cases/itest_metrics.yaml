@@ -909,20 +909,16 @@ integration_test:
   group_bys: ["metric_time"]
   check_query: |
     SELECT
-      a.ds AS metric_time
-      , b.every_two_days_bookers AS every_2_days_bookers_2_days_ago
-    FROM {{ mf_time_spine_source }} a
+      d.ds AS metric_time
+      , c.every_two_days_bookers AS every_2_days_bookers_2_days_ago
+    FROM {{ mf_time_spine_source }} d
     INNER JOIN (
       SELECT
-        d.ds
-        , COUNT(DISTINCT guest_id) AS every_two_days_bookers
-      FROM {{ mf_time_spine_source }} d
-      INNER JOIN (
-        SELECT
-          ds
-          , guest_id
-        FROM {{ source_schema }}.fct_bookings
-      ) c ON d.ds <= c.ds AND d.ds >= {{ render_date_sub("c", "ds", 2, TimeGranularity.DAY) }}
-      GROUP BY d.ds
-    ) b
-    ON {{ render_date_sub("a", "ds", 5, TimeGranularity.DAY) }} = b.ds
+        a.ds AS metric_time
+        , COUNT(DISTINCT b.guest_id) AS every_two_days_bookers
+      FROM {{ mf_time_spine_source }} a
+      INNER JOIN {{ source_schema }}.fct_bookings b
+        ON (b.ds <= a.ds) AND (b.ds > {{ render_date_sub("a", "ds", 2, TimeGranularity.DAY) }})
+      GROUP BY metric_time
+    ) c
+    ON {{ render_date_sub("d", "ds", 2, TimeGranularity.DAY) }} = c.metric_time
