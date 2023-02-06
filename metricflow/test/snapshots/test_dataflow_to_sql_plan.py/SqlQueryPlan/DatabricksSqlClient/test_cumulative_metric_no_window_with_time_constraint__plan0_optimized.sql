@@ -1,35 +1,17 @@
--- Join Self Over Time Range
+-- Read Elements From Data Source 'revenue'
+-- Metric Time Dimension 'ds'
+-- Constrain Time Range to [2000-01-01T00:00:00, 2020-01-01T00:00:00]
 -- Pass Only Elements:
 --   ['txn_revenue', 'ds__month']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  subq_10.ds__month AS ds__month
-  , SUM(subq_10.txn_revenue) AS revenue_all_time
+  DATE_TRUNC('month', created_at) AS ds__month
+  , SUM(revenue) AS revenue_all_time
 FROM (
-  -- Date Spine
-  SELECT
-    ds AS metric_time
-  FROM ***************************.mf_time_spine subq_12
-  WHERE ds BETWEEN CAST('2020-01-01' AS TIMESTAMP) AND CAST('2020-01-01' AS TIMESTAMP)
-  GROUP BY
-    ds
-) subq_11
-INNER JOIN (
-  -- Read Elements From Data Source 'revenue'
-  -- Metric Time Dimension 'ds'
-  -- Constrain Time Range to [2000-01-01T00:00:00, 2020-01-01T00:00:00]
-  SELECT
-    DATE_TRUNC('month', created_at) AS ds__month
-    , created_at AS metric_time
-    , revenue AS txn_revenue
-  FROM (
-    -- User Defined SQL Query
-    SELECT * FROM ***************************.fct_revenue
-  ) revenue_src_10006
-  WHERE created_at BETWEEN CAST('2000-01-01' AS TIMESTAMP) AND CAST('2020-01-01' AS TIMESTAMP)
-) subq_10
-ON
-  (subq_10.metric_time <= subq_11.metric_time)
+  -- User Defined SQL Query
+  SELECT * FROM ***************************.fct_revenue
+) revenue_src_10006
+WHERE created_at BETWEEN CAST('2000-01-01' AS TIMESTAMP) AND CAST('2020-01-01' AS TIMESTAMP)
 GROUP BY
-  subq_10.ds__month
+  DATE_TRUNC('month', created_at)
