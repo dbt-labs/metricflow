@@ -756,7 +756,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 break
 
         time_range_node: Optional[JoinOverTimeRangeNode[SqlDataSetT]] = None
-        if cumulative:
+        if cumulative and metric_time_dimension_spec:
             time_range_node = JoinOverTimeRangeNode(
                 parent_node=measure_recipe.measure_node,
                 window=cumulative_window,
