@@ -14,7 +14,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple, TypeVar, Generic, Any
 
-from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
+from dbt_semantic_interfaces.objects.metric import MetricTimeWindow
 from dbt_semantic_interfaces.references import (
     DimensionReference,
     MeasureReference,
@@ -23,14 +23,15 @@ from dbt_semantic_interfaces.references import (
     IdentifierReference,
 )
 from metricflow.aggregation_properties import AggregationState
+from metricflow.aggregation_properties import AggregationType
+from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.column_assoc import ColumnAssociation
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dataclass_serialization import SerializableDataclass
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
-from metricflow.object_utils import assert_exactly_one_arg_set, hash_items
+from metricflow.object_utils import hash_items
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.time.time_granularity import TimeGranularity
-from dbt_semantic_interfaces.objects.metric import MetricTimeWindow
 
 
 class ColumnAssociationResolver(ABC):
