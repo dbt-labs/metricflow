@@ -24,7 +24,7 @@ from metricflow.instances import (
     TimeDimensionInstance,
 )
 from metricflow.protocols.semantics import DataSourceSemanticsAccessor
-from metricflow.object_utils import assert_exactly_one_arg_set
+from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.specs import (
     MeasureSpec,
