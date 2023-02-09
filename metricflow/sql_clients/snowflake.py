@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
+import textwrap
 import threading
 import urllib.parse
 from collections import OrderedDict
@@ -258,15 +259,25 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
             extra_tags=extra_tags,
         )
 
-    def list_tables(self, schema_name: str) -> Sequence[str]:  # noqa: D
+    def list_tables(self, schema_name: str) -> Sequence[str]:
+        """List tables using 'information_schema' instead of SHOW TABLES to sidestep 10K row limit.
+
+        TODO: This and the previous implementation could have issues if Snowflake is configured with case-sensitivity.
+        """
         df = self.query(
-            f"SHOW TABLES IN {schema_name}",
+            textwrap.dedent(
+                """\
+                SELECT table_name FROM information_schema.tables
+                WHERE table_schema = :schema_name
+                """
+            ),
+            sql_bind_parameters=SqlBindParameters.create_from_dict({"schema_name": schema_name.upper()}),
         )
         if df.empty:
             return []
 
         # Lower casing table names to be similar to other SQL clients. TBD on the implications of this.
-        return [t.lower() for t in df["name"]]
+        return [t.lower() for t in df["table_name"]]
 
     def generate_health_check_tests(self, schema_name: str) -> List[Tuple[str, Any]]:  # type: ignore # noqa: D
         additional_tests = [
