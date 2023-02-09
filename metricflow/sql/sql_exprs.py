@@ -27,10 +27,11 @@ from metricflow.dag.id_generation import (
     SQL_EXPR_WINDOW_FUNCTION_ID_PREFIX,
 )
 from dbt_semantic_interfaces.objects.elements.measure import MeasureAggregationParameters
+from metricflow.enum_extension import assert_values_exhausted
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.visitor import Visitable, VisitorOutputT
 from metricflow.time.time_granularity import TimeGranularity
-from metricflow.object_utils import assert_values_exhausted, flatten_nested_sequence
+from metricflow.object_utils import flatten_nested_sequence
 
 
 class SqlExpressionNode(DagNode, Generic[VisitorOutputT], Visitable, ABC):

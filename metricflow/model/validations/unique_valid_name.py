@@ -9,9 +9,10 @@ from dbt_semantic_interfaces.objects.user_configured_model import UserConfigured
 from dbt_semantic_interfaces.references import (
     DataSourceElementReference,
     DataSourceReference,
-    ElementReference,
     MetricModelReference,
 )
+from dbt_semantic_interfaces.references import ElementReference
+from metricflow.enum_extension import assert_values_exhausted
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,
     DataSourceElementContext,
@@ -24,7 +25,6 @@ from metricflow.model.validations.validator_helpers import (
     ValidationIssue,
     validate_safely,
 )
-from metricflow.object_utils import assert_values_exhausted
 from metricflow.time.time_granularity import TimeGranularity
 
 

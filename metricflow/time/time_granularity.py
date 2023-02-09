@@ -5,7 +5,7 @@ from typing import Union, Any
 
 import pandas as pd
 
-from metricflow.object_utils import assert_values_exhausted, ExtendedEnum
+from metricflow.enum_extension import assert_values_exhausted, ExtendedEnum
 
 
 class TimeGranularity(ExtendedEnum):

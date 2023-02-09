@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from typing import List, Optional, Sequence
 
+from dbt_semantic_interfaces.objects.base import ModelWithMetadataParsing, HashableBaseModel
 from dbt_semantic_interfaces.objects.common import Metadata
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension
 from dbt_semantic_interfaces.objects.elements.identifier import Identifier
 from dbt_semantic_interfaces.objects.elements.measure import Measure
-from dbt_semantic_interfaces.objects.base import ModelWithMetadataParsing, HashableBaseModel
 from dbt_semantic_interfaces.references import DataSourceReference, LinkableElementReference, MeasureReference
-from metricflow.object_utils import ExtendedEnum
+from metricflow.enum_extension import ExtendedEnum
 
 
 class DataSourceOrigin(ExtendedEnum):
