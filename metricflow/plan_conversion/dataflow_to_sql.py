@@ -33,6 +33,7 @@ from metricflow.dataflow.dataflow_plan import (
     JoinToTimeSpineNode,
 )
 from metricflow.dataset.dataset import DataSet
+from metricflow.enum_extension import assert_values_exhausted
 from metricflow.instances import (
     InstanceSet,
     MetricInstance,
@@ -40,7 +41,6 @@ from metricflow.instances import (
 )
 from dbt_semantic_interfaces.objects.metric import MetricType
 from metricflow.model.semantic_model import SemanticModel
-from metricflow.object_utils import assert_values_exhausted
 from metricflow.plan_conversion.instance_converters import (
     AliasAggregatedMeasures,
     RemoveMeasures,

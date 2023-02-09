@@ -3,16 +3,17 @@ from __future__ import annotations
 from typing import List, Optional
 
 from dbt_semantic_interfaces.errors import ParsingException
-from dbt_semantic_interfaces.objects.common import Metadata
-from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
 from dbt_semantic_interfaces.objects.base import (
     HashableBaseModel,
     ModelWithMetadataParsing,
     PydanticCustomInputParser,
     PydanticParseableValueType,
 )
+from dbt_semantic_interfaces.objects.common import Metadata
+from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
 from dbt_semantic_interfaces.references import MeasureReference, MetricReference
-from metricflow.object_utils import ExtendedEnum, hash_items
+from metricflow.enum_extension import ExtendedEnum
+from metricflow.object_utils import hash_items
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.time.time_granularity import string_to_time_granularity
 

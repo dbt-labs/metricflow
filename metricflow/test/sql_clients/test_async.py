@@ -6,7 +6,7 @@ import time
 import pytest
 
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.object_utils import assert_values_exhausted
+from metricflow.enum_extension import assert_values_exhausted
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.protocols.sql_request import MF_EXTRA_TAGS_KEY, SqlJsonTag
