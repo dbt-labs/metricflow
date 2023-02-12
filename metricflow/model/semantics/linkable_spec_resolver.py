@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import more_itertools
 import time
 from collections import defaultdict
 from dataclasses import dataclass
@@ -13,7 +14,7 @@ from dbt_semantic_interfaces.objects.user_configured_model import UserConfigured
 from dbt_semantic_interfaces.references import DataSourceReference, MeasureReference, MetricReference
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.data_source_join_evaluator import DataSourceJoinEvaluator
-from metricflow.object_utils import pformat_big_objects, flatten_nested_sequence
+from metricflow.object_utils import pformat_big_objects
 from metricflow.protocols.semantics import DataSourceSemanticsAccessor
 from metricflow.specs import (
     DEFAULT_TIME_GRANULARITY,
@@ -118,10 +119,10 @@ class LinkableElementSet:
         linkable_identifiers = []
 
         ambiguous_linkable_dimensions = list(
-            flatten_nested_sequence([x.ambiguous_linkable_dimensions for x in linkable_element_sets])
+            tuple(more_itertools.flatten([x.ambiguous_linkable_dimensions for x in linkable_element_sets]))
         )
         ambiguous_linkable_identifiers = list(
-            flatten_nested_sequence([x.ambiguous_linkable_identifiers for x in linkable_element_sets])
+            tuple(more_itertools.flatten([x.ambiguous_linkable_identifiers for x in linkable_element_sets]))
         )
 
         for _, grouped_linkable_dimensions in key_to_linkable_dimension.items():

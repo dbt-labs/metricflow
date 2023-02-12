@@ -1,15 +1,14 @@
 from __future__ import annotations
-import itertools
 import logging
 import pprint
 import textwrap
 from collections.abc import Mapping
 from dataclasses import is_dataclass, fields
-import datetime
 from hashlib import sha1
-from typing import Sequence, TypeVar, Tuple, Union
+from typing import Sequence
 
 from dbt_semantic_interfaces.objects.base import HashableBaseModel
+from metricflow.sql.sql_column_type import SqlColumnType
 
 logger = logging.getLogger(__name__)
 
@@ -111,24 +110,9 @@ def pformat_big_objects(*args, **kwargs) -> str:  # type: ignore
     return "\n".join(items)
 
 
-SequenceT = TypeVar("SequenceT")
-
-
-def flatten_nested_sequence(sequence_of_sequences: Sequence[Sequence[SequenceT]]) -> Tuple[SequenceT, ...]:
-    """Convert a nested sequence into a flattened tuple.
-
-    e.g. ((1,2), (3,4)) -> (1, 2, 3, 4)
-    """
-    return tuple(itertools.chain.from_iterable(sequence_of_sequences))
-
-
 def hash_items(items: Sequence[SqlColumnType]) -> str:
     """Produces a hash from a list of strings."""
     hash_builder = sha1()
     for item in items:
         hash_builder.update(str(item).encode("utf-8"))
     return hash_builder.hexdigest()
-
-
-# Supported SQL column types (not comprehensive).
-SqlColumnType = Union[str, int, float, datetime.datetime, datetime.date, bool]

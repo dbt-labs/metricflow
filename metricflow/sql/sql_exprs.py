@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import itertools
+import more_itertools
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
@@ -31,7 +32,6 @@ from metricflow.enum_extension import assert_values_exhausted
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.visitor import Visitable, VisitorOutputT
 from metricflow.time.time_granularity import TimeGranularity
-from metricflow.object_utils import flatten_nested_sequence
 
 
 class SqlExpressionNode(DagNode, Generic[VisitorOutputT], Visitable, ABC):
@@ -127,13 +127,13 @@ class SqlExpressionTreeLineage:
     def combine(lineages: Sequence[SqlExpressionTreeLineage]) -> SqlExpressionTreeLineage:
         """Combine multiple lineages into one lineage, without de-duping."""
         return SqlExpressionTreeLineage(
-            string_exprs=flatten_nested_sequence(tuple(x.string_exprs for x in lineages)),
-            function_exprs=flatten_nested_sequence(tuple(x.function_exprs for x in lineages)),
-            column_reference_exprs=flatten_nested_sequence(tuple(x.column_reference_exprs for x in lineages)),
-            column_alias_reference_exprs=flatten_nested_sequence(
-                tuple(x.column_alias_reference_exprs for x in lineages)
+            string_exprs=tuple(more_itertools.flatten(tuple(x.string_exprs for x in lineages))),
+            function_exprs=tuple(more_itertools.flatten(tuple(x.function_exprs for x in lineages))),
+            column_reference_exprs=tuple(more_itertools.flatten(tuple(x.column_reference_exprs for x in lineages))),
+            column_alias_reference_exprs=tuple(
+                more_itertools.flatten(tuple(x.column_alias_reference_exprs for x in lineages))
             ),
-            other_exprs=flatten_nested_sequence(tuple(x.other_exprs for x in lineages)),
+            other_exprs=tuple(more_itertools.flatten(tuple(x.other_exprs for x in lineages))),
         )
 
     @property
