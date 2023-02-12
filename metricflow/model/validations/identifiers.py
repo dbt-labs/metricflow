@@ -234,11 +234,13 @@ class IdentifierConsistencyRule(ModelValidationRule):
         # build collection of sub-identifier contexts, keyed by identifier name
         identifier_to_sub_identifier_contexts: DefaultDict[str, List[SubIdentifierContext]] = defaultdict(list)
         all_contexts: List[SubIdentifierContext] = list(
-            more_itertools.flatten(
-                [
-                    IdentifierConsistencyRule._get_sub_identifier_context(data_source)
-                    for data_source in model.data_sources
-                ]
+            tuple(
+                more_itertools.flatten(
+                    [
+                        IdentifierConsistencyRule._get_sub_identifier_context(data_source)
+                        for data_source in model.data_sources
+                    ]
+                )
             )
         )
         for context in all_contexts:

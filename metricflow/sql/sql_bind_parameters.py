@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Any, Optional, Tuple, Mapping
 
 from metricflow.dataclass_serialization import SerializableDataclass
-from metricflow.object_utils import SqlColumnType
+from metricflow.sql.sql_column_type import SqlColumnType
 from metricflow.assert_one_arg import assert_exactly_one_arg_set
 
 

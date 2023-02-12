@@ -1,3 +1,4 @@
+import more_itertools
 import pytest
 import copy
 
@@ -5,7 +6,6 @@ from metricflow.model.model_validator import ModelValidator
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.unique_valid_name import MetricFlowReservedKeywords, UniqueAndValidNameRule
-from metricflow.object_utils import flatten_nested_sequence
 from metricflow.test.test_utils import find_data_source_with
 
 
@@ -81,7 +81,7 @@ def test_duplicate_measure_name(simple_model__with_primary_transforms: UserConfi
 
     duplicated_measure = data_source_with_measures.measures[0]
     duplicated_measures_tuple = (data_source_with_measures.measures, (duplicated_measure,))
-    data_source_with_measures.measures = flatten_nested_sequence(duplicated_measures_tuple)
+    data_source_with_measures.measures = tuple(more_itertools.flatten(duplicated_measures_tuple))
 
     with pytest.raises(
         ModelValidationException,
@@ -98,7 +98,7 @@ def test_duplicate_dimension_name(simple_model__with_primary_transforms: UserCon
 
     duplicated_dimension = data_source_with_dimensions.dimensions[0]
     duplicated_dimensions_tuple = (data_source_with_dimensions.dimensions, (duplicated_dimension,))
-    data_source_with_dimensions.dimensions = flatten_nested_sequence(duplicated_dimensions_tuple)
+    data_source_with_dimensions.dimensions = tuple(more_itertools.flatten(duplicated_dimensions_tuple))
 
     with pytest.raises(
         ModelValidationException,
@@ -116,7 +116,7 @@ def test_duplicate_identifier_name(simple_model__with_primary_transforms: UserCo
 
     duplicated_identifier = data_source_with_identifiers.identifiers[0]
     duplicated_identifiers_tuple = (data_source_with_identifiers.identifiers, (duplicated_identifier,))
-    data_source_with_identifiers.identifiers = flatten_nested_sequence(duplicated_identifiers_tuple)
+    data_source_with_identifiers.identifiers = tuple(more_itertools.flatten(duplicated_identifiers_tuple))
 
     with pytest.raises(
         ModelValidationException,
