@@ -4,7 +4,7 @@ import yaml
 from yamllint import config, linter, rules
 from metricflow.model.parsing.dir_to_model import (
     METRIC_TYPE,
-    DATA_SOURCE_TYPE,
+    entity_TYPE,
     collect_yaml_config_file_paths,
 )
 
@@ -79,7 +79,7 @@ class ConfigLinter:  # noqa: D
         # desc is of the form f'duplication of key "{key}" in mapping'
         # the following split gives us ['duplication of key ', <key>, ' in mapping']
         key = problem.desc.split('"')[1]
-        if key in [DATA_SOURCE_TYPE, METRIC_TYPE]:
+        if key in [entity_TYPE, METRIC_TYPE]:
             problem.desc += f'. Key "{key}" is a top level object. If multiple top level objects are specified in the same file, they must be separated using "---"'
 
     def lint_file(self, file_path: str) -> List[ValidationIssue]:  # noqa: D

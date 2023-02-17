@@ -6,15 +6,15 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Tuple, Sequence, Dict, List, Optional, FrozenSet
 
-from metricflow.instances import DataSourceReference
-from metricflow.model.objects.data_source import DataSource
+from metricflow.instances import EntityReference
+from metricflow.model.objects.entity import Entity
 from metricflow.model.objects.elements.dimension import DimensionType, Dimension
 from metricflow.model.objects.elements.identifier import IdentifierType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
-from metricflow.model.semantics.data_source_join_evaluator import DataSourceJoinEvaluator
+from metricflow.model.semantics.entity_join_evaluator import EntityJoinEvaluator
 from metricflow.object_utils import pformat_big_objects, flatten_nested_sequence
-from metricflow.protocols.semantics import DataSourceSemanticsAccessor
+from metricflow.protocols.semantics import EntitySemanticsAccessor
 from metricflow.references import MeasureReference
 from metricflow.references import MetricReference
 from metricflow.specs import (
@@ -268,10 +268,10 @@ class LinkableElementSet:
 
 
 @dataclass(frozen=True)
-class DataSourceJoinPathElement:
+class EntityJoinPathElement:
     """Describes joining a data source by the given identifier."""
 
-    data_source: DataSource
+    entity: Entity
     join_on_identifier: str
 
 
@@ -304,29 +304,29 @@ def _generate_linkable_time_dimensions(
 
 
 @dataclass(frozen=True)
-class DataSourceJoinPath:
+class EntityJoinPath:
     """Describes a series of joins between the measure data source, and other data sources by identifier.
 
     For example:
 
     (measure_source JOIN dimension_source0 ON identifier A) JOIN dimension_source1 ON identifier B
 
-    would be represented by 2 path elements [(data_source0, A), (dimension_source1, B)]
+    would be represented by 2 path elements [(entity0, A), (dimension_source1, B)]
     """
 
-    path_elements: Tuple[DataSourceJoinPathElement, ...]
+    path_elements: Tuple[EntityJoinPathElement, ...]
 
     def create_linkable_element_set(self, with_properties: FrozenSet[LinkableElementProperties]) -> LinkableElementSet:
         """Given the current path, generate the respective linkable elements from the last data source in the path."""
         identifier_links = tuple(x.join_on_identifier for x in self.path_elements)
 
         assert len(self.path_elements) > 0
-        data_source = self.path_elements[-1].data_source
+        entity = self.path_elements[-1].entity
 
         linkable_dimensions = []
         linkable_identifiers = []
 
-        for dimension in data_source.dimensions:
+        for dimension in entity.dimensions:
             dimension_type = dimension.type
             if dimension_type == DimensionType.CATEGORICAL:
                 linkable_dimensions.append(
@@ -347,7 +347,7 @@ class DataSourceJoinPath:
             else:
                 raise RuntimeError(f"Unhandled type: {dimension_type}")
 
-        for identifier in data_source.identifiers:
+        for identifier in entity.identifiers:
             # Avoid creating "booking_id__booking_id"
             if identifier.reference.element_name != identifier_links[-1]:
                 linkable_identifiers.append(
@@ -366,10 +366,10 @@ class DataSourceJoinPath:
         )
 
     @property
-    def last_data_source(self) -> DataSource:
+    def last_entity(self) -> Entity:
         """The last data source that would be joined in this path."""
         assert len(self.path_elements) > 0
-        return self.path_elements[-1].data_source
+        return self.path_elements[-1].entity
 
 
 class ValidLinkableSpecResolver:
@@ -381,31 +381,31 @@ class ValidLinkableSpecResolver:
     def __init__(
         self,
         user_configured_model: UserConfiguredModel,
-        data_source_semantics: DataSourceSemanticsAccessor,
+        entity_semantics: EntitySemanticsAccessor,
         max_identifier_links: int,
     ) -> None:
         """Constructor.
 
         Args:
             user_configured_model: the model to use.
-            data_source_semantics: used to look up identifiers for a data source.
+            entity_semantics: used to look up identifiers for a data source.
             max_identifier_links: the maximum number of joins to do when computing valid elements.
         """
         self._user_configured_model = user_configured_model
         # Sort data sources by name for consistency in building derived objects.
-        self._data_sources = sorted(self._user_configured_model.data_sources, key=lambda x: x.name)
-        self._join_evaluator = DataSourceJoinEvaluator(data_source_semantics)
+        self._entities = sorted(self._user_configured_model.entities, key=lambda x: x.name)
+        self._join_evaluator = EntityJoinEvaluator(entity_semantics)
 
         assert max_identifier_links >= 0
         self._max_identifier_links = max_identifier_links
 
         # Map measures / identifiers to data sources that contain them.
-        self._identifier_to_data_source: Dict[str, List[DataSource]] = defaultdict(list)
-        self._measure_to_data_source: Dict[str, List[DataSource]] = defaultdict(list)
+        self._identifier_to_entity: Dict[str, List[Entity]] = defaultdict(list)
+        self._measure_to_entity: Dict[str, List[Entity]] = defaultdict(list)
 
-        for data_source in self._data_sources:
-            for identifier in data_source.identifiers:
-                self._identifier_to_data_source[identifier.reference.element_name].append(data_source)
+        for entity in self._entities:
+            for identifier in entity.identifiers:
+                self._identifier_to_entity[identifier.reference.element_name].append(entity)
 
         self._metric_to_linkable_element_sets: Dict[str, List[LinkableElementSet]] = {}
 
@@ -418,27 +418,27 @@ class ValidLinkableSpecResolver:
             self._metric_to_linkable_element_sets[metric.name] = linkable_sets_for_measure
         logger.info(f"Building the [metric -> valid linkable element] index took: {time.time() - start_time:.2f}s")
 
-    def _get_data_source_for_measure(self, measure_reference: MeasureReference) -> DataSource:  # noqa: D
-        data_sources_where_measure_was_found = []
-        for data_source in self._data_sources:
-            if any([x.reference.element_name == measure_reference.element_name for x in data_source.measures]):
-                data_sources_where_measure_was_found.append(data_source)
+    def _get_entity_for_measure(self, measure_reference: MeasureReference) -> Entity:  # noqa: D
+        entities_where_measure_was_found = []
+        for entity in self._entities:
+            if any([x.reference.element_name == measure_reference.element_name for x in entity.measures]):
+                entities_where_measure_was_found.append(entity)
 
-        if len(data_sources_where_measure_was_found) == 0:
+        if len(entities_where_measure_was_found) == 0:
             raise ValueError(f"No data sources were found with {measure_reference} in the model")
-        elif len(data_sources_where_measure_was_found) > 1:
+        elif len(entities_where_measure_was_found) > 1:
             raise ValueError(
                 f"Measure {measure_reference} was found in multiple data sources:\n"
-                f"{pformat_big_objects(data_sources_where_measure_was_found)}"
+                f"{pformat_big_objects(entities_where_measure_was_found)}"
             )
-        return data_sources_where_measure_was_found[0]
+        return entities_where_measure_was_found[0]
 
-    def _get_local_set(self, data_source: DataSource) -> LinkableElementSet:
+    def _get_local_set(self, entity: Entity) -> LinkableElementSet:
         """Gets the local elements for a given data source."""
         linkable_dimensions = []
         linkable_identifiers = []
 
-        for dimension in data_source.dimensions:
+        for dimension in entity.dimensions:
             dimension_type = dimension.type
             if dimension_type == DimensionType.CATEGORICAL:
                 linkable_dimensions.append(
@@ -460,7 +460,7 @@ class ValidLinkableSpecResolver:
                 raise RuntimeError(f"Unhandled type: {dimension_type}")
 
         additional_linkable_dimensions = []
-        for identifier in data_source.identifiers:
+        for identifier in entity.identifiers:
             linkable_identifiers.append(
                 LinkableIdentifier(
                     element_name=identifier.reference.element_name,
@@ -490,45 +490,45 @@ class ValidLinkableSpecResolver:
             ambiguous_linkable_identifiers=(),
         )
 
-    def _get_data_sources_with_joinable_identifier(
+    def _get_entities_with_joinable_identifier(
         self,
-        left_data_source_reference: DataSourceReference,
+        left_entity_reference: EntityReference,
         identifier_reference: IdentifierReference,
-    ) -> Sequence[DataSource]:
+    ) -> Sequence[Entity]:
         # May switch to non-cached implementation.
-        data_sources = self._identifier_to_data_source[identifier_reference.element_name]
-        valid_data_sources = []
-        for data_source in data_sources:
-            if self._join_evaluator.is_valid_data_source_join(
-                left_data_source_reference=left_data_source_reference,
-                right_data_source_reference=data_source.reference,
+        entities = self._identifier_to_entity[identifier_reference.element_name]
+        valid_entities = []
+        for entity in entities:
+            if self._join_evaluator.is_valid_entity_join(
+                left_entity_reference=left_entity_reference,
+                right_entity_reference=entity.reference,
                 on_identifier_reference=identifier_reference,
             ):
-                valid_data_sources.append(data_source)
-        return valid_data_sources
+                valid_entities.append(entity)
+        return valid_entities
 
     def _get_linkable_element_set_for_measure(self, measure_reference: MeasureReference) -> LinkableElementSet:
         """Get the valid linkable elements for the given measure."""
-        measure_data_source = self._get_data_source_for_measure(measure_reference)
+        measure_entity = self._get_entity_for_measure(measure_reference)
 
         # Create local elements
-        local_linkable_elements = self._get_local_set(measure_data_source)
+        local_linkable_elements = self._get_local_set(measure_entity)
         join_paths = []
 
         # Create 1-hop elements
-        for identifier in measure_data_source.identifiers:
-            data_sources = self._get_data_sources_with_joinable_identifier(
-                left_data_source_reference=measure_data_source.reference,
+        for identifier in measure_entity.identifiers:
+            entities = self._get_entities_with_joinable_identifier(
+                left_entity_reference=measure_entity.reference,
                 identifier_reference=identifier.reference,
             )
-            for data_source in data_sources:
-                if data_source.name == measure_data_source.name:
+            for entity in entities:
+                if entity.name == measure_entity.name:
                     continue
                 join_paths.append(
-                    DataSourceJoinPath(
+                    EntityJoinPath(
                         path_elements=(
-                            DataSourceJoinPathElement(
-                                data_source=data_source, join_on_identifier=identifier.reference.element_name
+                            EntityJoinPathElement(
+                                entity=entity, join_on_identifier=identifier.reference.element_name
                             ),
                         )
                     )
@@ -544,10 +544,10 @@ class ValidLinkableSpecResolver:
         # Create multi-hop elements. At each iteration, we generate the list of valid elements based on the current join
         # path, extend all paths to include the next valid data source, then repeat.
         for i in range(self._max_identifier_links - 1):
-            new_join_paths: List[DataSourceJoinPath] = []
+            new_join_paths: List[EntityJoinPath] = []
             for join_path in join_paths:
                 new_join_paths.extend(
-                    self._find_next_possible_paths(measure_data_source=measure_data_source, current_join_path=join_path)
+                    self._find_next_possible_paths(measure_entity=measure_entity, current_join_path=join_path)
                 )
 
             if len(new_join_paths) == 0:
@@ -587,33 +587,33 @@ class ValidLinkableSpecResolver:
         return LinkableElementSet.intersection(linkable_element_sets)
 
     def _find_next_possible_paths(
-        self, measure_data_source: DataSource, current_join_path: DataSourceJoinPath
-    ) -> Sequence[DataSourceJoinPath]:
+        self, measure_entity: Entity, current_join_path: EntityJoinPath
+    ) -> Sequence[EntityJoinPath]:
         """Generate the set of possible paths that are 1 data source join longer that the "current_join_path"."""
-        last_data_source_in_path = current_join_path.last_data_source
+        last_entity_in_path = current_join_path.last_entity
         new_join_paths = []
 
-        for identifier in last_data_source_in_path.identifiers:
+        for identifier in last_entity_in_path.identifiers:
             identifier_name = identifier.reference.element_name
 
             # Don't create cycles in the join path by joining on the same identifier.
             if identifier_name in set(x.join_on_identifier for x in current_join_path.path_elements):
                 continue
 
-            data_sources_that_can_be_joined = self._get_data_sources_with_joinable_identifier(
-                left_data_source_reference=last_data_source_in_path.reference,
+            entities_that_can_be_joined = self._get_entities_with_joinable_identifier(
+                left_entity_reference=last_entity_in_path.reference,
                 identifier_reference=identifier.reference,
             )
-            for data_source in data_sources_that_can_be_joined:
+            for entity in entities_that_can_be_joined:
                 # Don't create cycles in the join path by repeating a data source in the path.
-                if data_source.name == measure_data_source.name or any(
-                    tuple(x.data_source.name == data_source.name for x in current_join_path.path_elements)
+                if entity.name == measure_entity.name or any(
+                    tuple(x.entity.name == entity.name for x in current_join_path.path_elements)
                 ):
                     continue
 
-                new_join_path = DataSourceJoinPath(
+                new_join_path = EntityJoinPath(
                     path_elements=current_join_path.path_elements
-                    + (DataSourceJoinPathElement(data_source=data_source, join_on_identifier=identifier_name),)
+                    + (EntityJoinPathElement(entity=entity, join_on_identifier=identifier_name),)
                 )
                 new_join_paths.append(new_join_path)
 

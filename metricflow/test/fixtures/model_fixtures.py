@@ -10,10 +10,10 @@ import pytest
 
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, BaseOutput
-from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
+from metricflow.dataset.convert_entity import EntityToDataSetConverter
 from metricflow.model.model_transformer import ModelTransformer
 from metricflow.model.model_validator import ModelValidator
-from metricflow.model.objects.data_source import DataSource
+from metricflow.model.objects.entity import Entity
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.parsing.dir_to_model import (
     parse_directory_of_yaml_files_to_model,
@@ -21,7 +21,7 @@ from metricflow.model.parsing.dir_to_model import (
 )
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
-from metricflow.dataset.data_source_adapter import DataSourceDataSet
+from metricflow.dataset.entity_adapter import EntityDataSet
 from metricflow.test.fixtures.id_fixtures import IdNumberSpace, patch_id_generators_helper
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
@@ -33,20 +33,20 @@ logger = logging.getLogger(__name__)
 
 
 def _data_set_to_read_nodes(
-    data_sets: OrderedDict[str, DataSourceDataSet]
-) -> OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]]:
+    data_sets: OrderedDict[str, EntityDataSet]
+) -> OrderedDict[str, ReadSqlSourceNode[EntityDataSet]]:
     """Return a mapping from the name of the data source to the dataflow plan node that reads from it."""
-    return_dict: OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]] = OrderedDict()
-    for data_source_name, data_set in data_sets.items():
-        return_dict[data_source_name] = ReadSqlSourceNode[DataSourceDataSet](data_set)
-        logger.debug(f"For data source {data_source_name}, creating node_id {return_dict[data_source_name].node_id}")
+    return_dict: OrderedDict[str, ReadSqlSourceNode[EntityDataSet]] = OrderedDict()
+    for entity_name, data_set in data_sets.items():
+        return_dict[entity_name] = ReadSqlSourceNode[EntityDataSet](data_set)
+        logger.debug(f"For data source {entity_name}, creating node_id {return_dict[entity_name].node_id}")
 
     return return_dict
 
 
 def _data_set_to_source_nodes(
-    semantic_model: SemanticModel, data_sets: OrderedDict[str, DataSourceDataSet]
-) -> Sequence[BaseOutput[DataSourceDataSet]]:
+    semantic_model: SemanticModel, data_sets: OrderedDict[str, EntityDataSet]
+) -> Sequence[BaseOutput[EntityDataSet]]:
     source_node_builder = SourceNodeBuilder(semantic_model)
     return source_node_builder.create_from_data_sets(list(data_sets.values()))
 
@@ -73,19 +73,19 @@ def query_parser_from_yaml(
 class ConsistentIdObjectRepository:
     """Stores all objects that should have consistent IDs in tests."""
 
-    simple_model_data_sets: OrderedDict[str, DataSourceDataSet]
-    simple_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]]
-    simple_model_source_nodes: Sequence[BaseOutput[DataSourceDataSet]]
+    simple_model_data_sets: OrderedDict[str, EntityDataSet]
+    simple_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[EntityDataSet]]
+    simple_model_source_nodes: Sequence[BaseOutput[EntityDataSet]]
 
-    multihop_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]]
-    multihop_model_source_nodes: Sequence[BaseOutput[DataSourceDataSet]]
+    multihop_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[EntityDataSet]]
+    multihop_model_source_nodes: Sequence[BaseOutput[EntityDataSet]]
 
-    composite_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]]
-    composite_model_source_nodes: Sequence[BaseOutput[DataSourceDataSet]]
+    composite_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[EntityDataSet]]
+    composite_model_source_nodes: Sequence[BaseOutput[EntityDataSet]]
 
-    scd_model_data_sets: OrderedDict[str, DataSourceDataSet]
-    scd_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]]
-    scd_model_source_nodes: Sequence[BaseOutput[DataSourceDataSet]]
+    scd_model_data_sets: OrderedDict[str, EntityDataSet]
+    scd_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[EntityDataSet]]
+    scd_model_source_nodes: Sequence[BaseOutput[EntityDataSet]]
 
 
 @pytest.fixture(scope="session")
@@ -125,22 +125,22 @@ def consistent_id_object_repository(
         )
 
 
-def create_data_sets(multihop_semantic_model: SemanticModel) -> OrderedDict[str, DataSourceDataSet]:
-    """Convert the DataSources in the model to SqlDataSets.
+def create_data_sets(multihop_semantic_model: SemanticModel) -> OrderedDict[str, EntityDataSet]:
+    """Convert the Entitys in the model to SqlDataSets.
 
     Key is the name of the data source, value is the associated data set.
     """
     # Use ordered dict and sort by name to get consistency when running tests.
     data_sets = OrderedDict()
-    data_sources: List[DataSource] = multihop_semantic_model.user_configured_model.data_sources
-    data_sources.sort(key=lambda x: x.name)
+    entities: List[Entity] = multihop_semantic_model.user_configured_model.entities
+    entities.sort(key=lambda x: x.name)
 
-    converter = DataSourceToDataSetConverter(
+    converter = EntityToDataSetConverter(
         column_association_resolver=DefaultColumnAssociationResolver(multihop_semantic_model)
     )
 
-    for data_source in data_sources:
-        data_sets[data_source.name] = converter.create_sql_source_data_set(data_source)
+    for entity in entities:
+        data_sets[entity.name] = converter.create_sql_source_data_set(entity)
 
     return data_sets
 
@@ -217,7 +217,7 @@ def multi_hop_join_semantic_model(mf_test_session_state: MetricFlowTestSessionSt
         "bridge_table": f"{schema}.bridge_table",
     }
     model_build_result = parse_directory_of_yaml_files_to_model(
-        os.path.join(os.path.dirname(__file__), "model_yamls/multi_hop_join_model/partitioned_data_sources"),
+        os.path.join(os.path.dirname(__file__), "model_yamls/multi_hop_join_model/partitioned_entities"),
         template_mapping=template_mapping,
     )
     return SemanticModel(model_build_result.model)
@@ -236,7 +236,7 @@ def unpartitioned_multi_hop_join_semantic_model(  # noqa: D
         "bridge_table": f"{schema}.bridge_table",
     }
     model_build_result = parse_directory_of_yaml_files_to_model(
-        os.path.join(os.path.dirname(__file__), "model_yamls/multi_hop_join_model/unpartitioned_data_sources"),
+        os.path.join(os.path.dirname(__file__), "model_yamls/multi_hop_join_model/unpartitioned_entities"),
         template_mapping=template_mapping,
     )
     return SemanticModel(model_build_result.model)

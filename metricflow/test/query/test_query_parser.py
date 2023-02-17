@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 BOOKINGS_YAML = textwrap.dedent(
     """\
-    data_source:
+    entity:
       name: bookings_source
 
       sql_query: |
@@ -58,7 +58,7 @@ BOOKINGS_YAML = textwrap.dedent(
 
 REVENUE_YAML = textwrap.dedent(
     """\
-    data_source:
+    entity:
       name: revenue_source
       description: revenue
       owners:

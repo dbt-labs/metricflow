@@ -6,17 +6,17 @@ from typing import Optional, List, Tuple, Sequence
 from metricflow.aggregation_properties import AggregationState
 from metricflow.dag.id_generation import IdGeneratorRegistry
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.dataset.data_source_adapter import DataSourceDataSet
+from metricflow.dataset.entity_adapter import EntityDataSet
 from metricflow.instances import (
     MeasureInstance,
-    DataSourceElementReference,
+    EntityElementReference,
     DimensionInstance,
     TimeDimensionInstance,
     IdentifierInstance,
     InstanceSet,
-    DataSourceReference,
+    EntityReference,
 )
-from metricflow.model.objects.data_source import DataSource
+from metricflow.model.objects.entity import Entity
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType
 from metricflow.model.objects.elements.identifier import Identifier
 from metricflow.model.objects.elements.measure import Measure
@@ -57,7 +57,7 @@ class DimensionConversionResult:
     select_columns: Sequence[SqlSelectColumn]
 
 
-class DataSourceToDataSetConverter:
+class EntityToDataSetConverter:
     """Converts a data source in the model to a data set that can be used with the dataflow plan builder.
 
     Identifier links generally refer to the identifiers used to join the measure source to the dimension source. For
@@ -74,7 +74,7 @@ class DataSourceToDataSetConverter:
 
     def _create_dimension_instance(
         self,
-        data_source_name: str,
+        entity_name: str,
         dimension: Dimension,
         identifier_links: Tuple[IdentifierReference, ...],
     ) -> DimensionInstance:
@@ -89,8 +89,8 @@ class DataSourceToDataSetConverter:
             associated_columns=column_associations,
             spec=dimension_spec,
             defined_from=(
-                DataSourceElementReference(
-                    data_source_name=data_source_name,
+                EntityElementReference(
+                    entity_name=entity_name,
                     element_name=dimension.reference.element_name,
                 ),
             ),
@@ -98,7 +98,7 @@ class DataSourceToDataSetConverter:
 
     def _create_time_dimension_instance(
         self,
-        data_source_name: str,
+        entity_name: str,
         time_dimension: Dimension,
         identifier_links: Tuple[IdentifierReference, ...],
         time_granularity: TimeGranularity = DEFAULT_TIME_GRANULARITY,
@@ -116,8 +116,8 @@ class DataSourceToDataSetConverter:
             associated_columns=column_associations,
             spec=time_dimension_spec,
             defined_from=(
-                DataSourceElementReference(
-                    data_source_name=data_source_name,
+                EntityElementReference(
+                    entity_name=entity_name,
                     element_name=time_dimension.reference.element_name,
                 ),
             ),
@@ -125,7 +125,7 @@ class DataSourceToDataSetConverter:
 
     def _create_identifier_instance(
         self,
-        data_source_name: str,
+        entity_name: str,
         identifier: Identifier,
         identifier_links: Tuple[IdentifierReference, ...],
     ) -> IdentifierInstance:
@@ -140,8 +140,8 @@ class DataSourceToDataSetConverter:
             associated_columns=column_associations,
             spec=identifier_spec,
             defined_from=(
-                DataSourceElementReference(
-                    data_source_name=data_source_name,
+                EntityElementReference(
+                    entity_name=entity_name,
                     element_name=identifier.reference.element_name,
                 ),
             ),
@@ -153,7 +153,7 @@ class DataSourceToDataSetConverter:
     ) -> SqlExpressionNode:
         """Create an expression that can be used for reading the element from the data source's SQL."""
         if element_expr:
-            if DataSourceToDataSetConverter._SQL_IDENTIFIER_REGEX.match(element_expr) and element_expr.upper() not in (
+            if EntityToDataSetConverter._SQL_IDENTIFIER_REGEX.match(element_expr) and element_expr.upper() not in (
                 "TRUE",
                 "FALSE",
                 "NULL",
@@ -175,7 +175,7 @@ class DataSourceToDataSetConverter:
 
     def _convert_measures(
         self,
-        data_source_name: str,
+        entity_name: str,
         measures: Sequence[Measure],
         table_alias: str,
     ) -> Tuple[Sequence[MeasureInstance], Sequence[SqlSelectColumn]]:
@@ -188,8 +188,8 @@ class DataSourceToDataSetConverter:
                 associated_columns=measure_spec.column_associations(self._column_association_resolver),
                 spec=measure_spec,
                 defined_from=(
-                    DataSourceElementReference(
-                        data_source_name=data_source_name,
+                    EntityElementReference(
+                        entity_name=entity_name,
                         element_name=measure.reference.element_name,
                     ),
                 ),
@@ -198,7 +198,7 @@ class DataSourceToDataSetConverter:
             measure_instances.append(measure_instance)
             select_columns.append(
                 SqlSelectColumn(
-                    expr=DataSourceToDataSetConverter._make_element_sql_expr(
+                    expr=EntityToDataSetConverter._make_element_sql_expr(
                         table_alias=table_alias,
                         element_name=measure.reference.element_name,
                         element_expr=measure.expr,
@@ -211,7 +211,7 @@ class DataSourceToDataSetConverter:
 
     def _convert_dimensions(
         self,
-        data_source_name: str,
+        entity_name: str,
         dimensions: Sequence[Dimension],
         identifier_links: Tuple[IdentifierReference, ...],
         table_alias: str,
@@ -223,14 +223,14 @@ class DataSourceToDataSetConverter:
         for dimension in dimensions or []:
             if dimension.type == DimensionType.CATEGORICAL:
                 dimension_instance = self._create_dimension_instance(
-                    data_source_name=data_source_name,
+                    entity_name=entity_name,
                     dimension=dimension,
                     identifier_links=identifier_links,
                 )
                 dimension_instances.append(dimension_instance)
                 select_columns.append(
                     SqlSelectColumn(
-                        expr=DataSourceToDataSetConverter._make_element_sql_expr(
+                        expr=EntityToDataSetConverter._make_element_sql_expr(
                             table_alias=table_alias,
                             element_name=dimension.reference.element_name,
                             element_expr=dimension.expr,
@@ -245,7 +245,7 @@ class DataSourceToDataSetConverter:
                     defined_time_granularity = dimension.type_params.time_granularity
 
                 time_dimension_instance = self._create_time_dimension_instance(
-                    data_source_name=data_source_name,
+                    entity_name=entity_name,
                     time_dimension=dimension,
                     identifier_links=identifier_links,
                     time_granularity=defined_time_granularity,
@@ -253,7 +253,7 @@ class DataSourceToDataSetConverter:
                 time_dimension_instances.append(time_dimension_instance)
                 select_columns.append(
                     SqlSelectColumn(
-                        expr=DataSourceToDataSetConverter._make_element_sql_expr(
+                        expr=EntityToDataSetConverter._make_element_sql_expr(
                             table_alias=table_alias,
                             element_name=dimension.reference.element_name,
                             element_expr=dimension.expr,
@@ -266,7 +266,7 @@ class DataSourceToDataSetConverter:
                 for time_granularity in TimeGranularity:
                     if time_granularity.to_int() > defined_time_granularity.to_int():
                         time_dimension_instance = self._create_time_dimension_instance(
-                            data_source_name=data_source_name,
+                            entity_name=entity_name,
                             time_dimension=dimension,
                             identifier_links=identifier_links,
                             time_granularity=time_granularity,
@@ -277,7 +277,7 @@ class DataSourceToDataSetConverter:
                             SqlSelectColumn(
                                 expr=SqlDateTruncExpression(
                                     time_granularity=time_granularity,
-                                    arg=DataSourceToDataSetConverter._make_element_sql_expr(
+                                    arg=EntityToDataSetConverter._make_element_sql_expr(
                                         table_alias=table_alias,
                                         element_name=dimension.reference.element_name,
                                         element_expr=dimension.expr,
@@ -297,7 +297,7 @@ class DataSourceToDataSetConverter:
 
     def _create_identifier_instances(
         self,
-        data_source_name: str,
+        entity_name: str,
         identifiers: Sequence[Identifier],
         identifier_links: Tuple[IdentifierReference, ...],
         table_alias: str,
@@ -311,7 +311,7 @@ class DataSourceToDataSetConverter:
                 continue
 
             identifier_instance = self._create_identifier_instance(
-                data_source_name=data_source_name,
+                entity_name=entity_name,
                 identifier=identifier,
                 identifier_links=identifier_links,
             )
@@ -331,7 +331,7 @@ class DataSourceToDataSetConverter:
 
                     select_columns.append(
                         SqlSelectColumn(
-                            expr=DataSourceToDataSetConverter._make_element_sql_expr(
+                            expr=EntityToDataSetConverter._make_element_sql_expr(
                                 table_alias=table_alias,
                                 element_name=sub_id_name,
                                 element_expr=expr,
@@ -342,7 +342,7 @@ class DataSourceToDataSetConverter:
             else:
                 select_columns.append(
                     SqlSelectColumn(
-                        expr=DataSourceToDataSetConverter._make_element_sql_expr(
+                        expr=EntityToDataSetConverter._make_element_sql_expr(
                             table_alias=table_alias,
                             element_name=identifier.reference.element_name,
                             element_expr=identifier.expr,
@@ -352,7 +352,7 @@ class DataSourceToDataSetConverter:
                 )
         return identifier_instances, select_columns
 
-    def create_sql_source_data_set(self, data_source: DataSource) -> DataSourceDataSet:
+    def create_sql_source_data_set(self, entity: Entity) -> EntityDataSet:
         """Create an SQL source data set from a data source in the model."""
 
         # Gather all instances and columns from all data sources.
@@ -362,13 +362,13 @@ class DataSourceToDataSetConverter:
         all_identifier_instances: List[IdentifierInstance] = []
 
         all_select_columns: List[SqlSelectColumn] = []
-        from_source_alias = IdGeneratorRegistry.for_class(self.__class__).create_id(f"{data_source.name}_src")
+        from_source_alias = IdGeneratorRegistry.for_class(self.__class__).create_id(f"{entity.name}_src")
 
         # Handle measures
-        if len(data_source.measures) > 0:
+        if len(entity.measures) > 0:
             measure_instances, select_columns = self._convert_measures(
-                data_source_name=data_source.name,
-                measures=data_source.measures,
+                entity_name=entity.name,
+                measures=entity.measures,
                 table_alias=from_source_alias,
             )
             all_measure_instances.extend(measure_instances)
@@ -379,15 +379,15 @@ class DataSourceToDataSetConverter:
         # the dimensions "country" and "user_id__country" both mean the same thing. To make matching easier, create both
         # instances in the instance set. We'll create a different instance for each "possible_identifier_links".
         possible_identifier_links: List[Tuple[IdentifierReference, ...]] = [()]
-        for identifier in data_source.identifiers:
+        for identifier in entity.identifiers:
             if identifier.is_linkable_identifier_type:
                 possible_identifier_links.append((identifier.reference,))
 
         # Handle dimensions
         conversion_results = [
             self._convert_dimensions(
-                data_source_name=data_source.name,
-                dimensions=data_source.dimensions,
+                entity_name=entity.name,
+                dimensions=entity.dimensions,
                 identifier_links=identifier_links,
                 table_alias=from_source_alias,
             )
@@ -421,8 +421,8 @@ class DataSourceToDataSetConverter:
         # Handle identifiers
         for identifier_links in possible_identifier_links:
             identifier_instances, select_columns = self._create_identifier_instances(
-                data_source_name=data_source.name,
-                identifiers=data_source.identifiers,
+                entity_name=entity.name,
+                identifiers=entity.identifiers,
                 identifier_links=identifier_links,
                 table_alias=from_source_alias,
             )
@@ -431,15 +431,15 @@ class DataSourceToDataSetConverter:
 
         # Generate the "from" clause depending on whether it's an SQL query or an SQL table.
         from_source: Optional[SqlQueryPlanNode] = None
-        if data_source.sql_table:
-            from_source = SqlTableFromClauseNode(sql_table=SqlTable.from_string(data_source.sql_table))
-        elif data_source.sql_query:
-            from_source = SqlSelectQueryFromClauseNode(select_query=data_source.sql_query)
+        if entity.sql_table:
+            from_source = SqlTableFromClauseNode(sql_table=SqlTable.from_string(entity.sql_table))
+        elif entity.sql_query:
+            from_source = SqlSelectQueryFromClauseNode(select_query=entity.sql_query)
         else:
-            raise RuntimeError(f"Data source does not have sql_table or sql_query set: {data_source}")
+            raise RuntimeError(f"Data source does not have sql_table or sql_query set: {entity}")
 
         select_statement_node = SqlSelectStatementNode(
-            description=f"Read Elements From Data Source '{data_source.name}'",
+            description=f"Read Elements From Data Source '{entity.name}'",
             select_columns=tuple(all_select_columns),
             from_source=from_source,
             from_source_alias=from_source_alias,
@@ -449,8 +449,8 @@ class DataSourceToDataSetConverter:
             order_bys=(),
         )
 
-        return DataSourceDataSet(
-            data_source_reference=DataSourceReference(data_source_name=data_source.name),
+        return EntityDataSet(
+            entity_reference=EntityReference(entity_name=entity.name),
             instance_set=InstanceSet(
                 measure_instances=tuple(all_measure_instances),
                 dimension_instances=tuple(all_dimension_instances),

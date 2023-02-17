@@ -15,8 +15,8 @@ class CompositeIdentifierExpressionRule(ModelTransformRule):
 
     @staticmethod
     def transform_model(model: UserConfiguredModel) -> UserConfiguredModel:  # noqa: D
-        for data_source in model.data_sources:
-            for identifier in data_source.identifiers:
+        for entity in model.entities:
+            for identifier in entity.identifiers:
                 if identifier.identifiers is None or len(identifier.identifiers) == 0:
                     continue
 
@@ -24,7 +24,7 @@ class CompositeIdentifierExpressionRule(ModelTransformRule):
                     if sub_identifier.name or sub_identifier.expr:
                         continue
 
-                    for identifier in data_source.identifiers:
+                    for identifier in entity.identifiers:
                         if sub_identifier.ref == identifier.name:
                             sub_identifier.ref = None
                             sub_identifier.name = identifier.name

@@ -72,8 +72,8 @@ class DefaultColumnAssociationResolver(ColumnAssociationResolver):
 
     def resolve_identifier_spec(self, identifier_spec: IdentifierSpec) -> Tuple[ColumnAssociation, ...]:  # noqa: D
         sub_id_references = []
-        for data_source in self._semantic_model.user_configured_model.data_sources:
-            for identifier in data_source.identifiers:
+        for entity in self._semantic_model.user_configured_model.entities:
+            for identifier in entity.identifiers:
                 if identifier.reference.element_name == identifier_spec.element_name:
                     sub_id_references = [sub_id.reference for sub_id in identifier.identifiers]
                     break

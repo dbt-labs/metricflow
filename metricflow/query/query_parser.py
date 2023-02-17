@@ -9,7 +9,7 @@ from typing import List, Optional, Tuple, Dict, Sequence
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import BaseOutput
-from metricflow.dataset.data_source_adapter import DataSourceDataSet
+from metricflow.dataset.entity_adapter import EntityDataSet
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.model.objects.constraints.where import WhereClauseConstraint
@@ -72,20 +72,20 @@ class MetricFlowQueryParser:
     def __init__(  # noqa: D
         self,
         model: SemanticModel,
-        source_nodes: Sequence[BaseOutput[DataSourceDataSet]],
-        node_output_resolver: DataflowPlanNodeOutputDataSetResolver[DataSourceDataSet],
+        source_nodes: Sequence[BaseOutput[EntityDataSet]],
+        node_output_resolver: DataflowPlanNodeOutputDataSetResolver[EntityDataSet],
     ) -> None:
         self._model = model
         self._metric_semantics = model.metric_semantics
-        self._data_source_semantics = model.data_source_semantics
+        self._entity_semantics = model.entity_semantics
 
         # Set up containers for known element names
-        self._known_identifier_element_references = self._data_source_semantics.get_identifier_references()
+        self._known_identifier_element_references = self._entity_semantics.get_identifier_references()
 
         self._known_time_dimension_element_references = [DataSet.metric_time_dimension_reference()]
         self._known_dimension_element_references = []
-        for dimension_reference in self._data_source_semantics.get_dimension_references():
-            dimension = self._data_source_semantics.get_dimension(dimension_reference)
+        for dimension_reference in self._entity_semantics.get_dimension_references():
+            dimension = self._entity_semantics.get_dimension(dimension_reference)
             if dimension.type == DimensionType.CATEGORICAL:
                 self._known_dimension_element_references.append(dimension_reference)
             elif dimension.type == DimensionType.TIME:
@@ -231,7 +231,7 @@ class MetricFlowQueryParser:
             if metric.constraint:
                 # add constraint to MetricSpec
                 metric_where_constraint = WhereConstraintConverter.convert_to_spec_where_constraint(
-                    self._data_source_semantics, metric.constraint
+                    self._entity_semantics, metric.constraint
                 )
             # TODO: Directly initializing Spec object instead of using a factory method since
             #       importing WhereConstraintConverter is a problem in specs.py
@@ -403,7 +403,7 @@ class MetricFlowQueryParser:
         spec_where_constraint: Optional[SpecWhereClauseConstraint] = None
         if parsed_where_constraint:
             spec_where_constraint = WhereConstraintConverter.convert_to_spec_where_constraint(
-                data_source_semantics=self._data_source_semantics,
+                entity_semantics=self._entity_semantics,
                 where_constraint=parsed_where_constraint,
             )
             where_time_specs = spec_where_constraint.linkable_spec_set.time_dimension_specs

@@ -4,8 +4,8 @@ import pytest
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, FilterElementsNode, MetricTimeDimensionTransformNode
-from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
-from metricflow.instances import DataSourceReference
+from metricflow.dataset.convert_entity import EntityToDataSetConverter
+from metricflow.instances import EntityReference
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.object_utils import pformat_big_objects
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
@@ -28,14 +28,14 @@ def test_view_sql_generated_at_a_node(
     time_spine_source: TimeSpineSource,
 ) -> None:
     """Example that shows how to view generated SQL for nodes in a dataflow plan."""
-    bookings_data_source = simple_semantic_model.data_source_semantics.get_by_reference(
-        DataSourceReference(data_source_name="bookings_source")
+    bookings_entity = simple_semantic_model.entity_semantics.get_by_reference(
+        EntityReference(entity_name="bookings_source")
     )
-    assert bookings_data_source
+    assert bookings_entity
     column_association_resolver = DefaultColumnAssociationResolver(
         semantic_model=simple_semantic_model,
     )
-    to_data_set_converter = DataSourceToDataSetConverter(column_association_resolver)
+    to_data_set_converter = EntityToDataSetConverter(column_association_resolver)
 
     to_sql_plan_converter = DataflowToSqlQueryPlanConverter[SqlDataSet](
         column_association_resolver=DefaultColumnAssociationResolver(simple_semantic_model),
@@ -50,7 +50,7 @@ def test_view_sql_generated_at_a_node(
     )
 
     # Show SQL and spec set at a source node.
-    bookings_source_data_set = to_data_set_converter.create_sql_source_data_set(bookings_data_source)
+    bookings_source_data_set = to_data_set_converter.create_sql_source_data_set(bookings_entity)
     read_source_node = ReadSqlSourceNode[SqlDataSet](bookings_source_data_set)
     sql_plan_at_read_node = to_sql_plan_converter.convert_to_sql_query_plan(
         sql_engine_attributes=sql_client.sql_engine_attributes,

@@ -17,7 +17,7 @@ def test_no_validity_dims(
     dataset = consistent_id_object_repository.scd_model_data_sets["bookings_source"]
 
     validity_window_join_description = CreateValidityWindowJoinDescription(
-        data_source_semantics=scd_semantic_model.data_source_semantics
+        entity_semantics=scd_semantic_model.entity_semantics
     ).transform(instance_set=dataset.instance_set)
 
     assert validity_window_join_description is None, (
@@ -44,7 +44,7 @@ def test_validity_window_conversion(
     )
 
     validity_window_join_description = CreateValidityWindowJoinDescription(
-        data_source_semantics=scd_semantic_model.data_source_semantics
+        entity_semantics=scd_semantic_model.entity_semantics
     ).transform(instance_set=dataset.instance_set)
 
     assert (
@@ -63,6 +63,6 @@ def test_multiple_validity_windows(
     second_dataset = consistent_id_object_repository.scd_model_data_sets["primary_accounts"]
     merged_instance_set = InstanceSet.merge([first_dataset.instance_set, second_dataset.instance_set])
     with pytest.raises(AssertionError, match="Found more than 1 set of validity window specs"):
-        CreateValidityWindowJoinDescription(data_source_semantics=scd_semantic_model.data_source_semantics).transform(
+        CreateValidityWindowJoinDescription(entity_semantics=scd_semantic_model.entity_semantics).transform(
             merged_instance_set
         )

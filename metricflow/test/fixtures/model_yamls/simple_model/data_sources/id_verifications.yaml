@@ -1,5 +1,5 @@
 ---
-data_source:
+entity:
   name: id_verifications
   description: id_verifications
   owners:

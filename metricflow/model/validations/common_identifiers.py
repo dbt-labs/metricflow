@@ -1,12 +1,12 @@
 from typing import Dict, List, Set
-from metricflow.instances import DataSourceElementReference
+from metricflow.instances import EntityElementReference
 
-from metricflow.model.objects.data_source import DataSource
+from metricflow.model.objects.entity import Entity
 from metricflow.model.objects.elements.identifier import Identifier
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
-    DataSourceElementContext,
-    DataSourceElementType,
+    EntityElementContext,
+    EntityElementType,
     FileContext,
     ModelValidationRule,
     ValidationWarning,
@@ -20,42 +20,42 @@ class CommonIdentifiersRule(ModelValidationRule):
     """Checks that identifiers exist on more than one data source"""
 
     @staticmethod
-    def _map_data_source_identifiers(data_sources: List[DataSource]) -> Dict[IdentifierReference, Set[str]]:
-        """Generate mapping of identifier names to the set of data_sources where it is defined"""
-        identifiers_to_data_sources: Dict[IdentifierReference, Set[str]] = {}
-        for data_source in data_sources or []:
-            for identifier in data_source.identifiers or []:
-                if identifier.reference in identifiers_to_data_sources:
-                    identifiers_to_data_sources[identifier.reference].add(data_source.name)
+    def _map_entity_identifiers(entities: List[Entity]) -> Dict[IdentifierReference, Set[str]]:
+        """Generate mapping of identifier names to the set of entities where it is defined"""
+        identifiers_to_entities: Dict[IdentifierReference, Set[str]] = {}
+        for entity in entities or []:
+            for identifier in entity.identifiers or []:
+                if identifier.reference in identifiers_to_entities:
+                    identifiers_to_entities[identifier.reference].add(entity.name)
                 else:
-                    identifiers_to_data_sources[identifier.reference] = {data_source.name}
-        return identifiers_to_data_sources
+                    identifiers_to_entities[identifier.reference] = {entity.name}
+        return identifiers_to_entities
 
     @staticmethod
     @validate_safely(whats_being_done="checking identifier exists on more than one data source")
     def _check_identifier(
         identifier: Identifier,
-        data_source: DataSource,
-        identifiers_to_data_sources: Dict[IdentifierReference, Set[str]],
+        entity: Entity,
+        identifiers_to_entities: Dict[IdentifierReference, Set[str]],
     ) -> List[ValidationIssueType]:
         issues: List[ValidationIssueType] = []
         # If the identifier is the dict and if the set of data sources minus this data source is empty,
         # then we warn the user that their identifier will be unused in joins
         if (
-            identifier.reference in identifiers_to_data_sources
-            and len(identifiers_to_data_sources[identifier.reference].difference({data_source.name})) == 0
+            identifier.reference in identifiers_to_entities
+            and len(identifiers_to_entities[identifier.reference].difference({entity.name})) == 0
         ):
             issues.append(
                 ValidationWarning(
-                    context=DataSourceElementContext(
-                        file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                        data_source_element=DataSourceElementReference(
-                            data_source_name=data_source.name, element_name=identifier.name
+                    context=EntityElementContext(
+                        file_context=FileContext.from_metadata(metadata=entity.metadata),
+                        entity_element=EntityElementReference(
+                            entity_name=entity.name, element_name=identifier.name
                         ),
-                        element_type=DataSourceElementType.IDENTIFIER,
+                        element_type=EntityElementType.IDENTIFIER,
                     ),
                     message=f"Identifier `{identifier.reference.element_name}` "
-                    f"only found in one data source `{data_source.name}` "
+                    f"only found in one data source `{entity.name}` "
                     f"which means it will be unused in joins.",
                 )
             )
@@ -64,16 +64,16 @@ class CommonIdentifiersRule(ModelValidationRule):
     @staticmethod
     @validate_safely(whats_being_done="running model validation warning if identifiers are only one one data source")
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:
-        """Issues a warning for any identifier that is associated with only one data_source"""
+        """Issues a warning for any identifier that is associated with only one entity"""
         issues = []
 
-        identifiers_to_data_sources = CommonIdentifiersRule._map_data_source_identifiers(model.data_sources)
-        for data_source in model.data_sources or []:
-            for identifier in data_source.identifiers or []:
+        identifiers_to_entities = CommonIdentifiersRule._map_entity_identifiers(model.entities)
+        for entity in model.entities or []:
+            for identifier in entity.identifiers or []:
                 issues += CommonIdentifiersRule._check_identifier(
                     identifier=identifier,
-                    data_source=data_source,
-                    identifiers_to_data_sources=identifiers_to_data_sources,
+                    entity=entity,
+                    identifiers_to_entities=identifiers_to_entities,
                 )
 
         return issues

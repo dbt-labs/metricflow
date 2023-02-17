@@ -17,10 +17,10 @@
             <!--    'non_additive_dimension_spec': None}  -->
             <ReadSqlSourceNode>
                 <!-- description =                                                                           -->
-                <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                <!--   Read From EntityDataSet(EntityReference(entity_name='bookings_source'))  -->
                 <!-- node_id = rss_0 -->
                 <!-- data_set =                                                                    -->
-                <!--   DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                <!--   EntityDataSet(EntityReference(entity_name='bookings_source'))  -->
             </ReadSqlSourceNode>
         </FilterElementsNode>
     </WriteToResultDataframeNode>

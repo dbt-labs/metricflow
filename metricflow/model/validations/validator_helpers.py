@@ -11,8 +11,8 @@ from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
 from pydantic import BaseModel, Extra
 
 from metricflow.instances import (
-    DataSourceElementReference,
-    DataSourceReference,
+    EntityElementReference,
+    EntityReference,
     MetricModelReference,
 )
 from metricflow.model.objects.base import FrozenBaseModel
@@ -50,7 +50,7 @@ ISSUE_COLOR_MAP = {
 }
 
 
-class DataSourceElementType(Enum):
+class EntityElementType(Enum):
     """Maps data source element types to a readable string."""
 
     MEASURE = "measure"
@@ -102,34 +102,34 @@ class MetricContext(BaseModel):
         return f"with metric `{self.metric.metric_name}` {self.file_context.context_str()}"
 
 
-class DataSourceContext(BaseModel):
+class EntityContext(BaseModel):
     """The context class for validation issues involving data sources"""
 
     file_context: FileContext
-    data_source: DataSourceReference
+    entity: EntityReference
 
     def context_str(self) -> str:
         """Human readable stringified representation of the context"""
-        return f"with data source `{self.data_source.data_source_name}` {self.file_context.context_str()}"
+        return f"with data source `{self.entity.entity_name}` {self.file_context.context_str()}"
 
 
-class DataSourceElementContext(BaseModel):
+class EntityElementContext(BaseModel):
     """The context class for validation issues involving dimensions"""
 
     file_context: FileContext
-    data_source_element: DataSourceElementReference
-    element_type: DataSourceElementType
+    entity_element: EntityElementReference
+    element_type: EntityElementType
 
     def context_str(self) -> str:
         """Human readable stringified representation of the context"""
-        return f"with {self.element_type.value} `{self.data_source_element.element_name}` in data source `{self.data_source_element.data_source_name}` {self.file_context.context_str()}"
+        return f"with {self.element_type.value} `{self.entity_element.element_name}` in data source `{self.entity_element.entity_name}` {self.file_context.context_str()}"
 
 
 ValidationContext = Union[
     FileContext,
     MetricContext,
-    DataSourceContext,
-    DataSourceElementContext,
+    EntityContext,
+    EntityElementContext,
 ]
 
 

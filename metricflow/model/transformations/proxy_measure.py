@@ -17,8 +17,8 @@ class CreateProxyMeasureRule(ModelTransformRule):
     @staticmethod
     def transform_model(model: UserConfiguredModel) -> UserConfiguredModel:
         """Creates measure proxy metrics for measures with `create_metric==True`"""
-        for data_source in model.data_sources:
-            for measure in data_source.measures:
+        for entity in model.entities:
+            for measure in entity.measures:
                 if not measure.create_metric:
                     continue
 

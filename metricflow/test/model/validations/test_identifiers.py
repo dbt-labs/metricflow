@@ -8,7 +8,7 @@ import pytest
 from metricflow.aggregation_properties import AggregationType
 from metricflow.model.model_validator import ModelValidator
 from metricflow.model.objects.common import YamlConfigFile
-from metricflow.model.objects.data_source import DataSource, Mutability, MutabilityType
+from metricflow.model.objects.entity import Entity, Mutability, MutabilityType
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from metricflow.model.objects.elements.identifier import IdentifierType, Identifier, CompositeSubIdentifier
 from metricflow.model.objects.elements.measure import Measure
@@ -19,38 +19,38 @@ from metricflow.model.validations.identifiers import (
     IdentifierConfigRule,
     IdentifierConsistencyRule,
     NaturalIdentifierConfigurationRule,
-    OnePrimaryIdentifierPerDataSourceRule,
+    OnePrimaryIdentifierPerEntityRule,
 )
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.object_utils import flatten_nested_sequence
 from metricflow.test.model.validations.helpers import (
-    data_source_with_guaranteed_meta,
+    entity_with_guaranteed_meta,
     metric_with_guaranteed_meta,
     base_model_file,
 )
-from metricflow.test.test_utils import find_data_source_with
+from metricflow.test.test_utils import find_entity_with
 from metricflow.time.time_granularity import TimeGranularity
 
 
-def test_data_source_cant_have_more_than_one_primary_identifier(
+def test_entity_cant_have_more_than_one_primary_identifier(
     simple_model__with_primary_transforms: UserConfiguredModel,
 ) -> None:  # noqa: D
     """Add an additional primary identifier to a data source and assert that it cannot have two"""
     model = copy.deepcopy(simple_model__with_primary_transforms)
-    func: Callable[[DataSource], bool] = lambda data_source: len(data_source.identifiers) > 1
+    func: Callable[[Entity], bool] = lambda entity: len(entity.identifiers) > 1
 
-    multiple_identifier_data_source, _ = find_data_source_with(model, func)
+    multiple_identifier_entity, _ = find_entity_with(model, func)
 
     identifier_references = set()
-    for identifier in multiple_identifier_data_source.identifiers:
+    for identifier in multiple_identifier_entity.identifiers:
         identifier.type = IdentifierType.PRIMARY
         identifier_references.add(identifier.reference)
 
-    build = ModelValidator([OnePrimaryIdentifierPerDataSourceRule()]).validate_model(model)
+    build = ModelValidator([OnePrimaryIdentifierPerEntityRule()]).validate_model(model)
 
     future_issue = (
         f"Data sources can have only one primary identifier. The data source"
-        f" `{multiple_identifier_data_source.name}` has {len(identifier_references)}"
+        f" `{multiple_identifier_entity.name}` has {len(identifier_references)}"
     )
 
     found_future_issue = False
@@ -73,8 +73,8 @@ def test_invalid_composite_identifiers() -> None:  # noqa:D
         model_validator = ModelValidator([IdentifierConfigRule()])
         model_validator.checked_validations(
             UserConfiguredModel(
-                data_sources=[
-                    data_source_with_guaranteed_meta(
+                entities=[
+                    entity_with_guaranteed_meta(
                         name="dim1",
                         sql_query=f"SELECT {dim_name}, {measure_name}, thorium_id FROM bar",
                         measures=[Measure(name=measure_name, agg=AggregationType.SUM)],
@@ -122,8 +122,8 @@ def test_composite_identifiers_nonexistent_ref() -> None:  # noqa:D
         model_validator = ModelValidator([IdentifierConfigRule()])
         model_validator.checked_validations(
             UserConfiguredModel(
-                data_sources=[
-                    data_source_with_guaranteed_meta(
+                entities=[
+                    entity_with_guaranteed_meta(
                         name="dim1",
                         sql_query=f"SELECT {dim_name}, {measure_name}, thorium_id FROM bar",
                         measures=[Measure(name=measure_name, agg=AggregationType.SUM)],
@@ -172,8 +172,8 @@ def test_composite_identifiers_ref_and_name() -> None:  # noqa:D
         model_validator = ModelValidator([IdentifierConfigRule()])
         model_validator.checked_validations(
             UserConfiguredModel(
-                data_sources=[
-                    data_source_with_guaranteed_meta(
+                entities=[
+                    entity_with_guaranteed_meta(
                         name="dim1",
                         sql_query=f"SELECT {dim_name}, {measure_name}, thorium_id FROM bar",
                         measures=[Measure(name=measure_name, agg=AggregationType.SUM)],
@@ -221,13 +221,13 @@ def test_mismatched_identifier(simple_model__with_primary_transforms: UserConfig
     """
     model = copy.deepcopy(simple_model__with_primary_transforms)
 
-    bookings_source, _ = find_data_source_with(
+    bookings_source, _ = find_entity_with(
         model=model,
-        function=lambda data_source: data_source.name == "bookings_source",
+        function=lambda entity: entity.name == "bookings_source",
     )
-    listings_latest, _ = find_data_source_with(
+    listings_latest, _ = find_entity_with(
         model=model,
-        function=lambda data_source: data_source.name == "listings_latest",
+        function=lambda entity: entity.name == "listings_latest",
     )
 
     identifier_bookings = Identifier(
@@ -258,7 +258,7 @@ def test_multiple_natural_identifiers() -> None:
     """Test validation enforcing that a single data source cannot have more than one natural identifier"""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        entity:
           name: too_many_natural_identifiers
           sql_table: some_schema.natural_identifier_table
           identifiers:
@@ -294,7 +294,7 @@ def test_natural_identifier_used_in_wrong_context() -> None:
     """Test validation enforcing that a single data source cannot have more than one natural identifier"""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        entity:
           name: random_natural_identifier
           sql_table: some_schema.random_natural_identifier_table
           identifiers:

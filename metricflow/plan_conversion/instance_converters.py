@@ -22,7 +22,7 @@ from metricflow.instances import (
     InstanceSetTransform,
     TimeDimensionInstance,
 )
-from metricflow.protocols.semantics import DataSourceSemanticsAccessor
+from metricflow.protocols.semantics import EntitySemanticsAccessor
 from metricflow.object_utils import assert_exactly_one_arg_set
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.specs import (
@@ -166,10 +166,10 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
         self,
         table_alias: str,
         column_resolver: ColumnAssociationResolver,
-        data_source_semantics: DataSourceSemanticsAccessor,
+        entity_semantics: EntitySemanticsAccessor,
         metric_input_measure_specs: Sequence[MetricInputMeasureSpec],
     ) -> None:
-        self._data_source_semantics = data_source_semantics
+        self._entity_semantics = entity_semantics
         self.metric_input_measure_specs = metric_input_measure_specs
         super().__init__(table_alias=table_alias, column_resolver=column_resolver)
 
@@ -204,7 +204,7 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
 
         # Create an expression that will aggregate the given measure.
         # Figure out the aggregation function for the measure.
-        measure = self._data_source_semantics.get_measure(measure_instance.spec.as_reference)
+        measure = self._entity_semantics.get_measure(measure_instance.spec.as_reference)
         aggregation_type = measure.agg
 
         expression_to_get_measure = SqlColumnReferenceExpression(
@@ -272,19 +272,19 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
     an SCD source, and extracting validity window information accordingly.
     """
 
-    def __init__(self, data_source_semantics: DataSourceSemanticsAccessor) -> None:
-        """Initializer. The DataSourceSemanticsAccessor is needed for getting the original model definition."""
-        self._data_source_semantics = data_source_semantics
+    def __init__(self, entity_semantics: EntitySemanticsAccessor) -> None:
+        """Initializer. The EntitySemanticsAccessor is needed for getting the original model definition."""
+        self._entity_semantics = entity_semantics
 
-    def _get_validity_window_dimensions_for_data_source(
-        self, data_source_name: str
+    def _get_validity_window_dimensions_for_entity(
+        self, entity_name: str
     ) -> Optional[Tuple[_DimensionValidityParams, _DimensionValidityParams]]:
         """Returns a 2-tuple (start, end) of validity window dimensions info, if any exist in the data source"""
-        data_source = self._data_source_semantics.get(data_source_name=data_source_name)
-        assert data_source, f"Could not find data source with name {data_source_name} after data set conversion!"
+        entity = self._entity_semantics.get(entity_name=entity_name)
+        assert entity, f"Could not find data source with name {entity_name} after data set conversion!"
 
-        start_dim = data_source.validity_start_dimension
-        end_dim = data_source.validity_end_dimension
+        start_dim = entity.validity_start_dimension
+        end_dim = entity.validity_end_dimension
 
         # We do this instead of relying on has_validity_dimensions because this also does type refinement
         if not start_dim or not end_dim:
@@ -309,17 +309,17 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
         us from processing a dataset composed of a join between two SCD data sources. This restriction is in
         place as a temporary simplification - if there is need for this feature we can enable it.
         """
-        data_source_to_window: Dict[str, ValidityWindowJoinDescription] = {}
-        instances_by_data_source = bucket(
-            instance_set.time_dimension_instances, lambda x: x.origin_data_source_reference.data_source_name
+        entity_to_window: Dict[str, ValidityWindowJoinDescription] = {}
+        instances_by_entity = bucket(
+            instance_set.time_dimension_instances, lambda x: x.origin_entity_reference.entity_name
         )
-        for data_source_name in instances_by_data_source:
-            validity_dims = self._get_validity_window_dimensions_for_data_source(data_source_name=data_source_name)
+        for entity_name in instances_by_entity:
+            validity_dims = self._get_validity_window_dimensions_for_entity(entity_name=entity_name)
             if validity_dims is None:
                 continue
 
             start_dim, end_dim = validity_dims
-            specs = {instance.spec for instance in instances_by_data_source[data_source_name]}
+            specs = {instance.spec for instance in instances_by_entity[entity_name]}
             start_specs = [
                 spec
                 for spec in specs
@@ -333,7 +333,7 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
             linkless_start_specs = {spec.without_identifier_links for spec in start_specs}
             linkless_end_specs = {spec.without_identifier_links for spec in end_specs}
             assert len(linkless_start_specs) == 1 and len(linkless_end_specs) == 1, (
-                f"Did not find exactly one pair of specs from data source `{data_source_name}` matching the validity "
+                f"Did not find exactly one pair of specs from data source `{entity_name}` matching the validity "
                 f"window end points defined in the data source. This means we cannot process an SCD join, because we "
                 f"require exactly one validity window to be specified for the query! The window in the data source "
                 f"is defined by start dimension `{start_dim}` and end dimension `{end_dim}`. We found "
@@ -345,17 +345,17 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
             # identifier links so that the subquery uses the correct reference in the ON statement
             start_specs = sorted(start_specs, key=lambda x: len(x.identifier_links))
             end_specs = sorted(end_specs, key=lambda x: len(x.identifier_links))
-            data_source_to_window[data_source_name] = ValidityWindowJoinDescription(
+            entity_to_window[entity_name] = ValidityWindowJoinDescription(
                 window_start_dimension=start_specs[0], window_end_dimension=end_specs[0]
             )
 
-        assert len(data_source_to_window) < 2, (
+        assert len(entity_to_window) < 2, (
             f"Found more than 1 set of validity window specs in the input instance set. This is not currently "
-            f"supported, as joins between SCD data sources are not yet allowed! {data_source_to_window}"
+            f"supported, as joins between SCD data sources are not yet allowed! {entity_to_window}"
         )
 
-        if data_source_to_window:
-            return list(data_source_to_window.values())[0]
+        if entity_to_window:
+            return list(entity_to_window.values())[0]
 
         return None
 

@@ -11,21 +11,21 @@ from typing import Callable, DefaultDict, Dict, List, Optional, Sequence, Tuple,
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import BaseOutput, FilterElementsNode
-from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
-from metricflow.dataset.data_source_adapter import DataSourceDataSet
+from metricflow.dataset.convert_entity import EntityToDataSetConverter
+from metricflow.dataset.entity_adapter import EntityDataSet
 
 from metricflow.dataset.dataset import DataSet
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
-from metricflow.instances import DataSourceElementReference, DataSourceReference, MetricModelReference
-from metricflow.model.objects.data_source import DataSource
+from metricflow.instances import EntityElementReference, EntityReference, MetricModelReference
+from metricflow.model.objects.entity import Entity
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType
 from metricflow.model.objects.metric import Metric
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.validations.validator_helpers import (
-    DataSourceContext,
-    DataSourceElementContext,
-    DataSourceElementType,
+    EntityContext,
+    EntityElementContext,
+    EntityElementType,
     FileContext,
     MetricContext,
     ModelValidationResults,
@@ -53,7 +53,7 @@ class QueryRenderingTools:
 
     semantic_model: SemanticModel
     source_node_builder: SourceNodeBuilder
-    converter: DataSourceToDataSetConverter
+    converter: EntityToDataSetConverter
     time_spine_source: TimeSpineSource
     plan_converter: DataflowToSqlQueryPlanConverter
 
@@ -61,7 +61,7 @@ class QueryRenderingTools:
         self.semantic_model = SemanticModel(user_configured_model=model)
         self.source_node_builder = SourceNodeBuilder(semantic_model=self.semantic_model)
         self.time_spine_source = TimeSpineSource(schema_name=system_schema)
-        self.converter = DataSourceToDataSetConverter(
+        self.converter = EntityToDataSetConverter(
             column_association_resolver=DefaultColumnAssociationResolver(semantic_model=self.semantic_model)
         )
         self.plan_converter = DataflowToSqlQueryPlanConverter(
@@ -69,7 +69,7 @@ class QueryRenderingTools:
             semantic_model=self.semantic_model,
             time_spine_source=self.time_spine_source,
         )
-        self.node_resolver = DataflowPlanNodeOutputDataSetResolver[DataSourceDataSet](
+        self.node_resolver = DataflowPlanNodeOutputDataSetResolver[EntityDataSet](
             column_association_resolver=DefaultColumnAssociationResolver(self.semantic_model),
             semantic_model=self.semantic_model,
             time_spine_source=self.time_spine_source,
@@ -98,17 +98,17 @@ class DataWarehouseTaskBuilder:
         return tuple(spec for spec in specs if not spec.identifier_links)
 
     @staticmethod
-    def _data_source_nodes(
-        render_tools: QueryRenderingTools, data_source: DataSource
-    ) -> Sequence[BaseOutput[DataSourceDataSet]]:
-        """Builds and returns the DataSourceDataSet node for the given data source"""
-        data_source_semantics = render_tools.semantic_model.data_source_semantics.get_by_reference(
-            DataSourceReference(data_source_name=data_source.name)
+    def _entity_nodes(
+        render_tools: QueryRenderingTools, entity: Entity
+    ) -> Sequence[BaseOutput[EntityDataSet]]:
+        """Builds and returns the EntityDataSet node for the given data source"""
+        entity_semantics = render_tools.semantic_model.entity_semantics.get_by_reference(
+            EntityReference(entity_name=entity.name)
         )
-        assert data_source_semantics
+        assert entity_semantics
 
         source_nodes = render_tools.source_node_builder.create_from_data_sets(
-            (render_tools.converter.create_sql_source_data_set(data_source_semantics),)
+            (render_tools.converter.create_sql_source_data_set(entity_semantics),)
         )
 
         assert len(source_nodes) >= 1
@@ -129,7 +129,7 @@ class DataWarehouseTaskBuilder:
         return (rendered_plan.sql, rendered_plan.execution_parameters)
 
     @classmethod
-    def gen_data_source_tasks(
+    def gen_entity_tasks(
         cls, model: UserConfiguredModel, sql_client: SqlClient, system_schema: str
     ) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the data sources of the model"""
@@ -139,17 +139,17 @@ class DataWarehouseTaskBuilder:
         # Additionally, we don't want to modify the original model, so we
         # first make a deep copy of it
         model = deepcopy(model)
-        for data_source in model.data_sources:
-            data_source.dimensions = list(data_source.dimensions) + [
-                Dimension(name=f"validation_dim_for_{data_source.name}", type=DimensionType.CATEGORICAL, expr="1")
+        for entity in model.entities:
+            entity.dimensions = list(entity.dimensions) + [
+                Dimension(name=f"validation_dim_for_{entity.name}", type=DimensionType.CATEGORICAL, expr="1")
             ]
 
         render_tools = QueryRenderingTools(model=model, system_schema=system_schema)
 
         tasks: List[DataWarehouseValidationTask] = []
-        for data_source in model.data_sources:
-            source_node = cls._data_source_nodes(render_tools=render_tools, data_source=data_source)[0]
-            spec = DimensionSpec.from_name(name=f"validation_dim_for_{data_source.name}")
+        for entity in model.entities:
+            source_node = cls._entity_nodes(render_tools=render_tools, entity=entity)[0]
+            spec = DimensionSpec.from_name(name=f"validation_dim_for_{entity.name}")
             filter_elements_node = FilterElementsNode(
                 parent_node=source_node, include_specs=InstanceSpecSet(dimension_specs=(spec,))
             )
@@ -160,14 +160,14 @@ class DataWarehouseTaskBuilder:
                         cls.renderize,
                         sql_client=sql_client,
                         plan_converter=render_tools.plan_converter,
-                        plan_id=f"{data_source.name}_validation",
+                        plan_id=f"{entity.name}_validation",
                         nodes=filter_elements_node,
                     ),
-                    context=DataSourceContext(
-                        file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                        data_source=DataSourceReference(data_source_name=data_source.name),
+                    context=EntityContext(
+                        file_context=FileContext.from_metadata(metadata=entity.metadata),
+                        entity=EntityReference(entity_name=entity.name),
                     ),
-                    error_message=f"Unable to access data source `{data_source.name}` in data warehouse",
+                    error_message=f"Unable to access data source `{entity.name}` in data warehouse",
                 )
             )
 
@@ -189,14 +189,14 @@ class DataWarehouseTaskBuilder:
         render_tools = QueryRenderingTools(model=model, system_schema=system_schema)
 
         tasks: List[DataWarehouseValidationTask] = []
-        for data_source in model.data_sources:
-            if not data_source.dimensions:
+        for entity in model.entities:
+            if not entity.dimensions:
                 continue
 
-            source_node = cls._data_source_nodes(render_tools=render_tools, data_source=data_source)[0]
+            source_node = cls._entity_nodes(render_tools=render_tools, entity=entity)[0]
 
-            data_source_sub_tasks: List[DataWarehouseValidationTask] = []
-            dataset = render_tools.converter.create_sql_source_data_set(data_source)
+            entity_sub_tasks: List[DataWarehouseValidationTask] = []
+            dataset = render_tools.converter.create_sql_source_data_set(entity)
 
             dimension_specs = DataWarehouseTaskBuilder._remove_identifier_link_specs(
                 dataset.instance_set.spec_set.dimension_specs
@@ -227,23 +227,23 @@ class DataWarehouseTaskBuilder:
                 )
 
             for spec, filter_elements_node in spec_filter_tuples:
-                data_source_sub_tasks.append(
+                entity_sub_tasks.append(
                     DataWarehouseValidationTask(
                         query_and_params_callable=partial(
                             cls.renderize,
                             sql_client=sql_client,
                             plan_converter=render_tools.plan_converter,
-                            plan_id=f"{data_source.name}_dim_{spec.element_name}_validation",
+                            plan_id=f"{entity.name}_dim_{spec.element_name}_validation",
                             nodes=filter_elements_node,
                         ),
-                        context=DataSourceElementContext(
-                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source_element=DataSourceElementReference(
-                                data_source_name=data_source.name, element_name=spec.element_name
+                        context=EntityElementContext(
+                            file_context=FileContext.from_metadata(metadata=entity.metadata),
+                            entity_element=EntityElementReference(
+                                entity_name=entity.name, element_name=spec.element_name
                             ),
-                            element_type=DataSourceElementType.DIMENSION,
+                            element_type=EntityElementType.DIMENSION,
                         ),
-                        error_message=f"Unable to query dimension `{spec.element_name}` on data source `{data_source.name}` in data warehouse",
+                        error_message=f"Unable to query dimension `{spec.element_name}` on data source `{entity.name}` in data warehouse",
                     )
                 )
 
@@ -260,15 +260,15 @@ class DataWarehouseTaskBuilder:
                         cls.renderize,
                         sql_client=sql_client,
                         plan_converter=render_tools.plan_converter,
-                        plan_id=f"{data_source.name}_all_dimensions_validation",
+                        plan_id=f"{entity.name}_all_dimensions_validation",
                         nodes=filter_elements_node,
                     ),
-                    context=DataSourceContext(
-                        file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                        data_source=DataSourceReference(data_source_name=data_source.name),
+                    context=EntityContext(
+                        file_context=FileContext.from_metadata(metadata=entity.metadata),
+                        entity=EntityReference(entity_name=entity.name),
                     ),
-                    error_message=f"Failed to query dimensions in data warehouse for data source `{data_source.name}`",
-                    on_fail_subtasks=data_source_sub_tasks,
+                    error_message=f"Failed to query dimensions in data warehouse for data source `{entity.name}`",
+                    on_fail_subtasks=entity_sub_tasks,
                 )
             )
         return tasks
@@ -289,44 +289,44 @@ class DataWarehouseTaskBuilder:
         render_tools = QueryRenderingTools(model=model, system_schema=system_schema)
 
         tasks: List[DataWarehouseValidationTask] = []
-        for data_source in model.data_sources:
-            if not data_source.identifiers:
+        for entity in model.entities:
+            if not entity.identifiers:
                 continue
-            source_node = cls._data_source_nodes(render_tools=render_tools, data_source=data_source)[0]
+            source_node = cls._entity_nodes(render_tools=render_tools, entity=entity)[0]
 
-            data_source_sub_tasks: List[DataWarehouseValidationTask] = []
-            dataset = render_tools.converter.create_sql_source_data_set(data_source)
-            data_source_specs = DataWarehouseTaskBuilder._remove_identifier_link_specs(
+            entity_sub_tasks: List[DataWarehouseValidationTask] = []
+            dataset = render_tools.converter.create_sql_source_data_set(entity)
+            entity_specs = DataWarehouseTaskBuilder._remove_identifier_link_specs(
                 dataset.instance_set.spec_set.identifier_specs
             )
-            for spec in data_source_specs:
+            for spec in entity_specs:
                 filter_elements_node = FilterElementsNode(
                     parent_node=source_node, include_specs=InstanceSpecSet(identifier_specs=(spec,))
                 )
-                data_source_sub_tasks.append(
+                entity_sub_tasks.append(
                     DataWarehouseValidationTask(
                         query_and_params_callable=partial(
                             cls.renderize,
                             sql_client=sql_client,
                             plan_converter=render_tools.plan_converter,
-                            plan_id=f"{data_source.name}_identifier_{spec.element_name}_validation",
+                            plan_id=f"{entity.name}_identifier_{spec.element_name}_validation",
                             nodes=filter_elements_node,
                         ),
-                        context=DataSourceElementContext(
-                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source_element=DataSourceElementReference(
-                                data_source_name=data_source.name, element_name=spec.element_name
+                        context=EntityElementContext(
+                            file_context=FileContext.from_metadata(metadata=entity.metadata),
+                            entity_element=EntityElementReference(
+                                entity_name=entity.name, element_name=spec.element_name
                             ),
-                            element_type=DataSourceElementType.IDENTIFIER,
+                            element_type=EntityElementType.IDENTIFIER,
                         ),
-                        error_message=f"Unable to query identifier `{spec.element_name}` on data source `{data_source.name}` in data warehouse",
+                        error_message=f"Unable to query identifier `{spec.element_name}` on data source `{entity.name}` in data warehouse",
                     )
                 )
 
             filter_elements_node = FilterElementsNode(
                 parent_node=source_node,
                 include_specs=InstanceSpecSet(
-                    identifier_specs=tuple(data_source_specs),
+                    identifier_specs=tuple(entity_specs),
                 ),
             )
             tasks.append(
@@ -335,15 +335,15 @@ class DataWarehouseTaskBuilder:
                         cls.renderize,
                         sql_client=sql_client,
                         plan_converter=render_tools.plan_converter,
-                        plan_id=f"{data_source.name}_all_identifiers_validation",
+                        plan_id=f"{entity.name}_all_identifiers_validation",
                         nodes=filter_elements_node,
                     ),
-                    context=DataSourceContext(
-                        file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                        data_source=DataSourceReference(data_source_name=data_source.name),
+                    context=EntityContext(
+                        file_context=FileContext.from_metadata(metadata=entity.metadata),
+                        entity=EntityReference(entity_name=entity.name),
                     ),
-                    error_message=f"Failed to query identifiers in data warehouse for data source `{data_source.name}`",
-                    on_fail_subtasks=data_source_sub_tasks,
+                    error_message=f"Failed to query identifiers in data warehouse for data source `{entity.name}`",
+                    on_fail_subtasks=entity_sub_tasks,
                 )
             )
         return tasks
@@ -364,15 +364,15 @@ class DataWarehouseTaskBuilder:
         render_tools = QueryRenderingTools(model=model, system_schema=system_schema)
 
         tasks: List[DataWarehouseValidationTask] = []
-        for data_source in model.data_sources:
-            if not data_source.measures:
+        for entity in model.entities:
+            if not entity.measures:
                 continue
 
-            source_nodes = cls._data_source_nodes(render_tools=render_tools, data_source=data_source)
-            dataset = render_tools.converter.create_sql_source_data_set(data_source)
-            data_source_specs = dataset.instance_set.spec_set.measure_specs
+            source_nodes = cls._entity_nodes(render_tools=render_tools, entity=entity)
+            dataset = render_tools.converter.create_sql_source_data_set(entity)
+            entity_specs = dataset.instance_set.spec_set.measure_specs
 
-            source_node_by_measure_spec: Dict[MeasureSpec, BaseOutput[DataSourceDataSet]] = {}
+            source_node_by_measure_spec: Dict[MeasureSpec, BaseOutput[EntityDataSet]] = {}
             measure_specs_source_node_pair = []
             for source_node in source_nodes:
                 measure_specs = render_tools.node_resolver.get_output_data_set(
@@ -382,9 +382,9 @@ class DataWarehouseTaskBuilder:
                 measure_specs_source_node_pair.append((measure_specs, source_node))
 
             source_node_to_sub_task: DefaultDict[
-                BaseOutput[DataSourceDataSet], List[DataWarehouseValidationTask]
+                BaseOutput[EntityDataSet], List[DataWarehouseValidationTask]
             ] = collections.defaultdict(list)
-            for spec in data_source_specs:
+            for spec in entity_specs:
                 obtained_source_node = source_node_by_measure_spec.get(spec)
                 assert obtained_source_node, f"Unable to find generated source node for measure: {spec.element_name}"
 
@@ -400,17 +400,17 @@ class DataWarehouseTaskBuilder:
                             cls.renderize,
                             sql_client=sql_client,
                             plan_converter=render_tools.plan_converter,
-                            plan_id=f"{data_source.name}_measure_{spec.element_name}_validation",
+                            plan_id=f"{entity.name}_measure_{spec.element_name}_validation",
                             nodes=filter_elements_node,
                         ),
-                        context=DataSourceElementContext(
-                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source_element=DataSourceElementReference(
-                                data_source_name=data_source.name, element_name=spec.element_name
+                        context=EntityElementContext(
+                            file_context=FileContext.from_metadata(metadata=entity.metadata),
+                            entity_element=EntityElementReference(
+                                entity_name=entity.name, element_name=spec.element_name
                             ),
-                            element_type=DataSourceElementType.MEASURE,
+                            element_type=EntityElementType.MEASURE,
                         ),
-                        error_message=f"Unable to query measure `{spec.element_name}` on data source `{data_source.name}` in data warehouse",
+                        error_message=f"Unable to query measure `{spec.element_name}` on data source `{entity.name}` in data warehouse",
                     )
                 )
 
@@ -424,14 +424,14 @@ class DataWarehouseTaskBuilder:
                             cls.renderize,
                             sql_client=sql_client,
                             plan_converter=render_tools.plan_converter,
-                            plan_id=f"{data_source.name}_all_measures_validation",
+                            plan_id=f"{entity.name}_all_measures_validation",
                             nodes=filter_elements_node,
                         ),
-                        context=DataSourceContext(
-                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source=DataSourceReference(data_source_name=data_source.name),
+                        context=EntityContext(
+                            file_context=FileContext.from_metadata(metadata=entity.metadata),
+                            entity=EntityReference(entity_name=entity.name),
                         ),
-                        error_message=f"Failed to query measures in data warehouse for data source `{data_source.name}`",
+                        error_message=f"Failed to query measures in data warehouse for data source `{entity.name}`",
                         on_fail_subtasks=source_node_to_sub_task[source_node],
                     )
                 )
@@ -533,7 +533,7 @@ class DataWarehouseModelValidator:
 
         return ModelValidationResults.from_issues_sequence(issues)
 
-    def validate_data_sources(
+    def validate_entities(
         self, model: UserConfiguredModel, timeout: Optional[int] = None
     ) -> ModelValidationResults:
         """Generates a list of tasks for validating the data sources of the model and then runs them
@@ -545,7 +545,7 @@ class DataWarehouseModelValidator:
         Returns:
             A list of validation issues discovered when running the passed in tasks against the data warehosue
         """
-        tasks = DataWarehouseTaskBuilder.gen_data_source_tasks(
+        tasks = DataWarehouseTaskBuilder.gen_entity_tasks(
             model=model, sql_client=self._sql_client, system_schema=self._sql_schema
         )
         return self.run_tasks(tasks=tasks, timeout=timeout)

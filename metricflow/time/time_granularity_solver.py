@@ -10,7 +10,7 @@ import pandas as pd
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import BaseOutput
-from metricflow.dataset.data_source_adapter import DataSourceDataSet
+from metricflow.dataset.entity_adapter import EntityDataSet
 from metricflow.instances import MetricModelReference
 from metricflow.model.objects.metric import MetricType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
@@ -59,8 +59,8 @@ class TimeGranularitySolver:
     def __init__(  # noqa: D
         self,
         semantic_model: SemanticModel,
-        source_nodes: Sequence[BaseOutput[DataSourceDataSet]],
-        node_output_resolver: DataflowPlanNodeOutputDataSetResolver[DataSourceDataSet],
+        source_nodes: Sequence[BaseOutput[EntityDataSet]],
+        node_output_resolver: DataflowPlanNodeOutputDataSetResolver[EntityDataSet],
     ) -> None:
         self._semantic_model = semantic_model
         self._metric_reference_to_measure_reference = TimeGranularitySolver._measures_for_metric(

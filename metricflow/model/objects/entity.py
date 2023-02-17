@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import List, Optional, Sequence
 
-from metricflow.instances import DataSourceReference
+from metricflow.instances import EntityReference
 from metricflow.model.objects.common import Metadata
 from metricflow.model.objects.elements.dimension import Dimension
 from metricflow.model.objects.elements.identifier import Identifier
@@ -12,7 +12,7 @@ from metricflow.object_utils import ExtendedEnum
 from metricflow.references import LinkableElementReference, MeasureReference
 
 
-class DataSourceOrigin(ExtendedEnum):
+class EntityOrigin(ExtendedEnum):
     """Describes how data sources were created
 
     Impacts determination of validity and duration of storage
@@ -48,7 +48,7 @@ class Mutability(HashableBaseModel):
     type_params: Optional[MutabilityTypeParams]
 
 
-class DataSource(HashableBaseModel, ModelWithMetadataParsing):
+class Entity(HashableBaseModel, ModelWithMetadataParsing):
     """Describes a data source"""
 
     name: str
@@ -62,7 +62,7 @@ class DataSource(HashableBaseModel, ModelWithMetadataParsing):
 
     mutability: Mutability = Mutability(type=MutabilityType.FULL_MUTATION)
 
-    origin: DataSourceOrigin = DataSourceOrigin.SOURCE
+    origin: EntityOrigin = EntityOrigin.SOURCE
     metadata: Optional[Metadata]
 
     @property
@@ -141,5 +141,5 @@ class DataSource(HashableBaseModel, ModelWithMetadataParsing):
         return partitions[0]
 
     @property
-    def reference(self) -> DataSourceReference:  # noqa: D
-        return DataSourceReference(data_source_name=self.name)
+    def reference(self) -> EntityReference:  # noqa: D
+        return EntityReference(entity_name=self.name)

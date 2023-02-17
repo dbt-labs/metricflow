@@ -1,6 +1,6 @@
 import logging
 
-from metricflow.model.objects.data_source import DataSource
+from metricflow.model.objects.entity import Entity
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.transformations.transform_rule import ModelTransformRule
 
@@ -13,27 +13,27 @@ class LowerCaseNamesRule(ModelTransformRule):
     @staticmethod
     def transform_model(model: UserConfiguredModel) -> UserConfiguredModel:  # noqa: D
         LowerCaseNamesRule._lowercase_top_level_objects(model)
-        for data_source in model.data_sources:
-            LowerCaseNamesRule._lowercase_data_source_elements(data_source)
+        for entity in model.entities:
+            LowerCaseNamesRule._lowercase_entity_elements(entity)
 
         return model
 
     @staticmethod
-    def _lowercase_data_source_elements(data_source: DataSource) -> None:
+    def _lowercase_entity_elements(entity: Entity) -> None:
         """Lowercases the names of data source elements."""
-        if data_source.measures:
-            for measure in data_source.measures:
+        if entity.measures:
+            for measure in entity.measures:
                 measure.name = measure.name.lower()
-        if data_source.identifiers:
-            for identifier in data_source.identifiers:
+        if entity.identifiers:
+            for identifier in entity.identifiers:
                 identifier.name = identifier.name.lower()
-        if data_source.dimensions:
-            for dimension in data_source.dimensions:
+        if entity.dimensions:
+            for dimension in entity.dimensions:
                 dimension.name = dimension.name.lower()
 
     @staticmethod
     def _lowercase_top_level_objects(model: UserConfiguredModel) -> None:
         """Lowercases the names of model objects"""
-        if model.data_sources:
-            for data_source in model.data_sources:
-                data_source.name = data_source.name.lower()
+        if model.entities:
+            for entity in model.entities:
+                entity.name = entity.name.lower()

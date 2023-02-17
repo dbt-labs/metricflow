@@ -12,10 +12,10 @@ from metricflow.dataflow.dataflow_plan import (
     FilterElementsNode,
     JoinDescription,
 )
-from metricflow.model.semantics.data_source_join_evaluator import DataSourceJoinEvaluator, MAX_JOIN_HOPS
+from metricflow.model.semantics.entity_join_evaluator import EntityJoinEvaluator, MAX_JOIN_HOPS
 from metricflow.object_utils import pformat_big_objects
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
-from metricflow.protocols.semantics import DataSourceSemanticsAccessor
+from metricflow.protocols.semantics import EntitySemanticsAccessor
 from metricflow.references import TimeDimensionReference, IdentifierReference
 from metricflow.spec_set_transforms import ToElementNameSet
 from metricflow.specs import LinkableInstanceSpec, LinklessIdentifierSpec, InstanceSpecSet
@@ -78,13 +78,13 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
 
     def __init__(  # noqa: D
         self,
-        data_source_semantics: DataSourceSemanticsAccessor,
+        entity_semantics: EntitySemanticsAccessor,
         node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver[SqlDataSetT],
     ):
         self._node_data_set_resolver = node_data_set_resolver
-        self._partition_resolver = PartitionJoinResolver(data_source_semantics)
-        self._data_source_semantics = data_source_semantics
-        self._join_evaluator = DataSourceJoinEvaluator(data_source_semantics)
+        self._partition_resolver = PartitionJoinResolver(entity_semantics)
+        self._entity_semantics = entity_semantics
+        self._join_evaluator = EntityJoinEvaluator(entity_semantics)
 
     def add_time_range_constraint(
         self,
@@ -138,12 +138,12 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                 len(identifier_instance_in_first_node.defined_from) == 1
             ), "Multiple items in defined_from not yet supported"
 
-            identifier = self._data_source_semantics.get_identifier_in_data_source(
+            identifier = self._entity_semantics.get_identifier_in_entity(
                 identifier_instance_in_first_node.defined_from[0]
             )
             if identifier is None:
                 raise RuntimeError(
-                    f"Invalid DataSourceElementReference {identifier_instance_in_first_node.defined_from[0]}"
+                    f"Invalid EntityElementReference {identifier_instance_in_first_node.defined_from[0]}"
                 )
 
             return True

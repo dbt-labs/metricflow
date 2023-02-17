@@ -1,6 +1,6 @@
 from typing import List
 
-from metricflow.model.objects.data_source import DataSource
+from metricflow.model.objects.entity import Entity
 from metricflow.model.objects.metric import Metric
 from metricflow.model.objects.base import HashableBaseModel
 
@@ -8,5 +8,5 @@ from metricflow.model.objects.base import HashableBaseModel
 class UserConfiguredModel(HashableBaseModel):
     """Model holds all the information the SemanticLayer needs to render a query"""
 
-    data_sources: List[DataSource]
+    entities: List[Entity]
     metrics: List[Metric]

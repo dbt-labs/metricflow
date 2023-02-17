@@ -1,4 +1,4 @@
-data_source: 
+entity: 
   name: transactions 
   description: |
     Each row represents one transaction. There

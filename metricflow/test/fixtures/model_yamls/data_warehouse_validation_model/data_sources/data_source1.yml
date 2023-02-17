@@ -1,5 +1,5 @@
 ---
-data_source:
+entity:
   name: animals
   description: If a user is a company / business, this defines the mapping.
   owners:

@@ -13,7 +13,7 @@ integration_test:
     GROUP BY ds;
 ---
 integration_test:
-  name: single_data_source_expr_metric
+  name: single_entity_expr_metric
   description: Tests querying an expression metric sourced from multiple measures, but one data source
   model: SIMPLE_MODEL
   metrics: ["booking_fees_per_booker"]
@@ -257,7 +257,7 @@ integration_test:
       ds
 ---
 integration_test:
-  name: ratio_single_data_source
+  name: ratio_single_entity
   description: Test ratio metric from a single data source.
   model: SIMPLE_MODEL
   metrics: ["bookings_per_booker"]

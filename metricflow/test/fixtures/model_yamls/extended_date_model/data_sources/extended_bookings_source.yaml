@@ -1,5 +1,5 @@
 ---
-data_source:
+entity:
   name: extended_bookings_source
   description: extended_bookings_source
   owners:

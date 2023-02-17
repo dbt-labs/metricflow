@@ -94,7 +94,7 @@ class MeasureSpecProperties:
     """Input dataclass for grouping properties of a sequence of MeasureSpecs."""
 
     measure_specs: Sequence[MeasureSpec]
-    data_source_name: str
+    entity_name: str
     agg_time_dimension: TimeDimensionReference
     non_additive_dimension_spec: Optional[NonAdditiveDimensionSpec] = None
 
@@ -111,7 +111,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         node_output_resolver: Optional[DataflowPlanNodeOutputDataSetResolver[SqlDataSetT]] = None,
         column_association_resolver: Optional[ColumnAssociationResolver] = None,
     ) -> None:
-        self._data_source_semantics = semantic_model.data_source_semantics
+        self._entity_semantics = semantic_model.entity_semantics
         self._metric_semantics = semantic_model.metric_semantics
         self._metric_time_dimension_reference = DataSet.metric_time_dimension_reference()
         self._cost_function = cost_function
@@ -347,17 +347,17 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         """Returns true if any of the linkable specs requires a multi-hop join to realize."""
         return any(len(x.identifier_links) > 1 for x in linkable_specs)
 
-    def _get_data_source_names_for_measures(self, measure_names: Sequence[MeasureSpec]) -> Set[str]:
+    def _get_entity_names_for_measures(self, measure_names: Sequence[MeasureSpec]) -> Set[str]:
         """Return the names of the data sources needed to compute the input measures
 
         This is a temporary method for use in assertion boundaries while we implement support for multiple data sources
         """
-        data_source_names: Set[str] = set()
+        entity_names: Set[str] = set()
         for measure_name in measure_names:
-            data_source_names = data_source_names.union(
-                {d.name for d in self._data_source_semantics.get_data_sources_for_measure(measure_name.as_reference)}
+            entity_names = entity_names.union(
+                {d.name for d in self._entity_semantics.get_entities_for_measure(measure_name.as_reference)}
             )
-        return data_source_names
+        return entity_names
 
     def _sort_by_suitability(self, nodes: Sequence[BaseOutput[SqlDataSetT]]) -> Sequence[BaseOutput[SqlDataSetT]]:
         """Sort nodes by the cost, then by the number of linkable specs.
@@ -411,28 +411,28 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         """Ensures that the group of MeasureSpecs has the same non_additive_dimension_spec and agg_time_dimension"""
         if len(measure_specs) == 0:
             raise ValueError("Cannot build MeasureParametersForRecipe when given an empty sequence of measure_specs.")
-        data_sources = self._get_data_source_names_for_measures(measure_specs)
-        if len(data_sources) > 1:
+        entities = self._get_entity_names_for_measures(measure_specs)
+        if len(entities) > 1:
             raise ValueError(
                 f"Cannot find common properties for measures {measure_specs} coming from multiple "
-                f"data sources: {data_sources}. This suggests the measure_specs were not correctly filtered."
+                f"data sources: {entities}. This suggests the measure_specs were not correctly filtered."
             )
 
-        agg_time_dimension = agg_time_dimension = self._data_source_semantics.get_agg_time_dimension_for_measure(
+        agg_time_dimension = agg_time_dimension = self._entity_semantics.get_agg_time_dimension_for_measure(
             measure_specs[0].as_reference
         )
         non_additive_dimension_spec = measure_specs[0].non_additive_dimension_spec
         for measure_spec in measure_specs:
             if non_additive_dimension_spec != measure_spec.non_additive_dimension_spec:
                 raise ValueError(f"measure_specs {measure_specs} do not have the same non_additive_dimension_spec.")
-            measure_agg_time_dimension = self._data_source_semantics.get_agg_time_dimension_for_measure(
+            measure_agg_time_dimension = self._entity_semantics.get_agg_time_dimension_for_measure(
                 measure_spec.as_reference
             )
             if measure_agg_time_dimension != agg_time_dimension:
                 raise ValueError(f"measure_specs {measure_specs} do not have the same agg_time_dimension.")
         return MeasureSpecProperties(
             measure_specs=measure_specs,
-            data_source_name=data_sources.pop(),
+            entity_name=entities.pop(),
             agg_time_dimension=agg_time_dimension,
             non_additive_dimension_spec=non_additive_dimension_spec,
         )
@@ -450,7 +450,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         """
         measure_specs = measure_spec_properties.measure_specs
         node_processor = PreDimensionJoinNodeProcessor(
-            data_source_semantics=self._data_source_semantics,
+            entity_semantics=self._entity_semantics,
             node_data_set_resolver=self._node_data_set_resolver,
         )
 
@@ -492,7 +492,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         logger.info(f"Processing nodes took: {time.time()-start_time:.2f}s")
 
         node_evaluator = NodeEvaluatorForLinkableInstances(
-            data_source_semantics=self._data_source_semantics,
+            entity_semantics=self._entity_semantics,
             nodes_available_for_joins=self._sort_by_suitability(nodes_available_for_joins),
             node_data_set_resolver=self._node_data_set_resolver,
         )
@@ -615,24 +615,24 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         aggregated set of measures.
         """
         output_nodes: List[BaseOutput[SqlDataSetT]] = []
-        data_sources_and_constraints_to_measures: DefaultDict[
+        entities_and_constraints_to_measures: DefaultDict[
             tuple[str, Optional[SpecWhereClauseConstraint]], List[MetricInputMeasureSpec]
         ] = collections.defaultdict(list)
         for input_spec in metric_input_measure_specs:
-            data_source_names = [
+            entity_names = [
                 dsource.name
-                for dsource in self._data_source_semantics.get_data_sources_for_measure(
+                for dsource in self._entity_semantics.get_entities_for_measure(
                     measure_reference=input_spec.measure_spec.as_reference
                 )
             ]
             assert (
-                len(data_source_names) == 1
-            ), f"Validation should enforce one data source per measure, but found {data_source_names} for {input_spec}!"
-            data_sources_and_constraints_to_measures[(data_source_names[0], input_spec.constraint)].append(input_spec)
+                len(entity_names) == 1
+            ), f"Validation should enforce one data source per measure, but found {entity_names} for {input_spec}!"
+            entities_and_constraints_to_measures[(entity_names[0], input_spec.constraint)].append(input_spec)
 
-        for (data_source, measure_constraint), measures in data_sources_and_constraints_to_measures.items():
+        for (entity, measure_constraint), measures in entities_and_constraints_to_measures.items():
             logger.info(
-                f"Building aggregated measures for {data_source}. "
+                f"Building aggregated measures for {entity}. "
                 f" Input measures: {measures} with constraints: {measure_constraint}"
             )
             if measure_constraint is None:
@@ -654,7 +654,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 if non_additive_spec is not None:
                     non_additive_message = f" with non-additive dimension spec: {non_additive_spec}"
 
-                logger.info(f"Building aggregated measures for {data_source}{non_additive_message}")
+                logger.info(f"Building aggregated measures for {entity}{non_additive_message}")
                 input_specs = tuple(input_specs_by_measure_spec[measure_spec] for measure_spec in measure_specs)
                 output_nodes.append(
                     self._build_aggregated_measures_from_measure_source_node(

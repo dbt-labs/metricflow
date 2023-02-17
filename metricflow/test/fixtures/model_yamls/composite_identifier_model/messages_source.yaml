@@ -1,5 +1,5 @@
 ---
-data_source:
+entity:
   name: messages_source
   description: messages_source
   owners:

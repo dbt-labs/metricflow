@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import Tuple, Sequence, List
 
 from metricflow.dataset.dataset import DataSet
-from metricflow.protocols.semantics import DataSourceSemanticsAccessor
+from metricflow.protocols.semantics import EntitySemanticsAccessor
 from metricflow.specs import (
     DimensionSpec,
     TimeDimensionSpec,
@@ -33,21 +33,21 @@ class PartitionTimeDimensionJoinDescription:
 class PartitionJoinResolver:
     """When joining data sets, this class helps to figure out the necessary partition specs to join on."""
 
-    def __init__(self, data_source_semantics: DataSourceSemanticsAccessor) -> None:  # noqa: D
-        self._data_source_semantics = data_source_semantics
+    def __init__(self, entity_semantics: EntitySemanticsAccessor) -> None:  # noqa: D
+        self._entity_semantics = entity_semantics
 
     def _get_partitions(self, spec_set: InstanceSpecSet) -> PartitionSpecSet:
         """Returns the specs from the instance set that correspond to partition specs."""
         partition_dimension_specs = tuple(
             x
             for x in spec_set.dimension_specs
-            if self._data_source_semantics.get_dimension(dimension_reference=x.reference).is_partition
+            if self._entity_semantics.get_dimension(dimension_reference=x.reference).is_partition
         )
         partition_time_dimension_specs = tuple(
             x
             for x in spec_set.time_dimension_specs
             if x.reference != DataSet.metric_time_dimension_reference()
-            and self._data_source_semantics.get_time_dimension(time_dimension_reference=x.reference).is_partition
+            and self._entity_semantics.get_time_dimension(time_dimension_reference=x.reference).is_partition
         )
 
         return PartitionSpecSet(

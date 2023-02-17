@@ -18,10 +18,10 @@ __SOURCE_TABLE_ALIAS = "a"
 
 
 def __get_filtered_measure_instance_set(
-    data_source_name: str, measure_name: str, object_repo: ConsistentIdObjectRepository
+    entity_name: str, measure_name: str, object_repo: ConsistentIdObjectRepository
 ) -> InstanceSet:
     """Gets an InstanceSet consisting of only the measure instance matching the given name and data source"""
-    dataset = object_repo.simple_model_data_sets[data_source_name]
+    dataset = object_repo.simple_model_data_sets[entity_name]
     instance_set = dataset.instance_set
     include_specs = tuple(
         instance.spec for instance in instance_set.measure_instances if instance.spec.element_name == measure_name
@@ -40,7 +40,7 @@ def test_sum_aggregation(
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
         DefaultColumnAssociationResolver(simple_semantic_model),
-        simple_semantic_model.data_source_semantics,
+        simple_semantic_model.entity_semantics,
         (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="booking_value")),),
     ).transform(instance_set=instance_set)
 
@@ -62,7 +62,7 @@ def test_sum_boolean_aggregation(
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
         DefaultColumnAssociationResolver(simple_semantic_model),
-        simple_semantic_model.data_source_semantics,
+        simple_semantic_model.entity_semantics,
         (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="instant_bookings")),),
     ).transform(instance_set=instance_set)
 
@@ -85,7 +85,7 @@ def test_avg_aggregation(
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
         DefaultColumnAssociationResolver(simple_semantic_model),
-        simple_semantic_model.data_source_semantics,
+        simple_semantic_model.entity_semantics,
         (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="average_booking_value")),),
     ).transform(instance_set=instance_set)
 
@@ -107,7 +107,7 @@ def test_count_distinct_aggregation(
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
         DefaultColumnAssociationResolver(simple_semantic_model),
-        simple_semantic_model.data_source_semantics,
+        simple_semantic_model.entity_semantics,
         (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="bookers")),),
     ).transform(instance_set=instance_set)
 
@@ -129,7 +129,7 @@ def test_max_aggregation(
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
         DefaultColumnAssociationResolver(simple_semantic_model),
-        simple_semantic_model.data_source_semantics,
+        simple_semantic_model.entity_semantics,
         (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="largest_listing")),),
     ).transform(instance_set=instance_set)
 
@@ -151,7 +151,7 @@ def test_min_aggregation(
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
         DefaultColumnAssociationResolver(simple_semantic_model),
-        simple_semantic_model.data_source_semantics,
+        simple_semantic_model.entity_semantics,
         (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="smallest_listing")),),
     ).transform(instance_set=instance_set)
 
@@ -173,7 +173,7 @@ def test_aliased_sum(
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
         DefaultColumnAssociationResolver(simple_semantic_model),
-        simple_semantic_model.data_source_semantics,
+        simple_semantic_model.entity_semantics,
         (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="booking_value"), alias="bvalue"),),
     ).transform(instance_set=instance_set)
 
@@ -196,7 +196,7 @@ def test_percentile_aggregation(
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
         DefaultColumnAssociationResolver(simple_semantic_model),
-        simple_semantic_model.data_source_semantics,
+        simple_semantic_model.entity_semantics,
         (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="booking_value_p99")),),
     ).transform(instance_set=instance_set)
 

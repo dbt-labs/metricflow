@@ -5,15 +5,15 @@ from datetime import date
 from typing import List, MutableSet, Tuple, Sequence, DefaultDict
 
 import more_itertools
-from metricflow.instances import DataSourceElementReference, DataSourceReference
+from metricflow.instances import EntityElementReference, EntityReference
 
-from metricflow.model.objects.data_source import DataSource
+from metricflow.model.objects.entity import Entity
 from metricflow.model.objects.elements.identifier import Identifier, IdentifierType, CompositeSubIdentifier
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
-    DataSourceContext,
-    DataSourceElementContext,
-    DataSourceElementType,
+    EntityContext,
+    EntityElementContext,
+    EntityElementType,
     FileContext,
     ModelValidationRule,
     ValidationIssue,
@@ -35,23 +35,23 @@ class IdentifierConfigRule(ModelValidationRule):
     @validate_safely(whats_being_done="running model validation ensuring identifiers are valid")
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
         issues = []
-        for data_source in model.data_sources:
-            issues += IdentifierConfigRule._validate_data_source_identifiers(data_source=data_source)
+        for entity in model.entities:
+            issues += IdentifierConfigRule._validate_entity_identifiers(entity=entity)
         return issues
 
     @staticmethod
     @validate_safely(whats_being_done="checking that the data source's identifiers are valid")
-    def _validate_data_source_identifiers(data_source: DataSource) -> List[ValidationIssueType]:
+    def _validate_entity_identifiers(entity: Entity) -> List[ValidationIssueType]:
         """Checks validity of composite identifiers"""
         issues: List[ValidationIssueType] = []
-        for ident in data_source.identifiers:
+        for ident in entity.identifiers:
             if ident.identifiers:
-                context = DataSourceElementContext(
-                    file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                    data_source_element=DataSourceElementReference(
-                        data_source_name=data_source.name, element_name=ident.name
+                context = EntityElementContext(
+                    file_context=FileContext.from_metadata(metadata=entity.metadata),
+                    entity_element=EntityElementReference(
+                        entity_name=entity.name, element_name=ident.name
                     ),
-                    element_type=DataSourceElementType.IDENTIFIER,
+                    element_type=EntityElementType.IDENTIFIER,
                 )
 
                 for sub_id in ident.identifiers:
@@ -64,7 +64,7 @@ class IdentifierConfigRule(ModelValidationRule):
                                 f"({ident.name}), please set one",
                             )
                         )
-                    elif sub_id.ref is not None and sub_id.ref not in [i.name for i in data_source.identifiers]:
+                    elif sub_id.ref is not None and sub_id.ref not in [i.name for i in entity.identifiers]:
                         issues.append(
                             ValidationError(
                                 context=context,
@@ -82,7 +82,7 @@ class IdentifierConfigRule(ModelValidationRule):
                         )
 
                     if sub_id.name:
-                        for i in data_source.identifiers:
+                        for i in entity.identifiers:
                             if i.name == sub_id.name and i.expr != sub_id.expr:
                                 issues.append(
                                     ValidationError(
@@ -106,30 +106,30 @@ class NaturalIdentifierConfigurationRule(ModelValidationRule):
             "natural identifiers are used in the appropriate contexts"
         )
     )
-    def _validate_data_source_natural_identifiers(data_source: DataSource) -> List[ValidationIssue]:
+    def _validate_entity_natural_identifiers(entity: Entity) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
-        context = DataSourceContext(
-            file_context=FileContext.from_metadata(metadata=data_source.metadata),
-            data_source=DataSourceReference(data_source_name=data_source.name),
+        context = EntityContext(
+            file_context=FileContext.from_metadata(metadata=entity.metadata),
+            entity=EntityReference(entity_name=entity.name),
         )
 
         natural_identifier_names = set(
-            [identifier.name for identifier in data_source.identifiers if identifier.type is IdentifierType.NATURAL]
+            [identifier.name for identifier in entity.identifiers if identifier.type is IdentifierType.NATURAL]
         )
         if len(natural_identifier_names) > 1:
             error = ValidationError(
                 context=context,
                 message=f"Data sources can have at most one natural identifier, but data source "
-                f"`{data_source.name}` has {len(natural_identifier_names)} distinct natural identifiers set! "
+                f"`{entity.name}` has {len(natural_identifier_names)} distinct natural identifiers set! "
                 f"{natural_identifier_names}.",
             )
             issues.append(error)
-        if natural_identifier_names and not [dim for dim in data_source.dimensions if dim.validity_params]:
+        if natural_identifier_names and not [dim for dim in entity.dimensions if dim.validity_params]:
             error = ValidationError(
                 context=context,
                 message=f"The use of `natural` identifiers is currently supported only in conjunction with a validity "
                 f"window defined in the set of time dimensions associated with the data source. Data source "
-                f"`{data_source.name}` uses a natural identifier ({natural_identifier_names}) but does not define a "
+                f"`{entity.name}` uses a natural identifier ({natural_identifier_names}) but does not define a "
                 f"validity window!",
             )
             issues.append(error)
@@ -143,34 +143,34 @@ class NaturalIdentifierConfigurationRule(ModelValidationRule):
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:
         """Validate identifiers marked as IdentifierType.NATURAL"""
         issues: List[ValidationIssue] = []
-        for data_source in model.data_sources:
-            issues += NaturalIdentifierConfigurationRule._validate_data_source_natural_identifiers(
-                data_source=data_source
+        for entity in model.entities:
+            issues += NaturalIdentifierConfigurationRule._validate_entity_natural_identifiers(
+                entity=entity
             )
 
         return issues
 
 
-class OnePrimaryIdentifierPerDataSourceRule(ModelValidationRule):
+class OnePrimaryIdentifierPerEntityRule(ModelValidationRule):
     """Ensures that each data source has only one primary identifier"""
 
     @staticmethod
     @validate_safely(whats_being_done="checking data source has only one primary identifier")
-    def _only_one_primary_identifier(data_source: DataSource) -> List[ValidationIssue]:
+    def _only_one_primary_identifier(entity: Entity) -> List[ValidationIssue]:
         primary_identifier_names: MutableSet[str] = set()
-        for identifier in data_source.identifiers or []:
+        for identifier in entity.identifiers or []:
             if identifier.type == IdentifierType.PRIMARY:
                 primary_identifier_names.add(identifier.reference.element_name)
 
         if len(primary_identifier_names) > 1:
             return [
                 ValidationFutureError(
-                    context=DataSourceContext(
-                        file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                        data_source=DataSourceReference(data_source_name=data_source.name),
+                    context=EntityContext(
+                        file_context=FileContext.from_metadata(metadata=entity.metadata),
+                        entity=EntityReference(entity_name=entity.name),
                     ),
                     message=f"Data sources can have only one primary identifier. The data source"
-                    f" `{data_source.name}` has {len(primary_identifier_names)}: {', '.join(primary_identifier_names)}",
+                    f" `{entity.name}` has {len(primary_identifier_names)}: {', '.join(primary_identifier_names)}",
                     error_date=date(2022, 1, 12),  # Wed January 12th 2022
                 )
             ]
@@ -183,8 +183,8 @@ class OnePrimaryIdentifierPerDataSourceRule(ModelValidationRule):
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
         issues = []
 
-        for data_source in model.data_sources:
-            issues += OnePrimaryIdentifierPerDataSourceRule._only_one_primary_identifier(data_source=data_source)
+        for entity in model.entities:
+            issues += OnePrimaryIdentifierPerEntityRule._only_one_primary_identifier(entity=entity)
 
         return issues
 
@@ -193,7 +193,7 @@ class OnePrimaryIdentifierPerDataSourceRule(ModelValidationRule):
 class SubIdentifierContext:
     """Organizes the context behind identifiers and their sub-identifiers."""
 
-    data_source: DataSource
+    entity: Entity
     identifier_reference: IdentifierReference
     sub_identifier_names: Tuple[str, ...]
 
@@ -213,12 +213,12 @@ class IdentifierConsistencyRule(ModelValidationRule):
         return sub_identifier_names
 
     @staticmethod
-    def _get_sub_identifier_context(data_source: DataSource) -> Sequence[SubIdentifierContext]:
+    def _get_sub_identifier_context(entity: Entity) -> Sequence[SubIdentifierContext]:
         contexts = []
-        for identifier in data_source.identifiers or []:
+        for identifier in entity.identifiers or []:
             contexts.append(
                 SubIdentifierContext(
-                    data_source=data_source,
+                    entity=entity,
                     identifier_reference=identifier.reference,
                     sub_identifier_names=tuple(IdentifierConsistencyRule._get_sub_identifier_names(identifier)),
                 )
@@ -234,8 +234,8 @@ class IdentifierConsistencyRule(ModelValidationRule):
         all_contexts: List[SubIdentifierContext] = list(
             more_itertools.flatten(
                 [
-                    IdentifierConsistencyRule._get_sub_identifier_context(data_source)
-                    for data_source in model.data_sources
+                    IdentifierConsistencyRule._get_sub_identifier_context(entity)
+                    for entity in model.entities
                 ]
             )
         )
@@ -252,15 +252,15 @@ class IdentifierConsistencyRule(ModelValidationRule):
 
         # convert each invalid identifier configuration into a validation warning
         for identifier_name, sub_identifier_contexts in invalid_sub_identifier_configurations.items():
-            data_source = sub_identifier_contexts[0].data_source
+            entity = sub_identifier_contexts[0].entity
             issues.append(
                 ValidationWarning(
-                    context=DataSourceElementContext(
-                        file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                        data_source_element=DataSourceElementReference(
-                            data_source_name=data_source.name, element_name=identifier_name
+                    context=EntityElementContext(
+                        file_context=FileContext.from_metadata(metadata=entity.metadata),
+                        entity_element=EntityElementReference(
+                            entity_name=entity.name, element_name=identifier_name
                         ),
-                        element_type=DataSourceElementType.IDENTIFIER,
+                        element_type=EntityElementType.IDENTIFIER,
                     ),
                     message=(
                         f"Identifier '{identifier_name}' does not have consistent sub-identifiers "

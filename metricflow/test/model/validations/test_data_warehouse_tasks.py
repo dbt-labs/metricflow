@@ -11,7 +11,7 @@ from metricflow.model.data_warehouse_model_validator import (
     DataWarehouseValidationTask,
 )
 from metricflow.model.model_transformer import ModelTransformer
-from metricflow.model.objects.data_source import Mutability, MutabilityType
+from metricflow.model.objects.entity import Mutability, MutabilityType
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType
 from metricflow.model.objects.elements.identifier import Identifier, IdentifierType
 from metricflow.model.objects.elements.measure import Measure
@@ -19,7 +19,7 @@ from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
-from metricflow.test.model.validations.helpers import data_source_with_guaranteed_meta
+from metricflow.test.model.validations.helpers import entity_with_guaranteed_meta
 from metricflow.test.plan_utils import assert_snapshot_text_equal, make_schema_replacement_function
 
 
@@ -40,17 +40,17 @@ def dw_backed_warehouse_validation_model(
     return data_warehouse_validation_model
 
 
-def test_build_data_source_tasks(
+def test_build_entity_tasks(
     mf_test_session_state: MetricFlowTestSessionState,
     data_warehouse_validation_model: UserConfiguredModel,
     async_sql_client: AsyncSqlClient,
 ) -> None:  # noqa:D
-    tasks = DataWarehouseTaskBuilder.gen_data_source_tasks(
+    tasks = DataWarehouseTaskBuilder.gen_entity_tasks(
         model=data_warehouse_validation_model,
         sql_client=async_sql_client,
         system_schema=mf_test_session_state.mf_system_schema,
     )
-    assert len(tasks) == len(data_warehouse_validation_model.data_sources)
+    assert len(tasks) == len(data_warehouse_validation_model.entities)
 
 
 def test_task_runner(  # noqa: D
@@ -83,7 +83,7 @@ def test_task_runner(  # noqa: D
     assert err_msg_bad in issues.errors[0].message
 
 
-def test_validate_data_sources(  # noqa: D
+def test_validate_entities(  # noqa: D
     dw_backed_warehouse_validation_model: UserConfiguredModel,
     async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -94,22 +94,22 @@ def test_validate_data_sources(  # noqa: D
         sql_client=async_sql_client, system_schema=mf_test_session_state.mf_system_schema
     )
 
-    issues = dw_validator.validate_data_sources(model)
+    issues = dw_validator.validate_entities(model)
     assert len(issues.all_issues) == 0
 
-    model.data_sources.append(
-        data_source_with_guaranteed_meta(
-            name="test_data_source2",
+    model.entities.append(
+        entity_with_guaranteed_meta(
+            name="test_entity2",
             sql_table="doesnt.exist",
             dimensions=[],
             mutability=Mutability(type=MutabilityType.IMMUTABLE),
         )
     )
 
-    issues = dw_validator.validate_data_sources(model)
+    issues = dw_validator.validate_entities(model)
     assert len(issues.all_issues) == 1
     assert len(issues.errors) == 1
-    assert "Unable to access data source `test_data_source2`" in issues.all_issues[0].message
+    assert "Unable to access data source `test_entity2`" in issues.all_issues[0].message
 
 
 def test_build_dimension_tasks(  # noqa: D
@@ -142,9 +142,9 @@ def test_validate_dimensions(  # noqa: D
     issues = dw_validator.validate_dimensions(model)
     assert len(issues.all_issues) == 0
 
-    dimensions = list(model.data_sources[0].dimensions)
+    dimensions = list(model.entities[0].dimensions)
     dimensions.append(Dimension(name="doesnt_exist", type=DimensionType.CATEGORICAL))
-    model.data_sources[0].dimensions = dimensions
+    model.entities[0].dimensions = dimensions
 
     issues = dw_validator.validate_dimensions(model)
     # One isssue is created for the short circuit query failure, and another is
@@ -180,9 +180,9 @@ def test_validate_identifiers(  # noqa: D
     issues = dw_validator.validate_identifiers(model)
     assert len(issues.all_issues) == 0
 
-    identifiers = list(model.data_sources[0].identifiers)
+    identifiers = list(model.entities[0].identifiers)
     identifiers.append(Identifier(name="doesnt_exist", type=IdentifierType.UNIQUE))
-    model.data_sources[0].identifiers = identifiers
+    model.entities[0].identifiers = identifiers
 
     issues = dw_validator.validate_identifiers(model)
     # One isssue is created for the short circuit query failure, and another is
@@ -218,9 +218,9 @@ def test_validate_measures(  # noqa: D
     issues = dw_validator.validate_measures(model)
     assert len(issues.all_issues) == 0
 
-    measures = list(model.data_sources[0].measures)
+    measures = list(model.entities[0].measures)
     measures.append(Measure(name="doesnt_exist", agg=AggregationType.SUM, agg_time_dimension="ds"))
-    model.data_sources[0].measures = measures
+    model.entities[0].measures = measures
 
     issues = dw_validator.validate_measures(model)
     # One isssue is created for the short circuit query failure, and another is
@@ -269,7 +269,7 @@ def test_validate_metrics(  # noqa: D
     assert len(issues.all_issues) == 0
 
     # Update model to have a new measure which creates a new metric by proxy
-    new_measures = list(model.data_sources[0].measures)
+    new_measures = list(model.entities[0].measures)
     new_measures.append(
         Measure(
             name="count_cats",
@@ -278,7 +278,7 @@ def test_validate_metrics(  # noqa: D
             create_metric=True,
         )
     )
-    model.data_sources[0].measures = new_measures
+    model.entities[0].measures = new_measures
     model.metrics = []
     model = ModelTransformer.transform(model)
 

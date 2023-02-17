@@ -1,4 +1,4 @@
-data_source:
+entity:
   name: foo
   description: bar buzz bazz
   owners:
@@ -20,7 +20,7 @@ data_source:
       create_metric: True
   mutability:
     type: immutable
-data_source:
+entity:
   name: foo
   description: bar buzz bazz
   owners:

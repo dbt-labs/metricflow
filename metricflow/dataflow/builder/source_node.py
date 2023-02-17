@@ -5,7 +5,7 @@ from metricflow.dataflow.dataflow_plan import (
     MetricTimeDimensionTransformNode,
     ReadSqlSourceNode,
 )
-from metricflow.dataset.data_source_adapter import DataSourceDataSet
+from metricflow.dataset.entity_adapter import EntityDataSet
 from metricflow.model.semantic_model import SemanticModel
 
 
@@ -19,14 +19,14 @@ class SourceNodeBuilder:
     def __init__(self, semantic_model: SemanticModel) -> None:  # noqa: D
         self._semantic_model = semantic_model
 
-    def create_from_data_sets(self, data_sets: Sequence[DataSourceDataSet]) -> Sequence[BaseOutput[DataSourceDataSet]]:
-        """Creates source nodes from DataSourceDataSets."""
-        source_nodes: List[BaseOutput[DataSourceDataSet]] = []
+    def create_from_data_sets(self, data_sets: Sequence[EntityDataSet]) -> Sequence[BaseOutput[EntityDataSet]]:
+        """Creates source nodes from EntityDataSets."""
+        source_nodes: List[BaseOutput[EntityDataSet]] = []
         for data_set in data_sets:
-            read_node = ReadSqlSourceNode[DataSourceDataSet](data_set)
+            read_node = ReadSqlSourceNode[EntityDataSet](data_set)
             agg_time_dim_to_measures_grouper = (
-                self._semantic_model.data_source_semantics.get_aggregation_time_dimensions_with_measures(
-                    data_set.data_source_reference
+                self._semantic_model.entity_semantics.get_aggregation_time_dimensions_with_measures(
+                    data_set.entity_reference
                 )
             )
 
@@ -38,7 +38,7 @@ class SourceNodeBuilder:
                 # Splits the measures by distinct aggregate time dimension.
                 for time_dimension_reference in time_dimension_references:
                     source_nodes.append(
-                        MetricTimeDimensionTransformNode[DataSourceDataSet](
+                        MetricTimeDimensionTransformNode[EntityDataSet](
                             parent_node=read_node,
                             aggregation_time_dimension_reference=time_dimension_reference,
                         )

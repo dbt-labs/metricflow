@@ -6,7 +6,7 @@ from metricflow.model.validations.validator_helpers import ModelValidationExcept
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.unique_valid_name import MetricFlowReservedKeywords, UniqueAndValidNameRule
 from metricflow.object_utils import flatten_nested_sequence
-from metricflow.test.test_utils import find_data_source_with
+from metricflow.test.test_utils import find_entity_with
 
 
 def copied_model(simple_model__with_primary_transforms: UserConfiguredModel) -> UserConfiguredModel:  # noqa: D
@@ -27,13 +27,13 @@ def copied_model(simple_model__with_primary_transforms: UserConfiguredModel) -> 
 """
 
 
-def test_duplicate_data_source_name(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa: D
+def test_duplicate_entity_name(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa: D
     model = copied_model(simple_model__with_primary_transforms)
-    duplicated_data_source = model.data_sources[0]
-    model.data_sources.append(duplicated_data_source)
+    duplicated_entity = model.entities[0]
+    model.entities.append(duplicated_entity)
     with pytest.raises(
         ModelValidationException,
-        match=rf"Can't use name `{duplicated_data_source.name}` for a data source when it was already used for a data source",
+        match=rf"Can't use name `{duplicated_entity.name}` for a data source when it was already used for a data source",
     ):
         ModelValidator([UniqueAndValidNameRule()]).checked_validations(model)
 
@@ -54,11 +54,11 @@ def test_top_level_metric_can_have_same_name_as_any_other_top_level_item(
 ) -> None:  # noqa:D
     metric_name = simple_model__with_primary_transforms.metrics[0].name
 
-    model_data_source = copied_model(simple_model__with_primary_transforms)
+    model_entity = copied_model(simple_model__with_primary_transforms)
 
-    model_data_source.data_sources[0].name = metric_name
+    model_entity.entities[0].name = metric_name
 
-    ModelValidator([UniqueAndValidNameRule()]).checked_validations(model_data_source)
+    ModelValidator([UniqueAndValidNameRule()]).checked_validations(model_entity)
 
 
 """
@@ -77,11 +77,11 @@ def test_duplicate_measure_name(simple_model__with_primary_transforms: UserConfi
     model = copied_model(simple_model__with_primary_transforms)
 
     # Ensure we have a usable data source for the test
-    data_source_with_measures, _ = find_data_source_with(model, lambda data_source: len(data_source.measures) > 0)
+    entity_with_measures, _ = find_entity_with(model, lambda entity: len(entity.measures) > 0)
 
-    duplicated_measure = data_source_with_measures.measures[0]
-    duplicated_measures_tuple = (data_source_with_measures.measures, (duplicated_measure,))
-    data_source_with_measures.measures = flatten_nested_sequence(duplicated_measures_tuple)
+    duplicated_measure = entity_with_measures.measures[0]
+    duplicated_measures_tuple = (entity_with_measures.measures, (duplicated_measure,))
+    entity_with_measures.measures = flatten_nested_sequence(duplicated_measures_tuple)
 
     with pytest.raises(
         ModelValidationException,
@@ -94,11 +94,11 @@ def test_duplicate_dimension_name(simple_model__with_primary_transforms: UserCon
     model = copied_model(simple_model__with_primary_transforms)
 
     # Ensure we have a usable data source for the test
-    data_source_with_dimensions, _ = find_data_source_with(model, lambda data_source: len(data_source.dimensions) > 0)
+    entity_with_dimensions, _ = find_entity_with(model, lambda entity: len(entity.dimensions) > 0)
 
-    duplicated_dimension = data_source_with_dimensions.dimensions[0]
-    duplicated_dimensions_tuple = (data_source_with_dimensions.dimensions, (duplicated_dimension,))
-    data_source_with_dimensions.dimensions = flatten_nested_sequence(duplicated_dimensions_tuple)
+    duplicated_dimension = entity_with_dimensions.dimensions[0]
+    duplicated_dimensions_tuple = (entity_with_dimensions.dimensions, (duplicated_dimension,))
+    entity_with_dimensions.dimensions = flatten_nested_sequence(duplicated_dimensions_tuple)
 
     with pytest.raises(
         ModelValidationException,
@@ -112,11 +112,11 @@ def test_duplicate_identifier_name(simple_model__with_primary_transforms: UserCo
     model = copied_model(simple_model__with_primary_transforms)
 
     # Ensure we have a usable data source for the test
-    data_source_with_identifiers, _ = find_data_source_with(model, lambda data_source: len(data_source.identifiers) > 0)
+    entity_with_identifiers, _ = find_entity_with(model, lambda entity: len(entity.identifiers) > 0)
 
-    duplicated_identifier = data_source_with_identifiers.identifiers[0]
-    duplicated_identifiers_tuple = (data_source_with_identifiers.identifiers, (duplicated_identifier,))
-    data_source_with_identifiers.identifiers = flatten_nested_sequence(duplicated_identifiers_tuple)
+    duplicated_identifier = entity_with_identifiers.identifiers[0]
+    duplicated_identifiers_tuple = (entity_with_identifiers.identifiers, (duplicated_identifier,))
+    entity_with_identifiers.identifiers = flatten_nested_sequence(duplicated_identifiers_tuple)
 
     with pytest.raises(
         ModelValidationException,

@@ -4,17 +4,17 @@ import enum
 import re
 from typing import Dict, Tuple, List, Optional
 from metricflow.instances import (
-    DataSourceElementReference,
-    DataSourceReference,
+    EntityElementReference,
+    EntityReference,
     MetricModelReference,
 )
 
-from metricflow.model.objects.data_source import DataSource
+from metricflow.model.objects.entity import Entity
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
-    DataSourceContext,
-    DataSourceElementContext,
-    DataSourceElementType,
+    EntityContext,
+    EntityElementContext,
+    EntityElementType,
     FileContext,
     MetricContext,
     ModelValidationRule,
@@ -93,52 +93,52 @@ class UniqueAndValidNameRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking data source sub element names are unique")
-    def _validate_data_source_elements(data_source: DataSource) -> List[ValidationIssueType]:
+    def _validate_entity_elements(entity: Entity) -> List[ValidationIssueType]:
         issues: List[ValidationIssueType] = []
         element_info_tuples: List[Tuple[ElementReference, str, ValidationContext]] = []
 
-        if data_source.measures:
-            for measure in data_source.measures:
+        if entity.measures:
+            for measure in entity.measures:
                 element_info_tuples.append(
                     (
                         measure.reference,
                         "measure",
-                        DataSourceElementContext(
-                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source_element=DataSourceElementReference(
-                                data_source_name=data_source.name, element_name=measure.name
+                        EntityElementContext(
+                            file_context=FileContext.from_metadata(metadata=entity.metadata),
+                            entity_element=EntityElementReference(
+                                entity_name=entity.name, element_name=measure.name
                             ),
-                            element_type=DataSourceElementType.MEASURE,
+                            element_type=EntityElementType.MEASURE,
                         ),
                     )
                 )
-        if data_source.identifiers:
-            for identifier in data_source.identifiers:
+        if entity.identifiers:
+            for identifier in entity.identifiers:
                 element_info_tuples.append(
                     (
                         identifier.reference,
                         "identifier",
-                        DataSourceElementContext(
-                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source_element=DataSourceElementReference(
-                                data_source_name=data_source.name, element_name=identifier.name
+                        EntityElementContext(
+                            file_context=FileContext.from_metadata(metadata=entity.metadata),
+                            entity_element=EntityElementReference(
+                                entity_name=entity.name, element_name=identifier.name
                             ),
-                            element_type=DataSourceElementType.IDENTIFIER,
+                            element_type=EntityElementType.IDENTIFIER,
                         ),
                     )
                 )
-        if data_source.dimensions:
-            for dimension in data_source.dimensions:
+        if entity.dimensions:
+            for dimension in entity.dimensions:
                 element_info_tuples.append(
                     (
                         dimension.reference,
                         "dimension",
-                        DataSourceElementContext(
-                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source_element=DataSourceElementReference(
-                                data_source_name=data_source.name, element_name=dimension.name
+                        EntityElementContext(
+                            file_context=FileContext.from_metadata(metadata=entity.metadata),
+                            entity_element=EntityElementReference(
+                                entity_name=entity.name, element_name=dimension.name
                             ),
-                            element_type=DataSourceElementType.DIMENSION,
+                            element_type=EntityElementType.DIMENSION,
                         ),
                     )
                 )
@@ -149,7 +149,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
                 issues.append(
                     ValidationError(
                         context=context,
-                        message=f"In data source `{data_source.name}`, can't use name `{name.element_name}` for a "
+                        message=f"In data source `{entity.name}`, can't use name `{name.element_name}` for a "
                         f"{_type} when it was already used for a {name_to_type[name]}",
                     )
                 )
@@ -166,15 +166,15 @@ class UniqueAndValidNameRule(ModelValidationRule):
     def _validate_top_level_objects(model: UserConfiguredModel) -> List[ValidationIssueType]:
         """Checks names of objects that are not nested."""
         object_info_tuples = []
-        if model.data_sources:
-            for data_source in model.data_sources:
+        if model.entities:
+            for entity in model.entities:
                 object_info_tuples.append(
                     (
-                        data_source.name,
+                        entity.name,
                         "data source",
-                        DataSourceContext(
-                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source=DataSourceReference(data_source_name=data_source.name),
+                        EntityContext(
+                            file_context=FileContext.from_metadata(metadata=entity.metadata),
+                            entity=EntityReference(entity_name=entity.name),
                         ),
                     )
                 )
@@ -222,7 +222,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
         issues = []
         issues += UniqueAndValidNameRule._validate_top_level_objects(model=model)
 
-        for data_source in model.data_sources:
-            issues += UniqueAndValidNameRule._validate_data_source_elements(data_source=data_source)
+        for entity in model.entities:
+            issues += UniqueAndValidNameRule._validate_entity_elements(entity=entity)
 
         return issues

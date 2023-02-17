@@ -5,13 +5,13 @@ from typing import Dict, List, FrozenSet, Set, Tuple, Sequence
 from metricflow.errors.errors import MetricNotFoundError, DuplicateMetricError, NonExistentMeasureError
 from metricflow.model.objects.metric import Metric, MetricType
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.semantics.data_source_semantics import DataSourceSemantics
+from metricflow.model.semantics.entity_semantics import EntitySemantics
 from metricflow.model.semantics.linkable_spec_resolver import ValidLinkableSpecResolver
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.spec_converters import WhereConstraintConverter
 from metricflow.references import MetricReference
 from metricflow.specs import MetricSpec, LinkableInstanceSpec, MetricInputMeasureSpec, MeasureSpec
-from metricflow.model.semantics.data_source_join_evaluator import MAX_JOIN_HOPS
+from metricflow.model.semantics.entity_join_evaluator import MAX_JOIN_HOPS
 
 
 logger = logging.getLogger(__name__)
@@ -19,11 +19,11 @@ logger = logging.getLogger(__name__)
 
 class MetricSemantics:  # noqa: D
     def __init__(  # noqa: D
-        self, user_configured_model: UserConfiguredModel, data_source_semantics: DataSourceSemantics
+        self, user_configured_model: UserConfiguredModel, entity_semantics: EntitySemantics
     ) -> None:
         self._user_configured_model = user_configured_model
         self._metrics: Dict[MetricReference, Metric] = {}
-        self._data_source_semantics = data_source_semantics
+        self._entity_semantics = entity_semantics
 
         # Dict from the name of the metric to the hash.
         self._metric_hashes: Dict[MetricReference, str] = {}
@@ -33,7 +33,7 @@ class MetricSemantics:  # noqa: D
 
         self._linkable_spec_resolver = ValidLinkableSpecResolver(
             user_configured_model=self._user_configured_model,
-            data_source_semantics=data_source_semantics,
+            entity_semantics=entity_semantics,
             max_identifier_links=MAX_JOIN_HOPS,
         )
 
@@ -79,7 +79,7 @@ class MetricSemantics:  # noqa: D
         if metric_reference in self._metrics:
             raise DuplicateMetricError(f"Metric `{metric.name}` has already been registered")
         for measure_reference in metric.measure_references:
-            if measure_reference not in self._data_source_semantics.measure_references:
+            if measure_reference not in self._entity_semantics.measure_references:
                 raise NonExistentMeasureError(
                     f"Metric `{metric.name}` references measure `{measure_reference}` which has not been registered"
                 )
@@ -99,7 +99,7 @@ class MetricSemantics:  # noqa: D
         for input_measure in metric.input_measures:
             spec_constraint = (
                 WhereConstraintConverter.convert_to_spec_where_constraint(
-                    data_source_semantics=self._data_source_semantics,
+                    entity_semantics=self._entity_semantics,
                     where_constraint=input_measure.constraint,
                 )
                 if input_measure.constraint is not None
@@ -107,7 +107,7 @@ class MetricSemantics:  # noqa: D
             )
             measure_spec = MeasureSpec(
                 element_name=input_measure.name,
-                non_additive_dimension_spec=self._data_source_semantics.non_additive_dimension_specs_by_measure.get(
+                non_additive_dimension_spec=self._entity_semantics.non_additive_dimension_specs_by_measure.get(
                     input_measure.measure_reference
                 ),
             )
@@ -140,7 +140,7 @@ class MetricSemantics:  # noqa: D
         for input_metric in metric.input_metrics:
             spec_constraint = (
                 WhereConstraintConverter.convert_to_spec_where_constraint(
-                    data_source_semantics=self._data_source_semantics,
+                    entity_semantics=self._entity_semantics,
                     where_constraint=input_metric.constraint,
                 )
                 if input_metric.constraint is not None

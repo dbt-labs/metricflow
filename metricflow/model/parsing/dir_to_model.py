@@ -11,11 +11,11 @@ from jsonschema import exceptions
 from metricflow.errors.errors import ParsingException
 from metricflow.model.model_transformer import ModelTransformer
 from metricflow.model.objects.common import Version, YamlConfigFile
-from metricflow.model.objects.data_source import DataSource
+from metricflow.model.objects.entity import Entity
 from metricflow.model.objects.metric import Metric
 from metricflow.model.parsing.schemas_internal import (
     metric_validator,
-    data_source_validator,
+    entity_validator,
 )
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.parsing.yaml_loader import (
@@ -35,8 +35,8 @@ logger = logging.getLogger(__name__)
 
 VERSION_KEY = "mf_config_schema"
 METRIC_TYPE = "metric"
-DATA_SOURCE_TYPE = "data_source"
-DOCUMENT_TYPES = [METRIC_TYPE, DATA_SOURCE_TYPE]
+entity_TYPE = "entity"
+DOCUMENT_TYPES = [METRIC_TYPE, entity_TYPE]
 
 
 @dataclass(frozen=True)
@@ -55,7 +55,7 @@ class FileParsingResult:
         issues: Issues found when trying to parse the file
     """
 
-    elements: List[Union[DataSource, Metric]]
+    elements: List[Union[Entity, Metric]]
     issues: List[ValidationIssueType]
 
 
@@ -188,7 +188,7 @@ def parse_yaml_files_to_validation_ready_model(
 
 def parse_yaml_files_to_model(
     files: List[YamlConfigFile],
-    data_source_class: Type[DataSource] = DataSource,
+    entity_class: Type[Entity] = Entity,
     metric_class: Type[Metric] = Metric,
 ) -> ModelBuildResult:
     """Builds UserConfiguredModel from list of config files (as strings).
@@ -198,21 +198,21 @@ def parse_yaml_files_to_model(
 
     Note: this function does not finalize the model
     """
-    data_sources = []
+    entities = []
     metrics = []
-    valid_object_classes = [data_source_class.__name__, metric_class.__name__]
+    valid_object_classes = [entity_class.__name__, metric_class.__name__]
     issues: List[ValidationIssueType] = []
 
     for config_file in files:
         parsing_result = parse_config_yaml(  # parse config file
             config_file,
-            data_source_class=data_source_class,
+            entity_class=entity_class,
             metric_class=metric_class,
         )
         file_issues = parsing_result.issues
         for obj in parsing_result.elements:
-            if isinstance(obj, data_source_class):
-                data_sources.append(obj)
+            if isinstance(obj, entity_class):
+                entities.append(obj)
             elif isinstance(obj, metric_class):
                 metrics.append(obj)
             else:
@@ -227,7 +227,7 @@ def parse_yaml_files_to_model(
 
     return ModelBuildResult(
         model=UserConfiguredModel(
-            data_sources=data_sources,
+            entities=entities,
             metrics=metrics,
         ),
         issues=ModelValidationResults.from_issues_sequence(issues),
@@ -236,11 +236,11 @@ def parse_yaml_files_to_model(
 
 def parse_config_yaml(
     config_yaml: YamlConfigFile,
-    data_source_class: Type[DataSource] = DataSource,
+    entity_class: Type[Entity] = Entity,
     metric_class: Type[Metric] = Metric,
 ) -> FileParsingResult:
     """Parses transform config file passed as string - Returns list of model objects"""
-    results: List[Union[DataSource, Metric]] = []
+    results: List[Union[Entity, Metric]] = []
     ctx: Optional[ParsingContext] = None
     issues: List[ValidationIssueType] = []
     try:
@@ -303,9 +303,9 @@ def parse_config_yaml(
                 if document_type == METRIC_TYPE:
                     metric_validator.validate(config_document[document_type])
                     results.append(metric_class.parse_obj(object_cfg))
-                elif document_type == DATA_SOURCE_TYPE:
-                    data_source_validator.validate(config_document[document_type])
-                    results.append(data_source_class.parse_obj(object_cfg))
+                elif document_type == entity_TYPE:
+                    entity_validator.validate(config_document[document_type])
+                    results.append(entity_class.parse_obj(object_cfg))
                 else:
                     issues.append(
                         ValidationError(

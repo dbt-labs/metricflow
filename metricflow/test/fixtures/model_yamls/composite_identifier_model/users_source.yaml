@@ -1,5 +1,5 @@
 ---
-data_source:
+entity:
   name: users_source
   description: users_source
   owners:

@@ -1,14 +1,14 @@
 from typing import List
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.instances import DataSourceElementReference
+from metricflow.instances import EntityElementReference
 
 
-from metricflow.model.objects.data_source import DataSource
+from metricflow.model.objects.entity import Entity
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
-    DataSourceContext,
-    DataSourceElementContext,
-    DataSourceElementType,
+    EntityContext,
+    EntityElementContext,
+    EntityElementType,
     FileContext,
     ModelValidationRule,
     ValidationError,
@@ -66,25 +66,25 @@ class ReservedKeywordsRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking that data source sub element names aren't reserved sql keywords")
-    def _validate_data_source_sub_elements(data_source: DataSource) -> List[ValidationIssueType]:
+    def _validate_entity_sub_elements(entity: Entity) -> List[ValidationIssueType]:
         issues: List[ValidationIssueType] = []
 
-        for dimension in data_source.dimensions:
+        for dimension in entity.dimensions:
             if dimension.name.upper() in RESERVED_KEYWORDS:
                 issues.append(
                     ValidationError(
-                        context=DataSourceElementContext(
-                            file_context=FileContext.from_metadata(data_source.metadata),
-                            data_source_element=DataSourceElementReference(
-                                data_source_name=data_source.name, element_name=dimension.name
+                        context=EntityElementContext(
+                            file_context=FileContext.from_metadata(entity.metadata),
+                            entity_element=EntityElementReference(
+                                entity_name=entity.name, element_name=dimension.name
                             ),
-                            element_type=DataSourceElementType.DIMENSION,
+                            element_type=EntityElementType.DIMENSION,
                         ),
                         message=f"'{dimension.name}' is an SQL reserved keyword, and thus cannot be used as a dimension 'name'.",
                     )
                 )
 
-        for identifier in data_source.identifiers:
+        for identifier in entity.identifiers:
             if identifier.is_composite:
                 msg = "'{name}' is an SQL reserved keyword, and thus cannot be used as a sub-identifier 'name'"
                 names = [sub_ident.name for sub_ident in identifier.identifiers if sub_ident.name is not None]
@@ -96,27 +96,27 @@ class ReservedKeywordsRule(ModelValidationRule):
                 if name.upper() in RESERVED_KEYWORDS:
                     issues.append(
                         ValidationError(
-                            context=DataSourceElementContext(
-                                file_context=FileContext.from_metadata(data_source.metadata),
-                                data_source_element=DataSourceElementReference(
-                                    data_source_name=data_source.name, element_name=identifier.name
+                            context=EntityElementContext(
+                                file_context=FileContext.from_metadata(entity.metadata),
+                                entity_element=EntityElementReference(
+                                    entity_name=entity.name, element_name=identifier.name
                                 ),
-                                element_type=DataSourceElementType.IDENTIFIER,
+                                element_type=EntityElementType.IDENTIFIER,
                             ),
                             message=msg.format(name=name),
                         )
                     )
 
-        for measure in data_source.measures:
+        for measure in entity.measures:
             if measure.name.upper() in RESERVED_KEYWORDS:
                 issues.append(
                     ValidationError(
-                        context=DataSourceElementContext(
-                            file_context=FileContext.from_metadata(data_source.metadata),
-                            data_source_element=DataSourceElementReference(
-                                data_source_name=data_source.name, element_name=measure.name
+                        context=EntityElementContext(
+                            file_context=FileContext.from_metadata(entity.metadata),
+                            entity_element=EntityElementReference(
+                                entity_name=entity.name, element_name=measure.name
                             ),
-                            element_type=DataSourceElementType.MEASURE,
+                            element_type=EntityElementType.MEASURE,
                         ),
                         message=f"'{measure.name}' is an SQL reserved keyword, and thus cannot be used as an measure 'name'.",
                     )
@@ -125,30 +125,30 @@ class ReservedKeywordsRule(ModelValidationRule):
         return issues
 
     @classmethod
-    @validate_safely(whats_being_done="checking that data_source sql_tables are not sql reserved keywords")
-    def _validate_data_sources(cls, model: UserConfiguredModel) -> List[ValidationIssueType]:
+    @validate_safely(whats_being_done="checking that entity sql_tables are not sql reserved keywords")
+    def _validate_entities(cls, model: UserConfiguredModel) -> List[ValidationIssueType]:
         """Checks names of objects that are not nested."""
         issues: List[ValidationIssueType] = []
         set_keywords = set(RESERVED_KEYWORDS)
 
-        for data_source in model.data_sources:
-            if data_source.sql_table is not None:
+        for entity in model.entities:
+            if entity.sql_table is not None:
                 set_sql_table_path_parts = set(
-                    [part.upper() for part in SqlTable.from_string(data_source.sql_table).parts_tuple]
+                    [part.upper() for part in SqlTable.from_string(entity.sql_table).parts_tuple]
                 )
                 keyword_intersection = set_keywords.intersection(set_sql_table_path_parts)
 
                 if len(keyword_intersection) > 0:
                     issues.append(
                         ValidationError(
-                            context=DataSourceContext(
-                                file_context=FileContext.from_metadata(data_source.metadata),
-                                data_source=data_source.reference,
+                            context=EntityContext(
+                                file_context=FileContext.from_metadata(entity.metadata),
+                                entity=entity.reference,
                             ),
-                            message=f"'{data_source.sql_table}' contains the SQL reserved keyword(s) {keyword_intersection}, and thus cannot be used for 'sql_table'.",
+                            message=f"'{entity.sql_table}' contains the SQL reserved keyword(s) {keyword_intersection}, and thus cannot be used for 'sql_table'.",
                         )
                     )
-            issues += cls._validate_data_source_sub_elements(data_source=data_source)
+            issues += cls._validate_entity_sub_elements(entity=entity)
 
         return issues
 
@@ -157,4 +157,4 @@ class ReservedKeywordsRule(ModelValidationRule):
         whats_being_done="running model validation ensuring elements that aren't selected via a defined expr don't contain reserved keywords"
     )
     def validate_model(cls, model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
-        return cls._validate_data_sources(model=model)
+        return cls._validate_entities(model=model)

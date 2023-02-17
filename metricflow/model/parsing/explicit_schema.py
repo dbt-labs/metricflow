@@ -8,7 +8,7 @@ from metricflow.model.parsing import schemas_internal
 
 TOP_LEVEL_SCHEMAS = {
     "metric": "metric",
-    "data_source": "data_source",
+    "entity": "entity",
     "derived_group_by_element_schema": "derived_identifier",
 }
 

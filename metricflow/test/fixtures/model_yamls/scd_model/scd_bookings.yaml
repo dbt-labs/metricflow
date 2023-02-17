@@ -1,5 +1,5 @@
 ---
-data_source:
+entity:
   name: bookings_source
   description: bookings data source for use in the SCD model
   owners:

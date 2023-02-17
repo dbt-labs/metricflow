@@ -12,8 +12,8 @@ class ConvertMedianToPercentileRule(ModelTransformRule):
 
     @staticmethod
     def transform_model(model: UserConfiguredModel) -> UserConfiguredModel:  # noqa: D
-        for data_source in model.data_sources:
-            for measure in data_source.measures:
+        for entity in model.entities:
+            for measure in entity.measures:
                 if measure.agg == AggregationType.MEDIAN:
                     measure.agg = AggregationType.PERCENTILE
 

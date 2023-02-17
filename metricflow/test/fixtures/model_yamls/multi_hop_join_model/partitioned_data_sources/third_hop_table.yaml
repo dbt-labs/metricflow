@@ -1,5 +1,5 @@
 --- 
-data_source:
+entity:
   name: third_hop_table
   description: third_hop_table
   owners:

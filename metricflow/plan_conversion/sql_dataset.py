@@ -4,8 +4,8 @@ from metricflow.column_assoc import ColumnAssociation
 from metricflow.dataset.dataset import DataSet
 from metricflow.instances import (
     InstanceSet,
-    DataSourceReference,
-    DataSourceElementInstance,
+    EntityReference,
+    EntityElementInstance,
     InstanceSetTransform,
 )
 from metricflow.object_utils import flatten_nested_sequence
@@ -118,17 +118,17 @@ class SqlDataSet(DataSet):
         return flatten_nested_sequence([instance.associated_columns for instance in instances])
 
 
-class SameDataSourceReferenceChecker(InstanceSetTransform[bool]):
+class SameEntityReferenceChecker(InstanceSetTransform[bool]):
     """Checks to see that all elements in the instance set come from the same data source."""
 
-    def __init__(self, data_source_reference: DataSourceReference) -> None:  # noqa: D
-        self._data_source_reference = data_source_reference
+    def __init__(self, entity_reference: EntityReference) -> None:  # noqa: D
+        self._entity_reference = entity_reference
 
     def transform(self, instance_set: InstanceSet) -> bool:  # noqa: D
-        combined: List[DataSourceElementInstance] = []
+        combined: List[EntityElementInstance] = []
         combined.extend(instance_set.measure_instances)
         combined.extend(instance_set.dimension_instances)
         combined.extend(instance_set.time_dimension_instances)
         combined.extend(instance_set.identifier_instances)
 
-        return all([all([y.is_from(self._data_source_reference) for y in x.defined_from]) for x in combined])
+        return all([all([y.is_from(self._entity_reference) for y in x.defined_from]) for x in combined])

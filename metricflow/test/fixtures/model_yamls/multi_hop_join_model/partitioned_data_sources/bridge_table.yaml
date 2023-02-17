@@ -1,5 +1,5 @@
 --- 
-data_source:
+entity:
   name: bridge_table
   description: bridge_table
   owners:

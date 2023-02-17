@@ -2,16 +2,16 @@ import pytest
 
 from metricflow.aggregation_properties import AggregationType
 from metricflow.model.model_validator import ModelValidator
-from metricflow.model.objects.data_source import Mutability, MutabilityType, DataSource
+from metricflow.model.objects.entity import Mutability, MutabilityType, Entity
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from metricflow.model.objects.elements.measure import Measure
 from metricflow.model.objects.metric import MetricType, MetricTypeParams, Metric
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.validations.data_sources import DataSourceTimeDimensionWarningsRule
+from metricflow.model.validations.entities import EntityTimeDimensionWarningsRule
 from metricflow.model.validations.dimension_const import DimensionConsistencyRule
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.references import DimensionReference, MeasureReference, TimeDimensionReference
-from metricflow.test.model.validations.helpers import data_source_with_guaranteed_meta, metric_with_guaranteed_meta
+from metricflow.test.model.validations.helpers import entity_with_guaranteed_meta, metric_with_guaranteed_meta
 from metricflow.time.time_granularity import TimeGranularity
 
 
@@ -22,8 +22,8 @@ def test_incompatible_dimension_type() -> None:  # noqa:D
         model_validator = ModelValidator([DimensionConsistencyRule()])
         model_validator.checked_validations(
             UserConfiguredModel(
-                data_sources=[
-                    data_source_with_guaranteed_meta(
+                entities=[
+                    entity_with_guaranteed_meta(
                         name="dim1",
                         sql_query=f"SELECT {dim_name}, {measure_name} FROM bar",
                         measures=[Measure(name=measure_name, agg=AggregationType.SUM)],
@@ -39,7 +39,7 @@ def test_incompatible_dimension_type() -> None:  # noqa:D
                         ],
                         mutability=Mutability(type=MutabilityType.IMMUTABLE),
                     ),
-                    data_source_with_guaranteed_meta(
+                    entity_with_guaranteed_meta(
                         name="categoricaldim",
                         sql_query="SELECT foo FROM bar",
                         dimensions=[Dimension(name=dim_name, type=DimensionType.CATEGORICAL)],
@@ -64,8 +64,8 @@ def test_incompatible_dimension_is_partition() -> None:  # noqa:D
         model_validator = ModelValidator([DimensionConsistencyRule()])
         model_validator.checked_validations(
             UserConfiguredModel(
-                data_sources=[
-                    data_source_with_guaranteed_meta(
+                entities=[
+                    entity_with_guaranteed_meta(
                         name="dim1",
                         sql_query=f"SELECT {dim_name}, {measure_name} FROM bar",
                         measures=[Measure(name=measure_name, agg=AggregationType.SUM)],
@@ -82,7 +82,7 @@ def test_incompatible_dimension_is_partition() -> None:  # noqa:D
                         ],
                         mutability=Mutability(type=MutabilityType.IMMUTABLE),
                     ),
-                    data_source_with_guaranteed_meta(
+                    entity_with_guaranteed_meta(
                         name="dim2",
                         sql_query="SELECT foo1 FROM bar",
                         dimensions=[
@@ -114,11 +114,11 @@ def test_multiple_primary_time_dimensions() -> None:  # noqa:D
         dimension_reference = TimeDimensionReference(element_name="ds")
         dimension_reference2 = DimensionReference(element_name="not_ds")
         measure_reference = MeasureReference(element_name="measure")
-        model_validator = ModelValidator([DataSourceTimeDimensionWarningsRule()])
+        model_validator = ModelValidator([EntityTimeDimensionWarningsRule()])
         model_validator.checked_validations(
             model=UserConfiguredModel(
-                data_sources=[
-                    DataSource(
+                entities=[
+                    Entity(
                         name="dim1",
                         sql_query=f"SELECT ds, {measure_reference.element_name} FROM bar",
                         measures=[

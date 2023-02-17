@@ -10,9 +10,9 @@ from metricflow.model.objects.metric import Metric
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.unique_valid_name import UniqueAndValidNameRule
 from metricflow.model.validations.validator_helpers import (
-    DataSourceElementContext,
-    DataSourceElementReference,
-    DataSourceElementType,
+    EntityElementContext,
+    EntityElementReference,
+    EntityElementType,
     FileContext,
     MetricContext,
     ModelValidationRule,
@@ -24,7 +24,7 @@ from metricflow.model.validations.validator_helpers import (
 from metricflow.references import MeasureReference
 
 
-class DataSourceMeasuresUniqueRule(ModelValidationRule):
+class EntityMeasuresUniqueRule(ModelValidationRule):
     """Asserts all measure names are unique across the model."""
 
     @staticmethod
@@ -34,24 +34,24 @@ class DataSourceMeasuresUniqueRule(ModelValidationRule):
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
         issues: List[ValidationIssueType] = []
 
-        measure_references_to_data_sources: Dict[MeasureReference, List] = defaultdict(list)
-        for data_source in model.data_sources:
-            for measure in data_source.measures:
-                if measure.reference in measure_references_to_data_sources:
+        measure_references_to_entities: Dict[MeasureReference, List] = defaultdict(list)
+        for entity in model.entities:
+            for measure in entity.measures:
+                if measure.reference in measure_references_to_entities:
                     issues.append(
                         ValidationError(
-                            context=DataSourceElementContext(
-                                file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                                data_source_element=DataSourceElementReference(
-                                    data_source_name=data_source.name, element_name=measure.name
+                            context=EntityElementContext(
+                                file_context=FileContext.from_metadata(metadata=entity.metadata),
+                                entity_element=EntityElementReference(
+                                    entity_name=entity.name, element_name=measure.name
                                 ),
-                                element_type=DataSourceElementType.MEASURE,
+                                element_type=EntityElementType.MEASURE,
                             ),
                             message=f"Found measure with name {measure.name} in multiple data sources with names "
-                            f"({measure_references_to_data_sources[measure.reference]})",
+                            f"({measure_references_to_entities[measure.reference]})",
                         )
                     )
-                measure_references_to_data_sources[measure.reference].append(data_source.name)
+                measure_references_to_entities[measure.reference].append(entity.name)
 
         return issues
 
@@ -225,15 +225,15 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
     @validate_safely(whats_being_done="ensuring that a measure's non_additive_dimensions is valid")
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
         issues: List[ValidationIssueType] = []
-        for data_source in model.data_sources or []:
-            for measure in data_source.measures:
+        for entity in model.entities or []:
+            for measure in entity.measures:
                 non_additive_dimension = measure.non_additive_dimension
                 if non_additive_dimension is None:
                     continue
                 agg_time_dimension = next(
                     (
                         dim
-                        for dim in data_source.dimensions
+                        for dim in entity.dimensions
                         if measure.checked_agg_time_dimension.element_name == dim.name
                     ),
                     None,
@@ -242,16 +242,16 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                     # Sanity check, should never hit this
                     issues.append(
                         ValidationError(
-                            context=DataSourceElementContext(
-                                file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                                data_source_element=DataSourceElementReference(
-                                    data_source_name=data_source.name, element_name=measure.name
+                            context=EntityElementContext(
+                                file_context=FileContext.from_metadata(metadata=entity.metadata),
+                                entity_element=EntityElementReference(
+                                    entity_name=entity.name, element_name=measure.name
                                 ),
-                                element_type=DataSourceElementType.MEASURE,
+                                element_type=EntityElementType.MEASURE,
                             ),
                             message=(
                                 f"Measure '{measure.name}' has a agg_time_dimension of {measure.checked_agg_time_dimension.element_name} "
-                                f"that is not defined as a dimension in data source '{data_source.name}'."
+                                f"that is not defined as a dimension in data source '{entity.name}'."
                             ),
                         )
                     )
@@ -259,21 +259,21 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
 
                 # Validates that the non_additive_dimension exists as a time dimension in the data source
                 matching_dimension = next(
-                    (dim for dim in data_source.dimensions if non_additive_dimension.name == dim.name), None
+                    (dim for dim in entity.dimensions if non_additive_dimension.name == dim.name), None
                 )
                 if matching_dimension is None:
                     issues.append(
                         ValidationError(
-                            context=DataSourceElementContext(
-                                file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                                data_source_element=DataSourceElementReference(
-                                    data_source_name=data_source.name, element_name=measure.name
+                            context=EntityElementContext(
+                                file_context=FileContext.from_metadata(metadata=entity.metadata),
+                                entity_element=EntityElementReference(
+                                    entity_name=entity.name, element_name=measure.name
                                 ),
-                                element_type=DataSourceElementType.MEASURE,
+                                element_type=EntityElementType.MEASURE,
                             ),
                             message=(
                                 f"Measure '{measure.name}' has a non_additive_dimension with name '{non_additive_dimension.name}' "
-                                f"that is not defined as a dimension in data source '{data_source.name}'."
+                                f"that is not defined as a dimension in data source '{entity.name}'."
                             ),
                         )
                     )
@@ -282,12 +282,12 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                     if matching_dimension.type != DimensionType.TIME:
                         issues.append(
                             ValidationError(
-                                context=DataSourceElementContext(
-                                    file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                                    data_source_element=DataSourceElementReference(
-                                        data_source_name=data_source.name, element_name=measure.name
+                                context=EntityElementContext(
+                                    file_context=FileContext.from_metadata(metadata=entity.metadata),
+                                    entity_element=EntityElementReference(
+                                        entity_name=entity.name, element_name=measure.name
                                     ),
-                                    element_type=DataSourceElementType.MEASURE,
+                                    element_type=EntityElementType.MEASURE,
                                 ),
                                 message=(
                                     f"Measure '{measure.name}' has a non_additive_dimension with name '{non_additive_dimension.name}' "
@@ -307,12 +307,12 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                     ):
                         issues.append(
                             ValidationError(
-                                context=DataSourceElementContext(
-                                    file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                                    data_source_element=DataSourceElementReference(
-                                        data_source_name=data_source.name, element_name=measure.name
+                                context=EntityElementContext(
+                                    file_context=FileContext.from_metadata(metadata=entity.metadata),
+                                    entity_element=EntityElementReference(
+                                        entity_name=entity.name, element_name=measure.name
                                     ),
-                                    element_type=DataSourceElementType.MEASURE,
+                                    element_type=EntityElementType.MEASURE,
                                 ),
                                 message=(
                                     f"Measure '{measure.name}' has a non_additive_dimension with name '{non_additive_dimension.name}' that has "
@@ -326,12 +326,12 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                 if non_additive_dimension.window_choice not in {AggregationType.MIN, AggregationType.MAX}:
                     issues.append(
                         ValidationError(
-                            context=DataSourceElementContext(
-                                file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                                data_source_element=DataSourceElementReference(
-                                    data_source_name=data_source.name, element_name=measure.name
+                            context=EntityElementContext(
+                                file_context=FileContext.from_metadata(metadata=entity.metadata),
+                                entity_element=EntityElementReference(
+                                    entity_name=entity.name, element_name=measure.name
                                 ),
-                                element_type=DataSourceElementType.MEASURE,
+                                element_type=EntityElementType.MEASURE,
                             ),
                             message=(
                                 f"Measure '{measure.name}' has a non_additive_dimension with an invalid 'window_choice' of '{non_additive_dimension.window_choice.value}'. "
@@ -341,18 +341,18 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                     )
 
                 # Validates that all window_groupings are identifiers
-                identifiers_in_data_source = {identifier.name for identifier in data_source.identifiers}
+                identifiers_in_entity = {identifier.name for identifier in entity.identifiers}
                 window_groupings = set(non_additive_dimension.window_groupings)
-                intersected_identifiers = window_groupings.intersection(identifiers_in_data_source)
+                intersected_identifiers = window_groupings.intersection(identifiers_in_entity)
                 if len(intersected_identifiers) != len(window_groupings):
                     issues.append(
                         ValidationError(
-                            context=DataSourceElementContext(
-                                file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                                data_source_element=DataSourceElementReference(
-                                    data_source_name=data_source.name, element_name=measure.name
+                            context=EntityElementContext(
+                                file_context=FileContext.from_metadata(metadata=entity.metadata),
+                                entity_element=EntityElementReference(
+                                    entity_name=entity.name, element_name=measure.name
                                 ),
-                                element_type=DataSourceElementType.MEASURE,
+                                element_type=EntityElementType.MEASURE,
                             ),
                             message=(
                                 f"Measure '{measure.name}' has a non_additive_dimension with an invalid 'window_groupings'. "
@@ -374,14 +374,14 @@ class CountAggregationExprRule(ModelValidationRule):
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
         issues: List[ValidationIssueType] = []
 
-        for data_source in model.data_sources:
-            for measure in data_source.measures:
-                context = DataSourceElementContext(
-                    file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                    data_source_element=DataSourceElementReference(
-                        data_source_name=data_source.name, element_name=measure.name
+        for entity in model.entities:
+            for measure in entity.measures:
+                context = EntityElementContext(
+                    file_context=FileContext.from_metadata(metadata=entity.metadata),
+                    entity_element=EntityElementReference(
+                        entity_name=entity.name, element_name=measure.name
                     ),
-                    element_type=DataSourceElementType.MEASURE,
+                    element_type=EntityElementType.MEASURE,
                 )
                 if measure.agg == AggregationType.COUNT and measure.expr is None:
                     issues.append(
@@ -425,14 +425,14 @@ class PercentileAggregationRule(ModelValidationRule):
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
         issues: List[ValidationIssueType] = []
 
-        for data_source in model.data_sources:
-            for measure in data_source.measures:
-                context = DataSourceElementContext(
-                    file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                    data_source_element=DataSourceElementReference(
-                        data_source_name=data_source.name, element_name=measure.name
+        for entity in model.entities:
+            for measure in entity.measures:
+                context = EntityElementContext(
+                    file_context=FileContext.from_metadata(metadata=entity.metadata),
+                    entity_element=EntityElementReference(
+                        entity_name=entity.name, element_name=measure.name
                     ),
-                    element_type=DataSourceElementType.MEASURE,
+                    element_type=EntityElementType.MEASURE,
                 )
                 if measure.agg == AggregationType.PERCENTILE:
                     if measure.agg_params is None or measure.agg_params.percentile is None:
@@ -504,8 +504,8 @@ class PercentileAggregationRule(ModelValidationRule):
 def _get_measure_names_from_model(model: UserConfiguredModel) -> Set[str]:
     """Return every distinct measure name specified in the model"""
     measure_names = set()
-    for data_source in model.data_sources:
-        for measure in data_source.measures:
+    for entity in model.entities:
+        for measure in entity.measures:
             measure_names.add(measure.reference.element_name)
 
     return measure_names

@@ -36,8 +36,8 @@
             },
             "type": "object"
         },
-        "data_source": {
-            "$id": "data_source",
+        "entity": {
+            "$id": "entity",
             "additionalProperties": false,
             "properties": {
                 "description": {
@@ -672,8 +672,8 @@
         }
     },
     "properties": {
-        "data_source": {
-            "$ref": "#/definitions/data_source"
+        "entity": {
+            "$ref": "#/definitions/entity"
         },
         "derived_identifier": {
             "$ref": "#/definitions/derived_group_by_element_schema"

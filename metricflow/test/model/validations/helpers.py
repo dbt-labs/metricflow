@@ -5,7 +5,7 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.engine.models import Dimension
 from metricflow.model.objects.common import FileSlice, Metadata, YamlConfigFile
 from metricflow.model.objects.constraints.where import WhereClauseConstraint
-from metricflow.model.objects.data_source import DataSource, DataSourceOrigin, Mutability
+from metricflow.model.objects.entity import Entity, EntityOrigin, Mutability
 from metricflow.model.objects.elements.identifier import Identifier
 from metricflow.model.objects.elements.measure import Measure
 from metricflow.model.objects.metric import Metric, MetricType, MetricTypeParams
@@ -19,8 +19,8 @@ def base_model_file() -> YamlConfigFile:
     """
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
-          name: sample_data_source
+        entity:
+          name: sample_entity
           sql_table: some_schema.source_table
           identifiers:
             - name: example_identifier
@@ -78,7 +78,7 @@ def metric_with_guaranteed_meta(
     )
 
 
-def data_source_with_guaranteed_meta(
+def entity_with_guaranteed_meta(
     name: str,
     mutability: Mutability,
     description: Optional[str] = None,
@@ -88,11 +88,11 @@ def data_source_with_guaranteed_meta(
     identifiers: Sequence[Identifier] = [],
     measures: Sequence[Measure] = [],
     dimensions: Sequence[Dimension] = [],
-    origin: DataSourceOrigin = DataSourceOrigin.SOURCE,
-) -> DataSource:
+    origin: EntityOrigin = EntityOrigin.SOURCE,
+) -> Entity:
     """Creates a data source with the given input. If a metadata object is not supplied, a default metadata object is used"""
 
-    return DataSource(
+    return Entity(
         name=name,
         mutability=mutability,
         description=description,

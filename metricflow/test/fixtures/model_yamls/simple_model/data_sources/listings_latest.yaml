@@ -1,5 +1,5 @@
 ---
-data_source:
+entity:
   name: listings_latest
   description: listings_latest
   owners:

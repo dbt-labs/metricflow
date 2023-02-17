@@ -5,7 +5,7 @@ from metricflow.model.parsing.schema_validator import SchemaValidator
 
 from metricflow.model.parsing.schemas import (
     metric_schema,
-    data_source_schema,
+    entity_schema,
     derived_group_by_element_schema,
     metric_input_schema,
     metric_input_measure_schema,
@@ -86,14 +86,14 @@ add_transform_metadata_fields_to_spec(identifier_schema)
 add_transform_metadata_fields_to_spec(metric_schema)
 add_locked_metadata_to_spec(metric_schema)
 
-add_transform_metadata_fields_to_spec(data_source_schema)
+add_transform_metadata_fields_to_spec(entity_schema)
 add_transform_metadata_fields_to_spec(derived_group_by_element_schema)
 
 
 schema_store = {
     # Top level schemas
     metric_schema["$id"]: metric_schema,
-    data_source_schema["$id"]: data_source_schema,
+    entity_schema["$id"]: entity_schema,
     derived_group_by_element_schema["$id"]: derived_group_by_element_schema,
     # Sub-object schemas
     metric_input_measure_schema["$id"]: metric_input_measure_schema,
@@ -113,6 +113,6 @@ schema_store = {
 }
 
 resolver = RefResolver.from_schema(schema=metric_schema, store=schema_store)
-data_source_validator = SchemaValidator(data_source_schema, resolver=resolver)
+entity_validator = SchemaValidator(entity_schema, resolver=resolver)
 derived_group_by_element_validator = SchemaValidator(derived_group_by_element_schema, resolver=resolver)
 metric_validator = SchemaValidator(metric_schema, resolver=resolver)

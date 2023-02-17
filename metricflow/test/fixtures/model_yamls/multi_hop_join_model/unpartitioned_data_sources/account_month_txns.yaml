@@ -1,5 +1,5 @@
 ---
-data_source:
+entity:
   name: account_month_txns
   description: account_month_txns
   owners:

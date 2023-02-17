@@ -6,4 +6,4 @@ def test_lint_dir(config_linter_model_path: str) -> None:  # noqa: D
 
     assert len(issues.all_issues) == 1
     assert len(issues.errors) == 1
-    assert 'duplication of key "data_source"' in issues.errors[0].as_readable_str()
+    assert 'duplication of key "entity"' in issues.errors[0].as_readable_str()

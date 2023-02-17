@@ -75,10 +75,10 @@
                                     <!-- aggregation_time_dimension = ds -->
                                     <ReadSqlSourceNode>
                                         <!-- description =                                                                           -->
-                                        <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                                        <!--   Read From EntityDataSet(EntityReference(entity_name='bookings_source'))  -->
                                         <!-- node_id = rss_10011 -->
                                         <!-- data_set =                                                                    -->
-                                        <!--   DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                                        <!--   EntityDataSet(EntityReference(entity_name='bookings_source'))  -->
                                     </ReadSqlSourceNode>
                                 </MetricTimeDimensionTransformNode>
                             </FilterElementsNode>
@@ -101,10 +101,10 @@
                                     <!-- aggregation_time_dimension = ds -->
                                     <ReadSqlSourceNode>
                                         <!-- description =                                                                           -->
-                                        <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='listings_latest'))  -->
+                                        <!--   Read From EntityDataSet(EntityReference(entity_name='listings_latest'))  -->
                                         <!-- node_id = rss_10014 -->
                                         <!-- data_set =                                                                    -->
-                                        <!--   DataSourceDataSet(DataSourceReference(data_source_name='listings_latest'))  -->
+                                        <!--   EntityDataSet(EntityReference(entity_name='listings_latest'))  -->
                                     </ReadSqlSourceNode>
                                 </MetricTimeDimensionTransformNode>
                             </FilterElementsNode>
@@ -180,10 +180,10 @@
                                     <!-- aggregation_time_dimension = ds -->
                                     <ReadSqlSourceNode>
                                         <!-- description =                                                                           -->
-                                        <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                                        <!--   Read From EntityDataSet(EntityReference(entity_name='bookings_source'))  -->
                                         <!-- node_id = rss_10011 -->
                                         <!-- data_set =                                                                    -->
-                                        <!--   DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                                        <!--   EntityDataSet(EntityReference(entity_name='bookings_source'))  -->
                                     </ReadSqlSourceNode>
                                 </MetricTimeDimensionTransformNode>
                             </FilterElementsNode>
@@ -206,10 +206,10 @@
                                     <!-- aggregation_time_dimension = ds -->
                                     <ReadSqlSourceNode>
                                         <!-- description =                                                                           -->
-                                        <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='listings_latest'))  -->
+                                        <!--   Read From EntityDataSet(EntityReference(entity_name='listings_latest'))  -->
                                         <!-- node_id = rss_10014 -->
                                         <!-- data_set =                                                                    -->
-                                        <!--   DataSourceDataSet(DataSourceReference(data_source_name='listings_latest'))  -->
+                                        <!--   EntityDataSet(EntityReference(entity_name='listings_latest'))  -->
                                     </ReadSqlSourceNode>
                                 </MetricTimeDimensionTransformNode>
                             </FilterElementsNode>

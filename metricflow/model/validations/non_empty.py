@@ -14,9 +14,9 @@ class NonEmptyRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking that the model has data sources")
-    def _check_model_has_data_sources(model: UserConfiguredModel) -> List[ValidationIssueType]:
+    def _check_model_has_entities(model: UserConfiguredModel) -> List[ValidationIssueType]:
         issues: List[ValidationIssueType] = []
-        if not model.data_sources:
+        if not model.entities:
             issues.append(
                 ValidationError(
                     message="No data sources present in the model.",
@@ -31,8 +31,8 @@ class NonEmptyRule(ModelValidationRule):
 
         # If we are going to generate measure proxy metrics that is sufficient as well
         create_measure_proxy_metrics = False
-        for data_source in model.data_sources:
-            for measure in data_source.measures:
+        for entity in model.entities:
+            for measure in entity.measures:
                 if measure.create_metric is True:
                     create_measure_proxy_metrics = True
                     break
@@ -49,6 +49,6 @@ class NonEmptyRule(ModelValidationRule):
     @validate_safely("running model validation rule ensuring metrics and data sources are defined")
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
         issues: List[ValidationIssueType] = []
-        issues += NonEmptyRule._check_model_has_data_sources(model=model)
+        issues += NonEmptyRule._check_model_has_entities(model=model)
         issues += NonEmptyRule._check_model_has_metrics(model=model)
         return issues

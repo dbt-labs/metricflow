@@ -1,4 +1,4 @@
-data_source:
+entity:
   name: countries
   description: Regions mapped to countries.
   owners:

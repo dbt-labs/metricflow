@@ -3,15 +3,15 @@ from typing import List
 
 import pytest
 from metricflow.instances import (
-    DataSourceElementReference,
-    DataSourceReference,
+    EntityElementReference,
+    EntityReference,
     MetricModelReference,
 )
 
 from metricflow.model.validations.validator_helpers import (
-    DataSourceContext,
-    DataSourceElementContext,
-    DataSourceElementType,
+    EntityContext,
+    EntityElementContext,
+    EntityElementType,
     FileContext,
     MetricContext,
     ModelValidationResults,
@@ -26,38 +26,38 @@ from metricflow.model.validations.validator_helpers import (
 @pytest.fixture
 def list_of_issues() -> List[ValidationIssueType]:  # noqa: D
     file_context = FileContext(file_name="foo", line_number=1337)
-    data_source_name = "My data source"
+    entity_name = "My data source"
 
     issues: List[ValidationIssueType] = []
     issues.append(
         ValidationWarning(
-            context=DataSourceContext(
+            context=EntityContext(
                 file_context=file_context,
-                data_source=DataSourceReference(data_source_name=data_source_name),
+                entity=EntityReference(entity_name=entity_name),
             ),
             message="Something caused a warning, problem #1",
         )
     )
     issues.append(
         ValidationWarning(
-            context=DataSourceElementContext(
+            context=EntityElementContext(
                 file_context=file_context,
-                data_source_element=DataSourceElementReference(
-                    data_source_name=data_source_name, element_name="My dimension"
+                entity_element=EntityElementReference(
+                    entity_name=entity_name, element_name="My dimension"
                 ),
-                element_type=DataSourceElementType.DIMENSION,
+                element_type=EntityElementType.DIMENSION,
             ),
             message="Something caused a warning, problem #2",
         )
     )
     issues.append(
         ValidationFutureError(
-            context=DataSourceElementContext(
+            context=EntityElementContext(
                 file_context=file_context,
-                data_source_element=DataSourceElementReference(
-                    data_source_name=data_source_name, element_name="My identifier"
+                entity_element=EntityElementReference(
+                    entity_name=entity_name, element_name="My identifier"
                 ),
-                element_type=DataSourceElementType.IDENTIFIER,
+                element_type=EntityElementType.IDENTIFIER,
             ),
             message="Something caused a future error, problem #3",
             error_date=date(2022, 6, 13),
@@ -65,13 +65,13 @@ def list_of_issues() -> List[ValidationIssueType]:  # noqa: D
     )
     issues.append(
         ValidationError(
-            context=DataSourceElementContext(
+            context=EntityElementContext(
                 file_context=file_context,
-                data_source_name=data_source_name,
-                data_source_element=DataSourceElementReference(
-                    data_source_name=data_source_name, element_name="My measure"
+                entity_name=entity_name,
+                entity_element=EntityElementReference(
+                    entity_name=entity_name, element_name="My measure"
                 ),
-                element_type=DataSourceElementType.MEASURE,
+                element_type=EntityElementType.MEASURE,
             ),
             message="Something caused an error, problem #4",
         )

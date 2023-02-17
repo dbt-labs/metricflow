@@ -1,5 +1,5 @@
 ---
-data_source:
+entity:
   name: lux_listing_mapping
   description: lux_listing_mapping
   owners:

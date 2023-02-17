@@ -1,5 +1,5 @@
 ---
-data_source:
+entity:
   name: lux_listing_mapping
   description: Mapping from listing_id to lux_listing_id
   owners:
@@ -15,7 +15,7 @@ data_source:
       type: foreign
       expr: lux_listing_id
 ---
-data_source:
+entity:
   name: lux_listings
   description: SCD Type II table of lux listings history
   owners:

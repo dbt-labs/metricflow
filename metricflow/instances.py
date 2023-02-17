@@ -33,41 +33,41 @@ class ModelReference(SerializableDataclass):
 
 
 @dataclass(frozen=True)
-class DataSourceReference(ModelReference):
+class EntityReference(ModelReference):
     """A reference to a data source definition in the model."""
 
-    data_source_name: str
+    entity_name: str
 
     def __hash__(self) -> int:  # noqa: D
-        return hash(self.data_source_name)
+        return hash(self.entity_name)
 
 
 @dataclass(frozen=True)
-class DataSourceElementReference(ModelReference):
+class EntityElementReference(ModelReference):
     """A reference to an element definition in a data source definition in the model.
 
     TODO: Fields should be *Reference objects.
     """
 
-    data_source_name: str
+    entity_name: str
     element_name: str
 
     @staticmethod
     def create_from_references(  # noqa: D
-        data_source_reference: DataSourceReference, element_reference: ElementReference
-    ) -> DataSourceElementReference:
-        return DataSourceElementReference(
-            data_source_name=data_source_reference.data_source_name,
+        entity_reference: EntityReference, element_reference: ElementReference
+    ) -> EntityElementReference:
+        return EntityElementReference(
+            entity_name=entity_reference.entity_name,
             element_name=element_reference.element_name,
         )
 
     @property
-    def data_source_reference(self) -> DataSourceReference:  # noqa: D
-        return DataSourceReference(self.data_source_name)
+    def entity_reference(self) -> EntityReference:  # noqa: D
+        return EntityReference(self.entity_name)
 
-    def is_from(self, ref: DataSourceReference) -> bool:
+    def is_from(self, ref: EntityReference) -> bool:
         """Returns true if this reference is from the same data source as the supplied reference."""
-        return self.data_source_name == ref.data_source_name
+        return self.entity_name == ref.entity_name
 
 
 @dataclass(frozen=True)
@@ -110,12 +110,12 @@ class MdoInstance(ABC, Generic[SpecT]):
 
 
 @dataclass(frozen=True)
-class DataSourceElementInstance(SerializableDataclass):  # noqa: D
+class EntityElementInstance(SerializableDataclass):  # noqa: D
     # This instance is derived from something defined in a data source.
-    defined_from: Tuple[DataSourceElementReference, ...]
+    defined_from: Tuple[EntityElementReference, ...]
 
     @property
-    def origin_data_source_reference(self) -> DataSourceElementReference:
+    def origin_entity_reference(self) -> EntityElementReference:
         """Property to grab the element reference pointing to the origin data source for this element instance
 
         By convention this is the zeroth element in the Tuple. At this time these tuples are always of exactly
@@ -125,7 +125,7 @@ class DataSourceElementInstance(SerializableDataclass):  # noqa: D
         """
         if len(self.defined_from) != 1:
             raise ValueError(
-                f"DataSourceElementInstances should have exactly one entry in the `defined_from` property, because "
+                f"EntityElementInstances should have exactly one entry in the `defined_from` property, because "
                 f"otherwise there is no way to ensure that the first element is always the origin data source! Found "
                 f"{len(self.defined_from)} elements in this particular instance: {self.defined_from}."
             )
@@ -134,26 +134,26 @@ class DataSourceElementInstance(SerializableDataclass):  # noqa: D
 
 
 @dataclass(frozen=True)
-class MeasureInstance(MdoInstance[MeasureSpec], DataSourceElementInstance):  # noqa: D
+class MeasureInstance(MdoInstance[MeasureSpec], EntityElementInstance):  # noqa: D
     associated_columns: Tuple[ColumnAssociation, ...]
     spec: MeasureSpec
     aggregation_state: AggregationState
 
 
 @dataclass(frozen=True)
-class DimensionInstance(MdoInstance[DimensionSpec], DataSourceElementInstance):  # noqa: D
+class DimensionInstance(MdoInstance[DimensionSpec], EntityElementInstance):  # noqa: D
     associated_columns: Tuple[ColumnAssociation, ...]
     spec: DimensionSpec
 
 
 @dataclass(frozen=True)
-class TimeDimensionInstance(MdoInstance[TimeDimensionSpec], DataSourceElementInstance):  # noqa: D
+class TimeDimensionInstance(MdoInstance[TimeDimensionSpec], EntityElementInstance):  # noqa: D
     associated_columns: Tuple[ColumnAssociation, ...]
     spec: TimeDimensionSpec
 
 
 @dataclass(frozen=True)
-class IdentifierInstance(MdoInstance[IdentifierSpec], DataSourceElementInstance):  # noqa: D
+class IdentifierInstance(MdoInstance[IdentifierSpec], EntityElementInstance):  # noqa: D
     associated_columns: Tuple[ColumnAssociation, ...]
     spec: IdentifierSpec
 
