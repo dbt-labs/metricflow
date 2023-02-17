@@ -49,44 +49,16 @@ def test_duplicate_metric_name(simple_model__with_primary_transforms: UserConfig
         ModelValidator([UniqueAndValidNameRule()]).checked_validations(model)
 
 
-def test_duplicate_materalization_name(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa:D
-    model = copied_model(simple_model__with_primary_transforms)
-    duplicated_materialization = model.materializations[0]
-    model.materializations.append(duplicated_materialization)
-    with pytest.raises(
-        ModelValidationException,
-        match=rf"Can't use name `{duplicated_materialization.name}` for a materialization when it was already used for a materialization",
-    ):
-        ModelValidator([UniqueAndValidNameRule()]).checked_validations(model)
-
-
 def test_top_level_metric_can_have_same_name_as_any_other_top_level_item(
     simple_model__with_primary_transforms: UserConfiguredModel,
 ) -> None:  # noqa:D
     metric_name = simple_model__with_primary_transforms.metrics[0].name
 
     model_data_source = copied_model(simple_model__with_primary_transforms)
-    model_materialization = copied_model(simple_model__with_primary_transforms)
 
     model_data_source.data_sources[0].name = metric_name
-    model_materialization.materializations[0].name = model_data_source.metrics[0].name
 
     ModelValidator([UniqueAndValidNameRule()]).checked_validations(model_data_source)
-    ModelValidator([UniqueAndValidNameRule()]).checked_validations(model_materialization)
-
-
-def test_top_level_elements_cant_share_names_except_with_metrics(
-    simple_model__with_primary_transforms: UserConfiguredModel,
-) -> None:  # noqa:D
-    data_source_name = simple_model__with_primary_transforms.data_sources[0].name
-    model_ds_and_mat = copied_model(simple_model__with_primary_transforms)
-    model_ds_and_mat.materializations[0].name = data_source_name
-
-    with pytest.raises(
-        ModelValidationException,
-        match=rf"Can't use name `{data_source_name}` for a materialization when it was already used for a data source",
-    ):
-        ModelValidator([UniqueAndValidNameRule()]).checked_validations(model_ds_and_mat)
 
 
 """

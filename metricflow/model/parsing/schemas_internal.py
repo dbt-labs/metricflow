@@ -6,7 +6,6 @@ from metricflow.model.parsing.schema_validator import SchemaValidator
 from metricflow.model.parsing.schemas import (
     metric_schema,
     data_source_schema,
-    materialization_schema,
     derived_group_by_element_schema,
     metric_input_schema,
     metric_input_measure_schema,
@@ -20,7 +19,6 @@ from metricflow.model.parsing.schemas import (
     mutability_schema,
     mutability_type_params_schema,
     composite_sub_identifier_schema,
-    materialization_destination_schema,
     non_additive_dimension_schema,
 )
 
@@ -89,7 +87,6 @@ add_transform_metadata_fields_to_spec(metric_schema)
 add_locked_metadata_to_spec(metric_schema)
 
 add_transform_metadata_fields_to_spec(data_source_schema)
-add_transform_metadata_fields_to_spec(materialization_schema)
 add_transform_metadata_fields_to_spec(derived_group_by_element_schema)
 
 
@@ -98,7 +95,6 @@ schema_store = {
     metric_schema["$id"]: metric_schema,
     data_source_schema["$id"]: data_source_schema,
     derived_group_by_element_schema["$id"]: derived_group_by_element_schema,
-    materialization_schema["$id"]: materialization_schema,
     # Sub-object schemas
     metric_input_measure_schema["$id"]: metric_input_measure_schema,
     metric_type_params_schema["$id"]: metric_type_params_schema,
@@ -112,7 +108,6 @@ schema_store = {
     mutability_schema["$id"]: mutability_schema,
     mutability_type_params_schema["$id"]: mutability_type_params_schema,
     composite_sub_identifier_schema["$id"]: composite_sub_identifier_schema,
-    materialization_destination_schema["$id"]: materialization_destination_schema,
     non_additive_dimension_schema["$id"]: non_additive_dimension_schema,
     metric_input_schema["$id"]: metric_input_schema,
 }
@@ -120,5 +115,4 @@ schema_store = {
 resolver = RefResolver.from_schema(schema=metric_schema, store=schema_store)
 data_source_validator = SchemaValidator(data_source_schema, resolver=resolver)
 derived_group_by_element_validator = SchemaValidator(derived_group_by_element_schema, resolver=resolver)
-materialization_validator = SchemaValidator(materialization_schema, resolver=resolver)
 metric_validator = SchemaValidator(metric_schema, resolver=resolver)

@@ -53,7 +53,6 @@ def test_incompatible_dimension_type() -> None:  # noqa:D
                         type_params=MetricTypeParams(measures=[measure_name]),
                     )
                 ],
-                materializations=[],
             )
         )
 
@@ -106,7 +105,6 @@ def test_incompatible_dimension_is_partition() -> None:  # noqa:D
                         type_params=MetricTypeParams(measures=[measure_name]),
                     )
                 ],
-                materializations=[],
             )
         )
 
@@ -158,6 +156,5 @@ def test_multiple_primary_time_dimensions() -> None:  # noqa:D
                         type_params=MetricTypeParams(measures=[measure_reference.element_name]),
                     )
                 ],
-                materializations=[],
             )
         )

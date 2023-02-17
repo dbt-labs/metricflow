@@ -37,6 +37,3 @@ class LowerCaseNamesRule(ModelTransformRule):
         if model.data_sources:
             for data_source in model.data_sources:
                 data_source.name = data_source.name.lower()
-        if model.materializations:
-            for materialization in model.materializations:
-                materialization.name = materialization.name.lower()

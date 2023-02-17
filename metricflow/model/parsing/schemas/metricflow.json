@@ -364,119 +364,6 @@
             },
             "type": "object"
         },
-        "materialization_destination_schema": {
-            "$id": "materialization_destination_schema",
-            "additionalProperties": false,
-            "anyOf": [
-                {
-                    "not": {
-                        "$ref": "#/definitions/is-tableau"
-                    }
-                },
-                {
-                    "required": [
-                        "tableau_params"
-                    ]
-                }
-            ],
-            "properties": {
-                "format": {
-                    "enum": [
-                        "WIDE",
-                        "wide"
-                    ]
-                },
-                "location": {
-                    "enum": [
-                        "DW",
-                        "FAST_CACHE",
-                        "dw",
-                        "fast_cache",
-                        "TABLEAU",
-                        "tableau"
-                    ]
-                },
-                "rollups": {
-                    "items": {
-                        "items": {
-                            "type": "string"
-                        },
-                        "type": "array"
-                    },
-                    "type": "array"
-                },
-                "tableau_params": {
-                    "$id": "materialization_params_tableau",
-                    "properties": {
-                        "projects": {
-                            "projects": {
-                                "type": "string"
-                            },
-                            "type": "array"
-                        }
-                    },
-                    "type": "object"
-                }
-            },
-            "type": "object"
-        },
-        "materialization_schema": {
-            "$id": "materialization_schema",
-            "additionalProperties": false,
-            "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "destination_table": {
-                    "type": "string"
-                },
-                "destinations": {
-                    "items": {
-                        "$ref": "#/definitions/materialization_destination_schema"
-                    },
-                    "type": "array"
-                },
-                "dimensions": {
-                    "items": {
-                        "type": "string"
-                    },
-                    "minItems": 1,
-                    "type": "array"
-                },
-                "display_name": {
-                    "type": "string"
-                },
-                "metrics": {
-                    "items": {
-                        "type": "string"
-                    },
-                    "minItems": 1,
-                    "type": "array"
-                },
-                "name": {
-                    "pattern": "(?!.*__).*^[a-z][a-z0-9_]*[a-z0-9]$",
-                    "type": "string"
-                },
-                "owners": {
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
-                },
-                "tier": {
-                    "type": [
-                        "string",
-                        "integer"
-                    ]
-                }
-            },
-            "required": [
-                "name",
-                "dimensions",
-                "metrics"
-            ],
-            "type": "object"
-        },
         "measure_schema": {
             "$id": "measure_schema",
             "additionalProperties": false,
@@ -793,9 +680,6 @@
         },
         "derived_identifier": {
             "$ref": "#/definitions/derived_group_by_element_schema"
-        },
-        "materialization": {
-            "$ref": "#/definitions/materialization_schema"
         },
         "metric": {
             "$ref": "#/definitions/metric"

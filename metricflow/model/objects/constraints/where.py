@@ -63,7 +63,7 @@ class WhereClauseConstraint(PydanticCustomInputParser, HashableBaseModel):
         """
         s = strip_where(s)
 
-        where_str = f"WHERE {s}"
+        where_str = f"where {s}"
         # to piggyback on moz sql parser we need a SELECT statement
         # moz breaks the sql statement into clauses:
         # where_str = "WHERE is_instant" yields -> {'select': {'value': '_'}, 'from': '_', 'where': 'is_instant'}

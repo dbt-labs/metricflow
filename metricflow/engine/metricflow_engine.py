@@ -25,10 +25,10 @@ from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import Sour
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
-from metricflow.engine.models import Dimension, Materialization, Metric
+from metricflow.engine.models import Dimension, Metric
 from metricflow.engine.time_source import ServerTimeSource
 from metricflow.engine.utils import build_user_configured_model_from_config, build_user_configured_model_from_dbt_cloud
-from metricflow.errors.errors import ExecutionException, MaterializationNotFoundError
+from metricflow.errors.errors import ExecutionException
 from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
 from metricflow.execution.execution_plan_to_text import execution_plan_to_text
 from metricflow.execution.executor import SequentialPlanExecutor
@@ -228,48 +228,6 @@ class AbstractMetricFlowEngine(ABC):
         """
         pass
 
-    @abstractmethod
-    def list_materializations(self) -> List[Materialization]:
-        """Retrieves a list of materialization names.
-
-        Returns:
-            A list of Materialization objects containing metadata.
-        """
-        pass
-
-    @abstractmethod
-    def materialize(
-        self,
-        materialization_name: str,
-        time_constraint_start: Optional[datetime.datetime] = None,
-        time_constraint_end: Optional[datetime.datetime] = None,
-    ) -> SqlTable:
-        """Builds a table containing metrics and dimensions from a materialization definition.
-
-        This can be very expensive if a large time range is provided.
-
-        Args:
-            materialization_name: Name of materialization
-            time_constraint_start: Materialized for the start of this time range.
-            time_constraint_end: Materialized for the end of this time range.
-
-        Returns:
-            SqlTable object of the materialized table.
-        """
-        pass
-
-    @abstractmethod
-    def drop_materialization(self, materialization_name: str) -> bool:
-        """Drops the table associated with a materialization definition.
-
-        Args:
-            materialization_name: Name of materialization to drop.
-
-        Returns:
-            True if a table has been drop, False if table doesn't exist.
-        """
-        pass
-
 
 class MetricFlowEngine(AbstractMetricFlowEngine):
     """Main entry point for queries."""
@@ -383,13 +341,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             source_nodes=source_nodes,
             node_output_resolver=node_output_resolver,
         )
-
-    def _get_materialization_by_name(self, materialization_name: str) -> Optional[Materialization]:
-        materializations = self.list_materializations()
-        for mat in materializations:
-            if mat.name == materialization_name:
-                return mat
-        return None
 
     def _generate_sql_table(self, table_name: str) -> SqlTable:
         return SqlTable.from_string(f"{self._schema}.{table_name}")
@@ -510,14 +461,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             )
         ]
 
-    @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-    def list_materializations(self) -> List[Materialization]:  # noqa: D
-        return [
-            Materialization(
-                name=mat.name, metrics=mat.metrics, dimensions=mat.dimensions, destination_table=mat.destination_table
-            )
-            for mat in self._semantic_model.user_configured_model.materializations
-        ]
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def list_metrics(self) -> List[Metric]:  # noqa: D
@@ -558,47 +501,3 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         dimension_values = [str(val) for val in result_dataframe[get_group_by_values]]
         return dimension_values
 
-    @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-    def materialize(  # noqa: D
-        self,
-        materialization_name: str,
-        time_constraint_start: Optional[datetime.datetime] = None,
-        time_constraint_end: Optional[datetime.datetime] = None,
-    ) -> SqlTable:
-        materialization = self._get_materialization_by_name(materialization_name)
-        if materialization is None:
-            raise MaterializationNotFoundError(
-                f"Unable to find materialization `{materialization_name}`. Perhaps it has not been registered"
-            )
-
-        # Use destination_table if exists else materialization_name
-        output_table = materialization.destination_table or self._generate_sql_table(materialization_name)
-        self._sql_client.drop_table(output_table)
-
-        # Executes the query with output_table
-        query_result = self.query(
-            MetricFlowQueryRequest.create_with_random_request_id(
-                metric_names=materialization.metrics,
-                group_by_names=materialization.dimensions,
-                time_constraint_start=time_constraint_start,
-                time_constraint_end=time_constraint_end,
-                output_table=output_table.sql,
-            )
-        )
-        assert query_result.result_table
-        return query_result.result_table
-
-    @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-    def drop_materialization(self, materialization_name: str) -> bool:  # noqa: D
-        materialization = self._get_materialization_by_name(materialization_name)
-        if materialization is None:
-            raise MaterializationNotFoundError(
-                f"Unable to find materialization `{materialization_name}`. Perhaps it has not been registered"
-            )
-
-        table = materialization.destination_table or self._generate_sql_table(materialization_name)
-
-        if self._sql_client.table_exists(table):
-            self._sql_client.drop_table(table)
-            return True
-        return False

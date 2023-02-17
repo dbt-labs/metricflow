@@ -10,7 +10,6 @@ TOP_LEVEL_SCHEMAS = {
     "metric": "metric",
     "data_source": "data_source",
     "derived_group_by_element_schema": "derived_identifier",
-    "materialization_schema": "materialization",
 }
 
 BASE_SCHEMA = {

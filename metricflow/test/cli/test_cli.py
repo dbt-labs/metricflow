@@ -3,13 +3,10 @@ from unittest.mock import patch, MagicMock
 
 from metricflow.cli.cli_context import CLIContext
 from metricflow.cli.main import (
-    drop_materialization,
     get_dimension_values,
     health_checks,
     list_dimensions,
-    list_materializations,
     list_metrics,
-    materialize,
     query,
     validate_configs,
     version,
@@ -50,29 +47,6 @@ def test_get_dimension_values(cli_runner: MetricFlowCliRunner) -> None:  # noqa:
 
     actual_output_lines = sorted(resp.output.split("\n"))
     assert ["", "• False", "• True"] == actual_output_lines
-    assert resp.exit_code == 0
-
-
-def test_list_materializations(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    resp = cli_runner.run(list_materializations)
-
-    assert "materialization: details related to materialization" in resp.output
-    assert resp.exit_code == 0
-
-
-def test_materialize(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    resp = cli_runner.run(
-        materialize, args=["--materialization-name", "test_materialization", "--start-time", "2020-01-02"]
-    )
-
-    assert "Materialized table created at" in resp.output
-    assert "test_materialization" in resp.output
-    assert resp.exit_code == 0
-
-
-def test_drop_materialization(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    resp = cli_runner.run(drop_materialization, args=["--materialization-name", "test_materialization"])
-
     assert resp.exit_code == 0
 
 

@@ -6,7 +6,6 @@ from typing import Dict, Tuple, List, Optional
 from metricflow.instances import (
     DataSourceElementReference,
     DataSourceReference,
-    MaterializationModelReference,
     MetricModelReference,
 )
 
@@ -17,7 +16,6 @@ from metricflow.model.validations.validator_helpers import (
     DataSourceElementContext,
     DataSourceElementType,
     FileContext,
-    MaterializationContext,
     MetricContext,
     ModelValidationRule,
     ValidationContext,
@@ -55,7 +53,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
     """Check that names are unique and valid.
 
     * Names of elements in data sources are unique / valid within the data source.
-    * Names of data sources, dimension sets, metric sets, and materializations in the model are unique / valid.
+    * Names of data sources, dimension sets, metric sets in the model are unique / valid.
     """
 
     NAME_REGEX = re.compile(r"\A[a-z][a-z0-9_]*[a-z0-9]\Z")
@@ -177,18 +175,6 @@ class UniqueAndValidNameRule(ModelValidationRule):
                         DataSourceContext(
                             file_context=FileContext.from_metadata(metadata=data_source.metadata),
                             data_source=DataSourceReference(data_source_name=data_source.name),
-                        ),
-                    )
-                )
-        if model.materializations:
-            for materialization in model.materializations:
-                object_info_tuples.append(
-                    (
-                        materialization.name,
-                        "materialization",
-                        MaterializationContext(
-                            file_context=FileContext.from_metadata(metadata=materialization.metadata),
-                            materialization=MaterializationModelReference(materialization_name=materialization.name),
                         ),
                     )
                 )

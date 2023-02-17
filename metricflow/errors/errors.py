@@ -33,10 +33,6 @@ class DuplicateMetricError(SemanticException):  # noqa:D
     pass
 
 
-class MaterializationNotFoundError(SemanticException, KeyError):  # noqa:D
-    pass
-
-
 class MetricNotFoundError(SemanticException, KeyError):  # noqa:D
     pass
 
@@ -95,10 +91,6 @@ class ModelCreationException(Exception):
         super().__init__(
             "An error occurred when attempting to build the semantic model",
         )
-
-
-class InferenceError(Exception):
-    """Exception to represent errors related to inference."""
 
 
 class ModelTransformError(Exception):

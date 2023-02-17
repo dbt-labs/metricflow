@@ -8,7 +8,6 @@ from metricflow.model.objects.constraints.where import WhereClauseConstraint
 from metricflow.model.objects.data_source import DataSource, DataSourceOrigin, Mutability
 from metricflow.model.objects.elements.identifier import Identifier
 from metricflow.model.objects.elements.measure import Measure
-from metricflow.model.objects.materialization import Materialization, MaterializationDestination
 from metricflow.model.objects.metric import Metric, MetricType, MetricTypeParams
 
 
@@ -56,28 +55,6 @@ def default_meta() -> Metadata:
             start_line_number=0,
             end_line_number=0,
         ),
-    )
-
-
-def materialization_with_guaranteed_meta(
-    name: str,
-    metrics: List[str],
-    dimensions: List[str],
-    description: str = "adhoc materialization",
-    metadata: Metadata = default_meta(),
-    destinations: List[MaterializationDestination] = [],
-    destination_table: Optional[SqlTable] = None,
-) -> Materialization:
-    """Creates a materialization with the given input. If a metadata object is not supplied, a default metadata object is used"""
-
-    return Materialization(
-        name=name,
-        description=description,
-        metrics=metrics,
-        dimensions=dimensions,
-        destinations=destinations,
-        destination_table=destination_table,
-        metadata=metadata,
     )
 
 
