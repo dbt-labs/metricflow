@@ -651,34 +651,22 @@ def validate_configs(
     if not show_all:
         print("(To see warnings and future-errors, run again with flag `--show-all`)")
 
-    # Skip linting validation for dbt cloud
-    if cfg.dbt_cloud_configs is not None:
-        lint_results = ModelValidationResults()
-    else:
-        # Lint Validation
-        lint_spinner = Halo(text="Checking for YAML format issues", spinner="dots")
-        lint_spinner.start()
+    lint_spinner = Halo(text="Checking for YAML format issues", spinner="dots")
+    lint_spinner.start()
 
-        lint_results = ConfigLinter().lint_dir(path_to_models(handler=cfg.config))
-        if not lint_results.has_blocking_issues:
-            lint_spinner.succeed(f"🎉 Successfully linted config YAML files ({lint_results.summary()})")
-        else:
-            lint_spinner.fail(f"Breaking issues found in config YAML files ({lint_results.summary()})")
-            _print_issues(lint_results, show_non_blocking=show_all, verbose=verbose_issues)
-            return
+    lint_results = ConfigLinter().lint_dir(path_to_models(handler=cfg.config))
+    if not lint_results.has_blocking_issues:
+        lint_spinner.succeed(f"🎉 Successfully linted config YAML files ({lint_results.summary()})")
+    else:
+        lint_spinner.fail(f"Breaking issues found in config YAML files ({lint_results.summary()})")
+        _print_issues(lint_results, show_non_blocking=show_all, verbose=verbose_issues)
+        return
 
     # Parsing Validation
     parsing_spinner = Halo(text="Building model from configs", spinner="dots")
     parsing_spinner.start()
 
-    if cfg.dbt_cloud_configs is not None:
-        from metricflow.model.parsing.dbt_cloud_to_model import model_build_result_for_dbt_cloud_job
-
-        parsing_result = model_build_result_for_dbt_cloud_job(
-            auth=cfg.dbt_cloud_configs.auth, job_id=cfg.dbt_cloud_configs.job_id
-        )
-    else:
-        parsing_result = model_build_result_from_config(handler=cfg.config, raise_issues_as_exceptions=False)
+    parsing_result = model_build_result_from_config(handler=cfg.config, raise_issues_as_exceptions=False)
 
     if not parsing_result.issues.has_blocking_issues:
         parsing_spinner.succeed(f"🎉 Successfully built model from configs ({parsing_result.issues.summary()})")

@@ -40,9 +40,6 @@
             "$id": "data_source",
             "additionalProperties": false,
             "properties": {
-                "dbt_model": {
-                    "type": "string"
-                },
                 "description": {
                     "type": "string"
                 },

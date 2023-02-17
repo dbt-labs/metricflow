@@ -275,7 +275,6 @@ data_source_schema = {
         },
         "sql_table": {"type": "string"},
         "sql_query": {"type": "string"},
-        "dbt_model": {"type": "string"},
         "identifiers": {"type": "array", "items": {"$ref": "identifier_schema"}},
         "measures": {"type": "array", "items": {"$ref": "measure_schema"}},
         "dimensions": {"type": "array", "items": {"$ref": "dimension_schema"}},

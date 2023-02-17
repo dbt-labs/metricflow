@@ -55,7 +55,6 @@ class DataSource(HashableBaseModel, ModelWithMetadataParsing):
     description: Optional[str]
     sql_table: Optional[str]
     sql_query: Optional[str]
-    dbt_model: Optional[str]
 
     identifiers: Sequence[Identifier] = []
     measures: Sequence[Measure] = []
