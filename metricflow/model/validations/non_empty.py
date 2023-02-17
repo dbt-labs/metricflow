@@ -1,6 +1,6 @@
 from typing import List
 
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt.dbt_semantic.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
     ModelValidationRule,
     ValidationError,

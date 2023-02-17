@@ -4,7 +4,7 @@ from typing import Dict, List, FrozenSet, Set, Tuple, Sequence
 
 from metricflow.errors.errors import MetricNotFoundError, DuplicateMetricError, NonExistentMeasureError
 from metricflow.model.objects.metric import Metric, MetricType
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt.dbt_semantic.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantics.entity_semantics import EntitySemantics
 from metricflow.model.semantics.linkable_spec_resolver import ValidLinkableSpecResolver
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties

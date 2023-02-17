@@ -3,7 +3,7 @@ import logging
 
 from typing import Sequence, Tuple
 
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt.dbt_semantic.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.transformations.add_input_metric_measures import AddInputMetricMeasuresRule
 from metricflow.model.transformations.agg_time_dimension import SetMeasureAggregationTimeDimensionRule
 from metricflow.model.transformations.boolean_measure import BooleanMeasureAggregationRule

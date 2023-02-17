@@ -5,7 +5,7 @@ from typing import Tuple
 from metricflow.model.model_validator import ModelValidator
 from metricflow.model.objects.entity import Entity
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt.dbt_semantic.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.element_const import ElementConsistencyRule
 from metricflow.model.validations.validator_helpers import EntityElementType, ModelValidationException
 from metricflow.test.test_utils import find_entity_with

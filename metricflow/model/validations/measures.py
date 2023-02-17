@@ -7,7 +7,7 @@ from metricflow.aggregation_properties import AggregationType
 from metricflow.instances import MetricModelReference
 from metricflow.model.objects.elements.dimension import DimensionType
 from metricflow.model.objects.metric import Metric
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt.dbt_semantic.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.unique_valid_name import UniqueAndValidNameRule
 from metricflow.model.validations.validator_helpers import (
     EntityElementContext,

@@ -5,7 +5,7 @@ from metricflow.instances import EntityElementReference, EntityReference
 from metricflow.model.objects.entity import Entity
 from metricflow.model.objects.elements.dimension import DimensionType
 from metricflow.model.objects.elements.identifier import IdentifierType
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt.dbt_semantic.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
     EntityContext,
     EntityElementContext,

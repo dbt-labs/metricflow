@@ -20,7 +20,7 @@ from metricflow.instances import EntityElementReference, EntityReference, Metric
 from metricflow.model.objects.entity import Entity
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType
 from metricflow.model.objects.metric import Metric
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt.dbt_semantic.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.validations.validator_helpers import (
     EntityContext,

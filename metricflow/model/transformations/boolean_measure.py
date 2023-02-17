@@ -1,7 +1,7 @@
 import logging
 
 from metricflow.aggregation_properties import AggregationType
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt.dbt_semantic.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.transformations.transform_rule import ModelTransformRule
 
 logger = logging.getLogger(__name__)

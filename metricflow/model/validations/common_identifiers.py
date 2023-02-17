@@ -3,7 +3,7 @@ from metricflow.instances import EntityElementReference
 
 from metricflow.model.objects.entity import Entity
 from metricflow.model.objects.elements.identifier import Identifier
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt.dbt_semantic.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
     EntityElementContext,
     EntityElementType,

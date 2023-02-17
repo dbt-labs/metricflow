@@ -1,4 +1,4 @@
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt.dbt_semantic.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantics.entity_container import PydanticEntityContainer
 from metricflow.model.semantics.entity_semantics import EntitySemantics
 from metricflow.model.semantics.metric_semantics import MetricSemantics
