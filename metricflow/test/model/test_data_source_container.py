@@ -2,7 +2,7 @@ import logging
 
 import pytest
 
-from dbt.dbt_semantic.objects.user_configured_model import UserConfiguredModel
+from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.semantics.entity_container import PydanticEntityContainer
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.entity_semantics import EntitySemantics

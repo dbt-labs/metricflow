@@ -1,4 +1,4 @@
-from dbt.dbt_semantic.objects.user_configured_model import UserConfiguredModel
+from dbt.contracts.graph.manifest import UserConfiguredModel
 
 
 def test_model_serialization_deserialization(simple_user_configured_model: UserConfiguredModel) -> None:

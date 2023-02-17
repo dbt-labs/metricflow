@@ -2,7 +2,7 @@ import logging
 
 from metricflow.errors.errors import ModelTransformError
 from metricflow.model.objects.metric import Metric, MetricInputMeasure, MetricType, MetricTypeParams
-from dbt.dbt_semantic.objects.user_configured_model import UserConfiguredModel
+from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.transformations.transform_rule import ModelTransformRule
 
 logger = logging.getLogger(__name__)

@@ -13,7 +13,7 @@ from metricflow.model.objects.elements.dimension import Dimension, DimensionType
 from metricflow.model.objects.elements.identifier import IdentifierType, Identifier, CompositeSubIdentifier
 from metricflow.model.objects.elements.measure import Measure
 from metricflow.model.objects.metric import MetricType, MetricTypeParams
-from dbt.dbt_semantic.objects.user_configured_model import UserConfiguredModel
+from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.parsing.dir_to_model import parse_yaml_files_to_validation_ready_model
 from metricflow.model.validations.identifiers import (
     IdentifierConfigRule,

@@ -1,6 +1,6 @@
 from metricflow.aggregation_properties import AggregationType
 from metricflow.errors.errors import ModelTransformError
-from dbt.dbt_semantic.objects.user_configured_model import UserConfiguredModel
+from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.transformations.transform_rule import ModelTransformRule
 
 ONE = "1"

@@ -13,7 +13,7 @@ from metricflow.model.validations.validator_helpers import (
     ValidationError,
     validate_safely,
 )
-from dbt.dbt_semantic.objects.user_configured_model import UserConfiguredModel
+from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.references import DimensionReference
 from metricflow.time.time_granularity import TimeGranularity
 

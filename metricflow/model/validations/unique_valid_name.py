@@ -10,7 +10,7 @@ from metricflow.instances import (
 )
 
 from metricflow.model.objects.entity import Entity
-from dbt.dbt_semantic.objects.user_configured_model import UserConfiguredModel
+from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
     EntityContext,
     EntityElementContext,

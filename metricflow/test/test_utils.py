@@ -8,7 +8,7 @@ from typing import Callable, Tuple, List
 
 from metricflow.model.objects.entity import Entity
 from metricflow.model.objects.metric import Metric
-from dbt.dbt_semantic.objects.user_configured_model import UserConfiguredModel
+from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.protocols.sql_client import SqlClient
 
 logger = logging.getLogger(__name__)

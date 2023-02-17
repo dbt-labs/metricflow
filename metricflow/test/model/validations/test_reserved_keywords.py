@@ -1,7 +1,7 @@
 import copy
 import random
 from metricflow.model.objects.elements.identifier import CompositeSubIdentifier
-from dbt.dbt_semantic.objects.user_configured_model import UserConfiguredModel
+from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.validations.reserved_keywords import RESERVED_KEYWORDS, ReservedKeywordsRule
 from metricflow.model.validations.validator_helpers import ValidationIssueLevel
 from metricflow.test.test_utils import find_entity_with

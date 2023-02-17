@@ -17,7 +17,7 @@ from metricflow.model.parsing.schemas_internal import (
     metric_validator,
     entity_validator,
 )
-from dbt.dbt_semantic.objects.user_configured_model import UserConfiguredModel
+from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.parsing.yaml_loader import (
     ParsingContext,
     YamlConfigLoader,

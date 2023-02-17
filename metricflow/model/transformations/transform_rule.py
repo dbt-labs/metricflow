@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from dbt.dbt_semantic.objects.user_configured_model import UserConfiguredModel
+from dbt.contracts.graph.manifest import UserConfiguredModel
 
 
 class ModelTransformRule(ABC):
