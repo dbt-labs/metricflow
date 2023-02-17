@@ -29,7 +29,7 @@ class EntityMeasuresUniqueRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(
-        whats_being_done="running model validation ensuring measures exist in only one configured data source"
+        whats_being_done="running model validation ensuring measures exist in only one configured entity"
     )
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
         issues: List[ValidationIssueType] = []
@@ -47,7 +47,7 @@ class EntityMeasuresUniqueRule(ModelValidationRule):
                                 ),
                                 element_type=EntityElementType.MEASURE,
                             ),
-                            message=f"Found measure with name {measure.name} in multiple data sources with names "
+                            message=f"Found measure with name {measure.name} in multiple entities with names "
                             f"({measure_references_to_entities[measure.reference]})",
                         )
                     )
@@ -170,7 +170,7 @@ class MeasureConstraintAliasesRule(ModelValidationRule):
                                 f"Measure alias {measure.alias} conflicts with a measure alias used elsewhere in the "
                                 f"model! This can cause ambiguity for certain types of query. Please choose another "
                                 f"alias, or, if the measures are constrained in the same way, consider centralizing "
-                                f"that definition in a new data source. Measure specification: {measure}. Existing "
+                                f"that definition in a new entity. Measure specification: {measure}. Existing "
                                 f"metrics with that measure alias used: {measure_alias_to_metrics[measure.alias]}"
                             ),
                         )
@@ -251,13 +251,13 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                             ),
                             message=(
                                 f"Measure '{measure.name}' has a agg_time_dimension of {measure.checked_agg_time_dimension.element_name} "
-                                f"that is not defined as a dimension in data source '{entity.name}'."
+                                f"that is not defined as a dimension in entity '{entity.name}'."
                             ),
                         )
                     )
                     continue
 
-                # Validates that the non_additive_dimension exists as a time dimension in the data source
+                # Validates that the non_additive_dimension exists as a time dimension in the entity
                 matching_dimension = next(
                     (dim for dim in entity.dimensions if non_additive_dimension.name == dim.name), None
                 )
@@ -273,7 +273,7 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                             ),
                             message=(
                                 f"Measure '{measure.name}' has a non_additive_dimension with name '{non_additive_dimension.name}' "
-                                f"that is not defined as a dimension in data source '{entity.name}'."
+                                f"that is not defined as a dimension in entity '{entity.name}'."
                             ),
                         )
                     )
@@ -356,7 +356,7 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                             ),
                             message=(
                                 f"Measure '{measure.name}' has a non_additive_dimension with an invalid 'window_groupings'. "
-                                f"These identifiers {window_groupings.difference(intersected_identifiers)} do not exist in the data source."
+                                f"These identifiers {window_groupings.difference(intersected_identifiers)} do not exist in the entity."
                             ),
                         )
                     )

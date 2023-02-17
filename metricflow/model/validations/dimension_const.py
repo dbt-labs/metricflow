@@ -19,7 +19,7 @@ from metricflow.time.time_granularity import TimeGranularity
 
 
 class DimensionConsistencyRule(ModelValidationRule):
-    """Checks for consistent dimension properties in the data sources in a model.
+    """Checks for consistent dimension properties in the entities in a model.
 
     * Dimensions with the same name should be of the same type.
     * Dimensions with the same name should be either all partitions or not.
@@ -60,8 +60,8 @@ class DimensionConsistencyRule(ModelValidationRule):
         Args:
             dimension: the dimension to check
             time_dims_to_granularity: a dict from the dimension to the time granularity it should have
-            entity: the associated data source. Used for generated issue messages
-        Throws: MdoValidationError if there is an inconsistent dimension in the data source.
+            entity: the associated entity. Used for generated issue messages
+        Throws: MdoValidationError if there is an inconsistent dimension in the entity.
         """
         issues: List[ValidationIssueType] = []
         context = EntityElementContext(
@@ -87,7 +87,7 @@ class DimensionConsistencyRule(ModelValidationRule):
                         ValidationError(
                             context=context,
                             message=f"Time granularity must be the same for time dimensions with the same name. "
-                            f"Problematic dimension: {dimension.name} in data source with name: "
+                            f"Problematic dimension: {dimension.name} in entity with name: "
                             f"`{entity.name}`. Expected granularity is {expected_granularity.name}.",
                         )
                     )
@@ -96,20 +96,20 @@ class DimensionConsistencyRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(
-        whats_being_done="checking that the data source has dimensions consistent with the given invariants"
+        whats_being_done="checking that the entity has dimensions consistent with the given invariants"
     )
     def _validate_entity(
         entity: Entity,
         dimension_to_invariant: Dict[DimensionReference, DimensionInvariants],
         update_invariant_dict: bool,
     ) -> List[ValidationIssueType]:
-        """Checks that the given data source has dimensions consistent with the given invariants.
+        """Checks that the given entity has dimensions consistent with the given invariants.
 
         Args:
-            entity: the data source to check
+            entity: the entity to check
             dimension_to_invariant: a dict from the dimension name to the properties it should have
             update_invariant_dict: whether to insert an entry into the dict if the given dimension name doesn't exist.
-        Throws: MdoValidationError if there is an inconsistent dimension in the data source.
+        Throws: MdoValidationError if there is an inconsistent dimension in the entity.
         """
         issues: List[ValidationIssueType] = []
 
@@ -140,7 +140,7 @@ class DimensionConsistencyRule(ModelValidationRule):
                 issues.append(
                     ValidationError(
                         context=context,
-                        message=f"In data source `{entity.name}`, type conflict for dimension `{dimension.name}` "
+                        message=f"In entity `{entity.name}`, type conflict for dimension `{dimension.name}` "
                         f"- already in model as type `{dimension_invariant.type}` but got `{dimension.type}`",
                     )
                 )
@@ -148,7 +148,7 @@ class DimensionConsistencyRule(ModelValidationRule):
                 issues.append(
                     ValidationError(
                         context=context,
-                        message=f"In data source `{entity.name}, conflicting is_partition attribute for dimension "
+                        message=f"In entity `{entity.name}, conflicting is_partition attribute for dimension "
                         f"`{dimension.reference}` - already in model"
                         f" with is_partition as `{dimension_invariant.is_partition}` but got "
                         f"`{is_partition}``",

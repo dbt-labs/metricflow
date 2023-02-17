@@ -35,11 +35,11 @@ logger = logging.getLogger(__name__)
 def _data_set_to_read_nodes(
     data_sets: OrderedDict[str, EntityDataSet]
 ) -> OrderedDict[str, ReadSqlSourceNode[EntityDataSet]]:
-    """Return a mapping from the name of the data source to the dataflow plan node that reads from it."""
+    """Return a mapping from the name of the entity to the dataflow plan node that reads from it."""
     return_dict: OrderedDict[str, ReadSqlSourceNode[EntityDataSet]] = OrderedDict()
     for entity_name, data_set in data_sets.items():
         return_dict[entity_name] = ReadSqlSourceNode[EntityDataSet](data_set)
-        logger.debug(f"For data source {entity_name}, creating node_id {return_dict[entity_name].node_id}")
+        logger.debug(f"For entity {entity_name}, creating node_id {return_dict[entity_name].node_id}")
 
     return return_dict
 
@@ -128,7 +128,7 @@ def consistent_id_object_repository(
 def create_data_sets(multihop_semantic_model: SemanticModel) -> OrderedDict[str, EntityDataSet]:
     """Convert the Entitys in the model to SqlDataSets.
 
-    Key is the name of the data source, value is the associated data set.
+    Key is the name of the entity, value is the associated data set.
     """
     # Use ordered dict and sort by name to get consistency when running tests.
     data_sets = OrderedDict()

@@ -51,7 +51,7 @@ ISSUE_COLOR_MAP = {
 
 
 class EntityElementType(Enum):
-    """Maps data source element types to a readable string."""
+    """Maps entity element types to a readable string."""
 
     MEASURE = "measure"
     DIMENSION = "dimension"
@@ -103,14 +103,14 @@ class MetricContext(BaseModel):
 
 
 class EntityContext(BaseModel):
-    """The context class for validation issues involving data sources"""
+    """The context class for validation issues involving entities"""
 
     file_context: FileContext
     entity: EntityReference
 
     def context_str(self) -> str:
         """Human readable stringified representation of the context"""
-        return f"with data source `{self.entity.entity_name}` {self.file_context.context_str()}"
+        return f"with entity `{self.entity.entity_name}` {self.file_context.context_str()}"
 
 
 class EntityElementContext(BaseModel):
@@ -122,7 +122,7 @@ class EntityElementContext(BaseModel):
 
     def context_str(self) -> str:
         """Human readable stringified representation of the context"""
-        return f"with {self.element_type.value} `{self.entity_element.element_name}` in data source `{self.entity_element.entity_name}` {self.file_context.context_str()}"
+        return f"with {self.element_type.value} `{self.entity_element.element_name}` in entity `{self.entity_element.entity_name}` {self.file_context.context_str()}"
 
 
 ValidationContext = Union[
@@ -331,9 +331,9 @@ def validate_safely(whats_being_done: str) -> Callable:
 
 @dataclass(frozen=True)
 class DimensionInvariants:
-    """Helper object to ensure consistent dimension attributes across data sources.
+    """Helper object to ensure consistent dimension attributes across entities.
 
-    All dimensions with a given name in all data sources should have attributes matching these values.
+    All dimensions with a given name in all entities should have attributes matching these values.
     """
 
     type: DimensionType

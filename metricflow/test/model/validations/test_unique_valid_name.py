@@ -16,7 +16,7 @@ def copied_model(simple_model__with_primary_transforms: UserConfiguredModel) -> 
 """
     Top Level Tests
     Top level elements include
-    - Data Sources
+    - entities
     - Metrics
     - Metric Sets
     - Dimension Sets
@@ -33,7 +33,7 @@ def test_duplicate_entity_name(simple_model__with_primary_transforms: UserConfig
     model.entities.append(duplicated_entity)
     with pytest.raises(
         ModelValidationException,
-        match=rf"Can't use name `{duplicated_entity.name}` for a data source when it was already used for a data source",
+        match=rf"Can't use name `{duplicated_entity.name}` for a entity when it was already used for a entity",
     ):
         ModelValidator([UniqueAndValidNameRule()]).checked_validations(model)
 
@@ -62,21 +62,21 @@ def test_top_level_metric_can_have_same_name_as_any_other_top_level_item(
 
 
 """
-    Data Source Element Tests
-    There are three types of data source elements
+    entity Element Tests
+    There are three types of entity elements
     - measures
     - identifiers
     - dimensions
 
     A name for any of these elements must be unique to all other element names
-    for the given data source.
+    for the given entity.
 """
 
 
 def test_duplicate_measure_name(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa:D
     model = copied_model(simple_model__with_primary_transforms)
 
-    # Ensure we have a usable data source for the test
+    # Ensure we have a usable entity for the test
     entity_with_measures, _ = find_entity_with(model, lambda entity: len(entity.measures) > 0)
 
     duplicated_measure = entity_with_measures.measures[0]
@@ -93,7 +93,7 @@ def test_duplicate_measure_name(simple_model__with_primary_transforms: UserConfi
 def test_duplicate_dimension_name(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa:D
     model = copied_model(simple_model__with_primary_transforms)
 
-    # Ensure we have a usable data source for the test
+    # Ensure we have a usable entity for the test
     entity_with_dimensions, _ = find_entity_with(model, lambda entity: len(entity.dimensions) > 0)
 
     duplicated_dimension = entity_with_dimensions.dimensions[0]
@@ -111,7 +111,7 @@ def test_duplicate_dimension_name(simple_model__with_primary_transforms: UserCon
 def test_duplicate_identifier_name(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa:D
     model = copied_model(simple_model__with_primary_transforms)
 
-    # Ensure we have a usable data source for the test
+    # Ensure we have a usable entity for the test
     entity_with_identifiers, _ = find_entity_with(model, lambda entity: len(entity.identifiers) > 0)
 
     duplicated_identifier = entity_with_identifiers.identifiers[0]

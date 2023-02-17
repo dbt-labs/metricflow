@@ -12,7 +12,7 @@ FROM (
     , SUM(subq_7.bookings) AS bookings
     , COUNT(DISTINCT subq_7.bookers) AS bookers
   FROM (
-    -- Read Elements From Data Source 'bookings_source'
+    -- Read Elements From entity 'bookings_source'
     -- Pass Only Elements:
     --   ['bookings', 'bookers', 'listing']
     SELECT

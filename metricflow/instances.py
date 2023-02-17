@@ -34,7 +34,7 @@ class ModelReference(SerializableDataclass):
 
 @dataclass(frozen=True)
 class EntityReference(ModelReference):
-    """A reference to a data source definition in the model."""
+    """A reference to a entity definition in the model."""
 
     entity_name: str
 
@@ -44,7 +44,7 @@ class EntityReference(ModelReference):
 
 @dataclass(frozen=True)
 class EntityElementReference(ModelReference):
-    """A reference to an element definition in a data source definition in the model.
+    """A reference to an element definition in a entity definition in the model.
 
     TODO: Fields should be *Reference objects.
     """
@@ -66,7 +66,7 @@ class EntityElementReference(ModelReference):
         return EntityReference(self.entity_name)
 
     def is_from(self, ref: EntityReference) -> bool:
-        """Returns true if this reference is from the same data source as the supplied reference."""
+        """Returns true if this reference is from the same entity as the supplied reference."""
         return self.entity_name == ref.entity_name
 
 
@@ -111,12 +111,12 @@ class MdoInstance(ABC, Generic[SpecT]):
 
 @dataclass(frozen=True)
 class EntityElementInstance(SerializableDataclass):  # noqa: D
-    # This instance is derived from something defined in a data source.
+    # This instance is derived from something defined in a entity.
     defined_from: Tuple[EntityElementReference, ...]
 
     @property
     def origin_entity_reference(self) -> EntityElementReference:
-        """Property to grab the element reference pointing to the origin data source for this element instance
+        """Property to grab the element reference pointing to the origin entity for this element instance
 
         By convention this is the zeroth element in the Tuple. At this time these tuples are always of exactly
         length 1, so the simple assertions here work.
@@ -126,7 +126,7 @@ class EntityElementInstance(SerializableDataclass):  # noqa: D
         if len(self.defined_from) != 1:
             raise ValueError(
                 f"EntityElementInstances should have exactly one entry in the `defined_from` property, because "
-                f"otherwise there is no way to ensure that the first element is always the origin data source! Found "
+                f"otherwise there is no way to ensure that the first element is always the origin entity! Found "
                 f"{len(self.defined_from)} elements in this particular instance: {self.defined_from}."
             )
 

@@ -27,10 +27,10 @@ logger = logging.getLogger(__name__)
 
 
 class EntitySemantics:
-    """Tracks semantic information for data source held in a set of EntityContainers
+    """Tracks semantic information for entity held in a set of EntityContainers
 
     This implements both the EntitySemanticsAccessors protocol, the interface type we use throughout the codebase.
-    That interface prevents unwanted calls to methods for adding data sources to the container.
+    That interface prevents unwanted calls to methods for adding entities to the container.
     """
 
     def __init__(  # noqa: D
@@ -56,13 +56,13 @@ class EntitySemantics:
             EntityReference, ElementGrouper[TimeDimensionReference, MeasureSpec]
         ] = {}
 
-        # Add semantic tracking for data sources from configured_entity_container
+        # Add semantic tracking for entities from configured_entity_container
         for entity in self._configured_entity_container.values():
             assert isinstance(entity, Entity)
             self.add_configured_entity(entity)
 
     def add_configured_entity(self, entity: Entity) -> None:
-        """Dont use this unless you mean it (ie in tests). The configured data sources are supposed to be static"""
+        """Dont use this unless you mean it (ie in tests). The configured entities are supposed to be static"""
         self._configured_entity_container._put(entity)
         self._add_entity(entity)
 
@@ -77,12 +77,12 @@ class EntitySemantics:
             if origin and dimension_source.origin != origin:
                 continue
             dimension = dimension_source.get_dimension(dimension_reference)
-            # find the data source that has the requested dimension by the requested identifier
+            # find the entity that has the requested dimension by the requested identifier
 
             return deepcopy(dimension)
 
         raise ValueError(
-            f"Could not find dimension with name ({dimension_reference.element_name}) in configured data sources"
+            f"Could not find dimension with name ({dimension_reference.element_name}) in configured entities"
         )
 
     def get_time_dimension(self, time_dimension_reference: TimeDimensionReference) -> Dimension:
@@ -91,7 +91,7 @@ class EntitySemantics:
 
         if dimension_reference not in self._dimension_index:
             raise ValueError(
-                f"Could not find dimension with name ({dimension_reference.element_name}) in configured data sources"
+                f"Could not find dimension with name ({dimension_reference.element_name}) in configured entities"
             )
 
         for dimension_source in self._dimension_index[dimension_reference]:
@@ -111,10 +111,10 @@ class EntitySemantics:
 
     def get_measure(self, measure_reference: MeasureReference) -> Measure:  # noqa: D
         if measure_reference not in self._measure_index:
-            raise ValueError(f"Could not find measure with name ({measure_reference}) in configured data sources")
+            raise ValueError(f"Could not find measure with name ({measure_reference}) in configured entities")
 
         assert len(self._measure_index[measure_reference]) >= 1
-        # Measures should be consistent across data sources, so just use the first one.
+        # Measures should be consistent across entities, so just use the first one.
         return list(self._measure_index[measure_reference])[0].get_measure(measure_reference)
 
     def get_identifier_references(self) -> List[IdentifierReference]:  # noqa: D
@@ -157,11 +157,11 @@ class EntitySemantics:
         fail_on_error: bool = True,
         logging_context: str = "",
     ) -> None:
-        """Add data source semantic information, validating consistency with existing data sources."""
+        """Add entity semantic information, validating consistency with existing entities."""
         errors = []
 
         if entity.name in self._entity_names:
-            errors.append(f"name {entity.name} already registered - please ensure data source names are unique")
+            errors.append(f"name {entity.name} already registered - please ensure entity names are unique")
 
         for measure in entity.measures:
             if measure.reference in self._measure_aggs and self._measure_aggs[measure.reference] != measure.agg:
@@ -173,7 +173,7 @@ class EntitySemantics:
         if errors:
             error_prefix = "\n  - "
             error_msg = (
-                f"Unable to add data source `{entity.name}` "
+                f"Unable to add entity `{entity.name}` "
                 f"{'while ' + logging_context + ' ' if logging_context else ''}"
                 f"{'... skipping' if not fail_on_error else ''}.\n"
                 f"Errors: {error_prefix + error_prefix.join(errors)}"
@@ -220,13 +220,13 @@ class EntitySemantics:
     def get_aggregation_time_dimensions_with_measures(
         self, entity_reference: EntityReference
     ) -> ElementGrouper[TimeDimensionReference, MeasureSpec]:
-        """Return all time dimensions in a data source with their associated measures."""
+        """Return all time dimensions in a entity with their associated measures."""
         assert (
             entity_reference in self._entity_to_aggregation_time_dimensions
-        ), f"Data Source {entity_reference} is not known"
+        ), f"entity {entity_reference} is not known"
         return self._entity_to_aggregation_time_dimensions[entity_reference]
 
     def get_entities_for_identifier(self, identifier_reference: IdentifierReference) -> Set[Entity]:
-        """Return all data sources associated with an identifier reference"""
+        """Return all entities associated with an identifier reference"""
         identifier_entity = self._identifier_ref_to_entity[identifier_reference]
         return set(self._entity_index[identifier_entity])

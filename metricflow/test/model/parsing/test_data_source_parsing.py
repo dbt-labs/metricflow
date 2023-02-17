@@ -10,7 +10,7 @@ from metricflow.time.time_granularity import TimeGranularity
 
 
 def test_base_entity_attribute_parsing() -> None:
-    """Test for parsing a data source specification without regard for measures, identifiers, or dimensions"""
+    """Test for parsing a entity specification without regard for measures, identifiers, or dimensions"""
     yaml_contents = textwrap.dedent(
         """\
         entity:
@@ -70,7 +70,7 @@ def test_entity_metadata_parsing() -> None:
 
 
 def test_entity_sql_table_parsing() -> None:
-    """Test for parsing a data source specification with a sql_table provided"""
+    """Test for parsing a entity specification with a sql_table provided"""
     yaml_contents = textwrap.dedent(
         """\
         entity:
@@ -90,7 +90,7 @@ def test_entity_sql_table_parsing() -> None:
 
 
 def test_entity_sql_query_parsing() -> None:
-    """Test for parsing a data source specification with a sql_query provided"""
+    """Test for parsing a entity specification with a sql_query provided"""
     yaml_contents = textwrap.dedent(
         """\
         entity:
@@ -110,7 +110,7 @@ def test_entity_sql_query_parsing() -> None:
 
 
 def test_entity_identifier_parsing() -> None:
-    """Test for parsing a basic identifier out of a data source specification"""
+    """Test for parsing a basic identifier out of a entity specification"""
     yaml_contents = textwrap.dedent(
         """\
         entity:
@@ -142,7 +142,7 @@ def test_entity_identifier_parsing() -> None:
 
 
 def test_entity_identifier_metadata_parsing() -> None:
-    """Test for parsing metadata for an identifier object defined in a data source specification"""
+    """Test for parsing metadata for an identifier object defined in a entity specification"""
     yaml_contents = textwrap.dedent(
         """\
         entity:
@@ -178,7 +178,7 @@ def test_entity_identifier_metadata_parsing() -> None:
 
 
 def test_entity_identifier_default_entity_parsing() -> None:
-    """Test for parsing an identifier with no entity specified out of a data source specification"""
+    """Test for parsing an identifier with no entity specified out of a entity specification"""
     yaml_contents = textwrap.dedent(
         """\
         entity:
@@ -203,7 +203,7 @@ def test_entity_identifier_default_entity_parsing() -> None:
 
 
 def test_entity_composite_sub_identifier_ref_parsing() -> None:
-    """Test for parsing a ref-based composite sub-identifier out of a data source specification"""
+    """Test for parsing a ref-based composite sub-identifier out of a entity specification"""
     yaml_contents = textwrap.dedent(
         """\
         entity:
@@ -236,7 +236,7 @@ def test_entity_composite_sub_identifier_ref_parsing() -> None:
 
 
 def test_entity_composite_sub_identifier_expr_parsing() -> None:
-    """Test for parsing an expr-based composite sub-identifier out of a data source specification"""
+    """Test for parsing an expr-based composite sub-identifier out of a entity specification"""
     yaml_contents = textwrap.dedent(
         """\
         entity:
@@ -269,7 +269,7 @@ def test_entity_composite_sub_identifier_expr_parsing() -> None:
 
 
 def test_entity_measure_parsing() -> None:
-    """Test for parsing a measure out of a data source specification"""
+    """Test for parsing a measure out of a entity specification"""
     yaml_contents = textwrap.dedent(
         """\
         entity:
@@ -298,7 +298,7 @@ def test_entity_measure_parsing() -> None:
 
 
 def test_entity_measure_metadata_parsing() -> None:
-    """Test for parsing metadata for a measure object defined in a data source specification"""
+    """Test for parsing metadata for a measure object defined in a entity specification"""
     yaml_contents = textwrap.dedent(
         """\
         entity:
@@ -334,7 +334,7 @@ def test_entity_measure_metadata_parsing() -> None:
 
 
 def test_entity_create_metric_measure_parsing() -> None:
-    """Test for parsing a measure out of a data source specification when create metric is set"""
+    """Test for parsing a measure out of a entity specification when create metric is set"""
     yaml_contents = textwrap.dedent(
         """\
         entity:
@@ -360,7 +360,7 @@ def test_entity_create_metric_measure_parsing() -> None:
 
 
 def test_entity_categorical_dimension_parsing() -> None:
-    """Test for parsing a categorical dimension out of a data source specification"""
+    """Test for parsing a categorical dimension out of a entity specification"""
     yaml_contents = textwrap.dedent(
         """\
         entity:
@@ -388,7 +388,7 @@ def test_entity_categorical_dimension_parsing() -> None:
 
 
 def test_entity_partition_dimension_parsing() -> None:
-    """Test for parsing a partition dimension out of a data source specification"""
+    """Test for parsing a partition dimension out of a entity specification"""
     yaml_contents = textwrap.dedent(
         """\
         entity:
@@ -414,7 +414,7 @@ def test_entity_partition_dimension_parsing() -> None:
 
 
 def test_entity_time_dimension_parsing() -> None:
-    """Test for parsing a time dimension out of a data source specification"""
+    """Test for parsing a time dimension out of a entity specification"""
     yaml_contents = textwrap.dedent(
         """\
         entity:
@@ -446,7 +446,7 @@ def test_entity_time_dimension_parsing() -> None:
 
 
 def test_entity_primary_time_dimension_parsing() -> None:
-    """Test for parsing a primary time dimension out of a data source specification"""
+    """Test for parsing a primary time dimension out of a entity specification"""
     yaml_contents = textwrap.dedent(
         """\
         entity:
@@ -476,7 +476,7 @@ def test_entity_primary_time_dimension_parsing() -> None:
 
 
 def test_entity_dimension_metadata_parsing() -> None:
-    """Test for parsing metadata for an dimension object defined in a data source specification"""
+    """Test for parsing metadata for an dimension object defined in a entity specification"""
     yaml_contents = textwrap.dedent(
         """\
         entity:
@@ -512,7 +512,7 @@ def test_entity_dimension_metadata_parsing() -> None:
 
 
 def test_entity_dimension_validity_params_parsing() -> None:
-    """Test for parsing dimension validity info out of a data source specification"""
+    """Test for parsing dimension validity info out of a entity specification"""
     yaml_contents = textwrap.dedent(
         """\
         entity:

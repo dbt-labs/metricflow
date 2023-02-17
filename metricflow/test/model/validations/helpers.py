@@ -90,7 +90,7 @@ def entity_with_guaranteed_meta(
     dimensions: Sequence[Dimension] = [],
     origin: EntityOrigin = EntityOrigin.SOURCE,
 ) -> Entity:
-    """Creates a data source with the given input. If a metadata object is not supplied, a default metadata object is used"""
+    """Creates a entity with the given input. If a metadata object is not supplied, a default metadata object is used"""
 
     return Entity(
         name=name,

@@ -66,7 +66,7 @@ FROM (
             , subq_0.bookers
             , subq_0.average_booking_value
           FROM (
-            -- Read Elements From Data Source 'bookings_source'
+            -- Read Elements From entity 'bookings_source'
             SELECT
               1 AS bookings
               , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
@@ -127,7 +127,7 @@ FROM (
             , subq_3.listing__lux_listing AS listing__lux_listing
             , subq_5.is_confirmed_lux AS lux_listing__is_confirmed_lux
           FROM (
-            -- Read Elements From Data Source 'lux_listing_mapping'
+            -- Read Elements From entity 'lux_listing_mapping'
             SELECT
               lux_listing_mapping_src_10021.listing_id AS listing
               , lux_listing_mapping_src_10021.lux_listing_id AS lux_listing
@@ -184,7 +184,7 @@ FROM (
               , subq_4.is_confirmed_lux
               , subq_4.lux_listing__is_confirmed_lux
             FROM (
-              -- Read Elements From Data Source 'lux_listings'
+              -- Read Elements From entity 'lux_listings'
               SELECT
                 lux_listings_src_10022.valid_from AS window_start
                 , DATE_TRUNC(lux_listings_src_10022.valid_from, isoweek) AS window_start__week

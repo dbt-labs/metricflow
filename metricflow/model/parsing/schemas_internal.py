@@ -78,7 +78,7 @@ locked_metadata_schema = {
 }
 
 
-# Add transform metadata fields to top level objects (metric, data source, derived identifier)
+# Add transform metadata fields to top level objects (metric, entity, derived identifier)
 add_transform_metadata_fields_to_spec(dimension_schema)
 add_transform_metadata_fields_to_spec(measure_schema)
 add_transform_metadata_fields_to_spec(identifier_schema)

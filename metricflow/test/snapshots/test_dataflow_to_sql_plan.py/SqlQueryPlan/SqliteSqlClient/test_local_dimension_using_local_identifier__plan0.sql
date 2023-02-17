@@ -54,7 +54,7 @@ FROM (
         , subq_0.user
         , subq_0.listing__user
       FROM (
-        -- Read Elements From Data Source 'listings_latest'
+        -- Read Elements From entity 'listings_latest'
         SELECT
           1 AS listings
           , listings_latest_src_10003.capacity AS largest_listing

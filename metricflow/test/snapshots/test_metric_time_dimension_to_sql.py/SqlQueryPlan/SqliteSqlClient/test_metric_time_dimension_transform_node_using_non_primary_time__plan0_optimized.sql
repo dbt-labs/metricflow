@@ -1,4 +1,4 @@
--- Read Elements From Data Source 'bookings_source'
+-- Read Elements From entity 'bookings_source'
 -- Metric Time Dimension 'booking_paid_at'
 SELECT
   booking_value AS booking_payments

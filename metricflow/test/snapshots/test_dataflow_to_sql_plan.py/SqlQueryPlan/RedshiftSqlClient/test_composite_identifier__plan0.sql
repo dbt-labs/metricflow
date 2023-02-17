@@ -43,7 +43,7 @@ FROM (
         , subq_0.user_id__team_id
         , subq_0.messages
       FROM (
-        -- Read Elements From Data Source 'messages_source'
+        -- Read Elements From entity 'messages_source'
         SELECT
           1 AS messages
           , messages_source_src_10015.ds

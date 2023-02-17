@@ -14,7 +14,7 @@ integration_test:
 ---
 integration_test:
   name: single_entity_expr_metric
-  description: Tests querying an expression metric sourced from multiple measures, but one data source
+  description: Tests querying an expression metric sourced from multiple measures, but one entity
   model: SIMPLE_MODEL
   metrics: ["booking_fees_per_booker"]
   group_bys: ["metric_time"]
@@ -27,7 +27,7 @@ integration_test:
 ---
 integration_test:
   name: expr_metric
-  description: Tests querying an expression metric sourced from multiple measures, but one data source
+  description: Tests querying an expression metric sourced from multiple measures, but one entity
   model: SIMPLE_MODEL
   metrics: ["views_times_booking_value"]
   group_bys: ["metric_time"]
@@ -258,7 +258,7 @@ integration_test:
 ---
 integration_test:
   name: ratio_single_entity
-  description: Test ratio metric from a single data source.
+  description: Test ratio metric from a single entity.
   model: SIMPLE_MODEL
   metrics: ["bookings_per_booker"]
   group_bys: ["metric_time"]
@@ -271,7 +271,7 @@ integration_test:
 ---
 integration_test:
   name: ratio
-  description: Test ratio metric from multiple data source.
+  description: Test ratio metric from multiple entity.
   model: SIMPLE_MODEL
   metrics: ["bookings_per_view"]
   group_bys: ["metric_time"]

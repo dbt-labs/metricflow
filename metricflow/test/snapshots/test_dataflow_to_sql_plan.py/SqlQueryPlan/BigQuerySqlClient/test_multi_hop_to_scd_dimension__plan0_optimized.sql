@@ -8,7 +8,7 @@ SELECT
   , subq_18.lux_listing__is_confirmed_lux AS listing__lux_listing__is_confirmed_lux
   , SUM(subq_13.bookings) AS bookings
 FROM (
-  -- Read Elements From Data Source 'bookings_source'
+  -- Read Elements From entity 'bookings_source'
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements:
   --   ['bookings', 'metric_time', 'listing']

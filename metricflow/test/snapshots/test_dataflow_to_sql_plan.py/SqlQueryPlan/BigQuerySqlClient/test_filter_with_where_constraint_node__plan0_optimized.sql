@@ -3,7 +3,7 @@ SELECT
   ds
   , bookings
 FROM (
-  -- Read Elements From Data Source 'bookings_source'
+  -- Read Elements From entity 'bookings_source'
   -- Pass Only Elements:
   --   ['bookings', 'ds']
   SELECT

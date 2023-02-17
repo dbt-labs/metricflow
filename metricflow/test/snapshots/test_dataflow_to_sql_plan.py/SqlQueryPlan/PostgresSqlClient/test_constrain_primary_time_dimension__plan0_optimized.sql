@@ -1,4 +1,4 @@
--- Read Elements From Data Source 'bookings_source'
+-- Read Elements From entity 'bookings_source'
 -- Pass Only Elements:
 --   ['bookings', 'ds']
 -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-02T00:00:00]

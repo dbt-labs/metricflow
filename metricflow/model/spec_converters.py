@@ -55,7 +55,7 @@ class WhereConstraintConverter:
     """Static class for converting WhereClauseConstraint objects to a SpecWhereClauseConstraint representation.
 
     The WhereClauseConstraint model object contains a parsed set of element names, and as such conversion to
-    a SpecWhereClauseConstraint requires semantic resolution of linkable specs across data sources. This resolution
+    a SpecWhereClauseConstraint requires semantic resolution of linkable specs across entities. This resolution
     has to happen for metrics and measures independently, as both can be constrained, so bolting this on
     to something like EntitySemantics will not be adequate.
     """

@@ -294,7 +294,7 @@ metric:
 ---
 metric:
   name: bookings_per_booker
-  description: bookings divided by bookers - single data source ratio metric test
+  description: bookings divided by bookers - single entity ratio metric test
   owners:
     - support@transformdata.io
   type: ratio

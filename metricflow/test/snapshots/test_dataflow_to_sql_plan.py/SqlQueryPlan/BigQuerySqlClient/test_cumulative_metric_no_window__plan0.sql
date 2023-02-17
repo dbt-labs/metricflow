@@ -29,7 +29,7 @@ FROM (
         , subq_0.user
         , subq_0.txn_revenue
       FROM (
-        -- Read Elements From Data Source 'revenue'
+        -- Read Elements From entity 'revenue'
         SELECT
           revenue_src_10006.revenue AS txn_revenue
           , revenue_src_10006.created_at AS ds

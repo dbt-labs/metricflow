@@ -16,7 +16,7 @@ class BooleanMeasureAggregationRule(ModelTransformRule):
             for measure in entity.measures:
                 if measure.agg == AggregationType.BOOLEAN:
                     logger.warning(
-                        f"In data source {entity.name}, measure `{measure.reference.element_name}` "
+                        f"In entity {entity.name}, measure `{measure.reference.element_name}` "
                         f"is configured as aggregation type `boolean`, which has been deprecated. Please use "
                         f"`sum_boolean` instead."
                     )

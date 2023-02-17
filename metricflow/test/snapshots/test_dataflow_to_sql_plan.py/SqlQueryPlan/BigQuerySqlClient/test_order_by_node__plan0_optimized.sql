@@ -6,7 +6,7 @@ SELECT
   , is_instant
   , SUM(bookings) AS bookings
 FROM (
-  -- Read Elements From Data Source 'bookings_source'
+  -- Read Elements From entity 'bookings_source'
   -- Pass Only Elements:
   --   ['bookings', 'is_instant', 'ds']
   SELECT

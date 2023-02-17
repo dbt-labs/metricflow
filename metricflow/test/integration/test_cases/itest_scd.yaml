@@ -68,7 +68,7 @@ integration_test:
   name: scd_grouped_metric_with_second_dim
   description: |
     Tests selecting a metric grouped by a non-SCD dimension along with an SCD-dimension. This allows us to
-    test that the joins are rendered correctly across different data source types, and continue to produce
+    test that the joins are rendered correctly across different entity types, and continue to produce
     correct output.
   model: SCD_MODEL
   metrics: ["bookings"]
@@ -94,7 +94,7 @@ integration_test:
 integration_test:
   name: scd_multi_hop_groupby_through_scd
   description: |
-    Tests selecting a metric grouped by a non-SCD dimension reached through an SCD data source. This allows us to
+    Tests selecting a metric grouped by a non-SCD dimension reached through an SCD entity. This allows us to
     test that the joins are rendered correctly for this multi-hop case, and that the SCD is filtered down to an ID
     mapping from the correct date.
   model: SCD_MODEL
@@ -118,7 +118,7 @@ integration_test:
 integration_test:
   name: scd_multi_hop_groupby_to_scd
   description: |
-    Tests selecting a metric grouped by an SCD dimension reached through a standard SCD data source. This allows us to
+    Tests selecting a metric grouped by an SCD dimension reached through a standard SCD entity. This allows us to
     test that the joins are rendered correctly for this multi-hop case, and that the SCD is filtered down to an ID
     mapping from the correct date.
   model: SCD_MODEL

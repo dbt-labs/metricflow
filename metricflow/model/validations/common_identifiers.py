@@ -17,7 +17,7 @@ from metricflow.references import IdentifierReference
 
 
 class CommonIdentifiersRule(ModelValidationRule):
-    """Checks that identifiers exist on more than one data source"""
+    """Checks that identifiers exist on more than one entity"""
 
     @staticmethod
     def _map_entity_identifiers(entities: List[Entity]) -> Dict[IdentifierReference, Set[str]]:
@@ -32,14 +32,14 @@ class CommonIdentifiersRule(ModelValidationRule):
         return identifiers_to_entities
 
     @staticmethod
-    @validate_safely(whats_being_done="checking identifier exists on more than one data source")
+    @validate_safely(whats_being_done="checking identifier exists on more than one entity")
     def _check_identifier(
         identifier: Identifier,
         entity: Entity,
         identifiers_to_entities: Dict[IdentifierReference, Set[str]],
     ) -> List[ValidationIssueType]:
         issues: List[ValidationIssueType] = []
-        # If the identifier is the dict and if the set of data sources minus this data source is empty,
+        # If the identifier is the dict and if the set of entities minus this entity is empty,
         # then we warn the user that their identifier will be unused in joins
         if (
             identifier.reference in identifiers_to_entities
@@ -55,14 +55,14 @@ class CommonIdentifiersRule(ModelValidationRule):
                         element_type=EntityElementType.IDENTIFIER,
                     ),
                     message=f"Identifier `{identifier.reference.element_name}` "
-                    f"only found in one data source `{entity.name}` "
+                    f"only found in one entity `{entity.name}` "
                     f"which means it will be unused in joins.",
                 )
             )
         return issues
 
     @staticmethod
-    @validate_safely(whats_being_done="running model validation warning if identifiers are only one one data source")
+    @validate_safely(whats_being_done="running model validation warning if identifiers are only one one entity")
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:
         """Issues a warning for any identifier that is associated with only one entity"""
         issues = []

@@ -61,7 +61,7 @@ FROM (
             , subq_0.ds__year AS metric_time__year
             , subq_0.account_id
           FROM (
-            -- Read Elements From Data Source 'account_month_txns'
+            -- Read Elements From entity 'account_month_txns'
             SELECT
               account_month_txns_src_10009.txn_count
               , account_month_txns_src_10009.ds_partitioned
@@ -124,7 +124,7 @@ FROM (
             , subq_3.customer_id AS customer_id
             , subq_3.account_id__customer_id AS account_id__customer_id
           FROM (
-            -- Read Elements From Data Source 'bridge_table'
+            -- Read Elements From entity 'bridge_table'
             SELECT
               bridge_table_src_10010.extra_dim
               , bridge_table_src_10010.ds_partitioned
@@ -177,7 +177,7 @@ FROM (
               , subq_4.customer_id__ds_partitioned__year
               , subq_4.customer_id
             FROM (
-              -- Read Elements From Data Source 'customer_table'
+              -- Read Elements From entity 'customer_table'
               SELECT
                 customer_table_src_10012.customer_name
                 , customer_table_src_10012.customer_atomic_weight

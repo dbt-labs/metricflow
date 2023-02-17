@@ -63,7 +63,7 @@ FROM (
             , subq_0.user
             , subq_0.verification__user
           FROM (
-            -- Read Elements From Data Source 'id_verifications'
+            -- Read Elements From entity 'id_verifications'
             SELECT
               1 AS identity_verifications
               , id_verifications_src_10002.ds
@@ -103,7 +103,7 @@ FROM (
           , subq_3.ds_partitioned
           , subq_3.user
         FROM (
-          -- Read Elements From Data Source 'users_ds_source'
+          -- Read Elements From entity 'users_ds_source'
           SELECT
             users_ds_source_src_10006.ds
             , '__DATE_TRUNC_NOT_SUPPORTED__' AS ds__week

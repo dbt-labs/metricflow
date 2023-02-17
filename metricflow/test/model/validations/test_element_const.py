@@ -18,7 +18,7 @@ def _categorical_dimensions(entity: Entity) -> Tuple[Dimension, ...]:
 def test_cross_element_names(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa:D
     model = copy.deepcopy(simple_model__with_primary_transforms)
 
-    # ensure we have a usable data source for the test
+    # ensure we have a usable entity for the test
     usable_ds, usable_ds_index = find_entity_with(
         model,
         lambda entity: len(entity.measures) > 0

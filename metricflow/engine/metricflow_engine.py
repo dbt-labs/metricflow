@@ -276,7 +276,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         for entity in self._semantic_model.user_configured_model.entities:
             data_set = converter.create_sql_source_data_set(entity)
             self._source_data_sets.append(data_set)
-            logger.info(f"Created source dataset from data source '{entity.name}'")
+            logger.info(f"Created source dataset from entity '{entity.name}'")
 
         source_node_builder = SourceNodeBuilder(self._semantic_model)
         source_nodes = source_node_builder.create_from_data_sets(self._source_data_sets)

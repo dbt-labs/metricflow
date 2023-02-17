@@ -119,7 +119,7 @@ class SqlDataSet(DataSet):
 
 
 class SameEntityReferenceChecker(InstanceSetTransform[bool]):
-    """Checks to see that all elements in the instance set come from the same data source."""
+    """Checks to see that all elements in the instance set come from the same entity."""
 
     def __init__(self, entity_reference: EntityReference) -> None:  # noqa: D
         self._entity_reference = entity_reference

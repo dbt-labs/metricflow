@@ -96,8 +96,8 @@ class LinkableElementSet:
     linkable_dimensions: Tuple[LinkableDimension, ...]
     linkable_identifiers: Tuple[LinkableIdentifier, ...]
 
-    # Ambiguous elements are ones where there are multiple join paths through different data sources that can be taken
-    # to get the element. This currently represents an error when defining data sources.
+    # Ambiguous elements are ones where there are multiple join paths through different entities that can be taken
+    # to get the element. This currently represents an error when defining entities.
     ambiguous_linkable_dimensions: Tuple[LinkableDimension, ...]
     ambiguous_linkable_identifiers: Tuple[LinkableIdentifier, ...]
 
@@ -269,7 +269,7 @@ class LinkableElementSet:
 
 @dataclass(frozen=True)
 class EntityJoinPathElement:
-    """Describes joining a data source by the given identifier."""
+    """Describes joining a entity by the given identifier."""
 
     entity: Entity
     join_on_identifier: str
@@ -305,7 +305,7 @@ def _generate_linkable_time_dimensions(
 
 @dataclass(frozen=True)
 class EntityJoinPath:
-    """Describes a series of joins between the measure data source, and other data sources by identifier.
+    """Describes a series of joins between the measure entity, and other entities by identifier.
 
     For example:
 
@@ -317,7 +317,7 @@ class EntityJoinPath:
     path_elements: Tuple[EntityJoinPathElement, ...]
 
     def create_linkable_element_set(self, with_properties: FrozenSet[LinkableElementProperties]) -> LinkableElementSet:
-        """Given the current path, generate the respective linkable elements from the last data source in the path."""
+        """Given the current path, generate the respective linkable elements from the last entity in the path."""
         identifier_links = tuple(x.join_on_identifier for x in self.path_elements)
 
         assert len(self.path_elements) > 0
@@ -367,7 +367,7 @@ class EntityJoinPath:
 
     @property
     def last_entity(self) -> Entity:
-        """The last data source that would be joined in this path."""
+        """The last entity that would be joined in this path."""
         assert len(self.path_elements) > 0
         return self.path_elements[-1].entity
 
@@ -388,18 +388,18 @@ class ValidLinkableSpecResolver:
 
         Args:
             user_configured_model: the model to use.
-            entity_semantics: used to look up identifiers for a data source.
+            entity_semantics: used to look up identifiers for a entity.
             max_identifier_links: the maximum number of joins to do when computing valid elements.
         """
         self._user_configured_model = user_configured_model
-        # Sort data sources by name for consistency in building derived objects.
+        # Sort entities by name for consistency in building derived objects.
         self._entities = sorted(self._user_configured_model.entities, key=lambda x: x.name)
         self._join_evaluator = EntityJoinEvaluator(entity_semantics)
 
         assert max_identifier_links >= 0
         self._max_identifier_links = max_identifier_links
 
-        # Map measures / identifiers to data sources that contain them.
+        # Map measures / identifiers to entities that contain them.
         self._identifier_to_entity: Dict[str, List[Entity]] = defaultdict(list)
         self._measure_to_entity: Dict[str, List[Entity]] = defaultdict(list)
 
@@ -425,16 +425,16 @@ class ValidLinkableSpecResolver:
                 entities_where_measure_was_found.append(entity)
 
         if len(entities_where_measure_was_found) == 0:
-            raise ValueError(f"No data sources were found with {measure_reference} in the model")
+            raise ValueError(f"No entities were found with {measure_reference} in the model")
         elif len(entities_where_measure_was_found) > 1:
             raise ValueError(
-                f"Measure {measure_reference} was found in multiple data sources:\n"
+                f"Measure {measure_reference} was found in multiple entities:\n"
                 f"{pformat_big_objects(entities_where_measure_was_found)}"
             )
         return entities_where_measure_was_found[0]
 
     def _get_local_set(self, entity: Entity) -> LinkableElementSet:
-        """Gets the local elements for a given data source."""
+        """Gets the local elements for a given entity."""
         linkable_dimensions = []
         linkable_identifiers = []
 
@@ -468,8 +468,8 @@ class ValidLinkableSpecResolver:
                     properties=frozenset({LinkableElementProperties.LOCAL, LinkableElementProperties.IDENTIFIER}),
                 )
             )
-            # If a data source has a primary identifier, we allow users to query using the dundered syntax, even though
-            # there is no join involved. e.g. in the test model, the "listings_latest" data source would allow using
+            # If a entity has a primary identifier, we allow users to query using the dundered syntax, even though
+            # there is no join involved. e.g. in the test model, the "listings_latest" entity would allow using
             # "listing__country_latest" for the "listings" metric.
             if identifier.type == IdentifierType.PRIMARY:
                 for linkable_dimension in linkable_dimensions:
@@ -542,7 +542,7 @@ class ValidLinkableSpecResolver:
         )
 
         # Create multi-hop elements. At each iteration, we generate the list of valid elements based on the current join
-        # path, extend all paths to include the next valid data source, then repeat.
+        # path, extend all paths to include the next valid entity, then repeat.
         for i in range(self._max_identifier_links - 1):
             new_join_paths: List[EntityJoinPath] = []
             for join_path in join_paths:
@@ -589,7 +589,7 @@ class ValidLinkableSpecResolver:
     def _find_next_possible_paths(
         self, measure_entity: Entity, current_join_path: EntityJoinPath
     ) -> Sequence[EntityJoinPath]:
-        """Generate the set of possible paths that are 1 data source join longer that the "current_join_path"."""
+        """Generate the set of possible paths that are 1 entity join longer that the "current_join_path"."""
         last_entity_in_path = current_join_path.last_entity
         new_join_paths = []
 
@@ -605,7 +605,7 @@ class ValidLinkableSpecResolver:
                 identifier_reference=identifier.reference,
             )
             for entity in entities_that_can_be_joined:
-                # Don't create cycles in the join path by repeating a data source in the path.
+                # Don't create cycles in the join path by repeating a entity in the path.
                 if entity.name == measure_entity.name or any(
                     tuple(x.entity.name == entity.name for x in current_join_path.path_elements)
                 ):

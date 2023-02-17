@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 class LowerCaseNamesRule(ModelTransformRule):
-    """Lowercases the names of both top level objects and data source elements in a model"""
+    """Lowercases the names of both top level objects and entity elements in a model"""
 
     @staticmethod
     def transform_model(model: UserConfiguredModel) -> UserConfiguredModel:  # noqa: D
@@ -20,7 +20,7 @@ class LowerCaseNamesRule(ModelTransformRule):
 
     @staticmethod
     def _lowercase_entity_elements(entity: Entity) -> None:
-        """Lowercases the names of data source elements."""
+        """Lowercases the names of entity elements."""
         if entity.measures:
             for measure in entity.measures:
                 measure.name = measure.name.lower()

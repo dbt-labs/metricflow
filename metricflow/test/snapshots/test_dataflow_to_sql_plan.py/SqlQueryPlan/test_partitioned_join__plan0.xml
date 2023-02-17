@@ -224,7 +224,7 @@
                             <!-- from_source = SqlSelectStatementNode(node_id=ss_10003) -->
                             <!-- where = None -->
                             <SqlSelectStatementNode>
-                                <!-- description = Read Elements From Data Source 'id_verifications' -->
+                                <!-- description = Read Elements From entity 'id_verifications' -->
                                 <!-- node_id = ss_10003 -->
                                 <!-- col0 =                                                         -->
                                 <!--   {'class': 'SqlSelectColumn',                                 -->
@@ -360,7 +360,7 @@
                         <!-- from_source = SqlSelectStatementNode(node_id=ss_10007) -->
                         <!-- where = None -->
                         <SqlSelectStatementNode>
-                            <!-- description = Read Elements From Data Source 'users_ds_source' -->
+                            <!-- description = Read Elements From entity 'users_ds_source' -->
                             <!-- node_id = ss_10007 -->
                             <!-- col0 =                                                      -->
                             <!--   {'class': 'SqlSelectColumn',                              -->

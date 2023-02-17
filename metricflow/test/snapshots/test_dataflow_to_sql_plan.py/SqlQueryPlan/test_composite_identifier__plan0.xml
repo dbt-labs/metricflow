@@ -158,7 +158,7 @@
                     <!-- from_source = SqlSelectStatementNode(node_id=ss_10015) -->
                     <!-- where = None -->
                     <SqlSelectStatementNode>
-                        <!-- description = Read Elements From Data Source 'messages_source' -->
+                        <!-- description = Read Elements From entity 'messages_source' -->
                         <!-- node_id = ss_10015 -->
                         <!-- col0 =                                                         -->
                         <!--   {'class': 'SqlSelectColumn',                                 -->

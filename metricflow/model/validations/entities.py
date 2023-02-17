@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 class EntityTimeDimensionWarningsRule(ModelValidationRule):
-    """Checks time dimensions in data sources."""
+    """Checks time dimensions in entities."""
 
     @staticmethod
     @validate_safely(whats_being_done="running model validation ensuring time dimensions are defined properly")
@@ -34,7 +34,7 @@ class EntityTimeDimensionWarningsRule(ModelValidationRule):
         return issues
 
     @staticmethod
-    @validate_safely(whats_being_done="checking validity of the data source's time dimensions")
+    @validate_safely(whats_being_done="checking validity of the entity's time dimensions")
     def _validate_entity(entity: Entity) -> List[ValidationIssueType]:
         issues: List[ValidationIssueType] = []
 
@@ -64,7 +64,7 @@ class EntityTimeDimensionWarningsRule(ModelValidationRule):
                             )
                         )
 
-        # A data source must have a primary time dimension if it has
+        # A entity must have a primary time dimension if it has
         # any measures that don't have an `agg_time_dimension` set
         if (
             len(primary_time_dimensions) == 0
@@ -77,7 +77,7 @@ class EntityTimeDimensionWarningsRule(ModelValidationRule):
                         file_context=FileContext.from_metadata(metadata=entity.metadata),
                         entity=EntityReference(entity_name=entity.name),
                     ),
-                    message=f"No primary time dimension in data source with name ({entity.name}). Please add one",
+                    message=f"No primary time dimension in entity with name ({entity.name}). Please add one",
                 )
             )
 
@@ -89,7 +89,7 @@ class EntityTimeDimensionWarningsRule(ModelValidationRule):
                             file_context=FileContext.from_metadata(metadata=entity.metadata),
                             entity=EntityReference(entity_name=entity.name),
                         ),
-                        message=f"In data source {entity.name}, "
+                        message=f"In entity {entity.name}, "
                         f"Primary time dimension with name: {primary_time_dimension.name} "
                         f"is one of many defined as primary.",
                     )
@@ -99,12 +99,12 @@ class EntityTimeDimensionWarningsRule(ModelValidationRule):
 
 
 class EntityValidityWindowRule(ModelValidationRule):
-    """Checks validity windows in data sources to ensure they comply with runtime requirements"""
+    """Checks validity windows in entities to ensure they comply with runtime requirements"""
 
     @staticmethod
     @validate_safely(whats_being_done="checking correctness of the time dimension validity parameters in the model")
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:
-        """Checks the validity param definitions in every data source in the model"""
+        """Checks the validity param definitions in every entity in the model"""
         issues: List[ValidationIssueType] = []
 
         for entity in model.entities:
@@ -114,10 +114,10 @@ class EntityValidityWindowRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(
-        whats_being_done="checking the data source's validity parameters for compatibility with runtime requirements"
+        whats_being_done="checking the entity's validity parameters for compatibility with runtime requirements"
     )
     def _validate_entity(entity: Entity) -> List[ValidationIssueType]:
-        """Runs assertions on data sources with validity parameters set on one or more time dimensions"""
+        """Runs assertions on entities with validity parameters set on one or more time dimensions"""
 
         issues: List[ValidationIssueType] = []
 
@@ -131,7 +131,7 @@ class EntityValidityWindowRule(ModelValidationRule):
             entity=EntityReference(entity_name=entity.name),
         )
         requirements = (
-            "Data sources using dimension validity params to define a validity window must have exactly two time "
+            "entities using dimension validity params to define a validity window must have exactly two time "
             "dimensions with validity params specified - one marked `is_start` and the other marked `is_end`."
         )
         validity_param_dimension_names = [dim.name for dim in validity_param_dims]
@@ -148,7 +148,7 @@ class EntityValidityWindowRule(ModelValidationRule):
             error = ValidationError(
                 context=context,
                 message=(
-                    f"Data source {entity.name} has a single validity param dimension that defines its window: "
+                    f"entity {entity.name} has a single validity param dimension that defines its window: "
                     f"`{validity_param_dimension_names[0]}`. This is not a currently supported configuration! "
                     f"{requirements} If you have one column defining a window, as in a daily snapshot table, you can "
                     f"define a separate dimension and increment the time value in the `expr` field as a work-around."
@@ -159,9 +159,9 @@ class EntityValidityWindowRule(ModelValidationRule):
             error = ValidationError(
                 context=context,
                 message=(
-                    f"Data source {entity.name} has {len(validity_param_dims)} dimensions defined with validity "
+                    f"entity {entity.name} has {len(validity_param_dims)} dimensions defined with validity "
                     f"params. They are: {validity_param_dimension_names}. There must be either zero or two! "
-                    f"If you wish to define a validity window for this data source, please follow these requirements: "
+                    f"If you wish to define a validity window for this entity, please follow these requirements: "
                     f"{requirements}"
                 ),
             )
@@ -172,7 +172,7 @@ class EntityValidityWindowRule(ModelValidationRule):
             error = ValidationError(
                 context=context,
                 message=(
-                    f"Data source {entity.name} has two validity param dimensions defined, but does not have "
+                    f"entity {entity.name} has two validity param dimensions defined, but does not have "
                     f"exactly one each marked with is_start and is_end! Dimensions: {validity_param_dimension_names}. "
                     f"is_start dimensions: {start_dim_names}. is_end dimensions: {end_dim_names}. {requirements}"
                 ),
@@ -188,8 +188,8 @@ class EntityValidityWindowRule(ModelValidationRule):
             error = ValidationError(
                 context=context,
                 message=(
-                    f"Data source {entity.name} has validity param dimensions defined, but does not have an "
-                    f"identifier with type `natural` set. The natural key for this data source is what we use to "
+                    f"entity {entity.name} has validity param dimensions defined, but does not have an "
+                    f"identifier with type `natural` set. The natural key for this entity is what we use to "
                     f"process a validity window join. Primary or unique identifiers, if any, might be suitable for "
                     f"use as natural keys: ({[identifier.name for identifier in primary_or_unique_identifiers]})."
                 ),
@@ -200,21 +200,21 @@ class EntityValidityWindowRule(ModelValidationRule):
             error = ValidationError(
                 context=context,
                 message=(
-                    f"Data source {entity.name} has validity param dimensions defined and also has one or more "
+                    f"entity {entity.name} has validity param dimensions defined and also has one or more "
                     f"identifiers designated as `primary` or `unique`. This is not yet supported, as we do not "
-                    f"currently process joins against these key types for data sources with validity windows "
+                    f"currently process joins against these key types for entities with validity windows "
                     f"specified."
                 ),
             )
             issues.append(error)
 
         if entity.measures:
-            # Temporarily block measure definitions in data sources with validity windows set
+            # Temporarily block measure definitions in entities with validity windows set
             measure_names = [measure.name for measure in entity.measures]
             error = ValidationError(
                 context=context,
                 message=(
-                    f"Data source {entity.name} has both measures and validity param dimensions defined. This "
+                    f"entity {entity.name} has both measures and validity param dimensions defined. This "
                     f"is not currently supported! Please remove either the measures or the validity params. "
                     f"Measure names: {measure_names}. Validity param dimension names: "
                     f"{validity_param_dimension_names}."

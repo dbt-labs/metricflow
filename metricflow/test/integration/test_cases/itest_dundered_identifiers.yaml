@@ -1,7 +1,7 @@
 ---
 integration_test:
   name: one_hop_dundered_identifier
-  description: Query a dimension from a different data source. Should match a left joined table query.
+  description: Query a dimension from a different entity. Should match a left joined table query.
   model: SIMPLE_MODEL
   metrics: ["bookings"]
   group_bys: ["listing__lux_listing"]
@@ -16,7 +16,7 @@ integration_test:
 ---
 integration_test:
   name: one_hop_dundered_composite_identifier
-  description: Query a dimension from a different data source joined using a composite identifier.
+  description: Query a dimension from a different entity joined using a composite identifier.
   model: COMPOSITE_IDENTIFIER_MODEL
   metrics: ["messages"]
   group_bys: ["user_team__user_id"]

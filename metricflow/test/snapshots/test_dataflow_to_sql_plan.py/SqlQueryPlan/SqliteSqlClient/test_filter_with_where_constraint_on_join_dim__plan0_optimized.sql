@@ -15,7 +15,7 @@ FROM (
     , subq_13.is_instant AS is_instant
     , listings_latest_src_10003.country AS listing__country_latest
   FROM (
-    -- Read Elements From Data Source 'bookings_source'
+    -- Read Elements From entity 'bookings_source'
     -- Metric Time Dimension 'ds'
     -- Pass Only Elements:
     --   ['bookings', 'is_instant', 'listing']

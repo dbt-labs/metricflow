@@ -22,7 +22,7 @@ FROM (
         subq_0.listing
         , subq_0.booking_value
       FROM (
-        -- Read Elements From Data Source 'bookings_source'
+        -- Read Elements From entity 'bookings_source'
         SELECT
           1 AS bookings
           , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
@@ -90,7 +90,7 @@ FROM (
         subq_2.listing
         , subq_2.country_latest
       FROM (
-        -- Read Elements From Data Source 'listings_latest'
+        -- Read Elements From entity 'listings_latest'
         SELECT
           1 AS listings
           , listings_latest_src_10004.capacity AS largest_listing

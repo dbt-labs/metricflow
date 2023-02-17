@@ -14,7 +14,7 @@ FROM (
     metric_time
     , SUM(booking_value) AS booking_value_with_is_instant_constraint
   FROM (
-    -- Read Elements From Data Source 'bookings_source'
+    -- Read Elements From entity 'bookings_source'
     -- Metric Time Dimension 'ds'
     -- Pass Only Elements:
     --   ['booking_value', 'is_instant', 'metric_time']
@@ -32,7 +32,7 @@ FROM (
     metric_time
 ) subq_17
 INNER JOIN (
-  -- Read Elements From Data Source 'bookings_source'
+  -- Read Elements From entity 'bookings_source'
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements:
   --   ['booking_value', 'metric_time']

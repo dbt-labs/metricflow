@@ -39,7 +39,7 @@ class PydanticEntityContainer(EntityContainer[Entity]):  # noqa: D
         return list(self._entity_index.values())
 
     def put(self, key: str, value: T) -> None:  # noqa: D
-        raise TypeError("Cannot call put on static data source container. Data sources are fixed on init")
+        raise TypeError("Cannot call put on static entity container. entities are fixed on init")
 
     def _put(self, entity: Entity) -> None:
         """Dont use this unless you mean it (ie in tests). This is supposed to be static"""

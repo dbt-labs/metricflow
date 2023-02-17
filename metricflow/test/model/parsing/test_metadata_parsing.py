@@ -13,9 +13,9 @@ from metricflow.model.semantic_model import SemanticModel
 
 
 def test_entity_metadata_parsing(simple_user_configured_model: UserConfiguredModel) -> None:
-    """Tests internal metadata object parsing from a file into the Data Source model object
+    """Tests internal metadata object parsing from a file into the entity model object
 
-    This only tests some basic file name parsing for each data source since they are not guaranteed
+    This only tests some basic file name parsing for each entity since they are not guaranteed
     to be collected in the same file in the simple model, and the output here has been transformed
     so the YAML contents might or might not match.
     """
@@ -23,7 +23,7 @@ def test_entity_metadata_parsing(simple_user_configured_model: UserConfiguredMod
     for entity in simple_user_configured_model.entities:
         assert (
             entity.metadata is not None
-        ), f"Metadata should always be parsed out of the model, but None found for data source: {entity}!"
+        ), f"Metadata should always be parsed out of the model, but None found for entity: {entity}!"
         _assert_metadata_filename_is_valid(entity.metadata)
 
 
@@ -95,7 +95,7 @@ def _assert_measure_metadata_is_valid(measures: Sequence[Measure]) -> None:
     The assertions check that:
     1. Metadata is always set by the parser
     2. Metadata always contains a reasonable repo file path and file name
-    3. Start and end line numbers are always increasing for every measure in the data source
+    3. Start and end line numbers are always increasing for every measure in the entity
 
     Since this test is operating on a transformed model, we do not make assertions about the raw YAML contents and how
     they relate to the properties of the measures themselves.

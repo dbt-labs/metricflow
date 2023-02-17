@@ -5,7 +5,7 @@
 SELECT
   CAST(subq_13.bookings AS DOUBLE PRECISION) / CAST(NULLIF(subq_17.listings, 0) AS DOUBLE PRECISION) AS bookings_per_listing
 FROM (
-  -- Read Elements From Data Source 'bookings_source'
+  -- Read Elements From entity 'bookings_source'
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements:
   --   ['bookings']
@@ -18,7 +18,7 @@ FROM (
   ) bookings_source_src_10001
 ) subq_13
 CROSS JOIN (
-  -- Read Elements From Data Source 'listings_latest'
+  -- Read Elements From entity 'listings_latest'
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements:
   --   ['listings']

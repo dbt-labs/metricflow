@@ -35,7 +35,7 @@ from metricflow.time.time_granularity import TimeGranularity
 def test_entity_cant_have_more_than_one_primary_identifier(
     simple_model__with_primary_transforms: UserConfiguredModel,
 ) -> None:  # noqa: D
-    """Add an additional primary identifier to a data source and assert that it cannot have two"""
+    """Add an additional primary identifier to a entity and assert that it cannot have two"""
     model = copy.deepcopy(simple_model__with_primary_transforms)
     func: Callable[[Entity], bool] = lambda entity: len(entity.identifiers) > 1
 
@@ -49,7 +49,7 @@ def test_entity_cant_have_more_than_one_primary_identifier(
     build = ModelValidator([OnePrimaryIdentifierPerEntityRule()]).validate_model(model)
 
     future_issue = (
-        f"Data sources can have only one primary identifier. The data source"
+        f"entities can have only one primary identifier. The entity"
         f" `{multiple_identifier_entity.name}` has {len(identifier_references)}"
     )
 
@@ -214,9 +214,9 @@ def test_composite_identifiers_ref_and_name() -> None:  # noqa:D
 
 
 def test_mismatched_identifier(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa: D
-    """Testing two mismatched identifiers in two data sources
+    """Testing two mismatched identifiers in two entities
 
-    Add two identifiers with mismatched sub-identifiers to two data sources in the model
+    Add two identifiers with mismatched sub-identifiers to two entities in the model
     Ensure that our composite identifiers rule catches this incompatibility
     """
     model = copy.deepcopy(simple_model__with_primary_transforms)
@@ -255,7 +255,7 @@ def test_mismatched_identifier(simple_model__with_primary_transforms: UserConfig
 
 
 def test_multiple_natural_identifiers() -> None:
-    """Test validation enforcing that a single data source cannot have more than one natural identifier"""
+    """Test validation enforcing that a single entity cannot have more than one natural identifier"""
     yaml_contents = textwrap.dedent(
         """\
         entity:
@@ -291,7 +291,7 @@ def test_multiple_natural_identifiers() -> None:
 
 
 def test_natural_identifier_used_in_wrong_context() -> None:
-    """Test validation enforcing that a single data source cannot have more than one natural identifier"""
+    """Test validation enforcing that a single entity cannot have more than one natural identifier"""
     yaml_contents = textwrap.dedent(
         """\
         entity:

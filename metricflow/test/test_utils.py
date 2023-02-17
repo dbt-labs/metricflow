@@ -35,13 +35,13 @@ def should_skip_multi_threaded(
 
 
 def find_entity_with(model: UserConfiguredModel, function: Callable[[Entity], bool]) -> Tuple[Entity, int]:
-    """Returns a data source from the model which matches the criteria defined by the passed in function'
+    """Returns a entity from the model which matches the criteria defined by the passed in function'
 
-    This is useful because the order of data sources in the list is non determinant, thus it's impossible to
-    hard code which data source you want by index. Using data source names isn't great for consistency because
-    data sources change and might no longer have the necessary parts to be useful for a given test. This
-    allows us to guarantee that a data source will be returned which meets the requirements of what a test needs,
-    unless none of the data sources will work.
+    This is useful because the order of entities in the list is non determinant, thus it's impossible to
+    hard code which entity you want by index. Using entity names isn't great for consistency because
+    entities change and might no longer have the necessary parts to be useful for a given test. This
+    allows us to guarantee that a entity will be returned which meets the requirements of what a test needs,
+    unless none of the entities will work.
     """
     for index, entity in enumerate(model.entities):
         if function(entity):

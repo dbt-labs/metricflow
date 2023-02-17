@@ -95,7 +95,7 @@ FROM (
                 , subq_0.create_a_cycle_in_the_join_graph__guest
                 , subq_0.create_a_cycle_in_the_join_graph__host
               FROM (
-                -- Read Elements From Data Source 'bookings_source'
+                -- Read Elements From entity 'bookings_source'
                 SELECT
                   1 AS bookings
                   , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
@@ -198,7 +198,7 @@ FROM (
                 , subq_3.user
                 , subq_3.listing__user
               FROM (
-                -- Read Elements From Data Source 'listings_latest'
+                -- Read Elements From entity 'listings_latest'
                 SELECT
                   1 AS listings
                   , listings_latest_src_10003.capacity AS largest_listing

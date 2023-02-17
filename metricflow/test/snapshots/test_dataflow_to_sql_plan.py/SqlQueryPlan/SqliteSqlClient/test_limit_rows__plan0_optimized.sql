@@ -5,7 +5,7 @@ SELECT
   SUM(bookings) AS bookings
   , ds
 FROM (
-  -- Read Elements From Data Source 'bookings_source'
+  -- Read Elements From entity 'bookings_source'
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements:
   --   ['bookings', 'ds']

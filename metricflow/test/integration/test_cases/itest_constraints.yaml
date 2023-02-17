@@ -33,7 +33,7 @@ integration_test:
 ---
 integration_test:
   name: test_query_with_constraint_on_joined_dimension
-  description: Query a metric with a constraint that was not requested as a dimension and is joined from another data source
+  description: Query a metric with a constraint that was not requested as a dimension and is joined from another entity
   model: SIMPLE_MODEL
   metrics: ["booking_value"]
   group_bys: ["is_instant"]

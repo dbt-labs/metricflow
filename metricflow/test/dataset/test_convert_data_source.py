@@ -27,7 +27,7 @@ def test_convert_table_entity_without_measures(  # noqa: D
     sql_client: SqlClient,
     consistent_id_object_repository: ConsistentIdObjectRepository,
 ) -> None:
-    """Simple test for converting a table data source. Since there are no measures, primary time is not checked."""
+    """Simple test for converting a table entity. Since there are no measures, primary time is not checked."""
     users_data_set = consistent_id_object_repository.simple_model_data_sets["users_latest"]
 
     expected_spec_set = InstanceSpecSet(
@@ -92,7 +92,7 @@ def test_convert_table_entity_with_measures(  # noqa: D
     sql_client: SqlClient,
     consistent_id_object_repository: ConsistentIdObjectRepository,
 ) -> None:
-    """Complete test of table data source conversion. This includes the full set of measures/identifiers/dimensions.
+    """Complete test of table entity conversion. This includes the full set of measures/identifiers/dimensions.
 
     Measures trigger a primary time dimension validation. Additionally, this includes both categorical and time
     dimension types, which should cover most, if not all, of the table source branches in the target class.

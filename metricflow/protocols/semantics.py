@@ -37,17 +37,17 @@ from metricflow.specs import (
 
 
 class EntitySemanticsAccessor(Protocol):
-    """Protocol defining core interface for accessing semantic information about a set of data source objects
+    """Protocol defining core interface for accessing semantic information about a set of entity objects
 
     This is primarily useful for restricting caller access to the subset of container methods and imports we want
     them to use. For example, the EntitySemantics class might implement this protocol but also include some
-    public methods for adding or removing data sources from the container, while this protocol only allows the
-    caller to invoke the accessor methods which retrieve semantic information about the collected data sources.
+    public methods for adding or removing entities from the container, while this protocol only allows the
+    caller to invoke the accessor methods which retrieve semantic information about the collected entities.
     """
 
     @abstractmethod
     def get_dimension_references(self) -> List[DimensionReference]:
-        """Retrieve all dimension references from the collection of data sources"""
+        """Retrieve all dimension references from the collection of entities"""
         raise NotImplementedError
 
     @abstractmethod
@@ -65,7 +65,7 @@ class EntitySemanticsAccessor(Protocol):
     @property
     @abstractmethod
     def measure_references(self) -> List[MeasureReference]:
-        """Return all measure references from the collection of data sources"""
+        """Return all measure references from the collection of entities"""
         raise NotImplementedError
 
     @property
@@ -73,7 +73,7 @@ class EntitySemanticsAccessor(Protocol):
     def non_additive_dimension_specs_by_measure(self) -> Dict[MeasureReference, NonAdditiveDimensionSpec]:
         """Return a mapping from all semi-additive measures to their corresponding non additive dimension parameters
 
-        This includes all measures with non-additive dimension parameters, if any, from the collection of data sources.
+        This includes all measures with non-additive dimension parameters, if any, from the collection of entities.
         """
         raise NotImplementedError
 
@@ -84,12 +84,12 @@ class EntitySemanticsAccessor(Protocol):
 
     @abstractmethod
     def get_identifier_references(self) -> List[IdentifierReference]:
-        """Retrieve all identifier references from the collection of data sources"""
+        """Retrieve all identifier references from the collection of entities"""
         raise NotImplementedError
 
     @abstractmethod
     def get_entities_for_measure(self, measure_reference: MeasureReference) -> List[Entity]:
-        """Retrieve a list of all data source model objects associated with the measure reference"""
+        """Retrieve a list of all entity model objects associated with the measure reference"""
         raise NotImplementedError
 
     @abstractmethod
@@ -98,35 +98,35 @@ class EntitySemanticsAccessor(Protocol):
 
     @abstractmethod
     def get_identifier_in_entity(self, ref: EntityElementReference) -> Optional[Identifier]:
-        """Retrieve the identifier matching the element -> data source mapping, if any"""
+        """Retrieve the identifier matching the element -> entity mapping, if any"""
         raise NotImplementedError
 
     @abstractmethod
     def get(self, entity_name: str) -> Optional[Entity]:
-        """Retrieve the data source model object matching the given name, if any"""
+        """Retrieve the entity model object matching the given name, if any"""
         raise NotImplementedError
 
     @abstractmethod
     def get_by_reference(self, entity_reference: EntityReference) -> Optional[Entity]:
-        """Retrieve the data source model object matching the input data source reference, if any"""
+        """Retrieve the entity model object matching the input entity reference, if any"""
         raise NotImplementedError
 
     @property
     @abstractmethod
     def entity_references(self) -> Sequence[EntityReference]:
-        """Return all EntityReference objects associated with the data sources in the collection"""
+        """Return all EntityReference objects associated with the entities in the collection"""
         raise NotImplementedError
 
     @abstractmethod
     def get_aggregation_time_dimensions_with_measures(
         self, entity_reference: EntityReference
     ) -> ElementGrouper[TimeDimensionReference, MeasureSpec]:
-        """Return all aggregation time dimensions in the given data source with their associated measures"""
+        """Return all aggregation time dimensions in the given entity with their associated measures"""
         raise NotImplementedError
 
     @abstractmethod
     def get_entities_for_identifier(self, identifier_reference: IdentifierReference) -> Set[Entity]:
-        """Return all data sources associated with an identifier reference"""
+        """Return all entities associated with an identifier reference"""
         raise NotImplementedError
 
 

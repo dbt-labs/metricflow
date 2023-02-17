@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 
 class IdentifierConfigRule(ModelValidationRule):
-    """Checks that data source identifiers are valid"""
+    """Checks that entity identifiers are valid"""
 
     @staticmethod
     @validate_safely(whats_being_done="running model validation ensuring identifiers are valid")
@@ -40,7 +40,7 @@ class IdentifierConfigRule(ModelValidationRule):
         return issues
 
     @staticmethod
-    @validate_safely(whats_being_done="checking that the data source's identifiers are valid")
+    @validate_safely(whats_being_done="checking that the entity's identifiers are valid")
     def _validate_entity_identifiers(entity: Entity) -> List[ValidationIssueType]:
         """Checks validity of composite identifiers"""
         issues: List[ValidationIssueType] = []
@@ -69,7 +69,7 @@ class IdentifierConfigRule(ModelValidationRule):
                             ValidationError(
                                 context=context,
                                 message=f"Identifier ref must reference an existing identifier by name. "
-                                f"No identifier in this data source has name: {sub_id.ref}",
+                                f"No identifier in this entity has name: {sub_id.ref}",
                             )
                         )
                     elif not sub_id.ref and not sub_id.name:
@@ -102,7 +102,7 @@ class NaturalIdentifierConfigurationRule(ModelValidationRule):
     @staticmethod
     @validate_safely(
         whats_being_done=(
-            "checking that each data source has no more than one natural identifier, and that "
+            "checking that each entity has no more than one natural identifier, and that "
             "natural identifiers are used in the appropriate contexts"
         )
     )
@@ -119,7 +119,7 @@ class NaturalIdentifierConfigurationRule(ModelValidationRule):
         if len(natural_identifier_names) > 1:
             error = ValidationError(
                 context=context,
-                message=f"Data sources can have at most one natural identifier, but data source "
+                message=f"entities can have at most one natural identifier, but entity "
                 f"`{entity.name}` has {len(natural_identifier_names)} distinct natural identifiers set! "
                 f"{natural_identifier_names}.",
             )
@@ -128,7 +128,7 @@ class NaturalIdentifierConfigurationRule(ModelValidationRule):
             error = ValidationError(
                 context=context,
                 message=f"The use of `natural` identifiers is currently supported only in conjunction with a validity "
-                f"window defined in the set of time dimensions associated with the data source. Data source "
+                f"window defined in the set of time dimensions associated with the entity. entity "
                 f"`{entity.name}` uses a natural identifier ({natural_identifier_names}) but does not define a "
                 f"validity window!",
             )
@@ -152,10 +152,10 @@ class NaturalIdentifierConfigurationRule(ModelValidationRule):
 
 
 class OnePrimaryIdentifierPerEntityRule(ModelValidationRule):
-    """Ensures that each data source has only one primary identifier"""
+    """Ensures that each entity has only one primary identifier"""
 
     @staticmethod
-    @validate_safely(whats_being_done="checking data source has only one primary identifier")
+    @validate_safely(whats_being_done="checking entity has only one primary identifier")
     def _only_one_primary_identifier(entity: Entity) -> List[ValidationIssue]:
         primary_identifier_names: MutableSet[str] = set()
         for identifier in entity.identifiers or []:
@@ -169,7 +169,7 @@ class OnePrimaryIdentifierPerEntityRule(ModelValidationRule):
                         file_context=FileContext.from_metadata(metadata=entity.metadata),
                         entity=EntityReference(entity_name=entity.name),
                     ),
-                    message=f"Data sources can have only one primary identifier. The data source"
+                    message=f"entities can have only one primary identifier. The entity"
                     f" `{entity.name}` has {len(primary_identifier_names)}: {', '.join(primary_identifier_names)}",
                     error_date=date(2022, 1, 12),  # Wed January 12th 2022
                 )
@@ -178,7 +178,7 @@ class OnePrimaryIdentifierPerEntityRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(
-        whats_being_done="running model validation ensuring each data source has only one primary identifier"
+        whats_being_done="running model validation ensuring each entity has only one primary identifier"
     )
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
         issues = []
@@ -199,7 +199,7 @@ class SubIdentifierContext:
 
 
 class IdentifierConsistencyRule(ModelValidationRule):
-    """Checks identifiers with the same name are defined with the same set of sub-identifiers in all data sources"""
+    """Checks identifiers with the same name are defined with the same set of sub-identifiers in all entities"""
 
     @staticmethod
     def _get_sub_identifier_names(identifier: Identifier) -> Sequence[str]:

@@ -16,7 +16,7 @@ FROM (
     , listings_latest_src_10003.country AS listing__country_latest
     , subq_22.ds AS ds
   FROM (
-    -- Read Elements From Data Source 'bookings_source'
+    -- Read Elements From entity 'bookings_source'
     -- Metric Time Dimension 'ds'
     -- Pass Only Elements:
     --   ['bookings', 'ds', 'listing']
@@ -47,7 +47,7 @@ INNER JOIN (
     , listings_latest_src_10003.country AS listing__country_latest
     , subq_31.ds AS ds
   FROM (
-    -- Read Elements From Data Source 'views_source'
+    -- Read Elements From entity 'views_source'
     -- Metric Time Dimension 'ds'
     -- Pass Only Elements:
     --   ['views', 'ds', 'listing']

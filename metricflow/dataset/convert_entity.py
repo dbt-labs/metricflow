@@ -50,7 +50,7 @@ logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True)
 class DimensionConversionResult:
-    """Helper class for returning the results of converting dimensions from a data source."""
+    """Helper class for returning the results of converting dimensions from a entity."""
 
     dimension_instances: Sequence[DimensionInstance]
     time_dimension_instances: Sequence[TimeDimensionInstance]
@@ -58,7 +58,7 @@ class DimensionConversionResult:
 
 
 class EntityToDataSetConverter:
-    """Converts a data source in the model to a data set that can be used with the dataflow plan builder.
+    """Converts a entity in the model to a data set that can be used with the dataflow plan builder.
 
     Identifier links generally refer to the identifiers used to join the measure source to the dimension source. For
     example, the dimension name "user_id__device_id__platform" has identifier links "user_id" and "device_id" and would
@@ -103,7 +103,7 @@ class EntityToDataSetConverter:
         identifier_links: Tuple[IdentifierReference, ...],
         time_granularity: TimeGranularity = DEFAULT_TIME_GRANULARITY,
     ) -> TimeDimensionInstance:
-        """Create a time dimension instance from the dimension object from a data source in the model."""
+        """Create a time dimension instance from the dimension object from a entity in the model."""
         time_dimension_spec = TimeDimensionSpec(
             element_name=time_dimension.reference.element_name,
             identifier_links=identifier_links,
@@ -129,7 +129,7 @@ class EntityToDataSetConverter:
         identifier: Identifier,
         identifier_links: Tuple[IdentifierReference, ...],
     ) -> IdentifierInstance:
-        """Create an identifier instance from the identifier object from a data sourcein the model."""
+        """Create an identifier instance from the identifier object from a entityin the model."""
         identifier_spec = IdentifierSpec(
             element_name=identifier.reference.element_name,
             identifier_links=identifier_links,
@@ -151,7 +151,7 @@ class EntityToDataSetConverter:
     def _make_element_sql_expr(
         table_alias: str, element_name: str, element_expr: Optional[str] = None
     ) -> SqlExpressionNode:
-        """Create an expression that can be used for reading the element from the data source's SQL."""
+        """Create an expression that can be used for reading the element from the entity's SQL."""
         if element_expr:
             if EntityToDataSetConverter._SQL_IDENTIFIER_REGEX.match(element_expr) and element_expr.upper() not in (
                 "TRUE",
@@ -353,9 +353,9 @@ class EntityToDataSetConverter:
         return identifier_instances, select_columns
 
     def create_sql_source_data_set(self, entity: Entity) -> EntityDataSet:
-        """Create an SQL source data set from a data source in the model."""
+        """Create an SQL source data set from a entity in the model."""
 
-        # Gather all instances and columns from all data sources.
+        # Gather all instances and columns from all entities.
         all_measure_instances: List[MeasureInstance] = []
         all_dimension_instances: List[DimensionInstance] = []
         all_time_dimension_instances: List[TimeDimensionInstance] = []
@@ -374,8 +374,8 @@ class EntityToDataSetConverter:
             all_measure_instances.extend(measure_instances)
             all_select_columns.extend(select_columns)
 
-        # For dimensions in a data source, we can access them through the local form, or the dundered form.
-        # e.g. in the "users" data source, with the "country" dimension and the "user_id" identifier,
+        # For dimensions in a entity, we can access them through the local form, or the dundered form.
+        # e.g. in the "users" entity, with the "country" dimension and the "user_id" identifier,
         # the dimensions "country" and "user_id__country" both mean the same thing. To make matching easier, create both
         # instances in the instance set. We'll create a different instance for each "possible_identifier_links".
         possible_identifier_links: List[Tuple[IdentifierReference, ...]] = [()]
@@ -436,10 +436,10 @@ class EntityToDataSetConverter:
         elif entity.sql_query:
             from_source = SqlSelectQueryFromClauseNode(select_query=entity.sql_query)
         else:
-            raise RuntimeError(f"Data source does not have sql_table or sql_query set: {entity}")
+            raise RuntimeError(f"entity does not have sql_table or sql_query set: {entity}")
 
         select_statement_node = SqlSelectStatementNode(
-            description=f"Read Elements From Data Source '{entity.name}'",
+            description=f"Read Elements From entity '{entity.name}'",
             select_columns=tuple(all_select_columns),
             from_source=from_source,
             from_source_alias=from_source_alias,

@@ -86,7 +86,7 @@ class InstanceSpec(SerializableDataclass):
     This can't be a Protocol as base classes of Protocols need to be Protocols.
     """
 
-    """Name of the dimension or identifier in the data source."""
+    """Name of the dimension or identifier in the entity."""
     element_name: str
 
     def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:
@@ -443,8 +443,8 @@ class MetricInputMeasureSpec(SerializableDataclass):
     """The spec for a measure defined as a metric input.
 
     This is necessary because the MeasureSpec is used as a key linking the measures used in the query
-    to the measures defined in the data sources. Adding metric-specific information, like constraints,
-    causes lookups connecting query -> data source to fail in strange ways. This spec, then, provides
+    to the measures defined in the entities. Adding metric-specific information, like constraints,
+    causes lookups connecting query -> entity to fail in strange ways. This spec, then, provides
     both the key (in the form of a MeasureSpec) along with whatever measure-specific attributes
     a user might specify in a metric definition or query accessing the metric itself.
 

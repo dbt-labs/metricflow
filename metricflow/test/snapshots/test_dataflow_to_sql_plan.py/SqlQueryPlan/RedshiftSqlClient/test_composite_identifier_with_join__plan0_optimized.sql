@@ -9,7 +9,7 @@ SELECT
   , users_source_src_10017.country AS user_team__country
   , SUM(subq_10.messages) AS messages
 FROM (
-  -- Read Elements From Data Source 'messages_source'
+  -- Read Elements From entity 'messages_source'
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements:
   --   ['messages', 'user_team', 'user_team']

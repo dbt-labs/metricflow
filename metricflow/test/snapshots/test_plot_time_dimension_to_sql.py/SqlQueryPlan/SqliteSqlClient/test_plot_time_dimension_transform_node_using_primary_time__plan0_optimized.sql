@@ -1,4 +1,4 @@
--- Read Elements From Data Source 'bookings_source'
+-- Read Elements From entity 'bookings_source'
 -- Set Measures to Aggregate By 'ds'
 SELECT
   1 AS bookings

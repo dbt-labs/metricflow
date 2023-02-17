@@ -29,7 +29,7 @@ FROM (
         , subq_0.ds__year AS metric_time__year
         , subq_0.user
       FROM (
-        -- Read Elements From Data Source 'revenue'
+        -- Read Elements From entity 'revenue'
         SELECT
           revenue_src_10005.revenue AS txn_revenue
           , revenue_src_10005.created_at AS ds

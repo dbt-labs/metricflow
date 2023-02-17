@@ -56,14 +56,14 @@ def test_join_type_coverage() -> None:
 def __get_simple_model_user_entity_references_by_type(
     semantic_model: SemanticModel,
 ) -> Dict[IdentifierType, EntityReference]:
-    """Helper to get a set of data sources with the `user` identifier organized by identifier type"""
+    """Helper to get a set of entities with the `user` identifier organized by identifier type"""
     foreign_user_entity = semantic_model.entity_semantics.get("listings_latest")
     primary_user_entity = semantic_model.entity_semantics.get("users_latest")
     unique_user_entity = semantic_model.entity_semantics.get("companies")
 
-    assert foreign_user_entity, "Could not find `listings_latest` data source in simple model!"
-    assert primary_user_entity, "Could not find `users_latest` data source in simple model!"
-    assert unique_user_entity, "Could not find `companies` data source in simple model!"
+    assert foreign_user_entity, "Could not find `listings_latest` entity in simple model!"
+    assert primary_user_entity, "Could not find `users_latest` entity in simple model!"
+    assert unique_user_entity, "Could not find `companies` entity in simple model!"
 
     return {
         IdentifierType.FOREIGN: foreign_user_entity.reference,
@@ -73,9 +73,9 @@ def __get_simple_model_user_entity_references_by_type(
 
 
 def test_distinct_target_entity_join_validation(simple_semantic_model: SemanticModel) -> None:
-    """Tests data source join validation to a PRIMARY or UNIQUE identifier
+    """Tests entity join validation to a PRIMARY or UNIQUE identifier
 
-    PRIMARY and UNIQUE identifier targets should be valid for any join at the data source level because they both
+    PRIMARY and UNIQUE identifier targets should be valid for any join at the entity level because they both
     represent identifier columns with distinct value sets, and as such there is no risk of inadvertent fanout joins.
     """
     entity_references = __get_simple_model_user_entity_references_by_type(simple_semantic_model)
@@ -122,13 +122,13 @@ def test_distinct_target_entity_join_validation(simple_semantic_model: SemanticM
         "unique to unique": unique_unique,
     }
     assert all(results.values()), (
-        f"All data source level join types for primary and unique targets should be valid, but we found "
+        f"All entity level join types for primary and unique targets should be valid, but we found "
         f"at least one that was not! Incorrectly failing types: {[k for k,v in results.items() if not v]}."
     )
 
 
 def test_foreign_target_entity_join_validation(simple_semantic_model: SemanticModel) -> None:
-    """Tests data source join validation to FOREIGN identifier types
+    """Tests entity join validation to FOREIGN identifier types
 
     These should all fail by default, as fanout joins are not supported
     """
@@ -158,17 +158,17 @@ def test_foreign_target_entity_join_validation(simple_semantic_model: SemanticMo
         "unique to foreign": unique_foreign,
     }
     assert not any(results.values()), (
-        f"All data source level joins against foreign targets should be invalid, but we found at least one "
+        f"All entity level joins against foreign targets should be invalid, but we found at least one "
         f"that was not! Incorrectly passing types: {[k for k,v in results.items() if v]}."
     )
 
 
 def test_entity_join_validation_on_missing_identifier(simple_semantic_model: SemanticModel) -> None:
-    """Tests data source join validation where the identifier is missing from one or both data sources"""
+    """Tests entity join validation where the identifier is missing from one or both entities"""
     primary_listing_entity = simple_semantic_model.entity_semantics.get("listings_latest")
-    assert primary_listing_entity, "Could not find data source `listings_latest` in the simple model!"
+    assert primary_listing_entity, "Could not find entity `listings_latest` in the simple model!"
     no_listing_entity = simple_semantic_model.entity_semantics.get("id_verifications")
-    assert no_listing_entity, "Could not find data source `id_verifications` in the simple model!"
+    assert no_listing_entity, "Could not find entity `id_verifications` in the simple model!"
     listing_identifier_reference = IdentifierReference(element_name="listing")
     join_evaluator = EntityJoinEvaluator(entity_semantics=simple_semantic_model.entity_semantics)
 
@@ -177,7 +177,7 @@ def test_entity_join_validation_on_missing_identifier(simple_semantic_model: Sem
         right_entity_reference=primary_listing_entity.reference,
         on_identifier_reference=listing_identifier_reference,
     ), (
-        "Found valid join on `listing` involving the `id_verifications` data source, which does not include the "
+        "Found valid join on `listing` involving the `id_verifications` entity, which does not include the "
         "`listing` identifier!"
     )
 
@@ -240,7 +240,7 @@ def test_distinct_target_instance_set_join_validation(
 def test_foreign_target_instance_set_join_validation(
     consistent_id_object_repository: ConsistentIdObjectRepository, simple_semantic_model: SemanticModel
 ) -> None:
-    """Tests data source join validation to FOREIGN identifier types"""
+    """Tests entity join validation to FOREIGN identifier types"""
     foreign_user_instance_set = consistent_id_object_repository.simple_model_data_sets["listings_latest"].instance_set
     primary_user_instance_set = consistent_id_object_repository.simple_model_data_sets["users_latest"].instance_set
     unique_user_instance_set = consistent_id_object_repository.simple_model_data_sets["companies"].instance_set
@@ -269,7 +269,7 @@ def test_foreign_target_instance_set_join_validation(
         "unique to foreign": unique_foreign,
     }
     assert not any(results.values()), (
-        f"All data source level joins against foreign targets should be invalid, but we found at least one "
+        f"All entity level joins against foreign targets should be invalid, but we found at least one "
         f"that was not! Incorrectly passing types: {[k for k,v in results.items() if v]}."
     )
 
@@ -357,7 +357,7 @@ def test_get_joinable_entities_multi_hop(multi_hop_join_semantic_model: Semantic
 
 
 def test_natural_identifier_entity_validation(scd_semantic_model: SemanticModel) -> None:
-    """Tests data source validation for NATURAL target identifier types
+    """Tests entity validation for NATURAL target identifier types
 
     These tests rely on the scd_semantic_model, which makes extensive use of NATURAL key types.
     """
@@ -368,10 +368,10 @@ def test_natural_identifier_entity_validation(scd_semantic_model: SemanticModel)
     user_identifier_reference = IdentifierReference(element_name="user")
     join_evaluator = EntityJoinEvaluator(entity_semantics=scd_semantic_model.entity_semantics)
     # Type refinement
-    assert natural_user_entity, "Could not find `primary_accounts` data source in scd model!"
-    assert foreign_user_entity, "Could not find `bookings_source` data source in scd model!"
-    assert primary_user_entity, "Could not find `users_latest` data source in scd model!"
-    assert unique_user_entity, "Could not find `companies` data source in scd model!"
+    assert natural_user_entity, "Could not find `primary_accounts` entity in scd model!"
+    assert foreign_user_entity, "Could not find `bookings_source` entity in scd model!"
+    assert primary_user_entity, "Could not find `users_latest` entity in scd model!"
+    assert unique_user_entity, "Could not find `companies` entity in scd model!"
 
     # Valid cases
     natural_primary = join_evaluator.is_valid_entity_join(

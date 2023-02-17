@@ -63,7 +63,7 @@ FROM (
             , subq_0.verification__verification_type
             , subq_0.identity_verifications
           FROM (
-            -- Read Elements From Data Source 'id_verifications'
+            -- Read Elements From entity 'id_verifications'
             SELECT
               1 AS identity_verifications
               , id_verifications_src_10003.ds
@@ -103,7 +103,7 @@ FROM (
           , subq_3.user
           , subq_3.home_state
         FROM (
-          -- Read Elements From Data Source 'users_ds_source'
+          -- Read Elements From entity 'users_ds_source'
           SELECT
             users_ds_source_src_10007.ds
             , DATE_TRUNC('week', users_ds_source_src_10007.ds) AS ds__week

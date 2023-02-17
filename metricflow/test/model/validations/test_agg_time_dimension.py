@@ -22,7 +22,7 @@ def test_invalid_aggregation_time_dimension(simple_user_configured_model: UserCo
         ModelValidationException,
         match=(
             "has the aggregation time dimension set to 'invalid_time_dimension', which is not a valid time dimension "
-            "in the data source"
+            "in the entity"
         ),
     ):
         model_validator = ModelValidator([AggregationTimeDimensionRule()])

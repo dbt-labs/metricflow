@@ -1,6 +1,6 @@
 <SqlQueryPlan>
     <SqlSelectStatementNode>
-        <!-- description = Read Elements From Data Source 'bookings_source' -->
+        <!-- description = Read Elements From entity 'bookings_source' -->
         <!-- node_id = ss_10001 -->
         <!-- col0 =                                                         -->
         <!--   {'class': 'SqlSelectColumn',                                 -->

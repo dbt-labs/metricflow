@@ -10,7 +10,7 @@ FROM (
     SUM(bookings) AS bookings
     , metric_time
   FROM (
-    -- Read Elements From Data Source 'bookings_source'
+    -- Read Elements From entity 'bookings_source'
     -- Metric Time Dimension 'ds'
     -- Pass Only Elements:
     --   ['bookings', 'metric_time']
@@ -26,7 +26,7 @@ FROM (
     metric_time
 ) subq_18
 FULL OUTER JOIN (
-  -- Read Elements From Data Source 'bookings_source'
+  -- Read Elements From entity 'bookings_source'
   -- Metric Time Dimension 'booking_paid_at'
   -- Pass Only Elements:
   --   ['booking_payments', 'metric_time']

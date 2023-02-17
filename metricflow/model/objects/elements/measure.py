@@ -41,7 +41,7 @@ class Measure(HashableBaseModel, ModelWithMetadataParsing):
     non_additive_dimension: Optional[NonAdditiveDimensionParameters] = None
 
     # Defines the time dimension to aggregate this measure by. If not specified, it means to use the primary time
-    # dimension in the data source.
+    # dimension in the entity.
     agg_time_dimension: Optional[str] = None
 
     @property

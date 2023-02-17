@@ -30,7 +30,7 @@ FROM (
         , subq_19.bookings AS bookings
         , subq_19.average_booking_value AS average_booking_value
       FROM (
-        -- Read Elements From Data Source 'bookings_source'
+        -- Read Elements From entity 'bookings_source'
         -- Metric Time Dimension 'ds'
         -- Pass Only Elements:
         --   ['average_booking_value', 'bookings', 'metric_time', 'listing']
@@ -54,7 +54,7 @@ FROM (
       metric_time
   ) subq_27
   INNER JOIN (
-    -- Read Elements From Data Source 'bookings_source'
+    -- Read Elements From entity 'bookings_source'
     -- Metric Time Dimension 'ds'
     -- Pass Only Elements:
     --   ['booking_value', 'metric_time']

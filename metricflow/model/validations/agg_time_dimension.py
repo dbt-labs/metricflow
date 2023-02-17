@@ -17,10 +17,10 @@ from metricflow.references import TimeDimensionReference
 
 
 class AggregationTimeDimensionRule(ModelValidationRule):
-    """Checks that the aggregation time dimension for a measure points to a valid time dimension in the data source."""
+    """Checks that the aggregation time dimension for a measure points to a valid time dimension in the entity."""
 
     @staticmethod
-    @validate_safely(whats_being_done="checking aggregation time dimension for data sources in the model")
+    @validate_safely(whats_being_done="checking aggregation time dimension for entities in the model")
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
         issues: List[ValidationIssueType] = []
         for entity in model.entities:
@@ -36,7 +36,7 @@ class AggregationTimeDimensionRule(ModelValidationRule):
         return False
 
     @staticmethod
-    @validate_safely(whats_being_done="checking aggregation time dimension for a data source")
+    @validate_safely(whats_being_done="checking aggregation time dimension for a entity")
     def _validate_entity(entity: Entity) -> List[ValidationIssueType]:
         issues: List[ValidationIssueType] = []
 
@@ -55,9 +55,9 @@ class AggregationTimeDimensionRule(ModelValidationRule):
                 issues.append(
                     ValidationError(
                         context=measure_context,
-                        message=f"In data source '{entity.name}', measure '{measure.name}' has the aggregation "
+                        message=f"In entity '{entity.name}', measure '{measure.name}' has the aggregation "
                         f"time dimension set to '{agg_time_dimension_reference.element_name}', "
-                        f"which is not a valid time dimension in the data source",
+                        f"which is not a valid time dimension in the entity",
                     )
                 )
 

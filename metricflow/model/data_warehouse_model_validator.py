@@ -47,7 +47,7 @@ from metricflow.sql.sql_bind_parameters import SqlBindParameters
 class QueryRenderingTools:
     """General tools that data warehosue validations use for rendering the validation queries
 
-    This is necessary for the validation steps that generate raw partial queries against the individual data sources
+    This is necessary for the validation steps that generate raw partial queries against the individual entities
     (e.g., selecting a single dimension column).
     """
 
@@ -101,7 +101,7 @@ class DataWarehouseTaskBuilder:
     def _entity_nodes(
         render_tools: QueryRenderingTools, entity: Entity
     ) -> Sequence[BaseOutput[EntityDataSet]]:
-        """Builds and returns the EntityDataSet node for the given data source"""
+        """Builds and returns the EntityDataSet node for the given entity"""
         entity_semantics = render_tools.semantic_model.entity_semantics.get_by_reference(
             EntityReference(entity_name=entity.name)
         )
@@ -132,10 +132,10 @@ class DataWarehouseTaskBuilder:
     def gen_entity_tasks(
         cls, model: UserConfiguredModel, sql_client: SqlClient, system_schema: str
     ) -> List[DataWarehouseValidationTask]:
-        """Generates a list of tasks for validating the data sources of the model"""
+        """Generates a list of tasks for validating the entities of the model"""
 
         # we need a dimension to query that we know exists (i.e. the dimension
-        # is guaranteed to not cause a problem) on each data source.
+        # is guaranteed to not cause a problem) on each entity.
         # Additionally, we don't want to modify the original model, so we
         # first make a deep copy of it
         model = deepcopy(model)
@@ -167,7 +167,7 @@ class DataWarehouseTaskBuilder:
                         file_context=FileContext.from_metadata(metadata=entity.metadata),
                         entity=EntityReference(entity_name=entity.name),
                     ),
-                    error_message=f"Unable to access data source `{entity.name}` in data warehouse",
+                    error_message=f"Unable to access entity `{entity.name}` in data warehouse",
                 )
             )
 
@@ -180,10 +180,10 @@ class DataWarehouseTaskBuilder:
         """Generates a list of tasks for validating the dimensions of the model
 
         The high level tasks returned are "short cut" queries which try to
-        query all the dimensions for a given data source. If that query fails,
+        query all the dimensions for a given entity. If that query fails,
         one or more of the dimensions is incorrectly specified. Thus if the
         query fails, there are subtasks which query the individual dimensions
-        on the data source to identify which have issues.
+        on the entity to identify which have issues.
         """
 
         render_tools = QueryRenderingTools(model=model, system_schema=system_schema)
@@ -243,7 +243,7 @@ class DataWarehouseTaskBuilder:
                             ),
                             element_type=EntityElementType.DIMENSION,
                         ),
-                        error_message=f"Unable to query dimension `{spec.element_name}` on data source `{entity.name}` in data warehouse",
+                        error_message=f"Unable to query dimension `{spec.element_name}` on entity `{entity.name}` in data warehouse",
                     )
                 )
 
@@ -267,7 +267,7 @@ class DataWarehouseTaskBuilder:
                         file_context=FileContext.from_metadata(metadata=entity.metadata),
                         entity=EntityReference(entity_name=entity.name),
                     ),
-                    error_message=f"Failed to query dimensions in data warehouse for data source `{entity.name}`",
+                    error_message=f"Failed to query dimensions in data warehouse for entity `{entity.name}`",
                     on_fail_subtasks=entity_sub_tasks,
                 )
             )
@@ -280,10 +280,10 @@ class DataWarehouseTaskBuilder:
         """Generates a list of tasks for validating the identifiers of the model
 
         The high level tasks returned are "short cut" queries which try to
-        query all the identifiers for a given data source. If that query fails,
+        query all the identifiers for a given entity. If that query fails,
         one or more of the identifiers is incorrectly specified. Thus if the
         query fails, there are subtasks which query the individual identifiers
-        on the data source to identify which have issues.
+        on the entity to identify which have issues.
         """
 
         render_tools = QueryRenderingTools(model=model, system_schema=system_schema)
@@ -319,7 +319,7 @@ class DataWarehouseTaskBuilder:
                             ),
                             element_type=EntityElementType.IDENTIFIER,
                         ),
-                        error_message=f"Unable to query identifier `{spec.element_name}` on data source `{entity.name}` in data warehouse",
+                        error_message=f"Unable to query identifier `{spec.element_name}` on entity `{entity.name}` in data warehouse",
                     )
                 )
 
@@ -342,7 +342,7 @@ class DataWarehouseTaskBuilder:
                         file_context=FileContext.from_metadata(metadata=entity.metadata),
                         entity=EntityReference(entity_name=entity.name),
                     ),
-                    error_message=f"Failed to query identifiers in data warehouse for data source `{entity.name}`",
+                    error_message=f"Failed to query identifiers in data warehouse for entity `{entity.name}`",
                     on_fail_subtasks=entity_sub_tasks,
                 )
             )
@@ -355,10 +355,10 @@ class DataWarehouseTaskBuilder:
         """Generates a list of tasks for validating the measures of the model
 
         The high level tasks returned are "short cut" queries which try to
-        query all the measures for a given data source. If that query fails,
+        query all the measures for a given entity. If that query fails,
         one or more of the measures is incorrectly specified. Thus if the
         query fails, there are subtasks which query the individual measures
-        on the data source to identify which have issues.
+        on the entity to identify which have issues.
         """
 
         render_tools = QueryRenderingTools(model=model, system_schema=system_schema)
@@ -410,7 +410,7 @@ class DataWarehouseTaskBuilder:
                             ),
                             element_type=EntityElementType.MEASURE,
                         ),
-                        error_message=f"Unable to query measure `{spec.element_name}` on data source `{entity.name}` in data warehouse",
+                        error_message=f"Unable to query measure `{spec.element_name}` on entity `{entity.name}` in data warehouse",
                     )
                 )
 
@@ -431,7 +431,7 @@ class DataWarehouseTaskBuilder:
                             file_context=FileContext.from_metadata(metadata=entity.metadata),
                             entity=EntityReference(entity_name=entity.name),
                         ),
-                        error_message=f"Failed to query measures in data warehouse for data source `{entity.name}`",
+                        error_message=f"Failed to query measures in data warehouse for entity `{entity.name}`",
                         on_fail_subtasks=source_node_to_sub_task[source_node],
                     )
                 )
@@ -536,7 +536,7 @@ class DataWarehouseModelValidator:
     def validate_entities(
         self, model: UserConfiguredModel, timeout: Optional[int] = None
     ) -> ModelValidationResults:
-        """Generates a list of tasks for validating the data sources of the model and then runs them
+        """Generates a list of tasks for validating the entities of the model and then runs them
 
         Args:
             model: Model which to run data warehouse validations on

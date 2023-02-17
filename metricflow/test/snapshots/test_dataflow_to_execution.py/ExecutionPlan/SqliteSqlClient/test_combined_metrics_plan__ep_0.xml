@@ -18,7 +18,7 @@
         <!--       , is_instant                                                                        -->
         <!--       , ds                                                                                -->
         <!--     FROM (                                                                                -->
-        <!--       -- Read Elements From Data Source 'bookings_source'                                 -->
+        <!--       -- Read Elements From entity 'bookings_source'                                 -->
         <!--       -- Metric Time Dimension 'ds'                                                       -->
         <!--       -- Pass Only Elements:                                                              -->
         <!--       --   ['bookings', 'is_instant', 'ds']                                               -->
@@ -43,7 +43,7 @@
         <!--       , is_instant                                                                        -->
         <!--       , ds                                                                                -->
         <!--     FROM (                                                                                -->
-        <!--       -- Read Elements From Data Source 'bookings_source'                                 -->
+        <!--       -- Read Elements From entity 'bookings_source'                                 -->
         <!--       -- Metric Time Dimension 'ds'                                                       -->
         <!--       -- Pass Only Elements:                                                              -->
         <!--       --   ['instant_bookings', 'is_instant', 'ds']                                       -->
@@ -67,7 +67,7 @@
         <!--       subq_12.ds = subq_13.ds                                                             -->
         <!--     )                                                                                     -->
         <!--   FULL OUTER JOIN (                                                                       -->
-        <!--     -- Read Elements From Data Source 'bookings_source'                                   -->
+        <!--     -- Read Elements From entity 'bookings_source'                                   -->
         <!--     -- Metric Time Dimension 'ds'                                                         -->
         <!--     -- Pass Only Elements:                                                                -->
         <!--     --   ['booking_value', 'is_instant', 'ds']                                            -->

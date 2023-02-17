@@ -17,7 +17,7 @@ INNER JOIN (
     , listing
     , booking_value * 0.05 AS booking_fees
   FROM (
-    -- Read Elements From Data Source 'bookings_source'
+    -- Read Elements From entity 'bookings_source'
     -- Metric Time Dimension 'ds'
     -- Pass Only Elements:
     --   ['booking_value', 'metric_time', 'listing']

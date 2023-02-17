@@ -10,16 +10,16 @@ from metricflow.model.validations.validator_helpers import (
 
 
 class NonEmptyRule(ModelValidationRule):
-    """Check if the model contains data sources and metrics."""
+    """Check if the model contains entities and metrics."""
 
     @staticmethod
-    @validate_safely(whats_being_done="checking that the model has data sources")
+    @validate_safely(whats_being_done="checking that the model has entities")
     def _check_model_has_entities(model: UserConfiguredModel) -> List[ValidationIssueType]:
         issues: List[ValidationIssueType] = []
         if not model.entities:
             issues.append(
                 ValidationError(
-                    message="No data sources present in the model.",
+                    message="No entities present in the model.",
                 )
             )
         return issues
@@ -46,7 +46,7 @@ class NonEmptyRule(ModelValidationRule):
         return issues
 
     @staticmethod
-    @validate_safely("running model validation rule ensuring metrics and data sources are defined")
+    @validate_safely("running model validation rule ensuring metrics and entities are defined")
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
         issues: List[ValidationIssueType] = []
         issues += NonEmptyRule._check_model_has_entities(model=model)

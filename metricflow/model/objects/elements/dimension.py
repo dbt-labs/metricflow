@@ -27,8 +27,8 @@ class DimensionValidityParams(HashableBaseModel):
 
     This construct is used for supporting SCD Type II tables, such as might be
     created via dbt's snapshot feature, or generated via periodic loads from external
-    dimension data sources. In either of those cases, there is typically a time dimension
-    associated with the SCD data source that indicates the start and end times of a
+    dimension entities. In either of those cases, there is typically a time dimension
+    associated with the SCD entity that indicates the start and end times of a
     validity window, where the dimension value is valid for any time within that range.
     """
 

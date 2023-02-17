@@ -60,7 +60,7 @@ FROM (
             , subq_0.user_id__team_id
             , subq_0.messages
           FROM (
-            -- Read Elements From Data Source 'messages_source'
+            -- Read Elements From entity 'messages_source'
             SELECT
               1 AS messages
               , messages_source_src_10015.ds
@@ -92,7 +92,7 @@ FROM (
           , subq_3.user_team___user_id
           , subq_3.country
         FROM (
-          -- Read Elements From Data Source 'users_source'
+          -- Read Elements From entity 'users_source'
           SELECT
             users_source_src_10017.created_at AS ds
             , DATE_TRUNC(users_source_src_10017.created_at, isoweek) AS ds__week

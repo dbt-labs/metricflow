@@ -9,7 +9,7 @@ SELECT
   , subq_10.user_team___team_id AS user_team___team_id
   , subq_10.user_team___user_id AS user_team___user_id
 FROM (
-  -- Read Elements From Data Source 'messages_source'
+  -- Read Elements From entity 'messages_source'
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements:
   --   ['messages', 'user_team', 'user_team']

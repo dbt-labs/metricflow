@@ -71,7 +71,7 @@ def test_measures_only_exist_in_one_entity() -> None:  # noqa: D
     base_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents_1)
     model = parse_yaml_files_to_validation_ready_model([base_file])
     build = ModelValidator().validate_model(model.model)
-    duplicate_measure_message = "Found measure with name .* in multiple data sources with names"
+    duplicate_measure_message = "Found measure with name .* in multiple entities with names"
     found_issue = False
 
     if build.issues is not None:
@@ -449,7 +449,7 @@ def test_invalid_non_additive_dimension_properties() -> None:
     )
 
     build = ModelValidator([MeasuresNonAdditiveDimensionRule()]).validate_model(transformed_model)
-    expected_error_substring_1 = "that is not defined as a dimension in data source 'sample_entity_2'."
+    expected_error_substring_1 = "that is not defined as a dimension in entity 'sample_entity_2'."
     expected_error_substring_2 = "has a non_additive_dimension with an invalid 'window_groupings'"
     expected_error_substring_3 = "that is defined as a categorical dimension which is not supported."
     expected_error_substring_4 = "that is not equal to the measure's agg_time_dimension"

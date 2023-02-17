@@ -4,7 +4,7 @@ SELECT
   listing__country_latest
   , SUM(listings) AS listings
 FROM (
-  -- Read Elements From Data Source 'listings_latest'
+  -- Read Elements From entity 'listings_latest'
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements:
   --   ['listings', 'listing__country_latest']

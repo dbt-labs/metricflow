@@ -76,7 +76,7 @@ FROM (
                 , subq_0.bookers
                 , subq_0.average_booking_value
               FROM (
-                -- Read Elements From Data Source 'bookings_source'
+                -- Read Elements From entity 'bookings_source'
                 SELECT
                   1 AS bookings
                   , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
@@ -117,7 +117,7 @@ FROM (
               , subq_3.listing
               , subq_3.capacity
             FROM (
-              -- Read Elements From Data Source 'listings'
+              -- Read Elements From entity 'listings'
               SELECT
                 listings_src_10020.active_from AS window_start
                 , DATE_TRUNC(listings_src_10020.active_from, isoweek) AS window_start__week

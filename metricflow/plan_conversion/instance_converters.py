@@ -279,9 +279,9 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
     def _get_validity_window_dimensions_for_entity(
         self, entity_name: str
     ) -> Optional[Tuple[_DimensionValidityParams, _DimensionValidityParams]]:
-        """Returns a 2-tuple (start, end) of validity window dimensions info, if any exist in the data source"""
+        """Returns a 2-tuple (start, end) of validity window dimensions info, if any exist in the entity"""
         entity = self._entity_semantics.get(entity_name=entity_name)
-        assert entity, f"Could not find data source with name {entity_name} after data set conversion!"
+        assert entity, f"Could not find entity with name {entity_name} after data set conversion!"
 
         start_dim = entity.validity_start_dimension
         end_dim = entity.validity_end_dimension
@@ -306,7 +306,7 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
         """Find the Time Dimension specs defining a validity window, if any, and return it
 
         This currently throws an exception if more than one such window is found, and effectively prevents
-        us from processing a dataset composed of a join between two SCD data sources. This restriction is in
+        us from processing a dataset composed of a join between two SCD entities. This restriction is in
         place as a temporary simplification - if there is need for this feature we can enable it.
         """
         entity_to_window: Dict[str, ValidityWindowJoinDescription] = {}
@@ -333,9 +333,9 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
             linkless_start_specs = {spec.without_identifier_links for spec in start_specs}
             linkless_end_specs = {spec.without_identifier_links for spec in end_specs}
             assert len(linkless_start_specs) == 1 and len(linkless_end_specs) == 1, (
-                f"Did not find exactly one pair of specs from data source `{entity_name}` matching the validity "
-                f"window end points defined in the data source. This means we cannot process an SCD join, because we "
-                f"require exactly one validity window to be specified for the query! The window in the data source "
+                f"Did not find exactly one pair of specs from entity `{entity_name}` matching the validity "
+                f"window end points defined in the entity. This means we cannot process an SCD join, because we "
+                f"require exactly one validity window to be specified for the query! The window in the entity "
                 f"is defined by start dimension `{start_dim}` and end dimension `{end_dim}`. We found "
                 f"{len(linkless_start_specs)} linkless specs for window start ({linkless_start_specs}) and "
                 f"{len(linkless_end_specs)} linkless specs for window end ({linkless_end_specs})."
@@ -351,7 +351,7 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
 
         assert len(entity_to_window) < 2, (
             f"Found more than 1 set of validity window specs in the input instance set. This is not currently "
-            f"supported, as joins between SCD data sources are not yet allowed! {entity_to_window}"
+            f"supported, as joins between SCD entities are not yet allowed! {entity_to_window}"
         )
 
         if entity_to_window:
@@ -587,9 +587,9 @@ class AliasAggregatedMeasures(InstanceSetTransform[InstanceSet]):
         """Initializer stores the input specs, which contain the aliases for each measure
 
         Note this class only works if used in conjunction with an AggregateMeasuresNode that has been generated
-        by querying a single data source for a single set of aggregated measures. This is currently enforced
+        by querying a single entity for a single set of aggregated measures. This is currently enforced
         by the structure of the DataflowPlanBuilder, which ensures each AggregateMeasuresNode corresponds to
-        a single data source set of measures for a single metric, and that these outputs will then be
+        a single entity set of measures for a single metric, and that these outputs will then be
         combinded via joins.
         """
         self.metric_input_measure_specs = metric_input_measure_specs

@@ -11,7 +11,7 @@ SELECT
   , subq_0.total_account_balance_first_day AS total_account_balance_first_day
   , subq_0.current_account_balance_by_user AS current_account_balance_by_user
 FROM (
-  -- Read Elements From Data Source 'accounts_source'
+  -- Read Elements From entity 'accounts_source'
   SELECT
     accounts_source_src_10000.account_balance
     , accounts_source_src_10000.account_balance AS total_account_balance_first_day
@@ -33,7 +33,7 @@ INNER JOIN (
   SELECT
     MIN(subq_1.ds) AS ds__complete
   FROM (
-    -- Read Elements From Data Source 'accounts_source'
+    -- Read Elements From entity 'accounts_source'
     SELECT
       accounts_source_src_10000.account_balance
       , accounts_source_src_10000.account_balance AS total_account_balance_first_day

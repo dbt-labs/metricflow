@@ -240,7 +240,7 @@
                             <!-- from_source = SqlSelectStatementNode(node_id=ss_10018) -->
                             <!-- where = None -->
                             <SqlSelectStatementNode>
-                                <!-- description = Read Elements From Data Source 'bookings_source' -->
+                                <!-- description = Read Elements From entity 'bookings_source' -->
                                 <!-- node_id = ss_10018 -->
                                 <!-- col0 =                                                         -->
                                 <!--   {'class': 'SqlSelectColumn',                                 -->
@@ -531,7 +531,7 @@
                             <!--    'on_condition': SqlComparisonExpression(node_id=cmp_3)}  -->
                             <!-- where = None -->
                             <SqlSelectStatementNode>
-                                <!-- description = Read Elements From Data Source 'listings' -->
+                                <!-- description = Read Elements From entity 'listings' -->
                                 <!-- node_id = ss_10020 -->
                                 <!-- col0 =                                                      -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
@@ -729,7 +729,7 @@
                                 <!-- from_source = SqlSelectStatementNode(node_id=ss_10024) -->
                                 <!-- where = None -->
                                 <SqlSelectStatementNode>
-                                    <!-- description = Read Elements From Data Source 'users_latest' -->
+                                    <!-- description = Read Elements From entity 'users_latest' -->
                                     <!-- node_id = ss_10024 -->
                                     <!-- col0 =                                                      -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->

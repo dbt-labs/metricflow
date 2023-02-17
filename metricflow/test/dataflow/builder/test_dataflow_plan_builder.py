@@ -233,7 +233,7 @@ def test_single_entity_ratio_metrics_plan(
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
 ) -> None:
-    """Tests a plan to retrieve a ratio where both measures come from one data source"""
+    """Tests a plan to retrieve a ratio where both measures come from one entity"""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings_per_booker"),),
@@ -266,7 +266,7 @@ def test_multi_entity_ratio_metrics_plan(
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
 ) -> None:
-    """Tests a plan to retrieve a ratio where both measures come from one data source"""
+    """Tests a plan to retrieve a ratio where both measures come from one entity"""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings_per_view"),),

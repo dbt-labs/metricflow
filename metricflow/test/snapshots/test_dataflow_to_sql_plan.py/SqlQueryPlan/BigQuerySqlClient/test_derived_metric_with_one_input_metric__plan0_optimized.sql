@@ -15,7 +15,7 @@ FROM (
       metric_time
       , SUM(bookings) AS bookings_5_days_ago
     FROM (
-      -- Read Elements From Data Source 'bookings_source'
+      -- Read Elements From entity 'bookings_source'
       -- Metric Time Dimension 'ds'
       -- Pass Only Elements:
       --   ['bookings', 'metric_time']

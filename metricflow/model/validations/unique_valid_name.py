@@ -52,8 +52,8 @@ class MetricFlowReservedKeywords(enum.Enum):
 class UniqueAndValidNameRule(ModelValidationRule):
     """Check that names are unique and valid.
 
-    * Names of elements in data sources are unique / valid within the data source.
-    * Names of data sources, dimension sets, metric sets in the model are unique / valid.
+    * Names of elements in entities are unique / valid within the entity.
+    * Names of entities, dimension sets, metric sets in the model are unique / valid.
     """
 
     NAME_REGEX = re.compile(r"\A[a-z][a-z0-9_]*[a-z0-9]\Z")
@@ -92,7 +92,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
         return issues
 
     @staticmethod
-    @validate_safely(whats_being_done="checking data source sub element names are unique")
+    @validate_safely(whats_being_done="checking entity sub element names are unique")
     def _validate_entity_elements(entity: Entity) -> List[ValidationIssueType]:
         issues: List[ValidationIssueType] = []
         element_info_tuples: List[Tuple[ElementReference, str, ValidationContext]] = []
@@ -149,7 +149,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
                 issues.append(
                     ValidationError(
                         context=context,
-                        message=f"In data source `{entity.name}`, can't use name `{name.element_name}` for a "
+                        message=f"In entity `{entity.name}`, can't use name `{name.element_name}` for a "
                         f"{_type} when it was already used for a {name_to_type[name]}",
                     )
                 )
@@ -171,7 +171,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
                 object_info_tuples.append(
                     (
                         entity.name,
-                        "data source",
+                        "entity",
                         EntityContext(
                             file_context=FileContext.from_metadata(metadata=entity.metadata),
                             entity=EntityReference(entity_name=entity.name),

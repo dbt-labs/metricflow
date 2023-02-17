@@ -4,7 +4,7 @@ from metricflow.model.transformations.transform_rule import ModelTransformRule
 
 
 class SliceNamesRule(ModelTransformRule):
-    """Slice the names of data source elements in a model
+    """Slice the names of entity elements in a model
 
     NOTE: specifically for testing
     """

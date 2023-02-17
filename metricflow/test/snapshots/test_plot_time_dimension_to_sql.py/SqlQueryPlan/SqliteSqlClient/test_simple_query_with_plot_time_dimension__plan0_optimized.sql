@@ -10,7 +10,7 @@ FROM (
     SUM(bookings) AS bookings
     , _ts
   FROM (
-    -- Read Elements From Data Source 'bookings_source'
+    -- Read Elements From entity 'bookings_source'
     -- Plot by Time Dimension 'ds'
     -- Pass Only Elements:
     --   ['bookings', '_ts']
@@ -26,7 +26,7 @@ FROM (
     _ts
 ) subq_18
 FULL OUTER JOIN (
-  -- Read Elements From Data Source 'bookings_source'
+  -- Read Elements From entity 'bookings_source'
   -- Plot by Time Dimension 'booking_paid_at'
   -- Pass Only Elements:
   --   ['booking_payments', '_ts']

@@ -14,7 +14,7 @@ MAX_JOIN_HOPS = 2
 
 @dataclass(frozen=True)
 class EntityIdentifierJoinType:
-    """Describe a type of join between data sources where identifiers are of the listed types."""
+    """Describe a type of join between entities where identifiers are of the listed types."""
 
     left_identifier_type: IdentifierType
     right_identifier_type: IdentifierType
@@ -22,7 +22,7 @@ class EntityIdentifierJoinType:
 
 @dataclass(frozen=True)
 class EntityIdentifierJoin:
-    """How to join one data source onto another, using a specific identifer and join type."""
+    """How to join one entity onto another, using a specific identifer and join type."""
 
     right_entity_reference: EntityReference
     identifier_reference: IdentifierReference
@@ -31,14 +31,14 @@ class EntityIdentifierJoin:
 
 @dataclass(frozen=True)
 class EntityLink:
-    """The valid join path to link two data sources. Might include multiple joins."""
+    """The valid join path to link two entities. Might include multiple joins."""
 
     left_entity_reference: EntityReference
     join_path: List[EntityIdentifierJoin]
 
 
 class EntityJoinEvaluator:
-    """Checks to see if a join between two data sources should be allowed."""
+    """Checks to see if a join between two entities should be allowed."""
 
     # Valid joins are the non-fanout joins.
     _VALID_IDENTIFIER_JOINS = (
@@ -103,7 +103,7 @@ class EntityJoinEvaluator:
     def get_joinable_entities(
         self, left_entity_reference: EntityReference, include_multi_hop: bool = False
     ) -> Dict[str, EntityLink]:
-        """List all data sources that can join to given data source, and the identifiers to join them."""
+        """List all entities that can join to given entity, and the identifiers to join them."""
         entity_joins: Dict[str, EntityLink] = {}
         self._get_remaining_hops_of_joinable_entities(
             left_entity_reference=left_entity_reference,
@@ -127,8 +127,8 @@ class EntityJoinEvaluator:
             )
             assert parent_entity is not None
 
-            # We'll get all joinable data sources in this hop before recursing to ensure we find the most
-            # efficient path to each data source.
+            # We'll get all joinable entities in this hop before recursing to ensure we find the most
+            # efficient path to each entity.
             join_paths_to_visit_next: List[List[EntityIdentifierJoin]] = []
             for identifier in parent_entity.identifiers:
                 identifier_reference = IdentifierReference(element_name=identifier.name)
@@ -137,14 +137,14 @@ class EntityJoinEvaluator:
                 )
 
                 for right_entity in identifier_entities:
-                    # Check if we've seen this data source already
+                    # Check if we've seen this entity already
                     if (
                         right_entity.name == left_entity_reference.entity_name
                         or right_entity.name in known_entity_joins
                     ):
                         continue
 
-                    # Check if there is a valid way to join this data source to existing join path
+                    # Check if there is a valid way to join this entity to existing join path
                     right_entity_reference = EntityReference(entity_name=right_entity.name)
                     valid_join_type = self.get_valid_entity_identifier_join_type(
                         left_entity_reference=parent_entity_reference,
@@ -188,7 +188,7 @@ class EntityJoinEvaluator:
         right_entity_reference: EntityReference,
         on_identifier_reference: IdentifierReference,
     ) -> Optional[EntityIdentifierJoinType]:
-        """Get valid join type used to join data sources on given identifier, if exists."""
+        """Get valid join type used to join entities on given identifier, if exists."""
         left_identifier = self._entity_semantics.get_identifier_in_entity(
             EntityElementReference.create_from_references(left_entity_reference, on_identifier_reference)
         )
@@ -205,10 +205,10 @@ class EntityJoinEvaluator:
         assert right_entity, "Type refinement. If you see this error something has refactored wrongly"
 
         if left_entity.has_validity_dimensions and right_entity.has_validity_dimensions:
-            # We cannot join two data sources with validity dimensions due to concerns with unexpected fanout
-            # due to the key structure of these data sources. Applying multi-stage validity window filters can
+            # We cannot join two entities with validity dimensions due to concerns with unexpected fanout
+            # due to the key structure of these entities. Applying multi-stage validity window filters can
             # also lead to unexpected removal of interim join keys. Note this will need to be updated if we enable
-            # measures in such data sources, since those will need to be converted to a different type of data source
+            # measures in such entities, since those will need to be converted to a different type of entity
             # to support measure computation.
             return None
 
@@ -247,7 +247,7 @@ class EntityJoinEvaluator:
         instance_set: InstanceSet,
         identifier_reference: IdentifierReference,
     ) -> EntityReference:
-        """Return the data source where the identifier was defined in the instance set."""
+        """Return the entity where the identifier was defined in the instance set."""
         matching_instances: List[IdentifierInstance] = []
         for identifier_instance in instance_set.identifier_instances:
             assert len(identifier_instance.defined_from) == 1

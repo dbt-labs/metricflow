@@ -26,7 +26,7 @@ from metricflow.model.validations.validator_helpers import (
 @pytest.fixture
 def list_of_issues() -> List[ValidationIssueType]:  # noqa: D
     file_context = FileContext(file_name="foo", line_number=1337)
-    entity_name = "My data source"
+    entity_name = "My entity"
 
     issues: List[ValidationIssueType] = []
     issues.append(

@@ -10,7 +10,7 @@ from metricflow.references import IdentifierReference, CompositeSubIdentifierRef
 
 
 class IdentifierType(ExtendedEnum):
-    """Defines uniqueness and the extent to which an identifier represents the common entity for a data source"""
+    """Defines uniqueness and the extent to which an identifier represents the common entity for a entity"""
 
     FOREIGN = "foreign"
     NATURAL = "natural"
@@ -80,10 +80,10 @@ class Identifier(HashableBaseModel, ModelWithMetadataParsing):
         """Indicates whether or not this identifier can be used as a linkable identifier type for joins
 
         That is, can you use the identifier as a linkable element in multi-hop dundered syntax. For example,
-        the country dimension in the listings data source can be linked via listing__country, because listing
+        the country dimension in the listings entity can be linked via listing__country, because listing
         is the primary key.
 
         At the moment, you may only request things accessible via primary, unique, or natural keys, with natural
-        keys reserved for SCD Type II style data sources.
+        keys reserved for SCD Type II style entities.
         """
         return self.type in (IdentifierType.PRIMARY, IdentifierType.UNIQUE, IdentifierType.NATURAL)

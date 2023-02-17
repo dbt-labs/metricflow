@@ -74,7 +74,7 @@ FROM (
           , subq_0.create_a_cycle_in_the_join_graph__guest
           , subq_0.create_a_cycle_in_the_join_graph__host
         FROM (
-          -- Read Elements From Data Source 'bookings_source'
+          -- Read Elements From entity 'bookings_source'
           SELECT
             1 AS bookings
             , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
@@ -199,7 +199,7 @@ FULL OUTER JOIN (
           , subq_4.create_a_cycle_in_the_join_graph__guest
           , subq_4.create_a_cycle_in_the_join_graph__host
         FROM (
-          -- Read Elements From Data Source 'bookings_source'
+          -- Read Elements From entity 'bookings_source'
           SELECT
             1 AS bookings
             , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings

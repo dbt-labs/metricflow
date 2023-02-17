@@ -1,4 +1,4 @@
--- Read Elements From Data Source 'bookings_source'
+-- Read Elements From entity 'bookings_source'
 -- Set Measures to Aggregate By 'booking_paid_at'
 SELECT
   booking_value AS booking_payments

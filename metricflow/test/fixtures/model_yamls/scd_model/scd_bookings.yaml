@@ -1,7 +1,7 @@
 ---
 entity:
   name: bookings_source
-  description: bookings data source for use in the SCD model
+  description: bookings entity for use in the SCD model
   owners:
     - support@transformdata.io
 

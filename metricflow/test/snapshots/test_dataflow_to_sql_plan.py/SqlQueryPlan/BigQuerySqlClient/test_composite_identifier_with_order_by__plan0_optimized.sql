@@ -6,7 +6,7 @@ SELECT
   , user_team___user_id
   , SUM(messages) AS messages
 FROM (
-  -- Read Elements From Data Source 'messages_source'
+  -- Read Elements From entity 'messages_source'
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements:
   --   ['messages', 'user_team']

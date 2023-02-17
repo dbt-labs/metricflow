@@ -51,7 +51,7 @@
         <!--    'on_condition': SqlLogicalExpression(node_id=lo_0)}    -->
         <!-- where = None -->
         <SqlSelectStatementNode>
-            <!-- description = Read Elements From Data Source 'accounts_source' -->
+            <!-- description = Read Elements From entity 'accounts_source' -->
             <!-- node_id = ss_10000 -->
             <!-- col0 =                                                      -->
             <!--   {'class': 'SqlSelectColumn',                              -->
@@ -118,7 +118,7 @@
             <!--    'column_alias': 'user'}                              -->
             <!-- where = None -->
             <SqlSelectStatementNode>
-                <!-- description = Read Elements From Data Source 'accounts_source' -->
+                <!-- description = Read Elements From entity 'accounts_source' -->
                 <!-- node_id = ss_10000 -->
                 <!-- col0 =                                                      -->
                 <!--   {'class': 'SqlSelectColumn',                              -->

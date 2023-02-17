@@ -72,7 +72,7 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
     It's also tricky trying to get tests / queries on Snowflake working with
     https://docs.snowflake.com/en/sql-reference/parameters.html#quoted-identifiers-ignore-case enabled.
     For example, when listing table names, all tables would be upper case with that setting (causing an issue where
-    data sources would constantly be primed because the table names didn't match).
+    entities would constantly be primed because the table names didn't match).
     """
 
     DEFAULT_LOGIN_TIMEOUT = 60
