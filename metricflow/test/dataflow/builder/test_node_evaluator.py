@@ -14,7 +14,7 @@ from metricflow.dataflow.builder.partitions import PartitionTimeDimensionJoinDes
 from metricflow.dataflow.dataflow_plan import BaseOutput, ValidityWindowJoinDescription
 from metricflow.dataset.dataset import DataSet
 from metricflow.model.semantic_model import SemanticModel
-from metricflow.dataset.entity_adapter import EntityDataSet
+from metricflow.dataset.entity_adapter import MetricFlowEntityDataSet
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.node_processor import PreDimensionJoinNodeProcessor
 from metricflow.plan_conversion.time_spine import TimeSpineSource
@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 def node_evaluator(
     consistent_id_object_repository: ConsistentIdObjectRepository,
     simple_semantic_model: SemanticModel,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
     time_spine_source: TimeSpineSource,
 ) -> NodeEvaluatorForLinkableInstances:  # noqa: D
     """Return a node evaluator using the nodes in entity_name_to_nodes"""
@@ -57,7 +57,7 @@ def node_evaluator(
 
 
 def make_multihop_node_evaluator(
-    model_source_nodes: Sequence[BaseOutput[EntityDataSet]],
+    model_source_nodes: Sequence[BaseOutput[MetricFlowEntityDataSet]],
     semantic_model_with_multihop_links: SemanticModel,
     desired_linkable_specs: Sequence[LinkableInstanceSpec],
     time_spine_source: TimeSpineSource,

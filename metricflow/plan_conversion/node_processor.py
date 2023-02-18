@@ -12,10 +12,10 @@ from metricflow.dataflow.dataflow_plan import (
     FilterElementsNode,
     JoinDescription,
 )
-from metricflow.model.semantics.entity_join_evaluator import EntityJoinEvaluator, MAX_JOIN_HOPS
+from metricflow.model.semantics.entity_join_evaluator import MetricFlowEntityJoinEvaluator, MAX_JOIN_HOPS
 from metricflow.object_utils import pformat_big_objects
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
-from metricflow.protocols.semantics import EntitySemanticsAccessor
+from metricflow.protocols.semantics import MetricFlowEntitySemanticsAccessor
 from metricflow.references import TimeDimensionReference, IdentifierReference
 from metricflow.spec_set_transforms import ToElementNameSet
 from metricflow.specs import LinkableInstanceSpec, LinklessIdentifierSpec, InstanceSpecSet
@@ -78,13 +78,13 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
 
     def __init__(  # noqa: D
         self,
-        entity_semantics: EntitySemanticsAccessor,
+        entity_semantics: MetricFlowEntitySemanticsAccessor,
         node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver[SqlDataSetT],
     ):
         self._node_data_set_resolver = node_data_set_resolver
         self._partition_resolver = PartitionJoinResolver(entity_semantics)
         self._entity_semantics = entity_semantics
-        self._join_evaluator = EntityJoinEvaluator(entity_semantics)
+        self._join_evaluator = MetricFlowEntityJoinEvaluator(entity_semantics)
 
     def add_time_range_constraint(
         self,
@@ -143,7 +143,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
             )
             if identifier is None:
                 raise RuntimeError(
-                    f"Invalid EntityElementReference {identifier_instance_in_first_node.defined_from[0]}"
+                    f"Invalid MetricFlowEntityElementReference {identifier_instance_in_first_node.defined_from[0]}"
                 )
 
             return True

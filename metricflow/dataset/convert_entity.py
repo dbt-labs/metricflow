@@ -6,17 +6,17 @@ from typing import Optional, List, Tuple, Sequence
 from metricflow.aggregation_properties import AggregationState
 from metricflow.dag.id_generation import IdGeneratorRegistry
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.dataset.entity_adapter import EntityDataSet
+from metricflow.dataset.entity_adapter import MetricFlowEntityDataSet
 from metricflow.instances import (
     MeasureInstance,
-    EntityElementReference,
+    MetricFlowEntityElementReference,
     DimensionInstance,
     TimeDimensionInstance,
     IdentifierInstance,
     InstanceSet,
-    EntityReference,
+    MetricFlowEntityReference,
 )
-from metricflow.model.objects.entity import Entity
+from metricflow.model.objects.conversions import MetricFlowMetricFlowEntity
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType
 from metricflow.model.objects.elements.identifier import Identifier
 from metricflow.model.objects.elements.measure import Measure
@@ -57,7 +57,7 @@ class DimensionConversionResult:
     select_columns: Sequence[SqlSelectColumn]
 
 
-class EntityToDataSetConverter:
+class MetricFlowEntityToDataSetConverter:
     """Converts a entity in the model to a data set that can be used with the dataflow plan builder.
 
     Identifier links generally refer to the identifiers used to join the measure source to the dimension source. For
@@ -89,7 +89,7 @@ class EntityToDataSetConverter:
             associated_columns=column_associations,
             spec=dimension_spec,
             defined_from=(
-                EntityElementReference(
+                MetricFlowEntityElementReference(
                     entity_name=entity_name,
                     element_name=dimension.reference.element_name,
                 ),
@@ -116,7 +116,7 @@ class EntityToDataSetConverter:
             associated_columns=column_associations,
             spec=time_dimension_spec,
             defined_from=(
-                EntityElementReference(
+                MetricFlowEntityElementReference(
                     entity_name=entity_name,
                     element_name=time_dimension.reference.element_name,
                 ),
@@ -140,7 +140,7 @@ class EntityToDataSetConverter:
             associated_columns=column_associations,
             spec=identifier_spec,
             defined_from=(
-                EntityElementReference(
+                MetricFlowEntityElementReference(
                     entity_name=entity_name,
                     element_name=identifier.reference.element_name,
                 ),
@@ -153,7 +153,7 @@ class EntityToDataSetConverter:
     ) -> SqlExpressionNode:
         """Create an expression that can be used for reading the element from the entity's SQL."""
         if element_expr:
-            if EntityToDataSetConverter._SQL_IDENTIFIER_REGEX.match(element_expr) and element_expr.upper() not in (
+            if MetricFlowEntityToDataSetConverter._SQL_IDENTIFIER_REGEX.match(element_expr) and element_expr.upper() not in (
                 "TRUE",
                 "FALSE",
                 "NULL",
@@ -188,7 +188,7 @@ class EntityToDataSetConverter:
                 associated_columns=measure_spec.column_associations(self._column_association_resolver),
                 spec=measure_spec,
                 defined_from=(
-                    EntityElementReference(
+                    MetricFlowEntityElementReference(
                         entity_name=entity_name,
                         element_name=measure.reference.element_name,
                     ),
@@ -198,7 +198,7 @@ class EntityToDataSetConverter:
             measure_instances.append(measure_instance)
             select_columns.append(
                 SqlSelectColumn(
-                    expr=EntityToDataSetConverter._make_element_sql_expr(
+                    expr=MetricFlowEntityToDataSetConverter._make_element_sql_expr(
                         table_alias=table_alias,
                         element_name=measure.reference.element_name,
                         element_expr=measure.expr,
@@ -230,7 +230,7 @@ class EntityToDataSetConverter:
                 dimension_instances.append(dimension_instance)
                 select_columns.append(
                     SqlSelectColumn(
-                        expr=EntityToDataSetConverter._make_element_sql_expr(
+                        expr=MetricFlowEntityToDataSetConverter._make_element_sql_expr(
                             table_alias=table_alias,
                             element_name=dimension.reference.element_name,
                             element_expr=dimension.expr,
@@ -253,7 +253,7 @@ class EntityToDataSetConverter:
                 time_dimension_instances.append(time_dimension_instance)
                 select_columns.append(
                     SqlSelectColumn(
-                        expr=EntityToDataSetConverter._make_element_sql_expr(
+                        expr=MetricFlowEntityToDataSetConverter._make_element_sql_expr(
                             table_alias=table_alias,
                             element_name=dimension.reference.element_name,
                             element_expr=dimension.expr,
@@ -277,7 +277,7 @@ class EntityToDataSetConverter:
                             SqlSelectColumn(
                                 expr=SqlDateTruncExpression(
                                     time_granularity=time_granularity,
-                                    arg=EntityToDataSetConverter._make_element_sql_expr(
+                                    arg=MetricFlowEntityToDataSetConverter._make_element_sql_expr(
                                         table_alias=table_alias,
                                         element_name=dimension.reference.element_name,
                                         element_expr=dimension.expr,
@@ -331,7 +331,7 @@ class EntityToDataSetConverter:
 
                     select_columns.append(
                         SqlSelectColumn(
-                            expr=EntityToDataSetConverter._make_element_sql_expr(
+                            expr=MetricFlowEntityToDataSetConverter._make_element_sql_expr(
                                 table_alias=table_alias,
                                 element_name=sub_id_name,
                                 element_expr=expr,
@@ -342,7 +342,7 @@ class EntityToDataSetConverter:
             else:
                 select_columns.append(
                     SqlSelectColumn(
-                        expr=EntityToDataSetConverter._make_element_sql_expr(
+                        expr=MetricFlowEntityToDataSetConverter._make_element_sql_expr(
                             table_alias=table_alias,
                             element_name=identifier.reference.element_name,
                             element_expr=identifier.expr,
@@ -352,7 +352,7 @@ class EntityToDataSetConverter:
                 )
         return identifier_instances, select_columns
 
-    def create_sql_source_data_set(self, entity: Entity) -> EntityDataSet:
+    def create_sql_source_data_set(self, entity: MetricFlowEntity) -> MetricFlowEntityDataSet:
         """Create an SQL source data set from a entity in the model."""
 
         # Gather all instances and columns from all entities.
@@ -449,8 +449,8 @@ class EntityToDataSetConverter:
             order_bys=(),
         )
 
-        return EntityDataSet(
-            entity_reference=EntityReference(entity_name=entity.name),
+        return MetricFlowEntityDataSet(
+            entity_reference=MetricFlowEntityReference(entity_name=entity.name),
             instance_set=InstanceSet(
                 measure_instances=tuple(all_measure_instances),
                 dimension_instances=tuple(all_dimension_instances),

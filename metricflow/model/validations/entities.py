@@ -1,15 +1,15 @@
 import logging
 from typing import List
-from metricflow.instances import EntityElementReference, EntityReference
+from metricflow.instances import MetricFlowEntityElementReference, MetricFlowEntityReference
 
-from metricflow.model.objects.entity import Entity
+from metricflow.model.objects.conversions import MetricFlowMetricFlowEntity
 from metricflow.model.objects.elements.dimension import DimensionType
 from metricflow.model.objects.elements.identifier import IdentifierType
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
-    EntityContext,
-    EntityElementContext,
-    EntityElementType,
+    MetricFlowEntityContext,
+    MetricFlowEntityElementContext,
+    MetricFlowEntityElementType,
     FileContext,
     ModelValidationRule,
     ValidationIssueType,
@@ -21,7 +21,7 @@ from metricflow.time.time_constants import SUPPORTED_GRANULARITIES
 logger = logging.getLogger(__name__)
 
 
-class EntityTimeDimensionWarningsRule(ModelValidationRule):
+class MetricFlowEntityTimeDimensionWarningsRule(ModelValidationRule):
     """Checks time dimensions in entities."""
 
     @staticmethod
@@ -30,23 +30,23 @@ class EntityTimeDimensionWarningsRule(ModelValidationRule):
         issues: List[ValidationIssueType] = []
 
         for entity in model.entities:
-            issues.extend(EntityTimeDimensionWarningsRule._validate_entity(entity=entity))
+            issues.extend(MetricFlowEntityTimeDimensionWarningsRule._validate_entity(entity=entity))
         return issues
 
     @staticmethod
     @validate_safely(whats_being_done="checking validity of the entity's time dimensions")
-    def _validate_entity(entity: Entity) -> List[ValidationIssueType]:
+    def _validate_entity(entity: MetricFlowEntity) -> List[ValidationIssueType]:
         issues: List[ValidationIssueType] = []
 
         primary_time_dimensions = []
 
         for dim in entity.dimensions:
-            context = EntityElementContext(
+            context = MetricFlowEntityElementContext(
                 file_context=FileContext.from_metadata(metadata=entity.metadata),
-                entity_element=EntityElementReference(
+                entity_element=MetricFlowEntityElementReference(
                     entity_name=entity.name, element_name=dim.name
                 ),
-                element_type=EntityElementType.DIMENSION,
+                element_type=MetricFlowEntityElementType.DIMENSION,
             )
 
             if dim.type == DimensionType.TIME:
@@ -73,9 +73,9 @@ class EntityTimeDimensionWarningsRule(ModelValidationRule):
         ):
             issues.append(
                 ValidationError(
-                    context=EntityContext(
+                    context=MetricFlowEntityContext(
                         file_context=FileContext.from_metadata(metadata=entity.metadata),
-                        entity=EntityReference(entity_name=entity.name),
+                        entity=MetricFlowEntityReference(entity_name=entity.name),
                     ),
                     message=f"No primary time dimension in entity with name ({entity.name}). Please add one",
                 )
@@ -85,9 +85,9 @@ class EntityTimeDimensionWarningsRule(ModelValidationRule):
             for primary_time_dimension in primary_time_dimensions:
                 issues.append(
                     ValidationError(
-                        context=EntityContext(
+                        context=MetricFlowEntityContext(
                             file_context=FileContext.from_metadata(metadata=entity.metadata),
-                            entity=EntityReference(entity_name=entity.name),
+                            entity=MetricFlowEntityReference(entity_name=entity.name),
                         ),
                         message=f"In entity {entity.name}, "
                         f"Primary time dimension with name: {primary_time_dimension.name} "
@@ -98,7 +98,7 @@ class EntityTimeDimensionWarningsRule(ModelValidationRule):
         return issues
 
 
-class EntityValidityWindowRule(ModelValidationRule):
+class MetricFlowEntityValidityWindowRule(ModelValidationRule):
     """Checks validity windows in entities to ensure they comply with runtime requirements"""
 
     @staticmethod
@@ -108,7 +108,7 @@ class EntityValidityWindowRule(ModelValidationRule):
         issues: List[ValidationIssueType] = []
 
         for entity in model.entities:
-            issues.extend(EntityValidityWindowRule._validate_entity(entity=entity))
+            issues.extend(MetricFlowEntityValidityWindowRule._validate_entity(entity=entity))
 
         return issues
 
@@ -116,7 +116,7 @@ class EntityValidityWindowRule(ModelValidationRule):
     @validate_safely(
         whats_being_done="checking the entity's validity parameters for compatibility with runtime requirements"
     )
-    def _validate_entity(entity: Entity) -> List[ValidationIssueType]:
+    def _validate_entity(entity: MetricFlowEntity) -> List[ValidationIssueType]:
         """Runs assertions on entities with validity parameters set on one or more time dimensions"""
 
         issues: List[ValidationIssueType] = []
@@ -126,9 +126,9 @@ class EntityValidityWindowRule(ModelValidationRule):
         if not validity_param_dims:
             return issues
 
-        context = EntityContext(
+        context = MetricFlowEntityContext(
             file_context=FileContext.from_metadata(metadata=entity.metadata),
-            entity=EntityReference(entity_name=entity.name),
+            entity=MetricFlowEntityReference(entity_name=entity.name),
         )
         requirements = (
             "entities using dimension validity params to define a validity window must have exactly two time "

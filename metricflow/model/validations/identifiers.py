@@ -5,15 +5,15 @@ from datetime import date
 from typing import List, MutableSet, Tuple, Sequence, DefaultDict
 
 import more_itertools
-from metricflow.instances import EntityElementReference, EntityReference
+from metricflow.instances import MetricFlowEntityElementReference, MetricFlowEntityReference
 
-from metricflow.model.objects.entity import Entity
+from metricflow.model.objects.conversions import MetricFlowMetricFlowEntity
 from metricflow.model.objects.elements.identifier import Identifier, IdentifierType, CompositeSubIdentifier
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
-    EntityContext,
-    EntityElementContext,
-    EntityElementType,
+    MetricFlowEntityContext,
+    MetricFlowEntityElementContext,
+    MetricFlowEntityElementType,
     FileContext,
     ModelValidationRule,
     ValidationIssue,
@@ -41,17 +41,17 @@ class IdentifierConfigRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking that the entity's identifiers are valid")
-    def _validate_entity_identifiers(entity: Entity) -> List[ValidationIssueType]:
+    def _validate_entity_identifiers(entity: MetricFlowEntity) -> List[ValidationIssueType]:
         """Checks validity of composite identifiers"""
         issues: List[ValidationIssueType] = []
         for ident in entity.identifiers:
             if ident.identifiers:
-                context = EntityElementContext(
+                context = MetricFlowEntityElementContext(
                     file_context=FileContext.from_metadata(metadata=entity.metadata),
-                    entity_element=EntityElementReference(
+                    entity_element=MetricFlowEntityElementReference(
                         entity_name=entity.name, element_name=ident.name
                     ),
-                    element_type=EntityElementType.IDENTIFIER,
+                    element_type=MetricFlowEntityElementType.IDENTIFIER,
                 )
 
                 for sub_id in ident.identifiers:
@@ -106,11 +106,11 @@ class NaturalIdentifierConfigurationRule(ModelValidationRule):
             "natural identifiers are used in the appropriate contexts"
         )
     )
-    def _validate_entity_natural_identifiers(entity: Entity) -> List[ValidationIssue]:
+    def _validate_entity_natural_identifiers(entity: MetricFlowEntity) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
-        context = EntityContext(
+        context = MetricFlowEntityContext(
             file_context=FileContext.from_metadata(metadata=entity.metadata),
-            entity=EntityReference(entity_name=entity.name),
+            entity=MetricFlowEntityReference(entity_name=entity.name),
         )
 
         natural_identifier_names = set(
@@ -151,12 +151,12 @@ class NaturalIdentifierConfigurationRule(ModelValidationRule):
         return issues
 
 
-class OnePrimaryIdentifierPerEntityRule(ModelValidationRule):
+class OnePrimaryIdentifierPerMetricFlowEntityRule(ModelValidationRule):
     """Ensures that each entity has only one primary identifier"""
 
     @staticmethod
     @validate_safely(whats_being_done="checking entity has only one primary identifier")
-    def _only_one_primary_identifier(entity: Entity) -> List[ValidationIssue]:
+    def _only_one_primary_identifier(entity: MetricFlowEntity) -> List[ValidationIssue]:
         primary_identifier_names: MutableSet[str] = set()
         for identifier in entity.identifiers or []:
             if identifier.type == IdentifierType.PRIMARY:
@@ -165,9 +165,9 @@ class OnePrimaryIdentifierPerEntityRule(ModelValidationRule):
         if len(primary_identifier_names) > 1:
             return [
                 ValidationFutureError(
-                    context=EntityContext(
+                    context=MetricFlowEntityContext(
                         file_context=FileContext.from_metadata(metadata=entity.metadata),
-                        entity=EntityReference(entity_name=entity.name),
+                        entity=MetricFlowEntityReference(entity_name=entity.name),
                     ),
                     message=f"entities can have only one primary identifier. The entity"
                     f" `{entity.name}` has {len(primary_identifier_names)}: {', '.join(primary_identifier_names)}",
@@ -184,7 +184,7 @@ class OnePrimaryIdentifierPerEntityRule(ModelValidationRule):
         issues = []
 
         for entity in model.entities:
-            issues += OnePrimaryIdentifierPerEntityRule._only_one_primary_identifier(entity=entity)
+            issues += OnePrimaryIdentifierPerMetricFlowEntityRule._only_one_primary_identifier(entity=entity)
 
         return issues
 
@@ -193,7 +193,7 @@ class OnePrimaryIdentifierPerEntityRule(ModelValidationRule):
 class SubIdentifierContext:
     """Organizes the context behind identifiers and their sub-identifiers."""
 
-    entity: Entity
+    entity: MetricFlowEntity
     identifier_reference: IdentifierReference
     sub_identifier_names: Tuple[str, ...]
 
@@ -213,7 +213,7 @@ class IdentifierConsistencyRule(ModelValidationRule):
         return sub_identifier_names
 
     @staticmethod
-    def _get_sub_identifier_context(entity: Entity) -> Sequence[SubIdentifierContext]:
+    def _get_sub_identifier_context(entity: MetricFlowEntity) -> Sequence[SubIdentifierContext]:
         contexts = []
         for identifier in entity.identifiers or []:
             contexts.append(
@@ -255,12 +255,12 @@ class IdentifierConsistencyRule(ModelValidationRule):
             entity = sub_identifier_contexts[0].entity
             issues.append(
                 ValidationWarning(
-                    context=EntityElementContext(
+                    context=MetricFlowEntityElementContext(
                         file_context=FileContext.from_metadata(metadata=entity.metadata),
-                        entity_element=EntityElementReference(
+                        entity_element=MetricFlowEntityElementReference(
                             entity_name=entity.name, element_name=identifier_name
                         ),
-                        element_type=EntityElementType.IDENTIFIER,
+                        element_type=MetricFlowEntityElementType.IDENTIFIER,
                     ),
                     message=(
                         f"Identifier '{identifier_name}' does not have consistent sub-identifiers "

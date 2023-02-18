@@ -3,15 +3,15 @@ from typing import List
 
 import pytest
 from metricflow.instances import (
-    EntityElementReference,
-    EntityReference,
+    MetricFlowEntityElementReference,
+    MetricFlowEntityReference,
     MetricModelReference,
 )
 
 from metricflow.model.validations.validator_helpers import (
-    EntityContext,
-    EntityElementContext,
-    EntityElementType,
+    MetricFlowEntityContext,
+    MetricFlowEntityElementContext,
+    MetricFlowEntityElementType,
     FileContext,
     MetricContext,
     ModelValidationResults,
@@ -31,33 +31,33 @@ def list_of_issues() -> List[ValidationIssueType]:  # noqa: D
     issues: List[ValidationIssueType] = []
     issues.append(
         ValidationWarning(
-            context=EntityContext(
+            context=MetricFlowEntityContext(
                 file_context=file_context,
-                entity=EntityReference(entity_name=entity_name),
+                entity=MetricFlowEntityReference(entity_name=entity_name),
             ),
             message="Something caused a warning, problem #1",
         )
     )
     issues.append(
         ValidationWarning(
-            context=EntityElementContext(
+            context=MetricFlowEntityElementContext(
                 file_context=file_context,
-                entity_element=EntityElementReference(
+                entity_element=MetricFlowEntityElementReference(
                     entity_name=entity_name, element_name="My dimension"
                 ),
-                element_type=EntityElementType.DIMENSION,
+                element_type=MetricFlowEntityElementType.DIMENSION,
             ),
             message="Something caused a warning, problem #2",
         )
     )
     issues.append(
         ValidationFutureError(
-            context=EntityElementContext(
+            context=MetricFlowEntityElementContext(
                 file_context=file_context,
-                entity_element=EntityElementReference(
+                entity_element=MetricFlowEntityElementReference(
                     entity_name=entity_name, element_name="My identifier"
                 ),
-                element_type=EntityElementType.IDENTIFIER,
+                element_type=MetricFlowEntityElementType.IDENTIFIER,
             ),
             message="Something caused a future error, problem #3",
             error_date=date(2022, 6, 13),
@@ -65,13 +65,13 @@ def list_of_issues() -> List[ValidationIssueType]:  # noqa: D
     )
     issues.append(
         ValidationError(
-            context=EntityElementContext(
+            context=MetricFlowEntityElementContext(
                 file_context=file_context,
                 entity_name=entity_name,
-                entity_element=EntityElementReference(
+                entity_element=MetricFlowEntityElementReference(
                     entity_name=entity_name, element_name="My measure"
                 ),
-                element_type=EntityElementType.MEASURE,
+                element_type=MetricFlowEntityElementType.MEASURE,
             ),
             message="Something caused an error, problem #4",
         )

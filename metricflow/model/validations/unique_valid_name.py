@@ -4,17 +4,17 @@ import enum
 import re
 from typing import Dict, Tuple, List, Optional
 from metricflow.instances import (
-    EntityElementReference,
-    EntityReference,
+    MetricFlowEntityElementReference,
+    MetricFlowEntityReference,
     MetricModelReference,
 )
 
-from metricflow.model.objects.entity import Entity
+from metricflow.model.objects.conversions import MetricFlowMetricFlowEntity
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
-    EntityContext,
-    EntityElementContext,
-    EntityElementType,
+    MetricFlowEntityContext,
+    MetricFlowEntityElementContext,
+    MetricFlowEntityElementType,
     FileContext,
     MetricContext,
     ModelValidationRule,
@@ -93,7 +93,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking entity sub element names are unique")
-    def _validate_entity_elements(entity: Entity) -> List[ValidationIssueType]:
+    def _validate_entity_elements(entity: MetricFlowEntity) -> List[ValidationIssueType]:
         issues: List[ValidationIssueType] = []
         element_info_tuples: List[Tuple[ElementReference, str, ValidationContext]] = []
 
@@ -103,12 +103,12 @@ class UniqueAndValidNameRule(ModelValidationRule):
                     (
                         measure.reference,
                         "measure",
-                        EntityElementContext(
+                        MetricFlowEntityElementContext(
                             file_context=FileContext.from_metadata(metadata=entity.metadata),
-                            entity_element=EntityElementReference(
+                            entity_element=MetricFlowEntityElementReference(
                                 entity_name=entity.name, element_name=measure.name
                             ),
-                            element_type=EntityElementType.MEASURE,
+                            element_type=MetricFlowEntityElementType.MEASURE,
                         ),
                     )
                 )
@@ -118,12 +118,12 @@ class UniqueAndValidNameRule(ModelValidationRule):
                     (
                         identifier.reference,
                         "identifier",
-                        EntityElementContext(
+                        MetricFlowEntityElementContext(
                             file_context=FileContext.from_metadata(metadata=entity.metadata),
-                            entity_element=EntityElementReference(
+                            entity_element=MetricFlowEntityElementReference(
                                 entity_name=entity.name, element_name=identifier.name
                             ),
-                            element_type=EntityElementType.IDENTIFIER,
+                            element_type=MetricFlowEntityElementType.IDENTIFIER,
                         ),
                     )
                 )
@@ -133,12 +133,12 @@ class UniqueAndValidNameRule(ModelValidationRule):
                     (
                         dimension.reference,
                         "dimension",
-                        EntityElementContext(
+                        MetricFlowEntityElementContext(
                             file_context=FileContext.from_metadata(metadata=entity.metadata),
-                            entity_element=EntityElementReference(
+                            entity_element=MetricFlowEntityElementReference(
                                 entity_name=entity.name, element_name=dimension.name
                             ),
-                            element_type=EntityElementType.DIMENSION,
+                            element_type=MetricFlowEntityElementType.DIMENSION,
                         ),
                     )
                 )
@@ -172,9 +172,9 @@ class UniqueAndValidNameRule(ModelValidationRule):
                     (
                         entity.name,
                         "entity",
-                        EntityContext(
+                        MetricFlowEntityContext(
                             file_context=FileContext.from_metadata(metadata=entity.metadata),
-                            entity=EntityReference(entity_name=entity.name),
+                            entity=MetricFlowEntityReference(entity_name=entity.name),
                         ),
                     )
                 )

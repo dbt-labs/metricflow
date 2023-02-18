@@ -15,7 +15,7 @@ from metricflow.dataset.dataset import DataSet
 from metricflow.model.objects.constraints.where import WhereClauseConstraint
 from metricflow.model.objects.elements.dimension import DimensionType
 from metricflow.model.objects.elements.measure import Measure
-from metricflow.protocols.semantics import EntitySemanticsAccessor
+from metricflow.protocols.semantics import MetricFlowEntitySemanticsAccessor
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.specs import (
     DimensionSpec,
@@ -57,17 +57,17 @@ class WhereConstraintConverter:
     The WhereClauseConstraint model object contains a parsed set of element names, and as such conversion to
     a SpecWhereClauseConstraint requires semantic resolution of linkable specs across entities. This resolution
     has to happen for metrics and measures independently, as both can be constrained, so bolting this on
-    to something like EntitySemantics will not be adequate.
+    to something like MetricFlowEntitySemantics will not be adequate.
     """
 
     @staticmethod
     def _convert_to_linkable_specs(
-        entity_semantics: EntitySemanticsAccessor, where_constraint_names: List[str]
+        entity_semantics: MetricFlowEntitySemanticsAccessor, where_constraint_names: List[str]
     ) -> LinkableSpecSet:
         """Processes where_clause_constraint.linkable_names into associated LinkableInstanceSpecs (dims, times, ids)
 
         where_constraint_names: WhereConstraintClause.linkable_names
-        entity_semantics: EntitySemanticsAccessor from the instantiated class
+        entity_semantics: MetricFlowEntitySemanticsAccessor from the instantiated class
 
         output: InstanceSpecSet of Tuple(DimensionSpec), Tuple(TimeDimensionSpec), Tuple(IdentifierSpec)
         """
@@ -110,7 +110,7 @@ class WhereConstraintConverter:
 
     @staticmethod
     def convert_to_spec_where_constraint(
-        entity_semantics: EntitySemanticsAccessor, where_constraint: WhereClauseConstraint
+        entity_semantics: MetricFlowEntitySemanticsAccessor, where_constraint: WhereClauseConstraint
     ) -> SpecWhereClauseConstraint:
         """Converts a where constraint to one using specs."""
         return SpecWhereClauseConstraint(

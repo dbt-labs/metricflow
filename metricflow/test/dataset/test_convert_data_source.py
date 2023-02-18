@@ -2,7 +2,7 @@ import logging
 
 from _pytest.fixtures import FixtureRequest
 
-from metricflow.instances import EntityReference
+from metricflow.instances import MetricFlowEntityReference
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.specs import (
     DimensionSpec,
@@ -76,7 +76,7 @@ def test_convert_table_entity_without_measures(  # noqa: D
     )
 
     assert users_data_set.instance_set.spec_set == expected_spec_set
-    assert users_data_set.entity_reference == EntityReference(entity_name="users_latest")
+    assert users_data_set.entity_reference == MetricFlowEntityReference(entity_name="users_latest")
     assert_rendered_sql_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
@@ -190,7 +190,7 @@ def test_convert_table_entity_with_measures(  # noqa: D
     )
 
     assert id_verifications_data_set.instance_set.spec_set == expected_spec_set
-    assert id_verifications_data_set.entity_reference == EntityReference(entity_name="id_verifications")
+    assert id_verifications_data_set.entity_reference == MetricFlowEntityReference(entity_name="id_verifications")
     assert_rendered_sql_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,

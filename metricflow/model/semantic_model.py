@@ -1,8 +1,8 @@
 from dbt.contracts.graph.manifest import UserConfiguredModel
-from metricflow.model.semantics.entity_container import PydanticEntityContainer
-from metricflow.model.semantics.entity_semantics import EntitySemantics
+from metricflow.model.semantics.entity_container import PydanticMetricFlowEntityContainer
+from metricflow.model.semantics.entity_semantics import MetricFlowEntitySemantics
 from metricflow.model.semantics.metric_semantics import MetricSemantics
-from metricflow.protocols.semantics import EntitySemanticsAccessor, MetricSemanticsAccessor
+from metricflow.protocols.semantics import MetricFlowEntitySemanticsAccessor, MetricSemanticsAccessor
 
 
 class SemanticModel:
@@ -10,8 +10,8 @@ class SemanticModel:
 
     def __init__(self, user_configured_model: UserConfiguredModel) -> None:  # noqa: D
         self._user_configured_model = user_configured_model
-        self._entity_semantics = EntitySemantics(
-            user_configured_model, PydanticEntityContainer(user_configured_model.entities)
+        self._entity_semantics = MetricFlowEntitySemantics(
+            user_configured_model, PydanticMetricFlowEntityContainer(user_configured_model.entities)
         )
         self._metric_semantics = MetricSemantics(self._user_configured_model, self._entity_semantics)
 
@@ -20,7 +20,7 @@ class SemanticModel:
         return self._user_configured_model
 
     @property
-    def entity_semantics(self) -> EntitySemanticsAccessor:  # noqa: D
+    def entity_semantics(self) -> MetricFlowEntitySemanticsAccessor:  # noqa: D
         return self._entity_semantics
 
     @property

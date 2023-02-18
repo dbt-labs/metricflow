@@ -75,10 +75,10 @@
                                 <!-- aggregation_time_dimension = ds -->
                                 <ReadSqlSourceNode>
                                     <!-- description =                                                                              -->
-                                    <!--   Read From EntityDataSet(EntityReference(entity_name='account_month_txns'))  -->
+                                    <!--   Read From MetricFlowEntityDataSet(MetricFlowEntityReference(entity_name='account_month_txns'))  -->
                                     <!-- node_id = rss_10025 -->
                                     <!-- data_set =                                                                       -->
-                                    <!--   EntityDataSet(EntityReference(entity_name='account_month_txns'))  -->
+                                    <!--   MetricFlowEntityDataSet(MetricFlowEntityReference(entity_name='account_month_txns'))  -->
                                 </ReadSqlSourceNode>
                             </MetricTimeDimensionTransformNode>
                         </FilterElementsNode>
@@ -123,10 +123,10 @@
                                 <!--    'validity_window': None}                                                                                                  -->
                                 <ReadSqlSourceNode>
                                     <!-- description =                                                                        -->
-                                    <!--   Read From EntityDataSet(EntityReference(entity_name='bridge_table'))  -->
+                                    <!--   Read From MetricFlowEntityDataSet(MetricFlowEntityReference(entity_name='bridge_table'))  -->
                                     <!-- node_id = rss_10026 -->
                                     <!-- data_set =                                                                 -->
-                                    <!--   EntityDataSet(EntityReference(entity_name='bridge_table'))  -->
+                                    <!--   MetricFlowEntityDataSet(MetricFlowEntityReference(entity_name='bridge_table'))  -->
                                 </ReadSqlSourceNode>
                                 <FilterElementsNode>
                                     <!-- description =                                 -->
@@ -226,10 +226,10 @@
                                     <!--    'identifier_links': ()}         -->
                                     <ReadSqlSourceNode>
                                         <!-- description =                                                                          -->
-                                        <!--   Read From EntityDataSet(EntityReference(entity_name='customer_table'))  -->
+                                        <!--   Read From MetricFlowEntityDataSet(MetricFlowEntityReference(entity_name='customer_table'))  -->
                                         <!-- node_id = rss_10028 -->
                                         <!-- data_set =                                                                   -->
-                                        <!--   EntityDataSet(EntityReference(entity_name='customer_table'))  -->
+                                        <!--   MetricFlowEntityDataSet(MetricFlowEntityReference(entity_name='customer_table'))  -->
                                     </ReadSqlSourceNode>
                                 </FilterElementsNode>
                             </JoinToBaseOutputNode>

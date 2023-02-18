@@ -10,9 +10,9 @@ from metricflow.model.objects.metric import Metric
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.validations.unique_valid_name import UniqueAndValidNameRule
 from metricflow.model.validations.validator_helpers import (
-    EntityElementContext,
-    EntityElementReference,
-    EntityElementType,
+    MetricFlowEntityElementContext,
+    MetricFlowEntityElementReference,
+    MetricFlowEntityElementType,
     FileContext,
     MetricContext,
     ModelValidationRule,
@@ -24,7 +24,7 @@ from metricflow.model.validations.validator_helpers import (
 from metricflow.references import MeasureReference
 
 
-class EntityMeasuresUniqueRule(ModelValidationRule):
+class MetricFlowEntityMeasuresUniqueRule(ModelValidationRule):
     """Asserts all measure names are unique across the model."""
 
     @staticmethod
@@ -40,12 +40,12 @@ class EntityMeasuresUniqueRule(ModelValidationRule):
                 if measure.reference in measure_references_to_entities:
                     issues.append(
                         ValidationError(
-                            context=EntityElementContext(
+                            context=MetricFlowEntityElementContext(
                                 file_context=FileContext.from_metadata(metadata=entity.metadata),
-                                entity_element=EntityElementReference(
+                                entity_element=MetricFlowEntityElementReference(
                                     entity_name=entity.name, element_name=measure.name
                                 ),
-                                element_type=EntityElementType.MEASURE,
+                                element_type=MetricFlowEntityElementType.MEASURE,
                             ),
                             message=f"Found measure with name {measure.name} in multiple entities with names "
                             f"({measure_references_to_entities[measure.reference]})",
@@ -242,12 +242,12 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                     # Sanity check, should never hit this
                     issues.append(
                         ValidationError(
-                            context=EntityElementContext(
+                            context=MetricFlowEntityElementContext(
                                 file_context=FileContext.from_metadata(metadata=entity.metadata),
-                                entity_element=EntityElementReference(
+                                entity_element=MetricFlowEntityElementReference(
                                     entity_name=entity.name, element_name=measure.name
                                 ),
-                                element_type=EntityElementType.MEASURE,
+                                element_type=MetricFlowEntityElementType.MEASURE,
                             ),
                             message=(
                                 f"Measure '{measure.name}' has a agg_time_dimension of {measure.checked_agg_time_dimension.element_name} "
@@ -264,12 +264,12 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                 if matching_dimension is None:
                     issues.append(
                         ValidationError(
-                            context=EntityElementContext(
+                            context=MetricFlowEntityElementContext(
                                 file_context=FileContext.from_metadata(metadata=entity.metadata),
-                                entity_element=EntityElementReference(
+                                entity_element=MetricFlowEntityElementReference(
                                     entity_name=entity.name, element_name=measure.name
                                 ),
-                                element_type=EntityElementType.MEASURE,
+                                element_type=MetricFlowEntityElementType.MEASURE,
                             ),
                             message=(
                                 f"Measure '{measure.name}' has a non_additive_dimension with name '{non_additive_dimension.name}' "
@@ -282,12 +282,12 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                     if matching_dimension.type != DimensionType.TIME:
                         issues.append(
                             ValidationError(
-                                context=EntityElementContext(
+                                context=MetricFlowEntityElementContext(
                                     file_context=FileContext.from_metadata(metadata=entity.metadata),
-                                    entity_element=EntityElementReference(
+                                    entity_element=MetricFlowEntityElementReference(
                                         entity_name=entity.name, element_name=measure.name
                                     ),
-                                    element_type=EntityElementType.MEASURE,
+                                    element_type=MetricFlowEntityElementType.MEASURE,
                                 ),
                                 message=(
                                     f"Measure '{measure.name}' has a non_additive_dimension with name '{non_additive_dimension.name}' "
@@ -307,12 +307,12 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                     ):
                         issues.append(
                             ValidationError(
-                                context=EntityElementContext(
+                                context=MetricFlowEntityElementContext(
                                     file_context=FileContext.from_metadata(metadata=entity.metadata),
-                                    entity_element=EntityElementReference(
+                                    entity_element=MetricFlowEntityElementReference(
                                         entity_name=entity.name, element_name=measure.name
                                     ),
-                                    element_type=EntityElementType.MEASURE,
+                                    element_type=MetricFlowEntityElementType.MEASURE,
                                 ),
                                 message=(
                                     f"Measure '{measure.name}' has a non_additive_dimension with name '{non_additive_dimension.name}' that has "
@@ -326,12 +326,12 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                 if non_additive_dimension.window_choice not in {AggregationType.MIN, AggregationType.MAX}:
                     issues.append(
                         ValidationError(
-                            context=EntityElementContext(
+                            context=MetricFlowEntityElementContext(
                                 file_context=FileContext.from_metadata(metadata=entity.metadata),
-                                entity_element=EntityElementReference(
+                                entity_element=MetricFlowEntityElementReference(
                                     entity_name=entity.name, element_name=measure.name
                                 ),
-                                element_type=EntityElementType.MEASURE,
+                                element_type=MetricFlowEntityElementType.MEASURE,
                             ),
                             message=(
                                 f"Measure '{measure.name}' has a non_additive_dimension with an invalid 'window_choice' of '{non_additive_dimension.window_choice.value}'. "
@@ -347,12 +347,12 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                 if len(intersected_identifiers) != len(window_groupings):
                     issues.append(
                         ValidationError(
-                            context=EntityElementContext(
+                            context=MetricFlowEntityElementContext(
                                 file_context=FileContext.from_metadata(metadata=entity.metadata),
-                                entity_element=EntityElementReference(
+                                entity_element=MetricFlowEntityElementReference(
                                     entity_name=entity.name, element_name=measure.name
                                 ),
-                                element_type=EntityElementType.MEASURE,
+                                element_type=MetricFlowEntityElementType.MEASURE,
                             ),
                             message=(
                                 f"Measure '{measure.name}' has a non_additive_dimension with an invalid 'window_groupings'. "
@@ -376,12 +376,12 @@ class CountAggregationExprRule(ModelValidationRule):
 
         for entity in model.entities:
             for measure in entity.measures:
-                context = EntityElementContext(
+                context = MetricFlowEntityElementContext(
                     file_context=FileContext.from_metadata(metadata=entity.metadata),
-                    entity_element=EntityElementReference(
+                    entity_element=MetricFlowEntityElementReference(
                         entity_name=entity.name, element_name=measure.name
                     ),
-                    element_type=EntityElementType.MEASURE,
+                    element_type=MetricFlowEntityElementType.MEASURE,
                 )
                 if measure.agg == AggregationType.COUNT and measure.expr is None:
                     issues.append(
@@ -427,12 +427,12 @@ class PercentileAggregationRule(ModelValidationRule):
 
         for entity in model.entities:
             for measure in entity.measures:
-                context = EntityElementContext(
+                context = MetricFlowEntityElementContext(
                     file_context=FileContext.from_metadata(metadata=entity.metadata),
-                    entity_element=EntityElementReference(
+                    entity_element=MetricFlowEntityElementReference(
                         entity_name=entity.name, element_name=measure.name
                     ),
-                    element_type=EntityElementType.MEASURE,
+                    element_type=MetricFlowEntityElementType.MEASURE,
                 )
                 if measure.agg == AggregationType.PERCENTILE:
                     if measure.agg_params is None or measure.agg_params.percentile is None:

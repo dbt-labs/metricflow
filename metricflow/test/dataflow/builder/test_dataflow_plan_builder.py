@@ -5,7 +5,7 @@ from _pytest.fixtures import FixtureRequest
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
-from metricflow.dataset.entity_adapter import EntityDataSet
+from metricflow.dataset.entity_adapter import MetricFlowEntityDataSet
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.specs import (
@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 def test_simple_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
 ) -> None:
     """Tests a simple plan getting a metric and a local dimension."""
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -64,7 +64,7 @@ def test_simple_plan(  # noqa: D
 def test_joined_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
 ) -> None:
     """Tests a plan getting a measure and a joined dimension."""
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -100,7 +100,7 @@ def test_joined_plan(  # noqa: D
 def test_order_by_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
 ) -> None:
     """Tests a plan with an order by."""
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -137,7 +137,7 @@ def test_order_by_plan(  # noqa: D
 def test_limit_rows_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
 ) -> None:
     """Tests a plan with a limit to the number of rows returned."""
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -165,7 +165,7 @@ def test_limit_rows_plan(  # noqa: D
 def test_multiple_metrics_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
 ) -> None:
     """Tests a plan to retrieve multiple metrics."""
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -198,7 +198,7 @@ def test_multiple_metrics_plan(  # noqa: D
 def test_expr_metrics_plan(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
 ) -> None:
     """Tests a plan to retrieve expr metric types"""
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -231,7 +231,7 @@ def test_expr_metrics_plan(
 def test_single_entity_ratio_metrics_plan(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
 ) -> None:
     """Tests a plan to retrieve a ratio where both measures come from one entity"""
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -264,7 +264,7 @@ def test_single_entity_ratio_metrics_plan(
 def test_multi_entity_ratio_metrics_plan(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
 ) -> None:
     """Tests a plan to retrieve a ratio where both measures come from one entity"""
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -297,7 +297,7 @@ def test_multi_entity_ratio_metrics_plan(
 def test_multihop_join_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    multihop_dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
+    multihop_dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
 ) -> None:
     """Tests a plan with an order by."""
     dataflow_plan = multihop_dataflow_plan_builder.build_plan(
@@ -332,7 +332,7 @@ def test_multihop_join_plan(  # noqa: D
 def test_where_constrained_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
 ) -> None:
     """Tests a simple plan getting a metric and a local dimension."""
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -377,7 +377,7 @@ def test_where_constrained_plan(  # noqa: D
 def test_where_constrained_plan_time_dimension(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
 ) -> None:
     """Tests a simple plan getting a metric and a local dimension."""
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -415,7 +415,7 @@ def test_where_constrained_plan_time_dimension(  # noqa: D
 def test_where_constrained_with_common_linkable_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
 ) -> None:
     """Tests a dataflow plan where the where clause has a common linkable with the query."""
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -459,7 +459,7 @@ def test_where_constrained_with_common_linkable_plan(  # noqa: D
 
 def test_multihop_join_plan_ambiguous_dim(  # noqa: D
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
 ) -> None:
     """Checks that an exception is thrown when trying to build a plan with an ambiguous dimension."""
     with pytest.raises(UnableToSatisfyQueryError):
@@ -482,7 +482,7 @@ def test_multihop_join_plan_ambiguous_dim(  # noqa: D
 def test_cumulative_metric(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
 ) -> None:
     """Tests a plan to compute a cumulative metric."""
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -510,7 +510,7 @@ def test_cumulative_metric(  # noqa: D
 def test_distinct_values_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
 ) -> None:
     """Tests a plan to get distinct values of a dimension."""
     dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
@@ -539,7 +539,7 @@ def test_distinct_values_plan(  # noqa: D
 def test_measure_constraint_plan(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
 ) -> None:
     """Tests a plan for querying a metric with a constraint on one or more of its input measures."""
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -567,7 +567,7 @@ def test_measure_constraint_plan(
 def test_measure_constraint_with_reused_measure_plan(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
 ) -> None:
     """Tests a plan for querying a metric with a constraint on one or more of its input measures."""
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -595,7 +595,7 @@ def test_measure_constraint_with_reused_measure_plan(
 def test_common_entity(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
 ) -> None:
     """Tests a simple plan getting a metric and a local dimension."""
     dataflow_plan = dataflow_plan_builder.build_plan(

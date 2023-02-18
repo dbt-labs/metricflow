@@ -85,10 +85,10 @@
                                 <!-- aggregation_time_dimension = ds -->
                                 <ReadSqlSourceNode>
                                     <!-- description =                                                                           -->
-                                    <!--   Read From EntityDataSet(EntityReference(entity_name='bookings_source'))  -->
+                                    <!--   Read From MetricFlowEntityDataSet(MetricFlowEntityReference(entity_name='bookings_source'))  -->
                                     <!-- node_id = rss_4 -->
                                     <!-- data_set =                                                                    -->
-                                    <!--   EntityDataSet(EntityReference(entity_name='bookings_source'))  -->
+                                    <!--   MetricFlowEntityDataSet(MetricFlowEntityReference(entity_name='bookings_source'))  -->
                                 </ReadSqlSourceNode>
                             </MetricTimeDimensionTransformNode>
                         </FilterElementsNode>
@@ -111,10 +111,10 @@
                                 <!-- aggregation_time_dimension = ds -->
                                 <ReadSqlSourceNode>
                                     <!-- description =                                                                           -->
-                                    <!--   Read From EntityDataSet(EntityReference(entity_name='listings_latest'))  -->
+                                    <!--   Read From MetricFlowEntityDataSet(MetricFlowEntityReference(entity_name='listings_latest'))  -->
                                     <!-- node_id = rss_5 -->
                                     <!-- data_set =                                                                    -->
-                                    <!--   EntityDataSet(EntityReference(entity_name='listings_latest'))  -->
+                                    <!--   MetricFlowEntityDataSet(MetricFlowEntityReference(entity_name='listings_latest'))  -->
                                 </ReadSqlSourceNode>
                             </MetricTimeDimensionTransformNode>
                         </FilterElementsNode>

@@ -8,7 +8,7 @@ from metricflow.model.model_validator import ModelValidator
 from metricflow.model.parsing.dir_to_model import parse_yaml_files_to_validation_ready_model
 from metricflow.model.validations.measures import (
     CountAggregationExprRule,
-    EntityMeasuresUniqueRule,
+    MetricFlowEntityMeasuresUniqueRule,
     MeasureConstraintAliasesRule,
     MeasuresNonAdditiveDimensionRule,
     MetricMeasuresRule,
@@ -107,7 +107,7 @@ def test_measures_only_exist_in_one_entity() -> None:  # noqa: D
     )
     dup_measure_file = YamlConfigFile(filepath="inline_for_test_2", contents=yaml_contents_2)
     dup_model = parse_yaml_files_to_validation_ready_model([base_file, dup_measure_file])
-    build = ModelValidator([EntityMeasuresUniqueRule()]).validate_model(dup_model.model)
+    build = ModelValidator([MetricFlowEntityMeasuresUniqueRule()]).validate_model(dup_model.model)
 
     if build.issues is not None:
         for issue in build.issues.all_issues:

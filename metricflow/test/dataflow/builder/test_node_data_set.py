@@ -8,7 +8,7 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.instances import (
     InstanceSet,
     MeasureInstance,
-    EntityElementReference,
+    MetricFlowEntityElementReference,
 )
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
@@ -52,7 +52,7 @@ def test_no_parent_node_data_set(
                         ),
                     ),
                     defined_from=(
-                        EntityElementReference(
+                        MetricFlowEntityElementReference(
                             entity_name="fct_bookings_entity", element_name="bookings"
                         ),
                     ),

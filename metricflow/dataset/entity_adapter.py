@@ -1,14 +1,14 @@
-from metricflow.instances import EntityReference, InstanceSet
+from metricflow.instances import MetricFlowEntityReference, InstanceSet
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.sql.sql_plan import SqlSelectStatementNode
 
 
-class EntityDataSet(SqlDataSet):
+class MetricFlowEntityDataSet(SqlDataSet):
     """Similar to SqlDataSet, but contains metadata on the entity that was used to create this."""
 
     def __init__(  # noqa: D
         self,
-        entity_reference: EntityReference,
+        entity_reference: MetricFlowEntityReference,
         instance_set: InstanceSet,
         sql_select_node: SqlSelectStatementNode,
     ) -> None:
@@ -19,5 +19,5 @@ class EntityDataSet(SqlDataSet):
         return f"{self.__class__.__name__}({self._entity_reference})"
 
     @property
-    def entity_reference(self) -> EntityReference:  # noqa: D
+    def entity_reference(self) -> MetricFlowEntityReference:  # noqa: D
         return self._entity_reference

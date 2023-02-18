@@ -3,9 +3,9 @@ import logging
 import pytest
 
 from dbt.contracts.graph.manifest import UserConfiguredModel
-from metricflow.model.semantics.entity_container import PydanticEntityContainer
+from metricflow.model.semantics.entity_container import PydanticMetricFlowEntityContainer
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
-from metricflow.model.semantics.entity_semantics import EntitySemantics
+from metricflow.model.semantics.entity_semantics import MetricFlowEntitySemantics
 from metricflow.model.semantics.metric_semantics import MetricSemantics
 from metricflow.references import IdentifierReference, MeasureReference
 from metricflow.references import MetricReference
@@ -14,16 +14,16 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.fixture
-def new_entity_semantics(simple_user_configured_model: UserConfiguredModel) -> EntitySemantics:  # Noqa: D
-    return EntitySemantics(
+def new_entity_semantics(simple_user_configured_model: UserConfiguredModel) -> MetricFlowEntitySemantics:  # Noqa: D
+    return MetricFlowEntitySemantics(
         model=simple_user_configured_model,
-        configured_entity_container=PydanticEntityContainer(simple_user_configured_model.entities),
+        configured_entity_container=PydanticMetricFlowEntityContainer(simple_user_configured_model.entities),
     )
 
 
 @pytest.fixture
 def new_metric_semantics(  # Noqa: D
-    simple_user_configured_model: UserConfiguredModel, new_entity_semantics: EntitySemantics
+    simple_user_configured_model: UserConfiguredModel, new_entity_semantics: MetricFlowEntitySemantics
 ) -> MetricSemantics:
     return MetricSemantics(
         user_configured_model=simple_user_configured_model,
@@ -31,7 +31,7 @@ def new_metric_semantics(  # Noqa: D
     )
 
 
-def test_get_names(new_entity_semantics: EntitySemantics) -> None:  # noqa: D
+def test_get_names(new_entity_semantics: MetricFlowEntitySemantics) -> None:  # noqa: D
     expected = [
         "account_type",
         "booking_paid_at",
@@ -89,7 +89,7 @@ def test_get_names(new_entity_semantics: EntitySemantics) -> None:  # noqa: D
     assert sorted([i.element_name for i in new_entity_semantics.get_identifier_references()]) == expected
 
 
-def test_get_elements(new_entity_semantics: EntitySemantics) -> None:  # noqa: D
+def test_get_elements(new_entity_semantics: MetricFlowEntitySemantics) -> None:  # noqa: D
     for dimension_reference in new_entity_semantics.get_dimension_references():
         assert (
             new_entity_semantics.get_dimension(dimension_reference=dimension_reference).reference
@@ -100,7 +100,7 @@ def test_get_elements(new_entity_semantics: EntitySemantics) -> None:  # noqa: D
         assert new_entity_semantics.get_measure(measure_reference=measure_reference).reference == measure_reference
 
 
-def test_get_entities_for_measure(new_entity_semantics: EntitySemantics) -> None:  # noqa: D
+def test_get_entities_for_measure(new_entity_semantics: MetricFlowEntitySemantics) -> None:  # noqa: D
     bookings_sources = new_entity_semantics.get_entities_for_measure(MeasureReference(element_name="bookings"))
     assert len(bookings_sources) == 1
     assert bookings_sources[0].name == "bookings_source"
@@ -197,7 +197,7 @@ def test_local_linked_elements_for_metric(new_metric_semantics: MetricSemantics)
     }
 
 
-def test_get_entities_for_identifier(new_entity_semantics: EntitySemantics) -> None:  # noqa: D
+def test_get_entities_for_identifier(new_entity_semantics: MetricFlowEntitySemantics) -> None:  # noqa: D
     identifier_reference = IdentifierReference(element_name="user")
     linked_entities = new_entity_semantics.get_entities_for_identifier(
         identifier_reference=identifier_reference

@@ -6,7 +6,7 @@ import dateutil.parser
 from _pytest.fixtures import FixtureRequest
 from typing import Callable, Tuple, List
 
-from metricflow.model.objects.entity import Entity
+from metricflow.model.objects.conversions import MetricFlowMetricFlowEntity
 from metricflow.model.objects.metric import Metric
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.protocols.sql_client import SqlClient
@@ -34,7 +34,7 @@ def should_skip_multi_threaded(
     return False
 
 
-def find_entity_with(model: UserConfiguredModel, function: Callable[[Entity], bool]) -> Tuple[Entity, int]:
+def find_entity_with(model: UserConfiguredModel, function: Callable[[MetricFlowEntity], bool]) -> Tuple[MetricFlowEntity, int]:
     """Returns a entity from the model which matches the criteria defined by the passed in function'
 
     This is useful because the order of entities in the list is non determinant, thus it's impossible to

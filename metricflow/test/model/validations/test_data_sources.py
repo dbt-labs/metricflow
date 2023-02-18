@@ -1,6 +1,6 @@
 import pytest
 
-from metricflow.model.objects.entity import MutabilityType, Mutability
+from dbt.contracts.graph.entities import MutabilityType, Mutability
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.test.model.validations.helpers import entity_with_guaranteed_meta

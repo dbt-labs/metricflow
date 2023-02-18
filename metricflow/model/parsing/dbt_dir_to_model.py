@@ -1,9 +1,10 @@
 from dataclasses import dataclass
 from dbt.lib import get_dbt_config
 from dbt import tracking
-from dbt.parser.manifest import ManifestLoader, Manifest
+from dbt.parser.manifest import ManifestLoader as DbtManifestLoader, Manifest as DbtManifest
 from metricflow.model.model_transformer import ModelTransformer
 from metricflow.model.parsing.dir_to_model import ModelBuildResult
+from metricflow.model.transformations.dbt_to_metricflow import DbtManifestTransformer
 from typing import Optional
 
 
@@ -22,7 +23,7 @@ class DbtProfileArgs:
 
 def get_dbt_project_manifest(
     directory: str, profile: Optional[str] = None, target: Optional[str] = None
-) -> Manifest:
+) -> DbtManifest:
     """Builds the dbt Manifest object from the dbt project"""
 
     profile_args = DbtProfileArgs(profile=profile, target=target)
@@ -30,5 +31,14 @@ def get_dbt_project_manifest(
     # If we don't disable tracking, we have to setup a full
     # dbt User object to build the manifest
     tracking.disable_tracking()
-    return ManifestLoader.get_full_manifest(config=dbt_config)
+    return DbtManifestLoader.get_full_manifest(config=dbt_config)
 
+
+def parse_dbt_project_to_model(
+    directory: str, profile: Optional[str] = None, target: Optional[str] = None
+) -> ModelBuildResult:
+    """Parse dbt model files in the given directory to a UserConfiguredModel."""
+    manifest = get_dbt_project_manifest(directory=directory, profile=profile, target=target)
+    build_result = DbtManifestTransformer(manifest=manifest).build_user_configured_model()
+    transformed_model = ModelTransformer.transform(model=build_result.model)
+    return ModelBuildResult(model=transformed_model, issues=build_result.issues)

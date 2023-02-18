@@ -11,8 +11,9 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import Dict, FrozenSet, List, Optional, Protocol, Sequence, Set, Tuple
 
-from metricflow.instances import EntityElementReference, EntityReference
-from metricflow.model.objects.entity import Entity, EntityOrigin
+from metricflow.instances import MetricFlowEntityElementReference, MetricFlowEntityReference
+from metricflow.model.objects.conversions import MetricFlowMetricFlowEntity
+from dbt.contracts.graph.entities import MetricFlowEntityOrigin
 from metricflow.model.objects.elements.dimension import Dimension
 from metricflow.model.objects.elements.identifier import Identifier
 from metricflow.model.objects.elements.measure import Measure
@@ -36,11 +37,11 @@ from metricflow.specs import (
 )
 
 
-class EntitySemanticsAccessor(Protocol):
+class MetricFlowEntitySemanticsAccessor(Protocol):
     """Protocol defining core interface for accessing semantic information about a set of entity objects
 
     This is primarily useful for restricting caller access to the subset of container methods and imports we want
-    them to use. For example, the EntitySemantics class might implement this protocol but also include some
+    them to use. For example, the MetricFlowEntitySemantics class might implement this protocol but also include some
     public methods for adding or removing entities from the container, while this protocol only allows the
     caller to invoke the accessor methods which retrieve semantic information about the collected entities.
     """
@@ -52,7 +53,7 @@ class EntitySemanticsAccessor(Protocol):
 
     @abstractmethod
     def get_dimension(
-        self, dimension_reference: DimensionReference, origin: Optional[EntityOrigin] = None
+        self, dimension_reference: DimensionReference, origin: Optional[MetricFlowEntityOrigin] = None
     ) -> Dimension:
         """Retrieve the dimension model object associated with the time dimension reference"""
         raise NotImplementedError
@@ -88,7 +89,7 @@ class EntitySemanticsAccessor(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    def get_entities_for_measure(self, measure_reference: MeasureReference) -> List[Entity]:
+    def get_entities_for_measure(self, measure_reference: MeasureReference) -> List[MetricFlowEntity]:
         """Retrieve a list of all entity model objects associated with the measure reference"""
         raise NotImplementedError
 
@@ -97,35 +98,35 @@ class EntitySemanticsAccessor(Protocol):
         """Retrieves the aggregate time dimension that is associated with the measure reference"""
 
     @abstractmethod
-    def get_identifier_in_entity(self, ref: EntityElementReference) -> Optional[Identifier]:
+    def get_identifier_in_entity(self, ref: MetricFlowEntityElementReference) -> Optional[Identifier]:
         """Retrieve the identifier matching the element -> entity mapping, if any"""
         raise NotImplementedError
 
     @abstractmethod
-    def get(self, entity_name: str) -> Optional[Entity]:
+    def get(self, entity_name: str) -> Optional[MetricFlowEntity]:
         """Retrieve the entity model object matching the given name, if any"""
         raise NotImplementedError
 
     @abstractmethod
-    def get_by_reference(self, entity_reference: EntityReference) -> Optional[Entity]:
+    def get_by_reference(self, entity_reference: MetricFlowEntityReference) -> Optional[MetricFlowEntity]:
         """Retrieve the entity model object matching the input entity reference, if any"""
         raise NotImplementedError
 
     @property
     @abstractmethod
-    def entity_references(self) -> Sequence[EntityReference]:
-        """Return all EntityReference objects associated with the entities in the collection"""
+    def entity_references(self) -> Sequence[MetricFlowEntityReference]:
+        """Return all MetricFlowEntityReference objects associated with the entities in the collection"""
         raise NotImplementedError
 
     @abstractmethod
     def get_aggregation_time_dimensions_with_measures(
-        self, entity_reference: EntityReference
+        self, entity_reference: MetricFlowEntityReference
     ) -> ElementGrouper[TimeDimensionReference, MeasureSpec]:
         """Return all aggregation time dimensions in the given entity with their associated measures"""
         raise NotImplementedError
 
     @abstractmethod
-    def get_entities_for_identifier(self, identifier_reference: IdentifierReference) -> Set[Entity]:
+    def get_entities_for_identifier(self, identifier_reference: IdentifierReference) -> Set[MetricFlowEntity]:
         """Return all entities associated with an identifier reference"""
         raise NotImplementedError
 

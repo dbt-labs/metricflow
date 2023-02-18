@@ -41,7 +41,7 @@ class NonExistentMeasureError(SemanticException):  # noqa:D
     pass
 
 
-class InvalidEntityError(SemanticException):  # noqa:D
+class InvalidMetricFlowEntityError(SemanticException):  # noqa:D
     pass
 
 

@@ -4,8 +4,8 @@ import pytest
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, FilterElementsNode, MetricTimeDimensionTransformNode
-from metricflow.dataset.convert_entity import EntityToDataSetConverter
-from metricflow.instances import EntityReference
+from metricflow.dataset.convert_entity import MetricFlowEntityToDataSetConverter
+from metricflow.instances import MetricFlowEntityReference
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.object_utils import pformat_big_objects
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
@@ -29,13 +29,13 @@ def test_view_sql_generated_at_a_node(
 ) -> None:
     """Example that shows how to view generated SQL for nodes in a dataflow plan."""
     bookings_entity = simple_semantic_model.entity_semantics.get_by_reference(
-        EntityReference(entity_name="bookings_source")
+        MetricFlowEntityReference(entity_name="bookings_source")
     )
     assert bookings_entity
     column_association_resolver = DefaultColumnAssociationResolver(
         semantic_model=simple_semantic_model,
     )
-    to_data_set_converter = EntityToDataSetConverter(column_association_resolver)
+    to_data_set_converter = MetricFlowEntityToDataSetConverter(column_association_resolver)
 
     to_sql_plan_converter = DataflowToSqlQueryPlanConverter[SqlDataSet](
         column_association_resolver=DefaultColumnAssociationResolver(simple_semantic_model),

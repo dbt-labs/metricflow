@@ -23,7 +23,7 @@ from metricflow.dataflow.dataflow_plan import (
     JoinToTimeSpineNode,
 )
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
-from metricflow.dataset.entity_adapter import EntityDataSet
+from metricflow.dataset.entity_adapter import MetricFlowEntityDataSet
 from metricflow.dataset.dataset import DataSet
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
@@ -64,8 +64,8 @@ from metricflow.model.objects.metric import MetricTimeWindow
 def composite_dataflow_to_sql_converter(  # noqa: D
     composite_identifier_semantic_model: SemanticModel,
     time_spine_source: TimeSpineSource,
-) -> DataflowToSqlQueryPlanConverter[EntityDataSet]:
-    return DataflowToSqlQueryPlanConverter[EntityDataSet](
+) -> DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet]:
+    return DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet](
         column_association_resolver=DefaultColumnAssociationResolver(composite_identifier_semantic_model),
         semantic_model=composite_identifier_semantic_model,
         time_spine_source=time_spine_source,
@@ -76,8 +76,8 @@ def composite_dataflow_to_sql_converter(  # noqa: D
 def multihop_dataflow_to_sql_converter(  # noqa: D
     multi_hop_join_semantic_model: SemanticModel,
     time_spine_source: TimeSpineSource,
-) -> DataflowToSqlQueryPlanConverter[EntityDataSet]:
-    return DataflowToSqlQueryPlanConverter[EntityDataSet](
+) -> DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet]:
+    return DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet](
         column_association_resolver=DefaultColumnAssociationResolver(multi_hop_join_semantic_model),
         semantic_model=multi_hop_join_semantic_model,
         time_spine_source=time_spine_source,
@@ -88,8 +88,8 @@ def multihop_dataflow_to_sql_converter(  # noqa: D
 def scd_dataflow_to_sql_converter(  # noqa: D
     scd_semantic_model: SemanticModel,
     time_spine_source: TimeSpineSource,
-) -> DataflowToSqlQueryPlanConverter[EntityDataSet]:
-    return DataflowToSqlQueryPlanConverter[EntityDataSet](
+) -> DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet]:
+    return DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet](
         column_association_resolver=DefaultColumnAssociationResolver(scd_semantic_model),
         semantic_model=scd_semantic_model,
         time_spine_source=time_spine_source,
@@ -99,9 +99,9 @@ def scd_dataflow_to_sql_converter(  # noqa: D
 def convert_and_check(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     sql_client: SqlClient,
-    node: BaseOutput[EntityDataSet],
+    node: BaseOutput[MetricFlowEntityDataSet],
 ) -> None:
     """Convert the dataflow plan to SQL and compare with snapshots."""
     # Generate plans w/o optimizers
@@ -156,7 +156,7 @@ def convert_and_check(
 def test_source_node(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -175,7 +175,7 @@ def test_source_node(  # noqa: D
 def test_filter_node(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -184,7 +184,7 @@ def test_filter_node(  # noqa: D
         element_name="bookings",
     )
     source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
-    filter_node = FilterElementsNode[EntityDataSet](
+    filter_node = FilterElementsNode[MetricFlowEntityDataSet](
         parent_node=source_node, include_specs=InstanceSpecSet(measure_specs=(measure_spec,))
     )
 
@@ -200,7 +200,7 @@ def test_filter_node(  # noqa: D
 def test_filter_with_where_constraint_node(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -211,11 +211,11 @@ def test_filter_with_where_constraint_node(  # noqa: D
     source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
 
     ds_spec = TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.DAY)
-    filter_node = FilterElementsNode[EntityDataSet](
+    filter_node = FilterElementsNode[MetricFlowEntityDataSet](
         parent_node=source_node,
         include_specs=InstanceSpecSet(measure_specs=(measure_spec,), time_dimension_specs=(ds_spec,)),
     )  # need to include ds_spec because where constraint operates on ds
-    where_constraint_node = WhereConstraintNode[EntityDataSet](
+    where_constraint_node = WhereConstraintNode[MetricFlowEntityDataSet](
         parent_node=filter_node,
         where_constraint=SpecWhereClauseConstraint(
             where_condition="ds = '2020-01-01'",
@@ -244,7 +244,7 @@ def test_filter_with_where_constraint_node(  # noqa: D
 def test_measure_aggregation_node(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -268,12 +268,12 @@ def test_measure_aggregation_node(  # noqa: D
     metric_input_measure_specs = tuple(MetricInputMeasureSpec(measure_spec=x) for x in measure_specs)
 
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
-    filtered_measure_node = FilterElementsNode[EntityDataSet](
+    filtered_measure_node = FilterElementsNode[MetricFlowEntityDataSet](
         parent_node=measure_source_node,
         include_specs=InstanceSpecSet(measure_specs=tuple(measure_specs)),
     )
 
-    aggregated_measure_node = AggregateMeasuresNode[EntityDataSet](
+    aggregated_measure_node = AggregateMeasuresNode[MetricFlowEntityDataSet](
         parent_node=filtered_measure_node, metric_input_measure_specs=metric_input_measure_specs
     )
 
@@ -289,7 +289,7 @@ def test_measure_aggregation_node(  # noqa: D
 def test_single_join_node(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -299,7 +299,7 @@ def test_single_join_node(  # noqa: D
     )
     identifier_spec = LinklessIdentifierSpec.from_element_name(element_name="listing")
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
-    filtered_measure_node = FilterElementsNode[EntityDataSet](
+    filtered_measure_node = FilterElementsNode[MetricFlowEntityDataSet](
         parent_node=measure_source_node,
         include_specs=InstanceSpecSet(
             measure_specs=(measure_spec,),
@@ -312,7 +312,7 @@ def test_single_join_node(  # noqa: D
         identifier_links=(),
     )
     dimension_source_node = consistent_id_object_repository.simple_model_read_nodes["listings_latest"]
-    filtered_dimension_node = FilterElementsNode[EntityDataSet](
+    filtered_dimension_node = FilterElementsNode[MetricFlowEntityDataSet](
         parent_node=dimension_source_node,
         include_specs=InstanceSpecSet(
             identifier_specs=(identifier_spec,),
@@ -320,7 +320,7 @@ def test_single_join_node(  # noqa: D
         ),
     )
 
-    join_node = JoinToBaseOutputNode[EntityDataSet](
+    join_node = JoinToBaseOutputNode[MetricFlowEntityDataSet](
         left_node=filtered_measure_node,
         join_targets=[
             JoinDescription(
@@ -344,7 +344,7 @@ def test_single_join_node(  # noqa: D
 def test_multi_join_node(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -354,7 +354,7 @@ def test_multi_join_node(
     )
     identifier_spec = LinklessIdentifierSpec.from_element_name(element_name="listing")
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
-    filtered_measure_node = FilterElementsNode[EntityDataSet](
+    filtered_measure_node = FilterElementsNode[MetricFlowEntityDataSet](
         parent_node=measure_source_node,
         include_specs=InstanceSpecSet(measure_specs=(measure_spec,), identifier_specs=(identifier_spec,)),
     )
@@ -364,7 +364,7 @@ def test_multi_join_node(
         identifier_links=(),
     )
     dimension_source_node = consistent_id_object_repository.simple_model_read_nodes["listings_latest"]
-    filtered_dimension_node = FilterElementsNode[EntityDataSet](
+    filtered_dimension_node = FilterElementsNode[MetricFlowEntityDataSet](
         parent_node=dimension_source_node,
         include_specs=InstanceSpecSet(
             identifier_specs=(identifier_spec,),
@@ -372,7 +372,7 @@ def test_multi_join_node(
         ),
     )
 
-    join_node = JoinToBaseOutputNode[EntityDataSet](
+    join_node = JoinToBaseOutputNode[MetricFlowEntityDataSet](
         left_node=filtered_measure_node,
         join_targets=[
             JoinDescription(
@@ -402,7 +402,7 @@ def test_multi_join_node(
 def test_compute_metrics_node(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -413,7 +413,7 @@ def test_compute_metrics_node(
     identifier_spec = LinklessIdentifierSpec.from_element_name(element_name="listing")
     metric_input_measure_specs = (MetricInputMeasureSpec(measure_spec=measure_spec),)
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
-    filtered_measure_node = FilterElementsNode[EntityDataSet](
+    filtered_measure_node = FilterElementsNode[MetricFlowEntityDataSet](
         parent_node=measure_source_node,
         include_specs=InstanceSpecSet(
             measure_specs=(measure_spec,),
@@ -426,7 +426,7 @@ def test_compute_metrics_node(
         identifier_links=(),
     )
     dimension_source_node = consistent_id_object_repository.simple_model_read_nodes["listings_latest"]
-    filtered_dimension_node = FilterElementsNode[EntityDataSet](
+    filtered_dimension_node = FilterElementsNode[MetricFlowEntityDataSet](
         parent_node=dimension_source_node,
         include_specs=InstanceSpecSet(
             identifier_specs=(identifier_spec,),
@@ -434,7 +434,7 @@ def test_compute_metrics_node(
         ),
     )
 
-    join_node = JoinToBaseOutputNode[EntityDataSet](
+    join_node = JoinToBaseOutputNode[MetricFlowEntityDataSet](
         left_node=filtered_measure_node,
         join_targets=[
             JoinDescription(
@@ -446,12 +446,12 @@ def test_compute_metrics_node(
         ],
     )
 
-    aggregated_measure_node = AggregateMeasuresNode[EntityDataSet](
+    aggregated_measure_node = AggregateMeasuresNode[MetricFlowEntityDataSet](
         parent_node=join_node, metric_input_measure_specs=metric_input_measure_specs
     )
 
     metric_spec = MetricSpec(element_name="bookings")
-    compute_metrics_node = ComputeMetricsNode[EntityDataSet](
+    compute_metrics_node = ComputeMetricsNode[MetricFlowEntityDataSet](
         parent_node=aggregated_measure_node, metric_specs=[metric_spec]
     )
 
@@ -467,7 +467,7 @@ def test_compute_metrics_node(
 def test_compute_metrics_node_simple_expr(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -478,7 +478,7 @@ def test_compute_metrics_node_simple_expr(
     identifier_spec = LinklessIdentifierSpec.from_element_name(element_name="listing")
     metric_input_measure_specs = (MetricInputMeasureSpec(measure_spec=measure_spec),)
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
-    filtered_measure_node = FilterElementsNode[EntityDataSet](
+    filtered_measure_node = FilterElementsNode[MetricFlowEntityDataSet](
         parent_node=measure_source_node,
         include_specs=InstanceSpecSet(measure_specs=(measure_spec,), identifier_specs=(identifier_spec,)),
     )
@@ -488,7 +488,7 @@ def test_compute_metrics_node_simple_expr(
         identifier_links=(),
     )
     dimension_source_node = consistent_id_object_repository.simple_model_read_nodes["listings_latest"]
-    filtered_dimension_node = FilterElementsNode[EntityDataSet](
+    filtered_dimension_node = FilterElementsNode[MetricFlowEntityDataSet](
         parent_node=dimension_source_node,
         include_specs=InstanceSpecSet(
             identifier_specs=(identifier_spec,),
@@ -496,7 +496,7 @@ def test_compute_metrics_node_simple_expr(
         ),
     )
 
-    join_node = JoinToBaseOutputNode[EntityDataSet](
+    join_node = JoinToBaseOutputNode[MetricFlowEntityDataSet](
         left_node=filtered_measure_node,
         join_targets=[
             JoinDescription(
@@ -508,15 +508,15 @@ def test_compute_metrics_node_simple_expr(
         ],
     )
 
-    aggregated_measures_node = AggregateMeasuresNode[EntityDataSet](
+    aggregated_measures_node = AggregateMeasuresNode[MetricFlowEntityDataSet](
         parent_node=join_node, metric_input_measure_specs=metric_input_measure_specs
     )
     metric_spec = MetricSpec(element_name="booking_fees")
-    compute_metrics_node = ComputeMetricsNode[EntityDataSet](
+    compute_metrics_node = ComputeMetricsNode[MetricFlowEntityDataSet](
         parent_node=aggregated_measures_node, metric_specs=[metric_spec]
     )
 
-    sink_node = WriteToResultDataframeNode[EntityDataSet](compute_metrics_node)
+    sink_node = WriteToResultDataframeNode[MetricFlowEntityDataSet](compute_metrics_node)
     dataflow_plan = DataflowPlan("plan0", sink_output_nodes=[sink_node])
 
     assert_plan_snapshot_text_equal(
@@ -544,7 +544,7 @@ def test_compute_metrics_node_simple_expr(
 def test_join_to_time_spine_node_without_offset(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -560,17 +560,17 @@ def test_join_to_time_spine_node_without_offset(  # noqa: D
         parent_node=measure_source_node,
         aggregation_time_dimension_reference=TimeDimensionReference(element_name="ds"),
     )
-    filtered_measure_node = FilterElementsNode[EntityDataSet](
+    filtered_measure_node = FilterElementsNode[MetricFlowEntityDataSet](
         parent_node=metric_time_node,
         include_specs=InstanceSpecSet(
             measure_specs=(measure_spec,), identifier_specs=(identifier_spec,), dimension_specs=(metric_time_spec,)
         ),
     )
-    aggregated_measures_node = AggregateMeasuresNode[EntityDataSet](
+    aggregated_measures_node = AggregateMeasuresNode[MetricFlowEntityDataSet](
         parent_node=filtered_measure_node, metric_input_measure_specs=metric_input_measure_specs
     )
     metric_spec = MetricSpec(element_name="booking_fees")
-    compute_metrics_node = ComputeMetricsNode[EntityDataSet](
+    compute_metrics_node = ComputeMetricsNode[MetricFlowEntityDataSet](
         parent_node=aggregated_measures_node, metric_specs=[metric_spec]
     )
     join_to_time_spine_node = JoinToTimeSpineNode(
@@ -579,7 +579,7 @@ def test_join_to_time_spine_node_without_offset(  # noqa: D
             start_time=as_datetime("2020-01-01"), end_time=as_datetime("2021-01-01")
         ),
     )
-    sink_node = WriteToResultDataframeNode[EntityDataSet](join_to_time_spine_node)
+    sink_node = WriteToResultDataframeNode[MetricFlowEntityDataSet](join_to_time_spine_node)
     dataflow_plan = DataflowPlan("plan0", sink_output_nodes=[sink_node])
 
     assert_plan_snapshot_text_equal(
@@ -607,7 +607,7 @@ def test_join_to_time_spine_node_without_offset(  # noqa: D
 def test_join_to_time_spine_node_with_offset_window(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -623,17 +623,17 @@ def test_join_to_time_spine_node_with_offset_window(  # noqa: D
         parent_node=measure_source_node,
         aggregation_time_dimension_reference=TimeDimensionReference(element_name="ds"),
     )
-    filtered_measure_node = FilterElementsNode[EntityDataSet](
+    filtered_measure_node = FilterElementsNode[MetricFlowEntityDataSet](
         parent_node=metric_time_node,
         include_specs=InstanceSpecSet(
             measure_specs=(measure_spec,), identifier_specs=(identifier_spec,), dimension_specs=(metric_time_spec,)
         ),
     )
-    aggregated_measures_node = AggregateMeasuresNode[EntityDataSet](
+    aggregated_measures_node = AggregateMeasuresNode[MetricFlowEntityDataSet](
         parent_node=filtered_measure_node, metric_input_measure_specs=metric_input_measure_specs
     )
     metric_spec = MetricSpec(element_name="booking_fees")
-    compute_metrics_node = ComputeMetricsNode[EntityDataSet](
+    compute_metrics_node = ComputeMetricsNode[MetricFlowEntityDataSet](
         parent_node=aggregated_measures_node, metric_specs=[metric_spec]
     )
     join_to_time_spine_node = JoinToTimeSpineNode(
@@ -644,7 +644,7 @@ def test_join_to_time_spine_node_with_offset_window(  # noqa: D
         offset_window=MetricTimeWindow(count=10, granularity=TimeGranularity.DAY),
     )
 
-    sink_node = WriteToResultDataframeNode[EntityDataSet](join_to_time_spine_node)
+    sink_node = WriteToResultDataframeNode[MetricFlowEntityDataSet](join_to_time_spine_node)
     dataflow_plan = DataflowPlan("plan0", sink_output_nodes=[sink_node])
 
     assert_plan_snapshot_text_equal(
@@ -672,7 +672,7 @@ def test_join_to_time_spine_node_with_offset_window(  # noqa: D
 def test_join_to_time_spine_node_with_offset_to_grain(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -688,17 +688,17 @@ def test_join_to_time_spine_node_with_offset_to_grain(
         parent_node=measure_source_node,
         aggregation_time_dimension_reference=TimeDimensionReference(element_name="ds"),
     )
-    filtered_measure_node = FilterElementsNode[EntityDataSet](
+    filtered_measure_node = FilterElementsNode[MetricFlowEntityDataSet](
         parent_node=metric_time_node,
         include_specs=InstanceSpecSet(
             measure_specs=(measure_spec,), identifier_specs=(identifier_spec,), dimension_specs=(metric_time_spec,)
         ),
     )
-    aggregated_measures_node = AggregateMeasuresNode[EntityDataSet](
+    aggregated_measures_node = AggregateMeasuresNode[MetricFlowEntityDataSet](
         parent_node=filtered_measure_node, metric_input_measure_specs=metric_input_measure_specs
     )
     metric_spec = MetricSpec(element_name="booking_fees")
-    compute_metrics_node = ComputeMetricsNode[EntityDataSet](
+    compute_metrics_node = ComputeMetricsNode[MetricFlowEntityDataSet](
         parent_node=aggregated_measures_node, metric_specs=[metric_spec]
     )
     join_to_time_spine_node = JoinToTimeSpineNode(
@@ -710,7 +710,7 @@ def test_join_to_time_spine_node_with_offset_to_grain(
         offset_to_grain=TimeGranularity.MONTH,
     )
 
-    sink_node = WriteToResultDataframeNode[EntityDataSet](join_to_time_spine_node)
+    sink_node = WriteToResultDataframeNode[MetricFlowEntityDataSet](join_to_time_spine_node)
     dataflow_plan = DataflowPlan("plan0", sink_output_nodes=[sink_node])
 
     assert_plan_snapshot_text_equal(
@@ -741,7 +741,7 @@ def test_join_to_time_spine_node_with_offset_to_grain(
 def test_compute_metrics_node_ratio_from_single_entity(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -758,7 +758,7 @@ def test_compute_metrics_node_ratio_from_single_entity(
         MetricInputMeasureSpec(measure_spec=denominator_spec),
     )
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
-    filtered_measures_node = FilterElementsNode[EntityDataSet](
+    filtered_measures_node = FilterElementsNode[MetricFlowEntityDataSet](
         parent_node=measure_source_node,
         include_specs=InstanceSpecSet(
             measure_specs=(numerator_spec, denominator_spec), identifier_specs=(identifier_spec,)
@@ -770,7 +770,7 @@ def test_compute_metrics_node_ratio_from_single_entity(
         identifier_links=(),
     )
     dimension_source_node = consistent_id_object_repository.simple_model_read_nodes["listings_latest"]
-    filtered_dimension_node = FilterElementsNode[EntityDataSet](
+    filtered_dimension_node = FilterElementsNode[MetricFlowEntityDataSet](
         parent_node=dimension_source_node,
         include_specs=InstanceSpecSet(
             identifier_specs=(identifier_spec,),
@@ -778,7 +778,7 @@ def test_compute_metrics_node_ratio_from_single_entity(
         ),
     )
 
-    join_node = JoinToBaseOutputNode[EntityDataSet](
+    join_node = JoinToBaseOutputNode[MetricFlowEntityDataSet](
         left_node=filtered_measures_node,
         join_targets=[
             JoinDescription(
@@ -790,11 +790,11 @@ def test_compute_metrics_node_ratio_from_single_entity(
         ],
     )
 
-    aggregated_measures_node = AggregateMeasuresNode[EntityDataSet](
+    aggregated_measures_node = AggregateMeasuresNode[MetricFlowEntityDataSet](
         parent_node=join_node, metric_input_measure_specs=metric_input_measure_specs
     )
     metric_spec = MetricSpec(element_name="bookings_per_booker")
-    compute_metrics_node = ComputeMetricsNode[EntityDataSet](
+    compute_metrics_node = ComputeMetricsNode[MetricFlowEntityDataSet](
         parent_node=aggregated_measures_node, metric_specs=[metric_spec]
     )
 
@@ -811,7 +811,7 @@ def test_compute_metrics_node_ratio_from_multiple_entities(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     sql_client: SqlClient,
 ) -> None:
     """Tests the compute metrics node for ratio type metrics
@@ -850,7 +850,7 @@ def test_order_by_node(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     consistent_id_object_repository: ConsistentIdObjectRepository,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan where there is a leaf compute metrics node."""
@@ -870,7 +870,7 @@ def test_order_by_node(
     )
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
 
-    filtered_measure_node = FilterElementsNode[EntityDataSet](
+    filtered_measure_node = FilterElementsNode[MetricFlowEntityDataSet](
         parent_node=measure_source_node,
         include_specs=InstanceSpecSet(
             measure_specs=(measure_spec,),
@@ -879,12 +879,12 @@ def test_order_by_node(
         ),
     )
 
-    aggregated_measure_node = AggregateMeasuresNode[EntityDataSet](
+    aggregated_measure_node = AggregateMeasuresNode[MetricFlowEntityDataSet](
         parent_node=filtered_measure_node, metric_input_measure_specs=metric_input_measure_specs
     )
 
     metric_spec = MetricSpec(element_name="bookings")
-    compute_metrics_node = ComputeMetricsNode[EntityDataSet](
+    compute_metrics_node = ComputeMetricsNode[MetricFlowEntityDataSet](
         parent_node=aggregated_measure_node, metric_specs=[metric_spec]
     )
 
@@ -914,8 +914,8 @@ def test_order_by_node(
 def test_multihop_node(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    multihop_dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
-    multihop_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    multihop_dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    multihop_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan where there is a join between 1 measure and 2 dimensions."""
@@ -946,8 +946,8 @@ def test_multihop_node(
 def test_filter_with_where_constraint_on_join_dim(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -990,7 +990,7 @@ def test_constrain_time_range_node(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     consistent_id_object_repository: ConsistentIdObjectRepository,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     sql_client: SqlClient,
 ) -> None:
     """Tests converting the ConstrainTimeRangeNode to SQL."""
@@ -1014,7 +1014,7 @@ def test_constrain_time_range_node(
         aggregation_time_dimension_reference=TimeDimensionReference(element_name="ds"),
     )
 
-    constrain_time_node = ConstrainTimeRangeNode[EntityDataSet](
+    constrain_time_node = ConstrainTimeRangeNode[MetricFlowEntityDataSet](
         parent_node=metric_time_node,
         time_range_constraint=TimeRangeConstraint(
             start_time=as_datetime("2020-01-01"),
@@ -1034,8 +1034,8 @@ def test_constrain_time_range_node(
 def test_cumulative_metric(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -1066,8 +1066,8 @@ def test_cumulative_metric(
 def test_cumulative_metric_with_time_constraint(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -1101,8 +1101,8 @@ def test_cumulative_metric_with_time_constraint(
 def test_cumulative_metric_no_ds(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -1127,8 +1127,8 @@ def test_cumulative_metric_no_ds(
 def test_cumulative_metric_no_window(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -1159,8 +1159,8 @@ def test_cumulative_metric_no_window(
 def test_cumulative_metric_no_window_with_time_constraint(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -1194,8 +1194,8 @@ def test_cumulative_metric_no_window_with_time_constraint(
 def test_cumulative_metric_grain_to_date(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -1226,8 +1226,8 @@ def test_cumulative_metric_grain_to_date(
 def test_partitioned_join(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -1256,8 +1256,8 @@ def test_partitioned_join(
 def test_limit_rows(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     sql_client: SqlClient,
 ) -> None:
     """Tests a plan with a limit to the number of rows returned."""
@@ -1286,8 +1286,8 @@ def test_limit_rows(  # noqa: D
 def test_composite_identifier(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    composite_dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
-    composite_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    composite_dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    composite_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = composite_dataflow_plan_builder.build_plan(
@@ -1309,8 +1309,8 @@ def test_composite_identifier(  # noqa: D
 def test_composite_identifier_with_order_by(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    composite_dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
-    composite_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    composite_dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    composite_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = composite_dataflow_plan_builder.build_plan(
@@ -1337,8 +1337,8 @@ def test_composite_identifier_with_order_by(  # noqa: D
 def test_composite_identifier_with_join(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    composite_dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
-    composite_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    composite_dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    composite_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = composite_dataflow_plan_builder.build_plan(
@@ -1366,8 +1366,8 @@ def test_composite_identifier_with_join(  # noqa: D
 def test_distinct_values(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     sql_client: SqlClient,
 ) -> None:
     """Tests a plan to get distinct values for a dimension."""
@@ -1392,8 +1392,8 @@ def test_distinct_values(  # noqa: D
 def test_local_dimension_using_local_identifier(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -1421,7 +1421,7 @@ def test_semi_additive_join_node(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     consistent_id_object_repository: ConsistentIdObjectRepository,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan using a SemiAdditiveJoinNode."""
@@ -1429,7 +1429,7 @@ def test_semi_additive_join_node(
     time_dimension_spec = TimeDimensionSpec(element_name="ds", identifier_links=())
 
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["accounts_source"]
-    semi_additive_join_node = SemiAdditiveJoinNode[EntityDataSet](
+    semi_additive_join_node = SemiAdditiveJoinNode[MetricFlowEntityDataSet](
         parent_node=measure_source_node,
         identifier_specs=tuple(),
         time_dimension_spec=time_dimension_spec,
@@ -1449,7 +1449,7 @@ def test_semi_additive_join_node_with_queried_group_by(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     consistent_id_object_repository: ConsistentIdObjectRepository,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan using a SemiAdditiveJoinNode."""
@@ -1460,7 +1460,7 @@ def test_semi_additive_join_node_with_queried_group_by(
     )
 
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["accounts_source"]
-    semi_additive_join_node = SemiAdditiveJoinNode[EntityDataSet](
+    semi_additive_join_node = SemiAdditiveJoinNode[MetricFlowEntityDataSet](
         parent_node=measure_source_node,
         identifier_specs=tuple(),
         time_dimension_spec=time_dimension_spec,
@@ -1480,7 +1480,7 @@ def test_semi_additive_join_node_with_grouping(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     consistent_id_object_repository: ConsistentIdObjectRepository,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan using a SemiAdditiveJoinNode with a window_grouping."""
@@ -1493,7 +1493,7 @@ def test_semi_additive_join_node_with_grouping(
     time_dimension_spec = TimeDimensionSpec(element_name="ds", identifier_links=())
 
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["accounts_source"]
-    semi_additive_join_node = SemiAdditiveJoinNode[EntityDataSet](
+    semi_additive_join_node = SemiAdditiveJoinNode[MetricFlowEntityDataSet](
         parent_node=measure_source_node,
         identifier_specs=(identifier_spec,),
         time_dimension_spec=time_dimension_spec,
@@ -1511,8 +1511,8 @@ def test_semi_additive_join_node_with_grouping(
 def test_measure_constraint(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -1534,8 +1534,8 @@ def test_measure_constraint(  # noqa: D
 def test_measure_constraint_with_reused_measure(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -1557,8 +1557,8 @@ def test_measure_constraint_with_reused_measure(  # noqa: D
 def test_measure_constraint_with_single_expr_and_alias(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -1580,8 +1580,8 @@ def test_measure_constraint_with_single_expr_and_alias(  # noqa: D
 def test_derived_metric(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -1603,8 +1603,8 @@ def test_derived_metric(  # noqa: D
 def test_nested_derived_metric(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -1626,8 +1626,8 @@ def test_nested_derived_metric(  # noqa: D
 def test_join_to_scd_dimension(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    scd_dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
-    scd_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    scd_dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    scd_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     sql_client: SqlClient,
 ) -> None:
     """Tests conversion of a plan using a dimension with a validity window inside a measure constraint"""
@@ -1667,8 +1667,8 @@ def test_join_to_scd_dimension(
 def test_multi_hop_through_scd_dimension(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    scd_dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
-    scd_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    scd_dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    scd_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     sql_client: SqlClient,
 ) -> None:
     """Tests conversion of a plan using a dimension that is reached through an SCD table"""
@@ -1692,8 +1692,8 @@ def test_multi_hop_through_scd_dimension(
 def test_multi_hop_to_scd_dimension(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    scd_dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
-    scd_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    scd_dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    scd_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     sql_client: SqlClient,
 ) -> None:
     """Tests conversion of a plan using an SCD dimension that is reached through another table"""
@@ -1717,8 +1717,8 @@ def test_multi_hop_to_scd_dimension(
 def test_multiple_metrics_no_dimensions(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -1742,8 +1742,8 @@ def test_multiple_metrics_no_dimensions(  # noqa: D
 def test_metric_with_measures_from_multiple_sources_no_dimensions(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -1764,8 +1764,8 @@ def test_metric_with_measures_from_multiple_sources_no_dimensions(  # noqa: D
 def test_common_entity(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -1787,8 +1787,8 @@ def test_common_entity(  # noqa: D
 def test_derived_metric_with_offset_window(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -1810,8 +1810,8 @@ def test_derived_metric_with_offset_window(  # noqa: D
 def test_derived_metric_with_offset_to_grain(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -1833,8 +1833,8 @@ def test_derived_metric_with_offset_to_grain(  # noqa: D
 def test_derived_metric_with_offset_window_and_offset_to_grain(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -1856,8 +1856,8 @@ def test_derived_metric_with_offset_window_and_offset_to_grain(  # noqa: D
 def test_derived_metric_with_one_input_metric(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[EntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet],
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(

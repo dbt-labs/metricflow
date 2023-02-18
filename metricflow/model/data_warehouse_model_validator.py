@@ -11,21 +11,21 @@ from typing import Callable, DefaultDict, Dict, List, Optional, Sequence, Tuple,
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import BaseOutput, FilterElementsNode
-from metricflow.dataset.convert_entity import EntityToDataSetConverter
-from metricflow.dataset.entity_adapter import EntityDataSet
+from metricflow.dataset.convert_entity import MetricFlowEntityToDataSetConverter
+from metricflow.dataset.entity_adapter import MetricFlowEntityDataSet
 
 from metricflow.dataset.dataset import DataSet
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
-from metricflow.instances import EntityElementReference, EntityReference, MetricModelReference
-from metricflow.model.objects.entity import Entity
+from metricflow.instances import MetricFlowEntityElementReference, MetricFlowEntityReference, MetricModelReference
+from metricflow.model.objects.conversions import MetricFlowMetricFlowEntity
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType
 from metricflow.model.objects.metric import Metric
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.validations.validator_helpers import (
-    EntityContext,
-    EntityElementContext,
-    EntityElementType,
+    MetricFlowEntityContext,
+    MetricFlowEntityElementContext,
+    MetricFlowEntityElementType,
     FileContext,
     MetricContext,
     ModelValidationResults,
@@ -53,7 +53,7 @@ class QueryRenderingTools:
 
     semantic_model: SemanticModel
     source_node_builder: SourceNodeBuilder
-    converter: EntityToDataSetConverter
+    converter: MetricFlowEntityToDataSetConverter
     time_spine_source: TimeSpineSource
     plan_converter: DataflowToSqlQueryPlanConverter
 
@@ -61,7 +61,7 @@ class QueryRenderingTools:
         self.semantic_model = SemanticModel(user_configured_model=model)
         self.source_node_builder = SourceNodeBuilder(semantic_model=self.semantic_model)
         self.time_spine_source = TimeSpineSource(schema_name=system_schema)
-        self.converter = EntityToDataSetConverter(
+        self.converter = MetricFlowEntityToDataSetConverter(
             column_association_resolver=DefaultColumnAssociationResolver(semantic_model=self.semantic_model)
         )
         self.plan_converter = DataflowToSqlQueryPlanConverter(
@@ -69,7 +69,7 @@ class QueryRenderingTools:
             semantic_model=self.semantic_model,
             time_spine_source=self.time_spine_source,
         )
-        self.node_resolver = DataflowPlanNodeOutputDataSetResolver[EntityDataSet](
+        self.node_resolver = DataflowPlanNodeOutputDataSetResolver[MetricFlowEntityDataSet](
             column_association_resolver=DefaultColumnAssociationResolver(self.semantic_model),
             semantic_model=self.semantic_model,
             time_spine_source=self.time_spine_source,
@@ -99,11 +99,11 @@ class DataWarehouseTaskBuilder:
 
     @staticmethod
     def _entity_nodes(
-        render_tools: QueryRenderingTools, entity: Entity
-    ) -> Sequence[BaseOutput[EntityDataSet]]:
-        """Builds and returns the EntityDataSet node for the given entity"""
+        render_tools: QueryRenderingTools, entity: MetricFlowEntity
+    ) -> Sequence[BaseOutput[MetricFlowEntityDataSet]]:
+        """Builds and returns the MetricFlowEntityDataSet node for the given entity"""
         entity_semantics = render_tools.semantic_model.entity_semantics.get_by_reference(
-            EntityReference(entity_name=entity.name)
+            MetricFlowEntityReference(entity_name=entity.name)
         )
         assert entity_semantics
 
@@ -163,9 +163,9 @@ class DataWarehouseTaskBuilder:
                         plan_id=f"{entity.name}_validation",
                         nodes=filter_elements_node,
                     ),
-                    context=EntityContext(
+                    context=MetricFlowEntityContext(
                         file_context=FileContext.from_metadata(metadata=entity.metadata),
-                        entity=EntityReference(entity_name=entity.name),
+                        entity=MetricFlowEntityReference(entity_name=entity.name),
                     ),
                     error_message=f"Unable to access entity `{entity.name}` in data warehouse",
                 )
@@ -236,12 +236,12 @@ class DataWarehouseTaskBuilder:
                             plan_id=f"{entity.name}_dim_{spec.element_name}_validation",
                             nodes=filter_elements_node,
                         ),
-                        context=EntityElementContext(
+                        context=MetricFlowEntityElementContext(
                             file_context=FileContext.from_metadata(metadata=entity.metadata),
-                            entity_element=EntityElementReference(
+                            entity_element=MetricFlowEntityElementReference(
                                 entity_name=entity.name, element_name=spec.element_name
                             ),
-                            element_type=EntityElementType.DIMENSION,
+                            element_type=MetricFlowEntityElementType.DIMENSION,
                         ),
                         error_message=f"Unable to query dimension `{spec.element_name}` on entity `{entity.name}` in data warehouse",
                     )
@@ -263,9 +263,9 @@ class DataWarehouseTaskBuilder:
                         plan_id=f"{entity.name}_all_dimensions_validation",
                         nodes=filter_elements_node,
                     ),
-                    context=EntityContext(
+                    context=MetricFlowEntityContext(
                         file_context=FileContext.from_metadata(metadata=entity.metadata),
-                        entity=EntityReference(entity_name=entity.name),
+                        entity=MetricFlowEntityReference(entity_name=entity.name),
                     ),
                     error_message=f"Failed to query dimensions in data warehouse for entity `{entity.name}`",
                     on_fail_subtasks=entity_sub_tasks,
@@ -312,12 +312,12 @@ class DataWarehouseTaskBuilder:
                             plan_id=f"{entity.name}_identifier_{spec.element_name}_validation",
                             nodes=filter_elements_node,
                         ),
-                        context=EntityElementContext(
+                        context=MetricFlowEntityElementContext(
                             file_context=FileContext.from_metadata(metadata=entity.metadata),
-                            entity_element=EntityElementReference(
+                            entity_element=MetricFlowEntityElementReference(
                                 entity_name=entity.name, element_name=spec.element_name
                             ),
-                            element_type=EntityElementType.IDENTIFIER,
+                            element_type=MetricFlowEntityElementType.IDENTIFIER,
                         ),
                         error_message=f"Unable to query identifier `{spec.element_name}` on entity `{entity.name}` in data warehouse",
                     )
@@ -338,9 +338,9 @@ class DataWarehouseTaskBuilder:
                         plan_id=f"{entity.name}_all_identifiers_validation",
                         nodes=filter_elements_node,
                     ),
-                    context=EntityContext(
+                    context=MetricFlowEntityContext(
                         file_context=FileContext.from_metadata(metadata=entity.metadata),
-                        entity=EntityReference(entity_name=entity.name),
+                        entity=MetricFlowEntityReference(entity_name=entity.name),
                     ),
                     error_message=f"Failed to query identifiers in data warehouse for entity `{entity.name}`",
                     on_fail_subtasks=entity_sub_tasks,
@@ -372,7 +372,7 @@ class DataWarehouseTaskBuilder:
             dataset = render_tools.converter.create_sql_source_data_set(entity)
             entity_specs = dataset.instance_set.spec_set.measure_specs
 
-            source_node_by_measure_spec: Dict[MeasureSpec, BaseOutput[EntityDataSet]] = {}
+            source_node_by_measure_spec: Dict[MeasureSpec, BaseOutput[MetricFlowEntityDataSet]] = {}
             measure_specs_source_node_pair = []
             for source_node in source_nodes:
                 measure_specs = render_tools.node_resolver.get_output_data_set(
@@ -382,7 +382,7 @@ class DataWarehouseTaskBuilder:
                 measure_specs_source_node_pair.append((measure_specs, source_node))
 
             source_node_to_sub_task: DefaultDict[
-                BaseOutput[EntityDataSet], List[DataWarehouseValidationTask]
+                BaseOutput[MetricFlowEntityDataSet], List[DataWarehouseValidationTask]
             ] = collections.defaultdict(list)
             for spec in entity_specs:
                 obtained_source_node = source_node_by_measure_spec.get(spec)
@@ -403,12 +403,12 @@ class DataWarehouseTaskBuilder:
                             plan_id=f"{entity.name}_measure_{spec.element_name}_validation",
                             nodes=filter_elements_node,
                         ),
-                        context=EntityElementContext(
+                        context=MetricFlowEntityElementContext(
                             file_context=FileContext.from_metadata(metadata=entity.metadata),
-                            entity_element=EntityElementReference(
+                            entity_element=MetricFlowEntityElementReference(
                                 entity_name=entity.name, element_name=spec.element_name
                             ),
-                            element_type=EntityElementType.MEASURE,
+                            element_type=MetricFlowEntityElementType.MEASURE,
                         ),
                         error_message=f"Unable to query measure `{spec.element_name}` on entity `{entity.name}` in data warehouse",
                     )
@@ -427,9 +427,9 @@ class DataWarehouseTaskBuilder:
                             plan_id=f"{entity.name}_all_measures_validation",
                             nodes=filter_elements_node,
                         ),
-                        context=EntityContext(
+                        context=MetricFlowEntityContext(
                             file_context=FileContext.from_metadata(metadata=entity.metadata),
-                            entity=EntityReference(entity_name=entity.name),
+                            entity=MetricFlowEntityReference(entity_name=entity.name),
                         ),
                         error_message=f"Failed to query measures in data warehouse for entity `{entity.name}`",
                         on_fail_subtasks=source_node_to_sub_task[source_node],

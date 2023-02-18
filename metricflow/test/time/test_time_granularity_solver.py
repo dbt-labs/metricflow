@@ -5,8 +5,8 @@ import pytest
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
-from metricflow.dataset.convert_entity import EntityToDataSetConverter
-from metricflow.dataset.entity_adapter import EntityDataSet
+from metricflow.dataset.convert_entity import MetricFlowEntityToDataSetConverter
+from metricflow.dataset.entity_adapter import MetricFlowEntityDataSet
 from metricflow.dataset.dataset import DataSet
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
@@ -27,12 +27,12 @@ def time_granularity_solver(  # noqa: D
     time_spine_source: TimeSpineSource,
 ) -> TimeGranularitySolver:
     column_association_resolver = DefaultColumnAssociationResolver(extended_date_semantic_model)
-    node_output_resolver = DataflowPlanNodeOutputDataSetResolver[EntityDataSet](
+    node_output_resolver = DataflowPlanNodeOutputDataSetResolver[MetricFlowEntityDataSet](
         column_association_resolver=column_association_resolver,
         semantic_model=extended_date_semantic_model,
         time_spine_source=time_spine_source,
     )
-    to_data_set_converter = EntityToDataSetConverter(column_association_resolver)
+    to_data_set_converter = MetricFlowEntityToDataSetConverter(column_association_resolver)
     source_data_sets = [
         to_data_set_converter.create_sql_source_data_set(x)
         for x in extended_date_semantic_model.user_configured_model.entities

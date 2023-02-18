@@ -9,7 +9,7 @@ from typing import List, Optional, Tuple, Dict, Sequence
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import BaseOutput
-from metricflow.dataset.entity_adapter import EntityDataSet
+from metricflow.dataset.entity_adapter import MetricFlowEntityDataSet
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.model.objects.constraints.where import WhereClauseConstraint
@@ -72,8 +72,8 @@ class MetricFlowQueryParser:
     def __init__(  # noqa: D
         self,
         model: SemanticModel,
-        source_nodes: Sequence[BaseOutput[EntityDataSet]],
-        node_output_resolver: DataflowPlanNodeOutputDataSetResolver[EntityDataSet],
+        source_nodes: Sequence[BaseOutput[MetricFlowEntityDataSet]],
+        node_output_resolver: DataflowPlanNodeOutputDataSetResolver[MetricFlowEntityDataSet],
     ) -> None:
         self._model = model
         self._metric_semantics = model.metric_semantics

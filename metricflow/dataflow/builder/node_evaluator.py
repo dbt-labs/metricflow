@@ -29,12 +29,12 @@ from metricflow.dataflow.dataflow_plan import (
     ValidityWindowJoinDescription,
 )
 from metricflow.instances import InstanceSet
-from metricflow.model.semantics.entity_join_evaluator import EntityJoinEvaluator
+from metricflow.model.semantics.entity_join_evaluator import MetricFlowEntityJoinEvaluator
 from metricflow.object_utils import pformat_big_objects
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
 
-from metricflow.protocols.semantics import EntitySemanticsAccessor
+from metricflow.protocols.semantics import MetricFlowEntitySemanticsAccessor
 from metricflow.specs import (
     LinkableInstanceSpec,
     LinklessIdentifierSpec,
@@ -112,7 +112,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
 
     def __init__(
         self,
-        entity_semantics: EntitySemanticsAccessor,
+        entity_semantics: MetricFlowEntitySemanticsAccessor,
         nodes_available_for_joins: Sequence[BaseOutput[SourceDataSetT]],
         node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver[SourceDataSetT],
     ) -> None:
@@ -128,7 +128,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
         self._nodes_available_for_joins = nodes_available_for_joins
         self._node_data_set_resolver = node_data_set_resolver
         self._partition_resolver = PartitionJoinResolver(self._entity_semantics)
-        self._join_evaluator = EntityJoinEvaluator(self._entity_semantics)
+        self._join_evaluator = MetricFlowEntityJoinEvaluator(self._entity_semantics)
 
     def _find_joinable_candidate_nodes_that_can_satisfy_linkable_specs(
         self,
@@ -177,7 +177,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                 )
                 if identifier_in_right_node is None:
                     raise RuntimeError(
-                        f"Invalid EntityElementReference {identifier_instance_in_right_node.defined_from[0]}"
+                        f"Invalid MetricFlowEntityElementReference {identifier_instance_in_right_node.defined_from[0]}"
                     )
 
                 identifier_instance_in_left_node = None

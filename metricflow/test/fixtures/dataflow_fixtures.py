@@ -4,7 +4,7 @@ import pytest
 
 from metricflow.dataflow.builder.costing import DefaultCostFunction
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.dataset.entity_adapter import EntityDataSet
+from metricflow.dataset.entity_adapter import MetricFlowEntityDataSet
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.plan_conversion.time_spine import TimeSpineSource, TimeSpineTableBuilder
 from metricflow.protocols.sql_client import SqlClient
@@ -24,12 +24,12 @@ def composite_dataflow_plan_builder(  # noqa: D
     composite_identifier_semantic_model: SemanticModel,
     consistent_id_object_repository: ConsistentIdObjectRepository,
     time_spine_source: TimeSpineSource,
-) -> DataflowPlanBuilder[EntityDataSet]:
+) -> DataflowPlanBuilder[MetricFlowEntityDataSet]:
 
     return DataflowPlanBuilder(
         source_nodes=consistent_id_object_repository.composite_model_source_nodes,
         semantic_model=composite_identifier_semantic_model,
-        cost_function=DefaultCostFunction[EntityDataSet](),
+        cost_function=DefaultCostFunction[MetricFlowEntityDataSet](),
         time_spine_source=time_spine_source,
     )
 
@@ -39,12 +39,12 @@ def dataflow_plan_builder(  # noqa: D
     simple_semantic_model: SemanticModel,
     consistent_id_object_repository: ConsistentIdObjectRepository,
     time_spine_source: TimeSpineSource,
-) -> DataflowPlanBuilder[EntityDataSet]:
+) -> DataflowPlanBuilder[MetricFlowEntityDataSet]:
 
     return DataflowPlanBuilder(
         source_nodes=consistent_id_object_repository.simple_model_source_nodes,
         semantic_model=simple_semantic_model,
-        cost_function=DefaultCostFunction[EntityDataSet](),
+        cost_function=DefaultCostFunction[MetricFlowEntityDataSet](),
         time_spine_source=time_spine_source,
     )
 
@@ -54,12 +54,12 @@ def multihop_dataflow_plan_builder(  # noqa: D
     multi_hop_join_semantic_model: SemanticModel,
     consistent_id_object_repository: ConsistentIdObjectRepository,
     time_spine_source: TimeSpineSource,
-) -> DataflowPlanBuilder[EntityDataSet]:
+) -> DataflowPlanBuilder[MetricFlowEntityDataSet]:
 
     return DataflowPlanBuilder(
         source_nodes=consistent_id_object_repository.multihop_model_source_nodes,
         semantic_model=multi_hop_join_semantic_model,
-        cost_function=DefaultCostFunction[EntityDataSet](),
+        cost_function=DefaultCostFunction[MetricFlowEntityDataSet](),
         time_spine_source=time_spine_source,
     )
 
@@ -69,12 +69,12 @@ def scd_dataflow_plan_builder(  # noqa: D
     scd_semantic_model: SemanticModel,
     consistent_id_object_repository: ConsistentIdObjectRepository,
     time_spine_source: TimeSpineSource,
-) -> DataflowPlanBuilder[EntityDataSet]:
+) -> DataflowPlanBuilder[MetricFlowEntityDataSet]:
 
     return DataflowPlanBuilder(
         source_nodes=consistent_id_object_repository.scd_model_source_nodes,
         semantic_model=scd_semantic_model,
-        cost_function=DefaultCostFunction[EntityDataSet](),
+        cost_function=DefaultCostFunction[MetricFlowEntityDataSet](),
         time_spine_source=time_spine_source,
     )
 

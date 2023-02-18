@@ -2,12 +2,12 @@ import pytest
 
 from metricflow.aggregation_properties import AggregationType
 from metricflow.model.model_validator import ModelValidator
-from metricflow.model.objects.entity import Mutability, MutabilityType, Entity
+from dbt.contracts.graph.entities import Mutability, MutabilityType, MetricFlowEntity
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from metricflow.model.objects.elements.measure import Measure
 from metricflow.model.objects.metric import MetricType, MetricTypeParams, Metric
 from dbt.contracts.graph.manifest import UserConfiguredModel
-from metricflow.model.validations.entities import EntityTimeDimensionWarningsRule
+from metricflow.model.validations.entities import MetricFlowEntityTimeDimensionWarningsRule
 from metricflow.model.validations.dimension_const import DimensionConsistencyRule
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.references import DimensionReference, MeasureReference, TimeDimensionReference
@@ -114,11 +114,11 @@ def test_multiple_primary_time_dimensions() -> None:  # noqa:D
         dimension_reference = TimeDimensionReference(element_name="ds")
         dimension_reference2 = DimensionReference(element_name="not_ds")
         measure_reference = MeasureReference(element_name="measure")
-        model_validator = ModelValidator([EntityTimeDimensionWarningsRule()])
+        model_validator = ModelValidator([MetricFlowEntityTimeDimensionWarningsRule()])
         model_validator.checked_validations(
             model=UserConfiguredModel(
                 entities=[
-                    Entity(
+                    MetricFlowEntity(
                         name="dim1",
                         sql_query=f"SELECT ds, {measure_reference.element_name} FROM bar",
                         measures=[

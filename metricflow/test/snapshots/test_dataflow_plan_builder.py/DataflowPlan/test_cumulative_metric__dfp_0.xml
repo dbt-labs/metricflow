@@ -38,10 +38,10 @@
                             <!-- aggregation_time_dimension = ds -->
                             <ReadSqlSourceNode>
                                 <!-- description =                                                                   -->
-                                <!--   Read From EntityDataSet(EntityReference(entity_name='revenue'))  -->
+                                <!--   Read From MetricFlowEntityDataSet(MetricFlowEntityReference(entity_name='revenue'))  -->
                                 <!-- node_id = rss_10016 -->
                                 <!-- data_set =                                                            -->
-                                <!--   EntityDataSet(EntityReference(entity_name='revenue'))  -->
+                                <!--   MetricFlowEntityDataSet(MetricFlowEntityReference(entity_name='revenue'))  -->
                             </ReadSqlSourceNode>
                         </MetricTimeDimensionTransformNode>
                     </FilterElementsNode>
