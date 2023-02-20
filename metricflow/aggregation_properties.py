@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from enum import Enum
 
-from metricflow.object_utils import ExtendedEnum, assert_values_exhausted
+from dbt.semantic.object_utils import ExtendedEnum, assert_values_exhausted
 
 
 class AggregationType(ExtendedEnum):

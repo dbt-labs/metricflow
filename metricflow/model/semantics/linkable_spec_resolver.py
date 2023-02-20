@@ -13,7 +13,7 @@ from dbt.contracts.graph.identifiers import IdentifierType
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.entity_join_evaluator import EntityJoinEvaluator
-from metricflow.object_utils import pformat_big_objects, flatten_nested_sequence
+from dbt.semantic.object_utils import pformat_big_objects, flatten_nested_sequence
 from metricflow.protocols.semantics import EntitySemanticsAccessor
 from dbt.semantic.references import MeasureReference
 from dbt.semantic.references import MetricReference

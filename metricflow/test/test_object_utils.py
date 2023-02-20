@@ -1,7 +1,7 @@
 import logging
 import textwrap
 
-from metricflow.object_utils import pretty_format, pformat_big_objects
+from dbt.semantic.object_utils import pretty_format, pformat_big_objects
 from metricflow.specs import DimensionSpec, IdentifierReference
 
 logger = logging.getLogger(__name__)

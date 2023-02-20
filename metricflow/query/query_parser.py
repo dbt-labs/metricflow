@@ -12,13 +12,13 @@ from metricflow.dataflow.dataflow_plan import BaseOutput
 from metricflow.dataset.entity_adapter import EntityDataSet
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
-from metricflow.model.objects.constraints.where import WhereClauseConstraint
+from dbt.semantic.constraints import WhereClauseConstraint
 from dbt.contracts.graph.dimensions import DimensionType
 from dbt.contracts.graph.metrics import MetricType
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.spec_converters import WhereConstraintConverter
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
-from metricflow.object_utils import pformat_big_objects
+from dbt.semantic.object_utils import pformat_big_objects
 from metricflow.query.query_exceptions import InvalidQueryException
 from dbt.semantic.references import DimensionReference, IdentifierReference, MetricReference, TimeDimensionReference
 from metricflow.specs import (

@@ -6,7 +6,7 @@ from typing import Callable
 import pytest
 
 from metricflow.aggregation_properties import AggregationType
-from metricflow.model.model_validator import ModelValidator
+from dbt.semantic.validations.model_validator import ModelValidator
 from metricflow.model.objects.common import YamlConfigFile
 from dbt.contracts.graph.entities import Mutability, MutabilityType
 from dbt.contracts.graph.nodes import Entity
@@ -23,7 +23,7 @@ from metricflow.model.validations.identifiers import (
     OnePrimaryIdentifierPerEntityRule,
 )
 from metricflow.model.validations.validator_helpers import ModelValidationException
-from metricflow.object_utils import flatten_nested_sequence
+from dbt.semantic.object_utils import flatten_nested_sequence
 from metricflow.test.model.validations.helpers import (
     entity_with_guaranteed_meta,
     metric_with_guaranteed_meta,

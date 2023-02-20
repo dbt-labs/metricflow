@@ -30,7 +30,7 @@ from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.logging.formatting import indent_log_line
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
-from metricflow.object_utils import pformat_big_objects, random_id
+from dbt.semantic.object_utils import pformat_big_objects, random_id
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_execution import DataflowToExecutionPlanConverter
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter

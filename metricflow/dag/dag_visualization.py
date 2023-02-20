@@ -5,7 +5,7 @@ from typing import TypeVar
 import graphviz
 
 from metricflow.dag.mf_dag import DagNode, MetricFlowDag
-from metricflow.object_utils import random_id
+from dbt.semantic.object_utils import random_id
 
 logger = logging.getLogger(__name__)
 DagNodeT = TypeVar("DagNodeT", bound=DagNode)

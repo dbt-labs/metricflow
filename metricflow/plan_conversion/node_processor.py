@@ -13,7 +13,7 @@ from metricflow.dataflow.dataflow_plan import (
     JoinDescription,
 )
 from metricflow.model.semantics.entity_join_evaluator import EntityJoinEvaluator, MAX_JOIN_HOPS
-from metricflow.object_utils import pformat_big_objects
+from dbt.semantic.object_utils import pformat_big_objects
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.protocols.semantics import EntitySemanticsAccessor
 from dbt.semantic.references import TimeDimensionReference, IdentifierReference

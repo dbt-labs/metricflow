@@ -8,7 +8,7 @@ import pytest
 from sqlalchemy.exc import ProgrammingError
 
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.object_utils import assert_values_exhausted, random_id, SqlColumnType
+from dbt.semantic.object_utils import assert_values_exhausted, random_id, SqlColumnType
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.sql_utils import make_df

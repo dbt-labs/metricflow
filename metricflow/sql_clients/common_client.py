@@ -1,6 +1,6 @@
 from typing import Optional, TypeVar
 
-from metricflow.object_utils import ExtendedEnum
+from dbt.semantic.object_utils import ExtendedEnum
 from metricflow.protocols.sql_client import SqlClient, SqlIsolationLevel
 
 

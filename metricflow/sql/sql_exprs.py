@@ -30,7 +30,7 @@ from dbt.contracts.graph.measures import MeasureAggregationParameters
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.visitor import Visitable, VisitorOutputT
 from metricflow.time.time_granularity import TimeGranularity
-from metricflow.object_utils import assert_values_exhausted, flatten_nested_sequence
+from dbt.semantic.object_utils import assert_values_exhausted, flatten_nested_sequence
 
 
 class SqlExpressionNode(DagNode, Generic[VisitorOutputT], Visitable, ABC):

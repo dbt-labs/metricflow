@@ -13,7 +13,7 @@ from typing import List
 
 from metricflow.configuration.config_handler import ConfigHandler
 from metricflow.configuration.constants import CONFIG_EMAIL
-from metricflow.object_utils import random_id
+from dbt.semantic.object_utils import random_id
 from metricflow.telemetry.handlers.handlers import (
     ToMemoryTelemetryHandler,
     TelemetryHandler,

@@ -43,7 +43,7 @@ from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
 from dbt.contracts.graph.metrics import MetricType, MetricTimeWindow
 from metricflow.model.semantic_model import SemanticModel
-from metricflow.object_utils import pformat_big_objects, assert_exactly_one_arg_set
+from dbt.semantic.object_utils import pformat_big_objects, assert_exactly_one_arg_set
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.node_processor import PreDimensionJoinNodeProcessor
 from metricflow.plan_conversion.sql_dataset import SqlDataSet

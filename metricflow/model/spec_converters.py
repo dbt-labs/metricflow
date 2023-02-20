@@ -12,7 +12,7 @@ shims likely point to the need for a bit of an internal refactor, but that's a c
 from typing import List
 
 from metricflow.dataset.dataset import DataSet
-from metricflow.model.objects.constraints.where import WhereClauseConstraint
+from dbt.semantic.constraints import WhereClauseConstraint
 from dbt.contracts.graph.dimensions import DimensionType
 from dbt.contracts.graph.measures import Measure
 from metricflow.protocols.semantics import EntitySemanticsAccessor

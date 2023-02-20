@@ -4,7 +4,7 @@ from typing import List, Optional, Sequence
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.engine.models import Dimension
 from metricflow.model.objects.common import FileSlice, Metadata, YamlConfigFile
-from metricflow.model.objects.constraints.where import WhereClauseConstraint
+from dbt.semantic.constraints import WhereClauseConstraint
 from dbt.contracts.graph.entities import EntityOrigin, Mutability
 from dbt.contracts.graph.identifiers import Identifier
 from dbt.contracts.graph.measures import Measure

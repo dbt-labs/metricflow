@@ -4,7 +4,7 @@ import textwrap
 import pytest
 from metricflow.model.objects.common import YamlConfigFile
 from metricflow.model.model_transformer import ModelTransformer
-from metricflow.model.model_validator import ModelValidator
+from dbt.semantic.validations.model_validator import ModelValidator
 from metricflow.model.parsing.dir_to_model import parse_yaml_files_to_validation_ready_model
 from metricflow.model.validations.measures import (
     CountAggregationExprRule,

@@ -1,7 +1,7 @@
 import textwrap
 
 from metricflow.model.objects.common import YamlConfigFile
-from metricflow.model.objects.constraints.where import WhereClauseConstraint
+from dbt.semantic.constraints import WhereClauseConstraint
 from dbt.contracts.graph.metrics import MetricTimeWindow, MetricInput, MetricInputMeasure, MetricType
 from metricflow.model.parsing.dir_to_model import parse_yaml_files_to_model
 from metricflow.model.validations.validator_helpers import ModelValidationException

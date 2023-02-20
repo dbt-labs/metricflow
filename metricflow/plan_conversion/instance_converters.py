@@ -23,7 +23,7 @@ from metricflow.instances import (
     TimeDimensionInstance,
 )
 from metricflow.protocols.semantics import EntitySemanticsAccessor
-from metricflow.object_utils import assert_exactly_one_arg_set
+from dbt.semantic.object_utils import assert_exactly_one_arg_set
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.specs import (
     MeasureSpec,

@@ -3,7 +3,7 @@ import pytest
 import re
 from typing import Callable
 
-from metricflow.model.model_validator import ModelValidator
+from dbt.semantic.validations.model_validator import ModelValidator
 from dbt.contracts.graph.nodes import Entity
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.validations.common_identifiers import CommonIdentifiersRule

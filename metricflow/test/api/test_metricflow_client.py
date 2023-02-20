@@ -2,7 +2,7 @@ from metricflow.api.metricflow_client import MetricFlowClient
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.engine.models import Dimension, Metric
 from metricflow.model.validations.validator_helpers import ModelValidationResults
-from metricflow.object_utils import random_id
+from dbt.semantic.object_utils import random_id
 
 
 def test_query(mf_client: MetricFlowClient) -> None:  # noqa: D

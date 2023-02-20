@@ -12,7 +12,7 @@ import pandas as pd
 from pydantic import Field
 
 from metricflow.model.objects.base import FrozenBaseModel
-from metricflow.object_utils import assert_exactly_one_arg_set
+from dbt.semantic.object_utils import assert_exactly_one_arg_set
 
 
 logger = logging.getLogger(__name__)

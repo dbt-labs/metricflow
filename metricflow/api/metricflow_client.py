@@ -15,7 +15,6 @@ from metricflow.engine.metricflow_engine import (
 )
 from metricflow.engine.models import Dimension, Metric
 from metricflow.engine.utils import build_user_configured_model_from_config, convert_to_datetime
-from metricflow.model.model_validator import ModelValidator
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.validations.validator_helpers import ModelValidationResults

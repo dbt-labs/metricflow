@@ -8,7 +8,7 @@ from metricflow.instances import (
     EntityElementInstance,
     InstanceSetTransform,
 )
-from metricflow.object_utils import flatten_nested_sequence
+from dbt.semantic.object_utils import flatten_nested_sequence
 from metricflow.specs import DimensionSpec, TimeDimensionSpec, IdentifierSpec
 from metricflow.sql.sql_plan import (
     SqlSelectStatementNode,

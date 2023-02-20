@@ -2,7 +2,7 @@ import copy
 import pytest
 from typing import Tuple
 
-from metricflow.model.model_validator import ModelValidator
+from dbt.semantic.validations.model_validator import ModelValidator
 from dbt.contracts.graph.nodes import Entity
 from dbt.contracts.graph.dimensions import Dimension, DimensionType
 from dbt.contracts.graph.manifest import UserConfiguredModel

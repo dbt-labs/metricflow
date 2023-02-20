@@ -7,7 +7,7 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 
 from metricflow.configuration.env_var import EnvironmentVariable
-from metricflow.object_utils import random_id
+from dbt.semantic.object_utils import random_id
 
 logger = logging.getLogger(__name__)
 

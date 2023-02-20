@@ -1,4 +1,4 @@
-from metricflow.model.objects.constraints.where import WhereClauseConstraint
+from dbt.semantic.constraints import WhereClauseConstraint
 
 
 def test_where_constraint_parsing() -> None:

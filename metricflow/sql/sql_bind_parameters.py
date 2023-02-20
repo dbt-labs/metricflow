@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Any, Optional, Tuple, Mapping
 
 from metricflow.dataclass_serialization import SerializableDataclass
-from metricflow.object_utils import SqlColumnType, assert_exactly_one_arg_set
+from dbt.semantic.object_utils import SqlColumnType, assert_exactly_one_arg_set
 
 
 @dataclass(frozen=True)

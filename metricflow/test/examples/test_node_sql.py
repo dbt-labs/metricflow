@@ -7,7 +7,7 @@ from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, FilterElementsN
 from metricflow.dataset.convert_entity import EntityToDataSetConverter
 from metricflow.instances import EntityReference
 from metricflow.model.semantic_model import SemanticModel
-from metricflow.object_utils import pformat_big_objects
+from dbt.semantic.object_utils import pformat_big_objects
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.sql_dataset import SqlDataSet

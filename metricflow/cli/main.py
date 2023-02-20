@@ -41,7 +41,7 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest, MetricFlowExplainResult, MetricFlowQueryResult
 from metricflow.model.data_warehouse_model_validator import DataWarehouseModelValidator
-from metricflow.model.model_validator import ModelValidator
+from dbt.semantic.validations.model_validator import ModelValidator
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.engine.utils import model_build_result_from_config, path_to_models
