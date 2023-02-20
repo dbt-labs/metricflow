@@ -3,7 +3,7 @@ from typing import List
 import pytest
 from _pytest.fixtures import FixtureRequest
 
-from metricflow.aggregation_properties import AggregationType
+from dbt.semantic.aggregation_properties import AggregationType
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan import (

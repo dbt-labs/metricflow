@@ -1,6 +1,6 @@
 import logging
 
-from metricflow.aggregation_properties import AggregationState
+from dbt.semantic.aggregation_properties import AggregationState
 from metricflow.column_assoc import ColumnAssociation, SingleColumnCorrelationKey
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, JoinToBaseOutputNode, JoinDescription

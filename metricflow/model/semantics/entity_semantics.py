@@ -3,7 +3,7 @@ from collections import defaultdict
 from copy import deepcopy
 from typing import Dict, List, Optional, Set, Sequence
 
-from metricflow.aggregation_properties import AggregationType
+from dbt.semantic.aggregation_properties import AggregationType
 from metricflow.errors.errors import InvalidEntityError
 from metricflow.instances import EntityReference, EntityElementReference
 from dbt.contracts.graph.nodes import Entity

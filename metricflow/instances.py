@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import List, TypeVar, Generic, Tuple
 
-from metricflow.aggregation_properties import AggregationState
+from dbt.semantic.aggregation_properties import AggregationState
 from metricflow.column_assoc import ColumnAssociation
 from metricflow.dataclass_serialization import SerializableDataclass
 from dbt.semantic.references import ElementReference

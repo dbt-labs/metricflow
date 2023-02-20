@@ -1,6 +1,6 @@
 import logging
 
-from metricflow.aggregation_properties import AggregationType
+from dbt.semantic.aggregation_properties import AggregationType
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.transformations.transform_rule import ModelTransformRule
 

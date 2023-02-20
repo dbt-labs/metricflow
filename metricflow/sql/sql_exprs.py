@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import List, Generic, Mapping, Sequence, Optional, Tuple, Dict
 
-from metricflow.aggregation_properties import AggregationType
+from dbt.semantic.aggregation_properties import AggregationType
 from metricflow.dag.mf_dag import DagNode, DisplayedProperty, NodeId
 from metricflow.dag.id_generation import (
     SQL_EXPR_COLUMN_REFERENCE_ID_PREFIX,

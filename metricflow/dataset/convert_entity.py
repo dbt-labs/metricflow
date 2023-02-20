@@ -3,7 +3,7 @@ import re
 from dataclasses import dataclass
 from typing import Optional, List, Tuple, Sequence
 
-from metricflow.aggregation_properties import AggregationState
+from dbt.semantic.aggregation_properties import AggregationState
 from metricflow.dag.id_generation import IdGeneratorRegistry
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.entity_adapter import EntityDataSet

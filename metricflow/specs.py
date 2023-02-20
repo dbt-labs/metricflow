@@ -14,7 +14,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple, TypeVar, Generic, Any
 
-from metricflow.aggregation_properties import AggregationType, AggregationState
+from dbt.semantic.aggregation_properties import AggregationType, AggregationState
 from metricflow.column_assoc import ColumnAssociation
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dataclass_serialization import SerializableDataclass

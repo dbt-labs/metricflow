@@ -9,7 +9,7 @@ from itertools import chain
 from more_itertools import bucket
 from typing import Dict, List, Optional, Sequence, Tuple
 
-from metricflow.aggregation_properties import AggregationState
+from dbt.semantic.aggregation_properties import AggregationState
 from metricflow.dataflow.dataflow_plan import ValidityWindowJoinDescription
 from metricflow.instances import (
     MdoInstance,

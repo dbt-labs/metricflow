@@ -1,7 +1,7 @@
 import logging
 from typing import Optional, Tuple
 
-from metricflow.aggregation_properties import AggregationState
+from dbt.semantic.aggregation_properties import AggregationState
 from metricflow.column_assoc import (
     SingleColumnCorrelationKey,
     ColumnAssociation,

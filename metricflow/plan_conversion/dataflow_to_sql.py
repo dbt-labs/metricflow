@@ -4,7 +4,7 @@ import logging
 from collections import OrderedDict
 from typing import Generic, List, Optional, Sequence, TypeVar, Union
 
-from metricflow.aggregation_properties import AggregationState, AggregationType
+from dbt.semantic.aggregation_properties import AggregationState, AggregationType
 from metricflow.column_assoc import ColumnAssociation, SingleColumnCorrelationKey
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dag.id_generation import IdGeneratorRegistry

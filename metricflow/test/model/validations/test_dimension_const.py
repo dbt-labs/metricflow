@@ -1,6 +1,6 @@
 import pytest
 
-from metricflow.aggregation_properties import AggregationType
+from dbt.semantic.aggregation_properties import AggregationType
 from dbt.semantic.validations.model_validator import ModelValidator
 from dbt.contracts.graph.entities import Mutability, MutabilityType
 from dbt.contracts.graph.dimensions import Dimension, DimensionType, DimensionTypeParams

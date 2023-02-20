@@ -1,6 +1,6 @@
 import textwrap
 
-from metricflow.aggregation_properties import AggregationType
+from dbt.semantic.aggregation_properties import AggregationType
 from metricflow.model.objects.common import YamlConfigFile
 from dbt.contracts.graph.entities import EntityOrigin, MutabilityType
 from dbt.contracts.graph.identifiers import IdentifierType

@@ -1,4 +1,4 @@
-from metricflow.aggregation_properties import AggregationType
+from dbt.semantic.aggregation_properties import AggregationType
 from metricflow.errors.errors import ModelTransformError
 from dbt.contracts.graph.measures import MeasureAggregationParameters
 from dbt.contracts.graph.manifest import UserConfiguredModel
