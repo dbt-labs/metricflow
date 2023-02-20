@@ -10,10 +10,10 @@ import pytest
 
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, BaseOutput
-from metricflow.dataset.convert_entity import MetricFlowEntityToDataSetConverter
+from metricflow.dataset.convert_entity import EntityToDataSetConverter
 from metricflow.model.model_transformer import ModelTransformer
 from metricflow.model.model_validator import ModelValidator
-from metricflow.model.objects.conversions import MetricFlowMetricFlowEntity
+from metricflow.model.objects.entity import Entity
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.parsing.dir_to_model import (
     parse_directory_of_yaml_files_to_model,
@@ -21,7 +21,7 @@ from metricflow.model.parsing.dir_to_model import (
 )
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
-from metricflow.dataset.entity_adapter import MetricFlowEntityDataSet
+from metricflow.dataset.entity_adapter import EntityDataSet
 from metricflow.test.fixtures.id_fixtures import IdNumberSpace, patch_id_generators_helper
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
@@ -33,20 +33,20 @@ logger = logging.getLogger(__name__)
 
 
 def _data_set_to_read_nodes(
-    data_sets: OrderedDict[str, MetricFlowEntityDataSet]
-) -> OrderedDict[str, ReadSqlSourceNode[MetricFlowEntityDataSet]]:
+    data_sets: OrderedDict[str, EntityDataSet]
+) -> OrderedDict[str, ReadSqlSourceNode[EntityDataSet]]:
     """Return a mapping from the name of the entity to the dataflow plan node that reads from it."""
-    return_dict: OrderedDict[str, ReadSqlSourceNode[MetricFlowEntityDataSet]] = OrderedDict()
+    return_dict: OrderedDict[str, ReadSqlSourceNode[EntityDataSet]] = OrderedDict()
     for entity_name, data_set in data_sets.items():
-        return_dict[entity_name] = ReadSqlSourceNode[MetricFlowEntityDataSet](data_set)
+        return_dict[entity_name] = ReadSqlSourceNode[EntityDataSet](data_set)
         logger.debug(f"For entity {entity_name}, creating node_id {return_dict[entity_name].node_id}")
 
     return return_dict
 
 
 def _data_set_to_source_nodes(
-    semantic_model: SemanticModel, data_sets: OrderedDict[str, MetricFlowEntityDataSet]
-) -> Sequence[BaseOutput[MetricFlowEntityDataSet]]:
+    semantic_model: SemanticModel, data_sets: OrderedDict[str, EntityDataSet]
+) -> Sequence[BaseOutput[EntityDataSet]]:
     source_node_builder = SourceNodeBuilder(semantic_model)
     return source_node_builder.create_from_data_sets(list(data_sets.values()))
 
@@ -73,19 +73,19 @@ def query_parser_from_yaml(
 class ConsistentIdObjectRepository:
     """Stores all objects that should have consistent IDs in tests."""
 
-    simple_model_data_sets: OrderedDict[str, MetricFlowEntityDataSet]
-    simple_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[MetricFlowEntityDataSet]]
-    simple_model_source_nodes: Sequence[BaseOutput[MetricFlowEntityDataSet]]
+    simple_model_data_sets: OrderedDict[str, EntityDataSet]
+    simple_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[EntityDataSet]]
+    simple_model_source_nodes: Sequence[BaseOutput[EntityDataSet]]
 
-    multihop_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[MetricFlowEntityDataSet]]
-    multihop_model_source_nodes: Sequence[BaseOutput[MetricFlowEntityDataSet]]
+    multihop_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[EntityDataSet]]
+    multihop_model_source_nodes: Sequence[BaseOutput[EntityDataSet]]
 
-    composite_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[MetricFlowEntityDataSet]]
-    composite_model_source_nodes: Sequence[BaseOutput[MetricFlowEntityDataSet]]
+    composite_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[EntityDataSet]]
+    composite_model_source_nodes: Sequence[BaseOutput[EntityDataSet]]
 
-    scd_model_data_sets: OrderedDict[str, MetricFlowEntityDataSet]
-    scd_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[MetricFlowEntityDataSet]]
-    scd_model_source_nodes: Sequence[BaseOutput[MetricFlowEntityDataSet]]
+    scd_model_data_sets: OrderedDict[str, EntityDataSet]
+    scd_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[EntityDataSet]]
+    scd_model_source_nodes: Sequence[BaseOutput[EntityDataSet]]
 
 
 @pytest.fixture(scope="session")
@@ -125,17 +125,17 @@ def consistent_id_object_repository(
         )
 
 
-def create_data_sets(multihop_semantic_model: SemanticModel) -> OrderedDict[str, MetricFlowEntityDataSet]:
-    """Convert the MetricFlowEntitys in the model to SqlDataSets.
+def create_data_sets(multihop_semantic_model: SemanticModel) -> OrderedDict[str, EntityDataSet]:
+    """Convert the Entitys in the model to SqlDataSets.
 
     Key is the name of the entity, value is the associated data set.
     """
     # Use ordered dict and sort by name to get consistency when running tests.
     data_sets = OrderedDict()
-    entities: List[MetricFlowEntity] = multihop_semantic_model.user_configured_model.entities
+    entities: List[Entity] = multihop_semantic_model.user_configured_model.entities
     entities.sort(key=lambda x: x.name)
 
-    converter = MetricFlowEntityToDataSetConverter(
+    converter = EntityToDataSetConverter(
         column_association_resolver=DefaultColumnAssociationResolver(multihop_semantic_model)
     )
 

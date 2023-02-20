@@ -1,11 +1,11 @@
 from collections import defaultdict
 from typing import List, DefaultDict
-from metricflow.instances import MetricFlowEntityReference
+from metricflow.instances import EntityReference
 
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
-    MetricFlowEntityContext,
-    MetricFlowEntityElementType,
+    EntityContext,
+    EntityElementType,
     FileContext,
     ModelValidationRule,
     ValidationError,
@@ -20,7 +20,7 @@ class ElementConsistencyRule(ModelValidationRule):
     This reduces the potential confusion that might arise from having an identifier named `country` and a dimension
     named `country` while allowing for things like the `user` identifier to exist in multiple entities. Note not
     all element types allow duplicates, and there are separate validation rules for those cases. See, for example,
-    the MetricFlowEntityMeasuresUniqueRule.
+    the EntityMeasuresUniqueRule.
     """
 
     @staticmethod
@@ -34,7 +34,7 @@ class ElementConsistencyRule(ModelValidationRule):
 
         for element_name, type_to_context in invalid_elements.items():
             # Sort these by value to ensure consistent error messaging
-            types_used = [MetricFlowEntityElementType(v) for v in sorted(k.value for k in type_to_context.keys())]
+            types_used = [EntityElementType(v) for v in sorted(k.value for k in type_to_context.keys())]
             for element_type in types_used:
                 entity_contexts = type_to_context[element_type]
                 entity_names = {ctx.entity.entity_name for ctx in entity_contexts}
@@ -52,23 +52,23 @@ class ElementConsistencyRule(ModelValidationRule):
     @staticmethod
     def _get_element_name_to_types(
         model: UserConfiguredModel,
-    ) -> DefaultDict[str, DefaultDict[MetricFlowEntityElementType, List[MetricFlowEntityContext]]]:
-        """Create a mapping of all element names in the model to types with a list of associated MetricFlowEntityContexts"""
-        element_types: DefaultDict[str, DefaultDict[MetricFlowEntityElementType, List[MetricFlowEntityContext]]] = defaultdict(
+    ) -> DefaultDict[str, DefaultDict[EntityElementType, List[EntityContext]]]:
+        """Create a mapping of all element names in the model to types with a list of associated EntityContexts"""
+        element_types: DefaultDict[str, DefaultDict[EntityElementType, List[EntityContext]]] = defaultdict(
             lambda: defaultdict(list)
         )
         for entity in model.entities:
-            entity_context = MetricFlowEntityContext(
+            entity_context = EntityContext(
                 file_context=FileContext.from_metadata(metadata=entity.metadata),
-                entity=MetricFlowEntityReference(entity_name=entity.name),
+                entity=EntityReference(entity_name=entity.name),
             )
             if entity.measures:
                 for measure in entity.measures:
-                    element_types[measure.name][MetricFlowEntityElementType.MEASURE].append(entity_context)
+                    element_types[measure.name][EntityElementType.MEASURE].append(entity_context)
             if entity.dimensions:
                 for dimension in entity.dimensions:
-                    element_types[dimension.name][MetricFlowEntityElementType.DIMENSION].append(entity_context)
+                    element_types[dimension.name][EntityElementType.DIMENSION].append(entity_context)
             if entity.identifiers:
                 for identifier in entity.identifiers:
-                    element_types[identifier.name][MetricFlowEntityElementType.IDENTIFIER].append(entity_context)
+                    element_types[identifier.name][EntityElementType.IDENTIFIER].append(entity_context)
         return element_types

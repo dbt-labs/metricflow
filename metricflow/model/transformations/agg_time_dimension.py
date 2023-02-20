@@ -1,7 +1,7 @@
 import logging
 from typing import Optional
 
-from metricflow.model.objects.conversions import MetricFlowMetricFlowEntity
+from metricflow.model.objects.entity import Entity
 from metricflow.model.objects.elements.dimension import DimensionType
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.transformations.transform_rule import ModelTransformRule
@@ -14,7 +14,7 @@ class SetMeasureAggregationTimeDimensionRule(ModelTransformRule):
     """Sets the aggregation time dimension for measures to the primary time dimension if not defined."""
 
     @staticmethod
-    def _find_primary_time_dimension(entity: MetricFlowEntity) -> Optional[TimeDimensionReference]:
+    def _find_primary_time_dimension(entity: Entity) -> Optional[TimeDimensionReference]:
         for dimension in entity.dimensions:
             if dimension.type == DimensionType.TIME and dimension.type_params and dimension.type_params.is_primary:
                 return dimension.time_dimension_reference

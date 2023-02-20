@@ -33,7 +33,7 @@ class ModelReference(SerializableDataclass):
 
 
 @dataclass(frozen=True)
-class MetricFlowEntityReference(ModelReference):
+class EntityReference(ModelReference):
     """A reference to a entity definition in the model."""
 
     entity_name: str
@@ -43,7 +43,7 @@ class MetricFlowEntityReference(ModelReference):
 
 
 @dataclass(frozen=True)
-class MetricFlowEntityElementReference(ModelReference):
+class EntityElementReference(ModelReference):
     """A reference to an element definition in a entity definition in the model.
 
     TODO: Fields should be *Reference objects.
@@ -54,18 +54,18 @@ class MetricFlowEntityElementReference(ModelReference):
 
     @staticmethod
     def create_from_references(  # noqa: D
-        entity_reference: MetricFlowEntityReference, element_reference: ElementReference
-    ) -> MetricFlowEntityElementReference:
-        return MetricFlowEntityElementReference(
+        entity_reference: EntityReference, element_reference: ElementReference
+    ) -> EntityElementReference:
+        return EntityElementReference(
             entity_name=entity_reference.entity_name,
             element_name=element_reference.element_name,
         )
 
     @property
-    def entity_reference(self) -> MetricFlowEntityReference:  # noqa: D
-        return MetricFlowEntityReference(self.entity_name)
+    def entity_reference(self) -> EntityReference:  # noqa: D
+        return EntityReference(self.entity_name)
 
-    def is_from(self, ref: MetricFlowEntityReference) -> bool:
+    def is_from(self, ref: EntityReference) -> bool:
         """Returns true if this reference is from the same entity as the supplied reference."""
         return self.entity_name == ref.entity_name
 
@@ -110,12 +110,12 @@ class MdoInstance(ABC, Generic[SpecT]):
 
 
 @dataclass(frozen=True)
-class MetricFlowEntityElementInstance(SerializableDataclass):  # noqa: D
+class EntityElementInstance(SerializableDataclass):  # noqa: D
     # This instance is derived from something defined in a entity.
-    defined_from: Tuple[MetricFlowEntityElementReference, ...]
+    defined_from: Tuple[EntityElementReference, ...]
 
     @property
-    def origin_entity_reference(self) -> MetricFlowEntityElementReference:
+    def origin_entity_reference(self) -> EntityElementReference:
         """Property to grab the element reference pointing to the origin entity for this element instance
 
         By convention this is the zeroth element in the Tuple. At this time these tuples are always of exactly
@@ -125,7 +125,7 @@ class MetricFlowEntityElementInstance(SerializableDataclass):  # noqa: D
         """
         if len(self.defined_from) != 1:
             raise ValueError(
-                f"MetricFlowEntityElementInstances should have exactly one entry in the `defined_from` property, because "
+                f"EntityElementInstances should have exactly one entry in the `defined_from` property, because "
                 f"otherwise there is no way to ensure that the first element is always the origin entity! Found "
                 f"{len(self.defined_from)} elements in this particular instance: {self.defined_from}."
             )
@@ -134,26 +134,26 @@ class MetricFlowEntityElementInstance(SerializableDataclass):  # noqa: D
 
 
 @dataclass(frozen=True)
-class MeasureInstance(MdoInstance[MeasureSpec], MetricFlowEntityElementInstance):  # noqa: D
+class MeasureInstance(MdoInstance[MeasureSpec], EntityElementInstance):  # noqa: D
     associated_columns: Tuple[ColumnAssociation, ...]
     spec: MeasureSpec
     aggregation_state: AggregationState
 
 
 @dataclass(frozen=True)
-class DimensionInstance(MdoInstance[DimensionSpec], MetricFlowEntityElementInstance):  # noqa: D
+class DimensionInstance(MdoInstance[DimensionSpec], EntityElementInstance):  # noqa: D
     associated_columns: Tuple[ColumnAssociation, ...]
     spec: DimensionSpec
 
 
 @dataclass(frozen=True)
-class TimeDimensionInstance(MdoInstance[TimeDimensionSpec], MetricFlowEntityElementInstance):  # noqa: D
+class TimeDimensionInstance(MdoInstance[TimeDimensionSpec], EntityElementInstance):  # noqa: D
     associated_columns: Tuple[ColumnAssociation, ...]
     spec: TimeDimensionSpec
 
 
 @dataclass(frozen=True)
-class IdentifierInstance(MdoInstance[IdentifierSpec], MetricFlowEntityElementInstance):  # noqa: D
+class IdentifierInstance(MdoInstance[IdentifierSpec], EntityElementInstance):  # noqa: D
     associated_columns: Tuple[ColumnAssociation, ...]
     spec: IdentifierSpec
 

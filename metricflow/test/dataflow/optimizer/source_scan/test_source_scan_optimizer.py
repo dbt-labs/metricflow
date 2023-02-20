@@ -30,7 +30,7 @@ from metricflow.dataflow.dataflow_plan import (
 )
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import SourceScanOptimizer
-from metricflow.dataset.entity_adapter import MetricFlowEntityDataSet
+from metricflow.dataset.entity_adapter import EntityDataSet
 from metricflow.dataset.dataset import DataSet
 from metricflow.specs import (
     DimensionSpec,
@@ -114,7 +114,7 @@ class ReadSqlSourceNodeCounter(Generic[SourceDataSetT], DataflowPlanNodeVisitor[
 def check_optimization(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
     query_spec: MetricFlowQuerySpec,
     expected_num_sources_in_unoptimized: int,
     expected_num_sources_in_optimized: int,
@@ -134,10 +134,10 @@ def check_optimization(  # noqa: D
         dag_graph=dataflow_plan,
     )
 
-    source_counter = ReadSqlSourceNodeCounter[MetricFlowEntityDataSet]()
+    source_counter = ReadSqlSourceNodeCounter[EntityDataSet]()
     assert source_counter.count_source_nodes(dataflow_plan) == expected_num_sources_in_unoptimized
 
-    optimizer = SourceScanOptimizer[MetricFlowEntityDataSet]()
+    optimizer = SourceScanOptimizer[EntityDataSet]()
     optimized_dataflow_plan = optimizer.optimize(dataflow_plan)
 
     assert_plan_snapshot_text_equal(
@@ -158,7 +158,7 @@ def check_optimization(  # noqa: D
 def test_2_metrics_from_1_entity(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
 ) -> None:
     """Tests that optimizing the plan for 2 metrics from 2 measure entities results in half the number of scans.
 
@@ -183,7 +183,7 @@ def test_2_metrics_from_1_entity(  # noqa: D
 def test_2_metrics_from_2_entities(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
 ) -> None:
     """Tests that 2 metrics from the 2 entities results in 2 scans."""
 
@@ -203,7 +203,7 @@ def test_2_metrics_from_2_entities(  # noqa: D
 def test_3_metrics_from_2_entities(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
 ) -> None:
     """Tests that 3 metrics from the 2 entities results in 2 scans."""
 
@@ -227,7 +227,7 @@ def test_3_metrics_from_2_entities(  # noqa: D
 def test_constrained_metric_not_combined(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
 ) -> None:
     """Tests that 2 metrics from the same entity but where 1 is constrained results in 2 scans.
 
@@ -267,7 +267,7 @@ def test_constrained_metric_not_combined(  # noqa: D
 def test_derived_metric(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
 ) -> None:
     """Tests optimization of a query that use a derived metrics with measures coming from a single entity.
 
@@ -289,7 +289,7 @@ def test_derived_metric(  # noqa: D
 def test_nested_derived_metric(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
 ) -> None:
     """Tests optimization of a query that use a nested derived metric from a single entity.
 
@@ -312,7 +312,7 @@ def test_nested_derived_metric(  # noqa: D
 def test_derived_metric_with_non_derived_metric(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
 ) -> None:
     """Tests optimization of queries that use derived metrics and non-derived metrics.
 
@@ -343,7 +343,7 @@ def test_derived_metric_with_non_derived_metric(  # noqa: D
 def test_2_ratio_metrics_from_1_entity(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[MetricFlowEntityDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[EntityDataSet],
 ) -> None:
     """Tests that 2 ratio metrics with measures from a 1 entity result in 1 scan."""
     check_optimization(

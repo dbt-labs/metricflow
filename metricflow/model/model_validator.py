@@ -6,19 +6,19 @@ from typing import List, Sequence
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.parsing.dir_to_model import ModelBuildResult
 from metricflow.model.validations.agg_time_dimension import AggregationTimeDimensionRule
-from metricflow.model.validations.entities import MetricFlowEntityTimeDimensionWarningsRule, MetricFlowEntityValidityWindowRule
+from metricflow.model.validations.entities import EntityTimeDimensionWarningsRule, EntityValidityWindowRule
 from metricflow.model.validations.dimension_const import DimensionConsistencyRule
 from metricflow.model.validations.element_const import ElementConsistencyRule
 from metricflow.model.validations.identifiers import (
     IdentifierConfigRule,
     IdentifierConsistencyRule,
     NaturalIdentifierConfigurationRule,
-    OnePrimaryIdentifierPerMetricFlowEntityRule,
+    OnePrimaryIdentifierPerEntityRule,
 )
 from metricflow.model.validations.measures import (
     PercentileAggregationRule,
     CountAggregationExprRule,
-    MetricFlowEntityMeasuresUniqueRule,
+    EntityMeasuresUniqueRule,
     MeasureConstraintAliasesRule,
     MetricMeasuresRule,
     MeasuresNonAdditiveDimensionRule,
@@ -43,15 +43,15 @@ class ModelValidator:
         PercentileAggregationRule(),
         DerivedMetricRule(),
         CountAggregationExprRule(),
-        MetricFlowEntityMeasuresUniqueRule(),
-        MetricFlowEntityTimeDimensionWarningsRule(),
-        MetricFlowEntityValidityWindowRule(),
+        EntityMeasuresUniqueRule(),
+        EntityTimeDimensionWarningsRule(),
+        EntityValidityWindowRule(),
         DimensionConsistencyRule(),
         ElementConsistencyRule(),
         IdentifierConfigRule(),
         IdentifierConsistencyRule(),
         NaturalIdentifierConfigurationRule(),
-        OnePrimaryIdentifierPerMetricFlowEntityRule(),
+        OnePrimaryIdentifierPerEntityRule(),
         MeasureConstraintAliasesRule(),
         MetricMeasuresRule(),
         CumulativeMetricRule(),

@@ -6,15 +6,15 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Tuple, Sequence, Dict, List, Optional, FrozenSet
 
-from metricflow.instances import MetricFlowEntityReference
-from metricflow.model.objects.conversions import MetricFlowMetricFlowEntity
+from metricflow.instances import EntityReference
+from metricflow.model.objects.entity import Entity
 from metricflow.model.objects.elements.dimension import DimensionType, Dimension
 from metricflow.model.objects.elements.identifier import IdentifierType
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
-from metricflow.model.semantics.entity_join_evaluator import MetricFlowEntityJoinEvaluator
+from metricflow.model.semantics.entity_join_evaluator import EntityJoinEvaluator
 from metricflow.object_utils import pformat_big_objects, flatten_nested_sequence
-from metricflow.protocols.semantics import MetricFlowEntitySemanticsAccessor
+from metricflow.protocols.semantics import EntitySemanticsAccessor
 from metricflow.references import MeasureReference
 from metricflow.references import MetricReference
 from metricflow.specs import (
@@ -268,10 +268,10 @@ class LinkableElementSet:
 
 
 @dataclass(frozen=True)
-class MetricFlowEntityJoinPathElement:
+class EntityJoinPathElement:
     """Describes joining a entity by the given identifier."""
 
-    entity: MetricFlowEntity
+    entity: Entity
     join_on_identifier: str
 
 
@@ -304,7 +304,7 @@ def _generate_linkable_time_dimensions(
 
 
 @dataclass(frozen=True)
-class MetricFlowEntityJoinPath:
+class EntityJoinPath:
     """Describes a series of joins between the measure entity, and other entities by identifier.
 
     For example:
@@ -314,7 +314,7 @@ class MetricFlowEntityJoinPath:
     would be represented by 2 path elements [(entity0, A), (dimension_source1, B)]
     """
 
-    path_elements: Tuple[MetricFlowEntityJoinPathElement, ...]
+    path_elements: Tuple[EntityJoinPathElement, ...]
 
     def create_linkable_element_set(self, with_properties: FrozenSet[LinkableElementProperties]) -> LinkableElementSet:
         """Given the current path, generate the respective linkable elements from the last entity in the path."""
@@ -366,7 +366,7 @@ class MetricFlowEntityJoinPath:
         )
 
     @property
-    def last_entity(self) -> MetricFlowEntity:
+    def last_entity(self) -> Entity:
         """The last entity that would be joined in this path."""
         assert len(self.path_elements) > 0
         return self.path_elements[-1].entity
@@ -381,7 +381,7 @@ class ValidLinkableSpecResolver:
     def __init__(
         self,
         user_configured_model: UserConfiguredModel,
-        entity_semantics: MetricFlowEntitySemanticsAccessor,
+        entity_semantics: EntitySemanticsAccessor,
         max_identifier_links: int,
     ) -> None:
         """Constructor.
@@ -394,14 +394,14 @@ class ValidLinkableSpecResolver:
         self._user_configured_model = user_configured_model
         # Sort entities by name for consistency in building derived objects.
         self._entities = sorted(self._user_configured_model.entities, key=lambda x: x.name)
-        self._join_evaluator = MetricFlowEntityJoinEvaluator(entity_semantics)
+        self._join_evaluator = EntityJoinEvaluator(entity_semantics)
 
         assert max_identifier_links >= 0
         self._max_identifier_links = max_identifier_links
 
         # Map measures / identifiers to entities that contain them.
-        self._identifier_to_entity: Dict[str, List[MetricFlowEntity]] = defaultdict(list)
-        self._measure_to_entity: Dict[str, List[MetricFlowEntity]] = defaultdict(list)
+        self._identifier_to_entity: Dict[str, List[Entity]] = defaultdict(list)
+        self._measure_to_entity: Dict[str, List[Entity]] = defaultdict(list)
 
         for entity in self._entities:
             for identifier in entity.identifiers:
@@ -418,7 +418,7 @@ class ValidLinkableSpecResolver:
             self._metric_to_linkable_element_sets[metric.name] = linkable_sets_for_measure
         logger.info(f"Building the [metric -> valid linkable element] index took: {time.time() - start_time:.2f}s")
 
-    def _get_entity_for_measure(self, measure_reference: MeasureReference) -> MetricFlowEntity:  # noqa: D
+    def _get_entity_for_measure(self, measure_reference: MeasureReference) -> Entity:  # noqa: D
         entities_where_measure_was_found = []
         for entity in self._entities:
             if any([x.reference.element_name == measure_reference.element_name for x in entity.measures]):
@@ -433,7 +433,7 @@ class ValidLinkableSpecResolver:
             )
         return entities_where_measure_was_found[0]
 
-    def _get_local_set(self, entity: MetricFlowEntity) -> LinkableElementSet:
+    def _get_local_set(self, entity: Entity) -> LinkableElementSet:
         """Gets the local elements for a given entity."""
         linkable_dimensions = []
         linkable_identifiers = []
@@ -492,9 +492,9 @@ class ValidLinkableSpecResolver:
 
     def _get_entities_with_joinable_identifier(
         self,
-        left_entity_reference: MetricFlowEntityReference,
+        left_entity_reference: EntityReference,
         identifier_reference: IdentifierReference,
-    ) -> Sequence[MetricFlowEntity]:
+    ) -> Sequence[Entity]:
         # May switch to non-cached implementation.
         entities = self._identifier_to_entity[identifier_reference.element_name]
         valid_entities = []
@@ -525,9 +525,9 @@ class ValidLinkableSpecResolver:
                 if entity.name == measure_entity.name:
                     continue
                 join_paths.append(
-                    MetricFlowEntityJoinPath(
+                    EntityJoinPath(
                         path_elements=(
-                            MetricFlowEntityJoinPathElement(
+                            EntityJoinPathElement(
                                 entity=entity, join_on_identifier=identifier.reference.element_name
                             ),
                         )
@@ -544,7 +544,7 @@ class ValidLinkableSpecResolver:
         # Create multi-hop elements. At each iteration, we generate the list of valid elements based on the current join
         # path, extend all paths to include the next valid entity, then repeat.
         for i in range(self._max_identifier_links - 1):
-            new_join_paths: List[MetricFlowEntityJoinPath] = []
+            new_join_paths: List[EntityJoinPath] = []
             for join_path in join_paths:
                 new_join_paths.extend(
                     self._find_next_possible_paths(measure_entity=measure_entity, current_join_path=join_path)
@@ -587,8 +587,8 @@ class ValidLinkableSpecResolver:
         return LinkableElementSet.intersection(linkable_element_sets)
 
     def _find_next_possible_paths(
-        self, measure_entity: MetricFlowEntity, current_join_path: MetricFlowEntityJoinPath
-    ) -> Sequence[MetricFlowEntityJoinPath]:
+        self, measure_entity: Entity, current_join_path: EntityJoinPath
+    ) -> Sequence[EntityJoinPath]:
         """Generate the set of possible paths that are 1 entity join longer that the "current_join_path"."""
         last_entity_in_path = current_join_path.last_entity
         new_join_paths = []
@@ -611,9 +611,9 @@ class ValidLinkableSpecResolver:
                 ):
                     continue
 
-                new_join_path = MetricFlowEntityJoinPath(
+                new_join_path = EntityJoinPath(
                     path_elements=current_join_path.path_elements
-                    + (MetricFlowEntityJoinPathElement(entity=entity, join_on_identifier=identifier_name),)
+                    + (EntityJoinPathElement(entity=entity, join_on_identifier=identifier_name),)
                 )
                 new_join_paths.append(new_join_path)
 

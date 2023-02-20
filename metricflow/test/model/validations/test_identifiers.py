@@ -8,8 +8,7 @@ import pytest
 from metricflow.aggregation_properties import AggregationType
 from metricflow.model.model_validator import ModelValidator
 from metricflow.model.objects.common import YamlConfigFile
-from metricflow.model.objects.conversions import MetricFlowMetricFlowEntity
-from dbt.contracts.graph.entities import Mutability, MutabilityType
+from metricflow.model.objects.entity import Entity, Mutability, MutabilityType
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from metricflow.model.objects.elements.identifier import IdentifierType, Identifier, CompositeSubIdentifier
 from metricflow.model.objects.elements.measure import Measure
@@ -20,7 +19,7 @@ from metricflow.model.validations.identifiers import (
     IdentifierConfigRule,
     IdentifierConsistencyRule,
     NaturalIdentifierConfigurationRule,
-    OnePrimaryIdentifierPerMetricFlowEntityRule,
+    OnePrimaryIdentifierPerEntityRule,
 )
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.object_utils import flatten_nested_sequence
@@ -38,7 +37,7 @@ def test_entity_cant_have_more_than_one_primary_identifier(
 ) -> None:  # noqa: D
     """Add an additional primary identifier to a entity and assert that it cannot have two"""
     model = copy.deepcopy(simple_model__with_primary_transforms)
-    func: Callable[[MetricFlowEntity], bool] = lambda entity: len(entity.identifiers) > 1
+    func: Callable[[Entity], bool] = lambda entity: len(entity.identifiers) > 1
 
     multiple_identifier_entity, _ = find_entity_with(model, func)
 
@@ -47,7 +46,7 @@ def test_entity_cant_have_more_than_one_primary_identifier(
         identifier.type = IdentifierType.PRIMARY
         identifier_references.add(identifier.reference)
 
-    build = ModelValidator([OnePrimaryIdentifierPerMetricFlowEntityRule()]).validate_model(model)
+    build = ModelValidator([OnePrimaryIdentifierPerEntityRule()]).validate_model(model)
 
     future_issue = (
         f"entities can have only one primary identifier. The entity"

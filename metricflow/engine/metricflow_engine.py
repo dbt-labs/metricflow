@@ -18,8 +18,8 @@ from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import DataflowPlan
 from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import SourceScanOptimizer
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.dataset.convert_entity import MetricFlowEntityToDataSetConverter
-from metricflow.dataset.entity_adapter import MetricFlowEntityDataSet
+from metricflow.dataset.convert_entity import EntityToDataSetConverter
+from metricflow.dataset.entity_adapter import EntityDataSet
 from metricflow.engine.models import Dimension, Metric
 from metricflow.engine.time_source import ServerTimeSource
 from metricflow.engine.utils import build_user_configured_model_from_config
@@ -116,7 +116,7 @@ class MetricFlowQueryResult:  # noqa: D
     """The result of a query and context on how it was generated."""
 
     query_spec: MetricFlowQuerySpec
-    dataflow_plan: DataflowPlan[MetricFlowEntityDataSet]
+    dataflow_plan: DataflowPlan[EntityDataSet]
     sql: str
     result_df: Optional[pd.DataFrame] = None
     result_table: Optional[SqlTable] = None
@@ -127,7 +127,7 @@ class MetricFlowExplainResult:
     """Returns plans for resolving a query."""
 
     query_spec: MetricFlowQuerySpec
-    dataflow_plan: DataflowPlan[MetricFlowEntityDataSet]
+    dataflow_plan: DataflowPlan[EntityDataSet]
     execution_plan: ExecutionPlan
     output_table: Optional[SqlTable] = None
 
@@ -271,8 +271,8 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
         self._schema = system_schema
 
-        self._source_data_sets: List[MetricFlowEntityDataSet] = []
-        converter = MetricFlowEntityToDataSetConverter(column_association_resolver=self._column_association_resolver)
+        self._source_data_sets: List[EntityDataSet] = []
+        converter = EntityToDataSetConverter(column_association_resolver=self._column_association_resolver)
         for entity in self._semantic_model.user_configured_model.entities:
             data_set = converter.create_sql_source_data_set(entity)
             self._source_data_sets.append(data_set)
@@ -281,23 +281,23 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         source_node_builder = SourceNodeBuilder(self._semantic_model)
         source_nodes = source_node_builder.create_from_data_sets(self._source_data_sets)
 
-        node_output_resolver = DataflowPlanNodeOutputDataSetResolver[MetricFlowEntityDataSet](
+        node_output_resolver = DataflowPlanNodeOutputDataSetResolver[EntityDataSet](
             column_association_resolver=DefaultColumnAssociationResolver(semantic_model),
             semantic_model=semantic_model,
             time_spine_source=self._time_spine_source,
         )
 
-        self._dataflow_plan_builder = DataflowPlanBuilder[MetricFlowEntityDataSet](
+        self._dataflow_plan_builder = DataflowPlanBuilder[EntityDataSet](
             source_nodes=source_nodes,
             semantic_model=self._semantic_model,
             time_spine_source=self._time_spine_source,
         )
-        self._to_sql_query_plan_converter = DataflowToSqlQueryPlanConverter[MetricFlowEntityDataSet](
+        self._to_sql_query_plan_converter = DataflowToSqlQueryPlanConverter[EntityDataSet](
             column_association_resolver=self._column_association_resolver,
             semantic_model=self._semantic_model,
             time_spine_source=self._time_spine_source,
         )
-        self._to_execution_plan_converter = DataflowToExecutionPlanConverter[MetricFlowEntityDataSet](
+        self._to_execution_plan_converter = DataflowToExecutionPlanConverter[EntityDataSet](
             sql_plan_converter=self._to_sql_query_plan_converter,
             sql_plan_renderer=self._sql_client.sql_engine_attributes.sql_query_plan_renderer,
             sql_client=sql_client,
@@ -392,7 +392,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             output_table = SqlTable.from_string(mf_query_request.output_table)
 
         dataflow_plan = self._dataflow_plan_builder.build_plan(
-            query_spec=query_spec, output_sql_table=output_table, optimizers=(SourceScanOptimizer[MetricFlowEntityDataSet](),)
+            query_spec=query_spec, output_sql_table=output_table, optimizers=(SourceScanOptimizer[EntityDataSet](),)
         )
 
         if len(dataflow_plan.sink_output_nodes) > 1:

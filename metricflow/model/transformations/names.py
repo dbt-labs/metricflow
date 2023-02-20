@@ -1,6 +1,6 @@
 import logging
 
-from metricflow.model.objects.conversions import MetricFlowMetricFlowEntity
+from metricflow.model.objects.entity import Entity
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.transformations.transform_rule import ModelTransformRule
 
@@ -19,7 +19,7 @@ class LowerCaseNamesRule(ModelTransformRule):
         return model
 
     @staticmethod
-    def _lowercase_entity_elements(entity: MetricFlowEntity) -> None:
+    def _lowercase_entity_elements(entity: Entity) -> None:
         """Lowercases the names of entity elements."""
         if entity.measures:
             for measure in entity.measures:

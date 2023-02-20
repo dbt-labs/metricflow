@@ -60,7 +60,7 @@ class Identifier(HashableBaseModel, ModelWithMetadataParsing):
 
         # guarantee value is string
         if not isinstance(value, str):
-            raise ValueError(f"MetricFlowEntity value should be a string (str) type, but got {type(value)} with value: {value}")
+            raise ValueError(f"Entity value should be a string (str) type, but got {type(value)} with value: {value}")
         return value
 
     @property

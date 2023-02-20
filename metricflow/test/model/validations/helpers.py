@@ -5,7 +5,7 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.engine.models import Dimension
 from metricflow.model.objects.common import FileSlice, Metadata, YamlConfigFile
 from metricflow.model.objects.constraints.where import WhereClauseConstraint
-from metricflow.model.objects.conversions import MetricFlowMetricFlowEntity, MetricFlowEntityOrigin, Mutability
+from metricflow.model.objects.entity import Entity, EntityOrigin, Mutability
 from metricflow.model.objects.elements.identifier import Identifier
 from metricflow.model.objects.elements.measure import Measure
 from metricflow.model.objects.metric import Metric, MetricType, MetricTypeParams
@@ -88,11 +88,11 @@ def entity_with_guaranteed_meta(
     identifiers: Sequence[Identifier] = [],
     measures: Sequence[Measure] = [],
     dimensions: Sequence[Dimension] = [],
-    origin: MetricFlowEntityOrigin = MetricFlowEntityOrigin.SOURCE,
-) -> MetricFlowEntity:
+    origin: EntityOrigin = EntityOrigin.SOURCE,
+) -> Entity:
     """Creates a entity with the given input. If a metadata object is not supplied, a default metadata object is used"""
 
-    return MetricFlowEntity(
+    return Entity(
         name=name,
         mutability=mutability,
         description=description,

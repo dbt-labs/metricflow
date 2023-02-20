@@ -1,20 +1,20 @@
 from typing import Dict, Sequence
 
-from metricflow.instances import MetricFlowEntityReference
+from metricflow.instances import EntityReference
 from metricflow.model.objects.elements.identifier import IdentifierType
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.semantics.entity_join_evaluator import (
-    MetricFlowEntityIdentifierJoinType,
-    MetricFlowEntityJoinEvaluator,
-    MetricFlowEntityLink,
-    MetricFlowEntityIdentifierJoin,
+    EntityIdentifierJoinType,
+    EntityJoinEvaluator,
+    EntityLink,
+    EntityIdentifierJoin,
 )
 from metricflow.object_utils import assert_values_exhausted
 from metricflow.references import IdentifierReference
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 
 
-def _get_join_types_for_identifier_type(identifier_type: IdentifierType) -> Sequence[MetricFlowEntityIdentifierJoinType]:
+def _get_join_types_for_identifier_type(identifier_type: IdentifierType) -> Sequence[EntityIdentifierJoinType]:
     """Exhaustively evaluate identifier types and return a sequence of all possible join type pairs
 
     The exhaustive conditional statically enforces that every identifier type is handled on the left.
@@ -28,7 +28,7 @@ def _get_join_types_for_identifier_type(identifier_type: IdentifierType) -> Sequ
         or identifier_type is IdentifierType.NATURAL
     ):
         join_types = tuple(
-            MetricFlowEntityIdentifierJoinType(left_identifier_type=identifier_type, right_identifier_type=join_type)
+            EntityIdentifierJoinType(left_identifier_type=identifier_type, right_identifier_type=join_type)
             for join_type in IdentifierType
         )
         return join_types
@@ -43,7 +43,7 @@ def test_join_type_coverage() -> None:
     and triggering a test failure for types which are handled in a non-exhaustive fashion
     """
     all_join_types = set(
-        MetricFlowEntityJoinEvaluator._INVALID_IDENTIFIER_JOINS + MetricFlowEntityJoinEvaluator._VALID_IDENTIFIER_JOINS
+        EntityJoinEvaluator._INVALID_IDENTIFIER_JOINS + EntityJoinEvaluator._VALID_IDENTIFIER_JOINS
     )
     for identifier_type in IdentifierType:
         join_types = _get_join_types_for_identifier_type(identifier_type=identifier_type)
@@ -55,7 +55,7 @@ def test_join_type_coverage() -> None:
 
 def __get_simple_model_user_entity_references_by_type(
     semantic_model: SemanticModel,
-) -> Dict[IdentifierType, MetricFlowEntityReference]:
+) -> Dict[IdentifierType, EntityReference]:
     """Helper to get a set of entities with the `user` identifier organized by identifier type"""
     foreign_user_entity = semantic_model.entity_semantics.get("listings_latest")
     primary_user_entity = semantic_model.entity_semantics.get("users_latest")
@@ -80,7 +80,7 @@ def test_distinct_target_entity_join_validation(simple_semantic_model: SemanticM
     """
     entity_references = __get_simple_model_user_entity_references_by_type(simple_semantic_model)
     user_identifier_reference = IdentifierReference(element_name="user")
-    join_evaluator = MetricFlowEntityJoinEvaluator(entity_semantics=simple_semantic_model.entity_semantics)
+    join_evaluator = EntityJoinEvaluator(entity_semantics=simple_semantic_model.entity_semantics)
 
     foreign_primary = join_evaluator.is_valid_entity_join(
         left_entity_reference=entity_references[IdentifierType.FOREIGN],
@@ -134,7 +134,7 @@ def test_foreign_target_entity_join_validation(simple_semantic_model: SemanticMo
     """
     entity_references = __get_simple_model_user_entity_references_by_type(simple_semantic_model)
     user_identifier_reference = IdentifierReference(element_name="user")
-    join_evaluator = MetricFlowEntityJoinEvaluator(entity_semantics=simple_semantic_model.entity_semantics)
+    join_evaluator = EntityJoinEvaluator(entity_semantics=simple_semantic_model.entity_semantics)
 
     foreign_foreign = join_evaluator.is_valid_entity_join(
         left_entity_reference=entity_references[IdentifierType.FOREIGN],
@@ -170,7 +170,7 @@ def test_entity_join_validation_on_missing_identifier(simple_semantic_model: Sem
     no_listing_entity = simple_semantic_model.entity_semantics.get("id_verifications")
     assert no_listing_entity, "Could not find entity `id_verifications` in the simple model!"
     listing_identifier_reference = IdentifierReference(element_name="listing")
-    join_evaluator = MetricFlowEntityJoinEvaluator(entity_semantics=simple_semantic_model.entity_semantics)
+    join_evaluator = EntityJoinEvaluator(entity_semantics=simple_semantic_model.entity_semantics)
 
     assert not join_evaluator.is_valid_entity_join(
         left_entity_reference=no_listing_entity.reference,
@@ -190,7 +190,7 @@ def test_distinct_target_instance_set_join_validation(
     primary_user_instance_set = consistent_id_object_repository.simple_model_data_sets["users_latest"].instance_set
     unique_user_instance_set = consistent_id_object_repository.simple_model_data_sets["companies"].instance_set
     user_identifier_reference = IdentifierReference(element_name="user")
-    join_evaluator = MetricFlowEntityJoinEvaluator(entity_semantics=simple_semantic_model.entity_semantics)
+    join_evaluator = EntityJoinEvaluator(entity_semantics=simple_semantic_model.entity_semantics)
 
     foreign_primary = join_evaluator.is_valid_instance_set_join(
         left_instance_set=foreign_user_instance_set,
@@ -245,7 +245,7 @@ def test_foreign_target_instance_set_join_validation(
     primary_user_instance_set = consistent_id_object_repository.simple_model_data_sets["users_latest"].instance_set
     unique_user_instance_set = consistent_id_object_repository.simple_model_data_sets["companies"].instance_set
     user_identifier_reference = IdentifierReference(element_name="user")
-    join_evaluator = MetricFlowEntityJoinEvaluator(entity_semantics=simple_semantic_model.entity_semantics)
+    join_evaluator = EntityJoinEvaluator(entity_semantics=simple_semantic_model.entity_semantics)
 
     foreign_foreign = join_evaluator.is_valid_instance_set_join(
         left_instance_set=foreign_user_instance_set,
@@ -275,19 +275,19 @@ def test_foreign_target_instance_set_join_validation(
 
 
 def test_get_joinable_entities_single_hop(multi_hop_join_semantic_model: SemanticModel) -> None:  # noqa: D
-    entity_reference = MetricFlowEntityReference(entity_name="account_month_txns")
-    join_evaluator = MetricFlowEntityJoinEvaluator(entity_semantics=multi_hop_join_semantic_model.entity_semantics)
+    entity_reference = EntityReference(entity_name="account_month_txns")
+    join_evaluator = EntityJoinEvaluator(entity_semantics=multi_hop_join_semantic_model.entity_semantics)
 
     # Single-hop
     joinable_entities = join_evaluator.get_joinable_entities(left_entity_reference=entity_reference)
     assert set(joinable_entities.keys()) == {"bridge_table"}
-    assert joinable_entities["bridge_table"] == MetricFlowEntityLink(
-        left_entity_reference=MetricFlowEntityReference(entity_name="account_month_txns"),
+    assert joinable_entities["bridge_table"] == EntityLink(
+        left_entity_reference=EntityReference(entity_name="account_month_txns"),
         join_path=[
-            MetricFlowEntityIdentifierJoin(
-                right_entity_reference=MetricFlowEntityReference(entity_name="bridge_table"),
+            EntityIdentifierJoin(
+                right_entity_reference=EntityReference(entity_name="bridge_table"),
                 identifier_reference=IdentifierReference(element_name="account_id"),
-                join_type=MetricFlowEntityIdentifierJoinType(
+                join_type=EntityIdentifierJoinType(
                     left_identifier_type=IdentifierType.PRIMARY, right_identifier_type=IdentifierType.PRIMARY
                 ),
             )
@@ -296,59 +296,59 @@ def test_get_joinable_entities_single_hop(multi_hop_join_semantic_model: Semanti
 
 
 def test_get_joinable_entities_multi_hop(multi_hop_join_semantic_model: SemanticModel) -> None:  # noqa: D
-    entity_reference = MetricFlowEntityReference(entity_name="account_month_txns")
-    join_evaluator = MetricFlowEntityJoinEvaluator(entity_semantics=multi_hop_join_semantic_model.entity_semantics)
+    entity_reference = EntityReference(entity_name="account_month_txns")
+    join_evaluator = EntityJoinEvaluator(entity_semantics=multi_hop_join_semantic_model.entity_semantics)
 
     # 2-hop
     joinable_entities = join_evaluator.get_joinable_entities(
         left_entity_reference=entity_reference, include_multi_hop=True
     )
     assert set(joinable_entities.keys()) == {"bridge_table", "customer_other_data", "customer_table"}
-    assert joinable_entities["bridge_table"] == MetricFlowEntityLink(
-        left_entity_reference=MetricFlowEntityReference(entity_name="account_month_txns"),
+    assert joinable_entities["bridge_table"] == EntityLink(
+        left_entity_reference=EntityReference(entity_name="account_month_txns"),
         join_path=[
-            MetricFlowEntityIdentifierJoin(
-                right_entity_reference=MetricFlowEntityReference(entity_name="bridge_table"),
+            EntityIdentifierJoin(
+                right_entity_reference=EntityReference(entity_name="bridge_table"),
                 identifier_reference=IdentifierReference(element_name="account_id"),
-                join_type=MetricFlowEntityIdentifierJoinType(
+                join_type=EntityIdentifierJoinType(
                     left_identifier_type=IdentifierType.PRIMARY, right_identifier_type=IdentifierType.PRIMARY
                 ),
             )
         ],
     )
-    assert joinable_entities["customer_other_data"] == MetricFlowEntityLink(
-        left_entity_reference=MetricFlowEntityReference(entity_name="account_month_txns"),
+    assert joinable_entities["customer_other_data"] == EntityLink(
+        left_entity_reference=EntityReference(entity_name="account_month_txns"),
         join_path=[
-            MetricFlowEntityIdentifierJoin(
-                right_entity_reference=MetricFlowEntityReference(entity_name="bridge_table"),
+            EntityIdentifierJoin(
+                right_entity_reference=EntityReference(entity_name="bridge_table"),
                 identifier_reference=IdentifierReference(element_name="account_id"),
-                join_type=MetricFlowEntityIdentifierJoinType(
+                join_type=EntityIdentifierJoinType(
                     left_identifier_type=IdentifierType.PRIMARY, right_identifier_type=IdentifierType.PRIMARY
                 ),
             ),
-            MetricFlowEntityIdentifierJoin(
-                right_entity_reference=MetricFlowEntityReference(entity_name="customer_other_data"),
+            EntityIdentifierJoin(
+                right_entity_reference=EntityReference(entity_name="customer_other_data"),
                 identifier_reference=IdentifierReference(element_name="customer_id"),
-                join_type=MetricFlowEntityIdentifierJoinType(
+                join_type=EntityIdentifierJoinType(
                     left_identifier_type=IdentifierType.FOREIGN, right_identifier_type=IdentifierType.PRIMARY
                 ),
             ),
         ],
     )
-    assert joinable_entities["customer_table"] == MetricFlowEntityLink(
-        left_entity_reference=MetricFlowEntityReference(entity_name="account_month_txns"),
+    assert joinable_entities["customer_table"] == EntityLink(
+        left_entity_reference=EntityReference(entity_name="account_month_txns"),
         join_path=[
-            MetricFlowEntityIdentifierJoin(
-                right_entity_reference=MetricFlowEntityReference(entity_name="bridge_table"),
+            EntityIdentifierJoin(
+                right_entity_reference=EntityReference(entity_name="bridge_table"),
                 identifier_reference=IdentifierReference(element_name="account_id"),
-                join_type=MetricFlowEntityIdentifierJoinType(
+                join_type=EntityIdentifierJoinType(
                     left_identifier_type=IdentifierType.PRIMARY, right_identifier_type=IdentifierType.PRIMARY
                 ),
             ),
-            MetricFlowEntityIdentifierJoin(
-                right_entity_reference=MetricFlowEntityReference(entity_name="customer_table"),
+            EntityIdentifierJoin(
+                right_entity_reference=EntityReference(entity_name="customer_table"),
                 identifier_reference=IdentifierReference(element_name="customer_id"),
-                join_type=MetricFlowEntityIdentifierJoinType(
+                join_type=EntityIdentifierJoinType(
                     left_identifier_type=IdentifierType.FOREIGN, right_identifier_type=IdentifierType.PRIMARY
                 ),
             ),
@@ -366,7 +366,7 @@ def test_natural_identifier_entity_validation(scd_semantic_model: SemanticModel)
     foreign_user_entity = scd_semantic_model.entity_semantics.get("bookings_source")
     unique_user_entity = scd_semantic_model.entity_semantics.get("companies")
     user_identifier_reference = IdentifierReference(element_name="user")
-    join_evaluator = MetricFlowEntityJoinEvaluator(entity_semantics=scd_semantic_model.entity_semantics)
+    join_evaluator = EntityJoinEvaluator(entity_semantics=scd_semantic_model.entity_semantics)
     # Type refinement
     assert natural_user_entity, "Could not find `primary_accounts` entity in scd model!"
     assert foreign_user_entity, "Could not find `bookings_source` entity in scd model!"
@@ -441,7 +441,7 @@ def test_natural_identifier_instance_set_validation(
     foreign_user_instance_set = consistent_id_object_repository.scd_model_data_sets["bookings_source"].instance_set
     unique_user_instance_set = consistent_id_object_repository.scd_model_data_sets["companies"].instance_set
     user_identifier_reference = IdentifierReference(element_name="user")
-    join_evaluator = MetricFlowEntityJoinEvaluator(entity_semantics=scd_semantic_model.entity_semantics)
+    join_evaluator = EntityJoinEvaluator(entity_semantics=scd_semantic_model.entity_semantics)
 
     # Valid cases
     natural_primary = join_evaluator.is_valid_instance_set_join(

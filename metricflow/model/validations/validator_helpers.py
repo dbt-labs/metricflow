@@ -11,8 +11,8 @@ from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
 from pydantic import BaseModel, Extra
 
 from metricflow.instances import (
-    MetricFlowEntityElementReference,
-    MetricFlowEntityReference,
+    EntityElementReference,
+    EntityReference,
     MetricModelReference,
 )
 from metricflow.model.objects.base import FrozenBaseModel
@@ -50,7 +50,7 @@ ISSUE_COLOR_MAP = {
 }
 
 
-class MetricFlowEntityElementType(Enum):
+class EntityElementType(Enum):
     """Maps entity element types to a readable string."""
 
     MEASURE = "measure"
@@ -102,23 +102,23 @@ class MetricContext(BaseModel):
         return f"with metric `{self.metric.metric_name}` {self.file_context.context_str()}"
 
 
-class MetricFlowEntityContext(BaseModel):
+class EntityContext(BaseModel):
     """The context class for validation issues involving entities"""
 
     file_context: FileContext
-    entity: MetricFlowEntityReference
+    entity: EntityReference
 
     def context_str(self) -> str:
         """Human readable stringified representation of the context"""
         return f"with entity `{self.entity.entity_name}` {self.file_context.context_str()}"
 
 
-class MetricFlowEntityElementContext(BaseModel):
+class EntityElementContext(BaseModel):
     """The context class for validation issues involving dimensions"""
 
     file_context: FileContext
-    entity_element: MetricFlowEntityElementReference
-    element_type: MetricFlowEntityElementType
+    entity_element: EntityElementReference
+    element_type: EntityElementType
 
     def context_str(self) -> str:
         """Human readable stringified representation of the context"""
@@ -128,8 +128,8 @@ class MetricFlowEntityElementContext(BaseModel):
 ValidationContext = Union[
     FileContext,
     MetricContext,
-    MetricFlowEntityContext,
-    MetricFlowEntityElementContext,
+    EntityContext,
+    EntityElementContext,
 ]
 
 

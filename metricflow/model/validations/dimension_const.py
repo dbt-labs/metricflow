@@ -1,11 +1,11 @@
 from typing import Dict, List
-from metricflow.instances import MetricFlowEntityElementReference
+from metricflow.instances import EntityElementReference
 
-from metricflow.model.objects.conversions import MetricFlowMetricFlowEntity
+from metricflow.model.objects.entity import Entity
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType
 from metricflow.model.validations.validator_helpers import (
-    MetricFlowEntityElementContext,
-    MetricFlowEntityElementType,
+    EntityElementContext,
+    EntityElementType,
     FileContext,
     ModelValidationRule,
     DimensionInvariants,
@@ -53,7 +53,7 @@ class DimensionConsistencyRule(ModelValidationRule):
     def _validate_dimension(
         dimension: Dimension,
         time_dims_to_granularity: Dict[DimensionReference, TimeGranularity],
-        entity: MetricFlowEntity,
+        entity: Entity,
     ) -> List[ValidationIssueType]:
         """Checks that time dimensions of the same name that aren't primary have the same time granularity specifications
 
@@ -64,12 +64,12 @@ class DimensionConsistencyRule(ModelValidationRule):
         Throws: MdoValidationError if there is an inconsistent dimension in the entity.
         """
         issues: List[ValidationIssueType] = []
-        context = MetricFlowEntityElementContext(
+        context = EntityElementContext(
             file_context=FileContext.from_metadata(metadata=entity.metadata),
-            entity_element=MetricFlowEntityElementReference(
+            entity_element=EntityElementReference(
                 entity_name=entity.name, element_name=dimension.name
             ),
-            element_type=MetricFlowEntityElementType.DIMENSION,
+            element_type=EntityElementType.DIMENSION,
         )
 
         if dimension.type == DimensionType.TIME:
@@ -99,7 +99,7 @@ class DimensionConsistencyRule(ModelValidationRule):
         whats_being_done="checking that the entity has dimensions consistent with the given invariants"
     )
     def _validate_entity(
-        entity: MetricFlowEntity,
+        entity: Entity,
         dimension_to_invariant: Dict[DimensionReference, DimensionInvariants],
         update_invariant_dict: bool,
     ) -> List[ValidationIssueType]:
@@ -128,12 +128,12 @@ class DimensionConsistencyRule(ModelValidationRule):
             # is_partition might not be specified in the configs, so default to False.
             is_partition = dimension.is_partition or False
 
-            context = MetricFlowEntityElementContext(
+            context = EntityElementContext(
                 file_context=FileContext.from_metadata(metadata=entity.metadata),
-                entity_element=MetricFlowEntityElementReference(
+                entity_element=EntityElementReference(
                     entity_name=entity.name, element_name=dimension.name
                 ),
-                element_type=MetricFlowEntityElementType.DIMENSION,
+                element_type=EntityElementType.DIMENSION,
             )
 
             if dimension_invariant.type != dimension.type:

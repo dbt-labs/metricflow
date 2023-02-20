@@ -1,14 +1,14 @@
 from typing import List
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.instances import MetricFlowEntityElementReference
+from metricflow.instances import EntityElementReference
 
 
-from metricflow.model.objects.conversions import MetricFlowMetricFlowEntity
+from metricflow.model.objects.entity import Entity
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
-    MetricFlowEntityContext,
-    MetricFlowEntityElementContext,
-    MetricFlowEntityElementType,
+    EntityContext,
+    EntityElementContext,
+    EntityElementType,
     FileContext,
     ModelValidationRule,
     ValidationError,
@@ -66,19 +66,19 @@ class ReservedKeywordsRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking that entity sub element names aren't reserved sql keywords")
-    def _validate_entity_sub_elements(entity: MetricFlowEntity) -> List[ValidationIssueType]:
+    def _validate_entity_sub_elements(entity: Entity) -> List[ValidationIssueType]:
         issues: List[ValidationIssueType] = []
 
         for dimension in entity.dimensions:
             if dimension.name.upper() in RESERVED_KEYWORDS:
                 issues.append(
                     ValidationError(
-                        context=MetricFlowEntityElementContext(
+                        context=EntityElementContext(
                             file_context=FileContext.from_metadata(entity.metadata),
-                            entity_element=MetricFlowEntityElementReference(
+                            entity_element=EntityElementReference(
                                 entity_name=entity.name, element_name=dimension.name
                             ),
-                            element_type=MetricFlowEntityElementType.DIMENSION,
+                            element_type=EntityElementType.DIMENSION,
                         ),
                         message=f"'{dimension.name}' is an SQL reserved keyword, and thus cannot be used as a dimension 'name'.",
                     )
@@ -96,12 +96,12 @@ class ReservedKeywordsRule(ModelValidationRule):
                 if name.upper() in RESERVED_KEYWORDS:
                     issues.append(
                         ValidationError(
-                            context=MetricFlowEntityElementContext(
+                            context=EntityElementContext(
                                 file_context=FileContext.from_metadata(entity.metadata),
-                                entity_element=MetricFlowEntityElementReference(
+                                entity_element=EntityElementReference(
                                     entity_name=entity.name, element_name=identifier.name
                                 ),
-                                element_type=MetricFlowEntityElementType.IDENTIFIER,
+                                element_type=EntityElementType.IDENTIFIER,
                             ),
                             message=msg.format(name=name),
                         )
@@ -111,12 +111,12 @@ class ReservedKeywordsRule(ModelValidationRule):
             if measure.name.upper() in RESERVED_KEYWORDS:
                 issues.append(
                     ValidationError(
-                        context=MetricFlowEntityElementContext(
+                        context=EntityElementContext(
                             file_context=FileContext.from_metadata(entity.metadata),
-                            entity_element=MetricFlowEntityElementReference(
+                            entity_element=EntityElementReference(
                                 entity_name=entity.name, element_name=measure.name
                             ),
-                            element_type=MetricFlowEntityElementType.MEASURE,
+                            element_type=EntityElementType.MEASURE,
                         ),
                         message=f"'{measure.name}' is an SQL reserved keyword, and thus cannot be used as an measure 'name'.",
                     )
@@ -141,7 +141,7 @@ class ReservedKeywordsRule(ModelValidationRule):
                 if len(keyword_intersection) > 0:
                     issues.append(
                         ValidationError(
-                            context=MetricFlowEntityContext(
+                            context=EntityContext(
                                 file_context=FileContext.from_metadata(entity.metadata),
                                 entity=entity.reference,
                             ),

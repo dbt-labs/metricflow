@@ -5,7 +5,7 @@ from typing import Dict, List, FrozenSet, Set, Tuple, Sequence
 from metricflow.errors.errors import MetricNotFoundError, DuplicateMetricError, NonExistentMeasureError
 from metricflow.model.objects.metric import Metric, MetricType
 from dbt.contracts.graph.manifest import UserConfiguredModel
-from metricflow.model.semantics.entity_semantics import MetricFlowEntitySemantics
+from metricflow.model.semantics.entity_semantics import EntitySemantics
 from metricflow.model.semantics.linkable_spec_resolver import ValidLinkableSpecResolver
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.spec_converters import WhereConstraintConverter
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 class MetricSemantics:  # noqa: D
     def __init__(  # noqa: D
-        self, user_configured_model: UserConfiguredModel, entity_semantics: MetricFlowEntitySemantics
+        self, user_configured_model: UserConfiguredModel, entity_semantics: EntitySemantics
     ) -> None:
         self._user_configured_model = user_configured_model
         self._metrics: Dict[MetricReference, Metric] = {}

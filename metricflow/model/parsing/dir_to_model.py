@@ -11,7 +11,7 @@ from jsonschema import exceptions
 from metricflow.errors.errors import ParsingException
 from metricflow.model.model_transformer import ModelTransformer
 from metricflow.model.objects.common import Version, YamlConfigFile
-from metricflow.model.objects.conversions import MetricFlowMetricFlowEntity
+from metricflow.model.objects.entity import Entity
 from metricflow.model.objects.metric import Metric
 from metricflow.model.parsing.schemas_internal import (
     metric_validator,
@@ -55,7 +55,7 @@ class FileParsingResult:
         issues: Issues found when trying to parse the file
     """
 
-    elements: List[Union[MetricFlowEntity, Metric]]
+    elements: List[Union[Entity, Metric]]
     issues: List[ValidationIssueType]
 
 
@@ -188,7 +188,7 @@ def parse_yaml_files_to_validation_ready_model(
 
 def parse_yaml_files_to_model(
     files: List[YamlConfigFile],
-    entity_class: Type[MetricFlowEntity] = MetricFlowEntity,
+    entity_class: Type[Entity] = Entity,
     metric_class: Type[Metric] = Metric,
 ) -> ModelBuildResult:
     """Builds UserConfiguredModel from list of config files (as strings).
@@ -236,11 +236,11 @@ def parse_yaml_files_to_model(
 
 def parse_config_yaml(
     config_yaml: YamlConfigFile,
-    entity_class: Type[MetricFlowEntity] = MetricFlowEntity,
+    entity_class: Type[Entity] = Entity,
     metric_class: Type[Metric] = Metric,
 ) -> FileParsingResult:
     """Parses transform config file passed as string - Returns list of model objects"""
-    results: List[Union[MetricFlowEntity, Metric]] = []
+    results: List[Union[Entity, Metric]] = []
     ctx: Optional[ParsingContext] = None
     issues: List[ValidationIssueType] = []
     try:

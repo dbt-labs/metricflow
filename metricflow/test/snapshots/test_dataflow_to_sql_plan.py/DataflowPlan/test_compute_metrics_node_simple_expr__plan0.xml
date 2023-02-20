@@ -42,10 +42,10 @@
                         <!--    'identifier_links': ()}             -->
                         <ReadSqlSourceNode>
                             <!-- description =                                                                           -->
-                            <!--   Read From MetricFlowEntityDataSet(MetricFlowEntityReference(entity_name='bookings_source'))  -->
+                            <!--   Read From EntityDataSet(EntityReference(entity_name='bookings_source'))  -->
                             <!-- node_id = rss_10001 -->
                             <!-- data_set =                                                                    -->
-                            <!--   MetricFlowEntityDataSet(MetricFlowEntityReference(entity_name='bookings_source'))  -->
+                            <!--   EntityDataSet(EntityReference(entity_name='bookings_source'))  -->
                         </ReadSqlSourceNode>
                     </FilterElementsNode>
                     <FilterElementsNode>
@@ -63,10 +63,10 @@
                         <!--    'identifier_links': ()}             -->
                         <ReadSqlSourceNode>
                             <!-- description =                                                                           -->
-                            <!--   Read From MetricFlowEntityDataSet(MetricFlowEntityReference(entity_name='listings_latest'))  -->
+                            <!--   Read From EntityDataSet(EntityReference(entity_name='listings_latest'))  -->
                             <!-- node_id = rss_10004 -->
                             <!-- data_set =                                                                    -->
-                            <!--   MetricFlowEntityDataSet(MetricFlowEntityReference(entity_name='listings_latest'))  -->
+                            <!--   EntityDataSet(EntityReference(entity_name='listings_latest'))  -->
                         </ReadSqlSourceNode>
                     </FilterElementsNode>
                 </JoinToBaseOutputNode>

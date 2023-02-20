@@ -4,15 +4,14 @@ from copy import deepcopy
 from typing import Dict, List, Optional, Set, Sequence
 
 from metricflow.aggregation_properties import AggregationType
-from metricflow.errors.errors import InvalidMetricFlowEntityError
-from metricflow.instances import MetricFlowEntityReference, MetricFlowEntityElementReference
-from metricflow.model.objects.conversions import MetricFlowMetricFlowEntity
-from dbt.contracts.graph.entities import MetricFlowEntityOrigin
+from metricflow.errors.errors import InvalidEntityError
+from metricflow.instances import EntityReference, EntityElementReference
+from metricflow.model.objects.entity import Entity, EntityOrigin
 from metricflow.model.objects.elements.dimension import Dimension
 from metricflow.model.objects.elements.identifier import Identifier
 from metricflow.model.objects.elements.measure import Measure
 from dbt.contracts.graph.manifest import UserConfiguredModel
-from metricflow.model.semantics.entity_container import PydanticMetricFlowEntityContainer
+from metricflow.model.semantics.entity_container import PydanticEntityContainer
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.spec_converters import MeasureConverter
 from metricflow.references import (
@@ -27,42 +26,42 @@ from metricflow.specs import NonAdditiveDimensionSpec, MeasureSpec
 logger = logging.getLogger(__name__)
 
 
-class MetricFlowEntitySemantics:
-    """Tracks semantic information for entity held in a set of MetricFlowEntityContainers
+class EntitySemantics:
+    """Tracks semantic information for entity held in a set of EntityContainers
 
-    This implements both the MetricFlowEntitySemanticsAccessors protocol, the interface type we use throughout the codebase.
+    This implements both the EntitySemanticsAccessors protocol, the interface type we use throughout the codebase.
     That interface prevents unwanted calls to methods for adding entities to the container.
     """
 
     def __init__(  # noqa: D
         self,
         model: UserConfiguredModel,
-        configured_entity_container: PydanticMetricFlowEntityContainer,
+        configured_entity_container: PydanticEntityContainer,
     ) -> None:
         self._model = model
-        self._measure_index: Dict[MeasureReference, List[MetricFlowEntity]] = defaultdict(list)
+        self._measure_index: Dict[MeasureReference, List[Entity]] = defaultdict(list)
         self._measure_aggs: Dict[
             MeasureReference, AggregationType
         ] = {}  # maps measures to their one consistent aggregation
         self._measure_agg_time_dimension: Dict[MeasureReference, TimeDimensionReference] = {}
         self._measure_non_additive_dimension_specs: Dict[MeasureReference, NonAdditiveDimensionSpec] = {}
-        self._dimension_index: Dict[DimensionReference, List[MetricFlowEntity]] = defaultdict(list)
-        self._linkable_reference_index: Dict[LinkableElementReference, List[MetricFlowEntity]] = defaultdict(list)
-        self._entity_index: Dict[Optional[str], List[MetricFlowEntity]] = defaultdict(list)
+        self._dimension_index: Dict[DimensionReference, List[Entity]] = defaultdict(list)
+        self._linkable_reference_index: Dict[LinkableElementReference, List[Entity]] = defaultdict(list)
+        self._entity_index: Dict[Optional[str], List[Entity]] = defaultdict(list)
         self._identifier_ref_to_entity: Dict[IdentifierReference, Optional[str]] = {}
         self._entity_names: Set[str] = set()
 
         self._configured_entity_container = configured_entity_container
         self._entity_to_aggregation_time_dimensions: Dict[
-            MetricFlowEntityReference, ElementGrouper[TimeDimensionReference, MeasureSpec]
+            EntityReference, ElementGrouper[TimeDimensionReference, MeasureSpec]
         ] = {}
 
         # Add semantic tracking for entities from configured_entity_container
         for entity in self._configured_entity_container.values():
-            assert isinstance(entity, MetricFlowEntity)
+            assert isinstance(entity, Entity)
             self.add_configured_entity(entity)
 
-    def add_configured_entity(self, entity: MetricFlowEntity) -> None:
+    def add_configured_entity(self, entity: Entity) -> None:
         """Dont use this unless you mean it (ie in tests). The configured entities are supposed to be static"""
         self._configured_entity_container._put(entity)
         self._add_entity(entity)
@@ -71,7 +70,7 @@ class MetricFlowEntitySemantics:
         return list(self._dimension_index.keys())
 
     def get_dimension(
-        self, dimension_reference: DimensionReference, origin: Optional[MetricFlowEntityOrigin] = None
+        self, dimension_reference: DimensionReference, origin: Optional[EntityOrigin] = None
     ) -> Dimension:
         """Retrieves a full dimension object by name"""
         for dimension_source in self._dimension_index[dimension_reference]:
@@ -122,7 +121,7 @@ class MetricFlowEntitySemantics:
         return list(self._identifier_ref_to_entity.keys())
 
     # DSC interface
-    def get_entities_for_measure(self, measure_reference: MeasureReference) -> List[MetricFlowEntity]:  # noqa: D
+    def get_entities_for_measure(self, measure_reference: MeasureReference) -> List[Entity]:  # noqa: D
         return self._measure_index[measure_reference]
 
     def get_agg_time_dimension_for_measure(  # noqa: D
@@ -130,7 +129,7 @@ class MetricFlowEntitySemantics:
     ) -> TimeDimensionReference:
         return self._measure_agg_time_dimension[measure_reference]
 
-    def get_identifier_in_entity(self, ref: MetricFlowEntityElementReference) -> Optional[Identifier]:  # Noqa: d
+    def get_identifier_in_entity(self, ref: EntityElementReference) -> Optional[Identifier]:  # Noqa: d
         entity = self.get(ref.entity_name)
         if not entity:
             return None
@@ -141,20 +140,20 @@ class MetricFlowEntitySemantics:
 
         return None
 
-    def get(self, entity_name: str) -> Optional[MetricFlowEntity]:  # noqa: D
+    def get(self, entity_name: str) -> Optional[Entity]:  # noqa: D
         if entity_name in self._configured_entity_container:
             entity = self._configured_entity_container.get(entity_name)
-            assert isinstance(entity, MetricFlowEntity)
+            assert isinstance(entity, Entity)
             return entity
 
         return None
 
-    def get_by_reference(self, entity_reference: MetricFlowEntityReference) -> Optional[MetricFlowEntity]:  # noqa: D
+    def get_by_reference(self, entity_reference: EntityReference) -> Optional[Entity]:  # noqa: D
         return self.get(entity_reference.entity_name)
 
     def _add_entity(
         self,
-        entity: MetricFlowEntity,
+        entity: Entity,
         fail_on_error: bool = True,
         logging_context: str = "",
     ) -> None:
@@ -180,7 +179,7 @@ class MetricFlowEntitySemantics:
                 f"Errors: {error_prefix + error_prefix.join(errors)}"
             )
             if fail_on_error:
-                raise InvalidMetricFlowEntityError(error_msg)
+                raise InvalidEntityError(error_msg)
             logger.warning(error_msg)
             return
 
@@ -214,12 +213,12 @@ class MetricFlowEntitySemantics:
             self._linkable_reference_index[ident.reference].append(entity)
 
     @property
-    def entity_references(self) -> Sequence[MetricFlowEntityReference]:  # noqa: D
+    def entity_references(self) -> Sequence[EntityReference]:  # noqa: D
         entity_names_sorted = sorted(self._entity_names)
-        return tuple(MetricFlowEntityReference(entity_name=x) for x in entity_names_sorted)
+        return tuple(EntityReference(entity_name=x) for x in entity_names_sorted)
 
     def get_aggregation_time_dimensions_with_measures(
-        self, entity_reference: MetricFlowEntityReference
+        self, entity_reference: EntityReference
     ) -> ElementGrouper[TimeDimensionReference, MeasureSpec]:
         """Return all time dimensions in a entity with their associated measures."""
         assert (
@@ -227,7 +226,7 @@ class MetricFlowEntitySemantics:
         ), f"entity {entity_reference} is not known"
         return self._entity_to_aggregation_time_dimensions[entity_reference]
 
-    def get_entities_for_identifier(self, identifier_reference: IdentifierReference) -> Set[MetricFlowEntity]:
+    def get_entities_for_identifier(self, identifier_reference: IdentifierReference) -> Set[Entity]:
         """Return all entities associated with an identifier reference"""
         identifier_entity = self._identifier_ref_to_entity[identifier_reference]
         return set(self._entity_index[identifier_entity])

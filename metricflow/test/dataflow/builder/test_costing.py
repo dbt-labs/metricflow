@@ -7,7 +7,7 @@ from metricflow.dataflow.dataflow_plan import (
     JoinToBaseOutputNode,
     JoinDescription,
 )
-from metricflow.dataset.entity_adapter import MetricFlowEntityDataSet
+from metricflow.dataset.entity_adapter import EntityDataSet
 from metricflow.specs import (
     MeasureSpec,
     IdentifierSpec,
@@ -28,7 +28,7 @@ def test_costing(consistent_id_object_repository: ConsistentIdObjectRepository) 
     bookings_spec = MeasureSpec(
         element_name="bookings",
     )
-    bookings_filtered = FilterElementsNode[MetricFlowEntityDataSet](
+    bookings_filtered = FilterElementsNode[EntityDataSet](
         parent_node=bookings_node,
         include_specs=InstanceSpecSet(
             measure_specs=(bookings_spec,),
@@ -41,7 +41,7 @@ def test_costing(consistent_id_object_repository: ConsistentIdObjectRepository) 
         ),
     )
 
-    listings_filtered = FilterElementsNode[MetricFlowEntityDataSet](
+    listings_filtered = FilterElementsNode[EntityDataSet](
         parent_node=listings_node,
         include_specs=InstanceSpecSet(
             dimension_specs=(
@@ -59,7 +59,7 @@ def test_costing(consistent_id_object_repository: ConsistentIdObjectRepository) 
         ),
     )
 
-    join_node = JoinToBaseOutputNode[MetricFlowEntityDataSet](
+    join_node = JoinToBaseOutputNode[EntityDataSet](
         left_node=bookings_filtered,
         join_targets=[
             JoinDescription(
@@ -71,11 +71,11 @@ def test_costing(consistent_id_object_repository: ConsistentIdObjectRepository) 
         ],
     )
 
-    bookings_aggregated = AggregateMeasuresNode[MetricFlowEntityDataSet](
+    bookings_aggregated = AggregateMeasuresNode[EntityDataSet](
         parent_node=join_node, metric_input_measure_specs=(MetricInputMeasureSpec(measure_spec=bookings_spec),)
     )
 
-    cost_function = DefaultCostFunction[MetricFlowEntityDataSet]()
+    cost_function = DefaultCostFunction[EntityDataSet]()
     cost = cost_function.calculate_cost(bookings_aggregated)
 
     assert cost == DefaultCost(num_joins=1, num_aggregations=1)

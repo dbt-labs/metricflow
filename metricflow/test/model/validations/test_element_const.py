@@ -3,15 +3,15 @@ import pytest
 from typing import Tuple
 
 from metricflow.model.model_validator import ModelValidator
-from metricflow.model.objects.conversions import MetricFlowMetricFlowEntity
+from metricflow.model.objects.entity import Entity
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.validations.element_const import ElementConsistencyRule
-from metricflow.model.validations.validator_helpers import MetricFlowEntityElementType, ModelValidationException
+from metricflow.model.validations.validator_helpers import EntityElementType, ModelValidationException
 from metricflow.test.test_utils import find_entity_with
 
 
-def _categorical_dimensions(entity: MetricFlowEntity) -> Tuple[Dimension, ...]:
+def _categorical_dimensions(entity: Entity) -> Tuple[Dimension, ...]:
     return tuple(dim for dim in entity.dimensions if dim.type == DimensionType.CATEGORICAL)
 
 
@@ -44,8 +44,8 @@ def test_cross_element_names(simple_model__with_primary_transforms: UserConfigur
     with pytest.raises(
         ModelValidationException,
         match=(
-            f"element `{measure_reference.element_name}` is of type {MetricFlowEntityElementType.DIMENSION}, but it is used as "
-            f"types .*?MetricFlowEntityElementType.DIMENSION.*?MetricFlowEntityElementType.MEASURE.*? across the model"
+            f"element `{measure_reference.element_name}` is of type {EntityElementType.DIMENSION}, but it is used as "
+            f"types .*?EntityElementType.DIMENSION.*?EntityElementType.MEASURE.*? across the model"
         ),
     ):
         ModelValidator([ElementConsistencyRule()]).checked_validations(model)
@@ -54,8 +54,8 @@ def test_cross_element_names(simple_model__with_primary_transforms: UserConfigur
     with pytest.raises(
         ModelValidationException,
         match=(
-            f"element `{measure_reference.element_name}` is of type {MetricFlowEntityElementType.IDENTIFIER}, but it is used as "
-            f"types .*?MetricFlowEntityElementType.IDENTIFIER.*?MetricFlowEntityElementType.MEASURE.*? across the model"
+            f"element `{measure_reference.element_name}` is of type {EntityElementType.IDENTIFIER}, but it is used as "
+            f"types .*?EntityElementType.IDENTIFIER.*?EntityElementType.MEASURE.*? across the model"
         ),
     ):
         ModelValidator([ElementConsistencyRule()]).checked_validations(model)
@@ -64,8 +64,8 @@ def test_cross_element_names(simple_model__with_primary_transforms: UserConfigur
     with pytest.raises(
         ModelValidationException,
         match=(
-            f"element `{dimension_reference.element_name}` is of type {MetricFlowEntityElementType.DIMENSION}, but it is used as "
-            f"types .*?MetricFlowEntityElementType.DIMENSION.*?MetricFlowEntityElementType.IDENTIFIER.*? across the model"
+            f"element `{dimension_reference.element_name}` is of type {EntityElementType.DIMENSION}, but it is used as "
+            f"types .*?EntityElementType.DIMENSION.*?EntityElementType.IDENTIFIER.*? across the model"
         ),
     ):
         ModelValidator([ElementConsistencyRule()]).checked_validations(model)

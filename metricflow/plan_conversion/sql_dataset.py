@@ -4,8 +4,8 @@ from metricflow.column_assoc import ColumnAssociation
 from metricflow.dataset.dataset import DataSet
 from metricflow.instances import (
     InstanceSet,
-    MetricFlowEntityReference,
-    MetricFlowEntityElementInstance,
+    EntityReference,
+    EntityElementInstance,
     InstanceSetTransform,
 )
 from metricflow.object_utils import flatten_nested_sequence
@@ -118,14 +118,14 @@ class SqlDataSet(DataSet):
         return flatten_nested_sequence([instance.associated_columns for instance in instances])
 
 
-class SameMetricFlowEntityReferenceChecker(InstanceSetTransform[bool]):
+class SameEntityReferenceChecker(InstanceSetTransform[bool]):
     """Checks to see that all elements in the instance set come from the same entity."""
 
-    def __init__(self, entity_reference: MetricFlowEntityReference) -> None:  # noqa: D
+    def __init__(self, entity_reference: EntityReference) -> None:  # noqa: D
         self._entity_reference = entity_reference
 
     def transform(self, instance_set: InstanceSet) -> bool:  # noqa: D
-        combined: List[MetricFlowEntityElementInstance] = []
+        combined: List[EntityElementInstance] = []
         combined.extend(instance_set.measure_instances)
         combined.extend(instance_set.dimension_instances)
         combined.extend(instance_set.time_dimension_instances)

@@ -70,10 +70,10 @@
                                     <!-- aggregation_time_dimension = ds -->
                                     <ReadSqlSourceNode>
                                         <!-- description =                                                                           -->
-                                        <!--   Read From MetricFlowEntityDataSet(MetricFlowEntityReference(entity_name='bookings_source'))  -->
+                                        <!--   Read From EntityDataSet(EntityReference(entity_name='bookings_source'))  -->
                                         <!-- node_id = rss_2 -->
                                         <!-- data_set =                                                                    -->
-                                        <!--   MetricFlowEntityDataSet(MetricFlowEntityReference(entity_name='bookings_source'))  -->
+                                        <!--   EntityDataSet(EntityReference(entity_name='bookings_source'))  -->
                                     </ReadSqlSourceNode>
                                 </MetricTimeDimensionTransformNode>
                             </FilterElementsNode>
@@ -124,10 +124,10 @@
                                 <!-- aggregation_time_dimension = ds -->
                                 <ReadSqlSourceNode>
                                     <!-- description =                                                                           -->
-                                    <!--   Read From MetricFlowEntityDataSet(MetricFlowEntityReference(entity_name='bookings_source'))  -->
+                                    <!--   Read From EntityDataSet(EntityReference(entity_name='bookings_source'))  -->
                                     <!-- node_id = rss_5 -->
                                     <!-- data_set =                                                                    -->
-                                    <!--   MetricFlowEntityDataSet(MetricFlowEntityReference(entity_name='bookings_source'))  -->
+                                    <!--   EntityDataSet(EntityReference(entity_name='bookings_source'))  -->
                                 </ReadSqlSourceNode>
                             </MetricTimeDimensionTransformNode>
                         </FilterElementsNode>

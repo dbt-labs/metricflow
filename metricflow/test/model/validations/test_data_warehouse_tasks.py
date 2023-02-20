@@ -11,7 +11,7 @@ from metricflow.model.data_warehouse_model_validator import (
     DataWarehouseValidationTask,
 )
 from metricflow.model.model_transformer import ModelTransformer
-from dbt.contracts.graph.entities import Mutability, MutabilityType
+from metricflow.model.objects.entity import Mutability, MutabilityType
 from metricflow.model.objects.elements.dimension import Dimension, DimensionType
 from metricflow.model.objects.elements.identifier import Identifier, IdentifierType
 from metricflow.model.objects.elements.measure import Measure

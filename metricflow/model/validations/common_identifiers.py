@@ -1,12 +1,12 @@
 from typing import Dict, List, Set
-from metricflow.instances import MetricFlowEntityElementReference
+from metricflow.instances import EntityElementReference
 
-from metricflow.model.objects.conversions import MetricFlowMetricFlowEntity
+from metricflow.model.objects.entity import Entity
 from metricflow.model.objects.elements.identifier import Identifier
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
-    MetricFlowEntityElementContext,
-    MetricFlowEntityElementType,
+    EntityElementContext,
+    EntityElementType,
     FileContext,
     ModelValidationRule,
     ValidationWarning,
@@ -20,7 +20,7 @@ class CommonIdentifiersRule(ModelValidationRule):
     """Checks that identifiers exist on more than one entity"""
 
     @staticmethod
-    def _map_entity_identifiers(entities: List[MetricFlowEntity]) -> Dict[IdentifierReference, Set[str]]:
+    def _map_entity_identifiers(entities: List[Entity]) -> Dict[IdentifierReference, Set[str]]:
         """Generate mapping of identifier names to the set of entities where it is defined"""
         identifiers_to_entities: Dict[IdentifierReference, Set[str]] = {}
         for entity in entities or []:
@@ -35,7 +35,7 @@ class CommonIdentifiersRule(ModelValidationRule):
     @validate_safely(whats_being_done="checking identifier exists on more than one entity")
     def _check_identifier(
         identifier: Identifier,
-        entity: MetricFlowEntity,
+        entity: Entity,
         identifiers_to_entities: Dict[IdentifierReference, Set[str]],
     ) -> List[ValidationIssueType]:
         issues: List[ValidationIssueType] = []
@@ -47,12 +47,12 @@ class CommonIdentifiersRule(ModelValidationRule):
         ):
             issues.append(
                 ValidationWarning(
-                    context=MetricFlowEntityElementContext(
+                    context=EntityElementContext(
                         file_context=FileContext.from_metadata(metadata=entity.metadata),
-                        entity_element=MetricFlowEntityElementReference(
+                        entity_element=EntityElementReference(
                             entity_name=entity.name, element_name=identifier.name
                         ),
-                        element_type=MetricFlowEntityElementType.IDENTIFIER,
+                        element_type=EntityElementType.IDENTIFIER,
                     ),
                     message=f"Identifier `{identifier.reference.element_name}` "
                     f"only found in one entity `{entity.name}` "

@@ -2,7 +2,7 @@ import textwrap
 
 from metricflow.aggregation_properties import AggregationType
 from metricflow.model.objects.common import YamlConfigFile
-from metricflow.model.objects.conversions import MetricFlowMetricFlowEntityOrigin, MutabilityType
+from metricflow.model.objects.entity import EntityOrigin, MutabilityType
 from metricflow.model.objects.elements.identifier import IdentifierType
 from metricflow.model.objects.elements.dimension import DimensionType
 from metricflow.model.parsing.dir_to_model import parse_yaml_files_to_model
@@ -31,7 +31,7 @@ def test_base_entity_attribute_parsing() -> None:
     assert len(build_result.model.entities) == 1
     entity = build_result.model.entities[0]
     assert entity.name == "base_property_test"
-    assert entity.origin == MetricFlowEntityOrigin.SOURCE  # auto-filled from default, not user-configurable
+    assert entity.origin == EntityOrigin.SOURCE  # auto-filled from default, not user-configurable
     assert entity.mutability.type == MutabilityType.APPEND_ONLY
     assert entity.mutability.type_params is not None
     assert entity.mutability.type_params.min == "minimum_value"
@@ -41,7 +41,7 @@ def test_base_entity_attribute_parsing() -> None:
 
 
 def test_entity_metadata_parsing() -> None:
-    """Test for asserting that internal metadata is parsed into the MetricFlowEntity object"""
+    """Test for asserting that internal metadata is parsed into the Entity object"""
     yaml_contents = textwrap.dedent(
         """\
         entity:
