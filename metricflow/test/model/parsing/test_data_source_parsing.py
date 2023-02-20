@@ -2,9 +2,9 @@ import textwrap
 
 from metricflow.aggregation_properties import AggregationType
 from metricflow.model.objects.common import YamlConfigFile
-from metricflow.model.objects.entity import EntityOrigin, MutabilityType
-from metricflow.model.objects.elements.identifier import IdentifierType
-from metricflow.model.objects.elements.dimension import DimensionType
+from dbt.contracts.graph.entities import EntityOrigin, MutabilityType
+from dbt.contracts.graph.identifiers import IdentifierType
+from dbt.contracts.graph.dimensions import DimensionType
 from metricflow.model.parsing.dir_to_model import parse_yaml_files_to_model
 from metricflow.time.time_granularity import TimeGranularity
 

@@ -5,8 +5,8 @@ from more_itertools import bucket
 
 from metricflow.aggregation_properties import AggregationType
 from metricflow.instances import MetricModelReference
-from metricflow.model.objects.elements.dimension import DimensionType
-from metricflow.model.objects.metric import Metric
+from dbt.contracts.graph.dimensions import DimensionType
+from dbt.contracts.graph.nodes import Metric
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.validations.unique_valid_name import UniqueAndValidNameRule
 from metricflow.model.validations.validator_helpers import (

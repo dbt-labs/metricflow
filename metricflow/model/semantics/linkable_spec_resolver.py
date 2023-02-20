@@ -7,9 +7,9 @@ from dataclasses import dataclass
 from typing import Tuple, Sequence, Dict, List, Optional, FrozenSet
 
 from metricflow.instances import EntityReference
-from metricflow.model.objects.entity import Entity
-from metricflow.model.objects.elements.dimension import DimensionType, Dimension
-from metricflow.model.objects.elements.identifier import IdentifierType
+from dbt.contracts.graph.nodes import Entity
+from dbt.contracts.graph.dimensions import DimensionType, Dimension
+from dbt.contracts.graph.identifiers import IdentifierType
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.entity_join_evaluator import EntityJoinEvaluator

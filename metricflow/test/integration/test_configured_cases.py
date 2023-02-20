@@ -7,7 +7,7 @@ import pytest
 from dateutil import parser
 
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowQueryRequest
-from metricflow.model.objects.elements.measure import MeasureAggregationParameters
+from dbt.contracts.graph.measures import MeasureAggregationParameters
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.object_utils import assert_values_exhausted
 from metricflow.plan_conversion.column_resolver import (

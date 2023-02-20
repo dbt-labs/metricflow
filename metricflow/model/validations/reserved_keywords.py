@@ -3,7 +3,7 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.instances import EntityElementReference
 
 
-from metricflow.model.objects.entity import Entity
+from dbt.contracts.graph.nodes import Entity
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
     EntityContext,

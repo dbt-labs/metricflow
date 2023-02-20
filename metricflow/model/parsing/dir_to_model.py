@@ -11,8 +11,7 @@ from jsonschema import exceptions
 from metricflow.errors.errors import ParsingException
 from metricflow.model.model_transformer import ModelTransformer
 from metricflow.model.objects.common import Version, YamlConfigFile
-from metricflow.model.objects.entity import Entity
-from metricflow.model.objects.metric import Metric
+from dbt.contracts.graph.nodes import Metric, Entity
 from metricflow.model.parsing.schemas_internal import (
     metric_validator,
     entity_validator,

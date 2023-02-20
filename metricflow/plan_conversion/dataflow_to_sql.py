@@ -37,7 +37,7 @@ from metricflow.instances import (
     MetricModelReference,
     TimeDimensionInstance,
 )
-from metricflow.model.objects.metric import MetricType
+from dbt.contracts.graph.metrics import MetricType
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.object_utils import assert_values_exhausted
 from metricflow.plan_conversion.instance_converters import (

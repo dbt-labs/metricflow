@@ -8,11 +8,12 @@ import pytest
 from metricflow.aggregation_properties import AggregationType
 from metricflow.model.model_validator import ModelValidator
 from metricflow.model.objects.common import YamlConfigFile
-from metricflow.model.objects.entity import Entity, Mutability, MutabilityType
-from metricflow.model.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
-from metricflow.model.objects.elements.identifier import IdentifierType, Identifier, CompositeSubIdentifier
-from metricflow.model.objects.elements.measure import Measure
-from metricflow.model.objects.metric import MetricType, MetricTypeParams
+from dbt.contracts.graph.entities import Mutability, MutabilityType
+from dbt.contracts.graph.nodes import Entity
+from dbt.contracts.graph.dimensions import Dimension, DimensionType, DimensionTypeParams
+from dbt.contracts.graph.identifiers import IdentifierType, Identifier, CompositeSubIdentifier
+from dbt.contracts.graph.measures import Measure
+from dbt.contracts.graph.metrics import MetricType, MetricTypeParams
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.parsing.dir_to_model import parse_yaml_files_to_validation_ready_model
 from metricflow.model.validations.identifiers import (

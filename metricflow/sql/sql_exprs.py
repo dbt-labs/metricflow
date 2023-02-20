@@ -26,7 +26,7 @@ from metricflow.dag.id_generation import (
     SQL_EXPR_BETWEEN_PREFIX,
     SQL_EXPR_WINDOW_FUNCTION_ID_PREFIX,
 )
-from metricflow.model.objects.elements.measure import MeasureAggregationParameters
+from dbt.contracts.graph.measures import MeasureAggregationParameters
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.visitor import Visitable, VisitorOutputT
 from metricflow.time.time_granularity import TimeGranularity

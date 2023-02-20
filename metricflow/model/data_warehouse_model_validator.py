@@ -17,9 +17,8 @@ from metricflow.dataset.entity_adapter import EntityDataSet
 from metricflow.dataset.dataset import DataSet
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
 from metricflow.instances import EntityElementReference, EntityReference, MetricModelReference
-from metricflow.model.objects.entity import Entity
-from metricflow.model.objects.elements.dimension import Dimension, DimensionType
-from metricflow.model.objects.metric import Metric
+from dbt.contracts.graph.dimensions import Dimension, DimensionType
+from dbt.contracts.graph.nodes import Metric, Entity
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.validations.validator_helpers import (

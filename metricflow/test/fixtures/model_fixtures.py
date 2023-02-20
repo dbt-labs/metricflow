@@ -13,7 +13,7 @@ from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, BaseOutput
 from metricflow.dataset.convert_entity import EntityToDataSetConverter
 from metricflow.model.model_transformer import ModelTransformer
 from metricflow.model.model_validator import ModelValidator
-from metricflow.model.objects.entity import Entity
+from dbt.contracts.graph.nodes import Entity
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.parsing.dir_to_model import (
     parse_directory_of_yaml_files_to_model,

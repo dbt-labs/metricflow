@@ -13,8 +13,8 @@ from typing import List
 
 from metricflow.dataset.dataset import DataSet
 from metricflow.model.objects.constraints.where import WhereClauseConstraint
-from metricflow.model.objects.elements.dimension import DimensionType
-from metricflow.model.objects.elements.measure import Measure
+from dbt.contracts.graph.dimensions import DimensionType
+from dbt.contracts.graph.measures import Measure
 from metricflow.protocols.semantics import EntitySemanticsAccessor
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.specs import (

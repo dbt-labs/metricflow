@@ -16,10 +16,10 @@ from metricflow.instances import (
     InstanceSet,
     EntityReference,
 )
-from metricflow.model.objects.entity import Entity
-from metricflow.model.objects.elements.dimension import Dimension, DimensionType
-from metricflow.model.objects.elements.identifier import Identifier
-from metricflow.model.objects.elements.measure import Measure
+from dbt.contracts.graph.nodes import Entity
+from dbt.contracts.graph.dimensions import Dimension, DimensionType
+from dbt.contracts.graph.identifiers import Identifier
+from dbt.contracts.graph.measures import Measure
 from metricflow.model.spec_converters import MeasureConverter
 from metricflow.specs import (
     TimeDimensionSpec,

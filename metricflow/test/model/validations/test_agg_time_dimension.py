@@ -1,7 +1,7 @@
 import pytest
 
 from metricflow.model.model_validator import ModelValidator
-from metricflow.model.objects.elements.dimension import DimensionType
+from dbt.contracts.graph.dimensions import DimensionType
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.validations.agg_time_dimension import AggregationTimeDimensionRule
 from metricflow.model.validations.validator_helpers import ModelValidationException

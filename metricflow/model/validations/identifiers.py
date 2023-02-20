@@ -7,8 +7,8 @@ from typing import List, MutableSet, Tuple, Sequence, DefaultDict
 import more_itertools
 from metricflow.instances import EntityElementReference, EntityReference
 
-from metricflow.model.objects.entity import Entity
-from metricflow.model.objects.elements.identifier import Identifier, IdentifierType, CompositeSubIdentifier
+from dbt.contracts.graph.nodes import Entity
+from dbt.contracts.graph.identifiers import Identifier, IdentifierType, CompositeSubIdentifier
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
     EntityContext,

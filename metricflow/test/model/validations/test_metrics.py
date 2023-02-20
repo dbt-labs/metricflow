@@ -2,11 +2,11 @@ import pytest
 
 from metricflow.aggregation_properties import AggregationType
 from metricflow.model.model_validator import ModelValidator
-from metricflow.model.objects.entity import Mutability, MutabilityType
-from metricflow.model.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
-from metricflow.model.objects.elements.identifier import Identifier, IdentifierType
-from metricflow.model.objects.elements.measure import Measure
-from metricflow.model.objects.metric import MetricInput, MetricType, MetricTypeParams
+from dbt.contracts.graph.entities import Mutability, MutabilityType
+from dbt.contracts.graph.dimensions import Dimension, DimensionType, DimensionTypeParams
+from dbt.contracts.graph.identifiers import Identifier, IdentifierType
+from dbt.contracts.graph.measures import Measure
+from dbt.contracts.graph.metrics import MetricInput, MetricType, MetricTypeParams
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.validations.metrics import DerivedMetricRule
 from metricflow.model.validations.validator_helpers import ModelValidationException

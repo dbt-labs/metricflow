@@ -3,7 +3,8 @@ from typing import List
 
 from metricflow.errors.errors import ParsingException
 from metricflow.instances import MetricModelReference
-from metricflow.model.objects.metric import Metric, MetricType, MetricTimeWindow
+from dbt.contracts.graph.metrics import MetricType, MetricTimeWindow
+from dbt.contracts.graph.nodes import Metric
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.validations.unique_valid_name import UniqueAndValidNameRule
 from metricflow.model.validations.validator_helpers import (

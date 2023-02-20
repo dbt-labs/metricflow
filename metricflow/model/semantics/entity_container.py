@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Generic, List, TypeVar, Dict
 
-from metricflow.model.objects.entity import Entity
+from dbt.contracts.graph.nodes import Entity
 
 T = TypeVar("T")
 

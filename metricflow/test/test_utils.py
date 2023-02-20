@@ -6,8 +6,7 @@ import dateutil.parser
 from _pytest.fixtures import FixtureRequest
 from typing import Callable, Tuple, List
 
-from metricflow.model.objects.entity import Entity
-from metricflow.model.objects.metric import Metric
+from dbt.contracts.graph.nodes import Metric, Entity
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.protocols.sql_client import SqlClient
 

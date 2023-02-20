@@ -41,7 +41,7 @@ from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOp
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
-from metricflow.model.objects.metric import MetricType, MetricTimeWindow
+from dbt.contracts.graph.metrics import MetricType, MetricTimeWindow
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.object_utils import pformat_big_objects, assert_exactly_one_arg_set
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver

@@ -11,10 +11,10 @@ from metricflow.model.data_warehouse_model_validator import (
     DataWarehouseValidationTask,
 )
 from metricflow.model.model_transformer import ModelTransformer
-from metricflow.model.objects.entity import Mutability, MutabilityType
-from metricflow.model.objects.elements.dimension import Dimension, DimensionType
-from metricflow.model.objects.elements.identifier import Identifier, IdentifierType
-from metricflow.model.objects.elements.measure import Measure
+from dbt.contracts.graph.entities import Mutability, MutabilityType
+from dbt.contracts.graph.dimensions import Dimension, DimensionType
+from dbt.contracts.graph.identifiers import Identifier, IdentifierType
+from dbt.contracts.graph.measures import Measure
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.sql.sql_bind_parameters import SqlBindParameters

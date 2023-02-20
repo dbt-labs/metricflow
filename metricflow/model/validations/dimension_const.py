@@ -1,8 +1,8 @@
 from typing import Dict, List
 from metricflow.instances import EntityElementReference
 
-from metricflow.model.objects.entity import Entity
-from metricflow.model.objects.elements.dimension import Dimension, DimensionType
+from dbt.contracts.graph.nodes import Entity
+from dbt.contracts.graph.dimensions import Dimension, DimensionType
 from metricflow.model.validations.validator_helpers import (
     EntityElementContext,
     EntityElementType,

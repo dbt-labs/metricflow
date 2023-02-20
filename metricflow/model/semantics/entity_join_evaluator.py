@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import List, Dict, Optional
 
 from metricflow.instances import EntityReference, EntityElementReference, IdentifierInstance, InstanceSet
-from metricflow.model.objects.elements.identifier import IdentifierType
+from dbt.contracts.graph.identifiers import IdentifierType
 from metricflow.object_utils import pformat_big_objects
 from metricflow.protocols.semantics import EntitySemanticsAccessor
 from metricflow.references import IdentifierReference

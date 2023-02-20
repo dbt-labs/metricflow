@@ -1,7 +1,8 @@
 import logging
 
 from metricflow.errors.errors import ModelTransformError
-from metricflow.model.objects.metric import Metric, MetricInputMeasure, MetricType, MetricTypeParams
+from dbt.contracts.graph.metrics import MetricInputMeasure, MetricType, MetricTypeParams
+from dbt.contracts.graph.nodes import Metric
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.transformations.transform_rule import ModelTransformRule
 

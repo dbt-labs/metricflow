@@ -6,7 +6,7 @@ from typing import Sequence
 import pytest
 
 from metricflow.model.objects.common import Metadata
-from metricflow.model.objects.elements.measure import Measure
+from dbt.contracts.graph.measures import Measure
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.parsing.yaml_loader import YamlConfigLoader
 from metricflow.model.semantic_model import SemanticModel

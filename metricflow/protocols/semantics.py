@@ -12,11 +12,11 @@ from abc import abstractmethod
 from typing import Dict, FrozenSet, List, Optional, Protocol, Sequence, Set, Tuple
 
 from metricflow.instances import EntityElementReference, EntityReference
-from metricflow.model.objects.entity import Entity, EntityOrigin
-from metricflow.model.objects.elements.dimension import Dimension
-from metricflow.model.objects.elements.identifier import Identifier
-from metricflow.model.objects.elements.measure import Measure
-from metricflow.model.objects.metric import Metric
+from dbt.contracts.graph.entities import EntityOrigin
+from dbt.contracts.graph.dimensions import Dimension
+from dbt.contracts.graph.identifiers import Identifier
+from dbt.contracts.graph.measures import Measure
+from dbt.contracts.graph.nodes import Metric, Entity
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.references import (

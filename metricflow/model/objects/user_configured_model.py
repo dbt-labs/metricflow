@@ -1,7 +1,6 @@
 from typing import List
 
-from metricflow.model.objects.entity import Entity
-from metricflow.model.objects.metric import Metric
+from dbt.contracts.graph.nodes import Metric, Entity
 from metricflow.model.objects.base import HashableBaseModel
 
 

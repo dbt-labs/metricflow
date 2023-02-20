@@ -4,9 +4,9 @@ from typing import List, Optional, Sequence
 
 from metricflow.instances import EntityReference
 from metricflow.model.objects.common import Metadata
-from metricflow.model.objects.elements.dimension import Dimension
-from metricflow.model.objects.elements.identifier import Identifier
-from metricflow.model.objects.elements.measure import Measure
+from dbt.contracts.graph.dimensions import Dimension
+from dbt.contracts.graph.identifiers import Identifier
+from dbt.contracts.graph.measures import Measure
 from metricflow.model.objects.base import ModelWithMetadataParsing, HashableBaseModel
 from metricflow.object_utils import ExtendedEnum
 from metricflow.references import LinkableElementReference, MeasureReference

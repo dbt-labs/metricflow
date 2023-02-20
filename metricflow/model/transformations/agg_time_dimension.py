@@ -1,8 +1,8 @@
 import logging
 from typing import Optional
 
-from metricflow.model.objects.entity import Entity
-from metricflow.model.objects.elements.dimension import DimensionType
+from dbt.contracts.graph.nodes import Entity
+from dbt.contracts.graph.dimensions import DimensionType
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.transformations.transform_rule import ModelTransformRule
 from metricflow.references import TimeDimensionReference

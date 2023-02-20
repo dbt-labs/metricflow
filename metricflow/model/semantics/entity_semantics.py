@@ -6,10 +6,11 @@ from typing import Dict, List, Optional, Set, Sequence
 from metricflow.aggregation_properties import AggregationType
 from metricflow.errors.errors import InvalidEntityError
 from metricflow.instances import EntityReference, EntityElementReference
-from metricflow.model.objects.entity import Entity, EntityOrigin
-from metricflow.model.objects.elements.dimension import Dimension
-from metricflow.model.objects.elements.identifier import Identifier
-from metricflow.model.objects.elements.measure import Measure
+from dbt.contracts.graph.nodes import Entity
+from dbt.contracts.graph.entities import EntityOrigin
+from dbt.contracts.graph.dimensions import Dimension
+from dbt.contracts.graph.identifiers import Identifier
+from dbt.contracts.graph.measures import Measure
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.semantics.entity_container import PydanticEntityContainer
 from metricflow.model.semantics.element_group import ElementGrouper

@@ -17,7 +17,7 @@ from metricflow.instances import (
 )
 from metricflow.model.objects.base import FrozenBaseModel
 from metricflow.model.objects.common import Metadata
-from metricflow.model.objects.elements.dimension import DimensionType
+from dbt.contracts.graph.dimensions import DimensionType
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.object_utils import assert_values_exhausted
 

@@ -5,11 +5,11 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.engine.models import Dimension
 from metricflow.model.objects.common import FileSlice, Metadata, YamlConfigFile
 from metricflow.model.objects.constraints.where import WhereClauseConstraint
-from metricflow.model.objects.entity import Entity, EntityOrigin, Mutability
-from metricflow.model.objects.elements.identifier import Identifier
-from metricflow.model.objects.elements.measure import Measure
-from metricflow.model.objects.metric import Metric, MetricType, MetricTypeParams
-
+from dbt.contracts.graph.entities import EntityOrigin, Mutability
+from dbt.contracts.graph.identifiers import Identifier
+from dbt.contracts.graph.measures import Measure
+from dbt.contracts.graph.metrics import MetricType, MetricTypeParams
+from dbt.contracts.graph.nodes import Metric, Entity
 
 def base_model_file() -> YamlConfigFile:
     """Returns a YamlConfigFile with the inputs for a basic valid model

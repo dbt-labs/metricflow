@@ -1,6 +1,6 @@
 import copy
 import random
-from metricflow.model.objects.elements.identifier import CompositeSubIdentifier
+from dbt.contracts.graph.identifiers import CompositeSubIdentifier
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.validations.reserved_keywords import RESERVED_KEYWORDS, ReservedKeywordsRule
 from metricflow.model.validations.validator_helpers import ValidationIssueLevel
