@@ -43,7 +43,7 @@ from metricflow.sql.sql_plan import (
     SqlQueryPlanNode,
     SqlSelectQueryFromClauseNode,
 )
-from metricflow.time.time_granularity import TimeGranularity
+from dbt.semantic.time import TimeGranularity
 
 logger = logging.getLogger(__name__)
 

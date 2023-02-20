@@ -28,7 +28,7 @@ from dbt.semantic.references import (
     IdentifierReference,
 )
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.time.time_granularity import TimeGranularity
+from dbt.semantic.time import TimeGranularity
 from dbt.contracts.graph.metrics import MetricTimeWindow
 
 

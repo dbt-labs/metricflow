@@ -14,7 +14,7 @@ from metricflow.specs import (
     LinklessIdentifierSpec,
     IdentifierReference,
 )
-from metricflow.time.time_granularity import TimeGranularity
+from dbt.semantic.time import TimeGranularity
 
 
 @pytest.fixture

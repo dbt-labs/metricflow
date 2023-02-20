@@ -4,7 +4,7 @@ from dbt.contracts.graph.entities import MutabilityType, Mutability
 from dbt.contracts.graph.dimensions import Dimension, DimensionType, DimensionTypeParams
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.test.model.validations.helpers import entity_with_guaranteed_meta
-from metricflow.time.time_granularity import TimeGranularity
+from dbt.semantic.time import TimeGranularity
 
 
 @pytest.mark.skip("TODO: Will convert to validation rule")

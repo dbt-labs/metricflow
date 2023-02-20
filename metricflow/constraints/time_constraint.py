@@ -8,7 +8,7 @@ from typing import Optional
 import pandas as pd
 
 from metricflow.dataclass_serialization import SerializableDataclass
-from metricflow.time.time_granularity import TimeGranularity
+from dbt.semantic.time import TimeGranularity
 
 logger = logging.getLogger(__name__)
 

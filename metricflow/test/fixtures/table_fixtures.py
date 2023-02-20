@@ -8,7 +8,7 @@ from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql_clients.sql_utils import make_df
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.time.time_constants import ISO8601_PYTHON_FORMAT
-from metricflow.time.time_granularity import TimeGranularity
+from dbt.semantic.time import TimeGranularity
 
 DEFAULT_DS = "ds"
 

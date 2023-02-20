@@ -6,7 +6,7 @@ from dbt.contracts.graph.metrics import MetricTimeWindow, MetricInput, MetricInp
 from metricflow.model.parsing.dir_to_model import parse_yaml_files_to_model
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.time.time_granularity import TimeGranularity
+from dbt.semantic.time import TimeGranularity
 
 
 def test_legacy_measure_metric_parsing() -> None:

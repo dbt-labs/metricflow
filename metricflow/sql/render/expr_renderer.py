@@ -33,7 +33,7 @@ from metricflow.sql.sql_exprs import (
     SqlWindowFunctionExpression,
 )
 from metricflow.sql.sql_plan import SqlSelectColumn
-from metricflow.time.time_granularity import TimeGranularity
+from dbt.semantic.time import TimeGranularity
 
 logger = logging.getLogger(__name__)
 

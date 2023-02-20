@@ -12,7 +12,7 @@ from metricflow.sql.sql_exprs import (
     SqlPercentileFunctionType,
     SqlTimeDeltaExpression,
 )
-from metricflow.time.time_granularity import TimeGranularity
+from dbt.semantic.time import TimeGranularity
 
 
 class PostgresSqlExpressionRenderer(DefaultSqlExpressionRenderer):

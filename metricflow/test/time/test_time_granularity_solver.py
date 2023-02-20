@@ -13,8 +13,8 @@ from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationR
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from dbt.semantic.references import MetricReference
 from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_MONTH, MTD_SPEC_YEAR, MTD_REFERENCE
-from metricflow.time.time_granularity import TimeGranularity
-from metricflow.time.time_granularity_solver import (
+from dbt.semantic.time import TimeGranularity
+from dbt.semantic.time_solver import (
     TimeGranularitySolver,
     PartialTimeDimensionSpec,
     RequestTimeGranularityException,

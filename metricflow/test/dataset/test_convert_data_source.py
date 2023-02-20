@@ -16,7 +16,7 @@ from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.sql.compare_sql_plan import assert_rendered_sql_equal
-from metricflow.time.time_granularity import TimeGranularity
+from dbt.semantic.time import TimeGranularity
 
 logger = logging.getLogger(__name__)
 

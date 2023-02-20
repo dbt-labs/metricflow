@@ -13,7 +13,7 @@ from metricflow.model.validations.validator_helpers import ModelValidationExcept
 from dbt.semantic.references import DimensionReference, IdentifierReference, TimeDimensionReference
 from metricflow.test.fixtures.table_fixtures import DEFAULT_DS
 from metricflow.test.model.validations.helpers import entity_with_guaranteed_meta, metric_with_guaranteed_meta
-from metricflow.time.time_granularity import TimeGranularity
+from dbt.semantic.time import TimeGranularity
 
 
 def test_metric_no_time_dim_dim_only_source() -> None:  # noqa:D

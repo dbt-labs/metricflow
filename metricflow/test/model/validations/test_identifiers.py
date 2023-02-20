@@ -30,7 +30,7 @@ from metricflow.test.model.validations.helpers import (
     base_model_file,
 )
 from metricflow.test.test_utils import find_entity_with
-from metricflow.time.time_granularity import TimeGranularity
+from dbt.semantic.time import TimeGranularity
 
 
 def test_entity_cant_have_more_than_one_primary_identifier(

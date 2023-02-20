@@ -4,7 +4,7 @@ import logging
 from dataclasses import dataclass
 from typing import Optional, Tuple
 
-from metricflow.time.time_granularity import TimeGranularity
+from dbt.semantic.time import TimeGranularity
 
 DUNDER = "__"
 

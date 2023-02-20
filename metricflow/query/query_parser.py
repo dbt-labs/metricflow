@@ -33,8 +33,8 @@ from metricflow.specs import (
     SpecWhereClauseConstraint,
     LinkableSpecSet,
 )
-from metricflow.time.time_granularity import TimeGranularity
-from metricflow.time.time_granularity_solver import (
+from dbt.semantic.time import TimeGranularity
+from dbt.semantic.time_solver import (
     TimeGranularitySolver,
     PartialTimeDimensionSpec,
     RequestTimeGranularityException,

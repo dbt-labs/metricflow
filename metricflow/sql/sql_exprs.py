@@ -29,7 +29,7 @@ from metricflow.dag.id_generation import (
 from dbt.contracts.graph.measures import MeasureAggregationParameters
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.visitor import Visitable, VisitorOutputT
-from metricflow.time.time_granularity import TimeGranularity
+from dbt.semantic.time import TimeGranularity
 from dbt.semantic.object_utils import assert_values_exhausted, flatten_nested_sequence
 
 

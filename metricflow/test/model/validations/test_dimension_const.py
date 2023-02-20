@@ -13,7 +13,7 @@ from metricflow.model.validations.dimension_const import DimensionConsistencyRul
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from dbt.semantic.references import DimensionReference, MeasureReference, TimeDimensionReference
 from metricflow.test.model.validations.helpers import entity_with_guaranteed_meta, metric_with_guaranteed_meta
-from metricflow.time.time_granularity import TimeGranularity
+from dbt.semantic.time import TimeGranularity
 
 
 def test_incompatible_dimension_type() -> None:  # noqa:D
