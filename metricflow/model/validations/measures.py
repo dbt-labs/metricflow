@@ -21,7 +21,7 @@ from metricflow.model.validations.validator_helpers import (
     ValidationWarning,
     validate_safely,
 )
-from metricflow.references import MeasureReference
+from dbt.semantic.references import MeasureReference
 
 
 class EntityMeasuresUniqueRule(ModelValidationRule):

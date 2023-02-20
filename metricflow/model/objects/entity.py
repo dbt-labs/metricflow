@@ -9,7 +9,7 @@ from dbt.contracts.graph.identifiers import Identifier
 from dbt.contracts.graph.measures import Measure
 from metricflow.model.objects.base import ModelWithMetadataParsing, HashableBaseModel
 from metricflow.object_utils import ExtendedEnum
-from metricflow.references import LinkableElementReference, MeasureReference
+from dbt.semantic.references import LinkableElementReference, MeasureReference
 
 
 class EntityOrigin(ExtendedEnum):

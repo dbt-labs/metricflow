@@ -9,7 +9,7 @@ from metricflow.model.semantics.linkable_spec_resolver import (
 )
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.entity_join_evaluator import MAX_JOIN_HOPS
-from metricflow.references import MetricReference
+from dbt.semantic.references import MetricReference
 
 logger = logging.getLogger(__name__)
 

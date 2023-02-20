@@ -7,8 +7,8 @@ from metricflow.model.semantics.entity_container import PydanticEntityContainer
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.entity_semantics import EntitySemantics
 from metricflow.model.semantics.metric_semantics import MetricSemantics
-from metricflow.references import IdentifierReference, MeasureReference
-from metricflow.references import MetricReference
+from dbt.semantic.references import IdentifierReference, MeasureReference
+from dbt.semantic.references import MetricReference
 
 logger = logging.getLogger(__name__)
 

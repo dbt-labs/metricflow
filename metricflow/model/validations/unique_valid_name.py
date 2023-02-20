@@ -24,7 +24,7 @@ from metricflow.model.validations.validator_helpers import (
     validate_safely,
 )
 from metricflow.object_utils import assert_values_exhausted
-from metricflow.references import ElementReference
+from dbt.semantic.references import ElementReference
 from metricflow.time.time_granularity import TimeGranularity
 
 

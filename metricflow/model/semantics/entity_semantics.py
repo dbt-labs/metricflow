@@ -15,7 +15,7 @@ from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.semantics.entity_container import PydanticEntityContainer
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.spec_converters import MeasureConverter
-from metricflow.references import (
+from dbt.semantic.references import (
     MeasureReference,
     TimeDimensionReference,
     DimensionReference,

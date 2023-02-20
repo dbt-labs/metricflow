@@ -12,7 +12,7 @@ from metricflow.model.objects.base import (
     PydanticParseableValueType,
 )
 from metricflow.object_utils import ExtendedEnum, hash_items
-from metricflow.references import MeasureReference
+from dbt.semantic.references import MeasureReference
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.time.time_granularity import string_to_time_granularity
 

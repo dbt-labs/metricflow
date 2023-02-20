@@ -6,7 +6,7 @@ from typing import Any, Optional, List
 from metricflow.model.objects.base import HashableBaseModel, ModelWithMetadataParsing
 from metricflow.model.objects.common import Metadata
 from metricflow.object_utils import ExtendedEnum
-from metricflow.references import IdentifierReference, CompositeSubIdentifierReference
+from dbt.semantic.references import IdentifierReference, CompositeSubIdentifierReference
 
 
 class IdentifierType(ExtendedEnum):

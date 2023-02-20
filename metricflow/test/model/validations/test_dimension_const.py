@@ -11,7 +11,7 @@ from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.validations.entities import EntityTimeDimensionWarningsRule
 from metricflow.model.validations.dimension_const import DimensionConsistencyRule
 from metricflow.model.validations.validator_helpers import ModelValidationException
-from metricflow.references import DimensionReference, MeasureReference, TimeDimensionReference
+from dbt.semantic.references import DimensionReference, MeasureReference, TimeDimensionReference
 from metricflow.test.model.validations.helpers import entity_with_guaranteed_meta, metric_with_guaranteed_meta
 from metricflow.time.time_granularity import TimeGranularity
 

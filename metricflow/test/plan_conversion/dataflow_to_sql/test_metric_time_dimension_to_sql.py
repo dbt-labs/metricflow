@@ -5,7 +5,7 @@ from metricflow.dataflow.dataflow_plan import MetricTimeDimensionTransformNode
 from metricflow.dataset.entity_adapter import EntityDataSet
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.references import TimeDimensionReference
+from dbt.semantic.references import TimeDimensionReference
 from metricflow.specs import MetricFlowQuerySpec, MetricSpec
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState

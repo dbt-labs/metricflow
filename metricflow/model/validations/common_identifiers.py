@@ -13,7 +13,7 @@ from metricflow.model.validations.validator_helpers import (
     validate_safely,
     ValidationIssueType,
 )
-from metricflow.references import IdentifierReference
+from dbt.semantic.references import IdentifierReference
 
 
 class CommonIdentifiersRule(ModelValidationRule):

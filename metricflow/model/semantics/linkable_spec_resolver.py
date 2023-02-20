@@ -15,8 +15,8 @@ from metricflow.model.semantics.linkable_element_properties import LinkableEleme
 from metricflow.model.semantics.entity_join_evaluator import EntityJoinEvaluator
 from metricflow.object_utils import pformat_big_objects, flatten_nested_sequence
 from metricflow.protocols.semantics import EntitySemanticsAccessor
-from metricflow.references import MeasureReference
-from metricflow.references import MetricReference
+from dbt.semantic.references import MeasureReference
+from dbt.semantic.references import MetricReference
 from metricflow.specs import (
     DEFAULT_TIME_GRANULARITY,
     LinkableSpecSet,

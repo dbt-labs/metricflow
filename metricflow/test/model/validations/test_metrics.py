@@ -10,7 +10,7 @@ from dbt.contracts.graph.metrics import MetricInput, MetricType, MetricTypeParam
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.validations.metrics import DerivedMetricRule
 from metricflow.model.validations.validator_helpers import ModelValidationException
-from metricflow.references import DimensionReference, IdentifierReference, TimeDimensionReference
+from dbt.semantic.references import DimensionReference, IdentifierReference, TimeDimensionReference
 from metricflow.test.fixtures.table_fixtures import DEFAULT_DS
 from metricflow.test.model.validations.helpers import entity_with_guaranteed_meta, metric_with_guaranteed_meta
 from metricflow.time.time_granularity import TimeGranularity

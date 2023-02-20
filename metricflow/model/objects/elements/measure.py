@@ -4,7 +4,7 @@ from typing import Optional, List
 from metricflow.aggregation_properties import AggregationType
 from metricflow.model.objects.common import Metadata
 from metricflow.model.objects.base import ModelWithMetadataParsing, HashableBaseModel
-from metricflow.references import MeasureReference, TimeDimensionReference
+from dbt.semantic.references import MeasureReference, TimeDimensionReference
 
 
 class NonAdditiveDimensionParameters(HashableBaseModel):

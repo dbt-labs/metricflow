@@ -23,7 +23,7 @@ from metricflow.model.validations.validator_helpers import (
     ValidationWarning,
 )
 from metricflow.model.validations.validator_helpers import ValidationFutureError
-from metricflow.references import IdentifierReference
+from dbt.semantic.references import IdentifierReference
 
 logger = logging.getLogger(__name__)
 

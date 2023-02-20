@@ -19,7 +19,7 @@ from dbt.contracts.graph.measures import Measure
 from dbt.contracts.graph.nodes import Metric, Entity
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
-from metricflow.references import (
+from dbt.semantic.references import (
     DimensionReference,
     IdentifierReference,
     MeasureReference,

@@ -38,7 +38,7 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.dataset import DataSet
 from dbt.contracts.graph.metrics import MetricTimeWindow
 from metricflow.object_utils import pformat_big_objects
-from metricflow.references import TimeDimensionReference
+from dbt.semantic.references import TimeDimensionReference
 from metricflow.specs import (
     MetricInputMeasureSpec,
     OrderBySpec,

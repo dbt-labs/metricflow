@@ -5,7 +5,7 @@ from dbt.contracts.graph.nodes import Entity
 from dbt.contracts.graph.dimensions import DimensionType
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.transformations.transform_rule import ModelTransformRule
-from metricflow.references import TimeDimensionReference
+from dbt.semantic.references import TimeDimensionReference
 
 logger = logging.getLogger(__name__)
 

@@ -10,7 +10,7 @@ from metricflow.model.semantics.entity_semantics import EntitySemantics
 from metricflow.model.semantics.linkable_spec_resolver import ValidLinkableSpecResolver
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.spec_converters import WhereConstraintConverter
-from metricflow.references import MetricReference
+from dbt.semantic.references import MetricReference
 from metricflow.specs import MetricSpec, LinkableInstanceSpec, MetricInputMeasureSpec, MeasureSpec
 from metricflow.model.semantics.entity_join_evaluator import MAX_JOIN_HOPS
 

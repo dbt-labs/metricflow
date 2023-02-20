@@ -10,7 +10,7 @@ from metricflow.model.semantics.entity_join_evaluator import (
     EntityIdentifierJoin,
 )
 from metricflow.object_utils import assert_values_exhausted
-from metricflow.references import IdentifierReference
+from dbt.semantic.references import IdentifierReference
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 
 

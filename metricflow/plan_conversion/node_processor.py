@@ -16,7 +16,7 @@ from metricflow.model.semantics.entity_join_evaluator import EntityJoinEvaluator
 from metricflow.object_utils import pformat_big_objects
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.protocols.semantics import EntitySemanticsAccessor
-from metricflow.references import TimeDimensionReference, IdentifierReference
+from dbt.semantic.references import TimeDimensionReference, IdentifierReference
 from metricflow.spec_set_transforms import ToElementNameSet
 from metricflow.specs import LinkableInstanceSpec, LinklessIdentifierSpec, InstanceSpecSet
 

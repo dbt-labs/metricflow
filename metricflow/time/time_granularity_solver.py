@@ -16,7 +16,7 @@ from dbt.contracts.graph.metrics import MetricType
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.query.query_exceptions import InvalidQueryException
-from metricflow.references import TimeDimensionReference, MeasureReference, MetricReference, IdentifierReference
+from dbt.semantic.references import TimeDimensionReference, MeasureReference, MetricReference, IdentifierReference
 from metricflow.specs import (
     TimeDimensionSpec,
     DEFAULT_TIME_GRANULARITY,

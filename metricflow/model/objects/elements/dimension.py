@@ -4,7 +4,7 @@ from typing import Optional
 
 from metricflow.model.objects.base import HashableBaseModel, ModelWithMetadataParsing
 from metricflow.model.objects.common import Metadata
-from metricflow.references import DimensionReference, TimeDimensionReference
+from dbt.semantic.references import DimensionReference, TimeDimensionReference
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.object_utils import ExtendedEnum
 

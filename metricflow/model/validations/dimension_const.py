@@ -14,7 +14,7 @@ from metricflow.model.validations.validator_helpers import (
     validate_safely,
 )
 from dbt.contracts.graph.manifest import UserConfiguredModel
-from metricflow.references import DimensionReference
+from dbt.semantic.references import DimensionReference
 from metricflow.time.time_granularity import TimeGranularity
 
 

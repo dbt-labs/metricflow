@@ -20,7 +20,7 @@ from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dataclass_serialization import SerializableDataclass
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.object_utils import assert_exactly_one_arg_set, hash_items
-from metricflow.references import (
+from dbt.semantic.references import (
     DimensionReference,
     MeasureReference,
     MetricReference,

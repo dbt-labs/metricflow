@@ -7,7 +7,7 @@ from metricflow.instances import EntityReference, EntityElementReference, Identi
 from dbt.contracts.graph.identifiers import IdentifierType
 from metricflow.object_utils import pformat_big_objects
 from metricflow.protocols.semantics import EntitySemanticsAccessor
-from metricflow.references import IdentifierReference
+from dbt.semantic.references import IdentifierReference
 
 MAX_JOIN_HOPS = 2
 

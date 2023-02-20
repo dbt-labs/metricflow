@@ -48,7 +48,7 @@ from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationR
 from metricflow.plan_conversion.node_processor import PreDimensionJoinNodeProcessor
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.time_spine import TimeSpineSource
-from metricflow.references import TimeDimensionReference
+from dbt.semantic.references import TimeDimensionReference
 from metricflow.specs import (
     MetricSpec,
     MetricInputMeasureSpec,

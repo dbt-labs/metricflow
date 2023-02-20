@@ -13,7 +13,7 @@ from metricflow.model.validations.validator_helpers import (
     validate_safely,
     ValidationError,
 )
-from metricflow.references import TimeDimensionReference
+from dbt.semantic.references import TimeDimensionReference
 
 
 class AggregationTimeDimensionRule(ModelValidationRule):
