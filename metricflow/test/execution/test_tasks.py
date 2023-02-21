@@ -7,7 +7,7 @@ from metricflow.execution.execution_plan import (
 from metricflow.execution.executor import SequentialPlanExecutor
 from dbt.semantic.object_utils import random_id
 from metricflow.protocols.async_sql_client import AsyncSqlClient
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from dbt.semantic.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.sql_utils import make_df
 from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState

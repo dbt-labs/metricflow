@@ -23,7 +23,7 @@ from metricflow.protocols.sql_request import (
     SqlJsonTag,
 )
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from dbt.semantic.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.async_request import SqlStatementCommentMetadata, CombinedSqlTags
 from metricflow.sql_clients.common_client import SqlDialect, not_empty, check_isolation_level
 from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient

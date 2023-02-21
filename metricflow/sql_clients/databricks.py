@@ -13,8 +13,8 @@ from metricflow.protocols.sql_client import SqlEngineAttributes, SqlEngine, SqlI
 from metricflow.protocols.sql_request import SqlRequestTagSet, SqlJsonTag
 from metricflow.sql.render.databricks import DatabricksSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql.sql_bind_parameters import SqlColumnType
+from dbt.semantic.sql_bind_parameters import SqlBindParameters
+from dbt.semantic.sql_bind_parameters import SqlColumnType
 from metricflow.sql_clients.async_request import CombinedSqlTags
 from metricflow.sql_clients.base_sql_client_implementation import BaseSqlClientImplementation
 from metricflow.sql_clients.common_client import SqlDialect, check_isolation_level

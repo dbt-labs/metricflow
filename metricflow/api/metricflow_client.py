@@ -13,7 +13,8 @@ from metricflow.engine.metricflow_engine import (
     MetricFlowQueryResult,
 )
 from metricflow.engine.models import Dimension, Metric
-from metricflow.engine.utils import build_user_configured_model_from_config, convert_to_datetime
+from metricflow.engine.utils import convert_to_datetime
+from metricflow.model.parsing.dbt_dir_to_model import get_dbt_user_configured_model
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.protocols.async_sql_client import AsyncSqlClient
@@ -39,7 +40,9 @@ class MetricFlowClient:
             handler = ConfigHandler()
         logger.debug(f"Constructing a MetricFlowClient with the config in {handler.yaml_file_path}")
         sql_client = make_sql_client_from_config(handler)
-        user_configured_model = build_user_configured_model_from_config(handler)
+        user_configured_model = get_dbt_user_configured_model(
+            directory="DELETE_THIS_STRING"
+        )
         schema = not_empty(handler.get_value(CONFIG_DWH_SCHEMA), CONFIG_DWH_SCHEMA, handler.url)
 
         return MetricFlowClient(

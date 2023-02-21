@@ -7,14 +7,14 @@ from typing import Optional
 
 import pandas as pd
 
-from metricflow.dataclass_serialization import SerializableDataclass
+from dbt.dataclass_schema import dbtClassMixin
 from dbt.semantic.time import TimeGranularity
 
 logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
-class TimeRangeConstraint(SerializableDataclass):
+class TimeRangeConstraint(dbtClassMixin):
     """Describes how the time dimension for metrics should be constrained."""
 
     start_time: datetime.datetime

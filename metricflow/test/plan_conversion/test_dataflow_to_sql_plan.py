@@ -47,7 +47,7 @@ from metricflow.specs import (
     InstanceSpecSet,
 )
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from dbt.semantic.sql_bind_parameters import SqlBindParameters
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState

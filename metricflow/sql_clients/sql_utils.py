@@ -22,7 +22,7 @@ from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.protocols.sql_client import SqlClient, SqlIsolationLevel
 from metricflow.protocols.sql_request import SqlJsonTag
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from dbt.semantic.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.base_sql_client_implementation import SqlClientException
 from metricflow.sql_clients.big_query import BigQuerySqlClient
 from metricflow.sql_clients.common_client import SqlDialect, not_empty

@@ -11,7 +11,7 @@ from metricflow.sql.render.expr_renderer import (
     SqlExpressionRenderer,
     SqlExpressionRenderResult,
 )
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from dbt.semantic.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_plan import (
     SqlQueryPlanNodeVisitor,
     SqlTableFromClauseNode,

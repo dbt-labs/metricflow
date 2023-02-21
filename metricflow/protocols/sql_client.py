@@ -8,7 +8,7 @@ from pandas import DataFrame
 
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from dbt.semantic.sql_bind_parameters import SqlBindParameters
 
 
 class SqlEngine(Enum):

@@ -17,7 +17,7 @@ from typing import List, Optional, Sequence, Tuple, TypeVar, Generic, Any
 from dbt.semantic.aggregation_properties import AggregationType, AggregationState
 from metricflow.column_assoc import ColumnAssociation
 from metricflow.constraints.time_constraint import TimeRangeConstraint
-from metricflow.dataclass_serialization import SerializableDataclass
+from dbt.dataclass_schema import dbtClassMixin
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from dbt.semantic.object_utils import assert_exactly_one_arg_set, hash_items
 from dbt.semantic.references import (
@@ -27,7 +27,7 @@ from dbt.semantic.references import (
     TimeDimensionReference,
     IdentifierReference,
 )
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from dbt.semantic.sql_bind_parameters import SqlBindParameters
 from dbt.semantic.time import TimeGranularity
 from dbt.contracts.graph.metrics import MetricTimeWindow
 
@@ -77,7 +77,7 @@ class ColumnAssociationResolver(ABC):
 
 
 @dataclass(frozen=True)
-class InstanceSpec(SerializableDataclass):
+class InstanceSpec(dbtClassMixin):
     """A specification for an instance of a metric definition object.
 
     An instance is different from the definition object in that it correlates to columns in the data flow and can be in
@@ -175,7 +175,7 @@ class LinkableInstanceSpec(InstanceSpec, ABC):
 
 
 @dataclass(frozen=True)
-class IdentifierSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
+class IdentifierSpec(LinkableInstanceSpec, dbtClassMixin):  # noqa: D
     def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
         return resolver.resolve_identifier_spec(self)
 
@@ -222,7 +222,7 @@ class IdentifierSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
 
 
 @dataclass(frozen=True)
-class LinklessIdentifierSpec(IdentifierSpec, SerializableDataclass):
+class LinklessIdentifierSpec(IdentifierSpec, dbtClassMixin):
     """Similar to IdentifierSpec, but requires that it doesn't have identifier links."""
 
     @staticmethod
@@ -247,7 +247,7 @@ class LinklessIdentifierSpec(IdentifierSpec, SerializableDataclass):
 
 
 @dataclass(frozen=True)
-class DimensionSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
+class DimensionSpec(LinkableInstanceSpec, dbtClassMixin):  # noqa: D
     element_name: str
     identifier_links: Tuple[IdentifierReference, ...]
 
@@ -339,7 +339,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
 
 
 @dataclass(frozen=True)
-class NonAdditiveDimensionSpec(SerializableDataclass):
+class NonAdditiveDimensionSpec(dbtClassMixin):
     """Spec representing non-additive dimension parameters for use within a MeasureSpec
 
     This is sourced from the NonAdditiveDimensionParameters model object, which provides the parsed parameter set,
@@ -439,7 +439,7 @@ class MetricSpec(InstanceSpec):  # noqa: D
 
 
 @dataclass(frozen=True)
-class MetricInputMeasureSpec(SerializableDataclass):
+class MetricInputMeasureSpec(dbtClassMixin):
     """The spec for a measure defined as a metric input.
 
     This is necessary because the MeasureSpec is used as a key linking the measures used in the query
@@ -469,7 +469,7 @@ class MetricInputMeasureSpec(SerializableDataclass):
 
 
 @dataclass(frozen=True)
-class OrderBySpec(SerializableDataclass):  # noqa: D
+class OrderBySpec(dbtClassMixin):  # noqa: D
 
     descending: bool
     metric_spec: Optional[MetricSpec] = None
@@ -495,13 +495,13 @@ class OrderBySpec(SerializableDataclass):  # noqa: D
 
 
 @dataclass(frozen=True)
-class FilterSpec(SerializableDataclass):  # noqa: D
+class FilterSpec(dbtClassMixin):  # noqa: D
     expr: str
     elements: Tuple[InstanceSpec, ...]
 
 
 @dataclass(frozen=True)
-class OutputColumnNameOverride(SerializableDataclass):
+class OutputColumnNameOverride(dbtClassMixin):
     """Describes how we should name the output column for a time dimension instead of the default.
 
     Note: This is used temporarily to maintain compatibility with the old framework.
@@ -512,7 +512,7 @@ class OutputColumnNameOverride(SerializableDataclass):
 
 
 @dataclass(frozen=True)
-class LinkableSpecSet(SerializableDataclass):
+class LinkableSpecSet(dbtClassMixin):
     """Groups linkable specs."""
 
     dimension_specs: Tuple[DimensionSpec, ...] = ()
@@ -571,7 +571,7 @@ class LinkableSpecSet(SerializableDataclass):
 
 
 @dataclass(frozen=True)
-class SpecWhereClauseConstraint(SerializableDataclass):
+class SpecWhereClauseConstraint(dbtClassMixin):
     """Similar to a WhereClauseConstraint, but with specs instead of strings"""
 
     # e.g. "listing__capacity_latest > 4"
@@ -594,7 +594,7 @@ class SpecWhereClauseConstraint(SerializableDataclass):
 
 
 @dataclass(frozen=True)
-class MetricFlowQuerySpec(SerializableDataclass):
+class MetricFlowQuerySpec(dbtClassMixin):
     """Specs needed for running a query."""
 
     metric_specs: Tuple[MetricSpec, ...] = ()
@@ -628,7 +628,7 @@ class InstanceSpecSetTransform(Generic[TransformOutputT], ABC):
 
 
 @dataclass(frozen=True)
-class InstanceSpecSet(SerializableDataclass):
+class InstanceSpecSet(dbtClassMixin):
     """Consolidates all specs used in an instance set"""
 
     metric_specs: Tuple[MetricSpec, ...] = ()
@@ -715,7 +715,7 @@ class InstanceSpecSet(SerializableDataclass):
 
 
 @dataclass(frozen=True)
-class PartitionSpecSet(SerializableDataclass):
+class PartitionSpecSet(dbtClassMixin):
     """Grouping of the linkable specs."""
 
     dimension_specs: Tuple[DimensionSpec, ...] = ()

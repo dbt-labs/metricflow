@@ -17,7 +17,7 @@ from dbt.contracts.graph.identifiers import Identifier, IdentifierType
 from dbt.contracts.graph.measures import Measure
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.protocols.async_sql_client import AsyncSqlClient
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from dbt.semantic.sql_bind_parameters import SqlBindParameters
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.model.validations.helpers import entity_with_guaranteed_meta
 from metricflow.test.plan_utils import assert_snapshot_text_equal, make_schema_replacement_function

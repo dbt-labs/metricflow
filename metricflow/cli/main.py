@@ -42,11 +42,10 @@ from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest, MetricFlowExplainResult, MetricFlowQueryResult
 from metricflow.model.data_warehouse_model_validator import DataWarehouseModelValidator
 from dbt.semantic.validations.model_validator import ModelValidator
+from dbt.semantic.validations.validator_helpers import ModelValidationResults
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.protocols.sql_client import SqlEngine
-from metricflow.engine.utils import model_build_result_from_config, path_to_models
-from metricflow.model.parsing.config_linter import ConfigLinter
-from dbt.semantic.validation.validator_helpers import ModelValidationResults
+from metricflow.model.parsing.dbt_dir_to_model import get_dbt_user_configured_model
 from metricflow.sql_clients.common_client import SqlDialect
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
@@ -651,22 +650,13 @@ def validate_configs(
     if not show_all:
         print("(To see warnings and future-errors, run again with flag `--show-all`)")
 
-    lint_spinner = Halo(text="Checking for YAML format issues", spinner="dots")
-    lint_spinner.start()
-
-    lint_results = ConfigLinter().lint_dir(path_to_models(handler=cfg.config))
-    if not lint_results.has_blocking_issues:
-        lint_spinner.succeed(f"🎉 Successfully linted config YAML files ({lint_results.summary()})")
-    else:
-        lint_spinner.fail(f"Breaking issues found in config YAML files ({lint_results.summary()})")
-        _print_issues(lint_results, show_non_blocking=show_all, verbose=verbose_issues)
-        return
-
     # Parsing Validation
     parsing_spinner = Halo(text="Building model from configs", spinner="dots")
     parsing_spinner.start()
 
-    parsing_result = model_build_result_from_config(handler=cfg.config, raise_issues_as_exceptions=False)
+    parsing_result = get_dbt_user_configured_model(
+        directory="DELETE_THIS_STRING"
+    )
 
     if not parsing_result.issues.has_blocking_issues:
         parsing_spinner.succeed(f"🎉 Successfully built model from configs ({parsing_result.issues.summary()})")

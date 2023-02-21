@@ -1,7 +1,7 @@
 import pytest
 
 from metricflow.dataclass_serialization import DataclassSerializer, DataClassDeserializer
-from metricflow.sql.sql_bind_parameters import SqlBindParameters, SqlBindParameter, SqlBindParameterValue
+from dbt.semantic.sql_bind_parameters import SqlBindParameters, SqlBindParameter, SqlBindParameterValue
 
 
 @pytest.fixture

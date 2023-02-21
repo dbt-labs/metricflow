@@ -20,7 +20,7 @@ from metricflow.protocols.sql_client import (
 )
 from metricflow.protocols.sql_client import SqlIsolationLevel
 from metricflow.protocols.sql_request import SqlRequestId, SqlRequestResult, SqlRequestTagSet, SqlJsonTag
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from dbt.semantic.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.async_request import SqlStatementCommentMetadata, CombinedSqlTags
 from metricflow.sql_clients.common_client import check_isolation_level
 

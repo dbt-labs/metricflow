@@ -1,8 +1,7 @@
 from abc import ABC
 from dataclasses import dataclass
 from typing import Optional, Any
-
-from metricflow.dataclass_serialization import SerializableDataclass
+from dbt.dataclass_schema import dbtClassMixin
 from dbt.semantic.object_utils import assert_exactly_one_arg_set
 
 
@@ -13,7 +12,7 @@ class ColumnCorrelationKey(ABC):
 
 
 @dataclass(frozen=True)
-class SingleColumnCorrelationKey(ColumnCorrelationKey, SerializableDataclass):
+class SingleColumnCorrelationKey(ColumnCorrelationKey, dbtClassMixin):
     """Key to use when there's only 1 column association in an instance."""
 
     # Pydantic throws an error during serialization if a dataclass has no fields.
@@ -27,14 +26,14 @@ class SingleColumnCorrelationKey(ColumnCorrelationKey, SerializableDataclass):
 
 
 @dataclass(frozen=True)
-class CompositeColumnCorrelationKey(ColumnCorrelationKey, SerializableDataclass):
+class CompositeColumnCorrelationKey(ColumnCorrelationKey, dbtClassMixin):
     """Key to use when there are multiple column associations in an instance"""
 
     sub_identifier: str
 
 
 @dataclass(frozen=True)
-class ColumnAssociation(SerializableDataclass):
+class ColumnAssociation(dbtClassMixin):
     """Used to describe how an instance is associated with columns in table / SQL query.
 
     Generally there will be a 1:1 mapping, but for composite identifiers, it can map to multiple columns. For that case,

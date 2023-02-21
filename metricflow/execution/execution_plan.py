@@ -15,7 +15,7 @@ from metricflow.dag.mf_dag import DagNode, MetricFlowDag, NodeId, DisplayedPrope
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.protocols.sql_request import SqlJsonTag
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from dbt.semantic.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.sql_utils import sync_execute, sync_query
 from metricflow.visitor import Visitable
 

@@ -7,9 +7,9 @@ from dataclasses import dataclass
 from typing import List, TypeVar, Generic, Tuple
 
 from dbt.semantic.aggregation_properties import AggregationState
+from dbt.semantic.references import EntityElementReference, MetricModelReference
+from dbt.dataclass_schema import dbtClassMixin
 from metricflow.column_assoc import ColumnAssociation
-from metricflow.dataclass_serialization import SerializableDataclass
-from dbt.semantic.references import ElementReference
 from metricflow.specs import (
     MetadataSpec,
     MeasureSpec,
@@ -20,62 +20,6 @@ from metricflow.specs import (
     TimeDimensionSpec,
     InstanceSpecSet,
 )
-
-
-class ModelReference(SerializableDataclass):
-    """A reference to something in the model.
-
-    For example, a measure instance could have a defined_from field that has a model reference to the measure / data
-    source that it is supposed to reference. Added for exploratory purposes, so whether this is needed is TBD.
-    """
-
-    pass
-
-
-@dataclass(frozen=True)
-class EntityReference(ModelReference):
-    """A reference to a entity definition in the model."""
-
-    entity_name: str
-
-    def __hash__(self) -> int:  # noqa: D
-        return hash(self.entity_name)
-
-
-@dataclass(frozen=True)
-class EntityElementReference(ModelReference):
-    """A reference to an element definition in a entity definition in the model.
-
-    TODO: Fields should be *Reference objects.
-    """
-
-    entity_name: str
-    element_name: str
-
-    @staticmethod
-    def create_from_references(  # noqa: D
-        entity_reference: EntityReference, element_reference: ElementReference
-    ) -> EntityElementReference:
-        return EntityElementReference(
-            entity_name=entity_reference.entity_name,
-            element_name=element_reference.element_name,
-        )
-
-    @property
-    def entity_reference(self) -> EntityReference:  # noqa: D
-        return EntityReference(self.entity_name)
-
-    def is_from(self, ref: EntityReference) -> bool:
-        """Returns true if this reference is from the same entity as the supplied reference."""
-        return self.entity_name == ref.entity_name
-
-
-@dataclass(frozen=True)
-class MetricModelReference(ModelReference):
-    """A reference to a metric definition in the model."""
-
-    metric_name: str
-
 
 # Type for the specification used in the instance.
 SpecT = TypeVar("SpecT", bound=InstanceSpec)
@@ -110,7 +54,7 @@ class MdoInstance(ABC, Generic[SpecT]):
 
 
 @dataclass(frozen=True)
-class EntityElementInstance(SerializableDataclass):  # noqa: D
+class EntityElementInstance(dbtClassMixin):  # noqa: D
     # This instance is derived from something defined in a entity.
     defined_from: Tuple[EntityElementReference, ...]
 
@@ -159,14 +103,14 @@ class IdentifierInstance(MdoInstance[IdentifierSpec], EntityElementInstance):  #
 
 
 @dataclass(frozen=True)
-class MetricInstance(MdoInstance[MetricSpec], SerializableDataclass):  # noqa: D
+class MetricInstance(MdoInstance[MetricSpec], dbtClassMixin):  # noqa: D
     associated_columns: Tuple[ColumnAssociation, ...]
     spec: MetricSpec
     defined_from: Tuple[MetricModelReference, ...]
 
 
 @dataclass(frozen=True)
-class MetadataInstance(MdoInstance[MetadataSpec], SerializableDataclass):  # noqa: D
+class MetadataInstance(MdoInstance[MetadataSpec], dbtClassMixin):  # noqa: D
     associated_columns: Tuple[ColumnAssociation, ...]
     spec: MetadataSpec
 
@@ -189,7 +133,7 @@ class InstanceSetTransform(Generic[TransformOutputT], ABC):
 
 
 @dataclass(frozen=True)
-class InstanceSet(SerializableDataclass):
+class InstanceSet(dbtClassMixin):
     """A set that includes all instance types.
 
     Generally used to help represent that data that is flowing between nodes in the metric dataflow plan.

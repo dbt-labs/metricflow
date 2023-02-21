@@ -13,7 +13,7 @@ from metricflow.protocols.sql_client import SqlEngineAttributes
 from metricflow.protocols.sql_request import SqlRequestTagSet, SqlJsonTag
 from metricflow.sql.render.duckdb_renderer import DuckDbSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from dbt.semantic.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.async_request import CombinedSqlTags
 from metricflow.sql_clients.common_client import SqlDialect
 from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient

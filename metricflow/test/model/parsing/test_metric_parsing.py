@@ -5,7 +5,7 @@ from dbt.semantic.constraints import WhereClauseConstraint
 from dbt.contracts.graph.metrics import MetricTimeWindow, MetricInput, MetricInputMeasure, MetricType
 from metricflow.model.parsing.dir_to_model import parse_yaml_files_to_model
 from metricflow.model.validations.validator_helpers import ModelValidationException
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from dbt.semantic.sql_bind_parameters import SqlBindParameters
 from dbt.semantic.time import TimeGranularity
 
 

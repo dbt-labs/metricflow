@@ -9,7 +9,7 @@ from typing import List
 
 import jinja2
 
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from dbt.semantic.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_exprs import (
     SqlExpressionNodeVisitor,
     SqlColumnReferenceExpression,

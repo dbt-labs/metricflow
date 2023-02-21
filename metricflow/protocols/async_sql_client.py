@@ -5,7 +5,7 @@ from typing import Protocol, Sequence, Optional, Callable
 
 from metricflow.protocols.sql_client import SqlClient, SqlIsolationLevel
 from metricflow.protocols.sql_request import SqlRequestId, SqlRequestResult, SqlJsonTag
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from dbt.semantic.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.async_request import CombinedSqlTags
 
 

@@ -27,7 +27,7 @@ from metricflow.dag.id_generation import (
     SQL_EXPR_WINDOW_FUNCTION_ID_PREFIX,
 )
 from dbt.contracts.graph.measures import MeasureAggregationParameters
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from dbt.semantic.sql_bind_parameters import SqlBindParameters
 from metricflow.visitor import Visitable, VisitorOutputT
 from dbt.semantic.time import TimeGranularity
 from dbt.semantic.object_utils import assert_values_exhausted, flatten_nested_sequence
