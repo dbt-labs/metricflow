@@ -21,11 +21,10 @@ from dbt.contracts.graph.dimensions import Dimension, DimensionType
 from dbt.contracts.graph.nodes import Metric, Entity
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
-from metricflow.model.validations.validator_helpers import (
+from dbt.semantic.validations.validator_helpers import (
     EntityContext,
     EntityElementContext,
     EntityElementType,
-    FileContext,
     MetricContext,
     ModelValidationResults,
     ValidationContext,

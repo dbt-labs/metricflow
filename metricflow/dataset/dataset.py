@@ -4,7 +4,7 @@ import logging
 from typing import Sequence
 
 from metricflow.instances import InstanceSet, TimeDimensionInstance
-from metricflow.model.validations.unique_valid_name import MetricFlowReservedKeywords
+from dbt.semantic.validations.unique_valid_name import SemanticReservedKeywords
 from dbt.semantic.references import TimeDimensionReference
 from metricflow.specs import TimeDimensionSpec
 from dbt.semantic.time import TimeGranularity
@@ -40,7 +40,7 @@ class DataSet:
         Or to put in another way, if metrics for those measures were plotted together on a graph, this is the name of
         the time dimension for the x-axis.
         """
-        return TimeDimensionReference(element_name=MetricFlowReservedKeywords.METRIC_TIME.value)
+        return TimeDimensionReference(element_name=SemanticReservedKeywords.METRIC_TIME.value)
 
     @staticmethod
     def metric_time_dimension_name() -> str:

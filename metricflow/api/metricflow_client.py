@@ -6,7 +6,6 @@ from typing import Dict, List, Optional
 from metricflow.configuration.config_handler import ConfigHandler
 from metricflow.configuration.constants import CONFIG_DWH_SCHEMA
 from metricflow.configuration.yaml_handler import YamlFileHandler
-from metricflow.dataflow.sql_table import SqlTable
 from metricflow.engine.metricflow_engine import (
     MetricFlowEngine,
     MetricFlowExplainResult,
@@ -17,7 +16,6 @@ from metricflow.engine.models import Dimension, Metric
 from metricflow.engine.utils import build_user_configured_model_from_config, convert_to_datetime
 from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
-from metricflow.model.validations.validator_helpers import ModelValidationResults
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql_clients.common_client import not_empty

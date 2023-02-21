@@ -4,7 +4,7 @@ import copy
 from dbt.semantic.validations.model_validator import ModelValidator
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from dbt.contracts.graph.manifest import UserConfiguredModel
-from metricflow.model.validations.unique_valid_name import MetricFlowReservedKeywords, UniqueAndValidNameRule
+from dbt.semantic.validations.unique_valid_name import SemanticReservedKeywords, UniqueAndValidNameRule
 from dbt.semantic.object_utils import flatten_nested_sequence
 from metricflow.test.test_utils import find_entity_with
 
@@ -158,8 +158,8 @@ def test_invalid_names() -> None:  # noqa:D
 
 
 def test_reserved_name() -> None:  # noqa: D
-    reserved_keyword = MetricFlowReservedKeywords.METRIC_TIME
-    reserved_reason = MetricFlowReservedKeywords.get_reserved_reason(reserved_keyword)
+    reserved_keyword = SemanticReservedKeywords.METRIC_TIME
+    reserved_reason = SemanticReservedKeywords.get_reserved_reason(reserved_keyword)
     issues = UniqueAndValidNameRule.check_valid_name(reserved_keyword.value.lower())
     match = False
     for issue in issues:

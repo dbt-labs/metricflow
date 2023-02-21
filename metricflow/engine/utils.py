@@ -6,8 +6,7 @@ from typing import Optional
 from metricflow.configuration.constants import CONFIG_MODEL_PATH
 from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.errors.errors import ModelCreationException
-from dbt.contracts.graph.manifest import UserConfiguredModel
-from metricflow.model.parsing.dir_to_model import ModelBuildResult, parse_directory_of_yaml_files_to_model
+from dbt.contracts.graph.manifest import UserConfiguredModel, ModelBuildResult
 from metricflow.sql_clients.common_client import not_empty
 
 
