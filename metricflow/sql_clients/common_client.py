@@ -1,6 +1,6 @@
 from typing import Optional, TypeVar
 
-from dbt.dataclass_schemas import StrEnum
+from dbt.dataclass_schema import StrEnum
 from metricflow.protocols.sql_client import SqlClient, SqlIsolationLevel
 
 

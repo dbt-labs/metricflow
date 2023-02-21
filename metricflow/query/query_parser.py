@@ -34,7 +34,7 @@ from metricflow.specs import (
     LinkableSpecSet,
 )
 from dbt.semantic.time import TimeGranularity
-from dbt.semantic.time_solver import (
+from metricflow.time.time_granularity_solver import (
     TimeGranularitySolver,
     PartialTimeDimensionSpec,
     RequestTimeGranularityException,
