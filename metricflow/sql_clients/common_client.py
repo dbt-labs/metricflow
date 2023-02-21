@@ -1,10 +1,10 @@
 from typing import Optional, TypeVar
 
-from dbt.semantic.object_utils import ExtendedEnum
+from dbt.dataclass_schemas import StrEnum
 from metricflow.protocols.sql_client import SqlClient, SqlIsolationLevel
 
 
-class SqlDialect(ExtendedEnum):
+class SqlDialect(StrEnum):
     """All SQL dialects that MQL currently supports. Value of enum is used in URLs as the dialect."""
 
     DUCKDB = "duckdb"

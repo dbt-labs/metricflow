@@ -1,9 +1,8 @@
 from dataclasses import dataclass
 from dbt.lib import get_dbt_config
 from dbt import tracking
-from dbt.parser.manifest import ManifestLoader, Manifest
-from metricflow.model.model_transformer import ModelTransformer
-from metricflow.model.parsing.dir_to_model import ModelBuildResult
+from dbt.parser.manifest import ManifestLoader
+from dbt.contracts.graph.manifest import Manifest, UserConfiguredModel
 from typing import Optional
 
 
@@ -32,3 +31,15 @@ def get_dbt_project_manifest(
     tracking.disable_tracking()
     return ManifestLoader.get_full_manifest(config=dbt_config)
 
+def get_dbt_user_configured_model(
+ directory: str, profile: Optional[str] = None, target: Optional[str] = None
+) -> UserConfiguredModel:
+    """Returns the user configured Model from the dbt Manifest"""
+    
+    manifest = get_dbt_project_manifest(
+        directory="/Users/callummccann/repos/dbt-core/testing-project/postgres",
+        profile=profile,
+        target=target
+    )
+
+    return manifest.user_configured_model

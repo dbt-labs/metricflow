@@ -22,7 +22,7 @@ from metricflow.dataset.convert_entity import EntityToDataSetConverter
 from metricflow.dataset.entity_adapter import EntityDataSet
 from metricflow.engine.models import Dimension, Metric
 from metricflow.engine.time_source import ServerTimeSource
-from metricflow.engine.utils import build_user_configured_model_from_config
+from metricflow.model.parsing.dbt_dir_to_model import get_dbt_user_configured_model
 from metricflow.errors.errors import ExecutionException
 from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
 from metricflow.execution.execution_plan_to_text import execution_plan_to_text
@@ -232,7 +232,9 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         """Initialize MetricFlowEngine via yaml config file."""
         sql_client = make_sql_client_from_config(handler)
 
-        semantic_model = SemanticModel(build_user_configured_model_from_config(handler))
+        semantic_model = SemanticModel(get_dbt_user_configured_model(
+            directory="REMOVE_THIS_STRING"
+        ))
         system_schema = not_empty(handler.get_value(CONFIG_DWH_SCHEMA), CONFIG_DWH_SCHEMA, handler.url)
         return MetricFlowEngine(
             semantic_model=semantic_model,

@@ -11,6 +11,7 @@ from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.engine.utils import build_user_configured_model_from_config
 from metricflow.errors.errors import SqlClientCreationException, MetricFlowInitException
 from dbt.contracts.graph.manifest import UserConfiguredModel
+from metricflow.model.parsing.dbt_dir_to_model import get_dbt_user_configured_model
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.sql_clients.sql_utils import make_sql_client_from_config
@@ -110,7 +111,9 @@ class CLIContext:
     @property
     def user_configured_model(self) -> UserConfiguredModel:  # noqa: D
         if self._user_configured_model is None:
-            self._user_configured_model = build_user_configured_model_from_config(self.config)
+            self._user_configured_model = get_dbt_user_configured_model(
+                directory="REMOVE_THIS_STRING"    
+            )
 
         assert self._user_configured_model is not None
         return self._user_configured_model
