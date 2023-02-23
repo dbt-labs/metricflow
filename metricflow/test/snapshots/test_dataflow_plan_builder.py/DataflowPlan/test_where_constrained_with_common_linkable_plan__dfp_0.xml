@@ -7,7 +7,7 @@
             <!-- node_id = cm_0 -->
             <!-- metric_spec =                   -->
             <!--   {'class': 'MetricSpec',       -->
-            <!--    'element_name': 'bookings',  -->
+            <!--    'name': 'bookings',  -->
             <!--    'constraint': None,          -->
             <!--    'alias': None,               -->
             <!--    'offset_window': None,       -->
@@ -24,9 +24,9 @@
                     <!--    'linkable_names': ('listing__country_latest',),                                                    -->
                     <!--    'linkable_spec_set': {'class': 'LinkableSpecSet',                                                  -->
                     <!--                          'dimension_specs': ({'class': 'DimensionSpec',                               -->
-                    <!--                                               'element_name': 'country_latest',                       -->
+                    <!--                                               'name': 'country_latest',                       -->
                     <!--                                               'identifier_links': ({'class': 'IdentifierReference',   -->
-                    <!--                                                                     'element_name': 'listing'},)},),  -->
+                    <!--                                                                     'name': 'listing'},)},),  -->
                     <!--                          'time_dimension_specs': (),                                                  -->
                     <!--                          'identifier_specs': ()},                                                     -->
                     <!--    'execution_parameters': {'class': 'SqlBindParameters', 'param_items': ()}}                         -->
@@ -37,13 +37,13 @@
                         <!-- node_id = pfe_2 -->
                         <!-- include_spec =                           -->
                         <!--   {'class': 'MeasureSpec',               -->
-                        <!--    'element_name': 'bookings',           -->
+                        <!--    'name': 'bookings',           -->
                         <!--    'non_additive_dimension_spec': None}  -->
                         <!-- include_spec =                                            -->
                         <!--   {'class': 'DimensionSpec',                              -->
-                        <!--    'element_name': 'country_latest',                      -->
+                        <!--    'name': 'country_latest',                      -->
                         <!--    'identifier_links': ({'class': 'IdentifierReference',  -->
-                        <!--                          'element_name': 'listing'},)}    -->
+                        <!--                          'name': 'listing'},)}    -->
                         <JoinToBaseOutputNode>
                             <!-- description = Join Standard Outputs -->
                             <!-- node_id = jso_0 -->
@@ -51,7 +51,7 @@
                             <!--   {'class': 'JoinDescription',                                -->
                             <!--    'join_node': FilterElementsNode(node_id=pfe_1),            -->
                             <!--    'join_on_identifier': {'class': 'LinklessIdentifierSpec',  -->
-                            <!--                           'element_name': 'listing',          -->
+                            <!--                           'name': 'listing',          -->
                             <!--                           'identifier_links': ()},            -->
                             <!--    'join_on_partition_dimensions': (),                        -->
                             <!--    'join_on_partition_time_dimensions': (),                   -->
@@ -63,11 +63,11 @@
                                 <!-- node_id = pfe_0 -->
                                 <!-- include_spec =                           -->
                                 <!--   {'class': 'MeasureSpec',               -->
-                                <!--    'element_name': 'bookings',           -->
+                                <!--    'name': 'bookings',           -->
                                 <!--    'non_additive_dimension_spec': None}  -->
                                 <!-- include_spec =                         -->
                                 <!--   {'class': 'LinklessIdentifierSpec',  -->
-                                <!--    'element_name': 'listing',          -->
+                                <!--    'name': 'listing',          -->
                                 <!--    'identifier_links': ()}             -->
                                 <MetricTimeDimensionTransformNode>
                                     <!-- description = Metric Time Dimension 'ds' -->
@@ -89,11 +89,11 @@
                                 <!-- node_id = pfe_1 -->
                                 <!-- include_spec =                        -->
                                 <!--   {'class': 'DimensionSpec',          -->
-                                <!--    'element_name': 'country_latest',  -->
+                                <!--    'name': 'country_latest',  -->
                                 <!--    'identifier_links': ()}            -->
                                 <!-- include_spec =                         -->
                                 <!--   {'class': 'LinklessIdentifierSpec',  -->
-                                <!--    'element_name': 'listing',          -->
+                                <!--    'name': 'listing',          -->
                                 <!--    'identifier_links': ()}             -->
                                 <MetricTimeDimensionTransformNode>
                                     <!-- description = Metric Time Dimension 'ds' -->

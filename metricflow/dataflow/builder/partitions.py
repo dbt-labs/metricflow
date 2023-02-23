@@ -71,20 +71,20 @@ class PartitionJoinResolver:
 
         partition_join_descriptions = []
 
-        start_node_dimension_element_names = tuple(
-            OrderedDict.fromkeys(x.element_name for x in start_node_partitions.dimension_specs)
+        start_node_dimension_names = tuple(
+            OrderedDict.fromkeys(x.name for x in start_node_partitions.dimension_specs)
         )
 
-        for element_name in start_node_dimension_element_names:
+        for name in start_node_dimension_names:
             start_node_spec = PartitionJoinResolver._get_simplest_dimension_spec(
-                tuple(x for x in start_node_partitions.dimension_specs if x.element_name == element_name)
+                tuple(x for x in start_node_partitions.dimension_specs if x.name == name)
             )
-            join_node_time_dimension_element_names = tuple(
-                OrderedDict.fromkeys(x.element_name for x in join_node_partitions.dimension_specs)
+            join_node_time_dimension_names = tuple(
+                OrderedDict.fromkeys(x.name for x in join_node_partitions.dimension_specs)
             )
-            if element_name in join_node_time_dimension_element_names:
+            if name in join_node_time_dimension_names:
                 join_node_spec = PartitionJoinResolver._get_simplest_dimension_spec(
-                    tuple(x for x in join_node_partitions.dimension_specs if x.element_name == element_name)
+                    tuple(x for x in join_node_partitions.dimension_specs if x.name == name)
                 )
                 partition_join_descriptions.append(
                     PartitionDimensionJoinDescription(
@@ -111,19 +111,19 @@ class PartitionJoinResolver:
         partition_join_descriptions: List[PartitionTimeDimensionJoinDescription] = []
 
         # Get all unique element names
-        time_dimension_element_names = tuple(
-            OrderedDict.fromkeys(x.element_name for x in start_node_partitions.time_dimension_specs)
+        time_dimension_names = tuple(
+            OrderedDict.fromkeys(x.name for x in start_node_partitions.time_dimension_specs)
         )
-        for element_name in time_dimension_element_names:
+        for name in time_dimension_names:
             start_node_spec = PartitionJoinResolver._get_simplest_time_dimension_spec(
-                tuple(x for x in start_node_partitions.time_dimension_specs if x.element_name == element_name)
+                tuple(x for x in start_node_partitions.time_dimension_specs if x.name == name)
             )
-            join_node_time_dimension_element_names = tuple(
-                OrderedDict.fromkeys(x.element_name for x in join_node_partitions.time_dimension_specs)
+            join_node_time_dimension_names = tuple(
+                OrderedDict.fromkeys(x.name for x in join_node_partitions.time_dimension_specs)
             )
-            if element_name in join_node_time_dimension_element_names:
+            if name in join_node_time_dimension_names:
                 join_node_spec = PartitionJoinResolver._get_simplest_time_dimension_spec(
-                    tuple(x for x in join_node_partitions.time_dimension_specs if x.element_name == element_name)
+                    tuple(x for x in join_node_partitions.time_dimension_specs if x.name == name)
                 )
                 partition_join_descriptions.append(
                     PartitionTimeDimensionJoinDescription(

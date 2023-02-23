@@ -47,7 +47,7 @@ def test_get_names(new_entity_semantics: EntitySemantics) -> None:  # noqa: D
         "is_lux_latest",
         "verification_type",
     ]
-    assert sorted([d.element_name for d in new_entity_semantics.get_dimension_references()]) == expected
+    assert sorted([d.name for d in new_entity_semantics.get_dimension_references()]) == expected
 
     expected = [
         "account_balance",
@@ -74,7 +74,7 @@ def test_get_names(new_entity_semantics: EntitySemantics) -> None:  # noqa: D
         "txn_revenue",
         "views",
     ]
-    assert sorted([m.element_name for m in new_entity_semantics.measure_references]) == expected
+    assert sorted([m.name for m in new_entity_semantics.measure_references]) == expected
 
     expected = [
         "company",
@@ -86,7 +86,7 @@ def test_get_names(new_entity_semantics: EntitySemantics) -> None:  # noqa: D
         "user",
         "verification",
     ]
-    assert sorted([i.element_name for i in new_entity_semantics.get_identifier_references()]) == expected
+    assert sorted([i.name for i in new_entity_semantics.get_identifier_references()]) == expected
 
 
 def test_get_elements(new_entity_semantics: EntitySemantics) -> None:  # noqa: D
@@ -96,20 +96,20 @@ def test_get_elements(new_entity_semantics: EntitySemantics) -> None:  # noqa: D
             == dimension_reference
         )
     for measure_reference in new_entity_semantics.measure_references:
-        measure_reference = MeasureReference(element_name=measure_reference.element_name)
+        measure_reference = MeasureReference(name=measure_reference.name)
         assert new_entity_semantics.get_measure(measure_reference=measure_reference).reference == measure_reference
 
 
 def test_get_entities_for_measure(new_entity_semantics: EntitySemantics) -> None:  # noqa: D
-    bookings_sources = new_entity_semantics.get_entities_for_measure(MeasureReference(element_name="bookings"))
+    bookings_sources = new_entity_semantics.get_entities_for_measure(MeasureReference(name="bookings"))
     assert len(bookings_sources) == 1
     assert bookings_sources[0].name == "bookings_source"
 
-    views_sources = new_entity_semantics.get_entities_for_measure(MeasureReference(element_name="views"))
+    views_sources = new_entity_semantics.get_entities_for_measure(MeasureReference(name="views"))
     assert len(views_sources) == 1
     assert views_sources[0].name == "views_source"
 
-    listings_sources = new_entity_semantics.get_entities_for_measure(MeasureReference(element_name="listings"))
+    listings_sources = new_entity_semantics.get_entities_for_measure(MeasureReference(name="listings"))
     assert len(listings_sources) == 1
     assert listings_sources[0].name == "listings_latest"
 
@@ -119,7 +119,7 @@ def test_elements_for_metric(new_metric_semantics: MetricSemantics) -> None:  # 
         [
             x.qualified_name
             for x in new_metric_semantics.element_specs_for_metrics(
-                [MetricReference(element_name="views")],
+                [MetricReference(name="views")],
                 without_any_property=frozenset({LinkableElementProperties.DERIVED_TIME_GRANULARITY}),
             )
         ]
@@ -163,7 +163,7 @@ def test_elements_for_metric(new_metric_semantics: MetricSemantics) -> None:  # 
     }
 
     local_specs = new_metric_semantics.element_specs_for_metrics(
-        metric_references=[MetricReference(element_name="views")],
+        metric_references=[MetricReference(name="views")],
         with_any_property=frozenset({LinkableElementProperties.LOCAL}),
         without_any_property=frozenset({LinkableElementProperties.DERIVED_TIME_GRANULARITY}),
     )
@@ -181,7 +181,7 @@ def test_local_linked_elements_for_metric(new_metric_semantics: MetricSemantics)
         [
             x.qualified_name
             for x in new_metric_semantics.element_specs_for_metrics(
-                [MetricReference(element_name="listings")],
+                [MetricReference(name="listings")],
                 with_any_property=frozenset({LinkableElementProperties.LOCAL_LINKED}),
                 without_any_property=frozenset({LinkableElementProperties.DERIVED_TIME_GRANULARITY}),
             )
@@ -198,7 +198,7 @@ def test_local_linked_elements_for_metric(new_metric_semantics: MetricSemantics)
 
 
 def test_get_entities_for_identifier(new_entity_semantics: EntitySemantics) -> None:  # noqa: D
-    identifier_reference = IdentifierReference(element_name="user")
+    identifier_reference = IdentifierReference(name="user")
     linked_entities = new_entity_semantics.get_entities_for_identifier(
         identifier_reference=identifier_reference
     )

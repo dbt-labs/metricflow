@@ -46,7 +46,7 @@ class MeasureConverter:
         )
 
         return MeasureSpec(
-            element_name=measure.name,
+            name=measure.name,
             non_additive_dimension_spec=non_additive_dimension_spec,
         )
 
@@ -78,26 +78,26 @@ class WhereConstraintConverter:
             StructuredLinkableSpecName.from_name(linkable_name) for linkable_name in where_constraint_names
         ]
         dimension_references = {
-            dimension_reference.element_name: dimension_reference
+            dimension_reference.name: dimension_reference
             for dimension_reference in entity_semantics.get_dimension_references()
         }
         identifier_references = {
-            identifier_reference.element_name: identifier_reference
+            identifier_reference.name: identifier_reference
             for identifier_reference in entity_semantics.get_identifier_references()
         }
 
         for spec_name in linkable_spec_names:
-            if spec_name.element_name == DataSet.metric_time_dimension_name():
+            if spec_name.name == DataSet.metric_time_dimension_name():
                 where_constraint_time_dimensions.append(TimeDimensionSpec.from_name(spec_name.qualified_name))
-            elif spec_name.element_name in dimension_references:
-                dimension = entity_semantics.get_dimension(dimension_references[spec_name.element_name])
+            elif spec_name.name in dimension_references:
+                dimension = entity_semantics.get_dimension(dimension_references[spec_name.name])
                 if dimension.type == DimensionType.CATEGORICAL:
                     where_constraint_dimensions.append(DimensionSpec.from_name(spec_name.qualified_name))
                 elif dimension.type == DimensionType.TIME:
                     where_constraint_time_dimensions.append(TimeDimensionSpec.from_name(spec_name.qualified_name))
                 else:
                     raise RuntimeError(f"Unhandled type: {dimension.type}")
-            elif spec_name.element_name in identifier_references:
+            elif spec_name.name in identifier_references:
                 where_constraint_identifiers.append(IdentifierSpec.from_name(spec_name.qualified_name))
             else:
                 raise InvalidQueryException(f"Unknown element: {spec_name}")

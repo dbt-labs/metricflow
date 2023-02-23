@@ -7,7 +7,7 @@
             <!-- node_id = cm_5 -->
             <!-- metric_spec =                                                 -->
             <!--   {'class': 'MetricSpec',                                     -->
-            <!--    'element_name': 'instant_plus_non_referred_bookings_pct',  -->
+            <!--    'name': 'instant_plus_non_referred_bookings_pct',  -->
             <!--    'constraint': None,                                        -->
             <!--    'alias': None,                                             -->
             <!--    'offset_window': None,                                     -->
@@ -21,7 +21,7 @@
                     <!-- node_id = cm_2 -->
                     <!-- metric_spec =                                    -->
                     <!--   {'class': 'MetricSpec',                        -->
-                    <!--    'element_name': 'non_referred_bookings_pct',  -->
+                    <!--    'name': 'non_referred_bookings_pct',  -->
                     <!--    'constraint': None,                           -->
                     <!--    'alias': 'non_referred',                      -->
                     <!--    'offset_window': None,                        -->
@@ -35,7 +35,7 @@
                             <!-- node_id = cm_0 -->
                             <!-- metric_spec =                            -->
                             <!--   {'class': 'MetricSpec',                -->
-                            <!--    'element_name': 'referred_bookings',  -->
+                            <!--    'name': 'referred_bookings',  -->
                             <!--    'constraint': None,                   -->
                             <!--    'alias': 'ref_bookings',              -->
                             <!--    'offset_window': None,                -->
@@ -50,11 +50,11 @@
                                     <!-- node_id = pfe_0 -->
                                     <!-- include_spec =                           -->
                                     <!--   {'class': 'MeasureSpec',               -->
-                                    <!--    'element_name': 'referred_bookings',  -->
+                                    <!--    'name': 'referred_bookings',  -->
                                     <!--    'non_additive_dimension_spec': None}  -->
                                     <!-- include_spec =                               -->
                                     <!--   {'class': 'TimeDimensionSpec',             -->
-                                    <!--    'element_name': 'metric_time',            -->
+                                    <!--    'name': 'metric_time',            -->
                                     <!--    'identifier_links': (),                   -->
                                     <!--    'time_granularity': TimeGranularity.DAY}  -->
                                     <MetricTimeDimensionTransformNode>
@@ -77,7 +77,7 @@
                             <!-- node_id = cm_1 -->
                             <!-- metric_spec =                   -->
                             <!--   {'class': 'MetricSpec',       -->
-                            <!--    'element_name': 'bookings',  -->
+                            <!--    'name': 'bookings',  -->
                             <!--    'constraint': None,          -->
                             <!--    'alias': None,               -->
                             <!--    'offset_window': None,       -->
@@ -92,11 +92,11 @@
                                     <!-- node_id = pfe_1 -->
                                     <!-- include_spec =                           -->
                                     <!--   {'class': 'MeasureSpec',               -->
-                                    <!--    'element_name': 'bookings',           -->
+                                    <!--    'name': 'bookings',           -->
                                     <!--    'non_additive_dimension_spec': None}  -->
                                     <!-- include_spec =                               -->
                                     <!--   {'class': 'TimeDimensionSpec',             -->
-                                    <!--    'element_name': 'metric_time',            -->
+                                    <!--    'name': 'metric_time',            -->
                                     <!--    'identifier_links': (),                   -->
                                     <!--    'time_granularity': TimeGranularity.DAY}  -->
                                     <MetricTimeDimensionTransformNode>
@@ -121,7 +121,7 @@
                     <!-- node_id = cm_3 -->
                     <!-- metric_spec =                           -->
                     <!--   {'class': 'MetricSpec',               -->
-                    <!--    'element_name': 'instant_bookings',  -->
+                    <!--    'name': 'instant_bookings',  -->
                     <!--    'constraint': None,                  -->
                     <!--    'alias': 'instant',                  -->
                     <!--    'offset_window': None,               -->
@@ -136,11 +136,11 @@
                             <!-- node_id = pfe_2 -->
                             <!-- include_spec =                           -->
                             <!--   {'class': 'MeasureSpec',               -->
-                            <!--    'element_name': 'instant_bookings',   -->
+                            <!--    'name': 'instant_bookings',   -->
                             <!--    'non_additive_dimension_spec': None}  -->
                             <!-- include_spec =                               -->
                             <!--   {'class': 'TimeDimensionSpec',             -->
-                            <!--    'element_name': 'metric_time',            -->
+                            <!--    'name': 'metric_time',            -->
                             <!--    'identifier_links': (),                   -->
                             <!--    'time_granularity': TimeGranularity.DAY}  -->
                             <MetricTimeDimensionTransformNode>
@@ -163,7 +163,7 @@
                     <!-- node_id = cm_4 -->
                     <!-- metric_spec =                   -->
                     <!--   {'class': 'MetricSpec',       -->
-                    <!--    'element_name': 'bookings',  -->
+                    <!--    'name': 'bookings',  -->
                     <!--    'constraint': None,          -->
                     <!--    'alias': None,               -->
                     <!--    'offset_window': None,       -->
@@ -178,11 +178,11 @@
                             <!-- node_id = pfe_3 -->
                             <!-- include_spec =                           -->
                             <!--   {'class': 'MeasureSpec',               -->
-                            <!--    'element_name': 'bookings',           -->
+                            <!--    'name': 'bookings',           -->
                             <!--    'non_additive_dimension_spec': None}  -->
                             <!-- include_spec =                               -->
                             <!--   {'class': 'TimeDimensionSpec',             -->
-                            <!--    'element_name': 'metric_time',            -->
+                            <!--    'name': 'metric_time',            -->
                             <!--    'identifier_links': (),                   -->
                             <!--    'time_granularity': TimeGranularity.DAY}  -->
                             <MetricTimeDimensionTransformNode>

@@ -79,7 +79,7 @@ class EntityToDataSetConverter:
     ) -> DimensionInstance:
         """Create a dimension instance from the dimension object in the model."""
         dimension_spec = DimensionSpec(
-            element_name=dimension.reference.element_name,
+            name=dimension.reference.name,
             identifier_links=identifier_links,
         )
         column_associations = dimension_spec.column_associations(self._column_association_resolver)
@@ -90,7 +90,7 @@ class EntityToDataSetConverter:
             defined_from=(
                 EntityElementReference(
                     entity_name=entity_name,
-                    element_name=dimension.reference.element_name,
+                    name=dimension.reference.name,
                 ),
             ),
         )
@@ -104,7 +104,7 @@ class EntityToDataSetConverter:
     ) -> TimeDimensionInstance:
         """Create a time dimension instance from the dimension object from a entity in the model."""
         time_dimension_spec = TimeDimensionSpec(
-            element_name=time_dimension.reference.element_name,
+            name=time_dimension.reference.name,
             identifier_links=identifier_links,
             time_granularity=time_granularity,
         )
@@ -117,7 +117,7 @@ class EntityToDataSetConverter:
             defined_from=(
                 EntityElementReference(
                     entity_name=entity_name,
-                    element_name=time_dimension.reference.element_name,
+                    name=time_dimension.reference.name,
                 ),
             ),
         )
@@ -130,7 +130,7 @@ class EntityToDataSetConverter:
     ) -> IdentifierInstance:
         """Create an identifier instance from the identifier object from a entityin the model."""
         identifier_spec = IdentifierSpec(
-            element_name=identifier.reference.element_name,
+            name=identifier.reference.name,
             identifier_links=identifier_links,
         )
         column_associations = identifier_spec.column_associations(self._column_association_resolver)
@@ -141,14 +141,14 @@ class EntityToDataSetConverter:
             defined_from=(
                 EntityElementReference(
                     entity_name=entity_name,
-                    element_name=identifier.reference.element_name,
+                    name=identifier.reference.name,
                 ),
             ),
         )
 
     @staticmethod
     def _make_element_sql_expr(
-        table_alias: str, element_name: str, element_expr: Optional[str] = None
+        table_alias: str, name: str, element_expr: Optional[str] = None
     ) -> SqlExpressionNode:
         """Create an expression that can be used for reading the element from the entity's SQL."""
         if element_expr:
@@ -168,7 +168,7 @@ class EntityToDataSetConverter:
         return SqlColumnReferenceExpression(
             SqlColumnReference(
                 table_alias=table_alias,
-                column_name=element_name,
+                column_name=name,
             )
         )
 
@@ -189,7 +189,7 @@ class EntityToDataSetConverter:
                 defined_from=(
                     EntityElementReference(
                         entity_name=entity_name,
-                        element_name=measure.reference.element_name,
+                        name=measure.reference.name,
                     ),
                 ),
                 aggregation_state=AggregationState.NON_AGGREGATED,
@@ -199,7 +199,7 @@ class EntityToDataSetConverter:
                 SqlSelectColumn(
                     expr=EntityToDataSetConverter._make_element_sql_expr(
                         table_alias=table_alias,
-                        element_name=measure.reference.element_name,
+                        name=measure.reference.name,
                         element_expr=measure.expr,
                     ),
                     column_alias=measure_instance.associated_column.column_name,
@@ -231,7 +231,7 @@ class EntityToDataSetConverter:
                     SqlSelectColumn(
                         expr=EntityToDataSetConverter._make_element_sql_expr(
                             table_alias=table_alias,
-                            element_name=dimension.reference.element_name,
+                            name=dimension.reference.name,
                             element_expr=dimension.expr,
                         ),
                         column_alias=dimension_instance.associated_column.column_name,
@@ -254,7 +254,7 @@ class EntityToDataSetConverter:
                     SqlSelectColumn(
                         expr=EntityToDataSetConverter._make_element_sql_expr(
                             table_alias=table_alias,
-                            element_name=dimension.reference.element_name,
+                            name=dimension.reference.name,
                             element_expr=dimension.expr,
                         ),
                         column_alias=time_dimension_instance.associated_column.column_name,
@@ -278,7 +278,7 @@ class EntityToDataSetConverter:
                                     time_granularity=time_granularity,
                                     arg=EntityToDataSetConverter._make_element_sql_expr(
                                         table_alias=table_alias,
-                                        element_name=dimension.reference.element_name,
+                                        name=dimension.reference.name,
                                         element_expr=dimension.expr,
                                     ),
                                 ),
@@ -332,7 +332,7 @@ class EntityToDataSetConverter:
                         SqlSelectColumn(
                             expr=EntityToDataSetConverter._make_element_sql_expr(
                                 table_alias=table_alias,
-                                element_name=sub_id_name,
+                                name=sub_id_name,
                                 element_expr=expr,
                             ),
                             column_alias=column_name,
@@ -343,7 +343,7 @@ class EntityToDataSetConverter:
                     SqlSelectColumn(
                         expr=EntityToDataSetConverter._make_element_sql_expr(
                             table_alias=table_alias,
-                            element_name=identifier.reference.element_name,
+                            name=identifier.reference.name,
                             element_expr=identifier.expr,
                         ),
                         column_alias=identifier_instance.associated_column.column_name,

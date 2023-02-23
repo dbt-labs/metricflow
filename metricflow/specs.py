@@ -87,7 +87,7 @@ class InstanceSpec(dbtClassMixin):
     """
 
     """Name of the dimension or identifier in the entity."""
-    element_name: str
+    name: str
 
     def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:
         """Figures out what columns in an SQL query that this spec should be associated with given the resolver.
@@ -118,25 +118,25 @@ SelfTypeT = TypeVar("SelfTypeT", bound="LinkableInstanceSpec")
 class MetadataSpec(InstanceSpec):
     """A specification for a specification that is built during the dataflow plan and not defined in config."""
 
-    element_name: str
+    name: str
 
     def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
         return (resolver.resolve_metadata_spec(self),)
 
     @property
     def qualified_name(self) -> str:  # noqa: D
-        return self.element_name
+        return self.name
 
     @staticmethod
     def from_name(name: str) -> MetadataSpec:  # noqa: D
-        return MetadataSpec(element_name=name)
+        return MetadataSpec(name=name)
 
 
 @dataclass(frozen=True)
 class LinkableInstanceSpec(InstanceSpec, ABC):
     """Generally a dimension or identifier that may be specified using identifier links.
 
-    For example, user_id__country -> LinkableElementSpec(element_name="country", identifier_links=["user_id"]
+    For example, user_id__country -> LinkableElementSpec(name="country", identifier_links=["user_id"]
 
     See InstanceSpec for the reason behind "type: ignore"
     """
@@ -166,7 +166,7 @@ class LinkableInstanceSpec(InstanceSpec, ABC):
     def qualified_name(self) -> str:
         """Return the qualified name of this spec. e.g. "user_id__country"."""
         return StructuredLinkableSpecName(
-            identifier_link_names=tuple(x.element_name for x in self.identifier_links), element_name=self.element_name
+            identifier_link_names=tuple(x.name for x in self.identifier_links), name=self.name
         ).qualified_name
 
     @property
@@ -182,11 +182,11 @@ class IdentifierSpec(LinkableInstanceSpec, dbtClassMixin):  # noqa: D
     @property
     def without_first_identifier_link(self) -> IdentifierSpec:  # noqa: D
         assert len(self.identifier_links) > 0, f"Spec does not have any identifier links: {self}"
-        return IdentifierSpec(element_name=self.element_name, identifier_links=self.identifier_links[1:])
+        return IdentifierSpec(name=self.name, identifier_links=self.identifier_links[1:])
 
     @property
     def without_identifier_links(self) -> IdentifierSpec:  # noqa: D
-        return LinklessIdentifierSpec.from_element_name(self.element_name)
+        return LinklessIdentifierSpec.from_name(self.name)
 
     @property
     def as_linkless_prefix(self) -> Tuple[IdentifierReference, ...]:
@@ -194,27 +194,27 @@ class IdentifierSpec(LinkableInstanceSpec, dbtClassMixin):  # noqa: D
 
         eg as a prefix to a DimensionSpec's identifier links to when a join is occurring via this identifier
         """
-        return (IdentifierReference(element_name=self.element_name),) + self.identifier_links
+        return (IdentifierReference(name=self.name),) + self.identifier_links
 
     @staticmethod
     def from_name(name: str) -> IdentifierSpec:  # noqa: D
         structured_name = StructuredLinkableSpecName.from_name(name)
         return IdentifierSpec(
             identifier_links=tuple(IdentifierReference(idl) for idl in structured_name.identifier_link_names),
-            element_name=structured_name.element_name,
+            name=structured_name.name,
         )
 
     def __eq__(self, other: Any) -> bool:  # type: ignore[misc] # noqa: D
         if not isinstance(other, IdentifierSpec):
             return False
-        return self.element_name == other.element_name and self.identifier_links == other.identifier_links
+        return self.name == other.name and self.identifier_links == other.identifier_links
 
     def __hash__(self) -> int:  # noqa: D
-        return hash((self.element_name, self.identifier_links))
+        return hash((self.name, self.identifier_links))
 
     @property
     def reference(self) -> IdentifierReference:  # noqa: D
-        return IdentifierReference(element_name=self.element_name)
+        return IdentifierReference(name=self.name)
 
     @property
     def as_linkable_spec_set(self) -> LinkableSpecSet:  # noqa: D
@@ -226,8 +226,8 @@ class LinklessIdentifierSpec(IdentifierSpec, dbtClassMixin):
     """Similar to IdentifierSpec, but requires that it doesn't have identifier links."""
 
     @staticmethod
-    def from_element_name(element_name: str) -> LinklessIdentifierSpec:  # noqa: D
-        return LinklessIdentifierSpec(element_name=element_name, identifier_links=())
+    def from_name(name: str) -> LinklessIdentifierSpec:  # noqa: D
+        return LinklessIdentifierSpec(name=name, identifier_links=())
 
     def __post_init__(self) -> None:  # noqa: D
         if len(self.identifier_links) > 0:
@@ -236,19 +236,19 @@ class LinklessIdentifierSpec(IdentifierSpec, dbtClassMixin):
     def __eq__(self, other: Any) -> bool:  # type: ignore[misc] # noqa: D
         if not isinstance(other, IdentifierSpec):
             return False
-        return self.element_name == other.element_name and self.identifier_links == other.identifier_links
+        return self.name == other.name and self.identifier_links == other.identifier_links
 
     def __hash__(self) -> int:  # noqa: D
-        return hash((self.element_name, self.identifier_links))
+        return hash((self.name, self.identifier_links))
 
     @staticmethod
     def from_reference(identifier_reference: IdentifierReference) -> LinklessIdentifierSpec:  # noqa: D
-        return LinklessIdentifierSpec(element_name=identifier_reference.element_name, identifier_links=())
+        return LinklessIdentifierSpec(name=identifier_reference.name, identifier_links=())
 
 
 @dataclass(frozen=True)
 class DimensionSpec(LinkableInstanceSpec, dbtClassMixin):  # noqa: D
-    element_name: str
+    name: str
     identifier_links: Tuple[IdentifierReference, ...]
 
     def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
@@ -257,15 +257,15 @@ class DimensionSpec(LinkableInstanceSpec, dbtClassMixin):  # noqa: D
     @property
     def without_first_identifier_link(self) -> DimensionSpec:  # noqa: D
         assert len(self.identifier_links) > 0, f"Spec does not have any identifier links: {self}"
-        return DimensionSpec(element_name=self.element_name, identifier_links=self.identifier_links[1:])
+        return DimensionSpec(name=self.name, identifier_links=self.identifier_links[1:])
 
     @property
     def without_identifier_links(self) -> DimensionSpec:  # noqa: D
-        return DimensionSpec(element_name=self.element_name, identifier_links=())
+        return DimensionSpec(name=self.name, identifier_links=())
 
     @staticmethod
     def from_linkable(spec: LinkableInstanceSpec) -> DimensionSpec:  # noqa: D
-        return DimensionSpec(element_name=spec.element_name, identifier_links=spec.identifier_links)
+        return DimensionSpec(name=spec.name, identifier_links=spec.identifier_links)
 
     @staticmethod
     def from_name(name: str) -> DimensionSpec:
@@ -273,12 +273,12 @@ class DimensionSpec(LinkableInstanceSpec, dbtClassMixin):  # noqa: D
         parsed_name = StructuredLinkableSpecName.from_name(name)
         return DimensionSpec(
             identifier_links=tuple([IdentifierReference(idl) for idl in parsed_name.identifier_link_names]),
-            element_name=parsed_name.element_name,
+            name=parsed_name.name,
         )
 
     @property
     def reference(self) -> DimensionReference:  # noqa: D
-        return DimensionReference(element_name=self.element_name)
+        return DimensionReference(name=self.name)
 
     @property
     def as_linkable_spec_set(self) -> LinkableSpecSet:  # noqa: D
@@ -299,37 +299,37 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
     def without_first_identifier_link(self) -> TimeDimensionSpec:  # noqa: D
         assert len(self.identifier_links) > 0, f"Spec does not have any identifier links: {self}"
         return TimeDimensionSpec(
-            element_name=self.element_name,
+            name=self.name,
             identifier_links=self.identifier_links[1:],
             time_granularity=self.time_granularity,
         )
 
     @property
     def without_identifier_links(self) -> TimeDimensionSpec:  # noqa: D
-        return TimeDimensionSpec.from_name(self.element_name)
+        return TimeDimensionSpec.from_name(self.name)
 
     @staticmethod
     def from_name(name: str) -> TimeDimensionSpec:  # noqa: D
         structured_name = StructuredLinkableSpecName.from_name(name)
         return TimeDimensionSpec(
             identifier_links=tuple(IdentifierReference(idl) for idl in structured_name.identifier_link_names),
-            element_name=structured_name.element_name,
+            name=structured_name.name,
             time_granularity=structured_name.time_granularity or DEFAULT_TIME_GRANULARITY,
         )
 
     @property
     def reference(self) -> TimeDimensionReference:  # noqa: D
-        return TimeDimensionReference(element_name=self.element_name)
+        return TimeDimensionReference(name=self.name)
 
     @property
     def dimension_reference(self) -> DimensionReference:  # noqa: D
-        return DimensionReference(element_name=self.element_name)
+        return DimensionReference(name=self.name)
 
     @property
     def qualified_name(self) -> str:  # noqa: D
         return StructuredLinkableSpecName(
-            identifier_link_names=tuple(x.element_name for x in self.identifier_links),
-            element_name=self.element_name,
+            identifier_link_names=tuple(x.name for x in self.identifier_links),
+            name=self.name,
             time_granularity=self.time_granularity,
         ).qualified_name
 
@@ -363,7 +363,7 @@ class NonAdditiveDimensionSpec(dbtClassMixin):
             dimension_specs=(),
             time_dimension_specs=(TimeDimensionSpec.from_name(self.name),),
             identifier_specs=tuple(
-                LinklessIdentifierSpec.from_element_name(identifier_name) for identifier_name in self.window_groupings
+                LinklessIdentifierSpec.from_name(identifier_name) for identifier_name in self.window_groupings
             ),
         )
 
@@ -375,7 +375,7 @@ class NonAdditiveDimensionSpec(dbtClassMixin):
 
 @dataclass(frozen=True)
 class MeasureSpec(InstanceSpec):  # noqa: D
-    element_name: str
+    name: str
     non_additive_dimension_spec: Optional[NonAdditiveDimensionSpec] = None
 
     def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
@@ -384,56 +384,56 @@ class MeasureSpec(InstanceSpec):  # noqa: D
     @staticmethod
     def from_name(name: str) -> MeasureSpec:
         """Construct from a name e.g. listing__ds__month."""
-        return MeasureSpec(element_name=name)
+        return MeasureSpec(name=name)
 
     @staticmethod
     def from_reference(reference: MeasureReference) -> MeasureSpec:
         """Initialize from a measure reference instance"""
-        return MeasureSpec(element_name=reference.element_name)
+        return MeasureSpec(name=reference.name)
 
     @property
     def qualified_name(self) -> str:  # noqa: D
-        return self.element_name
+        return self.name
 
     @property
     def as_reference(self) -> MeasureReference:  # noqa: D
-        return MeasureReference(element_name=self.element_name)
+        return MeasureReference(name=self.name)
 
 
 @dataclass(frozen=True)
 class MetricSpec(InstanceSpec):  # noqa: D
     # Time-over-time could go here
-    element_name: str
+    name: str
     constraint: Optional[SpecWhereClauseConstraint] = None
     alias: Optional[str] = None
     offset_window: Optional[MetricTimeWindow] = None
     offset_to_grain: Optional[TimeGranularity] = None
 
     @staticmethod
-    def from_element_name(element_name: str) -> MetricSpec:  # noqa: D
-        return MetricSpec(element_name=element_name)
+    def from_name(name: str) -> MetricSpec:  # noqa: D
+        return MetricSpec(name=name)
 
     def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
         return (resolver.resolve_metric_spec(self),)
 
     @property
     def qualified_name(self) -> str:  # noqa: D
-        return self.element_name
+        return self.name
 
     @property
     def as_reference(self) -> MetricReference:  # noqa: D
-        return MetricReference(element_name=self.element_name)
+        return MetricReference(name=self.name)
 
     @staticmethod
     def from_reference(reference: MetricReference) -> MetricSpec:
         """Initialize from a metric reference instance"""
-        return MetricSpec(element_name=reference.element_name)
+        return MetricSpec(name=reference.name)
 
     @property
     def alias_spec(self) -> MetricSpec:
         """Returns a MetricSpec represneting the alias state."""
         return MetricSpec(
-            element_name=self.alias or self.element_name,
+            name=self.alias or self.name,
             constraint=self.constraint,
         )
 
@@ -461,7 +461,7 @@ class MetricInputMeasureSpec(dbtClassMixin):
         """Return a MeasureSpec instance representing the post-aggregation spec state for the underlying measure"""
         if self.alias:
             return MeasureSpec(
-                element_name=self.alias,
+                name=self.alias,
                 non_additive_dimension_spec=self.measure_spec.non_additive_dimension_spec,
             )
         else:
@@ -576,7 +576,7 @@ class SpecWhereClauseConstraint(dbtClassMixin):
 
     # e.g. "listing__capacity_latest > 4"
     where_condition: str
-    # e.g. {DimensionSpec(element_name="capacity_latest", identifier_links=("listing",))
+    # e.g. {DimensionSpec(name="capacity_latest", identifier_links=("listing",))
     linkable_names: Tuple[str, ...]
     linkable_spec_set: LinkableSpecSet
     execution_parameters: SqlBindParameters

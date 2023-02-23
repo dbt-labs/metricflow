@@ -394,10 +394,10 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         """Finds the TimeDimensionSpec matching the non_additive_dimension_spec, if any"""
         queried_time_dimension_spec: Optional[LinkableInstanceSpec] = None
         for linkable_spec in linkable_specs:
-            dimension_name_match = linkable_spec.element_name == non_additive_dimension_spec.name
+            dimension_name_match = linkable_spec.name == non_additive_dimension_spec.name
             metric_time_match = (
-                non_additive_dimension_spec.name == agg_time_dimension.element_name
-                and linkable_spec.element_name == self._metric_time_dimension_reference.element_name
+                non_additive_dimension_spec.name == agg_time_dimension.name
+                and linkable_spec.name == self._metric_time_dimension_reference.name
             )
             if dimension_name_match or metric_time_match:
                 queried_time_dimension_spec = linkable_spec
@@ -693,8 +693,8 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         cumulative_window: Optional[MetricTimeWindow] = None,
         cumulative_grain_to_date: Optional[TimeGranularity] = None,
     ) -> BaseOutput[SqlDataSetT]:
-        metric_time_dimension_requested = self._metric_time_dimension_reference.element_name in [
-            linkable_spec.element_name for linkable_spec in queried_linkable_specs.as_tuple
+        metric_time_dimension_requested = self._metric_time_dimension_reference.name in [
+            linkable_spec.name for linkable_spec in queried_linkable_specs.as_tuple
         ]
         measure_specs = tuple(x.measure_spec for x in metric_input_measure_specs)
         measure_properties = self._build_measure_spec_properties(measure_specs)
@@ -871,7 +871,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             )
             time_dimension_spec = TimeDimensionSpec.from_name(non_additive_dimension_spec.name)
             window_groupings = tuple(
-                LinklessIdentifierSpec.from_element_name(name) for name in non_additive_dimension_spec.window_groupings
+                LinklessIdentifierSpec.from_name(name) for name in non_additive_dimension_spec.window_groupings
             )
             pre_aggregate_node = SemiAdditiveJoinNode[SqlDataSetT](
                 parent_node=pre_aggregate_node,

@@ -200,8 +200,8 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                 ):
                     continue
 
-                linkless_identifier_spec_in_node = LinklessIdentifierSpec.from_element_name(
-                    identifier_spec_in_right_node.element_name
+                linkless_identifier_spec_in_node = LinklessIdentifierSpec.from_name(
+                    identifier_spec_in_right_node.name
                 )
 
                 satisfiable_linkable_specs = []

@@ -37,10 +37,10 @@ def test_simple_plan(  # noqa: D
     """Tests a simple plan getting a metric and a local dimension."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"),),
+            metric_specs=(MetricSpec(name="bookings"),),
             dimension_specs=(
                 DimensionSpec(
-                    element_name="is_instant",
+                    name="is_instant",
                     identifier_links=(),
                 ),
             ),
@@ -69,15 +69,15 @@ def test_joined_plan(  # noqa: D
     """Tests a plan getting a measure and a joined dimension."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"),),
+            metric_specs=(MetricSpec(name="bookings"),),
             dimension_specs=(
                 DimensionSpec(
-                    element_name="is_instant",
+                    name="is_instant",
                     identifier_links=(),
                 ),
                 DimensionSpec(
-                    element_name="country_latest",
-                    identifier_links=(IdentifierReference(element_name="listing"),),
+                    name="country_latest",
+                    identifier_links=(IdentifierReference(name="listing"),),
                 ),
             ),
         )
@@ -105,7 +105,7 @@ def test_order_by_plan(  # noqa: D
     """Tests a plan with an order by."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"),),
+            metric_specs=(MetricSpec(name="bookings"),),
             time_dimension_specs=(MTD_SPEC_DAY,),
             order_by_specs=(
                 OrderBySpec(
@@ -113,7 +113,7 @@ def test_order_by_plan(  # noqa: D
                     descending=False,
                 ),
                 OrderBySpec(
-                    metric_spec=MetricSpec(element_name="bookings"),
+                    metric_spec=MetricSpec(name="bookings"),
                     descending=True,
                 ),
             ),
@@ -142,7 +142,7 @@ def test_limit_rows_plan(  # noqa: D
     """Tests a plan with a limit to the number of rows returned."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"),),
+            metric_specs=(MetricSpec(name="bookings"),),
             time_dimension_specs=(MTD_SPEC_DAY,),
             limit=1,
         )
@@ -170,10 +170,10 @@ def test_multiple_metrics_plan(  # noqa: D
     """Tests a plan to retrieve multiple metrics."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"), MetricSpec(element_name="booking_value")),
+            metric_specs=(MetricSpec(name="bookings"), MetricSpec(name="booking_value")),
             dimension_specs=(
                 DimensionSpec(
-                    element_name="is_instant",
+                    name="is_instant",
                     identifier_links=(),
                 ),
             ),
@@ -203,11 +203,11 @@ def test_expr_metrics_plan(
     """Tests a plan to retrieve expr metric types"""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="booking_fees"),),
+            metric_specs=(MetricSpec(name="booking_fees"),),
             dimension_specs=(
                 DimensionSpec(
-                    element_name="country_latest",
-                    identifier_links=(IdentifierReference(element_name="listing"),),
+                    name="country_latest",
+                    identifier_links=(IdentifierReference(name="listing"),),
                 ),
             ),
             time_dimension_specs=(MTD_SPEC_DAY,),
@@ -236,11 +236,11 @@ def test_single_entity_ratio_metrics_plan(
     """Tests a plan to retrieve a ratio where both measures come from one entity"""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings_per_booker"),),
+            metric_specs=(MetricSpec(name="bookings_per_booker"),),
             dimension_specs=(
                 DimensionSpec(
-                    element_name="country_latest",
-                    identifier_links=(IdentifierReference(element_name="listing"),),
+                    name="country_latest",
+                    identifier_links=(IdentifierReference(name="listing"),),
                 ),
             ),
             time_dimension_specs=(MTD_SPEC_DAY,),
@@ -269,11 +269,11 @@ def test_multi_entity_ratio_metrics_plan(
     """Tests a plan to retrieve a ratio where both measures come from one entity"""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings_per_view"),),
+            metric_specs=(MetricSpec(name="bookings_per_view"),),
             dimension_specs=(
                 DimensionSpec(
-                    element_name="country_latest",
-                    identifier_links=(IdentifierReference(element_name="listing"),),
+                    name="country_latest",
+                    identifier_links=(IdentifierReference(name="listing"),),
                 ),
             ),
             time_dimension_specs=(MTD_SPEC_DAY,),
@@ -302,13 +302,13 @@ def test_multihop_join_plan(  # noqa: D
     """Tests a plan with an order by."""
     dataflow_plan = multihop_dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="txn_count"),),
+            metric_specs=(MetricSpec(name="txn_count"),),
             dimension_specs=(
                 DimensionSpec(
-                    element_name="customer_name",
+                    name="customer_name",
                     identifier_links=(
-                        IdentifierReference(element_name="account_id"),
-                        IdentifierReference(element_name="customer_id"),
+                        IdentifierReference(name="account_id"),
+                        IdentifierReference(name="customer_id"),
                     ),
                 ),
             ),
@@ -337,10 +337,10 @@ def test_where_constrained_plan(  # noqa: D
     """Tests a simple plan getting a metric and a local dimension."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"),),
+            metric_specs=(MetricSpec(name="bookings"),),
             dimension_specs=(
                 DimensionSpec(
-                    element_name="is_instant",
+                    name="is_instant",
                     identifier_links=(),
                 ),
             ),
@@ -350,8 +350,8 @@ def test_where_constrained_plan(  # noqa: D
                 linkable_spec_set=LinkableSpecSet(
                     dimension_specs=(
                         DimensionSpec(
-                            element_name="country_latest",
-                            identifier_links=(IdentifierReference(element_name="listing"),),
+                            name="country_latest",
+                            identifier_links=(IdentifierReference(name="listing"),),
                         ),
                     )
                 ),
@@ -382,10 +382,10 @@ def test_where_constrained_plan_time_dimension(  # noqa: D
     """Tests a simple plan getting a metric and a local dimension."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"),),
+            metric_specs=(MetricSpec(name="bookings"),),
             dimension_specs=(
                 DimensionSpec(
-                    element_name="is_instant",
+                    name="is_instant",
                     identifier_links=(),
                 ),
             ),
@@ -420,11 +420,11 @@ def test_where_constrained_with_common_linkable_plan(  # noqa: D
     """Tests a dataflow plan where the where clause has a common linkable with the query."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"),),
+            metric_specs=(MetricSpec(name="bookings"),),
             dimension_specs=(
                 DimensionSpec(
-                    element_name="country_latest",
-                    identifier_links=(IdentifierReference(element_name="listing"),),
+                    name="country_latest",
+                    identifier_links=(IdentifierReference(name="listing"),),
                 ),
             ),
             where_constraint=SpecWhereClauseConstraint(
@@ -433,8 +433,8 @@ def test_where_constrained_with_common_linkable_plan(  # noqa: D
                 linkable_spec_set=LinkableSpecSet(
                     dimension_specs=(
                         DimensionSpec(
-                            element_name="country_latest",
-                            identifier_links=(IdentifierReference(element_name="listing"),),
+                            name="country_latest",
+                            identifier_links=(IdentifierReference(name="listing"),),
                         ),
                     )
                 ),
@@ -465,13 +465,13 @@ def test_multihop_join_plan_ambiguous_dim(  # noqa: D
     with pytest.raises(UnableToSatisfyQueryError):
         dataflow_plan_builder.build_plan(
             MetricFlowQuerySpec(
-                metric_specs=(MetricSpec(element_name="views"),),
+                metric_specs=(MetricSpec(name="views"),),
                 dimension_specs=(
                     DimensionSpec(
-                        element_name="home_country",
+                        name="home_country",
                         identifier_links=(
-                            IdentifierReference(element_name="listing"),
-                            IdentifierReference(element_name="user"),
+                            IdentifierReference(name="listing"),
+                            IdentifierReference(name="user"),
                         ),
                     ),
                 ),
@@ -487,7 +487,7 @@ def test_cumulative_metric(  # noqa: D
     """Tests a plan to compute a cumulative metric."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="trailing_2_months_revenue"),),
+            metric_specs=(MetricSpec(name="trailing_2_months_revenue"),),
             dimension_specs=(),
             time_dimension_specs=(MTD_SPEC_MONTH,),
         )
@@ -514,10 +514,10 @@ def test_distinct_values_plan(  # noqa: D
 ) -> None:
     """Tests a plan to get distinct values of a dimension."""
     dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
-        metric_specs=(MetricSpec(element_name="bookings"),),
+        metric_specs=(MetricSpec(name="bookings"),),
         dimension_spec=DimensionSpec(
-            element_name="country_latest",
-            identifier_links=(IdentifierReference(element_name="listing"),),
+            name="country_latest",
+            identifier_links=(IdentifierReference(name="listing"),),
         ),
         limit=100,
     )
@@ -544,7 +544,7 @@ def test_measure_constraint_plan(
     """Tests a plan for querying a metric with a constraint on one or more of its input measures."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="lux_booking_value_rate_expr"),),
+            metric_specs=(MetricSpec(name="lux_booking_value_rate_expr"),),
             dimension_specs=(),
             time_dimension_specs=(MTD_SPEC_DAY,),
         ),
@@ -572,7 +572,7 @@ def test_measure_constraint_with_reused_measure_plan(
     """Tests a plan for querying a metric with a constraint on one or more of its input measures."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="instant_booking_value_ratio"),),
+            metric_specs=(MetricSpec(name="instant_booking_value_ratio"),),
             dimension_specs=(),
             time_dimension_specs=(MTD_SPEC_DAY,),
         ),
@@ -600,10 +600,10 @@ def test_common_entity(  # noqa: D
     """Tests a simple plan getting a metric and a local dimension."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"), MetricSpec(element_name="booking_value")),
+            metric_specs=(MetricSpec(name="bookings"), MetricSpec(name="booking_value")),
             dimension_specs=(
                 DataSet.metric_time_dimension_spec(TimeGranularity.DAY),
-                DimensionSpec(element_name="country_latest", identifier_links=(IdentifierReference("listing"),)),
+                DimensionSpec(name="country_latest", identifier_links=(IdentifierReference("listing"),)),
             ),
         )
     )

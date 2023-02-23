@@ -18,7 +18,7 @@ def test_lonely_identifier_raises_issue(simple_model__with_primary_transforms: U
 
     func: Callable[[Entity], bool] = lambda entity: len(entity.identifiers) > 0
     entity_with_identifiers, _ = find_entity_with(model, func)
-    entity_with_identifiers.identifiers[0].name = IdentifierSpec.from_name(lonely_identifier_name).element_name
+    entity_with_identifiers.identifiers[0].name = IdentifierSpec.from_name(lonely_identifier_name).name
     model_validator = ModelValidator([CommonIdentifiersRule()])
     build = model_validator.validate_model(model)
 

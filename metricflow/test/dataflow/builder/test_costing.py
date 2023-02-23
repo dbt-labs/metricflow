@@ -26,7 +26,7 @@ def test_costing(consistent_id_object_repository: ConsistentIdObjectRepository) 
     listings_node = consistent_id_object_repository.simple_model_read_nodes["listings_latest"]
 
     bookings_spec = MeasureSpec(
-        element_name="bookings",
+        name="bookings",
     )
     bookings_filtered = FilterElementsNode[EntityDataSet](
         parent_node=bookings_node,
@@ -34,7 +34,7 @@ def test_costing(consistent_id_object_repository: ConsistentIdObjectRepository) 
             measure_specs=(bookings_spec,),
             identifier_specs=(
                 IdentifierSpec(
-                    element_name="listing",
+                    name="listing",
                     identifier_links=(),
                 ),
             ),
@@ -46,13 +46,13 @@ def test_costing(consistent_id_object_repository: ConsistentIdObjectRepository) 
         include_specs=InstanceSpecSet(
             dimension_specs=(
                 DimensionSpec(
-                    element_name="country_latest",
+                    name="country_latest",
                     identifier_links=(),
                 ),
             ),
             identifier_specs=(
                 IdentifierSpec(
-                    element_name="listing",
+                    name="listing",
                     identifier_links=(),
                 ),
             ),
@@ -64,7 +64,7 @@ def test_costing(consistent_id_object_repository: ConsistentIdObjectRepository) 
         join_targets=[
             JoinDescription(
                 join_node=listings_filtered,
-                join_on_identifier=LinklessIdentifierSpec.from_element_name("listing"),
+                join_on_identifier=LinklessIdentifierSpec.from_name("listing"),
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
             )

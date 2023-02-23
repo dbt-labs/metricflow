@@ -142,19 +142,19 @@ def test_metric_multiple_primary_time_dims() -> None:  # noqa:D
 
 
 def test_generated_metrics_only() -> None:  # noqa:D
-    dim_reference = DimensionReference(element_name="dim")
+    dim_reference = DimensionReference(name="dim")
 
-    dim2_reference = TimeDimensionReference(element_name=DEFAULT_DS)
+    dim2_reference = TimeDimensionReference(name=DEFAULT_DS)
     measure_name = "measure"
-    identifier_reference = IdentifierReference(element_name="primary")
+    identifier_reference = IdentifierReference(name="primary")
     entity = entity_with_guaranteed_meta(
         name="dim1",
-        sql_query=f"SELECT {dim_reference.element_name}, {measure_name} FROM bar",
-        measures=[Measure(name=measure_name, agg=AggregationType.SUM, agg_time_dimension=dim2_reference.element_name)],
+        sql_query=f"SELECT {dim_reference.name}, {measure_name} FROM bar",
+        measures=[Measure(name=measure_name, agg=AggregationType.SUM, agg_time_dimension=dim2_reference.name)],
         dimensions=[
-            Dimension(name=dim_reference.element_name, type=DimensionType.CATEGORICAL),
+            Dimension(name=dim_reference.name, type=DimensionType.CATEGORICAL),
             Dimension(
-                name=dim2_reference.element_name,
+                name=dim2_reference.name,
                 type=DimensionType.TIME,
                 type_params=DimensionTypeParams(
                     is_primary=True,
@@ -164,7 +164,7 @@ def test_generated_metrics_only() -> None:  # noqa:D
         ],
         mutability=Mutability(type=MutabilityType.IMMUTABLE),
         identifiers=[
-            Identifier(name=identifier_reference.element_name, type=IdentifierType.PRIMARY),
+            Identifier(name=identifier_reference.name, type=IdentifierType.PRIMARY),
         ],
     )
     entity.measures[0].create_metric = True

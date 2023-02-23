@@ -12,7 +12,7 @@
                 <!-- node_id = cm_0 -->
                 <!-- metric_spec =                   -->
                 <!--   {'class': 'MetricSpec',       -->
-                <!--    'element_name': 'bookings',  -->
+                <!--    'name': 'bookings',  -->
                 <!--    'constraint': None,          -->
                 <!--    'alias': None,               -->
                 <!--    'offset_window': None,       -->
@@ -27,11 +27,11 @@
                         <!-- node_id = pfe_0 -->
                         <!-- include_spec =                           -->
                         <!--   {'class': 'MeasureSpec',               -->
-                        <!--    'element_name': 'bookings',           -->
+                        <!--    'name': 'bookings',           -->
                         <!--    'non_additive_dimension_spec': None}  -->
                         <!-- include_spec =                               -->
                         <!--   {'class': 'TimeDimensionSpec',             -->
-                        <!--    'element_name': 'metric_time',            -->
+                        <!--    'name': 'metric_time',            -->
                         <!--    'identifier_links': (),                   -->
                         <!--    'time_granularity': TimeGranularity.DAY}  -->
                         <MetricTimeDimensionTransformNode>
@@ -54,7 +54,7 @@
                 <!-- node_id = cm_1 -->
                 <!-- metric_spec =                   -->
                 <!--   {'class': 'MetricSpec',       -->
-                <!--    'element_name': 'listings',  -->
+                <!--    'name': 'listings',  -->
                 <!--    'constraint': None,          -->
                 <!--    'alias': None,               -->
                 <!--    'offset_window': None,       -->
@@ -69,11 +69,11 @@
                         <!-- node_id = pfe_1 -->
                         <!-- include_spec =                           -->
                         <!--   {'class': 'MeasureSpec',               -->
-                        <!--    'element_name': 'listings',           -->
+                        <!--    'name': 'listings',           -->
                         <!--    'non_additive_dimension_spec': None}  -->
                         <!-- include_spec =                               -->
                         <!--   {'class': 'TimeDimensionSpec',             -->
-                        <!--    'element_name': 'metric_time',            -->
+                        <!--    'name': 'metric_time',            -->
                         <!--    'identifier_links': (),                   -->
                         <!--    'time_granularity': TimeGranularity.DAY}  -->
                         <MetricTimeDimensionTransformNode>

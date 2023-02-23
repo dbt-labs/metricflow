@@ -654,7 +654,7 @@ class SemiAdditiveJoinNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
 
     @property
     def description(self) -> str:  # noqa: D
-        return f"""Join on {self.agg_by_function.name}({self.time_dimension_spec.element_name}) and {[i.element_name for i in self.identifier_specs]} grouping by {self.queried_time_dimension_spec.element_name if self.queried_time_dimension_spec else None}"""
+        return f"""Join on {self.agg_by_function.name}({self.time_dimension_spec.name}) and {[i.name for i in self.identifier_specs]} grouping by {self.queried_time_dimension_spec.name if self.queried_time_dimension_spec else None}"""
 
     @property
     def parent_node(self) -> BaseOutput[SourceDataSetT]:  # noqa: D
@@ -969,12 +969,12 @@ class MetricTimeDimensionTransformNode(Generic[SourceDataSetT], BaseOutput[Sourc
 
     @property
     def description(self) -> str:  # noqa: D
-        return f"Metric Time Dimension '{self.aggregation_time_dimension_reference.element_name}'" ""
+        return f"Metric Time Dimension '{self.aggregation_time_dimension_reference.name}'" ""
 
     @property
     def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
         return super().displayed_properties + [
-            DisplayedProperty("aggregation_time_dimension", self.aggregation_time_dimension_reference.element_name)
+            DisplayedProperty("aggregation_time_dimension", self.aggregation_time_dimension_reference.name)
         ]
 
     @property

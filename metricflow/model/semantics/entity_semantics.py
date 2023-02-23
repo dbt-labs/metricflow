@@ -84,7 +84,7 @@ class EntitySemantics:
             return deepcopy(dimension)
 
         raise ValueError(
-            f"Could not find dimension with name ({dimension_reference.element_name}) in configured entities"
+            f"Could not find dimension with name ({dimension_reference.name}) in configured entities"
         )
 
     def get_time_dimension(self, time_dimension_reference: TimeDimensionReference) -> Dimension:
@@ -93,7 +93,7 @@ class EntitySemantics:
 
         if dimension_reference not in self._dimension_index:
             raise ValueError(
-                f"Could not find dimension with name ({dimension_reference.element_name}) in configured entities"
+                f"Could not find dimension with name ({dimension_reference.name}) in configured entities"
             )
 
         for dimension_source in self._dimension_index[dimension_reference]:
@@ -137,7 +137,7 @@ class EntitySemantics:
             return None
 
         for identifier in entity.identifiers:
-            if identifier.reference.element_name == ref.element_name:
+            if identifier.reference.name == ref.name:
                 return identifier
 
         return None
@@ -168,7 +168,7 @@ class EntitySemantics:
         for measure in entity.measures:
             if measure.reference in self._measure_aggs and self._measure_aggs[measure.reference] != measure.agg:
                 errors.append(
-                    f"conflicting aggregation (agg) for measure `{measure.reference.element_name}` registered as "
+                    f"conflicting aggregation (agg) for measure `{measure.reference.name}` registered as "
                     f"`{self._measure_aggs[measure.reference]}`; Got `{measure.agg}"
                 )
 

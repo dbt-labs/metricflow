@@ -24,7 +24,7 @@ def __get_filtered_measure_instance_set(
     dataset = object_repo.simple_model_data_sets[entity_name]
     instance_set = dataset.instance_set
     include_specs = tuple(
-        instance.spec for instance in instance_set.measure_instances if instance.spec.element_name == measure_name
+        instance.spec for instance in instance_set.measure_instances if instance.spec.name == measure_name
     )
     return FilterElements(include_specs=InstanceSpecSet(measure_specs=include_specs)).transform(instance_set)
 
@@ -41,7 +41,7 @@ def test_sum_aggregation(
         __SOURCE_TABLE_ALIAS,
         DefaultColumnAssociationResolver(simple_semantic_model),
         simple_semantic_model.entity_semantics,
-        (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="booking_value")),),
+        (MetricInputMeasureSpec(measure_spec=MeasureSpec(name="booking_value")),),
     ).transform(instance_set=instance_set)
 
     assert len(select_column_set.measure_columns) == 1
@@ -63,7 +63,7 @@ def test_sum_boolean_aggregation(
         __SOURCE_TABLE_ALIAS,
         DefaultColumnAssociationResolver(simple_semantic_model),
         simple_semantic_model.entity_semantics,
-        (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="instant_bookings")),),
+        (MetricInputMeasureSpec(measure_spec=MeasureSpec(name="instant_bookings")),),
     ).transform(instance_set=instance_set)
 
     assert len(select_column_set.measure_columns) == 1
@@ -86,7 +86,7 @@ def test_avg_aggregation(
         __SOURCE_TABLE_ALIAS,
         DefaultColumnAssociationResolver(simple_semantic_model),
         simple_semantic_model.entity_semantics,
-        (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="average_booking_value")),),
+        (MetricInputMeasureSpec(measure_spec=MeasureSpec(name="average_booking_value")),),
     ).transform(instance_set=instance_set)
 
     assert len(select_column_set.measure_columns) == 1
@@ -108,7 +108,7 @@ def test_count_distinct_aggregation(
         __SOURCE_TABLE_ALIAS,
         DefaultColumnAssociationResolver(simple_semantic_model),
         simple_semantic_model.entity_semantics,
-        (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="bookers")),),
+        (MetricInputMeasureSpec(measure_spec=MeasureSpec(name="bookers")),),
     ).transform(instance_set=instance_set)
 
     assert len(select_column_set.measure_columns) == 1
@@ -130,7 +130,7 @@ def test_max_aggregation(
         __SOURCE_TABLE_ALIAS,
         DefaultColumnAssociationResolver(simple_semantic_model),
         simple_semantic_model.entity_semantics,
-        (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="largest_listing")),),
+        (MetricInputMeasureSpec(measure_spec=MeasureSpec(name="largest_listing")),),
     ).transform(instance_set=instance_set)
 
     assert len(select_column_set.measure_columns) == 1
@@ -152,7 +152,7 @@ def test_min_aggregation(
         __SOURCE_TABLE_ALIAS,
         DefaultColumnAssociationResolver(simple_semantic_model),
         simple_semantic_model.entity_semantics,
-        (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="smallest_listing")),),
+        (MetricInputMeasureSpec(measure_spec=MeasureSpec(name="smallest_listing")),),
     ).transform(instance_set=instance_set)
 
     assert len(select_column_set.measure_columns) == 1
@@ -174,7 +174,7 @@ def test_aliased_sum(
         __SOURCE_TABLE_ALIAS,
         DefaultColumnAssociationResolver(simple_semantic_model),
         simple_semantic_model.entity_semantics,
-        (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="booking_value"), alias="bvalue"),),
+        (MetricInputMeasureSpec(measure_spec=MeasureSpec(name="booking_value"), alias="bvalue"),),
     ).transform(instance_set=instance_set)
 
     assert len(select_column_set.measure_columns) == 1
@@ -197,7 +197,7 @@ def test_percentile_aggregation(
         __SOURCE_TABLE_ALIAS,
         DefaultColumnAssociationResolver(simple_semantic_model),
         simple_semantic_model.entity_semantics,
-        (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="booking_value_p99")),),
+        (MetricInputMeasureSpec(measure_spec=MeasureSpec(name="booking_value_p99")),),
     ).transform(instance_set=instance_set)
 
     assert len(select_column_set.measure_columns) == 1

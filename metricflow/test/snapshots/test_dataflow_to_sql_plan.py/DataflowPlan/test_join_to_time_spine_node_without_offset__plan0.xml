@@ -13,7 +13,7 @@
                 <!-- node_id = cm_0 -->
                 <!-- metric_spec =                       -->
                 <!--   {'class': 'MetricSpec',           -->
-                <!--    'element_name': 'booking_fees',  -->
+                <!--    'name': 'booking_fees',  -->
                 <!--    'constraint': None,              -->
                 <!--    'alias': None,                   -->
                 <!--    'offset_window': None,           -->
@@ -28,16 +28,16 @@
                         <!-- node_id = pfe_0 -->
                         <!-- include_spec =                           -->
                         <!--   {'class': 'MeasureSpec',               -->
-                        <!--    'element_name': 'booking_value',      -->
+                        <!--    'name': 'booking_value',      -->
                         <!--    'non_additive_dimension_spec': None}  -->
                         <!-- include_spec =                               -->
                         <!--   {'class': 'TimeDimensionSpec',             -->
-                        <!--    'element_name': 'metric_time',            -->
+                        <!--    'name': 'metric_time',            -->
                         <!--    'identifier_links': (),                   -->
                         <!--    'time_granularity': TimeGranularity.DAY}  -->
                         <!-- include_spec =                         -->
                         <!--   {'class': 'LinklessIdentifierSpec',  -->
-                        <!--    'element_name': 'listing',          -->
+                        <!--    'name': 'listing',          -->
                         <!--    'identifier_links': ()}             -->
                         <MetricTimeDimensionTransformNode>
                             <!-- description = Metric Time Dimension 'ds' -->

@@ -7,7 +7,7 @@
             <!-- node_id = cm_0 -->
             <!-- metric_spec =                                    -->
             <!--   {'class': 'MetricSpec',                        -->
-            <!--    'element_name': 'trailing_2_months_revenue',  -->
+            <!--    'name': 'trailing_2_months_revenue',  -->
             <!--    'constraint': None,                           -->
             <!--    'alias': None,                                -->
             <!--    'offset_window': None,                        -->
@@ -25,11 +25,11 @@
                         <!-- node_id = pfe_0 -->
                         <!-- include_spec =                           -->
                         <!--   {'class': 'MeasureSpec',               -->
-                        <!--    'element_name': 'txn_revenue',        -->
+                        <!--    'name': 'txn_revenue',        -->
                         <!--    'non_additive_dimension_spec': None}  -->
                         <!-- include_spec =                                 -->
                         <!--   {'class': 'TimeDimensionSpec',               -->
-                        <!--    'element_name': 'metric_time',              -->
+                        <!--    'name': 'metric_time',              -->
                         <!--    'identifier_links': (),                     -->
                         <!--    'time_granularity': TimeGranularity.MONTH}  -->
                         <MetricTimeDimensionTransformNode>

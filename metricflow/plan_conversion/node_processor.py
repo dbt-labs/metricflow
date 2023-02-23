@@ -205,11 +205,11 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
 
                 # If the element name of the linkable spec doesn't exist in the joined data set, then it can't be
                 # useful for obtaining that linkable spec.
-                element_names_in_data_set = ToElementNameSet().transform(
+                names_in_data_set = ToElementNameSet().transform(
                     data_set_of_second_node_that_can_be_joined.instance_set.spec_set
                 )
 
-                if desired_linkable_spec.element_name not in element_names_in_data_set:
+                if desired_linkable_spec.name not in names_in_data_set:
                     continue
 
                 # The first and second nodes are joined by this identifier
@@ -309,8 +309,8 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
         A simple filter is to remove any nodes that don't share a common element with the query. Having a common element
         doesn't mean that the node will be useful, but not having common elements definitely means it's not useful.
         """
-        relevant_element_names = {x.element_name for x in desired_linkable_specs}.union(
-            {y.element_name for x in desired_linkable_specs for y in x.identifier_links}
+        relevant_names = {x.name for x in desired_linkable_specs}.union(
+            {y.name for x in desired_linkable_specs for y in x.identifier_links}
         )
 
         # The metric time dimension is used everywhere, so don't count it unless specifically desired in linkable spec
@@ -318,26 +318,26 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
         metric_time_dimension_used_in_linked_spec = any(
             [
                 len(linkable_spec.identifier_links) > 0
-                and linkable_spec.element_name == metric_time_dimension_reference.element_name
+                and linkable_spec.name == metric_time_dimension_reference.name
                 for linkable_spec in desired_linkable_specs
             ]
         )
 
         if (
-            metric_time_dimension_reference.element_name in relevant_element_names
+            metric_time_dimension_reference.name in relevant_names
             and not metric_time_dimension_used_in_linked_spec
         ):
-            relevant_element_names.remove(metric_time_dimension_reference.element_name)
+            relevant_names.remove(metric_time_dimension_reference.name)
 
-        logger.info(f"Relevant names are: {relevant_element_names}")
+        logger.info(f"Relevant names are: {relevant_names}")
 
         relevant_nodes = []
 
         for node in nodes:
             data_set = self._node_data_set_resolver.get_output_data_set(node)
-            element_names_in_data_set = ToElementNameSet().transform(data_set.instance_set.spec_set)
+            names_in_data_set = ToElementNameSet().transform(data_set.instance_set.spec_set)
 
-            if len(element_names_in_data_set.intersection(relevant_element_names)) > 0:
+            if len(names_in_data_set.intersection(relevant_names)) > 0:
                 relevant_nodes.append(node)
 
         return relevant_nodes

@@ -43,7 +43,7 @@ def list_of_issues() -> List[ValidationIssueType]:  # noqa: D
             context=EntityElementContext(
                 file_context=file_context,
                 entity_element=EntityElementReference(
-                    entity_name=entity_name, element_name="My dimension"
+                    entity_name=entity_name, name="My dimension"
                 ),
                 element_type=EntityElementType.DIMENSION,
             ),
@@ -55,7 +55,7 @@ def list_of_issues() -> List[ValidationIssueType]:  # noqa: D
             context=EntityElementContext(
                 file_context=file_context,
                 entity_element=EntityElementReference(
-                    entity_name=entity_name, element_name="My identifier"
+                    entity_name=entity_name, name="My identifier"
                 ),
                 element_type=EntityElementType.IDENTIFIER,
             ),
@@ -69,7 +69,7 @@ def list_of_issues() -> List[ValidationIssueType]:  # noqa: D
                 file_context=file_context,
                 entity_name=entity_name,
                 entity_element=EntityElementReference(
-                    entity_name=entity_name, element_name="My measure"
+                    entity_name=entity_name, name="My measure"
                 ),
                 element_type=EntityElementType.MEASURE,
             ),

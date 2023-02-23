@@ -7,7 +7,7 @@
             <!-- node_id = cm_0 -->
             <!-- metric_spec =                                      -->
             <!--   {'class': 'MetricSpec',                          -->
-            <!--    'element_name': 'instant_booking_value_ratio',  -->
+            <!--    'name': 'instant_booking_value_ratio',  -->
             <!--    'constraint': None,                             -->
             <!--    'alias': None,                                  -->
             <!--    'offset_window': None,                          -->
@@ -19,15 +19,15 @@
                 <!-- node_id = pfe_3 -->
                 <!-- include_spec =                                                  -->
                 <!--   {'class': 'MeasureSpec',                                      -->
-                <!--    'element_name': 'booking_value_with_is_instant_constraint',  -->
+                <!--    'name': 'booking_value_with_is_instant_constraint',  -->
                 <!--    'non_additive_dimension_spec': None}                         -->
                 <!-- include_spec =                           -->
                 <!--   {'class': 'MeasureSpec',               -->
-                <!--    'element_name': 'booking_value',      -->
+                <!--    'name': 'booking_value',      -->
                 <!--    'non_additive_dimension_spec': None}  -->
                 <!-- include_spec =                               -->
                 <!--   {'class': 'TimeDimensionSpec',             -->
-                <!--    'element_name': 'metric_time',            -->
+                <!--    'name': 'metric_time',            -->
                 <!--    'identifier_links': (),                   -->
                 <!--    'time_granularity': TimeGranularity.DAY}  -->
                 <JoinAggregatedMeasuresByGroupByColumnsNode>
@@ -44,11 +44,11 @@
                             <!-- node_id = pfe_1 -->
                             <!-- include_spec =                           -->
                             <!--   {'class': 'MeasureSpec',               -->
-                            <!--    'element_name': 'booking_value',      -->
+                            <!--    'name': 'booking_value',      -->
                             <!--    'non_additive_dimension_spec': None}  -->
                             <!-- include_spec =                               -->
                             <!--   {'class': 'TimeDimensionSpec',             -->
-                            <!--    'element_name': 'metric_time',            -->
+                            <!--    'name': 'metric_time',            -->
                             <!--    'identifier_links': (),                   -->
                             <!--    'time_granularity': TimeGranularity.DAY}  -->
                             <WhereConstraintNode>
@@ -60,7 +60,7 @@
                                 <!--    'linkable_names': ('is_instant',),                                          -->
                                 <!--    'linkable_spec_set': {'class': 'LinkableSpecSet',                           -->
                                 <!--                          'dimension_specs': ({'class': 'DimensionSpec',        -->
-                                <!--                                               'element_name': 'is_instant',    -->
+                                <!--                                               'name': 'is_instant',    -->
                                 <!--                                               'identifier_links': ()},),       -->
                                 <!--                          'time_dimension_specs': (),                           -->
                                 <!--                          'identifier_specs': ()},                              -->
@@ -72,13 +72,13 @@
                                     <!-- node_id = pfe_0 -->
                                     <!-- include_spec =                           -->
                                     <!--   {'class': 'MeasureSpec',               -->
-                                    <!--    'element_name': 'booking_value',      -->
+                                    <!--    'name': 'booking_value',      -->
                                     <!--    'non_additive_dimension_spec': None}  -->
                                     <!-- include_spec =                                                                      -->
-                                    <!--   {'class': 'DimensionSpec', 'element_name': 'is_instant', 'identifier_links': ()}  -->
+                                    <!--   {'class': 'DimensionSpec', 'name': 'is_instant', 'identifier_links': ()}  -->
                                     <!-- include_spec =                               -->
                                     <!--   {'class': 'TimeDimensionSpec',             -->
-                                    <!--    'element_name': 'metric_time',            -->
+                                    <!--    'name': 'metric_time',            -->
                                     <!--    'identifier_links': (),                   -->
                                     <!--    'time_granularity': TimeGranularity.DAY}  -->
                                     <MetricTimeDimensionTransformNode>
@@ -107,11 +107,11 @@
                             <!-- node_id = pfe_2 -->
                             <!-- include_spec =                           -->
                             <!--   {'class': 'MeasureSpec',               -->
-                            <!--    'element_name': 'booking_value',      -->
+                            <!--    'name': 'booking_value',      -->
                             <!--    'non_additive_dimension_spec': None}  -->
                             <!-- include_spec =                               -->
                             <!--   {'class': 'TimeDimensionSpec',             -->
-                            <!--    'element_name': 'metric_time',            -->
+                            <!--    'name': 'metric_time',            -->
                             <!--    'identifier_links': (),                   -->
                             <!--    'time_granularity': TimeGranularity.DAY}  -->
                             <MetricTimeDimensionTransformNode>

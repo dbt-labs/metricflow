@@ -34,12 +34,12 @@ def test_validity_window_conversion(
     dataset = consistent_id_object_repository.scd_model_data_sets["listings"]
     expected_join_description = ValidityWindowJoinDescription(
         window_start_dimension=TimeDimensionSpec(
-            element_name="window_start",
+            name="window_start",
             time_granularity=TimeGranularity.DAY,
             identifier_links=(),
         ),
         window_end_dimension=TimeDimensionSpec(
-            element_name="window_end", time_granularity=TimeGranularity.DAY, identifier_links=()
+            name="window_end", time_granularity=TimeGranularity.DAY, identifier_links=()
         ),
     )
 

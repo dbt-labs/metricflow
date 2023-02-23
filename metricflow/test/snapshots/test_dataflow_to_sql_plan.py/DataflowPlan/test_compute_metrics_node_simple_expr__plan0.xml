@@ -7,7 +7,7 @@
             <!-- node_id = cm_0 -->
             <!-- metric_spec =                       -->
             <!--   {'class': 'MetricSpec',           -->
-            <!--    'element_name': 'booking_fees',  -->
+            <!--    'name': 'booking_fees',  -->
             <!--    'constraint': None,              -->
             <!--    'alias': None,                   -->
             <!--    'offset_window': None,           -->
@@ -22,7 +22,7 @@
                     <!--   {'class': 'JoinDescription',                                -->
                     <!--    'join_node': FilterElementsNode(node_id=pfe_1),            -->
                     <!--    'join_on_identifier': {'class': 'LinklessIdentifierSpec',  -->
-                    <!--                           'element_name': 'listing',          -->
+                    <!--                           'name': 'listing',          -->
                     <!--                           'identifier_links': ()},            -->
                     <!--    'join_on_partition_dimensions': (),                        -->
                     <!--    'join_on_partition_time_dimensions': (),                   -->
@@ -34,11 +34,11 @@
                         <!-- node_id = pfe_0 -->
                         <!-- include_spec =                           -->
                         <!--   {'class': 'MeasureSpec',               -->
-                        <!--    'element_name': 'booking_value',      -->
+                        <!--    'name': 'booking_value',      -->
                         <!--    'non_additive_dimension_spec': None}  -->
                         <!-- include_spec =                         -->
                         <!--   {'class': 'LinklessIdentifierSpec',  -->
-                        <!--    'element_name': 'listing',          -->
+                        <!--    'name': 'listing',          -->
                         <!--    'identifier_links': ()}             -->
                         <ReadSqlSourceNode>
                             <!-- description =                                                                           -->
@@ -55,11 +55,11 @@
                         <!-- node_id = pfe_1 -->
                         <!-- include_spec =                        -->
                         <!--   {'class': 'DimensionSpec',          -->
-                        <!--    'element_name': 'country_latest',  -->
+                        <!--    'name': 'country_latest',  -->
                         <!--    'identifier_links': ()}            -->
                         <!-- include_spec =                         -->
                         <!--   {'class': 'LinklessIdentifierSpec',  -->
-                        <!--    'element_name': 'listing',          -->
+                        <!--    'name': 'listing',          -->
                         <!--    'identifier_links': ()}             -->
                         <ReadSqlSourceNode>
                             <!-- description =                                                                           -->

@@ -323,12 +323,12 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
             start_specs = [
                 spec
                 for spec in specs
-                if spec.element_name == start_dim.dimension_name and spec.time_granularity == start_dim.time_granularity
+                if spec.name == start_dim.dimension_name and spec.time_granularity == start_dim.time_granularity
             ]
             end_specs = [
                 spec
                 for spec in specs
-                if spec.element_name == end_dim.dimension_name and spec.time_granularity == end_dim.time_granularity
+                if spec.name == end_dim.dimension_name and spec.time_granularity == end_dim.time_granularity
             ]
             linkless_start_specs = {spec.without_identifier_links for spec in start_specs}
             linkless_end_specs = {spec.without_identifier_links for spec in end_specs}
@@ -378,7 +378,7 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
         for dimension_instance in instance_set.dimension_instances:
             # The new dimension spec should include the join on identifier.
             transformed_dimension_spec_from_right = DimensionSpec(
-                element_name=dimension_instance.spec.element_name,
+                name=dimension_instance.spec.name,
                 identifier_links=self._join_on_identifier.as_linkless_prefix + dimension_instance.spec.identifier_links,
             )
             dimension_instances_with_additional_link.append(
@@ -394,9 +394,9 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
         for time_dimension_instance in instance_set.time_dimension_instances:
             # The new dimension spec should include the join on identifier.
             transformed_time_dimension_spec_from_right = TimeDimensionSpec(
-                element_name=time_dimension_instance.spec.element_name,
+                name=time_dimension_instance.spec.name,
                 identifier_links=(
-                    (IdentifierReference(element_name=self._join_on_identifier.element_name),)
+                    (IdentifierReference(name=self._join_on_identifier.name),)
                     + time_dimension_instance.spec.identifier_links
                 ),
                 time_granularity=time_dimension_instance.spec.time_granularity,
@@ -418,7 +418,7 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
                 continue
             # The new identifier spec should include the join on identifier.
             transformed_identifier_spec_from_right = IdentifierSpec(
-                element_name=identifier_instance.spec.element_name,
+                name=identifier_instance.spec.name,
                 identifier_links=self._join_on_identifier.as_linkless_prefix
                 + identifier_instance.spec.identifier_links,
             )

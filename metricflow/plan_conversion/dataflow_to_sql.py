@@ -649,10 +649,10 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                     numerator is not None and denominator is not None
                 ), "Missing numerator or denominator for ratio metric, this should have been caught in validation!"
                 numerator_column_name = self._column_association_resolver.resolve_measure_spec(
-                    MeasureSpec(element_name=numerator.post_aggregation_measure_reference.element_name)
+                    MeasureSpec(name=numerator.post_aggregation_measure_reference.name)
                 ).column_name
                 denominator_column_name = self._column_association_resolver.resolve_measure_spec(
-                    MeasureSpec(element_name=denominator.post_aggregation_measure_reference.element_name)
+                    MeasureSpec(name=denominator.post_aggregation_measure_reference.name)
                 ).column_name
 
                 metric_expr = SqlRatioComputationExpression(
@@ -676,7 +676,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                     ), "Measure proxy metrics should always source from exactly 1 measure."
                     expr = self._column_association_resolver.resolve_measure_spec(
                         MeasureSpec(
-                            element_name=metric.input_measures[0].post_aggregation_measure_reference.element_name
+                            name=metric.input_measures[0].post_aggregation_measure_reference.name
                         )
                     ).column_name
                 else:
@@ -693,7 +693,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                     len(metric.measure_references) == 1
                 ), "Cumulative metrics should always source from exactly 1 measure."
                 expr = self._column_association_resolver.resolve_measure_spec(
-                    MeasureSpec(element_name=metric.input_measures[0].post_aggregation_measure_reference.element_name)
+                    MeasureSpec(name=metric.input_measures[0].post_aggregation_measure_reference.name)
                 ).column_name
                 metric_expr = SqlColumnReferenceExpression(
                     SqlColumnReference(
@@ -719,7 +719,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             metric_instances.append(
                 MetricInstance(
                     associated_columns=(output_column_association,),
-                    defined_from=(MetricModelReference(metric_name=metric_spec.element_name),),
+                    defined_from=(MetricModelReference(metric_name=metric_spec.name),),
                     spec=metric_spec.alias_spec,
                 )
             )
@@ -858,7 +858,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
         e.g.
 
-        with table_alias_to_metric_specs = {"a": MetricSpec(element_name="bookings")}
+        with table_alias_to_metric_specs = {"a": MetricSpec(name="bookings")}
 
         ->
 
@@ -1341,7 +1341,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             time_dimension_instances=tuple(
                 time_dimension_instance
                 for time_dimension_instance in parent_data_set.instance_set.time_dimension_instances
-                if time_dimension_instance.spec.element_name != DataSet.metric_time_dimension_reference().element_name
+                if time_dimension_instance.spec.name != DataSet.metric_time_dimension_reference().name
             ),
             identifier_instances=parent_data_set.instance_set.identifier_instances,
             metric_instances=parent_data_set.instance_set.metric_instances,

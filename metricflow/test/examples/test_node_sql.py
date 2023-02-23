@@ -65,7 +65,7 @@ def test_view_sql_generated_at_a_node(
 
     metric_time_node = MetricTimeDimensionTransformNode(
         parent_node=read_source_node,
-        aggregation_time_dimension_reference=TimeDimensionReference(element_name="ds"),
+        aggregation_time_dimension_reference=TimeDimensionReference(name="ds"),
     )
 
     # Show SQL and spec set at a filter node.
@@ -74,7 +74,7 @@ def test_view_sql_generated_at_a_node(
         include_specs=InstanceSpecSet(
             time_dimension_specs=(
                 TimeDimensionSpec(
-                    element_name="metric_time", identifier_links=(), time_granularity=TimeGranularity.DAY
+                    name="metric_time", identifier_links=(), time_granularity=TimeGranularity.DAY
                 ),
             ),
         ),

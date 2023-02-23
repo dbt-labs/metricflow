@@ -231,17 +231,17 @@ class DataWarehouseTaskBuilder:
                             cls.renderize,
                             sql_client=sql_client,
                             plan_converter=render_tools.plan_converter,
-                            plan_id=f"{entity.name}_dim_{spec.element_name}_validation",
+                            plan_id=f"{entity.name}_dim_{spec.name}_validation",
                             nodes=filter_elements_node,
                         ),
                         context=EntityElementContext(
                             file_context=FileContext.from_metadata(metadata=entity.metadata),
                             entity_element=EntityElementReference(
-                                entity_name=entity.name, element_name=spec.element_name
+                                entity_name=entity.name, name=spec.name
                             ),
                             element_type=EntityElementType.DIMENSION,
                         ),
-                        error_message=f"Unable to query dimension `{spec.element_name}` on entity `{entity.name}` in data warehouse",
+                        error_message=f"Unable to query dimension `{spec.name}` on entity `{entity.name}` in data warehouse",
                     )
                 )
 
@@ -307,17 +307,17 @@ class DataWarehouseTaskBuilder:
                             cls.renderize,
                             sql_client=sql_client,
                             plan_converter=render_tools.plan_converter,
-                            plan_id=f"{entity.name}_identifier_{spec.element_name}_validation",
+                            plan_id=f"{entity.name}_identifier_{spec.name}_validation",
                             nodes=filter_elements_node,
                         ),
                         context=EntityElementContext(
                             file_context=FileContext.from_metadata(metadata=entity.metadata),
                             entity_element=EntityElementReference(
-                                entity_name=entity.name, element_name=spec.element_name
+                                entity_name=entity.name, name=spec.name
                             ),
                             element_type=EntityElementType.IDENTIFIER,
                         ),
-                        error_message=f"Unable to query identifier `{spec.element_name}` on entity `{entity.name}` in data warehouse",
+                        error_message=f"Unable to query identifier `{spec.name}` on entity `{entity.name}` in data warehouse",
                     )
                 )
 
@@ -384,7 +384,7 @@ class DataWarehouseTaskBuilder:
             ] = collections.defaultdict(list)
             for spec in entity_specs:
                 obtained_source_node = source_node_by_measure_spec.get(spec)
-                assert obtained_source_node, f"Unable to find generated source node for measure: {spec.element_name}"
+                assert obtained_source_node, f"Unable to find generated source node for measure: {spec.name}"
 
                 filter_elements_node = FilterElementsNode(
                     parent_node=obtained_source_node,
@@ -398,17 +398,17 @@ class DataWarehouseTaskBuilder:
                             cls.renderize,
                             sql_client=sql_client,
                             plan_converter=render_tools.plan_converter,
-                            plan_id=f"{entity.name}_measure_{spec.element_name}_validation",
+                            plan_id=f"{entity.name}_measure_{spec.name}_validation",
                             nodes=filter_elements_node,
                         ),
                         context=EntityElementContext(
                             file_context=FileContext.from_metadata(metadata=entity.metadata),
                             entity_element=EntityElementReference(
-                                entity_name=entity.name, element_name=spec.element_name
+                                entity_name=entity.name, name=spec.name
                             ),
                             element_type=EntityElementType.MEASURE,
                         ),
-                        error_message=f"Unable to query measure `{spec.element_name}` on entity `{entity.name}` in data warehouse",
+                        error_message=f"Unable to query measure `{spec.name}` on entity `{entity.name}` in data warehouse",
                     )
                 )
 

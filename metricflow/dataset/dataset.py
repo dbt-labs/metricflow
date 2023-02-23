@@ -30,7 +30,7 @@ class DataSet:
         return tuple(
             time_dimension_instance
             for time_dimension_instance in self.instance_set.time_dimension_instances
-            if time_dimension_instance.spec.element_name == DataSet.metric_time_dimension_name()
+            if time_dimension_instance.spec.name == DataSet.metric_time_dimension_name()
         )
 
     @staticmethod
@@ -40,18 +40,18 @@ class DataSet:
         Or to put in another way, if metrics for those measures were plotted together on a graph, this is the name of
         the time dimension for the x-axis.
         """
-        return TimeDimensionReference(element_name=SemanticReservedKeywords.METRIC_TIME.value)
+        return TimeDimensionReference(name=SemanticReservedKeywords.METRIC_TIME.value)
 
     @staticmethod
     def metric_time_dimension_name() -> str:
         """See metric_time_dimension_reference(), but in name form for use in queries."""
-        return DataSet.metric_time_dimension_reference().element_name
+        return DataSet.metric_time_dimension_reference().name
 
     @staticmethod
     def metric_time_dimension_spec(time_granularity: TimeGranularity) -> TimeDimensionSpec:
         """Spec that corresponds to DataSet.metric_time_dimension_reference"""
         return TimeDimensionSpec(
-            element_name=DataSet.metric_time_dimension_reference().element_name,
+            name=DataSet.metric_time_dimension_reference().name,
             identifier_links=(),
             time_granularity=time_granularity,
         )

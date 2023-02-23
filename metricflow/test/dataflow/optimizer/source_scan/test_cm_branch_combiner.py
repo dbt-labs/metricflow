@@ -67,13 +67,13 @@ def test_filter_combination(  # noqa: D
 
     source0 = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     filter0 = FilterElementsNode(
-        parent_node=source0, include_specs=InstanceSpecSet(measure_specs=(MeasureSpec(element_name="bookings"),))
+        parent_node=source0, include_specs=InstanceSpecSet(measure_specs=(MeasureSpec(name="bookings"),))
     )
     source1 = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     filter1 = FilterElementsNode(
         parent_node=source1,
         include_specs=InstanceSpecSet(
-            measure_specs=(MeasureSpec(element_name="booking_value"),),
+            measure_specs=(MeasureSpec(name="booking_value"),),
         ),
     )
     combiner = ComputeMetricsBranchCombiner(filter0)

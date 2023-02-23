@@ -46,14 +46,14 @@ def test_joined_plan(  # noqa: D
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"),),
+            metric_specs=(MetricSpec(name="bookings"),),
             dimension_specs=(
                 DimensionSpec(
-                    element_name="is_instant",
+                    name="is_instant",
                     identifier_links=(),
                 ),
                 DimensionSpec(
-                    element_name="country_latest",
+                    name="country_latest",
                     identifier_links=(IdentifierReference("listing"),),
                 ),
             ),
@@ -85,12 +85,12 @@ def test_small_combined_metrics_plan(  # noqa: D
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(
-                MetricSpec(element_name="bookings"),
-                MetricSpec(element_name="booking_value"),
+                MetricSpec(name="bookings"),
+                MetricSpec(name="booking_value"),
             ),
             dimension_specs=(
                 DimensionSpec(
-                    element_name="is_instant",
+                    name="is_instant",
                     identifier_links=(),
                 ),
             ),
@@ -123,17 +123,17 @@ def test_combined_metrics_plan(  # noqa: D
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(
-                MetricSpec(element_name="bookings"),
-                MetricSpec(element_name="instant_bookings"),
-                MetricSpec(element_name="booking_value"),
+                MetricSpec(name="bookings"),
+                MetricSpec(name="instant_bookings"),
+                MetricSpec(name="booking_value"),
             ),
             dimension_specs=(
                 DimensionSpec(
-                    element_name="is_instant",
+                    name="is_instant",
                     identifier_links=(),
                 ),
             ),
-            time_dimension_specs=(TimeDimensionSpec(element_name="ds", identifier_links=()),),
+            time_dimension_specs=(TimeDimensionSpec(name="ds", identifier_links=()),),
         )
     )
 
@@ -163,13 +163,13 @@ def test_multihop_joined_plan(  # noqa: D
     """Tests a plan getting a measure and a joined dimension."""
     dataflow_plan = multihop_dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="txn_count"),),
+            metric_specs=(MetricSpec(name="txn_count"),),
             dimension_specs=(
                 DimensionSpec(
-                    element_name="customer_name",
+                    name="customer_name",
                     identifier_links=(
-                        IdentifierReference(element_name="account_id"),
-                        IdentifierReference(element_name="customer_id"),
+                        IdentifierReference(name="account_id"),
+                        IdentifierReference(name="customer_id"),
                     ),
                 ),
             ),

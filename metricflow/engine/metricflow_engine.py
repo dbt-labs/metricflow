@@ -420,7 +420,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         return [
             Dimension(name=dim.qualified_name)
             for dim in self._semantic_model.metric_semantics.element_specs_for_metrics(
-                metric_references=[MetricReference(element_name=mname) for mname in metric_names],
+                metric_references=[MetricReference(name=mname) for mname in metric_names],
                 without_any_property=frozenset(
                     {
                         LinkableElementProperties.IDENTIFIER,

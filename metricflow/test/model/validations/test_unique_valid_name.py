@@ -85,7 +85,7 @@ def test_duplicate_measure_name(simple_model__with_primary_transforms: UserConfi
 
     with pytest.raises(
         ModelValidationException,
-        match=rf"can't use name `{duplicated_measure.reference.element_name}` for a measure when it was already used for a measure",
+        match=rf"can't use name `{duplicated_measure.reference.name}` for a measure when it was already used for a measure",
     ):
         ModelValidator([UniqueAndValidNameRule()]).checked_validations(model)
 
@@ -102,7 +102,7 @@ def test_duplicate_dimension_name(simple_model__with_primary_transforms: UserCon
 
     with pytest.raises(
         ModelValidationException,
-        match=rf"can't use name `{duplicated_dimension.reference.element_name}` for a "
+        match=rf"can't use name `{duplicated_dimension.reference.name}` for a "
         rf"dimension when it was already used for a dimension",
     ):
         ModelValidator([UniqueAndValidNameRule()]).checked_validations(model)
@@ -120,7 +120,7 @@ def test_duplicate_identifier_name(simple_model__with_primary_transforms: UserCo
 
     with pytest.raises(
         ModelValidationException,
-        match=rf"can't use name `{duplicated_identifier.reference.element_name}` for a identifier when it was already used for a identifier",
+        match=rf"can't use name `{duplicated_identifier.reference.name}` for a identifier when it was already used for a identifier",
     ):
         ModelValidator([UniqueAndValidNameRule()]).checked_validations(model)
 

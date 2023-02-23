@@ -18,16 +18,16 @@ def test_pretty_print() -> None:  # noqa: D
 
 def test_pformat_big_objects() -> None:  # noqa: D
     dimension_spec = DimensionSpec(
-        element_name="country_latest", identifier_links=(IdentifierReference(element_name="listing"),)
+        name="country_latest", identifier_links=(IdentifierReference(name="listing"),)
     )
 
     assert pformat_big_objects(dimension_spec) == (
         textwrap.dedent(
             """\
             {'class': 'DimensionSpec',
-             'element_name': 'country_latest',
+             'name': 'country_latest',
              'identifier_links': ({'class': 'IdentifierReference',
-                                   'element_name': 'listing'},)}
+                                   'name': 'listing'},)}
             """
         ).rstrip()
     )
@@ -37,9 +37,9 @@ def test_pformat_big_objects() -> None:  # noqa: D
             """\
             dimension_spec:
                 {'class': 'DimensionSpec',
-                 'element_name': 'country_latest',
+                 'name': 'country_latest',
                  'identifier_links': ({'class': 'IdentifierReference',
-                                       'element_name': 'listing'},)}
+                                       'name': 'listing'},)}
             """
         ).rstrip()
     )

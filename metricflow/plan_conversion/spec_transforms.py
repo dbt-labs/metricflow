@@ -15,7 +15,7 @@ class CreateSelectCoalescedColumnsForLinkableSpecs(InstanceSpecSetTransform[Sele
 
     e.g.
 
-    dimension_specs = [DimensionSpec(element_name="is_instant")]
+    dimension_specs = [DimensionSpec(name="is_instant")]
     table_aliases = ["a", "b"]
 
     ->

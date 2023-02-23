@@ -5,7 +5,7 @@
         <ComputeMetricsNode>
             <!-- description = Compute Metrics via Expressions -->
             <!-- node_id = cm_0 -->
-            <!-- metric_spec = MetricSpec(element_name='instant_bookers_ratio') -->
+            <!-- metric_spec = MetricSpec(name='instant_bookers_ratio') -->
             <FilterElementsNode>
                 <!-- description =                              -->
                 <!--   Pass Only Elements:                      -->
@@ -13,11 +13,11 @@
                 <!-- node_id = pfe_3 -->
                 <!-- include_spec =                               -->
                 <!--   {'class': 'TimeDimensionSpec',             -->
-                <!--    'element_name': 'metric_time',            -->
+                <!--    'name': 'metric_time',            -->
                 <!--    'identifier_links': (),                   -->
                 <!--    'time_granularity': TimeGranularity.DAY}  -->
-                <!-- include_spec = MeasureSpec(element_name='bookers') -->
-                <!-- include_spec = MeasureSpec(element_name='bookers') -->
+                <!-- include_spec = MeasureSpec(name='bookers') -->
+                <!-- include_spec = MeasureSpec(name='bookers') -->
                 <JoinAggregatedMeasuresByGroupByColumnsNode>
                     <!-- description = Join Aggregated Measures with Standard Outputs -->
                     <!-- node_id = jamgc_0 -->
@@ -30,10 +30,10 @@
                             <!--   Pass Only Elements:           -->
                             <!--     ['bookers', 'metric_time']  -->
                             <!-- node_id = pfe_1 -->
-                            <!-- include_spec = MeasureSpec(element_name='bookers') -->
+                            <!-- include_spec = MeasureSpec(name='bookers') -->
                             <!-- include_spec =                               -->
                             <!--   {'class': 'TimeDimensionSpec',             -->
-                            <!--    'element_name': 'metric_time',            -->
+                            <!--    'name': 'metric_time',            -->
                             <!--    'identifier_links': (),                   -->
                             <!--    'time_granularity': TimeGranularity.DAY}  -->
                             <WhereConstraintNode>
@@ -43,7 +43,7 @@
                                 <!--   {'class': 'SpecWhereClauseConstraint',                                     -->
                                 <!--    'where_condition': 'is_instant',                                          -->
                                 <!--    'linkable_names': ('is_instant',),                                        -->
-                                <!--    'linkable_spec_set': {'dimension_specs': ({'element_name': 'is_instant',  -->
+                                <!--    'linkable_spec_set': {'dimension_specs': ({'name': 'is_instant',  -->
                                 <!--                                               'identifier_links': ()},),     -->
                                 <!--                          'time_dimension_specs': (),                         -->
                                 <!--                          'identifier_specs': ()},                            -->
@@ -53,12 +53,12 @@
                                     <!--   Pass Only Elements:                         -->
                                     <!--     ['bookers', 'is_instant', 'metric_time']  -->
                                     <!-- node_id = pfe_0 -->
-                                    <!-- include_spec = MeasureSpec(element_name='bookers') -->
+                                    <!-- include_spec = MeasureSpec(name='bookers') -->
                                     <!-- include_spec =                                                                      -->
-                                    <!--   {'class': 'DimensionSpec', 'element_name': 'is_instant', 'identifier_links': ()}  -->
+                                    <!--   {'class': 'DimensionSpec', 'name': 'is_instant', 'identifier_links': ()}  -->
                                     <!-- include_spec =                               -->
                                     <!--   {'class': 'TimeDimensionSpec',             -->
-                                    <!--    'element_name': 'metric_time',            -->
+                                    <!--    'name': 'metric_time',            -->
                                     <!--    'identifier_links': (),                   -->
                                     <!--    'time_granularity': TimeGranularity.DAY}  -->
                                     <MetricTimeDimensionTransformNode>
@@ -85,10 +85,10 @@
                             <!--   Pass Only Elements:           -->
                             <!--     ['bookers', 'metric_time']  -->
                             <!-- node_id = pfe_2 -->
-                            <!-- include_spec = MeasureSpec(element_name='bookers') -->
+                            <!-- include_spec = MeasureSpec(name='bookers') -->
                             <!-- include_spec =                               -->
                             <!--   {'class': 'TimeDimensionSpec',             -->
-                            <!--    'element_name': 'metric_time',            -->
+                            <!--    'name': 'metric_time',            -->
                             <!--    'identifier_links': (),                   -->
                             <!--    'time_granularity': TimeGranularity.DAY}  -->
                             <MetricTimeDimensionTransformNode>

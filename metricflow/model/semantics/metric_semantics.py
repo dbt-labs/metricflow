@@ -107,7 +107,7 @@ class MetricSemantics:  # noqa: D
                 else None
             )
             measure_spec = MeasureSpec(
-                element_name=input_measure.name,
+                name=input_measure.name,
                 non_additive_dimension_spec=self._entity_semantics.non_additive_dimension_specs_by_measure.get(
                     input_measure.measure_reference
                 ),
@@ -148,7 +148,7 @@ class MetricSemantics:  # noqa: D
                 else None
             )
             spec = MetricSpec(
-                element_name=input_metric.name,
+                name=input_metric.name,
                 constraint=spec_constraint,
                 alias=input_metric.alias,
                 offset_window=input_metric.offset_window,

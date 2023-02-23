@@ -169,10 +169,10 @@ def test_2_metrics_from_1_entity(  # noqa: D
         mf_test_session_state=mf_test_session_state,
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"), MetricSpec(element_name="booking_value")),
+            metric_specs=(MetricSpec(name="bookings"), MetricSpec(name="booking_value")),
             dimension_specs=(
                 DataSet.metric_time_dimension_spec(TimeGranularity.DAY),
-                DimensionSpec(element_name="country_latest", identifier_links=(IdentifierReference("listing"),)),
+                DimensionSpec(name="country_latest", identifier_links=(IdentifierReference("listing"),)),
             ),
         ),
         expected_num_sources_in_unoptimized=4,
@@ -192,7 +192,7 @@ def test_2_metrics_from_2_entities(  # noqa: D
         mf_test_session_state=mf_test_session_state,
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"), MetricSpec(element_name="listings")),
+            metric_specs=(MetricSpec(name="bookings"), MetricSpec(name="listings")),
             dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
         ),
         expected_num_sources_in_unoptimized=2,
@@ -213,9 +213,9 @@ def test_3_metrics_from_2_entities(  # noqa: D
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
             metric_specs=(
-                MetricSpec(element_name="bookings"),
-                MetricSpec(element_name="booking_value"),
-                MetricSpec(element_name="listings"),
+                MetricSpec(name="bookings"),
+                MetricSpec(name="booking_value"),
+                MetricSpec(name="listings"),
             ),
             dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
         ),
@@ -239,16 +239,16 @@ def test_constrained_metric_not_combined(  # noqa: D
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
             metric_specs=(
-                MetricSpec(element_name="booking_value"),
+                MetricSpec(name="booking_value"),
                 MetricSpec(
-                    element_name="instant_booking_value",
+                    name="instant_booking_value",
                     constraint=SpecWhereClauseConstraint(
                         where_condition="is_instant",
                         linkable_names=("is_instant",),
                         linkable_spec_set=LinkableSpecSet(
                             dimension_specs=(
                                 DimensionSpec(
-                                    element_name="is_instant",
+                                    name="is_instant",
                                     identifier_links=(),
                                 ),
                             )
@@ -278,7 +278,7 @@ def test_derived_metric(  # noqa: D
         mf_test_session_state=mf_test_session_state,
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="non_referred_bookings_pct"),),
+            metric_specs=(MetricSpec(name="non_referred_bookings_pct"),),
             dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
         ),
         expected_num_sources_in_unoptimized=2,
@@ -301,7 +301,7 @@ def test_nested_derived_metric(  # noqa: D
         mf_test_session_state=mf_test_session_state,
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="instant_plus_non_referred_bookings_pct"),),
+            metric_specs=(MetricSpec(name="instant_plus_non_referred_bookings_pct"),),
             dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
         ),
         expected_num_sources_in_unoptimized=4,
@@ -330,8 +330,8 @@ def test_derived_metric_with_non_derived_metric(  # noqa: D
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
             metric_specs=(
-                MetricSpec(element_name="booking_value"),
-                MetricSpec(element_name="non_referred_bookings_pct"),
+                MetricSpec(name="booking_value"),
+                MetricSpec(name="non_referred_bookings_pct"),
             ),
             dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
         ),
@@ -352,8 +352,8 @@ def test_2_ratio_metrics_from_1_entity(  # noqa: D
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
             metric_specs=(
-                MetricSpec(element_name="bookings_per_booker"),
-                MetricSpec(element_name="bookings_per_dollar"),
+                MetricSpec(name="bookings_per_booker"),
+                MetricSpec(name="bookings_per_dollar"),
             ),
             dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
         ),

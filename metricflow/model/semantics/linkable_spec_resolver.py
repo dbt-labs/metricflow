@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 class JoinPathKey:
     """A key that can uniquely identify an element and the joins used to realize the element."""
 
-    element_name: str
+    name: str
     identifier_links: Tuple[str, ...]
     time_granularity: Optional[TimeGranularity]
 
@@ -43,7 +43,7 @@ class JoinPathKey:
 class LinkableDimension:
     """Describes how a dimension can be realized by joining based on identifier links."""
 
-    element_name: str
+    name: str
     identifier_links: Tuple[str, ...]
     properties: FrozenSet[LinkableElementProperties]
     time_granularity: Optional[TimeGranularity] = None
@@ -51,7 +51,7 @@ class LinkableDimension:
     @property
     def path_key(self) -> JoinPathKey:  # noqa: D
         return JoinPathKey(
-            element_name=self.element_name,
+            name=self.name,
             identifier_links=self.identifier_links,
             time_granularity=self.time_granularity,
         )
@@ -59,7 +59,7 @@ class LinkableDimension:
     @property
     def after_intersection(self) -> LinkableDimension:  # noqa: D
         return LinkableDimension(
-            element_name=self.element_name,
+            name=self.name,
             identifier_links=self.identifier_links,
             properties=frozenset({LinkableElementProperties.INTERSECTED}),
             time_granularity=self.time_granularity,
@@ -70,20 +70,20 @@ class LinkableDimension:
 class LinkableIdentifier:
     """Describes how an identifier can be realized by joining based on identifier links."""
 
-    element_name: str
+    name: str
     properties: FrozenSet[LinkableElementProperties]
     identifier_links: Tuple[str, ...]
 
     @property
     def path_key(self) -> JoinPathKey:  # noqa: D
         return JoinPathKey(
-            element_name=self.element_name, identifier_links=self.identifier_links, time_granularity=None
+            name=self.name, identifier_links=self.identifier_links, time_granularity=None
         )
 
     @property
     def after_intersection(self) -> LinkableIdentifier:  # noqa: D
         return LinkableIdentifier(
-            element_name=self.element_name,
+            name=self.name,
             identifier_links=self.identifier_links,
             properties=frozenset({LinkableElementProperties.INTERSECTED}),
         )
@@ -242,16 +242,16 @@ class LinkableElementSet:
         return LinkableSpecSet(
             dimension_specs=tuple(
                 DimensionSpec(
-                    element_name=x.element_name,
-                    identifier_links=tuple(IdentifierReference(element_name=x) for x in x.identifier_links),
+                    name=x.name,
+                    identifier_links=tuple(IdentifierReference(name=x) for x in x.identifier_links),
                 )
                 for x in self.linkable_dimensions
                 if not x.time_granularity
             ),
             time_dimension_specs=tuple(
                 TimeDimensionSpec(
-                    element_name=x.element_name,
-                    identifier_links=tuple(IdentifierReference(element_name=x) for x in x.identifier_links),
+                    name=x.name,
+                    identifier_links=tuple(IdentifierReference(name=x) for x in x.identifier_links),
                     time_granularity=x.time_granularity,
                 )
                 for x in self.linkable_dimensions
@@ -259,8 +259,8 @@ class LinkableElementSet:
             ),
             identifier_specs=tuple(
                 IdentifierSpec(
-                    element_name=x.element_name,
-                    identifier_links=tuple(IdentifierReference(element_name=x) for x in x.identifier_links),
+                    name=x.name,
+                    identifier_links=tuple(IdentifierReference(name=x) for x in x.identifier_links),
                 )
                 for x in self.linkable_identifiers
             ),
@@ -293,7 +293,7 @@ def _generate_linkable_time_dimensions(
 
         linkable_dimensions.append(
             LinkableDimension(
-                element_name=dimension.reference.element_name,
+                name=dimension.reference.name,
                 identifier_links=identifier_links,
                 time_granularity=time_granularity,
                 properties=frozenset(properties),
@@ -331,7 +331,7 @@ class EntityJoinPath:
             if dimension_type == DimensionType.CATEGORICAL:
                 linkable_dimensions.append(
                     LinkableDimension(
-                        element_name=dimension.reference.element_name,
+                        name=dimension.reference.name,
                         identifier_links=identifier_links,
                         properties=with_properties,
                     )
@@ -349,10 +349,10 @@ class EntityJoinPath:
 
         for identifier in entity.identifiers:
             # Avoid creating "booking_id__booking_id"
-            if identifier.reference.element_name != identifier_links[-1]:
+            if identifier.reference.name != identifier_links[-1]:
                 linkable_identifiers.append(
                     LinkableIdentifier(
-                        element_name=identifier.reference.element_name,
+                        name=identifier.reference.name,
                         identifier_links=identifier_links,
                         properties=with_properties.union({LinkableElementProperties.IDENTIFIER}),
                     )
@@ -405,7 +405,7 @@ class ValidLinkableSpecResolver:
 
         for entity in self._entities:
             for identifier in entity.identifiers:
-                self._identifier_to_entity[identifier.reference.element_name].append(entity)
+                self._identifier_to_entity[identifier.reference.name].append(entity)
 
         self._metric_to_linkable_element_sets: Dict[str, List[LinkableElementSet]] = {}
 
@@ -421,7 +421,7 @@ class ValidLinkableSpecResolver:
     def _get_entity_for_measure(self, measure_reference: MeasureReference) -> Entity:  # noqa: D
         entities_where_measure_was_found = []
         for entity in self._entities:
-            if any([x.reference.element_name == measure_reference.element_name for x in entity.measures]):
+            if any([x.reference.name == measure_reference.name for x in entity.measures]):
                 entities_where_measure_was_found.append(entity)
 
         if len(entities_where_measure_was_found) == 0:
@@ -443,7 +443,7 @@ class ValidLinkableSpecResolver:
             if dimension_type == DimensionType.CATEGORICAL:
                 linkable_dimensions.append(
                     LinkableDimension(
-                        element_name=dimension.reference.element_name,
+                        name=dimension.reference.name,
                         identifier_links=(),
                         properties=frozenset({LinkableElementProperties.LOCAL}),
                     )
@@ -463,7 +463,7 @@ class ValidLinkableSpecResolver:
         for identifier in entity.identifiers:
             linkable_identifiers.append(
                 LinkableIdentifier(
-                    element_name=identifier.reference.element_name,
+                    name=identifier.reference.name,
                     identifier_links=(),
                     properties=frozenset({LinkableElementProperties.LOCAL, LinkableElementProperties.IDENTIFIER}),
                 )
@@ -476,8 +476,8 @@ class ValidLinkableSpecResolver:
                     properties = {LinkableElementProperties.LOCAL, LinkableElementProperties.LOCAL_LINKED}
                     additional_linkable_dimensions.append(
                         LinkableDimension(
-                            element_name=linkable_dimension.element_name,
-                            identifier_links=(identifier.reference.element_name,),
+                            name=linkable_dimension.name,
+                            identifier_links=(identifier.reference.name,),
                             time_granularity=linkable_dimension.time_granularity,
                             properties=frozenset(linkable_dimension.properties.union(properties)),
                         )
@@ -496,7 +496,7 @@ class ValidLinkableSpecResolver:
         identifier_reference: IdentifierReference,
     ) -> Sequence[Entity]:
         # May switch to non-cached implementation.
-        entities = self._identifier_to_entity[identifier_reference.element_name]
+        entities = self._identifier_to_entity[identifier_reference.name]
         valid_entities = []
         for entity in entities:
             if self._join_evaluator.is_valid_entity_join(
@@ -528,7 +528,7 @@ class ValidLinkableSpecResolver:
                     EntityJoinPath(
                         path_elements=(
                             EntityJoinPathElement(
-                                entity=entity, join_on_identifier=identifier.reference.element_name
+                                entity=entity, join_on_identifier=identifier.reference.name
                             ),
                         )
                     )
@@ -576,7 +576,7 @@ class ValidLinkableSpecResolver:
         """Gets the valid linkable elements that are common to all requested metrics."""
         linkable_element_sets = []
         for metric_reference in metric_references:
-            element_sets = self._metric_to_linkable_element_sets.get(metric_reference.element_name)
+            element_sets = self._metric_to_linkable_element_sets.get(metric_reference.name)
             if not element_sets:
                 raise ValueError(f"Unknown metric: {metric_reference} in element set")
             metric_result = LinkableElementSet.intersection(
@@ -594,7 +594,7 @@ class ValidLinkableSpecResolver:
         new_join_paths = []
 
         for identifier in last_entity_in_path.identifiers:
-            identifier_name = identifier.reference.element_name
+            identifier_name = identifier.reference.name
 
             # Don't create cycles in the join path by joining on the same identifier.
             if identifier_name in set(x.join_on_identifier for x in current_join_path.path_elements):

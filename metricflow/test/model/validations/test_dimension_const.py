@@ -112,26 +112,26 @@ def test_incompatible_dimension_is_partition() -> None:  # noqa:D
 
 def test_multiple_primary_time_dimensions() -> None:  # noqa:D
     with pytest.raises(ModelValidationException, match=r"one of many defined as primary"):
-        dimension_reference = TimeDimensionReference(element_name="ds")
-        dimension_reference2 = DimensionReference(element_name="not_ds")
-        measure_reference = MeasureReference(element_name="measure")
+        dimension_reference = TimeDimensionReference(name="ds")
+        dimension_reference2 = DimensionReference(name="not_ds")
+        measure_reference = MeasureReference(name="measure")
         model_validator = ModelValidator([EntityTimeDimensionWarningsRule()])
         model_validator.checked_validations(
             model=UserConfiguredModel(
                 entities=[
                     Entity(
                         name="dim1",
-                        sql_query=f"SELECT ds, {measure_reference.element_name} FROM bar",
+                        sql_query=f"SELECT ds, {measure_reference.name} FROM bar",
                         measures=[
                             Measure(
-                                name=measure_reference.element_name,
+                                name=measure_reference.name,
                                 agg=AggregationType.SUM,
-                                agg_time_dimension=dimension_reference.element_name,
+                                agg_time_dimension=dimension_reference.name,
                             )
                         ],
                         dimensions=[
                             Dimension(
-                                name=dimension_reference.element_name,
+                                name=dimension_reference.name,
                                 type=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
                                     is_primary=True,
@@ -139,7 +139,7 @@ def test_multiple_primary_time_dimensions() -> None:  # noqa:D
                                 ),
                             ),
                             Dimension(
-                                name=dimension_reference2.element_name,
+                                name=dimension_reference2.name,
                                 type=DimensionType.TIME,
                                 type_params=DimensionTypeParams(
                                     is_primary=True,
@@ -152,9 +152,9 @@ def test_multiple_primary_time_dimensions() -> None:  # noqa:D
                 ],
                 metrics=[
                     Metric(
-                        name=measure_reference.element_name,
+                        name=measure_reference.name,
                         type=MetricType.MEASURE_PROXY,
-                        type_params=MetricTypeParams(measures=[measure_reference.element_name]),
+                        type_params=MetricTypeParams(measures=[measure_reference.name]),
                     )
                 ],
             )

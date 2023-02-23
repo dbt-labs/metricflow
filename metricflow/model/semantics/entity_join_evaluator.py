@@ -131,7 +131,7 @@ class EntityJoinEvaluator:
             # efficient path to each entity.
             join_paths_to_visit_next: List[List[EntityIdentifierJoin]] = []
             for identifier in parent_entity.identifiers:
-                identifier_reference = IdentifierReference(element_name=identifier.name)
+                identifier_reference = IdentifierReference(name=identifier.name)
                 identifier_entities = self._entity_semantics.get_entities_for_identifier(
                     identifier_reference=identifier_reference
                 )

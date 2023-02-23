@@ -15,7 +15,7 @@ def _categorical_dimensions(entity: Entity) -> Tuple[Dimension, ...]:
     return tuple(dim for dim in entity.dimensions if dim.type == DimensionType.CATEGORICAL)
 
 
-def test_cross_element_names(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa:D
+def test_cross_names(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa:D
     model = copy.deepcopy(simple_model__with_primary_transforms)
 
     # ensure we have a usable entity for the test
@@ -36,15 +36,15 @@ def test_cross_element_names(simple_model__with_primary_transforms: UserConfigur
     ds_dimension_x_identifier = copy.deepcopy(usable_ds)
 
     # We update the matching categorical dimension by reference for convenience
-    ds_measure_x_dimension.get_dimension(dimension_reference).name = measure_reference.element_name
-    ds_measure_x_identifier.identifiers[0].name = measure_reference.element_name
-    ds_dimension_x_identifier.identifiers[0].name = dimension_reference.element_name
+    ds_measure_x_dimension.get_dimension(dimension_reference).name = measure_reference.name
+    ds_measure_x_identifier.identifiers[0].name = measure_reference.name
+    ds_dimension_x_identifier.identifiers[0].name = dimension_reference.name
 
     model.entities[usable_ds_index] = ds_measure_x_dimension
     with pytest.raises(
         ModelValidationException,
         match=(
-            f"element `{measure_reference.element_name}` is of type {EntityElementType.DIMENSION}, but it is used as "
+            f"element `{measure_reference.name}` is of type {EntityElementType.DIMENSION}, but it is used as "
             f"types .*?EntityElementType.DIMENSION.*?EntityElementType.MEASURE.*? across the model"
         ),
     ):
@@ -54,7 +54,7 @@ def test_cross_element_names(simple_model__with_primary_transforms: UserConfigur
     with pytest.raises(
         ModelValidationException,
         match=(
-            f"element `{measure_reference.element_name}` is of type {EntityElementType.IDENTIFIER}, but it is used as "
+            f"element `{measure_reference.name}` is of type {EntityElementType.IDENTIFIER}, but it is used as "
             f"types .*?EntityElementType.IDENTIFIER.*?EntityElementType.MEASURE.*? across the model"
         ),
     ):
@@ -64,7 +64,7 @@ def test_cross_element_names(simple_model__with_primary_transforms: UserConfigur
     with pytest.raises(
         ModelValidationException,
         match=(
-            f"element `{dimension_reference.element_name}` is of type {EntityElementType.DIMENSION}, but it is used as "
+            f"element `{dimension_reference.name}` is of type {EntityElementType.DIMENSION}, but it is used as "
             f"types .*?EntityElementType.DIMENSION.*?EntityElementType.IDENTIFIER.*? across the model"
         ),
     ):

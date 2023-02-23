@@ -23,7 +23,7 @@ def test_metric_time_dimension_transform_node_using_primary_time(  # noqa: D
     """Tests converting a PlotTimeDimensionTransform node using the primary time dimension to SQL."""
     source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     metric_time_dimension_transform_node = MetricTimeDimensionTransformNode(
-        parent_node=source_node, aggregation_time_dimension_reference=TimeDimensionReference(element_name="ds")
+        parent_node=source_node, aggregation_time_dimension_reference=TimeDimensionReference(name="ds")
     )
     convert_and_check(
         request=request,
@@ -45,7 +45,7 @@ def test_metric_time_dimension_transform_node_using_non_primary_time(  # noqa: D
     source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     metric_time_dimension_transform_node = MetricTimeDimensionTransformNode(
         parent_node=source_node,
-        aggregation_time_dimension_reference=TimeDimensionReference(element_name="booking_paid_at"),
+        aggregation_time_dimension_reference=TimeDimensionReference(name="booking_paid_at"),
     )
     convert_and_check(
         request=request,
@@ -68,8 +68,8 @@ def test_simple_query_with_metric_time_dimension(
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(
-                MetricSpec(element_name="bookings"),
-                MetricSpec(element_name="booking_payments"),
+                MetricSpec(name="bookings"),
+                MetricSpec(name="booking_payments"),
             ),
             dimension_specs=(),
             time_dimension_specs=(MTD_SPEC_DAY,),

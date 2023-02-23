@@ -49,21 +49,21 @@ def time_granularity_solver(  # noqa: D
 
 def test_validate_day_granuarity_for_day_metric(time_granularity_solver: TimeGranularitySolver) -> None:  # noqa: D
     time_granularity_solver.validate_time_granularity(
-        metric_references=[MetricReference(element_name="bookings")],
+        metric_references=[MetricReference(name="bookings")],
         time_dimension_specs=[DataSet.metric_time_dimension_spec(TimeGranularity.DAY)],
     )
 
 
 def test_validate_month_granuarity_for_day_metric(time_granularity_solver: TimeGranularitySolver) -> None:  # noqa: D
     time_granularity_solver.validate_time_granularity(
-        metric_references=[MetricReference(element_name="bookings")],
+        metric_references=[MetricReference(name="bookings")],
         time_dimension_specs=[DataSet.metric_time_dimension_spec(TimeGranularity.MONTH)],
     )
 
 
 def test_validate_month_granuarity_for_month_metric(time_granularity_solver: TimeGranularitySolver) -> None:  # noqa: D
     time_granularity_solver.validate_time_granularity(
-        metric_references=[MetricReference(element_name="bookings_monthly")],
+        metric_references=[MetricReference(name="bookings_monthly")],
         time_dimension_specs=[DataSet.metric_time_dimension_spec(TimeGranularity.MONTH)],
     )
 
@@ -72,7 +72,7 @@ def test_validate_month_granuarity_for_day_and_month_metrics(  # noqa: D
     time_granularity_solver: TimeGranularitySolver,
 ) -> None:
     time_granularity_solver.validate_time_granularity(
-        metric_references=[MetricReference(element_name="bookings"), MetricReference(element_name="bookings_monthly")],
+        metric_references=[MetricReference(name="bookings"), MetricReference(name="bookings_monthly")],
         time_dimension_specs=[DataSet.metric_time_dimension_spec(TimeGranularity.MONTH)],
     )
 
@@ -81,7 +81,7 @@ def test_validate_year_granularity_for_day_and_month_metrics(  # noqa: D
     time_granularity_solver: TimeGranularitySolver,
 ) -> None:
     time_granularity_solver.validate_time_granularity(
-        metric_references=[MetricReference(element_name="bookings"), MetricReference(element_name="bookings_monthly")],
+        metric_references=[MetricReference(name="bookings"), MetricReference(name="bookings_monthly")],
         time_dimension_specs=[DataSet.metric_time_dimension_spec(TimeGranularity.YEAR)],
     )
 
@@ -89,7 +89,7 @@ def test_validate_year_granularity_for_day_and_month_metrics(  # noqa: D
 def test_validate_day_granuarity_for_month_metric(time_granularity_solver: TimeGranularitySolver) -> None:  # noqa: D
     with pytest.raises(RequestTimeGranularityException):
         time_granularity_solver.validate_time_granularity(
-            metric_references=[MetricReference(element_name="bookings_monthly")],
+            metric_references=[MetricReference(name="bookings_monthly")],
             time_dimension_specs=[DataSet.metric_time_dimension_spec(TimeGranularity.DAY)],
         )
 
@@ -100,19 +100,19 @@ def test_validate_day_granularity_for_day_and_month_metric(  # noqa: D
     with pytest.raises(RequestTimeGranularityException):
         time_granularity_solver.validate_time_granularity(
             metric_references=[
-                MetricReference(element_name="bookings"),
-                MetricReference(element_name="bookings_monthly"),
+                MetricReference(name="bookings"),
+                MetricReference(name="bookings_monthly"),
             ],
             time_dimension_specs=[DataSet.metric_time_dimension_spec(TimeGranularity.DAY)],
         )
 
 
-PARTIAL_PTD_SPEC = PartialTimeDimensionSpec(element_name=DataSet.metric_time_dimension_name(), identifier_links=())
+PARTIAL_PTD_SPEC = PartialTimeDimensionSpec(name=DataSet.metric_time_dimension_name(), identifier_links=())
 
 
 def test_granularity_solution_for_day_metric(time_granularity_solver: TimeGranularitySolver) -> None:  # noqa: D
     assert time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
-        metric_references=[MetricReference(element_name="bookings")],
+        metric_references=[MetricReference(name="bookings")],
         partial_time_dimension_specs=[PARTIAL_PTD_SPEC],
         metric_time_dimension_reference=MTD_REFERENCE,
     ) == {
@@ -122,7 +122,7 @@ def test_granularity_solution_for_day_metric(time_granularity_solver: TimeGranul
 
 def test_granularity_solution_for_month_metric(time_granularity_solver: TimeGranularitySolver) -> None:  # noqa: D
     assert time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
-        metric_references=[MetricReference(element_name="bookings_monthly")],
+        metric_references=[MetricReference(name="bookings_monthly")],
         partial_time_dimension_specs=[PARTIAL_PTD_SPEC],
         metric_time_dimension_reference=MTD_REFERENCE,
     ) == {
@@ -134,7 +134,7 @@ def test_granularity_solution_for_day_and_month_metrics(  # noqa: D
     time_granularity_solver: TimeGranularitySolver,
 ) -> None:
     assert time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
-        metric_references=[MetricReference(element_name="bookings"), MetricReference(element_name="bookings_monthly")],
+        metric_references=[MetricReference(name="bookings"), MetricReference(name="bookings_monthly")],
         partial_time_dimension_specs=[PARTIAL_PTD_SPEC],
         metric_time_dimension_reference=MTD_REFERENCE,
     ) == {PARTIAL_PTD_SPEC: MTD_SPEC_MONTH}
@@ -146,8 +146,8 @@ def test_granularity_error_for_cumulative_metric(  # noqa: D
     with pytest.raises(RequestTimeGranularityException):
         time_granularity_solver.validate_time_granularity(
             metric_references=[
-                MetricReference(element_name="weekly_bookers"),
-                MetricReference(element_name="bookings_monthly"),
+                MetricReference(name="weekly_bookers"),
+                MetricReference(name="bookings_monthly"),
             ],
             time_dimension_specs=[MTD_SPEC_MONTH],
         )
@@ -157,7 +157,7 @@ def test_time_granularity_parameter(  # noqa: D
     time_granularity_solver: TimeGranularitySolver,
 ) -> None:
     assert time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
-        metric_references=[MetricReference(element_name="bookings"), MetricReference(element_name="bookings_monthly")],
+        metric_references=[MetricReference(name="bookings"), MetricReference(name="bookings_monthly")],
         partial_time_dimension_specs=[PARTIAL_PTD_SPEC],
         metric_time_dimension_reference=MTD_REFERENCE,
         time_granularity=TimeGranularity.YEAR,
@@ -170,8 +170,8 @@ def test_invalid_time_granularity_parameter(  # noqa: D
     with pytest.raises(RequestTimeGranularityException, match="Can't use time granularity.*"):
         time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
             metric_references=[
-                MetricReference(element_name="bookings"),
-                MetricReference(element_name="bookings_monthly"),
+                MetricReference(name="bookings"),
+                MetricReference(name="bookings_monthly"),
             ],
             partial_time_dimension_specs=[PARTIAL_PTD_SPEC],
             metric_time_dimension_reference=MTD_REFERENCE,

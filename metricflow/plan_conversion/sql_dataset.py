@@ -42,7 +42,7 @@ class SqlDataSet(DataSet):
         column_associations_to_return = None
         for linkable_instance in self.instance_set.identifier_instances:
             if (
-                identifier_spec.element_name == linkable_instance.spec.element_name
+                identifier_spec.name == linkable_instance.spec.name
                 and identifier_spec.identifier_links == linkable_instance.spec.identifier_links
             ):
                 column_associations_to_return = linkable_instance.associated_columns

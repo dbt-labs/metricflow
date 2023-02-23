@@ -7,7 +7,7 @@
             <!-- node_id = cm_0 -->
             <!-- metric_spec =                    -->
             <!--   {'class': 'MetricSpec',        -->
-            <!--    'element_name': 'txn_count',  -->
+            <!--    'name': 'txn_count',  -->
             <!--    'constraint': None,           -->
             <!--    'alias': None,                -->
             <!--    'offset_window': None,        -->
@@ -22,15 +22,15 @@
                     <!-- node_id = pfe_3 -->
                     <!-- include_spec =                           -->
                     <!--   {'class': 'MeasureSpec',               -->
-                    <!--    'element_name': 'txn_count',          -->
+                    <!--    'name': 'txn_count',          -->
                     <!--    'non_additive_dimension_spec': None}  -->
                     <!-- include_spec =                                             -->
                     <!--   {'class': 'DimensionSpec',                               -->
-                    <!--    'element_name': 'customer_name',                        -->
+                    <!--    'name': 'customer_name',                        -->
                     <!--    'identifier_links': ({'class': 'IdentifierReference',   -->
-                    <!--                          'element_name': 'account_id'},    -->
+                    <!--                          'name': 'account_id'},    -->
                     <!--                         {'class': 'IdentifierReference',   -->
-                    <!--                          'element_name': 'customer_id'})}  -->
+                    <!--                          'name': 'customer_id'})}  -->
                     <JoinToBaseOutputNode>
                         <!-- description = Join Standard Outputs -->
                         <!-- node_id = jso_1 -->
@@ -38,16 +38,16 @@
                         <!--   {'class': 'JoinDescription',                                                                                               -->
                         <!--    'join_node': FilterElementsNode(node_id=pfe_2),                                                                           -->
                         <!--    'join_on_identifier': {'class': 'LinklessIdentifierSpec',                                                                 -->
-                        <!--                           'element_name': 'account_id',                                                                      -->
+                        <!--                           'name': 'account_id',                                                                      -->
                         <!--                           'identifier_links': ()},                                                                           -->
                         <!--    'join_on_partition_dimensions': (),                                                                                       -->
                         <!--    'join_on_partition_time_dimensions': ({'class': 'PartitionTimeDimensionJoinDescription',                                  -->
                         <!--                                           'start_node_time_dimension_spec': {'class': 'TimeDimensionSpec',                   -->
-                        <!--                                                                              'element_name': 'ds_partitioned',               -->
+                        <!--                                                                              'name': 'ds_partitioned',               -->
                         <!--                                                                              'identifier_links': (),                         -->
                         <!--                                                                              'time_granularity': TimeGranularity.DAY},       -->
                         <!--                                           'node_to_join_time_dimension_spec': {'class': 'TimeDimensionSpec',                 -->
-                        <!--                                                                                'element_name': 'ds_partitioned',             -->
+                        <!--                                                                                'name': 'ds_partitioned',             -->
                         <!--                                                                                'identifier_links': (),                       -->
                         <!--                                                                                'time_granularity': TimeGranularity.DAY}},),  -->
                         <!--    'validity_window': None}                                                                                                  -->
@@ -58,16 +58,16 @@
                             <!-- node_id = pfe_1 -->
                             <!-- include_spec =                           -->
                             <!--   {'class': 'MeasureSpec',               -->
-                            <!--    'element_name': 'txn_count',          -->
+                            <!--    'name': 'txn_count',          -->
                             <!--    'non_additive_dimension_spec': None}  -->
                             <!-- include_spec =                               -->
                             <!--   {'class': 'TimeDimensionSpec',             -->
-                            <!--    'element_name': 'ds_partitioned',         -->
+                            <!--    'name': 'ds_partitioned',         -->
                             <!--    'identifier_links': (),                   -->
                             <!--    'time_granularity': TimeGranularity.DAY}  -->
                             <!-- include_spec =                         -->
                             <!--   {'class': 'LinklessIdentifierSpec',  -->
-                            <!--    'element_name': 'account_id',       -->
+                            <!--    'name': 'account_id',       -->
                             <!--    'identifier_links': ()}             -->
                             <MetricTimeDimensionTransformNode>
                                 <!-- description = Metric Time Dimension 'ds' -->
@@ -89,17 +89,17 @@
                             <!-- node_id = pfe_2 -->
                             <!-- include_spec =                                              -->
                             <!--   {'class': 'DimensionSpec',                                -->
-                            <!--    'element_name': 'customer_name',                         -->
+                            <!--    'name': 'customer_name',                         -->
                             <!--    'identifier_links': ({'class': 'IdentifierReference',    -->
-                            <!--                          'element_name': 'customer_id'},)}  -->
+                            <!--                          'name': 'customer_id'},)}  -->
                             <!-- include_spec =                               -->
                             <!--   {'class': 'TimeDimensionSpec',             -->
-                            <!--    'element_name': 'ds_partitioned',         -->
+                            <!--    'name': 'ds_partitioned',         -->
                             <!--    'identifier_links': (),                   -->
                             <!--    'time_granularity': TimeGranularity.DAY}  -->
                             <!-- include_spec =                         -->
                             <!--   {'class': 'LinklessIdentifierSpec',  -->
-                            <!--    'element_name': 'account_id',       -->
+                            <!--    'name': 'account_id',       -->
                             <!--    'identifier_links': ()}             -->
                             <JoinToBaseOutputNode>
                                 <!-- description = Join Standard Outputs -->
@@ -108,16 +108,16 @@
                                 <!--   {'class': 'JoinDescription',                                                                                               -->
                                 <!--    'join_node': FilterElementsNode(node_id=pfe_0),                                                                           -->
                                 <!--    'join_on_identifier': {'class': 'LinklessIdentifierSpec',                                                                 -->
-                                <!--                           'element_name': 'customer_id',                                                                     -->
+                                <!--                           'name': 'customer_id',                                                                     -->
                                 <!--                           'identifier_links': ()},                                                                           -->
                                 <!--    'join_on_partition_dimensions': (),                                                                                       -->
                                 <!--    'join_on_partition_time_dimensions': ({'class': 'PartitionTimeDimensionJoinDescription',                                  -->
                                 <!--                                           'start_node_time_dimension_spec': {'class': 'TimeDimensionSpec',                   -->
-                                <!--                                                                              'element_name': 'ds_partitioned',               -->
+                                <!--                                                                              'name': 'ds_partitioned',               -->
                                 <!--                                                                              'identifier_links': (),                         -->
                                 <!--                                                                              'time_granularity': TimeGranularity.DAY},       -->
                                 <!--                                           'node_to_join_time_dimension_spec': {'class': 'TimeDimensionSpec',                 -->
-                                <!--                                                                                'element_name': 'ds_partitioned',             -->
+                                <!--                                                                                'name': 'ds_partitioned',             -->
                                 <!--                                                                                'identifier_links': (),                       -->
                                 <!--                                                                                'time_granularity': TimeGranularity.DAY}},),  -->
                                 <!--    'validity_window': None}                                                                                                  -->
@@ -149,80 +149,80 @@
                                     <!-- node_id = pfe_0 -->
                                     <!-- include_spec =                       -->
                                     <!--   {'class': 'DimensionSpec',         -->
-                                    <!--    'element_name': 'customer_name',  -->
+                                    <!--    'name': 'customer_name',  -->
                                     <!--    'identifier_links': ()}           -->
                                     <!-- include_spec =                                -->
                                     <!--   {'class': 'DimensionSpec',                  -->
-                                    <!--    'element_name': 'customer_atomic_weight',  -->
+                                    <!--    'name': 'customer_atomic_weight',  -->
                                     <!--    'identifier_links': ()}                    -->
                                     <!-- include_spec =                                              -->
                                     <!--   {'class': 'DimensionSpec',                                -->
-                                    <!--    'element_name': 'customer_name',                         -->
+                                    <!--    'name': 'customer_name',                         -->
                                     <!--    'identifier_links': ({'class': 'IdentifierReference',    -->
-                                    <!--                          'element_name': 'customer_id'},)}  -->
+                                    <!--                          'name': 'customer_id'},)}  -->
                                     <!-- include_spec =                                              -->
                                     <!--   {'class': 'DimensionSpec',                                -->
-                                    <!--    'element_name': 'customer_atomic_weight',                -->
+                                    <!--    'name': 'customer_atomic_weight',                -->
                                     <!--    'identifier_links': ({'class': 'IdentifierReference',    -->
-                                    <!--                          'element_name': 'customer_id'},)}  -->
+                                    <!--                          'name': 'customer_id'},)}  -->
                                     <!-- include_spec =                               -->
                                     <!--   {'class': 'TimeDimensionSpec',             -->
-                                    <!--    'element_name': 'ds_partitioned',         -->
+                                    <!--    'name': 'ds_partitioned',         -->
                                     <!--    'identifier_links': (),                   -->
                                     <!--    'time_granularity': TimeGranularity.DAY}  -->
                                     <!-- include_spec =                                -->
                                     <!--   {'class': 'TimeDimensionSpec',              -->
-                                    <!--    'element_name': 'ds_partitioned',          -->
+                                    <!--    'name': 'ds_partitioned',          -->
                                     <!--    'identifier_links': (),                    -->
                                     <!--    'time_granularity': TimeGranularity.WEEK}  -->
                                     <!-- include_spec =                                 -->
                                     <!--   {'class': 'TimeDimensionSpec',               -->
-                                    <!--    'element_name': 'ds_partitioned',           -->
+                                    <!--    'name': 'ds_partitioned',           -->
                                     <!--    'identifier_links': (),                     -->
                                     <!--    'time_granularity': TimeGranularity.MONTH}  -->
                                     <!-- include_spec =                                   -->
                                     <!--   {'class': 'TimeDimensionSpec',                 -->
-                                    <!--    'element_name': 'ds_partitioned',             -->
+                                    <!--    'name': 'ds_partitioned',             -->
                                     <!--    'identifier_links': (),                       -->
                                     <!--    'time_granularity': TimeGranularity.QUARTER}  -->
                                     <!-- include_spec =                                -->
                                     <!--   {'class': 'TimeDimensionSpec',              -->
-                                    <!--    'element_name': 'ds_partitioned',          -->
+                                    <!--    'name': 'ds_partitioned',          -->
                                     <!--    'identifier_links': (),                    -->
                                     <!--    'time_granularity': TimeGranularity.YEAR}  -->
                                     <!-- include_spec =                                              -->
                                     <!--   {'class': 'TimeDimensionSpec',                            -->
-                                    <!--    'element_name': 'ds_partitioned',                        -->
+                                    <!--    'name': 'ds_partitioned',                        -->
                                     <!--    'identifier_links': ({'class': 'IdentifierReference',    -->
-                                    <!--                          'element_name': 'customer_id'},),  -->
+                                    <!--                          'name': 'customer_id'},),  -->
                                     <!--    'time_granularity': TimeGranularity.DAY}                 -->
                                     <!-- include_spec =                                              -->
                                     <!--   {'class': 'TimeDimensionSpec',                            -->
-                                    <!--    'element_name': 'ds_partitioned',                        -->
+                                    <!--    'name': 'ds_partitioned',                        -->
                                     <!--    'identifier_links': ({'class': 'IdentifierReference',    -->
-                                    <!--                          'element_name': 'customer_id'},),  -->
+                                    <!--                          'name': 'customer_id'},),  -->
                                     <!--    'time_granularity': TimeGranularity.WEEK}                -->
                                     <!-- include_spec =                                              -->
                                     <!--   {'class': 'TimeDimensionSpec',                            -->
-                                    <!--    'element_name': 'ds_partitioned',                        -->
+                                    <!--    'name': 'ds_partitioned',                        -->
                                     <!--    'identifier_links': ({'class': 'IdentifierReference',    -->
-                                    <!--                          'element_name': 'customer_id'},),  -->
+                                    <!--                          'name': 'customer_id'},),  -->
                                     <!--    'time_granularity': TimeGranularity.MONTH}               -->
                                     <!-- include_spec =                                              -->
                                     <!--   {'class': 'TimeDimensionSpec',                            -->
-                                    <!--    'element_name': 'ds_partitioned',                        -->
+                                    <!--    'name': 'ds_partitioned',                        -->
                                     <!--    'identifier_links': ({'class': 'IdentifierReference',    -->
-                                    <!--                          'element_name': 'customer_id'},),  -->
+                                    <!--                          'name': 'customer_id'},),  -->
                                     <!--    'time_granularity': TimeGranularity.QUARTER}             -->
                                     <!-- include_spec =                                              -->
                                     <!--   {'class': 'TimeDimensionSpec',                            -->
-                                    <!--    'element_name': 'ds_partitioned',                        -->
+                                    <!--    'name': 'ds_partitioned',                        -->
                                     <!--    'identifier_links': ({'class': 'IdentifierReference',    -->
-                                    <!--                          'element_name': 'customer_id'},),  -->
+                                    <!--                          'name': 'customer_id'},),  -->
                                     <!--    'time_granularity': TimeGranularity.YEAR}                -->
                                     <!-- include_spec =                     -->
                                     <!--   {'class': 'IdentifierSpec',      -->
-                                    <!--    'element_name': 'customer_id',  -->
+                                    <!--    'name': 'customer_id',  -->
                                     <!--    'identifier_links': ()}         -->
                                     <ReadSqlSourceNode>
                                         <!-- description =                                                                          -->

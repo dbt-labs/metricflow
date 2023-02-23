@@ -33,7 +33,7 @@ class PartialTimeDimensionSpec:
     This is used to represent a time dimension spec from the user before the granularity is figured out.
     """
 
-    element_name: str
+    name: str
     identifier_links: Tuple[IdentifierReference, ...]
 
 
@@ -90,7 +90,7 @@ class TimeGranularitySolver:
         metric_reference_to_measure_references: Dict[MetricModelReference, List[MeasureReference]] = {}
         for metric in model.metrics:
             metric_reference_to_measure_references[MetricModelReference(metric_name=metric.name)] = [
-                MeasureReference(element_name=measure.element_name) for measure in metric.measure_references
+                MeasureReference(name=measure.name) for measure in metric.measure_references
             ]
 
         return metric_reference_to_measure_references
@@ -115,7 +115,7 @@ class TimeGranularitySolver:
 
         for metric_reference in metric_references:
             for measure_reference in self._metric_reference_to_measure_reference[
-                MetricModelReference(metric_name=metric_reference.element_name)
+                MetricModelReference(metric_name=metric_reference.name)
             ]:
                 key = LocalTimeDimensionGranularityKey(
                     measure_reference=measure_reference,
@@ -164,7 +164,7 @@ class TimeGranularitySolver:
                         )
                         if time_dimension_spec.time_granularity != only_queryable_granularity:
                             raise RequestTimeGranularityException(
-                                f"For querying cumulative metric '{metric_reference.element_name}', the granularity of "
+                                f"For querying cumulative metric '{metric_reference.name}', the granularity of "
                                 f"'{time_dimension_spec.qualified_name}' must be {only_queryable_granularity.name}"
                             )
 
@@ -188,12 +188,12 @@ class TimeGranularitySolver:
                 _, min_time_granularity_for_querying = self.local_dimension_granularity_range(
                     metric_references=metric_references,
                     local_time_dimension_reference=TimeDimensionReference(
-                        element_name=partial_time_dimension_spec.element_name
+                        name=partial_time_dimension_spec.name
                     ),
                 )
 
                 if (
-                    partial_time_dimension_spec.element_name == metric_time_dimension_reference.element_name
+                    partial_time_dimension_spec.name == metric_time_dimension_reference.name
                     and time_granularity
                 ):
                     if time_granularity < min_time_granularity_for_querying:
@@ -202,13 +202,13 @@ class TimeGranularitySolver:
                             f"the minimum granularity is {min_time_granularity_for_querying}"
                         )
                     replacement_dict[partial_time_dimension_spec] = TimeDimensionSpec(
-                        element_name=partial_time_dimension_spec.element_name,
+                        name=partial_time_dimension_spec.name,
                         identifier_links=(),
                         time_granularity=time_granularity,
                     )
                 else:
                     replacement_dict[partial_time_dimension_spec] = TimeDimensionSpec(
-                        element_name=partial_time_dimension_spec.element_name,
+                        name=partial_time_dimension_spec.name,
                         identifier_links=(),
                         time_granularity=min_time_granularity_for_querying,
                     )
@@ -216,7 +216,7 @@ class TimeGranularitySolver:
             else:
                 # TODO: For joined time dimensions, also compute the minimum granularity for querying.
                 replacement_dict[partial_time_dimension_spec] = TimeDimensionSpec(
-                    element_name=partial_time_dimension_spec.element_name,
+                    name=partial_time_dimension_spec.name,
                     identifier_links=partial_time_dimension_spec.identifier_links,
                     time_granularity=DEFAULT_TIME_GRANULARITY,
                 )
