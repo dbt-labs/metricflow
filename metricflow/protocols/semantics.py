@@ -10,8 +10,6 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from typing import Dict, FrozenSet, List, Optional, Protocol, Sequence, Set, Tuple
-
-from metricflow.instances import EntityElementReference, EntityReference
 from dbt.contracts.graph.entities import EntityOrigin
 from dbt.contracts.graph.dimensions import Dimension
 from dbt.contracts.graph.identifiers import Identifier
@@ -25,6 +23,8 @@ from dbt.semantic.references import (
     MeasureReference,
     TimeDimensionReference,
     MetricReference,
+    EntityReference,
+    EntityElementReference
 )
 
 from metricflow.specs import (

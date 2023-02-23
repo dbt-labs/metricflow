@@ -76,7 +76,7 @@ class MetricSemantics:  # noqa: D
 
     def add_metric(self, metric: Metric) -> None:
         """Add metric, validating presence of required measures"""
-        metric_reference = MetricReference(element_name=metric.name)
+        metric_reference = MetricReference(name=metric.name)
         if metric_reference in self._metrics:
             raise DuplicateMetricError(f"Metric `{metric.name}` has already been registered")
         for measure_reference in metric.measure_references:

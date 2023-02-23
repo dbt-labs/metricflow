@@ -6,7 +6,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Tuple, Sequence, Dict, List, Optional, FrozenSet
 
-from metricflow.instances import EntityReference
+from dbt.semantic.references import EntityReference
 from dbt.contracts.graph.nodes import Entity
 from dbt.contracts.graph.dimensions import DimensionType, Dimension
 from dbt.contracts.graph.identifiers import IdentifierType

@@ -8,8 +8,8 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.instances import (
     InstanceSet,
     MeasureInstance,
-    EntityElementReference,
 )
+from dbt.semantic.references import EntityElementReference
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.sql_dataset import SqlDataSet

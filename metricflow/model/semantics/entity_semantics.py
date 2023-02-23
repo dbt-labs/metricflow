@@ -5,7 +5,6 @@ from typing import Dict, List, Optional, Set, Sequence
 
 from dbt.semantic.aggregation_properties import AggregationType
 from metricflow.errors.errors import InvalidEntityError
-from metricflow.instances import EntityReference, EntityElementReference
 from dbt.contracts.graph.nodes import Entity
 from dbt.contracts.graph.entities import EntityOrigin
 from dbt.contracts.graph.dimensions import Dimension
@@ -21,6 +20,8 @@ from dbt.semantic.references import (
     DimensionReference,
     LinkableElementReference,
     IdentifierReference,
+    EntityReference,
+    EntityElementReference
 )
 from metricflow.specs import NonAdditiveDimensionSpec, MeasureSpec
 

@@ -2,7 +2,7 @@ from datetime import date
 from typing import List
 
 import pytest
-from metricflow.instances import (
+from dbt.semantic.references import (
     EntityElementReference,
     EntityReference,
     MetricModelReference,

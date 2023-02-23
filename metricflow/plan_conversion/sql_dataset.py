@@ -4,10 +4,10 @@ from metricflow.column_assoc import ColumnAssociation
 from metricflow.dataset.dataset import DataSet
 from metricflow.instances import (
     InstanceSet,
-    EntityReference,
     EntityElementInstance,
-    InstanceSetTransform,
+    InstanceSetTransform, 
 )
+from dbt.semantic.references import EntityReference
 from dbt.semantic.object_utils import flatten_nested_sequence
 from metricflow.specs import DimensionSpec, TimeDimensionSpec, IdentifierSpec
 from metricflow.sql.sql_plan import (

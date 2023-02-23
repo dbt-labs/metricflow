@@ -1,4 +1,5 @@
-from metricflow.instances import EntityReference, InstanceSet
+from dbt.semantic.references import EntityReference
+from metricflow.instances import InstanceSet
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.sql.sql_plan import SqlSelectStatementNode
 

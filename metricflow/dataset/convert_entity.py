@@ -4,17 +4,16 @@ from dataclasses import dataclass
 from typing import Optional, List, Tuple, Sequence
 
 from dbt.semantic.aggregation_properties import AggregationState
+from dbt.semantic.references import EntityReference, EntityElementReference
 from metricflow.dag.id_generation import IdGeneratorRegistry
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.entity_adapter import EntityDataSet
 from metricflow.instances import (
     MeasureInstance,
-    EntityElementReference,
     DimensionInstance,
     TimeDimensionInstance,
     IdentifierInstance,
     InstanceSet,
-    EntityReference,
 )
 from dbt.contracts.graph.nodes import Entity
 from dbt.contracts.graph.dimensions import Dimension, DimensionType
