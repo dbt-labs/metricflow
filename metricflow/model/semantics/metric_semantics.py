@@ -30,7 +30,7 @@ class MetricSemantics:  # noqa: D
         self._metric_hashes: Dict[MetricReference, str] = {}
 
         for metric in self._user_configured_model.metrics:
-            self.add_metric(metric)
+            self.add_metric(metric)    
 
         self._linkable_spec_resolver = ValidLinkableSpecResolver(
             user_configured_model=self._user_configured_model,

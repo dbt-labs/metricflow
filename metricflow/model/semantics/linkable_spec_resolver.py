@@ -411,6 +411,8 @@ class ValidLinkableSpecResolver:
 
         start_time = time.time()
         for metric in self._user_configured_model.metrics:
+            # if metric.name == 'sales_minus_revenue':
+            #     breakpoint()
             linkable_sets_for_measure = []
             for measure in metric.measure_references:
                 linkable_sets_for_measure.append(self._get_linkable_element_set_for_measure(measure))
@@ -578,6 +580,7 @@ class ValidLinkableSpecResolver:
         for metric_reference in metric_references:
             element_sets = self._metric_to_linkable_element_sets.get(metric_reference.name)
             if not element_sets:
+                # breakpoint()
                 raise ValueError(f"Unknown metric: {metric_reference} in element set")
             metric_result = LinkableElementSet.intersection(
                 [x.filter(with_any_of=with_any_of, without_any_of=without_any_of) for x in element_sets]

@@ -22,7 +22,6 @@ from metricflow.cli import PACKAGE_NAME
 from metricflow.cli.constants import DEFAULT_RESULT_DECIMAL_PLACES, MAX_LIST_OBJECT_ELEMENTS
 from metricflow.cli.cli_context import CLIContext
 import metricflow.cli.custom_click_types as click_custom
-from metricflow.cli.tutorial import create_sample_data, gen_sample_model_configs, remove_sample_tables
 from metricflow.cli.utils import (
     exception_handler,
     generate_duckdb_demo_keys,
@@ -37,7 +36,6 @@ from metricflow.cli.utils import (
     MF_DATABRICKS_KEYS,
 )
 from metricflow.configuration.config_builder import YamlTemplateBuilder
-from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest, MetricFlowExplainResult, MetricFlowQueryResult
 from metricflow.model.data_warehouse_model_validator import DataWarehouseModelValidator
@@ -176,92 +174,6 @@ def setup(cfg: CLIContext, restart: bool) -> None:
             """
         )
     )
-
-
-@cli.command()
-@click.option("-m", "--msg", is_flag=True, help="Output the final steps dialogue")
-@click.option("--skip-dw", is_flag=True, help="Skip the data warehouse health checks")
-@click.option("--drop-tables", is_flag=True, help="Drop all the dummy tables created via tutorial")
-@pass_config
-@click.pass_context
-@log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool, drop_tables: bool) -> None:
-    """Run user through a tutorial."""
-
-    # This text is also located in the projects top-level README.md
-    help_msg = textwrap.dedent(
-        """\
-        🤓 Please run the following steps,
-
-            1.  In '{$HOME}/.metricflow/config.yml', `model_path` should be '{$HOME}/.metricflow/sample_models'.
-            2.  Try validating your data model: `mf validate-configs`
-            3.  Check out your metrics: `mf list-metrics`
-            4.  Check out dimensions for your metric `mf list-dimensions --metric-names transactions`
-            5.  Query your first metric: `mf query --metrics transactions --dimensions metric_time --order metric_time`
-            6.  Show the SQL MetricFlow generates:
-                `mf query --metrics transactions --dimensions metric_time --order metric_time --explain`
-            7.  Visualize the plan:
-                `mf query --metrics transactions --dimensions metric_time --order metric_time --explain --display-plans`
-                * This only works if you have graphviz installed - see README.
-            8.  Add another dimension:
-                `mf query --metrics transactions --dimensions metric_time,customer__country --order metric_time`
-            9.  Add a coarser time granularity:
-                `mf query --metrics transactions --dimensions metric_time__week --order metric_time__week`
-            10. Try a more complicated query:
-                `mf query \\
-                  --metrics transactions,transaction_usd_na,transaction_usd_na_l7d --dimensions metric_time,is_large \\
-                  --order metric_time --start-time 2022-03-20 --end-time 2022-04-01`
-                * You can also add `--explain` or `--display-plans`.
-            11. For more ways to interact with the sample models, go to
-                ‘https://docs.transform.co/docs/metricflow/metricflow-tutorial’.
-            12. Once you’re done, run `mf tutorial --skip-dw --drop-tables` to drop the sample tables.
-        """
-    )
-
-    if msg:
-        click.echo(help_msg)
-        exit()
-
-    # Check if the MetricFlow configuration file exists
-    path = pathlib.Path(cfg.config.file_path)
-    if not path.absolute().exists():
-        click.echo("💡 Please run `mf setup` to get your configs set up before going through the tutorial.")
-        exit()
-
-    # Validate that the data warehouse connection is successful
-    if not skip_dw:
-        ctx.invoke(health_checks)
-        click.confirm("❓ Are the health-checks all passing? Please fix them before continuing", abort=True)
-        click.echo("💡 For future reference, you can continue with the tutorial by adding `--skip-dw`\n")
-
-    if drop_tables:
-        spinner = Halo(text="Dropping tables...", spinner="dots")
-        spinner.start()
-        remove_sample_tables(sql_client=cfg.sql_client, system_schema=cfg.mf_system_schema)
-        spinner.succeed("Tables dropped")
-        exit()
-
-    # Seed sample data into data warehouse
-    spinner = Halo(text=f"🤖 Generating sample data into schema {cfg.mf_system_schema}...", spinner="dots")
-    spinner.start()
-    created = create_sample_data(sql_client=cfg.sql_client, system_schema=cfg.mf_system_schema)
-    if not created:
-        spinner.warn("🙊 Skipped creating sample tables since they already exist.")
-    else:
-        spinner.succeed("📀 Sample tables have been successfully created into your data warehouse.")
-
-    # Seed sample model file
-    model_path = os.path.join(cfg.config.dir_path, "sample_models")
-    pathlib.Path(model_path).mkdir(parents=True, exist_ok=True)
-    click.echo(f"🤖 Attempting to generate model configs to your local filesystem in '{str(model_path)}'.")
-    spinner = Halo(text="Dropping tables...", spinner="dots")
-    spinner.start()
-    gen_sample_model_configs(dir_path=str(model_path), system_schema=cfg.mf_system_schema)
-    spinner.succeed(f"📜 Model configs has been generated into '{model_path}'")
-
-    click.echo(help_msg)
-    click.echo("💡 Run `mf tutorial --msg` to see this message again without executing everything else")
-    exit()
 
 
 @cli.command()
@@ -425,13 +337,7 @@ def list_metrics(cfg: CLIContext, show_all_dims: bool = False, search: Optional[
     Automatically truncates long lists of dimensions, pass --show-all-dims to see all.
     """
 
-    spinner = Halo(text="🔍 Looking for all available metrics...", spinner="dots")
-    spinner.start()
-
     metrics = cfg.mf.list_metrics()
-
-    if not metrics:
-        spinner.fail("List of metrics unavailable.")
 
     filter_msg = ""
     if search is not None:
@@ -439,7 +345,6 @@ def list_metrics(cfg: CLIContext, show_all_dims: bool = False, search: Optional[
         metrics = [m for m in metrics if search.lower() in m.name.lower()]
         filter_msg = f" matching `{search}`, of a total of {num_metrics} available"
 
-    spinner.succeed(f"🌱 We've found {len(metrics)} metrics{filter_msg}.")
     click.echo('The list below shows metrics in the format of "metric_name: list of available dimensions"')
     num_dims_to_show = MAX_LIST_OBJECT_ELEMENTS
     for m in metrics:
