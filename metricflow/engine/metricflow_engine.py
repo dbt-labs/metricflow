@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import logging
+import os
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Optional, List, Sequence
@@ -45,6 +46,9 @@ from metricflow.sql_clients.sql_utils import make_sql_client_from_config
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
 from metricflow.time.time_source import TimeSource
+from dbt.task.base import get_nearest_project_dir
+import dbt.exceptions
+
 
 logger = logging.getLogger(__name__)
 _telemetry_reporter = TelemetryReporter(report_levels_higher_or_equal_to=TelemetryLevel.USAGE)
@@ -228,12 +232,11 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     """Main entry point for queries."""
 
     @staticmethod
-    def from_config(handler: YamlFileHandler) -> MetricFlowEngine:
+    def from_config(handler: YamlFileHandler, project_dir: str) -> MetricFlowEngine:
         """Initialize MetricFlowEngine via yaml config file."""
         sql_client = make_sql_client_from_config(handler)
-
         semantic_model = SemanticModel(get_dbt_user_configured_model(
-            directory="REMOVE_THIS_STRING"
+            directory=project_dir
         ))
         system_schema = not_empty(handler.get_value(CONFIG_DWH_SCHEMA), CONFIG_DWH_SCHEMA, handler.url)
         return MetricFlowEngine(

@@ -31,13 +31,14 @@ def get_dbt_project_manifest(
     tracking.disable_tracking()
     return ManifestLoader.get_full_manifest(config=dbt_config)
 
+
 def get_dbt_user_configured_model(
  directory: str, profile: Optional[str] = None, target: Optional[str] = None
 ) -> UserConfiguredModel:
     """Returns the user configured Model from the dbt Manifest"""
     
     manifest = get_dbt_project_manifest(
-        directory="/Users/callummccann/repos/dbt-core/testing-project/postgres",
+        directory=directory,
         profile=profile,
         target=target
     )

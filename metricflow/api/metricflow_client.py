@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import os
 from typing import Dict, List, Optional
 
 from metricflow.configuration.config_handler import ConfigHandler
@@ -16,6 +17,8 @@ from metricflow.engine.models import Dimension, Metric
 from metricflow.engine.utils import convert_to_datetime
 from metricflow.model.parsing.dbt_dir_to_model import get_dbt_user_configured_model
 from dbt.contracts.graph.manifest import UserConfiguredModel
+from dbt.task.base import get_nearest_project_dir
+from dbt import flags
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
@@ -28,8 +31,7 @@ logger = logging.getLogger(__name__)
 class MetricFlowClient:
     """MetricFlow Python client for running basic queries and other standard commands."""
 
-    @staticmethod
-    def from_config(config_file_path: Optional[str] = None) -> MetricFlowClient:
+    def from_config(self,config_file_path: Optional[str] = None) -> MetricFlowClient:
         """Builds a MetricFlowClient via config yaml file.
 
         If config_file_path is not passed, it will use the default config location.
@@ -40,8 +42,9 @@ class MetricFlowClient:
             handler = ConfigHandler()
         logger.debug(f"Constructing a MetricFlowClient with the config in {handler.yaml_file_path}")
         sql_client = make_sql_client_from_config(handler)
+        self.profiles_dir = flags.PROFILES_DIR
         user_configured_model = get_dbt_user_configured_model(
-            directory="DELETE_THIS_STRING"
+            directory= self.profiles_dir
         )
         schema = not_empty(handler.get_value(CONFIG_DWH_SCHEMA), CONFIG_DWH_SCHEMA, handler.url)
 

@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 import logging
+import os
 from logging.handlers import TimedRotatingFileHandler
 from typing import Dict, Optional
 
@@ -14,6 +15,7 @@ from dbt.contracts.graph.manifest import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.sql_clients.sql_utils import make_sql_client_from_config
+import dbt.exceptions
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +30,7 @@ class CLIContext:
         self._user_configured_model: Optional[UserConfiguredModel] = None
         self._semantic_model: Optional[SemanticModel] = None
         self._mf_system_schema: Optional[str] = None
+        self._project_dir: Optional[str] = None
         self.config = ConfigHandler()
         self._configure_logging()
 
@@ -60,6 +63,22 @@ class CLIContext:
         assert self._mf_system_schema
         return self._mf_system_schema
 
+
+    def _initialize_project_dir(self) -> None:
+        try:
+            self._project_dir = os.getcwd()
+        except Exception as e:
+            raise "Error message bad"
+
+    @property
+    def project_dir(self) -> str:
+        #TODO: Add support for cli flags
+        if self._project_dir is None:
+            self._initialize_project_dir()
+        assert self._project_dir is not None
+        return self._project_dir
+
+
     def __initialize_sql_client(self) -> None:
         """Initializes the SqlClient given the credentials."""
         try:
@@ -85,7 +104,10 @@ class CLIContext:
     def _initialize_metricflow_engine(self) -> None:
         """Initialize the MetricFlowEngine."""
         try:
-            self._mf = MetricFlowEngine.from_config(self.config)
+            self._mf = MetricFlowEngine.from_config(
+                handler=self.config, 
+                project_dir=self.project_dir
+            )
         except Exception as e:
             raise MetricFlowInitException from e
 
@@ -111,7 +133,7 @@ class CLIContext:
     def user_configured_model(self) -> UserConfiguredModel:  # noqa: D
         if self._user_configured_model is None:
             self._user_configured_model = get_dbt_user_configured_model(
-                directory="REMOVE_THIS_STRING"    
+                directory=self.project_dir   
             )
 
         assert self._user_configured_model is not None
