@@ -15,7 +15,7 @@ from dbt.contracts.graph.entities import Mutability, MutabilityType
 from dbt.contracts.graph.dimensions import Dimension, DimensionType
 from dbt.contracts.graph.identifiers import Identifier, IdentifierType
 from dbt.contracts.graph.measures import Measure
-from dbt.contracts.graph.manifest import UserConfiguredModel
+from dbt.semantic.user_configured_model import UserConfiguredModel
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from dbt.semantic.sql_bind_parameters import SqlBindParameters
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState

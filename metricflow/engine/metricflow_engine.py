@@ -46,8 +46,6 @@ from metricflow.sql_clients.sql_utils import make_sql_client_from_config
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
 from metricflow.time.time_source import TimeSource
-from dbt.task.base import get_nearest_project_dir
-import dbt.exceptions
 
 
 logger = logging.getLogger(__name__)

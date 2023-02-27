@@ -13,7 +13,7 @@ from metricflow.dataflow.dataflow_plan import BaseOutput
 from metricflow.dataset.entity_adapter import EntityDataSet
 from metricflow.instances import MetricModelReference
 from dbt.contracts.graph.metrics import MetricType
-from dbt.contracts.graph.manifest import UserConfiguredModel
+from dbt.semantic.user_configured_model import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.query.query_exceptions import InvalidQueryException
 from dbt.semantic.references import TimeDimensionReference, MeasureReference, MetricReference, IdentifierReference

@@ -7,7 +7,7 @@ from dbt.contracts.graph.dimensions import Dimension, DimensionType, DimensionTy
 from dbt.contracts.graph.identifiers import Identifier, IdentifierType
 from dbt.contracts.graph.measures import Measure
 from dbt.contracts.graph.metrics import MetricInput, MetricType, MetricTypeParams
-from dbt.contracts.graph.manifest import UserConfiguredModel
+from dbt.semantic.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.metrics import DerivedMetricRule
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from dbt.semantic.references import DimensionReference, IdentifierReference, TimeDimensionReference

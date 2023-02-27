@@ -14,7 +14,7 @@ from metricflow.dataset.convert_entity import EntityToDataSetConverter
 from metricflow.model.model_transformer import ModelTransformer
 from dbt.semantic.validations.model_validator import ModelValidator
 from dbt.contracts.graph.nodes import Entity
-from dbt.contracts.graph.manifest import UserConfiguredModel
+from dbt.semantic.user_configured_model import UserConfiguredModel
 from metricflow.model.parsing.dir_to_model import (
     parse_directory_of_yaml_files_to_model,
     parse_yaml_files_to_validation_ready_model,

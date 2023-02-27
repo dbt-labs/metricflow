@@ -5,7 +5,7 @@ from typing import Callable
 
 from dbt.semantic.validations.model_validator import ModelValidator
 from dbt.contracts.graph.nodes import Entity
-from dbt.contracts.graph.manifest import UserConfiguredModel
+from dbt.semantic.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.common_identifiers import CommonIdentifiersRule
 from metricflow.specs import IdentifierSpec
 from metricflow.test.test_utils import find_entity_with

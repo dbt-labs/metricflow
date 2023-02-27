@@ -10,7 +10,7 @@ from dbt.contracts.graph.entities import EntityOrigin
 from dbt.contracts.graph.dimensions import Dimension
 from dbt.contracts.graph.identifiers import Identifier
 from dbt.contracts.graph.measures import Measure
-from dbt.contracts.graph.manifest import UserConfiguredModel
+from dbt.semantic.user_configured_model import UserConfiguredModel
 from metricflow.model.semantics.entity_container import PydanticEntityContainer
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.spec_converters import MeasureConverter

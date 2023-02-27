@@ -2,7 +2,7 @@ from typing import Set
 
 from metricflow.errors.errors import ModelTransformError
 from dbt.contracts.graph.metrics import MetricType, MetricInputMeasure
-from dbt.contracts.graph.manifest import UserConfiguredModel
+from dbt.semantic.user_configured_model import UserConfiguredModel
 from metricflow.model.transformations.transform_rule import ModelTransformRule
 
 

@@ -3,7 +3,7 @@ import copy
 
 from dbt.semantic.validations.model_validator import ModelValidator
 from metricflow.model.validations.validator_helpers import ModelValidationException
-from dbt.contracts.graph.manifest import UserConfiguredModel
+from dbt.semantic.user_configured_model import UserConfiguredModel
 from dbt.semantic.validations.unique_valid_name import SemanticReservedKeywords, UniqueAndValidNameRule
 from dbt.semantic.object_utils import flatten_nested_sequence
 from metricflow.test.test_utils import find_entity_with

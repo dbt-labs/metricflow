@@ -7,7 +7,7 @@ import pytest
 
 from metricflow.model.objects.common import Metadata
 from dbt.contracts.graph.measures import Measure
-from dbt.contracts.graph.manifest import UserConfiguredModel
+from dbt.semantic.user_configured_model import UserConfiguredModel
 from metricflow.model.parsing.yaml_loader import YamlConfigLoader
 from metricflow.model.semantic_model import SemanticModel
 

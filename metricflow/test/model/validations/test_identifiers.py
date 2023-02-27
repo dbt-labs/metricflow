@@ -14,7 +14,7 @@ from dbt.contracts.graph.dimensions import Dimension, DimensionType, DimensionTy
 from dbt.contracts.graph.identifiers import IdentifierType, Identifier, CompositeSubIdentifier
 from dbt.contracts.graph.measures import Measure
 from dbt.contracts.graph.metrics import MetricType, MetricTypeParams
-from dbt.contracts.graph.manifest import UserConfiguredModel
+from dbt.semantic.user_configured_model import UserConfiguredModel
 from metricflow.model.parsing.dir_to_model import parse_yaml_files_to_validation_ready_model
 from metricflow.model.validations.identifiers import (
     IdentifierConfigRule,

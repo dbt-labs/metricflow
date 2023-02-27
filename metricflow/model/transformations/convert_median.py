@@ -1,7 +1,7 @@
 from dbt.semantic.aggregation_properties import AggregationType
 from metricflow.errors.errors import ModelTransformError
 from dbt.contracts.graph.measures import MeasureAggregationParameters
-from dbt.contracts.graph.manifest import UserConfiguredModel
+from dbt.semantic.user_configured_model import UserConfiguredModel
 from metricflow.model.transformations.transform_rule import ModelTransformRule
 
 MEDIAN_PERCENTILE = 0.5

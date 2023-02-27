@@ -7,7 +7,7 @@ from _pytest.fixtures import FixtureRequest
 from typing import Callable, Tuple, List
 
 from dbt.contracts.graph.nodes import Metric, Entity
-from dbt.contracts.graph.manifest import UserConfiguredModel
+from dbt.semantic.user_configured_model import UserConfiguredModel
 from metricflow.protocols.sql_client import SqlClient
 
 logger = logging.getLogger(__name__)

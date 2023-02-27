@@ -19,7 +19,7 @@ from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExpl
 from dbt.semantic.references import EntityElementReference, EntityReference, MetricModelReference
 from dbt.contracts.graph.dimensions import Dimension, DimensionType
 from dbt.contracts.graph.nodes import Metric, Entity
-from dbt.contracts.graph.manifest import UserConfiguredModel
+from dbt.semantic.user_configured_model import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
 from dbt.semantic.validations.validator_helpers import (
     EntityContext,
@@ -162,7 +162,6 @@ class DataWarehouseTaskBuilder:
                         nodes=filter_elements_node,
                     ),
                     context=EntityContext(
-                        file_context=FileContext.from_metadata(metadata=entity.metadata),
                         entity=EntityReference(entity_name=entity.name),
                     ),
                     error_message=f"Unable to access entity `{entity.name}` in data warehouse",
@@ -235,7 +234,6 @@ class DataWarehouseTaskBuilder:
                             nodes=filter_elements_node,
                         ),
                         context=EntityElementContext(
-                            file_context=FileContext.from_metadata(metadata=entity.metadata),
                             entity_element=EntityElementReference(
                                 entity_name=entity.name, name=spec.name
                             ),
@@ -262,7 +260,6 @@ class DataWarehouseTaskBuilder:
                         nodes=filter_elements_node,
                     ),
                     context=EntityContext(
-                        file_context=FileContext.from_metadata(metadata=entity.metadata),
                         entity=EntityReference(entity_name=entity.name),
                     ),
                     error_message=f"Failed to query dimensions in data warehouse for entity `{entity.name}`",
@@ -311,7 +308,6 @@ class DataWarehouseTaskBuilder:
                             nodes=filter_elements_node,
                         ),
                         context=EntityElementContext(
-                            file_context=FileContext.from_metadata(metadata=entity.metadata),
                             entity_element=EntityElementReference(
                                 entity_name=entity.name, name=spec.name
                             ),
@@ -337,7 +333,6 @@ class DataWarehouseTaskBuilder:
                         nodes=filter_elements_node,
                     ),
                     context=EntityContext(
-                        file_context=FileContext.from_metadata(metadata=entity.metadata),
                         entity=EntityReference(entity_name=entity.name),
                     ),
                     error_message=f"Failed to query identifiers in data warehouse for entity `{entity.name}`",
@@ -402,7 +397,6 @@ class DataWarehouseTaskBuilder:
                             nodes=filter_elements_node,
                         ),
                         context=EntityElementContext(
-                            file_context=FileContext.from_metadata(metadata=entity.metadata),
                             entity_element=EntityElementReference(
                                 entity_name=entity.name, name=spec.name
                             ),
@@ -426,7 +420,6 @@ class DataWarehouseTaskBuilder:
                             nodes=filter_elements_node,
                         ),
                         context=EntityContext(
-                            file_context=FileContext.from_metadata(metadata=entity.metadata),
                             entity=EntityReference(entity_name=entity.name),
                         ),
                         error_message=f"Failed to query measures in data warehouse for entity `{entity.name}`",
@@ -465,7 +458,6 @@ class DataWarehouseTaskBuilder:
                         mf_engine=mf_engine,
                     ),
                     context=MetricContext(
-                        file_context=FileContext.from_metadata(metadata=metric.metadata),
                         metric=MetricModelReference(metric_name=metric.name),
                     ),
                     error_message=f"Unable to query metric `{metric.name}`.",

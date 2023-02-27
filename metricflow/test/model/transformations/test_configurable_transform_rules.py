@@ -1,5 +1,5 @@
 from metricflow.model.model_transformer import ModelTransformer
-from dbt.contracts.graph.manifest import UserConfiguredModel
+from dbt.semantic.user_configured_model import UserConfiguredModel
 from metricflow.model.transformations.transform_rule import ModelTransformRule
 
 

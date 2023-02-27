@@ -5,7 +5,7 @@ from typing import Tuple
 from dbt.semantic.validations.model_validator import ModelValidator
 from dbt.contracts.graph.nodes import Entity
 from dbt.contracts.graph.dimensions import Dimension, DimensionType
-from dbt.contracts.graph.manifest import UserConfiguredModel
+from dbt.semantic.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.element_const import ElementConsistencyRule
 from metricflow.model.validations.validator_helpers import EntityElementType, ModelValidationException
 from metricflow.test.test_utils import find_entity_with

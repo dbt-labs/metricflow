@@ -16,7 +16,7 @@ from metricflow.engine.metricflow_engine import (
 from metricflow.engine.models import Dimension, Metric
 from metricflow.engine.utils import convert_to_datetime
 from metricflow.model.parsing.dbt_dir_to_model import get_dbt_user_configured_model
-from dbt.contracts.graph.manifest import UserConfiguredModel
+from dbt.semantic.user_configured_model import UserConfiguredModel
 from dbt.task.base import get_nearest_project_dir
 from dbt import flags
 from metricflow.model.semantic_model import SemanticModel
