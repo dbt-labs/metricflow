@@ -15,7 +15,6 @@ from dbt.semantic.user_configured_model import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.sql_clients.sql_utils import make_sql_client_from_config
-import dbt.exceptions
 
 logger = logging.getLogger(__name__)
 

@@ -114,7 +114,7 @@ class WhereConstraintConverter:
     ) -> SpecWhereClauseConstraint:
         """Converts a where constraint to one using specs."""
         return SpecWhereClauseConstraint(
-            where_condition=where_constraint.where,
+            where_condition=where_constraint.where_clause,
             linkable_names=tuple(where_constraint.linkable_names),
             linkable_spec_set=WhereConstraintConverter._convert_to_linkable_specs(
                 entity_semantics=entity_semantics,
