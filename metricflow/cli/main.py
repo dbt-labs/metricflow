@@ -295,26 +295,18 @@ def list_metrics(cfg: CLIContext, show_all_dims: bool = False, search: Optional[
 
 @cli.command()
 @click.option(
-    "--metric-names",
+    "--metrics",
     type=click_custom.SequenceParamType(),
-    help="List dimensions by given metrics (intersection). Ex. --metric-names bookings,messages",
+    help="List dimensions by given metrics (intersection). Ex. --metrics bookings,messages",
 )
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-def list_dimensions(cfg: CLIContext, metric_names: List[str]) -> None:
+def list_dimensions(cfg: CLIContext, metrics: List[str]) -> None:
     """List all unique dimensions."""
-    spinner = Halo(
-        text="🔍 Looking for all available dimensions...",
-        spinner="dots",
-    )
-    spinner.start()
 
-    dimensions = cfg.mf.simple_dimensions_for_metrics(metric_names)
-    if not dimensions:
-        spinner.fail("List of dimensions unavailable.")
+    dimensions = cfg.mf.simple_dimensions_for_metrics(metrics)
 
-    spinner.succeed(f"🌱 We've found {len(dimensions)} common dimensions for metrics {metric_names}.")
     for d in dimensions:
         click.echo(f"• {click.style(d.name, bold=True, fg='green')}")
 

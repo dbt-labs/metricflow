@@ -417,11 +417,11 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     def explain(self, mf_request: MetricFlowQueryRequest) -> MetricFlowExplainResult:  # noqa: D
         return self._create_execution_plan(mf_request)
 
-    def simple_dimensions_for_metrics(self, metric_names: List[str]) -> List[Dimension]:  # noqa: D
+    def simple_dimensions_for_metrics(self, metrics: List[str]) -> List[Dimension]:  # noqa: D
         return [
             Dimension(name=dim.qualified_name)
             for dim in self._semantic_model.metric_semantics.element_specs_for_metrics(
-                metric_references=[MetricReference(name=mname) for mname in metric_names],
+                metric_references=[MetricReference(name=mname) for mname in metrics],
                 without_any_property=frozenset(
                     {
                         LinkableElementProperties.IDENTIFIER,
