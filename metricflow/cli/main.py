@@ -110,73 +110,6 @@ def version() -> None:
 
 
 @cli.command()
-@click.option("--restart", is_flag=True, help="Wipe the config file and start over")
-@pass_config
-@log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-def setup(cfg: CLIContext, restart: bool) -> None:
-    """Setup MetricFlow."""
-
-    click.echo(
-        textwrap.dedent(
-            """\
-            🎉 Welcome to MetricFlow! 🎉
-            """
-        )
-    )
-
-    path = pathlib.Path(cfg.config.file_path)
-    abs_path = path.absolute()
-    to_create = not path.exists() or restart
-
-    # Seed the config template to the config file
-    if to_create:
-        dialect_map = {
-            SqlDialect.SNOWFLAKE.value: MF_SNOWFLAKE_KEYS,
-            SqlDialect.BIGQUERY.value: MF_BIGQUERY_KEYS,
-            SqlDialect.REDSHIFT.value: MF_REDSHIFT_KEYS,
-            SqlDialect.POSTGRESQL.value: MF_POSTGRESQL_KEYS,
-            SqlDialect.DUCKDB.value: generate_duckdb_demo_keys(config_dir=cfg.config.dir_path),
-            SqlDialect.DATABRICKS.value: MF_DATABRICKS_KEYS,
-        }
-
-        click.echo("Please enter your data warehouse dialect.")
-        click.echo("Use 'duckdb' for a standalone demo.")
-        click.echo("")
-        dialect = click.prompt(
-            "Dialect",
-            type=click.Choice(sorted([x for x in dialect_map.keys()])),
-            show_choices=True,
-        )
-
-        # If there is a collision, prefer to use the key in the dialect.
-        config_keys = list(dialect_map[dialect])
-        for mf_config_key in MF_CONFIG_KEYS:
-            if not any(x.key == mf_config_key.key for x in config_keys):
-                config_keys.append(mf_config_key)
-
-        with open(abs_path, "w") as file:
-            YamlTemplateBuilder.write_yaml(config_keys, file)
-
-    template_description = (
-        f"A template config file has been created in {abs_path}.\n"
-        if to_create
-        else f"A template config file already exists in {abs_path}, so it was left alone.\n"
-    )
-    click.echo(
-        textwrap.dedent(
-            f"""\
-            💻 {template_description}
-            If you are new to MetricFlow, we recommend you to run through our tutorial with `mf tutorial`\n
-            Next steps:
-              1. Review and fill out relevant fields.
-              2. Run `mf health-checks` to validate the data warehouse connection.
-              3. Run `mf validate-configs` to validate the model configurations.
-            """
-        )
-    )
-
-
-@cli.command()
 @query_options
 @click.option(
     "--as-table",
@@ -384,28 +317,6 @@ def list_dimensions(cfg: CLIContext, metric_names: List[str]) -> None:
     spinner.succeed(f"🌱 We've found {len(dimensions)} common dimensions for metrics {metric_names}.")
     for d in dimensions:
         click.echo(f"• {click.style(d.name, bold=True, fg='green')}")
-
-
-@cli.command()
-@pass_config
-@exception_handler
-@log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-def health_checks(cfg: CLIContext) -> None:
-    """Performs a health check against the DW provided in the configs."""
-    click.echo(f"For specifics on the health-checks, please visit {get_data_warehouse_config_link(cfg.config)}")
-    spinner = Halo(
-        text="🏥 Running health checks against your data warehouse... (This should not take longer than 30s for a successful connection)",
-        spinner="dots",
-    )
-    spinner.start()
-    res = cfg.run_health_checks()
-    spinner.succeed("Health checks completed.")
-    for test in res:
-        test_res = res[test]
-        if test_res["status"] != "SUCCESS":
-            click.echo(f"• ❌ {click.style(test, bold=True, fg=('red'))}:  Failed with - {test_res['error_message']}.")
-        else:
-            click.echo(f"• ✅ {click.style(test, bold=True, fg=('green'))}: Success!")
 
 
 @cli.command()
