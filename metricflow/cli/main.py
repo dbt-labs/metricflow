@@ -177,8 +177,6 @@ def query(
 ) -> None:
     """Create a new query with MetricFlow and assembles a MetricFlowQueryResult."""
     start = time.time()
-    spinner = Halo(text="Initiating query…", spinner="dots")
-    spinner.start()
 
     mf_request = MetricFlowQueryRequest.create_with_random_request_id(
         metric_names=metrics,
@@ -198,8 +196,6 @@ def query(
         explain_result = cfg.mf.explain(mf_request=mf_request)
     else:
         query_result = cfg.mf.query(mf_request=mf_request)
-
-    spinner.succeed(f"Success 🦄 - query completed after {time.time() - start:.2f} seconds")
 
     if explain:
         assert explain_result
@@ -326,11 +322,6 @@ def get_dimension_values(
     end_time: Optional[dt.datetime] = None,
 ) -> None:
     """List all dimension values with the corresponding metric."""
-    spinner = Halo(
-        text=f"🔍 Retrieving dimension values for dimension '{dimension_name}' of metric '{metric_name}'...",
-        spinner="dots",
-    )
-    spinner.start()
 
     dim_vals: Optional[List[str]] = None
 
@@ -342,7 +333,6 @@ def get_dimension_values(
             time_constraint_end=end_time,
         )
     except Exception as e:
-        spinner.fail()
         click.echo(
             textwrap.dedent(
                 f"""\
@@ -354,9 +344,6 @@ def get_dimension_values(
         exit(1)
 
     assert dim_vals
-    spinner.succeed(
-        f"🌱 We've found {len(dim_vals)} dimension values for dimension {dimension_name} of metric {metric_name}."
-    )
     for dim_val in dim_vals:
         click.echo(f"• {click.style(dim_val, bold=True, fg='green')}")
 
