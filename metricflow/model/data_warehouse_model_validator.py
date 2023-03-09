@@ -41,6 +41,7 @@ from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.specs import DimensionSpec, LinkableInstanceSpec, MeasureSpec, InstanceSpecSet
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from pandas import DataFrame
 
 
 @dataclass
@@ -84,6 +85,7 @@ class DataWarehouseValidationTask:
     error_message: str
     context: Optional[ValidationContext] = None
     on_fail_subtasks: List[DataWarehouseValidationTask] = field(default_factory=lambda: [])
+    on_success_result_comparison: Optional[DataFrame] = None
 
 
 LinkableInstanceSpecT = TypeVar("LinkableInstanceSpecT", bound=LinkableInstanceSpec)
@@ -518,7 +520,11 @@ class DataWarehouseModelValidator:
                 break
             try:
                 (query_string, query_params) = task.query_and_params_callable()
-                self._sql_client.dry_run(stmt=query_string, sql_bind_parameters=query_params)
+                if task.on_success_result_comparison is None:
+                    self._sql_client.dry_run(stmt=query_string, sql_bind_parameters=query_params)
+                else:
+                    result = self._sql_client.query(stmt=query_string, sql_bind_parameters=query_params)
+                    assert result == task.on_success_result_comparison
             except Exception as e:
                 issues.append(
                     ValidationError(
