@@ -52,8 +52,8 @@ dbt-redshift = {version="^1.4.0", optional=true}
 dbt-postgres = {version="^1.4.0", optional=true}
 dbt-bigquery = {version="^1.4.0", optional=true}
 dbt-metadata-client = {version="^0.1.0", optional=true}
-cryptography = "^39.0.1"
-pyopenssl = "^23.0.0"
+cryptography = "^39.0.1" # This is a pinned transitive dependencies that was done to patch a vulnerability
+pyopenssl = "^23.0.0" # This is a pinned transitive dependencies that was done to patch a vulnerability
 
 [tool.poetry.dev-dependencies]
 pytest-mock = "^3.7.0"
