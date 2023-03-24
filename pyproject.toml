@@ -52,6 +52,7 @@ dbt-redshift = {version="^1.4.0", optional=true}
 dbt-postgres = {version="^1.4.0", optional=true}
 dbt-bigquery = {version="^1.4.0", optional=true}
 dbt-metadata-client = {version="^0.1.0", optional=true}
+cryptography = "^39.0.1"
 
 [tool.poetry.dev-dependencies]
 pytest-mock = "^3.7.0"
