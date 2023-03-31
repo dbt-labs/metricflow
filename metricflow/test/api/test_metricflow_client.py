@@ -78,25 +78,9 @@ def test_list_dimensions(mf_client: MetricFlowClient) -> None:  # noqa: D
     assert dimensions[0].name == "ds"
 
 
-def test_list_materializations(mf_client: MetricFlowClient) -> None:  # noqa: D
-    materializations = mf_client.list_materializations()
-    assert materializations
-    assert isinstance(materializations[0], Materialization)
-
-
 def test_get_dimension_values(mf_client: MetricFlowClient) -> None:  # noqa: D
     dim_vals = mf_client.get_dimension_values("bookings", "ds", start_time="2020-01-01", end_time="2024-01-01")
     assert dim_vals
-
-
-def test_materializations(mf_client: MetricFlowClient) -> None:  # noqa: D
-    mat_name = "test_materialization"
-    output_table = mf_client.materialize(materialization_name=mat_name, start_time="2020-01-01", end_time="2024-01-01")
-    assert isinstance(output_table, SqlTable)
-    assert output_table.sql == f"{mf_client.system_schema}.{mat_name}"
-
-    dropped = mf_client.drop_materialization(mat_name)
-    assert dropped
 
 
 def test_validate_configs(mf_client: MetricFlowClient) -> None:  # noqa: D
