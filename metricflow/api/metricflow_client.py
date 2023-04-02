@@ -13,7 +13,7 @@ from metricflow.engine.metricflow_engine import (
     MetricFlowQueryRequest,
     MetricFlowQueryResult,
 )
-from metricflow.engine.models import Dimension, Materialization, Metric
+from metricflow.engine.models import Dimension, Metric
 from metricflow.engine.utils import build_user_configured_model_from_config, convert_to_datetime
 from metricflow.model.model_validator import ModelValidator
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
@@ -206,14 +206,6 @@ class MetricFlowClient:
         """
         return self.engine.simple_dimensions_for_metrics(metric_names=metric_names)
 
-    def list_materializations(self) -> List[Materialization]:
-        """Retrieves a list of materialization names.
-
-        Returns:
-            A list of Materialization objects containing metadata.
-        """
-        return self.engine.list_materializations()
-
     def get_dimension_values(
         self, metric_name: str, dimension_name: str, start_time: Optional[str] = None, end_time: Optional[str] = None
     ) -> List[str]:
@@ -236,40 +228,6 @@ class MetricFlowClient:
             time_constraint_start=parsed_start_time,
             time_constraint_end=parsed_end_time,
         )
-
-    def materialize(
-        self, materialization_name: str, start_time: Optional[str] = None, end_time: Optional[str] = None
-    ) -> SqlTable:
-        """Builds a table containing metrics and dimensions from a materialization definition.
-
-        This can be very expensive if a large time range is provided.
-
-        Args:
-            materialization_name: Name of materialization
-            start_time: Materialized for the start of this time range.
-            end_time: Materialized for the end of this time range.
-
-        Returns:
-            SqlTable object of the materialized table.
-        """
-        parsed_start_time = convert_to_datetime(start_time)
-        parsed_end_time = convert_to_datetime(end_time)
-        return self.engine.materialize(
-            materialization_name=materialization_name,
-            time_constraint_start=parsed_start_time,
-            time_constraint_end=parsed_end_time,
-        )
-
-    def drop_materialization(self, materialization_name: str) -> bool:
-        """Drops the table associated with a materialization definition.
-
-        Args:
-            materialization_name: Name of materialization to drop.
-
-        Returns:
-            True if a table has been drop, False if table doesn't exist.
-        """
-        return self.engine.drop_materialization(materialization_name=materialization_name)
 
     def validate_configs(self) -> ModelValidationResults:
         """Validate a model according to configured rules.
