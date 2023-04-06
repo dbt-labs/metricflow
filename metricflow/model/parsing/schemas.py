@@ -6,14 +6,6 @@ TRANSFORM_OBJECT_NAME_PATTERN = "(?!.*__).*^[a-z][a-z0-9_]*[a-z0-9]$"
 
 
 # Enums
-materialization_location_tableau_values = ["TABLEAU", "tableau"]
-materialization_location_values = ["DW", "FAST_CACHE"]
-materialization_location_values += [x.lower() for x in materialization_location_values]
-materialization_location_values += materialization_location_tableau_values
-
-materialization_format_values = ["WIDE"]
-materialization_format_values += [x.lower() for x in materialization_format_values]
-
 metric_types_enum_values = ["MEASURE_PROXY", "RATIO", "EXPR", "CUMULATIVE", "DERIVED"]
 metric_types_enum_values += [x.lower() for x in metric_types_enum_values]
 
@@ -47,37 +39,6 @@ dimension_type_values = ["CATEGORICAL", "TIME"]
 dimension_type_values += [x.lower() for x in dimension_type_values]
 
 time_dimension_type_values = ["TIME", "time"]
-
-tableau_params = {
-    "$id": "materialization_params_tableau",
-    "type": "object",
-    "properties": {
-        "projects": {
-            "type": "array",
-            "projects": {"type": "string"},
-        },
-    },
-}
-
-materialization_destination_schema = {
-    "$id": "materialization_destination_schema",
-    "type": "object",
-    "properties": {
-        "location": {"enum": materialization_location_values},
-        "format": {"enum": materialization_format_values},
-        "rollups": {
-            "type": "array",
-            "items": {
-                "type": "array",
-                "items": {"type": "string"},
-            },
-        },
-        "tableau_params": tableau_params,
-    },
-    "anyOf": [{"not": {"$ref": "#/definitions/is-tableau"}}, {"required": ["tableau_params"]}],
-    "definitions": {"is-tableau": {"properties": {"location": {"enum": materialization_location_tableau_values}}}},
-    "additionalProperties": False,
-}
 
 metric_input_measure_schema = {
     "$id": "metric_input_measure_schema",
@@ -341,40 +302,11 @@ derived_group_by_element_schema = {
     "required": ["name", "expr"],
 }
 
-materialization_schema = {
-    "$id": "materialization_schema",
-    "type": "object",
-    "properties": {
-        "name": {
-            "type": "string",
-            "pattern": TRANSFORM_OBJECT_NAME_PATTERN,
-        },
-        "dimensions": {
-            "type": "array",
-            "items": {"type": "string"},
-            "minItems": 1,
-        },
-        "metrics": {
-            "type": "array",
-            "items": {"type": "string"},
-            "minItems": 1,
-        },
-        "destinations": {
-            "type": "array",
-            "items": {"$ref": "materialization_destination_schema"},
-        },
-        "destination_table": {"type": "string"},
-    },
-    "additionalProperties": False,
-    "required": ["name", "dimensions", "metrics"],
-}
-
 schema_store = {
     # Top level schemas
     metric_schema["$id"]: metric_schema,
     data_source_schema["$id"]: data_source_schema,
     derived_group_by_element_schema["$id"]: derived_group_by_element_schema,
-    materialization_schema["$id"]: materialization_schema,
     # Sub-object schemas
     metric_input_measure_schema["$id"]: metric_input_measure_schema,
     metric_type_params_schema["$id"]: metric_type_params_schema,
@@ -387,7 +319,6 @@ schema_store = {
     mutability_schema["$id"]: mutability_schema,
     mutability_type_params_schema["$id"]: mutability_type_params_schema,
     composite_sub_identifier_schema["$id"]: composite_sub_identifier_schema,
-    materialization_destination_schema["$id"]: materialization_destination_schema,
     non_additive_dimension_schema["$id"]: non_additive_dimension_schema,
     metric_input_schema["$id"]: metric_input_schema,
 }
@@ -396,5 +327,4 @@ schema_store = {
 resolver = RefResolver.from_schema(schema=metric_schema, store=schema_store)
 data_source_validator = SchemaValidator(data_source_schema, resolver=resolver)
 derived_group_by_element_validator = SchemaValidator(derived_group_by_element_schema, resolver=resolver)
-materialization_validator = SchemaValidator(materialization_schema, resolver=resolver)
 metric_validator = SchemaValidator(metric_schema, resolver=resolver)

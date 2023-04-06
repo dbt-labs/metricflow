@@ -19,13 +19,3 @@ class Dimension:
     """Dataclass representation of a Dimension."""
 
     name: str
-
-
-@dataclass(frozen=True)
-class Materialization:
-    """Object to represent a Metric."""
-
-    name: str
-    metrics: List[str]
-    dimensions: List[str]
-    destination_table: Optional[SqlTable]

@@ -7,7 +7,6 @@ from _pytest.fixtures import FixtureRequest
 from typing import Callable, Tuple, List
 
 from metricflow.model.objects.data_source import DataSource
-from metricflow.model.objects.materialization import Materialization
 from metricflow.model.objects.metric import Metric
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.protocols.sql_client import SqlClient
@@ -65,12 +64,3 @@ def find_metric_with(model: UserConfiguredModel, function: Callable[[Metric], bo
             return metric, index
 
     raise Exception("Unable to find a metric matching function criteria")
-
-
-def model_with_materialization(
-    initial_model: UserConfiguredModel, materializations: List[Materialization]
-) -> UserConfiguredModel:
-    """Returns a copy of the model but with the materialization added"""
-    model_copy = copy.deepcopy(initial_model)
-    model_copy.materializations.extend(materializations)
-    return model_copy

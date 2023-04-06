@@ -1,7 +1,6 @@
 from typing import List
 
 from metricflow.model.objects.data_source import DataSource
-from metricflow.model.objects.materialization import Materialization
 from metricflow.model.objects.metric import Metric
 from metricflow.model.objects.base import HashableBaseModel
 
@@ -11,4 +10,3 @@ class UserConfiguredModel(HashableBaseModel):
 
     data_sources: List[DataSource]
     metrics: List[Metric]
-    materializations: List[Materialization] = []

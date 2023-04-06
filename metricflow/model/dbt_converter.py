@@ -34,7 +34,6 @@ from metricflow.model.dbt_mapping_rules.dbt_metric_to_measure import (
     DbtToMeasureAggTimeDimension,
 )
 from metricflow.model.objects.data_source import DataSource
-from metricflow.model.objects.materialization import Materialization
 from metricflow.model.objects.metric import Metric
 from metricflow.model.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.parsing.dir_to_model import ModelBuildResult
@@ -85,7 +84,6 @@ class DbtConverter:
         rules: Collection[DbtMappingRule] = DEFAULT_RULES,
         data_source_class: Type[DataSource] = DataSource,
         metric_class: Type[Metric] = Metric,
-        materialization_class: Type[Materialization] = Materialization,
     ) -> None:
         """Initializer for DbtConverter class
 
@@ -93,12 +91,10 @@ class DbtConverter:
             rules: A collection of DbtMappingRules which get saved as a FrozenSet (immutable and unordered). Defaults to DEFAULT_RULES.
             data_source_class: DataSource class to parse the mapped data sources to. Defaults to MetricFlow DataSource class.
             metric_class: Metric class to parse the mapped metrics to. Defaults to MetricFlow Metric class.
-            materialization_class: Materialization class to parse the mapped materializations to. Defaults to MetricFlow Materialization class.
         """
         self._unordered_rules = frozenset(rules)
         self.data_source_class = data_source_class
         self.metric_class = metric_class
-        self.materialization_class = materialization_class
 
     def _map_dbt_to_metricflow(self, dbt_metrics: Tuple[MetricNode, ...]) -> DbtMappingResults:
         """Using a series of rules transforms dbt metrics into a mapped dict representing UserConfiguredModel objects"""
@@ -138,18 +134,6 @@ class DbtConverter:
                     )
                 )
 
-        materializations: List[Type[Materialization]] = []
-        for materialization_dict in copied_objects.materializations.values():
-            try:
-                materializations.append(self.materialization_class.parse_obj(materialization_dict))
-            except Exception as e:
-                issues.append(
-                    ValidationError(
-                        message=f"Failed to parse dict of materialization {materialization_dict.get('name')} to object",
-                        extra_detail="".join(traceback.format_tb(e.__traceback__)),
-                    )
-                )
-
         metrics: List[Type[Metric]] = []
         for metric_dict in copied_objects.metrics.values():
             try:
@@ -163,7 +147,7 @@ class DbtConverter:
                 )
 
         return ModelBuildResult(
-            model=UserConfiguredModel(data_sources=data_sources, materializations=materializations, metrics=metrics),
+            model=UserConfiguredModel(data_sources=data_sources, metrics=metrics),
             issues=ModelValidationResults.from_issues_sequence(issues=issues),
         )
 

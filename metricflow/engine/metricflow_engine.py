@@ -25,10 +25,10 @@ from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import Sour
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
-from metricflow.engine.models import Dimension, Materialization, Metric
+from metricflow.engine.models import Dimension, Metric
 from metricflow.engine.time_source import ServerTimeSource
 from metricflow.engine.utils import build_user_configured_model_from_config, build_user_configured_model_from_dbt_cloud
-from metricflow.errors.errors import ExecutionException, MaterializationNotFoundError
+from metricflow.errors.errors import ExecutionException
 from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
 from metricflow.execution.execution_plan_to_text import execution_plan_to_text
 from metricflow.execution.executor import SequentialPlanExecutor
