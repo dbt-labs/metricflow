@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "dbt-semantic-interfaces"
+version = "0.1.0"
+description = "Library for standard semantic interface definitions and associated tooling"
+authors = ["dbt Labs <info@dbtlabs.com>"]
+license = "AGPL-3.0-or-later"
+readme = "README.md"
+homepage = "https://www.getdbt.com/"
+repository = "https://github.com/dbt-labs/metricflow/"
+
+metricflow = {path="../", develop=true}
+
+[tool.poetry.dependencies]
+python = ">=3.8, <=3.11"
+typing_extensions = ">=4.0.0"
+
+pydantic = "^1.9.0"
+jsonschema = "3.2.0"
+pandas = "^1.3.0"
+PyYAML = "^6.0"
+mo-sql-parsing = "^9.328.23003"
+more-itertools = "8.10.0"
+yamllint = "^1.26.3"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
