@@ -10,7 +10,7 @@ from metricflow.model.data_warehouse_model_validator import (
     DataWarehouseTaskBuilder,
     DataWarehouseValidationTask,
 )
-from metricflow.model.model_transformer import ModelTransformer
+from dbt_semantic_interfaces.model_transformer import ModelTransformer
 from dbt_semantic_interfaces.objects.data_source import Mutability, MutabilityType
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
 from dbt_semantic_interfaces.objects.elements.identifier import Identifier, IdentifierType
