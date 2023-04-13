@@ -8,13 +8,13 @@ from dbt.contracts.graph.unparsed import MetricFilter as DbtMetricFilter
 from dbt.exceptions import ref_invalid_args
 from dbt.contracts.graph.manifest import Manifest as DbtManifest
 from metricflow.aggregation_properties import AggregationType
-from metricflow.model.objects.constraints.where import WhereClauseConstraint
-from metricflow.model.objects.data_source import DataSource
-from metricflow.model.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
-from metricflow.model.objects.elements.identifier import Identifier
-from metricflow.model.objects.elements.measure import Measure
-from metricflow.model.objects.metric import Metric, MetricInputMeasure, MetricType, MetricTypeParams
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
+from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
+from dbt_semantic_interfaces.objects.elements.identifier import Identifier
+from dbt_semantic_interfaces.objects.elements.measure import Measure
+from dbt_semantic_interfaces.objects.metric import Metric, MetricInputMeasure, MetricType, MetricTypeParams
+from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.parsing.dir_to_model import ModelBuildResult
 from metricflow.model.validations.validator_helpers import ModelValidationResults, ValidationError, ValidationIssue
 from metricflow.time.time_granularity import TimeGranularity

@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Optional
 
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.model.objects.base import FrozenBaseModel
+from dbt_semantic_interfaces.objects.base import FrozenBaseModel
 
 
 class SqlColumn(FrozenBaseModel):

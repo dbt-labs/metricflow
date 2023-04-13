@@ -3,7 +3,7 @@ import pytest
 from metricflow.dataset.dataset import DataSet
 from metricflow.model.model_validator import ModelValidator
 from metricflow.model.validations.materializations import ValidMaterializationRule
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.test.model.validations.helpers import materialization_with_guaranteed_meta
 from metricflow.test.test_utils import model_with_materialization
 

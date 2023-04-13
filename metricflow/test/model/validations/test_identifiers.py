@@ -7,13 +7,13 @@ import pytest
 
 from metricflow.aggregation_properties import AggregationType
 from metricflow.model.model_validator import ModelValidator
-from metricflow.model.objects.common import YamlConfigFile
-from metricflow.model.objects.data_source import DataSource, Mutability, MutabilityType
-from metricflow.model.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
-from metricflow.model.objects.elements.identifier import IdentifierType, Identifier, CompositeSubIdentifier
-from metricflow.model.objects.elements.measure import Measure
-from metricflow.model.objects.metric import MetricType, MetricTypeParams
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.common import YamlConfigFile
+from dbt_semantic_interfaces.objects.data_source import DataSource, Mutability, MutabilityType
+from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
+from dbt_semantic_interfaces.objects.elements.identifier import IdentifierType, Identifier, CompositeSubIdentifier
+from dbt_semantic_interfaces.objects.elements.measure import Measure
+from dbt_semantic_interfaces.objects.metric import MetricType, MetricTypeParams
+from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.parsing.dir_to_model import parse_yaml_files_to_validation_ready_model
 from metricflow.model.validations.identifiers import (
     IdentifierConfigRule,

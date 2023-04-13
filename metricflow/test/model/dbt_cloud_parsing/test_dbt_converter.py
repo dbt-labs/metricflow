@@ -2,7 +2,7 @@ from typing import Tuple
 
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode
 from metricflow.model.dbt_converter import DbtConverter
-from metricflow.model.objects.metric import MetricType
+from dbt_semantic_interfaces.objects.metric import MetricType
 
 
 def test_for_breaking_model_changes(dbt_metrics: Tuple[MetricNode, ...]) -> None:

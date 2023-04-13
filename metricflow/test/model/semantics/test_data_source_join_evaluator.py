@@ -1,7 +1,7 @@
 from typing import Dict, Sequence
 
 from metricflow.instances import DataSourceReference
-from metricflow.model.objects.elements.identifier import IdentifierType
+from dbt_semantic_interfaces.objects.elements.identifier import IdentifierType
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.semantics.data_source_join_evaluator import (
     DataSourceIdentifierJoinType,

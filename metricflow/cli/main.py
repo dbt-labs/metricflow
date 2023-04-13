@@ -49,7 +49,7 @@ from metricflow.inference.solver.weighted_tree import WeightedTypeTreeInferenceS
 from metricflow.inference.runner import InferenceProgressReporter, InferenceRunner
 from metricflow.model.data_warehouse_model_validator import DataWarehouseModelValidator
 from metricflow.model.model_validator import ModelValidator
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.engine.utils import model_build_result_from_config, path_to_models
 from metricflow.model.parsing.config_linter import ConfigLinter

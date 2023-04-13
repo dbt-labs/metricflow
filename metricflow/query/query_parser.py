@@ -12,9 +12,9 @@ from metricflow.dataflow.dataflow_plan import BaseOutput
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
-from metricflow.model.objects.constraints.where import WhereClauseConstraint
-from metricflow.model.objects.elements.dimension import DimensionType
-from metricflow.model.objects.metric import MetricType
+from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
+from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
+from dbt_semantic_interfaces.objects.metric import MetricType
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.spec_converters import WhereConstraintConverter
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName

@@ -15,7 +15,7 @@ from metricflow.configuration.constants import (
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.engine.utils import build_user_configured_model_from_config, build_user_configured_model_from_dbt_config
 from metricflow.errors.errors import SqlClientCreationException, MetricFlowInitException
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.sql_clients.sql_utils import make_sql_client_from_config

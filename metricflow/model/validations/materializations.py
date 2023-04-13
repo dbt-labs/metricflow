@@ -10,8 +10,8 @@ from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.dataset.dataset import DataSet
-from metricflow.model.objects.materialization import Materialization
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.materialization import Materialization
+from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.validations.validator_helpers import (
     FileContext,

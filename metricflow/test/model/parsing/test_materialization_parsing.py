@@ -2,8 +2,8 @@ import textwrap
 
 from metricflow.dataflow.sql_table import SqlTable
 
-from metricflow.model.objects.common import YamlConfigFile
-from metricflow.model.objects.materialization import (
+from dbt_semantic_interfaces.objects.common import YamlConfigFile
+from dbt_semantic_interfaces.objects.materialization import (
     MaterializationFormat,
     MaterializationLocation,
     MaterializationTableauParams,

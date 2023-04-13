@@ -2,7 +2,7 @@ import re
 import textwrap
 
 import pytest
-from metricflow.model.objects.common import YamlConfigFile
+from dbt_semantic_interfaces.objects.common import YamlConfigFile
 from metricflow.model.model_transformer import ModelTransformer
 from metricflow.model.model_validator import ModelValidator
 from metricflow.model.parsing.dir_to_model import parse_yaml_files_to_validation_ready_model

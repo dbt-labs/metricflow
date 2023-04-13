@@ -7,9 +7,9 @@ from typing import List, MutableSet, Tuple, Sequence, DefaultDict
 import more_itertools
 from metricflow.instances import DataSourceElementReference, DataSourceReference
 
-from metricflow.model.objects.data_source import DataSource
-from metricflow.model.objects.elements.identifier import Identifier, IdentifierType, CompositeSubIdentifier
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.elements.identifier import Identifier, IdentifierType, CompositeSubIdentifier
+from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,
     DataSourceElementContext,

@@ -1,6 +1,6 @@
 import logging
 
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.materializations import ValidMaterializationRule
 from metricflow.test.model.validations.helpers import materialization_with_guaranteed_meta
 from metricflow.test.test_utils import (

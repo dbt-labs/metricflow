@@ -12,8 +12,8 @@ from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputData
 from metricflow.dataflow.dataflow_plan import BaseOutput
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.instances import MetricModelReference
-from metricflow.model.objects.metric import MetricType
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.metric import MetricType
+from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.references import TimeDimensionReference, MeasureReference, MetricReference, IdentifierReference

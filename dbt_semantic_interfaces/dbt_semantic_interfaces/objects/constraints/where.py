@@ -5,9 +5,8 @@ import re
 from typing import List, Optional, Dict, Any
 
 from mo_sql_parsing import parse as mo_parse
-
 from metricflow.errors.errors import ConstraintParseException
-from metricflow.model.objects.base import HashableBaseModel, PydanticCustomInputParser, PydanticParseableValueType
+from dbt_semantic_interfaces.objects.base import HashableBaseModel, PydanticCustomInputParser, PydanticParseableValueType
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 
 logger = logging.getLogger(__name__)
