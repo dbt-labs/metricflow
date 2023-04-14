@@ -13,8 +13,8 @@ from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, BaseOutput
 from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
 from metricflow.model.model_transformer import ModelTransformer
 from metricflow.model.model_validator import ModelValidator
-from metricflow.model.objects.data_source import DataSource
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.parsing.dir_to_model import (
     parse_directory_of_yaml_files_to_model,
     parse_yaml_files_to_validation_ready_model,
@@ -25,7 +25,7 @@ from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.test.fixtures.id_fixtures import IdNumberSpace, patch_id_generators_helper
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
-from metricflow.model.objects.common import YamlConfigFile
+from dbt_semantic_interfaces.objects.common import YamlConfigFile
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.query.query_parser import MetricFlowQueryParser
 

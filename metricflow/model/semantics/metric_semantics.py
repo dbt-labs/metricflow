@@ -3,8 +3,8 @@ import logging
 from typing import Dict, List, FrozenSet, Set, Tuple, Sequence
 
 from metricflow.errors.errors import MetricNotFoundError, DuplicateMetricError, NonExistentMeasureError
-from metricflow.model.objects.metric import Metric, MetricType
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.metric import Metric, MetricType
+from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantics.data_source_semantics import DataSourceSemantics
 from metricflow.model.semantics.linkable_spec_resolver import ValidLinkableSpecResolver
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties

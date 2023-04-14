@@ -13,7 +13,7 @@ import datetime
 from hashlib import sha1
 from typing import Sequence, TypeVar, Tuple, NoReturn, Type, Any, List, Union
 
-from metricflow.model.objects.base import HashableBaseModel
+from dbt_semantic_interfaces.objects.base import HashableBaseModel
 
 logger = logging.getLogger(__name__)
 

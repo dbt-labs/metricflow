@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import Optional
 
-from metricflow.model.objects.base import HashableBaseModel, ModelWithMetadataParsing
-from metricflow.model.objects.common import Metadata
+from dbt_semantic_interfaces.objects.base import HashableBaseModel, ModelWithMetadataParsing
+from dbt_semantic_interfaces.objects.common import Metadata
 from metricflow.references import DimensionReference, TimeDimensionReference
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.object_utils import ExtendedEnum

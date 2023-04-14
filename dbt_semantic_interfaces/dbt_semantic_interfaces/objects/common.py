@@ -5,7 +5,7 @@ import re
 from typing import Optional
 
 from metricflow.errors.errors import ParsingException
-from metricflow.model.objects.base import HashableBaseModel
+from dbt_semantic_interfaces.objects.base import HashableBaseModel
 
 
 class Version(HashableBaseModel):  # noqa: D

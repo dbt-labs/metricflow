@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Optional, Tuple, Union
 
-from metricflow.model.objects.base import FrozenBaseModel, PydanticCustomInputParser, PydanticParseableValueType
+from dbt_semantic_interfaces.objects.base import FrozenBaseModel, PydanticCustomInputParser, PydanticParseableValueType
 
 
 class SqlTable(PydanticCustomInputParser, FrozenBaseModel):

@@ -13,7 +13,7 @@ from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
     get_and_assert_calc_method_mapping,
 )
 from metricflow.model.dbt_converter import DbtConverter
-from metricflow.model.objects.metric import MetricType
+from dbt_semantic_interfaces.objects.metric import MetricType
 
 
 def test_dbt_metric_to_measure_rules_skip_derived_metrics(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D

@@ -57,7 +57,7 @@ from metricflow.test.sql.compare_sql_plan import assert_sql_plan_text_equal
 from metricflow.test.test_utils import as_datetime
 from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY
 from metricflow.time.time_granularity import TimeGranularity
-from metricflow.model.objects.metric import MetricTimeWindow
+from dbt_semantic_interfaces.objects.metric import MetricTimeWindow
 
 
 @pytest.fixture(scope="session")

@@ -12,8 +12,8 @@ from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
     DbtMappingRule,
     get_and_assert_calc_method_mapping,
 )
-from metricflow.model.objects.elements.dimension import DimensionType
-from metricflow.model.objects.metric import MetricType
+from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
+from dbt_semantic_interfaces.objects.metric import MetricType
 
 
 def test_dbt_metric_to_dimensions_rules_skip_derived_metrics(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D

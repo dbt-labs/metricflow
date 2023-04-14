@@ -7,10 +7,10 @@ from dataclasses import dataclass
 from typing import Tuple, Sequence, Dict, List, Optional, FrozenSet
 
 from metricflow.instances import DataSourceReference
-from metricflow.model.objects.data_source import DataSource
-from metricflow.model.objects.elements.dimension import DimensionType, Dimension
-from metricflow.model.objects.elements.identifier import IdentifierType
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.elements.dimension import DimensionType, Dimension
+from dbt_semantic_interfaces.objects.elements.identifier import IdentifierType
+from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.data_source_join_evaluator import DataSourceJoinEvaluator
 from metricflow.object_utils import pformat_big_objects, flatten_nested_sequence

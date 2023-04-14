@@ -16,7 +16,7 @@ from metricflow.engine.metricflow_engine import (
 from metricflow.engine.models import Dimension, Materialization, Metric
 from metricflow.engine.utils import build_user_configured_model_from_config, convert_to_datetime
 from metricflow.model.model_validator import ModelValidator
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.validations.validator_helpers import ModelValidationResults
 from metricflow.protocols.async_sql_client import AsyncSqlClient

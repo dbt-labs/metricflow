@@ -5,7 +5,7 @@ import pytest
 
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.errors.errors import UnableToSatisfyQueryError
-from metricflow.model.objects.common import YamlConfigFile
+from dbt_semantic_interfaces.objects.common import YamlConfigFile
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.specs import (
     MetricSpec,

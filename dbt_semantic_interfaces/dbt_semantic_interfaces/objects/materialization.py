@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import List, Optional
 
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.model.objects.common import Metadata
-from metricflow.model.objects.base import ModelWithMetadataParsing, HashableBaseModel
+from dbt_semantic_interfaces.objects.common import Metadata
+from dbt_semantic_interfaces.objects.base import ModelWithMetadataParsing, HashableBaseModel
 from metricflow.object_utils import ExtendedEnum
 
 

@@ -12,11 +12,11 @@ from abc import abstractmethod
 from typing import Dict, FrozenSet, List, Optional, Protocol, Sequence, Set, Tuple
 
 from metricflow.instances import DataSourceElementReference, DataSourceReference
-from metricflow.model.objects.data_source import DataSource, DataSourceOrigin
-from metricflow.model.objects.elements.dimension import Dimension
-from metricflow.model.objects.elements.identifier import Identifier
-from metricflow.model.objects.elements.measure import Measure
-from metricflow.model.objects.metric import Metric
+from dbt_semantic_interfaces.objects.data_source import DataSource, DataSourceOrigin
+from dbt_semantic_interfaces.objects.elements.dimension import Dimension
+from dbt_semantic_interfaces.objects.elements.identifier import Identifier
+from dbt_semantic_interfaces.objects.elements.measure import Measure
+from dbt_semantic_interfaces.objects.metric import Metric
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.references import (

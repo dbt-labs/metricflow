@@ -7,10 +7,10 @@ from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
     MappedObjects,
     assert_metric_model_name,
 )
-from metricflow.model.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
+from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.model.validations.validator_helpers import ModelValidationResults, ValidationIssue, ValidationError
-from metricflow.model.objects.constraints.where import WhereClauseConstraint
+from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
 
 
 DBT_COLUMN_TYPES_TO_DIMENSION_TYPES: Dict[str, DimensionType] = {
