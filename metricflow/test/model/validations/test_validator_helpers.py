@@ -9,7 +9,7 @@ from metricflow.instances import (
     MetricModelReference,
 )
 
-from metricflow.model.validations.validator_helpers import (
+from dbt_semantic_interfaces.validations.validator_helpers import (
     DataSourceContext,
     DataSourceElementContext,
     DataSourceElementType,

@@ -1,15 +1,15 @@
 import pytest
 
 from metricflow.aggregation_properties import AggregationType
-from metricflow.model.model_validator import ModelValidator
+from dbt_semantic_interfaces.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.data_source import Mutability, MutabilityType, DataSource
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.metric import MetricType, MetricTypeParams, Metric
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.validations.data_sources import DataSourceTimeDimensionWarningsRule
-from metricflow.model.validations.dimension_const import DimensionConsistencyRule
-from metricflow.model.validations.validator_helpers import ModelValidationException
+from dbt_semantic_interfaces.validations.data_sources import DataSourceTimeDimensionWarningsRule
+from dbt_semantic_interfaces.validations.dimension_const import DimensionConsistencyRule
+from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationException
 from metricflow.references import DimensionReference, MeasureReference, TimeDimensionReference
 from metricflow.test.model.validations.helpers import data_source_with_guaranteed_meta, metric_with_guaranteed_meta
 from metricflow.time.time_granularity import TimeGranularity

@@ -48,12 +48,12 @@ from metricflow.inference.renderer.config_file import ConfigFileRenderer
 from metricflow.inference.solver.weighted_tree import WeightedTypeTreeInferenceSolver
 from metricflow.inference.runner import InferenceProgressReporter, InferenceRunner
 from metricflow.model.data_warehouse_model_validator import DataWarehouseModelValidator
-from metricflow.model.model_validator import ModelValidator
+from dbt_semantic_interfaces.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.engine.utils import model_build_result_from_config, path_to_models
 from metricflow.model.parsing.config_linter import ConfigLinter
-from metricflow.model.validations.validator_helpers import ModelValidationResults
+from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationResults
 from metricflow.sql_clients.common_client import SqlDialect
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call

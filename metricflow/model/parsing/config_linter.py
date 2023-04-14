@@ -9,7 +9,7 @@ from metricflow.model.parsing.dir_to_model import (
     collect_yaml_config_file_paths,
 )
 
-from metricflow.model.validations.validator_helpers import (
+from dbt_semantic_interfaces.validations.validator_helpers import (
     FileContext,
     ModelValidationResults,
     ValidationError,

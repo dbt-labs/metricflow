@@ -1,10 +1,10 @@
 import pytest
 
-from metricflow.model.model_validator import ModelValidator
+from dbt_semantic_interfaces.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.validations.agg_time_dimension import AggregationTimeDimensionRule
-from metricflow.model.validations.validator_helpers import ModelValidationException
+from dbt_semantic_interfaces.validations.agg_time_dimension import AggregationTimeDimensionRule
+from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationException
 from metricflow.test.model.validations.test_unique_valid_name import copied_model
 from metricflow.test.test_utils import find_data_source_with
 

@@ -5,8 +5,8 @@ from metricflow.errors.errors import ParsingException
 from metricflow.instances import MetricModelReference
 from dbt_semantic_interfaces.objects.metric import Metric, MetricType, MetricTimeWindow
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.validations.unique_valid_name import UniqueAndValidNameRule
-from metricflow.model.validations.validator_helpers import (
+from dbt_semantic_interfaces.validations.unique_valid_name import UniqueAndValidNameRule
+from dbt_semantic_interfaces.validations.validator_helpers import (
     FileContext,
     MetricContext,
     ModelValidationRule,

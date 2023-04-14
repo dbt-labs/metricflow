@@ -9,7 +9,7 @@ from dbt_semantic_interfaces.objects.materialization import (
     MaterializationTableauParams,
 )
 from metricflow.model.parsing.dir_to_model import parse_yaml_files_to_model
-from metricflow.model.validations.validator_helpers import ModelValidationException
+from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationException
 
 
 def test_simple_materialization_parsing() -> None:

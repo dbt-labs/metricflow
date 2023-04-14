@@ -2,12 +2,12 @@ import copy
 import pytest
 from typing import Tuple
 
-from metricflow.model.model_validator import ModelValidator
+from dbt_semantic_interfaces.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.data_source import DataSource
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.validations.element_const import ElementConsistencyRule
-from metricflow.model.validations.validator_helpers import DataSourceElementType, ModelValidationException
+from dbt_semantic_interfaces.validations.element_const import ElementConsistencyRule
+from dbt_semantic_interfaces.validations.validator_helpers import DataSourceElementType, ModelValidationException
 from metricflow.test.test_utils import find_data_source_with
 
 

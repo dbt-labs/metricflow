@@ -4,16 +4,16 @@ import textwrap
 import pytest
 from dbt_semantic_interfaces.objects.common import YamlConfigFile
 from dbt_semantic_interfaces.model_transformer import ModelTransformer
-from metricflow.model.model_validator import ModelValidator
+from dbt_semantic_interfaces.model_validator import ModelValidator
 from metricflow.model.parsing.dir_to_model import parse_yaml_files_to_validation_ready_model
-from metricflow.model.validations.measures import (
+from dbt_semantic_interfaces.validations.measures import (
     CountAggregationExprRule,
     DataSourceMeasuresUniqueRule,
     MeasureConstraintAliasesRule,
     MeasuresNonAdditiveDimensionRule,
     MetricMeasuresRule,
 )
-from metricflow.model.validations.validator_helpers import ModelValidationException
+from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationException
 
 
 def test_metric_missing_measure() -> None:

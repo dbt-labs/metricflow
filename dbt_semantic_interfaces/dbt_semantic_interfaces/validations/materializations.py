@@ -13,7 +13,7 @@ from metricflow.dataset.dataset import DataSet
 from dbt_semantic_interfaces.objects.materialization import Materialization
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
-from metricflow.model.validations.validator_helpers import (
+from dbt_semantic_interfaces.validations.validator_helpers import (
     FileContext,
     MaterializationContext,
     ModelValidationRule,

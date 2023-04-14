@@ -12,7 +12,7 @@ from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, BaseOutput
 from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
 from dbt_semantic_interfaces.model_transformer import ModelTransformer
-from metricflow.model.model_validator import ModelValidator
+from dbt_semantic_interfaces.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.data_source import DataSource
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.parsing.dir_to_model import (

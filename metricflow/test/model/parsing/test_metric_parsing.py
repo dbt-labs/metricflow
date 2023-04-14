@@ -4,7 +4,7 @@ from dbt_semantic_interfaces.objects.common import YamlConfigFile
 from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
 from dbt_semantic_interfaces.objects.metric import MetricTimeWindow, MetricInput, MetricInputMeasure, MetricType
 from metricflow.model.parsing.dir_to_model import parse_yaml_files_to_model
-from metricflow.model.validations.validator_helpers import ModelValidationException
+from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationException
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.time.time_granularity import TimeGranularity
 

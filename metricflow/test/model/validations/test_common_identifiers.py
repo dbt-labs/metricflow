@@ -3,10 +3,10 @@ import pytest
 import re
 from typing import Callable
 
-from metricflow.model.model_validator import ModelValidator
+from dbt_semantic_interfaces.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.data_source import DataSource
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.validations.common_identifiers import CommonIdentifiersRule
+from dbt_semantic_interfaces.validations.common_identifiers import CommonIdentifiersRule
 from metricflow.specs import IdentifierSpec
 from metricflow.test.test_utils import find_data_source_with
 

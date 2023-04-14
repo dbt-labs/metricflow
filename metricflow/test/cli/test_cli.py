@@ -14,9 +14,9 @@ from metricflow.cli.main import (
     validate_configs,
     version,
 )
-from metricflow.model.model_validator import ModelValidator
+from dbt_semantic_interfaces.model_validator import ModelValidator
 from metricflow.model.parsing.config_linter import ConfigLinter
-from metricflow.model.validations.validator_helpers import (
+from dbt_semantic_interfaces.validations.validator_helpers import (
     ModelValidationResults,
     ValidationError,
     ValidationFutureError,

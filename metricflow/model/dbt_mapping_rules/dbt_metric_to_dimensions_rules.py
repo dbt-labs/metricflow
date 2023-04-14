@@ -9,7 +9,11 @@ from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
 )
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from metricflow.time.time_granularity import TimeGranularity
-from metricflow.model.validations.validator_helpers import ModelValidationResults, ValidationIssue, ValidationError
+from dbt_semantic_interfaces.validations.validator_helpers import (
+    ModelValidationResults,
+    ValidationIssue,
+    ValidationError,
+)
 from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
 
 
