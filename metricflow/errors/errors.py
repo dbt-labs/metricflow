@@ -1,7 +1,7 @@
 import textwrap
 from typing import Dict, Optional
 
-from metricflow.model.parsing.yaml_loader import ParsingContext
+from dbt_semantic_interfaces.parsing.yaml_loader import ParsingContext
 
 
 class CustomerFacingSemanticException(Exception):

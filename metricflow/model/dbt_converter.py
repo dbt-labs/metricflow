@@ -36,7 +36,7 @@ from metricflow.model.dbt_mapping_rules.dbt_metric_to_measure import (
 from dbt_semantic_interfaces.objects.data_source import DataSource
 from dbt_semantic_interfaces.objects.metric import Metric
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.parsing.dir_to_model import ModelBuildResult
+from dbt_semantic_interfaces.parsing.dir_to_model import ModelBuildResult
 from metricflow.model.validations.validator_helpers import ModelValidationResults, ValidationError, ValidationIssue
 
 logger = logging.getLogger(__name__)

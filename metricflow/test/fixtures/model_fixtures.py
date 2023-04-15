@@ -15,7 +15,7 @@ from dbt_semantic_interfaces.model_transformer import ModelTransformer
 from metricflow.model.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.data_source import DataSource
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.parsing.dir_to_model import (
+from dbt_semantic_interfaces.parsing.dir_to_model import (
     parse_directory_of_yaml_files_to_model,
     parse_yaml_files_to_validation_ready_model,
 )

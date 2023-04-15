@@ -13,12 +13,12 @@ from dbt_semantic_interfaces.model_transformer import ModelTransformer
 from dbt_semantic_interfaces.objects.common import Version, YamlConfigFile
 from dbt_semantic_interfaces.objects.data_source import DataSource
 from dbt_semantic_interfaces.objects.metric import Metric
-from metricflow.model.parsing.schemas_internal import (
+from dbt_semantic_interfaces.parsing.schemas import (
     metric_validator,
     data_source_validator,
 )
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.parsing.yaml_loader import (
+from dbt_semantic_interfaces.parsing.yaml_loader import (
     ParsingContext,
     YamlConfigLoader,
     PARSING_CONTEXT_KEY,

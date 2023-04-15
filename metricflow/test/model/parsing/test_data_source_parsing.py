@@ -5,7 +5,7 @@ from dbt_semantic_interfaces.objects.common import YamlConfigFile
 from dbt_semantic_interfaces.objects.data_source import DataSourceOrigin, MutabilityType
 from dbt_semantic_interfaces.objects.elements.identifier import IdentifierType
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
-from metricflow.model.parsing.dir_to_model import parse_yaml_files_to_model
+from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_model
 from metricflow.time.time_granularity import TimeGranularity
 
 

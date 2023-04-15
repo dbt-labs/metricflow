@@ -8,7 +8,7 @@ from typing import Any, Callable, ClassVar, Generic, Iterator, TypeVar
 from pydantic import BaseModel, root_validator
 
 from metricflow.errors.errors import ParsingException
-from metricflow.model.parsing.yaml_loader import ParsingContext, PARSING_CONTEXT_KEY
+from dbt_semantic_interfaces.parsing.yaml_loader import ParsingContext, PARSING_CONTEXT_KEY
 
 # Type alias for the implicit "Any" type used as input and output for Pydantic's parsing API
 PydanticParseableValueType = Any  # type: ignore[misc]

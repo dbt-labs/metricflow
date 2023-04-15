@@ -1,6 +1,6 @@
 from jsonschema import RefResolver
 
-from metricflow.model.parsing.schema_validator import SchemaValidator
+from dbt_semantic_interfaces.parsing.schema_validator import SchemaValidator
 
 TRANSFORM_OBJECT_NAME_PATTERN = "(?!.*__).*^[a-z][a-z0-9_]*[a-z0-9]$"
 

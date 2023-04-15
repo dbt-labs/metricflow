@@ -12,7 +12,7 @@ from metricflow.cli.main import (
     version,
 )
 from metricflow.model.model_validator import ModelValidator
-from metricflow.model.parsing.config_linter import ConfigLinter
+from dbt_semantic_interfaces.parsing.config_linter import ConfigLinter
 from metricflow.model.validations.validator_helpers import (
     ModelValidationResults,
     ValidationError,
