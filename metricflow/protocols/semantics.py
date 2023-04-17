@@ -8,15 +8,15 @@ than the interface specifications.
 
 from __future__ import annotations
 
-from abc import abstractmethod
-from typing import Dict, FrozenSet, List, Optional, Protocol, Sequence, Set, Tuple
+from abc import abstractmethod, ABC
+from typing import Dict, FrozenSet, List, Optional, Sequence, Set, Tuple
 
-from metricflow.instances import DataSourceElementReference, DataSourceReference
 from dbt_semantic_interfaces.objects.data_source import DataSource, DataSourceOrigin
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension
 from dbt_semantic_interfaces.objects.elements.identifier import Identifier
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.metric import Metric
+from metricflow.instances import DataSourceElementReference, DataSourceReference
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.references import (
@@ -26,7 +26,6 @@ from metricflow.references import (
     TimeDimensionReference,
     MetricReference,
 )
-
 from metricflow.specs import (
     LinkableInstanceSpec,
     MeasureSpec,
@@ -36,8 +35,8 @@ from metricflow.specs import (
 )
 
 
-class DataSourceSemanticsAccessor(Protocol):
-    """Protocol defining core interface for accessing semantic information about a set of data source objects
+class DataSourceSemanticsAccessor(ABC):
+    """Interface for accessing semantic information about a set of data source objects
 
     This is primarily useful for restricting caller access to the subset of container methods and imports we want
     them to use. For example, the DataSourceSemantics class might implement this protocol but also include some
@@ -130,8 +129,8 @@ class DataSourceSemanticsAccessor(Protocol):
         raise NotImplementedError
 
 
-class MetricSemanticsAccessor(Protocol):
-    """Protocol defining core interface for accessing semantic information about a set of metric objects
+class MetricSemanticsAccessor(ABC):
+    """Interface for accessing semantic information about a set of metric objects
 
     This is primarily useful for restricting caller access to the subset of container methods and imports we want
     them to use. For example, the MetricSemantics class might implement this protocol but also include some
