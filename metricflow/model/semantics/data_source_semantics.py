@@ -3,15 +3,14 @@ from collections import defaultdict
 from copy import deepcopy
 from typing import Dict, List, Optional, Set, Sequence
 
-from metricflow.aggregation_properties import AggregationType
-from metricflow.errors.errors import InvalidDataSourceError
-from metricflow.instances import DataSourceReference, DataSourceElementReference
 from dbt_semantic_interfaces.objects.data_source import DataSource, DataSourceOrigin
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension
 from dbt_semantic_interfaces.objects.elements.identifier import Identifier
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.semantics.data_source_container import PydanticDataSourceContainer
+from metricflow.aggregation_properties import AggregationType
+from metricflow.errors.errors import InvalidDataSourceError
+from metricflow.instances import DataSourceReference, DataSourceElementReference
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.spec_converters import MeasureConverter
 from metricflow.protocols.semantics import DataSourceSemanticsAccessor
@@ -37,7 +36,6 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
     def __init__(  # noqa: D
         self,
         model: UserConfiguredModel,
-        configured_data_source_container: PydanticDataSourceContainer,
     ) -> None:
         self._model = model
         self._measure_index: Dict[MeasureReference, List[DataSource]] = defaultdict(list)
@@ -52,20 +50,13 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
         self._identifier_ref_to_entity: Dict[IdentifierReference, Optional[str]] = {}
         self._data_source_names: Set[str] = set()
 
-        self._configured_data_source_container = configured_data_source_container
         self._data_source_to_aggregation_time_dimensions: Dict[
             DataSourceReference, ElementGrouper[TimeDimensionReference, MeasureSpec]
         ] = {}
 
-        # Add semantic tracking for data sources from configured_data_source_container
-        for data_source in self._configured_data_source_container.values():
-            assert isinstance(data_source, DataSource)
-            self.add_configured_data_source(data_source)
-
-    def add_configured_data_source(self, data_source: DataSource) -> None:
-        """Dont use this unless you mean it (ie in tests). The configured data sources are supposed to be static"""
-        self._configured_data_source_container._put(data_source)
-        self._add_data_source(data_source)
+        self._data_source_reference_to_data_source: Dict[DataSourceReference, DataSource] = {}
+        for data_source in self._model.data_sources:
+            self._add_data_source(data_source)
 
     def get_dimension_references(self) -> List[DimensionReference]:  # noqa: D
         return list(self._dimension_index.keys())
@@ -142,12 +133,7 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
         return None
 
     def get(self, data_source_name: str) -> Optional[DataSource]:  # noqa: D
-        if data_source_name in self._configured_data_source_container:
-            data_source = self._configured_data_source_container.get(data_source_name)
-            assert isinstance(data_source, DataSource)
-            return data_source
-
-        return None
+        return self._data_source_reference_to_data_source.get(DataSourceReference(data_source_name))
 
     def get_by_reference(self, data_source_reference: DataSourceReference) -> Optional[DataSource]:  # noqa: D
         return self.get(data_source_reference.data_source_name)
@@ -212,6 +198,8 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
             self._identifier_ref_to_entity[ident.reference] = ident.entity
             self._entity_index[ident.entity].append(data_source)
             self._linkable_reference_index[ident.reference].append(data_source)
+
+        self._data_source_reference_to_data_source[data_source.reference] = data_source
 
     @property
     def data_source_references(self) -> Sequence[DataSourceReference]:  # noqa: D

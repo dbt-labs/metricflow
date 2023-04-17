@@ -3,9 +3,8 @@ import logging
 import pytest
 
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.semantics.data_source_container import PydanticDataSourceContainer
-from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.data_source_semantics import DataSourceSemantics
+from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.metric_semantics import MetricSemantics
 from metricflow.references import IdentifierReference, MeasureReference
 from metricflow.references import MetricReference
@@ -17,7 +16,6 @@ logger = logging.getLogger(__name__)
 def new_data_source_semantics(simple_user_configured_model: UserConfiguredModel) -> DataSourceSemantics:  # Noqa: D
     return DataSourceSemantics(
         model=simple_user_configured_model,
-        configured_data_source_container=PydanticDataSourceContainer(simple_user_configured_model.data_sources),
     )
 
 
