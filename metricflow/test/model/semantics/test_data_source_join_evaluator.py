@@ -1,7 +1,7 @@
 from typing import Dict, Sequence
 
-from metricflow.instances import DataSourceReference
 from dbt_semantic_interfaces.objects.elements.identifier import IdentifierType
+from metricflow.instances import DataSourceReference
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.semantics.data_source_join_evaluator import (
     DataSourceIdentifierJoinType,
@@ -57,9 +57,13 @@ def __get_simple_model_user_data_source_references_by_type(
     semantic_model: SemanticModel,
 ) -> Dict[IdentifierType, DataSourceReference]:
     """Helper to get a set of data sources with the `user` identifier organized by identifier type"""
-    foreign_user_data_source = semantic_model.data_source_semantics.get("listings_latest")
-    primary_user_data_source = semantic_model.data_source_semantics.get("users_latest")
-    unique_user_data_source = semantic_model.data_source_semantics.get("companies")
+    foreign_user_data_source = semantic_model.data_source_semantics.get_by_reference(
+        DataSourceReference("listings_latest")
+    )
+    primary_user_data_source = semantic_model.data_source_semantics.get_by_reference(
+        DataSourceReference("users_latest")
+    )
+    unique_user_data_source = semantic_model.data_source_semantics.get_by_reference(DataSourceReference("companies"))
 
     assert foreign_user_data_source, "Could not find `listings_latest` data source in simple model!"
     assert primary_user_data_source, "Could not find `users_latest` data source in simple model!"
@@ -165,9 +169,13 @@ def test_foreign_target_data_source_join_validation(simple_semantic_model: Seman
 
 def test_data_source_join_validation_on_missing_identifier(simple_semantic_model: SemanticModel) -> None:
     """Tests data source join validation where the identifier is missing from one or both data sources"""
-    primary_listing_data_source = simple_semantic_model.data_source_semantics.get("listings_latest")
+    primary_listing_data_source = simple_semantic_model.data_source_semantics.get_by_reference(
+        DataSourceReference("listings_latest")
+    )
     assert primary_listing_data_source, "Could not find data source `listings_latest` in the simple model!"
-    no_listing_data_source = simple_semantic_model.data_source_semantics.get("id_verifications")
+    no_listing_data_source = simple_semantic_model.data_source_semantics.get_by_reference(
+        DataSourceReference("id_verifications")
+    )
     assert no_listing_data_source, "Could not find data source `id_verifications` in the simple model!"
     listing_identifier_reference = IdentifierReference(element_name="listing")
     join_evaluator = DataSourceJoinEvaluator(data_source_semantics=simple_semantic_model.data_source_semantics)
@@ -361,10 +369,18 @@ def test_natural_identifier_data_source_validation(scd_semantic_model: SemanticM
 
     These tests rely on the scd_semantic_model, which makes extensive use of NATURAL key types.
     """
-    natural_user_data_source = scd_semantic_model.data_source_semantics.get("primary_accounts")
-    primary_user_data_source = scd_semantic_model.data_source_semantics.get("users_latest")
-    foreign_user_data_source = scd_semantic_model.data_source_semantics.get("bookings_source")
-    unique_user_data_source = scd_semantic_model.data_source_semantics.get("companies")
+    natural_user_data_source = scd_semantic_model.data_source_semantics.get_by_reference(
+        DataSourceReference("primary_accounts")
+    )
+    primary_user_data_source = scd_semantic_model.data_source_semantics.get_by_reference(
+        DataSourceReference("users_latest")
+    )
+    foreign_user_data_source = scd_semantic_model.data_source_semantics.get_by_reference(
+        DataSourceReference("bookings_source")
+    )
+    unique_user_data_source = scd_semantic_model.data_source_semantics.get_by_reference(
+        DataSourceReference("companies")
+    )
     user_identifier_reference = IdentifierReference(element_name="user")
     join_evaluator = DataSourceJoinEvaluator(data_source_semantics=scd_semantic_model.data_source_semantics)
     # Type refinement

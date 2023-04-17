@@ -122,7 +122,7 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
         return self._measure_agg_time_dimension[measure_reference]
 
     def get_identifier_in_data_source(self, ref: DataSourceElementReference) -> Optional[Identifier]:  # Noqa: d
-        data_source = self.get(ref.data_source_name)
+        data_source = self.get_by_reference(ref.data_source_reference)
         if not data_source:
             return None
 
@@ -132,11 +132,8 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
 
         return None
 
-    def get(self, data_source_name: str) -> Optional[DataSource]:  # noqa: D
-        return self._data_source_reference_to_data_source.get(DataSourceReference(data_source_name))
-
     def get_by_reference(self, data_source_reference: DataSourceReference) -> Optional[DataSource]:  # noqa: D
-        return self.get(data_source_reference.data_source_name)
+        return self._data_source_reference_to_data_source.get(data_source_reference)
 
     def _add_data_source(
         self,

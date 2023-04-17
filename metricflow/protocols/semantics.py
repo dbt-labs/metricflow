@@ -101,11 +101,6 @@ class DataSourceSemanticsAccessor(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get(self, data_source_name: str) -> Optional[DataSource]:
-        """Retrieve the data source model object matching the given name, if any"""
-        raise NotImplementedError
-
-    @abstractmethod
     def get_by_reference(self, data_source_reference: DataSourceReference) -> Optional[DataSource]:
         """Retrieve the data source model object matching the input data source reference, if any"""
         raise NotImplementedError
