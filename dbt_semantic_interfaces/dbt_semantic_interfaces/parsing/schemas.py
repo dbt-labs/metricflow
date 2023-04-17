@@ -192,6 +192,7 @@ measure_schema = {
         "non_additive_dimension": {
             "$ref": "non_additive_dimension_schema",
         },
+        "description": {"type": "string"},
     },
     "additionalProperties": False,
     "required": ["name", "agg"],
@@ -259,6 +260,7 @@ metric_schema = {
         "type_params": {"$ref": "metric_type_params"},
         "constraint": {"type": "string"},
         "where_constraint": {"type": "string"},
+        "description": {"type": "string"},
     },
     "additionalProperties": False,
     "required": ["name", "type", "type_params"],
@@ -279,6 +281,7 @@ data_source_schema = {
         "measures": {"type": "array", "items": {"$ref": "measure_schema"}},
         "dimensions": {"type": "array", "items": {"$ref": "dimension_schema"}},
         "mutability": {"$ref": "mutability_schema"},
+        "description": {"type": "string"},
     },
     "additionalProperties": False,
     "required": ["name"],
