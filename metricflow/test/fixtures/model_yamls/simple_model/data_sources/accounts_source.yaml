@@ -2,8 +2,6 @@
 data_source:
   name: accounts_source
   description: accounts_source
-  owners:
-    - support@transformdata.io
 
   sql_query: |
     -- User Defined SQL Query

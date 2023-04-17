@@ -2,8 +2,6 @@
 data_source:
   name: companies
   description: If a user is a company / business, this defines the mapping.
-  owners:
-    - support@transformdata.io
 
   sql_table: $dim_companies_table
 

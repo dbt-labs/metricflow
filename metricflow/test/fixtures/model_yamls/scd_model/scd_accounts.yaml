@@ -2,8 +2,6 @@
 data_source:
   name: primary_accounts
   description: SCD Type II table of primary account history
-  owners:
-    - support@transformdata.io
 
   sql_table: $primary_accounts_table
 

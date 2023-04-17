@@ -2,8 +2,6 @@
 data_source:
   name: messages_source
   description: messages_source
-  owners:
-    - support@transformdata.io
 
   sql_table: $fct_messages_table
 

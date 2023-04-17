@@ -2,8 +2,6 @@
 data_source:
   name: users_ds_source
   description: users_ds_source
-  owners:
-    - support@transformdata.io
 
   sql_table: $dim_users_table
 

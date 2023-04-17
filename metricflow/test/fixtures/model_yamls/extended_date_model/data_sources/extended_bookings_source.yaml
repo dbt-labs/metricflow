@@ -2,8 +2,6 @@
 data_source:
   name: extended_bookings_source
   description: extended_bookings_source
-  owners:
-    - support@transformdata.io
 
   sql_table: $fct_bookings_extended_table
 

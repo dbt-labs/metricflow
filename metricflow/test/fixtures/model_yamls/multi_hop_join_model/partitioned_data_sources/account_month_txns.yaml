@@ -2,8 +2,6 @@
 data_source:
   name: account_month_txns
   description: account_month_txns
-  owners:
-    - support@transformdata.io
 
   sql_table: $account_month_txns
 
