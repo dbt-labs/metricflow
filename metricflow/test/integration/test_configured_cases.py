@@ -26,7 +26,7 @@ from metricflow.sql.sql_exprs import (
     SqlCastToTimestampExpression,
     SqlStringExpression,
 )
-from metricflow.time.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.time.time_granularity import TimeGranularity
 from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.integration.configured_test_case import (

@@ -3,7 +3,7 @@ from pandas import DataFrame
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.time.time_constants import ISO8601_PYTHON_FORMAT, ISO8601_PYTHON_TS_FORMAT
+from dbt_semantic_interfaces.time.time_constants import ISO8601_PYTHON_FORMAT, ISO8601_PYTHON_TS_FORMAT
 
 
 def test_date_spine_date_range(sql_client: SqlClient, time_spine_source: TimeSpineSource) -> None:  # noqa: D

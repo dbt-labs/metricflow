@@ -15,7 +15,7 @@ from metricflow.model.validations.validator_helpers import (
 )
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.references import DimensionReference
-from metricflow.time.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.time.time_granularity import TimeGranularity
 
 
 class DimensionConsistencyRule(ModelValidationRule):

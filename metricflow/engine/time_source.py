@@ -1,6 +1,6 @@
 import datetime as dt
 
-from metricflow.time.time_source import TimeSource
+from dbt_semantic_interfaces.time.time_source import TimeSource
 
 
 class ServerTimeSource(TimeSource):

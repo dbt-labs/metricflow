@@ -16,7 +16,7 @@ from metricflow.model.validations.validator_helpers import (
     ValidationError,
     validate_safely,
 )
-from metricflow.time.time_constants import SUPPORTED_GRANULARITIES
+from dbt_semantic_interfaces.time.time_constants import SUPPORTED_GRANULARITIES
 
 logger = logging.getLogger(__name__)
 

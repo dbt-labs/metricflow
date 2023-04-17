@@ -6,7 +6,7 @@ from metricflow.model.semantic_model import SemanticModel
 from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
 from metricflow.specs import TimeDimensionSpec
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
-from metricflow.time.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.time.time_granularity import TimeGranularity
 
 
 def test_no_validity_dims(

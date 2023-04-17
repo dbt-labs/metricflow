@@ -17,8 +17,8 @@ from metricflow.specs import (
 )
 from metricflow.test.test_utils import as_datetime
 from metricflow.test.time.metric_time_dimension import MTD
-from metricflow.time.time_granularity import TimeGranularity
-from metricflow.time.time_granularity_solver import RequestTimeGranularityException
+from dbt_semantic_interfaces.time.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.time.time_granularity_solver import RequestTimeGranularityException
 from metricflow.test.fixtures.model_fixtures import query_parser_from_yaml
 
 logger = logging.getLogger(__name__)

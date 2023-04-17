@@ -7,7 +7,7 @@ from metricflow.instances import InstanceSet, TimeDimensionInstance
 from metricflow.model.validations.unique_valid_name import MetricFlowReservedKeywords
 from metricflow.references import TimeDimensionReference
 from metricflow.specs import TimeDimensionSpec
-from metricflow.time.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.time.time_granularity import TimeGranularity
 
 
 logger = logging.getLogger(__name__)

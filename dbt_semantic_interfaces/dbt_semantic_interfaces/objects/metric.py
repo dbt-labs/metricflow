@@ -13,8 +13,8 @@ from dbt_semantic_interfaces.objects.base import (
 )
 from metricflow.object_utils import ExtendedEnum, hash_items
 from metricflow.references import MeasureReference
-from metricflow.time.time_granularity import TimeGranularity
-from metricflow.time.time_granularity import string_to_time_granularity
+from dbt_semantic_interfaces.time.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.time.time_granularity import string_to_time_granularity
 
 
 class MetricType(ExtendedEnum):

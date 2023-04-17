@@ -26,7 +26,7 @@ from metricflow.specs import (
     LinkableInstanceSpec,
     IdentifierReference,
 )
-from metricflow.time.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.time.time_granularity import TimeGranularity
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 
 logger = logging.getLogger(__name__)

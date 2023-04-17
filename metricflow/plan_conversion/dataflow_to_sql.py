@@ -101,7 +101,7 @@ from metricflow.sql.sql_plan import (
     SqlQueryPlanNode,
     SqlTableFromClauseNode,
 )
-from metricflow.time.time_constants import ISO8601_PYTHON_FORMAT
+from dbt_semantic_interfaces.time.time_constants import ISO8601_PYTHON_FORMAT
 
 logger = logging.getLogger(__name__)
 
