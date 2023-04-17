@@ -135,39 +135,23 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
     def get_by_reference(self, data_source_reference: DataSourceReference) -> Optional[DataSource]:  # noqa: D
         return self._data_source_reference_to_data_source.get(data_source_reference)
 
-    def _add_data_source(
-        self,
-        data_source: DataSource,
-        fail_on_error: bool = True,
-        logging_context: str = "",
-    ) -> None:
+    def _add_data_source(self, data_source: DataSource) -> None:
         """Add data source semantic information, validating consistency with existing data sources."""
         errors = []
 
-        if data_source.name in self._data_source_names:
-            errors.append(f"name {data_source.name} already registered - please ensure data source names are unique")
+        if data_source.reference in self._data_source_reference_to_data_source:
+            errors.append(f"Data source {data_source.reference} already added.")
 
         for measure in data_source.measures:
             if measure.reference in self._measure_aggs and self._measure_aggs[measure.reference] != measure.agg:
                 errors.append(
-                    f"conflicting aggregation (agg) for measure `{measure.reference.element_name}` registered as "
-                    f"`{self._measure_aggs[measure.reference]}`; Got `{measure.agg}"
+                    f"Conflicting aggregation (agg) for measure {measure.reference}. Currently registered as "
+                    f"{self._measure_aggs[measure.reference]} but got {measure.agg}."
                 )
 
-        if errors:
-            error_prefix = "\n  - "
-            error_msg = (
-                f"Unable to add data source `{data_source.name}` "
-                f"{'while ' + logging_context + ' ' if logging_context else ''}"
-                f"{'... skipping' if not fail_on_error else ''}.\n"
-                f"Errors: {error_prefix + error_prefix.join(errors)}"
-            )
-            if fail_on_error:
-                raise InvalidDataSourceError(error_msg)
-            logger.warning(error_msg)
-            return
+        if len(errors) > 0:
+            raise InvalidDataSourceError(f"Error adding {data_source.reference}. Got errors: {errors}")
 
-        self._data_source_names.add(data_source.name)
         self._data_source_to_aggregation_time_dimensions[data_source.reference] = ElementGrouper[
             TimeDimensionReference, MeasureSpec
         ]()
