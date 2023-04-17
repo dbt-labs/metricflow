@@ -14,6 +14,7 @@ from dbt_semantic_interfaces.objects.user_configured_model import UserConfigured
 from metricflow.model.semantics.data_source_container import PydanticDataSourceContainer
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.spec_converters import MeasureConverter
+from metricflow.protocols.semantics import DataSourceSemanticsAccessor
 from metricflow.references import (
     MeasureReference,
     TimeDimensionReference,
@@ -26,7 +27,7 @@ from metricflow.specs import NonAdditiveDimensionSpec, MeasureSpec
 logger = logging.getLogger(__name__)
 
 
-class DataSourceSemantics:
+class DataSourceSemantics(DataSourceSemanticsAccessor):
     """Tracks semantic information for data source held in a set of DataSourceContainers
 
     This implements both the DataSourceSemanticsAccessors protocol, the interface type we use throughout the codebase.
