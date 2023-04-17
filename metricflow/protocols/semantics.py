@@ -164,12 +164,6 @@ class MetricSemanticsAccessor(Protocol):
     def get_metric(self, metric_reference: MetricReference) -> Metric:  # noqa:D
         raise NotImplementedError
 
-    @property
-    @abstractmethod
-    def valid_hashes(self) -> Set[str]:
-        """Return all of the hashes of the metric definitions."""
-        raise NotImplementedError
-
     @abstractmethod
     def measures_for_metric(self, metric_reference: MetricReference) -> Tuple[MetricInputMeasureSpec, ...]:
         """Return the measure specs required to compute the metric."""

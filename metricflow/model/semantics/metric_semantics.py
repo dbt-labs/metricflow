@@ -1,18 +1,16 @@
 import logging
+from typing import Dict, List, FrozenSet, Tuple, Sequence
 
-from typing import Dict, List, FrozenSet, Set, Tuple, Sequence
-
-from metricflow.errors.errors import MetricNotFoundError, DuplicateMetricError, NonExistentMeasureError
 from dbt_semantic_interfaces.objects.metric import Metric, MetricType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from metricflow.errors.errors import MetricNotFoundError, DuplicateMetricError, NonExistentMeasureError
+from metricflow.model.semantics.data_source_join_evaluator import MAX_JOIN_HOPS
 from metricflow.model.semantics.data_source_semantics import DataSourceSemantics
-from metricflow.model.semantics.linkable_spec_resolver import ValidLinkableSpecResolver
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
+from metricflow.model.semantics.linkable_spec_resolver import ValidLinkableSpecResolver
 from metricflow.model.spec_converters import WhereConstraintConverter
 from metricflow.references import MetricReference
 from metricflow.specs import MetricSpec, LinkableInstanceSpec, MetricInputMeasureSpec, MeasureSpec
-from metricflow.model.semantics.data_source_join_evaluator import MAX_JOIN_HOPS
-
 
 logger = logging.getLogger(__name__)
 
@@ -24,9 +22,6 @@ class MetricSemantics:  # noqa: D
         self._user_configured_model = user_configured_model
         self._metrics: Dict[MetricReference, Metric] = {}
         self._data_source_semantics = data_source_semantics
-
-        # Dict from the name of the metric to the hash.
-        self._metric_hashes: Dict[MetricReference, str] = {}
 
         for metric in self._user_configured_model.metrics:
             self.add_metric(metric)
@@ -84,12 +79,6 @@ class MetricSemantics:  # noqa: D
                     f"Metric `{metric.name}` references measure `{measure_reference}` which has not been registered"
                 )
         self._metrics[metric_reference] = metric
-        self._metric_hashes[metric_reference] = metric.definition_hash
-
-    @property
-    def valid_hashes(self) -> Set[str]:
-        """Return all of the hashes of the metric definitions."""
-        return set(self._metric_hashes.values())
 
     def measures_for_metric(self, metric_reference: MetricReference) -> Tuple[MetricInputMeasureSpec, ...]:
         """Return the measure specs required to compute the metric."""
