@@ -181,13 +181,6 @@ metric:
   name: "revenue_mtd"
   description: "revenue mtd"
   type: cumulative
-  locked_metadata:
-    value_format: "$$,.2f" # we need to double dollars here since string template reserves dollar sign.
-    tags:
-      - "Finance"
-      - "Monthly"
-    private: true
-    unit: "dollars"
   type_params:
     measures:
       - txn_revenue
@@ -198,10 +191,6 @@ metric:
   description: Listings where the lux listing ID is not from a test.
   type: measure_proxy
   constraint: lux_or_normal_listing != 'LUX_TEST_ID'
-  locked_metadata:
-    value_format: ""
-    tags:
-      - "Listings"
   type_params:
     measures:
       - listings
@@ -229,11 +218,6 @@ metric:
   name: views_times_booking_value
   description: Booking_value multiplied by views - expr metric test
   type: expr
-  locked_metadata:
-    value_format: ",d"
-    tags:
-      - "Bookings"
-      - "Views"
   type_params:
     expr: "booking_value * views"
     measures:
@@ -247,11 +231,6 @@ metric:
   type_params:
     numerator: bookings
     denominator: bookers
-  locked_metadata:
-    value_format: ",.2f"
-    tags:
-      - "Bookings"
-      - "Bookers"
 ---
 metric:
   name: bookings_per_view
@@ -260,21 +239,11 @@ metric:
   type_params:
     numerator: bookings
     denominator: views
-  locked_metadata:
-    value_format: ",.2f"
-    tags:
-      - "Bookings"
-      - "Views"
 ---
 metric:
   name: bookings_per_listing
   description: Bookings divided by listings - ratio with primary identifier test
   type: ratio
-  locked_metadata:
-    value_format: ".2%"
-    tags:
-      - "Bookings"
-      - "Listings"
   type_params:
     numerator: bookings
     denominator: listings
@@ -283,11 +252,6 @@ metric:
   name: bookings_per_dollar
   description: Number of bookings per dollar of value
   type: ratio
-  locked_metadata:
-    value_format: ".2%"
-    tags:
-      - "Bookings"
-      - "Finance"
   type_params:
     numerator: bookings
     denominator: booking_value
@@ -314,10 +278,6 @@ metric:
     Average instant booking value as a ratio of overall max booking value.
     Tests constrained ratio measure.
   type: ratio
-  locked_metadata:
-    value_format: ".2%"
-    tags:
-      - "Bookings"
   type_params:
     numerator:
       name: average_booking_value
@@ -331,11 +291,6 @@ metric:
     Average lux booking value as a ratio of overall max booking value.
     Tests constrained ratio measure with external dimension join.
   type: ratio
-  locked_metadata:
-    value_format: ".2%"
-    tags:
-      - "Bookings"
-      - "Lux"
   type_params:
     numerator:
       name: average_booking_value
@@ -349,11 +304,6 @@ metric:
     Lux booking value defined as an expr with lux booking value, lux bookings, and total value as inputs.
     Tests constrained measure expr metric with external dimension join.
   type: expr
-  locked_metadata:
-    value_format: ".2%"
-    tags:
-      - "Bookings"
-      - "Lux"
   type_params:
     expr: "average_booking_value * bookings / NULLIF(booking_value, 0)"
     measures:
@@ -369,10 +319,6 @@ metric:
     Instant booking value defined as a ratio metric of instant booking value / booking value
     Tests constrained measure ratio metric with re-use of the same base measure
   type: ratio
-  locked_metadata:
-    value_format: ".2%"
-    tags:
-      - "Bookings"
   type_params:
     numerator:
       name: booking_value
@@ -387,10 +333,6 @@ metric:
     First day account balance ratio of western vs eastern region starting balance ratios,
     used to test interaction between semi-additive measures and measure constraints
   type: ratio
-  locked_metadata:
-    value_format: ".2%"
-    tags:
-      - "Finance"
   type_params:
     numerator:
       name: total_account_balance_first_day
