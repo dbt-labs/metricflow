@@ -254,7 +254,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
 
     def build_plan_for_distinct_values(
         self,
-        metric_specs: Tuple[MetricSpec, ...],
+        metric_specs: Sequence[MetricSpec],
         dimension_spec: Optional[DimensionSpec] = None,
         time_dimension_spec: Optional[TimeDimensionSpec] = None,
         identifier_spec: Optional[IdentifierSpec] = None,
@@ -274,7 +274,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         assert linkable_spec
 
         query_spec = MetricFlowQuerySpec(
-            metric_specs=metric_specs,
+            metric_specs=tuple(metric_specs),
             dimension_specs=(dimension_spec,) if dimension_spec else (),
             time_dimension_specs=(time_dimension_spec,) if time_dimension_spec else (),
             identifier_specs=(identifier_spec,) if identifier_spec else (),
@@ -600,7 +600,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
 
     def build_aggregated_measures(
         self,
-        metric_input_measure_specs: Tuple[MetricInputMeasureSpec, ...],
+        metric_input_measure_specs: Sequence[MetricInputMeasureSpec],
         queried_linkable_specs: LinkableSpecSet,
         where_constraint: Optional[SpecWhereClauseConstraint] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
@@ -685,7 +685,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
 
     def _build_aggregated_measures_from_measure_source_node(
         self,
-        metric_input_measure_specs: Tuple[MetricInputMeasureSpec, ...],
+        metric_input_measure_specs: Sequence[MetricInputMeasureSpec],
         queried_linkable_specs: LinkableSpecSet,
         where_constraint: Optional[SpecWhereClauseConstraint] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
@@ -895,5 +895,5 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             )
         return AggregateMeasuresNode[SqlDataSetT](
             parent_node=pre_aggregate_node,
-            metric_input_measure_specs=metric_input_measure_specs,
+            metric_input_measure_specs=tuple(metric_input_measure_specs),
         )
