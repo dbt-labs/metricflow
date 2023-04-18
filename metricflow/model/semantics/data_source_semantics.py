@@ -58,8 +58,8 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
         for data_source in self._model.data_sources:
             self._add_data_source(data_source)
 
-    def get_dimension_references(self) -> List[DimensionReference]:  # noqa: D
-        return list(self._dimension_index.keys())
+    def get_dimension_references(self) -> Sequence[DimensionReference]:  # noqa: D
+        return tuple(self._dimension_index.keys())
 
     def get_dimension(
         self, dimension_reference: DimensionReference, origin: Optional[DataSourceOrigin] = None
@@ -94,7 +94,7 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
         assert False, f"{time_dimension_reference} should have been in the dimension index"
 
     @property
-    def measure_references(self) -> List[MeasureReference]:  # noqa: D
+    def measure_references(self) -> Sequence[MeasureReference]:  # noqa: D
         return list(self._measure_index.keys())
 
     @property
@@ -109,11 +109,11 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
         # Measures should be consistent across data sources, so just use the first one.
         return list(self._measure_index[measure_reference])[0].get_measure(measure_reference)
 
-    def get_identifier_references(self) -> List[IdentifierReference]:  # noqa: D
+    def get_identifier_references(self) -> Sequence[IdentifierReference]:  # noqa: D
         return list(self._identifier_ref_to_entity.keys())
 
     # DSC interface
-    def get_data_sources_for_measure(self, measure_reference: MeasureReference) -> List[DataSource]:  # noqa: D
+    def get_data_sources_for_measure(self, measure_reference: MeasureReference) -> Sequence[DataSource]:  # noqa: D
         return self._measure_index[measure_reference]
 
     def get_agg_time_dimension_for_measure(  # noqa: D
