@@ -179,7 +179,6 @@ class UniqueAndValidNameRule(ModelValidationRule):
                     )
                 )
 
-
         name_to_type: Dict[str, str] = {}
 
         issues: List[ValidationIssueType] = []
