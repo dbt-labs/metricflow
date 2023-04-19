@@ -17,10 +17,10 @@ from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.dataset.dataset import DataSet
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
 from metricflow.instances import DataSourceElementReference, DataSourceReference, MetricModelReference
-from metricflow.model.objects.data_source import DataSource
-from metricflow.model.objects.elements.dimension import Dimension, DimensionType
-from metricflow.model.objects.metric import Metric
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
+from dbt_semantic_interfaces.objects.metric import Metric
+from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,

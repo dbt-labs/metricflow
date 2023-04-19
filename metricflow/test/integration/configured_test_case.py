@@ -8,7 +8,7 @@ from typing import Sequence, Tuple, Optional
 
 import yaml
 
-from metricflow.model.objects.base import FrozenBaseModel
+from dbt_semantic_interfaces.objects.base import FrozenBaseModel
 
 logger = logging.getLogger(__name__)
 

@@ -5,7 +5,7 @@ from typing import Any, Tuple, DefaultDict, Dict
 from typing_extensions import TypeAlias
 
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode, ModelNode
-from metricflow.model.objects.metric import MetricType
+from dbt_semantic_interfaces.objects.metric import MetricType
 from metricflow.model.validations.validator_helpers import ModelValidationResults
 
 

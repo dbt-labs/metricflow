@@ -3,12 +3,12 @@ from typing import List, Optional, Sequence
 
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.engine.models import Dimension
-from metricflow.model.objects.common import FileSlice, Metadata, YamlConfigFile
-from metricflow.model.objects.constraints.where import WhereClauseConstraint
-from metricflow.model.objects.data_source import DataSource, DataSourceOrigin, Mutability
-from metricflow.model.objects.elements.identifier import Identifier
-from metricflow.model.objects.elements.measure import Measure
-from metricflow.model.objects.metric import Metric, MetricType, MetricTypeParams
+from dbt_semantic_interfaces.objects.common import FileSlice, Metadata, YamlConfigFile
+from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
+from dbt_semantic_interfaces.objects.data_source import DataSource, DataSourceOrigin, Mutability
+from dbt_semantic_interfaces.objects.elements.identifier import Identifier
+from dbt_semantic_interfaces.objects.elements.measure import Measure
+from dbt_semantic_interfaces.objects.metric import Metric, MetricType, MetricTypeParams
 
 
 def base_model_file() -> YamlConfigFile:

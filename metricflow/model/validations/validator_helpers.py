@@ -15,10 +15,10 @@ from metricflow.instances import (
     DataSourceReference,
     MetricModelReference,
 )
-from metricflow.model.objects.base import FrozenBaseModel
-from metricflow.model.objects.common import Metadata
-from metricflow.model.objects.elements.dimension import DimensionType
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.base import FrozenBaseModel
+from dbt_semantic_interfaces.objects.common import Metadata
+from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
+from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.object_utils import assert_values_exhausted
 
 VALIDATE_SAFELY_ERROR_STR_TMPLT = ". Issue occurred in method `{method_name}` called with {arguments_str}"

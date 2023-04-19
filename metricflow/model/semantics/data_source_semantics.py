@@ -6,11 +6,11 @@ from typing import Dict, List, Optional, Set, Sequence
 from metricflow.aggregation_properties import AggregationType
 from metricflow.errors.errors import InvalidDataSourceError
 from metricflow.instances import DataSourceReference, DataSourceElementReference
-from metricflow.model.objects.data_source import DataSource, DataSourceOrigin
-from metricflow.model.objects.elements.dimension import Dimension
-from metricflow.model.objects.elements.identifier import Identifier
-from metricflow.model.objects.elements.measure import Measure
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.data_source import DataSource, DataSourceOrigin
+from dbt_semantic_interfaces.objects.elements.dimension import Dimension
+from dbt_semantic_interfaces.objects.elements.identifier import Identifier
+from dbt_semantic_interfaces.objects.elements.measure import Measure
+from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantics.data_source_container import PydanticDataSourceContainer
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.spec_converters import MeasureConverter

@@ -1,8 +1,8 @@
 import pytest
 
 from metricflow.model.model_validator import ModelValidator
-from metricflow.model.objects.elements.dimension import DimensionType
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
+from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.agg_time_dimension import AggregationTimeDimensionRule
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.test.model.validations.test_unique_valid_name import copied_model

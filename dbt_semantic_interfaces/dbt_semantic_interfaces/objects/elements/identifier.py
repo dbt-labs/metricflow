@@ -3,8 +3,8 @@ from __future__ import annotations
 from pydantic import validator
 from typing import Any, Optional, List
 
-from metricflow.model.objects.base import HashableBaseModel, ModelWithMetadataParsing
-from metricflow.model.objects.common import Metadata
+from dbt_semantic_interfaces.objects.base import HashableBaseModel, ModelWithMetadataParsing
+from dbt_semantic_interfaces.objects.common import Metadata
 from metricflow.object_utils import ExtendedEnum
 from metricflow.references import IdentifierReference, CompositeSubIdentifierReference
 

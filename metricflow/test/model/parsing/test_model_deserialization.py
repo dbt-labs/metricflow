@@ -1,4 +1,4 @@
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 
 
 def test_model_serialization_deserialization(simple_user_configured_model: UserConfiguredModel) -> None:

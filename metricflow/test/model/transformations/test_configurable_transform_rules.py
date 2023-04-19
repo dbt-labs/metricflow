@@ -1,6 +1,6 @@
-from metricflow.model.model_transformer import ModelTransformer
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.transformations.transform_rule import ModelTransformRule
+from dbt_semantic_interfaces.model_transformer import ModelTransformer
+from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.transformations.transform_rule import ModelTransformRule
 
 
 class SliceNamesRule(ModelTransformRule):

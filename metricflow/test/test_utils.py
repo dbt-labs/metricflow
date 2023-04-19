@@ -6,9 +6,9 @@ import dateutil.parser
 from _pytest.fixtures import FixtureRequest
 from typing import Callable, Tuple, List
 
-from metricflow.model.objects.data_source import DataSource
-from metricflow.model.objects.metric import Metric
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.metric import Metric
+from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.protocols.sql_client import SqlClient
 
 logger = logging.getLogger(__name__)

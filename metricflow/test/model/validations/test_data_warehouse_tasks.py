@@ -10,12 +10,12 @@ from metricflow.model.data_warehouse_model_validator import (
     DataWarehouseTaskBuilder,
     DataWarehouseValidationTask,
 )
-from metricflow.model.model_transformer import ModelTransformer
-from metricflow.model.objects.data_source import Mutability, MutabilityType
-from metricflow.model.objects.elements.dimension import Dimension, DimensionType
-from metricflow.model.objects.elements.identifier import Identifier, IdentifierType
-from metricflow.model.objects.elements.measure import Measure
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.model_transformer import ModelTransformer
+from dbt_semantic_interfaces.objects.data_source import Mutability, MutabilityType
+from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
+from dbt_semantic_interfaces.objects.elements.identifier import Identifier, IdentifierType
+from dbt_semantic_interfaces.objects.elements.measure import Measure
+from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState

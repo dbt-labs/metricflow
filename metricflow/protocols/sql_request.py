@@ -11,7 +11,7 @@ from typing import Optional, Sequence, Dict, Any
 import pandas as pd
 from pydantic import Field
 
-from metricflow.model.objects.base import FrozenBaseModel
+from dbt_semantic_interfaces.objects.base import FrozenBaseModel
 from metricflow.object_utils import assert_exactly_one_arg_set
 
 

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Generic, List, TypeVar, Dict
 
-from metricflow.model.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.data_source import DataSource
 
 T = TypeVar("T")
 

@@ -2,7 +2,7 @@ from collections import defaultdict
 from typing import List, DefaultDict
 from metricflow.instances import DataSourceReference
 
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,
     DataSourceElementType,

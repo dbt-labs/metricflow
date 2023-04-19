@@ -1,8 +1,8 @@
 from typing import List
 
-from metricflow.model.objects.data_source import DataSource
-from metricflow.model.objects.metric import Metric
-from metricflow.model.objects.base import HashableBaseModel
+from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.metric import Metric
+from dbt_semantic_interfaces.objects.base import HashableBaseModel
 
 
 class UserConfiguredModel(HashableBaseModel):

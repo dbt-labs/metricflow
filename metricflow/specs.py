@@ -29,7 +29,7 @@ from metricflow.references import (
 )
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.time.time_granularity import TimeGranularity
-from metricflow.model.objects.metric import MetricTimeWindow
+from dbt_semantic_interfaces.objects.metric import MetricTimeWindow
 
 
 class ColumnAssociationResolver(ABC):

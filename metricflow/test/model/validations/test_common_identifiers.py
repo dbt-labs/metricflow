@@ -4,8 +4,8 @@ import re
 from typing import Callable
 
 from metricflow.model.model_validator import ModelValidator
-from metricflow.model.objects.data_source import DataSource
-from metricflow.model.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.common_identifiers import CommonIdentifiersRule
 from metricflow.specs import IdentifierSpec
 from metricflow.test.test_utils import find_data_source_with

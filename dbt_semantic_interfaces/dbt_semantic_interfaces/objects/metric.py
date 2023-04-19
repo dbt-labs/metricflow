@@ -3,9 +3,9 @@ from __future__ import annotations
 from typing import List, Optional
 
 from metricflow.errors.errors import ParsingException
-from metricflow.model.objects.common import Metadata
-from metricflow.model.objects.constraints.where import WhereClauseConstraint
-from metricflow.model.objects.base import (
+from dbt_semantic_interfaces.objects.common import Metadata
+from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
+from dbt_semantic_interfaces.objects.base import (
     HashableBaseModel,
     ModelWithMetadataParsing,
     PydanticCustomInputParser,
