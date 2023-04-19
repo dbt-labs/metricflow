@@ -128,7 +128,10 @@ class MetricSemantics(MetricSemanticsAccessor):  # noqa: D
         input_metric_specs: List[MetricSpec] = []
 
         for input_metric in metric.input_metrics:
-            spec_constraint = (
+            original_metric_obj = self.get_metric(input_metric.as_reference)
+
+            # This is the constraint parameter added to the input metric in the derived metric definition
+            combined_spec_constraint = (
                 WhereConstraintConverter.convert_to_spec_where_constraint(
                     data_source_semantics=self._data_source_semantics,
                     where_constraint=input_metric.constraint,
@@ -136,9 +139,22 @@ class MetricSemantics(MetricSemanticsAccessor):  # noqa: D
                 if input_metric.constraint is not None
                 else None
             )
+
+            # This is the constraint parameter included in the original input metric definition
+            if original_metric_obj.constraint:
+                original_metric_constraint = WhereConstraintConverter.convert_to_spec_where_constraint(
+                    data_source_semantics=self._data_source_semantics,
+                    where_constraint=original_metric_obj.constraint,
+                )
+                combined_spec_constraint = (
+                    combined_spec_constraint.combine(original_metric_constraint)
+                    if combined_spec_constraint
+                    else original_metric_constraint
+                )
+
             spec = MetricSpec(
                 element_name=input_metric.name,
-                constraint=spec_constraint,
+                constraint=combined_spec_constraint,
                 alias=input_metric.alias,
                 offset_window=input_metric.offset_window,
                 offset_to_grain=input_metric.offset_to_grain,
