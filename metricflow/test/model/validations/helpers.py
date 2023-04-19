@@ -1,7 +1,6 @@
 import textwrap
-from typing import List, Optional, Sequence
+from typing import Optional, Sequence
 
-from metricflow.dataflow.sql_table import SqlTable
 from metricflow.engine.models import Dimension
 from dbt_semantic_interfaces.objects.common import FileSlice, Metadata, YamlConfigFile
 from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint

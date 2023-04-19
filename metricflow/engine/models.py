@@ -1,9 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Optional
-
-from metricflow.dataflow.sql_table import SqlTable
+from typing import List
 
 
 @dataclass(frozen=True)

@@ -1,10 +1,9 @@
-import copy
 import datetime
 import logging
 
 import dateutil.parser
 from _pytest.fixtures import FixtureRequest
-from typing import Callable, Tuple, List
+from typing import Callable, Tuple
 
 from dbt_semantic_interfaces.objects.data_source import DataSource
 from dbt_semantic_interfaces.objects.metric import Metric

@@ -6,7 +6,6 @@ from typing import Dict, List, Optional
 from metricflow.configuration.config_handler import ConfigHandler
 from metricflow.configuration.constants import CONFIG_DWH_SCHEMA
 from metricflow.configuration.yaml_handler import YamlFileHandler
-from metricflow.dataflow.sql_table import SqlTable
 from metricflow.engine.metricflow_engine import (
     MetricFlowEngine,
     MetricFlowExplainResult,

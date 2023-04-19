@@ -304,16 +304,6 @@
             ],
             "type": "object"
         },
-        "is-tableau": {
-            "properties": {
-                "location": {
-                    "enum": [
-                        "TABLEAU",
-                        "tableau"
-                    ]
-                }
-            }
-        },
         "is-time-dimension": {
             "properties": {
                 "type": {
