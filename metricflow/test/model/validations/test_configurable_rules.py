@@ -12,22 +12,26 @@ def test_can_configure_model_validator_rules(  # noqa: D
     simple_model__with_primary_transforms: UserConfiguredModel,
 ) -> None:
 
-    model = copy.deepcopy(simple_model__with_primary_transforms) 
-    model.metrics.append(metric_with_guaranteed_meta( 
-        name='metric_doesnt_exist_squared', 
-        type=MetricType.DERIVED, 
-        type_params=MetricTypeParams( 
-            expr='metric_doesnt_exist * metric_doesnt_exist', 
-            metrics=[MetricInput(name='metric_doesnt_exist')] 
-        ), 
-    )) 
-    
-    # confirm that with the default configuration, an issue is raised 
-    issues = ModelValidator().validate_model(model).issues 
-    assert len(issues.all_issues) == 1, f"ModelValidator with default rules had unexpected number of issues {issues}" 
-    
-    # confirm that a custom configuration excluding ValidMaterializationRule, no issue is raised 
+    model = copy.deepcopy(simple_model__with_primary_transforms)
+    model.metrics.append(
+        metric_with_guaranteed_meta(
+            name="metric_doesnt_exist_squared",
+            type=MetricType.DERIVED,
+            type_params=MetricTypeParams(
+                expr="metric_doesnt_exist * metric_doesnt_exist", metrics=[MetricInput(name="metric_doesnt_exist")]
+            ),
+        )
+    )
+
+    # confirm that with the default configuration, an issue is raised
+    issues = ModelValidator().validate_model(model).issues
+    assert len(issues.all_issues) == 1, f"ModelValidator with default rules had unexpected number of issues {issues}"
+
+    # confirm that a custom configuration excluding ValidMaterializationRule, no issue is raised
     rules = [rule for rule in ModelValidator.DEFAULT_RULES if rule.__class__ is not DerivedMetricRule]
+    issues = ModelValidator(rules=rules).validate_model(model).issues
+    assert len(issues.all_issues) == 0, f"ModelValidator without DerivedMetricRule returned issues {issues}"
+
 
 def test_cant_configure_model_validator_without_rules() -> None:  # noqa: D
     with pytest.raises(ValueError):
