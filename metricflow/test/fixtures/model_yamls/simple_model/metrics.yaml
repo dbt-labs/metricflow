@@ -375,6 +375,25 @@ metric:
       - name: bookings
 ---
 metric:
+  name: "booking_value_sub_instant"
+  description: "booking_value - instant_booking_value"
+  type: derived
+  type_params:
+    expr: booking_value - instant_booking_value
+    metrics:
+      - name: instant_booking_value
+      - name: booking_value
+---
+metric:
+  name: "booking_value_sub_instant_add_10"
+  description: "Add 10 to booking_value - instant_booking_value"
+  type: derived
+  type_params:
+    expr: booking_value_sub_instant + 10
+    metrics:
+      - name: booking_value_sub_instant
+---
+metric:
   name: bookings_per_lux_listing_derived
   description: Bookings divided by listings - using derived metric type
   type: derived
