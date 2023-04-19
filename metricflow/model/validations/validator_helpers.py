@@ -13,7 +13,6 @@ from pydantic import BaseModel, Extra
 from metricflow.instances import (
     DataSourceElementReference,
     DataSourceReference,
-    MaterializationModelReference,
     MetricModelReference,
 )
 from dbt_semantic_interfaces.objects.base import FrozenBaseModel
@@ -92,17 +91,6 @@ class FileContext(BaseModel):
         )
 
 
-class MaterializationContext(BaseModel):
-    """The context class for validation issues involving materializations"""
-
-    file_context: FileContext
-    materialization: MaterializationModelReference
-
-    def context_str(self) -> str:
-        """Human readable stringified representation of the context"""
-        return f"with materialization `{self.materialization.materialization_name}` {self.file_context.context_str()}"
-
-
 class MetricContext(BaseModel):
     """The context class for validation issues involving metrics"""
 
@@ -139,7 +127,6 @@ class DataSourceElementContext(BaseModel):
 
 ValidationContext = Union[
     FileContext,
-    MaterializationContext,
     MetricContext,
     DataSourceContext,
     DataSourceElementContext,

@@ -33,10 +33,6 @@ class DuplicateMetricError(SemanticException):  # noqa:D
     pass
 
 
-class MaterializationNotFoundError(SemanticException, KeyError):  # noqa:D
-    pass
-
-
 class MetricNotFoundError(SemanticException, KeyError):  # noqa:D
     pass
 

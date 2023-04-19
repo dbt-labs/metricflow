@@ -1,9 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Optional
-
-from metricflow.dataflow.sql_table import SqlTable
+from typing import List
 
 
 @dataclass(frozen=True)
@@ -19,13 +17,3 @@ class Dimension:
     """Dataclass representation of a Dimension."""
 
     name: str
-
-
-@dataclass(frozen=True)
-class Materialization:
-    """Object to represent a Metric."""
-
-    name: str
-    metrics: List[str]
-    dimensions: List[str]
-    destination_table: Optional[SqlTable]

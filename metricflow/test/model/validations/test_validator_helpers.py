@@ -5,7 +5,6 @@ import pytest
 from metricflow.instances import (
     DataSourceElementReference,
     DataSourceReference,
-    MaterializationModelReference,
     MetricModelReference,
 )
 
@@ -14,7 +13,6 @@ from metricflow.model.validations.validator_helpers import (
     DataSourceElementContext,
     DataSourceElementType,
     FileContext,
-    MaterializationContext,
     MetricContext,
     ModelValidationResults,
     ValidationError,
@@ -76,15 +74,6 @@ def list_of_issues() -> List[ValidationIssueType]:  # noqa: D
                 element_type=DataSourceElementType.MEASURE,
             ),
             message="Something caused an error, problem #4",
-        )
-    )
-    issues.append(
-        ValidationError(
-            context=MaterializationContext(
-                file_context=file_context,
-                materialization=MaterializationModelReference(materialization_name="My materialization"),
-            ),
-            message="Something caused an error, problem #5",
         )
     )
     issues.append(

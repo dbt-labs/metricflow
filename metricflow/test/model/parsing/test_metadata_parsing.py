@@ -61,21 +61,6 @@ def test_metric_metadata_parsing_with_measure_proxy(multi_hop_join_semantic_mode
         _assert_metadata_filename_is_valid(metric.metadata)
 
 
-def test_materialization_metadata_parsing(simple_user_configured_model: UserConfiguredModel) -> None:
-    """Tests internal metadata object parsing from a file into the Materialization model object
-
-    This only tests some basic file name parsing for each materialization since they are not guaranteed
-    to be collected in the same file in the simple model, and the output here has been transformed
-    so the YAML contents might or might not match.
-    """
-    assert len(simple_user_configured_model.materializations) > 0
-    for materialization in simple_user_configured_model.materializations:
-        assert (
-            materialization.metadata is not None
-        ), f"Metadata should always be parsed out of the model, but None found for materialization: {materialization}!"
-        _assert_metadata_filename_is_valid(materialization.metadata)
-
-
 def test_measure_metadata_parsing(simple_user_configured_model: UserConfiguredModel) -> None:
     """Tests internal metadata object parsing from a file into the Measure model object
 

@@ -108,7 +108,6 @@ def test_invalid_composite_identifiers() -> None:  # noqa:D
                         type_params=MetricTypeParams(measures=[measure_name]),
                     )
                 ],
-                materializations=[],
             )
         )
 
@@ -158,7 +157,6 @@ def test_composite_identifiers_nonexistent_ref() -> None:  # noqa:D
                         type_params=MetricTypeParams(measures=[measure_name]),
                     )
                 ],
-                materializations=[],
             )
         )
 
@@ -211,7 +209,6 @@ def test_composite_identifiers_ref_and_name() -> None:  # noqa:D
                         type_params=MetricTypeParams(measures=[measure_name]),
                     )
                 ],
-                materializations=[],
             )
         )
 

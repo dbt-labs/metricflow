@@ -15,7 +15,6 @@ from metricflow.model.validations.identifiers import (
     NaturalIdentifierConfigurationRule,
     OnePrimaryIdentifierPerDataSourceRule,
 )
-from metricflow.model.validations.materializations import ValidMaterializationRule
 from metricflow.model.validations.measures import (
     PercentileAggregationRule,
     CountAggregationExprRule,
@@ -58,7 +57,6 @@ class ModelValidator:
         CumulativeMetricRule(),
         NonEmptyRule(),
         UniqueAndValidNameRule(),
-        ValidMaterializationRule(),
         AggregationTimeDimensionRule(),
         ReservedKeywordsRule(),
         MeasuresNonAdditiveDimensionRule(),

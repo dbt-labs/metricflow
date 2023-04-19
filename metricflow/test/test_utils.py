@@ -1,13 +1,11 @@
-import copy
 import datetime
 import logging
 
 import dateutil.parser
 from _pytest.fixtures import FixtureRequest
-from typing import Callable, Tuple, List
+from typing import Callable, Tuple
 
 from dbt_semantic_interfaces.objects.data_source import DataSource
-from dbt_semantic_interfaces.objects.materialization import Materialization
 from dbt_semantic_interfaces.objects.metric import Metric
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.protocols.sql_client import SqlClient
@@ -65,12 +63,3 @@ def find_metric_with(model: UserConfiguredModel, function: Callable[[Metric], bo
             return metric, index
 
     raise Exception("Unable to find a metric matching function criteria")
-
-
-def model_with_materialization(
-    initial_model: UserConfiguredModel, materializations: List[Materialization]
-) -> UserConfiguredModel:
-    """Returns a copy of the model but with the materialization added"""
-    model_copy = copy.deepcopy(initial_model)
-    model_copy.materializations.extend(materializations)
-    return model_copy

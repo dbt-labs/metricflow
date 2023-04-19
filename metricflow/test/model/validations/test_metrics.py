@@ -62,7 +62,6 @@ def test_metric_no_time_dim_dim_only_source() -> None:  # noqa:D
                     type_params=MetricTypeParams(measures=[measure_name]),
                 )
             ],
-            materializations=[],
         )
     )
 
@@ -95,7 +94,6 @@ def test_metric_no_time_dim() -> None:  # noqa:D
                         type_params=MetricTypeParams(measures=[measure_name]),
                     )
                 ],
-                materializations=[],
             )
         )
 
@@ -139,7 +137,6 @@ def test_metric_multiple_primary_time_dims() -> None:  # noqa:D
                         type_params=MetricTypeParams(measures=[measure_name]),
                     )
                 ],
-                materializations=[],
             )
         )
 
@@ -176,7 +173,6 @@ def test_generated_metrics_only() -> None:  # noqa:D
         UserConfiguredModel(
             data_sources=[data_source],
             metrics=[],
-            materializations=[],
         )
     )
 
@@ -257,7 +253,6 @@ def test_derived_metric() -> None:  # noqa: D
                     ),
                 ),
             ],
-            materializations=[],
         )
     )
     build_issues = result.issues.errors

@@ -1,14 +1,12 @@
 import textwrap
-from typing import List, Optional, Sequence
+from typing import Optional, Sequence
 
-from metricflow.dataflow.sql_table import SqlTable
 from metricflow.engine.models import Dimension
 from dbt_semantic_interfaces.objects.common import FileSlice, Metadata, YamlConfigFile
 from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
 from dbt_semantic_interfaces.objects.data_source import DataSource, DataSourceOrigin, Mutability
 from dbt_semantic_interfaces.objects.elements.identifier import Identifier
 from dbt_semantic_interfaces.objects.elements.measure import Measure
-from dbt_semantic_interfaces.objects.materialization import Materialization, MaterializationDestination
 from dbt_semantic_interfaces.objects.metric import Metric, MetricType, MetricTypeParams
 
 
@@ -56,28 +54,6 @@ def default_meta() -> Metadata:
             start_line_number=0,
             end_line_number=0,
         ),
-    )
-
-
-def materialization_with_guaranteed_meta(
-    name: str,
-    metrics: List[str],
-    dimensions: List[str],
-    description: str = "adhoc materialization",
-    metadata: Metadata = default_meta(),
-    destinations: List[MaterializationDestination] = [],
-    destination_table: Optional[SqlTable] = None,
-) -> Materialization:
-    """Creates a materialization with the given input. If a metadata object is not supplied, a default metadata object is used"""
-
-    return Materialization(
-        name=name,
-        description=description,
-        metrics=metrics,
-        dimensions=dimensions,
-        destinations=destinations,
-        destination_table=destination_table,
-        metadata=metadata,
     )
 
 
