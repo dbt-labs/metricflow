@@ -25,7 +25,7 @@ kinds:
       {{- $IssueList := list }}
       {{- $changes := splitList " " $.Custom.Issue }}
       {{- range $issueNbr := $changes }}
-        {{- $changeLink := "[dbt-docs/#nbr](https://github.com/dbt-labs/metricflow/issues/nbr)" | replace "nbr" $issueNbr }}
+        {{- $changeLink := "[dbt-docs/#nbr](https://github.com/dbt-labs/dbt-docs/issues/nbr)" | replace "nbr" $issueNbr }}
         {{- $IssueList = append $IssueList $changeLink }}
       {{- end -}}
       - {{.Body}} ({{ range $index, $element := $IssueList }}{{if $index}}, {{end}}{{$element}}{{end}})
