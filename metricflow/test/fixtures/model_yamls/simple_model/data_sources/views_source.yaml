@@ -2,8 +2,6 @@
 data_source:
   name: views_source
   description: views_source
-  owners:
-    - support@transformdata.io
 
   sql_query: |
     -- User Defined SQL Query

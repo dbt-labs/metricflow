@@ -1,8 +1,6 @@
 data_source:
   name: foo
   description: bar buzz bazz
-  owners:
-    - support@transformdata.io
   sql_query: "SELECT * FROM $source_schema.fct_animals"
   dimensions:
     - name: ds
@@ -23,8 +21,6 @@ data_source:
 data_source:
   name: foo
   description: bar buzz bazz
-  owners:
-    - support@transformdata.io
   sql_query: "SELECT * FROM $source_schema.fct_animals"
   dimensions:
     - name: ds

@@ -2,8 +2,6 @@
 data_source:
   name: listings
   description: SCD Type II table of listings history
-  owners:
-    - support@transformdata.io
 
   sql_table: $listings_table
 

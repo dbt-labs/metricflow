@@ -2,8 +2,6 @@
 data_source:
   name: bookings_from_sql_query_source
   description: bookings_from_sql_query_source
-  owners:
-    - support@transformdata.io
 
   sql_query: SELECT * FROM $fct_bookings_extended_table
 

@@ -4,7 +4,7 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Dict, List, Union
 
-from metricflow.model.parsing import schemas_internal
+from dbt_semantic_interfaces.parsing import schemas
 
 TOP_LEVEL_SCHEMAS = {
     "metric": "metric",
@@ -76,6 +76,6 @@ def write_schema(schema: Dict, output_dir: str, file_name: str) -> None:
 
 
 if __name__ == "__main__":
-    schema = generate_explict_schema(schemas_internal.schema_store)
+    schema = generate_explict_schema(schemas.schema_store)
     output_dir = str(Path(__file__).parent / "schemas")
     write_schema(schema, output_dir, "metricflow.json")

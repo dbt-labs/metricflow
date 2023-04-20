@@ -4,7 +4,7 @@ import logging
 from typing import List, Sequence
 
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.parsing.dir_to_model import ModelBuildResult
+from dbt_semantic_interfaces.parsing.dir_to_model import ModelBuildResult
 from metricflow.model.validations.agg_time_dimension import AggregationTimeDimensionRule
 from metricflow.model.validations.data_sources import DataSourceTimeDimensionWarningsRule, DataSourceValidityWindowRule
 from metricflow.model.validations.dimension_const import DimensionConsistencyRule

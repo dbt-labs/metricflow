@@ -8,7 +8,7 @@ import pytest
 from dbt_semantic_interfaces.objects.common import Metadata
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.parsing.yaml_loader import YamlConfigLoader
+from dbt_semantic_interfaces.parsing.yaml_loader import YamlConfigLoader
 from metricflow.model.semantic_model import SemanticModel
 
 

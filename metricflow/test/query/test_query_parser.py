@@ -61,8 +61,6 @@ REVENUE_YAML = textwrap.dedent(
     data_source:
       name: revenue_source
       description: revenue
-      owners:
-        - support@transformdata.io
 
       sql_query: |
         -- User Defined SQL Query
@@ -98,8 +96,6 @@ METRICS_YAML = textwrap.dedent(
     metric:
       name: revenue_cumulative
       description: Cumulative metric for revenue for testing purposes
-      owners:
-        - support@transformdata.io
       type: cumulative
       type_params:
         measures:
@@ -109,8 +105,6 @@ METRICS_YAML = textwrap.dedent(
     metric:
       name: revenue_sub_10
       description: Derived cumulative metric for revenue for testing purposes
-      owners:
-        - support@transformdata.io
       type: derived
       type_params:
         expr: revenue_cumulative - 10
@@ -120,8 +114,6 @@ METRICS_YAML = textwrap.dedent(
     metric:
       name: revenue_growth_2_weeks
       description: Percentage growth of revenue compared to revenue 2 weeks prior
-      owners:
-        - support@transformdata.io
       type: derived
       type_params:
         expr: (revenue - revenue_2_weeks_ago) / revenue_2_weeks_ago

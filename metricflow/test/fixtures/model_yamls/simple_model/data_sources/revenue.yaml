@@ -2,8 +2,6 @@
 data_source:
   name: revenue
   description: revenue
-  owners:
-    - support@transformdata.io
 
   sql_query: |
     -- User Defined SQL Query

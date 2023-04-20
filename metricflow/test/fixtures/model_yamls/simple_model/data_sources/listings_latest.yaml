@@ -2,8 +2,6 @@
 data_source:
   name: listings_latest
   description: listings_latest
-  owners:
-    - support@transformdata.io
 
   sql_table: $listings_latest_table
 

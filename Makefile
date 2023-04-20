@@ -47,4 +47,4 @@ postgresql postgres:
 # Install metricflow for development work.
 .PHONY: json_schema
 json_schema:
-	python3 metricflow/model/parsing/explicit_schema.py
+	python3 dbt_semantic_interfaces/dbt_semantic_interfaces/parsing/explicit_schema.py

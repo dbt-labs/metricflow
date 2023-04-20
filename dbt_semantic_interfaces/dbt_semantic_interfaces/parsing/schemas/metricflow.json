@@ -52,9 +52,6 @@
                     },
                     "type": "array"
                 },
-                "display_name": {
-                    "type": "string"
-                },
                 "identifiers": {
                     "items": {
                         "$ref": "#/definitions/identifier_schema"
@@ -74,23 +71,11 @@
                     "pattern": "(?!.*__).*^[a-z][a-z0-9_]*[a-z0-9]$",
                     "type": "string"
                 },
-                "owners": {
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
-                },
                 "sql_query": {
                     "type": "string"
                 },
                 "sql_table": {
                     "type": "string"
-                },
-                "tier": {
-                    "type": [
-                        "string",
-                        "integer"
-                    ]
                 }
             },
             "required": [
@@ -102,12 +87,6 @@
             "$id": "derived_group_by_element_schema",
             "additionalProperties": false,
             "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "display_name": {
-                    "type": "string"
-                },
                 "expr": {
                     "type": [
                         "string",
@@ -123,18 +102,6 @@
                 "name": {
                     "pattern": "(?!.*__).*^[a-z][a-z0-9_]*[a-z0-9]$",
                     "type": "string"
-                },
-                "owners": {
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
-                },
-                "tier": {
-                    "type": [
-                        "string",
-                        "integer"
-                    ]
                 }
             },
             "required": [
@@ -159,12 +126,6 @@
                 }
             ],
             "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "display_name": {
-                    "type": "string"
-                },
                 "expr": {
                     "type": [
                         "string",
@@ -177,18 +138,6 @@
                 "name": {
                     "pattern": "(?!.*__).*^[a-z][a-z0-9_]*[a-z0-9]$",
                     "type": "string"
-                },
-                "owners": {
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
-                },
-                "tier": {
-                    "type": [
-                        "string",
-                        "integer"
-                    ]
                 },
                 "type": {
                     "enum": [
@@ -245,12 +194,6 @@
             "$id": "identifier_schema",
             "additionalProperties": false,
             "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "display_name": {
-                    "type": "string"
-                },
                 "entity": {
                     "type": "string"
                 },
@@ -270,20 +213,8 @@
                     "pattern": "(?!.*__).*^[a-z][a-z0-9_]*[a-z0-9]$",
                     "type": "string"
                 },
-                "owners": {
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
-                },
                 "role": {
                     "type": "string"
-                },
-                "tier": {
-                    "type": [
-                        "string",
-                        "integer"
-                    ]
                 },
                 "type": {
                     "enum": [
@@ -316,43 +247,6 @@
             "required": [
                 "type"
             ]
-        },
-        "locked_metadata": {
-            "$id": "locked_metadata",
-            "additionalProperties": false,
-            "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "display_name": {
-                    "type": "string"
-                },
-                "increase_is_good": {
-                    "type": "boolean"
-                },
-                "private": {
-                    "type": "boolean"
-                },
-                "tags": {
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
-                },
-                "tier": {
-                    "type": [
-                        "string",
-                        "integer"
-                    ]
-                },
-                "unit": {
-                    "type": "string"
-                },
-                "value_format": {
-                    "type": "string"
-                }
-            },
-            "type": "object"
         },
         "measure_schema": {
             "$id": "measure_schema",
@@ -398,9 +292,6 @@
                 "description": {
                     "type": "string"
                 },
-                "display_name": {
-                    "type": "string"
-                },
                 "expr": {
                     "type": [
                         "string",
@@ -414,18 +305,6 @@
                 },
                 "non_additive_dimension": {
                     "$ref": "#/definitions/non_additive_dimension_schema"
-                },
-                "owners": {
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
-                },
-                "tier": {
-                    "type": [
-                        "string",
-                        "integer"
-                    ]
                 }
             },
             "required": [
@@ -444,27 +323,9 @@
                 "description": {
                     "type": "string"
                 },
-                "display_name": {
-                    "type": "string"
-                },
-                "locked_metadata": {
-                    "$ref": "#/definitions/locked_metadata"
-                },
                 "name": {
                     "pattern": "(?!.*__).*^[a-z][a-z0-9_]*[a-z0-9]$",
                     "type": "string"
-                },
-                "owners": {
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
-                },
-                "tier": {
-                    "type": [
-                        "string",
-                        "integer"
-                    ]
                 },
                 "type": {
                     "enum": [

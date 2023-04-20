@@ -1,9 +1,9 @@
 from typing import Dict, Any
 
 from jsonschema import RefResolver
-from metricflow.model.parsing.schema_validator import SchemaValidator
+from dbt_semantic_interfaces.parsing.schema_validator import SchemaValidator
 
-from metricflow.model.parsing.schemas import (
+from dbt_semantic_interfaces.parsing.schemas import (
     metric_schema,
     data_source_schema,
     derived_group_by_element_schema,

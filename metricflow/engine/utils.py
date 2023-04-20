@@ -7,7 +7,7 @@ from metricflow.configuration.constants import CONFIG_MODEL_PATH
 from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.errors.errors import ModelCreationException
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.parsing.dir_to_model import ModelBuildResult, parse_directory_of_yaml_files_to_model
+from dbt_semantic_interfaces.parsing.dir_to_model import ModelBuildResult, parse_directory_of_yaml_files_to_model
 from metricflow.sql_clients.common_client import not_empty
 
 
@@ -61,7 +61,7 @@ def model_build_result_from_dbt_config(
         # import is at the top ofthe file MetricFlow will blow up if dbt
         # isn't installed. Thus by importing it here, we only run into the
         # exception if this method is called without dbt installed.
-        from metricflow.model.parsing.dbt_dir_to_model import parse_dbt_project_to_model
+        from dbt_semantic_interfaces.parsing.dbt_dir_to_model import parse_dbt_project_to_model
 
         return parse_dbt_project_to_model(directory=dbt_models_path, profile=profile, target=target)
     except Exception as e:
@@ -82,7 +82,7 @@ def build_user_configured_model_from_dbt_config(
 
 def build_user_configured_model_from_dbt_cloud(job_id: str, service_token: str) -> UserConfiguredModel:
     """Given dbt cloud params, create a UserConfiguredModel"""
-    from metricflow.model.parsing.dbt_cloud_to_model import model_build_result_for_dbt_cloud_job
+    from dbt_semantic_interfaces.parsing.dbt_cloud_to_model import model_build_result_for_dbt_cloud_job
 
     return model_build_result_for_dbt_cloud_job(auth=service_token, job_id=job_id).model
 
