@@ -4,8 +4,8 @@ Welcome to the MetricFlow developer community, we're thrilled to have you aboard
 
 ## Before you get started, please...
 
-1. Familiarize yourself with our [Code of Conduct](http://community.transform.co/metricflow-signup). In summary - be kind to each other. We're all here trying to make the data world a better place to work.
-2. Make sure you can sign our [Contributor License Agreement](TransformCLA.md). Unfortunately, we cannot accept PRs unless you have signed. If you are not able to sign the agreement you may still participate in our Slack community or interact with Issues. To sign the agreement simply put up a PR, and you will receive instructions there.
+1. Familiarize yourself with our [Code of Conduct](https://www.getdbt.com/community/code-of-conduct/#:~:text=We%20want%20everyone%20to%20have,don't%20be%20a%20jerk.). In summary - be kind to each other. We're all here trying to make the data world a better place to work.
+2. Make sure you can sign our [Contributor License Agreement](https://docs.getdbt.com/community/resources/contributor-license-agreements). Unfortunately, we cannot accept PRs unless you have signed. If you are not able to sign the agreement you may still participate in our Slack community or interact with Issues. To sign the agreement simply put up a PR, and you will receive instructions there.
 
 ## Environment setup
 
@@ -20,7 +20,7 @@ Welcome to the MetricFlow developer community, we're thrilled to have you aboard
     - Docker:
         - This is only required if you are developing with Postgres.
         - Follow the [instructions from Docker](https://docs.docker.com/get-docker/)
-3. [Create a fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) of the [MetricFlow repo](https://github.com/transform-data/metricflow) and [clone it locally](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository).
+3. [Create a fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) of the [MetricFlow repo](https://github.com/dbt-labs/metricflow) and [clone it locally](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository).
 4. Activate a [Python virtual environment](https://docs.python.org/3/library/venv.html). While this is not required, it is *strongly* encouraged.
     - We provide `make venv` and `make remove_venv` helpers for creating/deleting standard Python virtual envs. You may pass `VENV_NAME=your_custom_name` to override the default `venv` location.
     - [conda](https://docs.conda.io/en/latest/) users may prefer [conda's environment management](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) instead.
@@ -28,11 +28,6 @@ Welcome to the MetricFlow developer community, we're thrilled to have you aboard
 6. Run `make install` to get all of your dependencies loaded and ready for development
     - This includes useful dev tools, including pre-commit for linting.
     - You may run `pre-commit install` if you would like the linters to run prior to all local git commits
-7. OPTIONAL: install dbt dependencies. Developers working on dbt integrations will need to install these in order to work on those integrations and run the relevant tests. Any of the following commands should be sufficient for development purposes:
-    - `poetry install -E "dbt-postgres dbt-cloud"`
-    - `poetry install -E "dbt-redshift dbt-cloud"`
-    - `poetry install -E "dbt-snowflake dbt-cloud"`
-    - `poetry install -E "dbt-bigquery dbt-cloud"`
 
 ## Start testing and development
 
@@ -74,8 +69,13 @@ You're ready to start! Note all `make` and `poetry` commands should be run from 
 
 ## Submit your contribution!
 
-1. Merge your changes into your fork of the MetricFlow repository
-2. Make a well-formed Pull Request (PR) from your fork into the main MetricFlow repository. If you're not clear on what a well-formed PR looks like, fear not! We will help you here and throughout the review process.
+1. Use [`changie`](https://changie.dev/) to create changelog entries, without merge conflicts
+    - We use [changie](https://changie.dev) to generate `CHANGELOG` entries. **Note:** Do not edit the `CHANGELOG.md` directly. Your modifications will be lost.
+    - Follow the steps to [install `changie`](https://changie.dev/guide/installation/) for your system.
+    - Once changie is installed and your PR is created for a new feature, simply run the following command and changie will walk you through the process of creating a changelog entry: `changie new` 
+    - Commit the file that's created and your changelog entry is complete!
+2. Merge your changes into your fork of the MetricFlow repository
+3. Make a well-formed Pull Request (PR) from your fork into the main MetricFlow repository. If you're not clear on what a well-formed PR looks like, fear not! We will help you here and throughout the review process.
     - Well-formed PRs are composed of one or more well-formed commits, and include clear indications of how they were tested and verified prior to submission.
     - Well-formed commits are focused (loosely speaking they do one conceptual thing) and well-described.
     - A good commit message - like a good PR message - will have three components:
@@ -84,6 +84,6 @@ You're ready to start! Note all `make` and `poetry` commands should be run from 
         3. Additional detail on what the commit does, if needed
     - We want this because we believe the hardest part of a collaborative software project is not getting the computer to do what it's supposed to do. It's communicating to a human reader what you meant for the computer to do (and why!), and also getting the computer to do that thing.
     - This helps you too - well-formed PRs get reviewed a lot faster and a lot more productively. We want your contribution experience to be as smooth as possible and this helps immensely!
-3. One of our core contributors will review your PR and either approve it or send it back with requests for updates
-4. Once the PR has been approved, our core contributors will merge it into the main project.
-5. You will get a shoutout in our changelog/release notes. Thank you for your contribution!
+4. One of our core contributors will review your PR and either approve it or send it back with requests for updates
+5. Once the PR has been approved, our core contributors will merge it into the main project.
+6. You will get a shoutout in our changelog/release notes. Thank you for your contribution!
