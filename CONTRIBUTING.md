@@ -67,15 +67,23 @@ You're ready to start! Note all `make` and `poetry` commands should be run from 
     - Run `poetry run mf --help`
     - Follow the CLI help from there, just remember your local CLI is always `poetry run mf <COMMAND>`!
 
+## Adding or modifying a CHANGELOG Entry!
+
+We use [changie](https://changie.dev) to generate `CHANGELOG` entries. **Note:** Do not edit the `CHANGELOG.md` directly. Your modifications will be lost.
+
+In order to use it, you can:
+
+1. Follow the steps to [install `changie`](https://changie.dev/guide/installation/) for your system.
+2. Once changie is installed and your PR is created for a new feature, run the following command and changie will walk you through the process of creating a changelog entry. `changie new`.
+3. Commit the file that's created and your changelog entry is complete!
+4. (Optional if contributing to a feature in progress) Modify the changie yaml file in `metricflow/.changes/unreleased/` related to your change. If you need help finding this file, please ask within the discussion for the pull request!
+
+You don't need to worry about which `metricflow` version your change will go into. Just create the changelog entry with `changie`, and open your PR against the `main` branch. All merged changes will be included in the next minor version of `metricflow`. The maintainers _may_ choose to "backport" specific changes in order to patch older minor versions. In that case, a maintainer will take care of that backport after merging your PR, before releasing the new version of `metricflow`.
+
 ## Submit your contribution!
 
-1. Use [`changie`](https://changie.dev/) to create changelog entries, without merge conflicts
-    - We use [changie](https://changie.dev) to generate `CHANGELOG` entries. **Note:** Do not edit the `CHANGELOG.md` directly. Your modifications will be lost.
-    - Follow the steps to [install `changie`](https://changie.dev/guide/installation/) for your system.
-    - Once changie is installed and your PR is created for a new feature, simply run the following command and changie will walk you through the process of creating a changelog entry: `changie new` 
-    - Commit the file that's created and your changelog entry is complete!
-2. Merge your changes into your fork of the MetricFlow repository
-3. Make a well-formed Pull Request (PR) from your fork into the main MetricFlow repository. If you're not clear on what a well-formed PR looks like, fear not! We will help you here and throughout the review process.
+1. Merge your changes into your fork of the MetricFlow repository
+2. Make a well-formed Pull Request (PR) from your fork into the main MetricFlow repository. If you're not clear on what a well-formed PR looks like, fear not! We will help you here and throughout the review process.
     - Well-formed PRs are composed of one or more well-formed commits, and include clear indications of how they were tested and verified prior to submission.
     - Well-formed commits are focused (loosely speaking they do one conceptual thing) and well-described.
     - A good commit message - like a good PR message - will have three components:
@@ -84,6 +92,6 @@ You're ready to start! Note all `make` and `poetry` commands should be run from 
         3. Additional detail on what the commit does, if needed
     - We want this because we believe the hardest part of a collaborative software project is not getting the computer to do what it's supposed to do. It's communicating to a human reader what you meant for the computer to do (and why!), and also getting the computer to do that thing.
     - This helps you too - well-formed PRs get reviewed a lot faster and a lot more productively. We want your contribution experience to be as smooth as possible and this helps immensely!
-4. One of our core contributors will review your PR and either approve it or send it back with requests for updates
-5. Once the PR has been approved, our core contributors will merge it into the main project.
-6. You will get a shoutout in our changelog/release notes. Thank you for your contribution!
+3. One of our core contributors will review your PR and either approve it or send it back with requests for updates
+4. Once the PR has been approved, our core contributors will merge it into the main project.
+5. You will get a shoutout in our changelog/release notes. Thank you for your contribution!
