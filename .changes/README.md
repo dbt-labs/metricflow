@@ -16,7 +16,7 @@ Almost every code change we make associated with an issue will require a `CHANGE
 
 The `changie new` command will ensure correct file format and file name.  There is a one to one mapping of issues to changes.  Multiple issues cannot be lumped into a single entry. If you make a mistake, the yaml file may be directly modified and saved as long as the format is preserved.
 
-Note: If your PR has been cleared by the Core Team as not needing a changelog entry, the `Skip Changelog` label may be put on the PR to bypass the GitHub action that blacks PRs from being merged when they are missing a `CHANGELOG` entry.
+Note: If your PR has been cleared by the MetricFlow Team as not needing a changelog entry, the `Skip Changelog` label may be put on the PR to bypass the GitHub action that blocks PRs from being merged when they are missing a `CHANGELOG` entry.
 
 #### Prerelease Workflow
 These commands batch up changes in `/.changes/unreleased` to be included in this prerelease and move those files to a directory named for the release version.  The `--move-dir` will be created if it does not exist and is created in `/.changes`.
