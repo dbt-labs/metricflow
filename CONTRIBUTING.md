@@ -28,6 +28,11 @@ Welcome to the MetricFlow developer community, we're thrilled to have you aboard
 6. Run `make install` to get all of your dependencies loaded and ready for development
     - This includes useful dev tools, including pre-commit for linting.
     - You may run `pre-commit install` if you would like the linters to run prior to all local git commits
+7. OPTIONAL: install dbt dependencies. Developers working on dbt integrations will need to install these in order to work on those integrations and run the relevant tests. Any of the following commands should be sufficient for development purposes:
+    - `poetry install -E "dbt-postgres dbt-cloud"`
+    - `poetry install -E "dbt-redshift dbt-cloud"`
+    - `poetry install -E "dbt-snowflake dbt-cloud"`
+    - `poetry install -E "dbt-bigquery dbt-cloud"`
 
 ## Start testing and development
 
@@ -63,7 +68,7 @@ You're ready to start! Note all `make` and `poetry` commands should be run from 
     - `Black` for formatting
     - `Flake8` for general Python linting
     - `MyPy` for typechecking
-5. To see how your changes work with mnore interactive queries, use your repo-local CLI.
+5. To see how your changes work with more interactive queries, use your repo-local CLI.
     - Run `poetry run mf --help`
     - Follow the CLI help from there, just remember your local CLI is always `poetry run mf <COMMAND>`!
 
