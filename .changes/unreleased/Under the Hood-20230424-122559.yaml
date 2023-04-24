@@ -1,0 +1,8 @@
+kind: Under the Hood
+body: Ensure use of ValidationIssue instead of ValidationIssueType. ValidationIssueType
+  was from a time before ValidationIssue classes had proper inheritance, and it's
+  continued use was become problematic for typing.
+time: 2023-04-24T12:25:59.057065-07:00
+custom:
+  Author: QMalcolm
+  Issue: None
