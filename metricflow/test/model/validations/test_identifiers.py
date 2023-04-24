@@ -5,7 +5,7 @@ from typing import Callable
 
 import pytest
 
-from metricflow.aggregation_properties import AggregationType
+from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
 from metricflow.model.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.common import YamlConfigFile
 from dbt_semantic_interfaces.objects.data_source import DataSource, Mutability, MutabilityType

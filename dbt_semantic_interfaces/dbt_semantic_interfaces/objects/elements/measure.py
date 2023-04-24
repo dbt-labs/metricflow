@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import Optional, List
-from metricflow.aggregation_properties import AggregationType
+from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
 from dbt_semantic_interfaces.objects.common import Metadata
 from dbt_semantic_interfaces.objects.base import ModelWithMetadataParsing, HashableBaseModel
 from metricflow.references import MeasureReference, TimeDimensionReference
