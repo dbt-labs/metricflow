@@ -4,8 +4,8 @@ Welcome to the MetricFlow developer community, we're thrilled to have you aboard
 
 ## Before you get started, please...
 
-1. Familiarize yourself with our [Code of Conduct](http://community.transform.co/metricflow-signup). In summary - be kind to each other. We're all here trying to make the data world a better place to work.
-2. Make sure you can sign our [Contributor License Agreement](TransformCLA.md). Unfortunately, we cannot accept PRs unless you have signed. If you are not able to sign the agreement you may still participate in our Slack community or interact with Issues. To sign the agreement simply put up a PR, and you will receive instructions there.
+1. Familiarize yourself with our [Code of Conduct](https://www.getdbt.com/community/code-of-conduct/#:~:text=We%20want%20everyone%20to%20have,don't%20be%20a%20jerk.). In summary - be kind to each other. We're all here trying to make the data world a better place to work.
+2. Make sure you can sign our [Contributor License Agreement](https://docs.getdbt.com/community/resources/contributor-license-agreements). Unfortunately, we cannot accept PRs unless you have signed. If you are not able to sign the agreement you may still participate in our Slack community or interact with Issues. To sign the agreement simply put up a PR, and you will receive instructions there.
 
 ## Environment setup
 
@@ -20,7 +20,7 @@ Welcome to the MetricFlow developer community, we're thrilled to have you aboard
     - Docker:
         - This is only required if you are developing with Postgres.
         - Follow the [instructions from Docker](https://docs.docker.com/get-docker/)
-3. [Create a fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) of the [MetricFlow repo](https://github.com/transform-data/metricflow) and [clone it locally](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository).
+3. [Create a fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) of the [MetricFlow repo](https://github.com/dbt-labs/metricflow) and [clone it locally](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository).
 4. Activate a [Python virtual environment](https://docs.python.org/3/library/venv.html). While this is not required, it is *strongly* encouraged.
     - We provide `make venv` and `make remove_venv` helpers for creating/deleting standard Python virtual envs. You may pass `VENV_NAME=your_custom_name` to override the default `venv` location.
     - [conda](https://docs.conda.io/en/latest/) users may prefer [conda's environment management](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) instead.
@@ -68,9 +68,22 @@ You're ready to start! Note all `make` and `poetry` commands should be run from 
     - `Black` for formatting
     - `Flake8` for general Python linting
     - `MyPy` for typechecking
-5. To see how your changes work with mnore interactive queries, use your repo-local CLI.
+5. To see how your changes work with more interactive queries, use your repo-local CLI.
     - Run `poetry run mf --help`
     - Follow the CLI help from there, just remember your local CLI is always `poetry run mf <COMMAND>`!
+
+## Adding or modifying a CHANGELOG Entry!
+
+We use [changie](https://changie.dev) to generate `CHANGELOG` entries. **Note:** Do not edit the `CHANGELOG.md` directly. Your modifications will be lost.
+
+In order to use it, you can:
+
+1. Follow the steps to [install `changie`](https://changie.dev/guide/installation/) for your system.
+2. Once changie is installed and your PR is created for a new feature, run the following command and changie will walk you through the process of creating a changelog entry. `changie new`.
+3. Commit the file that's created and your changelog entry is complete!
+4. (Optional if contributing to a feature in progress) Modify the changie yaml file in `metricflow/.changes/unreleased/` related to your change. If you need help finding this file, please ask within the discussion for the pull request!
+
+You don't need to worry about which `metricflow` version your change will go into. Just create the changelog entry with `changie`, and open your PR against the `main` branch. All merged changes will be included in the next minor version of `metricflow`. The maintainers _may_ choose to "backport" specific changes in order to patch older minor versions. In that case, a maintainer will take care of that backport after merging your PR, before releasing the new version of `metricflow`.
 
 ## Submit your contribution!
 
