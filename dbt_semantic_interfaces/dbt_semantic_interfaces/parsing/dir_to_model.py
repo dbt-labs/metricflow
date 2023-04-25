@@ -8,7 +8,7 @@ from typing import Optional, Dict, List, Union, Type
 
 from jsonschema import exceptions
 
-from metricflow.errors.errors import ParsingException
+from dbt_semantic_interfaces.errors import ParsingException
 from dbt_semantic_interfaces.model_transformer import ModelTransformer
 from dbt_semantic_interfaces.objects.common import Version, YamlConfigFile
 from dbt_semantic_interfaces.objects.data_source import DataSource
