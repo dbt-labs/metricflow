@@ -1,7 +1,7 @@
-from metricflow.object_utils import ExtendedEnum
+from enum import Enum
 
 
-class AggregationType(ExtendedEnum):
+class AggregationType(Enum):
     """Aggregation methods for measures"""
 
     SUM = "sum"
