@@ -4,7 +4,7 @@ from typing import Tuple
 import pytest
 from _pytest.fixtures import FixtureRequest
 
-from metricflow.aggregation_properties import AggregationType
+from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
 from metricflow.model.data_warehouse_model_validator import (
     DataWarehouseModelValidator,
     DataWarehouseTaskBuilder,
