@@ -1,7 +1,7 @@
 <p align="center">
   <a target="_blank" href="https://transform.co/metricflow">
     <picture>
-      <img  alt="metricflow logo" src="https://github.com/transform-data/metricflow/raw/main/assets/MetricFlow_logo.png" width="auto" height="120">
+      <img  alt="metricflow logo" src="https://github.com/dbt-labs/metricflow/raw/main/assets/MetricFlow_logo.png" width="auto" height="120">
     </picture>
   </a>
   <br /><br />
@@ -13,11 +13,11 @@
   <a target="_blank" href="http://community.transform.co/metricflow-signup">
     <img src="https://img.shields.io/badge/Slack-join-163B36">
   </a>
-  <a target="_blank" href="https://github.com/transform-data/metricflow">
-    <img src="https://img.shields.io/github/stars/transform-data/metricflow?labelColor=image.png&color=163B36&logo=github">
+  <a target="_blank" href="https://github.com/dbt-labs/metricflow">
+    <img src="https://img.shields.io/github/stars/dbt-labs/metricflow?labelColor=image.png&color=163B36&logo=github">
   </a>
   <br />
-  <a target="_blank" href="https://github.com/transform-data/metricflow/blob/master/LICENSE">
+  <a target="_blank" href="https://github.com/dbt-labs/metricflow/blob/master/LICENSE">
     <img src="https://img.shields.io/pypi/l/metricflow?color=163B36&logo=AGPL-3.0">
   </a>
   <a target="_blank" href="https://pypi.org/project/metricflow/">
@@ -28,14 +28,14 @@
 
 # Welcome to MetricFlow
 
-See our latest updates in the [Metricflow Changelog](https://github.com/transform-data/metricflow/blob/main/CHANGELOG.md)!
+See our latest updates in the [Metricflow Changelog](https://github.com/dbt-labs/metricflow/blob/main/CHANGELOG.md)!
 
 MetricFlow is a semantic layer that makes it easy to organize metric definitions. It takes those definitions and generates legible and reusable SQL. This makes it easy to get consistent metrics output broken down by attributes (dimensions) of interest.
 
 The name comes from the approach taken to generate metrics. A query is compiled into a query plan (represented below) called a dataflow that constructs metrics. The plan is then optimized and rendered to engine-specific SQL.
 
 <p align="center">
-<img src="https://github.com/transform-data/metricflow/raw/main/assets/example_plan.svg" height="500"/>
+<img src="https://github.com/dbt-labs/metricflow/raw/main/assets/example_plan.svg" height="500"/>
 <br /><br />
 </p>
 
@@ -78,17 +78,17 @@ The best way to get started is to follow the [tutorial](https://docs.transform.c
 mf tutorial
 ```
 
-There are several examples of MetricFlow configs on common data sets in the [config-templates](https://github.com/transform-data/metricflow/tree/main/config-templates) folder. The tutorial will rely on a small set of [sample configs](https://github.com/transform-data/metricflow/tree/main/metricflow/cli/sample_models).
+There are several examples of MetricFlow configs on common data sets in the [config-templates](https://github.com/dbt-labs/metricflow/tree/main/config-templates) folder. The tutorial will rely on a small set of [sample configs](https://github.com/dbt-labs/metricflow/tree/main/metricflow/cli/sample_models).
 
 ## Resources
 
 - [Website](https://transform.co/metricflow)
 - [Documentation](https://docs.transform.co/docs/overview/metricflow-overview)
 - [Slack Community](https://community.transform.co/metricflow-signup)
-- [MetricFlow Git Repository](https://github.com/transform-data/metricflow)
-- [CHANGELOG.md](https://github.com/transform-data/metricflow/blob/main/CHANGELOG.md)
-- [ROADMAP.md](https://github.com/transform-data/metricflow/blob/main/ROADMAP.md)
-- [TENETS.md](https://github.com/transform-data/metricflow/blob/main/TENETS.md)
+- [MetricFlow Git Repository](https://github.com/dbt-labs/metricflow)
+- [CHANGELOG.md](https://github.com/dbt-labs/metricflow/blob/main/CHANGELOG.md)
+- [ROADMAP.md](https://github.com/dbt-labs/metricflow/blob/main/ROADMAP.md)
+- [TENETS.md](https://github.com/dbt-labs/metricflow/blob/main/TENETS.md)
 
 ## Contributing and Code of Conduct
 
@@ -96,10 +96,13 @@ This project will be a place where people can easily contribute high-quality upd
 
 You might wish to read our [code of conduct](http://community.transform.co/metricflow-signup) and <LINK> engineering practices </LINK> before diving in.
 
-To get started on direct contributions, head on over to our [contributor guide](https://github.com/transform-data/metricflow/blob/main/CONTRIBUTING.md).
+To get started on direct contributions, head on over to our [contributor guide](https://github.com/dbt-labs/metricflow/blob/main/CONTRIBUTING.md).
 
 ## License
 
-MetricFlow is open source software. The project relies on several licenses including AGPL-3.0-or-later and Apache (specified at folder level).
+MetricFlow is source-available software.
 
-MetricFlow is built by [Transform](https://transform.co/).
+Version 0 to 0.140.0 was covered by the Affero GPL license.
+Version 0.150.0 and greater is covered by the BSL license..
+
+MetricFlow is built by [dbt Labs](https://www.getdbt.com/).
