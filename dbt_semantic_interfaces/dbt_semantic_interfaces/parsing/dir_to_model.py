@@ -87,7 +87,6 @@ def collect_yaml_config_file_paths(directory: str) -> List[str]:
             config_file_paths.append(file_path)
 
     try:
-        breakpoint()
         repo = git.Repo(directory, search_parent_directories=True)
         # repo.ignored returns a list of file paths which are the file paths
         # that should be ignored as a subset of the handed in file paths

@@ -681,14 +681,14 @@ smmap = ">=3.0.1,<6"
 
 [[package]]
 name = "gitpython"
-version = "3.1.31"
-description = "GitPython is a Python library used to interact with Git repositories"
+version = "3.1.30"
+description = "GitPython is a python library used to interact with Git repositories"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "GitPython-3.1.31-py3-none-any.whl", hash = "sha256:f04893614f6aa713a60cbbe1e6a97403ef633103cdd0ef5eb6efe0deb98dbe8d"},
-    {file = "GitPython-3.1.31.tar.gz", hash = "sha256:8ce3bcf69adfdf7c7d503e78fd3b1c492af782d58893b650adb2ac8912ddd573"},
+    {file = "GitPython-3.1.30-py3-none-any.whl", hash = "sha256:cd455b0000615c60e286208ba540271af9fe531fa6a87cc590a7298785ab2882"},
+    {file = "GitPython-3.1.30.tar.gz", hash = "sha256:769c2d83e13f5d938b7688479da374c4e3d49f71549aaf462b646db9602ea6f8"},
 ]
 
 [package.dependencies]
@@ -2087,14 +2087,14 @@ files = [
 
 [[package]]
 name = "platformdirs"
-version = "3.3.0"
+version = "3.4.0"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "platformdirs-3.3.0-py3-none-any.whl", hash = "sha256:ea61fd7b85554beecbbd3e9b37fb26689b227ffae38f73353cbcc1cf8bd01878"},
-    {file = "platformdirs-3.3.0.tar.gz", hash = "sha256:64370d47dc3fca65b4879f89bdead8197e93e05d696d6d1816243ebae8595da5"},
+    {file = "platformdirs-3.4.0-py3-none-any.whl", hash = "sha256:01437886022decaf285d8972f9526397bfae2ac55480ed372ed6d9eca048870a"},
+    {file = "platformdirs-3.4.0.tar.gz", hash = "sha256:a5e1536e5ea4b1c238a1364da17ff2993d5bd28e15600c2c8224008aff6bbcad"},
 ]
 
 [package.extras]
@@ -2800,14 +2800,14 @@ full = ["numpy"]
 
 [[package]]
 name = "requests"
-version = "2.28.2"
+version = "2.29.0"
 description = "Python HTTP for Humans."
 category = "main"
 optional = false
-python-versions = ">=3.7, <4"
+python-versions = ">=3.7"
 files = [
-    {file = "requests-2.28.2-py3-none-any.whl", hash = "sha256:64299f4909223da747622c030b781c0d7811e359c37124b4bd368fb8c6518baa"},
-    {file = "requests-2.28.2.tar.gz", hash = "sha256:98b1b2782e3c6c4904938b84c0eb932721069dfdb9134313beff7c83c2df24bf"},
+    {file = "requests-2.29.0-py3-none-any.whl", hash = "sha256:e8f3c9be120d3333921d213eef078af392fba3933ab7ed2d1cba3b56f2568c3b"},
+    {file = "requests-2.29.0.tar.gz", hash = "sha256:f2e34a75f4749019bb0e3effb66683630e4ffeaf75819fb51bebef1bf5aef059"},
 ]
 
 [package.dependencies]
@@ -3467,4 +3467,4 @@ dbt-snowflake = ["dbt-snowflake"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.10"
-content-hash = "1c7b6e4a3b63c48daf481df53a4486872ddf8b6418a9add76f809d770d8e71ac"
+content-hash = "d8614c88e17cf5c9927a716ecf9d20c34a8a4b82adb5b0d9a39c60ca8a49f911"
