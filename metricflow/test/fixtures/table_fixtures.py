@@ -1,14 +1,24 @@
 import datetime
+import logging
+import os
+from pathlib import Path
 
 import pandas as pd
 import pytest
 
 from metricflow.dataflow.sql_table import SqlTable
+from metricflow.object_utils import pformat_big_objects
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql_clients.sql_utils import make_df
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.table_snapshot.table_snapshots import (
+    SqlTableSnapshotRepository,
+    SqlTableSnapshotRestorer,
+)
 from metricflow.time.time_constants import ISO8601_PYTHON_FORMAT
 from metricflow.time.time_granularity import TimeGranularity
+
+logger = logging.getLogger(__name__)
 
 DEFAULT_DS = "ds"
 
@@ -24,343 +34,53 @@ def create_table(sql_client: SqlClient, sql_table: SqlTable, df: pd.DataFrame) -
 
 
 @pytest.fixture(scope="session")
-def create_simple_model_tables(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> bool:
-    """Creates tables with example source data for testing."""
-    schema = mf_test_session_state.mf_source_schema
+def source_table_snapshot_repository() -> SqlTableSnapshotRepository:  # noqa: D
+    return SqlTableSnapshotRepository(Path(os.path.dirname(__file__)).joinpath("source_table_snapshots"))
 
-    cote_divoire = "cote d'ivoire"
 
-    # NOTE: fct_bookings should have both a host and guest id, but we do not yet
-    # have "entity roles" so that a user dimension can be attached to either
-    # guest or host (e.g. bookings by user:guest/country)
-    data = [
-        # While datetime columns can be used here, somewhere there is a conversion to a string when testing
-        # with sqlite, so when you read the datetime column, it comes out as a string.
-        # Columns for reference
-        # ["guest_id", "host_id", "listing_id", "booking_value", "is_instant", "ds", "ds_partitioned",
-        #  "booking_paid_at", "referrer_id"]
-        ("u0004114", "u0003141", "l3141592", 742.42, False, "2020-01-01", "2020-01-01", "2020-01-02", None),
-        ("u0004114", "u0003141", "l3141592", 441.14, True, "2020-01-01", "2020-01-01", "2020-01-02", "u0003141"),
-        ("u0003141", "u0003154", "l2718281", 499.99, True, "2020-01-01", "2020-01-01", "2020-01-02", None),
-        ("u0003154", "u0003141", "l2718281", 719.89, False, "2020-01-01", "2020-01-01", "2020-01-02", None),
-        ("u0004114", "u0003141", "l3141592", 319.85, True, "2020-01-01", "2020-01-01", "2020-01-02", "u0005432"),
-        ("u0004114", "u0003141", "l2718281", 442.42, True, "2020-01-02", "2020-01-02", "2020-01-03", None),
-        ("u0004114", "u0003141", "l2718281", 241.14, True, "2020-01-02", "2020-01-02", "2020-01-03", None),
-        ("u0004114", "u0003141", "l3141592", 799.99, False, "2020-01-02", "2020-01-02", "2020-01-03", None),
-        ("u0005432", "u0003452", "l2718281", 319.85, True, "2020-01-02", "2020-01-02", "2020-01-03", "u0003452"),
-        ("u0004114", "u1004114", "l9658588-incomplete", 0.0, False, "2020-01-02", "2020-01-02", "2020-01-03", None),
-        ("u0004114", "u1004114", "l8912456-incomplete", 0.0, False, "2020-01-02", "2020-01-02", "2020-01-03", None),
-        ("u0003452", "u0005432", "l3141592", 519.89, False, "2020-01-02", "2020-01-02", "2020-01-03", "u0003141"),
-        ("u0003452", "u0004114", "l5948301", 332.23, False, "2020-01-02", "2020-01-02", "2020-01-03", "u0003141"),
-        ("u1003452", "u1004114", "no_such_listing", 0.0, False, "2020-01-02", "2020-01-02", "2020-01-03", None),
-        ("u0003452", "u0004114", "l5948301", 0.0, False, "2020-01-03", "2020-01-03", "2020-01-04", None),
-        ("u0004114", "u0003141", "l3141592", 797.42, False, "2019-12-18", "2019-12-18", "2019-12-19", None),
-        ("u0004114", "u0003141", "l3141592", 808.14, True, "2019-12-18", "2019-12-18", "2019-12-19", "u0003141"),
-        ("u0003141", "u0003154", "l2718281", 531.99, True, "2019-12-18", "2019-12-18", "2019-12-19", None),
-        ("u0003154", "u0003141", "l2718281", 285.89, False, "2019-12-18", "2019-12-18", "2019-12-19", None),
-        ("u0004114", "u0003141", "l3141592", 714.85, True, "2019-12-18", "2019-12-18", "2019-12-19", "u0005432"),
-        ("u0004114", "u0003141", "l2718281", 368.42, True, "2019-12-19", "2019-12-19", "2019-12-20", None),
-        ("u0004114", "u0003141", "l2718281", 521.14, True, "2019-12-19", "2019-12-19", "2019-12-20", None),
-        ("u0004114", "u0003141", "l3141592", 581.99, False, "2019-12-19", "2019-12-19", "2019-12-20", None),
-        ("u0005432", "u0003452", "l2718281", 753.85, True, "2019-12-19", "2019-12-19", "2019-12-20", "u0003452"),
-        ("u0004114", "u1004114", "l9658588-incomplete", 0.0, False, "2019-12-19", "2019-12-19", "2019-12-20", None),
-        ("u0004114", "u1004114", "l8912456-incomplete", 0.0, False, "2019-12-19", "2019-12-19", "2019-12-20", None),
-        ("u0003452", "u0005432", "l3141592", 754.89, False, "2019-12-19", "2019-12-19", "2019-12-20", "u0003141"),
-        ("u0003452", "u0004114", "l5948301", 152.23, False, "2019-12-19", "2019-12-19", "2019-12-20", "u0003141"),
-        ("u1003452", "u1004114", "no_such_listing", 0.0, False, "2019-12-19", "2019-12-19", "2019-12-20", None),
-        ("u0003452", "u0004114", "l5948301", 0.0, False, "2019-12-20", "2019-12-20", "2019-12-21", None),
-        ("u0004114", "u0003141", "l3141592", 352.42, False, "2019-12-18", "2019-12-18", "2019-12-19", None),
-        ("u0004114", "u0003141", "l3141592", 444.14, True, "2019-12-18", "2019-12-18", "2019-12-19", "u0003141"),
-        ("u0003141", "u0003154", "l2718281", 415.99, True, "2019-12-18", "2019-12-18", "2019-12-19", None),
-        ("u0003154", "u0003141", "l2718281", 578.89, False, "2019-12-18", "2019-12-18", "2019-12-19", None),
-        ("u0004114", "u0003141", "l3141592", 768.85, True, "2019-12-18", "2019-12-18", "2019-12-19", "u0005432"),
-        ("u0004114", "u0003141", "l2718281", 532.42, True, "2019-12-19", "2019-12-19", "2019-12-20", None),
-        ("u0004114", "u0003141", "l2718281", 258.14, True, "2019-12-19", "2019-12-19", "2019-12-20", None),
-        ("u0004114", "u0003141", "l3141592", 753.99, False, "2019-12-19", "2019-12-19", "2019-12-20", None),
-        ("u0005432", "u0003452", "l2718281", 852.85, True, "2019-12-19", "2019-12-19", "2019-12-20", "u0003452"),
-        ("u0004114", "u1004114", "l9658588-incomplete", 0.0, False, "2019-12-19", "2019-12-19", "2019-12-20", None),
-        ("u0004114", "u1004114", "l8912456-incomplete", 0.0, False, "2019-12-19", "2019-12-19", "2019-12-20", None),
-        ("u0003452", "u0005432", "l3141592", 728.89, False, "2019-12-19", "2019-12-19", "2019-12-20", "u0003141"),
-        ("u0003452", "u0004114", "l5948301", 951.23, False, "2019-12-19", "2019-12-19", "2019-12-20", "u0003141"),
-        ("u1003452", "u1004114", "no_such_listing", 0.0, False, "2019-12-19", "2019-12-19", "2019-12-20", None),
-        ("u0003452", "u0004114", "l5948301", 0.0, False, "2019-12-20", "2019-12-20", "2019-12-21", None),
-        ("u0003452", "u0004114", "l5948301", 951.23, False, "2019-12-01", "2019-12-01", "2019-12-01", "u0003141"),
-    ]
-    create_table(
-        sql_client=sql_client,
-        sql_table=SqlTable(schema_name=schema, table_name="fct_bookings"),
-        df=make_df(
-            sql_client=sql_client,
-            columns=[
-                "guest_id",
-                "host_id",
-                "listing_id",
-                "booking_value",
-                "is_instant",
-                DEFAULT_DS,
-                "ds_partitioned",
-                "booking_paid_at",
-                "referrer_id",
-            ],
-            time_columns={DEFAULT_DS, "ds_partitioned", "booking_paid_at"},
-            data=data,
-        ),
+@pytest.fixture(scope="session")
+def create_source_tables(
+    mf_test_session_state: MetricFlowTestSessionState,
+    sql_client: SqlClient,
+    source_table_snapshot_repository: SqlTableSnapshotRepository,
+) -> None:
+    """Creates all tables that should be in the source schema.
+
+    If a table with a given name already exists in the source schema, it's assumed to have the expected schema / data.
+    """
+    schema_name = mf_test_session_state.mf_source_schema
+    # Figure out which tables are missing from the source schema.
+    expected_table_names = sorted(
+        [table_snapshot.table_name for table_snapshot in source_table_snapshot_repository.table_snapshots]
     )
-
-    # Like fct_bookings, but using dt instead of ds to verify that a primary time dimension named something other than
-    # ds can be used.
-    create_table(
-        sql_client=sql_client,
-        sql_table=SqlTable(schema_name=schema, table_name="fct_bookings_dt"),
-        df=make_df(
-            sql_client=sql_client,
-            columns=[
-                "guest_id",
-                "host_id",
-                "listing_id",
-                "booking_value",
-                "is_instant",
-                "dt",
-                "dt_partitioned",
-                "booking_paid_at",
-                "referrer_id",
-            ],
-            time_columns={"dt", "dt_partitioned"},
-            data=data,
-        ),
+    logger.info(
+        f"The following tables are needed in schema {schema_name}:\n" f"{pformat_big_objects(expected_table_names)}"
     )
+    source_schema_table_names = sorted(sql_client.list_tables(schema_name=schema_name))
 
-    create_table(
-        sql_client=sql_client,
-        sql_table=SqlTable(schema_name=schema, table_name="fct_views"),
-        df=make_df(
-            sql_client=sql_client,
-            columns=["user_id", "listing_id", DEFAULT_DS, "ds_partitioned"],
-            time_columns={DEFAULT_DS, "ds_partitioned"},
-            data=[
-                ("u0004114", "l3141592", "2020-01-01", "2020-01-01"),
-                ("u1612112", "l3141592", "2020-01-01", "2020-01-01"),
-                ("u0004114", "l2718281", "2020-01-02", "2020-01-02"),
-                ("u0004114", "l3141592", "2020-01-02", "2020-01-02"),
-                ("u1612112", "l2718281", "2020-01-02", "2020-01-02"),
-                ("u0004114", "", "2020-01-02", "2020-01-02"),
-                ("u0004114", "l7891283-incomplete", "2020-01-02", "2020-01-02"),
-            ],
-        ),
+    missing_table_names = set(expected_table_names).difference(source_schema_table_names)
+    logger.info(
+        f"The following tables are missing and will be restored:\n"
+        f"{pformat_big_objects(sorted(missing_table_names))}"
     )
-
-    create_table(
-        sql_client=sql_client,
-        sql_table=SqlTable(schema_name=schema, table_name="dim_listings_latest"),
-        df=make_df(
-            sql_client=sql_client,
-            columns=["listing_id", "country", "capacity", "is_lux", "user_id", "created_at"],
-            time_columns={"created_at"},
-            data=[
-                ("l3141592", "us", 3, True, "u0004114", "2020-01-01"),
-                ("l5948301", "us", 5, True, "u0004114", "2020-01-02"),
-                ("l2718281", cote_divoire, 4, False, "u0005432", "2020-01-02"),
-                ("l9658588-incomplete", "us", None, None, "u1004114", "2020-01-02"),
-                ("l8912456-incomplete", None, None, None, "u1004114", "2020-01-02"),
-                ("l7891283-incomplete", "ca", None, False, "u1004114", "2020-01-02"),
-            ],
-        ),
+    # Restore the ones that are missing.
+    snapshot_restorer = SqlTableSnapshotRestorer(
+        sql_client=sql_client, schema_name=mf_test_session_state.mf_source_schema
     )
+    for table_snapshot in source_table_snapshot_repository.table_snapshots:
+        if table_snapshot.table_name in missing_table_names:
+            logger.info(f"Restoring: {table_snapshot.table_name}")
+            snapshot_restorer.restore(table_snapshot)
 
-    # The dim_listings table is an SCD type II table in the style of a dbt snapshot with two columns setting the
-    # the range of time when this row was "active", with a NULL value for "active_to" meaning it's still current
-    create_table(
-        sql_client=sql_client,
-        sql_table=SqlTable(schema_name=schema, table_name="dim_listings"),
-        df=make_df(
-            sql_client=sql_client,
-            columns=["listing_id", "country", "capacity", "is_lux", "user_id", "active_from", "active_to"],
-            time_columns={"active_from", "active_to"},
-            data=[
-                ("l3141592", "us", 2, True, "u0004114", "2020-01-01", "2020-01-02"),
-                ("l2718281", cote_divoire, 4, True, "u0005432", "2020-01-01", "2020-01-02"),
-                ("l3141592", "us", 3, True, "u0004114", "2020-01-02", None),
-                # This cote_divoire property changed hands to a person from Maryland who considers it not lux
-                ("l2718281", cote_divoire, 4, False, "u0003154", "2020-01-02", None),
-                ("l5948301", "us", 5, True, "u0004114", "2020-01-02", None),
-                ("l9658588-incomplete", None, None, None, "u1004114", "2020-01-01", "2020-01-02"),
-                ("l9658588-incomplete", "us", None, None, "u1004114", "2020-01-02", None),
-                ("l8912456-incomplete", None, None, None, "u1004114", "2020-01-02", None),
-                ("l7891283-incomplete", "ca", None, False, "u1004114", "2020-01-02", None),
-            ],
-        ),
-    )
-    create_table(
-        sql_client=sql_client,  # successful identity verifications
-        sql_table=SqlTable(schema_name=schema, table_name="fct_id_verifications"),
-        df=make_df(
-            sql_client=sql_client,
-            columns=["verification_id", "user_id", "verification_type", DEFAULT_DS, "ds_partitioned"],
-            time_columns={DEFAULT_DS, "ds_partitioned"},
-            data=[
-                ("v0000001", "u0004114", "drivers_license", "2020-01-01", "2020-01-01"),
-                ("v0000002", "u1612112", "passport", "2020-01-01", "2020-01-01"),
-                ("v0000003", "u0004114", "social_security", "2020-01-02", "2020-01-02"),
-                ("v0000004", "u1612112", "drivers_license", "2020-01-02", "2020-01-02"),
-            ],
-        ),
-    )
 
-    create_table(
-        sql_client=sql_client,
-        sql_table=SqlTable(schema_name=schema, table_name="dim_users"),
-        df=make_df(
-            sql_client=sql_client,
-            columns=["user_id", "home_state", "created_at", DEFAULT_DS, "ds_partitioned"],
-            time_columns={"created_at", DEFAULT_DS, "ds_partitioned"},
-            data=[
-                ("u0004114", "CA", "2019-03-03", "2020-01-01", "2020-01-01"),
-                ("u1612112", "CA", "2019-04-03", "2020-01-01", "2020-01-01"),
-                ("u0005432", "TX", "2017-03-03", "2020-01-01", "2020-01-01"),
-                ("u0003452", "HI", "2013-03-03", "2020-01-01", "2020-01-01"),
-                ("u0003154", "MD", "2014-03-03", "2020-01-01", "2020-01-01"),
-                ("u0003141", "NY", "2015-03-03", "2020-01-01", "2020-01-01"),
-                ("u0004114", "CA", "2019-03-03", "2020-01-02", "2020-01-02"),
-                ("u1612112", "WA", "2019-04-03", "2020-01-02", "2020-01-02"),
-                ("u0005432", "TX", "2017-03-03", "2020-01-02", "2020-01-02"),
-                ("u0003452", "HI", "2013-03-03", "2020-01-02", "2020-01-02"),
-                ("u0003154", "MD", "2014-03-03", "2020-01-02", "2020-01-02"),
-                ("u0003141", "NY", "2015-03-03", "2020-01-02", "2020-01-02"),
-            ],
-        ),
-    )
+@pytest.fixture(scope="session")
+def create_simple_model_tables(create_source_tables: None) -> bool:
+    """Creates tables with example source data for testing the simple model.
 
-    create_table(
-        sql_client=sql_client,
-        sql_table=SqlTable(schema_name=schema, table_name="dim_users_latest"),
-        df=make_df(
-            sql_client=sql_client,
-            columns=["user_id", "home_state_latest", DEFAULT_DS],
-            time_columns={DEFAULT_DS},
-            data=[
-                ("u0004114", "CA", "2020-01-02"),
-                ("u1612112", "WA", "2020-01-02"),
-                ("u0005432", "TX", "2020-01-02"),
-                ("u0003452", "HI", "2020-01-02"),
-                ("u0003154", "MD", "2020-01-02"),
-                ("u0003141", "NY", "2020-01-02"),
-            ],
-        ),
-    )
-
-    create_table(
-        sql_client=sql_client,
-        sql_table=SqlTable(schema_name=schema, table_name="fct_revenue"),
-        df=make_df(
-            sql_client=sql_client,
-            columns=["revenue", "created_at", "user_id"],
-            time_columns={"created_at"},
-            data=[
-                (1000, "2020-01-01", "u0004114"),
-                (4000, "2020-02-01", "u0004114"),
-                (3000, "2020-03-01", "u0005432"),
-                (4000, "2020-04-02", "u0004114"),
-                (1000, "2021-01-01", "u0004114"),
-                (1000, "2021-01-02", "u0004114"),
-                (1000, "2021-01-03", "u0004114"),
-                (1000, "2021-01-04", "u0004114"),
-            ],
-        ),
-    )
-
-    create_table(
-        sql_client=sql_client,
-        sql_table=SqlTable(schema_name=schema, table_name="dim_lux_listing_id_mapping"),
-        df=make_df(
-            sql_client=sql_client,
-            columns=["listing_id", "lux_listing_id"],
-            data=[
-                ("l3141592", "ll_001"),
-                ("l5948301", "LUX_TEST_ID"),
-                ("l2718281", "ll_002"),
-            ],
-        ),
-    )
-
-    create_table(
-        sql_client=sql_client,
-        sql_table=SqlTable(schema_name=schema, table_name="dim_lux_listings"),
-        df=make_df(
-            sql_client=sql_client,
-            columns=["lux_listing_id", "is_confirmed_lux", "valid_from", "valid_to"],
-            time_columns={"valid_from", "valid_to"},
-            data=[
-                ("ll_001", True, "2020-01-01", None),
-                ("LUX_TEST_ID", True, "2020-01-02", None),
-                ("ll_002", True, "2020-01-01", "2020-01-02"),
-                ("ll_002", False, "2020-01-02", None),
-            ],
-        ),
-    )
-
-    create_table(
-        sql_client=sql_client,
-        sql_table=SqlTable(schema_name=schema, table_name="dim_companies"),
-        df=make_df(
-            sql_client=sql_client,
-            columns=["company_id", "user_id", "company_name"],
-            data=[
-                ("cpid_0", "u0003154", "MD Vacation Rentals LLC"),
-            ],
-        ),
-    )
-
-    accounts_data = [
-        ("u0004114", 2135, "2020-01-01", "checking"),
-        ("u0004114", 1234, "2020-01-01", "savings"),
-        ("u0005432", 5234, "2020-01-03", "checking"),
-        ("u0005432", 234, "2020-01-03", "savings"),
-        ("u0003141", 24634, "2020-01-01", "checking"),
-        ("u0003154", 23452, "2020-01-01", "checking"),
-        ("u0004114", 1213, "2020-01-06", "savings"),
-        ("u1612112", 5123, "2020-01-02", "checking"),
-        ("u0004114", 523, "2020-01-07", "checking"),
-        ("u0004114", 7434, "2020-01-10", "checkings"),
-        ("u0005432", 8456, "2020-01-02", "savings"),
-        ("u0003141", 12939, "2020-01-12", "checking"),
-        ("u0003452", 6939, "2020-01-02", "checking"),
-        ("u0003452", 35, "2020-01-12", "checking"),
-        ("u0005414", 5582, "2020-01-04", "savings"),
-    ]
-
-    create_table(
-        sql_client=sql_client,
-        sql_table=SqlTable(schema_name=schema, table_name="fct_accounts"),
-        df=make_df(
-            sql_client=sql_client,
-            columns=["user_id", "account_balance", DEFAULT_DS, "account_type"],
-            time_columns={DEFAULT_DS},
-            data=accounts_data,
-        ),
-    )
-
-    create_table(
-        sql_client=sql_client,
-        sql_table=SqlTable(schema_name=schema, table_name="dim_primary_accounts"),
-        df=make_df(
-            sql_client=sql_client,
-            columns=["user_id", "account_type", "set_as_primary", "removed_as_primary"],
-            time_columns={"set_as_primary", "removed_as_primary"},
-            data=[
-                ("u0004114", "savings", "2020-01-01", "2020-01-02"),
-                ("u1612112", "checking", "2020-01-01", "2020-01-01"),
-                ("u0005432", "savings", "2020-01-02", "2020-01-03"),
-                ("u0003452", "checking", "2020-01-01", None),
-                ("u0003154", "checking", "2020-01-01", None),
-                ("u0003141", "checking", "2020-01-01", None),
-                ("u0004114", "savings", "2020-01-02", None),
-                ("u1612112", "checking", "2020-01-02", "2020-01-02"),
-                ("u0005432", "checking", "2020-01-03", None),
-            ],
-        ),
-    )
-
-    return True
+    The use of this fixture will be consolidated with the create_source_tables fixture in a later PR once the other
+    table creation fixtures are migrated.
+    """
+    pass
 
 
 @pytest.fixture(scope="session")
