@@ -4,7 +4,6 @@ import logging
 from typing import List, Sequence
 
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from dbt_semantic_interfaces.parsing.dir_to_model import ModelBuildResult
 from metricflow.model.validations.agg_time_dimension import AggregationTimeDimensionRule
 from metricflow.model.validations.data_sources import DataSourceTimeDimensionWarningsRule, DataSourceValidityWindowRule
 from metricflow.model.validations.dimension_const import DimensionConsistencyRule
@@ -77,7 +76,7 @@ class ModelValidator:
         self._rules = rules
         self._executor = ProcessPoolExecutor(max_workers=max_workers)
 
-    def validate_model(self, model: UserConfiguredModel) -> ModelBuildResult:
+    def validate_model(self, model: UserConfiguredModel) -> ModelValidationResults:
         """Validate a model according to configured rules."""
         serialized_model = model.json()
 
@@ -92,14 +91,11 @@ class ModelValidator:
             result = ModelValidationResults.parse_raw(res)
             results.append(result)
 
-        return ModelBuildResult(model=model, issues=ModelValidationResults.merge(results))
+        return ModelValidationResults.merge(results)
 
-    def checked_validations(self, model: UserConfiguredModel) -> UserConfiguredModel:  # chTODO: remember checked_build
+    def checked_validations(self, model: UserConfiguredModel) -> None:
         """Similar to validate(), but throws an exception if validation fails."""
         model_copy = copy.deepcopy(model)
-        build_result = self.validate_model(model_copy)
-
-        if build_result.issues.has_blocking_issues:
-            raise ModelValidationException(issues=tuple(build_result.issues.all_issues))
-
-        return model
+        model_issues = self.validate_model(model_copy)
+        if model_issues.has_blocking_issues:
+            raise ModelValidationException(issues=tuple(model_issues.all_issues))

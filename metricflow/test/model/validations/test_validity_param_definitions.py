@@ -39,11 +39,11 @@ def test_validity_window_configuration() -> None:
     validity_window_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
     model = parse_yaml_files_to_validation_ready_model([base_model_file(), validity_window_file])
 
-    validation_result = ModelValidator().validate_model(model.model)
+    model_issues = ModelValidator().validate_model(model.model)
 
-    assert not validation_result.issues.has_blocking_issues, (
+    assert not model_issues.has_blocking_issues, (
         f"Found blocking issues validating model with validity window properly configured: "
-        f"{[x.as_readable_str() for x in validation_result.issues.errors]}"
+        f"{[x.as_readable_str() for x in model_issues.errors]}"
     )
 
 

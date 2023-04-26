@@ -701,17 +701,15 @@ def validate_configs(
     # Semantic validation
     semantic_spinner = Halo(text="Validating semantics of built model", spinner="dots")
     semantic_spinner.start()
-    semantic_result = ModelValidator(max_workers=semantic_validation_workers).validate_model(user_model)
+    model_issues = ModelValidator(max_workers=semantic_validation_workers).validate_model(user_model)
 
-    if not semantic_result.issues.has_blocking_issues:
-        semantic_spinner.succeed(
-            f"🎉 Successfully validated the semantics of built model ({semantic_result.issues.summary()})"
-        )
+    if not model_issues.has_blocking_issues:
+        semantic_spinner.succeed(f"🎉 Successfully validated the semantics of built model ({model_issues.summary()})")
     else:
         semantic_spinner.fail(
-            f"Breaking issues found when checking semantics of built model ({semantic_result.issues.summary()})"
+            f"Breaking issues found when checking semantics of built model ({model_issues.summary()})"
         )
-        _print_issues(semantic_result.issues, show_non_blocking=show_all, verbose=verbose_issues)
+        _print_issues(model_issues, show_non_blocking=show_all, verbose=verbose_issues)
         return
 
     dw_results = ModelValidationResults()
@@ -719,9 +717,7 @@ def validate_configs(
         dw_validator = DataWarehouseModelValidator(sql_client=cfg.sql_client, system_schema=cfg.mf_system_schema)
         dw_results = _data_warehouse_validations_runner(dw_validator=dw_validator, model=user_model, timeout=dw_timeout)
 
-    merged_results = ModelValidationResults.merge(
-        [lint_results, parsing_result.issues, semantic_result.issues, dw_results]
-    )
+    merged_results = ModelValidationResults.merge([lint_results, parsing_result.issues, model_issues, dw_results])
     _print_issues(merged_results, show_non_blocking=show_all, verbose=verbose_issues)
 
 
