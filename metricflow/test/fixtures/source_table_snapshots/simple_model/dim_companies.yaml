@@ -1,0 +1,11 @@
+table_snapshot:
+  table_name: dim_companies
+  column_definitions:
+    - name: company_id
+      type: STRING
+    - name: company_name
+      type: STRING
+    - name: user_id
+      type: STRING
+  rows:
+    - ["cpid_0", "MD Vacation Rentals LLC", "u0003154"]
