@@ -1,0 +1,14 @@
+table_snapshot:
+  table_name: example_table
+  column_definitions:
+    - name: user_id
+      type: INT
+    - name: name
+      type: STRING
+    - name: balance
+      type: FLOAT
+    - name: is_active
+      type: BOOLEAN
+  rows:
+    - ["0", "user0", "0.0", "False"]
+    - ["1", "user1", "0.1", "True"]
