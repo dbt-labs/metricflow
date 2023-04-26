@@ -10,7 +10,6 @@ class SqlDialect(ExtendedEnum):
     DUCKDB = "duckdb"
     REDSHIFT = "redshift"
     POSTGRESQL = "postgresql"
-    MYSQL = "mysql"
     SNOWFLAKE = "snowflake"
     BIGQUERY = "bigquery"
     DATABRICKS = "databricks"
