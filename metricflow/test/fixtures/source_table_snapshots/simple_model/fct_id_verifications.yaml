@@ -1,0 +1,18 @@
+table_snapshot:
+  table_name: fct_id_verifications
+  column_definitions:
+    - name: ds
+      type: TIME
+    - name: ds_partitioned
+      type: TIME
+    - name: verification_id
+      type: STRING
+    - name: user_id
+      type: STRING
+    - name: verification_type
+      type: STRING
+  rows:
+    - ["2020-01-01", "2020-01-01", "v0000001", "u0004114", "drivers_license"]
+    - ["2020-01-01", "2020-01-01", "v0000002", "u1612112", "passport"]
+    - ["2020-01-02", "2020-01-02", "v0000003", "u0004114", "social_security"]
+    - ["2020-01-02", "2020-01-02", "v0000004", "u1612112", "drivers_license"]

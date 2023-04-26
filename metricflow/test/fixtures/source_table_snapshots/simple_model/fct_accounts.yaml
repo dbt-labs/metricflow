@@ -1,0 +1,27 @@
+table_snapshot:
+  table_name: fct_accounts
+  column_definitions:
+    - name: ds
+      type: TIME
+    - name: user_id
+      type: STRING
+    - name: account_balance
+      type: INT
+    - name: account_type
+      type: STRING
+  rows:
+    - ["2020-01-01", "u0004114", "2135", "checking"]
+    - ["2020-01-01", "u0004114", "1234", "savings"]
+    - ["2020-01-01", "u0003141", "24634", "checking"]
+    - ["2020-01-01", "u0003154", "23452", "checking"]
+    - ["2020-01-02", "u1612112", "5123", "checking"]
+    - ["2020-01-02", "u0005432", "8456", "savings"]
+    - ["2020-01-02", "u0003452", "6939", "checking"]
+    - ["2020-01-03", "u0005432", "5234", "checking"]
+    - ["2020-01-03", "u0005432", "234", "savings"]
+    - ["2020-01-04", "u0005414", "5582", "savings"]
+    - ["2020-01-06", "u0004114", "1213", "savings"]
+    - ["2020-01-07", "u0004114", "523", "checking"]
+    - ["2020-01-10", "u0004114", "7434", "checkings"]
+    - ["2020-01-12", "u0003141", "12939", "checking"]
+    - ["2020-01-12", "u0003452", "35", "checking"]
