@@ -1,5 +1,5 @@
 <p align="center">
-  <a target="_blank" href="https://www.getdbt.com/">
+  <a target="_blank" href="https://transform.co/metricflow">
     <picture>
       <img  alt="metricflow logo" src="https://github.com/dbt-labs/metricflow/raw/main/assets/MetricFlow_logo.png" width="auto" height="120">
     </picture>
@@ -82,7 +82,7 @@ There are several examples of MetricFlow configs on common data sets in the [con
 
 ## Resources
 
-- [Website](https://www.getdbt.com/)
+- [Website](https://transform.co/metricflow)
 - [Documentation](https://docs.transform.co/docs/overview/metricflow-overview)
 - [Slack Community](https://community.transform.co/metricflow-signup)
 - [MetricFlow Git Repository](https://github.com/dbt-labs/metricflow)
