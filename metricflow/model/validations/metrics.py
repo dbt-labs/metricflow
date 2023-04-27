@@ -1,7 +1,7 @@
 import traceback
 from typing import List
 
-from metricflow.errors.errors import ParsingException
+from dbt_semantic_interfaces.errors import ParsingException
 from metricflow.instances import MetricModelReference
 from dbt_semantic_interfaces.objects.metric import Metric, MetricType, MetricTimeWindow
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
