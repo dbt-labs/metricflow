@@ -18,17 +18,17 @@ from metricflow.model.validations.validator_helpers import (
     ValidationError,
     ValidationFutureError,
     ValidationIssueLevel,
-    ValidationIssueType,
+    ValidationIssue,
     ValidationWarning,
 )
 
 
 @pytest.fixture
-def list_of_issues() -> List[ValidationIssueType]:  # noqa: D
+def list_of_issues() -> List[ValidationIssue]:  # noqa: D
     file_context = FileContext(file_name="foo", line_number=1337)
     data_source_name = "My data source"
 
-    issues: List[ValidationIssueType] = []
+    issues: List[ValidationIssue] = []
     issues.append(
         ValidationWarning(
             context=DataSourceContext(
@@ -90,7 +90,7 @@ def list_of_issues() -> List[ValidationIssueType]:  # noqa: D
 
 
 def test_creating_model_validation_results_from_issue_list(  # noqa: D
-    list_of_issues: List[ValidationIssueType],
+    list_of_issues: List[ValidationIssue],
 ) -> None:
     warnings = [issue for issue in list_of_issues if issue.level == ValidationIssueLevel.WARNING]
     future_errors = [issue for issue in list_of_issues if issue.level == ValidationIssueLevel.FUTURE_ERROR]
@@ -107,7 +107,7 @@ def test_creating_model_validation_results_from_issue_list(  # noqa: D
 
 
 def test_jsonifying_and_reloading_model_validation_results_is_equal(  # noqa: D
-    list_of_issues: List[ValidationIssueType],
+    list_of_issues: List[ValidationIssue],
 ) -> None:
     warnings = [issue for issue in list_of_issues if issue.level == ValidationIssueLevel.WARNING]
     errors = [issue for issue in list_of_issues if issue.level == ValidationIssueLevel.ERROR]
@@ -125,7 +125,7 @@ def test_jsonifying_and_reloading_model_validation_results_is_equal(  # noqa: D
     assert set_context_types == set(new_context_types)
 
 
-def test_merge_two_model_validation_results(list_of_issues: List[ValidationIssueType]) -> None:  # noqa: D
+def test_merge_two_model_validation_results(list_of_issues: List[ValidationIssue]) -> None:  # noqa: D
     validation_results = ModelValidationResults.from_issues_sequence(list_of_issues)
     validation_results_dup = ModelValidationResults.from_issues_sequence(list_of_issues)
     merged = ModelValidationResults.merge([validation_results, validation_results_dup])

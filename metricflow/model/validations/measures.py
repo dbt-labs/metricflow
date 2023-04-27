@@ -16,7 +16,7 @@ from metricflow.model.validations.validator_helpers import (
     FileContext,
     MetricContext,
     ModelValidationRule,
-    ValidationIssueType,
+    ValidationIssue,
     ValidationError,
     ValidationWarning,
     validate_safely,
@@ -31,8 +31,8 @@ class DataSourceMeasuresUniqueRule(ModelValidationRule):
     @validate_safely(
         whats_being_done="running model validation ensuring measures exist in only one configured data source"
     )
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
-        issues: List[ValidationIssueType] = []
+    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
+        issues: List[ValidationIssue] = []
 
         measure_references_to_data_sources: Dict[MeasureReference, List] = defaultdict(list)
         for data_source in model.data_sources:
@@ -64,7 +64,7 @@ class MeasureConstraintAliasesRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="ensuring measures aliases are set when required")
-    def _validate_required_aliases_are_set(metric: Metric, metric_context: MetricContext) -> List[ValidationIssueType]:
+    def _validate_required_aliases_are_set(metric: Metric, metric_context: MetricContext) -> List[ValidationIssue]:
         """Checks if valid aliases are set on the input measure references where they are required
 
         Aliases are required whenever there are 2 or more input measures with the same measure
@@ -75,7 +75,7 @@ class MeasureConstraintAliasesRule(ModelValidationRule):
         At this time aliases are required for ratio metrics, but eventually we could relax that requirement
         if we can find an automatic aliasing scheme for numerator/denominator that we feel comfortable using.
         """
-        issues: List[ValidationIssueType] = []
+        issues: List[ValidationIssue] = []
 
         if len(metric.measure_references) == len(set(metric.measure_references)):
             # All measure references are unique, so disambiguation via aliasing is not necessary
@@ -124,13 +124,13 @@ class MeasureConstraintAliasesRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking constrained measures are aliased properly")
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:
+    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:
         """Ensures measures that might need an alias have one set, and that the alias is distinct
 
         We do not allow aliases to collide with other alias or measure names, since that could create
         ambiguity at query time or cause issues if users ever restructure their models.
         """
-        issues: List[ValidationIssueType] = []
+        issues: List[ValidationIssue] = []
 
         measure_names = _get_measure_names_from_model(model)
         measure_alias_to_metrics: DefaultDict[str, List[str]] = defaultdict(list)
@@ -186,8 +186,8 @@ class MetricMeasuresRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking all measures referenced by the metric exist")
-    def _validate_metric_measure_references(metric: Metric, valid_measure_names: Set[str]) -> List[ValidationIssueType]:
-        issues: List[ValidationIssueType] = []
+    def _validate_metric_measure_references(metric: Metric, valid_measure_names: Set[str]) -> List[ValidationIssue]:
+        issues: List[ValidationIssue] = []
 
         for measure_reference in metric.measure_references:
             if measure_reference.element_name not in valid_measure_names:
@@ -207,8 +207,8 @@ class MetricMeasuresRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="running model validation ensuring metric measures exist")
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
-        issues: List[ValidationIssueType] = []
+    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
+        issues: List[ValidationIssue] = []
         valid_measure_names = _get_measure_names_from_model(model)
 
         for metric in model.metrics or []:
@@ -223,8 +223,8 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="ensuring that a measure's non_additive_dimensions is valid")
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
-        issues: List[ValidationIssueType] = []
+    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
+        issues: List[ValidationIssue] = []
         for data_source in model.data_sources or []:
             for measure in data_source.measures:
                 non_additive_dimension = measure.non_additive_dimension
@@ -371,8 +371,8 @@ class CountAggregationExprRule(ModelValidationRule):
     @validate_safely(
         whats_being_done="running model validation ensuring expr exist for measures with count aggregation"
     )
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
-        issues: List[ValidationIssueType] = []
+    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
+        issues: List[ValidationIssue] = []
 
         for data_source in model.data_sources:
             for measure in data_source.measures:
@@ -422,8 +422,8 @@ class PercentileAggregationRule(ModelValidationRule):
     @validate_safely(
         whats_being_done="running model validation ensuring the agg_params.percentile value exist for measures with percentile aggregation"
     )
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
-        issues: List[ValidationIssueType] = []
+    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
+        issues: List[ValidationIssue] = []
 
         for data_source in model.data_sources:
             for measure in data_source.measures:
