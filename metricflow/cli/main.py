@@ -657,8 +657,6 @@ def validate_configs(
     if not show_all:
         print("(To see warnings and future-errors, run again with flag `--show-all`)")
 
-    lint_results = ModelValidationResults()
-
     # Parsing Validation
     parsing_spinner = Halo(text="Building model from configs", spinner="dots")
     parsing_spinner.start()
@@ -702,7 +700,7 @@ def validate_configs(
         dw_validator = DataWarehouseModelValidator(sql_client=cfg.sql_client, system_schema=cfg.mf_system_schema)
         dw_results = _data_warehouse_validations_runner(dw_validator=dw_validator, model=user_model, timeout=dw_timeout)
 
-    merged_results = ModelValidationResults.merge([lint_results, parsing_result.issues, model_issues, dw_results])
+    merged_results = ModelValidationResults.merge([parsing_result.issues, model_issues, dw_results])
     _print_issues(merged_results, show_non_blocking=show_all, verbose=verbose_issues)
 
 
