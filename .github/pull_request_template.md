@@ -9,8 +9,10 @@ resolves #
 ### Description
 
 <!---
-  Describe the Pull Request here. Add any references and info to help reviewers
-  understand your changes. Include any tradeoffs you considered.
+  Provide context for the Pull Request here, including more details on what
+  is changing and why. Add any references and info to help reviewers
+  understand your changes, such as any tradeoffs you considered, and the local
+  test process you followed.
 -->
 
 ### Checklist
