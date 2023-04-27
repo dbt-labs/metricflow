@@ -15,10 +15,8 @@ resolves #
   test process you followed.
 -->
 
-### Checklist
-
-- [ ] I have read [the contributing guide](https://github.com/dbt-labs/metricflow/blob/main/CONTRIBUTING.md) and understand what's expected of me
-- [ ] I have signed the [CLA](https://docs.getdbt.com/docs/contributor-license-agreements)
-- [ ] I have run this code locally and it appears to resolve the stated issue
-- [ ] This PR includes tests, or tests are not required/relevant for this PR
-- [ ] I have run `changie new` to [create a changelog entry](https://github.com/dbt-labs/metricflow/blob/main/CONTRIBUTING.md#adding-a-changelog-entry)
+<!--- 
+  Before requesting review, please make sure you have:
+  1. read [the contributing guide](https://github.com/dbt-labs/metricflow/blob/main/CONTRIBUTING.md),
+  2. signed the [CLA](https://docs.getdbt.com/docs/contributor-license-agreements)
+  3. run `changie new` to [create a changelog entry](https://github.com/dbt-labs/metricflow/blob/main/CONTRIBUTING.md#adding-a-changelog-entry)
