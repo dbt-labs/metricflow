@@ -192,7 +192,6 @@ def test_request_tags(
         or engine_type is SqlEngine.REDSHIFT
         or engine_type is SqlEngine.DATABRICKS
         or engine_type is SqlEngine.POSTGRES
-        or engine_type is SqlEngine.MYSQL
     ):
         pytest.skip(f"Testing tags not supported in {engine_type}")
     else:

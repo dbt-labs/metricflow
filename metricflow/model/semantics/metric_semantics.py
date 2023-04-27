@@ -1,32 +1,28 @@
 import logging
+from typing import Dict, List, FrozenSet, Sequence
 
-from typing import Dict, List, FrozenSet, Set, Tuple, Sequence
-
-from metricflow.errors.errors import MetricNotFoundError, DuplicateMetricError, NonExistentMeasureError
 from dbt_semantic_interfaces.objects.metric import Metric, MetricType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from metricflow.errors.errors import MetricNotFoundError, DuplicateMetricError, NonExistentMeasureError
+from metricflow.model.semantics.data_source_join_evaluator import MAX_JOIN_HOPS
 from metricflow.model.semantics.data_source_semantics import DataSourceSemantics
-from metricflow.model.semantics.linkable_spec_resolver import ValidLinkableSpecResolver
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
+from metricflow.model.semantics.linkable_spec_resolver import ValidLinkableSpecResolver
 from metricflow.model.spec_converters import WhereConstraintConverter
+from metricflow.protocols.semantics import MetricSemanticsAccessor
 from metricflow.references import MetricReference
 from metricflow.specs import MetricSpec, LinkableInstanceSpec, MetricInputMeasureSpec, MeasureSpec
-from metricflow.model.semantics.data_source_join_evaluator import MAX_JOIN_HOPS
-
 
 logger = logging.getLogger(__name__)
 
 
-class MetricSemantics:  # noqa: D
+class MetricSemantics(MetricSemanticsAccessor):  # noqa: D
     def __init__(  # noqa: D
         self, user_configured_model: UserConfiguredModel, data_source_semantics: DataSourceSemantics
     ) -> None:
         self._user_configured_model = user_configured_model
         self._metrics: Dict[MetricReference, Metric] = {}
         self._data_source_semantics = data_source_semantics
-
-        # Dict from the name of the metric to the hash.
-        self._metric_hashes: Dict[MetricReference, str] = {}
 
         for metric in self._user_configured_model.metrics:
             self.add_metric(metric)
@@ -39,10 +35,10 @@ class MetricSemantics:  # noqa: D
 
     def element_specs_for_metrics(
         self,
-        metric_references: List[MetricReference],
+        metric_references: Sequence[MetricReference],
         with_any_property: FrozenSet[LinkableElementProperties] = LinkableElementProperties.all_properties(),
         without_any_property: FrozenSet[LinkableElementProperties] = frozenset(),
-    ) -> List[LinkableInstanceSpec]:
+    ) -> Sequence[LinkableInstanceSpec]:
         """Dimensions common to all metrics requested (intersection)"""
 
         all_linkable_specs = self._linkable_spec_resolver.get_linkable_elements_for_metrics(
@@ -53,7 +49,7 @@ class MetricSemantics:  # noqa: D
 
         return sorted(all_linkable_specs.as_tuple, key=lambda x: x.qualified_name)
 
-    def get_metrics(self, metric_references: List[MetricReference]) -> List[Metric]:  # noqa: D
+    def get_metrics(self, metric_references: Sequence[MetricReference]) -> Sequence[Metric]:  # noqa: D
         res = []
         for metric_reference in metric_references:
             if metric_reference not in self._metrics:
@@ -65,7 +61,7 @@ class MetricSemantics:  # noqa: D
         return res
 
     @property
-    def metric_references(self) -> List[MetricReference]:  # noqa: D
+    def metric_references(self) -> Sequence[MetricReference]:  # noqa: D
         return list(self._metrics.keys())
 
     def get_metric(self, metric_reference: MetricReference) -> Metric:  # noqa:D
@@ -84,14 +80,8 @@ class MetricSemantics:  # noqa: D
                     f"Metric `{metric.name}` references measure `{measure_reference}` which has not been registered"
                 )
         self._metrics[metric_reference] = metric
-        self._metric_hashes[metric_reference] = metric.definition_hash
 
-    @property
-    def valid_hashes(self) -> Set[str]:
-        """Return all of the hashes of the metric definitions."""
-        return set(self._metric_hashes.values())
-
-    def measures_for_metric(self, metric_reference: MetricReference) -> Tuple[MetricInputMeasureSpec, ...]:
+    def measures_for_metric(self, metric_reference: MetricReference) -> Sequence[MetricInputMeasureSpec]:
         """Return the measure specs required to compute the metric."""
         metric = self.get_metric(metric_reference)
         input_measure_specs: List[MetricInputMeasureSpec] = []
@@ -132,7 +122,7 @@ class MetricSemantics:  # noqa: D
                         return True
         return False
 
-    def metric_input_specs_for_metric(self, metric_reference: MetricReference) -> Tuple[MetricSpec, ...]:
+    def metric_input_specs_for_metric(self, metric_reference: MetricReference) -> Sequence[MetricSpec]:
         """Return the metric specs referenced by the metric. Current use case is for derived metrics."""
         metric = self.get_metric(metric_reference)
         input_metric_specs: List[MetricSpec] = []

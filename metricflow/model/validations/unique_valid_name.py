@@ -20,7 +20,7 @@ from metricflow.model.validations.validator_helpers import (
     ModelValidationRule,
     ValidationContext,
     ValidationError,
-    ValidationIssueType,
+    ValidationIssue,
     validate_safely,
 )
 from metricflow.object_utils import assert_values_exhausted
@@ -59,10 +59,8 @@ class UniqueAndValidNameRule(ModelValidationRule):
     NAME_REGEX = re.compile(r"\A[a-z][a-z0-9_]*[a-z0-9]\Z")
 
     @staticmethod
-    def check_valid_name(  # noqa: D
-        name: str, context: Optional[ValidationContext] = None
-    ) -> List[ValidationIssueType]:
-        issues: List[ValidationIssueType] = []
+    def check_valid_name(name: str, context: Optional[ValidationContext] = None) -> List[ValidationIssue]:  # noqa: D
+        issues: List[ValidationIssue] = []
 
         if not UniqueAndValidNameRule.NAME_REGEX.match(name):
             issues.append(
@@ -93,8 +91,8 @@ class UniqueAndValidNameRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking data source sub element names are unique")
-    def _validate_data_source_elements(data_source: DataSource) -> List[ValidationIssueType]:
-        issues: List[ValidationIssueType] = []
+    def _validate_data_source_elements(data_source: DataSource) -> List[ValidationIssue]:
+        issues: List[ValidationIssue] = []
         element_info_tuples: List[Tuple[ElementReference, str, ValidationContext]] = []
 
         if data_source.measures:
@@ -163,7 +161,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking model top level element names are sufficiently unique")
-    def _validate_top_level_objects(model: UserConfiguredModel) -> List[ValidationIssueType]:
+    def _validate_top_level_objects(model: UserConfiguredModel) -> List[ValidationIssue]:
         """Checks names of objects that are not nested."""
         object_info_tuples = []
         if model.data_sources:
@@ -181,7 +179,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
 
         name_to_type: Dict[str, str] = {}
 
-        issues: List[ValidationIssueType] = []
+        issues: List[ValidationIssue] = []
 
         for name, type_, context in object_info_tuples:
             if name in name_to_type:
@@ -218,7 +216,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="running model validation ensuring elements have adequately unique names")
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
+    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
         issues = []
         issues += UniqueAndValidNameRule._validate_top_level_objects(model=model)
 

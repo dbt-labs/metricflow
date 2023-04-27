@@ -175,7 +175,6 @@ def _issue_sleep_query(sql_client: SqlClient, sleep_time: int) -> None:
         or engine_type is SqlEngine.REDSHIFT
         or engine_type is SqlEngine.DATABRICKS
         or engine_type is SqlEngine.POSTGRES
-        or engine_type is SqlEngine.MYSQL
     ):
         raise RuntimeError(f"Sleep yet not supported with {engine_type}")
     else:
@@ -193,7 +192,6 @@ def _supports_sleep_query(sql_client: SqlClient) -> bool:
         or engine_type is SqlEngine.REDSHIFT
         or engine_type is SqlEngine.DATABRICKS
         or engine_type is SqlEngine.POSTGRES
-        or engine_type is SqlEngine.MYSQL
     ):
         return False
     else:

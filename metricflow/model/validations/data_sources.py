@@ -12,7 +12,7 @@ from metricflow.model.validations.validator_helpers import (
     DataSourceElementType,
     FileContext,
     ModelValidationRule,
-    ValidationIssueType,
+    ValidationIssue,
     ValidationError,
     validate_safely,
 )
@@ -26,8 +26,8 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="running model validation ensuring time dimensions are defined properly")
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
-        issues: List[ValidationIssueType] = []
+    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
+        issues: List[ValidationIssue] = []
 
         for data_source in model.data_sources:
             issues.extend(DataSourceTimeDimensionWarningsRule._validate_data_source(data_source=data_source))
@@ -35,8 +35,8 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking validity of the data source's time dimensions")
-    def _validate_data_source(data_source: DataSource) -> List[ValidationIssueType]:
-        issues: List[ValidationIssueType] = []
+    def _validate_data_source(data_source: DataSource) -> List[ValidationIssue]:
+        issues: List[ValidationIssue] = []
 
         primary_time_dimensions = []
 
@@ -103,9 +103,9 @@ class DataSourceValidityWindowRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking correctness of the time dimension validity parameters in the model")
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:
+    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:
         """Checks the validity param definitions in every data source in the model"""
-        issues: List[ValidationIssueType] = []
+        issues: List[ValidationIssue] = []
 
         for data_source in model.data_sources:
             issues.extend(DataSourceValidityWindowRule._validate_data_source(data_source=data_source))
@@ -116,10 +116,10 @@ class DataSourceValidityWindowRule(ModelValidationRule):
     @validate_safely(
         whats_being_done="checking the data source's validity parameters for compatibility with runtime requirements"
     )
-    def _validate_data_source(data_source: DataSource) -> List[ValidationIssueType]:
+    def _validate_data_source(data_source: DataSource) -> List[ValidationIssue]:
         """Runs assertions on data sources with validity parameters set on one or more time dimensions"""
 
-        issues: List[ValidationIssueType] = []
+        issues: List[ValidationIssue] = []
 
         validity_param_dims = [dim for dim in data_source.dimensions if dim.validity_params is not None]
 

@@ -8,15 +8,15 @@ than the interface specifications.
 
 from __future__ import annotations
 
-from abc import abstractmethod
-from typing import Dict, FrozenSet, List, Optional, Protocol, Sequence, Set, Tuple
+from abc import abstractmethod, ABC
+from typing import Dict, FrozenSet, Optional, Sequence, Set
 
-from metricflow.instances import DataSourceElementReference, DataSourceReference
 from dbt_semantic_interfaces.objects.data_source import DataSource, DataSourceOrigin
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension
 from dbt_semantic_interfaces.objects.elements.identifier import Identifier
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.metric import Metric
+from metricflow.instances import DataSourceElementReference, DataSourceReference
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.references import (
@@ -26,7 +26,6 @@ from metricflow.references import (
     TimeDimensionReference,
     MetricReference,
 )
-
 from metricflow.specs import (
     LinkableInstanceSpec,
     MeasureSpec,
@@ -36,8 +35,8 @@ from metricflow.specs import (
 )
 
 
-class DataSourceSemanticsAccessor(Protocol):
-    """Protocol defining core interface for accessing semantic information about a set of data source objects
+class DataSourceSemanticsAccessor(ABC):
+    """Interface for accessing semantic information about a set of data source objects
 
     This is primarily useful for restricting caller access to the subset of container methods and imports we want
     them to use. For example, the DataSourceSemantics class might implement this protocol but also include some
@@ -46,7 +45,7 @@ class DataSourceSemanticsAccessor(Protocol):
     """
 
     @abstractmethod
-    def get_dimension_references(self) -> List[DimensionReference]:
+    def get_dimension_references(self) -> Sequence[DimensionReference]:
         """Retrieve all dimension references from the collection of data sources"""
         raise NotImplementedError
 
@@ -64,7 +63,7 @@ class DataSourceSemanticsAccessor(Protocol):
 
     @property
     @abstractmethod
-    def measure_references(self) -> List[MeasureReference]:
+    def measure_references(self) -> Sequence[MeasureReference]:
         """Return all measure references from the collection of data sources"""
         raise NotImplementedError
 
@@ -83,12 +82,12 @@ class DataSourceSemanticsAccessor(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    def get_identifier_references(self) -> List[IdentifierReference]:
+    def get_identifier_references(self) -> Sequence[IdentifierReference]:
         """Retrieve all identifier references from the collection of data sources"""
         raise NotImplementedError
 
     @abstractmethod
-    def get_data_sources_for_measure(self, measure_reference: MeasureReference) -> List[DataSource]:
+    def get_data_sources_for_measure(self, measure_reference: MeasureReference) -> Sequence[DataSource]:
         """Retrieve a list of all data source model objects associated with the measure reference"""
         raise NotImplementedError
 
@@ -99,11 +98,6 @@ class DataSourceSemanticsAccessor(Protocol):
     @abstractmethod
     def get_identifier_in_data_source(self, ref: DataSourceElementReference) -> Optional[Identifier]:
         """Retrieve the identifier matching the element -> data source mapping, if any"""
-        raise NotImplementedError
-
-    @abstractmethod
-    def get(self, data_source_name: str) -> Optional[DataSource]:
-        """Retrieve the data source model object matching the given name, if any"""
         raise NotImplementedError
 
     @abstractmethod
@@ -130,8 +124,8 @@ class DataSourceSemanticsAccessor(Protocol):
         raise NotImplementedError
 
 
-class MetricSemanticsAccessor(Protocol):
-    """Protocol defining core interface for accessing semantic information about a set of metric objects
+class MetricSemanticsAccessor(ABC):
+    """Interface for accessing semantic information about a set of metric objects
 
     This is primarily useful for restricting caller access to the subset of container methods and imports we want
     them to use. For example, the MetricSemantics class might implement this protocol but also include some
@@ -142,21 +136,21 @@ class MetricSemanticsAccessor(Protocol):
     @abstractmethod
     def element_specs_for_metrics(
         self,
-        metric_references: List[MetricReference],
+        metric_references: Sequence[MetricReference],
         with_any_property: FrozenSet[LinkableElementProperties] = LinkableElementProperties.all_properties(),
         without_any_property: FrozenSet[LinkableElementProperties] = frozenset(),
-    ) -> List[LinkableInstanceSpec]:
+    ) -> Sequence[LinkableInstanceSpec]:
         """Retrieve the matching set of linkable elements common to all metrics requested (intersection)"""
         raise NotImplementedError
 
     @abstractmethod
-    def get_metrics(self, metric_references: List[MetricReference]) -> List[Metric]:
+    def get_metrics(self, metric_references: Sequence[MetricReference]) -> Sequence[Metric]:
         """Retrieve the Metric model objects associated with the provided metric specs"""
         raise NotImplementedError
 
     @property
     @abstractmethod
-    def metric_references(self) -> List[MetricReference]:
+    def metric_references(self) -> Sequence[MetricReference]:
         """Return the metric references"""
         raise NotImplementedError
 
@@ -164,14 +158,8 @@ class MetricSemanticsAccessor(Protocol):
     def get_metric(self, metric_reference: MetricReference) -> Metric:  # noqa:D
         raise NotImplementedError
 
-    @property
     @abstractmethod
-    def valid_hashes(self) -> Set[str]:
-        """Return all of the hashes of the metric definitions."""
-        raise NotImplementedError
-
-    @abstractmethod
-    def measures_for_metric(self, metric_reference: MetricReference) -> Tuple[MetricInputMeasureSpec, ...]:
+    def measures_for_metric(self, metric_reference: MetricReference) -> Sequence[MetricInputMeasureSpec]:
         """Return the measure specs required to compute the metric."""
         raise NotImplementedError
 
@@ -181,6 +169,6 @@ class MetricSemanticsAccessor(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    def metric_input_specs_for_metric(self, metric_spec: MetricReference) -> Tuple[MetricSpec, ...]:
+    def metric_input_specs_for_metric(self, metric_spec: MetricReference) -> Sequence[MetricSpec]:
         """Returns the metric input specs required to compute the metric."""
         raise NotImplementedError
