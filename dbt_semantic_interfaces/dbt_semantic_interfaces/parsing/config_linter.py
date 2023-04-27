@@ -2,7 +2,7 @@ import os
 from typing import List, Optional
 import yaml
 from yamllint import config, linter, rules
-from metricflow.model.parsing.dir_to_model import (
+from dbt_semantic_interfaces.parsing.dir_to_model import (
     METRIC_TYPE,
     DATA_SOURCE_TYPE,
     collect_yaml_config_file_paths,

@@ -2,8 +2,6 @@
 data_source:
   name: bookings_source
   description: bookings data source for use in the SCD model
-  owners:
-    - support@transformdata.io
 
   sql_table: $bookings_source_table
 

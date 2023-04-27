@@ -5,7 +5,7 @@ import pytest
 from dbt_semantic_interfaces.objects.common import YamlConfigFile
 from dbt_semantic_interfaces.model_transformer import ModelTransformer
 from metricflow.model.model_validator import ModelValidator
-from metricflow.model.parsing.dir_to_model import parse_yaml_files_to_validation_ready_model
+from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_validation_ready_model
 from metricflow.model.validations.measures import (
     CountAggregationExprRule,
     DataSourceMeasuresUniqueRule,
@@ -70,12 +70,12 @@ def test_measures_only_exist_in_one_data_source() -> None:  # noqa: D
     )
     base_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents_1)
     model = parse_yaml_files_to_validation_ready_model([base_file])
-    build = ModelValidator().validate_model(model.model)
+    model_issues = ModelValidator().validate_model(model.model)
     duplicate_measure_message = "Found measure with name .* in multiple data sources with names"
     found_issue = False
 
-    if build.issues is not None:
-        for issue in build.issues.all_issues:
+    if model_issues is not None:
+        for issue in model_issues.all_issues:
             if re.search(duplicate_measure_message, issue.message):
                 found_issue = True
 
@@ -107,10 +107,10 @@ def test_measures_only_exist_in_one_data_source() -> None:  # noqa: D
     )
     dup_measure_file = YamlConfigFile(filepath="inline_for_test_2", contents=yaml_contents_2)
     dup_model = parse_yaml_files_to_validation_ready_model([base_file, dup_measure_file])
-    build = ModelValidator([DataSourceMeasuresUniqueRule()]).validate_model(dup_model.model)
+    model_issues = ModelValidator([DataSourceMeasuresUniqueRule()]).validate_model(dup_model.model)
 
-    if build.issues is not None:
-        for issue in build.issues.all_issues:
+    if model_issues is not None:
+        for issue in model_issues.all_issues:
             if re.search(duplicate_measure_message, issue.message):
                 found_issue = True
 
@@ -158,11 +158,11 @@ def test_measure_alias_is_set_when_required() -> None:
     missing_alias_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
     model = parse_yaml_files_to_validation_ready_model([missing_alias_file])
 
-    build = ModelValidator([MeasureConstraintAliasesRule()]).validate_model(model.model)
+    model_issues = ModelValidator([MeasureConstraintAliasesRule()]).validate_model(model.model)
 
-    assert len(build.issues.errors) == 1
+    assert len(model_issues.errors) == 1
     expected_error_substring = f"depends on multiple different constrained versions of measure {measure_name}"
-    actual_error = build.issues.errors[0].as_readable_str()
+    actual_error = model_issues.errors[0].as_readable_str()
     assert (
         actual_error.find(expected_error_substring) != -1
     ), f"Expected error {expected_error_substring} not found in error string! Instead got {actual_error}"
@@ -207,11 +207,11 @@ def test_invalid_measure_alias_name() -> None:
     invalid_alias_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
     model = parse_yaml_files_to_validation_ready_model([invalid_alias_file])
 
-    build = ModelValidator([MeasureConstraintAliasesRule()]).validate_model(model.model)
+    model_issues = ModelValidator([MeasureConstraintAliasesRule()]).validate_model(model.model)
 
-    assert len(build.issues.errors) == 1
+    assert len(model_issues.errors) == 1
     expected_error_substring = f"Invalid name `{invalid_alias}` - names should only consist of"
-    actual_error = build.issues.errors[0].as_readable_str()
+    actual_error = model_issues.errors[0].as_readable_str()
     assert (
         actual_error.find(expected_error_substring) != -1
     ), f"Expected error {expected_error_substring} not found in error string! Instead got {actual_error}"
@@ -258,14 +258,14 @@ def test_measure_alias_measure_name_conflict() -> None:
     invalid_alias_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
     model = parse_yaml_files_to_validation_ready_model([invalid_alias_file])
 
-    build = ModelValidator([MeasureConstraintAliasesRule()]).validate_model(model.model)
+    model_issues = ModelValidator([MeasureConstraintAliasesRule()]).validate_model(model.model)
 
-    assert len(build.issues.errors) == 1
+    assert len(model_issues.errors) == 1
     expected_error_substring = (
         f"Alias `{invalid_alias}` for measure `{measure_name}` conflicts with measure names "
         f"defined elsewhere in the model!"
     )
-    actual_error = build.issues.errors[0].as_readable_str()
+    actual_error = model_issues.errors[0].as_readable_str()
     assert (
         actual_error.find(expected_error_substring) != -1
     ), f"Expected error {expected_error_substring} not found in error string! Instead got {actual_error}"
@@ -321,13 +321,13 @@ def test_reused_measure_alias() -> None:
     invalid_alias_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
     model = parse_yaml_files_to_validation_ready_model([invalid_alias_file])
 
-    build = ModelValidator([MeasureConstraintAliasesRule()]).validate_model(model.model)
+    model_issues = ModelValidator([MeasureConstraintAliasesRule()]).validate_model(model.model)
 
-    assert len(build.issues.errors) == 1
+    assert len(model_issues.errors) == 1
     expected_error_substring = (
         f"Measure alias {invalid_alias} conflicts with a measure alias used elsewhere in the model!"
     )
-    actual_error = build.issues.errors[0].as_readable_str()
+    actual_error = model_issues.errors[0].as_readable_str()
     assert (
         actual_error.find(expected_error_substring) != -1
     ), f"Expected error {expected_error_substring} not found in error string! Instead got {actual_error}"
@@ -379,13 +379,13 @@ def test_reused_measure_alias_within_metric() -> None:
     invalid_alias_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
     model = parse_yaml_files_to_validation_ready_model([invalid_alias_file])
 
-    build = ModelValidator([MeasureConstraintAliasesRule()]).validate_model(model.model)
+    model_issues = ModelValidator([MeasureConstraintAliasesRule()]).validate_model(model.model)
 
-    assert len(build.issues.errors) == 1
+    assert len(model_issues.errors) == 1
     expected_error_substring = (
         f"Measure alias {invalid_alias} conflicts with a measure alias used elsewhere in the model!"
     )
-    actual_error = build.issues.errors[0].as_readable_str()
+    actual_error = model_issues.errors[0].as_readable_str()
     assert (
         actual_error.find(expected_error_substring) != -1
     ), f"Expected error {expected_error_substring} not found in error string! Instead got {actual_error}"
@@ -448,7 +448,7 @@ def test_invalid_non_additive_dimension_properties() -> None:
         model=model_build_result.model, ordered_rule_sequences=(ModelTransformer.PRIMARY_RULES,)
     )
 
-    build = ModelValidator([MeasuresNonAdditiveDimensionRule()]).validate_model(transformed_model)
+    model_issues = ModelValidator([MeasuresNonAdditiveDimensionRule()]).validate_model(transformed_model)
     expected_error_substring_1 = "that is not defined as a dimension in data source 'sample_data_source_2'."
     expected_error_substring_2 = "has a non_additive_dimension with an invalid 'window_groupings'"
     expected_error_substring_3 = "that is defined as a categorical dimension which is not supported."
@@ -460,11 +460,11 @@ def test_invalid_non_additive_dimension_properties() -> None:
         expected_error_substring_3,
         expected_error_substring_4,
     ]:
-        if not any(actual_str.as_readable_str().find(expected_str) != -1 for actual_str in build.issues.errors):
+        if not any(actual_str.as_readable_str().find(expected_str) != -1 for actual_str in model_issues.errors):
             missing_error_strings.add(expected_str)
     assert (
         len(missing_error_strings) == 0
-    ), f"Failed to match one or more expected errors: {missing_error_strings} in {set([x.as_readable_str() for x in build.issues.errors])}"
+    ), f"Failed to match one or more expected errors: {missing_error_strings} in {set([x.as_readable_str() for x in model_issues.errors])}"
 
 
 def test_count_measure_missing_expr() -> None:
@@ -502,14 +502,14 @@ def test_count_measure_missing_expr() -> None:
         model=model_build_result.model, ordered_rule_sequences=(ModelTransformer.PRIMARY_RULES,)
     )
 
-    build = ModelValidator([CountAggregationExprRule()]).validate_model(transformed_model)
+    model_issues = ModelValidator([CountAggregationExprRule()]).validate_model(transformed_model)
     expected_error_substring = (
         "Measure 'bad_measure' uses a COUNT aggregation, which requires an expr to be provided. "
         "Provide 'expr: 1' if a count of all rows is desired."
     )
-    assert len(build.issues.errors) == 1
+    assert len(model_issues.errors) == 1
 
-    actual_error = build.issues.errors[0].as_readable_str()
+    actual_error = model_issues.errors[0].as_readable_str()
     assert (
         actual_error.find(expected_error_substring) != -1
     ), f"Expected error {expected_error_substring} not found in error string! Instead got {actual_error}"
@@ -551,11 +551,11 @@ def test_count_measure_with_distinct_expr() -> None:
         model=model_build_result.model, ordered_rule_sequences=(ModelTransformer.PRIMARY_RULES,)
     )
 
-    build = ModelValidator([CountAggregationExprRule()]).validate_model(transformed_model)
+    model_issues = ModelValidator([CountAggregationExprRule()]).validate_model(transformed_model)
     expected_error_substring = "Measure 'distinct_count' uses a 'count' aggregation with a DISTINCT expr"
 
-    assert len(build.issues.errors) == 1
-    actual_error = build.issues.errors[0].as_readable_str()
+    assert len(model_issues.errors) == 1
+    actual_error = model_issues.errors[0].as_readable_str()
     assert (
         actual_error.find(expected_error_substring) != -1
     ), f"Expected error {expected_error_substring} not found in error string! Instead got {actual_error}"
@@ -600,7 +600,7 @@ def test_percentile_measure_missing_agg_params() -> None:
     missing_agg_params_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
     model = parse_yaml_files_to_validation_ready_model([missing_agg_params_file])
 
-    build = ModelValidator().validate_model(model.model)
+    model_issues = ModelValidator().validate_model(model.model)
     expected_error_substring_1 = (
         "Measure 'bad_measure_1' uses a PERCENTILE aggregation, which requires agg_params.percentile to be provided."
     )
@@ -612,11 +612,11 @@ def test_percentile_measure_missing_agg_params() -> None:
 
     missing_error_strings = set()
     for expected_str in [expected_error_substring_1, expected_error_substring_2, expected_error_substring_3]:
-        if not any(actual_str.as_readable_str().find(expected_str) != -1 for actual_str in build.issues.errors):
+        if not any(actual_str.as_readable_str().find(expected_str) != -1 for actual_str in model_issues.errors):
             missing_error_strings.add(expected_str)
     assert (
         len(missing_error_strings) == 0
-    ), f"Failed to match one or more expected errors: {missing_error_strings} in {set([x.as_readable_str() for x in build.issues.errors])}"
+    ), f"Failed to match one or more expected errors: {missing_error_strings} in {set([x.as_readable_str() for x in model_issues.errors])}"
 
 
 def test_percentile_measure_bad_percentile_values() -> None:
@@ -656,7 +656,7 @@ def test_percentile_measure_bad_percentile_values() -> None:
     bad_percentile_values_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
     model = parse_yaml_files_to_validation_ready_model([bad_percentile_values_file])
 
-    build = ModelValidator().validate_model(model.model)
+    model_issues = ModelValidator().validate_model(model.model)
     expected_error_substring_1 = (
         "Percentile aggregation parameter for measure 'bad_measure_1' is '1.0', but"
         + "must be between 0 and 1 (non-inclusive). For example, to indicate the 65th percentile value, set 'percentile: 0.65'. "
@@ -673,8 +673,8 @@ def test_percentile_measure_bad_percentile_values() -> None:
         expected_error_substring_1,
         expected_error_substring_2,
     ]:
-        if not any(actual_str.as_readable_str().find(expected_str) != -1 for actual_str in build.issues.errors):
+        if not any(actual_str.as_readable_str().find(expected_str) != -1 for actual_str in model_issues.errors):
             missing_error_strings.add(expected_str)
     assert (
         len(missing_error_strings) == 0
-    ), f"Failed to match one or more expected errors: {missing_error_strings} in {set([x.as_readable_str() for x in build.issues.errors])}"
+    ), f"Failed to match one or more expected errors: {missing_error_strings} in {set([x.as_readable_str() for x in model_issues.errors])}"

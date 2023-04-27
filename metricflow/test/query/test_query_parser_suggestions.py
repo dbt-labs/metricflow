@@ -81,8 +81,6 @@ LISTINGS_YAML = textwrap.dedent(
     data_source:
       name: listings_latest
       description: listings_latest
-      owners:
-        - support@transformdata.io
 
       sql_table: schema.table
 

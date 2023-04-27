@@ -8,17 +8,17 @@ from typing import Optional, Dict, List, Union, Type
 
 from jsonschema import exceptions
 
-from metricflow.errors.errors import ParsingException
+from dbt_semantic_interfaces.errors import ParsingException
 from dbt_semantic_interfaces.model_transformer import ModelTransformer
 from dbt_semantic_interfaces.objects.common import Version, YamlConfigFile
 from dbt_semantic_interfaces.objects.data_source import DataSource
 from dbt_semantic_interfaces.objects.metric import Metric
-from metricflow.model.parsing.schemas_internal import (
+from dbt_semantic_interfaces.parsing.schemas import (
     metric_validator,
     data_source_validator,
 )
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.parsing.yaml_loader import (
+from dbt_semantic_interfaces.parsing.yaml_loader import (
     ParsingContext,
     YamlConfigLoader,
     PARSING_CONTEXT_KEY,
@@ -28,7 +28,7 @@ from metricflow.model.validations.validator_helpers import (
     ModelValidationException,
     ModelValidationResults,
     ValidationError,
-    ValidationIssueType,
+    ValidationIssue,
 )
 
 logger = logging.getLogger(__name__)
@@ -56,7 +56,7 @@ class FileParsingResult:
     """
 
     elements: List[Union[DataSource, Metric]]
-    issues: List[ValidationIssueType]
+    issues: List[ValidationIssue]
 
 
 def collect_yaml_config_file_paths(directory: str) -> List[str]:
@@ -201,7 +201,7 @@ def parse_yaml_files_to_model(
     data_sources = []
     metrics = []
     valid_object_classes = [data_source_class.__name__, metric_class.__name__]
-    issues: List[ValidationIssueType] = []
+    issues: List[ValidationIssue] = []
 
     for config_file in files:
         parsing_result = parse_config_yaml(  # parse config file
@@ -242,7 +242,7 @@ def parse_config_yaml(
     """Parses transform config file passed as string - Returns list of model objects"""
     results: List[Union[DataSource, Metric]] = []
     ctx: Optional[ParsingContext] = None
-    issues: List[ValidationIssueType] = []
+    issues: List[ValidationIssue] = []
     try:
         for config_document in YamlConfigLoader.load_all_with_context(
             name=config_yaml.filepath, contents=config_yaml.contents

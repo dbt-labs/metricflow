@@ -2,8 +2,6 @@
 data_source:
   name: users_latest
   description: users_latest
-  owners:
-    - support@transformdata.io
 
   sql_table: $users_latest_table
 

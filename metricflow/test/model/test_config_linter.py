@@ -1,4 +1,4 @@
-from metricflow.model.parsing.config_linter import ConfigLinter
+from dbt_semantic_interfaces.parsing.config_linter import ConfigLinter
 
 
 def test_lint_dir(config_linter_model_path: str) -> None:  # noqa: D

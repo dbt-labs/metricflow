@@ -9,7 +9,7 @@ from metricflow.model.validations.validator_helpers import (
     FileContext,
     ModelValidationRule,
     ValidationError,
-    ValidationIssueType,
+    ValidationIssue,
     validate_safely,
 )
 
@@ -25,7 +25,7 @@ class ElementConsistencyRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="running model validation ensuring model wide element consistency")
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssueType]:  # noqa: D
+    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
         issues = []
         element_name_to_types = ElementConsistencyRule._get_element_name_to_types(model=model)
         invalid_elements = {

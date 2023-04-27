@@ -21,9 +21,6 @@ class SqlEngine(Enum):
     SNOWFLAKE = "Snowflake"
     DATABRICKS = "Databricks"
 
-    # Not yet supported.
-    MYSQL = "MySQL"
-
 
 class SqlIsolationLevel(Enum):
     """Describes the isolation levels used to execute SQL queries. Values are passed as options to SQLAlchemy."""

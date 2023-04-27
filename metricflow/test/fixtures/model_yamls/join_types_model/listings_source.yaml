@@ -2,8 +2,6 @@
 data_source:
   name: listings_source
   description: listings_source
-  owners:
-    - support@transformdata.io
 
   sql_table: $dim_listings_for_joins_table
 

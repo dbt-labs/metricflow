@@ -52,7 +52,7 @@ from metricflow.model.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.engine.utils import model_build_result_from_config, path_to_models
-from metricflow.model.parsing.config_linter import ConfigLinter
+from dbt_semantic_interfaces.parsing.config_linter import ConfigLinter
 from metricflow.model.validations.validator_helpers import ModelValidationResults
 from metricflow.sql_clients.common_client import SqlDialect
 from metricflow.telemetry.models import TelemetryLevel
@@ -679,7 +679,7 @@ def validate_configs(
     parsing_spinner.start()
 
     if cfg.dbt_cloud_configs is not None:
-        from metricflow.model.parsing.dbt_cloud_to_model import model_build_result_for_dbt_cloud_job
+        from dbt_semantic_interfaces.parsing.dbt_cloud_to_model import model_build_result_for_dbt_cloud_job
 
         parsing_result = model_build_result_for_dbt_cloud_job(
             auth=cfg.dbt_cloud_configs.auth, job_id=cfg.dbt_cloud_configs.job_id
@@ -701,17 +701,15 @@ def validate_configs(
     # Semantic validation
     semantic_spinner = Halo(text="Validating semantics of built model", spinner="dots")
     semantic_spinner.start()
-    semantic_result = ModelValidator(max_workers=semantic_validation_workers).validate_model(user_model)
+    model_issues = ModelValidator(max_workers=semantic_validation_workers).validate_model(user_model)
 
-    if not semantic_result.issues.has_blocking_issues:
-        semantic_spinner.succeed(
-            f"🎉 Successfully validated the semantics of built model ({semantic_result.issues.summary()})"
-        )
+    if not model_issues.has_blocking_issues:
+        semantic_spinner.succeed(f"🎉 Successfully validated the semantics of built model ({model_issues.summary()})")
     else:
         semantic_spinner.fail(
-            f"Breaking issues found when checking semantics of built model ({semantic_result.issues.summary()})"
+            f"Breaking issues found when checking semantics of built model ({model_issues.summary()})"
         )
-        _print_issues(semantic_result.issues, show_non_blocking=show_all, verbose=verbose_issues)
+        _print_issues(model_issues, show_non_blocking=show_all, verbose=verbose_issues)
         return
 
     dw_results = ModelValidationResults()
@@ -719,9 +717,7 @@ def validate_configs(
         dw_validator = DataWarehouseModelValidator(sql_client=cfg.sql_client, system_schema=cfg.mf_system_schema)
         dw_results = _data_warehouse_validations_runner(dw_validator=dw_validator, model=user_model, timeout=dw_timeout)
 
-    merged_results = ModelValidationResults.merge(
-        [lint_results, parsing_result.issues, semantic_result.issues, dw_results]
-    )
+    merged_results = ModelValidationResults.merge([lint_results, parsing_result.issues, model_issues, dw_results])
     _print_issues(merged_results, show_non_blocking=show_all, verbose=verbose_issues)
 
 

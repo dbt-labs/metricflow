@@ -2,8 +2,6 @@
 data_source:
   name: bookings_monthly_source
   description: bookings_monthly_source
-  owners:
-    - support@transformdata.io
 
   sql_table: $fct_bookings_extended_monthly_table
 

@@ -1,7 +1,5 @@
 import textwrap
-from typing import Dict, Optional
-
-from metricflow.model.parsing.yaml_loader import ParsingContext
+from typing import Dict
 
 
 class CustomerFacingSemanticException(Exception):
@@ -45,21 +43,6 @@ class InvalidDataSourceError(SemanticException):  # noqa:D
     pass
 
 
-class ConstraintParseException(Exception):  # noqa: D
-    pass
-
-
-class ParsingException(Exception):  # noqa: D
-    def __init__(  # noqa: D
-        self, message: str, ctx: Optional[ParsingContext] = None, config_filepath: Optional[str] = None
-    ) -> None:
-        if config_filepath:
-            message = f"Failed to parse YAML file '{config_filepath}' - {message}"
-        if ctx:
-            message = f"{message}\nContext: {str(ctx)}"
-        super().__init__(message)
-
-
 class ExecutionException(Exception):
     """Raised if there are any errors while executing the execution plan"""
 
@@ -95,9 +78,3 @@ class ModelCreationException(Exception):
 
 class InferenceError(Exception):
     """Exception to represent errors related to inference."""
-
-
-class ModelTransformError(Exception):
-    """Exception to represent errors related to model transformations."""
-
-    pass

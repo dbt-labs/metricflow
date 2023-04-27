@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import List, Optional
 
-from metricflow.errors.errors import ParsingException
+from dbt_semantic_interfaces.errors import ParsingException
 from dbt_semantic_interfaces.objects.common import Metadata
 from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
 from dbt_semantic_interfaces.objects.base import (

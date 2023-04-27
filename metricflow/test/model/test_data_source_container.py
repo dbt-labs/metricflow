@@ -3,9 +3,8 @@ import logging
 import pytest
 
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.semantics.data_source_container import PydanticDataSourceContainer
-from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.data_source_semantics import DataSourceSemantics
+from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.metric_semantics import MetricSemantics
 from metricflow.references import IdentifierReference, MeasureReference
 from metricflow.references import MetricReference
@@ -14,24 +13,23 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.fixture
-def new_data_source_semantics(simple_user_configured_model: UserConfiguredModel) -> DataSourceSemantics:  # Noqa: D
+def data_source_semantics(simple_user_configured_model: UserConfiguredModel) -> DataSourceSemantics:  # Noqa: D
     return DataSourceSemantics(
         model=simple_user_configured_model,
-        configured_data_source_container=PydanticDataSourceContainer(simple_user_configured_model.data_sources),
     )
 
 
 @pytest.fixture
-def new_metric_semantics(  # Noqa: D
-    simple_user_configured_model: UserConfiguredModel, new_data_source_semantics: DataSourceSemantics
+def metric_semantics(  # Noqa: D
+    simple_user_configured_model: UserConfiguredModel, data_source_semantics: DataSourceSemantics
 ) -> MetricSemantics:
     return MetricSemantics(
         user_configured_model=simple_user_configured_model,
-        data_source_semantics=new_data_source_semantics,
+        data_source_semantics=data_source_semantics,
     )
 
 
-def test_get_names(new_data_source_semantics: DataSourceSemantics) -> None:  # noqa: D
+def test_get_names(data_source_semantics: DataSourceSemantics) -> None:  # noqa: D
     expected = [
         "account_type",
         "booking_paid_at",
@@ -47,7 +45,7 @@ def test_get_names(new_data_source_semantics: DataSourceSemantics) -> None:  # n
         "is_lux_latest",
         "verification_type",
     ]
-    assert sorted([d.element_name for d in new_data_source_semantics.get_dimension_references()]) == expected
+    assert sorted([d.element_name for d in data_source_semantics.get_dimension_references()]) == expected
 
     expected = [
         "account_balance",
@@ -74,7 +72,7 @@ def test_get_names(new_data_source_semantics: DataSourceSemantics) -> None:  # n
         "txn_revenue",
         "views",
     ]
-    assert sorted([m.element_name for m in new_data_source_semantics.measure_references]) == expected
+    assert sorted([m.element_name for m in data_source_semantics.measure_references]) == expected
 
     expected = [
         "company",
@@ -86,39 +84,39 @@ def test_get_names(new_data_source_semantics: DataSourceSemantics) -> None:  # n
         "user",
         "verification",
     ]
-    assert sorted([i.element_name for i in new_data_source_semantics.get_identifier_references()]) == expected
+    assert sorted([i.element_name for i in data_source_semantics.get_identifier_references()]) == expected
 
 
-def test_get_elements(new_data_source_semantics: DataSourceSemantics) -> None:  # noqa: D
-    for dimension_reference in new_data_source_semantics.get_dimension_references():
+def test_get_elements(data_source_semantics: DataSourceSemantics) -> None:  # noqa: D
+    for dimension_reference in data_source_semantics.get_dimension_references():
         assert (
-            new_data_source_semantics.get_dimension(dimension_reference=dimension_reference).reference
+            data_source_semantics.get_dimension(dimension_reference=dimension_reference).reference
             == dimension_reference
         )
-    for measure_reference in new_data_source_semantics.measure_references:
+    for measure_reference in data_source_semantics.measure_references:
         measure_reference = MeasureReference(element_name=measure_reference.element_name)
-        assert new_data_source_semantics.get_measure(measure_reference=measure_reference).reference == measure_reference
+        assert data_source_semantics.get_measure(measure_reference=measure_reference).reference == measure_reference
 
 
-def test_get_data_sources_for_measure(new_data_source_semantics: DataSourceSemantics) -> None:  # noqa: D
-    bookings_sources = new_data_source_semantics.get_data_sources_for_measure(MeasureReference(element_name="bookings"))
+def test_get_data_sources_for_measure(data_source_semantics: DataSourceSemantics) -> None:  # noqa: D
+    bookings_sources = data_source_semantics.get_data_sources_for_measure(MeasureReference(element_name="bookings"))
     assert len(bookings_sources) == 1
     assert bookings_sources[0].name == "bookings_source"
 
-    views_sources = new_data_source_semantics.get_data_sources_for_measure(MeasureReference(element_name="views"))
+    views_sources = data_source_semantics.get_data_sources_for_measure(MeasureReference(element_name="views"))
     assert len(views_sources) == 1
     assert views_sources[0].name == "views_source"
 
-    listings_sources = new_data_source_semantics.get_data_sources_for_measure(MeasureReference(element_name="listings"))
+    listings_sources = data_source_semantics.get_data_sources_for_measure(MeasureReference(element_name="listings"))
     assert len(listings_sources) == 1
     assert listings_sources[0].name == "listings_latest"
 
 
-def test_elements_for_metric(new_metric_semantics: MetricSemantics) -> None:  # noqa: D
+def test_elements_for_metric(metric_semantics: MetricSemantics) -> None:  # noqa: D
     assert set(
         [
             x.qualified_name
-            for x in new_metric_semantics.element_specs_for_metrics(
+            for x in metric_semantics.element_specs_for_metrics(
                 [MetricReference(element_name="views")],
                 without_any_property=frozenset({LinkableElementProperties.DERIVED_TIME_GRANULARITY}),
             )
@@ -162,7 +160,7 @@ def test_elements_for_metric(new_metric_semantics: MetricSemantics) -> None:  # 
         "user__home_state_latest",
     }
 
-    local_specs = new_metric_semantics.element_specs_for_metrics(
+    local_specs = metric_semantics.element_specs_for_metrics(
         metric_references=[MetricReference(element_name="views")],
         with_any_property=frozenset({LinkableElementProperties.LOCAL}),
         without_any_property=frozenset({LinkableElementProperties.DERIVED_TIME_GRANULARITY}),
@@ -176,11 +174,11 @@ def test_elements_for_metric(new_metric_semantics: MetricSemantics) -> None:  # 
     }
 
 
-def test_local_linked_elements_for_metric(new_metric_semantics: MetricSemantics) -> None:  # noqa: D
+def test_local_linked_elements_for_metric(metric_semantics: MetricSemantics) -> None:  # noqa: D
     result = set(
         [
             x.qualified_name
-            for x in new_metric_semantics.element_specs_for_metrics(
+            for x in metric_semantics.element_specs_for_metrics(
                 [MetricReference(element_name="listings")],
                 with_any_property=frozenset({LinkableElementProperties.LOCAL_LINKED}),
                 without_any_property=frozenset({LinkableElementProperties.DERIVED_TIME_GRANULARITY}),
@@ -197,9 +195,9 @@ def test_local_linked_elements_for_metric(new_metric_semantics: MetricSemantics)
     }
 
 
-def test_get_data_sources_for_identifier(new_data_source_semantics: DataSourceSemantics) -> None:  # noqa: D
+def test_get_data_sources_for_identifier(data_source_semantics: DataSourceSemantics) -> None:  # noqa: D
     identifier_reference = IdentifierReference(element_name="user")
-    linked_data_sources = new_data_source_semantics.get_data_sources_for_identifier(
+    linked_data_sources = data_source_semantics.get_data_sources_for_identifier(
         identifier_reference=identifier_reference
     )
     assert len(linked_data_sources) == 9

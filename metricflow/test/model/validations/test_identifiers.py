@@ -5,7 +5,7 @@ from typing import Callable
 
 import pytest
 
-from metricflow.aggregation_properties import AggregationType
+from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
 from metricflow.model.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.common import YamlConfigFile
 from dbt_semantic_interfaces.objects.data_source import DataSource, Mutability, MutabilityType
@@ -14,7 +14,7 @@ from dbt_semantic_interfaces.objects.elements.identifier import IdentifierType, 
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.metric import MetricType, MetricTypeParams
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.parsing.dir_to_model import parse_yaml_files_to_validation_ready_model
+from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_validation_ready_model
 from metricflow.model.validations.identifiers import (
     IdentifierConfigRule,
     IdentifierConsistencyRule,
@@ -46,7 +46,7 @@ def test_data_source_cant_have_more_than_one_primary_identifier(
         identifier.type = IdentifierType.PRIMARY
         identifier_references.add(identifier.reference)
 
-    build = ModelValidator([OnePrimaryIdentifierPerDataSourceRule()]).validate_model(model)
+    model_issues = ModelValidator([OnePrimaryIdentifierPerDataSourceRule()]).validate_model(model)
 
     future_issue = (
         f"Data sources can have only one primary identifier. The data source"
@@ -55,8 +55,8 @@ def test_data_source_cant_have_more_than_one_primary_identifier(
 
     found_future_issue = False
 
-    if build.issues is not None:
-        for issue in build.issues.all_issues:
+    if model_issues is not None:
+        for issue in model_issues.all_issues:
             if re.search(future_issue, issue.message):
                 found_future_issue = True
 
@@ -244,11 +244,11 @@ def test_mismatched_identifier(simple_model__with_primary_transforms: UserConfig
     )
     listings_latest.identifiers = flatten_nested_sequence([listings_latest.identifiers, [identifier_listings]])
 
-    build = ModelValidator([IdentifierConsistencyRule()]).validate_model(model)
+    model_issues = ModelValidator([IdentifierConsistencyRule()]).validate_model(model)
 
     expected_error_message_fragment = "does not have consistent sub-identifiers"
     error_count = len(
-        [issue for issue in build.issues.all_issues if re.search(expected_error_message_fragment, issue.message)]
+        [issue for issue in model_issues.all_issues if re.search(expected_error_message_fragment, issue.message)]
     )
 
     assert error_count == 1

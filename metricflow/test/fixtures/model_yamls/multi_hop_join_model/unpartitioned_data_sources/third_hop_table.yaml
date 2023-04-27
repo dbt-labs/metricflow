@@ -2,8 +2,6 @@
 data_source:
   name: third_hop_table
   description: third_hop_table
-  owners:
-    - support@transformdata.io
 
   sql_table: $third_hop_table
 

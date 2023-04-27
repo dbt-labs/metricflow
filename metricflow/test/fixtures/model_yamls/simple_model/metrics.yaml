@@ -2,8 +2,6 @@
 metric:
   name: "bookings"
   description: "bookings metric"
-  owners:
-    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -12,8 +10,6 @@ metric:
 metric:
   name: "average_booking_value"
   description: "average booking value metric"
-  owners:
-    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -22,8 +18,6 @@ metric:
 metric:
   name: "instant_bookings"
   description: "instant bookings"
-  owners:
-    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -32,8 +26,6 @@ metric:
 metric:
   name: "booking_value"
   description: "booking value"
-  owners:
-    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -42,8 +34,6 @@ metric:
 metric:
   name: "max_booking_value"
   description: "max booking value"
-  owners:
-    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -52,8 +42,6 @@ metric:
 metric:
   name: "min_booking_value"
   description: "min booking value"
-  owners:
-    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -62,8 +50,6 @@ metric:
 metric:
   name: "instant_booking_value"
   description: "booking value of instant bookings"
-  owners:
-    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -74,8 +60,6 @@ metric:
 metric:
   name: "average_instant_booking_value"
   description: "average booking value of instant bookings"
-  owners:
-    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -86,8 +70,6 @@ metric:
 metric:
   name: "booking_value_for_non_null_listing_id"
   description: "booking value of instant bookings"
-  owners:
-    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -98,8 +80,6 @@ metric:
 metric:
   name: "bookers"
   description: "bookers"
-  owners:
-    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -108,8 +88,6 @@ metric:
 metric:
   name: "booking_payments"
   description: "Booking payments."
-  owners:
-    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -118,8 +96,6 @@ metric:
 metric:
   name: "views"
   description: "views"
-  owners:
-    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -128,8 +104,6 @@ metric:
 metric:
   name: "listings"
   description: "listings"
-  owners:
-    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -138,8 +112,6 @@ metric:
 metric:
   name: "lux_listings"
   description: "lux_listings"
-  owners:
-    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -150,8 +122,6 @@ metric:
 metric:
   name: "smallest_listing"
   description: "smallest listing"
-  owners:
-    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -160,8 +130,6 @@ metric:
 metric:
   name: "largest_listing"
   description: "largest listing"
-  owners:
-    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -170,8 +138,6 @@ metric:
 metric:
   name: "identity_verifications"
   description: "identity_verifications"
-  owners:
-    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -180,8 +146,6 @@ metric:
 metric:
   name: "revenue"
   description: "revenue"
-  owners:
-    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -190,8 +154,6 @@ metric:
 metric:
   name: "trailing_2_months_revenue"
   description: "trailing_2_months_revenue"
-  owners:
-    - support@transformdata.io
   type: cumulative
   type_params:
     measures:
@@ -201,8 +163,6 @@ metric:
 metric:
   name: "revenue_all_time"
   description: "revenue_all_time"
-  owners:
-    - support@transformdata.io
   type: cumulative
   type_params:
     measures:
@@ -211,8 +171,6 @@ metric:
 metric:
   name: "every_two_days_bookers" # because the bookings test data only spans 3 days
   description: "every_two_days_bookers"
-  owners:
-    - support@transformdata.io
   type: cumulative
   type_params:
     measures:
@@ -222,16 +180,7 @@ metric:
 metric:
   name: "revenue_mtd"
   description: "revenue mtd"
-  owners:
-    - support@transformdata.io
   type: cumulative
-  locked_metadata:
-    value_format: "$$,.2f" # we need to double dollars here since string template reserves dollar sign.
-    tags:
-      - "Finance"
-      - "Monthly"
-    private: true
-    unit: "dollars"
   type_params:
     measures:
       - txn_revenue
@@ -240,14 +189,8 @@ metric:
 metric:
   name: non_lux_test_listings
   description: Listings where the lux listing ID is not from a test.
-  owners:
-    - support@transformdata.io
   type: measure_proxy
   constraint: lux_or_normal_listing != 'LUX_TEST_ID'
-  locked_metadata:
-    value_format: ""
-    tags:
-      - "Listings"
   type_params:
     measures:
       - listings
@@ -255,8 +198,6 @@ metric:
 metric:
   name: booking_fees
   description: Booking value multiplied by constant - simple expr metric test
-  owners:
-    - support@transformdata.io
   type: expr
   type_params:
     expr: "booking_value * 0.05"
@@ -266,8 +207,6 @@ metric:
 metric:
   name: booking_fees_per_booker
   description: booking_fees divided by bookers - single source multi measure expr test
-  owners:
-    - support@transformdata.io
   type: expr
   type_params:
     expr: "booking_value * 0.05 / bookers"
@@ -278,14 +217,7 @@ metric:
 metric:
   name: views_times_booking_value
   description: Booking_value multiplied by views - expr metric test
-  owners:
-    - support@transformdata.io
   type: expr
-  locked_metadata:
-    value_format: ",d"
-    tags:
-      - "Bookings"
-      - "Views"
   type_params:
     expr: "booking_value * views"
     measures:
@@ -295,44 +227,23 @@ metric:
 metric:
   name: bookings_per_booker
   description: bookings divided by bookers - single data source ratio metric test
-  owners:
-    - support@transformdata.io
   type: ratio
   type_params:
     numerator: bookings
     denominator: bookers
-  locked_metadata:
-    value_format: ",.2f"
-    tags:
-      - "Bookings"
-      - "Bookers"
 ---
 metric:
   name: bookings_per_view
   description: Bookings divided by views - ratio metric test
-  owners:
-    - support@transformdata.io
   type: ratio
   type_params:
     numerator: bookings
     denominator: views
-  locked_metadata:
-    value_format: ",.2f"
-    tags:
-      - "Bookings"
-      - "Views"
 ---
 metric:
   name: bookings_per_listing
   description: Bookings divided by listings - ratio with primary identifier test
-  owners:
-    - support@transformdata.io
   type: ratio
-  locked_metadata:
-    value_format: ".2%"
-    tags:
-      - "Bookings"
-      - "Listings"
   type_params:
     numerator: bookings
     denominator: listings
@@ -340,14 +251,7 @@ metric:
 metric:
   name: bookings_per_dollar
   description: Number of bookings per dollar of value
-  owners:
-    - support@transformdata.io
   type: ratio
-  locked_metadata:
-    value_format: ".2%"
-    tags:
-      - "Bookings"
-      - "Finance"
   type_params:
     numerator: bookings
     denominator: booking_value
@@ -355,8 +259,6 @@ metric:
 metric:
   name: "total_account_balance_first_day"
   description: "total_account_balance_first_day"
-  owners:
-    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -365,8 +267,6 @@ metric:
 metric:
   name: "current_account_balance_by_user"
   description: "current_account_balance_by_user"
-  owners:
-    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -377,13 +277,7 @@ metric:
   description: |
     Average instant booking value as a ratio of overall max booking value.
     Tests constrained ratio measure.
-  owners:
-    - support@transformdata.io
   type: ratio
-  locked_metadata:
-    value_format: ".2%"
-    tags:
-      - "Bookings"
   type_params:
     numerator:
       name: average_booking_value
@@ -396,14 +290,7 @@ metric:
   description: |
     Average lux booking value as a ratio of overall max booking value.
     Tests constrained ratio measure with external dimension join.
-  owners:
-    - support@transformdata.io
   type: ratio
-  locked_metadata:
-    value_format: ".2%"
-    tags:
-      - "Bookings"
-      - "Lux"
   type_params:
     numerator:
       name: average_booking_value
@@ -416,14 +303,7 @@ metric:
   description: |
     Lux booking value defined as an expr with lux booking value, lux bookings, and total value as inputs.
     Tests constrained measure expr metric with external dimension join.
-  owners:
-    - support@transformdata.io
   type: expr
-  locked_metadata:
-    value_format: ".2%"
-    tags:
-      - "Bookings"
-      - "Lux"
   type_params:
     expr: "average_booking_value * bookings / NULLIF(booking_value, 0)"
     measures:
@@ -438,13 +318,7 @@ metric:
   description: |
     Instant booking value defined as a ratio metric of instant booking value / booking value
     Tests constrained measure ratio metric with re-use of the same base measure
-  owners:
-    - support@transformdata.io
   type: ratio
-  locked_metadata:
-    value_format: ".2%"
-    tags:
-      - "Bookings"
   type_params:
     numerator:
       name: booking_value
@@ -458,13 +332,7 @@ metric:
   description: |
     First day account balance ratio of western vs eastern region starting balance ratios,
     used to test interaction between semi-additive measures and measure constraints
-  owners:
-    - support@transformdata.io
   type: ratio
-  locked_metadata:
-    value_format: ".2%"
-    tags:
-      - "Finance"
   type_params:
     numerator:
       name: total_account_balance_first_day
@@ -479,8 +347,6 @@ metric:
   name: double_counted_delayed_bookings
   description: |
     Minimal repro case for an expr with a single constrained and aliased measure as input.
-  owners:
-    - support@transformdata.io
   type: expr
   type_params:
     expr: delayed_bookings * 2
@@ -492,8 +358,6 @@ metric:
 metric:
   name: "referred_bookings"
   description: "bookings made through a referral"
-  owners:
-    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -502,8 +366,6 @@ metric:
 metric:
   name: "non_referred_bookings_pct"
   description: "percentage of bookings that are not made through a referral"
-  owners:
-    - support@transformdata.io
   type: derived
   type_params:
     expr: (bookings - ref_bookings) * 1.0 / bookings
@@ -515,8 +377,6 @@ metric:
 metric:
   name: bookings_per_lux_listing_derived
   description: Bookings divided by listings - using derived metric type
-  owners:
-    - support@transformdata.io
   type: derived
   type_params:
     expr: bookings * 1.0 / NULLIF(lux_listing, 0)
@@ -531,8 +391,6 @@ metric:
   description: |
     percentage of bookings that are not made through a referral + instant booking pct,
     used to test nested derived metrics.
-  owners:
-    - support@transformdata.io
   type: derived
   type_params:
     expr: non_referred + (instant * 1.0 / bookings)
@@ -547,8 +405,6 @@ metric:
   name: "trailing_2_months_revenue_sub_10"
   description: |
     Test derived metric with a cumulative metric
-  owners:
-    - support@transformdata.io
   type: derived
   type_params:
     expr: t2mr - 10
@@ -559,8 +415,6 @@ metric:
 metric:
   name: booking_value_per_view
   description: proportion of booking value per view, which allows us to test joins to listings with null values
-  owners:
-    - support@transformdata.io
   type: derived
   type_params:
     expr: booking_value / NULLIF(views, 0)
@@ -571,8 +425,6 @@ metric:
 metric:
   name: "median_booking_value"
   description: "median booking value"
-  owners:
-    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -581,8 +433,6 @@ metric:
 metric:
   name: "booking_value_p99"
   description: "p99 booking value"
-  owners:
-    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -591,8 +441,6 @@ metric:
 metric:
   name: "discrete_booking_value_p99"
   description: "discrete p99 booking value"
-  owners:
-    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -601,8 +449,6 @@ metric:
 metric:
   name: "approximate_continuous_booking_value_p99"
   description: "approximate continuous p99 booking value"
-  owners:
-    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -611,8 +457,6 @@ metric:
 metric:
   name: "approximate_discrete_booking_value_p99"
   description: "approximate discrete p99 booking value"
-  owners:
-    - support@transformdata.io
   type: measure_proxy
   type_params:
     measures:
@@ -623,8 +467,6 @@ metric:
   description: |
     percentage growth of bookings compared to bookings 2 weeks prior,
     used to test derived metrics with an offset_window.
-  owners:
-    - support@transformdata.io
   type: derived
   type_params:
     expr: bookings - bookings_2_weeks_ago
@@ -639,8 +481,6 @@ metric:
   description: |
     percentage growth of bookings since the start of the month,
     used to test derived metrics with an offset_to_grain.
-  owners:
-    - support@transformdata.io
   type: derived
   type_params:
     expr: bookings - bookings_at_start_of_month
@@ -655,8 +495,6 @@ metric:
   description: |
     percentage growth of bookings compared to bookings 2 weeks prior,
     used to test derived metrics with an offset_window.
-  owners:
-    - support@transformdata.io
   type: derived
   type_params:
     expr: month_start_bookings - bookings_1_month_ago
@@ -673,8 +511,6 @@ metric:
   description: |
     number of bookings 5 days ago. used to test derived metric offset
     with only one input metric.
-  owners:
-    - support@transformdata.io
   type: derived
   type_params:
     expr: bookings_5_days_ago

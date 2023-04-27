@@ -2,8 +2,6 @@
 data_source:
   name: bookings_source
   description: bookings_source
-  owners:
-    - support@transformdata.io
 
   sql_table: $fct_bookings_for_joins_table
 

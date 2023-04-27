@@ -12,7 +12,7 @@ from metricflow.cli.main import (
     version,
 )
 from metricflow.model.model_validator import ModelValidator
-from metricflow.model.parsing.config_linter import ConfigLinter
+from dbt_semantic_interfaces.parsing.config_linter import ConfigLinter
 from metricflow.model.validations.validator_helpers import (
     ModelValidationResults,
     ValidationError,
@@ -59,10 +59,10 @@ def test_validate_configs(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
         ValidationFutureError(context=None, message="future_error_message", error_date=datetime.now()),  # type: ignore
         ValidationError(context=None, message="error_message"),  # type: ignore
     )
-    mocked_build_result = MagicMock(issues=ModelValidationResults.from_issues_sequence(issues))
+    mocked_validate_model = ModelValidationResults.from_issues_sequence(issues)
     with patch("metricflow.cli.main.model_build_result_from_config", return_value=mocked_parsing_result):
         with patch("metricflow.cli.main.path_to_models", return_value=""):
-            with patch.object(ModelValidator, "validate_model", return_value=mocked_build_result):
+            with patch.object(ModelValidator, "validate_model", return_value=mocked_validate_model):
                 resp = cli_runner.run(validate_configs)
 
     assert "error_message" in resp.output
@@ -78,10 +78,10 @@ def test_future_errors_and_warnings_conditionally_show_up(cli_runner: MetricFlow
         ValidationFutureError(context=None, message="future_error_message", error_date=datetime.now()),  # type: ignore
         ValidationError(context=None, message="error_message"),  # type: ignore
     )
-    mocked_build_result = MagicMock(issues=ModelValidationResults.from_issues_sequence(issues))
+    mocked_validate_model = ModelValidationResults.from_issues_sequence(issues)
     with patch("metricflow.cli.main.model_build_result_from_config", return_value=mocked_parsing_result):
         with patch("metricflow.cli.main.path_to_models", return_value=""):
-            with patch.object(ModelValidator, "validate_model", return_value=mocked_build_result):
+            with patch.object(ModelValidator, "validate_model", return_value=mocked_validate_model):
                 resp = cli_runner.run(validate_configs)
 
     assert "warning_message" not in resp.output
@@ -90,7 +90,7 @@ def test_future_errors_and_warnings_conditionally_show_up(cli_runner: MetricFlow
 
     with patch("metricflow.cli.main.model_build_result_from_config", return_value=mocked_parsing_result):
         with patch("metricflow.cli.main.path_to_models", return_value=""):
-            with patch.object(ModelValidator, "validate_model", return_value=mocked_build_result):
+            with patch.object(ModelValidator, "validate_model", return_value=mocked_validate_model):
                 resp = cli_runner.run(validate_configs, ["--show-all"])
 
     assert "warning_message" in resp.output
@@ -106,9 +106,7 @@ def test_validate_configs_data_warehouse_validations(cli_runner: MetricFlowCliRu
     ]
     with patch("metricflow.cli.main.model_build_result_from_config", return_value=mocked_parsing_result):
         with patch("metricflow.cli.main.path_to_models", return_value=""):
-            with patch.object(
-                ModelValidator, "validate_model", return_value=MagicMock(issues=ModelValidationResults())
-            ):
+            with patch.object(ModelValidator, "validate_model", return_value=ModelValidationResults()):
                 with patch.object(CLIContext, "sql_client", return_value=None):  # type: ignore
                     with patch(
                         "metricflow.cli.main._run_dw_validations",

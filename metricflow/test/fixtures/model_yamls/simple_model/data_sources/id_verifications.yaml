@@ -2,8 +2,6 @@
 data_source:
   name: id_verifications
   description: id_verifications
-  owners:
-    - support@transformdata.io
 
   sql_table: $fct_id_verifications_table
 

@@ -3,17 +3,17 @@ from collections import defaultdict
 from copy import deepcopy
 from typing import Dict, List, Optional, Set, Sequence
 
-from metricflow.aggregation_properties import AggregationType
-from metricflow.errors.errors import InvalidDataSourceError
-from metricflow.instances import DataSourceReference, DataSourceElementReference
 from dbt_semantic_interfaces.objects.data_source import DataSource, DataSourceOrigin
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension
 from dbt_semantic_interfaces.objects.elements.identifier import Identifier
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.semantics.data_source_container import PydanticDataSourceContainer
+from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
+from metricflow.errors.errors import InvalidDataSourceError
+from metricflow.instances import DataSourceReference, DataSourceElementReference
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.spec_converters import MeasureConverter
+from metricflow.protocols.semantics import DataSourceSemanticsAccessor
 from metricflow.references import (
     MeasureReference,
     TimeDimensionReference,
@@ -26,7 +26,7 @@ from metricflow.specs import NonAdditiveDimensionSpec, MeasureSpec
 logger = logging.getLogger(__name__)
 
 
-class DataSourceSemantics:
+class DataSourceSemantics(DataSourceSemanticsAccessor):
     """Tracks semantic information for data source held in a set of DataSourceContainers
 
     This implements both the DataSourceSemanticsAccessors protocol, the interface type we use throughout the codebase.
@@ -36,7 +36,6 @@ class DataSourceSemantics:
     def __init__(  # noqa: D
         self,
         model: UserConfiguredModel,
-        configured_data_source_container: PydanticDataSourceContainer,
     ) -> None:
         self._model = model
         self._measure_index: Dict[MeasureReference, List[DataSource]] = defaultdict(list)
@@ -51,23 +50,16 @@ class DataSourceSemantics:
         self._identifier_ref_to_entity: Dict[IdentifierReference, Optional[str]] = {}
         self._data_source_names: Set[str] = set()
 
-        self._configured_data_source_container = configured_data_source_container
         self._data_source_to_aggregation_time_dimensions: Dict[
             DataSourceReference, ElementGrouper[TimeDimensionReference, MeasureSpec]
         ] = {}
 
-        # Add semantic tracking for data sources from configured_data_source_container
-        for data_source in self._configured_data_source_container.values():
-            assert isinstance(data_source, DataSource)
-            self.add_configured_data_source(data_source)
+        self._data_source_reference_to_data_source: Dict[DataSourceReference, DataSource] = {}
+        for data_source in self._model.data_sources:
+            self._add_data_source(data_source)
 
-    def add_configured_data_source(self, data_source: DataSource) -> None:
-        """Dont use this unless you mean it (ie in tests). The configured data sources are supposed to be static"""
-        self._configured_data_source_container._put(data_source)
-        self._add_data_source(data_source)
-
-    def get_dimension_references(self) -> List[DimensionReference]:  # noqa: D
-        return list(self._dimension_index.keys())
+    def get_dimension_references(self) -> Sequence[DimensionReference]:  # noqa: D
+        return tuple(self._dimension_index.keys())
 
     def get_dimension(
         self, dimension_reference: DimensionReference, origin: Optional[DataSourceOrigin] = None
@@ -102,7 +94,7 @@ class DataSourceSemantics:
         assert False, f"{time_dimension_reference} should have been in the dimension index"
 
     @property
-    def measure_references(self) -> List[MeasureReference]:  # noqa: D
+    def measure_references(self) -> Sequence[MeasureReference]:  # noqa: D
         return list(self._measure_index.keys())
 
     @property
@@ -117,11 +109,11 @@ class DataSourceSemantics:
         # Measures should be consistent across data sources, so just use the first one.
         return list(self._measure_index[measure_reference])[0].get_measure(measure_reference)
 
-    def get_identifier_references(self) -> List[IdentifierReference]:  # noqa: D
+    def get_identifier_references(self) -> Sequence[IdentifierReference]:  # noqa: D
         return list(self._identifier_ref_to_entity.keys())
 
     # DSC interface
-    def get_data_sources_for_measure(self, measure_reference: MeasureReference) -> List[DataSource]:  # noqa: D
+    def get_data_sources_for_measure(self, measure_reference: MeasureReference) -> Sequence[DataSource]:  # noqa: D
         return self._measure_index[measure_reference]
 
     def get_agg_time_dimension_for_measure(  # noqa: D
@@ -130,7 +122,7 @@ class DataSourceSemantics:
         return self._measure_agg_time_dimension[measure_reference]
 
     def get_identifier_in_data_source(self, ref: DataSourceElementReference) -> Optional[Identifier]:  # Noqa: d
-        data_source = self.get(ref.data_source_name)
+        data_source = self.get_by_reference(ref.data_source_reference)
         if not data_source:
             return None
 
@@ -140,50 +132,26 @@ class DataSourceSemantics:
 
         return None
 
-    def get(self, data_source_name: str) -> Optional[DataSource]:  # noqa: D
-        if data_source_name in self._configured_data_source_container:
-            data_source = self._configured_data_source_container.get(data_source_name)
-            assert isinstance(data_source, DataSource)
-            return data_source
-
-        return None
-
     def get_by_reference(self, data_source_reference: DataSourceReference) -> Optional[DataSource]:  # noqa: D
-        return self.get(data_source_reference.data_source_name)
+        return self._data_source_reference_to_data_source.get(data_source_reference)
 
-    def _add_data_source(
-        self,
-        data_source: DataSource,
-        fail_on_error: bool = True,
-        logging_context: str = "",
-    ) -> None:
+    def _add_data_source(self, data_source: DataSource) -> None:
         """Add data source semantic information, validating consistency with existing data sources."""
         errors = []
 
-        if data_source.name in self._data_source_names:
-            errors.append(f"name {data_source.name} already registered - please ensure data source names are unique")
+        if data_source.reference in self._data_source_reference_to_data_source:
+            errors.append(f"Data source {data_source.reference} already added.")
 
         for measure in data_source.measures:
             if measure.reference in self._measure_aggs and self._measure_aggs[measure.reference] != measure.agg:
                 errors.append(
-                    f"conflicting aggregation (agg) for measure `{measure.reference.element_name}` registered as "
-                    f"`{self._measure_aggs[measure.reference]}`; Got `{measure.agg}"
+                    f"Conflicting aggregation (agg) for measure {measure.reference}. Currently registered as "
+                    f"{self._measure_aggs[measure.reference]} but got {measure.agg}."
                 )
 
-        if errors:
-            error_prefix = "\n  - "
-            error_msg = (
-                f"Unable to add data source `{data_source.name}` "
-                f"{'while ' + logging_context + ' ' if logging_context else ''}"
-                f"{'... skipping' if not fail_on_error else ''}.\n"
-                f"Errors: {error_prefix + error_prefix.join(errors)}"
-            )
-            if fail_on_error:
-                raise InvalidDataSourceError(error_msg)
-            logger.warning(error_msg)
-            return
+        if len(errors) > 0:
+            raise InvalidDataSourceError(f"Error adding {data_source.reference}. Got errors: {errors}")
 
-        self._data_source_names.add(data_source.name)
         self._data_source_to_aggregation_time_dimensions[data_source.reference] = ElementGrouper[
             TimeDimensionReference, MeasureSpec
         ]()
@@ -211,6 +179,8 @@ class DataSourceSemantics:
             self._identifier_ref_to_entity[ident.reference] = ident.entity
             self._entity_index[ident.entity].append(data_source)
             self._linkable_reference_index[ident.reference].append(data_source)
+
+        self._data_source_reference_to_data_source[data_source.reference] = data_source
 
     @property
     def data_source_references(self) -> Sequence[DataSourceReference]:  # noqa: D

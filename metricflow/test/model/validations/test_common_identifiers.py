@@ -20,15 +20,15 @@ def test_lonely_identifier_raises_issue(simple_model__with_primary_transforms: U
     data_source_with_identifiers, _ = find_data_source_with(model, func)
     data_source_with_identifiers.identifiers[0].name = IdentifierSpec.from_name(lonely_identifier_name).element_name
     model_validator = ModelValidator([CommonIdentifiersRule()])
-    build = model_validator.validate_model(model)
+    model_issues = model_validator.validate_model(model)
 
     found_warning = False
     warning = (
         f"Identifier `{lonely_identifier_name}` only found in one data source `{data_source_with_identifiers.name}` "
         f"which means it will be unused in joins."
     )
-    if build.issues is not None:
-        for issue in build.issues:
+    if model_issues is not None:
+        for issue in model_issues.all_issues:
             if re.search(warning, issue.message):
                 found_warning = True
 
