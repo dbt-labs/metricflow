@@ -5,7 +5,6 @@ import traceback
 from typing import DefaultDict, Dict, List, Optional, Set
 from dbt.contracts.graph.nodes import Metric as DbtMetric, ModelNode as DbtModelNode
 from dbt.contracts.graph.unparsed import MetricFilter as DbtMetricFilter
-from dbt.exceptions import ref_invalid_args
 from dbt.contracts.graph.manifest import Manifest as DbtManifest
 from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
 from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
@@ -101,8 +100,6 @@ class DbtManifestTransformer:
             elif len(ref_parts) == 2:
                 target_package = ref_parts[0].strip(" \"'\t\r\n")
                 target_model = ref_parts[1].strip(" \"'\t\r\n")
-            else:
-                ref_invalid_args(dbt_metric.name, ref_parts)
         else:
             target_model = dbt_metric.model
 
