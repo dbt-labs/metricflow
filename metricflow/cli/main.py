@@ -52,7 +52,6 @@ from metricflow.model.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.engine.utils import model_build_result_from_config, path_to_models
-from dbt_semantic_interfaces.parsing.config_linter import ConfigLinter
 from metricflow.model.validations.validator_helpers import ModelValidationResults
 from metricflow.sql_clients.common_client import SqlDialect
 from metricflow.telemetry.models import TelemetryLevel
@@ -658,21 +657,7 @@ def validate_configs(
     if not show_all:
         print("(To see warnings and future-errors, run again with flag `--show-all`)")
 
-    # Skip linting validation for dbt cloud
-    if cfg.dbt_cloud_configs is not None:
-        lint_results = ModelValidationResults()
-    else:
-        # Lint Validation
-        lint_spinner = Halo(text="Checking for YAML format issues", spinner="dots")
-        lint_spinner.start()
-
-        lint_results = ConfigLinter().lint_dir(path_to_models(handler=cfg.config))
-        if not lint_results.has_blocking_issues:
-            lint_spinner.succeed(f"🎉 Successfully linted config YAML files ({lint_results.summary()})")
-        else:
-            lint_spinner.fail(f"Breaking issues found in config YAML files ({lint_results.summary()})")
-            _print_issues(lint_results, show_non_blocking=show_all, verbose=verbose_issues)
-            return
+    lint_results = ModelValidationResults()
 
     # Parsing Validation
     parsing_spinner = Halo(text="Building model from configs", spinner="dots")

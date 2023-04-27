@@ -12,7 +12,6 @@ from metricflow.cli.main import (
     version,
 )
 from metricflow.model.model_validator import ModelValidator
-from dbt_semantic_interfaces.parsing.config_linter import ConfigLinter
 from metricflow.model.validations.validator_helpers import (
     ModelValidationResults,
     ValidationError,
@@ -129,16 +128,6 @@ def test_validate_configs_skip_data_warehouse_validations(cli_runner: MetricFlow
                 resp = cli_runner.run(validate_configs, args=["--skip-dw"])
 
     assert "Data Warehouse Error" not in resp.output
-    assert resp.exit_code == 0
-
-
-def test_validate_configs_with_lint_issues(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    lint_issues = [ValidationError(context=None, message="YAML Lint Error")]
-    with patch("metricflow.cli.main.path_to_models", return_value=""):
-        with patch.object(ConfigLinter, "lint_dir", return_value=ModelValidationResults(errors=lint_issues)):
-            resp = cli_runner.run(validate_configs)
-
-    assert "YAML Lint Error" in resp.output
     assert resp.exit_code == 0
 
 

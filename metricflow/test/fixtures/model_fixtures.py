@@ -300,10 +300,3 @@ def data_warehouse_validation_model(template_mapping: Dict[str, str]) -> UserCon
         template_mapping=template_mapping,
     )
     return model_build_result.model
-
-
-@pytest.fixture(scope="session")
-def config_linter_model_path() -> str:
-    """Model path for ConfigLinter tests"""
-
-    return os.path.join(os.path.dirname(__file__), "model_yamls/config_linter_model")
