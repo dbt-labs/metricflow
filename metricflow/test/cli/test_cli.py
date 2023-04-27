@@ -117,9 +117,7 @@ def test_validate_configs_skip_data_warehouse_validations(cli_runner: MetricFlow
     # Mock build result for `model_build_result_from_config`
     mocked_parsing_result = MagicMock(issues=ModelValidationResults())
     with patch("metricflow.cli.main.model_build_result_from_config", return_value=mocked_parsing_result):
-        with patch.object(
-            ModelValidator, "validate_model", return_value=MagicMock(issues=ModelValidationResults())
-        ):
+        with patch.object(ModelValidator, "validate_model", return_value=MagicMock(issues=ModelValidationResults())):
             resp = cli_runner.run(validate_configs, args=["--skip-dw"])
 
     assert "Data Warehouse Error" not in resp.output
