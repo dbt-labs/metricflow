@@ -31,5 +31,5 @@ repos:
             pytest,
             python-dateutil,
             types-python-dateutil,
-            dbt-core,
+            dbt-core==1.4.0,
           ]
