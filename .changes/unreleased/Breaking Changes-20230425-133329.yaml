@@ -1,0 +1,6 @@
+kind: Breaking Changes
+body: License Change - Version 0 to 0.140.0 was covered by the Affero GPL license. Version 0.150.0 and greater is covered by the BSL license.
+time: 2023-04-25T13:33:29.983367-07:00
+custom:
+  Author: nhandel
+  Issue: "465"

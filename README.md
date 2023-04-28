@@ -100,6 +100,9 @@ To get started on direct contributions, head on over to our [contributor guide](
 
 ## License
 
-MetricFlow is open source software. The project relies on several licenses including AGPL-3.0-or-later and Apache (specified at folder level).
+MetricFlow is source-available software.
+
+Version 0 to 0.140.0 was covered by the Affero GPL license.
+Version 0.150.0 and greater is covered by the BSL license..
 
 MetricFlow is built by [dbt Labs](https://www.getdbt.com/).
