@@ -3,7 +3,7 @@ data_source:
   name: primary_accounts
   description: SCD Type II table of primary account history
 
-  sql_table: $primary_accounts_table
+  sql_table: $source_schema.dim_primary_accounts
 
   dimensions:
     - name: primary_from

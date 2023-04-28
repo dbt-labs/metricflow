@@ -3,7 +3,7 @@ data_source:
   name: users_latest
   description: users_latest
 
-  sql_table: $users_latest_table
+  sql_table: $source_schema.dim_users_latest
 
   dimensions:
     - name: ds

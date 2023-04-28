@@ -3,7 +3,7 @@ data_source:
   name: companies
   description: If a user is a company / business, this defines the mapping.
 
-  sql_table: $dim_companies_table
+  sql_table: $source_schema.dim_companies
 
   dimensions:
     - name: company_name

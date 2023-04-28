@@ -3,7 +3,7 @@ data_source:
   name: account_month_txns
   description: account_month_txns
 
-  sql_table: $account_month_txns
+  sql_table: $source_schema.account_month_txns
 
   measures:
     - name: txn_count

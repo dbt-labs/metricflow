@@ -3,7 +3,7 @@ data_source:
   name: listings_source
   description: listings_source
 
-  sql_table: $dim_listings_for_joins_table
+  sql_table: $source_schema.dim_listings_for_joins
 
   dimensions:
     - name: country

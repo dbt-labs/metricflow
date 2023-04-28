@@ -3,7 +3,7 @@ data_source:
   name: users_ds_source
   description: users_ds_source
 
-  sql_table: $dim_users_table
+  sql_table: $source_schema.dim_users
 
   dimensions:
     - name: ds

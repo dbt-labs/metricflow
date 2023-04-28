@@ -148,29 +148,7 @@ def create_data_sets(multihop_semantic_model: SemanticModel) -> OrderedDict[str,
 @pytest.fixture(scope="session")
 def template_mapping(mf_test_session_state: MetricFlowTestSessionState) -> Dict[str, str]:
     """Mapping for template variables in the model YAML files."""
-    schema = mf_test_session_state.mf_source_schema
-    return {
-        "bookings_source_query": f"SELECT * FROM {schema}.fct_bookings_dt ",
-        "bookings_source_table": f"{schema}.fct_bookings",
-        "views_source_table": f"{schema}.fct_views",
-        "listings_latest_table": f"{schema}.dim_listings_latest",
-        "listings_table": f"{schema}.dim_listings",
-        "listings_latest": f"{schema}.dim_listings_latest_table",
-        "dim_listings_latest_table": f"{schema}.dim_listings_latest",
-        "users_latest_table": f"{schema}.dim_users_latest",
-        "dim_users_table": f"{schema}.dim_users",
-        "fct_id_verifications_table": f"{schema}.fct_id_verifications",
-        "fct_revenue_table": f"{schema}.fct_revenue",
-        "dim_lux_listing_id_mapping_table": f"{schema}.dim_lux_listing_id_mapping",
-        "dim_lux_listings_table": f"{schema}.dim_lux_listings",
-        "thorium_table": f"{schema}.thorium",
-        "osmium_table": f"{schema}.osmium",
-        "dysprosium_table": f"{schema}.dysprosium",
-        "dim_companies_table": f"{schema}.dim_companies",
-        "source_schema": schema,
-        "accounts_source_table": f"{schema}.fct_accounts",
-        "primary_accounts_table": f"{schema}.dim_primary_accounts",
-    }
+    return {"source_schema": mf_test_session_state.mf_source_schema}
 
 
 @pytest.fixture(scope="session")
@@ -193,12 +171,6 @@ def simple_semantic_model(template_mapping: Dict[str, str]) -> SemanticModel:  #
 def composite_entity_semantic_model(  # noqa: D
     template_mapping: Dict[str, str], mf_test_session_state: MetricFlowTestSessionState
 ) -> SemanticModel:
-    schema = mf_test_session_state.mf_source_schema
-    template_mapping = {
-        "fct_messages_table": f"{schema}.fct_messages",
-        "fct_users_table": f"{schema}.fct_users",
-        "fct_users_more_table": f"{schema}.fct_users_more",
-    }
     model_build_result = parse_directory_of_yaml_files_to_model(
         os.path.join(os.path.dirname(__file__), "model_yamls/composite_identifier_model"),
         template_mapping=template_mapping,
@@ -207,15 +179,7 @@ def composite_entity_semantic_model(  # noqa: D
 
 
 @pytest.fixture(scope="session")
-def multi_hop_join_semantic_model(mf_test_session_state: MetricFlowTestSessionState) -> SemanticModel:  # noqa: D
-    schema = mf_test_session_state.mf_source_schema
-    template_mapping = {
-        "account_month_txns": f"{schema}.account_month_txns",
-        "customer_table": f"{schema}.customer_table",
-        "third_hop_table": f"{schema}.third_hop_table",
-        "customer_other_data": f"{schema}.customer_other_data",
-        "bridge_table": f"{schema}.bridge_table",
-    }
+def multi_hop_join_semantic_model(template_mapping: Dict[str, str]) -> SemanticModel:  # noqa: D
     model_build_result = parse_directory_of_yaml_files_to_model(
         os.path.join(os.path.dirname(__file__), "model_yamls/multi_hop_join_model/partitioned_data_sources"),
         template_mapping=template_mapping,
@@ -224,17 +188,7 @@ def multi_hop_join_semantic_model(mf_test_session_state: MetricFlowTestSessionSt
 
 
 @pytest.fixture(scope="session")
-def unpartitioned_multi_hop_join_semantic_model(  # noqa: D
-    mf_test_session_state: MetricFlowTestSessionState,
-) -> SemanticModel:
-    schema = mf_test_session_state.mf_source_schema
-    template_mapping = {
-        "account_month_txns": f"{schema}.account_month_txns",
-        "customer_table": f"{schema}.customer_table",
-        "third_hop_table": f"{schema}.third_hop_table",
-        "customer_other_data": f"{schema}.customer_other_data",
-        "bridge_table": f"{schema}.bridge_table",
-    }
+def unpartitioned_multi_hop_join_semantic_model(template_mapping: Dict[str, str]) -> SemanticModel:  # noqa: D
     model_build_result = parse_directory_of_yaml_files_to_model(
         os.path.join(os.path.dirname(__file__), "model_yamls/multi_hop_join_model/unpartitioned_data_sources"),
         template_mapping=template_mapping,
@@ -268,13 +222,7 @@ def simple_model__with_primary_transforms(template_mapping: Dict[str, str]) -> U
 
 
 @pytest.fixture(scope="session")
-def extended_date_semantic_model(mf_test_session_state: MetricFlowTestSessionState) -> SemanticModel:  # noqa: D
-    schema = mf_test_session_state.mf_source_schema
-    template_mapping = {
-        "fct_bookings_extended_table": f"{schema}.fct_bookings_extended",
-        "fct_bookings_extended_monthly_table": f"{schema}.fct_bookings_extended_monthly",
-        "dim_listings_extended_table": f"{schema}.dim_listings_extended",
-    }
+def extended_date_semantic_model(template_mapping: Dict[str, str]) -> SemanticModel:  # noqa: D
     model_build_result = parse_directory_of_yaml_files_to_model(
         os.path.join(os.path.dirname(__file__), "model_yamls/extended_date_model"),
         template_mapping=template_mapping,

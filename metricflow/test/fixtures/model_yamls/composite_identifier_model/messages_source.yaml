@@ -3,7 +3,7 @@ data_source:
   name: messages_source
   description: messages_source
 
-  sql_table: $fct_messages_table
+  sql_table: $source_schema.fct_messages
 
   measures:
     - name: messages

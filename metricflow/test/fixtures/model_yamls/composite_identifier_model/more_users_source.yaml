@@ -3,7 +3,7 @@ data_source:
   name: more_users_source
   description: more_users_source
 
-  sql_table: $fct_users_more_table
+  sql_table: $source_schema.fct_users_more
 
 
   dimensions:

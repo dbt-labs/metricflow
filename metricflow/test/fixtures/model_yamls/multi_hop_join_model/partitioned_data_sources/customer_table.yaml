@@ -3,7 +3,7 @@ data_source:
   name: customer_table
   description: customer_table
 
-  sql_table: $customer_table
+  sql_table: $source_schema.customer_table
 
   dimensions:
     - name: customer_name

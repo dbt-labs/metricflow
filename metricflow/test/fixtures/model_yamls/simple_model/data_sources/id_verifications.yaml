@@ -3,7 +3,7 @@ data_source:
   name: id_verifications
   description: id_verifications
 
-  sql_table: $fct_id_verifications_table
+  sql_table: $source_schema.fct_id_verifications
 
   measures:
     - name: identity_verifications
