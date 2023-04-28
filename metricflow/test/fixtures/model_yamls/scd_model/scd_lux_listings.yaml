@@ -3,7 +3,7 @@ data_source:
   name: lux_listing_mapping
   description: Mapping from listing_id to lux_listing_id
 
-  sql_table: $dim_lux_listing_id_mapping_table
+  sql_table: $source_schema.dim_lux_listing_id_mapping
 
   identifiers:
     - name: listing
@@ -17,7 +17,7 @@ data_source:
   name: lux_listings
   description: SCD Type II table of lux listings history
 
-  sql_table: $dim_lux_listings_table
+  sql_table: $source_schema.dim_lux_listings
 
   dimensions:
     - name: window_start

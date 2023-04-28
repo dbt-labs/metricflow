@@ -3,7 +3,7 @@ data_source:
   name: extended_bookings_source
   description: extended_bookings_source
 
-  sql_table: $fct_bookings_extended_table
+  sql_table: $source_schema.fct_bookings_extended
 
   measures:
     - name: bookings

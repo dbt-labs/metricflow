@@ -5,7 +5,7 @@ data_source:
 
   sql_query: |
     -- User Defined SQL Query
-    SELECT * FROM $accounts_source_table
+    SELECT * FROM $source_schema.fct_accounts
 
   measures:
     - name: account_balance

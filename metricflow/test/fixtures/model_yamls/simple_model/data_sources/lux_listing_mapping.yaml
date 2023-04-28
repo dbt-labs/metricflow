@@ -3,7 +3,7 @@ data_source:
   name: lux_listing_mapping
   description: lux_listing_mapping
 
-  sql_table: $dim_lux_listing_id_mapping_table
+  sql_table: $source_schema.dim_lux_listing_id_mapping
 
   identifiers:
     - name: listing

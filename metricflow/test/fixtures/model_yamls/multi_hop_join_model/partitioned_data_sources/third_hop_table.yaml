@@ -3,7 +3,7 @@ data_source:
   name: third_hop_table
   description: third_hop_table
 
-  sql_table: $third_hop_table
+  sql_table: $source_schema.third_hop_table
 
   dimensions:
     - name: value

@@ -3,7 +3,7 @@ data_source:
   name: bookings_source
   description: bookings data source for use in the SCD model
 
-  sql_table: $bookings_source_table
+  sql_table: $source_schema.fct_bookings
 
   measures:
     - name: bookings

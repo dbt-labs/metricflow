@@ -5,7 +5,7 @@ data_source:
 
   sql_query: |
     -- User Defined SQL Query
-    SELECT * FROM $fct_revenue_table
+    SELECT * FROM $source_schema.fct_revenue
 
   measures:
     - name: txn_revenue

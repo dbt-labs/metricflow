@@ -3,7 +3,7 @@ data_source:
   name: bookings_monthly_source
   description: bookings_monthly_source
 
-  sql_table: $fct_bookings_extended_monthly_table
+  sql_table: $source_schema.fct_bookings_extended_monthly
 
   measures:
     - name: bookings_monthly

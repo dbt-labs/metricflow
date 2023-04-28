@@ -3,8 +3,7 @@ data_source:
   name: users_source
   description: users_source
 
-  sql_table: $fct_users_table
-
+  sql_table: $source_schema.fct_users
 
   dimensions:
     - name: ds
