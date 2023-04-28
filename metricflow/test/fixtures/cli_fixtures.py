@@ -24,7 +24,7 @@ def cli_context(  # noqa: D
     simple_user_configured_model: UserConfiguredModel,
     time_spine_source: TimeSpineSource,
     mf_test_session_state: MetricFlowTestSessionState,
-    create_simple_model_tables: bool,
+    create_source_tables: bool,
 ) -> CLIContext:
     semantic_model = SemanticModel(simple_user_configured_model)
     mf_engine = MetricFlowEngine(

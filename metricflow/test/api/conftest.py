@@ -9,7 +9,7 @@ from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 
 @pytest.fixture
 def mf_client(
-    create_simple_model_tables: bool,
+    create_source_tables: bool,
     async_sql_client: AsyncSqlClient,
     simple_semantic_model: SemanticModel,
     time_spine_source: TimeSpineSource,

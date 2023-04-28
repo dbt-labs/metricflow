@@ -26,7 +26,7 @@ class IntegrationTestHelpers:
 @pytest.fixture
 def it_helpers(  # noqa: D
     async_sql_client: AsyncSqlClient,
-    create_simple_model_tables: bool,
+    create_source_tables: bool,
     simple_semantic_model: SemanticModel,
     time_spine_source: TimeSpineSource,
     mf_test_session_state: MetricFlowTestSessionState,

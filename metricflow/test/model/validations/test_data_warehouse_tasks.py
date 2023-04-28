@@ -25,7 +25,7 @@ from metricflow.test.plan_utils import assert_snapshot_text_equal, make_schema_r
 
 @pytest.fixture(scope="session")
 def dw_backed_warehouse_validation_model(
-    create_data_warehouse_validation_model_tables: bool,
+    create_source_tables: None,
     data_warehouse_validation_model: UserConfiguredModel,
 ) -> UserConfiguredModel:
     """Model-generating fixture to ensure the underlying tables are created for querying
@@ -36,7 +36,6 @@ def dw_backed_warehouse_validation_model(
     any test that executes warehouse validation queries. It is not needed for test cases which simply
     use the model to construct tasks without executing them.
     """
-    assert create_data_warehouse_validation_model_tables, "Failed to create DW validation tables!"
     return data_warehouse_validation_model
 
 
