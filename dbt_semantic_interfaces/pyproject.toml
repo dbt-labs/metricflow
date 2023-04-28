@@ -20,7 +20,6 @@ pandas = "^1.3.0"
 PyYAML = "^6.0"
 mo-sql-parsing = "^9.328.23003"
 more-itertools = "8.10.0"
-yamllint = "^1.26.3"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

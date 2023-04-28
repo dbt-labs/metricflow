@@ -51,8 +51,7 @@ from metricflow.model.data_warehouse_model_validator import DataWarehouseModelVa
 from metricflow.model.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.protocols.sql_client import SqlEngine
-from metricflow.engine.utils import model_build_result_from_config, path_to_models
-from dbt_semantic_interfaces.parsing.config_linter import ConfigLinter
+from metricflow.engine.utils import model_build_result_from_config
 from metricflow.model.validations.validator_helpers import ModelValidationResults
 from metricflow.sql_clients.common_client import SqlDialect
 from metricflow.telemetry.models import TelemetryLevel
@@ -658,22 +657,6 @@ def validate_configs(
     if not show_all:
         print("(To see warnings and future-errors, run again with flag `--show-all`)")
 
-    # Skip linting validation for dbt cloud
-    if cfg.dbt_cloud_configs is not None:
-        lint_results = ModelValidationResults()
-    else:
-        # Lint Validation
-        lint_spinner = Halo(text="Checking for YAML format issues", spinner="dots")
-        lint_spinner.start()
-
-        lint_results = ConfigLinter().lint_dir(path_to_models(handler=cfg.config))
-        if not lint_results.has_blocking_issues:
-            lint_spinner.succeed(f"🎉 Successfully linted config YAML files ({lint_results.summary()})")
-        else:
-            lint_spinner.fail(f"Breaking issues found in config YAML files ({lint_results.summary()})")
-            _print_issues(lint_results, show_non_blocking=show_all, verbose=verbose_issues)
-            return
-
     # Parsing Validation
     parsing_spinner = Halo(text="Building model from configs", spinner="dots")
     parsing_spinner.start()
@@ -717,7 +700,7 @@ def validate_configs(
         dw_validator = DataWarehouseModelValidator(sql_client=cfg.sql_client, system_schema=cfg.mf_system_schema)
         dw_results = _data_warehouse_validations_runner(dw_validator=dw_validator, model=user_model, timeout=dw_timeout)
 
-    merged_results = ModelValidationResults.merge([lint_results, parsing_result.issues, model_issues, dw_results])
+    merged_results = ModelValidationResults.merge([parsing_result.issues, model_issues, dw_results])
     _print_issues(merged_results, show_non_blocking=show_all, verbose=verbose_issues)
 
 
