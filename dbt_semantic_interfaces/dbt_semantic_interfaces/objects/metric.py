@@ -12,7 +12,7 @@ from dbt_semantic_interfaces.objects.base import (
     PydanticParseableValueType,
 )
 from metricflow.object_utils import ExtendedEnum, hash_items
-from metricflow.references import MeasureReference
+from metricflow.references import MeasureReference, MetricReference
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.time.time_granularity import string_to_time_granularity
 
@@ -128,6 +128,10 @@ class MetricInput(HashableBaseModel):
     alias: Optional[str]
     offset_window: Optional[MetricTimeWindow]
     offset_to_grain: Optional[TimeGranularity]
+
+    @property
+    def as_reference(self) -> MetricReference:  # noqa: D
+        return MetricReference(element_name=self.name)
 
 
 class MetricTypeParams(HashableBaseModel):
