@@ -180,11 +180,7 @@ def test_case(
     extended_date_semantic_model: SemanticModel,
     scd_semantic_model: SemanticModel,
     async_sql_client: AsyncSqlClient,
-    create_simple_model_tables: bool,
-    create_message_source_tables: bool,
-    create_bridge_table: bool,
-    create_extended_date_model_tables: bool,
-    create_scd_model_tables: bool,
+    create_source_tables: bool,
     time_spine_source: TimeSpineSource,
 ) -> None:
     """Runs all integration tests configured in the test case YAML directory."""
