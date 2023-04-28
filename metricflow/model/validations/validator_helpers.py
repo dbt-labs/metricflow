@@ -202,9 +202,6 @@ class ValidationError(ValidationIssue, BaseModel):
         return ValidationIssueLevel.ERROR
 
 
-ValidationIssueType = Union[ValidationWarning, ValidationFutureError, ValidationError]
-
-
 class ModelValidationResults(FrozenBaseModel):
     """Class for organizating the results of running validations"""
 
@@ -218,7 +215,7 @@ class ModelValidationResults(FrozenBaseModel):
         return len(self.errors) != 0
 
     @classmethod
-    def from_issues_sequence(cls, issues: Sequence[ValidationIssueType]) -> ModelValidationResults:
+    def from_issues_sequence(cls, issues: Sequence[ValidationIssue]) -> ModelValidationResults:
         """Constructs a ModelValidationResults class from a list of ValidationIssues"""
 
         warnings: List[ValidationWarning] = []
@@ -263,7 +260,7 @@ class ModelValidationResults(FrozenBaseModel):
         )
 
     @property
-    def all_issues(self) -> Tuple[ValidationIssueType, ...]:
+    def all_issues(self) -> Tuple[ValidationIssue, ...]:
         """For when a singular list of issues is needed"""
         return self.errors + self.future_errors + self.warnings
 
@@ -308,9 +305,9 @@ def validate_safely(whats_being_done: str) -> Callable:
 
     def decorator_check_element_safely(func: Callable) -> Callable:  # noqa
         @functools.wraps(func)
-        def wrapper(*args: Any, **kwargs: Any) -> List[ValidationIssueType]:  # type: ignore
+        def wrapper(*args: Any, **kwargs: Any) -> List[ValidationIssue]:  # type: ignore
             """Safely run a check on model elements"""
-            issues: List[ValidationIssueType]
+            issues: List[ValidationIssue]
             try:
                 issues = func(*args, **kwargs)
             except Exception as e:
@@ -345,7 +342,7 @@ class ModelValidationRule(ABC):
 
     @classmethod
     @abstractmethod
-    def validate_model(cls, model: UserConfiguredModel) -> List[ValidationIssueType]:
+    def validate_model(cls, model: UserConfiguredModel) -> List[ValidationIssue]:
         """Check the given model and return a list of validation issues"""
         pass
 
@@ -365,6 +362,6 @@ class ModelValidationRule(ABC):
 class ModelValidationException(Exception):
     """Exception raised when validation of a model fails."""
 
-    def __init__(self, issues: Tuple[ValidationIssueType, ...]) -> None:  # noqa: D
+    def __init__(self, issues: Tuple[ValidationIssue, ...]) -> None:  # noqa: D
         issues_str = "\n".join([x.as_readable_str(verbose=True) for x in issues])
         super().__init__(f"Error validating model. Issues:\n{issues_str}")

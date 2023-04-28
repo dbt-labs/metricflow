@@ -1,0 +1,7 @@
+kind: Under the Hood
+body: Removing `model` from the `ModelValidator.validate` return type. The model isn't
+  altered, and thus doesn't need to be returned.
+time: 2023-04-24T12:29:00.760974-07:00
+custom:
+  Author: QMalcolm
+  Issue: None

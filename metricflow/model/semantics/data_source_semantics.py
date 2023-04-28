@@ -8,7 +8,7 @@ from dbt_semantic_interfaces.objects.elements.dimension import Dimension
 from dbt_semantic_interfaces.objects.elements.identifier import Identifier
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from metricflow.aggregation_properties import AggregationType
+from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
 from metricflow.errors.errors import InvalidDataSourceError
 from metricflow.instances import DataSourceReference, DataSourceElementReference
 from metricflow.model.semantics.element_group import ElementGrouper

@@ -804,3 +804,69 @@ integration_test:
         metric_time
     ) b
     ON {{ render_date_sub("a", "ds", 5, TimeGranularity.DAY) }} = b.metric_time
+---
+integration_test:
+  name: derived_metric_with_input_metric_with_constraint
+  description: |
+    Tests a derived metric where the input metric has a metric constraint
+  model: SIMPLE_MODEL
+  metrics: ["booking_value_sub_instant"]
+  group_bys: ["metric_time"]
+  check_query: |
+    SELECT
+      booking_value - instant_booking_value AS booking_value_sub_instant
+      , a.metric_time
+    FROM (
+      SELECT
+        SUM(booking_value) AS instant_booking_value
+        , ds AS metric_time
+      FROM {{ source_schema }}.fct_bookings
+      WHERE is_instant
+      GROUP BY
+        ds
+    ) a
+    INNER JOIN (
+      SELECT
+        SUM(booking_value) AS booking_value
+        , ds AS metric_time
+      FROM {{ source_schema }}.fct_bookings
+      GROUP BY
+        ds
+    ) b
+    ON a.metric_time = b.metric_time
+---
+integration_test:
+  name: nested_derived_metric_with_input_metric_with_constraint
+  description: |
+    Tests a nested derived metric where the input metric is a derived metric 
+    where the input_metric has a metric constraint
+  model: SIMPLE_MODEL
+  metrics: ["booking_value_sub_instant_add_10"]
+  group_bys: ["metric_time"]
+  check_query: |
+    SELECT 
+      c.booking_value_sub_instant + 10 AS booking_value_sub_instant_add_10
+      , c.metric_time
+    FROM (
+      SELECT
+        booking_value - instant_booking_value AS booking_value_sub_instant
+        , a.metric_time AS metric_time
+      FROM (
+        SELECT
+          SUM(booking_value) AS instant_booking_value
+          , ds AS metric_time
+        FROM {{ source_schema }}.fct_bookings
+        WHERE is_instant
+        GROUP BY
+          ds
+      ) a
+      INNER JOIN (
+        SELECT
+          SUM(booking_value) AS booking_value
+          , ds AS metric_time
+        FROM {{ source_schema }}.fct_bookings
+        GROUP BY
+          ds
+      ) b
+      ON a.metric_time = b.metric_time
+    ) c

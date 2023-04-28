@@ -7,10 +7,10 @@
   <br /><br />
   <b>Build and maintain all of your metric logic in code.</b>
   <br /><br />
-  <a target="_blank" href="https://twitter.com/transformio">
-    <img src="https://img.shields.io/twitter/follow/transformio?labelColor=image.png&color=163B36&logo=twitter&style=flat">
+  <a target="_blank" href="https://twitter.com/dbt_labs">
+    <img src="https://img.shields.io/twitter/follow/dbt_labs?labelColor=image.png&color=163B36&logo=twitter&style=flat">
   </a>
-  <a target="_blank" href="http://community.transform.co/metricflow-signup">
+  <a target="_blank" href="https://www.getdbt.com/community/">
     <img src="https://img.shields.io/badge/Slack-join-163B36">
   </a>
   <a target="_blank" href="https://github.com/dbt-labs/metricflow">
