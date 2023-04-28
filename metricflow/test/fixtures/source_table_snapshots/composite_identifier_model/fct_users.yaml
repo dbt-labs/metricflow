@@ -1,0 +1,21 @@
+table_snapshot:
+  table_name: fct_users
+  column_definitions:
+    - name: created_at
+      type: TIME
+    - name: team_id
+      type: STRING
+    - name: id
+      type: STRING
+    - name: country
+      type: STRING
+    - name: ident_2
+      type: STRING
+  rows:
+    - ["2020-01-01", "t0", "u0", "burkina faso", "u0_2"]
+    - ["2020-01-01", "t0", "u1", "vanuatu", "u1_2"]
+    - ["2020-01-01", "t1", "u0", "merica", "u0_2"]
+    - ["2020-01-01", "t1", "u1", "merica", "u1_2"]
+    - ["2020-01-01", "t1", "u2", "burkina faso", "u2_2"]
+    - ["2020-01-01", "t1", "u3", "vanuata", "u3_2"]
+
