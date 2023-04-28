@@ -1,0 +1,17 @@
+table_snapshot:
+  table_name: customer_table
+  column_definitions:
+    - name: ds_partitioned
+      type: TIME
+    - name: customer_id
+      type: STRING
+    - name: customer_name
+      type: STRING
+    - name: customer_atomic_weight
+      type: STRING
+  rows:
+    - ["2020-01-01", "0", "thorium", "90"]
+    - ["2020-01-01", "2", "tellurium", "52"]
+    - ["2020-01-02", "1", "osmium", "76"]
+    - ["2020-01-04", "3", "einsteinium", "99"]
+

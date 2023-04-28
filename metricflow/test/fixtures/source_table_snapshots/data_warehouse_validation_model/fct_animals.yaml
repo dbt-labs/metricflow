@@ -1,0 +1,10 @@
+table_snapshot:
+  table_name: fct_animals
+  column_definitions:
+    - name: is_dog
+      type: BOOLEAN
+    - name: ds
+      type: TIME
+  rows:
+    - ["True", "2022-06-01"]
+
