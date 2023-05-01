@@ -13,7 +13,6 @@ from dbt_semantic_interfaces.objects.common import Metadata
 from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
 from dbt_semantic_interfaces.references import MeasureReference, MetricReference
 from metricflow.enum_extension import ExtendedEnum
-from metricflow.object_utils import hash_items
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.time.time_granularity import string_to_time_granularity
 
@@ -191,13 +190,3 @@ class Metric(HashableBaseModel, ModelWithMetadataParsing):
     def input_metrics(self) -> List[MetricInput]:
         """Return the associated input metrics for this metric"""
         return self.type_params.metrics or []
-
-    @property
-    def definition_hash(self) -> str:  # noqa: D
-        values: List[str] = [self.name, self.type_params.expr or ""]
-        if self.constraint:
-            values.append(self.constraint.where)
-            if self.constraint.linkable_names:
-                values.extend(self.constraint.linkable_names)
-        values.extend([m.element_name for m in self.measure_references])
-        return hash_items(values)
