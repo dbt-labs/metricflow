@@ -1,7 +1,7 @@
 from typing import Dict, Sequence
 
 from dbt_semantic_interfaces.objects.elements.identifier import IdentifierType
-from metricflow.instances import DataSourceReference
+from dbt_semantic_interfaces.references import DataSourceReference, IdentifierReference
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.semantics.data_source_join_evaluator import (
     DataSourceIdentifierJoinType,
@@ -10,7 +10,6 @@ from metricflow.model.semantics.data_source_join_evaluator import (
     DataSourceIdentifierJoin,
 )
 from metricflow.object_utils import assert_values_exhausted
-from metricflow.references import IdentifierReference
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 
 

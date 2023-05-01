@@ -15,12 +15,17 @@ from metricflow.errors.errors import UnableToSatisfyQueryError
 from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.metric import MetricType
+from dbt_semantic_interfaces.references import (
+    DimensionReference,
+    IdentifierReference,
+    MetricReference,
+    TimeDimensionReference,
+)
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.spec_converters import WhereConstraintConverter
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.object_utils import pformat_big_objects
 from metricflow.query.query_exceptions import InvalidQueryException
-from metricflow.references import DimensionReference, IdentifierReference, MetricReference, TimeDimensionReference
 from metricflow.specs import (
     MetricFlowQuerySpec,
     MetricSpec,

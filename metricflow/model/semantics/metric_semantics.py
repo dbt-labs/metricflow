@@ -3,6 +3,7 @@ from typing import Dict, List, FrozenSet, Sequence
 
 from dbt_semantic_interfaces.objects.metric import Metric, MetricType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.references import MetricReference
 from metricflow.errors.errors import MetricNotFoundError, DuplicateMetricError, NonExistentMeasureError
 from metricflow.model.semantics.data_source_join_evaluator import MAX_JOIN_HOPS
 from metricflow.model.semantics.data_source_semantics import DataSourceSemantics
@@ -10,7 +11,6 @@ from metricflow.model.semantics.linkable_element_properties import LinkableEleme
 from metricflow.model.semantics.linkable_spec_resolver import ValidLinkableSpecResolver
 from metricflow.model.spec_converters import WhereConstraintConverter
 from metricflow.protocols.semantics import MetricSemanticsAccessor
-from metricflow.references import MetricReference
 from metricflow.specs import MetricSpec, LinkableInstanceSpec, MetricInputMeasureSpec, MeasureSpec
 
 logger = logging.getLogger(__name__)

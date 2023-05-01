@@ -1,5 +1,4 @@
 from typing import Dict, List
-from metricflow.instances import DataSourceElementReference
 
 from dbt_semantic_interfaces.objects.data_source import DataSource
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
@@ -14,7 +13,7 @@ from metricflow.model.validations.validator_helpers import (
     validate_safely,
 )
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from metricflow.references import DimensionReference
+from dbt_semantic_interfaces.references import DataSourceElementReference, DimensionReference
 from metricflow.time.time_granularity import TimeGranularity
 
 

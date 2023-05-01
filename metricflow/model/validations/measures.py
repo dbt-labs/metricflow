@@ -4,10 +4,10 @@ from typing import DefaultDict, Dict, List, Set
 from more_itertools import bucket
 
 from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
-from metricflow.instances import MetricModelReference
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.metric import Metric
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.references import MetricModelReference, MeasureReference
 from metricflow.model.validations.unique_valid_name import UniqueAndValidNameRule
 from metricflow.model.validations.validator_helpers import (
     DataSourceElementContext,
@@ -21,7 +21,6 @@ from metricflow.model.validations.validator_helpers import (
     ValidationWarning,
     validate_safely,
 )
-from metricflow.references import MeasureReference
 
 
 class DataSourceMeasuresUniqueRule(ModelValidationRule):

@@ -3,11 +3,10 @@ import logging
 import pytest
 
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.references import IdentifierReference, MeasureReference, MetricReference
 from metricflow.model.semantics.data_source_semantics import DataSourceSemantics
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.metric_semantics import MetricSemantics
-from metricflow.references import IdentifierReference, MeasureReference
-from metricflow.references import MetricReference
 
 logger = logging.getLogger(__name__)
 

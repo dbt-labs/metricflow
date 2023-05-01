@@ -6,17 +6,15 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Tuple, Sequence, Dict, List, Optional, FrozenSet
 
-from metricflow.instances import DataSourceReference
 from dbt_semantic_interfaces.objects.data_source import DataSource
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType, Dimension
 from dbt_semantic_interfaces.objects.elements.identifier import IdentifierType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.references import DataSourceReference, MeasureReference, MetricReference
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.data_source_join_evaluator import DataSourceJoinEvaluator
 from metricflow.object_utils import pformat_big_objects, flatten_nested_sequence
 from metricflow.protocols.semantics import DataSourceSemanticsAccessor
-from metricflow.references import MeasureReference
-from metricflow.references import MetricReference
 from metricflow.specs import (
     DEFAULT_TIME_GRANULARITY,
     LinkableSpecSet,

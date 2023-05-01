@@ -1,11 +1,11 @@
 import logging
 from typing import List
-from metricflow.instances import DataSourceElementReference, DataSourceReference
 
 from dbt_semantic_interfaces.objects.data_source import DataSource
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.elements.identifier import IdentifierType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.references import DataSourceElementReference, DataSourceReference
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,
     DataSourceElementContext,
