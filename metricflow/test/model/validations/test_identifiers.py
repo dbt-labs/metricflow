@@ -3,6 +3,7 @@ import re
 import textwrap
 from typing import Callable
 
+import more_itertools
 import pytest
 
 from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
@@ -22,14 +23,13 @@ from metricflow.model.validations.identifiers import (
     OnePrimaryIdentifierPerDataSourceRule,
 )
 from metricflow.model.validations.validator_helpers import ModelValidationException
-from metricflow.object_utils import flatten_nested_sequence
 from metricflow.test.model.validations.helpers import (
     data_source_with_guaranteed_meta,
     metric_with_guaranteed_meta,
     base_model_file,
 )
 from metricflow.test.test_utils import find_data_source_with
-from metricflow.time.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 
 def test_data_source_cant_have_more_than_one_primary_identifier(
@@ -235,14 +235,14 @@ def test_mismatched_identifier(simple_model__with_primary_transforms: UserConfig
         type=IdentifierType.FOREIGN,
         identifiers=[CompositeSubIdentifier(ref="sub_identifier1")],
     )
-    bookings_source.identifiers = flatten_nested_sequence([bookings_source.identifiers, [identifier_bookings]])
+    bookings_source.identifiers = tuple(more_itertools.flatten([bookings_source.identifiers, [identifier_bookings]]))
 
     identifier_listings = Identifier(
         name="composite_identifier",
         type=IdentifierType.FOREIGN,
         identifiers=[CompositeSubIdentifier(ref="sub_identifier2")],
     )
-    listings_latest.identifiers = flatten_nested_sequence([listings_latest.identifiers, [identifier_listings]])
+    listings_latest.identifiers = tuple(more_itertools.flatten([listings_latest.identifiers, [identifier_listings]]))
 
     model_issues = ModelValidator([IdentifierConsistencyRule()]).validate_model(model)
 

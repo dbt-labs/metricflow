@@ -3,14 +3,16 @@ from __future__ import annotations
 import enum
 import re
 from typing import Dict, Tuple, List, Optional
-from metricflow.instances import (
+
+from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.references import (
     DataSourceElementReference,
     DataSourceReference,
     MetricModelReference,
 )
-
-from dbt_semantic_interfaces.objects.data_source import DataSource
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.references import ElementReference
+from metricflow.enum_extension import assert_values_exhausted
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,
     DataSourceElementContext,
@@ -23,9 +25,7 @@ from metricflow.model.validations.validator_helpers import (
     ValidationIssue,
     validate_safely,
 )
-from metricflow.object_utils import assert_values_exhausted
-from metricflow.references import ElementReference
-from metricflow.time.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 
 @enum.unique

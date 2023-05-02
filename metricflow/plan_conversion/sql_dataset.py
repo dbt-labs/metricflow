@@ -1,14 +1,15 @@
 from typing import Sequence, List
 
+import more_itertools
+
+from dbt_semantic_interfaces.references import DataSourceReference
 from metricflow.column_assoc import ColumnAssociation
 from metricflow.dataset.dataset import DataSet
 from metricflow.instances import (
     InstanceSet,
-    DataSourceReference,
     DataSourceElementInstance,
     InstanceSetTransform,
 )
-from metricflow.object_utils import flatten_nested_sequence
 from metricflow.specs import DimensionSpec, TimeDimensionSpec, IdentifierSpec
 from metricflow.sql.sql_plan import (
     SqlSelectStatementNode,
@@ -115,7 +116,7 @@ class SqlDataSet(DataSet):
             + self.instance_set.dimension_instances
             + self.instance_set.time_dimension_instances
         )
-        return flatten_nested_sequence([instance.associated_columns for instance in instances])
+        return tuple(more_itertools.flatten([instance.associated_columns for instance in instances]))
 
 
 class SameDataSourceReferenceChecker(InstanceSetTransform[bool]):

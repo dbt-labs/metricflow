@@ -8,12 +8,12 @@ from dbt_semantic_interfaces.objects.elements.identifier import Identifier, Iden
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.metric import MetricInput, MetricType, MetricTypeParams
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.references import DimensionReference, IdentifierReference, TimeDimensionReference
 from metricflow.model.validations.metrics import DerivedMetricRule
 from metricflow.model.validations.validator_helpers import ModelValidationException
-from metricflow.references import DimensionReference, IdentifierReference, TimeDimensionReference
 from metricflow.test.fixtures.table_fixtures import DEFAULT_DS
 from metricflow.test.model.validations.helpers import data_source_with_guaranteed_meta, metric_with_guaranteed_meta
-from metricflow.time.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 
 def test_metric_no_time_dim_dim_only_source() -> None:  # noqa:D

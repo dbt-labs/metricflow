@@ -16,16 +16,17 @@ from dbt_semantic_interfaces.objects.elements.dimension import Dimension
 from dbt_semantic_interfaces.objects.elements.identifier import Identifier
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.metric import Metric
-from metricflow.instances import DataSourceElementReference, DataSourceReference
-from metricflow.model.semantics.element_group import ElementGrouper
-from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
-from metricflow.references import (
+from dbt_semantic_interfaces.references import (
+    DataSourceElementReference,
+    DataSourceReference,
     DimensionReference,
     IdentifierReference,
     MeasureReference,
     TimeDimensionReference,
     MetricReference,
 )
+from metricflow.model.semantics.element_group import ElementGrouper
+from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.specs import (
     LinkableInstanceSpec,
     MeasureSpec,

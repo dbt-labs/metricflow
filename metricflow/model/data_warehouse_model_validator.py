@@ -16,7 +16,7 @@ from metricflow.dataset.data_source_adapter import DataSourceDataSet
 
 from metricflow.dataset.dataset import DataSet
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
-from metricflow.instances import DataSourceElementReference, DataSourceReference, MetricModelReference
+from dbt_semantic_interfaces.references import DataSourceElementReference, DataSourceReference, MetricModelReference
 from dbt_semantic_interfaces.objects.data_source import DataSource
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
 from dbt_semantic_interfaces.objects.metric import Metric

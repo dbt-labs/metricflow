@@ -1,4 +1,4 @@
-from metricflow.time.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 # Python formatting string to use for converting datetime to ISO8601
 ISO8601_PYTHON_FORMAT = "%Y-%m-%d"

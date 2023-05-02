@@ -1,4 +1,4 @@
-from metricflow.object_utils import assert_values_exhausted
+from metricflow.enum_extension import assert_values_exhausted
 from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
     SqlExpressionRenderer,

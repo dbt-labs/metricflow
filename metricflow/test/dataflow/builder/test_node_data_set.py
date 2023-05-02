@@ -1,5 +1,6 @@
 import logging
 
+from dbt_semantic_interfaces.references import DataSourceElementReference
 from metricflow.aggregation_properties import AggregationState
 from metricflow.column_assoc import ColumnAssociation, SingleColumnCorrelationKey
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
@@ -8,7 +9,6 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.instances import (
     InstanceSet,
     MeasureInstance,
-    DataSourceElementReference,
 )
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
@@ -25,7 +25,7 @@ from metricflow.specs import (
 )
 from metricflow.sql.sql_exprs import SqlColumnReferenceExpression, SqlColumnReference
 from metricflow.sql.sql_plan import SqlSelectStatementNode, SqlSelectColumn, SqlTableFromClauseNode
-from metricflow.time.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 
 logger = logging.getLogger(__name__)

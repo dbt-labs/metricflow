@@ -1,31 +1,16 @@
 from __future__ import annotations
-import itertools
 import logging
 import pprint
-import random
-import string
 import textwrap
-from collections import OrderedDict
 from collections.abc import Mapping
 from dataclasses import is_dataclass, fields
-from enum import Enum
-import datetime
 from hashlib import sha1
-from typing import Sequence, TypeVar, Tuple, NoReturn, Type, Any, List, Union
+from typing import Sequence
 
 from dbt_semantic_interfaces.objects.base import HashableBaseModel
+from metricflow.sql.sql_column_type import SqlColumnType
 
 logger = logging.getLogger(__name__)
-
-
-def assert_exactly_one_arg_set(**kwargs) -> None:  # type: ignore
-    """Throws an assertion error if 0 or more than 1 argument is not None."""
-    num_set = 0
-    for value in kwargs.values():
-        if value is not None:
-            num_set += 1
-
-    assert num_set == 1, f"{num_set} argument(s) set instead of 1 in arguments: {kwargs}"
 
 
 def is_hashable_base_model(obj):  # type:ignore # noqa: D
@@ -125,94 +110,9 @@ def pformat_big_objects(*args, **kwargs) -> str:  # type: ignore
     return "\n".join(items)
 
 
-SequenceT = TypeVar("SequenceT")
-
-
-def flatten_nested_sequence(sequence_of_sequences: Sequence[Sequence[SequenceT]]) -> Tuple[SequenceT, ...]:
-    """Convert a nested sequence into a flattened tuple.
-
-    e.g. ((1,2), (3,4)) -> (1, 2, 3, 4)
-    """
-    return tuple(itertools.chain.from_iterable(sequence_of_sequences))
-
-
-def flatten_and_dedupe(sequence_of_sequences: Sequence[Sequence[SequenceT]]) -> Tuple[SequenceT, ...]:
-    """Convert a nested sequence into a flattened tuple, with de-duping.
-
-    e.g. ((1,2), (2,3)) -> (1, 2, 3)
-    """
-    items = flatten_nested_sequence(sequence_of_sequences)
-    return tuple(OrderedDict.fromkeys(items))
-
-
-def random_id() -> str:
-    """Generates an 8-digit random alphanumeric string."""
-    alphabet = string.ascii_lowercase + string.digits
-    # Characters that go below the line are visually unappealing, so don't use those.
-    filtered_alphabet = [x for x in alphabet if x not in "gjpqy"]
-    return "".join(random.choices(filtered_alphabet, k=8))
-
-
-def assert_values_exhausted(value: NoReturn) -> NoReturn:
-    """Helper method to allow MyPy to guarantee an exhaustive switch through an enumeration or literal
-
-    DO NOT MODIFY THE TYPE SIGNATURE OF THIS FUNCTION UNLESS MYPY CHANGES HOW IT HANDLES THINGS
-
-    To use this function correctly you MUST do an exhaustive switch through ALL values, using `is` for comparison
-    (doing x == SomeEnum.VALUE will not work, nor will `x in (SomeEnum.VALUE_1, SomeEnum.VALUE_2)`).
-
-    If mypy raises an error of the form:
-      `x has incompatible type SomeEnum; expected NoReturn`
-    the switch is not constructed correctly. Fix your switch statement to use `is` for all comparisons.
-
-    If mypy raises an error of the form
-      `x has incompatible type Union[Literal...]` expected NoReturn`
-    the switch statement is non-exhaustive, and the values listed in the error message need to be accounted for.
-
-    See https://mypy.readthedocs.io/en/stable/literal_types.html#exhaustiveness-checks
-    For an enum example, see issue:
-    https://github.com/python/mypy/issues/6366#issuecomment-560369716
-    """
-    assert False, f"Should be unreachable, but got {value}"
-
-
 def hash_items(items: Sequence[SqlColumnType]) -> str:
     """Produces a hash from a list of strings."""
     hash_builder = sha1()
     for item in items:
         hash_builder.update(str(item).encode("utf-8"))
     return hash_builder.hexdigest()
-
-
-T = TypeVar("T", bound="ExtendedEnum")
-
-
-class ExtendedEnum(Enum):
-    """Extension of standard Enum class with some extra utilities"""
-
-    @classmethod
-    def _missing_(cls: Type[T], value: Any) -> "ExtendedEnum":  # type: ignore[misc]
-        """Make enums case insensitive"""
-        for member in cls:
-            if member.value == value.lower():
-                return member
-            if member.value == value.upper():
-                return member
-
-        raise ValueError(f"Invalid enum value: `{value}` in enum {cls.__name__}")
-
-    @classmethod
-    def for_name(cls: Type[T], name: str) -> T:
-        """Return enum member with this name"""
-        if name not in cls.__members__:
-            raise KeyError(f"Unable to find name `{name}` in enum {cls.__name__}")
-        return getattr(cls, name)
-
-    @classmethod
-    def list_names(cls) -> List[str]:
-        """List valid names within this enum class"""
-        return list(cls.__members__.keys())
-
-
-# Supported SQL column types (not comprehensive).
-SqlColumnType = Union[str, int, float, datetime.datetime, datetime.date, bool]

@@ -4,9 +4,9 @@ from typing import Optional
 
 from dbt_semantic_interfaces.objects.base import HashableBaseModel, ModelWithMetadataParsing
 from dbt_semantic_interfaces.objects.common import Metadata
-from metricflow.references import DimensionReference, TimeDimensionReference
-from metricflow.time.time_granularity import TimeGranularity
-from metricflow.object_utils import ExtendedEnum
+from dbt_semantic_interfaces.references import DimensionReference, TimeDimensionReference
+from metricflow.enum_extension import ExtendedEnum
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 ISO8601_FMT = "YYYY-MM-DD"
 

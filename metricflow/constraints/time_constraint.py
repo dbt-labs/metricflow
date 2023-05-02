@@ -8,7 +8,8 @@ from typing import Optional
 import pandas as pd
 
 from metricflow.dataclass_serialization import SerializableDataclass
-from metricflow.time.time_granularity import TimeGranularity
+from metricflow.time.time_granularity import offset_period
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +68,7 @@ class TimeRangeConstraint(SerializableDataclass):
         if the metric is weekly-active-users (ie window = 1 week) it moves time_constraint.start one week earlier
         """
         start_ts = pd.Timestamp(self.start_time)
-        offset = time_granularity.offset_period * time_unit_count
+        offset = offset_period(time_granularity) * time_unit_count
         adjusted_start = (start_ts - offset).to_pydatetime()
         return TimeRangeConstraint(
             start_time=adjusted_start,

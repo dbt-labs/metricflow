@@ -3,11 +3,11 @@ from __future__ import annotations
 import logging
 from typing import Sequence
 
+from dbt_semantic_interfaces.references import TimeDimensionReference
 from metricflow.instances import InstanceSet, TimeDimensionInstance
 from metricflow.model.validations.unique_valid_name import MetricFlowReservedKeywords
-from metricflow.references import TimeDimensionReference
 from metricflow.specs import TimeDimensionSpec
-from metricflow.time.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 
 logger = logging.getLogger(__name__)

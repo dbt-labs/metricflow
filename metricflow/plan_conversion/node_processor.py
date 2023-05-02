@@ -2,6 +2,8 @@ import logging
 from dataclasses import dataclass
 from typing import Generic, Sequence, List, TypeVar, Optional, Set
 
+from dbt_semantic_interfaces.references import TimeDimensionReference, IdentifierReference
+
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.partitions import PartitionJoinResolver
@@ -16,7 +18,6 @@ from metricflow.model.semantics.data_source_join_evaluator import DataSourceJoin
 from metricflow.object_utils import pformat_big_objects
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.protocols.semantics import DataSourceSemanticsAccessor
-from metricflow.references import TimeDimensionReference, IdentifierReference
 from metricflow.spec_set_transforms import ToElementNameSet
 from metricflow.specs import LinkableInstanceSpec, LinklessIdentifierSpec, InstanceSpecSet
 

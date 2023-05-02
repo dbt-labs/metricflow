@@ -148,7 +148,7 @@ class InferenceRunner:
         with self._progress.rules():
             signals_by_column = defaultdict(list)
             signals = [rule.process(warehouse) for rule in self.ruleset]
-            for rule_signal in more_itertools.flatten(signals):
+            for rule_signal in tuple(more_itertools.flatten(signals)):
                 signals_by_column[rule_signal.column].append(rule_signal)
 
         with self._progress.solver():

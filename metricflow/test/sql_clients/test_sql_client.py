@@ -8,7 +8,9 @@ import pytest
 from sqlalchemy.exc import ProgrammingError
 
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.object_utils import assert_values_exhausted, random_id, SqlColumnType
+from metricflow.enum_extension import assert_values_exhausted
+from metricflow.sql.sql_column_type import SqlColumnType
+from metricflow.random_id import random_id
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.sql_utils import make_df

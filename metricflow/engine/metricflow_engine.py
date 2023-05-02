@@ -8,6 +8,7 @@ from typing import Optional, List, Sequence
 
 import pandas as pd
 
+from dbt_semantic_interfaces.references import MetricReference
 from metricflow.configuration.constants import (
     CONFIG_DBT_CLOUD_JOB_ID,
     CONFIG_DBT_CLOUD_SERVICE_TOKEN,
@@ -35,14 +36,14 @@ from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.logging.formatting import indent_log_line
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
-from metricflow.object_utils import pformat_big_objects, random_id
+from metricflow.object_utils import pformat_big_objects
+from metricflow.random_id import random_id
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_execution import DataflowToExecutionPlanConverter
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.time_spine import TimeSpineSource, TimeSpineTableBuilder
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.query.query_parser import MetricFlowQueryParser
-from metricflow.references import MetricReference
 from metricflow.specs import ColumnAssociationResolver, MetricFlowQuerySpec
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql_clients.common_client import not_empty

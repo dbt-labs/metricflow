@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import click
 import functools
 import traceback
 from abc import ABC, abstractmethod
@@ -8,18 +7,20 @@ from dataclasses import dataclass
 from datetime import date
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
+
+import click
 from pydantic import BaseModel, Extra
 
-from metricflow.instances import (
-    DataSourceElementReference,
-    DataSourceReference,
-    MetricModelReference,
-)
 from dbt_semantic_interfaces.objects.base import FrozenBaseModel
 from dbt_semantic_interfaces.objects.common import Metadata
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from metricflow.object_utils import assert_values_exhausted
+from dbt_semantic_interfaces.references import (
+    DataSourceElementReference,
+    DataSourceReference,
+    MetricModelReference,
+)
+from metricflow.enum_extension import assert_values_exhausted
 
 VALIDATE_SAFELY_ERROR_STR_TMPLT = ". Issue occurred in method `{method_name}` called with {arguments_str}"
 ValidationContextJSON = Dict[str, Union[str, int, None]]

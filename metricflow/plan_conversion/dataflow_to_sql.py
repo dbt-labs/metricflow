@@ -5,6 +5,7 @@ from collections import OrderedDict
 from typing import Generic, List, Optional, Sequence, TypeVar, Union
 
 from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
+from dbt_semantic_interfaces.references import MetricModelReference
 from metricflow.aggregation_properties import AggregationState
 from metricflow.column_assoc import ColumnAssociation, SingleColumnCorrelationKey
 from metricflow.constraints.time_constraint import TimeRangeConstraint
@@ -32,15 +33,14 @@ from metricflow.dataflow.dataflow_plan import (
     JoinToTimeSpineNode,
 )
 from metricflow.dataset.dataset import DataSet
+from metricflow.enum_extension import assert_values_exhausted
 from metricflow.instances import (
     InstanceSet,
     MetricInstance,
-    MetricModelReference,
     TimeDimensionInstance,
 )
 from dbt_semantic_interfaces.objects.metric import MetricType
 from metricflow.model.semantic_model import SemanticModel
-from metricflow.object_utils import assert_values_exhausted
 from metricflow.plan_conversion.instance_converters import (
     AliasAggregatedMeasures,
     RemoveMeasures,

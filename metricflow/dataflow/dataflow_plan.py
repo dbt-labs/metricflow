@@ -11,6 +11,7 @@ from typing import List, TypeVar, Generic, Optional, Sequence, Tuple, Union, Typ
 import jinja2
 
 from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
+from dbt_semantic_interfaces.references import TimeDimensionReference
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dag.id_generation import (
     DATAFLOW_NODE_AGGREGATE_MEASURES_ID_PREFIX,
@@ -38,7 +39,6 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.dataset import DataSet
 from dbt_semantic_interfaces.objects.metric import MetricTimeWindow
 from metricflow.object_utils import pformat_big_objects
-from metricflow.references import TimeDimensionReference
 from metricflow.specs import (
     MetricInputMeasureSpec,
     OrderBySpec,
@@ -49,7 +49,7 @@ from metricflow.specs import (
     InstanceSpecSet,
 )
 from metricflow.sql.sql_plan import SqlJoinType
-from metricflow.time.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 from metricflow.visitor import Visitable, VisitorOutputT
 
 logger = logging.getLogger(__name__)

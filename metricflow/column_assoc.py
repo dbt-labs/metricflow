@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import Optional, Any
 
 from metricflow.dataclass_serialization import SerializableDataclass
-from metricflow.object_utils import assert_exactly_one_arg_set
+from metricflow.assert_one_arg import assert_exactly_one_arg_set
 
 
 class ColumnCorrelationKey(ABC):

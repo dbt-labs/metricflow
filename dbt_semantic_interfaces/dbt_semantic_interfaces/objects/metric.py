@@ -3,18 +3,17 @@ from __future__ import annotations
 from typing import List, Optional
 
 from dbt_semantic_interfaces.errors import ParsingException
-from dbt_semantic_interfaces.objects.common import Metadata
-from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
 from dbt_semantic_interfaces.objects.base import (
     HashableBaseModel,
     ModelWithMetadataParsing,
     PydanticCustomInputParser,
     PydanticParseableValueType,
 )
-from metricflow.object_utils import ExtendedEnum, hash_items
-from metricflow.references import MeasureReference, MetricReference
-from metricflow.time.time_granularity import TimeGranularity
-from metricflow.time.time_granularity import string_to_time_granularity
+from dbt_semantic_interfaces.objects.common import Metadata
+from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
+from dbt_semantic_interfaces.references import MeasureReference, MetricReference
+from metricflow.enum_extension import ExtendedEnum
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity, string_to_time_granularity
 
 
 class MetricType(ExtendedEnum):
@@ -190,13 +189,3 @@ class Metric(HashableBaseModel, ModelWithMetadataParsing):
     def input_metrics(self) -> List[MetricInput]:
         """Return the associated input metrics for this metric"""
         return self.type_params.metrics or []
-
-    @property
-    def definition_hash(self) -> str:  # noqa: D
-        values: List[str] = [self.name, self.type_params.expr or ""]
-        if self.constraint:
-            values.append(self.constraint.where)
-            if self.constraint.linkable_names:
-                values.extend(self.constraint.linkable_names)
-        values.extend([m.element_name for m in self.measure_references])
-        return hash_items(values)

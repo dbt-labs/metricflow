@@ -1,4 +1,4 @@
-from metricflow.object_utils import assert_values_exhausted
+from metricflow.enum_extension import assert_values_exhausted
 from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
     SqlExpressionRenderer,
@@ -12,7 +12,7 @@ from metricflow.sql.sql_exprs import (
     SqlPercentileFunctionType,
     SqlTimeDeltaExpression,
 )
-from metricflow.time.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 
 class PostgresSqlExpressionRenderer(DefaultSqlExpressionRenderer):

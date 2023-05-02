@@ -6,6 +6,7 @@ import time
 from dataclasses import dataclass
 from typing import DefaultDict, List, TypeVar, Optional, Generic, Dict, Tuple, Sequence, Set, Union
 
+from dbt_semantic_interfaces.references import TimeDimensionReference
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dag.id_generation import IdGeneratorRegistry, DATAFLOW_PLAN_PREFIX
 from metricflow.dataflow.builder.costing import DefaultCostFunction, DataflowPlanNodeCostFunction
@@ -43,12 +44,12 @@ from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
 from dbt_semantic_interfaces.objects.metric import MetricType, MetricTimeWindow
 from metricflow.model.semantic_model import SemanticModel
-from metricflow.object_utils import pformat_big_objects, assert_exactly_one_arg_set
+from metricflow.object_utils import pformat_big_objects
+from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.node_processor import PreDimensionJoinNodeProcessor
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.time_spine import TimeSpineSource
-from metricflow.references import TimeDimensionReference
 from metricflow.specs import (
     MetricSpec,
     MetricInputMeasureSpec,
@@ -67,7 +68,7 @@ from metricflow.specs import (
     InstanceSpecSet,
 )
 from metricflow.sql.sql_plan import SqlJoinType
-from metricflow.time.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 

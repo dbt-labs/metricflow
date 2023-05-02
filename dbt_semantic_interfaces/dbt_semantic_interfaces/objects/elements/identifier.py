@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from pydantic import validator
 from typing import Any, Optional, List
+
+from pydantic import validator
 
 from dbt_semantic_interfaces.objects.base import HashableBaseModel, ModelWithMetadataParsing
 from dbt_semantic_interfaces.objects.common import Metadata
-from metricflow.object_utils import ExtendedEnum
-from metricflow.references import IdentifierReference, CompositeSubIdentifierReference
+from dbt_semantic_interfaces.references import IdentifierReference, CompositeSubIdentifierReference
+from metricflow.enum_extension import ExtendedEnum
 
 
 class IdentifierType(ExtendedEnum):
