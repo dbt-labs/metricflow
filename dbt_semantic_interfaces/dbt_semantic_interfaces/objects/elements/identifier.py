@@ -7,7 +7,7 @@ from pydantic import validator
 from dbt_semantic_interfaces.objects.base import HashableBaseModel, ModelWithMetadataParsing
 from dbt_semantic_interfaces.objects.common import Metadata
 from dbt_semantic_interfaces.references import IdentifierReference, CompositeSubIdentifierReference
-from metricflow.enum_extension import ExtendedEnum
+from dbt_semantic_interfaces.enum_extension import ExtendedEnum
 
 
 class IdentifierType(ExtendedEnum):

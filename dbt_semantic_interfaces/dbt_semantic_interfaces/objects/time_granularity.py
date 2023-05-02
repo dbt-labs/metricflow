@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import Any
-from metricflow.enum_extension import assert_values_exhausted, ExtendedEnum
+from dbt_semantic_interfaces.enum_extension import assert_values_exhausted, ExtendedEnum
 
 
 class TimeGranularity(ExtendedEnum):

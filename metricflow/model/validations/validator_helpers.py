@@ -20,7 +20,7 @@ from dbt_semantic_interfaces.references import (
     DataSourceReference,
     MetricModelReference,
 )
-from metricflow.enum_extension import assert_values_exhausted
+from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 
 VALIDATE_SAFELY_ERROR_STR_TMPLT = ". Issue occurred in method `{method_name}` called with {arguments_str}"
 ValidationContextJSON = Dict[str, Union[str, int, None]]

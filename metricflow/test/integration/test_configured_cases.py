@@ -8,7 +8,7 @@ from dateutil import parser
 
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowQueryRequest
 from dbt_semantic_interfaces.objects.elements.measure import MeasureAggregationParameters
-from metricflow.enum_extension import assert_values_exhausted
+from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.plan_conversion.column_resolver import (
     DefaultColumnAssociationResolver,
