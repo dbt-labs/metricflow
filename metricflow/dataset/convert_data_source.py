@@ -23,7 +23,7 @@ from metricflow.model.spec_converters import MeasureConverter
 from metricflow.specs import (
     TimeDimensionSpec,
     DimensionSpec,
-    IdentifierSpec,
+    EntitySpec,
     ColumnAssociationResolver,
     DEFAULT_TIME_GRANULARITY,
     EntityReference,
@@ -129,7 +129,7 @@ class DataSourceToDataSetConverter:
         identifier_links: Tuple[EntityReference, ...],
     ) -> IdentifierInstance:
         """Create an identifier instance from the identifier object from a data sourcein the model."""
-        identifier_spec = IdentifierSpec(
+        identifier_spec = EntitySpec(
             element_name=identifier.reference.element_name,
             identifier_links=identifier_links,
         )

@@ -20,8 +20,8 @@ from metricflow.plan_conversion.node_processor import PreDimensionJoinNodeProces
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.specs import (
     DimensionSpec,
-    IdentifierSpec,
-    LinklessIdentifierSpec,
+    EntitySpec,
+    LinklessEntitySpec,
     TimeDimensionSpec,
     LinkableInstanceSpec,
     EntityReference,
@@ -240,7 +240,7 @@ def test_node_evaluator_with_joined_spec(  # noqa: D
         join_recipes=(
             JoinLinkableInstancesRecipe(
                 node_to_join=consistent_id_object_repository.simple_model_read_nodes["listings_latest"],
-                join_on_identifier=LinklessIdentifierSpec.from_element_name("listing"),
+                join_on_identifier=LinklessEntitySpec.from_element_name("listing"),
                 satisfiable_linkable_specs=[
                     DimensionSpec(
                         element_name="country_latest",
@@ -286,7 +286,7 @@ def test_node_evaluator_with_joined_spec_on_unique_id(  # noqa: D
         join_recipes=(
             JoinLinkableInstancesRecipe(
                 node_to_join=consistent_id_object_repository.simple_model_read_nodes["companies"],
-                join_on_identifier=LinklessIdentifierSpec.from_element_name("user"),
+                join_on_identifier=LinklessEntitySpec.from_element_name("user"),
                 satisfiable_linkable_specs=[
                     DimensionSpec(
                         element_name="company_name",
@@ -313,7 +313,7 @@ def test_node_evaluator_with_multiple_joined_specs(  # noqa: D
                 element_name="home_state_latest",
                 identifier_links=(EntityReference(element_name="user"),),
             ),
-            IdentifierSpec(
+            EntitySpec(
                 element_name="user",
                 identifier_links=(EntityReference(element_name="listing"),),
             ),
@@ -324,7 +324,7 @@ def test_node_evaluator_with_multiple_joined_specs(  # noqa: D
     assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
         local_linkable_specs=(),
         joinable_linkable_specs=(
-            IdentifierSpec(
+            EntitySpec(
                 element_name="user",
                 identifier_links=(EntityReference(element_name="listing"),),
             ),
@@ -336,9 +336,9 @@ def test_node_evaluator_with_multiple_joined_specs(  # noqa: D
         join_recipes=(
             JoinLinkableInstancesRecipe(
                 node_to_join=consistent_id_object_repository.simple_model_read_nodes["listings_latest"],
-                join_on_identifier=LinklessIdentifierSpec.from_element_name("listing"),
+                join_on_identifier=LinklessEntitySpec.from_element_name("listing"),
                 satisfiable_linkable_specs=[
-                    IdentifierSpec(
+                    EntitySpec(
                         element_name="user",
                         identifier_links=(EntityReference(element_name="listing"),),
                     )
@@ -348,7 +348,7 @@ def test_node_evaluator_with_multiple_joined_specs(  # noqa: D
             ),
             JoinLinkableInstancesRecipe(
                 node_to_join=consistent_id_object_repository.simple_model_read_nodes["users_latest"],
-                join_on_identifier=LinklessIdentifierSpec.from_element_name("user"),
+                join_on_identifier=LinklessEntitySpec.from_element_name("user"),
                 satisfiable_linkable_specs=[
                     DimensionSpec(
                         element_name="home_state_latest",
@@ -407,7 +407,7 @@ def test_node_evaluator_with_multihop_joined_spec(  # noqa: D
         join_recipes=(
             JoinLinkableInstancesRecipe(
                 node_to_join=evaluation.join_recipes[0].node_to_join,
-                join_on_identifier=LinklessIdentifierSpec.from_element_name("account_id"),
+                join_on_identifier=LinklessEntitySpec.from_element_name("account_id"),
                 satisfiable_linkable_specs=[
                     DimensionSpec(
                         element_name="customer_name",
@@ -462,7 +462,7 @@ def test_node_evaluator_with_partition_joined_spec(  # noqa: D
         join_recipes=(
             JoinLinkableInstancesRecipe(
                 node_to_join=consistent_id_object_repository.simple_model_read_nodes["users_ds_source"],
-                join_on_identifier=LinklessIdentifierSpec.from_element_name("user"),
+                join_on_identifier=LinklessEntitySpec.from_element_name("user"),
                 satisfiable_linkable_specs=[
                     DimensionSpec(
                         element_name="home_state",
@@ -531,7 +531,7 @@ def test_node_evaluator_with_scd_target(
         join_recipes=(
             JoinLinkableInstancesRecipe(
                 node_to_join=consistent_id_object_repository.scd_model_read_nodes["listings"],
-                join_on_identifier=LinklessIdentifierSpec.from_element_name("listing"),
+                join_on_identifier=LinklessEntitySpec.from_element_name("listing"),
                 satisfiable_linkable_specs=[
                     DimensionSpec(
                         element_name="is_lux",
@@ -587,7 +587,7 @@ def test_node_evaluator_with_multi_hop_scd_target(
         join_recipes=(
             JoinLinkableInstancesRecipe(
                 node_to_join=evaluation.join_recipes[0].node_to_join,
-                join_on_identifier=LinklessIdentifierSpec.from_element_name("listing"),
+                join_on_identifier=LinklessEntitySpec.from_element_name("listing"),
                 satisfiable_linkable_specs=[
                     DimensionSpec(
                         element_name="is_confirmed_lux",
@@ -650,7 +650,7 @@ def test_node_evaluator_with_multi_hop_through_scd(
         join_recipes=(
             JoinLinkableInstancesRecipe(
                 node_to_join=evaluation.join_recipes[0].node_to_join,
-                join_on_identifier=LinklessIdentifierSpec.from_element_name("listing"),
+                join_on_identifier=LinklessEntitySpec.from_element_name("listing"),
                 satisfiable_linkable_specs=[
                     DimensionSpec(
                         element_name="home_state_latest",

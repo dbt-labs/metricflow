@@ -57,14 +57,14 @@ from metricflow.specs import (
     MetricFlowQuerySpec,
     MeasureSpec,
     TimeDimensionSpec,
-    IdentifierSpec,
+    EntitySpec,
     DimensionSpec,
     OrderBySpec,
     NonAdditiveDimensionSpec,
     SpecWhereClauseConstraint,
     LinkableSpecSet,
     ColumnAssociationResolver,
-    LinklessIdentifierSpec,
+    LinklessEntitySpec,
     InstanceSpecSet,
 )
 from metricflow.sql.sql_plan import SqlJoinType
@@ -258,7 +258,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         metric_specs: Sequence[MetricSpec],
         dimension_spec: Optional[DimensionSpec] = None,
         time_dimension_spec: Optional[TimeDimensionSpec] = None,
-        identifier_spec: Optional[IdentifierSpec] = None,
+        identifier_spec: Optional[EntitySpec] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         limit: Optional[int] = None,
     ) -> DataflowPlan[SqlDataSetT]:
@@ -787,8 +787,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             # If we're joining something in, then we need the associated identifier, partitions, and time dimension
             # specs defining the validity window (if necessary)
             include_specs: List[LinkableInstanceSpec] = [
-                LinklessIdentifierSpec.from_reference(x.identifier_links[0])
-                for x in join_recipe.satisfiable_linkable_specs
+                LinklessEntitySpec.from_reference(x.identifier_links[0]) for x in join_recipe.satisfiable_linkable_specs
             ]
             include_specs.extend([x.node_to_join_dimension_spec for x in join_recipe.join_on_partition_dimensions])
             include_specs.extend(
@@ -872,7 +871,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             )
             time_dimension_spec = TimeDimensionSpec.from_name(non_additive_dimension_spec.name)
             window_groupings = tuple(
-                LinklessIdentifierSpec.from_element_name(name) for name in non_additive_dimension_spec.window_groupings
+                LinklessEntitySpec.from_element_name(name) for name in non_additive_dimension_spec.window_groupings
             )
             pre_aggregate_node = SemiAdditiveJoinNode[SqlDataSetT](
                 parent_node=pre_aggregate_node,

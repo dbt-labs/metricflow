@@ -7,7 +7,7 @@ from metricflow.model.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.data_source import DataSource
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.common_identifiers import CommonIdentifiersRule
-from metricflow.specs import IdentifierSpec
+from metricflow.specs import EntitySpec
 from metricflow.test.test_utils import find_data_source_with
 
 
@@ -18,7 +18,7 @@ def test_lonely_identifier_raises_issue(simple_model__with_primary_transforms: U
 
     func: Callable[[DataSource], bool] = lambda data_source: len(data_source.identifiers) > 0
     data_source_with_identifiers, _ = find_data_source_with(model, func)
-    data_source_with_identifiers.identifiers[0].name = IdentifierSpec.from_name(lonely_identifier_name).element_name
+    data_source_with_identifiers.identifiers[0].name = EntitySpec.from_name(lonely_identifier_name).element_name
     model_validator = ModelValidator([CommonIdentifiersRule()])
     model_issues = model_validator.validate_model(model)
 

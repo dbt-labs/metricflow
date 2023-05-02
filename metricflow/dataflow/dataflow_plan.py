@@ -43,7 +43,7 @@ from metricflow.specs import (
     MetricInputMeasureSpec,
     OrderBySpec,
     MetricSpec,
-    LinklessIdentifierSpec,
+    LinklessEntitySpec,
     TimeDimensionSpec,
     SpecWhereClauseConstraint,
     InstanceSpecSet,
@@ -266,7 +266,7 @@ class JoinDescription(Generic[SourceDataSetT]):
     """Describes how data from a node should be joined to data from another node."""
 
     join_node: BaseOutput[SourceDataSetT]
-    join_on_identifier: LinklessIdentifierSpec
+    join_on_identifier: LinklessEntitySpec
 
     join_on_partition_dimensions: Tuple[PartitionDimensionJoinDescription, ...]
     join_on_partition_time_dimensions: Tuple[PartitionTimeDimensionJoinDescription, ...]
@@ -621,7 +621,7 @@ class SemiAdditiveJoinNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
     def __init__(
         self,
         parent_node: BaseOutput[SourceDataSetT],
-        identifier_specs: Sequence[LinklessIdentifierSpec],
+        identifier_specs: Sequence[LinklessEntitySpec],
         time_dimension_spec: TimeDimensionSpec,
         agg_by_function: AggregationType,
         queried_time_dimension_spec: Optional[TimeDimensionSpec] = None,
@@ -661,7 +661,7 @@ class SemiAdditiveJoinNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
         return self._parent_node
 
     @property
-    def identifier_specs(self) -> Sequence[LinklessIdentifierSpec]:  # noqa: D
+    def identifier_specs(self) -> Sequence[LinklessEntitySpec]:  # noqa: D
         return self._identifier_specs
 
     @property

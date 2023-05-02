@@ -33,11 +33,11 @@ from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.specs import (
     DimensionSpec,
-    IdentifierSpec,
+    EntitySpec,
     MeasureSpec,
     MetricInputMeasureSpec,
     MetricSpec,
-    LinklessIdentifierSpec,
+    LinklessEntitySpec,
     MetricFlowQuerySpec,
     NonAdditiveDimensionSpec,
     OrderBySpec,
@@ -297,7 +297,7 @@ def test_single_join_node(  # noqa: D
     measure_spec = MeasureSpec(
         element_name="bookings",
     )
-    identifier_spec = LinklessIdentifierSpec.from_element_name(element_name="listing")
+    identifier_spec = LinklessEntitySpec.from_element_name(element_name="listing")
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     filtered_measure_node = FilterElementsNode[DataSourceDataSet](
         parent_node=measure_source_node,
@@ -352,7 +352,7 @@ def test_multi_join_node(
     measure_spec = MeasureSpec(
         element_name="bookings",
     )
-    identifier_spec = LinklessIdentifierSpec.from_element_name(element_name="listing")
+    identifier_spec = LinklessEntitySpec.from_element_name(element_name="listing")
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     filtered_measure_node = FilterElementsNode[DataSourceDataSet](
         parent_node=measure_source_node,
@@ -377,13 +377,13 @@ def test_multi_join_node(
         join_targets=[
             JoinDescription(
                 join_node=filtered_dimension_node,
-                join_on_identifier=LinklessIdentifierSpec.from_element_name(element_name="listing"),
+                join_on_identifier=LinklessEntitySpec.from_element_name(element_name="listing"),
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
             ),
             JoinDescription(
                 join_node=filtered_dimension_node,
-                join_on_identifier=LinklessIdentifierSpec.from_element_name(element_name="listing"),
+                join_on_identifier=LinklessEntitySpec.from_element_name(element_name="listing"),
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
             ),
@@ -410,7 +410,7 @@ def test_compute_metrics_node(
     measure_spec = MeasureSpec(
         element_name="bookings",
     )
-    identifier_spec = LinklessIdentifierSpec.from_element_name(element_name="listing")
+    identifier_spec = LinklessEntitySpec.from_element_name(element_name="listing")
     metric_input_measure_specs = (MetricInputMeasureSpec(measure_spec=measure_spec),)
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     filtered_measure_node = FilterElementsNode[DataSourceDataSet](
@@ -475,7 +475,7 @@ def test_compute_metrics_node_simple_expr(
     measure_spec = MeasureSpec(
         element_name="booking_value",
     )
-    identifier_spec = LinklessIdentifierSpec.from_element_name(element_name="listing")
+    identifier_spec = LinklessEntitySpec.from_element_name(element_name="listing")
     metric_input_measure_specs = (MetricInputMeasureSpec(measure_spec=measure_spec),)
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     filtered_measure_node = FilterElementsNode[DataSourceDataSet](
@@ -550,7 +550,7 @@ def test_join_to_time_spine_node_without_offset(  # noqa: D
 ) -> None:
     """Tests JoinToTimeSpineNode for a single metric with offset_window."""
     measure_spec = MeasureSpec(element_name="booking_value")
-    identifier_spec = LinklessIdentifierSpec.from_element_name(element_name="listing")
+    identifier_spec = LinklessEntitySpec.from_element_name(element_name="listing")
     metric_input_measure_specs = (MetricInputMeasureSpec(measure_spec=measure_spec),)
     metric_time_spec = TimeDimensionSpec(
         element_name="metric_time", identifier_links=(), time_granularity=TimeGranularity.DAY
@@ -613,7 +613,7 @@ def test_join_to_time_spine_node_with_offset_window(  # noqa: D
 ) -> None:
     """Tests JoinToTimeSpineNode for a single metric with offset_window."""
     measure_spec = MeasureSpec(element_name="booking_value")
-    identifier_spec = LinklessIdentifierSpec.from_element_name(element_name="listing")
+    identifier_spec = LinklessEntitySpec.from_element_name(element_name="listing")
     metric_input_measure_specs = (MetricInputMeasureSpec(measure_spec=measure_spec),)
     metric_time_spec = TimeDimensionSpec(
         element_name="metric_time", identifier_links=(), time_granularity=TimeGranularity.DAY
@@ -678,7 +678,7 @@ def test_join_to_time_spine_node_with_offset_to_grain(
 ) -> None:
     """Tests JoinToTimeSpineNode for a single metric with offset_to_grain."""
     measure_spec = MeasureSpec(element_name="booking_value")
-    identifier_spec = LinklessIdentifierSpec.from_element_name(element_name="listing")
+    identifier_spec = LinklessEntitySpec.from_element_name(element_name="listing")
     metric_input_measure_specs = (MetricInputMeasureSpec(measure_spec=measure_spec),)
     metric_time_spec = TimeDimensionSpec(
         element_name="metric_time", identifier_links=(), time_granularity=TimeGranularity.DAY
@@ -752,7 +752,7 @@ def test_compute_metrics_node_ratio_from_single_data_source(
     denominator_spec = MeasureSpec(
         element_name="bookers",
     )
-    identifier_spec = LinklessIdentifierSpec.from_element_name(element_name="listing")
+    identifier_spec = LinklessEntitySpec.from_element_name(element_name="listing")
     metric_input_measure_specs = (
         MetricInputMeasureSpec(measure_spec=numerator_spec),
         MetricInputMeasureSpec(measure_spec=denominator_spec),
@@ -1293,7 +1293,7 @@ def test_composite_identifier(  # noqa: D
     dataflow_plan = composite_dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="messages"),),
-            identifier_specs=(IdentifierSpec(element_name="user_team", identifier_links=()),),
+            identifier_specs=(EntitySpec(element_name="user_team", identifier_links=()),),
         )
     )
 
@@ -1316,11 +1316,9 @@ def test_composite_identifier_with_order_by(  # noqa: D
     dataflow_plan = composite_dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="messages"),),
-            identifier_specs=(IdentifierSpec(element_name="user_team", identifier_links=()),),
+            identifier_specs=(EntitySpec(element_name="user_team", identifier_links=()),),
             order_by_specs=(
-                OrderBySpec(
-                    identifier_spec=IdentifierSpec(element_name="user_team", identifier_links=()), descending=True
-                ),
+                OrderBySpec(identifier_spec=EntitySpec(element_name="user_team", identifier_links=()), descending=True),
             ),
         )
     )
@@ -1350,7 +1348,7 @@ def test_composite_identifier_with_join(  # noqa: D
                     identifier_links=(EntityReference(element_name="user_team"),),
                 ),
             ),
-            identifier_specs=(IdentifierSpec(element_name="user_team", identifier_links=()),),
+            identifier_specs=(EntitySpec(element_name="user_team", identifier_links=()),),
         )
     )
 
@@ -1489,7 +1487,7 @@ def test_semi_additive_join_node_with_grouping(
         window_choice=AggregationType.MAX,
         window_groupings=("user",),
     )
-    identifier_spec = LinklessIdentifierSpec(element_name="user", identifier_links=())
+    identifier_spec = LinklessEntitySpec(element_name="user", identifier_links=())
     time_dimension_spec = TimeDimensionSpec(element_name="ds", identifier_links=())
 
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["accounts_source"]

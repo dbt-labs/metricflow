@@ -19,7 +19,7 @@ from metricflow.object_utils import pformat_big_objects
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.protocols.semantics import DataSourceSemanticsAccessor
 from metricflow.spec_set_transforms import ToElementNameSet
-from metricflow.specs import LinkableInstanceSpec, LinklessIdentifierSpec, InstanceSpecSet
+from metricflow.specs import LinkableInstanceSpec, LinklessEntitySpec, InstanceSpecSet
 
 SqlDataSetT = TypeVar("SqlDataSetT", bound=SqlDataSet)
 
@@ -44,7 +44,7 @@ class MultiHopJoinCandidateLineage(Generic[SqlDataSetT]):
 
     first_node_to_join: BaseOutput[SqlDataSetT]
     second_node_to_join: BaseOutput[SqlDataSetT]
-    join_second_node_by_identifier: LinklessIdentifierSpec
+    join_second_node_by_identifier: LinklessEntitySpec
 
 
 @dataclass(frozen=True)
@@ -248,7 +248,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                             join_targets=[
                                 JoinDescription(
                                     join_node=filtered_joinable_node,
-                                    join_on_identifier=LinklessIdentifierSpec.from_reference(
+                                    join_on_identifier=LinklessEntitySpec.from_reference(
                                         desired_linkable_spec.identifier_links[1]
                                     ),
                                     join_on_partition_dimensions=join_on_partition_dimensions,
@@ -261,7 +261,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                             second_node_to_join=second_node_that_could_be_joined,
                             # identifier_spec_in_first_node should already not have identifier links since we checked
                             # for that, but using this method for type checking.
-                            join_second_node_by_identifier=LinklessIdentifierSpec.from_reference(
+                            join_second_node_by_identifier=LinklessEntitySpec.from_reference(
                                 desired_linkable_spec.identifier_links[1]
                             ),
                         ),

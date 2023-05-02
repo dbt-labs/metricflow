@@ -10,9 +10,9 @@ from metricflow.dataflow.dataflow_plan import (
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.specs import (
     MeasureSpec,
-    IdentifierSpec,
+    EntitySpec,
     DimensionSpec,
-    LinklessIdentifierSpec,
+    LinklessEntitySpec,
     MetricInputMeasureSpec,
     InstanceSpecSet,
 )
@@ -33,7 +33,7 @@ def test_costing(consistent_id_object_repository: ConsistentIdObjectRepository) 
         include_specs=InstanceSpecSet(
             measure_specs=(bookings_spec,),
             identifier_specs=(
-                IdentifierSpec(
+                EntitySpec(
                     element_name="listing",
                     identifier_links=(),
                 ),
@@ -51,7 +51,7 @@ def test_costing(consistent_id_object_repository: ConsistentIdObjectRepository) 
                 ),
             ),
             identifier_specs=(
-                IdentifierSpec(
+                EntitySpec(
                     element_name="listing",
                     identifier_links=(),
                 ),
@@ -64,7 +64,7 @@ def test_costing(consistent_id_object_repository: ConsistentIdObjectRepository) 
         join_targets=[
             JoinDescription(
                 join_node=listings_filtered,
-                join_on_identifier=LinklessIdentifierSpec.from_element_name("listing"),
+                join_on_identifier=LinklessEntitySpec.from_element_name("listing"),
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
             )

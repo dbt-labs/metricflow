@@ -19,7 +19,7 @@ from metricflow.protocols.semantics import DataSourceSemanticsAccessor
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.specs import (
     DimensionSpec,
-    IdentifierSpec,
+    EntitySpec,
     LinkableSpecSet,
     MeasureSpec,
     NonAdditiveDimensionSpec,
@@ -69,7 +69,7 @@ class WhereConstraintConverter:
         where_constraint_names: WhereConstraintClause.linkable_names
         data_source_semantics: DataSourceSemanticsAccessor from the instantiated class
 
-        output: InstanceSpecSet of Tuple(DimensionSpec), Tuple(TimeDimensionSpec), Tuple(IdentifierSpec)
+        output: InstanceSpecSet of Tuple(DimensionSpec), Tuple(TimeDimensionSpec), Tuple(EntitySpec)
         """
         where_constraint_dimensions = []
         where_constraint_time_dimensions = []
@@ -98,7 +98,7 @@ class WhereConstraintConverter:
                 else:
                     raise RuntimeError(f"Unhandled type: {dimension.type}")
             elif spec_name.element_name in identifier_references:
-                where_constraint_identifiers.append(IdentifierSpec.from_name(spec_name.qualified_name))
+                where_constraint_identifiers.append(EntitySpec.from_name(spec_name.qualified_name))
             else:
                 raise InvalidQueryException(f"Unknown element: {spec_name}")
 

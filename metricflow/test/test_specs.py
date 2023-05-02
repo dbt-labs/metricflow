@@ -4,14 +4,14 @@ import pytest
 
 from metricflow.specs import (
     DimensionSpec,
-    IdentifierSpec,
+    EntitySpec,
     InstanceSpec,
     LinkableInstanceSpec,
     TimeDimensionSpec,
     InstanceSpecSet,
     MetricSpec,
     MeasureSpec,
-    LinklessIdentifierSpec,
+    LinklessEntitySpec,
     EntityReference,
 )
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
@@ -38,14 +38,14 @@ def time_dimension_spec() -> TimeDimensionSpec:  # noqa: D
 
 
 @pytest.fixture
-def identifier_spec() -> IdentifierSpec:  # noqa: D
-    return IdentifierSpec(
+def identifier_spec() -> EntitySpec:  # noqa: D
+    return EntitySpec(
         element_name="user_id",
         identifier_links=(EntityReference(element_name="listing_id"),),
     )
 
 
-def test_merge_specs(dimension_spec: DimensionSpec, identifier_spec: IdentifierSpec) -> None:
+def test_merge_specs(dimension_spec: DimensionSpec, identifier_spec: EntitySpec) -> None:
     """Tests InstanceSpec.merge()"""
     assert InstanceSpec.merge([dimension_spec], [identifier_spec]) == [dimension_spec, identifier_spec]
 
@@ -76,21 +76,21 @@ def test_time_dimension_without_identifier_links(time_dimension_spec: TimeDimens
     )
 
 
-def test_identifier_without_first_identifier_link(identifier_spec: IdentifierSpec) -> None:  # noqa: D
-    assert identifier_spec.without_first_identifier_link == IdentifierSpec(
+def test_identifier_without_first_identifier_link(identifier_spec: EntitySpec) -> None:  # noqa: D
+    assert identifier_spec.without_first_identifier_link == EntitySpec(
         element_name="user_id",
         identifier_links=(),
     )
 
 
-def test_identifier_without_identifier_links(identifier_spec: IdentifierSpec) -> None:  # noqa: D
-    assert identifier_spec.without_identifier_links == IdentifierSpec(
+def test_identifier_without_identifier_links(identifier_spec: EntitySpec) -> None:  # noqa: D
+    assert identifier_spec.without_identifier_links == EntitySpec(
         element_name="user_id",
         identifier_links=(),
     )
 
 
-def test_merge_linkable_specs(dimension_spec: DimensionSpec, identifier_spec: IdentifierSpec) -> None:  # noqa: D
+def test_merge_linkable_specs(dimension_spec: DimensionSpec, identifier_spec: EntitySpec) -> None:  # noqa: D
     linkable_specs: Sequence[LinkableInstanceSpec] = [dimension_spec, identifier_spec]
 
     assert LinkableInstanceSpec.merge_linkable_specs([dimension_spec], [identifier_spec]) == linkable_specs
@@ -131,7 +131,7 @@ def spec_set() -> InstanceSpecSet:  # noqa: D
             ),
         ),
         identifier_specs=(
-            IdentifierSpec(
+            EntitySpec(
                 element_name="user_id",
                 identifier_links=(EntityReference(element_name="listing_id"),),
             ),
@@ -147,7 +147,7 @@ def test_spec_set_linkable_specs(spec_set: InstanceSpecSet) -> None:  # noqa: D
             identifier_links=(),
             time_granularity=TimeGranularity.DAY,
         ),
-        IdentifierSpec(
+        EntitySpec(
             element_name="user_id",
             identifier_links=(EntityReference(element_name="listing_id"),),
         ),
@@ -166,7 +166,7 @@ def test_spec_set_all_specs(spec_set: InstanceSpecSet) -> None:  # noqa: D
             identifier_links=(),
             time_granularity=TimeGranularity.DAY,
         ),
-        IdentifierSpec(
+        EntitySpec(
             element_name="user_id",
             identifier_links=(EntityReference(element_name="listing_id"),),
         ),
@@ -174,9 +174,9 @@ def test_spec_set_all_specs(spec_set: InstanceSpecSet) -> None:  # noqa: D
 
 
 def test_linkless_identifier() -> None:  # noqa: D
-    """Check that equals and hash works as expected for the LinklessIdentifierSpec / IdentifierSpec"""
-    identifier_spec = IdentifierSpec(element_name="user_id", identifier_links=())
-    linkless_identifier_spec = LinklessIdentifierSpec.from_element_name("user_id")
+    """Check that equals and hash works as expected for the LinklessEntitySpec / EntitySpec"""
+    identifier_spec = EntitySpec(element_name="user_id", identifier_links=())
+    linkless_identifier_spec = LinklessEntitySpec.from_element_name("user_id")
 
     # Check equality between the two.
     assert identifier_spec == identifier_spec

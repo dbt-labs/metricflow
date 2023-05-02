@@ -21,7 +21,7 @@ from metricflow.specs import (
     LinkableSpecSet,
     DimensionSpec,
     TimeDimensionSpec,
-    IdentifierSpec,
+    EntitySpec,
     EntityReference,
 )
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
@@ -257,7 +257,7 @@ class LinkableElementSet:
                 if x.time_granularity
             ),
             identifier_specs=tuple(
-                IdentifierSpec(
+                EntitySpec(
                     element_name=x.element_name,
                     identifier_links=tuple(EntityReference(element_name=x) for x in x.identifier_links),
                 )

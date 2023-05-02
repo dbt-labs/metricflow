@@ -10,7 +10,7 @@ from metricflow.instances import (
     DataSourceElementInstance,
     InstanceSetTransform,
 )
-from metricflow.specs import DimensionSpec, TimeDimensionSpec, IdentifierSpec
+from metricflow.specs import DimensionSpec, TimeDimensionSpec, EntitySpec
 from metricflow.sql.sql_plan import (
     SqlSelectStatementNode,
 )
@@ -36,7 +36,7 @@ class SqlDataSet(DataSet):
 
     def column_associations_for_identifier(
         self,
-        identifier_spec: IdentifierSpec,
+        identifier_spec: EntitySpec,
     ) -> Sequence[ColumnAssociation]:
         """Given the name of the identifier, return the set of columns associated with it in the data set."""
         matching_instances = 0

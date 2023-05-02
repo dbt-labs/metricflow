@@ -6,7 +6,7 @@ from dbt_semantic_interfaces.references import DataSourceReference
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.specs import (
     DimensionSpec,
-    IdentifierSpec,
+    EntitySpec,
     InstanceSpecSet,
     MeasureSpec,
     TimeDimensionSpec,
@@ -40,7 +40,7 @@ def test_convert_table_data_source_without_measures(  # noqa: D
                 identifier_links=(EntityReference(element_name="user"),),
             ),
         ),
-        identifier_specs=(IdentifierSpec(element_name="user", identifier_links=()),),
+        identifier_specs=(EntitySpec(element_name="user", identifier_links=()),),
         time_dimension_specs=(
             TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.DAY),
             TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.WEEK),
@@ -110,9 +110,9 @@ def test_convert_table_data_source_with_measures(  # noqa: D
             ),
         ),
         identifier_specs=(
-            IdentifierSpec(element_name="verification", identifier_links=()),
-            IdentifierSpec(element_name="user", identifier_links=()),
-            IdentifierSpec(
+            EntitySpec(element_name="verification", identifier_links=()),
+            EntitySpec(element_name="user", identifier_links=()),
+            EntitySpec(
                 element_name="user",
                 identifier_links=(EntityReference(element_name="verification"),),
             ),

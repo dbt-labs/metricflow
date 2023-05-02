@@ -31,7 +31,7 @@ from metricflow.specs import (
     MetricSpec,
     DimensionSpec,
     TimeDimensionSpec,
-    IdentifierSpec,
+    EntitySpec,
     LinkableInstanceSpec,
     OrderBySpec,
     OutputColumnNameOverride,
@@ -61,7 +61,7 @@ class LinkableInstanceSpecs:
     dimension_specs: Tuple[DimensionSpec, ...]
     time_dimension_specs: Tuple[TimeDimensionSpec, ...]
     partial_time_dimension_specs: Tuple[PartialTimeDimensionSpec, ...]
-    identifier_specs: Tuple[IdentifierSpec, ...]
+    identifier_specs: Tuple[EntitySpec, ...]
 
 
 class MetricFlowQueryParser:
@@ -598,7 +598,7 @@ class MetricFlowQueryParser:
             elif DimensionReference(element_name=element_name) in self._known_dimension_element_references:
                 dimension_specs.append(DimensionSpec(element_name=element_name, identifier_links=identifier_links))
             elif EntityReference(element_name=element_name) in self._known_identifier_element_references:
-                identifier_specs.append(IdentifierSpec(element_name=element_name, identifier_links=identifier_links))
+                identifier_specs.append(EntitySpec(element_name=element_name, identifier_links=identifier_links))
             else:
                 valid_group_by_names_for_metrics = sorted(
                     x.qualified_name for x in self._metric_semantics.element_specs_for_metrics(list(metric_references))
@@ -629,7 +629,7 @@ class MetricFlowQueryParser:
         metric_references: Tuple[MetricReference, ...],
         dimension_specs: Tuple[DimensionSpec, ...],
         time_dimension_specs: Tuple[TimeDimensionSpec, ...],
-        identifier_specs: Tuple[IdentifierSpec, ...],
+        identifier_specs: Tuple[EntitySpec, ...],
     ) -> List[LinkableInstanceSpec]:
         """Checks that each requested linkable instance can be retrieved for the given metric"""
         invalid_linkable_specs: List[LinkableInstanceSpec] = []
@@ -749,7 +749,7 @@ class MetricFlowQueryParser:
                     )
                 order_by_specs.append(
                     OrderBySpec(
-                        identifier_spec=IdentifierSpec(
+                        identifier_spec=EntitySpec(
                             element_name=parsed_name.element_name,
                             identifier_links=tuple(
                                 EntityReference(element_name=x) for x in parsed_name.identifier_link_names

@@ -30,11 +30,11 @@ from metricflow.specs import (
     MeasureSpec,
     MetricInputMeasureSpec,
     InstanceSpec,
-    IdentifierSpec,
+    EntitySpec,
     DimensionSpec,
     ColumnAssociationResolver,
     TimeDimensionSpec,
-    LinklessIdentifierSpec,
+    LinklessEntitySpec,
     LinkableInstanceSpec,
     EntityReference,
     InstanceSpecSet,
@@ -367,7 +367,7 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
     e.g. "country" -> "user_id__country" after a data set has been joined by identifier.
     """
 
-    def __init__(self, join_on_identifier: LinklessIdentifierSpec) -> None:  # noqa: D
+    def __init__(self, join_on_identifier: LinklessEntitySpec) -> None:  # noqa: D
         self._join_on_identifier = join_on_identifier
 
     def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D
@@ -418,7 +418,7 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
             if identifier_instance.spec == self._join_on_identifier:
                 continue
             # The new identifier spec should include the join on identifier.
-            transformed_identifier_spec_from_right = IdentifierSpec(
+            transformed_identifier_spec_from_right = EntitySpec(
                 element_name=identifier_instance.spec.element_name,
                 identifier_links=self._join_on_identifier.as_linkless_prefix
                 + identifier_instance.spec.identifier_links,
@@ -449,7 +449,7 @@ class FilterLinkableInstancesWithLeadingLink(InstanceSetTransform[InstanceSet]):
 
     def __init__(  # noqa: D
         self,
-        identifier_link: LinklessIdentifierSpec,
+        identifier_link: LinklessEntitySpec,
     ) -> None:
         """Constructor.
 
@@ -461,7 +461,7 @@ class FilterLinkableInstancesWithLeadingLink(InstanceSetTransform[InstanceSet]):
     def _should_pass(self, linkable_spec: LinkableInstanceSpec) -> bool:  # noqa: D
         return (
             len(linkable_spec.identifier_links) == 0
-            or LinklessIdentifierSpec.from_reference(linkable_spec.identifier_links[0]) != self._identifier_link
+            or LinklessEntitySpec.from_reference(linkable_spec.identifier_links[0]) != self._identifier_link
         )
 
     def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D

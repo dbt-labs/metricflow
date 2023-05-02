@@ -15,10 +15,10 @@ from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationR
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.specs import (
-    IdentifierSpec,
+    EntitySpec,
     MeasureSpec,
     TimeDimensionSpec,
-    LinklessIdentifierSpec,
+    LinklessEntitySpec,
     DimensionSpec,
     InstanceSpecSet,
     EntityReference,
@@ -108,7 +108,7 @@ def test_joined_node_data_set(
         join_targets=[
             JoinDescription(
                 join_node=users_node,
-                join_on_identifier=LinklessIdentifierSpec.from_element_name("user"),
+                join_on_identifier=LinklessEntitySpec.from_element_name("user"),
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
             )
@@ -129,7 +129,7 @@ def test_joined_node_data_set(
                 identifier_links=(EntityReference(element_name="user"),),
             ),
         ),
-        identifier_specs=(IdentifierSpec(element_name="user", identifier_links=()),),
+        identifier_specs=(EntitySpec(element_name="user", identifier_links=()),),
         time_dimension_specs=(
             TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.DAY),
             TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.WEEK),

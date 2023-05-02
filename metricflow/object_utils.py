@@ -35,7 +35,7 @@ def _to_pretty_printable_object(obj):  # type: ignore
 
     {'class': 'DimensionSpec',
      'element_name': 'country_latest',
-     'identifier_links': ({'class': 'IdentifierSpec',
+     'identifier_links': ({'class': 'EntitySpec',
                            'element_name': 'listing',
                            'identifier_links': ()},)}
     """

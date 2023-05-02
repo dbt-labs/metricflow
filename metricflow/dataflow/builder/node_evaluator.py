@@ -37,7 +37,7 @@ from metricflow.plan_conversion.instance_converters import CreateValidityWindowJ
 from metricflow.protocols.semantics import DataSourceSemanticsAccessor
 from metricflow.specs import (
     LinkableInstanceSpec,
-    LinklessIdentifierSpec,
+    LinklessEntitySpec,
 )
 
 logger = logging.getLogger(__name__)
@@ -54,7 +54,7 @@ class JoinLinkableInstancesRecipe:
 
     node_to_join: BaseOutput
     # The identifier to join "node_to_join" on.
-    join_on_identifier: LinklessIdentifierSpec
+    join_on_identifier: LinklessEntitySpec
     # The linkable instances from the query that can be satisfied if we join this node. Note that this is different from
     # the linkable specs in the node that can help to satisfy the query. e.g. "user_id__country" might be one of the
     # "satisfiable_linkable_specs", but "country" is the linkable spec in the node.
@@ -200,7 +200,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                 ):
                     continue
 
-                linkless_identifier_spec_in_node = LinklessIdentifierSpec.from_element_name(
+                linkless_identifier_spec_in_node = LinklessEntitySpec.from_element_name(
                     identifier_spec_in_right_node.element_name
                 )
 
@@ -226,7 +226,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                     # but since we're doing all left joins now, it's been left out.
 
                     required_identifier_matches_data_set_identifier = (
-                        LinklessIdentifierSpec.from_reference(needed_linkable_spec.identifier_links[0])
+                        LinklessEntitySpec.from_reference(needed_linkable_spec.identifier_links[0])
                         == linkless_identifier_spec_in_node
                     )
                     needed_linkable_spec_in_node = (
@@ -335,7 +335,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
             is_local = required_linkable_spec in data_set_linkable_specs
             is_unjoinable = (
                 len(required_linkable_spec.identifier_links) == 0
-                or LinklessIdentifierSpec.from_reference(required_linkable_spec.identifier_links[0])
+                or LinklessEntitySpec.from_reference(required_linkable_spec.identifier_links[0])
                 not in data_set_linkable_specs
             )
             if is_local:

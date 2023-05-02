@@ -14,7 +14,7 @@ from metricflow.specs import (
     MetadataSpec,
     MeasureSpec,
     DimensionSpec,
-    IdentifierSpec,
+    EntitySpec,
     MetricSpec,
     InstanceSpec,
     TimeDimensionSpec,
@@ -98,9 +98,9 @@ class TimeDimensionInstance(MdoInstance[TimeDimensionSpec], DataSourceElementIns
 
 
 @dataclass(frozen=True)
-class IdentifierInstance(MdoInstance[IdentifierSpec], DataSourceElementInstance):  # noqa: D
+class IdentifierInstance(MdoInstance[EntitySpec], DataSourceElementInstance):  # noqa: D
     associated_columns: Tuple[ColumnAssociation, ...]
-    spec: IdentifierSpec
+    spec: EntitySpec
 
 
 @dataclass(frozen=True)

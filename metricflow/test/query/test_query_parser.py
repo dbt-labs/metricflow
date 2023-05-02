@@ -11,7 +11,7 @@ from metricflow.specs import (
     MetricSpec,
     DimensionSpec,
     TimeDimensionSpec,
-    IdentifierSpec,
+    EntitySpec,
     OrderBySpec,
     OutputColumnNameOverride,
 )
@@ -139,7 +139,7 @@ def test_query_parser(time_spine_source: TimeSpineSource) -> None:  # noqa: D
     assert query_spec.time_dimension_specs == (
         TimeDimensionSpec(element_name=MTD, identifier_links=(), time_granularity=TimeGranularity.DAY),
     )
-    assert query_spec.identifier_specs == (IdentifierSpec(element_name="listing", identifier_links=()),)
+    assert query_spec.identifier_specs == (EntitySpec(element_name="listing", identifier_links=()),)
     assert query_spec.order_by_specs == (
         OrderBySpec(
             time_dimension_spec=TimeDimensionSpec(
