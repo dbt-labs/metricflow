@@ -66,7 +66,7 @@ class LinkableDimension:
 
 
 @dataclass(frozen=True)
-class LinkableIdentifier:
+class LinkableEntity:
     """Describes how an identifier can be realized by joining based on identifier links."""
 
     element_name: str
@@ -80,8 +80,8 @@ class LinkableIdentifier:
         )
 
     @property
-    def after_intersection(self) -> LinkableIdentifier:  # noqa: D
-        return LinkableIdentifier(
+    def after_intersection(self) -> LinkableEntity:  # noqa: D
+        return LinkableEntity(
             element_name=self.element_name,
             identifier_links=self.identifier_links,
             properties=frozenset({LinkableElementProperties.INTERSECTED}),
@@ -93,12 +93,12 @@ class LinkableElementSet:
     """Container class for storing all linkable elements for a metric."""
 
     linkable_dimensions: Tuple[LinkableDimension, ...]
-    linkable_identifiers: Tuple[LinkableIdentifier, ...]
+    linkable_identifiers: Tuple[LinkableEntity, ...]
 
     # Ambiguous elements are ones where there are multiple join paths through different data sources that can be taken
     # to get the element. This currently represents an error when defining data sources.
     ambiguous_linkable_dimensions: Tuple[LinkableDimension, ...]
-    ambiguous_linkable_identifiers: Tuple[LinkableIdentifier, ...]
+    ambiguous_linkable_identifiers: Tuple[LinkableEntity, ...]
 
     @staticmethod
     def merge(linkable_element_sets: Sequence[LinkableElementSet]) -> LinkableElementSet:
@@ -107,7 +107,7 @@ class LinkableElementSet:
         If there are elements with the same join key, those elements will be categorized as ambiguous.
         """
         key_to_linkable_dimension: Dict[JoinPathKey, List[LinkableDimension]] = defaultdict(list)
-        key_to_linkable_identifier: Dict[JoinPathKey, List[LinkableIdentifier]] = defaultdict(list)
+        key_to_linkable_identifier: Dict[JoinPathKey, List[LinkableEntity]] = defaultdict(list)
 
         for linkable_element_set in linkable_element_sets:
             for linkable_dimension in linkable_element_set.linkable_dimensions:
@@ -350,7 +350,7 @@ class DataSourceJoinPath:
             # Avoid creating "booking_id__booking_id"
             if identifier.reference.element_name != identifier_links[-1]:
                 linkable_identifiers.append(
-                    LinkableIdentifier(
+                    LinkableEntity(
                         element_name=identifier.reference.element_name,
                         identifier_links=identifier_links,
                         properties=with_properties.union({LinkableElementProperties.IDENTIFIER}),
@@ -461,7 +461,7 @@ class ValidLinkableSpecResolver:
         additional_linkable_dimensions = []
         for identifier in data_source.identifiers:
             linkable_identifiers.append(
-                LinkableIdentifier(
+                LinkableEntity(
                     element_name=identifier.reference.element_name,
                     identifier_links=(),
                     properties=frozenset({LinkableElementProperties.LOCAL, LinkableElementProperties.IDENTIFIER}),
