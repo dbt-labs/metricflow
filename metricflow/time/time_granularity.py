@@ -119,22 +119,18 @@ def adjust_to_end_of_period(
         return period_end_offset(time_granularity).rollback(date_to_adjust)
 
 
-class ExtendedTimeGranularity(TimeGranularity):
-    """For time dimensions, the smallest possible difference between two time values.
-
-    Needed for calculating adjacency when merging 2 different time ranges.
-    """
-
-    def match_start_or_end_of_period(self, date_to_match: pd.Timestamp, date_to_adjust: pd.Timestamp) -> pd.Timestamp:
-        """Adjust date_to_adjust to be start or end of period based on if date_to_match is at start or end of period."""
-        if is_period_start(self, date_to_match):
-            return adjust_to_start_of_period(self, date_to_adjust)
-        elif is_period_end(self, date_to_match):
-            return adjust_to_end_of_period(self, date_to_adjust)
-        else:
-            raise ValueError(
-                f"Expected `date_to_match` to fall at the start or end of the granularity period. Got '{date_to_match}' for granularity {self}."
-            )
+def match_start_or_end_of_period(
+    time_granularity: TimeGranularity, date_to_match: pd.Timestamp, date_to_adjust: pd.Timestamp
+) -> pd.Timestamp:
+    """Adjust date_to_adjust to be start or end of period based on if date_to_match is at start or end of period."""
+    if is_period_start(time_granularity, date_to_match):
+        return adjust_to_start_of_period(time_granularity, date_to_adjust)
+    elif is_period_end(time_granularity, date_to_match):
+        return adjust_to_end_of_period(time_granularity, date_to_adjust)
+    else:
+        raise ValueError(
+            f"Expected `date_to_match` to fall at the start or end of the granularity period. Got '{date_to_match}' for granularity {time_granularity}."
+        )
 
 
 class ISOWeekDay(ExtendedEnum):
