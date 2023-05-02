@@ -1,47 +1,19 @@
 from __future__ import annotations
 
 from datetime import date
-from typing import Union, Any
+from typing import Union
 
 import pandas as pd
 
 from metricflow.enum_extension import assert_values_exhausted, ExtendedEnum
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 
-class TimeGranularity(ExtendedEnum):
+class ExtendedTimeGranularity(TimeGranularity):
     """For time dimensions, the smallest possible difference between two time values.
 
     Needed for calculating adjacency when merging 2 different time ranges.
     """
-
-    # Names are used in parameters to DATE_TRUNC, so don't change them.
-    # Values are used to convert user supplied strings to enums.
-    DAY = "day"
-    WEEK = "week"
-    MONTH = "month"
-    QUARTER = "quarter"
-    YEAR = "year"
-
-    def to_int(self) -> int:
-        """Convert to an int so that the size of the granularity can be easily compared."""
-        if self is TimeGranularity.DAY:
-            return 10
-        elif self is TimeGranularity.WEEK:
-            return 11
-        elif self is TimeGranularity.MONTH:
-            return 12
-        elif self is TimeGranularity.QUARTER:
-            return 13
-        elif self is TimeGranularity.YEAR:
-            return 14
-        else:
-            assert_values_exhausted(self)
-
-    def is_smaller_than(self, other: "TimeGranularity") -> bool:  # noqa: D
-        return self.to_int() < other.to_int()
-
-    def is_smaller_than_or_equal(self, other: "TimeGranularity") -> bool:  # noqa: D
-        return self.to_int() <= other.to_int()
 
     @property
     def offset_period(self) -> pd.offsets.DateOffset:
@@ -155,17 +127,6 @@ class TimeGranularity(ExtendedEnum):
             raise ValueError(
                 f"Expected `date_to_match` to fall at the start or end of the granularity period. Got '{date_to_match}' for granularity {self}."
             )
-
-    def __lt__(self, other: Any) -> bool:  # type: ignore [misc] # noqa: D
-        if not isinstance(other, TimeGranularity):
-            return NotImplemented
-        return self.to_int() < other.to_int()
-
-    def __hash__(self) -> int:  # noqa: D
-        return self.to_int()
-
-    def __repr__(self) -> str:  # noqa: D
-        return f"{self.__class__.__name__}.{self.name}"
 
 
 class ISOWeekDay(ExtendedEnum):
