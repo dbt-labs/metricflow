@@ -1,9 +1,9 @@
 from typing import List
 
-from metricflow.instances import DataSourceElementReference
 from dbt_semantic_interfaces.objects.data_source import DataSource
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.references import DataSourceElementReference, TimeDimensionReference
 from metricflow.model.validations.validator_helpers import (
     DataSourceElementContext,
     DataSourceElementType,
@@ -13,7 +13,6 @@ from metricflow.model.validations.validator_helpers import (
     validate_safely,
     ValidationError,
 )
-from metricflow.references import TimeDimensionReference
 
 
 class AggregationTimeDimensionRule(ModelValidationRule):

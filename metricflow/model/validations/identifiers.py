@@ -5,11 +5,15 @@ from datetime import date
 from typing import List, MutableSet, Tuple, Sequence, DefaultDict
 
 import more_itertools
-from metricflow.instances import DataSourceElementReference, DataSourceReference
 
 from dbt_semantic_interfaces.objects.data_source import DataSource
 from dbt_semantic_interfaces.objects.elements.identifier import Identifier, IdentifierType, CompositeSubIdentifier
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.references import (
+    DataSourceElementReference,
+    DataSourceReference,
+    IdentifierReference,
+)
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,
     DataSourceElementContext,
@@ -22,7 +26,6 @@ from metricflow.model.validations.validator_helpers import (
     ValidationWarning,
 )
 from metricflow.model.validations.validator_helpers import ValidationFutureError
-from metricflow.references import IdentifierReference
 
 logger = logging.getLogger(__name__)
 

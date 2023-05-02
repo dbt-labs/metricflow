@@ -3,11 +3,15 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Dict, Optional
 
-from metricflow.instances import DataSourceReference, DataSourceElementReference, IdentifierInstance, InstanceSet
 from dbt_semantic_interfaces.objects.elements.identifier import IdentifierType
+from dbt_semantic_interfaces.references import (
+    DataSourceReference,
+    DataSourceElementReference,
+    IdentifierReference,
+)
+from metricflow.instances import IdentifierInstance, InstanceSet
 from metricflow.object_utils import pformat_big_objects
 from metricflow.protocols.semantics import DataSourceSemanticsAccessor
-from metricflow.references import IdentifierReference
 
 MAX_JOIN_HOPS = 2
 

@@ -1,6 +1,6 @@
 from typing import List
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.instances import DataSourceElementReference
+from dbt_semantic_interfaces.references import DataSourceElementReference
 
 
 from dbt_semantic_interfaces.objects.data_source import DataSource

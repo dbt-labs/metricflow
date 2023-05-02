@@ -1,5 +1,6 @@
 import logging
 
+from dbt_semantic_interfaces.references import DataSourceElementReference
 from metricflow.aggregation_properties import AggregationState
 from metricflow.column_assoc import ColumnAssociation, SingleColumnCorrelationKey
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
@@ -8,7 +9,6 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.instances import (
     InstanceSet,
     MeasureInstance,
-    DataSourceElementReference,
 )
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver

@@ -9,6 +9,7 @@ from itertools import chain
 from more_itertools import bucket
 from typing import Dict, List, Optional, Sequence, Tuple
 
+from dbt_semantic_interfaces.references import DataSourceReference
 from metricflow.aggregation_properties import AggregationState
 from metricflow.dataflow.dataflow_plan import ValidityWindowJoinDescription
 from metricflow.instances import (
@@ -21,7 +22,6 @@ from metricflow.instances import (
     InstanceSet,
     InstanceSetTransform,
     TimeDimensionInstance,
-    DataSourceReference,
 )
 from metricflow.protocols.semantics import DataSourceSemanticsAccessor
 from metricflow.object_utils import assert_exactly_one_arg_set

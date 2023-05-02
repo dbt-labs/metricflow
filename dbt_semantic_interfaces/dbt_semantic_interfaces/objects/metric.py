@@ -11,8 +11,8 @@ from dbt_semantic_interfaces.objects.base import (
     PydanticCustomInputParser,
     PydanticParseableValueType,
 )
+from dbt_semantic_interfaces.references import MeasureReference, MetricReference
 from metricflow.object_utils import ExtendedEnum, hash_items
-from metricflow.references import MeasureReference, MetricReference
 from metricflow.time.time_granularity import TimeGranularity
 from metricflow.time.time_granularity import string_to_time_granularity
 

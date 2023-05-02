@@ -2,10 +2,11 @@ import logging
 
 import pytest
 
+from dbt_semantic_interfaces.references import DataSourceReference
+
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, FilterElementsNode, MetricTimeDimensionTransformNode
 from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
-from metricflow.instances import DataSourceReference
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.object_utils import pformat_big_objects
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver

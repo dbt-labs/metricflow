@@ -8,6 +8,7 @@ from typing import Optional, List, Sequence
 
 import pandas as pd
 
+from dbt_semantic_interfaces.references import MetricReference
 from metricflow.configuration.constants import (
     CONFIG_DBT_CLOUD_JOB_ID,
     CONFIG_DBT_CLOUD_SERVICE_TOKEN,
@@ -42,7 +43,6 @@ from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanCon
 from metricflow.plan_conversion.time_spine import TimeSpineSource, TimeSpineTableBuilder
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.query.query_parser import MetricFlowQueryParser
-from metricflow.references import MetricReference
 from metricflow.specs import ColumnAssociationResolver, MetricFlowQuerySpec
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql_clients.common_client import not_empty

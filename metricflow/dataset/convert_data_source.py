@@ -3,18 +3,17 @@ import re
 from dataclasses import dataclass
 from typing import Optional, List, Tuple, Sequence
 
+from dbt_semantic_interfaces.references import DataSourceReference, DataSourceElementReference
 from metricflow.aggregation_properties import AggregationState
 from metricflow.dag.id_generation import IdGeneratorRegistry
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.instances import (
     MeasureInstance,
-    DataSourceElementReference,
     DimensionInstance,
     TimeDimensionInstance,
     IdentifierInstance,
     InstanceSet,
-    DataSourceReference,
 )
 from dbt_semantic_interfaces.objects.data_source import DataSource
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType

@@ -9,18 +9,19 @@ from dbt_semantic_interfaces.objects.elements.identifier import Identifier
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
-from metricflow.errors.errors import InvalidDataSourceError
-from metricflow.instances import DataSourceReference, DataSourceElementReference
-from metricflow.model.semantics.element_group import ElementGrouper
-from metricflow.model.spec_converters import MeasureConverter
-from metricflow.protocols.semantics import DataSourceSemanticsAccessor
-from metricflow.references import (
+from dbt_semantic_interfaces.references import (
+    DataSourceReference,
+    DataSourceElementReference,
     MeasureReference,
     TimeDimensionReference,
     DimensionReference,
     LinkableElementReference,
     IdentifierReference,
 )
+from metricflow.errors.errors import InvalidDataSourceError
+from metricflow.model.semantics.element_group import ElementGrouper
+from metricflow.model.spec_converters import MeasureConverter
+from metricflow.protocols.semantics import DataSourceSemanticsAccessor
 from metricflow.specs import NonAdditiveDimensionSpec, MeasureSpec
 
 logger = logging.getLogger(__name__)

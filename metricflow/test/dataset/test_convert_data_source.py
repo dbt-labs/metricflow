@@ -2,7 +2,7 @@ import logging
 
 from _pytest.fixtures import FixtureRequest
 
-from metricflow.instances import DataSourceReference
+from dbt_semantic_interfaces.references import DataSourceReference
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.specs import (
     DimensionSpec,

@@ -4,6 +4,7 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 
 from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
+from dbt_semantic_interfaces.references import TimeDimensionReference, IdentifierReference
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan import (
@@ -30,7 +31,6 @@ from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationR
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.references import TimeDimensionReference, IdentifierReference
 from metricflow.specs import (
     DimensionSpec,
     IdentifierSpec,

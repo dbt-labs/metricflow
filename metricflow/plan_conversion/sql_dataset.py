@@ -1,10 +1,10 @@
 from typing import Sequence, List
 
+from dbt_semantic_interfaces.references import DataSourceReference
 from metricflow.column_assoc import ColumnAssociation
 from metricflow.dataset.dataset import DataSet
 from metricflow.instances import (
     InstanceSet,
-    DataSourceReference,
     DataSourceElementInstance,
     InstanceSetTransform,
 )
