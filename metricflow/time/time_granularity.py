@@ -5,7 +5,7 @@ from typing import Union
 
 import pandas as pd
 
-from metricflow.enum_extension import assert_values_exhausted, ExtendedEnum
+from dbt_semantic_interfaces.enum_extension import assert_values_exhausted, ExtendedEnum
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 
