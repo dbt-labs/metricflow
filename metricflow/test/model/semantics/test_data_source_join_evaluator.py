@@ -5,15 +5,15 @@ from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.references import DataSourceReference, EntityReference
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.semantics.data_source_join_evaluator import (
-    DataSourceIdentifierJoinType,
+    DataSourceEntityJoinType,
     DataSourceJoinEvaluator,
     DataSourceLink,
-    DataSourceIdentifierJoin,
+    DataSourceEntityJoin,
 )
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 
 
-def _get_join_types_for_identifier_type(identifier_type: EntityType) -> Sequence[DataSourceIdentifierJoinType]:
+def _get_join_types_for_identifier_type(identifier_type: EntityType) -> Sequence[DataSourceEntityJoinType]:
     """Exhaustively evaluate identifier types and return a sequence of all possible join type pairs
 
     The exhaustive conditional statically enforces that every identifier type is handled on the left.
@@ -27,7 +27,7 @@ def _get_join_types_for_identifier_type(identifier_type: EntityType) -> Sequence
         or identifier_type is EntityType.NATURAL
     ):
         join_types = tuple(
-            DataSourceIdentifierJoinType(left_identifier_type=identifier_type, right_identifier_type=join_type)
+            DataSourceEntityJoinType(left_identifier_type=identifier_type, right_identifier_type=join_type)
             for join_type in EntityType
         )
         return join_types
@@ -291,10 +291,10 @@ def test_get_joinable_data_sources_single_hop(multi_hop_join_semantic_model: Sem
     assert joinable_data_sources["bridge_table"] == DataSourceLink(
         left_data_source_reference=DataSourceReference(data_source_name="account_month_txns"),
         join_path=[
-            DataSourceIdentifierJoin(
+            DataSourceEntityJoin(
                 right_data_source_reference=DataSourceReference(data_source_name="bridge_table"),
                 identifier_reference=EntityReference(element_name="account_id"),
-                join_type=DataSourceIdentifierJoinType(
+                join_type=DataSourceEntityJoinType(
                     left_identifier_type=EntityType.PRIMARY, right_identifier_type=EntityType.PRIMARY
                 ),
             )
@@ -314,10 +314,10 @@ def test_get_joinable_data_sources_multi_hop(multi_hop_join_semantic_model: Sema
     assert joinable_data_sources["bridge_table"] == DataSourceLink(
         left_data_source_reference=DataSourceReference(data_source_name="account_month_txns"),
         join_path=[
-            DataSourceIdentifierJoin(
+            DataSourceEntityJoin(
                 right_data_source_reference=DataSourceReference(data_source_name="bridge_table"),
                 identifier_reference=EntityReference(element_name="account_id"),
-                join_type=DataSourceIdentifierJoinType(
+                join_type=DataSourceEntityJoinType(
                     left_identifier_type=EntityType.PRIMARY, right_identifier_type=EntityType.PRIMARY
                 ),
             )
@@ -326,17 +326,17 @@ def test_get_joinable_data_sources_multi_hop(multi_hop_join_semantic_model: Sema
     assert joinable_data_sources["customer_other_data"] == DataSourceLink(
         left_data_source_reference=DataSourceReference(data_source_name="account_month_txns"),
         join_path=[
-            DataSourceIdentifierJoin(
+            DataSourceEntityJoin(
                 right_data_source_reference=DataSourceReference(data_source_name="bridge_table"),
                 identifier_reference=EntityReference(element_name="account_id"),
-                join_type=DataSourceIdentifierJoinType(
+                join_type=DataSourceEntityJoinType(
                     left_identifier_type=EntityType.PRIMARY, right_identifier_type=EntityType.PRIMARY
                 ),
             ),
-            DataSourceIdentifierJoin(
+            DataSourceEntityJoin(
                 right_data_source_reference=DataSourceReference(data_source_name="customer_other_data"),
                 identifier_reference=EntityReference(element_name="customer_id"),
-                join_type=DataSourceIdentifierJoinType(
+                join_type=DataSourceEntityJoinType(
                     left_identifier_type=EntityType.FOREIGN, right_identifier_type=EntityType.PRIMARY
                 ),
             ),
@@ -345,17 +345,17 @@ def test_get_joinable_data_sources_multi_hop(multi_hop_join_semantic_model: Sema
     assert joinable_data_sources["customer_table"] == DataSourceLink(
         left_data_source_reference=DataSourceReference(data_source_name="account_month_txns"),
         join_path=[
-            DataSourceIdentifierJoin(
+            DataSourceEntityJoin(
                 right_data_source_reference=DataSourceReference(data_source_name="bridge_table"),
                 identifier_reference=EntityReference(element_name="account_id"),
-                join_type=DataSourceIdentifierJoinType(
+                join_type=DataSourceEntityJoinType(
                     left_identifier_type=EntityType.PRIMARY, right_identifier_type=EntityType.PRIMARY
                 ),
             ),
-            DataSourceIdentifierJoin(
+            DataSourceEntityJoin(
                 right_data_source_reference=DataSourceReference(data_source_name="customer_table"),
                 identifier_reference=EntityReference(element_name="customer_id"),
-                join_type=DataSourceIdentifierJoinType(
+                join_type=DataSourceEntityJoinType(
                     left_identifier_type=EntityType.FOREIGN, right_identifier_type=EntityType.PRIMARY
                 ),
             ),

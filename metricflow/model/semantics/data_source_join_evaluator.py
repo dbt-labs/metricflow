@@ -17,7 +17,7 @@ MAX_JOIN_HOPS = 2
 
 
 @dataclass(frozen=True)
-class DataSourceIdentifierJoinType:
+class DataSourceEntityJoinType:
     """Describe a type of join between data sources where identifiers are of the listed types."""
 
     left_identifier_type: EntityType
@@ -25,12 +25,12 @@ class DataSourceIdentifierJoinType:
 
 
 @dataclass(frozen=True)
-class DataSourceIdentifierJoin:
+class DataSourceEntityJoin:
     """How to join one data source onto another, using a specific identifer and join type."""
 
     right_data_source_reference: DataSourceReference
     identifier_reference: EntityReference
-    join_type: DataSourceIdentifierJoinType
+    join_type: DataSourceEntityJoinType
 
 
 @dataclass(frozen=True)
@@ -38,7 +38,7 @@ class DataSourceLink:
     """The valid join path to link two data sources. Might include multiple joins."""
 
     left_data_source_reference: DataSourceReference
-    join_path: List[DataSourceIdentifierJoin]
+    join_path: List[DataSourceEntityJoin]
 
 
 class DataSourceJoinEvaluator:
@@ -46,27 +46,27 @@ class DataSourceJoinEvaluator:
 
     # Valid joins are the non-fanout joins.
     _VALID_IDENTIFIER_JOINS = (
-        DataSourceIdentifierJoinType(left_identifier_type=EntityType.PRIMARY, right_identifier_type=EntityType.NATURAL),
-        DataSourceIdentifierJoinType(left_identifier_type=EntityType.PRIMARY, right_identifier_type=EntityType.PRIMARY),
-        DataSourceIdentifierJoinType(left_identifier_type=EntityType.PRIMARY, right_identifier_type=EntityType.UNIQUE),
-        DataSourceIdentifierJoinType(left_identifier_type=EntityType.UNIQUE, right_identifier_type=EntityType.NATURAL),
-        DataSourceIdentifierJoinType(left_identifier_type=EntityType.UNIQUE, right_identifier_type=EntityType.PRIMARY),
-        DataSourceIdentifierJoinType(left_identifier_type=EntityType.UNIQUE, right_identifier_type=EntityType.UNIQUE),
-        DataSourceIdentifierJoinType(left_identifier_type=EntityType.FOREIGN, right_identifier_type=EntityType.NATURAL),
-        DataSourceIdentifierJoinType(left_identifier_type=EntityType.FOREIGN, right_identifier_type=EntityType.PRIMARY),
-        DataSourceIdentifierJoinType(left_identifier_type=EntityType.FOREIGN, right_identifier_type=EntityType.UNIQUE),
-        DataSourceIdentifierJoinType(left_identifier_type=EntityType.NATURAL, right_identifier_type=EntityType.PRIMARY),
-        DataSourceIdentifierJoinType(left_identifier_type=EntityType.NATURAL, right_identifier_type=EntityType.UNIQUE),
+        DataSourceEntityJoinType(left_identifier_type=EntityType.PRIMARY, right_identifier_type=EntityType.NATURAL),
+        DataSourceEntityJoinType(left_identifier_type=EntityType.PRIMARY, right_identifier_type=EntityType.PRIMARY),
+        DataSourceEntityJoinType(left_identifier_type=EntityType.PRIMARY, right_identifier_type=EntityType.UNIQUE),
+        DataSourceEntityJoinType(left_identifier_type=EntityType.UNIQUE, right_identifier_type=EntityType.NATURAL),
+        DataSourceEntityJoinType(left_identifier_type=EntityType.UNIQUE, right_identifier_type=EntityType.PRIMARY),
+        DataSourceEntityJoinType(left_identifier_type=EntityType.UNIQUE, right_identifier_type=EntityType.UNIQUE),
+        DataSourceEntityJoinType(left_identifier_type=EntityType.FOREIGN, right_identifier_type=EntityType.NATURAL),
+        DataSourceEntityJoinType(left_identifier_type=EntityType.FOREIGN, right_identifier_type=EntityType.PRIMARY),
+        DataSourceEntityJoinType(left_identifier_type=EntityType.FOREIGN, right_identifier_type=EntityType.UNIQUE),
+        DataSourceEntityJoinType(left_identifier_type=EntityType.NATURAL, right_identifier_type=EntityType.PRIMARY),
+        DataSourceEntityJoinType(left_identifier_type=EntityType.NATURAL, right_identifier_type=EntityType.UNIQUE),
     )
 
     _INVALID_IDENTIFIER_JOINS = (
-        DataSourceIdentifierJoinType(left_identifier_type=EntityType.PRIMARY, right_identifier_type=EntityType.FOREIGN),
-        DataSourceIdentifierJoinType(left_identifier_type=EntityType.UNIQUE, right_identifier_type=EntityType.FOREIGN),
-        DataSourceIdentifierJoinType(left_identifier_type=EntityType.FOREIGN, right_identifier_type=EntityType.FOREIGN),
-        DataSourceIdentifierJoinType(left_identifier_type=EntityType.NATURAL, right_identifier_type=EntityType.FOREIGN),
+        DataSourceEntityJoinType(left_identifier_type=EntityType.PRIMARY, right_identifier_type=EntityType.FOREIGN),
+        DataSourceEntityJoinType(left_identifier_type=EntityType.UNIQUE, right_identifier_type=EntityType.FOREIGN),
+        DataSourceEntityJoinType(left_identifier_type=EntityType.FOREIGN, right_identifier_type=EntityType.FOREIGN),
+        DataSourceEntityJoinType(left_identifier_type=EntityType.NATURAL, right_identifier_type=EntityType.FOREIGN),
         # Natural -> Natural joins are not allowed due to hidden fanout or missing value concerns with
         # multiple validity windows in play
-        DataSourceIdentifierJoinType(left_identifier_type=EntityType.NATURAL, right_identifier_type=EntityType.NATURAL),
+        DataSourceEntityJoinType(left_identifier_type=EntityType.NATURAL, right_identifier_type=EntityType.NATURAL),
     )
 
     def __init__(self, data_source_semantics: DataSourceSemanticsAccessor) -> None:  # noqa: D
@@ -88,7 +88,7 @@ class DataSourceJoinEvaluator:
     def _get_remaining_hops_of_joinable_data_sources(
         self,
         left_data_source_reference: DataSourceReference,
-        parent_data_source_to_join_paths: Dict[DataSourceReference, List[DataSourceIdentifierJoin]],
+        parent_data_source_to_join_paths: Dict[DataSourceReference, List[DataSourceEntityJoin]],
         known_data_source_joins: Dict[str, DataSourceLink],
         join_hops_remaining: int,
     ) -> None:
@@ -101,7 +101,7 @@ class DataSourceJoinEvaluator:
 
             # We'll get all joinable data sources in this hop before recursing to ensure we find the most
             # efficient path to each data source.
-            join_paths_to_visit_next: List[List[DataSourceIdentifierJoin]] = []
+            join_paths_to_visit_next: List[List[DataSourceEntityJoin]] = []
             for identifier in parent_data_source.identifiers:
                 identifier_reference = EntityReference(element_name=identifier.name)
                 identifier_data_sources = self._data_source_semantics.get_data_sources_for_identifier(
@@ -127,7 +127,7 @@ class DataSourceJoinEvaluator:
                         continue
 
                     join_path_for_data_source = parent_join_path + [
-                        DataSourceIdentifierJoin(
+                        DataSourceEntityJoin(
                             right_data_source_reference=right_data_source_reference,
                             identifier_reference=identifier_reference,
                             join_type=valid_join_type,
@@ -142,7 +142,7 @@ class DataSourceJoinEvaluator:
         if not join_hops_remaining:
             return
 
-        right_data_sources_to_join_paths: Dict[DataSourceReference, List[DataSourceIdentifierJoin]] = {}
+        right_data_sources_to_join_paths: Dict[DataSourceReference, List[DataSourceEntityJoin]] = {}
         for join_path in join_paths_to_visit_next:
             assert len(join_path) > 0
             right_data_sources_to_join_paths[join_path[-1].right_data_source_reference] = join_path
@@ -159,7 +159,7 @@ class DataSourceJoinEvaluator:
         left_data_source_reference: DataSourceReference,
         right_data_source_reference: DataSourceReference,
         on_identifier_reference: EntityReference,
-    ) -> Optional[DataSourceIdentifierJoinType]:
+    ) -> Optional[DataSourceEntityJoinType]:
         """Get valid join type used to join data sources on given identifier, if exists."""
         left_identifier = self._data_source_semantics.get_identifier_in_data_source(
             DataSourceElementReference.create_from_references(left_data_source_reference, on_identifier_reference)
@@ -189,7 +189,7 @@ class DataSourceJoinEvaluator:
                 # There is no way to refine this to a single row per key, so we cannot support this join
                 return None
 
-        join_type = DataSourceIdentifierJoinType(left_identifier.type, right_identifier.type)
+        join_type = DataSourceEntityJoinType(left_identifier.type, right_identifier.type)
 
         if join_type in DataSourceJoinEvaluator._VALID_IDENTIFIER_JOINS:
             return join_type

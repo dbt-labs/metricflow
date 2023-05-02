@@ -16,11 +16,11 @@ from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.metric import MetricType, MetricTypeParams
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_validation_ready_model
-from metricflow.model.validations.identifiers import (
-    IdentifierConfigRule,
-    IdentifierConsistencyRule,
-    NaturalIdentifierConfigurationRule,
-    OnePrimaryIdentifierPerDataSourceRule,
+from metricflow.model.validations.entities import (
+    EntityConfigRule,
+    EntityConsistencyRule,
+    NaturalEntityConfigurationRule,
+    OnePrimaryEntityPerDataSourceRule,
 )
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.test.model.validations.helpers import (
@@ -46,7 +46,7 @@ def test_data_source_cant_have_more_than_one_primary_identifier(
         identifier.type = EntityType.PRIMARY
         identifier_references.add(identifier.reference)
 
-    model_issues = ModelValidator([OnePrimaryIdentifierPerDataSourceRule()]).validate_model(model)
+    model_issues = ModelValidator([OnePrimaryEntityPerDataSourceRule()]).validate_model(model)
 
     future_issue = (
         f"Data sources can have only one primary identifier. The data source"
@@ -70,7 +70,7 @@ def test_invalid_composite_identifiers() -> None:  # noqa:D
         measure2_name = "metric_with_no_time_dim"
         identifier_name = "thorium"
         foreign_identifier_name = "composite_thorium"
-        model_validator = ModelValidator([IdentifierConfigRule()])
+        model_validator = ModelValidator([EntityConfigRule()])
         model_validator.checked_validations(
             UserConfiguredModel(
                 data_sources=[
@@ -119,7 +119,7 @@ def test_composite_identifiers_nonexistent_ref() -> None:  # noqa:D
         measure2_name = "metric_with_no_time_dim"
         identifier_name = "thorium"
         foreign_identifier_name = "composite_thorium"
-        model_validator = ModelValidator([IdentifierConfigRule()])
+        model_validator = ModelValidator([EntityConfigRule()])
         model_validator.checked_validations(
             UserConfiguredModel(
                 data_sources=[
@@ -169,7 +169,7 @@ def test_composite_identifiers_ref_and_name() -> None:  # noqa:D
         identifier_name = "thorium"
         foreign_identifier_name = "composite_thorium"
         foreign_identifier2_name = "shouldnt_have_both"
-        model_validator = ModelValidator([IdentifierConfigRule()])
+        model_validator = ModelValidator([EntityConfigRule()])
         model_validator.checked_validations(
             UserConfiguredModel(
                 data_sources=[
@@ -242,7 +242,7 @@ def test_mismatched_identifier(simple_model__with_primary_transforms: UserConfig
     )
     listings_latest.identifiers = tuple(more_itertools.flatten([listings_latest.identifiers, [identifier_listings]]))
 
-    model_issues = ModelValidator([IdentifierConsistencyRule()]).validate_model(model)
+    model_issues = ModelValidator([EntityConsistencyRule()]).validate_model(model)
 
     expected_error_message_fragment = "does not have consistent sub-identifiers"
     error_count = len(
@@ -285,7 +285,7 @@ def test_multiple_natural_identifiers() -> None:
     model = parse_yaml_files_to_validation_ready_model([base_model_file(), natural_identifier_file])
 
     with pytest.raises(ModelValidationException, match="can have at most one natural identifier"):
-        ModelValidator([NaturalIdentifierConfigurationRule()]).checked_validations(model.model)
+        ModelValidator([NaturalEntityConfigurationRule()]).checked_validations(model.model)
 
 
 def test_natural_identifier_used_in_wrong_context() -> None:
@@ -307,4 +307,4 @@ def test_natural_identifier_used_in_wrong_context() -> None:
     model = parse_yaml_files_to_validation_ready_model([base_model_file(), natural_identifier_file])
 
     with pytest.raises(ModelValidationException, match="use of `natural` identifiers is currently supported only in"):
-        ModelValidator([NaturalIdentifierConfigurationRule()]).checked_validations(model.model)
+        ModelValidator([NaturalEntityConfigurationRule()]).checked_validations(model.model)

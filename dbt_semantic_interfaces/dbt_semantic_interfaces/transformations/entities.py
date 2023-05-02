@@ -6,7 +6,7 @@ from dbt_semantic_interfaces.transformations.transform_rule import ModelTransfor
 logger = logging.getLogger(__name__)
 
 
-class CompositeIdentifierExpressionRule(ModelTransformRule):
+class CompositeEntityExpressionRule(ModelTransformRule):
     """Transform composite sub-identifiers for convenience.
 
     If a sub-identifier has no expression, check if an identifier exists with the same name and use that identifier's

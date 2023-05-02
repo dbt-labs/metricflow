@@ -15,7 +15,7 @@ from metricflow.model.validations.validator_helpers import (
 )
 
 
-class CommonIdentifiersRule(ModelValidationRule):
+class CommonEntitysRule(ModelValidationRule):
     """Checks that identifiers exist on more than one data source"""
 
     @staticmethod
@@ -66,10 +66,10 @@ class CommonIdentifiersRule(ModelValidationRule):
         """Issues a warning for any identifier that is associated with only one data_source"""
         issues = []
 
-        identifiers_to_data_sources = CommonIdentifiersRule._map_data_source_identifiers(model.data_sources)
+        identifiers_to_data_sources = CommonEntitysRule._map_data_source_identifiers(model.data_sources)
         for data_source in model.data_sources or []:
             for identifier in data_source.identifiers or []:
-                issues += CommonIdentifiersRule._check_identifier(
+                issues += CommonEntitysRule._check_identifier(
                     identifier=identifier,
                     data_source=data_source,
                     identifiers_to_data_sources=identifiers_to_data_sources,

@@ -30,7 +30,7 @@ from metricflow.model.validations.validator_helpers import ValidationFutureError
 logger = logging.getLogger(__name__)
 
 
-class IdentifierConfigRule(ModelValidationRule):
+class EntityConfigRule(ModelValidationRule):
     """Checks that data source identifiers are valid"""
 
     @staticmethod
@@ -38,7 +38,7 @@ class IdentifierConfigRule(ModelValidationRule):
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
         issues = []
         for data_source in model.data_sources:
-            issues += IdentifierConfigRule._validate_data_source_identifiers(data_source=data_source)
+            issues += EntityConfigRule._validate_data_source_identifiers(data_source=data_source)
         return issues
 
     @staticmethod
@@ -98,7 +98,7 @@ class IdentifierConfigRule(ModelValidationRule):
         return issues
 
 
-class NaturalIdentifierConfigurationRule(ModelValidationRule):
+class NaturalEntityConfigurationRule(ModelValidationRule):
     """Ensures that identifiers marked as EntityType.NATURAL are configured correctly"""
 
     @staticmethod
@@ -144,14 +144,12 @@ class NaturalIdentifierConfigurationRule(ModelValidationRule):
         """Validate identifiers marked as EntityType.NATURAL"""
         issues: List[ValidationIssue] = []
         for data_source in model.data_sources:
-            issues += NaturalIdentifierConfigurationRule._validate_data_source_natural_identifiers(
-                data_source=data_source
-            )
+            issues += NaturalEntityConfigurationRule._validate_data_source_natural_identifiers(data_source=data_source)
 
         return issues
 
 
-class OnePrimaryIdentifierPerDataSourceRule(ModelValidationRule):
+class OnePrimaryEntityPerDataSourceRule(ModelValidationRule):
     """Ensures that each data source has only one primary identifier"""
 
     @staticmethod
@@ -184,13 +182,13 @@ class OnePrimaryIdentifierPerDataSourceRule(ModelValidationRule):
         issues = []
 
         for data_source in model.data_sources:
-            issues += OnePrimaryIdentifierPerDataSourceRule._only_one_primary_identifier(data_source=data_source)
+            issues += OnePrimaryEntityPerDataSourceRule._only_one_primary_identifier(data_source=data_source)
 
         return issues
 
 
 @dataclass(frozen=True)
-class SubIdentifierContext:
+class SubEntityContext:
     """Organizes the context behind identifiers and their sub-identifiers."""
 
     data_source: DataSource
@@ -198,7 +196,7 @@ class SubIdentifierContext:
     sub_identifier_names: Tuple[str, ...]
 
 
-class IdentifierConsistencyRule(ModelValidationRule):
+class EntityConsistencyRule(ModelValidationRule):
     """Checks identifiers with the same name are defined with the same set of sub-identifiers in all data sources"""
 
     @staticmethod
@@ -213,14 +211,14 @@ class IdentifierConsistencyRule(ModelValidationRule):
         return sub_identifier_names
 
     @staticmethod
-    def _get_sub_identifier_context(data_source: DataSource) -> Sequence[SubIdentifierContext]:
+    def _get_sub_identifier_context(data_source: DataSource) -> Sequence[SubEntityContext]:
         contexts = []
         for identifier in data_source.identifiers or []:
             contexts.append(
-                SubIdentifierContext(
+                SubEntityContext(
                     data_source=data_source,
                     identifier_reference=identifier.reference,
-                    sub_identifier_names=tuple(IdentifierConsistencyRule._get_sub_identifier_names(identifier)),
+                    sub_identifier_names=tuple(EntityConsistencyRule._get_sub_identifier_names(identifier)),
                 )
             )
         return contexts
@@ -230,12 +228,12 @@ class IdentifierConsistencyRule(ModelValidationRule):
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
         issues: List[ValidationIssue] = []
         # build collection of sub-identifier contexts, keyed by identifier name
-        identifier_to_sub_identifier_contexts: DefaultDict[str, List[SubIdentifierContext]] = defaultdict(list)
-        all_contexts: List[SubIdentifierContext] = list(
+        identifier_to_sub_identifier_contexts: DefaultDict[str, List[SubEntityContext]] = defaultdict(list)
+        all_contexts: List[SubEntityContext] = list(
             tuple(
                 more_itertools.flatten(
                     [
-                        IdentifierConsistencyRule._get_sub_identifier_context(data_source)
+                        EntityConsistencyRule._get_sub_identifier_context(data_source)
                         for data_source in model.data_sources
                     ]
                 )

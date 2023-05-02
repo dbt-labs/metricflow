@@ -8,11 +8,11 @@ from metricflow.model.validations.agg_time_dimension import AggregationTimeDimen
 from metricflow.model.validations.data_sources import DataSourceTimeDimensionWarningsRule, DataSourceValidityWindowRule
 from metricflow.model.validations.dimension_const import DimensionConsistencyRule
 from metricflow.model.validations.element_const import ElementConsistencyRule
-from metricflow.model.validations.identifiers import (
-    IdentifierConfigRule,
-    IdentifierConsistencyRule,
-    NaturalIdentifierConfigurationRule,
-    OnePrimaryIdentifierPerDataSourceRule,
+from metricflow.model.validations.entities import (
+    EntityConfigRule,
+    EntityConsistencyRule,
+    NaturalEntityConfigurationRule,
+    OnePrimaryEntityPerDataSourceRule,
 )
 from metricflow.model.validations.measures import (
     PercentileAggregationRule,
@@ -47,10 +47,10 @@ class ModelValidator:
         DataSourceValidityWindowRule(),
         DimensionConsistencyRule(),
         ElementConsistencyRule(),
-        IdentifierConfigRule(),
-        IdentifierConsistencyRule(),
-        NaturalIdentifierConfigurationRule(),
-        OnePrimaryIdentifierPerDataSourceRule(),
+        EntityConfigRule(),
+        EntityConsistencyRule(),
+        NaturalEntityConfigurationRule(),
+        OnePrimaryEntityPerDataSourceRule(),
         MeasureConstraintAliasesRule(),
         MetricMeasuresRule(),
         CumulativeMetricRule(),
