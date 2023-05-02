@@ -58,7 +58,11 @@ from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
 from metricflow.dag.dag_visualization import display_dag_as_svg
 
-from metricflow.conversion.helpers import found_dbt_project, check_manifest_file
+from metricflow.conversion.helpers import (
+    found_dbt_project,
+    check_manifest_file,
+    extract_keys_from_manifest
+)
 
 logger = logging.getLogger(__name__)
 
@@ -151,6 +155,7 @@ def convert(
     ## TODO: Move found_dbt_project into the CLIContext class. Not doing yet for testing
     click.echo(found_dbt_project())
     click.echo(check_manifest_file())
+    click.echo(extract_keys_from_manifest())
 
 @cli.command()
 @click.option("--restart", is_flag=True, help="Wipe the config file and start over")
