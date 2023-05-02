@@ -16,6 +16,7 @@ from metricflow.test.table_snapshot.table_snapshots import (
     SqlTableSnapshotRestorer,
 )
 from metricflow.time.time_constants import ISO8601_PYTHON_FORMAT
+from metricflow.time.time_granularity import period_begin_offset
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
@@ -337,7 +338,7 @@ def create_extended_date_model_tables(mf_test_session_state: MetricFlowTestSessi
         fct_bookings_extended_monthly_data.append((10, True, current_date.strftime(ISO8601_PYTHON_FORMAT)))
         fct_bookings_extended_monthly_data.append((5, False, current_date.strftime(ISO8601_PYTHON_FORMAT)))
 
-        current_date += TimeGranularity.MONTH.period_begin_offset
+        current_date += period_begin_offset(TimeGranularity.MONTH)
 
     sql_table = SqlTable(schema_name=schema, table_name="fct_bookings_extended_monthly")
     sql_client.drop_table(sql_table=sql_table)
