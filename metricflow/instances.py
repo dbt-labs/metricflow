@@ -98,7 +98,7 @@ class TimeDimensionInstance(MdoInstance[TimeDimensionSpec], DataSourceElementIns
 
 
 @dataclass(frozen=True)
-class IdentifierInstance(MdoInstance[EntitySpec], DataSourceElementInstance):  # noqa: D
+class EntityInstance(MdoInstance[EntitySpec], DataSourceElementInstance):  # noqa: D
     associated_columns: Tuple[ColumnAssociation, ...]
     spec: EntitySpec
 
@@ -143,7 +143,7 @@ class InstanceSet(SerializableDataclass):
     measure_instances: Tuple[MeasureInstance, ...] = ()
     dimension_instances: Tuple[DimensionInstance, ...] = ()
     time_dimension_instances: Tuple[TimeDimensionInstance, ...] = ()
-    identifier_instances: Tuple[IdentifierInstance, ...] = ()
+    identifier_instances: Tuple[EntityInstance, ...] = ()
     metric_instances: Tuple[MetricInstance, ...] = ()
     metadata_instances: Tuple[MetadataInstance, ...] = ()
 
@@ -159,7 +159,7 @@ class InstanceSet(SerializableDataclass):
         measure_instances: List[MeasureInstance] = []
         dimension_instances: List[DimensionInstance] = []
         time_dimension_instances: List[TimeDimensionInstance] = []
-        identifier_instances: List[IdentifierInstance] = []
+        identifier_instances: List[EntityInstance] = []
         metric_instances: List[MetricInstance] = []
         metadata_instances: List[MetadataInstance] = []
 

@@ -12,7 +12,7 @@ from metricflow.instances import (
     MeasureInstance,
     DimensionInstance,
     TimeDimensionInstance,
-    IdentifierInstance,
+    EntityInstance,
     InstanceSet,
 )
 from dbt_semantic_interfaces.objects.data_source import DataSource
@@ -127,7 +127,7 @@ class DataSourceToDataSetConverter:
         data_source_name: str,
         identifier: Entity,
         identifier_links: Tuple[EntityReference, ...],
-    ) -> IdentifierInstance:
+    ) -> EntityInstance:
         """Create an identifier instance from the identifier object from a data sourcein the model."""
         identifier_spec = EntitySpec(
             element_name=identifier.reference.element_name,
@@ -135,7 +135,7 @@ class DataSourceToDataSetConverter:
         )
         column_associations = identifier_spec.column_associations(self._column_association_resolver)
 
-        return IdentifierInstance(
+        return EntityInstance(
             associated_columns=column_associations,
             spec=identifier_spec,
             defined_from=(
@@ -300,7 +300,7 @@ class DataSourceToDataSetConverter:
         identifiers: Sequence[Entity],
         identifier_links: Tuple[EntityReference, ...],
         table_alias: str,
-    ) -> Tuple[Sequence[IdentifierInstance], Sequence[SqlSelectColumn]]:
+    ) -> Tuple[Sequence[EntityInstance], Sequence[SqlSelectColumn]]:
         identifier_instances = []
         select_columns = []
         for identifier in identifiers or []:
@@ -358,7 +358,7 @@ class DataSourceToDataSetConverter:
         all_measure_instances: List[MeasureInstance] = []
         all_dimension_instances: List[DimensionInstance] = []
         all_time_dimension_instances: List[TimeDimensionInstance] = []
-        all_identifier_instances: List[IdentifierInstance] = []
+        all_identifier_instances: List[EntityInstance] = []
 
         all_select_columns: List[SqlSelectColumn] = []
         from_source_alias = IdGeneratorRegistry.for_class(self.__class__).create_id(f"{data_source.name}_src")

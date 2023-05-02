@@ -15,7 +15,7 @@ from metricflow.dataflow.dataflow_plan import ValidityWindowJoinDescription
 from metricflow.instances import (
     MdoInstance,
     DimensionInstance,
-    IdentifierInstance,
+    EntityInstance,
     MetadataInstance,
     MetricInstance,
     MeasureInstance,
@@ -424,7 +424,7 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
                 + identifier_instance.spec.identifier_links,
             )
             identifier_instances_with_additional_link.append(
-                IdentifierInstance(
+                EntityInstance(
                     associated_columns=identifier_instance.associated_columns,
                     defined_from=identifier_instance.defined_from,
                     spec=transformed_identifier_spec_from_right,
@@ -774,7 +774,7 @@ class ChangeAssociatedColumns(InstanceSetTransform[InstanceSet]):
         output_identifier_instances = []
         for input_identifier_instance in instance_set.identifier_instances:
             output_identifier_instances.append(
-                IdentifierInstance(
+                EntityInstance(
                     associated_columns=self._column_association_resolver.resolve_identifier_spec(
                         identifier_spec=input_identifier_instance.spec
                     ),

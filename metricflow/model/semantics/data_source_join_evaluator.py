@@ -9,7 +9,7 @@ from dbt_semantic_interfaces.references import (
     DataSourceElementReference,
     EntityReference,
 )
-from metricflow.instances import IdentifierInstance, InstanceSet
+from metricflow.instances import EntityInstance, InstanceSet
 from metricflow.object_utils import pformat_big_objects
 from metricflow.protocols.semantics import DataSourceSemanticsAccessor
 
@@ -220,7 +220,7 @@ class DataSourceJoinEvaluator:
         identifier_reference: EntityReference,
     ) -> DataSourceReference:
         """Return the data source where the identifier was defined in the instance set."""
-        matching_instances: List[IdentifierInstance] = []
+        matching_instances: List[EntityInstance] = []
         for identifier_instance in instance_set.identifier_instances:
             assert len(identifier_instance.defined_from) == 1
             if (
