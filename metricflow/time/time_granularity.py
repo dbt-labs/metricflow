@@ -109,25 +109,28 @@ def adjust_to_start_of_period(
         return period_begin_offset(time_granularity).rollforward(date_to_adjust)
 
 
+def adjust_to_end_of_period(
+    time_granularity: TimeGranularity, date_to_adjust: pd.Timestamp, rollforward: bool = True
+) -> pd.Timestamp:
+    """Adjust to end of period if not at end already."""
+    if rollforward:
+        return period_end_offset(time_granularity).rollforward(date_to_adjust)
+    else:
+        return period_end_offset(time_granularity).rollback(date_to_adjust)
+
+
 class ExtendedTimeGranularity(TimeGranularity):
     """For time dimensions, the smallest possible difference between two time values.
 
     Needed for calculating adjacency when merging 2 different time ranges.
     """
 
-    def adjust_to_end_of_period(self, date_to_adjust: pd.Timestamp, rollforward: bool = True) -> pd.Timestamp:
-        """Adjust to end of period if not at end already."""
-        if rollforward:
-            return period_end_offset(self).rollforward(date_to_adjust)
-        else:
-            return period_end_offset(self).rollback(date_to_adjust)
-
     def match_start_or_end_of_period(self, date_to_match: pd.Timestamp, date_to_adjust: pd.Timestamp) -> pd.Timestamp:
         """Adjust date_to_adjust to be start or end of period based on if date_to_match is at start or end of period."""
         if is_period_start(self, date_to_match):
             return adjust_to_start_of_period(self, date_to_adjust)
         elif is_period_end(self, date_to_match):
-            return self.adjust_to_end_of_period(date_to_adjust)
+            return adjust_to_end_of_period(self, date_to_adjust)
         else:
             raise ValueError(
                 f"Expected `date_to_match` to fall at the start or end of the granularity period. Got '{date_to_match}' for granularity {self}."
