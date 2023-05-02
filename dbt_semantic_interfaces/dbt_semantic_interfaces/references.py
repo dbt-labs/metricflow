@@ -7,14 +7,14 @@ from metricflow.dataclass_serialization import SerializableDataclass
 
 @dataclass(frozen=True)
 class ElementReference(SerializableDataclass):
-    """Used when we need to refer to a dimension, measure, identifier, but other attributes are unknown."""
+    """Used when we need to refer to a dimension, measure, entity, but other attributes are unknown."""
 
     element_name: str
 
 
 @dataclass(frozen=True)
 class LinkableElementReference(ElementReference):
-    """Used when we need to refer to a dimension or identifier, but other attributes are unknown."""
+    """Used when we need to refer to a dimension or entity, but other attributes are unknown."""
 
     pass
 
@@ -36,12 +36,12 @@ class DimensionReference(LinkableElementReference):  # noqa: D
 
 
 @dataclass(frozen=True)
-class IdentifierReference(LinkableElementReference):  # noqa: D
+class EntityReference(LinkableElementReference):  # noqa: D
     pass
 
 
 @dataclass(frozen=True)
-class CompositeSubIdentifierReference(ElementReference):  # noqa: D
+class CompositeSubEntityReference(ElementReference):  # noqa: D
     pass
 
 

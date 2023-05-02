@@ -379,8 +379,8 @@ class DataSourceToDataSetConverter:
         # instances in the instance set. We'll create a different instance for each "possible_identifier_links".
         possible_identifier_links: List[Tuple[IdentifierReference, ...]] = [()]
         for identifier in data_source.identifiers:
-            if identifier.is_linkable_identifier_type:
-                possible_identifier_links.append((identifier.reference,))
+            if identifier.is_linkable_entity_type:
+                possible_entity_links.append((identifier.reference,))
 
         # Handle dimensions
         conversion_results = [
