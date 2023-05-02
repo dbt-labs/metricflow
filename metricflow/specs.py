@@ -31,7 +31,7 @@ from metricflow.dataclass_serialization import SerializableDataclass
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.object_utils import hash_items
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.time.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 
 class ColumnAssociationResolver(ABC):

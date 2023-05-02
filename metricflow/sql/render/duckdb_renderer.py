@@ -12,7 +12,7 @@ from metricflow.sql.sql_exprs import (
     SqlPercentileFunctionType,
     SqlTimeDeltaExpression,
 )
-from metricflow.time.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 
 class DuckDbSqlExpressionRenderer(DefaultSqlExpressionRenderer):

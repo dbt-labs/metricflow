@@ -26,7 +26,13 @@ from metricflow.specs import (
     TimeDimensionSpec,
     DEFAULT_TIME_GRANULARITY,
 )
-from metricflow.time.time_granularity import TimeGranularity
+from metricflow.time.time_granularity import (
+    is_period_start,
+    is_period_end,
+    adjust_to_start_of_period,
+    adjust_to_end_of_period,
+)
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -238,12 +244,12 @@ class TimeGranularitySolver:
         constraint_end = time_range_constraint.end_time
 
         start_ts = pd.Timestamp(time_range_constraint.start_time)
-        if not time_granularity.is_period_start(start_ts):
-            constraint_start = time_granularity.adjust_to_start_of_period(start_ts).to_pydatetime()
+        if not is_period_start(time_granularity, start_ts):
+            constraint_start = adjust_to_start_of_period(time_granularity, start_ts).to_pydatetime()
 
         end_ts = pd.Timestamp(time_range_constraint.end_time)
-        if not time_granularity.is_period_end(end_ts):
-            constraint_end = time_granularity.adjust_to_end_of_period(end_ts).to_pydatetime()
+        if not is_period_end(time_granularity, end_ts):
+            constraint_end = adjust_to_end_of_period(time_granularity, end_ts).to_pydatetime()
 
         if constraint_start < TimeRangeConstraint.ALL_TIME_BEGIN():
             constraint_start = TimeRangeConstraint.ALL_TIME_BEGIN()

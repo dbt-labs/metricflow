@@ -24,7 +24,7 @@ from metricflow.specs import (
     IdentifierSpec,
     IdentifierReference,
 )
-from metricflow.time.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 
