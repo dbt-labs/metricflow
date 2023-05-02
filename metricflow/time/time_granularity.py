@@ -26,16 +26,16 @@ def offset_period(time_granularity: TimeGranularity) -> pd.offsets.DateOffset:
         assert_values_exhausted(time_granularity)
 
 
+def format_with_first_or_last(time_granularity: TimeGranularity) -> bool:
+    """Indicates that this can only be calculated if query results display the first or last date of the period."""
+    return time_granularity in [TimeGranularity.MONTH, TimeGranularity.QUARTER, TimeGranularity.YEAR]
+
+
 class ExtendedTimeGranularity(TimeGranularity):
     """For time dimensions, the smallest possible difference between two time values.
 
     Needed for calculating adjacency when merging 2 different time ranges.
     """
-
-    @property
-    def format_with_first_or_last(self) -> bool:
-        """Indicates that this can only be calculated if query results display the first or last date of the period."""
-        return self in [TimeGranularity.MONTH, TimeGranularity.QUARTER, TimeGranularity.YEAR]
 
     def is_period_start(self, date: Union[pd.Timestamp, date]) -> bool:  # noqa: D
         pd_date = pd.Timestamp(date)
