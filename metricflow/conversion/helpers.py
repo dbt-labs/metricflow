@@ -1,7 +1,7 @@
 import os
 import json
 
-def found_dbt_project() -> str:
+def check_dbt_project() -> str:
     """Checks if dbt_project.yml exists in the current directory and returns a boolean."""
     try:
         os.path.exists("dbt_project.yml")

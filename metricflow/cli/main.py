@@ -59,7 +59,7 @@ from metricflow.telemetry.reporter import TelemetryReporter, log_call
 from metricflow.dag.dag_visualization import display_dag_as_svg
 
 from metricflow.conversion.helpers import (
-    found_dbt_project,
+    check_dbt_project,
     check_manifest_file,
     extract_semantic_manifest
 )
@@ -153,7 +153,7 @@ def convert(
 ) -> None:
     ## These functions run and return messages based on the results of the functions
     ## TODO: Move found_dbt_project into the CLIContext class. Not doing yet for testing
-    click.echo(found_dbt_project())
+    click.echo(check_dbt_project())
     click.echo(check_manifest_file())
     # click.echo(extract_semantic_manifest())
 
