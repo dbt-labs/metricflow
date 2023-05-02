@@ -48,27 +48,28 @@ def is_period_start(time_granularity: TimeGranularity, date: Union[pd.Timestamp,
         assert_values_exhausted(time_granularity)
 
 
+def is_period_end(time_granularity: TimeGranularity, date: Union[pd.Timestamp, date]) -> bool:  # noqa: D
+    pd_date = pd.Timestamp(date)
+
+    if time_granularity is TimeGranularity.DAY:
+        return True
+    elif time_granularity is TimeGranularity.WEEK:
+        return ISOWeekDay.from_pandas_timestamp(pd_date).is_week_end
+    elif time_granularity is TimeGranularity.MONTH:
+        return pd_date.is_month_end
+    elif time_granularity is TimeGranularity.QUARTER:
+        return pd_date.is_quarter_end
+    elif time_granularity is TimeGranularity.YEAR:
+        return pd_date.is_year_end
+    else:
+        assert_values_exhausted(time_granularity)
+
+
 class ExtendedTimeGranularity(TimeGranularity):
     """For time dimensions, the smallest possible difference between two time values.
 
     Needed for calculating adjacency when merging 2 different time ranges.
     """
-
-    def is_period_end(self, date: Union[pd.Timestamp, date]) -> bool:  # noqa: D
-        pd_date = pd.Timestamp(date)
-
-        if self is TimeGranularity.DAY:
-            return True
-        elif self is TimeGranularity.WEEK:
-            return ISOWeekDay.from_pandas_timestamp(pd_date).is_week_end
-        elif self is TimeGranularity.MONTH:
-            return pd_date.is_month_end
-        elif self is TimeGranularity.QUARTER:
-            return pd_date.is_quarter_end
-        elif self is TimeGranularity.YEAR:
-            return pd_date.is_year_end
-        else:
-            assert_values_exhausted(self)
 
     @property
     def period_begin_offset(  # noqa: D
@@ -122,7 +123,7 @@ class ExtendedTimeGranularity(TimeGranularity):
         """Adjust date_to_adjust to be start or end of period based on if date_to_match is at start or end of period."""
         if is_period_start(self, date_to_match):
             return self.adjust_to_start_of_period(date_to_adjust)
-        elif self.is_period_end(date_to_match):
+        elif is_period_end(self, date_to_match):
             return self.adjust_to_end_of_period(date_to_adjust)
         else:
             raise ValueError(
