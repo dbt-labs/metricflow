@@ -58,7 +58,7 @@ from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
 from metricflow.dag.dag_visualization import display_dag_as_svg
 
-from metricflow.conversion.helpers import found_dbt_project
+from metricflow.conversion.helpers import found_dbt_project, run_dbt_compile
 
 logger = logging.getLogger(__name__)
 
@@ -147,10 +147,9 @@ def convert(
     output_dir: str,
     overwrite: bool,
 ) -> None:
-    if not found_dbt_project():
-        click.echo("Error: dbt_project.yml not found in current directory. Please navigate to a dbt directory to run conversion")
-        cfg.exit(1)
-    click.echo("Found the dbt project file!")
+    ## These functions run and return messages based on the results of the functions
+    click.echo(found_dbt_project())
+    click.echo(run_dbt_compile())
 
 @cli.command()
 @click.option("--restart", is_flag=True, help="Wipe the config file and start over")
