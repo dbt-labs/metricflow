@@ -177,8 +177,8 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
             self._linkable_reference_index[dim.reference].append(data_source)
             self._dimension_index[dim.reference].append(data_source)
         for ident in data_source.identifiers:
-            self._identifier_ref_to_entity[ident.reference] = ident.entity
-            self._entity_index[ident.entity].append(data_source)
+            self._identifier_ref_to_entity[ident.reference] = ident.name
+            self._entity_index[ident.name].append(data_source)
             self._linkable_reference_index[ident.reference].append(data_source)
 
         self._data_source_reference_to_data_source[data_source.reference] = data_source
