@@ -119,6 +119,12 @@ def version() -> None:
 
 
 @cli.command()
+def convert() -> None:
+    """Convert the semantic objects in a dbt project to the new spec"""
+    click.echo(pkg_version(PACKAGE_NAME))
+
+
+@cli.command()
 @click.option("--restart", is_flag=True, help="Wipe the config file and start over")
 @pass_config
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
