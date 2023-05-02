@@ -9,28 +9,28 @@ from metricflow.enum_extension import assert_values_exhausted, ExtendedEnum
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 
+def offset_period(time_granularity: TimeGranularity) -> pd.offsets.DateOffset:
+    """Offset object to use for adjusting by one granularity period."""
+    # The type checker is throwing errors for some of those arguments, but they are valid.
+    if time_granularity is TimeGranularity.DAY:
+        return pd.offsets.DateOffset(days=1)  # type: ignore
+    elif time_granularity is TimeGranularity.WEEK:
+        return pd.offsets.DateOffset(weeks=1)  # type: ignore
+    elif time_granularity is TimeGranularity.MONTH:
+        return pd.offsets.DateOffset(months=1)
+    elif time_granularity is TimeGranularity.QUARTER:
+        return pd.offsets.DateOffset(months=3)
+    elif time_granularity is TimeGranularity.YEAR:
+        return pd.offsets.DateOffset(years=1)  # type: ignore
+    else:
+        assert_values_exhausted(time_granularity)
+
+
 class ExtendedTimeGranularity(TimeGranularity):
     """For time dimensions, the smallest possible difference between two time values.
 
     Needed for calculating adjacency when merging 2 different time ranges.
     """
-
-    @property
-    def offset_period(self) -> pd.offsets.DateOffset:
-        """Offset object to use for adjusting by one granularity period."""
-        # The type checker is throwing errors for some of those arguments, but they are valid.
-        if self is TimeGranularity.DAY:
-            return pd.offsets.DateOffset(days=1)  # type: ignore
-        elif self is TimeGranularity.WEEK:
-            return pd.offsets.DateOffset(weeks=1)  # type: ignore
-        elif self is TimeGranularity.MONTH:
-            return pd.offsets.DateOffset(months=1)
-        elif self is TimeGranularity.QUARTER:
-            return pd.offsets.DateOffset(months=3)
-        elif self is TimeGranularity.YEAR:
-            return pd.offsets.DateOffset(years=1)  # type: ignore
-        else:
-            assert_values_exhausted(self)
 
     @property
     def format_with_first_or_last(self) -> bool:
