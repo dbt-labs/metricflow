@@ -1,7 +1,7 @@
 from typing import Tuple
 
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode
-from metricflow.model.dbt_mapping_rules.dbt_metric_to_metrics_rules import (
+from metricflow.conversion.dbt_mapping_rules.dbt_metric_to_metrics_rules import (
     DbtToMetricName,
     DbtToMetricType,
     DbtToMetricDescription,
@@ -9,7 +9,7 @@ from metricflow.model.dbt_mapping_rules.dbt_metric_to_metrics_rules import (
     DbtToDerivedMetricTypeParams,
     DbtToMeasureProxyMetricTypeParams,
 )
-from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import MappedObjects, get_and_assert_calc_method_mapping
+from metricflow.conversion.dbt_mapping_rules.dbt_mapping_rule import MappedObjects, get_and_assert_calc_method_mapping
 from dbt_semantic_interfaces.objects.metric import MetricType
 
 

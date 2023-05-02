@@ -2,7 +2,7 @@ import traceback
 from typing import Dict, List, Optional, Tuple
 
 from dbt_metadata_client.dbt_metadata_api_schema import CatalogColumn, MetricNode, MetricFilter
-from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
+from metricflow.conversion.dbt_mapping_rules.dbt_mapping_rule import (
     DbtMappingRule,
     MappedObjects,
     assert_metric_model_name,

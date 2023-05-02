@@ -4,17 +4,17 @@ import traceback
 from typing import Collection, FrozenSet, List, Tuple, Type
 
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode
-from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
+from metricflow.conversion.dbt_mapping_rules.dbt_mapping_rule import (
     DbtMappingRule,
     DbtMappingResults,
     MappedObjects,
 )
-from metricflow.model.dbt_mapping_rules.dbt_metric_model_to_data_source_rules import (
+from metricflow.conversion.dbt_mapping_rules.dbt_metric_model_to_data_source_rules import (
     DbtMapToDataSourceName,
     DbtMapToDataSourceDescription,
     DbtMapDataSourceSqlTable,
 )
-from metricflow.model.dbt_mapping_rules.dbt_metric_to_metrics_rules import (
+from metricflow.conversion.dbt_mapping_rules.dbt_metric_to_metrics_rules import (
     DbtToMetricName,
     DbtToMetricDescription,
     DbtToMetricType,
@@ -22,12 +22,12 @@ from metricflow.model.dbt_mapping_rules.dbt_metric_to_metrics_rules import (
     DbtToMetricConstraint,
     DbtToDerivedMetricTypeParams,
 )
-from metricflow.model.dbt_mapping_rules.dbt_metric_to_dimensions_rules import (
+from metricflow.conversion.dbt_mapping_rules.dbt_metric_to_dimensions_rules import (
     DbtDimensionsToDimensions,
     DbtTimestampToDimension,
     DbtFiltersToDimensions,
 )
-from metricflow.model.dbt_mapping_rules.dbt_metric_to_measure import (
+from metricflow.conversion.dbt_mapping_rules.dbt_metric_to_measure import (
     DbtToMeasureName,
     DbtToMeasureExpr,
     DbtToMeasureAgg,

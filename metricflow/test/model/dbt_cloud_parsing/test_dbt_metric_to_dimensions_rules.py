@@ -1,13 +1,13 @@
 from typing import Any, Dict, Tuple
 
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode
-from metricflow.model.dbt_converter import DbtConverter
-from metricflow.model.dbt_mapping_rules.dbt_metric_to_dimensions_rules import (
+from metricflow.conversion.dbt_converter import DbtConverter
+from metricflow.conversion.dbt_mapping_rules.dbt_metric_to_dimensions_rules import (
     DbtDimensionsToDimensions,
     DbtTimestampToDimension,
     DbtFiltersToDimensions,
 )
-from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
+from metricflow.conversion.dbt_mapping_rules.dbt_mapping_rule import (
     MappedObjects,
     DbtMappingRule,
     get_and_assert_calc_method_mapping,
