@@ -42,7 +42,7 @@ def get_ignored_files():
                     ignored_files.add(line)
     return ignored_files
 
-def extract_keys_from_manifest():
+def extract_semantic_manifest():
     """The function reads the manifest.json file from the 'target/' directory and
     returns only the top-level keys "metrics" and "semantic_models". The function
     uses the built-in json library for parsing the JSON data."""

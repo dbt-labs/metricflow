@@ -1,6 +1,7 @@
 import os
 import time
-from metricflow.conversion.helpers import check_manifest_file
+import json
+from metricflow.conversion.helpers import check_manifest_file, extract_semantic_manifest
 
 # Unit Test
 def test_check_manifest_file_missing_manifest(tmpdir):
@@ -39,3 +40,27 @@ def test_check_manifest_file(tmpdir):
 
     result = check_manifest_file()
     assert result == "Your manifest.json file is out of date - please run dbt compile again!"
+
+
+def test_extract_semantic_manifest(tmpdir):
+    os.chdir(tmpdir)
+    target_directory = 'target/'
+    os.makedirs(target_directory)
+
+    manifest_content = {
+        "metrics": {"metric_1": "value_1", "metric_2": "value_2"},
+        "semantic_models": {"model_1": "value_1", "model_2": "value_2"},
+        "models": {"key_1": "value_1", "key_2": "value_2"},
+    }
+
+    manifest_path = os.path.join(target_directory, 'manifest.json')
+    with open(manifest_path, 'w') as manifest_file:
+        json.dump(manifest_content, manifest_file)
+
+
+    semantic_manifest = extract_semantic_manifest()
+
+    assert semantic_manifest == {
+        "metrics": {"metric_1": "value_1", "metric_2": "value_2"},
+        "semantic_models": {"model_1": "value_1", "model_2": "value_2"},
+    }
