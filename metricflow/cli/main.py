@@ -119,8 +119,32 @@ def version() -> None:
 
 
 @cli.command()
-def convert() -> None:
-    """Convert the semantic objects in a dbt project to the new spec"""
+@click.option(
+    "--output-dir",
+    type=click.Path(
+        dir_okay=True,
+        file_okay=False,
+        writable=True,
+        readable=True,
+    ),
+    required=False,
+    help="Output directory for the inferred config files.",
+)
+@click.option(
+    "--overwrite",
+    is_flag=True,
+    required=False,
+    default=False,
+    help="If specified, allows existing semantic files to be overwritten by inference.",
+)
+@pass_config
+@exception_handler
+@log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
+def convert(
+    cfg: CLIContext,
+    output_dir: str,
+    overwrite: bool,
+) -> None:
     click.echo(pkg_version(PACKAGE_NAME))
 
 
