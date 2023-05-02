@@ -31,27 +31,28 @@ def format_with_first_or_last(time_granularity: TimeGranularity) -> bool:
     return time_granularity in [TimeGranularity.MONTH, TimeGranularity.QUARTER, TimeGranularity.YEAR]
 
 
+def is_period_start(time_granularity: TimeGranularity, date: Union[pd.Timestamp, date]) -> bool:  # noqa: D
+    pd_date = pd.Timestamp(date)
+
+    if time_granularity is TimeGranularity.DAY:
+        return True
+    elif time_granularity is TimeGranularity.WEEK:
+        return ISOWeekDay.from_pandas_timestamp(pd_date).is_week_start
+    elif time_granularity is TimeGranularity.MONTH:
+        return pd_date.is_month_start
+    elif time_granularity is TimeGranularity.QUARTER:
+        return pd_date.is_quarter_start
+    elif time_granularity is TimeGranularity.YEAR:
+        return pd_date.is_year_start
+    else:
+        assert_values_exhausted(time_granularity)
+
+
 class ExtendedTimeGranularity(TimeGranularity):
     """For time dimensions, the smallest possible difference between two time values.
 
     Needed for calculating adjacency when merging 2 different time ranges.
     """
-
-    def is_period_start(self, date: Union[pd.Timestamp, date]) -> bool:  # noqa: D
-        pd_date = pd.Timestamp(date)
-
-        if self is TimeGranularity.DAY:
-            return True
-        elif self is TimeGranularity.WEEK:
-            return ISOWeekDay.from_pandas_timestamp(pd_date).is_week_start
-        elif self is TimeGranularity.MONTH:
-            return pd_date.is_month_start
-        elif self is TimeGranularity.QUARTER:
-            return pd_date.is_quarter_start
-        elif self is TimeGranularity.YEAR:
-            return pd_date.is_year_start
-        else:
-            assert_values_exhausted(self)
 
     def is_period_end(self, date: Union[pd.Timestamp, date]) -> bool:  # noqa: D
         pd_date = pd.Timestamp(date)
@@ -119,7 +120,7 @@ class ExtendedTimeGranularity(TimeGranularity):
 
     def match_start_or_end_of_period(self, date_to_match: pd.Timestamp, date_to_adjust: pd.Timestamp) -> pd.Timestamp:
         """Adjust date_to_adjust to be start or end of period based on if date_to_match is at start or end of period."""
-        if self.is_period_start(date_to_match):
+        if is_period_start(self, date_to_match):
             return self.adjust_to_start_of_period(date_to_adjust)
         elif self.is_period_end(date_to_match):
             return self.adjust_to_end_of_period(date_to_adjust)
