@@ -17,7 +17,7 @@ from metricflow.instances import (
 )
 from dbt_semantic_interfaces.objects.data_source import DataSource
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
-from dbt_semantic_interfaces.objects.elements.identifier import Identifier
+from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from metricflow.model.spec_converters import MeasureConverter
 from metricflow.specs import (
@@ -26,7 +26,7 @@ from metricflow.specs import (
     IdentifierSpec,
     ColumnAssociationResolver,
     DEFAULT_TIME_GRANULARITY,
-    IdentifierReference,
+    EntityReference,
 )
 from metricflow.sql.sql_exprs import (
     SqlStringExpression,
@@ -59,7 +59,7 @@ class DimensionConversionResult:
 class DataSourceToDataSetConverter:
     """Converts a data source in the model to a data set that can be used with the dataflow plan builder.
 
-    Identifier links generally refer to the identifiers used to join the measure source to the dimension source. For
+    Entity links generally refer to the identifiers used to join the measure source to the dimension source. For
     example, the dimension name "user_id__device_id__platform" has identifier links "user_id" and "device_id" and would
     mean that the measure source was joined by "user_id" to an intermediate source, and then it was joined by
     "device_id" to the source containing the "platform" dimension.
@@ -75,7 +75,7 @@ class DataSourceToDataSetConverter:
         self,
         data_source_name: str,
         dimension: Dimension,
-        identifier_links: Tuple[IdentifierReference, ...],
+        identifier_links: Tuple[EntityReference, ...],
     ) -> DimensionInstance:
         """Create a dimension instance from the dimension object in the model."""
         dimension_spec = DimensionSpec(
@@ -99,7 +99,7 @@ class DataSourceToDataSetConverter:
         self,
         data_source_name: str,
         time_dimension: Dimension,
-        identifier_links: Tuple[IdentifierReference, ...],
+        identifier_links: Tuple[EntityReference, ...],
         time_granularity: TimeGranularity = DEFAULT_TIME_GRANULARITY,
     ) -> TimeDimensionInstance:
         """Create a time dimension instance from the dimension object from a data source in the model."""
@@ -125,8 +125,8 @@ class DataSourceToDataSetConverter:
     def _create_identifier_instance(
         self,
         data_source_name: str,
-        identifier: Identifier,
-        identifier_links: Tuple[IdentifierReference, ...],
+        identifier: Entity,
+        identifier_links: Tuple[EntityReference, ...],
     ) -> IdentifierInstance:
         """Create an identifier instance from the identifier object from a data sourcein the model."""
         identifier_spec = IdentifierSpec(
@@ -212,7 +212,7 @@ class DataSourceToDataSetConverter:
         self,
         data_source_name: str,
         dimensions: Sequence[Dimension],
-        identifier_links: Tuple[IdentifierReference, ...],
+        identifier_links: Tuple[EntityReference, ...],
         table_alias: str,
     ) -> DimensionConversionResult:
         dimension_instances = []
@@ -297,8 +297,8 @@ class DataSourceToDataSetConverter:
     def _create_identifier_instances(
         self,
         data_source_name: str,
-        identifiers: Sequence[Identifier],
-        identifier_links: Tuple[IdentifierReference, ...],
+        identifiers: Sequence[Entity],
+        identifier_links: Tuple[EntityReference, ...],
         table_alias: str,
     ) -> Tuple[Sequence[IdentifierInstance], Sequence[SqlSelectColumn]]:
         identifier_instances = []
@@ -377,7 +377,7 @@ class DataSourceToDataSetConverter:
         # e.g. in the "users" data source, with the "country" dimension and the "user_id" identifier,
         # the dimensions "country" and "user_id__country" both mean the same thing. To make matching easier, create both
         # instances in the instance set. We'll create a different instance for each "possible_identifier_links".
-        possible_identifier_links: List[Tuple[IdentifierReference, ...]] = [()]
+        possible_identifier_links: List[Tuple[EntityReference, ...]] = [()]
         for identifier in data_source.identifiers:
             if identifier.is_linkable_entity_type:
                 possible_entity_links.append((identifier.reference,))

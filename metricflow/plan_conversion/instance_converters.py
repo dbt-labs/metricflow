@@ -36,7 +36,7 @@ from metricflow.specs import (
     TimeDimensionSpec,
     LinklessIdentifierSpec,
     LinkableInstanceSpec,
-    IdentifierReference,
+    EntityReference,
     InstanceSpecSet,
 )
 from metricflow.sql.sql_exprs import (
@@ -397,7 +397,7 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
             transformed_time_dimension_spec_from_right = TimeDimensionSpec(
                 element_name=time_dimension_instance.spec.element_name,
                 identifier_links=(
-                    (IdentifierReference(element_name=self._join_on_identifier.element_name),)
+                    (EntityReference(element_name=self._join_on_identifier.element_name),)
                     + time_dimension_instance.spec.identifier_links
                 ),
                 time_granularity=time_dimension_instance.spec.time_granularity,

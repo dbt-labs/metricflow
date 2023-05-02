@@ -24,7 +24,7 @@ def test_lonely_identifier_raises_issue(simple_model__with_primary_transforms: U
 
     found_warning = False
     warning = (
-        f"Identifier `{lonely_identifier_name}` only found in one data source `{data_source_with_identifiers.name}` "
+        f"Entity `{lonely_identifier_name}` only found in one data source `{data_source_with_identifiers.name}` "
         f"which means it will be unused in joins."
     )
     if model_issues is not None:

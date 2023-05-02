@@ -3,7 +3,7 @@ from typing import List
 
 from dbt_semantic_interfaces.objects.data_source import DataSource
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
-from dbt_semantic_interfaces.objects.elements.identifier import IdentifierType
+from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.references import DataSourceElementReference, DataSourceReference
 from metricflow.model.validations.validator_helpers import (
@@ -182,9 +182,9 @@ class DataSourceValidityWindowRule(ModelValidationRule):
         primary_or_unique_identifiers = [
             identifier
             for identifier in data_source.identifiers
-            if identifier.type in (IdentifierType.PRIMARY, IdentifierType.UNIQUE)
+            if identifier.type in (EntityType.PRIMARY, EntityType.UNIQUE)
         ]
-        if not any([identifier.type is IdentifierType.NATURAL for identifier in data_source.identifiers]):
+        if not any([identifier.type is EntityType.NATURAL for identifier in data_source.identifiers]):
             error = ValidationError(
                 context=context,
                 message=(

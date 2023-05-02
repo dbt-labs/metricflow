@@ -7,12 +7,12 @@ from typing import List, MutableSet, Tuple, Sequence, DefaultDict
 import more_itertools
 
 from dbt_semantic_interfaces.objects.data_source import DataSource
-from dbt_semantic_interfaces.objects.elements.identifier import Identifier, IdentifierType, CompositeSubIdentifier
+from dbt_semantic_interfaces.objects.elements.entity import Entity, EntityType, CompositeSubEntity
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.references import (
     DataSourceElementReference,
     DataSourceReference,
-    IdentifierReference,
+    EntityReference,
 )
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,
@@ -58,7 +58,7 @@ class IdentifierConfigRule(ModelValidationRule):
 
                 for sub_id in ident.identifiers:
                     if sub_id.ref and (sub_id.name or sub_id.expr):
-                        logger.warning(f"Identifier with error is: {ident}")
+                        logger.warning(f"Entity with error is: {ident}")
                         issues.append(
                             ValidationError(
                                 context=context,
@@ -70,7 +70,7 @@ class IdentifierConfigRule(ModelValidationRule):
                         issues.append(
                             ValidationError(
                                 context=context,
-                                message=f"Identifier ref must reference an existing identifier by name. "
+                                message=f"Entity ref must reference an existing identifier by name. "
                                 f"No identifier in this data source has name: {sub_id.ref}",
                             )
                         )
@@ -90,7 +90,7 @@ class IdentifierConfigRule(ModelValidationRule):
                                     ValidationError(
                                         context=context,
                                         message=f"If sub identifier has same name ({sub_id.name}) "
-                                        f"as an existing Identifier they must have the same expr",
+                                        f"as an existing Entity they must have the same expr",
                                     )
                                 )
                                 break
@@ -99,7 +99,7 @@ class IdentifierConfigRule(ModelValidationRule):
 
 
 class NaturalIdentifierConfigurationRule(ModelValidationRule):
-    """Ensures that identifiers marked as IdentifierType.NATURAL are configured correctly"""
+    """Ensures that identifiers marked as EntityType.NATURAL are configured correctly"""
 
     @staticmethod
     @validate_safely(
@@ -116,7 +116,7 @@ class NaturalIdentifierConfigurationRule(ModelValidationRule):
         )
 
         natural_identifier_names = set(
-            [identifier.name for identifier in data_source.identifiers if identifier.type is IdentifierType.NATURAL]
+            [identifier.name for identifier in data_source.identifiers if identifier.type is EntityType.NATURAL]
         )
         if len(natural_identifier_names) > 1:
             error = ValidationError(
@@ -139,11 +139,9 @@ class NaturalIdentifierConfigurationRule(ModelValidationRule):
         return issues
 
     @staticmethod
-    @validate_safely(
-        whats_being_done="checking that identifiers marked as IdentifierType.NATURAL are properly configured"
-    )
+    @validate_safely(whats_being_done="checking that identifiers marked as EntityType.NATURAL are properly configured")
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:
-        """Validate identifiers marked as IdentifierType.NATURAL"""
+        """Validate identifiers marked as EntityType.NATURAL"""
         issues: List[ValidationIssue] = []
         for data_source in model.data_sources:
             issues += NaturalIdentifierConfigurationRule._validate_data_source_natural_identifiers(
@@ -161,7 +159,7 @@ class OnePrimaryIdentifierPerDataSourceRule(ModelValidationRule):
     def _only_one_primary_identifier(data_source: DataSource) -> List[ValidationIssue]:
         primary_identifier_names: MutableSet[str] = set()
         for identifier in data_source.identifiers or []:
-            if identifier.type == IdentifierType.PRIMARY:
+            if identifier.type == EntityType.PRIMARY:
                 primary_identifier_names.add(identifier.reference.element_name)
 
         if len(primary_identifier_names) > 1:
@@ -196,7 +194,7 @@ class SubIdentifierContext:
     """Organizes the context behind identifiers and their sub-identifiers."""
 
     data_source: DataSource
-    identifier_reference: IdentifierReference
+    identifier_reference: EntityReference
     sub_identifier_names: Tuple[str, ...]
 
 
@@ -204,9 +202,9 @@ class IdentifierConsistencyRule(ModelValidationRule):
     """Checks identifiers with the same name are defined with the same set of sub-identifiers in all data sources"""
 
     @staticmethod
-    def _get_sub_identifier_names(identifier: Identifier) -> Sequence[str]:
+    def _get_sub_identifier_names(identifier: Entity) -> Sequence[str]:
         sub_identifier_names = []
-        sub_identifier: CompositeSubIdentifier
+        sub_identifier: CompositeSubEntity
         for sub_identifier in identifier.identifiers or []:
             if sub_identifier.name:
                 sub_identifier_names.append(sub_identifier.name)
@@ -267,7 +265,7 @@ class IdentifierConsistencyRule(ModelValidationRule):
                         element_type=DataSourceElementType.IDENTIFIER,
                     ),
                     message=(
-                        f"Identifier '{identifier_name}' does not have consistent sub-identifiers "
+                        f"Entity '{identifier_name}' does not have consistent sub-identifiers "
                         f"throughout the model: {list(sorted(sub_identifier_contexts, key=lambda x: x.sub_identifier_names))}"
                     ),
                 )

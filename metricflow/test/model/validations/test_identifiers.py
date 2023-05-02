@@ -11,7 +11,7 @@ from metricflow.model.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.common import YamlConfigFile
 from dbt_semantic_interfaces.objects.data_source import DataSource, Mutability, MutabilityType
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
-from dbt_semantic_interfaces.objects.elements.identifier import IdentifierType, Identifier, CompositeSubIdentifier
+from dbt_semantic_interfaces.objects.elements.entity import EntityType, Entity, CompositeSubEntity
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.metric import MetricType, MetricTypeParams
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
@@ -43,7 +43,7 @@ def test_data_source_cant_have_more_than_one_primary_identifier(
 
     identifier_references = set()
     for identifier in multiple_identifier_data_source.identifiers:
-        identifier.type = IdentifierType.PRIMARY
+        identifier.type = EntityType.PRIMARY
         identifier_references.add(identifier.reference)
 
     model_issues = ModelValidator([OnePrimaryIdentifierPerDataSourceRule()]).validate_model(model)
@@ -89,12 +89,12 @@ def test_invalid_composite_identifiers() -> None:  # noqa:D
                             )
                         ],
                         identifiers=[
-                            Identifier(name=identifier_name, type=IdentifierType.PRIMARY, expr="thorium_id"),
-                            Identifier(
+                            Entity(name=identifier_name, type=EntityType.PRIMARY, expr="thorium_id"),
+                            Entity(
                                 name=foreign_identifier_name,
-                                type=IdentifierType.FOREIGN,
+                                type=EntityType.FOREIGN,
                                 identifiers=[
-                                    CompositeSubIdentifier(name=identifier_name, expr="not_thorium_id"),
+                                    CompositeSubEntity(name=identifier_name, expr="not_thorium_id"),
                                 ],
                             ),
                         ],
@@ -113,7 +113,7 @@ def test_invalid_composite_identifiers() -> None:  # noqa:D
 
 
 def test_composite_identifiers_nonexistent_ref() -> None:  # noqa:D
-    with pytest.raises(ModelValidationException, match=r"Identifier ref must reference an existing identifier by name"):
+    with pytest.raises(ModelValidationException, match=r"Entity ref must reference an existing identifier by name"):
         dim_name = "time"
         measure_name = "foo"
         measure2_name = "metric_with_no_time_dim"
@@ -138,12 +138,12 @@ def test_composite_identifiers_nonexistent_ref() -> None:  # noqa:D
                             )
                         ],
                         identifiers=[
-                            Identifier(name=identifier_name, type=IdentifierType.PRIMARY, expr="thorium_id"),
-                            Identifier(
+                            Entity(name=identifier_name, type=EntityType.PRIMARY, expr="thorium_id"),
+                            Entity(
                                 name=foreign_identifier_name,
-                                type=IdentifierType.FOREIGN,
+                                type=EntityType.FOREIGN,
                                 identifiers=[
-                                    CompositeSubIdentifier(ref="ident_that_doesnt_exist"),
+                                    CompositeSubEntity(ref="ident_that_doesnt_exist"),
                                 ],
                             ),
                         ],
@@ -188,14 +188,12 @@ def test_composite_identifiers_ref_and_name() -> None:  # noqa:D
                             )
                         ],
                         identifiers=[
-                            Identifier(name=identifier_name, type=IdentifierType.PRIMARY, expr="thorium_id"),
-                            Identifier(
+                            Entity(name=identifier_name, type=EntityType.PRIMARY, expr="thorium_id"),
+                            Entity(
                                 name=foreign_identifier_name,
-                                type=IdentifierType.FOREIGN,
+                                type=EntityType.FOREIGN,
                                 identifiers=[
-                                    CompositeSubIdentifier(
-                                        ref="ident_that_doesnt_exist", name=foreign_identifier2_name
-                                    ),
+                                    CompositeSubEntity(ref="ident_that_doesnt_exist", name=foreign_identifier2_name),
                                 ],
                             ),
                         ],
@@ -230,17 +228,17 @@ def test_mismatched_identifier(simple_model__with_primary_transforms: UserConfig
         function=lambda data_source: data_source.name == "listings_latest",
     )
 
-    identifier_bookings = Identifier(
+    identifier_bookings = Entity(
         name="composite_identifier",
-        type=IdentifierType.FOREIGN,
-        identifiers=[CompositeSubIdentifier(ref="sub_identifier1")],
+        type=EntityType.FOREIGN,
+        identifiers=[CompositeSubEntity(ref="sub_identifier1")],
     )
     bookings_source.identifiers = tuple(more_itertools.flatten([bookings_source.identifiers, [identifier_bookings]]))
 
-    identifier_listings = Identifier(
+    identifier_listings = Entity(
         name="composite_identifier",
-        type=IdentifierType.FOREIGN,
-        identifiers=[CompositeSubIdentifier(ref="sub_identifier2")],
+        type=EntityType.FOREIGN,
+        identifiers=[CompositeSubEntity(ref="sub_identifier2")],
     )
     listings_latest.identifiers = tuple(more_itertools.flatten([listings_latest.identifiers, [identifier_listings]]))
 

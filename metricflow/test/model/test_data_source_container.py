@@ -3,7 +3,7 @@ import logging
 import pytest
 
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from dbt_semantic_interfaces.references import IdentifierReference, MeasureReference, MetricReference
+from dbt_semantic_interfaces.references import EntityReference, MeasureReference, MetricReference
 from metricflow.model.semantics.data_source_semantics import DataSourceSemantics
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.metric_semantics import MetricSemantics
@@ -195,7 +195,7 @@ def test_local_linked_elements_for_metric(metric_semantics: MetricSemantics) -> 
 
 
 def test_get_data_sources_for_identifier(data_source_semantics: DataSourceSemantics) -> None:  # noqa: D
-    identifier_reference = IdentifierReference(element_name="user")
+    identifier_reference = EntityReference(element_name="user")
     linked_data_sources = data_source_semantics.get_data_sources_for_identifier(
         identifier_reference=identifier_reference
     )

@@ -1,9 +1,9 @@
 from typing import Dict, List, Set
 
 from dbt_semantic_interfaces.objects.data_source import DataSource
-from dbt_semantic_interfaces.objects.elements.identifier import Identifier
+from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from dbt_semantic_interfaces.references import DataSourceElementReference, IdentifierReference
+from dbt_semantic_interfaces.references import DataSourceElementReference, EntityReference
 from metricflow.model.validations.validator_helpers import (
     DataSourceElementContext,
     DataSourceElementType,
@@ -19,9 +19,9 @@ class CommonIdentifiersRule(ModelValidationRule):
     """Checks that identifiers exist on more than one data source"""
 
     @staticmethod
-    def _map_data_source_identifiers(data_sources: List[DataSource]) -> Dict[IdentifierReference, Set[str]]:
+    def _map_data_source_identifiers(data_sources: List[DataSource]) -> Dict[EntityReference, Set[str]]:
         """Generate mapping of identifier names to the set of data_sources where it is defined"""
-        identifiers_to_data_sources: Dict[IdentifierReference, Set[str]] = {}
+        identifiers_to_data_sources: Dict[EntityReference, Set[str]] = {}
         for data_source in data_sources or []:
             for identifier in data_source.identifiers or []:
                 if identifier.reference in identifiers_to_data_sources:
@@ -33,9 +33,9 @@ class CommonIdentifiersRule(ModelValidationRule):
     @staticmethod
     @validate_safely(whats_being_done="checking identifier exists on more than one data source")
     def _check_identifier(
-        identifier: Identifier,
+        identifier: Entity,
         data_source: DataSource,
-        identifiers_to_data_sources: Dict[IdentifierReference, Set[str]],
+        identifiers_to_data_sources: Dict[EntityReference, Set[str]],
     ) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
         # If the identifier is the dict and if the set of data sources minus this data source is empty,
@@ -53,7 +53,7 @@ class CommonIdentifiersRule(ModelValidationRule):
                         ),
                         element_type=DataSourceElementType.IDENTIFIER,
                     ),
-                    message=f"Identifier `{identifier.reference.element_name}` "
+                    message=f"Entity `{identifier.reference.element_name}` "
                     f"only found in one data source `{data_source.name}` "
                     f"which means it will be unused in joins.",
                 )

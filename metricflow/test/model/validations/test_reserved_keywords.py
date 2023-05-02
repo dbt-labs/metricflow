@@ -1,6 +1,6 @@
 import copy
 import random
-from dbt_semantic_interfaces.objects.elements.identifier import CompositeSubIdentifier
+from dbt_semantic_interfaces.objects.elements.entity import CompositeSubEntity
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.reserved_keywords import RESERVED_KEYWORDS, ReservedKeywordsRule
 from metricflow.model.validations.validator_helpers import ValidationIssueLevel
@@ -83,9 +83,9 @@ def test_reserved_keywords_in_composite_identifiers(  # noqa: D
     )
     identifier = data_source.identifiers[0]
     identifier.identifiers = [
-        CompositeSubIdentifier(name=random_keyword()),  # should error
-        CompositeSubIdentifier(name=random_keyword()),  # should error
-        CompositeSubIdentifier(expr="SELECT TRUE AS col1"),  # shouldn't error
+        CompositeSubEntity(name=random_keyword()),  # should error
+        CompositeSubEntity(name=random_keyword()),  # should error
+        CompositeSubEntity(expr="SELECT TRUE AS col1"),  # shouldn't error
     ]
 
     issues = ReservedKeywordsRule.validate_model(model)

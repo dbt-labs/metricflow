@@ -2,7 +2,7 @@ import logging
 from dataclasses import dataclass
 from typing import Generic, Sequence, List, TypeVar, Optional, Set
 
-from dbt_semantic_interfaces.references import TimeDimensionReference, IdentifierReference
+from dbt_semantic_interfaces.references import TimeDimensionReference, EntityReference
 
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
@@ -121,7 +121,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
     def _node_contains_identifier(
         self,
         node: BaseOutput[SqlDataSetT],
-        identifier_reference: IdentifierReference,
+        identifier_reference: EntityReference,
     ) -> bool:
         """Returns true if the output of the node contains an identifier of the given types."""
         data_set = self._node_data_set_resolver.get_output_data_set(node)

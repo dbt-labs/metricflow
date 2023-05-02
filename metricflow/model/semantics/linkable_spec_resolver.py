@@ -9,7 +9,7 @@ from typing import Tuple, Sequence, Dict, List, Optional, FrozenSet
 
 from dbt_semantic_interfaces.objects.data_source import DataSource
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType, Dimension
-from dbt_semantic_interfaces.objects.elements.identifier import IdentifierType
+from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.references import DataSourceReference, MeasureReference, MetricReference
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
@@ -22,7 +22,7 @@ from metricflow.specs import (
     DimensionSpec,
     TimeDimensionSpec,
     IdentifierSpec,
-    IdentifierReference,
+    EntityReference,
 )
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
@@ -242,7 +242,7 @@ class LinkableElementSet:
             dimension_specs=tuple(
                 DimensionSpec(
                     element_name=x.element_name,
-                    identifier_links=tuple(IdentifierReference(element_name=x) for x in x.identifier_links),
+                    identifier_links=tuple(EntityReference(element_name=x) for x in x.identifier_links),
                 )
                 for x in self.linkable_dimensions
                 if not x.time_granularity
@@ -250,7 +250,7 @@ class LinkableElementSet:
             time_dimension_specs=tuple(
                 TimeDimensionSpec(
                     element_name=x.element_name,
-                    identifier_links=tuple(IdentifierReference(element_name=x) for x in x.identifier_links),
+                    identifier_links=tuple(EntityReference(element_name=x) for x in x.identifier_links),
                     time_granularity=x.time_granularity,
                 )
                 for x in self.linkable_dimensions
@@ -259,7 +259,7 @@ class LinkableElementSet:
             identifier_specs=tuple(
                 IdentifierSpec(
                     element_name=x.element_name,
-                    identifier_links=tuple(IdentifierReference(element_name=x) for x in x.identifier_links),
+                    identifier_links=tuple(EntityReference(element_name=x) for x in x.identifier_links),
                 )
                 for x in self.linkable_identifiers
             ),
@@ -470,7 +470,7 @@ class ValidLinkableSpecResolver:
             # If a data source has a primary identifier, we allow users to query using the dundered syntax, even though
             # there is no join involved. e.g. in the test model, the "listings_latest" data source would allow using
             # "listing__country_latest" for the "listings" metric.
-            if identifier.type == IdentifierType.PRIMARY:
+            if identifier.type == EntityType.PRIMARY:
                 for linkable_dimension in linkable_dimensions:
                     properties = {LinkableElementProperties.LOCAL, LinkableElementProperties.LOCAL_LINKED}
                     additional_linkable_dimensions.append(
@@ -492,7 +492,7 @@ class ValidLinkableSpecResolver:
     def _get_data_sources_with_joinable_identifier(
         self,
         left_data_source_reference: DataSourceReference,
-        identifier_reference: IdentifierReference,
+        identifier_reference: EntityReference,
     ) -> Sequence[DataSource]:
         # May switch to non-cached implementation.
         data_sources = self._identifier_to_data_source[identifier_reference.element_name]

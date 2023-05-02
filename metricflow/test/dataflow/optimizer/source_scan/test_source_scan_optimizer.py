@@ -34,7 +34,7 @@ from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.dataset.dataset import DataSet
 from metricflow.specs import (
     DimensionSpec,
-    IdentifierReference,
+    EntityReference,
     LinkableSpecSet,
     MetricFlowQuerySpec,
     MetricSpec,
@@ -172,7 +172,7 @@ def test_2_metrics_from_1_data_source(  # noqa: D
             metric_specs=(MetricSpec(element_name="bookings"), MetricSpec(element_name="booking_value")),
             dimension_specs=(
                 DataSet.metric_time_dimension_spec(TimeGranularity.DAY),
-                DimensionSpec(element_name="country_latest", identifier_links=(IdentifierReference("listing"),)),
+                DimensionSpec(element_name="country_latest", identifier_links=(EntityReference("listing"),)),
             ),
         ),
         expected_num_sources_in_unoptimized=4,

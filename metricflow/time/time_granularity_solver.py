@@ -18,7 +18,7 @@ from dbt_semantic_interfaces.references import (
     MetricModelReference,
     MeasureReference,
     MetricReference,
-    IdentifierReference,
+    EntityReference,
 )
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.query.query_exceptions import InvalidQueryException
@@ -45,7 +45,7 @@ class PartialTimeDimensionSpec:
     """
 
     element_name: str
-    identifier_links: Tuple[IdentifierReference, ...]
+    identifier_links: Tuple[EntityReference, ...]
 
 
 @dataclass(frozen=True)

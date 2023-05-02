@@ -20,7 +20,7 @@ from dbt_semantic_interfaces.references import (
     MeasureReference,
     MetricReference,
     TimeDimensionReference,
-    IdentifierReference,
+    EntityReference,
 )
 from metricflow.aggregation_properties import AggregationState
 from metricflow.aggregation_properties import AggregationType
@@ -144,7 +144,7 @@ class LinkableInstanceSpec(InstanceSpec, ABC):
     """
 
     """A list representing the join path of identifiers to get to this element."""
-    identifier_links: Tuple[IdentifierReference, ...]
+    identifier_links: Tuple[EntityReference, ...]
 
     @property
     def without_first_identifier_link(self: SelfTypeT) -> SelfTypeT:
@@ -191,18 +191,18 @@ class IdentifierSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
         return LinklessIdentifierSpec.from_element_name(self.element_name)
 
     @property
-    def as_linkless_prefix(self) -> Tuple[IdentifierReference, ...]:
+    def as_linkless_prefix(self) -> Tuple[EntityReference, ...]:
         """Creates tuple of linkless identifiers that could be included in the identifier_links of another spec
 
         eg as a prefix to a DimensionSpec's identifier links to when a join is occurring via this identifier
         """
-        return (IdentifierReference(element_name=self.element_name),) + self.identifier_links
+        return (EntityReference(element_name=self.element_name),) + self.identifier_links
 
     @staticmethod
     def from_name(name: str) -> IdentifierSpec:  # noqa: D
         structured_name = StructuredLinkableSpecName.from_name(name)
         return IdentifierSpec(
-            identifier_links=tuple(IdentifierReference(idl) for idl in structured_name.identifier_link_names),
+            identifier_links=tuple(EntityReference(idl) for idl in structured_name.identifier_link_names),
             element_name=structured_name.element_name,
         )
 
@@ -215,8 +215,8 @@ class IdentifierSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
         return hash((self.element_name, self.identifier_links))
 
     @property
-    def reference(self) -> IdentifierReference:  # noqa: D
-        return IdentifierReference(element_name=self.element_name)
+    def reference(self) -> EntityReference:  # noqa: D
+        return EntityReference(element_name=self.element_name)
 
     @property
     def as_linkable_spec_set(self) -> LinkableSpecSet:  # noqa: D
@@ -244,14 +244,14 @@ class LinklessIdentifierSpec(IdentifierSpec, SerializableDataclass):
         return hash((self.element_name, self.identifier_links))
 
     @staticmethod
-    def from_reference(identifier_reference: IdentifierReference) -> LinklessIdentifierSpec:  # noqa: D
+    def from_reference(identifier_reference: EntityReference) -> LinklessIdentifierSpec:  # noqa: D
         return LinklessIdentifierSpec(element_name=identifier_reference.element_name, identifier_links=())
 
 
 @dataclass(frozen=True)
 class DimensionSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
     element_name: str
-    identifier_links: Tuple[IdentifierReference, ...]
+    identifier_links: Tuple[EntityReference, ...]
 
     def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
         return (resolver.resolve_dimension_spec(self),)
@@ -274,7 +274,7 @@ class DimensionSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
         """Construct from a name e.g. listing__ds__month."""
         parsed_name = StructuredLinkableSpecName.from_name(name)
         return DimensionSpec(
-            identifier_links=tuple([IdentifierReference(idl) for idl in parsed_name.identifier_link_names]),
+            identifier_links=tuple([EntityReference(idl) for idl in parsed_name.identifier_link_names]),
             element_name=parsed_name.element_name,
         )
 
@@ -314,7 +314,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
     def from_name(name: str) -> TimeDimensionSpec:  # noqa: D
         structured_name = StructuredLinkableSpecName.from_name(name)
         return TimeDimensionSpec(
-            identifier_links=tuple(IdentifierReference(idl) for idl in structured_name.identifier_link_names),
+            identifier_links=tuple(EntityReference(idl) for idl in structured_name.identifier_link_names),
             element_name=structured_name.element_name,
             time_granularity=structured_name.time_granularity or DEFAULT_TIME_GRANULARITY,
         )

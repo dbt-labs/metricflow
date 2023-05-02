@@ -17,7 +17,7 @@ from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.metric import MetricType
 from dbt_semantic_interfaces.references import (
     DimensionReference,
-    IdentifierReference,
+    EntityReference,
     MetricReference,
     TimeDimensionReference,
 )
@@ -577,7 +577,7 @@ class MetricFlowQueryParser:
         for qualified_name in qualified_linkable_names:
             structured_name = StructuredLinkableSpecName.from_name(qualified_name)
             element_name = structured_name.element_name
-            identifier_links = tuple(IdentifierReference(element_name=x) for x in structured_name.identifier_link_names)
+            identifier_links = tuple(EntityReference(element_name=x) for x in structured_name.identifier_link_names)
             # Create the spec based on the type of element referenced.
             if TimeDimensionReference(element_name=element_name) in self._known_time_dimension_element_references:
                 if structured_name.time_granularity:
@@ -597,7 +597,7 @@ class MetricFlowQueryParser:
                     )
             elif DimensionReference(element_name=element_name) in self._known_dimension_element_references:
                 dimension_specs.append(DimensionSpec(element_name=element_name, identifier_links=identifier_links))
-            elif IdentifierReference(element_name=element_name) in self._known_identifier_element_references:
+            elif EntityReference(element_name=element_name) in self._known_identifier_element_references:
                 identifier_specs.append(IdentifierSpec(element_name=element_name, identifier_links=identifier_links))
             else:
                 valid_group_by_names_for_metrics = sorted(
@@ -699,7 +699,7 @@ class MetricFlowQueryParser:
                         dimension_spec=DimensionSpec(
                             element_name=parsed_name.element_name,
                             identifier_links=tuple(
-                                IdentifierReference(element_name=x) for x in parsed_name.identifier_link_names
+                                EntityReference(element_name=x) for x in parsed_name.identifier_link_names
                             ),
                         ),
                         descending=descending,
@@ -709,7 +709,7 @@ class MetricFlowQueryParser:
                 TimeDimensionReference(element_name=parsed_name.element_name)
                 in self._known_time_dimension_element_references
             ):
-                identifier_links = tuple(IdentifierReference(element_name=x) for x in parsed_name.identifier_link_names)
+                identifier_links = tuple(EntityReference(element_name=x) for x in parsed_name.identifier_link_names)
                 if parsed_name.time_granularity:
                     order_by_specs.append(
                         OrderBySpec(
@@ -742,9 +742,7 @@ class MetricFlowQueryParser:
                             f"match a requested time dimension"
                         )
 
-            elif (
-                IdentifierReference(element_name=parsed_name.element_name) in self._known_identifier_element_references
-            ):
+            elif EntityReference(element_name=parsed_name.element_name) in self._known_identifier_element_references:
                 if parsed_name.time_granularity:
                     raise InvalidQueryException(
                         f"Order by item '{order_by_name}' references an identifier but has a time granularity"
@@ -754,7 +752,7 @@ class MetricFlowQueryParser:
                         identifier_spec=IdentifierSpec(
                             element_name=parsed_name.element_name,
                             identifier_links=tuple(
-                                IdentifierReference(element_name=x) for x in parsed_name.identifier_link_names
+                                EntityReference(element_name=x) for x in parsed_name.identifier_link_names
                             ),
                         ),
                         descending=descending,

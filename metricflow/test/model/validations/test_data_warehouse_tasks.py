@@ -13,7 +13,7 @@ from metricflow.model.data_warehouse_model_validator import (
 from dbt_semantic_interfaces.model_transformer import ModelTransformer
 from dbt_semantic_interfaces.objects.data_source import Mutability, MutabilityType
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
-from dbt_semantic_interfaces.objects.elements.identifier import Identifier, IdentifierType
+from dbt_semantic_interfaces.objects.elements.entity import Entity, EntityType
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.protocols.async_sql_client import AsyncSqlClient
@@ -181,7 +181,7 @@ def test_validate_identifiers(  # noqa: D
     assert len(issues.all_issues) == 0
 
     identifiers = list(model.data_sources[0].identifiers)
-    identifiers.append(Identifier(name="doesnt_exist", type=IdentifierType.UNIQUE))
+    identifiers.append(Entity(name="doesnt_exist", type=EntityType.UNIQUE))
     model.data_sources[0].identifiers = identifiers
 
     issues = dw_validator.validate_identifiers(model)

@@ -3,7 +3,7 @@ import textwrap
 from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
 from dbt_semantic_interfaces.objects.common import YamlConfigFile
 from dbt_semantic_interfaces.objects.data_source import DataSourceOrigin, MutabilityType
-from dbt_semantic_interfaces.objects.elements.identifier import IdentifierType
+from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_model
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
@@ -155,7 +155,7 @@ def test_data_source_identifier_parsing() -> None:
     assert len(data_source.identifiers) == 1
     identifier = data_source.identifiers[0]
     assert identifier.name == "example_identifier"
-    assert identifier.type is IdentifierType.PRIMARY
+    assert identifier.type is EntityType.PRIMARY
     assert identifier.role == "test_role"
     assert identifier.entity == "other_identifier"
     assert identifier.expr == "example_id"

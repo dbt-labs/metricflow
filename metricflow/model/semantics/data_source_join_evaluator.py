@@ -3,11 +3,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Dict, Optional
 
-from dbt_semantic_interfaces.objects.elements.identifier import IdentifierType
+from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.references import (
     DataSourceReference,
     DataSourceElementReference,
-    IdentifierReference,
+    EntityReference,
 )
 from metricflow.instances import IdentifierInstance, InstanceSet
 from metricflow.object_utils import pformat_big_objects
@@ -20,8 +20,8 @@ MAX_JOIN_HOPS = 2
 class DataSourceIdentifierJoinType:
     """Describe a type of join between data sources where identifiers are of the listed types."""
 
-    left_identifier_type: IdentifierType
-    right_identifier_type: IdentifierType
+    left_identifier_type: EntityType
+    right_identifier_type: EntityType
 
 
 @dataclass(frozen=True)
@@ -29,7 +29,7 @@ class DataSourceIdentifierJoin:
     """How to join one data source onto another, using a specific identifer and join type."""
 
     right_data_source_reference: DataSourceReference
-    identifier_reference: IdentifierReference
+    identifier_reference: EntityReference
     join_type: DataSourceIdentifierJoinType
 
 
@@ -46,59 +46,27 @@ class DataSourceJoinEvaluator:
 
     # Valid joins are the non-fanout joins.
     _VALID_IDENTIFIER_JOINS = (
-        DataSourceIdentifierJoinType(
-            left_identifier_type=IdentifierType.PRIMARY, right_identifier_type=IdentifierType.NATURAL
-        ),
-        DataSourceIdentifierJoinType(
-            left_identifier_type=IdentifierType.PRIMARY, right_identifier_type=IdentifierType.PRIMARY
-        ),
-        DataSourceIdentifierJoinType(
-            left_identifier_type=IdentifierType.PRIMARY, right_identifier_type=IdentifierType.UNIQUE
-        ),
-        DataSourceIdentifierJoinType(
-            left_identifier_type=IdentifierType.UNIQUE, right_identifier_type=IdentifierType.NATURAL
-        ),
-        DataSourceIdentifierJoinType(
-            left_identifier_type=IdentifierType.UNIQUE, right_identifier_type=IdentifierType.PRIMARY
-        ),
-        DataSourceIdentifierJoinType(
-            left_identifier_type=IdentifierType.UNIQUE, right_identifier_type=IdentifierType.UNIQUE
-        ),
-        DataSourceIdentifierJoinType(
-            left_identifier_type=IdentifierType.FOREIGN, right_identifier_type=IdentifierType.NATURAL
-        ),
-        DataSourceIdentifierJoinType(
-            left_identifier_type=IdentifierType.FOREIGN, right_identifier_type=IdentifierType.PRIMARY
-        ),
-        DataSourceIdentifierJoinType(
-            left_identifier_type=IdentifierType.FOREIGN, right_identifier_type=IdentifierType.UNIQUE
-        ),
-        DataSourceIdentifierJoinType(
-            left_identifier_type=IdentifierType.NATURAL, right_identifier_type=IdentifierType.PRIMARY
-        ),
-        DataSourceIdentifierJoinType(
-            left_identifier_type=IdentifierType.NATURAL, right_identifier_type=IdentifierType.UNIQUE
-        ),
+        DataSourceIdentifierJoinType(left_identifier_type=EntityType.PRIMARY, right_identifier_type=EntityType.NATURAL),
+        DataSourceIdentifierJoinType(left_identifier_type=EntityType.PRIMARY, right_identifier_type=EntityType.PRIMARY),
+        DataSourceIdentifierJoinType(left_identifier_type=EntityType.PRIMARY, right_identifier_type=EntityType.UNIQUE),
+        DataSourceIdentifierJoinType(left_identifier_type=EntityType.UNIQUE, right_identifier_type=EntityType.NATURAL),
+        DataSourceIdentifierJoinType(left_identifier_type=EntityType.UNIQUE, right_identifier_type=EntityType.PRIMARY),
+        DataSourceIdentifierJoinType(left_identifier_type=EntityType.UNIQUE, right_identifier_type=EntityType.UNIQUE),
+        DataSourceIdentifierJoinType(left_identifier_type=EntityType.FOREIGN, right_identifier_type=EntityType.NATURAL),
+        DataSourceIdentifierJoinType(left_identifier_type=EntityType.FOREIGN, right_identifier_type=EntityType.PRIMARY),
+        DataSourceIdentifierJoinType(left_identifier_type=EntityType.FOREIGN, right_identifier_type=EntityType.UNIQUE),
+        DataSourceIdentifierJoinType(left_identifier_type=EntityType.NATURAL, right_identifier_type=EntityType.PRIMARY),
+        DataSourceIdentifierJoinType(left_identifier_type=EntityType.NATURAL, right_identifier_type=EntityType.UNIQUE),
     )
 
     _INVALID_IDENTIFIER_JOINS = (
-        DataSourceIdentifierJoinType(
-            left_identifier_type=IdentifierType.PRIMARY, right_identifier_type=IdentifierType.FOREIGN
-        ),
-        DataSourceIdentifierJoinType(
-            left_identifier_type=IdentifierType.UNIQUE, right_identifier_type=IdentifierType.FOREIGN
-        ),
-        DataSourceIdentifierJoinType(
-            left_identifier_type=IdentifierType.FOREIGN, right_identifier_type=IdentifierType.FOREIGN
-        ),
-        DataSourceIdentifierJoinType(
-            left_identifier_type=IdentifierType.NATURAL, right_identifier_type=IdentifierType.FOREIGN
-        ),
+        DataSourceIdentifierJoinType(left_identifier_type=EntityType.PRIMARY, right_identifier_type=EntityType.FOREIGN),
+        DataSourceIdentifierJoinType(left_identifier_type=EntityType.UNIQUE, right_identifier_type=EntityType.FOREIGN),
+        DataSourceIdentifierJoinType(left_identifier_type=EntityType.FOREIGN, right_identifier_type=EntityType.FOREIGN),
+        DataSourceIdentifierJoinType(left_identifier_type=EntityType.NATURAL, right_identifier_type=EntityType.FOREIGN),
         # Natural -> Natural joins are not allowed due to hidden fanout or missing value concerns with
         # multiple validity windows in play
-        DataSourceIdentifierJoinType(
-            left_identifier_type=IdentifierType.NATURAL, right_identifier_type=IdentifierType.NATURAL
-        ),
+        DataSourceIdentifierJoinType(left_identifier_type=EntityType.NATURAL, right_identifier_type=EntityType.NATURAL),
     )
 
     def __init__(self, data_source_semantics: DataSourceSemanticsAccessor) -> None:  # noqa: D
@@ -135,7 +103,7 @@ class DataSourceJoinEvaluator:
             # efficient path to each data source.
             join_paths_to_visit_next: List[List[DataSourceIdentifierJoin]] = []
             for identifier in parent_data_source.identifiers:
-                identifier_reference = IdentifierReference(element_name=identifier.name)
+                identifier_reference = EntityReference(element_name=identifier.name)
                 identifier_data_sources = self._data_source_semantics.get_data_sources_for_identifier(
                     identifier_reference=identifier_reference
                 )
@@ -190,7 +158,7 @@ class DataSourceJoinEvaluator:
         self,
         left_data_source_reference: DataSourceReference,
         right_data_source_reference: DataSourceReference,
-        on_identifier_reference: IdentifierReference,
+        on_identifier_reference: EntityReference,
     ) -> Optional[DataSourceIdentifierJoinType]:
         """Get valid join type used to join data sources on given identifier, if exists."""
         left_identifier = self._data_source_semantics.get_identifier_in_data_source(
@@ -216,7 +184,7 @@ class DataSourceJoinEvaluator:
             # to support measure computation.
             return None
 
-        if right_identifier.type is IdentifierType.NATURAL:
+        if right_identifier.type is EntityType.NATURAL:
             if not right_data_source.has_validity_dimensions:
                 # There is no way to refine this to a single row per key, so we cannot support this join
                 return None
@@ -234,7 +202,7 @@ class DataSourceJoinEvaluator:
         self,
         left_data_source_reference: DataSourceReference,
         right_data_source_reference: DataSourceReference,
-        on_identifier_reference: IdentifierReference,
+        on_identifier_reference: EntityReference,
     ) -> bool:
         """Return true if we should allow a join with the given parameters to resolve a query."""
         return (
@@ -249,7 +217,7 @@ class DataSourceJoinEvaluator:
     @staticmethod
     def _data_source_of_identifier_in_instance_set(
         instance_set: InstanceSet,
-        identifier_reference: IdentifierReference,
+        identifier_reference: EntityReference,
     ) -> DataSourceReference:
         """Return the data source where the identifier was defined in the instance set."""
         matching_instances: List[IdentifierInstance] = []
@@ -271,7 +239,7 @@ class DataSourceJoinEvaluator:
         self,
         left_instance_set: InstanceSet,
         right_instance_set: InstanceSet,
-        on_identifier_reference: IdentifierReference,
+        on_identifier_reference: EntityReference,
     ) -> bool:
         """Return true if the instance sets can be joined using the given identifier."""
         return self.is_valid_data_source_join(

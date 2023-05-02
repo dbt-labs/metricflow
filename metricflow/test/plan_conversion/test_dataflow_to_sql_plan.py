@@ -4,7 +4,7 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 
 from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
-from dbt_semantic_interfaces.references import TimeDimensionReference, IdentifierReference
+from dbt_semantic_interfaces.references import TimeDimensionReference, EntityReference
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan import (
@@ -821,7 +821,7 @@ def test_compute_metrics_node_ratio_from_multiple_data_sources(
     """
     dimension_spec = DimensionSpec(
         element_name="country_latest",
-        identifier_links=(IdentifierReference(element_name="listing"),),
+        identifier_links=(EntityReference(element_name="listing"),),
     )
     time_dimension_spec = TimeDimensionSpec(
         element_name="ds",
@@ -926,8 +926,8 @@ def test_multihop_node(
                 DimensionSpec(
                     element_name="customer_name",
                     identifier_links=(
-                        IdentifierReference(element_name="account_id"),
-                        IdentifierReference(element_name="customer_id"),
+                        EntityReference(element_name="account_id"),
+                        EntityReference(element_name="customer_id"),
                     ),
                 ),
             ),
@@ -968,7 +968,7 @@ def test_filter_with_where_constraint_on_join_dim(
                     dimension_specs=(
                         DimensionSpec(
                             element_name="country_latest",
-                            identifier_links=(IdentifierReference(element_name="listing"),),
+                            identifier_links=(EntityReference(element_name="listing"),),
                         ),
                     )
                 ),
@@ -1238,7 +1238,7 @@ def test_partitioned_join(
             dimension_specs=(
                 DimensionSpec(
                     element_name="home_state",
-                    identifier_links=(IdentifierReference(element_name="user"),),
+                    identifier_links=(EntityReference(element_name="user"),),
                 ),
             ),
         )
@@ -1347,7 +1347,7 @@ def test_composite_identifier_with_join(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="country",
-                    identifier_links=(IdentifierReference(element_name="user_team"),),
+                    identifier_links=(EntityReference(element_name="user_team"),),
                 ),
             ),
             identifier_specs=(IdentifierSpec(element_name="user_team", identifier_links=()),),
@@ -1375,7 +1375,7 @@ def test_distinct_values(  # noqa: D
         metric_specs=(MetricSpec(element_name="bookings"),),
         dimension_spec=DimensionSpec(
             element_name="country_latest",
-            identifier_links=(IdentifierReference(element_name="listing"),),
+            identifier_links=(EntityReference(element_name="listing"),),
         ),
         limit=100,
     )
@@ -1402,7 +1402,7 @@ def test_local_dimension_using_local_identifier(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="country_latest",
-                    identifier_links=(IdentifierReference(element_name="listing"),),
+                    identifier_links=(EntityReference(element_name="listing"),),
                 ),
             ),
         )
@@ -1643,7 +1643,7 @@ def test_join_to_scd_dimension(
                             dimension_specs=(
                                 DimensionSpec(
                                     element_name="capacity",
-                                    identifier_links=(IdentifierReference(element_name="listing"),),
+                                    identifier_links=(EntityReference(element_name="listing"),),
                                 ),
                             ),
                         ),

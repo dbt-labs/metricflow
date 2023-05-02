@@ -5,7 +5,7 @@ from typing import Dict, List, Optional, Set, Sequence
 
 from dbt_semantic_interfaces.objects.data_source import DataSource, DataSourceOrigin
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension
-from dbt_semantic_interfaces.objects.elements.identifier import Identifier
+from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
@@ -16,7 +16,7 @@ from dbt_semantic_interfaces.references import (
     TimeDimensionReference,
     DimensionReference,
     LinkableElementReference,
-    IdentifierReference,
+    EntityReference,
 )
 from metricflow.errors.errors import InvalidDataSourceError
 from metricflow.model.semantics.element_group import ElementGrouper
@@ -48,7 +48,7 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
         self._dimension_index: Dict[DimensionReference, List[DataSource]] = defaultdict(list)
         self._linkable_reference_index: Dict[LinkableElementReference, List[DataSource]] = defaultdict(list)
         self._entity_index: Dict[Optional[str], List[DataSource]] = defaultdict(list)
-        self._identifier_ref_to_entity: Dict[IdentifierReference, Optional[str]] = {}
+        self._identifier_ref_to_entity: Dict[EntityReference, Optional[str]] = {}
         self._data_source_names: Set[str] = set()
 
         self._data_source_to_aggregation_time_dimensions: Dict[
@@ -110,7 +110,7 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
         # Measures should be consistent across data sources, so just use the first one.
         return list(self._measure_index[measure_reference])[0].get_measure(measure_reference)
 
-    def get_identifier_references(self) -> Sequence[IdentifierReference]:  # noqa: D
+    def get_identifier_references(self) -> Sequence[EntityReference]:  # noqa: D
         return list(self._identifier_ref_to_entity.keys())
 
     # DSC interface
@@ -122,7 +122,7 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
     ) -> TimeDimensionReference:
         return self._measure_agg_time_dimension[measure_reference]
 
-    def get_identifier_in_data_source(self, ref: DataSourceElementReference) -> Optional[Identifier]:  # Noqa: d
+    def get_identifier_in_data_source(self, ref: DataSourceElementReference) -> Optional[Entity]:  # Noqa: d
         data_source = self.get_by_reference(ref.data_source_reference)
         if not data_source:
             return None
@@ -197,7 +197,7 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
         ), f"Data Source {data_source_reference} is not known"
         return self._data_source_to_aggregation_time_dimensions[data_source_reference]
 
-    def get_data_sources_for_identifier(self, identifier_reference: IdentifierReference) -> Set[DataSource]:
+    def get_data_sources_for_identifier(self, identifier_reference: EntityReference) -> Set[DataSource]:
         """Return all data sources associated with an identifier reference"""
         identifier_entity = self._identifier_ref_to_entity[identifier_reference]
         return set(self._entity_index[identifier_entity])
