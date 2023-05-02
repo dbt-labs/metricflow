@@ -62,10 +62,6 @@ class YamlConfigFile(HashableBaseModel):
     url: Optional[str]
 
 
-class SourceContext(HashableBaseModel):  # noqa: D
-    definition_hash: str
-
-
 class Metadata(HashableBaseModel):  # noqa: D
     repo_file_path: str
     file_slice: FileSlice
