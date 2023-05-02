@@ -20,16 +20,28 @@ def check_manifest_file():
         return "The manifest.json file does not exist."
 
     manifest_mtime = os.path.getmtime(manifest_path)
+    ignored_files = get_ignored_files()
 
-    with os.scandir() as entries:
-        for entry in entries:
-            if entry.is_file():
-                file_mtime = os.path.getmtime(entry)
+    for root, _, files in os.walk("."):
+        for file in files:
+            if file not in ignored_files:
+                file_path = os.path.join(root, file)
+                file_mtime = os.path.getmtime(file_path)
 
                 if file_mtime > manifest_mtime + 60:
                     return "Your manifest.json file is out of date - please run dbt compile again!"
 
     return "Your manifest.json file is up to date."
+
+def get_ignored_files():
+    ignored_files = set()
+    if os.path.isfile(".gitignore"):
+        with open(".gitignore", "r") as ignore_file:
+            for line in ignore_file.readlines():
+                line = line.strip()
+                if line and not line.startswith("#"):
+                    ignored_files.add(line)
+    return ignored_files
 
 def extract_keys_from_manifest():
     """The function reads the manifest.json file from the 'target/' directory and
