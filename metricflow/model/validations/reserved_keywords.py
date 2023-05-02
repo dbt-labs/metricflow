@@ -1,5 +1,4 @@
 from typing import List
-from metricflow.dataflow.sql_table import SqlTable
 from dbt_semantic_interfaces.references import DataSourceElementReference
 
 
@@ -133,9 +132,7 @@ class ReservedKeywordsRule(ModelValidationRule):
 
         for data_source in model.data_sources:
             if data_source.sql_table is not None:
-                set_sql_table_path_parts = set(
-                    [part.upper() for part in SqlTable.from_string(data_source.sql_table).parts_tuple]
-                )
+                set_sql_table_path_parts = set([part.upper() for part in data_source.sql_table.split(".")])
                 keyword_intersection = set_keywords.intersection(set_sql_table_path_parts)
 
                 if len(keyword_intersection) > 0:
