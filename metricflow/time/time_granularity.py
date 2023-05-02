@@ -99,18 +99,21 @@ def period_end_offset(  # noqa: D
         assert_values_exhausted(time_granularity)
 
 
+def adjust_to_start_of_period(
+    time_granularity: TimeGranularity, date_to_adjust: pd.Timestamp, rollback: bool = True
+) -> pd.Timestamp:
+    """Adjust to start of period if not at start already."""
+    if rollback:
+        return period_begin_offset(time_granularity).rollback(date_to_adjust)
+    else:
+        return period_begin_offset(time_granularity).rollforward(date_to_adjust)
+
+
 class ExtendedTimeGranularity(TimeGranularity):
     """For time dimensions, the smallest possible difference between two time values.
 
     Needed for calculating adjacency when merging 2 different time ranges.
     """
-
-    def adjust_to_start_of_period(self, date_to_adjust: pd.Timestamp, rollback: bool = True) -> pd.Timestamp:
-        """Adjust to start of period if not at start already."""
-        if rollback:
-            return period_begin_offset(self).rollback(date_to_adjust)
-        else:
-            return period_begin_offset(self).rollforward(date_to_adjust)
 
     def adjust_to_end_of_period(self, date_to_adjust: pd.Timestamp, rollforward: bool = True) -> pd.Timestamp:
         """Adjust to end of period if not at end already."""
@@ -122,7 +125,7 @@ class ExtendedTimeGranularity(TimeGranularity):
     def match_start_or_end_of_period(self, date_to_match: pd.Timestamp, date_to_adjust: pd.Timestamp) -> pd.Timestamp:
         """Adjust date_to_adjust to be start or end of period based on if date_to_match is at start or end of period."""
         if is_period_start(self, date_to_match):
-            return self.adjust_to_start_of_period(date_to_adjust)
+            return adjust_to_start_of_period(self, date_to_adjust)
         elif is_period_end(self, date_to_match):
             return self.adjust_to_end_of_period(date_to_adjust)
         else:
