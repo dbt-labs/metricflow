@@ -16,7 +16,7 @@ from metricflow.test.table_snapshot.table_snapshots import (
     SqlTableSnapshotRestorer,
 )
 from metricflow.time.time_constants import ISO8601_PYTHON_FORMAT
-from metricflow.time.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 

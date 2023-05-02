@@ -29,7 +29,7 @@ from metricflow.test.model.validations.helpers import (
     base_model_file,
 )
 from metricflow.test.test_utils import find_data_source_with
-from metricflow.time.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 
 def test_data_source_cant_have_more_than_one_primary_identifier(

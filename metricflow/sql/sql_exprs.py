@@ -31,7 +31,7 @@ from dbt_semantic_interfaces.objects.elements.measure import MeasureAggregationP
 from metricflow.enum_extension import assert_values_exhausted
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.visitor import Visitable, VisitorOutputT
-from metricflow.time.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 
 class SqlExpressionNode(DagNode, Generic[VisitorOutputT], Visitable, ABC):
