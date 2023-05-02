@@ -82,28 +82,28 @@ def period_begin_offset(  # noqa: D
         assert_values_exhausted(time_granularity)
 
 
+def period_end_offset(  # noqa: D
+    time_granularity: TimeGranularity,
+) -> Union[pd.offsets.MonthEnd, pd.offsets.QuarterEnd, pd.offsets.Week, pd.offsets.YearEnd]:
+    if time_granularity is TimeGranularity.DAY:
+        raise ValueError(f"Can't get period end offset for TimeGranularity.{time_granularity.name}.")
+    elif time_granularity == TimeGranularity.WEEK:
+        return pd.offsets.Week(weekday=ISOWeekDay.SUNDAY.pandas_value)
+    elif time_granularity is TimeGranularity.MONTH:
+        return pd.offsets.MonthEnd()
+    elif time_granularity is TimeGranularity.QUARTER:
+        return pd.offsets.QuarterEnd(startingMonth=3)
+    elif time_granularity is TimeGranularity.YEAR:
+        return pd.offsets.YearEnd()
+    else:
+        assert_values_exhausted(time_granularity)
+
+
 class ExtendedTimeGranularity(TimeGranularity):
     """For time dimensions, the smallest possible difference between two time values.
 
     Needed for calculating adjacency when merging 2 different time ranges.
     """
-
-    @property
-    def period_end_offset(  # noqa: D
-        self,
-    ) -> Union[pd.offsets.MonthEnd, pd.offsets.QuarterEnd, pd.offsets.Week, pd.offsets.YearEnd]:
-        if self is TimeGranularity.DAY:
-            raise ValueError(f"Can't get period end offset for TimeGranularity.{self.name}.")
-        elif self == TimeGranularity.WEEK:
-            return pd.offsets.Week(weekday=ISOWeekDay.SUNDAY.pandas_value)
-        elif self is TimeGranularity.MONTH:
-            return pd.offsets.MonthEnd()
-        elif self is TimeGranularity.QUARTER:
-            return pd.offsets.QuarterEnd(startingMonth=3)
-        elif self is TimeGranularity.YEAR:
-            return pd.offsets.YearEnd()
-        else:
-            assert_values_exhausted(self)
 
     def adjust_to_start_of_period(self, date_to_adjust: pd.Timestamp, rollback: bool = True) -> pd.Timestamp:
         """Adjust to start of period if not at start already."""
@@ -115,9 +115,9 @@ class ExtendedTimeGranularity(TimeGranularity):
     def adjust_to_end_of_period(self, date_to_adjust: pd.Timestamp, rollforward: bool = True) -> pd.Timestamp:
         """Adjust to end of period if not at end already."""
         if rollforward:
-            return self.period_end_offset.rollforward(date_to_adjust)
+            return period_end_offset(self).rollforward(date_to_adjust)
         else:
-            return self.period_end_offset.rollback(date_to_adjust)
+            return period_end_offset(self).rollback(date_to_adjust)
 
     def match_start_or_end_of_period(self, date_to_match: pd.Timestamp, date_to_adjust: pd.Timestamp) -> pd.Timestamp:
         """Adjust date_to_adjust to be start or end of period based on if date_to_match is at start or end of period."""
