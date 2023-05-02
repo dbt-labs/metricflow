@@ -12,8 +12,8 @@ metric_types_enum_values += [x.lower() for x in metric_types_enum_values]
 mutability_type_values = ["IMMUTABLE", "APPEND_ONLY", "FULL_MUTATION", "DS_APPEND_ONLY"]
 mutability_type_values += [x.lower() for x in mutability_type_values]
 
-identifier_type_enum_values = ["PRIMARY", "UNIQUE", "FOREIGN", "NATURAL"]
-identifier_type_enum_values += [x.lower() for x in identifier_type_enum_values]
+entity_type_enum_values = ["PRIMARY", "UNIQUE", "FOREIGN", "NATURAL"]
+entity_type_enum_values += [x.lower() for x in entity_type_enum_values]
 
 aggregation_type_values = [
     "SUM",
@@ -91,8 +91,8 @@ metric_type_params_schema = {
     "additionalProperties": False,
 }
 
-composite_sub_identifier_schema = {
-    "$id": "composite_sub_identifier_schema",
+composite_sub_entity_schema = {
+    "$id": "composite_sub_entity_schema",
     "type": "object",
     "properties": {
         "name": {"type": "string"},
@@ -102,21 +102,21 @@ composite_sub_identifier_schema = {
     "additionalProperties": False,
 }
 
-identifier_schema = {
-    "$id": "identifier_schema",
+entity_schema = {
+    "$id": "entity_schema",
     "type": "object",
     "properties": {
         "name": {
             "type": "string",
             "pattern": TRANSFORM_OBJECT_NAME_PATTERN,
         },
-        "type": {"enum": identifier_type_enum_values},
+        "type": {"enum": entity_type_enum_values},
         "role": {"type": "string"},
         "expr": {"type": ["string", "boolean"]},
         "entity": {"type": "string"},
-        "identifiers": {
+        "entities": {
             "type": "array",
-            "items": {"$ref": "composite_sub_identifier_schema"},
+            "items": {"$ref": "composite_sub_entity_schema"},
         },
     },
     "additionalProperties": False,
@@ -277,7 +277,7 @@ data_source_schema = {
         "sql_table": {"type": "string"},
         "sql_query": {"type": "string"},
         "dbt_model": {"type": "string"},
-        "identifiers": {"type": "array", "items": {"$ref": "identifier_schema"}},
+        "identifiers": {"type": "array", "items": {"$ref": "entity_schema"}},
         "measures": {"type": "array", "items": {"$ref": "measure_schema"}},
         "dimensions": {"type": "array", "items": {"$ref": "dimension_schema"}},
         "mutability": {"$ref": "mutability_schema"},
@@ -313,7 +313,7 @@ schema_store = {
     # Sub-object schemas
     metric_input_measure_schema["$id"]: metric_input_measure_schema,
     metric_type_params_schema["$id"]: metric_type_params_schema,
-    identifier_schema["$id"]: identifier_schema,
+    entity_schema["$id"]: entity_schema,
     measure_schema["$id"]: measure_schema,
     dimension_schema["$id"]: dimension_schema,
     validity_params_schema["$id"]: validity_params_schema,
@@ -321,7 +321,7 @@ schema_store = {
     aggregation_type_params_schema["$id"]: aggregation_type_params_schema,
     mutability_schema["$id"]: mutability_schema,
     mutability_type_params_schema["$id"]: mutability_type_params_schema,
-    composite_sub_identifier_schema["$id"]: composite_sub_identifier_schema,
+    composite_sub_entity_schema["$id"]: composite_sub_entity_schema,
     non_additive_dimension_schema["$id"]: non_additive_dimension_schema,
     metric_input_schema["$id"]: metric_input_schema,
 }

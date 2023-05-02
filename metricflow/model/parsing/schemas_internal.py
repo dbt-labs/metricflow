@@ -10,7 +10,7 @@ from dbt_semantic_interfaces.parsing.schemas import (
     metric_input_schema,
     metric_input_measure_schema,
     metric_type_params_schema,
-    identifier_schema,
+    entity_schema,
     measure_schema,
     dimension_schema,
     validity_params_schema,
@@ -18,7 +18,7 @@ from dbt_semantic_interfaces.parsing.schemas import (
     aggregation_type_params_schema,
     mutability_schema,
     mutability_type_params_schema,
-    composite_sub_identifier_schema,
+    composite_sub_entity_schema,
     non_additive_dimension_schema,
 )
 
@@ -78,10 +78,10 @@ locked_metadata_schema = {
 }
 
 
-# Add transform metadata fields to top level objects (metric, data source, derived identifier)
+# Add transform metadata fields to top level objects (metric, data source, derived entity)
 add_transform_metadata_fields_to_spec(dimension_schema)
 add_transform_metadata_fields_to_spec(measure_schema)
-add_transform_metadata_fields_to_spec(identifier_schema)
+add_transform_metadata_fields_to_spec(entity_schema)
 
 add_transform_metadata_fields_to_spec(metric_schema)
 add_locked_metadata_to_spec(metric_schema)
@@ -99,7 +99,7 @@ schema_store = {
     metric_input_measure_schema["$id"]: metric_input_measure_schema,
     metric_type_params_schema["$id"]: metric_type_params_schema,
     locked_metadata_schema["$id"]: locked_metadata_schema,
-    identifier_schema["$id"]: identifier_schema,
+    entity_schema["$id"]: entity_schema,
     measure_schema["$id"]: measure_schema,
     dimension_schema["$id"]: dimension_schema,
     validity_params_schema["$id"]: validity_params_schema,
@@ -107,7 +107,7 @@ schema_store = {
     aggregation_type_params_schema["$id"]: aggregation_type_params_schema,
     mutability_schema["$id"]: mutability_schema,
     mutability_type_params_schema["$id"]: mutability_type_params_schema,
-    composite_sub_identifier_schema["$id"]: composite_sub_identifier_schema,
+    composite_sub_entity_schema["$id"]: composite_sub_entity_schema,
     non_additive_dimension_schema["$id"]: non_additive_dimension_schema,
     metric_input_schema["$id"]: metric_input_schema,
 }
