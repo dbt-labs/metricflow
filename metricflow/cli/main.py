@@ -148,6 +148,7 @@ def convert(
     overwrite: bool,
 ) -> None:
     ## These functions run and return messages based on the results of the functions
+    ## TODO: Move found_dbt_project into the CLIContext class. Not doing yet for testing
     click.echo(found_dbt_project())
     click.echo(check_manifest_file())
 
