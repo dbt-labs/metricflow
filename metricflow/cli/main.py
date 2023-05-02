@@ -58,7 +58,7 @@ from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
 from metricflow.dag.dag_visualization import display_dag_as_svg
 
-from metricflow.conversion.helpers import found_dbt_project, run_dbt_compile
+from metricflow.conversion.helpers import found_dbt_project, check_manifest_file
 
 logger = logging.getLogger(__name__)
 
@@ -149,7 +149,7 @@ def convert(
 ) -> None:
     ## These functions run and return messages based on the results of the functions
     click.echo(found_dbt_project())
-    click.echo(run_dbt_compile())
+    click.echo(check_manifest_file())
 
 @cli.command()
 @click.option("--restart", is_flag=True, help="Wipe the config file and start over")
