@@ -21,14 +21,13 @@ def check_manifest_file():
 
     manifest_mtime = os.path.getmtime(manifest_path)
     ignored_files = get_ignored_files()
-
     for root, _, files in os.walk("."):
         for file in files:
             if file not in ignored_files:
                 file_path = os.path.join(root, file)
                 file_mtime = os.path.getmtime(file_path)
 
-                if file_mtime > manifest_mtime + 60:
+                if file_mtime > manifest_mtime + 5:
                     return "Your manifest.json file is out of date - please run dbt compile again!"
 
     return "Your manifest.json file is up to date."
