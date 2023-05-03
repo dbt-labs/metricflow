@@ -87,7 +87,7 @@ class CreateSelectColumnsForInstances(InstanceSetTransform[SelectColumnSet]):
         time_dimension_cols = list(
             chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.time_dimension_instances])
         )
-        identifier_cols = list(
+        entity_cols = list(
             chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.entity_instances])
         )
         metadata_cols = list(
@@ -98,7 +98,7 @@ class CreateSelectColumnsForInstances(InstanceSetTransform[SelectColumnSet]):
             measure_columns=measure_cols,
             dimension_columns=dimension_cols,
             time_dimension_columns=time_dimension_cols,
-            identifier_columns=identifier_cols,
+            entity_columns=entity_cols,
             metadata_columns=metadata_cols,
         )
 
@@ -240,7 +240,7 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
         time_dimension_cols = list(
             chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.time_dimension_instances])
         )
-        identifier_cols = list(
+        entity_cols = list(
             chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.entity_instances])
         )
         metadata_cols = list(
@@ -251,7 +251,7 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
             measure_columns=measure_cols,
             dimension_columns=dimension_cols,
             time_dimension_columns=time_dimension_cols,
-            identifier_columns=identifier_cols,
+            entity_columns=entity_cols,
             metadata_columns=metadata_cols,
         )
 

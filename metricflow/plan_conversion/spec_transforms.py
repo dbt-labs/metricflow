@@ -35,7 +35,7 @@ class CreateSelectCoalescedColumnsForLinkableSpecs(InstanceSpecSetTransform[Sele
 
         dimension_columns: List[SqlSelectColumn] = []
         time_dimension_columns: List[SqlSelectColumn] = []
-        identifier_columns: List[SqlSelectColumn] = []
+        entity_columns: List[SqlSelectColumn] = []
 
         for dimension_spec in spec_set.dimension_specs:
             column_name = self._column_association_resolver.resolve_dimension_spec(dimension_spec).column_name
@@ -60,7 +60,7 @@ class CreateSelectCoalescedColumnsForLinkableSpecs(InstanceSpecSetTransform[Sele
             assert len(column_associations) == 1, "Composite identifiers not supported"
             column_name = column_associations[0].column_name
 
-            identifier_columns.append(
+            entity_columns.append(
                 SqlSelectColumn(
                     expr=make_coalesced_expr(self._table_aliases, column_name),
                     column_alias=column_name,
@@ -70,7 +70,7 @@ class CreateSelectCoalescedColumnsForLinkableSpecs(InstanceSpecSetTransform[Sele
         return SelectColumnSet(
             dimension_columns=dimension_columns,
             time_dimension_columns=time_dimension_columns,
-            identifier_columns=identifier_columns,
+            entity_columns=entity_columns,
         )
 
 

@@ -154,30 +154,30 @@ class SqlQueryPlanJoinBuilder:
 
         # Figure out which columns in the "left" data set correspond to the identifier that we want to join on.
         # The column associations tell us which columns correspond to which instances in the data set.
-        left_data_set_identifier_column_associations = left_data_set.data_set.column_associations_for_identifier(
+        left_data_set_entity_column_associations = left_data_set.data_set.column_associations_for_identifier(
             join_on_identifier
         )
-        left_data_set_identifier_cols = [c.column_name for c in left_data_set_identifier_column_associations]
+        left_data_set_entity_cols = [c.column_name for c in left_data_set_entity_column_associations]
 
         # Figure out which columns in the "right" data set correspond to the identifier that we want to join on.
         right_data_set_column_associations = right_data_set.data_set.column_associations_for_identifier(
             join_on_identifier
         )
-        right_data_set_identifier_cols = [c.column_name for c in right_data_set_column_associations]
+        right_data_set_entity_cols = [c.column_name for c in right_data_set_column_associations]
 
-        assert len(left_data_set_identifier_cols) == len(right_data_set_identifier_cols), (
-            f"Cannot construct join - the number of columns on the left ({left_data_set_identifier_cols}) side of "
-            f"the join does not match the right ({right_data_set_identifier_cols})"
+        assert len(left_data_set_entity_cols) == len(right_data_set_entity_cols), (
+            f"Cannot construct join - the number of columns on the left ({left_data_set_entity_cols}) side of "
+            f"the join does not match the right ({right_data_set_entity_cols})"
         )
 
         # We have the columns that we need to "join on" in the query, so add it to the list of join descriptions to
         # use later.
         column_equality_descriptions = []
-        for idx in range(len(left_data_set_identifier_cols)):
+        for idx in range(len(left_data_set_entity_cols)):
             column_equality_descriptions.append(
                 ColumnEqualityDescription(
-                    left_column_alias=left_data_set_identifier_cols[idx],
-                    right_column_alias=right_data_set_identifier_cols[idx],
+                    left_column_alias=left_data_set_entity_cols[idx],
+                    right_column_alias=right_data_set_entity_cols[idx],
                 )
             )
         # Add the partition columns as well.

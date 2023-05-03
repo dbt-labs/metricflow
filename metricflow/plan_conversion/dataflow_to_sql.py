@@ -1223,24 +1223,24 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         # Build optional window grouping SqlSelectColumn
         identifier_select_columns: List[SqlSelectColumn] = []
         for entity_spec in node.entity_specs:
-            identifier_column_associations = self.column_association_resolver.resolve_entity_spec(entity_spec)
-            assert len(identifier_column_associations) == 1, "Composite identifiers not supported"
-            identifier_column_name = identifier_column_associations[0].column_name
+            entity_column_associations = self.column_association_resolver.resolve_entity_spec(entity_spec)
+            assert len(entity_column_associations) == 1, "Composite identifiers not supported"
+            entity_column_name = entity_column_associations[0].column_name
             identifier_select_columns.append(
                 SqlSelectColumn(
                     expr=SqlColumnReferenceExpression(
                         SqlColumnReference(
                             table_alias=inner_join_data_set_alias,
-                            column_name=identifier_column_name,
+                            column_name=entity_column_name,
                         ),
                     ),
-                    column_alias=identifier_column_name,
+                    column_alias=entity_column_name,
                 )
             )
             column_equality_descriptions.append(
                 ColumnEqualityDescription(
-                    left_column_alias=identifier_column_name,
-                    right_column_alias=identifier_column_name,
+                    left_column_alias=entity_column_name,
+                    right_column_alias=entity_column_name,
                 )
             )
 
