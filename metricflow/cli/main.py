@@ -58,11 +58,7 @@ from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
 from metricflow.dag.dag_visualization import display_dag_as_svg
 
-from metricflow.conversion.helpers import (
-    check_dbt_project,
-    check_manifest_file,
-    extract_semantic_manifest
-)
+from metricflow.conversion.helpers import check_dbt_project, check_manifest_file, extract_semantic_manifest
 
 logger = logging.getLogger(__name__)
 
@@ -151,11 +147,13 @@ def convert(
     output_dir: str,
     overwrite: bool,
 ) -> None:
-    ## These functions run and return messages based on the results of the functions
-    ## TODO: Move found_dbt_project into the CLIContext class. Not doing yet for testing
+    """Convert dbt metrics to MetricFlow semantic models & metrics."""
+    # These functions run and return messages based on the results of the functions
+    # TODO: Move found_dbt_project into the CLIContext class. Not doing yet for testing
     click.echo(check_dbt_project())
     click.echo(check_manifest_file())
-    # click.echo(extract_semantic_manifest())
+    click.echo(extract_semantic_manifest())
+
 
 @cli.command()
 @click.option("--restart", is_flag=True, help="Wipe the config file and start over")

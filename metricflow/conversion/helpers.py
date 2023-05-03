@@ -1,5 +1,7 @@
 import os
 import json
+from typing import Dict, Set
+
 
 def check_dbt_project() -> str:
     """Checks if dbt_project.yml exists in the current directory and returns a boolean."""
@@ -9,15 +11,17 @@ def check_dbt_project() -> str:
     except:
         return "Error: dbt_project.yml not found in current directory. Please navigate to a dbt directory to run conversion"
 
-def check_manifest_file():
+
+def check_manifest_file() -> str:
     """This function checks if the manifest.json file in the 'target/' directory is
     newer or the same age as all other files in the current directory. If any other
-    file is more recent, it returns a message to update the manifest file. The 
+    file is more recent, it returns a message to update the manifest file. The
     function uses os.scandir() for improved performance."""
-    target_directory = 'target/'
-    manifest_path = os.path.join(target_directory, 'manifest.json')
+
+    target_directory = "target/"
+    manifest_path = os.path.join(target_directory, "manifest.json")
     if not os.path.isfile(manifest_path):
-        return "The manifest.json file does not exist."
+        raise Exception("The manifest.json file does not exist.")
 
     manifest_mtime = os.path.getmtime(manifest_path)
     ignored_files = get_ignored_files()
@@ -28,11 +32,13 @@ def check_manifest_file():
                 file_mtime = os.path.getmtime(file_path)
 
                 if file_mtime > manifest_mtime + 5:
-                    return "Your manifest.json file is out of date - please run dbt compile again!"
+                    raise Exception("Your manifest.json file is out of date - please run dbt compile again!")
 
     return "Your manifest.json file is up to date."
 
-def get_ignored_files():
+
+def get_ignored_files() -> Set:
+    """Gets the list of ignored files from the .gitignore"""
     ignored_files = set()
     if os.path.isfile(".gitignore"):
         with open(".gitignore", "r") as ignore_file:
@@ -42,17 +48,18 @@ def get_ignored_files():
                     ignored_files.add(line)
     return ignored_files
 
-def extract_semantic_manifest():
+
+def extract_semantic_manifest() -> Dict:
     """The function reads the manifest.json file from the 'target/' directory and
     returns only the top-level keys "metrics" and "semantic_models". The function
     uses the built-in json library for parsing the JSON data."""
-    target_directory = 'target/'
-    manifest_path = os.path.join(target_directory, 'manifest.json')
+    target_directory = "target/"
+    manifest_path = os.path.join(target_directory, "manifest.json")
     if not os.path.isfile(manifest_path):
-        return "The manifest.json file does not exist."
+        raise Exception("The manifest.json file does not exist.")
 
-    with open(manifest_path, 'r') as manifest_file:
+    with open(manifest_path, "r") as manifest_file:
         manifest_data = json.load(manifest_file)
 
-    extracted_data = {key: manifest_data[key] for key in ['metrics', 'semantic_models'] if key in manifest_data}
+    extracted_data = {key: manifest_data[key] for key in ["metrics", "semantic_models"] if key in manifest_data}
     return extracted_data

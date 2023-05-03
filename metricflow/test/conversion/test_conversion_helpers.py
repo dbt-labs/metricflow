@@ -1,33 +1,36 @@
 import os
+from py.path import LocalPath
 import time
 import json
 from metricflow.conversion.helpers import check_manifest_file, extract_semantic_manifest
 
+
 # Unit Test
-def test_check_manifest_file_missing_manifest(tmpdir):
+def test_check_manifest_file_missing_manifest(tmpdir: LocalPath) -> None:  # noqa: D
     os.chdir(tmpdir)
     result = check_manifest_file()
     assert result == "The manifest.json file does not exist."
 
+
 # Integration Test
-def test_check_manifest_file(tmpdir):
+def test_check_manifest_file(tmpdir: LocalPath) -> None:  # noqa: D
     os.chdir(tmpdir)
-    target_directory = 'target/'
+    target_directory = "target/"
     os.makedirs(target_directory)
 
-    manifest_path = os.path.join(target_directory, 'manifest.json')
-    with open(manifest_path, 'w') as manifest_file:
+    manifest_path = os.path.join(target_directory, "manifest.json")
+    with open(manifest_path, "w") as manifest_file:
         manifest_file.write("{}")
 
     # Touch a file with an older timestamp
-    with open('older_file.txt', 'w') as older_file:
+    with open("older_file.txt", "w") as older_file:
         older_file.write("Test data")
 
     time.sleep(6)
 
     # Update manifest.json file with new content
     new_manifest_content = '{"new_key": "new_value"}'
-    with open(manifest_path, 'w') as manifest_file:
+    with open(manifest_path, "w") as manifest_file:
         manifest_file.write(new_manifest_content)
 
     result = check_manifest_file()
@@ -35,16 +38,16 @@ def test_check_manifest_file(tmpdir):
 
     # Touch a file with a newer timestamp
     time.sleep(6)
-    with open('newer_file.txt', 'w') as newer_file:
+    with open("newer_file.txt", "w") as newer_file:
         newer_file.write("Test data")
 
     result = check_manifest_file()
     assert result == "Your manifest.json file is out of date - please run dbt compile again!"
 
 
-def test_extract_semantic_manifest(tmpdir):
+def test_extract_semantic_manifest(tmpdir: LocalPath) -> None:  # noqa: D
     os.chdir(tmpdir)
-    target_directory = 'target/'
+    target_directory = "target/"
     os.makedirs(target_directory)
 
     manifest_content = {
@@ -53,10 +56,9 @@ def test_extract_semantic_manifest(tmpdir):
         "models": {"key_1": "value_1", "key_2": "value_2"},
     }
 
-    manifest_path = os.path.join(target_directory, 'manifest.json')
-    with open(manifest_path, 'w') as manifest_file:
+    manifest_path = os.path.join(target_directory, "manifest.json")
+    with open(manifest_path, "w") as manifest_file:
         json.dump(manifest_content, manifest_file)
-
 
     semantic_manifest = extract_semantic_manifest()
 
