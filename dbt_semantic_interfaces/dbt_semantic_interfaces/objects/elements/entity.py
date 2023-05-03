@@ -32,9 +32,7 @@ class CompositeSubEntity(HashableBaseModel):
 
     @property
     def reference(self) -> CompositeSubEntityReference:  # noqa: D
-        assert (
-            self.name
-        ), f"The element name should have been set during model transformation. Got {self}"
+        assert self.name, f"The element name should have been set during model transformation. Got {self}"
         return CompositeSubEntityReference(element_name=self.name)
 
 

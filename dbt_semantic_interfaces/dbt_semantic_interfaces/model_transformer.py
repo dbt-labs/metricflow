@@ -55,9 +55,7 @@ class ModelTransformer:
     @staticmethod
     def transform(
         model: UserConfiguredModel,
-        ordered_rule_sequences: Tuple[
-            Sequence[ModelTransformRule], ...
-        ] = DEFAULT_RULES,
+        ordered_rule_sequences: Tuple[Sequence[ModelTransformRule], ...] = DEFAULT_RULES,
     ) -> UserConfiguredModel:
         """Copies the passed in model, applies the rules to the new model, and then returns that model
 
