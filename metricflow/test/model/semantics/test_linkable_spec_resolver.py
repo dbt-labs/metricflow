@@ -226,7 +226,7 @@ def test_derived_time_granularity_property(simple_model_spec_resolver: ValidLink
     )
 
 
-def test_identifier_property(simple_model_spec_resolver: ValidLinkableSpecResolver) -> None:  # noqa: D
+def test_entity_property(simple_model_spec_resolver: ValidLinkableSpecResolver) -> None:  # noqa: D
     property_check_helper(
         spec_resolver=simple_model_spec_resolver,
         metric_references=[MetricReference(element_name="listings")],

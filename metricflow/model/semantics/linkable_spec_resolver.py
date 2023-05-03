@@ -91,12 +91,12 @@ class LinkableElementSet:
     """Container class for storing all linkable elements for a metric."""
 
     linkable_dimensions: Tuple[LinkableDimension, ...]
-    linkable_identifiers: Tuple[LinkableEntity, ...]
+    linkable_entities: Tuple[LinkableEntity, ...]
 
     # Ambiguous elements are ones where there are multiple join paths through different data sources that can be taken
     # to get the element. This currently represents an error when defining data sources.
     ambiguous_linkable_dimensions: Tuple[LinkableDimension, ...]
-    ambiguous_linkable_identifiers: Tuple[LinkableEntity, ...]
+    ambiguous_linkable_entities: Tuple[LinkableEntity, ...]
 
     @staticmethod
     def merge(linkable_element_sets: Sequence[LinkableElementSet]) -> LinkableElementSet:
@@ -105,22 +105,22 @@ class LinkableElementSet:
         If there are elements with the same join key, those elements will be categorized as ambiguous.
         """
         key_to_linkable_dimension: Dict[JoinPathKey, List[LinkableDimension]] = defaultdict(list)
-        key_to_linkable_identifier: Dict[JoinPathKey, List[LinkableEntity]] = defaultdict(list)
+        key_to_linkable_entity: Dict[JoinPathKey, List[LinkableEntity]] = defaultdict(list)
 
         for linkable_element_set in linkable_element_sets:
             for linkable_dimension in linkable_element_set.linkable_dimensions:
                 key_to_linkable_dimension[linkable_dimension.path_key].append(linkable_dimension)
-            for linkable_identifier in linkable_element_set.linkable_identifiers:
-                key_to_linkable_identifier[linkable_identifier.path_key].append(linkable_identifier)
+            for linkable_entity in linkable_element_set.linkable_entities:
+                key_to_linkable_entity[linkable_entity.path_key].append(linkable_entity)
 
         linkable_dimensions = []
-        linkable_identifiers = []
+        linkable_entities = []
 
         ambiguous_linkable_dimensions = list(
             tuple(more_itertools.flatten([x.ambiguous_linkable_dimensions for x in linkable_element_sets]))
         )
-        ambiguous_linkable_identifiers = list(
-            tuple(more_itertools.flatten([x.ambiguous_linkable_identifiers for x in linkable_element_sets]))
+        ambiguous_linkable_entities = list(
+            tuple(more_itertools.flatten([x.ambiguous_linkable_entities for x in linkable_element_sets]))
         )
 
         for _, grouped_linkable_dimensions in key_to_linkable_dimension.items():
@@ -130,18 +130,18 @@ class LinkableElementSet:
                 else:
                     ambiguous_linkable_dimensions.append(linkable_dimension)
 
-        for _, grouped_linkable_identifier in key_to_linkable_identifier.items():
-            for linkable_identifier in grouped_linkable_identifier:
-                if len(grouped_linkable_identifier) == 1:
-                    linkable_identifiers.append(linkable_identifier)
+        for _, grouped_linkable_entity in key_to_linkable_entity.items():
+            for linkable_entity in grouped_linkable_entity:
+                if len(grouped_linkable_entity) == 1:
+                    linkable_entities.append(linkable_entity)
                 else:
-                    ambiguous_linkable_identifiers.append(linkable_identifier)
+                    ambiguous_linkable_entities.append(linkable_entity)
 
         return LinkableElementSet(
             linkable_dimensions=tuple(linkable_dimensions),
-            linkable_identifiers=tuple(linkable_identifiers),
+            linkable_entities=tuple(linkable_entities),
             ambiguous_linkable_dimensions=tuple(ambiguous_linkable_dimensions),
-            ambiguous_linkable_identifiers=tuple(ambiguous_linkable_identifiers),
+            ambiguous_linkable_entities=tuple(ambiguous_linkable_entities),
         )
 
     @staticmethod
@@ -150,9 +150,9 @@ class LinkableElementSet:
         if len(linkable_element_sets) == 0:
             return LinkableElementSet(
                 linkable_dimensions=(),
-                linkable_identifiers=(),
+                linkable_entities=(),
                 ambiguous_linkable_dimensions=(),
-                ambiguous_linkable_identifiers=(),
+                ambiguous_linkable_entities=(),
             )
 
         # Need to find an easier syntax for finding the common items from multiple LinkableElementSets.
@@ -164,10 +164,8 @@ class LinkableElementSet:
             else set()
         )
 
-        common_linkable_identifiers = (
-            set.intersection(
-                *[set([y.after_intersection for y in x.linkable_identifiers]) for x in linkable_element_sets]
-            )
+        common_linkable_entities = (
+            set.intersection(*[set([y.after_intersection for y in x.linkable_entities]) for x in linkable_element_sets])
             if len(linkable_element_sets) > 0
             else set()
         )
@@ -180,9 +178,9 @@ class LinkableElementSet:
             else set()
         )
 
-        common_ambiguous_linkable_identifiers = (
+        common_ambiguous_linkable_entities = (
             set.intersection(
-                *[set([y.after_intersection for y in x.ambiguous_linkable_identifiers]) for x in linkable_element_sets]
+                *[set([y.after_intersection for y in x.ambiguous_linkable_entities]) for x in linkable_element_sets]
             )
             if len(linkable_element_sets) > 0
             else set()
@@ -190,9 +188,9 @@ class LinkableElementSet:
 
         return LinkableElementSet(
             linkable_dimensions=tuple(common_linkable_dimensions),
-            linkable_identifiers=tuple(common_linkable_identifiers),
+            linkable_entities=tuple(common_linkable_entities),
             ambiguous_linkable_dimensions=tuple(common_ambiguous_linkable_dimensions),
-            ambiguous_linkable_identifiers=tuple(common_ambiguous_linkable_identifiers),
+            ambiguous_linkable_entities=tuple(common_ambiguous_linkable_entities),
         )
 
     def filter(
@@ -209,9 +207,9 @@ class LinkableElementSet:
             if len(x.properties.intersection(with_any_of)) > 0 and len(x.properties.intersection(without_any_of)) == 0
         )
 
-        linkable_identifiers = tuple(
+        linkable_entities = tuple(
             x
-            for x in self.linkable_identifiers
+            for x in self.linkable_entities
             if len(x.properties.intersection(with_any_of)) > 0 and len(x.properties.intersection(without_any_of)) == 0
         )
 
@@ -221,17 +219,17 @@ class LinkableElementSet:
             if len(x.properties.intersection(with_any_of)) > 0 and len(x.properties.intersection(without_any_of)) == 0
         )
 
-        ambiguous_linkable_identifiers = tuple(
+        ambiguous_linkable_entities = tuple(
             x
-            for x in self.ambiguous_linkable_identifiers
+            for x in self.ambiguous_linkable_entities
             if len(x.properties.intersection(with_any_of)) > 0 and len(x.properties.intersection(without_any_of)) == 0
         )
 
         return LinkableElementSet(
             linkable_dimensions=linkable_dimensions,
-            linkable_identifiers=linkable_identifiers,
+            linkable_entities=linkable_entities,
             ambiguous_linkable_dimensions=ambiguous_linkable_dimensions,
-            ambiguous_linkable_identifiers=ambiguous_linkable_identifiers,
+            ambiguous_linkable_entities=ambiguous_linkable_entities,
         )
 
     @property
@@ -259,7 +257,7 @@ class LinkableElementSet:
                     element_name=x.element_name,
                     entity_links=tuple(EntityReference(element_name=x) for x in x.entity_links),
                 )
-                for x in self.linkable_identifiers
+                for x in self.linkable_entities
             ),
         )
 
@@ -269,7 +267,7 @@ class DataSourceJoinPathElement:
     """Describes joining a data source by the given identifier."""
 
     data_source: DataSource
-    join_on_identifier: str
+    join_on_entity: str
 
 
 def _generate_linkable_time_dimensions(
@@ -315,13 +313,13 @@ class DataSourceJoinPath:
 
     def create_linkable_element_set(self, with_properties: FrozenSet[LinkableElementProperties]) -> LinkableElementSet:
         """Given the current path, generate the respective linkable elements from the last data source in the path."""
-        entity_links = tuple(x.join_on_identifier for x in self.path_elements)
+        entity_links = tuple(x.join_on_entity for x in self.path_elements)
 
         assert len(self.path_elements) > 0
         data_source = self.path_elements[-1].data_source
 
         linkable_dimensions = []
-        linkable_identifiers = []
+        linkable_entities = []
 
         for dimension in data_source.dimensions:
             dimension_type = dimension.type
@@ -347,7 +345,7 @@ class DataSourceJoinPath:
         for identifier in data_source.identifiers:
             # Avoid creating "booking_id__booking_id"
             if identifier.reference.element_name != entity_links[-1]:
-                linkable_identifiers.append(
+                linkable_entities.append(
                     LinkableEntity(
                         element_name=identifier.reference.element_name,
                         entity_links=entity_links,
@@ -357,9 +355,9 @@ class DataSourceJoinPath:
 
         return LinkableElementSet(
             linkable_dimensions=tuple(linkable_dimensions),
-            linkable_identifiers=tuple(linkable_identifiers),
+            linkable_entities=tuple(linkable_entities),
             ambiguous_linkable_dimensions=(),
-            ambiguous_linkable_identifiers=(),
+            ambiguous_linkable_entities=(),
         )
 
     @property
@@ -397,12 +395,12 @@ class ValidLinkableSpecResolver:
         self._max_entity_links = max_entity_links
 
         # Map measures / identifiers to data sources that contain them.
-        self._identifier_to_data_source: Dict[str, List[DataSource]] = defaultdict(list)
+        self._entity_to_data_source: Dict[str, List[DataSource]] = defaultdict(list)
         self._measure_to_data_source: Dict[str, List[DataSource]] = defaultdict(list)
 
         for data_source in self._data_sources:
             for identifier in data_source.identifiers:
-                self._identifier_to_data_source[identifier.reference.element_name].append(data_source)
+                self._entity_to_data_source[identifier.reference.element_name].append(data_source)
 
         self._metric_to_linkable_element_sets: Dict[str, List[LinkableElementSet]] = {}
 
@@ -433,7 +431,7 @@ class ValidLinkableSpecResolver:
     def _get_local_set(self, data_source: DataSource) -> LinkableElementSet:
         """Gets the local elements for a given data source."""
         linkable_dimensions = []
-        linkable_identifiers = []
+        linkable_entities = []
 
         for dimension in data_source.dimensions:
             dimension_type = dimension.type
@@ -458,7 +456,7 @@ class ValidLinkableSpecResolver:
 
         additional_linkable_dimensions = []
         for identifier in data_source.identifiers:
-            linkable_identifiers.append(
+            linkable_entities.append(
                 LinkableEntity(
                     element_name=identifier.reference.element_name,
                     entity_links=(),
@@ -482,18 +480,18 @@ class ValidLinkableSpecResolver:
 
         return LinkableElementSet(
             linkable_dimensions=tuple(linkable_dimensions + additional_linkable_dimensions),
-            linkable_identifiers=tuple(linkable_identifiers),
+            linkable_entities=tuple(linkable_entities),
             ambiguous_linkable_dimensions=(),
-            ambiguous_linkable_identifiers=(),
+            ambiguous_linkable_entities=(),
         )
 
-    def _get_data_sources_with_joinable_identifier(
+    def _get_data_sources_with_joinable_entity(
         self,
         left_data_source_reference: DataSourceReference,
         entity_reference: EntityReference,
     ) -> Sequence[DataSource]:
         # May switch to non-cached implementation.
-        data_sources = self._identifier_to_data_source[entity_reference.element_name]
+        data_sources = self._entity_to_data_source[entity_reference.element_name]
         valid_data_sources = []
         for data_source in data_sources:
             if self._join_evaluator.is_valid_data_source_join(
@@ -514,7 +512,7 @@ class ValidLinkableSpecResolver:
 
         # Create 1-hop elements
         for identifier in measure_data_source.identifiers:
-            data_sources = self._get_data_sources_with_joinable_identifier(
+            data_sources = self._get_data_sources_with_joinable_entity(
                 left_data_source_reference=measure_data_source.reference,
                 entity_reference=identifier.reference,
             )
@@ -525,7 +523,7 @@ class ValidLinkableSpecResolver:
                     DataSourceJoinPath(
                         path_elements=(
                             DataSourceJoinPathElement(
-                                data_source=data_source, join_on_identifier=identifier.reference.element_name
+                                data_source=data_source, join_on_entity=identifier.reference.element_name
                             ),
                         )
                     )
@@ -591,13 +589,13 @@ class ValidLinkableSpecResolver:
         new_join_paths = []
 
         for identifier in last_data_source_in_path.identifiers:
-            identifier_name = identifier.reference.element_name
+            entity_name = identifier.reference.element_name
 
             # Don't create cycles in the join path by joining on the same identifier.
-            if identifier_name in set(x.join_on_identifier for x in current_join_path.path_elements):
+            if entity_name in set(x.join_on_entity for x in current_join_path.path_elements):
                 continue
 
-            data_sources_that_can_be_joined = self._get_data_sources_with_joinable_identifier(
+            data_sources_that_can_be_joined = self._get_data_sources_with_joinable_entity(
                 left_data_source_reference=last_data_source_in_path.reference,
                 entity_reference=identifier.reference,
             )
@@ -610,7 +608,7 @@ class ValidLinkableSpecResolver:
 
                 new_join_path = DataSourceJoinPath(
                     path_elements=current_join_path.path_elements
-                    + (DataSourceJoinPathElement(data_source=data_source, join_on_identifier=identifier_name),)
+                    + (DataSourceJoinPathElement(data_source=data_source, join_on_entity=entity_name),)
                 )
                 new_join_paths.append(new_join_path)
 

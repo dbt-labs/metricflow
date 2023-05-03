@@ -85,7 +85,7 @@ class MetricFlowQueryParser:
         self._data_source_semantics = model.data_source_semantics
 
         # Set up containers for known element names
-        self._known_identifier_element_references = self._data_source_semantics.get_entity_references()
+        self._known_entity_element_references = self._data_source_semantics.get_entity_references()
 
         self._known_time_dimension_element_references = [DataSet.metric_time_dimension_reference()]
         self._known_dimension_element_references = []
@@ -597,7 +597,7 @@ class MetricFlowQueryParser:
                     )
             elif DimensionReference(element_name=element_name) in self._known_dimension_element_references:
                 dimension_specs.append(DimensionSpec(element_name=element_name, entity_links=entity_links))
-            elif EntityReference(element_name=element_name) in self._known_identifier_element_references:
+            elif EntityReference(element_name=element_name) in self._known_entity_element_references:
                 entity_specs.append(EntitySpec(element_name=element_name, entity_links=entity_links))
             else:
                 valid_group_by_names_for_metrics = sorted(
@@ -740,7 +740,7 @@ class MetricFlowQueryParser:
                             f"match a requested time dimension"
                         )
 
-            elif EntityReference(element_name=parsed_name.element_name) in self._known_identifier_element_references:
+            elif EntityReference(element_name=parsed_name.element_name) in self._known_entity_element_references:
                 if parsed_name.time_granularity:
                     raise InvalidQueryException(
                         f"Order by item '{order_by_name}' references an identifier but has a time granularity"

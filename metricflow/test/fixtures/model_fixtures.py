@@ -92,7 +92,7 @@ class ConsistentIdObjectRepository:
 def consistent_id_object_repository(
     simple_semantic_model: SemanticModel,
     multi_hop_join_semantic_model: SemanticModel,
-    composite_identifier_semantic_model: SemanticModel,
+    composite_entity_semantic_model: SemanticModel,
     scd_semantic_model: SemanticModel,
 ) -> ConsistentIdObjectRepository:  # noqa: D
     """Create objects that have incremental numeric IDs with a consistent value.
@@ -104,7 +104,7 @@ def consistent_id_object_repository(
     with patch_id_generators_helper(start_value=IdNumberSpace.CONSISTENT_ID_REPOSITORY):
         sm_data_sets = create_data_sets(simple_semantic_model)
         multihop_data_sets = create_data_sets(multi_hop_join_semantic_model)
-        composite_data_sets = create_data_sets(composite_identifier_semantic_model)
+        composite_data_sets = create_data_sets(composite_entity_semantic_model)
         scd_data_sets = create_data_sets(scd_semantic_model)
 
         return ConsistentIdObjectRepository(
@@ -115,7 +115,7 @@ def consistent_id_object_repository(
             multihop_model_source_nodes=_data_set_to_source_nodes(multi_hop_join_semantic_model, multihop_data_sets),
             composite_model_read_nodes=_data_set_to_read_nodes(composite_data_sets),
             composite_model_source_nodes=_data_set_to_source_nodes(
-                composite_identifier_semantic_model, composite_data_sets
+                composite_entity_semantic_model, composite_data_sets
             ),
             scd_model_data_sets=scd_data_sets,
             scd_model_read_nodes=_data_set_to_read_nodes(scd_data_sets),
@@ -190,7 +190,7 @@ def simple_semantic_model(template_mapping: Dict[str, str]) -> SemanticModel:  #
 
 
 @pytest.fixture(scope="session")
-def composite_identifier_semantic_model(  # noqa: D
+def composite_entity_semantic_model(  # noqa: D
     template_mapping: Dict[str, str], mf_test_session_state: MetricFlowTestSessionState
 ) -> SemanticModel:
     schema = mf_test_session_state.mf_source_schema

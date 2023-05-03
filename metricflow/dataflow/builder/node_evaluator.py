@@ -54,7 +54,7 @@ class JoinLinkableInstancesRecipe:
 
     node_to_join: BaseOutput
     # The identifier to join "node_to_join" on.
-    join_on_identifier: LinklessEntitySpec
+    join_on_entity: LinklessEntitySpec
     # The linkable instances from the query that can be satisfied if we join this node. Note that this is different from
     # the linkable specs in the node that can help to satisfy the query. e.g. "user_id__country" might be one of the
     # "satisfiable_linkable_specs", but "country" is the linkable spec in the node.
@@ -71,7 +71,7 @@ class JoinLinkableInstancesRecipe:
         """The recipe as a join description to use in the dataflow plan node."""
         return JoinDescription(
             join_node=self.node_to_join,
-            join_on_identifier=self.join_on_identifier,
+            join_on_entity=self.join_on_entity,
             join_on_partition_dimensions=self.join_on_partition_dimensions,
             join_on_partition_time_dimensions=self.join_on_partition_time_dimensions,
             validity_window=self.validity_window,
@@ -170,10 +170,10 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                     len(entity_instance_in_right_node.defined_from) == 1
                 ), f"Did not get exactly 1 defined_from in {entity_instance_in_right_node}"
 
-                identifier_in_right_node = self._data_source_semantics.get_identifier_in_data_source(
+                entity_in_right_node = self._data_source_semantics.get_entity_in_data_source(
                     entity_instance_in_right_node.defined_from[0]
                 )
-                if identifier_in_right_node is None:
+                if entity_in_right_node is None:
                     raise RuntimeError(
                         f"Invalid DataSourceElementReference {entity_instance_in_right_node.defined_from[0]}"
                     )
@@ -223,14 +223,14 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                     # We might also need to check the identifier type and see if it's the type of join we're allowing,
                     # but since we're doing all left joins now, it's been left out.
 
-                    required_identifier_matches_data_set_identifier = (
+                    required_entity_matches_data_set_entity = (
                         LinklessEntitySpec.from_reference(needed_linkable_spec.entity_links[0])
                         == linkless_entity_spec_in_node
                     )
                     needed_linkable_spec_in_node = (
                         needed_linkable_spec.without_first_entity_link in linkable_specs_in_right_node
                     )
-                    if required_identifier_matches_data_set_identifier and needed_linkable_spec_in_node:
+                    if required_entity_matches_data_set_entity and needed_linkable_spec_in_node:
                         satisfiable_linkable_specs.append(needed_linkable_spec)
 
                 # If this node can satisfy some linkable specs, it could be useful to join on, so add it to the
@@ -251,7 +251,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                     candidates_for_join.append(
                         JoinLinkableInstancesRecipe(
                             node_to_join=right_node,
-                            join_on_identifier=linkless_entity_spec_in_node,
+                            join_on_entity=linkless_entity_spec_in_node,
                             satisfiable_linkable_specs=satisfiable_linkable_specs,
                             join_on_partition_dimensions=join_on_partition_dimensions,
                             join_on_partition_time_dimensions=join_on_partition_time_dimensions,
@@ -288,7 +288,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                 updated_candidate_data_sets.append(
                     JoinLinkableInstancesRecipe(
                         node_to_join=candidate_for_join.node_to_join,
-                        join_on_identifier=candidate_for_join.join_on_identifier,
+                        join_on_entity=candidate_for_join.join_on_entity,
                         satisfiable_linkable_specs=updated_satisfiable_linkable_specs,
                         join_on_partition_dimensions=candidate_for_join.join_on_partition_dimensions,
                         join_on_partition_time_dimensions=candidate_for_join.join_on_partition_time_dimensions,

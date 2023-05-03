@@ -19,7 +19,7 @@ class CommonEntitysRule(ModelValidationRule):
     """Checks that identifiers exist on more than one data source"""
 
     @staticmethod
-    def _map_data_source_identifiers(data_sources: List[DataSource]) -> Dict[EntityReference, Set[str]]:
+    def _map_data_source_entities(data_sources: List[DataSource]) -> Dict[EntityReference, Set[str]]:
         """Generate mapping of identifier names to the set of data_sources where it is defined"""
         identifiers_to_data_sources: Dict[EntityReference, Set[str]] = {}
         for data_source in data_sources or []:
@@ -32,7 +32,7 @@ class CommonEntitysRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking identifier exists on more than one data source")
-    def _check_identifier(
+    def _check_entity(
         identifier: Entity,
         data_source: DataSource,
         identifiers_to_data_sources: Dict[EntityReference, Set[str]],
@@ -66,10 +66,10 @@ class CommonEntitysRule(ModelValidationRule):
         """Issues a warning for any identifier that is associated with only one data_source"""
         issues = []
 
-        identifiers_to_data_sources = CommonEntitysRule._map_data_source_identifiers(model.data_sources)
+        identifiers_to_data_sources = CommonEntitysRule._map_data_source_entities(model.data_sources)
         for data_source in model.data_sources or []:
             for identifier in data_source.identifiers or []:
-                issues += CommonEntitysRule._check_identifier(
+                issues += CommonEntitysRule._check_entity(
                     identifier=identifier,
                     data_source=data_source,
                     identifiers_to_data_sources=identifiers_to_data_sources,

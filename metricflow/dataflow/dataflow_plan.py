@@ -266,7 +266,7 @@ class JoinDescription(Generic[SourceDataSetT]):
     """Describes how data from a node should be joined to data from another node."""
 
     join_node: BaseOutput[SourceDataSetT]
-    join_on_identifier: LinklessEntitySpec
+    join_on_entity: LinklessEntitySpec
 
     join_on_partition_dimensions: Tuple[PartitionDimensionJoinDescription, ...]
     join_on_partition_time_dimensions: Tuple[PartitionTimeDimensionJoinDescription, ...]
@@ -331,7 +331,7 @@ class JoinToBaseOutputNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
 
         for i in range(len(self.join_targets)):
             if (
-                self.join_targets[i].join_on_identifier != other_node.join_targets[i].join_on_identifier
+                self.join_targets[i].join_on_entity != other_node.join_targets[i].join_on_entity
                 or self.join_targets[i].join_on_partition_dimensions
                 != other_node.join_targets[i].join_on_partition_dimensions
                 or self.join_targets[i].join_on_partition_time_dimensions
@@ -354,7 +354,7 @@ class JoinToBaseOutputNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
             join_targets=[
                 JoinDescription(
                     join_node=new_join_nodes[i],
-                    join_on_identifier=old_join_target.join_on_identifier,
+                    join_on_entity=old_join_target.join_on_entity,
                     join_on_partition_dimensions=old_join_target.join_on_partition_dimensions,
                     join_on_partition_time_dimensions=old_join_target.join_on_partition_time_dimensions,
                     validity_window=old_join_target.validity_window,

@@ -562,7 +562,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
 
             # Nodes containing the linkable instances will be joined to the node containing the measure, so these
             # identifiers will need to be present in the measure node.
-            required_local_entity_specs = tuple(x.join_on_identifier for x in evaluation.join_recipes)
+            required_local_entity_specs = tuple(x.join_on_entity for x in evaluation.join_recipes)
             # Same thing with partitions.
             required_local_dimension_specs = tuple(
                 y.start_node_dimension_spec for x in evaluation.join_recipes for y in x.join_on_partition_dimensions
@@ -813,7 +813,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             join_targets.append(
                 JoinDescription(
                     join_node=filtered_node_to_join,
-                    join_on_identifier=join_recipe.join_on_identifier,
+                    join_on_entity=join_recipe.join_on_entity,
                     join_on_partition_dimensions=join_recipe.join_on_partition_dimensions,
                     join_on_partition_time_dimensions=join_recipe.join_on_partition_time_dimensions,
                     validity_window=join_recipe.validity_window,

@@ -34,7 +34,7 @@ class SqlDataSet(DataSet):
         """Return a SELECT node that can be used to read data from the given SQL table or SQL query"""
         return self._sql_select_node
 
-    def column_associations_for_identifier(
+    def column_associations_for_entity(
         self,
         entity_spec: EntitySpec,
     ) -> Sequence[ColumnAssociation]:

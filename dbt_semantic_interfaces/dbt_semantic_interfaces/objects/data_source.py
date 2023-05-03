@@ -93,7 +93,7 @@ class DataSource(HashableBaseModel, ModelWithMetadataParsing):
 
         raise ValueError(f"No dimension with name ({dimension_reference}) in data source with name ({self.name})")
 
-    def get_identifier(self, entity_reference: LinkableElementReference) -> Entity:  # noqa: D
+    def get_entity(self, entity_reference: LinkableElementReference) -> Entity:  # noqa: D
         for ident in self.identifiers:
             if ident.reference == entity_reference:
                 return ident

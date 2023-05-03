@@ -20,8 +20,8 @@ MAX_JOIN_HOPS = 2
 class DataSourceEntityJoinType:
     """Describe a type of join between data sources where identifiers are of the listed types."""
 
-    left_identifier_type: EntityType
-    right_identifier_type: EntityType
+    left_entity_type: EntityType
+    right_entity_type: EntityType
 
 
 @dataclass(frozen=True)
@@ -46,27 +46,27 @@ class DataSourceJoinEvaluator:
 
     # Valid joins are the non-fanout joins.
     _VALID_IDENTIFIER_JOINS = (
-        DataSourceEntityJoinType(left_identifier_type=EntityType.PRIMARY, right_identifier_type=EntityType.NATURAL),
-        DataSourceEntityJoinType(left_identifier_type=EntityType.PRIMARY, right_identifier_type=EntityType.PRIMARY),
-        DataSourceEntityJoinType(left_identifier_type=EntityType.PRIMARY, right_identifier_type=EntityType.UNIQUE),
-        DataSourceEntityJoinType(left_identifier_type=EntityType.UNIQUE, right_identifier_type=EntityType.NATURAL),
-        DataSourceEntityJoinType(left_identifier_type=EntityType.UNIQUE, right_identifier_type=EntityType.PRIMARY),
-        DataSourceEntityJoinType(left_identifier_type=EntityType.UNIQUE, right_identifier_type=EntityType.UNIQUE),
-        DataSourceEntityJoinType(left_identifier_type=EntityType.FOREIGN, right_identifier_type=EntityType.NATURAL),
-        DataSourceEntityJoinType(left_identifier_type=EntityType.FOREIGN, right_identifier_type=EntityType.PRIMARY),
-        DataSourceEntityJoinType(left_identifier_type=EntityType.FOREIGN, right_identifier_type=EntityType.UNIQUE),
-        DataSourceEntityJoinType(left_identifier_type=EntityType.NATURAL, right_identifier_type=EntityType.PRIMARY),
-        DataSourceEntityJoinType(left_identifier_type=EntityType.NATURAL, right_identifier_type=EntityType.UNIQUE),
+        DataSourceEntityJoinType(left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.NATURAL),
+        DataSourceEntityJoinType(left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.PRIMARY),
+        DataSourceEntityJoinType(left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.UNIQUE),
+        DataSourceEntityJoinType(left_entity_type=EntityType.UNIQUE, right_entity_type=EntityType.NATURAL),
+        DataSourceEntityJoinType(left_entity_type=EntityType.UNIQUE, right_entity_type=EntityType.PRIMARY),
+        DataSourceEntityJoinType(left_entity_type=EntityType.UNIQUE, right_entity_type=EntityType.UNIQUE),
+        DataSourceEntityJoinType(left_entity_type=EntityType.FOREIGN, right_entity_type=EntityType.NATURAL),
+        DataSourceEntityJoinType(left_entity_type=EntityType.FOREIGN, right_entity_type=EntityType.PRIMARY),
+        DataSourceEntityJoinType(left_entity_type=EntityType.FOREIGN, right_entity_type=EntityType.UNIQUE),
+        DataSourceEntityJoinType(left_entity_type=EntityType.NATURAL, right_entity_type=EntityType.PRIMARY),
+        DataSourceEntityJoinType(left_entity_type=EntityType.NATURAL, right_entity_type=EntityType.UNIQUE),
     )
 
     _INVALID_IDENTIFIER_JOINS = (
-        DataSourceEntityJoinType(left_identifier_type=EntityType.PRIMARY, right_identifier_type=EntityType.FOREIGN),
-        DataSourceEntityJoinType(left_identifier_type=EntityType.UNIQUE, right_identifier_type=EntityType.FOREIGN),
-        DataSourceEntityJoinType(left_identifier_type=EntityType.FOREIGN, right_identifier_type=EntityType.FOREIGN),
-        DataSourceEntityJoinType(left_identifier_type=EntityType.NATURAL, right_identifier_type=EntityType.FOREIGN),
+        DataSourceEntityJoinType(left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.FOREIGN),
+        DataSourceEntityJoinType(left_entity_type=EntityType.UNIQUE, right_entity_type=EntityType.FOREIGN),
+        DataSourceEntityJoinType(left_entity_type=EntityType.FOREIGN, right_entity_type=EntityType.FOREIGN),
+        DataSourceEntityJoinType(left_entity_type=EntityType.NATURAL, right_entity_type=EntityType.FOREIGN),
         # Natural -> Natural joins are not allowed due to hidden fanout or missing value concerns with
         # multiple validity windows in play
-        DataSourceEntityJoinType(left_identifier_type=EntityType.NATURAL, right_identifier_type=EntityType.NATURAL),
+        DataSourceEntityJoinType(left_entity_type=EntityType.NATURAL, right_entity_type=EntityType.NATURAL),
     )
 
     def __init__(self, data_source_semantics: DataSourceSemanticsAccessor) -> None:  # noqa: D
@@ -104,11 +104,11 @@ class DataSourceJoinEvaluator:
             join_paths_to_visit_next: List[List[DataSourceEntityJoin]] = []
             for identifier in parent_data_source.identifiers:
                 entity_reference = EntityReference(element_name=identifier.name)
-                identifier_data_sources = self._data_source_semantics.get_data_sources_for_identifier(
+                entity_data_sources = self._data_source_semantics.get_data_sources_for_entity(
                     entity_reference=entity_reference
                 )
 
-                for right_data_source in identifier_data_sources:
+                for right_data_source in entity_data_sources:
                     # Check if we've seen this data source already
                     if (
                         right_data_source.name == left_data_source_reference.data_source_name
@@ -118,7 +118,7 @@ class DataSourceJoinEvaluator:
 
                     # Check if there is a valid way to join this data source to existing join path
                     right_data_source_reference = DataSourceReference(data_source_name=right_data_source.name)
-                    valid_join_type = self.get_valid_data_source_identifier_join_type(
+                    valid_join_type = self.get_valid_data_source_entity_join_type(
                         left_data_source_reference=parent_data_source_reference,
                         right_data_source_reference=right_data_source_reference,
                         on_entity_reference=entity_reference,
@@ -154,21 +154,21 @@ class DataSourceJoinEvaluator:
             join_hops_remaining=join_hops_remaining,
         )
 
-    def get_valid_data_source_identifier_join_type(
+    def get_valid_data_source_entity_join_type(
         self,
         left_data_source_reference: DataSourceReference,
         right_data_source_reference: DataSourceReference,
         on_entity_reference: EntityReference,
     ) -> Optional[DataSourceEntityJoinType]:
         """Get valid join type used to join data sources on given identifier, if exists."""
-        left_identifier = self._data_source_semantics.get_identifier_in_data_source(
+        left_entity = self._data_source_semantics.get_entity_in_data_source(
             DataSourceElementReference.create_from_references(left_data_source_reference, on_entity_reference)
         )
 
-        right_identifier = self._data_source_semantics.get_identifier_in_data_source(
+        right_entity = self._data_source_semantics.get_entity_in_data_source(
             DataSourceElementReference.create_from_references(right_data_source_reference, on_entity_reference)
         )
-        if left_identifier is None or right_identifier is None:
+        if left_entity is None or right_entity is None:
             return None
 
         left_data_source = self._data_source_semantics.get_by_reference(left_data_source_reference)
@@ -184,12 +184,12 @@ class DataSourceJoinEvaluator:
             # to support measure computation.
             return None
 
-        if right_identifier.type is EntityType.NATURAL:
+        if right_entity.type is EntityType.NATURAL:
             if not right_data_source.has_validity_dimensions:
                 # There is no way to refine this to a single row per key, so we cannot support this join
                 return None
 
-        join_type = DataSourceEntityJoinType(left_identifier.type, right_identifier.type)
+        join_type = DataSourceEntityJoinType(left_entity.type, right_entity.type)
 
         if join_type in DataSourceJoinEvaluator._VALID_IDENTIFIER_JOINS:
             return join_type
@@ -206,7 +206,7 @@ class DataSourceJoinEvaluator:
     ) -> bool:
         """Return true if we should allow a join with the given parameters to resolve a query."""
         return (
-            self.get_valid_data_source_identifier_join_type(
+            self.get_valid_data_source_entity_join_type(
                 left_data_source_reference=left_data_source_reference,
                 right_data_source_reference=right_data_source_reference,
                 on_entity_reference=on_entity_reference,
@@ -215,7 +215,7 @@ class DataSourceJoinEvaluator:
         )
 
     @staticmethod
-    def _data_source_of_identifier_in_instance_set(
+    def _data_source_of_entity_in_instance_set(
         instance_set: InstanceSet,
         entity_reference: EntityReference,
     ) -> DataSourceReference:
@@ -240,10 +240,10 @@ class DataSourceJoinEvaluator:
     ) -> bool:
         """Return true if the instance sets can be joined using the given identifier."""
         return self.is_valid_data_source_join(
-            left_data_source_reference=DataSourceJoinEvaluator._data_source_of_identifier_in_instance_set(
+            left_data_source_reference=DataSourceJoinEvaluator._data_source_of_entity_in_instance_set(
                 instance_set=left_instance_set, entity_reference=on_entity_reference
             ),
-            right_data_source_reference=DataSourceJoinEvaluator._data_source_of_identifier_in_instance_set(
+            right_data_source_reference=DataSourceJoinEvaluator._data_source_of_entity_in_instance_set(
                 instance_set=right_instance_set,
                 entity_reference=on_entity_reference,
             ),

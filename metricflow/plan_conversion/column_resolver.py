@@ -78,21 +78,21 @@ class DefaultColumnAssociationResolver(ColumnAssociationResolver):
                     sub_entity_references = [sub_entity.reference for sub_entity in entity.entities]
                     break
 
-        # composite identifier case
+        # composite entity case
         if len(sub_entity_references) != 0:
             column_associations: Tuple[ColumnAssociation, ...] = ()
             for sub_entity_reference in sub_entity_references:
                 if sub_entity_reference is not None:
                     sub_entity_name = f"{entity_spec.element_name}___{sub_entity_reference.element_name}"
-                    sub_identifier = StructuredLinkableSpecName(
+                    sub_entity = StructuredLinkableSpecName(
                         entity_link_names=tuple(x.element_name for x in entity_spec.entity_links),
                         element_name=sub_entity_name,
                     ).qualified_name
                     column_associations += (
                         ColumnAssociation(
-                            column_name=sub_identifier,
+                            column_name=sub_entity,
                             composite_column_correlation_key=CompositeColumnCorrelationKey(
-                                sub_identifier=StructuredLinkableSpecName(
+                                sub_entity=StructuredLinkableSpecName(
                                     entity_link_names=(),
                                     element_name=sub_entity_name,
                                 ).qualified_name

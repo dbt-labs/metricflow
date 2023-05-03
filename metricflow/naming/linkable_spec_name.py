@@ -65,12 +65,12 @@ class StructuredLinkableSpecName:
         return DUNDER.join(list(self.entity_link_names) + [self.element_name])
 
     @property
-    def qualified_name_without_identifier(self) -> str:
-        """Return the name without the identifier. e.g. listing__ds__month -> ds__month"""
+    def qualified_name_without_entity(self) -> str:
+        """Return the name without the entity. e.g. listing__ds__month -> ds__month"""
         return DUNDER.join([self.element_name] + ([self.time_granularity.value] if self.time_granularity else []))
 
     @property
-    def identifier_prefix(self) -> Optional[str]:
+    def entity_prefix(self) -> Optional[str]:
         """Return the identifier prefix. e.g. listing__ds__month -> listing"""
         if len(self.entity_link_names) > 0:
             return DUNDER.join(self.entity_link_names)

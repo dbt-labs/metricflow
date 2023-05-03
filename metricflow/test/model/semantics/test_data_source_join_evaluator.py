@@ -13,7 +13,7 @@ from metricflow.model.semantics.data_source_join_evaluator import (
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 
 
-def _get_join_types_for_identifier_type(identifier_type: EntityType) -> Sequence[DataSourceEntityJoinType]:
+def _get_join_types_for_entity_type(entity_type: EntityType) -> Sequence[DataSourceEntityJoinType]:
     """Exhaustively evaluate identifier types and return a sequence of all possible join type pairs
 
     The exhaustive conditional statically enforces that every identifier type is handled on the left.
@@ -21,18 +21,18 @@ def _get_join_types_for_identifier_type(identifier_type: EntityType) -> Sequence
     """
 
     if (
-        identifier_type is EntityType.FOREIGN
-        or identifier_type is EntityType.PRIMARY
-        or identifier_type is EntityType.UNIQUE
-        or identifier_type is EntityType.NATURAL
+        entity_type is EntityType.FOREIGN
+        or entity_type is EntityType.PRIMARY
+        or entity_type is EntityType.UNIQUE
+        or entity_type is EntityType.NATURAL
     ):
         join_types = tuple(
-            DataSourceEntityJoinType(left_identifier_type=identifier_type, right_identifier_type=join_type)
+            DataSourceEntityJoinType(left_entity_type=entity_type, right_entity_type=join_type)
             for join_type in EntityType
         )
         return join_types
     else:
-        assert_values_exhausted(identifier_type)
+        assert_values_exhausted(entity_type)
 
 
 def test_join_type_coverage() -> None:
@@ -45,7 +45,7 @@ def test_join_type_coverage() -> None:
         DataSourceJoinEvaluator._INVALID_IDENTIFIER_JOINS + DataSourceJoinEvaluator._VALID_IDENTIFIER_JOINS
     )
     for identifier_type in EntityType:
-        join_types = _get_join_types_for_identifier_type(identifier_type=identifier_type)
+        join_types = _get_join_types_for_entity_type(entity_type=identifier_type)
         for join_type in join_types:
             assert (
                 join_type in all_join_types
@@ -166,7 +166,7 @@ def test_foreign_target_data_source_join_validation(simple_semantic_model: Seman
     )
 
 
-def test_data_source_join_validation_on_missing_identifier(simple_semantic_model: SemanticModel) -> None:
+def test_data_source_join_validation_on_missing_entity(simple_semantic_model: SemanticModel) -> None:
     """Tests data source join validation where the identifier is missing from one or both data sources"""
     primary_listing_data_source = simple_semantic_model.data_source_semantics.get_by_reference(
         DataSourceReference("listings_latest")
@@ -295,7 +295,7 @@ def test_get_joinable_data_sources_single_hop(multi_hop_join_semantic_model: Sem
                 right_data_source_reference=DataSourceReference(data_source_name="bridge_table"),
                 entity_reference=EntityReference(element_name="account_id"),
                 join_type=DataSourceEntityJoinType(
-                    left_identifier_type=EntityType.PRIMARY, right_identifier_type=EntityType.PRIMARY
+                    left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.PRIMARY
                 ),
             )
         ],
@@ -318,7 +318,7 @@ def test_get_joinable_data_sources_multi_hop(multi_hop_join_semantic_model: Sema
                 right_data_source_reference=DataSourceReference(data_source_name="bridge_table"),
                 entity_reference=EntityReference(element_name="account_id"),
                 join_type=DataSourceEntityJoinType(
-                    left_identifier_type=EntityType.PRIMARY, right_identifier_type=EntityType.PRIMARY
+                    left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.PRIMARY
                 ),
             )
         ],
@@ -330,14 +330,14 @@ def test_get_joinable_data_sources_multi_hop(multi_hop_join_semantic_model: Sema
                 right_data_source_reference=DataSourceReference(data_source_name="bridge_table"),
                 entity_reference=EntityReference(element_name="account_id"),
                 join_type=DataSourceEntityJoinType(
-                    left_identifier_type=EntityType.PRIMARY, right_identifier_type=EntityType.PRIMARY
+                    left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.PRIMARY
                 ),
             ),
             DataSourceEntityJoin(
                 right_data_source_reference=DataSourceReference(data_source_name="customer_other_data"),
                 entity_reference=EntityReference(element_name="customer_id"),
                 join_type=DataSourceEntityJoinType(
-                    left_identifier_type=EntityType.FOREIGN, right_identifier_type=EntityType.PRIMARY
+                    left_entity_type=EntityType.FOREIGN, right_entity_type=EntityType.PRIMARY
                 ),
             ),
         ],
@@ -349,21 +349,21 @@ def test_get_joinable_data_sources_multi_hop(multi_hop_join_semantic_model: Sema
                 right_data_source_reference=DataSourceReference(data_source_name="bridge_table"),
                 entity_reference=EntityReference(element_name="account_id"),
                 join_type=DataSourceEntityJoinType(
-                    left_identifier_type=EntityType.PRIMARY, right_identifier_type=EntityType.PRIMARY
+                    left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.PRIMARY
                 ),
             ),
             DataSourceEntityJoin(
                 right_data_source_reference=DataSourceReference(data_source_name="customer_table"),
                 entity_reference=EntityReference(element_name="customer_id"),
                 join_type=DataSourceEntityJoinType(
-                    left_identifier_type=EntityType.FOREIGN, right_identifier_type=EntityType.PRIMARY
+                    left_entity_type=EntityType.FOREIGN, right_entity_type=EntityType.PRIMARY
                 ),
             ),
         ],
     )
 
 
-def test_natural_identifier_data_source_validation(scd_semantic_model: SemanticModel) -> None:
+def test_natural_entity_data_source_validation(scd_semantic_model: SemanticModel) -> None:
     """Tests data source validation for NATURAL target identifier types
 
     These tests rely on the scd_semantic_model, which makes extensive use of NATURAL key types.

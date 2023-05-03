@@ -73,7 +73,7 @@ class WhereConstraintConverter:
         """
         where_constraint_dimensions = []
         where_constraint_time_dimensions = []
-        where_constraint_identifiers = []
+        where_constraint_entities = []
         linkable_spec_names = [
             StructuredLinkableSpecName.from_name(linkable_name) for linkable_name in where_constraint_names
         ]
@@ -98,14 +98,14 @@ class WhereConstraintConverter:
                 else:
                     raise RuntimeError(f"Unhandled type: {dimension.type}")
             elif spec_name.element_name in entity_references:
-                where_constraint_identifiers.append(EntitySpec.from_name(spec_name.qualified_name))
+                where_constraint_entities.append(EntitySpec.from_name(spec_name.qualified_name))
             else:
                 raise InvalidQueryException(f"Unknown element: {spec_name}")
 
         return LinkableSpecSet(
             dimension_specs=tuple(where_constraint_dimensions),
             time_dimension_specs=tuple(where_constraint_time_dimensions),
-            entity_specs=tuple(where_constraint_identifiers),
+            entity_specs=tuple(where_constraint_entities),
         )
 
     @staticmethod

@@ -174,7 +174,7 @@ def test_case(
     mf_test_session_state: MetricFlowTestSessionState,
     simple_semantic_model: SemanticModel,
     simple_semantic_model_non_ds: SemanticModel,
-    composite_identifier_semantic_model: SemanticModel,
+    composite_entity_semantic_model: SemanticModel,
     unpartitioned_multi_hop_join_semantic_model: SemanticModel,
     multi_hop_join_semantic_model: SemanticModel,
     extended_date_semantic_model: SemanticModel,
@@ -201,7 +201,7 @@ def test_case(
     elif case.model is IntegrationTestModel.SIMPLE_MODEL_NON_DS:
         semantic_model = simple_semantic_model_non_ds
     elif case.model is IntegrationTestModel.COMPOSITE_IDENTIFIER_MODEL:
-        semantic_model = composite_identifier_semantic_model
+        semantic_model = composite_entity_semantic_model
     elif case.model is IntegrationTestModel.UNPARTITIONED_MULTI_HOP_JOIN_MODEL:
         semantic_model = unpartitioned_multi_hop_join_semantic_model
     elif case.model is IntegrationTestModel.PARTITIONED_MULTI_HOP_JOIN_MODEL:

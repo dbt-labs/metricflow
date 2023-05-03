@@ -97,7 +97,7 @@ class DataSourceSemanticsAccessor(ABC):
         """Retrieves the aggregate time dimension that is associated with the measure reference"""
 
     @abstractmethod
-    def get_identifier_in_data_source(self, ref: DataSourceElementReference) -> Optional[Entity]:
+    def get_entity_in_data_source(self, ref: DataSourceElementReference) -> Optional[Entity]:
         """Retrieve the identifier matching the element -> data source mapping, if any"""
         raise NotImplementedError
 
@@ -120,7 +120,7 @@ class DataSourceSemanticsAccessor(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_data_sources_for_identifier(self, entity_reference: EntityReference) -> Set[DataSource]:
+    def get_data_sources_for_entity(self, entity_reference: EntityReference) -> Set[DataSource]:
         """Return all data sources associated with an identifier reference"""
         raise NotImplementedError
 

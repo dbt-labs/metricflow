@@ -62,12 +62,12 @@ from dbt_semantic_interfaces.objects.metric import MetricTimeWindow
 
 @pytest.fixture(scope="session")
 def composite_dataflow_to_sql_converter(  # noqa: D
-    composite_identifier_semantic_model: SemanticModel,
+    composite_entity_semantic_model: SemanticModel,
     time_spine_source: TimeSpineSource,
 ) -> DataflowToSqlQueryPlanConverter[DataSourceDataSet]:
     return DataflowToSqlQueryPlanConverter[DataSourceDataSet](
-        column_association_resolver=DefaultColumnAssociationResolver(composite_identifier_semantic_model),
-        semantic_model=composite_identifier_semantic_model,
+        column_association_resolver=DefaultColumnAssociationResolver(composite_entity_semantic_model),
+        semantic_model=composite_entity_semantic_model,
         time_spine_source=time_spine_source,
     )
 
@@ -325,7 +325,7 @@ def test_single_join_node(  # noqa: D
         join_targets=[
             JoinDescription(
                 join_node=filtered_dimension_node,
-                join_on_identifier=entity_spec,
+                join_on_entity=entity_spec,
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
             )
@@ -377,13 +377,13 @@ def test_multi_join_node(
         join_targets=[
             JoinDescription(
                 join_node=filtered_dimension_node,
-                join_on_identifier=LinklessEntitySpec.from_element_name(element_name="listing"),
+                join_on_entity=LinklessEntitySpec.from_element_name(element_name="listing"),
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
             ),
             JoinDescription(
                 join_node=filtered_dimension_node,
-                join_on_identifier=LinklessEntitySpec.from_element_name(element_name="listing"),
+                join_on_entity=LinklessEntitySpec.from_element_name(element_name="listing"),
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
             ),
@@ -439,7 +439,7 @@ def test_compute_metrics_node(
         join_targets=[
             JoinDescription(
                 join_node=filtered_dimension_node,
-                join_on_identifier=entity_spec,
+                join_on_entity=entity_spec,
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
             )
@@ -501,7 +501,7 @@ def test_compute_metrics_node_simple_expr(
         join_targets=[
             JoinDescription(
                 join_node=filtered_dimension_node,
-                join_on_identifier=entity_spec,
+                join_on_entity=entity_spec,
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
             )
@@ -781,7 +781,7 @@ def test_compute_metrics_node_ratio_from_single_data_source(
         join_targets=[
             JoinDescription(
                 join_node=filtered_dimension_node,
-                join_on_identifier=entity_spec,
+                join_on_entity=entity_spec,
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
             )
@@ -1281,7 +1281,7 @@ def test_limit_rows(  # noqa: D
     )
 
 
-def test_composite_identifier(  # noqa: D
+def test_composite_entity(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     composite_dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
@@ -1304,7 +1304,7 @@ def test_composite_identifier(  # noqa: D
     )
 
 
-def test_composite_identifier_with_order_by(  # noqa: D
+def test_composite_entity_with_order_by(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     composite_dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
@@ -1330,7 +1330,7 @@ def test_composite_identifier_with_order_by(  # noqa: D
     )
 
 
-def test_composite_identifier_with_join(  # noqa: D
+def test_composite_entity_with_join(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     composite_dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
@@ -1385,7 +1385,7 @@ def test_distinct_values(  # noqa: D
     )
 
 
-def test_local_dimension_using_local_identifier(  # noqa: D
+def test_local_dimension_using_local_entity(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],

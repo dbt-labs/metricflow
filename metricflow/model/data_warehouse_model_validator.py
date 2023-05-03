@@ -274,7 +274,7 @@ class DataWarehouseTaskBuilder:
         return tasks
 
     @classmethod
-    def gen_identifier_tasks(
+    def gen_entity_tasks(
         cls, model: UserConfiguredModel, sql_client: SqlClient, system_schema: str
     ) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the identifiers of the model
@@ -309,7 +309,7 @@ class DataWarehouseTaskBuilder:
                             cls.renderize,
                             sql_client=sql_client,
                             plan_converter=render_tools.plan_converter,
-                            plan_id=f"{data_source.name}_identifier_{spec.element_name}_validation",
+                            plan_id=f"{data_source.name}_entity_{spec.element_name}_validation",
                             nodes=filter_elements_node,
                         ),
                         context=DataSourceElementContext(
@@ -335,7 +335,7 @@ class DataWarehouseTaskBuilder:
                         cls.renderize,
                         sql_client=sql_client,
                         plan_converter=render_tools.plan_converter,
-                        plan_id=f"{data_source.name}_all_identifiers_validation",
+                        plan_id=f"{data_source.name}_all_entities_validation",
                         nodes=filter_elements_node,
                     ),
                     context=DataSourceContext(
@@ -565,7 +565,7 @@ class DataWarehouseModelValidator:
         )
         return self.run_tasks(tasks=tasks, timeout=timeout)
 
-    def validate_identifiers(self, model: UserConfiguredModel, timeout: Optional[int] = None) -> ModelValidationResults:
+    def validate_entities(self, model: UserConfiguredModel, timeout: Optional[int] = None) -> ModelValidationResults:
         """Generates a list of tasks for validating the identifiers of the model and then runs them
 
         Args:
@@ -575,7 +575,7 @@ class DataWarehouseModelValidator:
         Returns:
             A list of validation issues. If there are no validation issues, an empty list is returned.
         """
-        tasks = DataWarehouseTaskBuilder.gen_identifier_tasks(
+        tasks = DataWarehouseTaskBuilder.gen_entity_tasks(
             model=model, sql_client=self._sql_client, system_schema=self._sql_schema
         )
         return self.run_tasks(tasks=tasks, timeout=timeout)

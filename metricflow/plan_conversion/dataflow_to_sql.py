@@ -391,7 +391,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         # The dataflow plan describes how the data sets coming from the parent nodes should be joined together. Use
         # those descriptions to convert them to join descriptions for the SQL query plan.
         for join_description in node.join_targets:
-            join_on_identifier = join_description.join_on_identifier
+            join_on_entity = join_description.join_on_entity
 
             right_node_to_join: BaseOutput = join_description.join_node
             right_data_set: SqlDataSet = right_node_to_join.accept(self)
@@ -405,7 +405,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 )
             )
 
-            # Remove the linkable instances with the join_on_identifier as the leading link as the next step adds the
+            # Remove the linkable instances with the join_on_entity as the leading link as the next step adds the
             # link. This is to avoid cases where there is a primary identifier and a dimension in the data set, and we
             # create an instance in the next step that has the same identifier link.
             # e.g. a data set has the dimension "listing__country_latest" and "listing" is a primary identifier in the
@@ -414,7 +414,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
             # logger.error(f"before filter is:\n{pformat_big_objects(right_data_set.instance_set.spec_set)}")
             right_data_set_instance_set_filtered = FilterLinkableInstancesWithLeadingLink(
-                entity_link=join_on_identifier,
+                entity_link=join_on_entity,
             ).transform(right_data_set.instance_set)
             # logger.error(f"after filter is:\n{pformat_big_objects(right_data_set_instance_set_filtered.spec_set)}")
 
@@ -424,7 +424,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             # the output data set should have the "country" dimension instance with the "user_id" identifier link
             # (if "user_id" equality was the join condition). "country" -> "user_id__country"
             right_data_set_instance_set_after_join = right_data_set_instance_set_filtered.transform(
-                AddLinkToLinkableElements(join_on_identifier=join_on_identifier)
+                AddLinkToLinkableElements(join_on_entity=join_on_entity)
             )
             table_alias_to_instance_set[right_data_set_alias] = right_data_set_instance_set_after_join
 
@@ -1221,12 +1221,12 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         )
 
         # Build optional window grouping SqlSelectColumn
-        identifier_select_columns: List[SqlSelectColumn] = []
+        entity_select_columns: List[SqlSelectColumn] = []
         for entity_spec in node.entity_specs:
             entity_column_associations = self.column_association_resolver.resolve_entity_spec(entity_spec)
             assert len(entity_column_associations) == 1, "Composite identifiers not supported"
             entity_column_name = entity_column_associations[0].column_name
-            identifier_select_columns.append(
+            entity_select_columns.append(
                 SqlSelectColumn(
                     expr=SqlColumnReferenceExpression(
                         SqlColumnReference(
@@ -1260,7 +1260,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 column_alias=query_time_dimension_column_name,
             )
 
-        row_filter_group_bys = tuple(identifier_select_columns)
+        row_filter_group_bys = tuple(entity_select_columns)
         if queried_time_dimension_select_column:
             row_filter_group_bys += (queried_time_dimension_select_column,)
         # Construct SelectNode for Row filtering

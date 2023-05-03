@@ -108,7 +108,7 @@ def test_joined_node_data_set(
         join_targets=[
             JoinDescription(
                 join_node=users_node,
-                join_on_identifier=LinklessEntitySpec.from_element_name("user"),
+                join_on_entity=LinklessEntitySpec.from_element_name("user"),
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
             )

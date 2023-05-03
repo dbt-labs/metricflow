@@ -44,7 +44,7 @@ class MultiHopJoinCandidateLineage(Generic[SqlDataSetT]):
 
     first_node_to_join: BaseOutput[SqlDataSetT]
     second_node_to_join: BaseOutput[SqlDataSetT]
-    join_second_node_by_identifier: LinklessEntitySpec
+    join_second_node_by_entity: LinklessEntitySpec
 
 
 @dataclass(frozen=True)
@@ -118,7 +118,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                 processed_nodes.append(source_node)
         return processed_nodes
 
-    def _node_contains_identifier(
+    def _node_contains_entity(
         self,
         node: BaseOutput[SqlDataSetT],
         entity_reference: EntityReference,
@@ -139,7 +139,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                 len(entity_instance_in_first_node.defined_from) == 1
             ), "Multiple items in defined_from not yet supported"
 
-            identifier = self._data_source_semantics.get_identifier_in_data_source(
+            identifier = self._data_source_semantics.get_entity_in_data_source(
                 entity_instance_in_first_node.defined_from[0]
             )
             if identifier is None:
@@ -176,11 +176,11 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
 
             # When joining on the identifier, the first node needs the first and second identifier links.
             if not (
-                self._node_contains_identifier(
+                self._node_contains_entity(
                     node=first_node_that_could_be_joined,
                     entity_reference=desired_linkable_spec.entity_links[0],
                 )
-                and self._node_contains_identifier(
+                and self._node_contains_entity(
                     node=first_node_that_could_be_joined,
                     entity_reference=desired_linkable_spec.entity_links[1],
                 )
@@ -189,7 +189,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
 
             for second_node_that_could_be_joined in nodes:
                 if not (
-                    self._node_contains_identifier(
+                    self._node_contains_entity(
                         node=second_node_that_could_be_joined,
                         entity_reference=desired_linkable_spec.entity_links[1],
                     )
@@ -248,7 +248,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                             join_targets=[
                                 JoinDescription(
                                     join_node=filtered_joinable_node,
-                                    join_on_identifier=LinklessEntitySpec.from_reference(
+                                    join_on_entity=LinklessEntitySpec.from_reference(
                                         desired_linkable_spec.entity_links[1]
                                     ),
                                     join_on_partition_dimensions=join_on_partition_dimensions,
@@ -261,7 +261,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                             second_node_to_join=second_node_that_could_be_joined,
                             # entity_spec_in_first_node should already not have identifier links since we checked
                             # for that, but using this method for type checking.
-                            join_second_node_by_identifier=LinklessEntitySpec.from_reference(
+                            join_second_node_by_entity=LinklessEntitySpec.from_reference(
                                 desired_linkable_spec.entity_links[1]
                             ),
                         ),

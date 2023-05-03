@@ -179,7 +179,7 @@ class DataSourceValidityWindowRule(ModelValidationRule):
             )
             issues.append(error)
 
-        primary_or_unique_identifiers = [
+        primary_or_unique_entities = [
             identifier
             for identifier in data_source.identifiers
             if identifier.type in (EntityType.PRIMARY, EntityType.UNIQUE)
@@ -191,12 +191,12 @@ class DataSourceValidityWindowRule(ModelValidationRule):
                     f"Data source {data_source.name} has validity param dimensions defined, but does not have an "
                     f"identifier with type `natural` set. The natural key for this data source is what we use to "
                     f"process a validity window join. Primary or unique identifiers, if any, might be suitable for "
-                    f"use as natural keys: ({[identifier.name for identifier in primary_or_unique_identifiers]})."
+                    f"use as natural keys: ({[identifier.name for identifier in primary_or_unique_entities]})."
                 ),
             )
             issues.append(error)
 
-        if primary_or_unique_identifiers:
+        if primary_or_unique_entities:
             error = ValidationError(
                 context=context,
                 message=(

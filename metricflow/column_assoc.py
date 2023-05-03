@@ -30,7 +30,7 @@ class SingleColumnCorrelationKey(ColumnCorrelationKey, SerializableDataclass):
 class CompositeColumnCorrelationKey(ColumnCorrelationKey, SerializableDataclass):
     """Key to use when there are multiple column associations in an instance"""
 
-    sub_identifier: str
+    sub_entity: str
 
 
 @dataclass(frozen=True)

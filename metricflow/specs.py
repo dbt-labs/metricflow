@@ -365,7 +365,7 @@ class NonAdditiveDimensionSpec(SerializableDataclass):
             dimension_specs=(),
             time_dimension_specs=(TimeDimensionSpec.from_name(self.name),),
             entity_specs=tuple(
-                LinklessEntitySpec.from_element_name(identifier_name) for identifier_name in self.window_groupings
+                LinklessEntitySpec.from_element_name(entity_name) for entity_name in self.window_groupings
             ),
         )
 

@@ -150,19 +150,15 @@ class SqlQueryPlanJoinBuilder:
         columns and account for validity windows, if those are defined in one of the datasets.
         """
 
-        join_on_identifier = join_description.join_on_identifier
+        join_on_entity = join_description.join_on_entity
 
         # Figure out which columns in the "left" data set correspond to the identifier that we want to join on.
         # The column associations tell us which columns correspond to which instances in the data set.
-        left_data_set_entity_column_associations = left_data_set.data_set.column_associations_for_identifier(
-            join_on_identifier
-        )
+        left_data_set_entity_column_associations = left_data_set.data_set.column_associations_for_entity(join_on_entity)
         left_data_set_entity_cols = [c.column_name for c in left_data_set_entity_column_associations]
 
         # Figure out which columns in the "right" data set correspond to the identifier that we want to join on.
-        right_data_set_column_associations = right_data_set.data_set.column_associations_for_identifier(
-            join_on_identifier
-        )
+        right_data_set_column_associations = right_data_set.data_set.column_associations_for_entity(join_on_entity)
         right_data_set_entity_cols = [c.column_name for c in right_data_set_column_associations]
 
         assert len(left_data_set_entity_cols) == len(right_data_set_entity_cols), (

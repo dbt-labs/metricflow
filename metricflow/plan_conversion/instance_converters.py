@@ -367,8 +367,8 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
     e.g. "country" -> "user_id__country" after a data set has been joined by identifier.
     """
 
-    def __init__(self, join_on_identifier: LinklessEntitySpec) -> None:  # noqa: D
-        self._join_on_identifier = join_on_identifier
+    def __init__(self, join_on_entity: LinklessEntitySpec) -> None:  # noqa: D
+        self._join_on_entity = join_on_entity
 
     def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D
         assert len(instance_set.metric_instances) == 0, "Can't add links to instance sets with metrics"
@@ -380,7 +380,7 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
             # The new dimension spec should include the join on identifier.
             transformed_dimension_spec_from_right = DimensionSpec(
                 element_name=dimension_instance.spec.element_name,
-                entity_links=self._join_on_identifier.as_linkless_prefix + dimension_instance.spec.entity_links,
+                entity_links=self._join_on_entity.as_linkless_prefix + dimension_instance.spec.entity_links,
             )
             dimension_instances_with_additional_link.append(
                 DimensionInstance(
@@ -397,7 +397,7 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
             transformed_time_dimension_spec_from_right = TimeDimensionSpec(
                 element_name=time_dimension_instance.spec.element_name,
                 entity_links=(
-                    (EntityReference(element_name=self._join_on_identifier.element_name),)
+                    (EntityReference(element_name=self._join_on_entity.element_name),)
                     + time_dimension_instance.spec.entity_links
                 ),
                 time_granularity=time_dimension_instance.spec.time_granularity,
@@ -415,12 +415,12 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
         for entity_instance in instance_set.entity_instances:
             # Don't include adding the identifier link to the same identifier.
             # Otherwise, you would create "user_id__user_id", which is confusing.
-            if entity_instance.spec == self._join_on_identifier:
+            if entity_instance.spec == self._join_on_entity:
                 continue
             # The new identifier spec should include the join on identifier.
             transformed_entity_spec_from_right = EntitySpec(
                 element_name=entity_instance.spec.element_name,
-                entity_links=self._join_on_identifier.as_linkless_prefix + entity_instance.spec.entity_links,
+                entity_links=self._join_on_entity.as_linkless_prefix + entity_instance.spec.entity_links,
             )
             entity_instances_with_additional_link.append(
                 EntityInstance(

@@ -152,12 +152,12 @@ def test_validate_dimensions(  # noqa: D
     assert len(issues.all_issues) == 2
 
 
-def test_build_identifiers_tasks(  # noqa: D
+def test_build_entities_tasks(  # noqa: D
     data_warehouse_validation_model: UserConfiguredModel,
     async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
-    tasks = DataWarehouseTaskBuilder.gen_identifier_tasks(
+    tasks = DataWarehouseTaskBuilder.gen_entity_tasks(
         model=data_warehouse_validation_model,
         sql_client=async_sql_client,
         system_schema=mf_test_session_state.mf_system_schema,
@@ -166,7 +166,7 @@ def test_build_identifiers_tasks(  # noqa: D
     assert len(tasks[0].on_fail_subtasks) == 1  # a sub task for each identifier on the data source
 
 
-def test_validate_identifiers(  # noqa: D
+def test_validate_entities(  # noqa: D
     dw_backed_warehouse_validation_model: UserConfiguredModel,
     async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -177,14 +177,14 @@ def test_validate_identifiers(  # noqa: D
         sql_client=async_sql_client, system_schema=mf_test_session_state.mf_system_schema
     )
 
-    issues = dw_validator.validate_identifiers(model)
+    issues = dw_validator.validate_entities(model)
     assert len(issues.all_issues) == 0
 
     identifiers = list(model.data_sources[0].identifiers)
     identifiers.append(Entity(name="doesnt_exist", type=EntityType.UNIQUE))
     model.data_sources[0].identifiers = identifiers
 
-    issues = dw_validator.validate_identifiers(model)
+    issues = dw_validator.validate_entities(model)
     # One isssue is created for the short circuit query failure, and another is
     # created for the sub task checking the specific identifier
     assert len(issues.all_issues) == 2

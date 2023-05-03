@@ -64,7 +64,7 @@ def test_costing(consistent_id_object_repository: ConsistentIdObjectRepository) 
         join_targets=[
             JoinDescription(
                 join_node=listings_filtered,
-                join_on_identifier=LinklessEntitySpec.from_element_name("listing"),
+                join_on_entity=LinklessEntitySpec.from_element_name("listing"),
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
             )
