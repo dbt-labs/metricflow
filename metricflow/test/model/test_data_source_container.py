@@ -197,4 +197,4 @@ def test_local_linked_elements_for_metric(metric_semantics: MetricSemantics) -> 
 def test_get_data_sources_for_entity(data_source_semantics: DataSourceSemantics) -> None:  # noqa: D
     entity_reference = EntityReference(element_name="user")
     linked_data_sources = data_source_semantics.get_data_sources_for_entity(entity_reference=entity_reference)
-    assert len(linked_data_sources) == 9
+    assert len(linked_data_sources) == 8

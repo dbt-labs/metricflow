@@ -326,7 +326,7 @@ def test_validity_window_must_have_a_natural_key() -> None:
     validity_window_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
     model = parse_yaml_files_to_validation_ready_model([base_model_file(), validity_window_file])
 
-    with pytest.raises(ModelValidationException, match="does not have an identifier with type `natural` set"):
+    with pytest.raises(ModelValidationException, match="does not have an entity with type `natural` set"):
         ModelValidator([DataSourceValidityWindowRule()]).checked_validations(model.model)
 
 
@@ -368,5 +368,5 @@ def test_validity_window_does_not_use_primary_key() -> None:
     validity_window_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
     model = parse_yaml_files_to_validation_ready_model([base_model_file(), validity_window_file])
 
-    with pytest.raises(ModelValidationException, match="has one or more identifiers designated as `primary`"):
+    with pytest.raises(ModelValidationException, match="has one or more entities designated as `primary`"):
         ModelValidator([DataSourceValidityWindowRule()]).checked_validations(model.model)

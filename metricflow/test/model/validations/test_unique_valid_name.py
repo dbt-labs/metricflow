@@ -108,7 +108,7 @@ def test_duplicate_dimension_name(simple_model__with_primary_transforms: UserCon
         ModelValidator([UniqueAndValidNameRule()]).checked_validations(model)
 
 
-def test_duplicate_identifier_name(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa:D
+def test_duplicate_entity_name(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa:D
     model = copied_model(simple_model__with_primary_transforms)
 
     # Ensure we have a usable data source for the test
@@ -120,7 +120,7 @@ def test_duplicate_identifier_name(simple_model__with_primary_transforms: UserCo
 
     with pytest.raises(
         ModelValidationException,
-        match=rf"can't use name `{duplicated_identifier.reference.element_name}` for a identifier when it was already used for a identifier",
+        match=rf"can't use name `{duplicated_identifier.reference.element_name}` for a entity when it was already used for a entity",
     ):
         ModelValidator([UniqueAndValidNameRule()]).checked_validations(model)
 

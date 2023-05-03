@@ -26,8 +26,7 @@ def test_pformat_big_objects() -> None:  # noqa: D
             """\
             {'class': 'DimensionSpec',
              'element_name': 'country_latest',
-             'entity_links': ({'class': 'EntityReference',
-                                   'element_name': 'listing'},)}
+             'entity_links': ({'class': 'EntityReference', 'element_name': 'listing'},)}
             """
         ).rstrip()
     )
@@ -38,8 +37,7 @@ def test_pformat_big_objects() -> None:  # noqa: D
             dimension_spec:
                 {'class': 'DimensionSpec',
                  'element_name': 'country_latest',
-                 'entity_links': ({'class': 'EntityReference',
-                                       'element_name': 'listing'},)}
+                 'entity_links': ({'class': 'EntityReference', 'element_name': 'listing'},)}
             """
         ).rstrip()
     )
