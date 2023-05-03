@@ -70,7 +70,7 @@ class ColumnAssociationResolver(ABC):
         pass
 
     @abstractmethod
-    def resolve_identifier_spec(self, identifier_spec: EntitySpec) -> Tuple[ColumnAssociation, ...]:  # noqa: D
+    def resolve_identifier_spec(self, entity_spec: EntitySpec) -> Tuple[ColumnAssociation, ...]:  # noqa: D
         pass
 
     @abstractmethod

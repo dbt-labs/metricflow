@@ -775,7 +775,7 @@ class ChangeAssociatedColumns(InstanceSetTransform[InstanceSet]):
             output_identifier_instances.append(
                 EntityInstance(
                     associated_columns=self._column_association_resolver.resolve_identifier_spec(
-                        identifier_spec=input_identifier_instance.spec
+                        entity_spec=input_identifier_instance.spec
                     ),
                     spec=input_identifier_instance.spec,
                     defined_from=input_identifier_instance.defined_from,
