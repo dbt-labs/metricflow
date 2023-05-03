@@ -40,8 +40,6 @@ class DimensionTypeParams(HashableBaseModel):
     """Dimension type params add additional context to some types (time) of dimensions"""
 
     is_primary: bool = False
-    # For legacy support. This is not used.
-    time_format: str = ISO8601_FMT
     time_granularity: TimeGranularity
     validity_params: Optional[DimensionValidityParams] = None
 

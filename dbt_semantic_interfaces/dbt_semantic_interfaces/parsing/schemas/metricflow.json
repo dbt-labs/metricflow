@@ -164,9 +164,6 @@
                 "is_primary": {
                     "type": "boolean"
                 },
-                "time_format": {
-                    "type": "string"
-                },
                 "time_granularity": {
                     "enum": [
                         "DAY",

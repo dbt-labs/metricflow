@@ -446,7 +446,6 @@ def test_data_source_time_dimension_parsing() -> None:
             - name: example_time_dimension
               type: time
               type_params:
-                time_format: "%Y-%M-%D"
                 time_granularity: month
         """
     )
@@ -461,7 +460,6 @@ def test_data_source_time_dimension_parsing() -> None:
     assert dimension.type is DimensionType.TIME
     assert dimension.type_params is not None
     assert dimension.type_params.is_primary is not True
-    assert dimension.type_params.time_format == "%Y-%M-%D"
     assert dimension.type_params.time_granularity is TimeGranularity.MONTH
 
 
