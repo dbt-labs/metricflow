@@ -9,26 +9,26 @@ logger = logging.getLogger(__name__)
 class CompositeEntityExpressionRule(ModelTransformRule):
     """Transform composite sub-identifiers for convenience.
 
-    If a sub-identifier has no expression, check if an identifier exists with the same name and use that identifier's
+    If a sub-entity has no expression, check if an entity exists with the same name and use that entity's
     expression if it has one.
     """
 
     @staticmethod
     def transform_model(model: UserConfiguredModel) -> UserConfiguredModel:  # noqa: D
         for data_source in model.data_sources:
-            for identifier in data_source.identifiers:
-                if identifier.identifiers is None or len(identifier.identifiers) == 0:
+            for entity in data_source.identifiers:
+                if entity.entities is None or len(entity.entities) == 0:
                     continue
 
-                for sub_identifier in identifier.identifiers:
-                    if sub_identifier.name or sub_identifier.expr:
+                for sub_entity in entity.entities:
+                    if sub_entity.name or sub_entity.expr:
                         continue
 
-                    for identifier in data_source.identifiers:
-                        if sub_identifier.ref == identifier.name:
-                            sub_identifier.ref = None
-                            sub_identifier.name = identifier.name
-                            sub_identifier.expr = identifier.expr
+                    for entity in data_source.identifiers:
+                        if sub_entity.ref == entity.name:
+                            sub_entity.ref = None
+                            sub_entity.name = entity.name
+                            sub_entity.expr = entity.expr
                             break
 
         return model

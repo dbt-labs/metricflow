@@ -79,7 +79,7 @@ class DefaultColumnAssociationResolver(ColumnAssociationResolver):
                     break
 
         # composite identifier case
-        if len(sub_id_references) != 0:
+        if len(sub_entity_references) != 0:
             column_associations: Tuple[ColumnAssociation, ...] = ()
             for sub_entity_reference in sub_entity_references:
                 if sub_entity_reference is not None:

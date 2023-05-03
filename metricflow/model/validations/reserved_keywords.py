@@ -83,13 +83,13 @@ class ReservedKeywordsRule(ModelValidationRule):
                     )
                 )
 
-        for identifier in data_source.identifiers:
-            if identifier.is_composite:
-                msg = "'{name}' is an SQL reserved keyword, and thus cannot be used as a sub-identifier 'name'"
-                names = [sub_ident.name for sub_ident in identifier.identifiers if sub_ident.name is not None]
+        for entity in data_source.identifiers:
+            if entity.is_composite:
+                msg = "'{name}' is an SQL reserved keyword, and thus cannot be used as a sub-entity 'name'"
+                names = [sub_entity.name for sub_entity in entity.entities if sub_entity.name is not None]
             else:
-                msg = "'{name}' is an SQL reserved keyword, and thus cannot be used as an identifier 'name'"
-                names = [identifier.name]
+                msg = "'{name}' is an SQL reserved keyword, and thus cannot be used as an entity 'name'"
+                names = [entity.name]
 
             for name in names:
                 if name.upper() in RESERVED_KEYWORDS:
@@ -98,7 +98,7 @@ class ReservedKeywordsRule(ModelValidationRule):
                             context=DataSourceElementContext(
                                 file_context=FileContext.from_metadata(data_source.metadata),
                                 data_source_element=DataSourceElementReference(
-                                    data_source_name=data_source.name, element_name=identifier.name
+                                    data_source_name=data_source.name, element_name=entity.name
                                 ),
                                 element_type=DataSourceElementType.IDENTIFIER,
                             ),

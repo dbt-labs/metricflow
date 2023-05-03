@@ -93,7 +93,7 @@ def test_invalid_composite_identifiers() -> None:  # noqa:D
                             Entity(
                                 name=foreign_identifier_name,
                                 type=EntityType.FOREIGN,
-                                identifiers=[
+                                entities=[
                                     CompositeSubEntity(name=identifier_name, expr="not_thorium_id"),
                                 ],
                             ),
@@ -142,7 +142,7 @@ def test_composite_identifiers_nonexistent_ref() -> None:  # noqa:D
                             Entity(
                                 name=foreign_identifier_name,
                                 type=EntityType.FOREIGN,
-                                identifiers=[
+                                entities=[
                                     CompositeSubEntity(ref="ident_that_doesnt_exist"),
                                 ],
                             ),
@@ -192,7 +192,7 @@ def test_composite_identifiers_ref_and_name() -> None:  # noqa:D
                             Entity(
                                 name=foreign_identifier_name,
                                 type=EntityType.FOREIGN,
-                                identifiers=[
+                                entities=[
                                     CompositeSubEntity(ref="ident_that_doesnt_exist", name=foreign_identifier2_name),
                                 ],
                             ),

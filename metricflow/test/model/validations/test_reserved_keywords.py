@@ -67,7 +67,7 @@ def test_reserved_keywords_in_identifiers(  # noqa: D
     )
     identifier = data_source.identifiers[0]
     identifier.name = random_keyword()
-    identifier.identifiers = []
+    identifier.entities = []
 
     issues = ReservedKeywordsRule.validate_model(model)
     assert len(issues) == 1
@@ -82,7 +82,7 @@ def test_reserved_keywords_in_composite_identifiers(  # noqa: D
         model=model, function=lambda data_source: len(data_source.identifiers) > 0
     )
     identifier = data_source.identifiers[0]
-    identifier.identifiers = [
+    identifier.entities = [
         CompositeSubEntity(name=random_keyword()),  # should error
         CompositeSubEntity(name=random_keyword()),  # should error
         CompositeSubEntity(expr="SELECT TRUE AS col1"),  # shouldn't error

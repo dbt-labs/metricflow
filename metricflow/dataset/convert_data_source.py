@@ -294,16 +294,16 @@ class DataSourceToDataSetConverter:
             select_columns=select_columns,
         )
 
-    def _create_identifier_instances(
+    def _create_entity_instances(
         self,
         data_source_name: str,
-        identifiers: Sequence[Entity],
+        entities: Sequence[Entity],
         identifier_links: Tuple[EntityReference, ...],
         table_alias: str,
     ) -> Tuple[Sequence[EntityInstance], Sequence[SqlSelectColumn]]:
         identifier_instances = []
         select_columns = []
-        for identifier in identifiers or []:
+        for identifier in entities or []:
             # We don't want to create something like user_id__user_id, so skip if the link is the same as the
             # identifier.
             if len(identifier_links) == 1 and identifier.reference == identifier_links[0]:
@@ -317,22 +317,22 @@ class DataSourceToDataSetConverter:
 
             identifier_instances.append(identifier_instance)
             if identifier.is_composite:
-                for idx in range(len(identifier.identifiers)):
-                    sub_id = identifier.identifiers[idx]
+                for idx in range(len(identifier.entities)):
+                    sub_entity = identifier.entities[idx]
                     column_name = identifier_instance.associated_columns[idx].column_name
 
-                    expr = sub_id.expr
+                    expr = sub_entity.expr
                     if expr is None:
-                        assert sub_id.name is not None
-                        expr = sub_id.name
-                    sub_id_name = sub_id.ref or sub_id.name
-                    assert sub_id_name, f"Sub-identifier {sub_id} must have 'name' or 'ref' defined"
+                        assert sub_entity.name is not None
+                        expr = sub_entity.name
+                    sub_entity_name = sub_entity.ref or sub_entity.name
+                    assert sub_entity_name, f"Sub-entity {sub_entity} must have 'name' or 'ref' defined"
 
                     select_columns.append(
                         SqlSelectColumn(
                             expr=DataSourceToDataSetConverter._make_element_sql_expr(
                                 table_alias=table_alias,
-                                element_name=sub_id_name,
+                                element_name=sub_entity_name,
                                 element_expr=expr,
                             ),
                             column_alias=column_name,
@@ -419,13 +419,13 @@ class DataSourceToDataSetConverter:
 
         # Handle identifiers
         for identifier_links in possible_identifier_links:
-            identifier_instances, select_columns = self._create_identifier_instances(
+            entity_instances, select_columns = self._create_entity_instances(
                 data_source_name=data_source.name,
-                identifiers=data_source.identifiers,
+                entities=data_source.identifiers,
                 identifier_links=identifier_links,
                 table_alias=from_source_alias,
             )
-            all_identifier_instances.extend(identifier_instances)
+            all_identifier_instances.extend(entity_instances)
             all_select_columns.extend(select_columns)
 
         # Generate the "from" clause depending on whether it's an SQL query or an SQL table.
