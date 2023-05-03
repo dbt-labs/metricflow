@@ -64,7 +64,7 @@ def test_no_parent_node_data_set(
             ),
             dimension_instances=(),
             time_dimension_instances=(),
-            identifier_instances=(),
+            entity_instances=(),
         ),
         sql_select_node=SqlSelectStatementNode(
             description="test0",

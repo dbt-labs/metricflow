@@ -444,7 +444,7 @@ def test_natural_identifier_data_source_validation(scd_semantic_model: SemanticM
     )
 
 
-def test_natural_identifier_instance_set_validation(
+def test_natural_entity_instance_set_validation(
     consistent_id_object_repository: ConsistentIdObjectRepository, scd_semantic_model: SemanticModel
 ) -> None:
     """Tests instance set validation for NATURAL target identifier types

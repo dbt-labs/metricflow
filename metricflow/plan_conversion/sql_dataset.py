@@ -41,7 +41,7 @@ class SqlDataSet(DataSet):
         """Given the name of the identifier, return the set of columns associated with it in the data set."""
         matching_instances = 0
         column_associations_to_return = None
-        for linkable_instance in self.instance_set.identifier_instances:
+        for linkable_instance in self.instance_set.entity_instances:
             if (
                 entity_spec.element_name == linkable_instance.spec.element_name
                 and entity_spec.entity_links == linkable_instance.spec.entity_links
@@ -112,7 +112,7 @@ class SqlDataSet(DataSet):
     def groupable_column_associations(self) -> Sequence[ColumnAssociation]:
         """Return a flattened iterable with all groupable column associations for the current data set"""
         instances = (
-            self.instance_set.identifier_instances
+            self.instance_set.entity_instances
             + self.instance_set.dimension_instances
             + self.instance_set.time_dimension_instances
         )
@@ -130,6 +130,6 @@ class SameDataSourceReferenceChecker(InstanceSetTransform[bool]):
         combined.extend(instance_set.measure_instances)
         combined.extend(instance_set.dimension_instances)
         combined.extend(instance_set.time_dimension_instances)
-        combined.extend(instance_set.identifier_instances)
+        combined.extend(instance_set.entity_instances)
 
         return all([all([y.is_from(self._data_source_reference) for y in x.defined_from]) for x in combined])

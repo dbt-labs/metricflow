@@ -221,13 +221,10 @@ class DataSourceJoinEvaluator:
     ) -> DataSourceReference:
         """Return the data source where the identifier was defined in the instance set."""
         matching_instances: List[EntityInstance] = []
-        for identifier_instance in instance_set.identifier_instances:
-            assert len(identifier_instance.defined_from) == 1
-            if (
-                len(identifier_instance.spec.entity_links) == 0
-                and identifier_instance.spec.reference == identifier_reference
-            ):
-                matching_instances.append(identifier_instance)
+        for entity_instance in instance_set.entity_instances:
+            assert len(entity_instance.defined_from) == 1
+            if len(entity_instance.spec.entity_links) == 0 and entity_instance.spec.reference == identifier_reference:
+                matching_instances.append(entity_instance)
 
         assert len(matching_instances) == 1, (
             f"Not exactly 1 matching identifier instances found: {matching_instances} for {identifier_reference} in "

@@ -88,7 +88,7 @@ class CreateSelectColumnsForInstances(InstanceSetTransform[SelectColumnSet]):
             chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.time_dimension_instances])
         )
         identifier_cols = list(
-            chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.identifier_instances])
+            chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.entity_instances])
         )
         metadata_cols = list(
             chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.metadata_instances])
@@ -241,7 +241,7 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
             chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.time_dimension_instances])
         )
         identifier_cols = list(
-            chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.identifier_instances])
+            chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.entity_instances])
         )
         metadata_cols = list(
             chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.metadata_instances])
@@ -411,21 +411,21 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
             )
 
         # Handle identifier instances
-        identifier_instances_with_additional_link = []
-        for identifier_instance in instance_set.identifier_instances:
+        entity_instances_with_additional_link = []
+        for entity_instance in instance_set.entity_instances:
             # Don't include adding the identifier link to the same identifier.
             # Otherwise, you would create "user_id__user_id", which is confusing.
-            if identifier_instance.spec == self._join_on_identifier:
+            if entity_instance.spec == self._join_on_identifier:
                 continue
             # The new identifier spec should include the join on identifier.
             transformed_entity_spec_from_right = EntitySpec(
-                element_name=identifier_instance.spec.element_name,
-                entity_links=self._join_on_identifier.as_linkless_prefix + identifier_instance.spec.entity_links,
+                element_name=entity_instance.spec.element_name,
+                entity_links=self._join_on_identifier.as_linkless_prefix + entity_instance.spec.entity_links,
             )
-            identifier_instances_with_additional_link.append(
+            entity_instances_with_additional_link.append(
                 EntityInstance(
-                    associated_columns=identifier_instance.associated_columns,
-                    defined_from=identifier_instance.defined_from,
+                    associated_columns=entity_instance.associated_columns,
+                    defined_from=entity_instance.defined_from,
                     spec=transformed_entity_spec_from_right,
                 )
             )
@@ -434,7 +434,7 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
             measure_instances=(),
             dimension_instances=tuple(dimension_instances_with_additional_link),
             time_dimension_instances=tuple(time_dimension_instances_with_additional_link),
-            identifier_instances=tuple(identifier_instances_with_additional_link),
+            entity_instances=tuple(entity_instances_with_additional_link),
             metric_instances=(),
             metadata_instances=(),
         )
@@ -470,13 +470,13 @@ class FilterLinkableInstancesWithLeadingLink(InstanceSetTransform[InstanceSet]):
         filtered_time_dimension_instances = tuple(
             x for x in instance_set.time_dimension_instances if self._should_pass(x.spec)
         )
-        filtered_identifier_instances = tuple(x for x in instance_set.identifier_instances if self._should_pass(x.spec))
+        filtered_entity_instances = tuple(x for x in instance_set.entity_instances if self._should_pass(x.spec))
 
         output = InstanceSet(
             measure_instances=instance_set.measure_instances,
             dimension_instances=filtered_dimension_instances,
             time_dimension_instances=filtered_time_dimension_instances,
-            identifier_instances=filtered_identifier_instances,
+            entity_instances=filtered_entity_instances,
             metric_instances=instance_set.metric_instances,
             metadata_instances=instance_set.metadata_instances,
         )
@@ -535,7 +535,7 @@ class FilterElements(InstanceSetTransform[InstanceSet]):
             time_dimension_instances=tuple(
                 x for x in instance_set.time_dimension_instances if self._should_pass(x.spec)
             ),
-            identifier_instances=tuple(x for x in instance_set.identifier_instances if self._should_pass(x.spec)),
+            entity_instances=tuple(x for x in instance_set.entity_instances if self._should_pass(x.spec)),
             metric_instances=tuple(x for x in instance_set.metric_instances if self._should_pass(x.spec)),
             metadata_instances=tuple(x for x in instance_set.metadata_instances if self._should_pass(x.spec)),
         )
@@ -574,7 +574,7 @@ class ChangeMeasureAggregationState(InstanceSetTransform[InstanceSet]):
             measure_instances=measure_instances,
             dimension_instances=instance_set.dimension_instances,
             time_dimension_instances=instance_set.time_dimension_instances,
-            identifier_instances=instance_set.identifier_instances,
+            entity_instances=instance_set.entity_instances,
             metric_instances=instance_set.metric_instances,
             metadata_instances=instance_set.metadata_instances,
         )
@@ -628,7 +628,7 @@ class AliasAggregatedMeasures(InstanceSetTransform[InstanceSet]):
             measure_instances=self._alias_measure_instances(instance_set.measure_instances),
             dimension_instances=instance_set.dimension_instances,
             time_dimension_instances=instance_set.time_dimension_instances,
-            identifier_instances=instance_set.identifier_instances,
+            entity_instances=instance_set.entity_instances,
             metric_instances=instance_set.metric_instances,
             metadata_instances=instance_set.metadata_instances,
         )
@@ -645,7 +645,7 @@ class AddMetrics(InstanceSetTransform[InstanceSet]):
             measure_instances=instance_set.measure_instances,
             dimension_instances=instance_set.dimension_instances,
             time_dimension_instances=instance_set.time_dimension_instances,
-            identifier_instances=instance_set.identifier_instances,
+            entity_instances=instance_set.entity_instances,
             metric_instances=instance_set.metric_instances + tuple(self._metric_instances),
             metadata_instances=instance_set.metadata_instances,
         )
@@ -659,7 +659,7 @@ class RemoveMeasures(InstanceSetTransform[InstanceSet]):
             measure_instances=(),
             dimension_instances=instance_set.dimension_instances,
             time_dimension_instances=instance_set.time_dimension_instances,
-            identifier_instances=instance_set.identifier_instances,
+            entity_instances=instance_set.entity_instances,
             metric_instances=instance_set.metric_instances,
             metadata_instances=instance_set.metadata_instances,
         )
@@ -673,7 +673,7 @@ class RemoveMetrics(InstanceSetTransform[InstanceSet]):
             measure_instances=instance_set.measure_instances,
             dimension_instances=instance_set.dimension_instances,
             time_dimension_instances=instance_set.time_dimension_instances,
-            identifier_instances=instance_set.identifier_instances,
+            entity_instances=instance_set.entity_instances,
             metric_instances=(),
             metadata_instances=instance_set.metadata_instances,
         )
@@ -770,15 +770,15 @@ class ChangeAssociatedColumns(InstanceSetTransform[InstanceSet]):
                 )
             )
 
-        output_identifier_instances = []
-        for input_identifier_instance in instance_set.identifier_instances:
-            output_identifier_instances.append(
+        output_entity_instances = []
+        for input_entity_instance in instance_set.entity_instances:
+            output_entity_instances.append(
                 EntityInstance(
                     associated_columns=self._column_association_resolver.resolve_entity_spec(
-                        entity_spec=input_identifier_instance.spec
+                        entity_spec=input_entity_instance.spec
                     ),
-                    spec=input_identifier_instance.spec,
-                    defined_from=input_identifier_instance.defined_from,
+                    spec=input_entity_instance.spec,
+                    defined_from=input_entity_instance.defined_from,
                 )
             )
 
@@ -811,7 +811,7 @@ class ChangeAssociatedColumns(InstanceSetTransform[InstanceSet]):
             measure_instances=tuple(output_measure_instances),
             dimension_instances=tuple(output_dimension_instances),
             time_dimension_instances=tuple(output_time_dimension_instances),
-            identifier_instances=tuple(output_identifier_instances),
+            entity_instances=tuple(output_entity_instances),
             metric_instances=tuple(output_metric_instances),
             metadata_instances=tuple(output_metadata_instances),
         )

@@ -143,7 +143,7 @@ class InstanceSet(SerializableDataclass):
     measure_instances: Tuple[MeasureInstance, ...] = ()
     dimension_instances: Tuple[DimensionInstance, ...] = ()
     time_dimension_instances: Tuple[TimeDimensionInstance, ...] = ()
-    identifier_instances: Tuple[EntityInstance, ...] = ()
+    entity_instances: Tuple[EntityInstance, ...] = ()
     metric_instances: Tuple[MetricInstance, ...] = ()
     metadata_instances: Tuple[MetadataInstance, ...] = ()
 
@@ -159,7 +159,7 @@ class InstanceSet(SerializableDataclass):
         measure_instances: List[MeasureInstance] = []
         dimension_instances: List[DimensionInstance] = []
         time_dimension_instances: List[TimeDimensionInstance] = []
-        identifier_instances: List[EntityInstance] = []
+        entity_instances: List[EntityInstance] = []
         metric_instances: List[MetricInstance] = []
         metadata_instances: List[MetadataInstance] = []
 
@@ -173,9 +173,9 @@ class InstanceSet(SerializableDataclass):
             for time_dimension_instance in instance_set.time_dimension_instances:
                 if time_dimension_instance.spec not in {x.spec for x in time_dimension_instances}:
                     time_dimension_instances.append(time_dimension_instance)
-            for identifier_instance in instance_set.identifier_instances:
-                if identifier_instance.spec not in {x.spec for x in identifier_instances}:
-                    identifier_instances.append(identifier_instance)
+            for entity_instance in instance_set.entity_instances:
+                if entity_instance.spec not in {x.spec for x in entity_instances}:
+                    entity_instances.append(entity_instance)
             for metric_instance in instance_set.metric_instances:
                 if metric_instance.spec not in {x.spec for x in metric_instances}:
                     metric_instances.append(metric_instance)
@@ -187,7 +187,7 @@ class InstanceSet(SerializableDataclass):
             measure_instances=tuple(measure_instances),
             dimension_instances=tuple(dimension_instances),
             time_dimension_instances=tuple(time_dimension_instances),
-            identifier_instances=tuple(identifier_instances),
+            entity_instances=tuple(entity_instances),
             metric_instances=tuple(metric_instances),
             metadata_instances=tuple(metadata_instances),
         )
@@ -198,7 +198,7 @@ class InstanceSet(SerializableDataclass):
             measure_specs=tuple(x.spec for x in self.measure_instances),
             dimension_specs=tuple(x.spec for x in self.dimension_instances),
             time_dimension_specs=tuple(x.spec for x in self.time_dimension_instances),
-            entity_specs=tuple(x.spec for x in self.identifier_instances),
+            entity_specs=tuple(x.spec for x in self.entity_instances),
             metric_specs=tuple(x.spec for x in self.metric_instances),
             metadata_specs=tuple(x.spec for x in self.metadata_instances),
         )

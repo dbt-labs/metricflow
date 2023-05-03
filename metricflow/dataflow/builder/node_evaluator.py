@@ -157,43 +157,43 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                 if len(entity_spec_in_right_node.entity_links) > 0:
                     continue
 
-                identifier_instance_in_right_node = None
-                for instance in data_set_in_right_node.instance_set.identifier_instances:
+                entity_instance_in_right_node = None
+                for instance in data_set_in_right_node.instance_set.entity_instances:
                     if instance.spec == entity_spec_in_right_node:
-                        identifier_instance_in_right_node = instance
+                        entity_instance_in_right_node = instance
                         break
 
-                if identifier_instance_in_right_node is None:
+                if entity_instance_in_right_node is None:
                     raise RuntimeError(f"Could not find identifier instance with name ({entity_spec_in_right_node})")
 
                 assert (
-                    len(identifier_instance_in_right_node.defined_from) == 1
-                ), f"Did not get exactly 1 defined_from in {identifier_instance_in_right_node}"
+                    len(entity_instance_in_right_node.defined_from) == 1
+                ), f"Did not get exactly 1 defined_from in {entity_instance_in_right_node}"
 
                 identifier_in_right_node = self._data_source_semantics.get_identifier_in_data_source(
-                    identifier_instance_in_right_node.defined_from[0]
+                    entity_instance_in_right_node.defined_from[0]
                 )
                 if identifier_in_right_node is None:
                     raise RuntimeError(
-                        f"Invalid DataSourceElementReference {identifier_instance_in_right_node.defined_from[0]}"
+                        f"Invalid DataSourceElementReference {entity_instance_in_right_node.defined_from[0]}"
                     )
 
-                identifier_instance_in_left_node = None
-                for instance in start_node_instance_set.identifier_instances:
+                entity_instance_in_left_node = None
+                for instance in start_node_instance_set.entity_instances:
                     if instance.spec.reference == entity_spec_in_right_node.reference:
-                        identifier_instance_in_left_node = instance
+                        entity_instance_in_left_node = instance
                         break
 
-                if identifier_instance_in_left_node is None:
+                if entity_instance_in_left_node is None:
                     # The right node can have a superset of identifiers.
                     continue
 
-                assert len(identifier_instance_in_left_node.defined_from) == 1
-                assert len(identifier_instance_in_right_node.defined_from) == 1
+                assert len(entity_instance_in_left_node.defined_from) == 1
+                assert len(entity_instance_in_right_node.defined_from) == 1
 
                 if not self._join_evaluator.is_valid_data_source_join(
-                    left_data_source_reference=identifier_instance_in_left_node.defined_from[0].data_source_reference,
-                    right_data_source_reference=identifier_instance_in_right_node.defined_from[0].data_source_reference,
+                    left_data_source_reference=entity_instance_in_left_node.defined_from[0].data_source_reference,
+                    right_data_source_reference=entity_instance_in_right_node.defined_from[0].data_source_reference,
                     on_identifier_reference=entity_spec_in_right_node.reference,
                 ):
                     continue

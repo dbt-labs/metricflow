@@ -126,8 +126,8 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
         """Returns true if the output of the node contains an identifier of the given types."""
         data_set = self._node_data_set_resolver.get_output_data_set(node)
 
-        for identifier_instance_in_first_node in data_set.instance_set.identifier_instances:
-            entity_spec_in_first_node = identifier_instance_in_first_node.spec
+        for entity_instance_in_first_node in data_set.instance_set.entity_instances:
+            entity_spec_in_first_node = entity_instance_in_first_node.spec
 
             if entity_spec_in_first_node.reference != identifier_reference:
                 continue
@@ -136,15 +136,15 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                 continue
 
             assert (
-                len(identifier_instance_in_first_node.defined_from) == 1
+                len(entity_instance_in_first_node.defined_from) == 1
             ), "Multiple items in defined_from not yet supported"
 
             identifier = self._data_source_semantics.get_identifier_in_data_source(
-                identifier_instance_in_first_node.defined_from[0]
+                entity_instance_in_first_node.defined_from[0]
             )
             if identifier is None:
                 raise RuntimeError(
-                    f"Invalid DataSourceElementReference {identifier_instance_in_first_node.defined_from[0]}"
+                    f"Invalid DataSourceElementReference {entity_instance_in_first_node.defined_from[0]}"
                 )
 
             return True

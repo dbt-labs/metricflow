@@ -122,7 +122,7 @@ class DataSourceToDataSetConverter:
             ),
         )
 
-    def _create_identifier_instance(
+    def _create_entity_instance(
         self,
         data_source_name: str,
         identifier: Entity,
@@ -301,7 +301,7 @@ class DataSourceToDataSetConverter:
         entity_links: Tuple[EntityReference, ...],
         table_alias: str,
     ) -> Tuple[Sequence[EntityInstance], Sequence[SqlSelectColumn]]:
-        identifier_instances = []
+        entity_instances = []
         select_columns = []
         for identifier in entities or []:
             # We don't want to create something like user_id__user_id, so skip if the link is the same as the
@@ -309,17 +309,17 @@ class DataSourceToDataSetConverter:
             if len(entity_links) == 1 and identifier.reference == entity_links[0]:
                 continue
 
-            identifier_instance = self._create_identifier_instance(
+            entity_instance = self._create_entity_instance(
                 data_source_name=data_source_name,
                 identifier=identifier,
                 entity_links=entity_links,
             )
 
-            identifier_instances.append(identifier_instance)
+            entity_instances.append(entity_instance)
             if identifier.is_composite:
                 for idx in range(len(identifier.entities)):
                     sub_entity = identifier.entities[idx]
-                    column_name = identifier_instance.associated_columns[idx].column_name
+                    column_name = entity_instance.associated_columns[idx].column_name
 
                     expr = sub_entity.expr
                     if expr is None:
@@ -346,10 +346,10 @@ class DataSourceToDataSetConverter:
                             element_name=identifier.reference.element_name,
                             element_expr=identifier.expr,
                         ),
-                        column_alias=identifier_instance.associated_column.column_name,
+                        column_alias=entity_instance.associated_column.column_name,
                     )
                 )
-        return identifier_instances, select_columns
+        return entity_instances, select_columns
 
     def create_sql_source_data_set(self, data_source: DataSource) -> DataSourceDataSet:
         """Create an SQL source data set from a data source in the model."""
@@ -358,7 +358,7 @@ class DataSourceToDataSetConverter:
         all_measure_instances: List[MeasureInstance] = []
         all_dimension_instances: List[DimensionInstance] = []
         all_time_dimension_instances: List[TimeDimensionInstance] = []
-        all_identifier_instances: List[EntityInstance] = []
+        all_entity_instances: List[EntityInstance] = []
 
         all_select_columns: List[SqlSelectColumn] = []
         from_source_alias = IdGeneratorRegistry.for_class(self.__class__).create_id(f"{data_source.name}_src")
@@ -425,7 +425,7 @@ class DataSourceToDataSetConverter:
                 entity_links=entity_links,
                 table_alias=from_source_alias,
             )
-            all_identifier_instances.extend(entity_instances)
+            all_entity_instances.extend(entity_instances)
             all_select_columns.extend(select_columns)
 
         # Generate the "from" clause depending on whether it's an SQL query or an SQL table.
@@ -454,7 +454,7 @@ class DataSourceToDataSetConverter:
                 measure_instances=tuple(all_measure_instances),
                 dimension_instances=tuple(all_dimension_instances),
                 time_dimension_instances=tuple(all_time_dimension_instances),
-                identifier_instances=tuple(all_identifier_instances),
+                entity_instances=tuple(all_entity_instances),
                 metric_instances=(),
             ),
             sql_select_node=select_statement_node,

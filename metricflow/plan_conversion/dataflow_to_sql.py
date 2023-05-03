@@ -335,7 +335,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         modified_input_instance_set = InstanceSet(
             measure_instances=input_data_set.instance_set.measure_instances,
             dimension_instances=input_data_set.instance_set.dimension_instances,
-            identifier_instances=input_data_set.instance_set.identifier_instances,
+            entity_instances=input_data_set.instance_set.entity_instances,
             metric_instances=input_data_set.instance_set.metric_instances,
             # we omit the metric time dimension from the right side of the self-join because we need to use
             # the metric time dimension from the right side
@@ -1145,7 +1145,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             measure_instances=tuple(output_measure_instances),
             dimension_instances=input_data_set.instance_set.dimension_instances,
             time_dimension_instances=tuple(output_time_dimension_instances),
-            identifier_instances=input_data_set.instance_set.identifier_instances,
+            entity_instances=input_data_set.instance_set.entity_instances,
             metric_instances=input_data_set.instance_set.metric_instances,
         )
         output_instance_set = ChangeAssociatedColumns(self._column_association_resolver).transform(output_instance_set)
@@ -1344,7 +1344,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 for time_dimension_instance in parent_data_set.instance_set.time_dimension_instances
                 if time_dimension_instance.spec.element_name != DataSet.metric_time_dimension_reference().element_name
             ),
-            identifier_instances=parent_data_set.instance_set.identifier_instances,
+            entity_instances=parent_data_set.instance_set.entity_instances,
             metric_instances=parent_data_set.instance_set.metric_instances,
             metadata_instances=parent_data_set.instance_set.metadata_instances,
         )
