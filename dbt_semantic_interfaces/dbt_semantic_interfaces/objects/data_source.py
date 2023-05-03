@@ -66,7 +66,7 @@ class DataSource(HashableBaseModel, ModelWithMetadataParsing):
     metadata: Optional[Metadata]
 
     @property
-    def identifier_references(self) -> List[LinkableElementReference]:  # noqa: D
+    def entity_references(self) -> List[LinkableElementReference]:  # noqa: D
         return [i.reference for i in self.identifiers]
 
     @property
@@ -93,12 +93,12 @@ class DataSource(HashableBaseModel, ModelWithMetadataParsing):
 
         raise ValueError(f"No dimension with name ({dimension_reference}) in data source with name ({self.name})")
 
-    def get_identifier(self, identifier_reference: LinkableElementReference) -> Entity:  # noqa: D
+    def get_identifier(self, entity_reference: LinkableElementReference) -> Entity:  # noqa: D
         for ident in self.identifiers:
-            if ident.reference == identifier_reference:
+            if ident.reference == entity_reference:
                 return ident
 
-        raise ValueError(f"No identifier with name ({identifier_reference}) in data source with name ({self.name})")
+        raise ValueError(f"No identifier with name ({entity_reference}) in data source with name ({self.name})")
 
     @property
     def has_validity_dimensions(self) -> bool:

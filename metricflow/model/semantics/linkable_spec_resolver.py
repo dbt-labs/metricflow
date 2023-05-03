@@ -490,16 +490,16 @@ class ValidLinkableSpecResolver:
     def _get_data_sources_with_joinable_identifier(
         self,
         left_data_source_reference: DataSourceReference,
-        identifier_reference: EntityReference,
+        entity_reference: EntityReference,
     ) -> Sequence[DataSource]:
         # May switch to non-cached implementation.
-        data_sources = self._identifier_to_data_source[identifier_reference.element_name]
+        data_sources = self._identifier_to_data_source[entity_reference.element_name]
         valid_data_sources = []
         for data_source in data_sources:
             if self._join_evaluator.is_valid_data_source_join(
                 left_data_source_reference=left_data_source_reference,
                 right_data_source_reference=data_source.reference,
-                on_identifier_reference=identifier_reference,
+                on_entity_reference=entity_reference,
             ):
                 valid_data_sources.append(data_source)
         return valid_data_sources
@@ -516,7 +516,7 @@ class ValidLinkableSpecResolver:
         for identifier in measure_data_source.identifiers:
             data_sources = self._get_data_sources_with_joinable_identifier(
                 left_data_source_reference=measure_data_source.reference,
-                identifier_reference=identifier.reference,
+                entity_reference=identifier.reference,
             )
             for data_source in data_sources:
                 if data_source.name == measure_data_source.name:
@@ -599,7 +599,7 @@ class ValidLinkableSpecResolver:
 
             data_sources_that_can_be_joined = self._get_data_sources_with_joinable_identifier(
                 left_data_source_reference=last_data_source_in_path.reference,
-                identifier_reference=identifier.reference,
+                entity_reference=identifier.reference,
             )
             for data_source in data_sources_that_can_be_joined:
                 # Don't create cycles in the join path by repeating a data source in the path.

@@ -121,7 +121,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
     def _node_contains_identifier(
         self,
         node: BaseOutput[SqlDataSetT],
-        identifier_reference: EntityReference,
+        entity_reference: EntityReference,
     ) -> bool:
         """Returns true if the output of the node contains an identifier of the given types."""
         data_set = self._node_data_set_resolver.get_output_data_set(node)
@@ -129,7 +129,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
         for entity_instance_in_first_node in data_set.instance_set.entity_instances:
             entity_spec_in_first_node = entity_instance_in_first_node.spec
 
-            if entity_spec_in_first_node.reference != identifier_reference:
+            if entity_spec_in_first_node.reference != entity_reference:
                 continue
 
             if len(entity_spec_in_first_node.entity_links) > 0:
@@ -178,11 +178,11 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
             if not (
                 self._node_contains_identifier(
                     node=first_node_that_could_be_joined,
-                    identifier_reference=desired_linkable_spec.entity_links[0],
+                    entity_reference=desired_linkable_spec.entity_links[0],
                 )
                 and self._node_contains_identifier(
                     node=first_node_that_could_be_joined,
-                    identifier_reference=desired_linkable_spec.entity_links[1],
+                    entity_reference=desired_linkable_spec.entity_links[1],
                 )
             ):
                 continue
@@ -191,7 +191,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                 if not (
                     self._node_contains_identifier(
                         node=second_node_that_could_be_joined,
-                        identifier_reference=desired_linkable_spec.entity_links[1],
+                        entity_reference=desired_linkable_spec.entity_links[1],
                     )
                 ):
                     continue
@@ -214,12 +214,12 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                     continue
 
                 # The first and second nodes are joined by this identifier
-                identifier_reference_to_join_first_and_second_nodes = desired_linkable_spec.entity_links[1]
+                entity_reference_to_join_first_and_second_nodes = desired_linkable_spec.entity_links[1]
 
                 if not self._join_evaluator.is_valid_instance_set_join(
                     left_instance_set=data_set_of_first_node_that_could_be_joined.instance_set,
                     right_instance_set=data_set_of_second_node_that_can_be_joined.instance_set,
-                    on_identifier_reference=identifier_reference_to_join_first_and_second_nodes,
+                    on_entity_reference=entity_reference_to_join_first_and_second_nodes,
                 ):
                     continue
 

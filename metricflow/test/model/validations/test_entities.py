@@ -41,16 +41,16 @@ def test_data_source_cant_have_more_than_one_primary_identifier(
 
     multiple_identifier_data_source, _ = find_data_source_with(model, func)
 
-    identifier_references = set()
+    entity_references = set()
     for identifier in multiple_identifier_data_source.identifiers:
         identifier.type = EntityType.PRIMARY
-        identifier_references.add(identifier.reference)
+        entity_references.add(identifier.reference)
 
     model_issues = ModelValidator([OnePrimaryEntityPerDataSourceRule()]).validate_model(model)
 
     future_issue = (
         f"Data sources can have only one primary identifier. The data source"
-        f" `{multiple_identifier_data_source.name}` has {len(identifier_references)}"
+        f" `{multiple_identifier_data_source.name}` has {len(entity_references)}"
     )
 
     found_future_issue = False

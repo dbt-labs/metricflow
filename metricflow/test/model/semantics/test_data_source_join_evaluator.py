@@ -82,38 +82,38 @@ def test_distinct_target_data_source_join_validation(simple_semantic_model: Sema
     represent identifier columns with distinct value sets, and as such there is no risk of inadvertent fanout joins.
     """
     data_source_references = __get_simple_model_user_data_source_references_by_type(simple_semantic_model)
-    user_identifier_reference = EntityReference(element_name="user")
+    user_entity_reference = EntityReference(element_name="user")
     join_evaluator = DataSourceJoinEvaluator(data_source_semantics=simple_semantic_model.data_source_semantics)
 
     foreign_primary = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=data_source_references[EntityType.FOREIGN],
         right_data_source_reference=data_source_references[EntityType.PRIMARY],
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
     primary_primary = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=data_source_references[EntityType.PRIMARY],
         right_data_source_reference=data_source_references[EntityType.PRIMARY],
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
     unique_primary = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=data_source_references[EntityType.UNIQUE],
         right_data_source_reference=data_source_references[EntityType.PRIMARY],
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
     foreign_unique = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=data_source_references[EntityType.FOREIGN],
         right_data_source_reference=data_source_references[EntityType.UNIQUE],
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
     primary_unique = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=data_source_references[EntityType.PRIMARY],
         right_data_source_reference=data_source_references[EntityType.UNIQUE],
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
     unique_unique = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=data_source_references[EntityType.UNIQUE],
         right_data_source_reference=data_source_references[EntityType.UNIQUE],
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
 
     results = {
@@ -136,23 +136,23 @@ def test_foreign_target_data_source_join_validation(simple_semantic_model: Seman
     These should all fail by default, as fanout joins are not supported
     """
     data_source_references = __get_simple_model_user_data_source_references_by_type(simple_semantic_model)
-    user_identifier_reference = EntityReference(element_name="user")
+    user_entity_reference = EntityReference(element_name="user")
     join_evaluator = DataSourceJoinEvaluator(data_source_semantics=simple_semantic_model.data_source_semantics)
 
     foreign_foreign = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=data_source_references[EntityType.FOREIGN],
         right_data_source_reference=data_source_references[EntityType.FOREIGN],
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
     primary_foreign = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=data_source_references[EntityType.PRIMARY],
         right_data_source_reference=data_source_references[EntityType.FOREIGN],
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
     unique_foreign = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=data_source_references[EntityType.UNIQUE],
         right_data_source_reference=data_source_references[EntityType.FOREIGN],
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
 
     results = {
@@ -176,13 +176,13 @@ def test_data_source_join_validation_on_missing_identifier(simple_semantic_model
         DataSourceReference("id_verifications")
     )
     assert no_listing_data_source, "Could not find data source `id_verifications` in the simple model!"
-    listing_identifier_reference = EntityReference(element_name="listing")
+    listing_entity_reference = EntityReference(element_name="listing")
     join_evaluator = DataSourceJoinEvaluator(data_source_semantics=simple_semantic_model.data_source_semantics)
 
     assert not join_evaluator.is_valid_data_source_join(
         left_data_source_reference=no_listing_data_source.reference,
         right_data_source_reference=primary_listing_data_source.reference,
-        on_identifier_reference=listing_identifier_reference,
+        on_entity_reference=listing_entity_reference,
     ), (
         "Found valid join on `listing` involving the `id_verifications` data source, which does not include the "
         "`listing` identifier!"
@@ -196,38 +196,38 @@ def test_distinct_target_instance_set_join_validation(
     foreign_user_instance_set = consistent_id_object_repository.simple_model_data_sets["listings_latest"].instance_set
     primary_user_instance_set = consistent_id_object_repository.simple_model_data_sets["users_latest"].instance_set
     unique_user_instance_set = consistent_id_object_repository.simple_model_data_sets["companies"].instance_set
-    user_identifier_reference = EntityReference(element_name="user")
+    user_entity_reference = EntityReference(element_name="user")
     join_evaluator = DataSourceJoinEvaluator(data_source_semantics=simple_semantic_model.data_source_semantics)
 
     foreign_primary = join_evaluator.is_valid_instance_set_join(
         left_instance_set=foreign_user_instance_set,
         right_instance_set=primary_user_instance_set,
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
     primary_primary = join_evaluator.is_valid_instance_set_join(
         left_instance_set=primary_user_instance_set,
         right_instance_set=primary_user_instance_set,
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
     unique_primary = join_evaluator.is_valid_instance_set_join(
         left_instance_set=unique_user_instance_set,
         right_instance_set=primary_user_instance_set,
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
     foreign_unique = join_evaluator.is_valid_instance_set_join(
         left_instance_set=foreign_user_instance_set,
         right_instance_set=unique_user_instance_set,
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
     primary_unique = join_evaluator.is_valid_instance_set_join(
         left_instance_set=primary_user_instance_set,
         right_instance_set=unique_user_instance_set,
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
     unique_unique = join_evaluator.is_valid_instance_set_join(
         left_instance_set=unique_user_instance_set,
         right_instance_set=unique_user_instance_set,
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
 
     results = {
@@ -251,23 +251,23 @@ def test_foreign_target_instance_set_join_validation(
     foreign_user_instance_set = consistent_id_object_repository.simple_model_data_sets["listings_latest"].instance_set
     primary_user_instance_set = consistent_id_object_repository.simple_model_data_sets["users_latest"].instance_set
     unique_user_instance_set = consistent_id_object_repository.simple_model_data_sets["companies"].instance_set
-    user_identifier_reference = EntityReference(element_name="user")
+    user_entity_reference = EntityReference(element_name="user")
     join_evaluator = DataSourceJoinEvaluator(data_source_semantics=simple_semantic_model.data_source_semantics)
 
     foreign_foreign = join_evaluator.is_valid_instance_set_join(
         left_instance_set=foreign_user_instance_set,
         right_instance_set=foreign_user_instance_set,
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
     primary_foreign = join_evaluator.is_valid_instance_set_join(
         left_instance_set=primary_user_instance_set,
         right_instance_set=foreign_user_instance_set,
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
     unique_foreign = join_evaluator.is_valid_instance_set_join(
         left_instance_set=unique_user_instance_set,
         right_instance_set=foreign_user_instance_set,
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
 
     results = {
@@ -293,7 +293,7 @@ def test_get_joinable_data_sources_single_hop(multi_hop_join_semantic_model: Sem
         join_path=[
             DataSourceEntityJoin(
                 right_data_source_reference=DataSourceReference(data_source_name="bridge_table"),
-                identifier_reference=EntityReference(element_name="account_id"),
+                entity_reference=EntityReference(element_name="account_id"),
                 join_type=DataSourceEntityJoinType(
                     left_identifier_type=EntityType.PRIMARY, right_identifier_type=EntityType.PRIMARY
                 ),
@@ -316,7 +316,7 @@ def test_get_joinable_data_sources_multi_hop(multi_hop_join_semantic_model: Sema
         join_path=[
             DataSourceEntityJoin(
                 right_data_source_reference=DataSourceReference(data_source_name="bridge_table"),
-                identifier_reference=EntityReference(element_name="account_id"),
+                entity_reference=EntityReference(element_name="account_id"),
                 join_type=DataSourceEntityJoinType(
                     left_identifier_type=EntityType.PRIMARY, right_identifier_type=EntityType.PRIMARY
                 ),
@@ -328,14 +328,14 @@ def test_get_joinable_data_sources_multi_hop(multi_hop_join_semantic_model: Sema
         join_path=[
             DataSourceEntityJoin(
                 right_data_source_reference=DataSourceReference(data_source_name="bridge_table"),
-                identifier_reference=EntityReference(element_name="account_id"),
+                entity_reference=EntityReference(element_name="account_id"),
                 join_type=DataSourceEntityJoinType(
                     left_identifier_type=EntityType.PRIMARY, right_identifier_type=EntityType.PRIMARY
                 ),
             ),
             DataSourceEntityJoin(
                 right_data_source_reference=DataSourceReference(data_source_name="customer_other_data"),
-                identifier_reference=EntityReference(element_name="customer_id"),
+                entity_reference=EntityReference(element_name="customer_id"),
                 join_type=DataSourceEntityJoinType(
                     left_identifier_type=EntityType.FOREIGN, right_identifier_type=EntityType.PRIMARY
                 ),
@@ -347,14 +347,14 @@ def test_get_joinable_data_sources_multi_hop(multi_hop_join_semantic_model: Sema
         join_path=[
             DataSourceEntityJoin(
                 right_data_source_reference=DataSourceReference(data_source_name="bridge_table"),
-                identifier_reference=EntityReference(element_name="account_id"),
+                entity_reference=EntityReference(element_name="account_id"),
                 join_type=DataSourceEntityJoinType(
                     left_identifier_type=EntityType.PRIMARY, right_identifier_type=EntityType.PRIMARY
                 ),
             ),
             DataSourceEntityJoin(
                 right_data_source_reference=DataSourceReference(data_source_name="customer_table"),
-                identifier_reference=EntityReference(element_name="customer_id"),
+                entity_reference=EntityReference(element_name="customer_id"),
                 join_type=DataSourceEntityJoinType(
                     left_identifier_type=EntityType.FOREIGN, right_identifier_type=EntityType.PRIMARY
                 ),
@@ -380,7 +380,7 @@ def test_natural_identifier_data_source_validation(scd_semantic_model: SemanticM
     unique_user_data_source = scd_semantic_model.data_source_semantics.get_by_reference(
         DataSourceReference("companies")
     )
-    user_identifier_reference = EntityReference(element_name="user")
+    user_entity_reference = EntityReference(element_name="user")
     join_evaluator = DataSourceJoinEvaluator(data_source_semantics=scd_semantic_model.data_source_semantics)
     # Type refinement
     assert natural_user_data_source, "Could not find `primary_accounts` data source in scd model!"
@@ -392,38 +392,38 @@ def test_natural_identifier_data_source_validation(scd_semantic_model: SemanticM
     natural_primary = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=natural_user_data_source.reference,
         right_data_source_reference=primary_user_data_source.reference,
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
     natural_unique = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=natural_user_data_source.reference,
         right_data_source_reference=unique_user_data_source.reference,
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
     foreign_natural = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=foreign_user_data_source.reference,
         right_data_source_reference=natural_user_data_source.reference,
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
     primary_natural = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=primary_user_data_source.reference,
         right_data_source_reference=natural_user_data_source.reference,
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
     unique_natural = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=unique_user_data_source.reference,
         right_data_source_reference=natural_user_data_source.reference,
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
     # Invalid cases
     natural_foreign = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=natural_user_data_source.reference,
         right_data_source_reference=foreign_user_data_source.reference,
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
     natural_natural = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=natural_user_data_source.reference,
         right_data_source_reference=natural_user_data_source.reference,
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
 
     valid_joins = {
@@ -455,45 +455,45 @@ def test_natural_entity_instance_set_validation(
     primary_user_instance_set = consistent_id_object_repository.scd_model_data_sets["users_latest"].instance_set
     foreign_user_instance_set = consistent_id_object_repository.scd_model_data_sets["bookings_source"].instance_set
     unique_user_instance_set = consistent_id_object_repository.scd_model_data_sets["companies"].instance_set
-    user_identifier_reference = EntityReference(element_name="user")
+    user_entity_reference = EntityReference(element_name="user")
     join_evaluator = DataSourceJoinEvaluator(data_source_semantics=scd_semantic_model.data_source_semantics)
 
     # Valid cases
     natural_primary = join_evaluator.is_valid_instance_set_join(
         left_instance_set=natural_user_instance_set,
         right_instance_set=primary_user_instance_set,
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
     natural_unique = join_evaluator.is_valid_instance_set_join(
         left_instance_set=natural_user_instance_set,
         right_instance_set=unique_user_instance_set,
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
     foreign_natural = join_evaluator.is_valid_instance_set_join(
         left_instance_set=foreign_user_instance_set,
         right_instance_set=natural_user_instance_set,
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
     primary_natural = join_evaluator.is_valid_instance_set_join(
         left_instance_set=primary_user_instance_set,
         right_instance_set=natural_user_instance_set,
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
     unique_natural = join_evaluator.is_valid_instance_set_join(
         left_instance_set=unique_user_instance_set,
         right_instance_set=natural_user_instance_set,
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
     # Invalid cases
     natural_foreign = join_evaluator.is_valid_instance_set_join(
         left_instance_set=natural_user_instance_set,
         right_instance_set=foreign_user_instance_set,
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
     natural_natural = join_evaluator.is_valid_instance_set_join(
         left_instance_set=natural_user_instance_set,
         right_instance_set=natural_user_instance_set,
-        on_identifier_reference=user_identifier_reference,
+        on_entity_reference=user_entity_reference,
     )
 
     valid_joins = {

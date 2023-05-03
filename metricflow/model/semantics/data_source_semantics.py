@@ -110,7 +110,7 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
         # Measures should be consistent across data sources, so just use the first one.
         return list(self._measure_index[measure_reference])[0].get_measure(measure_reference)
 
-    def get_identifier_references(self) -> Sequence[EntityReference]:  # noqa: D
+    def get_entity_references(self) -> Sequence[EntityReference]:  # noqa: D
         return list(self._identifier_ref_to_entity.keys())
 
     # DSC interface
@@ -197,7 +197,7 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
         ), f"Data Source {data_source_reference} is not known"
         return self._data_source_to_aggregation_time_dimensions[data_source_reference]
 
-    def get_data_sources_for_identifier(self, identifier_reference: EntityReference) -> Set[DataSource]:
+    def get_data_sources_for_identifier(self, entity_reference: EntityReference) -> Set[DataSource]:
         """Return all data sources associated with an identifier reference"""
-        identifier_entity = self._identifier_ref_to_entity[identifier_reference]
+        identifier_entity = self._identifier_ref_to_entity[entity_reference]
         return set(self._entity_index[identifier_entity])

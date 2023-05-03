@@ -83,7 +83,7 @@ def test_get_names(data_source_semantics: DataSourceSemantics) -> None:  # noqa:
         "user",
         "verification",
     ]
-    assert sorted([i.element_name for i in data_source_semantics.get_identifier_references()]) == expected
+    assert sorted([i.element_name for i in data_source_semantics.get_entity_references()]) == expected
 
 
 def test_get_elements(data_source_semantics: DataSourceSemantics) -> None:  # noqa: D
@@ -195,8 +195,6 @@ def test_local_linked_elements_for_metric(metric_semantics: MetricSemantics) -> 
 
 
 def test_get_data_sources_for_identifier(data_source_semantics: DataSourceSemantics) -> None:  # noqa: D
-    identifier_reference = EntityReference(element_name="user")
-    linked_data_sources = data_source_semantics.get_data_sources_for_identifier(
-        identifier_reference=identifier_reference
-    )
+    entity_reference = EntityReference(element_name="user")
+    linked_data_sources = data_source_semantics.get_data_sources_for_identifier(entity_reference=entity_reference)
     assert len(linked_data_sources) == 9

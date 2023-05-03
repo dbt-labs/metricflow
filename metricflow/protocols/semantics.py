@@ -83,7 +83,7 @@ class DataSourceSemanticsAccessor(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_identifier_references(self) -> Sequence[EntityReference]:
+    def get_entity_references(self) -> Sequence[EntityReference]:
         """Retrieve all identifier references from the collection of data sources"""
         raise NotImplementedError
 
@@ -120,7 +120,7 @@ class DataSourceSemanticsAccessor(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_data_sources_for_identifier(self, identifier_reference: EntityReference) -> Set[DataSource]:
+    def get_data_sources_for_identifier(self, entity_reference: EntityReference) -> Set[DataSource]:
         """Return all data sources associated with an identifier reference"""
         raise NotImplementedError
 

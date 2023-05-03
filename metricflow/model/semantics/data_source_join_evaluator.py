@@ -29,7 +29,7 @@ class DataSourceEntityJoin:
     """How to join one data source onto another, using a specific identifer and join type."""
 
     right_data_source_reference: DataSourceReference
-    identifier_reference: EntityReference
+    entity_reference: EntityReference
     join_type: DataSourceEntityJoinType
 
 
@@ -103,9 +103,9 @@ class DataSourceJoinEvaluator:
             # efficient path to each data source.
             join_paths_to_visit_next: List[List[DataSourceEntityJoin]] = []
             for identifier in parent_data_source.identifiers:
-                identifier_reference = EntityReference(element_name=identifier.name)
+                entity_reference = EntityReference(element_name=identifier.name)
                 identifier_data_sources = self._data_source_semantics.get_data_sources_for_identifier(
-                    identifier_reference=identifier_reference
+                    entity_reference=entity_reference
                 )
 
                 for right_data_source in identifier_data_sources:
@@ -121,7 +121,7 @@ class DataSourceJoinEvaluator:
                     valid_join_type = self.get_valid_data_source_identifier_join_type(
                         left_data_source_reference=parent_data_source_reference,
                         right_data_source_reference=right_data_source_reference,
-                        on_identifier_reference=identifier_reference,
+                        on_entity_reference=entity_reference,
                     )
                     if valid_join_type is None:
                         continue
@@ -129,7 +129,7 @@ class DataSourceJoinEvaluator:
                     join_path_for_data_source = parent_join_path + [
                         DataSourceEntityJoin(
                             right_data_source_reference=right_data_source_reference,
-                            identifier_reference=identifier_reference,
+                            entity_reference=entity_reference,
                             join_type=valid_join_type,
                         )
                     ]
@@ -158,15 +158,15 @@ class DataSourceJoinEvaluator:
         self,
         left_data_source_reference: DataSourceReference,
         right_data_source_reference: DataSourceReference,
-        on_identifier_reference: EntityReference,
+        on_entity_reference: EntityReference,
     ) -> Optional[DataSourceEntityJoinType]:
         """Get valid join type used to join data sources on given identifier, if exists."""
         left_identifier = self._data_source_semantics.get_identifier_in_data_source(
-            DataSourceElementReference.create_from_references(left_data_source_reference, on_identifier_reference)
+            DataSourceElementReference.create_from_references(left_data_source_reference, on_entity_reference)
         )
 
         right_identifier = self._data_source_semantics.get_identifier_in_data_source(
-            DataSourceElementReference.create_from_references(right_data_source_reference, on_identifier_reference)
+            DataSourceElementReference.create_from_references(right_data_source_reference, on_entity_reference)
         )
         if left_identifier is None or right_identifier is None:
             return None
@@ -202,14 +202,14 @@ class DataSourceJoinEvaluator:
         self,
         left_data_source_reference: DataSourceReference,
         right_data_source_reference: DataSourceReference,
-        on_identifier_reference: EntityReference,
+        on_entity_reference: EntityReference,
     ) -> bool:
         """Return true if we should allow a join with the given parameters to resolve a query."""
         return (
             self.get_valid_data_source_identifier_join_type(
                 left_data_source_reference=left_data_source_reference,
                 right_data_source_reference=right_data_source_reference,
-                on_identifier_reference=on_identifier_reference,
+                on_entity_reference=on_entity_reference,
             )
             is not None
         )
@@ -217,17 +217,17 @@ class DataSourceJoinEvaluator:
     @staticmethod
     def _data_source_of_identifier_in_instance_set(
         instance_set: InstanceSet,
-        identifier_reference: EntityReference,
+        entity_reference: EntityReference,
     ) -> DataSourceReference:
         """Return the data source where the identifier was defined in the instance set."""
         matching_instances: List[EntityInstance] = []
         for entity_instance in instance_set.entity_instances:
             assert len(entity_instance.defined_from) == 1
-            if len(entity_instance.spec.entity_links) == 0 and entity_instance.spec.reference == identifier_reference:
+            if len(entity_instance.spec.entity_links) == 0 and entity_instance.spec.reference == entity_reference:
                 matching_instances.append(entity_instance)
 
         assert len(matching_instances) == 1, (
-            f"Not exactly 1 matching identifier instances found: {matching_instances} for {identifier_reference} in "
+            f"Not exactly 1 matching identifier instances found: {matching_instances} for {entity_reference} in "
             f"{pformat_big_objects(instance_set)}"
         )
         return matching_instances[0].origin_data_source_reference.data_source_reference
@@ -236,16 +236,16 @@ class DataSourceJoinEvaluator:
         self,
         left_instance_set: InstanceSet,
         right_instance_set: InstanceSet,
-        on_identifier_reference: EntityReference,
+        on_entity_reference: EntityReference,
     ) -> bool:
         """Return true if the instance sets can be joined using the given identifier."""
         return self.is_valid_data_source_join(
             left_data_source_reference=DataSourceJoinEvaluator._data_source_of_identifier_in_instance_set(
-                instance_set=left_instance_set, identifier_reference=on_identifier_reference
+                instance_set=left_instance_set, entity_reference=on_entity_reference
             ),
             right_data_source_reference=DataSourceJoinEvaluator._data_source_of_identifier_in_instance_set(
                 instance_set=right_instance_set,
-                identifier_reference=on_identifier_reference,
+                entity_reference=on_entity_reference,
             ),
-            on_identifier_reference=on_identifier_reference,
+            on_entity_reference=on_entity_reference,
         )

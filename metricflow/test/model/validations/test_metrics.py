@@ -146,7 +146,7 @@ def test_generated_metrics_only() -> None:  # noqa:D
 
     dim2_reference = TimeDimensionReference(element_name=DEFAULT_DS)
     measure_name = "measure"
-    identifier_reference = EntityReference(element_name="primary")
+    entity_reference = EntityReference(element_name="primary")
     data_source = data_source_with_guaranteed_meta(
         name="dim1",
         sql_query=f"SELECT {dim_reference.element_name}, {measure_name} FROM bar",
@@ -164,7 +164,7 @@ def test_generated_metrics_only() -> None:  # noqa:D
         ],
         mutability=Mutability(type=MutabilityType.IMMUTABLE),
         identifiers=[
-            Entity(name=identifier_reference.element_name, type=EntityType.PRIMARY),
+            Entity(name=entity_reference.element_name, type=EntityType.PRIMARY),
         ],
     )
     data_source.measures[0].create_metric = True

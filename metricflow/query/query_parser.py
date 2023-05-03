@@ -85,7 +85,7 @@ class MetricFlowQueryParser:
         self._data_source_semantics = model.data_source_semantics
 
         # Set up containers for known element names
-        self._known_identifier_element_references = self._data_source_semantics.get_identifier_references()
+        self._known_identifier_element_references = self._data_source_semantics.get_entity_references()
 
         self._known_time_dimension_element_references = [DataSet.metric_time_dimension_reference()]
         self._known_dimension_element_references = []

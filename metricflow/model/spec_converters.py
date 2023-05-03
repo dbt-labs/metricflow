@@ -81,9 +81,9 @@ class WhereConstraintConverter:
             dimension_reference.element_name: dimension_reference
             for dimension_reference in data_source_semantics.get_dimension_references()
         }
-        identifier_references = {
-            identifier_reference.element_name: identifier_reference
-            for identifier_reference in data_source_semantics.get_identifier_references()
+        entity_references = {
+            entity_reference.element_name: entity_reference
+            for entity_reference in data_source_semantics.get_entity_references()
         }
 
         for spec_name in linkable_spec_names:
@@ -97,7 +97,7 @@ class WhereConstraintConverter:
                     where_constraint_time_dimensions.append(TimeDimensionSpec.from_name(spec_name.qualified_name))
                 else:
                     raise RuntimeError(f"Unhandled type: {dimension.type}")
-            elif spec_name.element_name in identifier_references:
+            elif spec_name.element_name in entity_references:
                 where_constraint_identifiers.append(EntitySpec.from_name(spec_name.qualified_name))
             else:
                 raise InvalidQueryException(f"Unknown element: {spec_name}")

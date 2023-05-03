@@ -244,8 +244,8 @@ class LinklessEntitySpec(EntitySpec, SerializableDataclass):
         return hash((self.element_name, self.entity_links))
 
     @staticmethod
-    def from_reference(identifier_reference: EntityReference) -> LinklessEntitySpec:  # noqa: D
-        return LinklessEntitySpec(element_name=identifier_reference.element_name, entity_links=())
+    def from_reference(entity_reference: EntityReference) -> LinklessEntitySpec:  # noqa: D
+        return LinklessEntitySpec(element_name=entity_reference.element_name, entity_links=())
 
 
 @dataclass(frozen=True)
