@@ -135,15 +135,15 @@ def test_query_parser(time_spine_source: TimeSpineSource) -> None:  # noqa: D
     )
 
     assert query_spec.metric_specs == (MetricSpec(element_name="bookings"),)
-    assert query_spec.dimension_specs == (DimensionSpec(element_name="is_instant", identifier_links=()),)
+    assert query_spec.dimension_specs == (DimensionSpec(element_name="is_instant", entity_links=()),)
     assert query_spec.time_dimension_specs == (
-        TimeDimensionSpec(element_name=MTD, identifier_links=(), time_granularity=TimeGranularity.DAY),
+        TimeDimensionSpec(element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY),
     )
-    assert query_spec.identifier_specs == (EntitySpec(element_name="listing", identifier_links=()),)
+    assert query_spec.identifier_specs == (EntitySpec(element_name="listing", entity_links=()),)
     assert query_spec.order_by_specs == (
         OrderBySpec(
             time_dimension_spec=TimeDimensionSpec(
-                element_name=MTD, identifier_links=(), time_granularity=TimeGranularity.DAY
+                element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY
             ),
             descending=False,
         ),
@@ -174,7 +174,7 @@ def test_order_by_granularity_conversion(time_spine_source: TimeSpineSource) -> 
     assert (
         OrderBySpec(
             time_dimension_spec=TimeDimensionSpec(
-                element_name=MTD, identifier_links=(), time_granularity=TimeGranularity.MONTH
+                element_name=MTD, entity_links=(), time_granularity=TimeGranularity.MONTH
             ),
             descending=True,
         ),
@@ -193,7 +193,7 @@ def test_order_by_granularity_no_conversion(time_spine_source: TimeSpineSource) 
     assert (
         OrderBySpec(
             time_dimension_spec=TimeDimensionSpec(
-                element_name=MTD, identifier_links=(), time_granularity=TimeGranularity.DAY
+                element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY
             ),
             descending=False,
         ),
@@ -242,7 +242,7 @@ def test_column_override(time_spine_source: TimeSpineSource) -> None:
         OutputColumnNameOverride(
             time_dimension_spec=TimeDimensionSpec(
                 element_name=MTD,
-                identifier_links=(),
+                entity_links=(),
                 time_granularity=TimeGranularity.MONTH,
             ),
             output_column_name=MTD,
@@ -274,7 +274,7 @@ def test_parse_and_validate_where_constraint_dims(time_spine_source: TimeSpineSo
         time_constraint_end=as_datetime("2020-02-15"),
         where_constraint_str="WHERE is_instant = '1'",
     )
-    assert DimensionSpec(element_name="is_instant", identifier_links=()) not in query_spec.dimension_specs
+    assert DimensionSpec(element_name="is_instant", entity_links=()) not in query_spec.dimension_specs
 
 
 def test_parse_and_validate_where_constraint_metric_time(time_spine_source: TimeSpineSource) -> None:

@@ -282,7 +282,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         metric_time_dimension_spec: Optional[TimeDimensionSpec] = None
         metric_time_dimension_instance: Optional[TimeDimensionInstance] = None
         for instance in input_data_set.metric_time_dimension_instances:
-            if len(instance.spec.identifier_links) == 0:
+            if len(instance.spec.entity_links) == 0:
                 metric_time_dimension_instance = instance
                 metric_time_dimension_spec = instance.spec
                 break
@@ -414,7 +414,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
             # logger.error(f"before filter is:\n{pformat_big_objects(right_data_set.instance_set.spec_set)}")
             right_data_set_instance_set_filtered = FilterLinkableInstancesWithLeadingLink(
-                identifier_link=join_on_identifier,
+                entity_link=join_on_identifier,
             ).transform(right_data_set.instance_set)
             # logger.error(f"after filter is:\n{pformat_big_objects(right_data_set_instance_set_filtered.spec_set)}")
 
@@ -1112,7 +1112,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         for time_dimension_instance in input_data_set.instance_set.time_dimension_instances:
             # The specification for the time dimension to use for aggregation is the local one.
             if (
-                len(time_dimension_instance.spec.identifier_links) == 0
+                len(time_dimension_instance.spec.entity_links) == 0
                 and time_dimension_instance.spec.reference == node.aggregation_time_dimension_reference
             ):
                 matching_time_dimension_instances.append(time_dimension_instance)
@@ -1306,7 +1306,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         # Build time spine dataset
         metric_time_dimension_instance: Optional[TimeDimensionInstance] = None
         for instance in parent_data_set.metric_time_dimension_instances:
-            if len(instance.spec.identifier_links) == 0:
+            if len(instance.spec.entity_links) == 0:
                 # Use the instance with the lowest granularity
                 if not metric_time_dimension_instance or (
                     instance.spec.time_granularity < metric_time_dimension_instance.spec.time_granularity

@@ -34,42 +34,42 @@ def test_convert_table_data_source_without_measures(  # noqa: D
         metric_specs=(),
         measure_specs=(),
         dimension_specs=(
-            DimensionSpec(element_name="home_state_latest", identifier_links=()),
+            DimensionSpec(element_name="home_state_latest", entity_links=()),
             DimensionSpec(
                 element_name="home_state_latest",
-                identifier_links=(EntityReference(element_name="user"),),
+                entity_links=(EntityReference(element_name="user"),),
             ),
         ),
-        identifier_specs=(EntitySpec(element_name="user", identifier_links=()),),
+        identifier_specs=(EntitySpec(element_name="user", entity_links=()),),
         time_dimension_specs=(
-            TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.DAY),
-            TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.WEEK),
-            TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.MONTH),
-            TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.QUARTER),
-            TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.YEAR),
+            TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.DAY),
+            TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.WEEK),
+            TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.MONTH),
+            TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.QUARTER),
+            TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.YEAR),
             TimeDimensionSpec(
                 element_name="ds",
-                identifier_links=(EntityReference(element_name="user"),),
+                entity_links=(EntityReference(element_name="user"),),
                 time_granularity=TimeGranularity.DAY,
             ),
             TimeDimensionSpec(
                 element_name="ds",
-                identifier_links=(EntityReference(element_name="user"),),
+                entity_links=(EntityReference(element_name="user"),),
                 time_granularity=TimeGranularity.WEEK,
             ),
             TimeDimensionSpec(
                 element_name="ds",
-                identifier_links=(EntityReference(element_name="user"),),
+                entity_links=(EntityReference(element_name="user"),),
                 time_granularity=TimeGranularity.MONTH,
             ),
             TimeDimensionSpec(
                 element_name="ds",
-                identifier_links=(EntityReference(element_name="user"),),
+                entity_links=(EntityReference(element_name="user"),),
                 time_granularity=TimeGranularity.QUARTER,
             ),
             TimeDimensionSpec(
                 element_name="ds",
-                identifier_links=(EntityReference(element_name="user"),),
+                entity_links=(EntityReference(element_name="user"),),
                 time_granularity=TimeGranularity.YEAR,
             ),
         ),
@@ -103,87 +103,79 @@ def test_convert_table_data_source_with_measures(  # noqa: D
         metric_specs=(),
         measure_specs=(MeasureSpec(element_name="identity_verifications"),),
         dimension_specs=(
-            DimensionSpec(element_name="verification_type", identifier_links=()),
+            DimensionSpec(element_name="verification_type", entity_links=()),
             DimensionSpec(
                 element_name="verification_type",
-                identifier_links=(EntityReference(element_name="verification"),),
+                entity_links=(EntityReference(element_name="verification"),),
             ),
         ),
         identifier_specs=(
-            EntitySpec(element_name="verification", identifier_links=()),
-            EntitySpec(element_name="user", identifier_links=()),
+            EntitySpec(element_name="verification", entity_links=()),
+            EntitySpec(element_name="user", entity_links=()),
             EntitySpec(
                 element_name="user",
-                identifier_links=(EntityReference(element_name="verification"),),
+                entity_links=(EntityReference(element_name="verification"),),
             ),
         ),
         time_dimension_specs=(
-            TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.DAY),
-            TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.WEEK),
-            TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.MONTH),
-            TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.QUARTER),
-            TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.YEAR),
-            TimeDimensionSpec(element_name="ds_partitioned", identifier_links=(), time_granularity=TimeGranularity.DAY),
-            TimeDimensionSpec(
-                element_name="ds_partitioned", identifier_links=(), time_granularity=TimeGranularity.WEEK
-            ),
-            TimeDimensionSpec(
-                element_name="ds_partitioned", identifier_links=(), time_granularity=TimeGranularity.MONTH
-            ),
-            TimeDimensionSpec(
-                element_name="ds_partitioned", identifier_links=(), time_granularity=TimeGranularity.QUARTER
-            ),
-            TimeDimensionSpec(
-                element_name="ds_partitioned", identifier_links=(), time_granularity=TimeGranularity.YEAR
-            ),
+            TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.DAY),
+            TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.WEEK),
+            TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.MONTH),
+            TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.QUARTER),
+            TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.YEAR),
+            TimeDimensionSpec(element_name="ds_partitioned", entity_links=(), time_granularity=TimeGranularity.DAY),
+            TimeDimensionSpec(element_name="ds_partitioned", entity_links=(), time_granularity=TimeGranularity.WEEK),
+            TimeDimensionSpec(element_name="ds_partitioned", entity_links=(), time_granularity=TimeGranularity.MONTH),
+            TimeDimensionSpec(element_name="ds_partitioned", entity_links=(), time_granularity=TimeGranularity.QUARTER),
+            TimeDimensionSpec(element_name="ds_partitioned", entity_links=(), time_granularity=TimeGranularity.YEAR),
             TimeDimensionSpec(
                 element_name="ds",
-                identifier_links=(EntityReference(element_name="verification"),),
+                entity_links=(EntityReference(element_name="verification"),),
                 time_granularity=TimeGranularity.DAY,
             ),
             TimeDimensionSpec(
                 element_name="ds",
-                identifier_links=(EntityReference(element_name="verification"),),
+                entity_links=(EntityReference(element_name="verification"),),
                 time_granularity=TimeGranularity.WEEK,
             ),
             TimeDimensionSpec(
                 element_name="ds",
-                identifier_links=(EntityReference(element_name="verification"),),
+                entity_links=(EntityReference(element_name="verification"),),
                 time_granularity=TimeGranularity.MONTH,
             ),
             TimeDimensionSpec(
                 element_name="ds",
-                identifier_links=(EntityReference(element_name="verification"),),
+                entity_links=(EntityReference(element_name="verification"),),
                 time_granularity=TimeGranularity.QUARTER,
             ),
             TimeDimensionSpec(
                 element_name="ds",
-                identifier_links=(EntityReference(element_name="verification"),),
+                entity_links=(EntityReference(element_name="verification"),),
                 time_granularity=TimeGranularity.YEAR,
             ),
             TimeDimensionSpec(
                 element_name="ds_partitioned",
-                identifier_links=(EntityReference(element_name="verification"),),
+                entity_links=(EntityReference(element_name="verification"),),
                 time_granularity=TimeGranularity.DAY,
             ),
             TimeDimensionSpec(
                 element_name="ds_partitioned",
-                identifier_links=(EntityReference(element_name="verification"),),
+                entity_links=(EntityReference(element_name="verification"),),
                 time_granularity=TimeGranularity.WEEK,
             ),
             TimeDimensionSpec(
                 element_name="ds_partitioned",
-                identifier_links=(EntityReference(element_name="verification"),),
+                entity_links=(EntityReference(element_name="verification"),),
                 time_granularity=TimeGranularity.MONTH,
             ),
             TimeDimensionSpec(
                 element_name="ds_partitioned",
-                identifier_links=(EntityReference(element_name="verification"),),
+                entity_links=(EntityReference(element_name="verification"),),
                 time_granularity=TimeGranularity.QUARTER,
             ),
             TimeDimensionSpec(
                 element_name="ds_partitioned",
-                identifier_links=(EntityReference(element_name="verification"),),
+                entity_links=(EntityReference(element_name="verification"),),
                 time_granularity=TimeGranularity.YEAR,
             ),
         ),

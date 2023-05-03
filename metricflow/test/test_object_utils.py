@@ -18,7 +18,7 @@ def test_pretty_print() -> None:  # noqa: D
 
 def test_pformat_big_objects() -> None:  # noqa: D
     dimension_spec = DimensionSpec(
-        element_name="country_latest", identifier_links=(EntityReference(element_name="listing"),)
+        element_name="country_latest", entity_links=(EntityReference(element_name="listing"),)
     )
 
     assert pformat_big_objects(dimension_spec) == (
@@ -26,7 +26,7 @@ def test_pformat_big_objects() -> None:  # noqa: D
             """\
             {'class': 'DimensionSpec',
              'element_name': 'country_latest',
-             'identifier_links': ({'class': 'EntityReference',
+             'entity_links': ({'class': 'EntityReference',
                                    'element_name': 'listing'},)}
             """
         ).rstrip()
@@ -38,7 +38,7 @@ def test_pformat_big_objects() -> None:  # noqa: D
             dimension_spec:
                 {'class': 'DimensionSpec',
                  'element_name': 'country_latest',
-                 'identifier_links': ({'class': 'EntityReference',
+                 'entity_links': ({'class': 'EntityReference',
                                        'element_name': 'listing'},)}
             """
         ).rstrip()

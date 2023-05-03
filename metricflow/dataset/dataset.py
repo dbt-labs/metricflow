@@ -52,7 +52,7 @@ class DataSet:
         """Spec that corresponds to DataSet.metric_time_dimension_reference"""
         return TimeDimensionSpec(
             element_name=DataSet.metric_time_dimension_reference().element_name,
-            identifier_links=(),
+            entity_links=(),
             time_granularity=time_granularity,
         )
 

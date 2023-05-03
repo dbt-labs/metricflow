@@ -36,10 +36,10 @@ def test_validity_window_conversion(
         window_start_dimension=TimeDimensionSpec(
             element_name="window_start",
             time_granularity=TimeGranularity.DAY,
-            identifier_links=(),
+            entity_links=(),
         ),
         window_end_dimension=TimeDimensionSpec(
-            element_name="window_end", time_granularity=TimeGranularity.DAY, identifier_links=()
+            element_name="window_end", time_granularity=TimeGranularity.DAY, entity_links=()
         ),
     )
 

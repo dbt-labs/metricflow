@@ -224,7 +224,7 @@ class DataSourceJoinEvaluator:
         for identifier_instance in instance_set.identifier_instances:
             assert len(identifier_instance.defined_from) == 1
             if (
-                len(identifier_instance.spec.identifier_links) == 0
+                len(identifier_instance.spec.entity_links) == 0
                 and identifier_instance.spec.reference == identifier_reference
             ):
                 matching_instances.append(identifier_instance)

@@ -331,8 +331,8 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
                 for spec in specs
                 if spec.element_name == end_dim.dimension_name and spec.time_granularity == end_dim.time_granularity
             ]
-            linkless_start_specs = {spec.without_identifier_links for spec in start_specs}
-            linkless_end_specs = {spec.without_identifier_links for spec in end_specs}
+            linkless_start_specs = {spec.without_entity_links for spec in start_specs}
+            linkless_end_specs = {spec.without_entity_links for spec in end_specs}
             assert len(linkless_start_specs) == 1 and len(linkless_end_specs) == 1, (
                 f"Did not find exactly one pair of specs from data source `{data_source_reference}` matching the validity "
                 f"window end points defined in the data source. This means we cannot process an SCD join, because we "
@@ -344,8 +344,8 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
             # SCD join targets are joined as dimension links in much the same was as partitions are joined. Therefore,
             # we treat this like a partition time column join and take the dimension spec with the shortest set of
             # identifier links so that the subquery uses the correct reference in the ON statement
-            start_specs = sorted(start_specs, key=lambda x: len(x.identifier_links))
-            end_specs = sorted(end_specs, key=lambda x: len(x.identifier_links))
+            start_specs = sorted(start_specs, key=lambda x: len(x.entity_links))
+            end_specs = sorted(end_specs, key=lambda x: len(x.entity_links))
             data_source_to_window[data_source_reference] = ValidityWindowJoinDescription(
                 window_start_dimension=start_specs[0], window_end_dimension=end_specs[0]
             )
@@ -380,7 +380,7 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
             # The new dimension spec should include the join on identifier.
             transformed_dimension_spec_from_right = DimensionSpec(
                 element_name=dimension_instance.spec.element_name,
-                identifier_links=self._join_on_identifier.as_linkless_prefix + dimension_instance.spec.identifier_links,
+                entity_links=self._join_on_identifier.as_linkless_prefix + dimension_instance.spec.entity_links,
             )
             dimension_instances_with_additional_link.append(
                 DimensionInstance(
@@ -396,9 +396,9 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
             # The new dimension spec should include the join on identifier.
             transformed_time_dimension_spec_from_right = TimeDimensionSpec(
                 element_name=time_dimension_instance.spec.element_name,
-                identifier_links=(
+                entity_links=(
                     (EntityReference(element_name=self._join_on_identifier.element_name),)
-                    + time_dimension_instance.spec.identifier_links
+                    + time_dimension_instance.spec.entity_links
                 ),
                 time_granularity=time_dimension_instance.spec.time_granularity,
             )
@@ -420,8 +420,7 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
             # The new identifier spec should include the join on identifier.
             transformed_identifier_spec_from_right = EntitySpec(
                 element_name=identifier_instance.spec.element_name,
-                identifier_links=self._join_on_identifier.as_linkless_prefix
-                + identifier_instance.spec.identifier_links,
+                entity_links=self._join_on_identifier.as_linkless_prefix + identifier_instance.spec.entity_links,
             )
             identifier_instances_with_additional_link.append(
                 EntityInstance(
@@ -449,19 +448,19 @@ class FilterLinkableInstancesWithLeadingLink(InstanceSetTransform[InstanceSet]):
 
     def __init__(  # noqa: D
         self,
-        identifier_link: LinklessEntitySpec,
+        entity_link: LinklessEntitySpec,
     ) -> None:
         """Constructor.
 
         Args:
-            identifier_link: Remove elements with this link as the first element in "identifier_links"
+            entity_link: Remove elements with this link as the first element in "entity_links"
         """
-        self._identifier_link = identifier_link
+        self._entity_link = entity_link
 
     def _should_pass(self, linkable_spec: LinkableInstanceSpec) -> bool:  # noqa: D
         return (
-            len(linkable_spec.identifier_links) == 0
-            or LinklessEntitySpec.from_reference(linkable_spec.identifier_links[0]) != self._identifier_link
+            len(linkable_spec.entity_links) == 0
+            or LinklessEntitySpec.from_reference(linkable_spec.entity_links[0]) != self._entity_link
         )
 
     def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D

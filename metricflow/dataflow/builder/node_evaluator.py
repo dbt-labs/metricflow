@@ -154,7 +154,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
             for identifier_spec_in_right_node in identifier_specs_in_right_node:
                 # If an identifier has links, what that means and whether it can be used is unclear at the moment,
                 # so skip it.
-                if len(identifier_spec_in_right_node.identifier_links) > 0:
+                if len(identifier_spec_in_right_node.entity_links) > 0:
                     continue
 
                 identifier_instance_in_right_node = None
@@ -207,7 +207,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                 satisfiable_linkable_specs = []
                 for needed_linkable_spec in needed_linkable_specs:
                     assert (
-                        len(needed_linkable_spec.identifier_links) != 0
+                        len(needed_linkable_spec.entity_links) != 0
                     ), f"Invalid needed linkable spec passed in {needed_linkable_spec}"
 
                     # If the identifier in the data set matches the link, then it can be used for joins. For example,
@@ -220,17 +220,17 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                     #
                     # Then the data set must contain "device_id__platform", which is realized with
                     #
-                    # required_linkable_spec.remove_first_identifier_link()
+                    # required_linkable_spec.remove_first_entity_link()
                     #
                     # We might also need to check the identifier type and see if it's the type of join we're allowing,
                     # but since we're doing all left joins now, it's been left out.
 
                     required_identifier_matches_data_set_identifier = (
-                        LinklessEntitySpec.from_reference(needed_linkable_spec.identifier_links[0])
+                        LinklessEntitySpec.from_reference(needed_linkable_spec.entity_links[0])
                         == linkless_identifier_spec_in_node
                     )
                     needed_linkable_spec_in_node = (
-                        needed_linkable_spec.without_first_identifier_link in linkable_specs_in_right_node
+                        needed_linkable_spec.without_first_entity_link in linkable_specs_in_right_node
                     )
                     if required_identifier_matches_data_set_identifier and needed_linkable_spec_in_node:
                         satisfiable_linkable_specs.append(needed_linkable_spec)
@@ -334,8 +334,8 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
         for required_linkable_spec in required_linkable_specs:
             is_local = required_linkable_spec in data_set_linkable_specs
             is_unjoinable = (
-                len(required_linkable_spec.identifier_links) == 0
-                or LinklessEntitySpec.from_reference(required_linkable_spec.identifier_links[0])
+                len(required_linkable_spec.entity_links) == 0
+                or LinklessEntitySpec.from_reference(required_linkable_spec.entity_links[0])
                 not in data_set_linkable_specs
             )
             if is_local:

@@ -210,7 +210,7 @@ def test_filter_with_where_constraint_node(  # noqa: D
     )
     source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
 
-    ds_spec = TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.DAY)
+    ds_spec = TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.DAY)
     filter_node = FilterElementsNode[DataSourceDataSet](
         parent_node=source_node,
         include_specs=InstanceSpecSet(measure_specs=(measure_spec,), time_dimension_specs=(ds_spec,)),
@@ -224,7 +224,7 @@ def test_filter_with_where_constraint_node(  # noqa: D
                 dimension_specs=(
                     DimensionSpec(
                         element_name="ds",
-                        identifier_links=(),
+                        entity_links=(),
                     ),
                 )
             ),
@@ -309,7 +309,7 @@ def test_single_join_node(  # noqa: D
 
     dimension_spec = DimensionSpec(
         element_name="country_latest",
-        identifier_links=(),
+        entity_links=(),
     )
     dimension_source_node = consistent_id_object_repository.simple_model_read_nodes["listings_latest"]
     filtered_dimension_node = FilterElementsNode[DataSourceDataSet](
@@ -361,7 +361,7 @@ def test_multi_join_node(
 
     dimension_spec = DimensionSpec(
         element_name="country_latest",
-        identifier_links=(),
+        entity_links=(),
     )
     dimension_source_node = consistent_id_object_repository.simple_model_read_nodes["listings_latest"]
     filtered_dimension_node = FilterElementsNode[DataSourceDataSet](
@@ -423,7 +423,7 @@ def test_compute_metrics_node(
 
     dimension_spec = DimensionSpec(
         element_name="country_latest",
-        identifier_links=(),
+        entity_links=(),
     )
     dimension_source_node = consistent_id_object_repository.simple_model_read_nodes["listings_latest"]
     filtered_dimension_node = FilterElementsNode[DataSourceDataSet](
@@ -485,7 +485,7 @@ def test_compute_metrics_node_simple_expr(
 
     dimension_spec = DimensionSpec(
         element_name="country_latest",
-        identifier_links=(),
+        entity_links=(),
     )
     dimension_source_node = consistent_id_object_repository.simple_model_read_nodes["listings_latest"]
     filtered_dimension_node = FilterElementsNode[DataSourceDataSet](
@@ -553,7 +553,7 @@ def test_join_to_time_spine_node_without_offset(  # noqa: D
     identifier_spec = LinklessEntitySpec.from_element_name(element_name="listing")
     metric_input_measure_specs = (MetricInputMeasureSpec(measure_spec=measure_spec),)
     metric_time_spec = TimeDimensionSpec(
-        element_name="metric_time", identifier_links=(), time_granularity=TimeGranularity.DAY
+        element_name="metric_time", entity_links=(), time_granularity=TimeGranularity.DAY
     )
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     metric_time_node = MetricTimeDimensionTransformNode(
@@ -616,7 +616,7 @@ def test_join_to_time_spine_node_with_offset_window(  # noqa: D
     identifier_spec = LinklessEntitySpec.from_element_name(element_name="listing")
     metric_input_measure_specs = (MetricInputMeasureSpec(measure_spec=measure_spec),)
     metric_time_spec = TimeDimensionSpec(
-        element_name="metric_time", identifier_links=(), time_granularity=TimeGranularity.DAY
+        element_name="metric_time", entity_links=(), time_granularity=TimeGranularity.DAY
     )
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     metric_time_node = MetricTimeDimensionTransformNode(
@@ -681,7 +681,7 @@ def test_join_to_time_spine_node_with_offset_to_grain(
     identifier_spec = LinklessEntitySpec.from_element_name(element_name="listing")
     metric_input_measure_specs = (MetricInputMeasureSpec(measure_spec=measure_spec),)
     metric_time_spec = TimeDimensionSpec(
-        element_name="metric_time", identifier_links=(), time_granularity=TimeGranularity.DAY
+        element_name="metric_time", entity_links=(), time_granularity=TimeGranularity.DAY
     )
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     metric_time_node = MetricTimeDimensionTransformNode(
@@ -767,7 +767,7 @@ def test_compute_metrics_node_ratio_from_single_data_source(
 
     dimension_spec = DimensionSpec(
         element_name="country_latest",
-        identifier_links=(),
+        entity_links=(),
     )
     dimension_source_node = consistent_id_object_repository.simple_model_read_nodes["listings_latest"]
     filtered_dimension_node = FilterElementsNode[DataSourceDataSet](
@@ -821,11 +821,11 @@ def test_compute_metrics_node_ratio_from_multiple_data_sources(
     """
     dimension_spec = DimensionSpec(
         element_name="country_latest",
-        identifier_links=(EntityReference(element_name="listing"),),
+        entity_links=(EntityReference(element_name="listing"),),
     )
     time_dimension_spec = TimeDimensionSpec(
         element_name="ds",
-        identifier_links=(),
+        entity_links=(),
     )
     metric_spec = MetricSpec(element_name="bookings_per_view")
 
@@ -861,12 +861,12 @@ def test_order_by_node(
 
     dimension_spec = DimensionSpec(
         element_name="is_instant",
-        identifier_links=(),
+        entity_links=(),
     )
 
     time_dimension_spec = TimeDimensionSpec(
         element_name="ds",
-        identifier_links=(),
+        entity_links=(),
     )
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
 
@@ -925,7 +925,7 @@ def test_multihop_node(
             dimension_specs=(
                 DimensionSpec(
                     element_name="customer_name",
-                    identifier_links=(
+                    entity_links=(
                         EntityReference(element_name="account_id"),
                         EntityReference(element_name="customer_id"),
                     ),
@@ -958,7 +958,7 @@ def test_filter_with_where_constraint_on_join_dim(
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
-                    identifier_links=(),
+                    entity_links=(),
                 ),
             ),
             where_constraint=SpecWhereClauseConstraint(
@@ -968,7 +968,7 @@ def test_filter_with_where_constraint_on_join_dim(
                     dimension_specs=(
                         DimensionSpec(
                             element_name="country_latest",
-                            identifier_links=(EntityReference(element_name="listing"),),
+                            entity_links=(EntityReference(element_name="listing"),),
                         ),
                     )
                 ),
@@ -1005,7 +1005,7 @@ def test_constrain_time_range_node(
                 ),
             ),
             time_dimension_specs=(
-                TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.DAY),
+                TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.DAY),
             ),
         ),
     )
@@ -1047,7 +1047,7 @@ def test_cumulative_metric(
             time_dimension_specs=(
                 TimeDimensionSpec(
                     element_name="ds",
-                    identifier_links=(),
+                    entity_links=(),
                     time_granularity=TimeGranularity.MONTH,
                 ),
             ),
@@ -1079,7 +1079,7 @@ def test_cumulative_metric_with_time_constraint(
             time_dimension_specs=(
                 TimeDimensionSpec(
                     element_name="ds",
-                    identifier_links=(),
+                    entity_links=(),
                     time_granularity=TimeGranularity.MONTH,
                 ),
             ),
@@ -1140,7 +1140,7 @@ def test_cumulative_metric_no_window(
             time_dimension_specs=(
                 TimeDimensionSpec(
                     element_name="ds",
-                    identifier_links=(),
+                    entity_links=(),
                     time_granularity=TimeGranularity.MONTH,
                 ),
             ),
@@ -1172,7 +1172,7 @@ def test_cumulative_metric_no_window_with_time_constraint(
             time_dimension_specs=(
                 TimeDimensionSpec(
                     element_name="ds",
-                    identifier_links=(),
+                    entity_links=(),
                     time_granularity=TimeGranularity.MONTH,
                 ),
             ),
@@ -1207,7 +1207,7 @@ def test_cumulative_metric_grain_to_date(
             time_dimension_specs=(
                 TimeDimensionSpec(
                     element_name="ds",
-                    identifier_links=(),
+                    entity_links=(),
                     time_granularity=TimeGranularity.MONTH,
                 ),
             ),
@@ -1238,7 +1238,7 @@ def test_partitioned_join(
             dimension_specs=(
                 DimensionSpec(
                     element_name="home_state",
-                    identifier_links=(EntityReference(element_name="user"),),
+                    entity_links=(EntityReference(element_name="user"),),
                 ),
             ),
         )
@@ -1267,7 +1267,7 @@ def test_limit_rows(  # noqa: D
             time_dimension_specs=(
                 TimeDimensionSpec(
                     element_name="ds",
-                    identifier_links=(),
+                    entity_links=(),
                 ),
             ),
             limit=1,
@@ -1293,7 +1293,7 @@ def test_composite_identifier(  # noqa: D
     dataflow_plan = composite_dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="messages"),),
-            identifier_specs=(EntitySpec(element_name="user_team", identifier_links=()),),
+            identifier_specs=(EntitySpec(element_name="user_team", entity_links=()),),
         )
     )
 
@@ -1316,9 +1316,9 @@ def test_composite_identifier_with_order_by(  # noqa: D
     dataflow_plan = composite_dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="messages"),),
-            identifier_specs=(EntitySpec(element_name="user_team", identifier_links=()),),
+            identifier_specs=(EntitySpec(element_name="user_team", entity_links=()),),
             order_by_specs=(
-                OrderBySpec(identifier_spec=EntitySpec(element_name="user_team", identifier_links=()), descending=True),
+                OrderBySpec(identifier_spec=EntitySpec(element_name="user_team", entity_links=()), descending=True),
             ),
         )
     )
@@ -1345,10 +1345,10 @@ def test_composite_identifier_with_join(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="country",
-                    identifier_links=(EntityReference(element_name="user_team"),),
+                    entity_links=(EntityReference(element_name="user_team"),),
                 ),
             ),
-            identifier_specs=(EntitySpec(element_name="user_team", identifier_links=()),),
+            identifier_specs=(EntitySpec(element_name="user_team", entity_links=()),),
         )
     )
 
@@ -1373,7 +1373,7 @@ def test_distinct_values(  # noqa: D
         metric_specs=(MetricSpec(element_name="bookings"),),
         dimension_spec=DimensionSpec(
             element_name="country_latest",
-            identifier_links=(EntityReference(element_name="listing"),),
+            entity_links=(EntityReference(element_name="listing"),),
         ),
         limit=100,
     )
@@ -1400,7 +1400,7 @@ def test_local_dimension_using_local_identifier(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="country_latest",
-                    identifier_links=(EntityReference(element_name="listing"),),
+                    entity_links=(EntityReference(element_name="listing"),),
                 ),
             ),
         )
@@ -1424,7 +1424,7 @@ def test_semi_additive_join_node(
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan using a SemiAdditiveJoinNode."""
     non_additive_dimension_spec = NonAdditiveDimensionSpec(name="ds", window_choice=AggregationType.MIN)
-    time_dimension_spec = TimeDimensionSpec(element_name="ds", identifier_links=())
+    time_dimension_spec = TimeDimensionSpec(element_name="ds", entity_links=())
 
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["accounts_source"]
     semi_additive_join_node = SemiAdditiveJoinNode[DataSourceDataSet](
@@ -1452,9 +1452,9 @@ def test_semi_additive_join_node_with_queried_group_by(
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan using a SemiAdditiveJoinNode."""
     non_additive_dimension_spec = NonAdditiveDimensionSpec(name="ds", window_choice=AggregationType.MIN)
-    time_dimension_spec = TimeDimensionSpec(element_name="ds", identifier_links=())
+    time_dimension_spec = TimeDimensionSpec(element_name="ds", entity_links=())
     queried_time_dimension_spec = TimeDimensionSpec(
-        element_name="ds", identifier_links=(), time_granularity=TimeGranularity.WEEK
+        element_name="ds", entity_links=(), time_granularity=TimeGranularity.WEEK
     )
 
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["accounts_source"]
@@ -1487,8 +1487,8 @@ def test_semi_additive_join_node_with_grouping(
         window_choice=AggregationType.MAX,
         window_groupings=("user",),
     )
-    identifier_spec = LinklessEntitySpec(element_name="user", identifier_links=())
-    time_dimension_spec = TimeDimensionSpec(element_name="ds", identifier_links=())
+    identifier_spec = LinklessEntitySpec(element_name="user", entity_links=())
+    time_dimension_spec = TimeDimensionSpec(element_name="ds", entity_links=())
 
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["accounts_source"]
     semi_additive_join_node = SemiAdditiveJoinNode[DataSourceDataSet](
@@ -1641,7 +1641,7 @@ def test_join_to_scd_dimension(
                             dimension_specs=(
                                 DimensionSpec(
                                     element_name="capacity",
-                                    identifier_links=(EntityReference(element_name="listing"),),
+                                    entity_links=(EntityReference(element_name="listing"),),
                                 ),
                             ),
                         ),

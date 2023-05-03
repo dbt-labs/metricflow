@@ -34,7 +34,7 @@ class JoinPathKey:
     """A key that can uniquely identify an element and the joins used to realize the element."""
 
     element_name: str
-    identifier_links: Tuple[str, ...]
+    entity_links: Tuple[str, ...]
     time_granularity: Optional[TimeGranularity]
 
 
@@ -43,7 +43,7 @@ class LinkableDimension:
     """Describes how a dimension can be realized by joining based on identifier links."""
 
     element_name: str
-    identifier_links: Tuple[str, ...]
+    entity_links: Tuple[str, ...]
     properties: FrozenSet[LinkableElementProperties]
     time_granularity: Optional[TimeGranularity] = None
 
@@ -51,7 +51,7 @@ class LinkableDimension:
     def path_key(self) -> JoinPathKey:  # noqa: D
         return JoinPathKey(
             element_name=self.element_name,
-            identifier_links=self.identifier_links,
+            entity_links=self.entity_links,
             time_granularity=self.time_granularity,
         )
 
@@ -59,7 +59,7 @@ class LinkableDimension:
     def after_intersection(self) -> LinkableDimension:  # noqa: D
         return LinkableDimension(
             element_name=self.element_name,
-            identifier_links=self.identifier_links,
+            entity_links=self.entity_links,
             properties=frozenset({LinkableElementProperties.INTERSECTED}),
             time_granularity=self.time_granularity,
         )
@@ -71,19 +71,17 @@ class LinkableEntity:
 
     element_name: str
     properties: FrozenSet[LinkableElementProperties]
-    identifier_links: Tuple[str, ...]
+    entity_links: Tuple[str, ...]
 
     @property
     def path_key(self) -> JoinPathKey:  # noqa: D
-        return JoinPathKey(
-            element_name=self.element_name, identifier_links=self.identifier_links, time_granularity=None
-        )
+        return JoinPathKey(element_name=self.element_name, entity_links=self.entity_links, time_granularity=None)
 
     @property
     def after_intersection(self) -> LinkableEntity:  # noqa: D
         return LinkableEntity(
             element_name=self.element_name,
-            identifier_links=self.identifier_links,
+            entity_links=self.entity_links,
             properties=frozenset({LinkableElementProperties.INTERSECTED}),
         )
 
@@ -242,7 +240,7 @@ class LinkableElementSet:
             dimension_specs=tuple(
                 DimensionSpec(
                     element_name=x.element_name,
-                    identifier_links=tuple(EntityReference(element_name=x) for x in x.identifier_links),
+                    entity_links=tuple(EntityReference(element_name=x) for x in x.entity_links),
                 )
                 for x in self.linkable_dimensions
                 if not x.time_granularity
@@ -250,7 +248,7 @@ class LinkableElementSet:
             time_dimension_specs=tuple(
                 TimeDimensionSpec(
                     element_name=x.element_name,
-                    identifier_links=tuple(EntityReference(element_name=x) for x in x.identifier_links),
+                    entity_links=tuple(EntityReference(element_name=x) for x in x.entity_links),
                     time_granularity=x.time_granularity,
                 )
                 for x in self.linkable_dimensions
@@ -259,7 +257,7 @@ class LinkableElementSet:
             identifier_specs=tuple(
                 EntitySpec(
                     element_name=x.element_name,
-                    identifier_links=tuple(EntityReference(element_name=x) for x in x.identifier_links),
+                    entity_links=tuple(EntityReference(element_name=x) for x in x.entity_links),
                 )
                 for x in self.linkable_identifiers
             ),
@@ -275,7 +273,7 @@ class DataSourceJoinPathElement:
 
 
 def _generate_linkable_time_dimensions(
-    dimension: Dimension, identifier_links: Tuple[str, ...], with_properties: FrozenSet[LinkableElementProperties]
+    dimension: Dimension, entity_links: Tuple[str, ...], with_properties: FrozenSet[LinkableElementProperties]
 ) -> Sequence[LinkableDimension]:
     """Generates different versions of the given dimension, but at other valid time granularities."""
     linkable_dimensions = []
@@ -293,7 +291,7 @@ def _generate_linkable_time_dimensions(
         linkable_dimensions.append(
             LinkableDimension(
                 element_name=dimension.reference.element_name,
-                identifier_links=identifier_links,
+                entity_links=entity_links,
                 time_granularity=time_granularity,
                 properties=frozenset(properties),
             )
@@ -317,7 +315,7 @@ class DataSourceJoinPath:
 
     def create_linkable_element_set(self, with_properties: FrozenSet[LinkableElementProperties]) -> LinkableElementSet:
         """Given the current path, generate the respective linkable elements from the last data source in the path."""
-        identifier_links = tuple(x.join_on_identifier for x in self.path_elements)
+        entity_links = tuple(x.join_on_identifier for x in self.path_elements)
 
         assert len(self.path_elements) > 0
         data_source = self.path_elements[-1].data_source
@@ -331,7 +329,7 @@ class DataSourceJoinPath:
                 linkable_dimensions.append(
                     LinkableDimension(
                         element_name=dimension.reference.element_name,
-                        identifier_links=identifier_links,
+                        entity_links=entity_links,
                         properties=with_properties,
                     )
                 )
@@ -339,7 +337,7 @@ class DataSourceJoinPath:
                 linkable_dimensions.extend(
                     _generate_linkable_time_dimensions(
                         dimension=dimension,
-                        identifier_links=identifier_links,
+                        entity_links=entity_links,
                         with_properties=with_properties,
                     )
                 )
@@ -348,11 +346,11 @@ class DataSourceJoinPath:
 
         for identifier in data_source.identifiers:
             # Avoid creating "booking_id__booking_id"
-            if identifier.reference.element_name != identifier_links[-1]:
+            if identifier.reference.element_name != entity_links[-1]:
                 linkable_identifiers.append(
                     LinkableEntity(
                         element_name=identifier.reference.element_name,
-                        identifier_links=identifier_links,
+                        entity_links=entity_links,
                         properties=with_properties.union({LinkableElementProperties.IDENTIFIER}),
                     )
                 )
@@ -381,22 +379,22 @@ class ValidLinkableSpecResolver:
         self,
         user_configured_model: UserConfiguredModel,
         data_source_semantics: DataSourceSemanticsAccessor,
-        max_identifier_links: int,
+        max_entity_links: int,
     ) -> None:
         """Constructor.
 
         Args:
             user_configured_model: the model to use.
             data_source_semantics: used to look up identifiers for a data source.
-            max_identifier_links: the maximum number of joins to do when computing valid elements.
+            max_entity_links: the maximum number of joins to do when computing valid elements.
         """
         self._user_configured_model = user_configured_model
         # Sort data sources by name for consistency in building derived objects.
         self._data_sources = sorted(self._user_configured_model.data_sources, key=lambda x: x.name)
         self._join_evaluator = DataSourceJoinEvaluator(data_source_semantics)
 
-        assert max_identifier_links >= 0
-        self._max_identifier_links = max_identifier_links
+        assert max_entity_links >= 0
+        self._max_entity_links = max_entity_links
 
         # Map measures / identifiers to data sources that contain them.
         self._identifier_to_data_source: Dict[str, List[DataSource]] = defaultdict(list)
@@ -443,7 +441,7 @@ class ValidLinkableSpecResolver:
                 linkable_dimensions.append(
                     LinkableDimension(
                         element_name=dimension.reference.element_name,
-                        identifier_links=(),
+                        entity_links=(),
                         properties=frozenset({LinkableElementProperties.LOCAL}),
                     )
                 )
@@ -451,7 +449,7 @@ class ValidLinkableSpecResolver:
                 linkable_dimensions.extend(
                     _generate_linkable_time_dimensions(
                         dimension=dimension,
-                        identifier_links=(),
+                        entity_links=(),
                         with_properties=frozenset({LinkableElementProperties.LOCAL}),
                     )
                 )
@@ -463,7 +461,7 @@ class ValidLinkableSpecResolver:
             linkable_identifiers.append(
                 LinkableEntity(
                     element_name=identifier.reference.element_name,
-                    identifier_links=(),
+                    entity_links=(),
                     properties=frozenset({LinkableElementProperties.LOCAL, LinkableElementProperties.IDENTIFIER}),
                 )
             )
@@ -476,7 +474,7 @@ class ValidLinkableSpecResolver:
                     additional_linkable_dimensions.append(
                         LinkableDimension(
                             element_name=linkable_dimension.element_name,
-                            identifier_links=(identifier.reference.element_name,),
+                            entity_links=(identifier.reference.element_name,),
                             time_granularity=linkable_dimension.time_granularity,
                             properties=frozenset(linkable_dimension.properties.union(properties)),
                         )
@@ -542,7 +540,7 @@ class ValidLinkableSpecResolver:
 
         # Create multi-hop elements. At each iteration, we generate the list of valid elements based on the current join
         # path, extend all paths to include the next valid data source, then repeat.
-        for i in range(self._max_identifier_links - 1):
+        for i in range(self._max_entity_links - 1):
             new_join_paths: List[DataSourceJoinPath] = []
             for join_path in join_paths:
                 new_join_paths.extend(

@@ -44,7 +44,7 @@ class DefaultColumnAssociationResolver(ColumnAssociationResolver):
     def resolve_dimension_spec(self, dimension_spec: DimensionSpec) -> ColumnAssociation:  # noqa: D
         return ColumnAssociation(
             column_name=StructuredLinkableSpecName(
-                identifier_link_names=tuple(x.element_name for x in dimension_spec.identifier_links),
+                entity_link_names=tuple(x.element_name for x in dimension_spec.entity_links),
                 element_name=dimension_spec.element_name,
             ).qualified_name,
             single_column_correlation_key=SingleColumnCorrelationKey(),
@@ -55,12 +55,12 @@ class DefaultColumnAssociationResolver(ColumnAssociationResolver):
     ) -> ColumnAssociation:
         if time_dimension_spec.time_granularity == TimeGranularity.DAY:
             column_name = StructuredLinkableSpecName(
-                identifier_link_names=tuple(x.element_name for x in time_dimension_spec.identifier_links),
+                entity_link_names=tuple(x.element_name for x in time_dimension_spec.entity_links),
                 element_name=time_dimension_spec.element_name,
             ).qualified_name
         else:
             column_name = StructuredLinkableSpecName(
-                identifier_link_names=tuple(x.element_name for x in time_dimension_spec.identifier_links),
+                entity_link_names=tuple(x.element_name for x in time_dimension_spec.entity_links),
                 element_name=time_dimension_spec.element_name,
                 time_granularity=time_dimension_spec.time_granularity,
             ).qualified_name

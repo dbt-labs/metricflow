@@ -346,7 +346,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
     @staticmethod
     def _contains_multihop_linkables(linkable_specs: Sequence[LinkableInstanceSpec]) -> bool:
         """Returns true if any of the linkable specs requires a multi-hop join to realize."""
-        return any(len(x.identifier_links) > 1 for x in linkable_specs)
+        return any(len(x.entity_links) > 1 for x in linkable_specs)
 
     def _get_data_source_names_for_measures(self, measure_names: Sequence[MeasureSpec]) -> Set[str]:
         """Return the names of the data sources needed to compute the input measures
@@ -782,12 +782,12 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             # Figure out what elements to filter from the joined node.
 
             # Sanity check - all linkable specs should have a link, or else why would we be joining them.
-            assert all([len(x.identifier_links) > 0 for x in join_recipe.satisfiable_linkable_specs])
+            assert all([len(x.entity_links) > 0 for x in join_recipe.satisfiable_linkable_specs])
 
             # If we're joining something in, then we need the associated identifier, partitions, and time dimension
             # specs defining the validity window (if necessary)
             include_specs: List[LinkableInstanceSpec] = [
-                LinklessEntitySpec.from_reference(x.identifier_links[0]) for x in join_recipe.satisfiable_linkable_specs
+                LinklessEntitySpec.from_reference(x.entity_links[0]) for x in join_recipe.satisfiable_linkable_specs
             ]
             include_specs.extend([x.node_to_join_dimension_spec for x in join_recipe.join_on_partition_dimensions])
             include_specs.extend(
@@ -805,7 +805,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             # link when filtering before the join.
             # e.g. if the node is used to satisfy "user_id__country", then the node must have the identifier
             # "user_id" and the "country" dimension so that it can be joined to the measure node.
-            include_specs.extend([x.without_first_identifier_link for x in join_recipe.satisfiable_linkable_specs])
+            include_specs.extend([x.without_first_entity_link for x in join_recipe.satisfiable_linkable_specs])
             filtered_node_to_join = FilterElementsNode[SqlDataSetT](
                 parent_node=join_recipe.node_to_join,
                 include_specs=InstanceSpecSet.create_from_linkable_specs(include_specs),

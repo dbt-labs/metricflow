@@ -74,9 +74,7 @@ def test_view_sql_generated_at_a_node(
         parent_node=metric_time_node,
         include_specs=InstanceSpecSet(
             time_dimension_specs=(
-                TimeDimensionSpec(
-                    element_name="metric_time", identifier_links=(), time_granularity=TimeGranularity.DAY
-                ),
+                TimeDimensionSpec(element_name="metric_time", entity_links=(), time_granularity=TimeGranularity.DAY),
             ),
         ),
     )

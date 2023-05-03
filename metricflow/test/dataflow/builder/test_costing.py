@@ -35,7 +35,7 @@ def test_costing(consistent_id_object_repository: ConsistentIdObjectRepository) 
             identifier_specs=(
                 EntitySpec(
                     element_name="listing",
-                    identifier_links=(),
+                    entity_links=(),
                 ),
             ),
         ),
@@ -47,13 +47,13 @@ def test_costing(consistent_id_object_repository: ConsistentIdObjectRepository) 
             dimension_specs=(
                 DimensionSpec(
                     element_name="country_latest",
-                    identifier_links=(),
+                    entity_links=(),
                 ),
             ),
             identifier_specs=(
                 EntitySpec(
                     element_name="listing",
-                    identifier_links=(),
+                    entity_links=(),
                 ),
             ),
         ),

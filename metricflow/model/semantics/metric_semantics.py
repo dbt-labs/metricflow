@@ -30,7 +30,7 @@ class MetricSemantics(MetricSemanticsAccessor):  # noqa: D
         self._linkable_spec_resolver = ValidLinkableSpecResolver(
             user_configured_model=self._user_configured_model,
             data_source_semantics=data_source_semantics,
-            max_identifier_links=MAX_JOIN_HOPS,
+            max_entity_links=MAX_JOIN_HOPS,
         )
 
     def element_specs_for_metrics(

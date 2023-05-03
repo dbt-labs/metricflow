@@ -20,7 +20,7 @@ def simple_model_spec_resolver(simple_semantic_model: SemanticModel) -> ValidLin
     return ValidLinkableSpecResolver(
         user_configured_model=simple_semantic_model.user_configured_model,
         data_source_semantics=simple_semantic_model.data_source_semantics,
-        max_identifier_links=MAX_JOIN_HOPS,
+        max_entity_links=MAX_JOIN_HOPS,
     )
 
 
@@ -172,7 +172,7 @@ def test_multi_hop_property(multi_hop_join_semantic_model: SemanticModel) -> Non
     multi_hop_spec_resolver = ValidLinkableSpecResolver(
         user_configured_model=multi_hop_join_semantic_model.user_configured_model,
         data_source_semantics=multi_hop_join_semantic_model.data_source_semantics,
-        max_identifier_links=MAX_JOIN_HOPS,
+        max_entity_links=MAX_JOIN_HOPS,
     )
     property_check_helper(
         spec_resolver=multi_hop_spec_resolver,

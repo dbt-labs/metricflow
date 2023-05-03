@@ -93,9 +93,9 @@ class DataWarehouseTaskBuilder:
     """Task builder for standard data warehouse validation tasks"""
 
     @staticmethod
-    def _remove_identifier_link_specs(specs: Tuple[LinkableInstanceSpecT, ...]) -> Tuple[LinkableInstanceSpecT, ...]:
-        """For the purposes of data warehouse validation, specs with identifier_links are unnecesary"""
-        return tuple(spec for spec in specs if not spec.identifier_links)
+    def _remove_entity_link_specs(specs: Tuple[LinkableInstanceSpecT, ...]) -> Tuple[LinkableInstanceSpecT, ...]:
+        """For the purposes of data warehouse validation, specs with entity_links are unnecesary"""
+        return tuple(spec for spec in specs if not spec.entity_links)
 
     @staticmethod
     def _data_source_nodes(
@@ -198,7 +198,7 @@ class DataWarehouseTaskBuilder:
             data_source_sub_tasks: List[DataWarehouseValidationTask] = []
             dataset = render_tools.converter.create_sql_source_data_set(data_source)
 
-            dimension_specs = DataWarehouseTaskBuilder._remove_identifier_link_specs(
+            dimension_specs = DataWarehouseTaskBuilder._remove_entity_link_specs(
                 dataset.instance_set.spec_set.dimension_specs
             )
 
@@ -213,7 +213,7 @@ class DataWarehouseTaskBuilder:
                     )
                 )
 
-            time_dimension_specs = DataWarehouseTaskBuilder._remove_identifier_link_specs(
+            time_dimension_specs = DataWarehouseTaskBuilder._remove_entity_link_specs(
                 dataset.instance_set.spec_set.time_dimension_specs
             )
             for spec in time_dimension_specs:
@@ -296,7 +296,7 @@ class DataWarehouseTaskBuilder:
 
             data_source_sub_tasks: List[DataWarehouseValidationTask] = []
             dataset = render_tools.converter.create_sql_source_data_set(data_source)
-            data_source_specs = DataWarehouseTaskBuilder._remove_identifier_link_specs(
+            data_source_specs = DataWarehouseTaskBuilder._remove_entity_link_specs(
                 dataset.instance_set.spec_set.identifier_specs
             )
             for spec in data_source_specs:
