@@ -32,7 +32,7 @@ def test_costing(consistent_id_object_repository: ConsistentIdObjectRepository) 
         parent_node=bookings_node,
         include_specs=InstanceSpecSet(
             measure_specs=(bookings_spec,),
-            identifier_specs=(
+            entity_specs=(
                 EntitySpec(
                     element_name="listing",
                     entity_links=(),
@@ -50,7 +50,7 @@ def test_costing(consistent_id_object_repository: ConsistentIdObjectRepository) 
                     entity_links=(),
                 ),
             ),
-            identifier_specs=(
+            entity_specs=(
                 EntitySpec(
                     element_name="listing",
                     entity_links=(),

@@ -36,26 +36,26 @@ class SqlDataSet(DataSet):
 
     def column_associations_for_identifier(
         self,
-        identifier_spec: EntitySpec,
+        entity_spec: EntitySpec,
     ) -> Sequence[ColumnAssociation]:
         """Given the name of the identifier, return the set of columns associated with it in the data set."""
         matching_instances = 0
         column_associations_to_return = None
         for linkable_instance in self.instance_set.identifier_instances:
             if (
-                identifier_spec.element_name == linkable_instance.spec.element_name
-                and identifier_spec.entity_links == linkable_instance.spec.entity_links
+                entity_spec.element_name == linkable_instance.spec.element_name
+                and entity_spec.entity_links == linkable_instance.spec.entity_links
             ):
                 column_associations_to_return = linkable_instance.associated_columns
                 matching_instances += 1
 
         if matching_instances > 1:
             raise RuntimeError(
-                f"More than one instance with spec {identifier_spec} in " f"instance set: {self.instance_set}"
+                f"More than one instance with spec {entity_spec} in " f"instance set: {self.instance_set}"
             )
 
         if not column_associations_to_return:
-            raise RuntimeError(f"No instances with spec {identifier_spec} in instance set: {self.instance_set}")
+            raise RuntimeError(f"No instances with spec {entity_spec} in instance set: {self.instance_set}")
 
         return column_associations_to_return
 

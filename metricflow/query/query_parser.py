@@ -61,7 +61,7 @@ class LinkableInstanceSpecs:
     dimension_specs: Tuple[DimensionSpec, ...]
     time_dimension_specs: Tuple[TimeDimensionSpec, ...]
     partial_time_dimension_specs: Tuple[PartialTimeDimensionSpec, ...]
-    identifier_specs: Tuple[EntitySpec, ...]
+    entity_specs: Tuple[EntitySpec, ...]
 
 
 class MetricFlowQueryParser:
@@ -194,7 +194,7 @@ class MetricFlowQueryParser:
             metric_references=metric_references,
             dimension_specs=all_linkable_specs.dimension_specs,
             time_dimension_specs=time_dimension_specs,
-            identifier_specs=all_linkable_specs.identifier_specs,
+            entity_specs=all_linkable_specs.entity_specs,
         )
         if len(invalid_group_bys) > 0:
             valid_group_by_names_for_metrics = sorted(
@@ -368,7 +368,7 @@ class MetricFlowQueryParser:
             linkable_specs=LinkableSpecSet(
                 dimension_specs=requested_linkable_specs.dimension_specs,
                 time_dimension_specs=time_dimension_specs,
-                identifier_specs=requested_linkable_specs.identifier_specs,
+                entity_specs=requested_linkable_specs.entity_specs,
             ),
         )
 
@@ -423,7 +423,7 @@ class MetricFlowQueryParser:
         return MetricFlowQuerySpec(
             metric_specs=metric_specs,
             dimension_specs=requested_linkable_specs.dimension_specs,
-            identifier_specs=requested_linkable_specs.identifier_specs,
+            entity_specs=requested_linkable_specs.entity_specs,
             time_dimension_specs=time_dimension_specs,
             order_by_specs=order_by_specs,
             output_column_name_overrides=tuple(output_column_name_overrides),
@@ -448,7 +448,7 @@ class MetricFlowQueryParser:
                 order_by_spec.item in metric_specs
                 or order_by_spec.item in linkable_specs.dimension_specs
                 or order_by_spec.item in linkable_specs.time_dimension_specs
-                or order_by_spec.item in linkable_specs.identifier_specs
+                or order_by_spec.item in linkable_specs.entity_specs
             ):
                 raise InvalidQueryException(f"Order by item {order_by_spec} not in the query")
 
@@ -572,7 +572,7 @@ class MetricFlowQueryParser:
         dimension_specs = []
         time_dimension_specs = []
         partial_time_dimension_specs = []
-        identifier_specs = []
+        entity_specs = []
 
         for qualified_name in qualified_linkable_names:
             structured_name = StructuredLinkableSpecName.from_name(qualified_name)
@@ -598,7 +598,7 @@ class MetricFlowQueryParser:
             elif DimensionReference(element_name=element_name) in self._known_dimension_element_references:
                 dimension_specs.append(DimensionSpec(element_name=element_name, entity_links=entity_links))
             elif EntityReference(element_name=element_name) in self._known_identifier_element_references:
-                identifier_specs.append(EntitySpec(element_name=element_name, entity_links=entity_links))
+                entity_specs.append(EntitySpec(element_name=element_name, entity_links=entity_links))
             else:
                 valid_group_by_names_for_metrics = sorted(
                     x.qualified_name for x in self._metric_semantics.element_specs_for_metrics(list(metric_references))
@@ -621,7 +621,7 @@ class MetricFlowQueryParser:
             dimension_specs=tuple(dimension_specs),
             time_dimension_specs=tuple(time_dimension_specs),
             partial_time_dimension_specs=tuple(partial_time_dimension_specs),
-            identifier_specs=tuple(identifier_specs),
+            entity_specs=tuple(entity_specs),
         )
 
     def _get_invalid_linkable_specs(
@@ -629,7 +629,7 @@ class MetricFlowQueryParser:
         metric_references: Tuple[MetricReference, ...],
         dimension_specs: Tuple[DimensionSpec, ...],
         time_dimension_specs: Tuple[TimeDimensionSpec, ...],
-        identifier_specs: Tuple[EntitySpec, ...],
+        entity_specs: Tuple[EntitySpec, ...],
     ) -> List[LinkableInstanceSpec]:
         """Checks that each requested linkable instance can be retrieved for the given metric"""
         invalid_linkable_specs: List[LinkableInstanceSpec] = []
@@ -642,9 +642,9 @@ class MetricFlowQueryParser:
             if dimension_spec not in valid_linkable_specs:
                 invalid_linkable_specs.append(dimension_spec)
 
-        for identifier_spec in identifier_specs:
-            if identifier_spec not in valid_linkable_specs:
-                invalid_linkable_specs.append(identifier_spec)
+        for entity_spec in entity_specs:
+            if entity_spec not in valid_linkable_specs:
+                invalid_linkable_specs.append(entity_spec)
 
         for time_dimension_spec in time_dimension_specs:
             if (
@@ -747,7 +747,7 @@ class MetricFlowQueryParser:
                     )
                 order_by_specs.append(
                     OrderBySpec(
-                        identifier_spec=EntitySpec(
+                        entity_spec=EntitySpec(
                             element_name=parsed_name.element_name,
                             entity_links=tuple(EntityReference(element_name=x) for x in parsed_name.entity_link_names),
                         ),

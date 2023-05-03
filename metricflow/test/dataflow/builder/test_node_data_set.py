@@ -129,7 +129,7 @@ def test_joined_node_data_set(
                 entity_links=(EntityReference(element_name="user"),),
             ),
         ),
-        identifier_specs=(EntitySpec(element_name="user", entity_links=()),),
+        entity_specs=(EntitySpec(element_name="user", entity_links=()),),
         time_dimension_specs=(
             TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.DAY),
             TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.WEEK),

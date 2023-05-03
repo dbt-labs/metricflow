@@ -144,29 +144,27 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
         for right_node in self._nodes_available_for_joins:
             data_set_in_right_node: SqlDataSet = self._node_data_set_resolver.get_output_data_set(right_node)
             linkable_specs_in_right_node = data_set_in_right_node.instance_set.spec_set.linkable_specs
-            identifier_specs_in_right_node = data_set_in_right_node.instance_set.spec_set.identifier_specs
+            entity_specs_in_right_node = data_set_in_right_node.instance_set.spec_set.entity_specs
 
             # For each unlinked identifier in the data set, create a candidate for joining.
             # For a data set to be useful for satisfying a linkable spec, it needs to have the identifier
             # and the linkable spec without the identifier. This allows joining based on the identifier, which will
             # then produce the linkable spec. See comments further below for more details.
 
-            for identifier_spec_in_right_node in identifier_specs_in_right_node:
+            for entity_spec_in_right_node in entity_specs_in_right_node:
                 # If an identifier has links, what that means and whether it can be used is unclear at the moment,
                 # so skip it.
-                if len(identifier_spec_in_right_node.entity_links) > 0:
+                if len(entity_spec_in_right_node.entity_links) > 0:
                     continue
 
                 identifier_instance_in_right_node = None
                 for instance in data_set_in_right_node.instance_set.identifier_instances:
-                    if instance.spec == identifier_spec_in_right_node:
+                    if instance.spec == entity_spec_in_right_node:
                         identifier_instance_in_right_node = instance
                         break
 
                 if identifier_instance_in_right_node is None:
-                    raise RuntimeError(
-                        f"Could not find identifier instance with name ({identifier_spec_in_right_node})"
-                    )
+                    raise RuntimeError(f"Could not find identifier instance with name ({entity_spec_in_right_node})")
 
                 assert (
                     len(identifier_instance_in_right_node.defined_from) == 1
@@ -182,7 +180,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
 
                 identifier_instance_in_left_node = None
                 for instance in start_node_instance_set.identifier_instances:
-                    if instance.spec.reference == identifier_spec_in_right_node.reference:
+                    if instance.spec.reference == entity_spec_in_right_node.reference:
                         identifier_instance_in_left_node = instance
                         break
 
@@ -196,12 +194,12 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                 if not self._join_evaluator.is_valid_data_source_join(
                     left_data_source_reference=identifier_instance_in_left_node.defined_from[0].data_source_reference,
                     right_data_source_reference=identifier_instance_in_right_node.defined_from[0].data_source_reference,
-                    on_identifier_reference=identifier_spec_in_right_node.reference,
+                    on_identifier_reference=entity_spec_in_right_node.reference,
                 ):
                     continue
 
-                linkless_identifier_spec_in_node = LinklessEntitySpec.from_element_name(
-                    identifier_spec_in_right_node.element_name
+                linkless_entity_spec_in_node = LinklessEntitySpec.from_element_name(
+                    entity_spec_in_right_node.element_name
                 )
 
                 satisfiable_linkable_specs = []
@@ -216,7 +214,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                     #
                     # Multi-hop example:
                     # required_linkable_spec = "user_id__device_id__platform"
-                    # identifier_spec_in_data_set = "user_id"
+                    # entity_spec_in_data_set = "user_id"
                     #
                     # Then the data set must contain "device_id__platform", which is realized with
                     #
@@ -227,7 +225,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
 
                     required_identifier_matches_data_set_identifier = (
                         LinklessEntitySpec.from_reference(needed_linkable_spec.entity_links[0])
-                        == linkless_identifier_spec_in_node
+                        == linkless_entity_spec_in_node
                     )
                     needed_linkable_spec_in_node = (
                         needed_linkable_spec.without_first_entity_link in linkable_specs_in_right_node
@@ -253,7 +251,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                     candidates_for_join.append(
                         JoinLinkableInstancesRecipe(
                             node_to_join=right_node,
-                            join_on_identifier=linkless_identifier_spec_in_node,
+                            join_on_identifier=linkless_entity_spec_in_node,
                             satisfiable_linkable_specs=satisfiable_linkable_specs,
                             join_on_partition_dimensions=join_on_partition_dimensions,
                             join_on_partition_time_dimensions=join_on_partition_time_dimensions,

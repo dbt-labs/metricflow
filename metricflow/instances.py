@@ -198,7 +198,7 @@ class InstanceSet(SerializableDataclass):
             measure_specs=tuple(x.spec for x in self.measure_instances),
             dimension_specs=tuple(x.spec for x in self.dimension_instances),
             time_dimension_specs=tuple(x.spec for x in self.time_dimension_instances),
-            identifier_specs=tuple(x.spec for x in self.identifier_instances),
+            entity_specs=tuple(x.spec for x in self.identifier_instances),
             metric_specs=tuple(x.spec for x in self.metric_instances),
             metadata_specs=tuple(x.spec for x in self.metadata_instances),
         )

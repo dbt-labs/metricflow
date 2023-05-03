@@ -40,7 +40,7 @@ def test_convert_table_data_source_without_measures(  # noqa: D
                 entity_links=(EntityReference(element_name="user"),),
             ),
         ),
-        identifier_specs=(EntitySpec(element_name="user", entity_links=()),),
+        entity_specs=(EntitySpec(element_name="user", entity_links=()),),
         time_dimension_specs=(
             TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.DAY),
             TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.WEEK),
@@ -109,7 +109,7 @@ def test_convert_table_data_source_with_measures(  # noqa: D
                 entity_links=(EntityReference(element_name="verification"),),
             ),
         ),
-        identifier_specs=(
+        entity_specs=(
             EntitySpec(element_name="verification", entity_links=()),
             EntitySpec(element_name="user", entity_links=()),
             EntitySpec(

@@ -63,7 +63,7 @@ def test_linkable_spec_resolver(simple_model_spec_resolver: ValidLinkableSpecRes
         "listing__lux_listing",
         "listing__user",
         "listing__user__company",
-    ] == sorted(tuple(x.qualified_name for x in result.identifier_specs))
+    ] == sorted(tuple(x.qualified_name for x in result.entity_specs))
 
 
 def property_check_helper(  # noqa: D

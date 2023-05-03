@@ -129,15 +129,15 @@ class DataSourceToDataSetConverter:
         entity_links: Tuple[EntityReference, ...],
     ) -> EntityInstance:
         """Create an identifier instance from the identifier object from a data sourcein the model."""
-        identifier_spec = EntitySpec(
+        entity_spec = EntitySpec(
             element_name=identifier.reference.element_name,
             entity_links=entity_links,
         )
-        column_associations = identifier_spec.column_associations(self._column_association_resolver)
+        column_associations = entity_spec.column_associations(self._column_association_resolver)
 
         return EntityInstance(
             associated_columns=column_associations,
-            spec=identifier_spec,
+            spec=entity_spec,
             defined_from=(
                 DataSourceElementReference(
                     data_source_name=data_source_name,

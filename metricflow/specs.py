@@ -70,7 +70,7 @@ class ColumnAssociationResolver(ABC):
         pass
 
     @abstractmethod
-    def resolve_identifier_spec(self, entity_spec: EntitySpec) -> Tuple[ColumnAssociation, ...]:  # noqa: D
+    def resolve_entity_spec(self, entity_spec: EntitySpec) -> Tuple[ColumnAssociation, ...]:  # noqa: D
         pass
 
     @abstractmethod
@@ -179,7 +179,7 @@ class LinkableInstanceSpec(InstanceSpec, ABC):
 @dataclass(frozen=True)
 class EntitySpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
     def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
-        return resolver.resolve_identifier_spec(self)
+        return resolver.resolve_entity_spec(self)
 
     @property
     def without_first_entity_link(self) -> EntitySpec:  # noqa: D
@@ -220,7 +220,7 @@ class EntitySpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
 
     @property
     def as_linkable_spec_set(self) -> LinkableSpecSet:  # noqa: D
-        return LinkableSpecSet(identifier_specs=(self,))
+        return LinkableSpecSet(entity_specs=(self,))
 
 
 @dataclass(frozen=True)
@@ -364,7 +364,7 @@ class NonAdditiveDimensionSpec(SerializableDataclass):
         return LinkableSpecSet(
             dimension_specs=(),
             time_dimension_specs=(TimeDimensionSpec.from_name(self.name),),
-            identifier_specs=tuple(
+            entity_specs=tuple(
                 LinklessEntitySpec.from_element_name(identifier_name) for identifier_name in self.window_groupings
             ),
         )
@@ -477,20 +477,20 @@ class OrderBySpec(SerializableDataclass):  # noqa: D
     metric_spec: Optional[MetricSpec] = None
     dimension_spec: Optional[DimensionSpec] = None
     time_dimension_spec: Optional[TimeDimensionSpec] = None
-    identifier_spec: Optional[EntitySpec] = None
+    entity_spec: Optional[EntitySpec] = None
 
     def __post_init__(self) -> None:  # noqa: D
         assert_exactly_one_arg_set(
             metric_spec=self.metric_spec,
             dimension_spec=self.dimension_spec,
             time_dimension_spec=self.time_dimension_spec,
-            identifier_spec=self.identifier_spec,
+            entity_spec=self.entity_spec,
         )
 
     @property
     def item(self) -> InstanceSpec:  # noqa: D
         result: Optional[InstanceSpec] = (
-            self.metric_spec or self.dimension_spec or self.time_dimension_spec or self.identifier_spec
+            self.metric_spec or self.dimension_spec or self.time_dimension_spec or self.entity_spec
         )
         assert result
         return result
@@ -519,11 +519,11 @@ class LinkableSpecSet(SerializableDataclass):
 
     dimension_specs: Tuple[DimensionSpec, ...] = ()
     time_dimension_specs: Tuple[TimeDimensionSpec, ...] = ()
-    identifier_specs: Tuple[EntitySpec, ...] = ()
+    entity_specs: Tuple[EntitySpec, ...] = ()
 
     @property
     def as_tuple(self) -> Tuple[LinkableInstanceSpec, ...]:  # noqa: D
-        return tuple(itertools.chain(self.dimension_specs, self.time_dimension_specs, self.identifier_specs))
+        return tuple(itertools.chain(self.dimension_specs, self.time_dimension_specs, self.entity_specs))
 
     @staticmethod
     def merge(spec_sets: Sequence[LinkableSpecSet]) -> LinkableSpecSet:
@@ -531,7 +531,7 @@ class LinkableSpecSet(SerializableDataclass):
 
         dimension_specs: List[DimensionSpec] = []
         time_dimension_specs: List[TimeDimensionSpec] = []
-        identifier_specs: List[EntitySpec] = []
+        entity_specs: List[EntitySpec] = []
 
         for spec_set in spec_sets:
             for dimension_spec in spec_set.dimension_specs:
@@ -540,14 +540,14 @@ class LinkableSpecSet(SerializableDataclass):
             for time_dimension_spec in spec_set.time_dimension_specs:
                 if time_dimension_spec not in time_dimension_specs:
                     time_dimension_specs.append(time_dimension_spec)
-            for identifier_spec in spec_set.identifier_specs:
-                if identifier_spec not in identifier_specs:
-                    identifier_specs.append(identifier_spec)
+            for entity_spec in spec_set.entity_specs:
+                if entity_spec not in entity_specs:
+                    entity_specs.append(entity_spec)
 
         return LinkableSpecSet(
             dimension_specs=tuple(dimension_specs),
             time_dimension_specs=tuple(time_dimension_specs),
-            identifier_specs=tuple(identifier_specs),
+            entity_specs=tuple(entity_specs),
         )
 
     def is_subset_of(self, other_set: LinkableSpecSet) -> bool:  # noqa: D
@@ -558,18 +558,18 @@ class LinkableSpecSet(SerializableDataclass):
         return InstanceSpecSet(
             dimension_specs=self.dimension_specs,
             time_dimension_specs=self.time_dimension_specs,
-            identifier_specs=self.identifier_specs,
+            entity_specs=self.entity_specs,
         )
 
     def difference(self, other: LinkableSpecSet) -> LinkableSpecSet:  # noqa: D
         return LinkableSpecSet(
             dimension_specs=tuple(set(self.dimension_specs) - set(other.dimension_specs)),
             time_dimension_specs=tuple(set(self.time_dimension_specs) - set(other.time_dimension_specs)),
-            identifier_specs=tuple(set(self.identifier_specs) - set(other.identifier_specs)),
+            entity_specs=tuple(set(self.entity_specs) - set(other.entity_specs)),
         )
 
     def __len__(self) -> int:  # noqa: D
-        return len(self.dimension_specs) + len(self.time_dimension_specs) + len(self.identifier_specs)
+        return len(self.dimension_specs) + len(self.time_dimension_specs) + len(self.entity_specs)
 
 
 @dataclass(frozen=True)
@@ -601,7 +601,7 @@ class MetricFlowQuerySpec(SerializableDataclass):
 
     metric_specs: Tuple[MetricSpec, ...] = ()
     dimension_specs: Tuple[DimensionSpec, ...] = ()
-    identifier_specs: Tuple[EntitySpec, ...] = ()
+    entity_specs: Tuple[EntitySpec, ...] = ()
     time_dimension_specs: Tuple[TimeDimensionSpec, ...] = ()
     order_by_specs: Tuple[OrderBySpec, ...] = ()
     output_column_name_overrides: Tuple[OutputColumnNameOverride, ...] = ()
@@ -614,7 +614,7 @@ class MetricFlowQuerySpec(SerializableDataclass):
         return LinkableSpecSet(
             dimension_specs=self.dimension_specs,
             time_dimension_specs=self.time_dimension_specs,
-            identifier_specs=self.identifier_specs,
+            entity_specs=self.entity_specs,
         )
 
 
@@ -636,7 +636,7 @@ class InstanceSpecSet(SerializableDataclass):
     metric_specs: Tuple[MetricSpec, ...] = ()
     measure_specs: Tuple[MeasureSpec, ...] = ()
     dimension_specs: Tuple[DimensionSpec, ...] = ()
-    identifier_specs: Tuple[EntitySpec, ...] = ()
+    entity_specs: Tuple[EntitySpec, ...] = ()
     time_dimension_specs: Tuple[TimeDimensionSpec, ...] = ()
     metadata_specs: Tuple[MetadataSpec, ...] = ()
 
@@ -647,7 +647,7 @@ class InstanceSpecSet(SerializableDataclass):
             metric_specs=tuple(itertools.chain.from_iterable([x.metric_specs for x in others])),
             measure_specs=tuple(itertools.chain.from_iterable([x.measure_specs for x in others])),
             dimension_specs=tuple(itertools.chain.from_iterable([x.dimension_specs for x in others])),
-            identifier_specs=tuple(itertools.chain.from_iterable([x.identifier_specs for x in others])),
+            entity_specs=tuple(itertools.chain.from_iterable([x.entity_specs for x in others])),
             time_dimension_specs=tuple(itertools.chain.from_iterable([x.time_dimension_specs for x in others])),
             metadata_specs=tuple(itertools.chain.from_iterable([x.metadata_specs for x in others])),
         )
@@ -677,23 +677,23 @@ class InstanceSpecSet(SerializableDataclass):
             if time_dimension_spec not in time_dimension_specs_deduped:
                 time_dimension_specs_deduped.append(time_dimension_spec)
 
-        identifier_specs_deduped = []
-        for identifier_spec in self.identifier_specs:
-            if identifier_spec not in identifier_specs_deduped:
-                identifier_specs_deduped.append(identifier_spec)
+        entity_specs_deduped = []
+        for entity_spec in self.entity_specs:
+            if entity_spec not in entity_specs_deduped:
+                entity_specs_deduped.append(entity_spec)
 
         return InstanceSpecSet(
             metric_specs=tuple(metric_specs_deduped),
             measure_specs=tuple(measure_specs_deduped),
             dimension_specs=tuple(dimension_specs_deduped),
             time_dimension_specs=tuple(time_dimension_specs_deduped),
-            identifier_specs=tuple(identifier_specs_deduped),
+            entity_specs=tuple(entity_specs_deduped),
         )
 
     @property
     def linkable_specs(self) -> Sequence[LinkableInstanceSpec]:
         """All linkable specs in this set."""
-        return list(itertools.chain(self.dimension_specs, self.time_dimension_specs, self.identifier_specs))
+        return list(itertools.chain(self.dimension_specs, self.time_dimension_specs, self.entity_specs))
 
     @property
     def all_specs(self) -> Sequence[InstanceSpec]:  # noqa: D
@@ -702,7 +702,7 @@ class InstanceSpecSet(SerializableDataclass):
                 self.measure_specs,
                 self.dimension_specs,
                 self.time_dimension_specs,
-                self.identifier_specs,
+                self.entity_specs,
                 self.metric_specs,
                 self.metadata_specs,
             )

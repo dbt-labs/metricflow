@@ -297,11 +297,11 @@ class DataWarehouseTaskBuilder:
             data_source_sub_tasks: List[DataWarehouseValidationTask] = []
             dataset = render_tools.converter.create_sql_source_data_set(data_source)
             data_source_specs = DataWarehouseTaskBuilder._remove_entity_link_specs(
-                dataset.instance_set.spec_set.identifier_specs
+                dataset.instance_set.spec_set.entity_specs
             )
             for spec in data_source_specs:
                 filter_elements_node = FilterElementsNode(
-                    parent_node=source_node, include_specs=InstanceSpecSet(identifier_specs=(spec,))
+                    parent_node=source_node, include_specs=InstanceSpecSet(entity_specs=(spec,))
                 )
                 data_source_sub_tasks.append(
                     DataWarehouseValidationTask(
@@ -326,7 +326,7 @@ class DataWarehouseTaskBuilder:
             filter_elements_node = FilterElementsNode(
                 parent_node=source_node,
                 include_specs=InstanceSpecSet(
-                    identifier_specs=tuple(data_source_specs),
+                    entity_specs=tuple(data_source_specs),
                 ),
             )
             tasks.append(

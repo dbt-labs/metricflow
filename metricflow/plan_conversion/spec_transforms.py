@@ -55,8 +55,8 @@ class CreateSelectCoalescedColumnsForLinkableSpecs(InstanceSpecSetTransform[Sele
                 )
             )
 
-        for identifier_spec in spec_set.identifier_specs:
-            column_associations = self._column_association_resolver.resolve_identifier_spec(identifier_spec)
+        for entity_spec in spec_set.entity_specs:
+            column_associations = self._column_association_resolver.resolve_entity_spec(entity_spec)
             assert len(column_associations) == 1, "Composite identifiers not supported"
             column_name = column_associations[0].column_name
 
@@ -83,5 +83,5 @@ class SelectOnlyLinkableSpecs(InstanceSpecSetTransform[InstanceSpecSet]):
             measure_specs=(),
             dimension_specs=spec_set.dimension_specs,
             time_dimension_specs=spec_set.time_dimension_specs,
-            identifier_specs=spec_set.identifier_specs,
+            entity_specs=spec_set.entity_specs,
         )

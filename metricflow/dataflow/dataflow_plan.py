@@ -582,7 +582,7 @@ class SemiAdditiveJoinNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
 
     Data transformation example,
     | date       | account_balance | user |                             | date       | account_balance | user |
-    |:-----------|-----------------|-----:|     identifier_specs:       |:-----------|-----------------|-----:|
+    |:-----------|-----------------|-----:|     entity_specs:       |:-----------|-----------------|-----:|
     | 2019-12-31 |            1000 |    u1|       - user                | 2020-01-03 |            2000 |    u1|
     | 2020-01-03 |            2000 |    u1| ->  time_dimension_spec: -> | 2020-01-12              1500 |    u2|
     | 2020-01-09 |            3000 |    u2|       - date                | 2020-01-12 |            1000 |    u3|
@@ -590,12 +590,12 @@ class SemiAdditiveJoinNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
     | 2020-01-12 |            1000 |    u3|       - MAX
 
 
-    Similarly, if we don't provide any identifier_specs, it would end up performing the aggregation filter only on the
+    Similarly, if we don't provide any entity_specs, it would end up performing the aggregation filter only on the
     time_dimension_spec without any grouping by any identifiers.
 
     Data transformation example,
     | date       | account_balance | user |                             | date       | account_balance |
-    |:-----------|-----------------|-----:|     identifier_specs:       |:-----------|----------------:|
+    |:-----------|-----------------|-----:|     entity_specs:       |:-----------|----------------:|
     | 2019-12-31 |            1000 |    u1|                             | 2020-01-12 |            2500 |
     | 2020-01-03 |            2000 |    u1| ->  time_dimension_spec: ->
     | 2020-01-09 |            3000 |    u2|       - date
@@ -608,7 +608,7 @@ class SemiAdditiveJoinNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
 
     Data transformation example,
     | date       | account_balance | user |                                  | date       | account_balance |
-    |:-----------|-----------------|-----:|     identifier_specs:            |:-----------|----------------:|
+    |:-----------|-----------------|-----:|     entity_specs:            |:-----------|----------------:|
     | 2019-12-31 |            1500 |    u1|     time_dimension_spec:         | 2019-12-31 |            1500 |
     | 2020-01-03 |            2000 |    u1| ->    - date                  -> | 2020-01-07 |            3000 |
     | 2020-01-09 |            3000 |    u2|     agg_by_function:             | 2020-01-14 |            3250 |
@@ -621,7 +621,7 @@ class SemiAdditiveJoinNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
     def __init__(
         self,
         parent_node: BaseOutput[SourceDataSetT],
-        identifier_specs: Sequence[LinklessEntitySpec],
+        entity_specs: Sequence[LinklessEntitySpec],
         time_dimension_spec: TimeDimensionSpec,
         agg_by_function: AggregationType,
         queried_time_dimension_spec: Optional[TimeDimensionSpec] = None,
@@ -630,13 +630,13 @@ class SemiAdditiveJoinNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
 
         Args:
             parent_node: node with standard output
-            identifier_specs: the identifiers to group the join by
+            entity_specs: the identifiers to group the join by
             time_dimension_spec: the time dimension used for row filtering via an aggregation
             agg_by_function: the aggregation function used on the time dimension
             queried_time_dimension_spec: The group by provided in the query used to build the windows we want to filter on.
         """
         self._parent_node = parent_node
-        self._identifier_specs = identifier_specs
+        self._entity_specs = entity_specs
         self._time_dimension_spec = time_dimension_spec
         self._agg_by_function = agg_by_function
         self._queried_time_dimension_spec = queried_time_dimension_spec
@@ -654,15 +654,15 @@ class SemiAdditiveJoinNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
 
     @property
     def description(self) -> str:  # noqa: D
-        return f"""Join on {self.agg_by_function.name}({self.time_dimension_spec.element_name}) and {[i.element_name for i in self.identifier_specs]} grouping by {self.queried_time_dimension_spec.element_name if self.queried_time_dimension_spec else None}"""
+        return f"""Join on {self.agg_by_function.name}({self.time_dimension_spec.element_name}) and {[i.element_name for i in self.entity_specs]} grouping by {self.queried_time_dimension_spec.element_name if self.queried_time_dimension_spec else None}"""
 
     @property
     def parent_node(self) -> BaseOutput[SourceDataSetT]:  # noqa: D
         return self._parent_node
 
     @property
-    def identifier_specs(self) -> Sequence[LinklessEntitySpec]:  # noqa: D
-        return self._identifier_specs
+    def entity_specs(self) -> Sequence[LinklessEntitySpec]:  # noqa: D
+        return self._entity_specs
 
     @property
     def time_dimension_spec(self) -> TimeDimensionSpec:  # noqa: D
@@ -686,7 +686,7 @@ class SemiAdditiveJoinNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
 
         return (
             isinstance(other_node, self.__class__)
-            and other_node.identifier_specs == self.identifier_specs
+            and other_node.entity_specs == self.entity_specs
             and other_node.time_dimension_spec == self.time_dimension_spec
             and other_node.agg_by_function == self.agg_by_function
             and other_node.queried_time_dimension_spec == self.queried_time_dimension_spec
@@ -699,7 +699,7 @@ class SemiAdditiveJoinNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
 
         return SemiAdditiveJoinNode[SourceDataSetT](
             parent_node=new_parent_nodes[0],
-            identifier_specs=self.identifier_specs,
+            entity_specs=self.entity_specs,
             time_dimension_spec=self.time_dimension_spec,
             agg_by_function=self.agg_by_function,
             queried_time_dimension_spec=self.queried_time_dimension_spec,

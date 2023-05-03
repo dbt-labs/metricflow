@@ -38,16 +38,16 @@ def time_dimension_spec() -> TimeDimensionSpec:  # noqa: D
 
 
 @pytest.fixture
-def identifier_spec() -> EntitySpec:  # noqa: D
+def entity_spec() -> EntitySpec:  # noqa: D
     return EntitySpec(
         element_name="user_id",
         entity_links=(EntityReference(element_name="listing_id"),),
     )
 
 
-def test_merge_specs(dimension_spec: DimensionSpec, identifier_spec: EntitySpec) -> None:
+def test_merge_specs(dimension_spec: DimensionSpec, entity_spec: EntitySpec) -> None:
     """Tests InstanceSpec.merge()"""
-    assert InstanceSpec.merge([dimension_spec], [identifier_spec]) == [dimension_spec, identifier_spec]
+    assert InstanceSpec.merge([dimension_spec], [entity_spec]) == [dimension_spec, entity_spec]
 
 
 def test_dimension_without_first_entity_link(dimension_spec: DimensionSpec) -> None:  # noqa: D
@@ -76,24 +76,24 @@ def test_time_dimension_without_entity_links(time_dimension_spec: TimeDimensionS
     )
 
 
-def test_identifier_without_first_entity_link(identifier_spec: EntitySpec) -> None:  # noqa: D
-    assert identifier_spec.without_first_entity_link == EntitySpec(
+def test_identifier_without_first_entity_link(entity_spec: EntitySpec) -> None:  # noqa: D
+    assert entity_spec.without_first_entity_link == EntitySpec(
         element_name="user_id",
         entity_links=(),
     )
 
 
-def test_identifier_without_entity_links(identifier_spec: EntitySpec) -> None:  # noqa: D
-    assert identifier_spec.without_entity_links == EntitySpec(
+def test_identifier_without_entity_links(entity_spec: EntitySpec) -> None:  # noqa: D
+    assert entity_spec.without_entity_links == EntitySpec(
         element_name="user_id",
         entity_links=(),
     )
 
 
-def test_merge_linkable_specs(dimension_spec: DimensionSpec, identifier_spec: EntitySpec) -> None:  # noqa: D
-    linkable_specs: Sequence[LinkableInstanceSpec] = [dimension_spec, identifier_spec]
+def test_merge_linkable_specs(dimension_spec: DimensionSpec, entity_spec: EntitySpec) -> None:  # noqa: D
+    linkable_specs: Sequence[LinkableInstanceSpec] = [dimension_spec, entity_spec]
 
-    assert LinkableInstanceSpec.merge_linkable_specs([dimension_spec], [identifier_spec]) == linkable_specs
+    assert LinkableInstanceSpec.merge_linkable_specs([dimension_spec], [entity_spec]) == linkable_specs
 
 
 def test_qualified_name() -> None:  # noqa: D
@@ -130,7 +130,7 @@ def spec_set() -> InstanceSpecSet:  # noqa: D
                 time_granularity=TimeGranularity.DAY,
             ),
         ),
-        identifier_specs=(
+        entity_specs=(
             EntitySpec(
                 element_name="user_id",
                 entity_links=(EntityReference(element_name="listing_id"),),
@@ -175,22 +175,22 @@ def test_spec_set_all_specs(spec_set: InstanceSpecSet) -> None:  # noqa: D
 
 def test_linkless_identifier() -> None:  # noqa: D
     """Check that equals and hash works as expected for the LinklessEntitySpec / EntitySpec"""
-    identifier_spec = EntitySpec(element_name="user_id", entity_links=())
-    linkless_identifier_spec = LinklessEntitySpec.from_element_name("user_id")
+    entity_spec = EntitySpec(element_name="user_id", entity_links=())
+    linkless_entity_spec = LinklessEntitySpec.from_element_name("user_id")
 
     # Check equality between the two.
-    assert identifier_spec == identifier_spec
-    assert linkless_identifier_spec == linkless_identifier_spec
-    assert identifier_spec == linkless_identifier_spec
+    assert entity_spec == entity_spec
+    assert linkless_entity_spec == linkless_entity_spec
+    assert entity_spec == linkless_entity_spec
 
     # Check that they are treated equivalently in sets.
-    set_with_identifier_spec = {identifier_spec}
-    assert identifier_spec in set_with_identifier_spec
-    assert linkless_identifier_spec in set_with_identifier_spec
+    set_with_entity_spec = {entity_spec}
+    assert entity_spec in set_with_entity_spec
+    assert linkless_entity_spec in set_with_entity_spec
 
-    set_with_linkless_identifier_spec = {linkless_identifier_spec}
-    assert identifier_spec in set_with_linkless_identifier_spec
-    assert linkless_identifier_spec in set_with_linkless_identifier_spec
+    set_with_linkless_entity_spec = {linkless_entity_spec}
+    assert entity_spec in set_with_linkless_entity_spec
+    assert linkless_entity_spec in set_with_linkless_entity_spec
 
-    set_with_identifier_spec.add(linkless_identifier_spec)
-    assert len(set_with_identifier_spec) == 1
+    set_with_entity_spec.add(linkless_entity_spec)
+    assert len(set_with_entity_spec) == 1

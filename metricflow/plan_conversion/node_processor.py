@@ -127,12 +127,12 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
         data_set = self._node_data_set_resolver.get_output_data_set(node)
 
         for identifier_instance_in_first_node in data_set.instance_set.identifier_instances:
-            identifier_spec_in_first_node = identifier_instance_in_first_node.spec
+            entity_spec_in_first_node = identifier_instance_in_first_node.spec
 
-            if identifier_spec_in_first_node.reference != identifier_reference:
+            if entity_spec_in_first_node.reference != identifier_reference:
                 continue
 
-            if len(identifier_spec_in_first_node.entity_links) > 0:
+            if len(entity_spec_in_first_node.entity_links) > 0:
                 continue
 
             assert (
@@ -228,7 +228,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                 filtered_joinable_node = FilterElementsNode(
                     parent_node=second_node_that_could_be_joined,
                     include_specs=InstanceSpecSet.create_from_linkable_specs(
-                        specs.dimension_specs + specs.identifier_specs + specs.time_dimension_specs
+                        specs.dimension_specs + specs.entity_specs + specs.time_dimension_specs
                     ),
                 )
 
@@ -259,7 +259,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                         lineage=MultiHopJoinCandidateLineage(
                             first_node_to_join=first_node_that_could_be_joined,
                             second_node_to_join=second_node_that_could_be_joined,
-                            # identifier_spec_in_first_node should already not have identifier links since we checked
+                            # entity_spec_in_first_node should already not have identifier links since we checked
                             # for that, but using this method for type checking.
                             join_second_node_by_identifier=LinklessEntitySpec.from_reference(
                                 desired_linkable_spec.entity_links[1]

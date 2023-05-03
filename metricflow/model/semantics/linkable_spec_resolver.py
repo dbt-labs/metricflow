@@ -254,7 +254,7 @@ class LinkableElementSet:
                 for x in self.linkable_dimensions
                 if x.time_granularity
             ),
-            identifier_specs=tuple(
+            entity_specs=tuple(
                 EntitySpec(
                     element_name=x.element_name,
                     entity_links=tuple(EntityReference(element_name=x) for x in x.entity_links),

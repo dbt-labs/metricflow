@@ -70,7 +70,7 @@ class DefaultColumnAssociationResolver(ColumnAssociationResolver):
             single_column_correlation_key=SingleColumnCorrelationKey(),
         )
 
-    def resolve_identifier_spec(self, entity_spec: EntitySpec) -> Tuple[ColumnAssociation, ...]:  # noqa: D
+    def resolve_entity_spec(self, entity_spec: EntitySpec) -> Tuple[ColumnAssociation, ...]:  # noqa: D
         sub_entity_references = []
         for data_source in self._semantic_model.user_configured_model.data_sources:
             for entity in data_source.identifiers:

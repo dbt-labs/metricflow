@@ -105,7 +105,7 @@ class WhereConstraintConverter:
         return LinkableSpecSet(
             dimension_specs=tuple(where_constraint_dimensions),
             time_dimension_specs=tuple(where_constraint_time_dimensions),
-            identifier_specs=tuple(where_constraint_identifiers),
+            entity_specs=tuple(where_constraint_identifiers),
         )
 
     @staticmethod

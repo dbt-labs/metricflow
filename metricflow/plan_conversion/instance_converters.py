@@ -418,7 +418,7 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
             if identifier_instance.spec == self._join_on_identifier:
                 continue
             # The new identifier spec should include the join on identifier.
-            transformed_identifier_spec_from_right = EntitySpec(
+            transformed_entity_spec_from_right = EntitySpec(
                 element_name=identifier_instance.spec.element_name,
                 entity_links=self._join_on_identifier.as_linkless_prefix + identifier_instance.spec.entity_links,
             )
@@ -426,7 +426,7 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
                 EntityInstance(
                     associated_columns=identifier_instance.associated_columns,
                     defined_from=identifier_instance.defined_from,
-                    spec=transformed_identifier_spec_from_right,
+                    spec=transformed_entity_spec_from_right,
                 )
             )
 
@@ -774,7 +774,7 @@ class ChangeAssociatedColumns(InstanceSetTransform[InstanceSet]):
         for input_identifier_instance in instance_set.identifier_instances:
             output_identifier_instances.append(
                 EntityInstance(
-                    associated_columns=self._column_association_resolver.resolve_identifier_spec(
+                    associated_columns=self._column_association_resolver.resolve_entity_spec(
                         entity_spec=input_identifier_instance.spec
                     ),
                     spec=input_identifier_instance.spec,
