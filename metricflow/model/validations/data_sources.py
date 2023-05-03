@@ -5,18 +5,15 @@ from dbt_semantic_interfaces.objects.data_source import DataSource
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.elements.identifier import IdentifierType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from dbt_semantic_interfaces.references import DataSourceElementReference, DataSourceReference
+from dbt_semantic_interfaces.references import DataSourceReference
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,
-    DataSourceElementContext,
-    DataSourceElementType,
     FileContext,
     ModelValidationRule,
     ValidationIssue,
     ValidationError,
     validate_safely,
 )
-from metricflow.time.time_constants import SUPPORTED_GRANULARITIES
 
 logger = logging.getLogger(__name__)
 
@@ -41,28 +38,8 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
         primary_time_dimensions = []
 
         for dim in data_source.dimensions:
-            context = DataSourceElementContext(
-                file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                data_source_element=DataSourceElementReference(
-                    data_source_name=data_source.name, element_name=dim.name
-                ),
-                element_type=DataSourceElementType.DIMENSION,
-            )
-
-            if dim.type == DimensionType.TIME:
-                if dim.type_params is None:
-                    continue
-                elif dim.type_params.is_primary:
-                    primary_time_dimensions.append(dim)
-                elif dim.type_params.time_granularity:
-                    if dim.type_params.time_granularity not in SUPPORTED_GRANULARITIES:
-                        issues.append(
-                            ValidationError(
-                                context=context,
-                                message=f"Unsupported time granularity in time dimension with name: {dim.name}, "
-                                f"Please use {[s.value for s in SUPPORTED_GRANULARITIES]}",
-                            )
-                        )
+            if dim.type == DimensionType.TIME and dim.type_params is not None and dim.type_params.is_primary:
+                primary_time_dimensions.append(dim)
 
         # A data source must have a primary time dimension if it has
         # any measures that don't have an `agg_time_dimension` set
