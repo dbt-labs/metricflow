@@ -33,12 +33,9 @@
                         <!-- include_spec =                               -->
                         <!--   {'class': 'TimeDimensionSpec',             -->
                         <!--    'element_name': 'metric_time',            -->
-                        <!--    'identifier_links': (),                   -->
+                        <!--    'entity_links': (),                       -->
                         <!--    'time_granularity': TimeGranularity.DAY}  -->
-                        <!-- include_spec =                         -->
-                        <!--   {'class': 'LinklessIdentifierSpec',  -->
-                        <!--    'element_name': 'listing',          -->
-                        <!--    'identifier_links': ()}             -->
+                        <!-- include_spec = LinklessEntitySpec(element_name='listing', entity_links=()) -->
                         <MetricTimeDimensionTransformNode>
                             <!-- description = Metric Time Dimension 'ds' -->
                             <!-- node_id = sma_0 -->

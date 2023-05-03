@@ -32,7 +32,7 @@
                         <!-- include_spec =                               -->
                         <!--   {'class': 'TimeDimensionSpec',             -->
                         <!--    'element_name': 'metric_time',            -->
-                        <!--    'identifier_links': (),                   -->
+                        <!--    'entity_links': (),                       -->
                         <!--    'time_granularity': TimeGranularity.DAY}  -->
                         <MetricTimeDimensionTransformNode>
                             <!-- description = Metric Time Dimension 'ds' -->
@@ -95,7 +95,7 @@
                             <!-- include_spec =                               -->
                             <!--   {'class': 'TimeDimensionSpec',             -->
                             <!--    'element_name': 'metric_time',            -->
-                            <!--    'identifier_links': (),                   -->
+                            <!--    'entity_links': (),                       -->
                             <!--    'time_granularity': TimeGranularity.DAY}  -->
                             <MetricTimeDimensionTransformNode>
                                 <!-- description = Metric Time Dimension 'ds' -->
