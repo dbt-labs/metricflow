@@ -111,17 +111,17 @@ class UniqueAndValidNameRule(ModelValidationRule):
                     )
                 )
         if data_source.identifiers:
-            for identifier in data_source.identifiers:
+            for entity in data_source.identifiers:
                 element_info_tuples.append(
                     (
-                        identifier.reference,
-                        "identifier",
+                        entity.reference,
+                        "entity",
                         DataSourceElementContext(
                             file_context=FileContext.from_metadata(metadata=data_source.metadata),
                             data_source_element=DataSourceElementReference(
-                                data_source_name=data_source.name, element_name=identifier.name
+                                data_source_name=data_source.name, element_name=entity.name
                             ),
-                            element_type=DataSourceElementType.IDENTIFIER,
+                            element_type=DataSourceElementType.ENTITY,
                         ),
                     )
                 )

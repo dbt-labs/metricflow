@@ -40,7 +40,7 @@ class JoinPathKey:
 
 @dataclass(frozen=True)
 class LinkableDimension:
-    """Describes how a dimension can be realized by joining based on identifier links."""
+    """Describes how a dimension can be realized by joining based on entity links."""
 
     element_name: str
     entity_links: Tuple[str, ...]
@@ -67,7 +67,7 @@ class LinkableDimension:
 
 @dataclass(frozen=True)
 class LinkableEntity:
-    """Describes how an identifier can be realized by joining based on identifier links."""
+    """Describes how an entity can be realized by joining based on entity links."""
 
     element_name: str
     properties: FrozenSet[LinkableElementProperties]
@@ -264,7 +264,7 @@ class LinkableElementSet:
 
 @dataclass(frozen=True)
 class DataSourceJoinPathElement:
-    """Describes joining a data source by the given identifier."""
+    """Describes joining a data source by the given entity."""
 
     data_source: DataSource
     join_on_entity: str
@@ -300,11 +300,11 @@ def _generate_linkable_time_dimensions(
 
 @dataclass(frozen=True)
 class DataSourceJoinPath:
-    """Describes a series of joins between the measure data source, and other data sources by identifier.
+    """Describes a series of joins between the measure data source, and other data sources by entity.
 
     For example:
 
-    (measure_source JOIN dimension_source0 ON identifier A) JOIN dimension_source1 ON identifier B
+    (measure_source JOIN dimension_source0 ON entity A) JOIN dimension_source1 ON entity B
 
     would be represented by 2 path elements [(data_source0, A), (dimension_source1, B)]
     """
@@ -342,14 +342,14 @@ class DataSourceJoinPath:
             else:
                 raise RuntimeError(f"Unhandled type: {dimension_type}")
 
-        for identifier in data_source.identifiers:
+        for entity in data_source.identifiers:
             # Avoid creating "booking_id__booking_id"
-            if identifier.reference.element_name != entity_links[-1]:
+            if entity.reference.element_name != entity_links[-1]:
                 linkable_entities.append(
                     LinkableEntity(
-                        element_name=identifier.reference.element_name,
+                        element_name=entity.reference.element_name,
                         entity_links=entity_links,
-                        properties=with_properties.union({LinkableElementProperties.IDENTIFIER}),
+                        properties=with_properties.union({LinkableElementProperties.ENTITY}),
                     )
                 )
 
@@ -383,7 +383,7 @@ class ValidLinkableSpecResolver:
 
         Args:
             user_configured_model: the model to use.
-            data_source_semantics: used to look up identifiers for a data source.
+            data_source_semantics: used to look up entities for a data source.
             max_entity_links: the maximum number of joins to do when computing valid elements.
         """
         self._user_configured_model = user_configured_model
@@ -394,13 +394,13 @@ class ValidLinkableSpecResolver:
         assert max_entity_links >= 0
         self._max_entity_links = max_entity_links
 
-        # Map measures / identifiers to data sources that contain them.
+        # Map measures / entities to data sources that contain them.
         self._entity_to_data_source: Dict[str, List[DataSource]] = defaultdict(list)
         self._measure_to_data_source: Dict[str, List[DataSource]] = defaultdict(list)
 
         for data_source in self._data_sources:
-            for identifier in data_source.identifiers:
-                self._entity_to_data_source[identifier.reference.element_name].append(data_source)
+            for entity in data_source.identifiers:
+                self._entity_to_data_source[entity.reference.element_name].append(data_source)
 
         self._metric_to_linkable_element_sets: Dict[str, List[LinkableElementSet]] = {}
 
@@ -455,24 +455,24 @@ class ValidLinkableSpecResolver:
                 raise RuntimeError(f"Unhandled type: {dimension_type}")
 
         additional_linkable_dimensions = []
-        for identifier in data_source.identifiers:
+        for entity in data_source.identifiers:
             linkable_entities.append(
                 LinkableEntity(
-                    element_name=identifier.reference.element_name,
+                    element_name=entity.reference.element_name,
                     entity_links=(),
-                    properties=frozenset({LinkableElementProperties.LOCAL, LinkableElementProperties.IDENTIFIER}),
+                    properties=frozenset({LinkableElementProperties.LOCAL, LinkableElementProperties.ENTITY}),
                 )
             )
-            # If a data source has a primary identifier, we allow users to query using the dundered syntax, even though
+            # If a data source has a primary entity, we allow users to query using the dundered syntax, even though
             # there is no join involved. e.g. in the test model, the "listings_latest" data source would allow using
             # "listing__country_latest" for the "listings" metric.
-            if identifier.type == EntityType.PRIMARY:
+            if entity.type == EntityType.PRIMARY:
                 for linkable_dimension in linkable_dimensions:
                     properties = {LinkableElementProperties.LOCAL, LinkableElementProperties.LOCAL_LINKED}
                     additional_linkable_dimensions.append(
                         LinkableDimension(
                             element_name=linkable_dimension.element_name,
-                            entity_links=(identifier.reference.element_name,),
+                            entity_links=(entity.reference.element_name,),
                             time_granularity=linkable_dimension.time_granularity,
                             properties=frozenset(linkable_dimension.properties.union(properties)),
                         )
@@ -511,10 +511,10 @@ class ValidLinkableSpecResolver:
         join_paths = []
 
         # Create 1-hop elements
-        for identifier in measure_data_source.identifiers:
+        for entity in measure_data_source.identifiers:
             data_sources = self._get_data_sources_with_joinable_entity(
                 left_data_source_reference=measure_data_source.reference,
-                entity_reference=identifier.reference,
+                entity_reference=entity.reference,
             )
             for data_source in data_sources:
                 if data_source.name == measure_data_source.name:
@@ -523,7 +523,7 @@ class ValidLinkableSpecResolver:
                     DataSourceJoinPath(
                         path_elements=(
                             DataSourceJoinPathElement(
-                                data_source=data_source, join_on_entity=identifier.reference.element_name
+                                data_source=data_source, join_on_entity=entity.reference.element_name
                             ),
                         )
                     )
@@ -588,16 +588,16 @@ class ValidLinkableSpecResolver:
         last_data_source_in_path = current_join_path.last_data_source
         new_join_paths = []
 
-        for identifier in last_data_source_in_path.identifiers:
-            entity_name = identifier.reference.element_name
+        for entity in last_data_source_in_path.identifiers:
+            entity_name = entity.reference.element_name
 
-            # Don't create cycles in the join path by joining on the same identifier.
+            # Don't create cycles in the join path by joining on the same entity.
             if entity_name in set(x.join_on_entity for x in current_join_path.path_elements):
                 continue
 
             data_sources_that_can_be_joined = self._get_data_sources_with_joinable_entity(
                 left_data_source_reference=last_data_source_in_path.reference,
-                entity_reference=identifier.reference,
+                entity_reference=entity.reference,
             )
             for data_source in data_sources_that_can_be_joined:
                 # Don't create cycles in the join path by repeating a data source in the path.

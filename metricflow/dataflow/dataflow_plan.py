@@ -194,7 +194,7 @@ class DataflowPlanNodeVisitor(Generic[SourceDataSetT, VisitorOutputT], ABC):
 class BaseOutput(Generic[SourceDataSetT], DataflowPlanNode[SourceDataSetT], ABC):
     """A node that outputs data in a "base" format.
 
-    The base format is where the columns represent un-aggregated measures, dimensions, and identifiers.
+    The base format is where the columns represent un-aggregated measures, dimensions, and entities.
     """
 
     pass
@@ -275,7 +275,7 @@ class JoinDescription(Generic[SourceDataSetT]):
 
 
 class JoinToBaseOutputNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
-    """A node that joins data from other nodes to a standard output node, one by one via identifier."""
+    """A node that joins data from other nodes to a standard output node, one by one via entity."""
 
     def __init__(
         self,
@@ -449,7 +449,7 @@ class JoinOverTimeRangeNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT])
 class AggregatedMeasuresOutput(Generic[SourceDataSetT], BaseOutput[SourceDataSetT], ABC):
     """A node that outputs data where the measures are aggregated.
 
-    The measures are aggregated with respect to the present identifiers and dimensions.
+    The measures are aggregated with respect to the present entities and dimensions.
     """
 
     pass
@@ -574,7 +574,7 @@ class SemiAdditiveJoinNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
 
     This is designed to filter a dataset down to singular non-additive time dimension values by aggregating
     the time dimension with MAX/MIN then joining back to the original dataset on that aggregated value.
-    Additionally, an optional sequence of identifiers can be passed in to group by and join on during the filtering.
+    Additionally, an optional sequence of entities can be passed in to group by and join on during the filtering.
 
     For example, if we have a data set that includes "account_balances,user,date", we can build a
     "latest_account_balance_by_user" data set using this node by filtering the data set such that for each user,
@@ -591,7 +591,7 @@ class SemiAdditiveJoinNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
 
 
     Similarly, if we don't provide any entity_specs, it would end up performing the aggregation filter only on the
-    time_dimension_spec without any grouping by any identifiers.
+    time_dimension_spec without any grouping by any entities.
 
     Data transformation example,
     | date       | account_balance | user |                             | date       | account_balance |
@@ -630,7 +630,7 @@ class SemiAdditiveJoinNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
 
         Args:
             parent_node: node with standard output
-            entity_specs: the identifiers to group the join by
+            entity_specs: the entities to group the join by
             time_dimension_spec: the time dimension used for row filtering via an aggregation
             agg_by_function: the aggregation function used on the time dimension
             queried_time_dimension_spec: The group by provided in the query used to build the windows we want to filter on.
@@ -802,7 +802,7 @@ class JoinToTimeSpineNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT], A
 
 
 class ComputeMetricsNode(Generic[SourceDataSetT], ComputedMetricsOutput[SourceDataSetT]):
-    """A node that computes metrics from input measures. Dimensions / identifiers are passed through."""
+    """A node that computes metrics from input measures. Dimensions / entities are passed through."""
 
     def __init__(self, parent_node: BaseOutput[SourceDataSetT], metric_specs: List[MetricSpec]) -> None:  # noqa: D
         """Constructor.

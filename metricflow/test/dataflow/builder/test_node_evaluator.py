@@ -147,11 +147,11 @@ def test_node_evaluator_with_local_spec(  # noqa: D
     )
 
 
-def test_node_evaluator_with_local_spec_using_primary_identifier(  # noqa: D
+def test_node_evaluator_with_local_spec_using_primary_entity(  # noqa: D
     consistent_id_object_repository: ConsistentIdObjectRepository,
     node_evaluator: NodeEvaluatorForLinkableInstances,
 ) -> None:
-    """Tests the case where the requested linkable spec with an identifier link is available in the start node."""
+    """Tests the case where the requested linkable spec with an entity link is available in the start node."""
     bookings_source_node = consistent_id_object_repository.simple_model_read_nodes["users_latest"]
     evaluation = node_evaluator.evaluate_node(
         required_linkable_specs=[
@@ -175,11 +175,11 @@ def test_node_evaluator_with_local_spec_using_primary_identifier(  # noqa: D
     )
 
 
-def test_node_evaluator_with_local_spec_using_primary_composite_identifier(  # noqa: D
+def test_node_evaluator_with_local_spec_using_primary_composite_entity(  # noqa: D
     consistent_id_object_repository: ConsistentIdObjectRepository,
     node_evaluator: NodeEvaluatorForLinkableInstances,
 ) -> None:
-    """Similar to test_node_evaluator_with_local_spec_using_primary_identifier, but with a composite identifier"""
+    """Similar to test_node_evaluator_with_local_spec_using_primary_entity, but with a composite entity"""
     bookings_source_node = consistent_id_object_repository.composite_model_read_nodes["users_source"]
     evaluation = node_evaluator.evaluate_node(
         required_linkable_specs=[
@@ -263,7 +263,7 @@ def test_node_evaluator_with_joined_spec_on_unique_id(  # noqa: D
     consistent_id_object_repository: ConsistentIdObjectRepository,
     node_evaluator: NodeEvaluatorForLinkableInstances,
 ) -> None:
-    """Similar to test_node_evaluator_with_joined_spec() but using a unique identifier."""
+    """Similar to test_node_evaluator_with_joined_spec() but using a unique entity."""
     listings_node = consistent_id_object_repository.simple_model_read_nodes["listings_latest"]
     evaluation = node_evaluator.evaluate_node(
         required_linkable_specs=[
@@ -557,7 +557,7 @@ def test_node_evaluator_with_multi_hop_scd_target(
 ) -> None:
     """Tests the case where the joined node is an SCD reached through another node
 
-    The validity window should have an identifier link, the validity window join is mediated by an intervening
+    The validity window should have an entity link, the validity window join is mediated by an intervening
     node, and so we need to refer to that column via the link prefix.
     """
     linkable_specs = [DimensionSpec.from_name("listing__lux_listing__is_confirmed_lux")]
@@ -620,7 +620,7 @@ def test_node_evaluator_with_multi_hop_through_scd(
 ) -> None:
     """Tests the case where the joined node is reached via an SCD
 
-    The validity window should NOT have any identifier links, as the validity window join is not mediated by an
+    The validity window should NOT have any entity links, as the validity window join is not mediated by an
     intervening node and therefore the column name does not use the link prefix.
     """
     linkable_specs = [DimensionSpec.from_name("listing__user__home_state_latest")]

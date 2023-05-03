@@ -70,7 +70,7 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
             if origin and dimension_source.origin != origin:
                 continue
             dimension = dimension_source.get_dimension(dimension_reference)
-            # find the data source that has the requested dimension by the requested identifier
+            # find the data source that has the requested dimension by the requested entity
 
             return deepcopy(dimension)
 
@@ -127,9 +127,9 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
         if not data_source:
             return None
 
-        for identifier in data_source.identifiers:
-            if identifier.reference.element_name == ref.element_name:
-                return identifier
+        for entity in data_source.identifiers:
+            if entity.reference.element_name == ref.element_name:
+                return entity
 
         return None
 
@@ -176,10 +176,10 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
         for dim in data_source.dimensions:
             self._linkable_reference_index[dim.reference].append(data_source)
             self._dimension_index[dim.reference].append(data_source)
-        for ident in data_source.identifiers:
-            self._entity_ref_to_entity[ident.reference] = ident.name
-            self._entity_index[ident.name].append(data_source)
-            self._linkable_reference_index[ident.reference].append(data_source)
+        for entity in data_source.identifiers:
+            self._entity_ref_to_entity[entity.reference] = entity.name
+            self._entity_index[entity.name].append(data_source)
+            self._linkable_reference_index[entity.reference].append(data_source)
 
         self._data_source_reference_to_data_source[data_source.reference] = data_source
 

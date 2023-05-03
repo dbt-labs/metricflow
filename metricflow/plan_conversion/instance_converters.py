@@ -343,7 +343,7 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
             )
             # SCD join targets are joined as dimension links in much the same was as partitions are joined. Therefore,
             # we treat this like a partition time column join and take the dimension spec with the shortest set of
-            # identifier links so that the subquery uses the correct reference in the ON statement
+            # entity links so that the subquery uses the correct reference in the ON statement
             start_specs = sorted(start_specs, key=lambda x: len(x.entity_links))
             end_specs = sorted(end_specs, key=lambda x: len(x.entity_links))
             data_source_to_window[data_source_reference] = ValidityWindowJoinDescription(
@@ -364,7 +364,7 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
 class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
     """Return a new instance set where the all linkable elements in the set have a new link added.
 
-    e.g. "country" -> "user_id__country" after a data set has been joined by identifier.
+    e.g. "country" -> "user_id__country" after a data set has been joined by entity.
     """
 
     def __init__(self, join_on_entity: LinklessEntitySpec) -> None:  # noqa: D
@@ -377,7 +377,7 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
         # Handle dimension instances
         dimension_instances_with_additional_link = []
         for dimension_instance in instance_set.dimension_instances:
-            # The new dimension spec should include the join on identifier.
+            # The new dimension spec should include the join on entity.
             transformed_dimension_spec_from_right = DimensionSpec(
                 element_name=dimension_instance.spec.element_name,
                 entity_links=self._join_on_entity.as_linkless_prefix + dimension_instance.spec.entity_links,
@@ -393,7 +393,7 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
         # Handle time dimension instances
         time_dimension_instances_with_additional_link = []
         for time_dimension_instance in instance_set.time_dimension_instances:
-            # The new dimension spec should include the join on identifier.
+            # The new dimension spec should include the join on entity.
             transformed_time_dimension_spec_from_right = TimeDimensionSpec(
                 element_name=time_dimension_instance.spec.element_name,
                 entity_links=(
@@ -410,14 +410,14 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
                 )
             )
 
-        # Handle identifier instances
+        # Handle entity instances
         entity_instances_with_additional_link = []
         for entity_instance in instance_set.entity_instances:
-            # Don't include adding the identifier link to the same identifier.
+            # Don't include adding the entity link to the same entity.
             # Otherwise, you would create "user_id__user_id", which is confusing.
             if entity_instance.spec == self._join_on_entity:
                 continue
-            # The new identifier spec should include the join on identifier.
+            # The new entity spec should include the join on entity.
             transformed_entity_spec_from_right = EntitySpec(
                 element_name=entity_instance.spec.element_name,
                 entity_links=self._join_on_entity.as_linkless_prefix + entity_instance.spec.entity_links,

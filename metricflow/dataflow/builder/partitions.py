@@ -57,7 +57,7 @@ class PartitionJoinResolver:
 
     @staticmethod
     def _get_simplest_dimension_spec(dimension_specs: Sequence[DimensionSpec]) -> DimensionSpec:
-        """Return the time dimension spec with the fewest identifier links."""
+        """Return the time dimension spec with the fewest entity links."""
         assert len(dimension_specs) > 0
         sorted_dimension_specs = sorted(dimension_specs, key=lambda x: len(x.entity_links))
         return sorted_dimension_specs[0]
@@ -97,7 +97,7 @@ class PartitionJoinResolver:
 
     @staticmethod
     def _get_simplest_time_dimension_spec(time_dimension_specs: Sequence[TimeDimensionSpec]) -> TimeDimensionSpec:
-        """Return the time dimension spec with the smallest granularity, then fewest identifier links."""
+        """Return the time dimension spec with the smallest granularity, then fewest entity links."""
         assert len(time_dimension_specs) > 0
         sorted_specs = sorted(time_dimension_specs, key=lambda x: (x.time_granularity, len(x.entity_links)))
         return sorted_specs[0]

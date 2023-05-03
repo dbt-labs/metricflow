@@ -25,7 +25,7 @@ class DataflowPlanNodeOutputDataSetResolver(Generic[SourceDataSetT], DataflowToS
     output different dimensions (this information is not necessarily in the node itself).
 
     NodeEvaluatorForLinkableInstances needs the data set associated with a node so that it knows what dimensions and
-    identifiers are in the node. This information is used to figure out whether that node is useful to join to in order
+    entities are in the node. This information is used to figure out whether that node is useful to join to in order
     to retrieve a particular dimension.
 
     In the simple case, if the input nodes are all ReadSqlSourceNodes, then the data set is a member variable of the

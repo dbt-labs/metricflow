@@ -38,7 +38,7 @@ class SqlDataSet(DataSet):
         self,
         entity_spec: EntitySpec,
     ) -> Sequence[ColumnAssociation]:
-        """Given the name of the identifier, return the set of columns associated with it in the data set."""
+        """Given the name of the entity, return the set of columns associated with it in the data set."""
         matching_instances = 0
         column_associations_to_return = None
         for linkable_instance in self.instance_set.entity_instances:

@@ -57,7 +57,7 @@ class CreateSelectCoalescedColumnsForLinkableSpecs(InstanceSpecSetTransform[Sele
 
         for entity_spec in spec_set.entity_specs:
             column_associations = self._column_association_resolver.resolve_entity_spec(entity_spec)
-            assert len(column_associations) == 1, "Composite identifiers not supported"
+            assert len(column_associations) == 1, "Composite entities not supported"
             column_name = column_associations[0].column_name
 
             entity_columns.append(

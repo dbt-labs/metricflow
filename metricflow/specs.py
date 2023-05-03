@@ -38,7 +38,7 @@ class ColumnAssociationResolver(ABC):
     """Get the default column associations for an element instance.
 
     This is used for naming columns in an SQL query consistently. For example, dimensions with links are
-    named like <identifier link>__<dimension name> e.g. user_id__country, and time dimensions at a different time
+    named like <entity link>__<dimension name> e.g. user_id__country, and time dimensions at a different time
     granularity are named <time dimension>__<time granularity> e.g. ds__month. Having a central place to name them will
     make it easier to change this later on. Names generated need to be unique within a query.
 
@@ -88,7 +88,7 @@ class InstanceSpec(SerializableDataclass):
     This can't be a Protocol as base classes of Protocols need to be Protocols.
     """
 
-    """Name of the dimension or identifier in the data source."""
+    """Name of the dimension or entity in the data source."""
     element_name: str
 
     def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:
@@ -136,14 +136,14 @@ class MetadataSpec(InstanceSpec):
 
 @dataclass(frozen=True)
 class LinkableInstanceSpec(InstanceSpec, ABC):
-    """Generally a dimension or identifier that may be specified using identifier links.
+    """Generally a dimension or entity that may be specified using entity links.
 
     For example, user_id__country -> LinkableElementSpec(element_name="country", entity_links=["user_id"]
 
     See InstanceSpec for the reason behind "type: ignore"
     """
 
-    """A list representing the join path of identifiers to get to this element."""
+    """A list representing the join path of entities to get to this element."""
     entity_links: Tuple[EntityReference, ...]
 
     @property
@@ -183,7 +183,7 @@ class EntitySpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
 
     @property
     def without_first_entity_link(self) -> EntitySpec:  # noqa: D
-        assert len(self.entity_links) > 0, f"Spec does not have any identifier links: {self}"
+        assert len(self.entity_links) > 0, f"Spec does not have any entity links: {self}"
         return EntitySpec(element_name=self.element_name, entity_links=self.entity_links[1:])
 
     @property
@@ -192,9 +192,9 @@ class EntitySpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
 
     @property
     def as_linkless_prefix(self) -> Tuple[EntityReference, ...]:
-        """Creates tuple of linkless identifiers that could be included in the entity_links of another spec
+        """Creates tuple of linkless entities that could be included in the entity_links of another spec
 
-        eg as a prefix to a DimensionSpec's identifier links to when a join is occurring via this identifier
+        eg as a prefix to a DimensionSpec's entity links to when a join is occurring via this entity
         """
         return (EntityReference(element_name=self.element_name),) + self.entity_links
 
@@ -225,7 +225,7 @@ class EntitySpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
 
 @dataclass(frozen=True)
 class LinklessEntitySpec(EntitySpec, SerializableDataclass):
-    """Similar to EntitySpec, but requires that it doesn't have identifier links."""
+    """Similar to EntitySpec, but requires that it doesn't have entity links."""
 
     @staticmethod
     def from_element_name(element_name: str) -> LinklessEntitySpec:  # noqa: D
@@ -233,7 +233,7 @@ class LinklessEntitySpec(EntitySpec, SerializableDataclass):
 
     def __post_init__(self) -> None:  # noqa: D
         if len(self.entity_links) > 0:
-            raise RuntimeError(f"{self.__class__.__name__} shouldn't have identifier links. Got: {self}")
+            raise RuntimeError(f"{self.__class__.__name__} shouldn't have entity links. Got: {self}")
 
     def __eq__(self, other: Any) -> bool:  # type: ignore[misc] # noqa: D
         if not isinstance(other, EntitySpec):
@@ -258,7 +258,7 @@ class DimensionSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
 
     @property
     def without_first_entity_link(self) -> DimensionSpec:  # noqa: D
-        assert len(self.entity_links) > 0, f"Spec does not have any identifier links: {self}"
+        assert len(self.entity_links) > 0, f"Spec does not have any entity links: {self}"
         return DimensionSpec(element_name=self.element_name, entity_links=self.entity_links[1:])
 
     @property
@@ -299,7 +299,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
 
     @property
     def without_first_entity_link(self) -> TimeDimensionSpec:  # noqa: D
-        assert len(self.entity_links) > 0, f"Spec does not have any identifier links: {self}"
+        assert len(self.entity_links) > 0, f"Spec does not have any entity links: {self}"
         return TimeDimensionSpec(
             element_name=self.element_name,
             entity_links=self.entity_links[1:],

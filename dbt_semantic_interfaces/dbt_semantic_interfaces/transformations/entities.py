@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 
 class CompositeEntityExpressionRule(ModelTransformRule):
-    """Transform composite sub-identifiers for convenience.
+    """Transform composite sub-entities for convenience.
 
     If a sub-entity has no expression, check if an entity exists with the same name and use that entity's
     expression if it has one.

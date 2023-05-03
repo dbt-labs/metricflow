@@ -23,7 +23,7 @@ class DimensionType(ExtendedEnum):
 
 
 class DimensionValidityParams(HashableBaseModel):
-    """Parameters identifying a given dimension as an identifier for validity state
+    """Parameters identifying a given dimension as an entity for validity state
 
     This construct is used for supporting SCD Type II tables, such as might be
     created via dbt's snapshot feature, or generated via periodic loads from external

@@ -15,7 +15,7 @@ class SqlTable(PydanticCustomInputParser, FrozenBaseModel):
     def _from_yaml_value(cls, input: PydanticParseableValueType) -> SqlTable:
         """Parses a SqlTable from string input found in a user-provided model specification
 
-        Raises a ValueError on any non-string input, as all user-provided specifications of table identifiers
+        Raises a ValueError on any non-string input, as all user-provided specifications of table entities
         should be strings conforming to the expectations defined in the from_string method.
         """
         if isinstance(input, str):

@@ -39,7 +39,7 @@ class MdoInstance(ABC, Generic[SpecT]):
     """
 
     # The columns associated with this instance. Some instances may have multiple columns associated with it, e.g.
-    # composite identifiers.
+    # composite entities.
     associated_columns: Tuple[ColumnAssociation, ...]
     # The spec that describes this instance.
     spec: SpecT

@@ -406,9 +406,9 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             )
 
             # Remove the linkable instances with the join_on_entity as the leading link as the next step adds the
-            # link. This is to avoid cases where there is a primary identifier and a dimension in the data set, and we
-            # create an instance in the next step that has the same identifier link.
-            # e.g. a data set has the dimension "listing__country_latest" and "listing" is a primary identifier in the
+            # link. This is to avoid cases where there is a primary entity and a dimension in the data set, and we
+            # create an instance in the next step that has the same entity link.
+            # e.g. a data set has the dimension "listing__country_latest" and "listing" is a primary entity in the
             # data set. The next step would create an instance like "listing__listing__country_latest" without this
             # filter.
 
@@ -421,7 +421,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             # After the right data set is joined to the "from" data set, we need to change the links for some of the
             # instances that represent the right data set. For example, if the "from" data set contains the "bookings"
             # measure instance and the right dataset contains the "country" dimension instance, then after the join,
-            # the output data set should have the "country" dimension instance with the "user_id" identifier link
+            # the output data set should have the "country" dimension instance with the "user_id" entity link
             # (if "user_id" equality was the join condition). "country" -> "user_id__country"
             right_data_set_instance_set_after_join = right_data_set_instance_set_filtered.transform(
                 AddLinkToLinkableElements(join_on_entity=join_on_entity)
@@ -433,7 +433,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         )
 
         # Change the aggregation state for the measures to be partially aggregated if it was previously aggregated
-        # since we removed the identifiers and added the dimensions. The dimensions could have the same value for
+        # since we removed the entities and added the dimensions. The dimensions could have the same value for
         # multiple rows, so we'll need to re-aggregate.
         from_data_set_output_instance_set = from_data_set_output_instance_set.transform(
             ChangeMeasureAggregationState(
@@ -1178,7 +1178,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
         This node will get the build a data set row filtered by the aggregate function on the
         specified dimension that is non-additive. Then that dataset would be joined with the input data
-        on that dimension along with grouping by identifiers that are also passed in.
+        on that dimension along with grouping by entities that are also passed in.
         """
         from_data_set: SqlDataSet = node.parent_node.accept(self)
 
@@ -1224,7 +1224,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         entity_select_columns: List[SqlSelectColumn] = []
         for entity_spec in node.entity_specs:
             entity_column_associations = self.column_association_resolver.resolve_entity_spec(entity_spec)
-            assert len(entity_column_associations) == 1, "Composite identifiers not supported"
+            assert len(entity_column_associations) == 1, "Composite entities not supported"
             entity_column_name = entity_column_associations[0].column_name
             entity_select_columns.append(
                 SqlSelectColumn(

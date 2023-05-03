@@ -605,7 +605,7 @@ def _data_warehouse_validations_runner(
         dw_validator.validate_dimensions, model=model, validation_type="dimensions", timeout=timeout
     )
     entity_results = _run_dw_validations(
-        dw_validator.validate_entities, model=model, validation_type="identifiers", timeout=timeout
+        dw_validator.validate_entities, model=model, validation_type="entities", timeout=timeout
     )
     measure_results = _run_dw_validations(
         dw_validator.validate_measures, model=model, validation_type="measures", timeout=timeout

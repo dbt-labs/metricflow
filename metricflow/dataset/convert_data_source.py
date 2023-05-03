@@ -59,8 +59,8 @@ class DimensionConversionResult:
 class DataSourceToDataSetConverter:
     """Converts a data source in the model to a data set that can be used with the dataflow plan builder.
 
-    Entity links generally refer to the identifiers used to join the measure source to the dimension source. For
-    example, the dimension name "user_id__device_id__platform" has identifier links "user_id" and "device_id" and would
+    Entity links generally refer to the entities used to join the measure source to the dimension source. For
+    example, the dimension name "user_id__device_id__platform" has entity links "user_id" and "device_id" and would
     mean that the measure source was joined by "user_id" to an intermediate source, and then it was joined by
     "device_id" to the source containing the "platform" dimension.
     """
@@ -125,12 +125,12 @@ class DataSourceToDataSetConverter:
     def _create_entity_instance(
         self,
         data_source_name: str,
-        identifier: Entity,
+        entity: Entity,
         entity_links: Tuple[EntityReference, ...],
     ) -> EntityInstance:
-        """Create an identifier instance from the identifier object from a data sourcein the model."""
+        """Create an entity instance from the entity object from a data sourcein the model."""
         entity_spec = EntitySpec(
-            element_name=identifier.reference.element_name,
+            element_name=entity.reference.element_name,
             entity_links=entity_links,
         )
         column_associations = entity_spec.column_associations(self._column_association_resolver)
@@ -141,7 +141,7 @@ class DataSourceToDataSetConverter:
             defined_from=(
                 DataSourceElementReference(
                     data_source_name=data_source_name,
-                    element_name=identifier.reference.element_name,
+                    element_name=entity.reference.element_name,
                 ),
             ),
         )
@@ -303,22 +303,22 @@ class DataSourceToDataSetConverter:
     ) -> Tuple[Sequence[EntityInstance], Sequence[SqlSelectColumn]]:
         entity_instances = []
         select_columns = []
-        for identifier in entities or []:
+        for entity in entities or []:
             # We don't want to create something like user_id__user_id, so skip if the link is the same as the
-            # identifier.
-            if len(entity_links) == 1 and identifier.reference == entity_links[0]:
+            # entity.
+            if len(entity_links) == 1 and entity.reference == entity_links[0]:
                 continue
 
             entity_instance = self._create_entity_instance(
                 data_source_name=data_source_name,
-                identifier=identifier,
+                entity=entity,
                 entity_links=entity_links,
             )
 
             entity_instances.append(entity_instance)
-            if identifier.is_composite:
-                for idx in range(len(identifier.entities)):
-                    sub_entity = identifier.entities[idx]
+            if entity.is_composite:
+                for idx in range(len(entity.entities)):
+                    sub_entity = entity.entities[idx]
                     column_name = entity_instance.associated_columns[idx].column_name
 
                     expr = sub_entity.expr
@@ -343,8 +343,8 @@ class DataSourceToDataSetConverter:
                     SqlSelectColumn(
                         expr=DataSourceToDataSetConverter._make_element_sql_expr(
                             table_alias=table_alias,
-                            element_name=identifier.reference.element_name,
-                            element_expr=identifier.expr,
+                            element_name=entity.reference.element_name,
+                            element_expr=entity.expr,
                         ),
                         column_alias=entity_instance.associated_column.column_name,
                     )
@@ -374,13 +374,13 @@ class DataSourceToDataSetConverter:
             all_select_columns.extend(select_columns)
 
         # For dimensions in a data source, we can access them through the local form, or the dundered form.
-        # e.g. in the "users" data source, with the "country" dimension and the "user_id" identifier,
+        # e.g. in the "users" data source, with the "country" dimension and the "user_id" entity,
         # the dimensions "country" and "user_id__country" both mean the same thing. To make matching easier, create both
         # instances in the instance set. We'll create a different instance for each "possible_entity_links".
         possible_entity_links: List[Tuple[EntityReference, ...]] = [()]
-        for identifier in data_source.identifiers:
-            if identifier.is_linkable_entity_type:
-                possible_entity_links.append((identifier.reference,))
+        for entity in data_source.identifiers:
+            if entity.is_linkable_entity_type:
+                possible_entity_links.append((entity.reference,))
 
         # Handle dimensions
         conversion_results = [
@@ -417,7 +417,7 @@ class DataSourceToDataSetConverter:
             ]
         )
 
-        # Handle identifiers
+        # Handle entities
         for entity_links in possible_entity_links:
             entity_instances, select_columns = self._create_entity_instances(
                 data_source_name=data_source.name,

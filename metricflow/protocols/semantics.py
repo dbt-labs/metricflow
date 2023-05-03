@@ -84,7 +84,7 @@ class DataSourceSemanticsAccessor(ABC):
 
     @abstractmethod
     def get_entity_references(self) -> Sequence[EntityReference]:
-        """Retrieve all identifier references from the collection of data sources"""
+        """Retrieve all entity references from the collection of data sources"""
         raise NotImplementedError
 
     @abstractmethod
@@ -98,7 +98,7 @@ class DataSourceSemanticsAccessor(ABC):
 
     @abstractmethod
     def get_entity_in_data_source(self, ref: DataSourceElementReference) -> Optional[Entity]:
-        """Retrieve the identifier matching the element -> data source mapping, if any"""
+        """Retrieve the entity matching the element -> data source mapping, if any"""
         raise NotImplementedError
 
     @abstractmethod
@@ -121,7 +121,7 @@ class DataSourceSemanticsAccessor(ABC):
 
     @abstractmethod
     def get_data_sources_for_entity(self, entity_reference: EntityReference) -> Set[DataSource]:
-        """Return all data sources associated with an identifier reference"""
+        """Return all data sources associated with an entity reference"""
         raise NotImplementedError
 
 

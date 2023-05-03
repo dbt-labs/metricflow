@@ -117,7 +117,7 @@ class MetricFlowClient:
 
         Args:
             metrics: Names of the metrics to query.
-            dimensions: Names of the dimensions and identifiers to query.
+            dimensions: Names of the dimensions and entities to query.
             limit: Limit the result to this many rows.
             start_time: Get data for the start of this time range.
             end_time: Get data for the end of this time range.
@@ -158,7 +158,7 @@ class MetricFlowClient:
 
         Args:
             metrics: Names of the metrics to query.
-            dimensions: Names of the dimensions and identifiers to query.
+            dimensions: Names of the dimensions and entities to query.
             limit: Limit the result to this many rows.
             start_time: Get data for the start of this time range.
             end_time: Get data for the end of this time range.

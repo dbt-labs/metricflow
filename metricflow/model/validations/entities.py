@@ -53,7 +53,7 @@ class EntityConfigRule(ModelValidationRule):
                     data_source_element=DataSourceElementReference(
                         data_source_name=data_source.name, element_name=entity.name
                     ),
-                    element_type=DataSourceElementType.IDENTIFIER,
+                    element_type=DataSourceElementType.ENTITY,
                 )
 
                 for sub_entity in entity.entities:
@@ -99,13 +99,13 @@ class EntityConfigRule(ModelValidationRule):
 
 
 class NaturalEntityConfigurationRule(ModelValidationRule):
-    """Ensures that identifiers marked as EntityType.NATURAL are configured correctly"""
+    """Ensures that entities marked as EntityType.NATURAL are configured correctly"""
 
     @staticmethod
     @validate_safely(
         whats_being_done=(
-            "checking that each data source has no more than one natural identifier, and that "
-            "natural identifiers are used in the appropriate contexts"
+            "checking that each data source has no more than one natural entity, and that "
+            "natural entities are used in the appropriate contexts"
         )
     )
     def _validate_data_source_natural_entities(data_source: DataSource) -> List[ValidationIssue]:
@@ -116,22 +116,22 @@ class NaturalEntityConfigurationRule(ModelValidationRule):
         )
 
         natural_entity_names = set(
-            [identifier.name for identifier in data_source.identifiers if identifier.type is EntityType.NATURAL]
+            [entity.name for entity in data_source.identifiers if entity.type is EntityType.NATURAL]
         )
         if len(natural_entity_names) > 1:
             error = ValidationError(
                 context=context,
-                message=f"Data sources can have at most one natural identifier, but data source "
-                f"`{data_source.name}` has {len(natural_entity_names)} distinct natural identifiers set! "
+                message=f"Data sources can have at most one natural entity, but data source "
+                f"`{data_source.name}` has {len(natural_entity_names)} distinct natural entities set! "
                 f"{natural_entity_names}.",
             )
             issues.append(error)
         if natural_entity_names and not [dim for dim in data_source.dimensions if dim.validity_params]:
             error = ValidationError(
                 context=context,
-                message=f"The use of `natural` identifiers is currently supported only in conjunction with a validity "
+                message=f"The use of `natural` entities is currently supported only in conjunction with a validity "
                 f"window defined in the set of time dimensions associated with the data source. Data source "
-                f"`{data_source.name}` uses a natural identifier ({natural_entity_names}) but does not define a "
+                f"`{data_source.name}` uses a natural entity ({natural_entity_names}) but does not define a "
                 f"validity window!",
             )
             issues.append(error)
@@ -139,9 +139,9 @@ class NaturalEntityConfigurationRule(ModelValidationRule):
         return issues
 
     @staticmethod
-    @validate_safely(whats_being_done="checking that identifiers marked as EntityType.NATURAL are properly configured")
+    @validate_safely(whats_being_done="checking that entities marked as EntityType.NATURAL are properly configured")
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:
-        """Validate identifiers marked as EntityType.NATURAL"""
+        """Validate entities marked as EntityType.NATURAL"""
         issues: List[ValidationIssue] = []
         for data_source in model.data_sources:
             issues += NaturalEntityConfigurationRule._validate_data_source_natural_entities(data_source=data_source)
@@ -150,15 +150,15 @@ class NaturalEntityConfigurationRule(ModelValidationRule):
 
 
 class OnePrimaryEntityPerDataSourceRule(ModelValidationRule):
-    """Ensures that each data source has only one primary identifier"""
+    """Ensures that each data source has only one primary entity"""
 
     @staticmethod
-    @validate_safely(whats_being_done="checking data source has only one primary identifier")
+    @validate_safely(whats_being_done="checking data source has only one primary entity")
     def _only_one_primary_entity(data_source: DataSource) -> List[ValidationIssue]:
         primary_entity_names: MutableSet[str] = set()
-        for identifier in data_source.identifiers or []:
-            if identifier.type == EntityType.PRIMARY:
-                primary_entity_names.add(identifier.reference.element_name)
+        for entity in data_source.identifiers or []:
+            if entity.type == EntityType.PRIMARY:
+                primary_entity_names.add(entity.reference.element_name)
 
         if len(primary_entity_names) > 1:
             return [
@@ -167,7 +167,7 @@ class OnePrimaryEntityPerDataSourceRule(ModelValidationRule):
                         file_context=FileContext.from_metadata(metadata=data_source.metadata),
                         data_source=DataSourceReference(data_source_name=data_source.name),
                     ),
-                    message=f"Data sources can have only one primary identifier. The data source"
+                    message=f"Data sources can have only one primary entity. The data source"
                     f" `{data_source.name}` has {len(primary_entity_names)}: {', '.join(primary_entity_names)}",
                     error_date=date(2022, 1, 12),  # Wed January 12th 2022
                 )
@@ -175,9 +175,7 @@ class OnePrimaryEntityPerDataSourceRule(ModelValidationRule):
         return []
 
     @staticmethod
-    @validate_safely(
-        whats_being_done="running model validation ensuring each data source has only one primary identifier"
-    )
+    @validate_safely(whats_being_done="running model validation ensuring each data source has only one primary entity")
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
         issues = []
 
@@ -257,7 +255,7 @@ class EntityConsistencyRule(ModelValidationRule):
                         data_source_element=DataSourceElementReference(
                             data_source_name=data_source.name, element_name=entity_name
                         ),
-                        element_type=DataSourceElementType.IDENTIFIER,
+                        element_type=DataSourceElementType.ENTITY,
                     ),
                     message=(
                         f"Entity '{entity_name}' does not have consistent sub-entities "

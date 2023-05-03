@@ -76,14 +76,14 @@ def test_time_dimension_without_entity_links(time_dimension_spec: TimeDimensionS
     )
 
 
-def test_identifier_without_first_entity_link(entity_spec: EntitySpec) -> None:  # noqa: D
+def test_entity_without_first_entity_link(entity_spec: EntitySpec) -> None:  # noqa: D
     assert entity_spec.without_first_entity_link == EntitySpec(
         element_name="user_id",
         entity_links=(),
     )
 
 
-def test_identifier_without_entity_links(entity_spec: EntitySpec) -> None:  # noqa: D
+def test_entity_without_entity_links(entity_spec: EntitySpec) -> None:  # noqa: D
     assert entity_spec.without_entity_links == EntitySpec(
         element_name="user_id",
         entity_links=(),
@@ -173,7 +173,7 @@ def test_spec_set_all_specs(spec_set: InstanceSpecSet) -> None:  # noqa: D
     }
 
 
-def test_linkless_identifier() -> None:  # noqa: D
+def test_linkless_entity() -> None:  # noqa: D
     """Check that equals and hash works as expected for the LinklessEntitySpec / EntitySpec"""
     entity_spec = EntitySpec(element_name="user_id", entity_links=())
     linkless_entity_spec = LinklessEntitySpec.from_element_name("user_id")

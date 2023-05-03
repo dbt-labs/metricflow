@@ -176,7 +176,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
 
         Args:
             metric_specs: Specs for metrics to compute.
-            queried_linkable_specs: Dimensions/identifiers that were queried for.
+            queried_linkable_specs: Dimensions/entities that were queried for.
             where_constraint: Where constraint used to compute the metric.
             time_range_constraint: Time range constraint used to compute the metric.
             combine_metrics_join_type: The join used when combining the computed metrics.
@@ -561,7 +561,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             )
 
             # Nodes containing the linkable instances will be joined to the node containing the measure, so these
-            # identifiers will need to be present in the measure node.
+            # entities will need to be present in the measure node.
             required_local_entity_specs = tuple(x.join_on_entity for x in evaluation.join_recipes)
             # Same thing with partitions.
             required_local_dimension_specs = tuple(
@@ -784,7 +784,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             # Sanity check - all linkable specs should have a link, or else why would we be joining them.
             assert all([len(x.entity_links) > 0 for x in join_recipe.satisfiable_linkable_specs])
 
-            # If we're joining something in, then we need the associated identifier, partitions, and time dimension
+            # If we're joining something in, then we need the associated entity, partitions, and time dimension
             # specs defining the validity window (if necessary)
             include_specs: List[LinkableInstanceSpec] = [
                 LinklessEntitySpec.from_reference(x.entity_links[0]) for x in join_recipe.satisfiable_linkable_specs
@@ -801,9 +801,9 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                     ]
                 )
 
-            # satisfiable_linkable_specs describes what can be satisfied after the join, so remove the identifier
+            # satisfiable_linkable_specs describes what can be satisfied after the join, so remove the entity
             # link when filtering before the join.
-            # e.g. if the node is used to satisfy "user_id__country", then the node must have the identifier
+            # e.g. if the node is used to satisfy "user_id__country", then the node must have the entity
             # "user_id" and the "country" dimension so that it can be joined to the measure node.
             include_specs.extend([x.without_first_entity_link for x in join_recipe.satisfiable_linkable_specs])
             filtered_node_to_join = FilterElementsNode[SqlDataSetT](

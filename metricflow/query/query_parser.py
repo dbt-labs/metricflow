@@ -68,7 +68,7 @@ class MetricFlowQueryParser:
     """Parse input strings from the user into a metric query specification.
 
     Definitions:
-    element name - the name of an element (measure, dimension, identifier) in a data source, or a metric name.
+    element name - the name of an element (measure, dimension, entity) in a data source, or a metric name.
     qualified name - an element name with prefixes and suffixes added to it that further describe transformations or
     conditions for the element to retrieve. e.g. "ds__month" is the "ds" time dimension at the "month" granularity. Or
     "user_id__country" is the "country" dimension that is retrieved by joining "user_id" to the measure data source.
@@ -663,7 +663,7 @@ class MetricFlowQueryParser:
         time_dimension_spec_replacements: Dict[PartialTimeDimensionSpec, TimeDimensionSpec],
     ) -> Tuple[OrderBySpec, ...]:
         """time_dimension_spec_replacements is used to replace a partial spec from parsing the names to a full one."""
-        # TODO: Validate identifier links
+        # TODO: Validate entity links
         # TODO: Validate order by items are in the query
         order_by_specs: List[OrderBySpec] = []
         for order_by_name in order_by_names:
@@ -680,7 +680,7 @@ class MetricFlowQueryParser:
                     )
                 if parsed_name.entity_link_names:
                     raise InvalidQueryException(
-                        f"Order by item '{order_by_name}' references a metric but has identifier links"
+                        f"Order by item '{order_by_name}' references a metric but has entity links"
                     )
                 order_by_specs.append(
                     OrderBySpec(
@@ -743,7 +743,7 @@ class MetricFlowQueryParser:
             elif EntityReference(element_name=parsed_name.element_name) in self._known_entity_element_references:
                 if parsed_name.time_granularity:
                     raise InvalidQueryException(
-                        f"Order by item '{order_by_name}' references an identifier but has a time granularity"
+                        f"Order by item '{order_by_name}' references an entity but has a time granularity"
                     )
                 order_by_specs.append(
                     OrderBySpec(

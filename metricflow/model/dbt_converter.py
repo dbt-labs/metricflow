@@ -112,11 +112,11 @@ class DbtConverter:
         # we don't want to modify the passed in objects, so we decopy them
         copied_objects = deepcopy(mapped_objects)
 
-        # Move dimensions, identifiers, and measures on to their respective data sources
+        # Move dimensions, entities, and measures on to their respective data sources
         for data_source_name, dimensions_map in copied_objects.dimensions.items():
             copied_objects.data_sources[data_source_name]["dimensions"] = list(dimensions_map.values())
-        for data_source_name, identifiers_map in copied_objects.identifiers.items():
-            copied_objects.data_sources[data_source_name]["identifiers"] = list(identifiers_map.values())
+        for data_source_name, entities_map in copied_objects.identifiers.items():
+            copied_objects.data_sources[data_source_name]["identifiers"] = list(entities_map.values())
         for data_source_name, measure_map in copied_objects.measures.items():
             copied_objects.data_sources[data_source_name]["measures"] = list(measure_map.values())
 

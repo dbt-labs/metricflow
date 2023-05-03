@@ -230,6 +230,6 @@ def test_entity_property(simple_model_spec_resolver: ValidLinkableSpecResolver) 
     property_check_helper(
         spec_resolver=simple_model_spec_resolver,
         metric_references=[MetricReference(element_name="listings")],
-        element_property=LinkableElementProperties.IDENTIFIER,
+        element_property=LinkableElementProperties.ENTITY,
         expected_names=["listing", "listing__lux_listing", "user", "user__company"],
     )

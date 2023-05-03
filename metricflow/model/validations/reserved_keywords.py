@@ -100,7 +100,7 @@ class ReservedKeywordsRule(ModelValidationRule):
                                 data_source_element=DataSourceElementReference(
                                     data_source_name=data_source.name, element_name=entity.name
                                 ),
-                                element_type=DataSourceElementType.IDENTIFIER,
+                                element_type=DataSourceElementType.ENTITY,
                             ),
                             message=msg.format(name=name),
                         )

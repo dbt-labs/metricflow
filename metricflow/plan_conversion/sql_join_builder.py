@@ -70,7 +70,7 @@ class SqlQueryPlanJoinBuilder:
     ) -> SqlJoinDescription:
         """Make a join description where the base condition is a set of equality comparisons between columns.
 
-        Typically the columns in column_equality_descriptions are identifiers we are trying to match,
+        Typically the columns in column_equality_descriptions are entities we are trying to match,
         although they may include things like dimension partitions or time dimension columns where an
         equality is expected.
 
@@ -79,8 +79,8 @@ class SqlQueryPlanJoinBuilder:
 
         Args:
             right_source_node: node representing the join target, may be either a table or subquery
-            left_source_alias: string alias identifier for the join source
-            right_source_alias: string alias identifier for the join target
+            left_source_alias: string alias entity for the join source
+            right_source_alias: string alias entity for the join target
             column_equality_descriptions: set of equality constraints for the ON statement
             join_type: type of SQL join, e.g., LEFT, INNER, etc.
             additional_on_conditions: set of additional constraints to add in the ON statement (via AND)
@@ -144,20 +144,20 @@ class SqlQueryPlanJoinBuilder:
         right_data_set: AnnotatedSqlDataSet,
         join_description: JoinDescription,
     ) -> SqlJoinDescription:
-        """Make a join description to link two base output DataSets by matching identifiers
+        """Make a join description to link two base output DataSets by matching entities
 
-        In addition to the identifier equality condition, this will ensure datasets are joined on all partition
+        In addition to the entity equality condition, this will ensure datasets are joined on all partition
         columns and account for validity windows, if those are defined in one of the datasets.
         """
 
         join_on_entity = join_description.join_on_entity
 
-        # Figure out which columns in the "left" data set correspond to the identifier that we want to join on.
+        # Figure out which columns in the "left" data set correspond to the entity that we want to join on.
         # The column associations tell us which columns correspond to which instances in the data set.
         left_data_set_entity_column_associations = left_data_set.data_set.column_associations_for_entity(join_on_entity)
         left_data_set_entity_cols = [c.column_name for c in left_data_set_entity_column_associations]
 
-        # Figure out which columns in the "right" data set correspond to the identifier that we want to join on.
+        # Figure out which columns in the "right" data set correspond to the entity that we want to join on.
         right_data_set_column_associations = right_data_set.data_set.column_associations_for_entity(join_on_entity)
         right_data_set_entity_cols = [c.column_name for c in right_data_set_column_associations]
 
@@ -229,7 +229,7 @@ class SqlQueryPlanJoinBuilder:
         By convention, the join description ties the validity window to the "right" side data source, and so
         we extract the metric time instance from the left data set.
 
-        We use the instance with the smallest granularity and shortest identifier link path, since it will be
+        We use the instance with the smallest granularity and shortest entity link path, since it will be
         used in the ON statement for the join against the validity window.
         """
         if join_description.validity_window is None:

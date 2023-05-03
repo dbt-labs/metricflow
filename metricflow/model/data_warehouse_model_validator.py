@@ -277,12 +277,12 @@ class DataWarehouseTaskBuilder:
     def gen_entity_tasks(
         cls, model: UserConfiguredModel, sql_client: SqlClient, system_schema: str
     ) -> List[DataWarehouseValidationTask]:
-        """Generates a list of tasks for validating the identifiers of the model
+        """Generates a list of tasks for validating the entities of the model
 
         The high level tasks returned are "short cut" queries which try to
-        query all the identifiers for a given data source. If that query fails,
-        one or more of the identifiers is incorrectly specified. Thus if the
-        query fails, there are subtasks which query the individual identifiers
+        query all the entities for a given data source. If that query fails,
+        one or more of the entities is incorrectly specified. Thus if the
+        query fails, there are subtasks which query the individual entities
         on the data source to identify which have issues.
         """
 
@@ -317,9 +317,9 @@ class DataWarehouseTaskBuilder:
                             data_source_element=DataSourceElementReference(
                                 data_source_name=data_source.name, element_name=spec.element_name
                             ),
-                            element_type=DataSourceElementType.IDENTIFIER,
+                            element_type=DataSourceElementType.ENTITY,
                         ),
-                        error_message=f"Unable to query identifier `{spec.element_name}` on data source `{data_source.name}` in data warehouse",
+                        error_message=f"Unable to query entity `{spec.element_name}` on data source `{data_source.name}` in data warehouse",
                     )
                 )
 
@@ -342,7 +342,7 @@ class DataWarehouseTaskBuilder:
                         file_context=FileContext.from_metadata(metadata=data_source.metadata),
                         data_source=DataSourceReference(data_source_name=data_source.name),
                     ),
-                    error_message=f"Failed to query identifiers in data warehouse for data source `{data_source.name}`",
+                    error_message=f"Failed to query entities in data warehouse for data source `{data_source.name}`",
                     on_fail_subtasks=data_source_sub_tasks,
                 )
             )
@@ -566,7 +566,7 @@ class DataWarehouseModelValidator:
         return self.run_tasks(tasks=tasks, timeout=timeout)
 
     def validate_entities(self, model: UserConfiguredModel, timeout: Optional[int] = None) -> ModelValidationResults:
-        """Generates a list of tasks for validating the identifiers of the model and then runs them
+        """Generates a list of tasks for validating the entities of the model and then runs them
 
         Args:
             model: Model which to run data warehouse validations on

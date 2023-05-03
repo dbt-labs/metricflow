@@ -54,8 +54,8 @@ def test_cross_element_names(simple_model__with_primary_transforms: UserConfigur
     with pytest.raises(
         ModelValidationException,
         match=(
-            f"element `{measure_reference.element_name}` is of type {DataSourceElementType.IDENTIFIER}, but it is used as "
-            f"types .*?DataSourceElementType.IDENTIFIER.*?DataSourceElementType.MEASURE.*? across the model"
+            f"element `{measure_reference.element_name}` is of type {DataSourceElementType.ENTITY}, but it is used as "
+            f"types .*?DataSourceElementType.ENTITY.*?DataSourceElementType.MEASURE.*? across the model"
         ),
     ):
         ModelValidator([ElementConsistencyRule()]).checked_validations(model)
@@ -65,7 +65,7 @@ def test_cross_element_names(simple_model__with_primary_transforms: UserConfigur
         ModelValidationException,
         match=(
             f"element `{dimension_reference.element_name}` is of type {DataSourceElementType.DIMENSION}, but it is used as "
-            f"types .*?DataSourceElementType.DIMENSION.*?DataSourceElementType.IDENTIFIER.*? across the model"
+            f"types .*?DataSourceElementType.DIMENSION.*?DataSourceElementType.ENTITY.*? across the model"
         ),
     ):
         ModelValidator([ElementConsistencyRule()]).checked_validations(model)

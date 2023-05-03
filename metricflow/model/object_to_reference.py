@@ -32,8 +32,8 @@ class ObjectToReference:
         return MeasureReference(element_name=measure.name)
 
     @staticmethod
-    def from_entity(identifier: Entity) -> EntityReference:  # noqa: D
-        return EntityReference(element_name=identifier.name)
+    def from_entity(entity: Entity) -> EntityReference:  # noqa: D
+        return EntityReference(element_name=entity.name)
 
     @staticmethod
     def from_metric(metric: Metric) -> MetricReference:  # noqa: D

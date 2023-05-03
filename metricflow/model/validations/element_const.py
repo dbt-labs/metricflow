@@ -17,8 +17,8 @@ from metricflow.model.validations.validator_helpers import (
 class ElementConsistencyRule(ModelValidationRule):
     """Checks that elements in data sources with the same name are of the same element type across the model
 
-    This reduces the potential confusion that might arise from having an identifier named `country` and a dimension
-    named `country` while allowing for things like the `user` identifier to exist in multiple data sources. Note not
+    This reduces the potential confusion that might arise from having an entity named `country` and a dimension
+    named `country` while allowing for things like the `user` entity to exist in multiple data sources. Note not
     all element types allow duplicates, and there are separate validation rules for those cases. See, for example,
     the DataSourceMeasuresUniqueRule.
     """
@@ -69,6 +69,6 @@ class ElementConsistencyRule(ModelValidationRule):
                 for dimension in data_source.dimensions:
                     element_types[dimension.name][DataSourceElementType.DIMENSION].append(data_source_context)
             if data_source.identifiers:
-                for identifier in data_source.identifiers:
-                    element_types[identifier.name][DataSourceElementType.IDENTIFIER].append(data_source_context)
+                for entity in data_source.identifiers:
+                    element_types[entity.name][DataSourceElementType.ENTITY].append(data_source_context)
         return element_types

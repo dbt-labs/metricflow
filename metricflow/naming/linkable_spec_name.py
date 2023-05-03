@@ -71,7 +71,7 @@ class StructuredLinkableSpecName:
 
     @property
     def entity_prefix(self) -> Optional[str]:
-        """Return the identifier prefix. e.g. listing__ds__month -> listing"""
+        """Return the entity prefix. e.g. listing__ds__month -> listing"""
         if len(self.entity_link_names) > 0:
             return DUNDER.join(self.entity_link_names)
 

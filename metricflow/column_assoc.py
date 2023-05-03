@@ -37,7 +37,7 @@ class CompositeColumnCorrelationKey(ColumnCorrelationKey, SerializableDataclass)
 class ColumnAssociation(SerializableDataclass):
     """Used to describe how an instance is associated with columns in table / SQL query.
 
-    Generally there will be a 1:1 mapping, but for composite identifiers, it can map to multiple columns. For that case,
+    Generally there will be a 1:1 mapping, but for composite entities, it can map to multiple columns. For that case,
     this can be subclassed to add more context.
     """
 
