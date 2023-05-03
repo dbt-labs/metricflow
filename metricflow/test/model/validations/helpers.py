@@ -25,7 +25,6 @@ def base_model_file() -> YamlConfigFile:
             - name: example_identifier
               type: primary
               role: test_role
-              entity: other_identifier
               expr: example_id
           measures:
             - name: num_sample_rows
