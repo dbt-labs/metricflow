@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from typing import List, Optional
 
+from dbt_semantic_interfaces.objects.common import Metadata
+
+from dbt_semantic_interfaces.enum_extension import ExtendedEnum
 from dbt_semantic_interfaces.errors import ParsingException
 from dbt_semantic_interfaces.objects.base import (
     HashableBaseModel,
@@ -9,11 +12,10 @@ from dbt_semantic_interfaces.objects.base import (
     PydanticCustomInputParser,
     PydanticParseableValueType,
 )
+from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
 from dbt_semantic_interfaces.objects.metadata import Metadata
-from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
-from dbt_semantic_interfaces.references import MeasureReference, MetricReference
-from dbt_semantic_interfaces.enum_extension import ExtendedEnum
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity, string_to_time_granularity
+from dbt_semantic_interfaces.references import MeasureReference, MetricReference
 
 
 class MetricType(ExtendedEnum):
@@ -34,7 +36,7 @@ class MetricInputMeasure(PydanticCustomInputParser, HashableBaseModel):
     """
 
     name: str
-    constraint: Optional[WhereClauseConstraint]
+    constraint: Optional[WhereFilter]
     alias: Optional[str]
 
     @classmethod
@@ -123,7 +125,7 @@ class MetricInput(HashableBaseModel):
     """Provides a pointer to a metric along with the additional properties used on that metric."""
 
     name: str
-    constraint: Optional[WhereClauseConstraint]
+    constraint: Optional[WhereFilter]
     alias: Optional[str]
     offset_window: Optional[MetricTimeWindow]
     offset_to_grain: Optional[TimeGranularity]
@@ -163,7 +165,7 @@ class Metric(HashableBaseModel, ModelWithMetadataParsing):
     description: Optional[str]
     type: MetricType
     type_params: MetricTypeParams
-    constraint: Optional[WhereClauseConstraint]
+    constraint: Optional[WhereFilter]
     metadata: Optional[Metadata]
 
     @property
