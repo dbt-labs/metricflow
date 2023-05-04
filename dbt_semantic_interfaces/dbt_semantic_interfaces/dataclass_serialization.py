@@ -6,7 +6,18 @@ import logging
 from builtins import NameError
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Dict, Optional, Type, TypeVar, Tuple, Union, get_args, get_origin, get_type_hints
+from typing import (
+    Any,
+    Dict,
+    Optional,
+    Type,
+    TypeVar,
+    Tuple,
+    Union,
+    get_args,
+    get_origin,
+    get_type_hints,
+)
 from typing_extensions import TypeAlias
 
 import pydantic
@@ -35,7 +46,9 @@ class DataclassDeserializationError(Exception):
     pass
 
 
-def _get_dataclass_field_definitions(dataclass_type: Type) -> Dict[str, FieldDefinition]:
+def _get_dataclass_field_definitions(
+    dataclass_type: Type,
+) -> Dict[str, FieldDefinition]:
     """Returns the types of fields in a dataclass. Returns a dict from the name of the field to the type."""
     assert dataclasses.is_dataclass(dataclass_type)
     try:
@@ -200,7 +213,8 @@ class DataclassSerializer:
             field_values: Dict[str, AnyValueType] = {}
             for field_name, field_definition in field_dict.items():
                 field_values[field_name] = self._convert_dataclass_instance_to_pydantic_model(
-                    object_type=field_definition.annotated_field_type, obj=getattr(obj, field_name)
+                    object_type=field_definition.annotated_field_type,
+                    obj=getattr(obj, field_name),
                 )
             return PydanticModel(**field_values)
 
@@ -303,7 +317,9 @@ class DataClassTypeToPydanticTypeConverter:  # noqa: D
         return self._dataclass_type_to_pydantic_type[dataclass_type]
 
     @staticmethod
-    def _convert_dataclass_type_to_pydantic_type(dataclass_type: Type) -> Type[BaseModel]:  # noqa: D
+    def _convert_dataclass_type_to_pydantic_type(
+        dataclass_type: Type,
+    ) -> Type[BaseModel]:  # noqa: D
         logger.debug(f"Converting {dataclass_type.__name__} to a pydantic class")
         assert issubclass(dataclass_type, SerializableDataclass)
         assert dataclasses.is_dataclass(dataclass_type)
@@ -344,7 +360,8 @@ class DataClassTypeToPydanticTypeConverter:  # noqa: D
                 FieldDefinition(field_type=optional_field_type_parameter)
             )
             return FieldDefinition(  # type: ignore[arg-type]
-                Union[converted_field_definition.field_type, type(None)], field_definition.default_value
+                Union[converted_field_definition.field_type, type(None)],
+                field_definition.default_value,
             )
         elif _is_sequence_like_tuple_type(field_definition.annotated_field_type):
             tuple_field_type_parameter = _get_type_parameter_for_sequence_like_tuple_type(
@@ -353,7 +370,10 @@ class DataClassTypeToPydanticTypeConverter:  # noqa: D
             converted_field_definition = DataClassTypeToPydanticTypeConverter._convert_nested_fields(
                 FieldDefinition(field_type=tuple_field_type_parameter)
             )
-            return FieldDefinition(Tuple[converted_field_definition.field_type, ...], field_definition.default_value)
+            return FieldDefinition(
+                Tuple[converted_field_definition.field_type, ...],
+                field_definition.default_value,
+            )
         elif issubclass(field_definition.annotated_field_type, SerializableDataclass):
             return FieldDefinition(
                 field_type=DataClassTypeToPydanticTypeConverter._convert_dataclass_type_to_pydantic_type(

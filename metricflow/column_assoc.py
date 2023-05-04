@@ -2,7 +2,7 @@ from abc import ABC
 from dataclasses import dataclass
 from typing import Optional, Any
 
-from metricflow.dataclass_serialization import SerializableDataclass
+from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from metricflow.assert_one_arg import assert_exactly_one_arg_set
 
 

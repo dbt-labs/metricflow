@@ -7,7 +7,7 @@ from typing import Optional
 
 import pandas as pd
 
-from metricflow.dataclass_serialization import SerializableDataclass
+from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from metricflow.time.time_granularity import offset_period
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 

@@ -1,6 +1,6 @@
 import pytest
 
-from metricflow.dataclass_serialization import DataclassSerializer, DataClassDeserializer
+from dbt_semantic_interfaces.dataclass_serialization import DataclassSerializer, DataClassDeserializer
 from metricflow.instances import InstanceSet
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 
