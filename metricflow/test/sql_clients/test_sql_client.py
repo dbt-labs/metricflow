@@ -90,7 +90,7 @@ def test_failed_query_with_execution_params(sql_client: SqlClient) -> None:  # n
 
 
 def test_create_table(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D
-    sql_table = SqlTable(schema_name=mf_test_session_state.mf_source_schema, table_name=_random_table())
+    sql_table = SqlTable(schema_name=mf_test_session_state.mf_system_schema, table_name=_random_table())
     sql_client.create_table_as_select(sql_table, _select_x_as_y())
     df = sql_client.query(f"SELECT * FROM {sql_table.sql}")
     _check_1col(df)
@@ -111,7 +111,7 @@ def test_create_table_from_dataframe(  # noqa: D
             (3, None, 1.2, None, "2020-01-04"),  # Test None types for NA conversions
         ],
     )
-    sql_table = SqlTable(schema_name=mf_test_session_state.mf_source_schema, table_name=_random_table())
+    sql_table = SqlTable(schema_name=mf_test_session_state.mf_system_schema, table_name=_random_table())
     sql_client.create_table_from_dataframe(sql_table=sql_table, df=expected_df)
 
     actual_df = sql_client.query(f"SELECT * FROM {sql_table.sql}")
@@ -119,7 +119,7 @@ def test_create_table_from_dataframe(  # noqa: D
 
 
 def test_table_exists(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D
-    sql_table = SqlTable(schema_name=mf_test_session_state.mf_source_schema, table_name=_random_table())
+    sql_table = SqlTable(schema_name=mf_test_session_state.mf_system_schema, table_name=_random_table())
     sql_client.create_table_as_select(sql_table, _select_x_as_y())
     assert sql_client.table_exists(sql_table)
 
@@ -145,11 +145,11 @@ def example_df() -> pd.DataFrame:
 
 
 def test_health_checks(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D
-    sql_client.health_checks(schema_name=mf_test_session_state.mf_source_schema)
+    sql_client.health_checks(schema_name=mf_test_session_state.mf_system_schema)
 
 
 def test_dry_run(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D
-    test_table = SqlTable(schema_name=mf_test_session_state.mf_source_schema, table_name=_random_table())
+    test_table = SqlTable(schema_name=mf_test_session_state.mf_system_schema, table_name=_random_table())
 
     stmt = f"CREATE TABLE {test_table.sql} AS SELECT 1 AS foo"
     sql_client.dry_run(stmt)
@@ -241,11 +241,11 @@ def test_update_params_with_same_key_different_values() -> None:  # noqa: D
 
 
 def test_list_tables(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D
-    source_schema = mf_test_session_state.mf_source_schema
-    sql_table = SqlTable(schema_name=source_schema, table_name=_random_table())
-    table_count_before_create = len(sql_client.list_tables(source_schema))
+    schema = mf_test_session_state.mf_system_schema
+    sql_table = SqlTable(schema_name=schema, table_name=_random_table())
+    table_count_before_create = len(sql_client.list_tables(schema))
     sql_client.create_table_as_select(sql_table, _select_x_as_y())
-    table_list = sql_client.list_tables(source_schema)
+    table_list = sql_client.list_tables(schema)
     table_count_after_create = len(table_list)
     assert table_count_after_create == table_count_before_create + 1
     assert len([x for x in table_list if x == sql_table.table_name]) == 1
