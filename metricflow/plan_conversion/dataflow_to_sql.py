@@ -282,7 +282,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         metric_time_dimension_spec: Optional[TimeDimensionSpec] = None
         metric_time_dimension_instance: Optional[TimeDimensionInstance] = None
         for instance in input_data_set.metric_time_dimension_instances:
-            if len(instance.spec.identifier_links) == 0:
+            if len(instance.spec.entity_links) == 0:
                 metric_time_dimension_instance = instance
                 metric_time_dimension_spec = instance.spec
                 break
@@ -335,7 +335,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         modified_input_instance_set = InstanceSet(
             measure_instances=input_data_set.instance_set.measure_instances,
             dimension_instances=input_data_set.instance_set.dimension_instances,
-            identifier_instances=input_data_set.instance_set.identifier_instances,
+            entity_instances=input_data_set.instance_set.entity_instances,
             metric_instances=input_data_set.instance_set.metric_instances,
             # we omit the metric time dimension from the right side of the self-join because we need to use
             # the metric time dimension from the right side
@@ -391,7 +391,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         # The dataflow plan describes how the data sets coming from the parent nodes should be joined together. Use
         # those descriptions to convert them to join descriptions for the SQL query plan.
         for join_description in node.join_targets:
-            join_on_identifier = join_description.join_on_identifier
+            join_on_entity = join_description.join_on_entity
 
             right_node_to_join: BaseOutput = join_description.join_node
             right_data_set: SqlDataSet = right_node_to_join.accept(self)
@@ -405,26 +405,26 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 )
             )
 
-            # Remove the linkable instances with the join_on_identifier as the leading link as the next step adds the
-            # link. This is to avoid cases where there is a primary identifier and a dimension in the data set, and we
-            # create an instance in the next step that has the same identifier link.
-            # e.g. a data set has the dimension "listing__country_latest" and "listing" is a primary identifier in the
+            # Remove the linkable instances with the join_on_entity as the leading link as the next step adds the
+            # link. This is to avoid cases where there is a primary entity and a dimension in the data set, and we
+            # create an instance in the next step that has the same entity link.
+            # e.g. a data set has the dimension "listing__country_latest" and "listing" is a primary entity in the
             # data set. The next step would create an instance like "listing__listing__country_latest" without this
             # filter.
 
             # logger.error(f"before filter is:\n{pformat_big_objects(right_data_set.instance_set.spec_set)}")
             right_data_set_instance_set_filtered = FilterLinkableInstancesWithLeadingLink(
-                identifier_link=join_on_identifier,
+                entity_link=join_on_entity,
             ).transform(right_data_set.instance_set)
             # logger.error(f"after filter is:\n{pformat_big_objects(right_data_set_instance_set_filtered.spec_set)}")
 
             # After the right data set is joined to the "from" data set, we need to change the links for some of the
             # instances that represent the right data set. For example, if the "from" data set contains the "bookings"
             # measure instance and the right dataset contains the "country" dimension instance, then after the join,
-            # the output data set should have the "country" dimension instance with the "user_id" identifier link
+            # the output data set should have the "country" dimension instance with the "user_id" entity link
             # (if "user_id" equality was the join condition). "country" -> "user_id__country"
             right_data_set_instance_set_after_join = right_data_set_instance_set_filtered.transform(
-                AddLinkToLinkableElements(join_on_identifier=join_on_identifier)
+                AddLinkToLinkableElements(join_on_entity=join_on_entity)
             )
             table_alias_to_instance_set[right_data_set_alias] = right_data_set_instance_set_after_join
 
@@ -433,7 +433,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         )
 
         # Change the aggregation state for the measures to be partially aggregated if it was previously aggregated
-        # since we removed the identifiers and added the dimensions. The dimensions could have the same value for
+        # since we removed the entities and added the dimensions. The dimensions could have the same value for
         # multiple rows, so we'll need to re-aggregate.
         from_data_set_output_instance_set = from_data_set_output_instance_set.transform(
             ChangeMeasureAggregationState(
@@ -1112,7 +1112,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         for time_dimension_instance in input_data_set.instance_set.time_dimension_instances:
             # The specification for the time dimension to use for aggregation is the local one.
             if (
-                len(time_dimension_instance.spec.identifier_links) == 0
+                len(time_dimension_instance.spec.entity_links) == 0
                 and time_dimension_instance.spec.reference == node.aggregation_time_dimension_reference
             ):
                 matching_time_dimension_instances.append(time_dimension_instance)
@@ -1145,7 +1145,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             measure_instances=tuple(output_measure_instances),
             dimension_instances=input_data_set.instance_set.dimension_instances,
             time_dimension_instances=tuple(output_time_dimension_instances),
-            identifier_instances=input_data_set.instance_set.identifier_instances,
+            entity_instances=input_data_set.instance_set.entity_instances,
             metric_instances=input_data_set.instance_set.metric_instances,
         )
         output_instance_set = ChangeAssociatedColumns(self._column_association_resolver).transform(output_instance_set)
@@ -1178,7 +1178,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
         This node will get the build a data set row filtered by the aggregate function on the
         specified dimension that is non-additive. Then that dataset would be joined with the input data
-        on that dimension along with grouping by identifiers that are also passed in.
+        on that dimension along with grouping by entities that are also passed in.
         """
         from_data_set: SqlDataSet = node.parent_node.accept(self)
 
@@ -1221,26 +1221,26 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         )
 
         # Build optional window grouping SqlSelectColumn
-        identifier_select_columns: List[SqlSelectColumn] = []
-        for identifier_spec in node.identifier_specs:
-            identifier_column_associations = self.column_association_resolver.resolve_identifier_spec(identifier_spec)
-            assert len(identifier_column_associations) == 1, "Composite identifiers not supported"
-            identifier_column_name = identifier_column_associations[0].column_name
-            identifier_select_columns.append(
+        entity_select_columns: List[SqlSelectColumn] = []
+        for entity_spec in node.entity_specs:
+            entity_column_associations = self.column_association_resolver.resolve_entity_spec(entity_spec)
+            assert len(entity_column_associations) == 1, "Composite entities not supported"
+            entity_column_name = entity_column_associations[0].column_name
+            entity_select_columns.append(
                 SqlSelectColumn(
                     expr=SqlColumnReferenceExpression(
                         SqlColumnReference(
                             table_alias=inner_join_data_set_alias,
-                            column_name=identifier_column_name,
+                            column_name=entity_column_name,
                         ),
                     ),
-                    column_alias=identifier_column_name,
+                    column_alias=entity_column_name,
                 )
             )
             column_equality_descriptions.append(
                 ColumnEqualityDescription(
-                    left_column_alias=identifier_column_name,
-                    right_column_alias=identifier_column_name,
+                    left_column_alias=entity_column_name,
+                    right_column_alias=entity_column_name,
                 )
             )
 
@@ -1260,7 +1260,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 column_alias=query_time_dimension_column_name,
             )
 
-        row_filter_group_bys = tuple(identifier_select_columns)
+        row_filter_group_bys = tuple(entity_select_columns)
         if queried_time_dimension_select_column:
             row_filter_group_bys += (queried_time_dimension_select_column,)
         # Construct SelectNode for Row filtering
@@ -1306,7 +1306,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         # Build time spine dataset
         metric_time_dimension_instance: Optional[TimeDimensionInstance] = None
         for instance in parent_data_set.metric_time_dimension_instances:
-            if len(instance.spec.identifier_links) == 0:
+            if len(instance.spec.entity_links) == 0:
                 # Use the instance with the lowest granularity
                 if not metric_time_dimension_instance or (
                     instance.spec.time_granularity < metric_time_dimension_instance.spec.time_granularity
@@ -1344,7 +1344,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 for time_dimension_instance in parent_data_set.instance_set.time_dimension_instances
                 if time_dimension_instance.spec.element_name != DataSet.metric_time_dimension_reference().element_name
             ),
-            identifier_instances=parent_data_set.instance_set.identifier_instances,
+            entity_instances=parent_data_set.instance_set.entity_instances,
             metric_instances=parent_data_set.instance_set.metric_instances,
             metadata_instances=parent_data_set.instance_set.metadata_instances,
         )

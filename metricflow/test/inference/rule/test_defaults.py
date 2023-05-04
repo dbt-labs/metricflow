@@ -24,55 +24,55 @@ def get_column_properties(column_str: str, type: InferenceColumnType, unique: bo
 
 
 def test_any_identifier_by_name_matcher() -> None:  # noqa: D
-    assert defaults.AnyIdentifierByNameRule().match_column(
+    assert defaults.AnyEntityByNameRule().match_column(
         get_column_properties("db.schema.table.id", InferenceColumnType.INTEGER, True)
     )
-    assert defaults.AnyIdentifierByNameRule().match_column(
+    assert defaults.AnyEntityByNameRule().match_column(
         get_column_properties("db.schema.table.tableid", InferenceColumnType.INTEGER, True)
     )
-    assert defaults.AnyIdentifierByNameRule().match_column(
+    assert defaults.AnyEntityByNameRule().match_column(
         get_column_properties("db.schema.table.table_id", InferenceColumnType.INTEGER, True)
     )
-    assert defaults.AnyIdentifierByNameRule().match_column(
+    assert defaults.AnyEntityByNameRule().match_column(
         get_column_properties("db.schema.table.othertable_id", InferenceColumnType.INTEGER, True)
     )
-    assert not defaults.AnyIdentifierByNameRule().match_column(
+    assert not defaults.AnyEntityByNameRule().match_column(
         get_column_properties("db.schema.table.whatever", InferenceColumnType.INTEGER, True)
     )
 
 
 def test_primary_identifier_by_name_matcher() -> None:  # noqa: D
-    assert defaults.PrimaryIdentifierByNameRule().match_column(
+    assert defaults.PrimaryEntityByNameRule().match_column(
         get_column_properties("db.schema.table.id", InferenceColumnType.INTEGER, True)
     )
-    assert defaults.PrimaryIdentifierByNameRule().match_column(
+    assert defaults.PrimaryEntityByNameRule().match_column(
         get_column_properties("db.schema.table.tableid", InferenceColumnType.INTEGER, True)
     )
-    assert defaults.PrimaryIdentifierByNameRule().match_column(
+    assert defaults.PrimaryEntityByNameRule().match_column(
         get_column_properties("db.schema.table.table_id", InferenceColumnType.INTEGER, True)
     )
-    assert defaults.PrimaryIdentifierByNameRule().match_column(
+    assert defaults.PrimaryEntityByNameRule().match_column(
         get_column_properties("db.schema.tables.table_id", InferenceColumnType.INTEGER, True)
     )
-    assert defaults.PrimaryIdentifierByNameRule().match_column(
+    assert defaults.PrimaryEntityByNameRule().match_column(
         get_column_properties("db.schema.tables.tableid", InferenceColumnType.INTEGER, True)
     )
-    assert not defaults.PrimaryIdentifierByNameRule().match_column(
+    assert not defaults.PrimaryEntityByNameRule().match_column(
         get_column_properties("db.schema.table.othertable_id", InferenceColumnType.INTEGER, True)
     )
-    assert not defaults.PrimaryIdentifierByNameRule().match_column(
+    assert not defaults.PrimaryEntityByNameRule().match_column(
         get_column_properties("db.schema.table.othertableid", InferenceColumnType.INTEGER, True)
     )
-    assert not defaults.PrimaryIdentifierByNameRule().match_column(
+    assert not defaults.PrimaryEntityByNameRule().match_column(
         get_column_properties("db.schema.table.whatever", InferenceColumnType.INTEGER, True)
     )
 
 
 def test_unique_identifier_by_distinct_count_matcher() -> None:  # noqa: D
-    assert defaults.UniqueIdentifierByDistinctCountRule().match_column(
+    assert defaults.UniqueEntityByDistinctCountRule().match_column(
         get_column_properties("db.schema.table.unique_id", InferenceColumnType.INTEGER, True)
     )
-    assert not defaults.UniqueIdentifierByDistinctCountRule().match_column(
+    assert not defaults.UniqueEntityByDistinctCountRule().match_column(
         get_column_properties("db.schema.table.unique_id", InferenceColumnType.STRING, False)
     )
 

@@ -25,8 +25,8 @@ class LowerCaseNamesRule(ModelTransformRule):
             for measure in data_source.measures:
                 measure.name = measure.name.lower()
         if data_source.identifiers:
-            for identifier in data_source.identifiers:
-                identifier.name = identifier.name.lower()
+            for entity in data_source.identifiers:
+                entity.name = entity.name.lower()
         if data_source.dimensions:
             for dimension in data_source.dimensions:
                 dimension.name = dimension.name.lower()

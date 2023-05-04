@@ -17,7 +17,7 @@ class SelectColumnSet:
     measure_columns: List[SqlSelectColumn] = field(default_factory=list)
     dimension_columns: List[SqlSelectColumn] = field(default_factory=list)
     time_dimension_columns: List[SqlSelectColumn] = field(default_factory=list)
-    identifier_columns: List[SqlSelectColumn] = field(default_factory=list)
+    entity_columns: List[SqlSelectColumn] = field(default_factory=list)
     metadata_columns: List[SqlSelectColumn] = field(default_factory=list)
 
     def merge(self, other_set: SelectColumnSet) -> SelectColumnSet:
@@ -27,7 +27,7 @@ class SelectColumnSet:
             measure_columns=self.measure_columns + other_set.measure_columns,
             dimension_columns=self.dimension_columns + other_set.dimension_columns,
             time_dimension_columns=self.time_dimension_columns + other_set.time_dimension_columns,
-            identifier_columns=self.identifier_columns + other_set.identifier_columns,
+            entity_columns=self.entity_columns + other_set.entity_columns,
             metadata_columns=self.metadata_columns + other_set.metadata_columns,
         )
 
@@ -36,7 +36,7 @@ class SelectColumnSet:
         return tuple(
             # This order was chosen to match the column sequence data consumers typically prefer.
             self.time_dimension_columns
-            + self.identifier_columns
+            + self.entity_columns
             + self.dimension_columns
             + self.metric_columns
             + self.measure_columns
@@ -49,6 +49,6 @@ class SelectColumnSet:
             metric_columns=self.metric_columns,
             dimension_columns=self.dimension_columns,
             time_dimension_columns=self.time_dimension_columns,
-            identifier_columns=self.identifier_columns,
+            entity_columns=self.entity_columns,
             metadata_columns=self.metadata_columns,
         )

@@ -3,8 +3,8 @@
 I have a node containing a measure that's needed for a metric, and I also have a list of dimensions that I need for that
 measure.
 
-Can I join that node with other nodes using a common identifier to get those dimensions? If so, what are those nodes,
-what identifier should I join on, and if I do that join, what dimensions can be retrieved?
+Can I join that node with other nodes using a common entity to get those dimensions? If so, what are those nodes,
+what entity should I join on, and if I do that join, what dimensions can be retrieved?
 
 Note: the term "dimension" is used below, but it actually refers to any LinkableInstance. Also, when you see the term
 "start_node", think "node containing the measure". Using the term "start_node" as the scenario of joining measure nodes
@@ -37,7 +37,7 @@ from metricflow.plan_conversion.instance_converters import CreateValidityWindowJ
 from metricflow.protocols.semantics import DataSourceSemanticsAccessor
 from metricflow.specs import (
     LinkableInstanceSpec,
-    LinklessIdentifierSpec,
+    LinklessEntitySpec,
 )
 
 logger = logging.getLogger(__name__)
@@ -48,13 +48,13 @@ class JoinLinkableInstancesRecipe:
     """A recipe for how to join a node containing linkable instances to the "start_node".
 
     node_to_join contains the linkable instances that are needed - it should be filtered so that the output data set of
-    that node only includes the identifier instance for the join and the instances associated with
+    that node only includes the entity instance for the join and the instances associated with
     satisfiable_linkable_specs.
     """
 
     node_to_join: BaseOutput
-    # The identifier to join "node_to_join" on.
-    join_on_identifier: LinklessIdentifierSpec
+    # The entity to join "node_to_join" on.
+    join_on_entity: LinklessEntitySpec
     # The linkable instances from the query that can be satisfied if we join this node. Note that this is different from
     # the linkable specs in the node that can help to satisfy the query. e.g. "user_id__country" might be one of the
     # "satisfiable_linkable_specs", but "country" is the linkable spec in the node.
@@ -71,7 +71,7 @@ class JoinLinkableInstancesRecipe:
         """The recipe as a join description to use in the dataflow plan node."""
         return JoinDescription(
             join_node=self.node_to_join,
-            join_on_identifier=self.join_on_identifier,
+            join_on_entity=self.join_on_entity,
             join_on_partition_dimensions=self.join_on_partition_dimensions,
             join_on_partition_time_dimensions=self.join_on_partition_time_dimensions,
             validity_window=self.validity_window,
@@ -100,7 +100,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
     """Helps to evaluate if linkable instances can be obtained using the given node, with joins if necessary.
 
     For example, consider a "start_node" containing the "bookings" measure, "is_instant" dimension, and "listing_id"
-    identifier with nodes_available_for_joins including a node with the "listing_id" identifier, and the "country"
+    entity with nodes_available_for_joins including a node with the "listing_id" entity, and the "country"
     dimension.
 
     We want to know if we can get "bookings", "is_instant", "listing_id__country" using the start_node. The result
@@ -144,95 +144,93 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
         for right_node in self._nodes_available_for_joins:
             data_set_in_right_node: SqlDataSet = self._node_data_set_resolver.get_output_data_set(right_node)
             linkable_specs_in_right_node = data_set_in_right_node.instance_set.spec_set.linkable_specs
-            identifier_specs_in_right_node = data_set_in_right_node.instance_set.spec_set.identifier_specs
+            entity_specs_in_right_node = data_set_in_right_node.instance_set.spec_set.entity_specs
 
-            # For each unlinked identifier in the data set, create a candidate for joining.
-            # For a data set to be useful for satisfying a linkable spec, it needs to have the identifier
-            # and the linkable spec without the identifier. This allows joining based on the identifier, which will
+            # For each unlinked entity in the data set, create a candidate for joining.
+            # For a data set to be useful for satisfying a linkable spec, it needs to have the entity
+            # and the linkable spec without the entity. This allows joining based on the entity, which will
             # then produce the linkable spec. See comments further below for more details.
 
-            for identifier_spec_in_right_node in identifier_specs_in_right_node:
-                # If an identifier has links, what that means and whether it can be used is unclear at the moment,
+            for entity_spec_in_right_node in entity_specs_in_right_node:
+                # If an entity has links, what that means and whether it can be used is unclear at the moment,
                 # so skip it.
-                if len(identifier_spec_in_right_node.identifier_links) > 0:
+                if len(entity_spec_in_right_node.entity_links) > 0:
                     continue
 
-                identifier_instance_in_right_node = None
-                for instance in data_set_in_right_node.instance_set.identifier_instances:
-                    if instance.spec == identifier_spec_in_right_node:
-                        identifier_instance_in_right_node = instance
+                entity_instance_in_right_node = None
+                for instance in data_set_in_right_node.instance_set.entity_instances:
+                    if instance.spec == entity_spec_in_right_node:
+                        entity_instance_in_right_node = instance
                         break
 
-                if identifier_instance_in_right_node is None:
-                    raise RuntimeError(
-                        f"Could not find identifier instance with name ({identifier_spec_in_right_node})"
-                    )
+                if entity_instance_in_right_node is None:
+                    raise RuntimeError(f"Could not find entity instance with name ({entity_spec_in_right_node})")
 
                 assert (
-                    len(identifier_instance_in_right_node.defined_from) == 1
-                ), f"Did not get exactly 1 defined_from in {identifier_instance_in_right_node}"
+                    len(entity_instance_in_right_node.defined_from) == 1
+                ), f"Did not get exactly 1 defined_from in {entity_instance_in_right_node}"
 
-                identifier_in_right_node = self._data_source_semantics.get_identifier_in_data_source(
-                    identifier_instance_in_right_node.defined_from[0]
+                entity_in_right_node = self._data_source_semantics.get_entity_in_data_source(
+                    entity_instance_in_right_node.defined_from[0]
                 )
-                if identifier_in_right_node is None:
+                if entity_in_right_node is None:
                     raise RuntimeError(
-                        f"Invalid DataSourceElementReference {identifier_instance_in_right_node.defined_from[0]}"
+                        f"Invalid DataSourceElementReference {entity_instance_in_right_node.defined_from[0]}"
                     )
 
-                identifier_instance_in_left_node = None
-                for instance in start_node_instance_set.identifier_instances:
-                    if instance.spec.reference == identifier_spec_in_right_node.reference:
-                        identifier_instance_in_left_node = instance
+                entity_instance_in_left_node = None
+                for instance in start_node_instance_set.entity_instances:
+                    if instance.spec.reference == entity_spec_in_right_node.reference:
+                        entity_instance_in_left_node = instance
                         break
 
-                if identifier_instance_in_left_node is None:
-                    # The right node can have a superset of identifiers.
+                if entity_instance_in_left_node is None:
+                    # The right node can have a superset of entities.
                     continue
 
-                assert len(identifier_instance_in_left_node.defined_from) == 1
-                assert len(identifier_instance_in_right_node.defined_from) == 1
+                assert len(entity_instance_in_left_node.defined_from) == 1
+                assert len(entity_instance_in_right_node.defined_from) == 1
 
                 if not self._join_evaluator.is_valid_data_source_join(
-                    left_data_source_reference=identifier_instance_in_left_node.defined_from[0].data_source_reference,
-                    right_data_source_reference=identifier_instance_in_right_node.defined_from[0].data_source_reference,
-                    on_identifier_reference=identifier_spec_in_right_node.reference,
+                    left_data_source_reference=entity_instance_in_left_node.defined_from[0].data_source_reference,
+                    right_data_source_reference=entity_instance_in_right_node.defined_from[0].data_source_reference,
+                    on_entity_reference=entity_spec_in_right_node.reference,
                 ):
                     continue
 
-                linkless_identifier_spec_in_node = LinklessIdentifierSpec.from_element_name(
-                    identifier_spec_in_right_node.element_name
+                linkless_entity_spec_in_node = LinklessEntitySpec.from_element_name(
+                    entity_spec_in_right_node.element_name
                 )
 
                 satisfiable_linkable_specs = []
                 for needed_linkable_spec in needed_linkable_specs:
                     assert (
-                        len(needed_linkable_spec.identifier_links) != 0
+                        len(needed_linkable_spec.entity_links) != 0
                     ), f"Invalid needed linkable spec passed in {needed_linkable_spec}"
 
-                    # If the identifier in the data set matches the link, then it can be used for joins. For example,
-                    # if the node has the identifier "user_id", and dimension "country" then it can be used for
+                    # If the entity in the data set matches the link, then it can be used for joins. For example,
+                    # if the node has the entity "user_id", and dimension "country" then it can be used for
                     # satisfying "user_id__country".
                     #
                     # Multi-hop example:
                     # required_linkable_spec = "user_id__device_id__platform"
-                    # identifier_spec_in_data_set = "user_id"
+                    # entity_spec_in_data_set = "user_id"
                     #
                     # Then the data set must contain "device_id__platform", which is realized with
                     #
-                    # required_linkable_spec.remove_first_identifier_link()
+                    # required_linkable_spec.remove_first_entity_link()
                     #
-                    # We might also need to check the identifier type and see if it's the type of join we're allowing,
+                    # We might also need to check the entity type and see if it's the type of join we're allowing,
                     # but since we're doing all left joins now, it's been left out.
 
-                    required_identifier_matches_data_set_identifier = (
-                        LinklessIdentifierSpec.from_reference(needed_linkable_spec.identifier_links[0])
-                        == linkless_identifier_spec_in_node
+                    required_entity_matches_data_set_entity = (
+                        LinklessEntitySpec.from_reference(needed_linkable_spec.entity_links[0])
+                        == linkless_entity_spec_in_node
                     )
                     needed_linkable_spec_in_node = (
-                        needed_linkable_spec.without_first_identifier_link in linkable_specs_in_right_node
+                        needed_linkable_spec.without_first_entity_link in linkable_specs_in_right_node
                     )
-                    if required_identifier_matches_data_set_identifier and needed_linkable_spec_in_node:
+                    if required_entity_matches_data_set_entity and needed_linkable_spec_in_node:
                         satisfiable_linkable_specs.append(needed_linkable_spec)
 
                 # If this node can satisfy some linkable specs, it could be useful to join on, so add it to the
@@ -253,7 +251,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                     candidates_for_join.append(
                         JoinLinkableInstancesRecipe(
                             node_to_join=right_node,
-                            join_on_identifier=linkless_identifier_spec_in_node,
+                            join_on_entity=linkless_entity_spec_in_node,
                             satisfiable_linkable_specs=satisfiable_linkable_specs,
                             join_on_partition_dimensions=join_on_partition_dimensions,
                             join_on_partition_time_dimensions=join_on_partition_time_dimensions,
@@ -290,7 +288,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                 updated_candidate_data_sets.append(
                     JoinLinkableInstancesRecipe(
                         node_to_join=candidate_for_join.node_to_join,
-                        join_on_identifier=candidate_for_join.join_on_identifier,
+                        join_on_entity=candidate_for_join.join_on_entity,
                         satisfiable_linkable_specs=updated_satisfiable_linkable_specs,
                         join_on_partition_dimensions=candidate_for_join.join_on_partition_dimensions,
                         join_on_partition_time_dimensions=candidate_for_join.join_on_partition_time_dimensions,
@@ -313,7 +311,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
         In other words, given the data set associated with "start_node":
 
         * Can all "required_linkable_specs" be retrieved from the start_node? (These would be considered "local").
-        * If not, can they be retrieved by joining an available node though a common identifier?
+        * If not, can they be retrieved by joining an available node though a common entity?
         * If so, return all possible ways (by joining different nodes) that can be done.
         """
         candidate_instance_set: InstanceSet = self._node_data_set_resolver.get_output_data_set(start_node).instance_set
@@ -334,8 +332,8 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
         for required_linkable_spec in required_linkable_specs:
             is_local = required_linkable_spec in data_set_linkable_specs
             is_unjoinable = (
-                len(required_linkable_spec.identifier_links) == 0
-                or LinklessIdentifierSpec.from_reference(required_linkable_spec.identifier_links[0])
+                len(required_linkable_spec.entity_links) == 0
+                or LinklessEntitySpec.from_reference(required_linkable_spec.entity_links[0])
                 not in data_set_linkable_specs
             )
             if is_local:

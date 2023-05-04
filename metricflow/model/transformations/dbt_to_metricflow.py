@@ -11,7 +11,7 @@ from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
 from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
 from dbt_semantic_interfaces.objects.data_source import DataSource
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
-from dbt_semantic_interfaces.objects.elements.identifier import Identifier
+from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.metric import Metric, MetricInputMeasure, MetricType, MetricTypeParams
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
@@ -276,7 +276,7 @@ class DbtManifestTransformer:
 
         # collect the variations of data source properties
         measures: Set[Measure] = set()
-        identifiers: Set[Identifier] = set()
+        identifiers: Set[Entity] = set()
         dimensions: Set[Dimension] = set()
         names: Set[str] = set()
         descriptions: Set[str] = set()

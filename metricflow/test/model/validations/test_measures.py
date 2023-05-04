@@ -53,7 +53,6 @@ def test_measures_only_exist_in_one_data_source() -> None:  # noqa: D
             - name: example_identifier
               type: primary
               role: test_role
-              entity: other_identifier
               expr: example_id
           measures:
             - name: num_sample_rows
@@ -90,7 +89,6 @@ def test_measures_only_exist_in_one_data_source() -> None:  # noqa: D
             - name: example_identifier_2
               type: primary
               role: test_role
-              entity: other_identifier
               expr: example_id
           measures:
             - name: num_sample_rows
@@ -129,7 +127,6 @@ def test_measure_alias_is_set_when_required() -> None:
             - name: example_identifier
               type: primary
               role: test_role
-              entity: other_identifier
               expr: example_id
           measures:
             - name: {measure_name}
@@ -181,7 +178,6 @@ def test_invalid_measure_alias_name() -> None:
             - name: example_identifier
               type: primary
               role: test_role
-              entity: other_identifier
               expr: example_id
           measures:
             - name: num_sample_rows
@@ -231,7 +227,6 @@ def test_measure_alias_measure_name_conflict() -> None:
             - name: example_identifier
               type: primary
               role: test_role
-              entity: other_identifier
               expr: example_id
           measures:
             - name: {measure_name}
@@ -285,7 +280,6 @@ def test_reused_measure_alias() -> None:
             - name: example_identifier
               type: primary
               role: test_role
-              entity: other_identifier
               expr: example_id
           measures:
             - name: num_sample_rows
@@ -349,7 +343,6 @@ def test_reused_measure_alias_within_metric() -> None:
             - name: example_identifier
               type: primary
               role: test_role
-              entity: other_identifier
               expr: example_id
           measures:
             - name: num_sample_rows
@@ -403,7 +396,6 @@ def test_invalid_non_additive_dimension_properties() -> None:
             - name: example_identifier
               type: primary
               role: test_role
-              entity: other_identifier
               expr: example_id
           measures:
             - name: bad_measure
@@ -478,7 +470,6 @@ def test_count_measure_missing_expr() -> None:
             - name: example_identifier
               type: primary
               role: test_role
-              entity: other_identifier
               expr: example_id
           measures:
             - name: num_sample_rows
@@ -526,7 +517,6 @@ def test_count_measure_with_distinct_expr() -> None:
             - name: example_identifier
               type: primary
               role: test_role
-              entity: other_identifier
               expr: example_id
           measures:
             - name: num_sample_rows
@@ -572,7 +562,6 @@ def test_percentile_measure_missing_agg_params() -> None:
             - name: example_identifier
               type: primary
               role: test_role
-              entity: other_identifier
               expr: example_id
           measures:
             - name: bad_measure_1
@@ -630,7 +619,6 @@ def test_percentile_measure_bad_percentile_values() -> None:
             - name: example_identifier
               type: primary
               role: test_role
-              entity: other_identifier
               expr: example_id
           measures:
             - name: bad_measure_1

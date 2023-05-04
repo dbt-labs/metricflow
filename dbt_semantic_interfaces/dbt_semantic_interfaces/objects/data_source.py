@@ -5,7 +5,7 @@ from typing import List, Optional, Sequence
 from dbt_semantic_interfaces.objects.base import ModelWithMetadataParsing, HashableBaseModel
 from dbt_semantic_interfaces.objects.common import Metadata
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension
-from dbt_semantic_interfaces.objects.elements.identifier import Identifier
+from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.references import DataSourceReference, LinkableElementReference, MeasureReference
 from dbt_semantic_interfaces.enum_extension import ExtendedEnum
@@ -56,7 +56,7 @@ class DataSource(HashableBaseModel, ModelWithMetadataParsing):
     sql_query: Optional[str]
     dbt_model: Optional[str]
 
-    identifiers: Sequence[Identifier] = []
+    identifiers: Sequence[Entity] = []
     measures: Sequence[Measure] = []
     dimensions: Sequence[Dimension] = []
 
@@ -66,7 +66,7 @@ class DataSource(HashableBaseModel, ModelWithMetadataParsing):
     metadata: Optional[Metadata]
 
     @property
-    def identifier_references(self) -> List[LinkableElementReference]:  # noqa: D
+    def entity_references(self) -> List[LinkableElementReference]:  # noqa: D
         return [i.reference for i in self.identifiers]
 
     @property
@@ -93,12 +93,12 @@ class DataSource(HashableBaseModel, ModelWithMetadataParsing):
 
         raise ValueError(f"No dimension with name ({dimension_reference}) in data source with name ({self.name})")
 
-    def get_identifier(self, identifier_reference: LinkableElementReference) -> Identifier:  # noqa: D
-        for ident in self.identifiers:
-            if ident.reference == identifier_reference:
-                return ident
+    def get_entity(self, entity_reference: LinkableElementReference) -> Entity:  # noqa: D
+        for entity in self.identifiers:
+            if entity.reference == entity_reference:
+                return entity
 
-        raise ValueError(f"No identifier with name ({identifier_reference}) in data source with name ({self.name})")
+        raise ValueError(f"No entity with name ({entity_reference}) in data source with name ({self.name})")
 
     @property
     def has_validity_dimensions(self) -> bool:

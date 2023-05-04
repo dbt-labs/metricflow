@@ -57,14 +57,14 @@ from metricflow.specs import (
     MetricFlowQuerySpec,
     MeasureSpec,
     TimeDimensionSpec,
-    IdentifierSpec,
+    EntitySpec,
     DimensionSpec,
     OrderBySpec,
     NonAdditiveDimensionSpec,
     SpecWhereClauseConstraint,
     LinkableSpecSet,
     ColumnAssociationResolver,
-    LinklessIdentifierSpec,
+    LinklessEntitySpec,
     InstanceSpecSet,
 )
 from metricflow.sql.sql_plan import SqlJoinType
@@ -176,7 +176,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
 
         Args:
             metric_specs: Specs for metrics to compute.
-            queried_linkable_specs: Dimensions/identifiers that were queried for.
+            queried_linkable_specs: Dimensions/entities that were queried for.
             where_constraint: Where constraint used to compute the metric.
             time_range_constraint: Time range constraint used to compute the metric.
             combine_metrics_join_type: The join used when combining the computed metrics.
@@ -258,7 +258,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         metric_specs: Sequence[MetricSpec],
         dimension_spec: Optional[DimensionSpec] = None,
         time_dimension_spec: Optional[TimeDimensionSpec] = None,
-        identifier_spec: Optional[IdentifierSpec] = None,
+        entity_spec: Optional[EntitySpec] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         limit: Optional[int] = None,
     ) -> DataflowPlan[SqlDataSetT]:
@@ -267,18 +267,18 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         e.g. distinct listing__country_latest for bookings by listing__country_latest
         """
         assert_exactly_one_arg_set(
-            dimension_spec=dimension_spec, time_dimension_spec=time_dimension_spec, identifier_spec=identifier_spec
+            dimension_spec=dimension_spec, time_dimension_spec=time_dimension_spec, entity_spec=entity_spec
         )
 
         # Doing this to keep the type checker happy, but assert_exactly_one_arg_set should ensure this.
-        linkable_spec: Optional[LinkableInstanceSpec] = dimension_spec or time_dimension_spec or identifier_spec
+        linkable_spec: Optional[LinkableInstanceSpec] = dimension_spec or time_dimension_spec or entity_spec
         assert linkable_spec
 
         query_spec = MetricFlowQuerySpec(
             metric_specs=tuple(metric_specs),
             dimension_specs=(dimension_spec,) if dimension_spec else (),
             time_dimension_specs=(time_dimension_spec,) if time_dimension_spec else (),
-            identifier_specs=(identifier_spec,) if identifier_spec else (),
+            entity_specs=(entity_spec,) if entity_spec else (),
             time_range_constraint=time_range_constraint,
         )
         metrics_output_node = self._build_metrics_output_node(
@@ -299,7 +299,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 OrderBySpec(
                     dimension_spec=dimension_spec,
                     time_dimension_spec=time_dimension_spec,
-                    identifier_spec=identifier_spec,
+                    entity_spec=entity_spec,
                     descending=False,
                 ),
             ),
@@ -346,7 +346,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
     @staticmethod
     def _contains_multihop_linkables(linkable_specs: Sequence[LinkableInstanceSpec]) -> bool:
         """Returns true if any of the linkable specs requires a multi-hop join to realize."""
-        return any(len(x.identifier_links) > 1 for x in linkable_specs)
+        return any(len(x.entity_links) > 1 for x in linkable_specs)
 
     def _get_data_source_names_for_measures(self, measure_names: Sequence[MeasureSpec]) -> Set[str]:
         """Return the names of the data sources needed to compute the input measures
@@ -561,8 +561,8 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             )
 
             # Nodes containing the linkable instances will be joined to the node containing the measure, so these
-            # identifiers will need to be present in the measure node.
-            required_local_identifier_specs = tuple(x.join_on_identifier for x in evaluation.join_recipes)
+            # entities will need to be present in the measure node.
+            required_local_entity_specs = tuple(x.join_on_entity for x in evaluation.join_recipes)
             # Same thing with partitions.
             required_local_dimension_specs = tuple(
                 y.start_node_dimension_spec for x in evaluation.join_recipes for y in x.join_on_partition_dimensions
@@ -577,7 +577,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 measure_node=node_with_lowest_cost,
                 required_local_linkable_specs=(
                     evaluation.local_linkable_specs
-                    + required_local_identifier_specs
+                    + required_local_entity_specs
                     + required_local_dimension_specs
                     + required_local_time_dimension_specs
                 ),
@@ -782,13 +782,12 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             # Figure out what elements to filter from the joined node.
 
             # Sanity check - all linkable specs should have a link, or else why would we be joining them.
-            assert all([len(x.identifier_links) > 0 for x in join_recipe.satisfiable_linkable_specs])
+            assert all([len(x.entity_links) > 0 for x in join_recipe.satisfiable_linkable_specs])
 
-            # If we're joining something in, then we need the associated identifier, partitions, and time dimension
+            # If we're joining something in, then we need the associated entity, partitions, and time dimension
             # specs defining the validity window (if necessary)
             include_specs: List[LinkableInstanceSpec] = [
-                LinklessIdentifierSpec.from_reference(x.identifier_links[0])
-                for x in join_recipe.satisfiable_linkable_specs
+                LinklessEntitySpec.from_reference(x.entity_links[0]) for x in join_recipe.satisfiable_linkable_specs
             ]
             include_specs.extend([x.node_to_join_dimension_spec for x in join_recipe.join_on_partition_dimensions])
             include_specs.extend(
@@ -802,11 +801,11 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                     ]
                 )
 
-            # satisfiable_linkable_specs describes what can be satisfied after the join, so remove the identifier
+            # satisfiable_linkable_specs describes what can be satisfied after the join, so remove the entity
             # link when filtering before the join.
-            # e.g. if the node is used to satisfy "user_id__country", then the node must have the identifier
+            # e.g. if the node is used to satisfy "user_id__country", then the node must have the entity
             # "user_id" and the "country" dimension so that it can be joined to the measure node.
-            include_specs.extend([x.without_first_identifier_link for x in join_recipe.satisfiable_linkable_specs])
+            include_specs.extend([x.without_first_entity_link for x in join_recipe.satisfiable_linkable_specs])
             filtered_node_to_join = FilterElementsNode[SqlDataSetT](
                 parent_node=join_recipe.node_to_join,
                 include_specs=InstanceSpecSet.create_from_linkable_specs(include_specs),
@@ -814,7 +813,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             join_targets.append(
                 JoinDescription(
                     join_node=filtered_node_to_join,
-                    join_on_identifier=join_recipe.join_on_identifier,
+                    join_on_entity=join_recipe.join_on_entity,
                     join_on_partition_dimensions=join_recipe.join_on_partition_dimensions,
                     join_on_partition_time_dimensions=join_recipe.join_on_partition_time_dimensions,
                     validity_window=join_recipe.validity_window,
@@ -872,11 +871,11 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             )
             time_dimension_spec = TimeDimensionSpec.from_name(non_additive_dimension_spec.name)
             window_groupings = tuple(
-                LinklessIdentifierSpec.from_element_name(name) for name in non_additive_dimension_spec.window_groupings
+                LinklessEntitySpec.from_element_name(name) for name in non_additive_dimension_spec.window_groupings
             )
             pre_aggregate_node = SemiAdditiveJoinNode[SqlDataSetT](
                 parent_node=pre_aggregate_node,
-                identifier_specs=window_groupings,
+                entity_specs=window_groupings,
                 time_dimension_spec=time_dimension_spec,
                 agg_by_function=non_additive_dimension_spec.window_choice,
                 queried_time_dimension_spec=queried_time_dimension_spec,

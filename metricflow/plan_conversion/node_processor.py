@@ -2,7 +2,7 @@ import logging
 from dataclasses import dataclass
 from typing import Generic, Sequence, List, TypeVar, Optional, Set
 
-from dbt_semantic_interfaces.references import TimeDimensionReference, IdentifierReference
+from dbt_semantic_interfaces.references import TimeDimensionReference, EntityReference
 
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
@@ -19,7 +19,7 @@ from metricflow.object_utils import pformat_big_objects
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.protocols.semantics import DataSourceSemanticsAccessor
 from metricflow.spec_set_transforms import ToElementNameSet
-from metricflow.specs import LinkableInstanceSpec, LinklessIdentifierSpec, InstanceSpecSet
+from metricflow.specs import LinkableInstanceSpec, LinklessEntitySpec, InstanceSpecSet
 
 SqlDataSetT = TypeVar("SqlDataSetT", bound=SqlDataSet)
 
@@ -32,9 +32,9 @@ class MultiHopJoinCandidateLineage(Generic[SqlDataSetT]):
     """Describes how the multi-hop join candidate was formed.
 
     For example, if
-    * bridge_source has the primary identifier account_id and the foreign identifier customer_id
-    * customers_source has the primary identifier customer_id and dimension country
-    * transactions_source has the transactions measure and the account_id foreign identifier
+    * bridge_source has the primary entity account_id and the foreign entity customer_id
+    * customers_source has the primary entity customer_id and dimension country
+    * transactions_source has the transactions measure and the account_id foreign entity
 
     Then the candidate lineage can be describe as
         first_node_to_join = bridge_source
@@ -44,7 +44,7 @@ class MultiHopJoinCandidateLineage(Generic[SqlDataSetT]):
 
     first_node_to_join: BaseOutput[SqlDataSetT]
     second_node_to_join: BaseOutput[SqlDataSetT]
-    join_second_node_by_identifier: LinklessIdentifierSpec
+    join_second_node_by_entity: LinklessEntitySpec
 
 
 @dataclass(frozen=True)
@@ -104,7 +104,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                 for time_dimension_instance in node_output_data_set.instance_set.time_dimension_instances:
                     if (
                         time_dimension_instance.spec.reference == metric_time_dimension_reference
-                        and len(time_dimension_instance.spec.identifier_links) == 0
+                        and len(time_dimension_instance.spec.entity_links) == 0
                     ):
                         constrain_time = True
                         break
@@ -118,33 +118,33 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                 processed_nodes.append(source_node)
         return processed_nodes
 
-    def _node_contains_identifier(
+    def _node_contains_entity(
         self,
         node: BaseOutput[SqlDataSetT],
-        identifier_reference: IdentifierReference,
+        entity_reference: EntityReference,
     ) -> bool:
-        """Returns true if the output of the node contains an identifier of the given types."""
+        """Returns true if the output of the node contains an entity of the given types."""
         data_set = self._node_data_set_resolver.get_output_data_set(node)
 
-        for identifier_instance_in_first_node in data_set.instance_set.identifier_instances:
-            identifier_spec_in_first_node = identifier_instance_in_first_node.spec
+        for entity_instance_in_first_node in data_set.instance_set.entity_instances:
+            entity_spec_in_first_node = entity_instance_in_first_node.spec
 
-            if identifier_spec_in_first_node.reference != identifier_reference:
+            if entity_spec_in_first_node.reference != entity_reference:
                 continue
 
-            if len(identifier_spec_in_first_node.identifier_links) > 0:
+            if len(entity_spec_in_first_node.entity_links) > 0:
                 continue
 
             assert (
-                len(identifier_instance_in_first_node.defined_from) == 1
+                len(entity_instance_in_first_node.defined_from) == 1
             ), "Multiple items in defined_from not yet supported"
 
-            identifier = self._data_source_semantics.get_identifier_in_data_source(
-                identifier_instance_in_first_node.defined_from[0]
+            entity = self._data_source_semantics.get_entity_in_data_source(
+                entity_instance_in_first_node.defined_from[0]
             )
-            if identifier is None:
+            if entity is None:
                 raise RuntimeError(
-                    f"Invalid DataSourceElementReference {identifier_instance_in_first_node.defined_from[0]}"
+                    f"Invalid DataSourceElementReference {entity_instance_in_first_node.defined_from[0]}"
                 )
 
             return True
@@ -158,12 +158,12 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
     ) -> Sequence[MultiHopJoinCandidate]:
         """Assemble nodes representing all possible one-hop joins"""
 
-        if len(desired_linkable_spec.identifier_links) > MAX_JOIN_HOPS:
+        if len(desired_linkable_spec.entity_links) > MAX_JOIN_HOPS:
             raise NotImplementedError(
-                f"Multi-hop joins with more than {MAX_JOIN_HOPS} identifier links not yet supported. "
+                f"Multi-hop joins with more than {MAX_JOIN_HOPS} entity links not yet supported. "
                 f"Got: {desired_linkable_spec}"
             )
-        if len(desired_linkable_spec.identifier_links) != 2:
+        if len(desired_linkable_spec.entity_links) != 2:
             return ()
 
         multi_hop_join_candidates: List[MultiHopJoinCandidate] = []
@@ -174,24 +174,24 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                 first_node_that_could_be_joined
             )
 
-            # When joining on the identifier, the first node needs the first and second identifier links.
+            # When joining on the entity, the first node needs the first and second entity links.
             if not (
-                self._node_contains_identifier(
+                self._node_contains_entity(
                     node=first_node_that_could_be_joined,
-                    identifier_reference=desired_linkable_spec.identifier_links[0],
+                    entity_reference=desired_linkable_spec.entity_links[0],
                 )
-                and self._node_contains_identifier(
+                and self._node_contains_entity(
                     node=first_node_that_could_be_joined,
-                    identifier_reference=desired_linkable_spec.identifier_links[1],
+                    entity_reference=desired_linkable_spec.entity_links[1],
                 )
             ):
                 continue
 
             for second_node_that_could_be_joined in nodes:
                 if not (
-                    self._node_contains_identifier(
+                    self._node_contains_entity(
                         node=second_node_that_could_be_joined,
-                        identifier_reference=desired_linkable_spec.identifier_links[1],
+                        entity_reference=desired_linkable_spec.entity_links[1],
                     )
                 ):
                     continue
@@ -213,13 +213,13 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                 if desired_linkable_spec.element_name not in element_names_in_data_set:
                     continue
 
-                # The first and second nodes are joined by this identifier
-                identifier_reference_to_join_first_and_second_nodes = desired_linkable_spec.identifier_links[1]
+                # The first and second nodes are joined by this entity
+                entity_reference_to_join_first_and_second_nodes = desired_linkable_spec.entity_links[1]
 
                 if not self._join_evaluator.is_valid_instance_set_join(
                     left_instance_set=data_set_of_first_node_that_could_be_joined.instance_set,
                     right_instance_set=data_set_of_second_node_that_can_be_joined.instance_set,
-                    on_identifier_reference=identifier_reference_to_join_first_and_second_nodes,
+                    on_entity_reference=entity_reference_to_join_first_and_second_nodes,
                 ):
                     continue
 
@@ -228,7 +228,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                 filtered_joinable_node = FilterElementsNode(
                     parent_node=second_node_that_could_be_joined,
                     include_specs=InstanceSpecSet.create_from_linkable_specs(
-                        specs.dimension_specs + specs.identifier_specs + specs.time_dimension_specs
+                        specs.dimension_specs + specs.entity_specs + specs.time_dimension_specs
                     ),
                 )
 
@@ -248,8 +248,8 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                             join_targets=[
                                 JoinDescription(
                                     join_node=filtered_joinable_node,
-                                    join_on_identifier=LinklessIdentifierSpec.from_reference(
-                                        desired_linkable_spec.identifier_links[1]
+                                    join_on_entity=LinklessEntitySpec.from_reference(
+                                        desired_linkable_spec.entity_links[1]
                                     ),
                                     join_on_partition_dimensions=join_on_partition_dimensions,
                                     join_on_partition_time_dimensions=join_on_partition_time_dimensions,
@@ -259,10 +259,10 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                         lineage=MultiHopJoinCandidateLineage(
                             first_node_to_join=first_node_that_could_be_joined,
                             second_node_to_join=second_node_that_could_be_joined,
-                            # identifier_spec_in_first_node should already not have identifier links since we checked
+                            # entity_spec_in_first_node should already not have entity links since we checked
                             # for that, but using this method for type checking.
-                            join_second_node_by_identifier=LinklessIdentifierSpec.from_reference(
-                                desired_linkable_spec.identifier_links[1]
+                            join_second_node_by_entity=LinklessEntitySpec.from_reference(
+                                desired_linkable_spec.entity_links[1]
                             ),
                         ),
                     )
@@ -311,14 +311,14 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
         doesn't mean that the node will be useful, but not having common elements definitely means it's not useful.
         """
         relevant_element_names = {x.element_name for x in desired_linkable_specs}.union(
-            {y.element_name for x in desired_linkable_specs for y in x.identifier_links}
+            {y.element_name for x in desired_linkable_specs for y in x.entity_links}
         )
 
         # The metric time dimension is used everywhere, so don't count it unless specifically desired in linkable spec
-        # that has identifier links.
+        # that has entity links.
         metric_time_dimension_used_in_linked_spec = any(
             [
-                len(linkable_spec.identifier_links) > 0
+                len(linkable_spec.entity_links) > 0
                 and linkable_spec.element_name == metric_time_dimension_reference.element_name
                 for linkable_spec in desired_linkable_specs
             ]

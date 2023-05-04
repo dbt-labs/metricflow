@@ -17,7 +17,7 @@ integration_test:
 integration_test:
   name: one_hop_dundered_composite_identifier
   description: Query a dimension from a different data source joined using a composite identifier.
-  model: COMPOSITE_IDENTIFIER_MODEL
+  model: COMPOSITE_ENTITY_MODEL
   metrics: ["messages"]
   group_bys: ["user_team__user_id"]
   check_query: |

@@ -30,14 +30,14 @@ class SingleColumnCorrelationKey(ColumnCorrelationKey, SerializableDataclass):
 class CompositeColumnCorrelationKey(ColumnCorrelationKey, SerializableDataclass):
     """Key to use when there are multiple column associations in an instance"""
 
-    sub_identifier: str
+    sub_entity: str
 
 
 @dataclass(frozen=True)
 class ColumnAssociation(SerializableDataclass):
     """Used to describe how an instance is associated with columns in table / SQL query.
 
-    Generally there will be a 1:1 mapping, but for composite identifiers, it can map to multiple columns. For that case,
+    Generally there will be a 1:1 mapping, but for composite entities, it can map to multiple columns. For that case,
     this can be subclassed to add more context.
     """
 

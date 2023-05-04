@@ -93,9 +93,9 @@ class DataWarehouseTaskBuilder:
     """Task builder for standard data warehouse validation tasks"""
 
     @staticmethod
-    def _remove_identifier_link_specs(specs: Tuple[LinkableInstanceSpecT, ...]) -> Tuple[LinkableInstanceSpecT, ...]:
-        """For the purposes of data warehouse validation, specs with identifier_links are unnecesary"""
-        return tuple(spec for spec in specs if not spec.identifier_links)
+    def _remove_entity_link_specs(specs: Tuple[LinkableInstanceSpecT, ...]) -> Tuple[LinkableInstanceSpecT, ...]:
+        """For the purposes of data warehouse validation, specs with entity_links are unnecesary"""
+        return tuple(spec for spec in specs if not spec.entity_links)
 
     @staticmethod
     def _data_source_nodes(
@@ -198,7 +198,7 @@ class DataWarehouseTaskBuilder:
             data_source_sub_tasks: List[DataWarehouseValidationTask] = []
             dataset = render_tools.converter.create_sql_source_data_set(data_source)
 
-            dimension_specs = DataWarehouseTaskBuilder._remove_identifier_link_specs(
+            dimension_specs = DataWarehouseTaskBuilder._remove_entity_link_specs(
                 dataset.instance_set.spec_set.dimension_specs
             )
 
@@ -213,7 +213,7 @@ class DataWarehouseTaskBuilder:
                     )
                 )
 
-            time_dimension_specs = DataWarehouseTaskBuilder._remove_identifier_link_specs(
+            time_dimension_specs = DataWarehouseTaskBuilder._remove_entity_link_specs(
                 dataset.instance_set.spec_set.time_dimension_specs
             )
             for spec in time_dimension_specs:
@@ -274,15 +274,15 @@ class DataWarehouseTaskBuilder:
         return tasks
 
     @classmethod
-    def gen_identifier_tasks(
+    def gen_entity_tasks(
         cls, model: UserConfiguredModel, sql_client: SqlClient, system_schema: str
     ) -> List[DataWarehouseValidationTask]:
-        """Generates a list of tasks for validating the identifiers of the model
+        """Generates a list of tasks for validating the entities of the model
 
         The high level tasks returned are "short cut" queries which try to
-        query all the identifiers for a given data source. If that query fails,
-        one or more of the identifiers is incorrectly specified. Thus if the
-        query fails, there are subtasks which query the individual identifiers
+        query all the entities for a given data source. If that query fails,
+        one or more of the entities is incorrectly specified. Thus if the
+        query fails, there are subtasks which query the individual entities
         on the data source to identify which have issues.
         """
 
@@ -296,12 +296,12 @@ class DataWarehouseTaskBuilder:
 
             data_source_sub_tasks: List[DataWarehouseValidationTask] = []
             dataset = render_tools.converter.create_sql_source_data_set(data_source)
-            data_source_specs = DataWarehouseTaskBuilder._remove_identifier_link_specs(
-                dataset.instance_set.spec_set.identifier_specs
+            data_source_specs = DataWarehouseTaskBuilder._remove_entity_link_specs(
+                dataset.instance_set.spec_set.entity_specs
             )
             for spec in data_source_specs:
                 filter_elements_node = FilterElementsNode(
-                    parent_node=source_node, include_specs=InstanceSpecSet(identifier_specs=(spec,))
+                    parent_node=source_node, include_specs=InstanceSpecSet(entity_specs=(spec,))
                 )
                 data_source_sub_tasks.append(
                     DataWarehouseValidationTask(
@@ -309,7 +309,7 @@ class DataWarehouseTaskBuilder:
                             cls.renderize,
                             sql_client=sql_client,
                             plan_converter=render_tools.plan_converter,
-                            plan_id=f"{data_source.name}_identifier_{spec.element_name}_validation",
+                            plan_id=f"{data_source.name}_entity_{spec.element_name}_validation",
                             nodes=filter_elements_node,
                         ),
                         context=DataSourceElementContext(
@@ -317,16 +317,16 @@ class DataWarehouseTaskBuilder:
                             data_source_element=DataSourceElementReference(
                                 data_source_name=data_source.name, element_name=spec.element_name
                             ),
-                            element_type=DataSourceElementType.IDENTIFIER,
+                            element_type=DataSourceElementType.ENTITY,
                         ),
-                        error_message=f"Unable to query identifier `{spec.element_name}` on data source `{data_source.name}` in data warehouse",
+                        error_message=f"Unable to query entity `{spec.element_name}` on data source `{data_source.name}` in data warehouse",
                     )
                 )
 
             filter_elements_node = FilterElementsNode(
                 parent_node=source_node,
                 include_specs=InstanceSpecSet(
-                    identifier_specs=tuple(data_source_specs),
+                    entity_specs=tuple(data_source_specs),
                 ),
             )
             tasks.append(
@@ -335,14 +335,14 @@ class DataWarehouseTaskBuilder:
                         cls.renderize,
                         sql_client=sql_client,
                         plan_converter=render_tools.plan_converter,
-                        plan_id=f"{data_source.name}_all_identifiers_validation",
+                        plan_id=f"{data_source.name}_all_entities_validation",
                         nodes=filter_elements_node,
                     ),
                     context=DataSourceContext(
                         file_context=FileContext.from_metadata(metadata=data_source.metadata),
                         data_source=DataSourceReference(data_source_name=data_source.name),
                     ),
-                    error_message=f"Failed to query identifiers in data warehouse for data source `{data_source.name}`",
+                    error_message=f"Failed to query entities in data warehouse for data source `{data_source.name}`",
                     on_fail_subtasks=data_source_sub_tasks,
                 )
             )
@@ -565,8 +565,8 @@ class DataWarehouseModelValidator:
         )
         return self.run_tasks(tasks=tasks, timeout=timeout)
 
-    def validate_identifiers(self, model: UserConfiguredModel, timeout: Optional[int] = None) -> ModelValidationResults:
-        """Generates a list of tasks for validating the identifiers of the model and then runs them
+    def validate_entities(self, model: UserConfiguredModel, timeout: Optional[int] = None) -> ModelValidationResults:
+        """Generates a list of tasks for validating the entities of the model and then runs them
 
         Args:
             model: Model which to run data warehouse validations on
@@ -575,7 +575,7 @@ class DataWarehouseModelValidator:
         Returns:
             A list of validation issues. If there are no validation issues, an empty list is returned.
         """
-        tasks = DataWarehouseTaskBuilder.gen_identifier_tasks(
+        tasks = DataWarehouseTaskBuilder.gen_entity_tasks(
             model=model, sql_client=self._sql_client, system_schema=self._sql_schema
         )
         return self.run_tasks(tasks=tasks, timeout=timeout)

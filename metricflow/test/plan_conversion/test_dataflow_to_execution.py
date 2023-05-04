@@ -13,7 +13,7 @@ from metricflow.specs import (
     MetricSpec,
     DimensionSpec,
     TimeDimensionSpec,
-    IdentifierReference,
+    EntityReference,
 )
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
@@ -50,11 +50,11 @@ def test_joined_plan(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
-                    identifier_links=(),
+                    entity_links=(),
                 ),
                 DimensionSpec(
                     element_name="country_latest",
-                    identifier_links=(IdentifierReference("listing"),),
+                    entity_links=(EntityReference("listing"),),
                 ),
             ),
         )
@@ -91,7 +91,7 @@ def test_small_combined_metrics_plan(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
-                    identifier_links=(),
+                    entity_links=(),
                 ),
             ),
         )
@@ -130,10 +130,10 @@ def test_combined_metrics_plan(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
-                    identifier_links=(),
+                    entity_links=(),
                 ),
             ),
-            time_dimension_specs=(TimeDimensionSpec(element_name="ds", identifier_links=()),),
+            time_dimension_specs=(TimeDimensionSpec(element_name="ds", entity_links=()),),
         )
     )
 
@@ -167,9 +167,9 @@ def test_multihop_joined_plan(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="customer_name",
-                    identifier_links=(
-                        IdentifierReference(element_name="account_id"),
-                        IdentifierReference(element_name="customer_id"),
+                    entity_links=(
+                        EntityReference(element_name="account_id"),
+                        EntityReference(element_name="customer_id"),
                     ),
                 ),
             ),

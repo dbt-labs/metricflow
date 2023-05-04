@@ -20,7 +20,7 @@ data_source:
       type: foreign
     - name: customer_order
       type: foreign
-      identifiers:
+      entities:
         - ref: customer
         - name: id_order
   measures:

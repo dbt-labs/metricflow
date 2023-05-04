@@ -30,7 +30,7 @@
                         <!-- include_spec =                                 -->
                         <!--   {'class': 'TimeDimensionSpec',               -->
                         <!--    'element_name': 'metric_time',              -->
-                        <!--    'identifier_links': (),                     -->
+                        <!--    'entity_links': (),                         -->
                         <!--    'time_granularity': TimeGranularity.MONTH}  -->
                         <MetricTimeDimensionTransformNode>
                             <!-- description = Metric Time Dimension 'ds' -->

@@ -28,16 +28,16 @@ def _to_pretty_printable_object(obj):  # type: ignore
     e.g.
     metricflow.specs.DimensionSpec(
         element_name='country',
-        identifier_links=()
+        entity_links=()
     ),
 
     Instead, the below will print something like:
 
     {'class': 'DimensionSpec',
      'element_name': 'country_latest',
-     'identifier_links': ({'class': 'IdentifierSpec',
+     'entity_links': ({'class': 'EntitySpec',
                            'element_name': 'listing',
-                           'identifier_links': ()},)}
+                           'entity_links': ()},)}
     """
     if obj is None:
         return None
@@ -97,7 +97,7 @@ def pformat_big_objects(*args, **kwargs) -> str:  # type: ignore
      'measure_node': ReadSqlSourceNode(node_id=rss_140),
      'required_local_linkable_specs': ({'class': 'DimensionSpec',
                                         'element_name': 'is_instant',
-                                        'identifier_links': ()},),
+                                        'entity_links': ()},),
      'join_linkable_instances_recipes': ()}
 
     """

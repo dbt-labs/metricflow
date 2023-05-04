@@ -57,7 +57,7 @@ def list_of_issues() -> List[ValidationIssue]:  # noqa: D
                 data_source_element=DataSourceElementReference(
                     data_source_name=data_source_name, element_name="My identifier"
                 ),
-                element_type=DataSourceElementType.IDENTIFIER,
+                element_type=DataSourceElementType.ENTITY,
             ),
             message="Something caused a future error, problem #3",
             error_date=date(2022, 6, 13),

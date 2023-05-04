@@ -15,13 +15,13 @@ from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationR
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.specs import (
-    IdentifierSpec,
+    EntitySpec,
     MeasureSpec,
     TimeDimensionSpec,
-    LinklessIdentifierSpec,
+    LinklessEntitySpec,
     DimensionSpec,
     InstanceSpecSet,
-    IdentifierReference,
+    EntityReference,
 )
 from metricflow.sql.sql_exprs import SqlColumnReferenceExpression, SqlColumnReference
 from metricflow.sql.sql_plan import SqlSelectStatementNode, SqlSelectColumn, SqlTableFromClauseNode
@@ -64,7 +64,7 @@ def test_no_parent_node_data_set(
             ),
             dimension_instances=(),
             time_dimension_instances=(),
-            identifier_instances=(),
+            entity_instances=(),
         ),
         sql_select_node=SqlSelectStatementNode(
             description="test0",
@@ -108,7 +108,7 @@ def test_joined_node_data_set(
         join_targets=[
             JoinDescription(
                 join_node=users_node,
-                join_on_identifier=LinklessIdentifierSpec.from_element_name("user"),
+                join_on_entity=LinklessEntitySpec.from_element_name("user"),
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
             )
@@ -126,39 +126,39 @@ def test_joined_node_data_set(
         dimension_specs=(
             DimensionSpec(
                 element_name="home_state_latest",
-                identifier_links=(IdentifierReference(element_name="user"),),
+                entity_links=(EntityReference(element_name="user"),),
             ),
         ),
-        identifier_specs=(IdentifierSpec(element_name="user", identifier_links=()),),
+        entity_specs=(EntitySpec(element_name="user", entity_links=()),),
         time_dimension_specs=(
-            TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.DAY),
-            TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.WEEK),
-            TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.MONTH),
-            TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.QUARTER),
-            TimeDimensionSpec(element_name="ds", identifier_links=(), time_granularity=TimeGranularity.YEAR),
+            TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.DAY),
+            TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.WEEK),
+            TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.MONTH),
+            TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.QUARTER),
+            TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.YEAR),
             TimeDimensionSpec(
                 element_name="ds",
-                identifier_links=(IdentifierReference(element_name="user"),),
+                entity_links=(EntityReference(element_name="user"),),
                 time_granularity=TimeGranularity.DAY,
             ),
             TimeDimensionSpec(
                 element_name="ds",
-                identifier_links=(IdentifierReference(element_name="user"),),
+                entity_links=(EntityReference(element_name="user"),),
                 time_granularity=TimeGranularity.WEEK,
             ),
             TimeDimensionSpec(
                 element_name="ds",
-                identifier_links=(IdentifierReference(element_name="user"),),
+                entity_links=(EntityReference(element_name="user"),),
                 time_granularity=TimeGranularity.MONTH,
             ),
             TimeDimensionSpec(
                 element_name="ds",
-                identifier_links=(IdentifierReference(element_name="user"),),
+                entity_links=(EntityReference(element_name="user"),),
                 time_granularity=TimeGranularity.QUARTER,
             ),
             TimeDimensionSpec(
                 element_name="ds",
-                identifier_links=(IdentifierReference(element_name="user"),),
+                entity_links=(EntityReference(element_name="user"),),
                 time_granularity=TimeGranularity.YEAR,
             ),
         ),

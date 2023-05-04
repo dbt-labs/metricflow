@@ -3,7 +3,7 @@ from typing import List
 
 from dbt_semantic_interfaces.objects.data_source import DataSource
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
-from dbt_semantic_interfaces.objects.elements.identifier import IdentifierType
+from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.references import DataSourceReference
 from metricflow.model.validations.validator_helpers import (
@@ -156,29 +156,27 @@ class DataSourceValidityWindowRule(ModelValidationRule):
             )
             issues.append(error)
 
-        primary_or_unique_identifiers = [
-            identifier
-            for identifier in data_source.identifiers
-            if identifier.type in (IdentifierType.PRIMARY, IdentifierType.UNIQUE)
+        primary_or_unique_entities = [
+            entity for entity in data_source.identifiers if entity.type in (EntityType.PRIMARY, EntityType.UNIQUE)
         ]
-        if not any([identifier.type is IdentifierType.NATURAL for identifier in data_source.identifiers]):
+        if not any([entity.type is EntityType.NATURAL for entity in data_source.identifiers]):
             error = ValidationError(
                 context=context,
                 message=(
                     f"Data source {data_source.name} has validity param dimensions defined, but does not have an "
-                    f"identifier with type `natural` set. The natural key for this data source is what we use to "
+                    f"entity with type `natural` set. The natural key for this data source is what we use to "
                     f"process a validity window join. Primary or unique identifiers, if any, might be suitable for "
-                    f"use as natural keys: ({[identifier.name for identifier in primary_or_unique_identifiers]})."
+                    f"use as natural keys: ({[entity.name for entity in primary_or_unique_entities]})."
                 ),
             )
             issues.append(error)
 
-        if primary_or_unique_identifiers:
+        if primary_or_unique_entities:
             error = ValidationError(
                 context=context,
                 message=(
                     f"Data source {data_source.name} has validity param dimensions defined and also has one or more "
-                    f"identifiers designated as `primary` or `unique`. This is not yet supported, as we do not "
+                    f"entities designated as `primary` or `unique`. This is not yet supported, as we do not "
                     f"currently process joins against these key types for data sources with validity windows "
                     f"specified."
                 ),

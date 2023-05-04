@@ -20,7 +20,7 @@ def simple_model_spec_resolver(simple_semantic_model: SemanticModel) -> ValidLin
     return ValidLinkableSpecResolver(
         user_configured_model=simple_semantic_model.user_configured_model,
         data_source_semantics=simple_semantic_model.data_source_semantics,
-        max_identifier_links=MAX_JOIN_HOPS,
+        max_entity_links=MAX_JOIN_HOPS,
     )
 
 
@@ -63,7 +63,7 @@ def test_linkable_spec_resolver(simple_model_spec_resolver: ValidLinkableSpecRes
         "listing__lux_listing",
         "listing__user",
         "listing__user__company",
-    ] == sorted(tuple(x.qualified_name for x in result.identifier_specs))
+    ] == sorted(tuple(x.qualified_name for x in result.entity_specs))
 
 
 def property_check_helper(  # noqa: D
@@ -172,7 +172,7 @@ def test_multi_hop_property(multi_hop_join_semantic_model: SemanticModel) -> Non
     multi_hop_spec_resolver = ValidLinkableSpecResolver(
         user_configured_model=multi_hop_join_semantic_model.user_configured_model,
         data_source_semantics=multi_hop_join_semantic_model.data_source_semantics,
-        max_identifier_links=MAX_JOIN_HOPS,
+        max_entity_links=MAX_JOIN_HOPS,
     )
     property_check_helper(
         spec_resolver=multi_hop_spec_resolver,
@@ -226,10 +226,10 @@ def test_derived_time_granularity_property(simple_model_spec_resolver: ValidLink
     )
 
 
-def test_identifier_property(simple_model_spec_resolver: ValidLinkableSpecResolver) -> None:  # noqa: D
+def test_entity_property(simple_model_spec_resolver: ValidLinkableSpecResolver) -> None:  # noqa: D
     property_check_helper(
         spec_resolver=simple_model_spec_resolver,
         metric_references=[MetricReference(element_name="listings")],
-        element_property=LinkableElementProperties.IDENTIFIER,
+        element_property=LinkableElementProperties.ENTITY,
         expected_names=["listing", "listing__lux_listing", "user", "user__company"],
     )

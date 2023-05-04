@@ -12,5 +12,5 @@ class ToElementNameSet(InstanceSpecSetTransform[Set[str]]):
             .union({x.element_name for x in spec_set.measure_specs})
             .union({x.element_name for x in spec_set.dimension_specs})
             .union({x.element_name for x in spec_set.time_dimension_specs})
-            .union({x.element_name for x in spec_set.identifier_specs})
+            .union({x.element_name for x in spec_set.entity_specs})
         )

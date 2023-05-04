@@ -18,7 +18,7 @@ from dbt_semantic_interfaces.references import (
     MetricModelReference,
     MeasureReference,
     MetricReference,
-    IdentifierReference,
+    EntityReference,
 )
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.query.query_exceptions import InvalidQueryException
@@ -45,7 +45,7 @@ class PartialTimeDimensionSpec:
     """
 
     element_name: str
-    identifier_links: Tuple[IdentifierReference, ...]
+    entity_links: Tuple[EntityReference, ...]
 
 
 @dataclass(frozen=True)
@@ -86,7 +86,7 @@ class TimeGranularitySolver:
             output_data_set = node_output_resolver.get_output_data_set(source_node)
             for time_dimension_instance in output_data_set.instance_set.time_dimension_instances:
                 time_dimension_spec = time_dimension_instance.spec
-                if len(time_dimension_spec.identifier_links) == 0:
+                if len(time_dimension_spec.entity_links) == 0:
                     for measure_instance in output_data_set.instance_set.measure_instances:
                         self._local_time_dimension_granularities[
                             LocalTimeDimensionGranularityKey(
@@ -153,7 +153,7 @@ class TimeGranularitySolver:
         """
         for time_dimension_spec in time_dimension_specs:
             # Validate local time dimensions.
-            if time_dimension_spec.identifier_links == ():
+            if time_dimension_spec.entity_links == ():
                 _, min_granularity_for_querying = self.local_dimension_granularity_range(
                     metric_references=metric_references,
                     local_time_dimension_reference=time_dimension_spec.reference,
@@ -195,7 +195,7 @@ class TimeGranularitySolver:
         replacement_dict: OrderedDict[PartialTimeDimensionSpec, TimeDimensionSpec] = OrderedDict()
         for partial_time_dimension_spec in partial_time_dimension_specs:
             # Handle local time dimensions
-            if partial_time_dimension_spec.identifier_links == ():
+            if partial_time_dimension_spec.entity_links == ():
                 _, min_time_granularity_for_querying = self.local_dimension_granularity_range(
                     metric_references=metric_references,
                     local_time_dimension_reference=TimeDimensionReference(
@@ -214,13 +214,13 @@ class TimeGranularitySolver:
                         )
                     replacement_dict[partial_time_dimension_spec] = TimeDimensionSpec(
                         element_name=partial_time_dimension_spec.element_name,
-                        identifier_links=(),
+                        entity_links=(),
                         time_granularity=time_granularity,
                     )
                 else:
                     replacement_dict[partial_time_dimension_spec] = TimeDimensionSpec(
                         element_name=partial_time_dimension_spec.element_name,
-                        identifier_links=(),
+                        entity_links=(),
                         time_granularity=min_time_granularity_for_querying,
                     )
             # Handle joined time dimensions.
@@ -228,7 +228,7 @@ class TimeGranularitySolver:
                 # TODO: For joined time dimensions, also compute the minimum granularity for querying.
                 replacement_dict[partial_time_dimension_spec] = TimeDimensionSpec(
                     element_name=partial_time_dimension_spec.element_name,
-                    identifier_links=partial_time_dimension_spec.identifier_links,
+                    entity_links=partial_time_dimension_spec.entity_links,
                     time_granularity=DEFAULT_TIME_GRANULARITY,
                 )
         return replacement_dict

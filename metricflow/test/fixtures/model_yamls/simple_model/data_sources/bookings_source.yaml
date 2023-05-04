@@ -89,11 +89,9 @@ data_source:
     - name: guest
       type: foreign
       expr: guest_id
-      entity: user
     - name: host
       type: foreign
       expr: host_id
-      entity: user
     - name: create_a_cycle_in_the_join_graph
       type: primary
       expr: guest_id

@@ -31,7 +31,6 @@ data_source:
     - name: user
       type: foreign
       expr: user_id
-      entity: user
     - name: create_a_cycle_in_the_join_graph
       type: primary
       expr: user_id

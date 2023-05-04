@@ -25,7 +25,7 @@ data_source:
       type: unique
     - name: user_team
       type: foreign
-      identifiers:
+      entities:
         - name: team_id
         - name: user_id
 

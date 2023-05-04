@@ -4,11 +4,11 @@ from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
 from metricflow.model.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.data_source import Mutability, MutabilityType
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
-from dbt_semantic_interfaces.objects.elements.identifier import Identifier, IdentifierType
+from dbt_semantic_interfaces.objects.elements.entity import Entity, EntityType
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.metric import MetricInput, MetricType, MetricTypeParams
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from dbt_semantic_interfaces.references import DimensionReference, IdentifierReference, TimeDimensionReference
+from dbt_semantic_interfaces.references import DimensionReference, EntityReference, TimeDimensionReference
 from metricflow.model.validations.metrics import DerivedMetricRule
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.test.fixtures.table_fixtures import DEFAULT_DS
@@ -146,7 +146,7 @@ def test_generated_metrics_only() -> None:  # noqa:D
 
     dim2_reference = TimeDimensionReference(element_name=DEFAULT_DS)
     measure_name = "measure"
-    identifier_reference = IdentifierReference(element_name="primary")
+    entity_reference = EntityReference(element_name="primary")
     data_source = data_source_with_guaranteed_meta(
         name="dim1",
         sql_query=f"SELECT {dim_reference.element_name}, {measure_name} FROM bar",
@@ -164,7 +164,7 @@ def test_generated_metrics_only() -> None:  # noqa:D
         ],
         mutability=Mutability(type=MutabilityType.IMMUTABLE),
         identifiers=[
-            Identifier(name=identifier_reference.element_name, type=IdentifierType.PRIMARY),
+            Entity(name=entity_reference.element_name, type=EntityType.PRIMARY),
         ],
     )
     data_source.measures[0].create_metric = True

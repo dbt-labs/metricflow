@@ -13,14 +13,14 @@ from typing import Dict, FrozenSet, Optional, Sequence, Set
 
 from dbt_semantic_interfaces.objects.data_source import DataSource, DataSourceOrigin
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension
-from dbt_semantic_interfaces.objects.elements.identifier import Identifier
+from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.metric import Metric
 from dbt_semantic_interfaces.references import (
     DataSourceElementReference,
     DataSourceReference,
     DimensionReference,
-    IdentifierReference,
+    EntityReference,
     MeasureReference,
     TimeDimensionReference,
     MetricReference,
@@ -83,8 +83,8 @@ class DataSourceSemanticsAccessor(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_identifier_references(self) -> Sequence[IdentifierReference]:
-        """Retrieve all identifier references from the collection of data sources"""
+    def get_entity_references(self) -> Sequence[EntityReference]:
+        """Retrieve all entity references from the collection of data sources"""
         raise NotImplementedError
 
     @abstractmethod
@@ -97,8 +97,8 @@ class DataSourceSemanticsAccessor(ABC):
         """Retrieves the aggregate time dimension that is associated with the measure reference"""
 
     @abstractmethod
-    def get_identifier_in_data_source(self, ref: DataSourceElementReference) -> Optional[Identifier]:
-        """Retrieve the identifier matching the element -> data source mapping, if any"""
+    def get_entity_in_data_source(self, ref: DataSourceElementReference) -> Optional[Entity]:
+        """Retrieve the entity matching the element -> data source mapping, if any"""
         raise NotImplementedError
 
     @abstractmethod
@@ -120,8 +120,8 @@ class DataSourceSemanticsAccessor(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_data_sources_for_identifier(self, identifier_reference: IdentifierReference) -> Set[DataSource]:
-        """Return all data sources associated with an identifier reference"""
+    def get_data_sources_for_entity(self, entity_reference: EntityReference) -> Set[DataSource]:
+        """Return all data sources associated with an entity reference"""
         raise NotImplementedError
 
 

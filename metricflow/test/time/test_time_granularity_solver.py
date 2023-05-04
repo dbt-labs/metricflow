@@ -107,7 +107,7 @@ def test_validate_day_granularity_for_day_and_month_metric(  # noqa: D
         )
 
 
-PARTIAL_PTD_SPEC = PartialTimeDimensionSpec(element_name=DataSet.metric_time_dimension_name(), identifier_links=())
+PARTIAL_PTD_SPEC = PartialTimeDimensionSpec(element_name=DataSet.metric_time_dimension_name(), entity_links=())
 
 
 def test_granularity_solution_for_day_metric(time_granularity_solver: TimeGranularitySolver) -> None:  # noqa: D

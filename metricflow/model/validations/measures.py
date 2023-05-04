@@ -339,11 +339,11 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                         )
                     )
 
-                # Validates that all window_groupings are identifiers
-                identifiers_in_data_source = {identifier.name for identifier in data_source.identifiers}
+                # Validates that all window_groupings are entities
+                entities_in_data_source = {entity.name for entity in data_source.identifiers}
                 window_groupings = set(non_additive_dimension.window_groupings)
-                intersected_identifiers = window_groupings.intersection(identifiers_in_data_source)
-                if len(intersected_identifiers) != len(window_groupings):
+                intersected_entities = window_groupings.intersection(entities_in_data_source)
+                if len(intersected_entities) != len(window_groupings):
                     issues.append(
                         ValidationError(
                             context=DataSourceElementContext(
@@ -355,7 +355,7 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                             ),
                             message=(
                                 f"Measure '{measure.name}' has a non_additive_dimension with an invalid 'window_groupings'. "
-                                f"These identifiers {window_groupings.difference(intersected_identifiers)} do not exist in the data source."
+                                f"These entities {window_groupings.difference(intersected_entities)} do not exist in the data source."
                             ),
                         )
                     )

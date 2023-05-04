@@ -21,14 +21,14 @@ Using 'session' scope can result in other 'session' scope fixtures causing ID co
 
 @pytest.fixture
 def composite_dataflow_plan_builder(  # noqa: D
-    composite_identifier_semantic_model: SemanticModel,
+    composite_entity_semantic_model: SemanticModel,
     consistent_id_object_repository: ConsistentIdObjectRepository,
     time_spine_source: TimeSpineSource,
 ) -> DataflowPlanBuilder[DataSourceDataSet]:
 
     return DataflowPlanBuilder(
         source_nodes=consistent_id_object_repository.composite_model_source_nodes,
-        semantic_model=composite_identifier_semantic_model,
+        semantic_model=composite_entity_semantic_model,
         cost_function=DefaultCostFunction[DataSourceDataSet](),
         time_spine_source=time_spine_source,
     )

@@ -17,8 +17,8 @@
             },
             "type": "object"
         },
-        "composite_sub_identifier_schema": {
-            "$id": "composite_sub_identifier_schema",
+        "composite_sub_entity_schema": {
+            "$id": "composite_sub_entity_schema",
             "additionalProperties": false,
             "properties": {
                 "expr": {
@@ -54,7 +54,7 @@
                 },
                 "identifiers": {
                     "items": {
-                        "$ref": "#/definitions/identifier_schema"
+                        "$ref": "#/definitions/entity_schema"
                     },
                     "type": "array"
                 },
@@ -187,10 +187,16 @@
             ],
             "type": "object"
         },
-        "identifier_schema": {
-            "$id": "identifier_schema",
+        "entity_schema": {
+            "$id": "entity_schema",
             "additionalProperties": false,
             "properties": {
+                "entities": {
+                    "items": {
+                        "$ref": "#/definitions/composite_sub_entity_schema"
+                    },
+                    "type": "array"
+                },
                 "entity": {
                     "type": "string"
                 },
@@ -199,12 +205,6 @@
                         "string",
                         "boolean"
                     ]
-                },
-                "identifiers": {
-                    "items": {
-                        "$ref": "#/definitions/composite_sub_identifier_schema"
-                    },
-                    "type": "array"
                 },
                 "name": {
                     "pattern": "(?!.*__).*^[a-z][a-z0-9_]*[a-z0-9]$",

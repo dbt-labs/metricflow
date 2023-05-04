@@ -12,21 +12,21 @@ from metricflow.instances import (
     MeasureInstance,
     DimensionInstance,
     TimeDimensionInstance,
-    IdentifierInstance,
+    EntityInstance,
     InstanceSet,
 )
 from dbt_semantic_interfaces.objects.data_source import DataSource
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
-from dbt_semantic_interfaces.objects.elements.identifier import Identifier
+from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from metricflow.model.spec_converters import MeasureConverter
 from metricflow.specs import (
     TimeDimensionSpec,
     DimensionSpec,
-    IdentifierSpec,
+    EntitySpec,
     ColumnAssociationResolver,
     DEFAULT_TIME_GRANULARITY,
-    IdentifierReference,
+    EntityReference,
 )
 from metricflow.sql.sql_exprs import (
     SqlStringExpression,
@@ -59,8 +59,8 @@ class DimensionConversionResult:
 class DataSourceToDataSetConverter:
     """Converts a data source in the model to a data set that can be used with the dataflow plan builder.
 
-    Identifier links generally refer to the identifiers used to join the measure source to the dimension source. For
-    example, the dimension name "user_id__device_id__platform" has identifier links "user_id" and "device_id" and would
+    Entity links generally refer to the entities used to join the measure source to the dimension source. For
+    example, the dimension name "user_id__device_id__platform" has entity links "user_id" and "device_id" and would
     mean that the measure source was joined by "user_id" to an intermediate source, and then it was joined by
     "device_id" to the source containing the "platform" dimension.
     """
@@ -75,12 +75,12 @@ class DataSourceToDataSetConverter:
         self,
         data_source_name: str,
         dimension: Dimension,
-        identifier_links: Tuple[IdentifierReference, ...],
+        entity_links: Tuple[EntityReference, ...],
     ) -> DimensionInstance:
         """Create a dimension instance from the dimension object in the model."""
         dimension_spec = DimensionSpec(
             element_name=dimension.reference.element_name,
-            identifier_links=identifier_links,
+            entity_links=entity_links,
         )
         column_associations = dimension_spec.column_associations(self._column_association_resolver)
 
@@ -99,13 +99,13 @@ class DataSourceToDataSetConverter:
         self,
         data_source_name: str,
         time_dimension: Dimension,
-        identifier_links: Tuple[IdentifierReference, ...],
+        entity_links: Tuple[EntityReference, ...],
         time_granularity: TimeGranularity = DEFAULT_TIME_GRANULARITY,
     ) -> TimeDimensionInstance:
         """Create a time dimension instance from the dimension object from a data source in the model."""
         time_dimension_spec = TimeDimensionSpec(
             element_name=time_dimension.reference.element_name,
-            identifier_links=identifier_links,
+            entity_links=entity_links,
             time_granularity=time_granularity,
         )
 
@@ -122,26 +122,26 @@ class DataSourceToDataSetConverter:
             ),
         )
 
-    def _create_identifier_instance(
+    def _create_entity_instance(
         self,
         data_source_name: str,
-        identifier: Identifier,
-        identifier_links: Tuple[IdentifierReference, ...],
-    ) -> IdentifierInstance:
-        """Create an identifier instance from the identifier object from a data sourcein the model."""
-        identifier_spec = IdentifierSpec(
-            element_name=identifier.reference.element_name,
-            identifier_links=identifier_links,
+        entity: Entity,
+        entity_links: Tuple[EntityReference, ...],
+    ) -> EntityInstance:
+        """Create an entity instance from the entity object from a data sourcein the model."""
+        entity_spec = EntitySpec(
+            element_name=entity.reference.element_name,
+            entity_links=entity_links,
         )
-        column_associations = identifier_spec.column_associations(self._column_association_resolver)
+        column_associations = entity_spec.column_associations(self._column_association_resolver)
 
-        return IdentifierInstance(
+        return EntityInstance(
             associated_columns=column_associations,
-            spec=identifier_spec,
+            spec=entity_spec,
             defined_from=(
                 DataSourceElementReference(
                     data_source_name=data_source_name,
-                    element_name=identifier.reference.element_name,
+                    element_name=entity.reference.element_name,
                 ),
             ),
         )
@@ -212,7 +212,7 @@ class DataSourceToDataSetConverter:
         self,
         data_source_name: str,
         dimensions: Sequence[Dimension],
-        identifier_links: Tuple[IdentifierReference, ...],
+        entity_links: Tuple[EntityReference, ...],
         table_alias: str,
     ) -> DimensionConversionResult:
         dimension_instances = []
@@ -224,7 +224,7 @@ class DataSourceToDataSetConverter:
                 dimension_instance = self._create_dimension_instance(
                     data_source_name=data_source_name,
                     dimension=dimension,
-                    identifier_links=identifier_links,
+                    entity_links=entity_links,
                 )
                 dimension_instances.append(dimension_instance)
                 select_columns.append(
@@ -246,7 +246,7 @@ class DataSourceToDataSetConverter:
                 time_dimension_instance = self._create_time_dimension_instance(
                     data_source_name=data_source_name,
                     time_dimension=dimension,
-                    identifier_links=identifier_links,
+                    entity_links=entity_links,
                     time_granularity=defined_time_granularity,
                 )
                 time_dimension_instances.append(time_dimension_instance)
@@ -267,7 +267,7 @@ class DataSourceToDataSetConverter:
                         time_dimension_instance = self._create_time_dimension_instance(
                             data_source_name=data_source_name,
                             time_dimension=dimension,
-                            identifier_links=identifier_links,
+                            entity_links=entity_links,
                             time_granularity=time_granularity,
                         )
                         time_dimension_instances.append(time_dimension_instance)
@@ -294,45 +294,45 @@ class DataSourceToDataSetConverter:
             select_columns=select_columns,
         )
 
-    def _create_identifier_instances(
+    def _create_entity_instances(
         self,
         data_source_name: str,
-        identifiers: Sequence[Identifier],
-        identifier_links: Tuple[IdentifierReference, ...],
+        entities: Sequence[Entity],
+        entity_links: Tuple[EntityReference, ...],
         table_alias: str,
-    ) -> Tuple[Sequence[IdentifierInstance], Sequence[SqlSelectColumn]]:
-        identifier_instances = []
+    ) -> Tuple[Sequence[EntityInstance], Sequence[SqlSelectColumn]]:
+        entity_instances = []
         select_columns = []
-        for identifier in identifiers or []:
+        for entity in entities or []:
             # We don't want to create something like user_id__user_id, so skip if the link is the same as the
-            # identifier.
-            if len(identifier_links) == 1 and identifier.reference == identifier_links[0]:
+            # entity.
+            if len(entity_links) == 1 and entity.reference == entity_links[0]:
                 continue
 
-            identifier_instance = self._create_identifier_instance(
+            entity_instance = self._create_entity_instance(
                 data_source_name=data_source_name,
-                identifier=identifier,
-                identifier_links=identifier_links,
+                entity=entity,
+                entity_links=entity_links,
             )
 
-            identifier_instances.append(identifier_instance)
-            if identifier.is_composite:
-                for idx in range(len(identifier.identifiers)):
-                    sub_id = identifier.identifiers[idx]
-                    column_name = identifier_instance.associated_columns[idx].column_name
+            entity_instances.append(entity_instance)
+            if entity.is_composite:
+                for idx in range(len(entity.entities)):
+                    sub_entity = entity.entities[idx]
+                    column_name = entity_instance.associated_columns[idx].column_name
 
-                    expr = sub_id.expr
+                    expr = sub_entity.expr
                     if expr is None:
-                        assert sub_id.name is not None
-                        expr = sub_id.name
-                    sub_id_name = sub_id.ref or sub_id.name
-                    assert sub_id_name, f"Sub-identifier {sub_id} must have 'name' or 'ref' defined"
+                        assert sub_entity.name is not None
+                        expr = sub_entity.name
+                    sub_entity_name = sub_entity.ref or sub_entity.name
+                    assert sub_entity_name, f"Sub-entity {sub_entity} must have 'name' or 'ref' defined"
 
                     select_columns.append(
                         SqlSelectColumn(
                             expr=DataSourceToDataSetConverter._make_element_sql_expr(
                                 table_alias=table_alias,
-                                element_name=sub_id_name,
+                                element_name=sub_entity_name,
                                 element_expr=expr,
                             ),
                             column_alias=column_name,
@@ -343,13 +343,13 @@ class DataSourceToDataSetConverter:
                     SqlSelectColumn(
                         expr=DataSourceToDataSetConverter._make_element_sql_expr(
                             table_alias=table_alias,
-                            element_name=identifier.reference.element_name,
-                            element_expr=identifier.expr,
+                            element_name=entity.reference.element_name,
+                            element_expr=entity.expr,
                         ),
-                        column_alias=identifier_instance.associated_column.column_name,
+                        column_alias=entity_instance.associated_column.column_name,
                     )
                 )
-        return identifier_instances, select_columns
+        return entity_instances, select_columns
 
     def create_sql_source_data_set(self, data_source: DataSource) -> DataSourceDataSet:
         """Create an SQL source data set from a data source in the model."""
@@ -358,7 +358,7 @@ class DataSourceToDataSetConverter:
         all_measure_instances: List[MeasureInstance] = []
         all_dimension_instances: List[DimensionInstance] = []
         all_time_dimension_instances: List[TimeDimensionInstance] = []
-        all_identifier_instances: List[IdentifierInstance] = []
+        all_entity_instances: List[EntityInstance] = []
 
         all_select_columns: List[SqlSelectColumn] = []
         from_source_alias = IdGeneratorRegistry.for_class(self.__class__).create_id(f"{data_source.name}_src")
@@ -374,23 +374,23 @@ class DataSourceToDataSetConverter:
             all_select_columns.extend(select_columns)
 
         # For dimensions in a data source, we can access them through the local form, or the dundered form.
-        # e.g. in the "users" data source, with the "country" dimension and the "user_id" identifier,
+        # e.g. in the "users" data source, with the "country" dimension and the "user_id" entity,
         # the dimensions "country" and "user_id__country" both mean the same thing. To make matching easier, create both
-        # instances in the instance set. We'll create a different instance for each "possible_identifier_links".
-        possible_identifier_links: List[Tuple[IdentifierReference, ...]] = [()]
-        for identifier in data_source.identifiers:
-            if identifier.is_linkable_identifier_type:
-                possible_identifier_links.append((identifier.reference,))
+        # instances in the instance set. We'll create a different instance for each "possible_entity_links".
+        possible_entity_links: List[Tuple[EntityReference, ...]] = [()]
+        for entity in data_source.identifiers:
+            if entity.is_linkable_entity_type:
+                possible_entity_links.append((entity.reference,))
 
         # Handle dimensions
         conversion_results = [
             self._convert_dimensions(
                 data_source_name=data_source.name,
                 dimensions=data_source.dimensions,
-                identifier_links=identifier_links,
+                entity_links=entity_links,
                 table_alias=from_source_alias,
             )
-            for identifier_links in possible_identifier_links
+            for entity_links in possible_entity_links
         ]
 
         all_dimension_instances.extend(
@@ -417,15 +417,15 @@ class DataSourceToDataSetConverter:
             ]
         )
 
-        # Handle identifiers
-        for identifier_links in possible_identifier_links:
-            identifier_instances, select_columns = self._create_identifier_instances(
+        # Handle entities
+        for entity_links in possible_entity_links:
+            entity_instances, select_columns = self._create_entity_instances(
                 data_source_name=data_source.name,
-                identifiers=data_source.identifiers,
-                identifier_links=identifier_links,
+                entities=data_source.identifiers,
+                entity_links=entity_links,
                 table_alias=from_source_alias,
             )
-            all_identifier_instances.extend(identifier_instances)
+            all_entity_instances.extend(entity_instances)
             all_select_columns.extend(select_columns)
 
         # Generate the "from" clause depending on whether it's an SQL query or an SQL table.
@@ -454,7 +454,7 @@ class DataSourceToDataSetConverter:
                 measure_instances=tuple(all_measure_instances),
                 dimension_instances=tuple(all_dimension_instances),
                 time_dimension_instances=tuple(all_time_dimension_instances),
-                identifier_instances=tuple(all_identifier_instances),
+                entity_instances=tuple(all_entity_instances),
                 metric_instances=(),
             ),
             sql_select_node=select_statement_node,

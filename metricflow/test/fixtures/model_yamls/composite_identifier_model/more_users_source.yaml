@@ -16,7 +16,7 @@ data_source:
       type: primary
     - name: user_composite_ident_2
       type: unique
-      identifiers:
+      entities:
         - name: ident_2
         - ref: user_id
 

@@ -14,7 +14,7 @@ from metricflow.specs import (
     DimensionSpec,
     SpecWhereClauseConstraint,
     LinkableSpecSet,
-    IdentifierReference,
+    EntityReference,
 )
 from metricflow.specs import (
     OrderBySpec,
@@ -41,7 +41,7 @@ def test_simple_plan(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
-                    identifier_links=(),
+                    entity_links=(),
                 ),
             ),
         )
@@ -73,11 +73,11 @@ def test_joined_plan(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
-                    identifier_links=(),
+                    entity_links=(),
                 ),
                 DimensionSpec(
                     element_name="country_latest",
-                    identifier_links=(IdentifierReference(element_name="listing"),),
+                    entity_links=(EntityReference(element_name="listing"),),
                 ),
             ),
         )
@@ -174,7 +174,7 @@ def test_multiple_metrics_plan(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
-                    identifier_links=(),
+                    entity_links=(),
                 ),
             ),
             time_dimension_specs=(MTD_SPEC_DAY,),
@@ -207,7 +207,7 @@ def test_expr_metrics_plan(
             dimension_specs=(
                 DimensionSpec(
                     element_name="country_latest",
-                    identifier_links=(IdentifierReference(element_name="listing"),),
+                    entity_links=(EntityReference(element_name="listing"),),
                 ),
             ),
             time_dimension_specs=(MTD_SPEC_DAY,),
@@ -240,7 +240,7 @@ def test_single_data_source_ratio_metrics_plan(
             dimension_specs=(
                 DimensionSpec(
                     element_name="country_latest",
-                    identifier_links=(IdentifierReference(element_name="listing"),),
+                    entity_links=(EntityReference(element_name="listing"),),
                 ),
             ),
             time_dimension_specs=(MTD_SPEC_DAY,),
@@ -273,7 +273,7 @@ def test_multi_data_source_ratio_metrics_plan(
             dimension_specs=(
                 DimensionSpec(
                     element_name="country_latest",
-                    identifier_links=(IdentifierReference(element_name="listing"),),
+                    entity_links=(EntityReference(element_name="listing"),),
                 ),
             ),
             time_dimension_specs=(MTD_SPEC_DAY,),
@@ -306,9 +306,9 @@ def test_multihop_join_plan(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="customer_name",
-                    identifier_links=(
-                        IdentifierReference(element_name="account_id"),
-                        IdentifierReference(element_name="customer_id"),
+                    entity_links=(
+                        EntityReference(element_name="account_id"),
+                        EntityReference(element_name="customer_id"),
                     ),
                 ),
             ),
@@ -341,7 +341,7 @@ def test_where_constrained_plan(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
-                    identifier_links=(),
+                    entity_links=(),
                 ),
             ),
             where_constraint=SpecWhereClauseConstraint(
@@ -351,7 +351,7 @@ def test_where_constrained_plan(  # noqa: D
                     dimension_specs=(
                         DimensionSpec(
                             element_name="country_latest",
-                            identifier_links=(IdentifierReference(element_name="listing"),),
+                            entity_links=(EntityReference(element_name="listing"),),
                         ),
                     )
                 ),
@@ -386,7 +386,7 @@ def test_where_constrained_plan_time_dimension(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
-                    identifier_links=(),
+                    entity_links=(),
                 ),
             ),
             where_constraint=SpecWhereClauseConstraint(
@@ -424,7 +424,7 @@ def test_where_constrained_with_common_linkable_plan(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="country_latest",
-                    identifier_links=(IdentifierReference(element_name="listing"),),
+                    entity_links=(EntityReference(element_name="listing"),),
                 ),
             ),
             where_constraint=SpecWhereClauseConstraint(
@@ -434,7 +434,7 @@ def test_where_constrained_with_common_linkable_plan(  # noqa: D
                     dimension_specs=(
                         DimensionSpec(
                             element_name="country_latest",
-                            identifier_links=(IdentifierReference(element_name="listing"),),
+                            entity_links=(EntityReference(element_name="listing"),),
                         ),
                     )
                 ),
@@ -469,9 +469,9 @@ def test_multihop_join_plan_ambiguous_dim(  # noqa: D
                 dimension_specs=(
                     DimensionSpec(
                         element_name="home_country",
-                        identifier_links=(
-                            IdentifierReference(element_name="listing"),
-                            IdentifierReference(element_name="user"),
+                        entity_links=(
+                            EntityReference(element_name="listing"),
+                            EntityReference(element_name="user"),
                         ),
                     ),
                 ),
@@ -517,7 +517,7 @@ def test_distinct_values_plan(  # noqa: D
         metric_specs=(MetricSpec(element_name="bookings"),),
         dimension_spec=DimensionSpec(
             element_name="country_latest",
-            identifier_links=(IdentifierReference(element_name="listing"),),
+            entity_links=(EntityReference(element_name="listing"),),
         ),
         limit=100,
     )
@@ -603,7 +603,7 @@ def test_common_data_source(  # noqa: D
             metric_specs=(MetricSpec(element_name="bookings"), MetricSpec(element_name="booking_value")),
             dimension_specs=(
                 DataSet.metric_time_dimension_spec(TimeGranularity.DAY),
-                DimensionSpec(element_name="country_latest", identifier_links=(IdentifierReference("listing"),)),
+                DimensionSpec(element_name="country_latest", entity_links=(EntityReference("listing"),)),
             ),
         )
     )

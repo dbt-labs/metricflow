@@ -70,7 +70,7 @@ class MetricFlowQueryRequest:
     """Encapsulates the parameters for a metric query.
 
     metric_names: Names of the metrics to query.
-    group_by_names: Names of the dimensions and identifiers to query.
+    group_by_names: Names of the dimensions and entities to query.
     limit: Limit the result to this many rows.
     time_constraint_start: Get data for the start of this time range.
     time_constraint_end: Get data for the end of this time range.
@@ -454,7 +454,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 metric_references=[MetricReference(element_name=mname) for mname in metric_names],
                 without_any_property=frozenset(
                     {
-                        LinkableElementProperties.IDENTIFIER,
+                        LinkableElementProperties.ENTITY,
                         LinkableElementProperties.DERIVED_TIME_GRANULARITY,
                         LinkableElementProperties.LOCAL_LINKED,
                     }

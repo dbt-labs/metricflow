@@ -19,7 +19,7 @@ from metricflow.protocols.semantics import DataSourceSemanticsAccessor
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.specs import (
     DimensionSpec,
-    IdentifierSpec,
+    EntitySpec,
     LinkableSpecSet,
     MeasureSpec,
     NonAdditiveDimensionSpec,
@@ -69,11 +69,11 @@ class WhereConstraintConverter:
         where_constraint_names: WhereConstraintClause.linkable_names
         data_source_semantics: DataSourceSemanticsAccessor from the instantiated class
 
-        output: InstanceSpecSet of Tuple(DimensionSpec), Tuple(TimeDimensionSpec), Tuple(IdentifierSpec)
+        output: InstanceSpecSet of Tuple(DimensionSpec), Tuple(TimeDimensionSpec), Tuple(EntitySpec)
         """
         where_constraint_dimensions = []
         where_constraint_time_dimensions = []
-        where_constraint_identifiers = []
+        where_constraint_entities = []
         linkable_spec_names = [
             StructuredLinkableSpecName.from_name(linkable_name) for linkable_name in where_constraint_names
         ]
@@ -81,9 +81,9 @@ class WhereConstraintConverter:
             dimension_reference.element_name: dimension_reference
             for dimension_reference in data_source_semantics.get_dimension_references()
         }
-        identifier_references = {
-            identifier_reference.element_name: identifier_reference
-            for identifier_reference in data_source_semantics.get_identifier_references()
+        entity_references = {
+            entity_reference.element_name: entity_reference
+            for entity_reference in data_source_semantics.get_entity_references()
         }
 
         for spec_name in linkable_spec_names:
@@ -97,15 +97,15 @@ class WhereConstraintConverter:
                     where_constraint_time_dimensions.append(TimeDimensionSpec.from_name(spec_name.qualified_name))
                 else:
                     raise RuntimeError(f"Unhandled type: {dimension.type}")
-            elif spec_name.element_name in identifier_references:
-                where_constraint_identifiers.append(IdentifierSpec.from_name(spec_name.qualified_name))
+            elif spec_name.element_name in entity_references:
+                where_constraint_entities.append(EntitySpec.from_name(spec_name.qualified_name))
             else:
                 raise InvalidQueryException(f"Unknown element: {spec_name}")
 
         return LinkableSpecSet(
             dimension_specs=tuple(where_constraint_dimensions),
             time_dimension_specs=tuple(where_constraint_time_dimensions),
-            identifier_specs=tuple(where_constraint_identifiers),
+            entity_specs=tuple(where_constraint_entities),
         )
 
     @staticmethod

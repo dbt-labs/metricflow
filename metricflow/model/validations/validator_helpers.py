@@ -56,7 +56,7 @@ class DataSourceElementType(Enum):
 
     MEASURE = "measure"
     DIMENSION = "dimension"
-    IDENTIFIER = "identifier"
+    ENTITY = "entity"
 
 
 class FileContext(BaseModel):

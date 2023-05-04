@@ -35,7 +35,7 @@ class CreateSelectCoalescedColumnsForLinkableSpecs(InstanceSpecSetTransform[Sele
 
         dimension_columns: List[SqlSelectColumn] = []
         time_dimension_columns: List[SqlSelectColumn] = []
-        identifier_columns: List[SqlSelectColumn] = []
+        entity_columns: List[SqlSelectColumn] = []
 
         for dimension_spec in spec_set.dimension_specs:
             column_name = self._column_association_resolver.resolve_dimension_spec(dimension_spec).column_name
@@ -55,12 +55,12 @@ class CreateSelectCoalescedColumnsForLinkableSpecs(InstanceSpecSetTransform[Sele
                 )
             )
 
-        for identifier_spec in spec_set.identifier_specs:
-            column_associations = self._column_association_resolver.resolve_identifier_spec(identifier_spec)
-            assert len(column_associations) == 1, "Composite identifiers not supported"
+        for entity_spec in spec_set.entity_specs:
+            column_associations = self._column_association_resolver.resolve_entity_spec(entity_spec)
+            assert len(column_associations) == 1, "Composite entities not supported"
             column_name = column_associations[0].column_name
 
-            identifier_columns.append(
+            entity_columns.append(
                 SqlSelectColumn(
                     expr=make_coalesced_expr(self._table_aliases, column_name),
                     column_alias=column_name,
@@ -70,7 +70,7 @@ class CreateSelectCoalescedColumnsForLinkableSpecs(InstanceSpecSetTransform[Sele
         return SelectColumnSet(
             dimension_columns=dimension_columns,
             time_dimension_columns=time_dimension_columns,
-            identifier_columns=identifier_columns,
+            entity_columns=entity_columns,
         )
 
 
@@ -83,5 +83,5 @@ class SelectOnlyLinkableSpecs(InstanceSpecSetTransform[InstanceSpecSet]):
             measure_specs=(),
             dimension_specs=spec_set.dimension_specs,
             time_dimension_specs=spec_set.time_dimension_specs,
-            identifier_specs=spec_set.identifier_specs,
+            entity_specs=spec_set.entity_specs,
         )

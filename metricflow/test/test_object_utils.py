@@ -2,7 +2,7 @@ import logging
 import textwrap
 
 from metricflow.object_utils import pretty_format, pformat_big_objects
-from metricflow.specs import DimensionSpec, IdentifierReference
+from metricflow.specs import DimensionSpec, EntityReference
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +18,7 @@ def test_pretty_print() -> None:  # noqa: D
 
 def test_pformat_big_objects() -> None:  # noqa: D
     dimension_spec = DimensionSpec(
-        element_name="country_latest", identifier_links=(IdentifierReference(element_name="listing"),)
+        element_name="country_latest", entity_links=(EntityReference(element_name="listing"),)
     )
 
     assert pformat_big_objects(dimension_spec) == (
@@ -26,8 +26,7 @@ def test_pformat_big_objects() -> None:  # noqa: D
             """\
             {'class': 'DimensionSpec',
              'element_name': 'country_latest',
-             'identifier_links': ({'class': 'IdentifierReference',
-                                   'element_name': 'listing'},)}
+             'entity_links': ({'class': 'EntityReference', 'element_name': 'listing'},)}
             """
         ).rstrip()
     )
@@ -38,8 +37,7 @@ def test_pformat_big_objects() -> None:  # noqa: D
             dimension_spec:
                 {'class': 'DimensionSpec',
                  'element_name': 'country_latest',
-                 'identifier_links': ({'class': 'IdentifierReference',
-                                       'element_name': 'listing'},)}
+                 'entity_links': ({'class': 'EntityReference', 'element_name': 'listing'},)}
             """
         ).rstrip()
     )

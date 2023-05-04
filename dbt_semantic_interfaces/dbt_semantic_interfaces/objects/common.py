@@ -16,7 +16,6 @@ class Version(HashableBaseModel):  # noqa: D
 
     @staticmethod
     def parse(version: str) -> Version:  # noqa: D
-
         if not Version._VERSION_REGEX.match(version):
             raise ParsingException(
                 f"Expected a version of the form 'v<MAJOR_VERSION>.<MINOR_VERSION>' but got '{version}'."

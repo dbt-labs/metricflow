@@ -604,8 +604,8 @@ def _data_warehouse_validations_runner(
     dimension_results = _run_dw_validations(
         dw_validator.validate_dimensions, model=model, validation_type="dimensions", timeout=timeout
     )
-    identifier_results = _run_dw_validations(
-        dw_validator.validate_identifiers, model=model, validation_type="identifiers", timeout=timeout
+    entity_results = _run_dw_validations(
+        dw_validator.validate_entities, model=model, validation_type="entities", timeout=timeout
     )
     measure_results = _run_dw_validations(
         dw_validator.validate_measures, model=model, validation_type="measures", timeout=timeout
@@ -615,7 +615,7 @@ def _data_warehouse_validations_runner(
     )
 
     return ModelValidationResults.merge(
-        [data_source_results, dimension_results, identifier_results, measure_results, metric_results]
+        [data_source_results, dimension_results, entity_results, measure_results, metric_results]
     )
 
 

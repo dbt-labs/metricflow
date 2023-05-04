@@ -17,7 +17,7 @@ from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.metric import MetricType
 from dbt_semantic_interfaces.references import (
     DimensionReference,
-    IdentifierReference,
+    EntityReference,
     MetricReference,
     TimeDimensionReference,
 )
@@ -31,7 +31,7 @@ from metricflow.specs import (
     MetricSpec,
     DimensionSpec,
     TimeDimensionSpec,
-    IdentifierSpec,
+    EntitySpec,
     LinkableInstanceSpec,
     OrderBySpec,
     OutputColumnNameOverride,
@@ -61,14 +61,14 @@ class LinkableInstanceSpecs:
     dimension_specs: Tuple[DimensionSpec, ...]
     time_dimension_specs: Tuple[TimeDimensionSpec, ...]
     partial_time_dimension_specs: Tuple[PartialTimeDimensionSpec, ...]
-    identifier_specs: Tuple[IdentifierSpec, ...]
+    entity_specs: Tuple[EntitySpec, ...]
 
 
 class MetricFlowQueryParser:
     """Parse input strings from the user into a metric query specification.
 
     Definitions:
-    element name - the name of an element (measure, dimension, identifier) in a data source, or a metric name.
+    element name - the name of an element (measure, dimension, entity) in a data source, or a metric name.
     qualified name - an element name with prefixes and suffixes added to it that further describe transformations or
     conditions for the element to retrieve. e.g. "ds__month" is the "ds" time dimension at the "month" granularity. Or
     "user_id__country" is the "country" dimension that is retrieved by joining "user_id" to the measure data source.
@@ -85,7 +85,7 @@ class MetricFlowQueryParser:
         self._data_source_semantics = model.data_source_semantics
 
         # Set up containers for known element names
-        self._known_identifier_element_references = self._data_source_semantics.get_identifier_references()
+        self._known_entity_element_references = self._data_source_semantics.get_entity_references()
 
         self._known_time_dimension_element_references = [DataSet.metric_time_dimension_reference()]
         self._known_dimension_element_references = []
@@ -194,7 +194,7 @@ class MetricFlowQueryParser:
             metric_references=metric_references,
             dimension_specs=all_linkable_specs.dimension_specs,
             time_dimension_specs=time_dimension_specs,
-            identifier_specs=all_linkable_specs.identifier_specs,
+            entity_specs=all_linkable_specs.entity_specs,
         )
         if len(invalid_group_bys) > 0:
             valid_group_by_names_for_metrics = sorted(
@@ -368,7 +368,7 @@ class MetricFlowQueryParser:
             linkable_specs=LinkableSpecSet(
                 dimension_specs=requested_linkable_specs.dimension_specs,
                 time_dimension_specs=time_dimension_specs,
-                identifier_specs=requested_linkable_specs.identifier_specs,
+                entity_specs=requested_linkable_specs.entity_specs,
             ),
         )
 
@@ -423,7 +423,7 @@ class MetricFlowQueryParser:
         return MetricFlowQuerySpec(
             metric_specs=metric_specs,
             dimension_specs=requested_linkable_specs.dimension_specs,
-            identifier_specs=requested_linkable_specs.identifier_specs,
+            entity_specs=requested_linkable_specs.entity_specs,
             time_dimension_specs=time_dimension_specs,
             order_by_specs=order_by_specs,
             output_column_name_overrides=tuple(output_column_name_overrides),
@@ -448,7 +448,7 @@ class MetricFlowQueryParser:
                 order_by_spec.item in metric_specs
                 or order_by_spec.item in linkable_specs.dimension_specs
                 or order_by_spec.item in linkable_specs.time_dimension_specs
-                or order_by_spec.item in linkable_specs.identifier_specs
+                or order_by_spec.item in linkable_specs.entity_specs
             ):
                 raise InvalidQueryException(f"Order by item {order_by_spec} not in the query")
 
@@ -484,7 +484,7 @@ class MetricFlowQueryParser:
             if (
                 partial_time_dimension_spec_to_replace.element_name
                 == self._metric_time_dimension_reference.element_name
-                and partial_time_dimension_spec_to_replace.identifier_links == ()
+                and partial_time_dimension_spec_to_replace.entity_links == ()
             ):
                 return partial_time_dimension_spec_to_replace, replace_with_time_dimension_spec
 
@@ -498,7 +498,7 @@ class MetricFlowQueryParser:
         for time_dimension_spec in partial_time_dimension_specs:
             if (
                 time_dimension_spec.element_name == self._metric_time_dimension_reference.element_name
-                and time_dimension_spec.identifier_links == ()
+                and time_dimension_spec.entity_links == ()
             ):
                 return True
         return False
@@ -518,7 +518,7 @@ class MetricFlowQueryParser:
             for x in time_dimension_specs
             if (
                 x.element_name == self._metric_time_dimension_reference.element_name
-                and x.identifier_links == ()
+                and x.entity_links == ()
                 and x.time_granularity
             )
         ]
@@ -572,19 +572,19 @@ class MetricFlowQueryParser:
         dimension_specs = []
         time_dimension_specs = []
         partial_time_dimension_specs = []
-        identifier_specs = []
+        entity_specs = []
 
         for qualified_name in qualified_linkable_names:
             structured_name = StructuredLinkableSpecName.from_name(qualified_name)
             element_name = structured_name.element_name
-            identifier_links = tuple(IdentifierReference(element_name=x) for x in structured_name.identifier_link_names)
+            entity_links = tuple(EntityReference(element_name=x) for x in structured_name.entity_link_names)
             # Create the spec based on the type of element referenced.
             if TimeDimensionReference(element_name=element_name) in self._known_time_dimension_element_references:
                 if structured_name.time_granularity:
                     time_dimension_specs.append(
                         TimeDimensionSpec(
                             element_name=element_name,
-                            identifier_links=identifier_links,
+                            entity_links=entity_links,
                             time_granularity=structured_name.time_granularity,
                         )
                     )
@@ -592,13 +592,13 @@ class MetricFlowQueryParser:
                     partial_time_dimension_specs.append(
                         PartialTimeDimensionSpec(
                             element_name=element_name,
-                            identifier_links=identifier_links,
+                            entity_links=entity_links,
                         )
                     )
             elif DimensionReference(element_name=element_name) in self._known_dimension_element_references:
-                dimension_specs.append(DimensionSpec(element_name=element_name, identifier_links=identifier_links))
-            elif IdentifierReference(element_name=element_name) in self._known_identifier_element_references:
-                identifier_specs.append(IdentifierSpec(element_name=element_name, identifier_links=identifier_links))
+                dimension_specs.append(DimensionSpec(element_name=element_name, entity_links=entity_links))
+            elif EntityReference(element_name=element_name) in self._known_entity_element_references:
+                entity_specs.append(EntitySpec(element_name=element_name, entity_links=entity_links))
             else:
                 valid_group_by_names_for_metrics = sorted(
                     x.qualified_name for x in self._metric_semantics.element_specs_for_metrics(list(metric_references))
@@ -621,7 +621,7 @@ class MetricFlowQueryParser:
             dimension_specs=tuple(dimension_specs),
             time_dimension_specs=tuple(time_dimension_specs),
             partial_time_dimension_specs=tuple(partial_time_dimension_specs),
-            identifier_specs=tuple(identifier_specs),
+            entity_specs=tuple(entity_specs),
         )
 
     def _get_invalid_linkable_specs(
@@ -629,7 +629,7 @@ class MetricFlowQueryParser:
         metric_references: Tuple[MetricReference, ...],
         dimension_specs: Tuple[DimensionSpec, ...],
         time_dimension_specs: Tuple[TimeDimensionSpec, ...],
-        identifier_specs: Tuple[IdentifierSpec, ...],
+        entity_specs: Tuple[EntitySpec, ...],
     ) -> List[LinkableInstanceSpec]:
         """Checks that each requested linkable instance can be retrieved for the given metric"""
         invalid_linkable_specs: List[LinkableInstanceSpec] = []
@@ -642,9 +642,9 @@ class MetricFlowQueryParser:
             if dimension_spec not in valid_linkable_specs:
                 invalid_linkable_specs.append(dimension_spec)
 
-        for identifier_spec in identifier_specs:
-            if identifier_spec not in valid_linkable_specs:
-                invalid_linkable_specs.append(identifier_spec)
+        for entity_spec in entity_specs:
+            if entity_spec not in valid_linkable_specs:
+                invalid_linkable_specs.append(entity_spec)
 
         for time_dimension_spec in time_dimension_specs:
             if (
@@ -663,7 +663,7 @@ class MetricFlowQueryParser:
         time_dimension_spec_replacements: Dict[PartialTimeDimensionSpec, TimeDimensionSpec],
     ) -> Tuple[OrderBySpec, ...]:
         """time_dimension_spec_replacements is used to replace a partial spec from parsing the names to a full one."""
-        # TODO: Validate identifier links
+        # TODO: Validate entity links
         # TODO: Validate order by items are in the query
         order_by_specs: List[OrderBySpec] = []
         for order_by_name in order_by_names:
@@ -678,9 +678,9 @@ class MetricFlowQueryParser:
                     raise InvalidQueryException(
                         f"Order by item '{order_by_name}' references a metric but has a time granularity"
                     )
-                if parsed_name.identifier_link_names:
+                if parsed_name.entity_link_names:
                     raise InvalidQueryException(
-                        f"Order by item '{order_by_name}' references a metric but has identifier links"
+                        f"Order by item '{order_by_name}' references a metric but has entity links"
                     )
                 order_by_specs.append(
                     OrderBySpec(
@@ -698,9 +698,7 @@ class MetricFlowQueryParser:
                     OrderBySpec(
                         dimension_spec=DimensionSpec(
                             element_name=parsed_name.element_name,
-                            identifier_links=tuple(
-                                IdentifierReference(element_name=x) for x in parsed_name.identifier_link_names
-                            ),
+                            entity_links=tuple(EntityReference(element_name=x) for x in parsed_name.entity_link_names),
                         ),
                         descending=descending,
                     )
@@ -709,13 +707,13 @@ class MetricFlowQueryParser:
                 TimeDimensionReference(element_name=parsed_name.element_name)
                 in self._known_time_dimension_element_references
             ):
-                identifier_links = tuple(IdentifierReference(element_name=x) for x in parsed_name.identifier_link_names)
+                entity_links = tuple(EntityReference(element_name=x) for x in parsed_name.entity_link_names)
                 if parsed_name.time_granularity:
                     order_by_specs.append(
                         OrderBySpec(
                             time_dimension_spec=TimeDimensionSpec(
                                 element_name=parsed_name.element_name,
-                                identifier_links=identifier_links,
+                                entity_links=entity_links,
                                 time_granularity=parsed_name.time_granularity,
                             ),
                             descending=descending,
@@ -726,7 +724,7 @@ class MetricFlowQueryParser:
                     # granularity as it was done for the requested dimensions.
                     partial_time_dimension_spec = PartialTimeDimensionSpec(
                         element_name=parsed_name.element_name,
-                        identifier_links=identifier_links,
+                        entity_links=entity_links,
                     )
 
                     if partial_time_dimension_spec in time_dimension_spec_replacements:
@@ -742,20 +740,16 @@ class MetricFlowQueryParser:
                             f"match a requested time dimension"
                         )
 
-            elif (
-                IdentifierReference(element_name=parsed_name.element_name) in self._known_identifier_element_references
-            ):
+            elif EntityReference(element_name=parsed_name.element_name) in self._known_entity_element_references:
                 if parsed_name.time_granularity:
                     raise InvalidQueryException(
-                        f"Order by item '{order_by_name}' references an identifier but has a time granularity"
+                        f"Order by item '{order_by_name}' references an entity but has a time granularity"
                     )
                 order_by_specs.append(
                     OrderBySpec(
-                        identifier_spec=IdentifierSpec(
+                        entity_spec=EntitySpec(
                             element_name=parsed_name.element_name,
-                            identifier_links=tuple(
-                                IdentifierReference(element_name=x) for x in parsed_name.identifier_link_names
-                            ),
+                            entity_links=tuple(EntityReference(element_name=x) for x in parsed_name.entity_link_names),
                         ),
                         descending=descending,
                     )
