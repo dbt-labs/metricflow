@@ -1,23 +1,25 @@
+import traceback
 from collections import defaultdict
 from dataclasses import dataclass
 from operator import xor
-import traceback
 from typing import DefaultDict, Dict, List, Optional, Set
+
+from dbt.contracts.graph.manifest import Manifest as DbtManifest
 from dbt.contracts.graph.nodes import Metric as DbtMetric, ModelNode as DbtModelNode
 from dbt.contracts.graph.unparsed import MetricFilter as DbtMetricFilter
 from dbt.exceptions import ref_invalid_args
-from dbt.contracts.graph.manifest import Manifest as DbtManifest
+
 from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
-from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
 from dbt_semantic_interfaces.objects.data_source import DataSource
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.elements.measure import Measure
+from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
 from dbt_semantic_interfaces.objects.metric import Metric, MetricInputMeasure, MetricType, MetricTypeParams
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.parsing.dir_to_model import ModelBuildResult
 from metricflow.model.validations.validator_helpers import ModelValidationResults, ValidationError, ValidationIssue
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 
 @dataclass
@@ -219,7 +221,8 @@ class DbtManifestTransformer:
             TODO: We could probably replace this with whatever method dbt uses to
             build the statement.
         """
-        clauses = [f"{filter.field} {filter.operator} {filter.value}" for filter in filters]
+        # TODO: Verify correctness.
+        clauses = [f"""{{{{ dimension("{filter.field}") }}}} {filter.operator} {filter.value}""" for filter in filters]
         return " AND ".join(clauses)
 
     def build_proxy_metric(self, dbt_metric: DbtMetric) -> Metric:
@@ -235,11 +238,11 @@ class DbtManifestTransformer:
         if dbt_metric.calculation_method == "derived":
             raise RuntimeError("Cannot build a MetricFlow proxy metric for `derived` DbtMetric")
 
-        where_clause_constraint: Optional[WhereClauseConstraint] = None
+        where_filter: Optional[WhereFilter] = None
         if dbt_metric.filters:
-            where_clause_constraint = WhereClauseConstraint(
-                where=self.build_where_stmt_from_filters(filters=dbt_metric.filters),
-                linkable_names=[filter.field for filter in dbt_metric.filters],
+            # TODO: Figure out how to migrate.
+            where_filter = WhereFilter(
+                where_sql_template=self.build_where_stmt_from_filters(filters=dbt_metric.filters)
             )
 
         return Metric(
@@ -249,7 +252,7 @@ class DbtManifestTransformer:
             type_params=MetricTypeParams(
                 measure=MetricInputMeasure(name=dbt_metric.name),
             ),
-            constraint=where_clause_constraint,
+            constraint=where_filter,
         )
 
     def dbt_metric_to_metricflow_elements(self, dbt_metric: DbtMetric) -> TransformedDbtMetric:

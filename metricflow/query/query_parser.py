@@ -8,6 +8,7 @@ from typing import List, Optional, Tuple, Dict, Sequence
 
 from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
+from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
 from dbt_semantic_interfaces.objects.metric import MetricType
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.references import (
@@ -22,6 +23,7 @@ from metricflow.dataflow.dataflow_plan import BaseOutput
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
+from metricflow.model.resolved_where_filter import ResolvedWhereFilter
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.spec_converters import WhereConstraintConverter
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
@@ -38,6 +40,7 @@ from metricflow.specs import (
     OutputColumnNameOverride,
     SpecWhereClauseConstraint,
     LinkableSpecSet,
+    ColumnAssociationResolver,
 )
 from metricflow.time.time_granularity_solver import (
     TimeGranularitySolver,
@@ -106,10 +109,12 @@ class MetricFlowQueryParser:
 
     def __init__(  # noqa: D
         self,
+        column_association_resolver: ColumnAssociationResolver,
         model: SemanticModel,
         source_nodes: Sequence[BaseOutput[DataSourceDataSet]],
         node_output_resolver: DataflowPlanNodeOutputDataSetResolver[DataSourceDataSet],
     ) -> None:
+        self._column_association_resolver = column_association_resolver
         self._model = model
         self._metric_semantics = model.metric_semantics
         self._data_source_semantics = model.data_source_semantics
@@ -169,7 +174,7 @@ class MetricFlowQueryParser:
         limit: Optional[int] = None,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
-        where_constraint: Optional[WhereClauseConstraint] = None,
+        where_constraint: Optional[WhereFilter] = None,
         where_constraint_str: Optional[str] = None,
         order: Optional[Sequence[str]] = None,
         time_granularity: Optional[TimeGranularity] = None,
@@ -285,7 +290,7 @@ class MetricFlowQueryParser:
         limit: Optional[int] = None,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
-        where_constraint: Optional[WhereClauseConstraint] = None,
+        where_constraint: Optional[WhereFilter] = None,
         where_constraint_str: Optional[str] = None,
         order: Optional[Sequence[str]] = None,
         time_granularity: Optional[TimeGranularity] = None,
@@ -294,9 +299,9 @@ class MetricFlowQueryParser:
             where_constraint and where_constraint_str
         ), "Both where_constraint and where_constraint_str should not be set"
 
-        parsed_where_constraint: Optional[WhereClauseConstraint]
+        parsed_where_constraint: Optional[WhereFilter]
         if where_constraint_str:
-            parsed_where_constraint = WhereClauseConstraint.parse(where_constraint_str)
+            parsed_where_constraint = WhereFilter(where_sql_template=where_constraint_str)
         else:
             parsed_where_constraint = where_constraint
 
@@ -356,9 +361,9 @@ class MetricFlowQueryParser:
             )
         )
 
-        all_group_by_names = list(group_by_names)
-        if parsed_where_constraint is not None:
-            all_group_by_names += parsed_where_constraint.linkable_names
+        # all_group_by_names = list(group_by_names)
+        # if parsed_where_constraint is not None:
+        #     all_group_by_names += parsed_where_constraint.linkable_names
 
         time_dimension_specs = requested_linkable_specs.time_dimension_specs + tuple(
             time_dimension_spec for _, time_dimension_spec in partial_time_dimension_spec_replacements.items()
@@ -373,22 +378,35 @@ class MetricFlowQueryParser:
         for metric_reference in metric_references:
             metric = self._metric_semantics.get_metric(metric_reference)
             if metric.constraint is not None:
-                all_linkable_specs = self._parse_linkable_element_names(
-                    qualified_linkable_names=all_group_by_names + metric.constraint.linkable_names,
+                query_time_specs = self._parse_linkable_element_names(
+                    qualified_linkable_names=group_by_names,
                     metric_references=(metric_reference,),
                 )
+
+                # Combine the group by elements from the query with the group by elements that are required by the
+                # metric filter to see if that's a valid set that could be queried.
                 self._validate_linkable_specs(
                     metric_references=(metric_reference,),
-                    all_linkable_specs=all_linkable_specs,
+                    all_linkable_specs=QueryTimeLinkableSpecSet.combine(
+                        (
+                            query_time_specs,
+                            QueryTimeLinkableSpecSet.create_from_linkable_spec_set(
+                                ResolvedWhereFilter.create_from_where_filter(
+                                    where_filter=metric.constraint,
+                                    column_association_resolver=self._column_association_resolver,
+                                ).linkable_spec_set
+                            ),
+                        ),
+                    ),
                     time_dimension_specs=time_dimension_specs,
                 )
-        all_linkable_specs = self._parse_linkable_element_names(
-            qualified_linkable_names=all_group_by_names,
+        specs_from_query = self._parse_linkable_element_names(
+            qualified_linkable_names=group_by_names,
             metric_references=metric_references,
         )
         self._validate_linkable_specs(
             metric_references=metric_references,
-            all_linkable_specs=all_linkable_specs,
+            all_linkable_specs=specs_from_query,
             time_dimension_specs=time_dimension_specs,
         )
 
