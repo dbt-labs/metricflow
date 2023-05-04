@@ -3,6 +3,7 @@ import logging
 import pytest
 from _pytest.fixtures import FixtureRequest
 
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
@@ -24,7 +25,6 @@ from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.plan_utils import assert_plan_snapshot_text_equal
 from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY, MTD, MTD_SPEC_MONTH
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 

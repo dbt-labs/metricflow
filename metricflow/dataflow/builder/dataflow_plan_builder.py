@@ -66,6 +66,7 @@ from metricflow.specs import (
     ColumnAssociationResolver,
     LinklessEntitySpec,
     InstanceSpecSet,
+    ResolvedWhereFilter,
 )
 from metricflow.sql.sql_plan import SqlJoinType
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity

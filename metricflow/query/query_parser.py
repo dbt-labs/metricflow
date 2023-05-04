@@ -6,21 +6,22 @@ import time
 from dataclasses import dataclass
 from typing import List, Optional, Tuple, Dict, Sequence
 
-from metricflow.constraints.time_constraint import TimeRangeConstraint
-from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
-from metricflow.dataflow.dataflow_plan import BaseOutput
-from metricflow.dataset.data_source_adapter import DataSourceDataSet
-from metricflow.dataset.dataset import DataSet
-from metricflow.errors.errors import UnableToSatisfyQueryError
 from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.metric import MetricType
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.references import (
     DimensionReference,
     EntityReference,
     MetricReference,
     TimeDimensionReference,
 )
+from metricflow.constraints.time_constraint import TimeRangeConstraint
+from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
+from metricflow.dataflow.dataflow_plan import BaseOutput
+from metricflow.dataset.data_source_adapter import DataSourceDataSet
+from metricflow.dataset.dataset import DataSet
+from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.spec_converters import WhereConstraintConverter
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
@@ -38,7 +39,6 @@ from metricflow.specs import (
     SpecWhereClauseConstraint,
     LinkableSpecSet,
 )
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 from metricflow.time.time_granularity_solver import (
     TimeGranularitySolver,
     PartialTimeDimensionSpec,

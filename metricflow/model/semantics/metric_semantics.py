@@ -11,7 +11,12 @@ from metricflow.model.semantics.linkable_element_properties import LinkableEleme
 from metricflow.model.semantics.linkable_spec_resolver import ValidLinkableSpecResolver
 from metricflow.model.spec_converters import WhereConstraintConverter
 from metricflow.protocols.semantics import MetricSemanticsAccessor
-from metricflow.specs import MetricSpec, LinkableInstanceSpec, MetricInputMeasureSpec, MeasureSpec
+from metricflow.specs import (
+    MetricSpec,
+    LinkableInstanceSpec,
+    MetricInputMeasureSpec,
+    MeasureSpec,
+)
 
 logger = logging.getLogger(__name__)
 
