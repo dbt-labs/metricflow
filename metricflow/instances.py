@@ -9,7 +9,7 @@ from typing import List, TypeVar, Generic, Tuple
 from dbt_semantic_interfaces.references import DataSourceElementReference, MetricModelReference
 from metricflow.aggregation_properties import AggregationState
 from metricflow.column_assoc import ColumnAssociation
-from metricflow.dataclass_serialization import SerializableDataclass
+from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from metricflow.specs import (
     MetadataSpec,
     MeasureSpec,

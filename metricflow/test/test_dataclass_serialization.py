@@ -4,7 +4,11 @@ from typing import Optional, Tuple, Protocol
 
 import pytest
 
-from metricflow.dataclass_serialization import SerializableDataclass, DataClassDeserializer, DataclassSerializer
+from dbt_semantic_interfaces.dataclass_serialization import (
+    SerializableDataclass,
+    DataClassDeserializer,
+    DataclassSerializer,
+)
 
 logger = logging.getLogger(__name__)
 

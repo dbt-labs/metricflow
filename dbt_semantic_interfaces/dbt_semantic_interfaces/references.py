@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from metricflow.dataclass_serialization import SerializableDataclass
+from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 
 
 @dataclass(frozen=True)

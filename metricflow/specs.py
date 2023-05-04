@@ -27,7 +27,7 @@ from metricflow.aggregation_properties import AggregationType
 from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.column_assoc import ColumnAssociation
 from metricflow.constraints.time_constraint import TimeRangeConstraint
-from metricflow.dataclass_serialization import SerializableDataclass
+from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.object_utils import hash_items
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
