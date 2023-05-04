@@ -1,12 +1,13 @@
 import textwrap
 
-from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
+from dbt_semantic_interfaces.objects.common import YamlConfigFile
+
+from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
 from dbt_semantic_interfaces.objects.metric import MetricTimeWindow, MetricInput, MetricInputMeasure, MetricType
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_model
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from metricflow.model.validations.validator_helpers import ModelValidationException
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 
 def test_legacy_measure_metric_parsing() -> None:
@@ -42,7 +43,7 @@ def test_legacy_metric_input_measure_object_parsing() -> None:
           type_params:
             measure:
               name: legacy_measure_from_object
-              constraint: some_bool
+              constraint: "{{ dimension('some_bool') }}"
         """
     )
     file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
@@ -53,9 +54,7 @@ def test_legacy_metric_input_measure_object_parsing() -> None:
     metric = build_result.model.metrics[0]
     assert metric.type_params.measure == MetricInputMeasure(
         name="legacy_measure_from_object",
-        constraint=WhereClauseConstraint(
-            where="some_bool", linkable_names=["some_bool"], sql_params=SqlBindParameters()
-        ),
+        constraint=WhereFilter(where_sql_template="""{{ dimension('some_bool') }}"""),
     )
 
 
@@ -127,7 +126,7 @@ def test_ratio_metric_input_measure_object_parsing() -> None:
           type_params:
             numerator:
               name: numerator_measure_from_object
-              constraint: "WHERE some_number > 5"
+              constraint: "some_number > 5"
             denominator:
               name: denominator_measure_from_object
         """
@@ -140,8 +139,8 @@ def test_ratio_metric_input_measure_object_parsing() -> None:
     metric = build_result.model.metrics[0]
     assert metric.type_params.numerator == MetricInputMeasure(
         name="numerator_measure_from_object",
-        constraint=WhereClauseConstraint(
-            where="some_number > 5", linkable_names=["some_number"], sql_params=SqlBindParameters()
+        constraint=WhereFilter(
+            where_sql_template="some_number > 5",
         ),
     )
     assert metric.type_params.denominator == MetricInputMeasure(name="denominator_measure_from_object")
@@ -199,9 +198,7 @@ def test_expr_metric_input_measure_object_parsing() -> None:
     assert metric.type_params.measures == [
         MetricInputMeasure(
             name="measure_one_from_object",
-            constraint=WhereClauseConstraint(
-                where="some_bool", linkable_names=["some_bool"], sql_params=SqlBindParameters()
-            ),
+            constraint=WhereFilter(where_sql_template="some_bool"),
         ),
         MetricInputMeasure(name="measure_two_from_object"),
     ]
@@ -336,7 +333,7 @@ def test_constraint_metric_parsing() -> None:
           type_params:
             measures:
               - input_measure
-          constraint: "some_dimension IN ('value1', 'value2')"
+          constraint: "{{ dimension('some_dimension') }} IN ('value1', 'value2')"
         """
     )
     file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
@@ -347,10 +344,8 @@ def test_constraint_metric_parsing() -> None:
     metric = build_result.model.metrics[0]
     assert metric.name == "constraint_test"
     assert metric.type is MetricType.MEASURE_PROXY
-    assert metric.constraint == WhereClauseConstraint(
-        where="some_dimension IN ('value1', 'value2')",
-        linkable_names=["some_dimension"],
-        sql_params=SqlBindParameters(),
+    assert metric.constraint == WhereFilter(
+        where_sql_template="{{ dimension('some_dimension') }} IN ('value1', 'value2')"
     )
 
 
@@ -385,7 +380,7 @@ def test_derived_metric_input_parsing() -> None:
     assert metric.type_params.metrics[1] == MetricInput(
         name="input_metric",
         alias="constrained_input_metric",
-        constraint=WhereClauseConstraint(where="input_metric < 10", linkable_names=["input_metric"]),
+        constraint=WhereFilter(where_sql_template="input_metric < 10"),
     )
 
 
