@@ -56,7 +56,7 @@ class DataSource(HashableBaseModel, ModelWithMetadataParsing):
     sql_query: Optional[str]
     dbt_model: Optional[str]
 
-    identifiers: Sequence[Entity] = []
+    entities: Sequence[Entity] = []
     measures: Sequence[Measure] = []
     dimensions: Sequence[Dimension] = []
 
@@ -67,7 +67,7 @@ class DataSource(HashableBaseModel, ModelWithMetadataParsing):
 
     @property
     def entity_references(self) -> List[LinkableElementReference]:  # noqa: D
-        return [i.reference for i in self.identifiers]
+        return [i.reference for i in self.entities]
 
     @property
     def dimension_references(self) -> List[LinkableElementReference]:  # noqa: D
@@ -94,7 +94,7 @@ class DataSource(HashableBaseModel, ModelWithMetadataParsing):
         raise ValueError(f"No dimension with name ({dimension_reference}) in data source with name ({self.name})")
 
     def get_entity(self, entity_reference: LinkableElementReference) -> Entity:  # noqa: D
-        for entity in self.identifiers:
+        for entity in self.entities:
             if entity.reference == entity_reference:
                 return entity
 
