@@ -20,9 +20,6 @@ data_source:
       type: foreign
     - name: customer_order
       type: foreign
-      entities:
-        - ref: customer
-        - name: id_order
   measures:
     - name: transaction_amount_usd
       description: The total USD value of the transaction.
