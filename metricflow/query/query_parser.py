@@ -24,7 +24,7 @@ from dbt_semantic_interfaces.references import (
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.spec_converters import WhereConstraintConverter
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
-from metricflow.object_utils import pformat_big_objects
+from dbt_semantic_interfaces.object_utils import pformat_big_objects
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.specs import (
     MetricFlowQuerySpec,

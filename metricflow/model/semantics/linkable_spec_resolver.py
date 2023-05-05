@@ -14,7 +14,7 @@ from dbt_semantic_interfaces.objects.user_configured_model import UserConfigured
 from dbt_semantic_interfaces.references import DataSourceReference, MeasureReference, MetricReference
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.data_source_join_evaluator import DataSourceJoinEvaluator
-from metricflow.object_utils import pformat_big_objects
+from dbt_semantic_interfaces.object_utils import pformat_big_objects
 from metricflow.protocols.semantics import DataSourceSemanticsAccessor
 from metricflow.specs import (
     DEFAULT_TIME_GRANULARITY,

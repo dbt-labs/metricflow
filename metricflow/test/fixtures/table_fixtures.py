@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.object_utils import pformat_big_objects
+from dbt_semantic_interfaces.object_utils import pformat_big_objects
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.table_snapshot.table_snapshots import (
