@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional, List
+from typing import Optional
 
 from dbt_semantic_interfaces.objects.base import (
     HashableBaseModel,
@@ -8,10 +8,7 @@ from dbt_semantic_interfaces.objects.base import (
 )
 from dbt_semantic_interfaces.objects.common import Metadata
 from dbt_semantic_interfaces.enum_extension import ExtendedEnum
-from dbt_semantic_interfaces.references import (
-    EntityReference,
-    CompositeSubEntityReference,
-)
+from dbt_semantic_interfaces.references import EntityReference
 
 
 class EntityType(ExtendedEnum):
@@ -23,19 +20,6 @@ class EntityType(ExtendedEnum):
     UNIQUE = "unique"
 
 
-class CompositeSubEntity(HashableBaseModel):
-    """CompositeSubEntities either describe or reference the entities that comprise a composite entity"""
-
-    name: Optional[str]
-    expr: Optional[str]
-    ref: Optional[str]
-
-    @property
-    def reference(self) -> CompositeSubEntityReference:  # noqa: D
-        assert self.name, f"The element name should have been set during model transformation. Got {self}"
-        return CompositeSubEntityReference(element_name=self.name)
-
-
 class Entity(HashableBaseModel, ModelWithMetadataParsing):
     """Describes a entity"""
 
@@ -43,13 +27,8 @@ class Entity(HashableBaseModel, ModelWithMetadataParsing):
     description: Optional[str]
     type: EntityType
     role: Optional[str]
-    entities: List[CompositeSubEntity] = []
     expr: Optional[str] = None
     metadata: Optional[Metadata] = None
-
-    @property
-    def is_composite(self) -> bool:  # noqa: D
-        return self.entities is not None and len(self.entities) > 0
 
     @property
     def reference(self) -> EntityReference:  # noqa: D
