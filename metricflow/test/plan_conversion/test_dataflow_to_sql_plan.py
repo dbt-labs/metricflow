@@ -33,7 +33,6 @@ from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.specs import (
     DimensionSpec,
-    EntitySpec,
     MeasureSpec,
     MetricInputMeasureSpec,
     MetricSpec,
@@ -58,18 +57,6 @@ from metricflow.test.test_utils import as_datetime
 from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.objects.metric import MetricTimeWindow
-
-
-@pytest.fixture(scope="session")
-def composite_dataflow_to_sql_converter(  # noqa: D
-    composite_entity_semantic_model: SemanticModel,
-    time_spine_source: TimeSpineSource,
-) -> DataflowToSqlQueryPlanConverter[DataSourceDataSet]:
-    return DataflowToSqlQueryPlanConverter[DataSourceDataSet](
-        column_association_resolver=DefaultColumnAssociationResolver(composite_entity_semantic_model),
-        semantic_model=composite_entity_semantic_model,
-        time_spine_source=time_spine_source,
-    )
 
 
 @pytest.fixture(scope="session")
@@ -1276,84 +1263,6 @@ def test_limit_rows(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
-        sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
-    )
-
-
-def test_composite_entity(  # noqa: D
-    request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
-    composite_dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
-    composite_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
-    sql_client: SqlClient,
-) -> None:
-    dataflow_plan = composite_dataflow_plan_builder.build_plan(
-        MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="messages"),),
-            entity_specs=(EntitySpec(element_name="user_team", entity_links=()),),
-        )
-    )
-
-    convert_and_check(
-        request=request,
-        mf_test_session_state=mf_test_session_state,
-        dataflow_to_sql_converter=composite_dataflow_to_sql_converter,
-        sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
-    )
-
-
-def test_composite_entity_with_order_by(  # noqa: D
-    request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
-    composite_dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
-    composite_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
-    sql_client: SqlClient,
-) -> None:
-    dataflow_plan = composite_dataflow_plan_builder.build_plan(
-        MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="messages"),),
-            entity_specs=(EntitySpec(element_name="user_team", entity_links=()),),
-            order_by_specs=(
-                OrderBySpec(entity_spec=EntitySpec(element_name="user_team", entity_links=()), descending=True),
-            ),
-        )
-    )
-
-    convert_and_check(
-        request=request,
-        mf_test_session_state=mf_test_session_state,
-        dataflow_to_sql_converter=composite_dataflow_to_sql_converter,
-        sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
-    )
-
-
-def test_composite_entity_with_join(  # noqa: D
-    request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
-    composite_dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
-    composite_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
-    sql_client: SqlClient,
-) -> None:
-    dataflow_plan = composite_dataflow_plan_builder.build_plan(
-        MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="messages"),),
-            dimension_specs=(
-                DimensionSpec(
-                    element_name="country",
-                    entity_links=(EntityReference(element_name="user_team"),),
-                ),
-            ),
-            entity_specs=(EntitySpec(element_name="user_team", entity_links=()),),
-        )
-    )
-
-    convert_and_check(
-        request=request,
-        mf_test_session_state=mf_test_session_state,
-        dataflow_to_sql_converter=composite_dataflow_to_sql_converter,
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
     )
