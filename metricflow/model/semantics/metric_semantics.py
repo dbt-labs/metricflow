@@ -16,6 +16,7 @@ from metricflow.specs import (
     LinkableInstanceSpec,
     MetricInputMeasureSpec,
     MeasureSpec,
+    ColumnAssociationResolver,
 )
 
 logger = logging.getLogger(__name__)
@@ -86,7 +87,11 @@ class MetricSemantics(MetricSemanticsAccessor):  # noqa: D
                 )
         self._metrics[metric_reference] = metric
 
-    def measures_for_metric(self, metric_reference: MetricReference) -> Sequence[MetricInputMeasureSpec]:
+    def measures_for_metric(
+        self,
+        metric_reference: MetricReference,
+        column_association_resolver: ColumnAssociationResolver,
+    ) -> Sequence[MetricInputMeasureSpec]:
         """Return the measure specs required to compute the metric."""
         metric = self.get_metric(metric_reference)
         input_measure_specs: List[MetricInputMeasureSpec] = []
@@ -127,7 +132,11 @@ class MetricSemantics(MetricSemanticsAccessor):  # noqa: D
                         return True
         return False
 
-    def metric_input_specs_for_metric(self, metric_reference: MetricReference) -> Sequence[MetricSpec]:
+    def metric_input_specs_for_metric(
+        self,
+        metric_reference: MetricReference,
+        column_association_resolver: ColumnAssociationResolver,
+    ) -> Sequence[MetricSpec]:
         """Return the metric specs referenced by the metric. Current use case is for derived metrics."""
         metric = self.get_metric(metric_reference)
         input_metric_specs: List[MetricSpec] = []

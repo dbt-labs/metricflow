@@ -118,13 +118,14 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         self._metric_time_dimension_reference = DataSet.metric_time_dimension_reference()
         self._cost_function = cost_function
         self._source_nodes = source_nodes
+        self._column_association_resolver = (
+            DefaultColumnAssociationResolver(semantic_model)
+            if not column_association_resolver
+            else column_association_resolver
+        )
         self._node_data_set_resolver = (
             DataflowPlanNodeOutputDataSetResolver[SqlDataSetT](
-                column_association_resolver=(
-                    DefaultColumnAssociationResolver(semantic_model)
-                    if not column_association_resolver
-                    else column_association_resolver
-                ),
+                column_association_resolver=self._column_association_resolver,
                 semantic_model=semantic_model,
                 time_spine_source=time_spine_source,
             )
@@ -189,7 +190,10 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             metric = self._metric_semantics.get_metric(metric_reference)
 
             if metric.type == MetricType.DERIVED:
-                metric_input_specs = self._metric_semantics.metric_input_specs_for_metric(metric_reference)
+                metric_input_specs = self._metric_semantics.metric_input_specs_for_metric(
+                    metric_reference=metric_reference,
+                    column_association_resolver=self._column_association_resolver,
+                )
                 logger.info(
                     f"For derived metric: {metric_spec}, needed metrics are:\n"
                     f"{pformat_big_objects(metric_input_specs=metric_input_specs)}"
@@ -206,7 +210,10 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                     metric_specs=[metric_spec],
                 )
             else:
-                metric_input_measure_specs = self._metric_semantics.measures_for_metric(metric_reference)
+                metric_input_measure_specs = self._metric_semantics.measures_for_metric(
+                    metric_reference=metric_reference,
+                    column_association_resolver=self._column_association_resolver,
+                )
 
                 logger.info(
                     f"For {metric_spec}, needed measures are:\n"
