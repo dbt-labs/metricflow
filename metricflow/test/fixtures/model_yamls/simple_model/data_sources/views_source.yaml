@@ -24,7 +24,7 @@ data_source:
       type_params:
         time_granularity: day
 
-  identifiers:
+  entities:
     - name: listing
       type: foreign
       expr: listing_id

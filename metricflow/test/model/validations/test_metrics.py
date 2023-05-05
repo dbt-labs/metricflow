@@ -163,7 +163,7 @@ def test_generated_metrics_only() -> None:  # noqa:D
             ),
         ],
         mutability=Mutability(type=MutabilityType.IMMUTABLE),
-        identifiers=[
+        entities=[
             Entity(name=entity_reference.element_name, type=EntityType.PRIMARY),
         ],
     )

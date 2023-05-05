@@ -340,7 +340,7 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                     )
 
                 # Validates that all window_groupings are entities
-                entities_in_data_source = {entity.name for entity in data_source.identifiers}
+                entities_in_data_source = {entity.name for entity in data_source.entities}
                 window_groupings = set(non_additive_dimension.window_groupings)
                 intersected_entities = window_groupings.intersection(entities_in_data_source)
                 if len(intersected_entities) != len(window_groupings):

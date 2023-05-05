@@ -83,7 +83,7 @@ class ReservedKeywordsRule(ModelValidationRule):
                     )
                 )
 
-        for entity in data_source.identifiers:
+        for entity in data_source.entities:
             msg = "'{name}' is an SQL reserved keyword, and thus cannot be used as an entity 'name'"
             names = [entity.name]
 

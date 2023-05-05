@@ -10,7 +10,7 @@ from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 
 def test_base_data_source_attribute_parsing() -> None:
-    """Test for parsing a data source specification without regard for measures, identifiers, or dimensions"""
+    """Test for parsing a data source specification without regard for measures, entities, or dimensions"""
     yaml_contents = textwrap.dedent(
         """\
         data_source:
@@ -129,17 +129,17 @@ def test_data_source_dbt_model_parsing() -> None:
     assert data_source.dbt_model == "dbt_source.some_model"
 
 
-def test_data_source_identifier_parsing() -> None:
-    """Test for parsing a basic identifier out of a data source specification"""
+def test_data_source_entity_parsing() -> None:
+    """Test for parsing a basic entity out of a data source specification"""
     yaml_contents = textwrap.dedent(
         """\
         data_source:
-          name: identifier_test
+          name: entity_test
           mutability:
             type: immutable
           sql_table: some_schema.source_table
-          identifiers:
-            - name: example_identifier
+          entities:
+            - name: example_entity
               type: primary
               role: test_role
               expr: example_id
@@ -151,25 +151,25 @@ def test_data_source_identifier_parsing() -> None:
 
     assert len(build_result.model.data_sources) == 1
     data_source = build_result.model.data_sources[0]
-    assert len(data_source.identifiers) == 1
-    identifier = data_source.identifiers[0]
-    assert identifier.name == "example_identifier"
-    assert identifier.type is EntityType.PRIMARY
-    assert identifier.role == "test_role"
-    assert identifier.expr == "example_id"
+    assert len(data_source.entities) == 1
+    entity = data_source.entities[0]
+    assert entity.name == "example_entity"
+    assert entity.type is EntityType.PRIMARY
+    assert entity.role == "test_role"
+    assert entity.expr == "example_id"
 
 
-def test_data_source_identifier_metadata_parsing() -> None:
-    """Test for parsing metadata for an identifier object defined in a data source specification"""
+def test_data_source_entity_metadata_parsing() -> None:
+    """Test for parsing metadata for an entity object defined in a data source specification"""
     yaml_contents = textwrap.dedent(
         """\
         data_source:
-          name: identifier_test
+          name: entity_test
           mutability:
             type: immutable
           sql_table: some_schema.source_table
-          identifiers:
-            - name: example_identifier
+          entities:
+            - name: example_entity
               type: primary
               role: test_role
         """
@@ -180,19 +180,19 @@ def test_data_source_identifier_metadata_parsing() -> None:
 
     assert len(build_result.model.data_sources) == 1
     data_source = build_result.model.data_sources[0]
-    assert len(data_source.identifiers) == 1
-    identifier = data_source.identifiers[0]
-    assert identifier.metadata is not None
-    assert identifier.metadata.repo_file_path == "test_dir/inline_for_test"
-    assert identifier.metadata.file_slice.filename == "inline_for_test"
+    assert len(data_source.entities) == 1
+    entity = data_source.entities[0]
+    assert entity.metadata is not None
+    assert entity.metadata.repo_file_path == "test_dir/inline_for_test"
+    assert entity.metadata.file_slice.filename == "inline_for_test"
     expected_metadata_content = textwrap.dedent(
         """\
-      name: example_identifier
+      name: example_entity
       type: primary
       role: test_role
       """
     )
-    assert identifier.metadata.file_slice.content == expected_metadata_content
+    assert entity.metadata.file_slice.content == expected_metadata_content
 
 
 def test_data_source_measure_parsing() -> None:

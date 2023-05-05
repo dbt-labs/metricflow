@@ -9,7 +9,7 @@ data_source:
     - name: company_name
       type: categorical
 
-  identifiers:
+  entities:
     - name: company
       type: primary
       expr: company_id

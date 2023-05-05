@@ -24,7 +24,7 @@ data_source:
     - name: verification_type
       type: categorical
 
-  identifiers:
+  entities:
     - name: verification
       type: primary
       expr: verification_id

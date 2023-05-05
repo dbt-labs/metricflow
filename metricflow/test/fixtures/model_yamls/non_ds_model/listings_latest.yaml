@@ -25,7 +25,7 @@ data_source:
       type: categorical
       expr: country
 
-  identifiers:
+  entities:
     - name: listing
       type: primary
       expr: listing_id

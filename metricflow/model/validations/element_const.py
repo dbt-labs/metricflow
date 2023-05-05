@@ -68,7 +68,7 @@ class ElementConsistencyRule(ModelValidationRule):
             if data_source.dimensions:
                 for dimension in data_source.dimensions:
                     element_types[dimension.name][DataSourceElementType.DIMENSION].append(data_source_context)
-            if data_source.identifiers:
-                for entity in data_source.identifiers:
+            if data_source.entities:
+                for entity in data_source.entities:
                     element_types[entity.name][DataSourceElementType.ENTITY].append(data_source_context)
         return element_types

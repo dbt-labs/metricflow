@@ -48,7 +48,7 @@ BOOKINGS_YAML = textwrap.dedent(
             is_primary: True
             time_granularity: day
 
-      identifiers:
+      entities:
         - name: listing
           type: foreign
           expr: listing_id
@@ -83,7 +83,7 @@ REVENUE_YAML = textwrap.dedent(
           type: categorical
           expr: country
 
-      identifiers:
+      entities:
         - name: user
           type: foreign
           expr: user_id

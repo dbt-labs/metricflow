@@ -92,7 +92,7 @@ def test_convert_table_data_source_with_measures(  # noqa: D
     sql_client: SqlClient,
     consistent_id_object_repository: ConsistentIdObjectRepository,
 ) -> None:
-    """Complete test of table data source conversion. This includes the full set of measures/identifiers/dimensions.
+    """Complete test of table data source conversion. This includes the full set of measures/entities/dimensions.
 
     Measures trigger a primary time dimension validation. Additionally, this includes both categorical and time
     dimension types, which should cover most, if not all, of the table source branches in the target class.

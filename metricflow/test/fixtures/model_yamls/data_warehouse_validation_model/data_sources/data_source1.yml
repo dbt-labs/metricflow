@@ -19,7 +19,7 @@ data_source:
       agg: sum
       expr: 1
       create_metric: True
-  identifiers:
+  entities:
     - name: id
       type: primary
       expr: "1"

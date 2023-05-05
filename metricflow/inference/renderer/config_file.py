@@ -52,7 +52,7 @@ class ConfigFileRenderer(InferenceRenderer):
     def _fixme(self, comment: str) -> str:
         return f"FIXME: {comment}"
 
-    def _render_id_columns(self, results: List[InferenceResult]) -> List[CommentedMap]:
+    def _render_entity_columns(self, results: List[InferenceResult]) -> List[CommentedMap]:
         type_map = {
             InferenceSignalType.ID.PRIMARY: "primary",
             InferenceSignalType.ID.FOREIGN: "foreign",
@@ -122,7 +122,7 @@ class ConfigFileRenderer(InferenceRenderer):
                 "data_source": {
                     "name": table.table_name,
                     "sql_table": table.sql,
-                    "identifiers": self._render_id_columns(results),
+                    "entities": self._render_entity_columns(results),
                     "dimensions": self._render_dimension_columns(results),
                     "measures": [],
                 }

@@ -9,7 +9,7 @@ data_source:
     - name: extra_dim
       type: categorical
 
-  identifiers:
+  entities:
     - name: account_id
       type: primary
     - name: customer_id

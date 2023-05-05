@@ -23,7 +23,7 @@ data_source:
     - name: account_type
       type: categorical
 
-  identifiers:
+  entities:
     - name: user
       type: natural
       expr: user_id

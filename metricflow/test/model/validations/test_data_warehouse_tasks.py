@@ -161,8 +161,8 @@ def test_build_entities_tasks(  # noqa: D
         sql_client=async_sql_client,
         system_schema=mf_test_session_state.mf_system_schema,
     )
-    assert len(tasks) == 1  # on data source query with all identifiers
-    assert len(tasks[0].on_fail_subtasks) == 1  # a sub task for each identifier on the data source
+    assert len(tasks) == 1  # on data source query with all entities
+    assert len(tasks[0].on_fail_subtasks) == 1  # a sub task for each entity on the data source
 
 
 def test_validate_entities(  # noqa: D
@@ -179,13 +179,13 @@ def test_validate_entities(  # noqa: D
     issues = dw_validator.validate_entities(model)
     assert len(issues.all_issues) == 0
 
-    identifiers = list(model.data_sources[0].identifiers)
-    identifiers.append(Entity(name="doesnt_exist", type=EntityType.UNIQUE))
-    model.data_sources[0].identifiers = identifiers
+    entities = list(model.data_sources[0].entities)
+    entities.append(Entity(name="doesnt_exist", type=EntityType.UNIQUE))
+    model.data_sources[0].entities = entities
 
     issues = dw_validator.validate_entities(model)
     # One isssue is created for the short circuit query failure, and another is
-    # created for the sub task checking the specific identifier
+    # created for the sub task checking the specific entity
     assert len(issues.all_issues) == 2
 
 

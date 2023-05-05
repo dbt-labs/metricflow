@@ -3,7 +3,7 @@ data_source:
   description: Regions mapped to countries.
   owners:
     - support@transformdata.io
-  identifiers:
+  entities:
     - name: country
       type: primary
   dimensions:

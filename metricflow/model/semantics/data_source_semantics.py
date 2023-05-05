@@ -127,7 +127,7 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
         if not data_source:
             return None
 
-        for entity in data_source.identifiers:
+        for entity in data_source.entities:
             if entity.reference.element_name == ref.element_name:
                 return entity
 
@@ -176,7 +176,7 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
         for dim in data_source.dimensions:
             self._linkable_reference_index[dim.reference].append(data_source)
             self._dimension_index[dim.reference].append(data_source)
-        for entity in data_source.identifiers:
+        for entity in data_source.entities:
             self._entity_ref_to_entity[entity.reference] = entity.name
             self._entity_index[entity.name].append(data_source)
             self._linkable_reference_index[entity.reference].append(data_source)
@@ -198,6 +198,6 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
         return self._data_source_to_aggregation_time_dimensions[data_source_reference]
 
     def get_data_sources_for_entity(self, entity_reference: EntityReference) -> Set[DataSource]:
-        """Return all data sources associated with an identifier reference"""
+        """Return all data sources associated with an entity reference"""
         entity = self._entity_ref_to_entity[entity_reference]
         return set(self._entity_index[entity])

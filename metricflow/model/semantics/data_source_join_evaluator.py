@@ -45,7 +45,7 @@ class DataSourceJoinEvaluator:
     """Checks to see if a join between two data sources should be allowed."""
 
     # Valid joins are the non-fanout joins.
-    _VALID_IDENTIFIER_JOINS = (
+    _VALID_ENTITY_JOINS = (
         DataSourceEntityJoinType(left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.NATURAL),
         DataSourceEntityJoinType(left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.PRIMARY),
         DataSourceEntityJoinType(left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.UNIQUE),
@@ -59,7 +59,7 @@ class DataSourceJoinEvaluator:
         DataSourceEntityJoinType(left_entity_type=EntityType.NATURAL, right_entity_type=EntityType.UNIQUE),
     )
 
-    _INVALID_IDENTIFIER_JOINS = (
+    _INVALID_ENTITY_JOINS = (
         DataSourceEntityJoinType(left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.FOREIGN),
         DataSourceEntityJoinType(left_entity_type=EntityType.UNIQUE, right_entity_type=EntityType.FOREIGN),
         DataSourceEntityJoinType(left_entity_type=EntityType.FOREIGN, right_entity_type=EntityType.FOREIGN),
@@ -102,7 +102,7 @@ class DataSourceJoinEvaluator:
             # We'll get all joinable data sources in this hop before recursing to ensure we find the most
             # efficient path to each data source.
             join_paths_to_visit_next: List[List[DataSourceEntityJoin]] = []
-            for entity in parent_data_source.identifiers:
+            for entity in parent_data_source.entities:
                 entity_reference = EntityReference(element_name=entity.name)
                 entity_data_sources = self._data_source_semantics.get_data_sources_for_entity(
                     entity_reference=entity_reference
@@ -191,9 +191,9 @@ class DataSourceJoinEvaluator:
 
         join_type = DataSourceEntityJoinType(left_entity.type, right_entity.type)
 
-        if join_type in DataSourceJoinEvaluator._VALID_IDENTIFIER_JOINS:
+        if join_type in DataSourceJoinEvaluator._VALID_ENTITY_JOINS:
             return join_type
-        elif join_type in DataSourceJoinEvaluator._INVALID_IDENTIFIER_JOINS:
+        elif join_type in DataSourceJoinEvaluator._INVALID_ENTITY_JOINS:
             return None
 
         raise RuntimeError(f"Join type not handled: {join_type}")

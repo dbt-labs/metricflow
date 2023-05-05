@@ -3,7 +3,7 @@ data_source:
   description: Location and description of all customers.
   owners:
     - support@transformdata.io
-  identifiers:
+  entities:
     - name: customer
       type: primary
       expr: id_customer

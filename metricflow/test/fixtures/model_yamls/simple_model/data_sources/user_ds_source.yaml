@@ -23,7 +23,7 @@ data_source:
     - name: home_state
       type: categorical
 
-  identifiers:
+  entities:
     - name: user
       type: primary
       expr: user_id

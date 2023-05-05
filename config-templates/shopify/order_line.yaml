@@ -5,7 +5,7 @@ data_source:
   # We're joining because any data source with measures needs a primary time dimension.
   sql_query: |
     select * from SHOPIFY.ORDER_LINE a left join SHOPIFY."ORDER" b on a.order = b.order
-  identifiers:
+  entities:
     - name: order_line
       type: primary
       expr: id

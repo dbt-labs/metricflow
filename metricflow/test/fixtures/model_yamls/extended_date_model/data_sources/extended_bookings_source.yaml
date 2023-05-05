@@ -24,7 +24,7 @@ data_source:
     - name: is_instant
       type: categorical
 
-  identifiers:
+  entities:
     - name: booking_id
       type: primary
     - name: listing_id

@@ -37,7 +37,7 @@ data_source:
       type: categorical
       expr: capacity
 
-  identifiers:
+  entities:
     - name: listing
       type: primary
       expr: listing_id

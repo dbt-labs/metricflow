@@ -9,7 +9,7 @@ data_source:
     - name: value
       type: categorical
 
-  identifiers:
+  entities:
     - name: customer_third_hop_id
       type: primary
 

@@ -11,7 +11,7 @@ from metricflow.inference.rule.rules import ColumnMatcherRule, LowCardinalityRat
 
 
 # -------------
-# IDENTIFIERS
+# ENTITIES
 # -------------
 
 
@@ -38,7 +38,7 @@ class AnyEntityByNameRule(ColumnMatcherRule):
 
 
 class PrimaryEntityByNameRule(ColumnMatcherRule):
-    """Inference rule that matches primary identifiers by their names.
+    """Inference rule that matches primary entities by their names.
 
     It will match columns such as `db.schema.mytable.mytable_id`,
     `db.schema.mytable.mytableid` and `db.schema.mytable.id`.
@@ -62,7 +62,7 @@ class PrimaryEntityByNameRule(ColumnMatcherRule):
 
 
 class UniqueEntityByDistinctCountRule(ColumnMatcherRule):
-    """Inference rule that matches unique identifiers by their COUNT DISTINCT.
+    """Inference rule that matches unique entities by their COUNT DISTINCT.
 
     It will always produce a ID.UNIQUE complementary signal with VERY_HIGH confidence.
     """

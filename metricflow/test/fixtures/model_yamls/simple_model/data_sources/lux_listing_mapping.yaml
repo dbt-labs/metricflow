@@ -5,7 +5,7 @@ data_source:
 
   sql_table: $source_schema.dim_lux_listing_id_mapping
 
-  identifiers:
+  entities:
     - name: listing
       type: primary
       expr: listing_id

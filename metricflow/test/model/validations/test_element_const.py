@@ -22,7 +22,7 @@ def test_cross_element_names(simple_model__with_primary_transforms: UserConfigur
     usable_ds, usable_ds_index = find_data_source_with(
         model,
         lambda data_source: len(data_source.measures) > 0
-        and len(data_source.identifiers) > 0
+        and len(data_source.entities) > 0
         and len(_categorical_dimensions(data_source=data_source)) > 0,
     )
 
@@ -32,13 +32,13 @@ def test_cross_element_names(simple_model__with_primary_transforms: UserConfigur
     dimension_reference = _categorical_dimensions(data_source=usable_ds)[0].reference
 
     ds_measure_x_dimension = copy.deepcopy(usable_ds)
-    ds_measure_x_identifier = copy.deepcopy(usable_ds)
-    ds_dimension_x_identifier = copy.deepcopy(usable_ds)
+    ds_measure_x_entity = copy.deepcopy(usable_ds)
+    ds_dimension_x_entity = copy.deepcopy(usable_ds)
 
     # We update the matching categorical dimension by reference for convenience
     ds_measure_x_dimension.get_dimension(dimension_reference).name = measure_reference.element_name
-    ds_measure_x_identifier.identifiers[0].name = measure_reference.element_name
-    ds_dimension_x_identifier.identifiers[0].name = dimension_reference.element_name
+    ds_measure_x_entity.entities[0].name = measure_reference.element_name
+    ds_dimension_x_entity.entities[0].name = dimension_reference.element_name
 
     model.data_sources[usable_ds_index] = ds_measure_x_dimension
     with pytest.raises(
@@ -50,7 +50,7 @@ def test_cross_element_names(simple_model__with_primary_transforms: UserConfigur
     ):
         ModelValidator([ElementConsistencyRule()]).checked_validations(model)
 
-    model.data_sources[usable_ds_index] = ds_measure_x_identifier
+    model.data_sources[usable_ds_index] = ds_measure_x_entity
     with pytest.raises(
         ModelValidationException,
         match=(
@@ -60,7 +60,7 @@ def test_cross_element_names(simple_model__with_primary_transforms: UserConfigur
     ):
         ModelValidator([ElementConsistencyRule()]).checked_validations(model)
 
-    model.data_sources[usable_ds_index] = ds_dimension_x_identifier
+    model.data_sources[usable_ds_index] = ds_dimension_x_entity
     with pytest.raises(
         ModelValidationException,
         match=(

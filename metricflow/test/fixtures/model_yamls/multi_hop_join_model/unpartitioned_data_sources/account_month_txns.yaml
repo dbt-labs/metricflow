@@ -19,7 +19,7 @@ data_source:
     - name: account_month
       type: categorical
 
-  identifiers:
+  entities:
     - name: account_id
       type: primary
 

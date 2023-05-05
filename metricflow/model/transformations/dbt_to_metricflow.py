@@ -276,7 +276,7 @@ class DbtManifestTransformer:
 
         # collect the variations of data source properties
         measures: Set[Measure] = set()
-        identifiers: Set[Entity] = set()
+        entities: Set[Entity] = set()
         dimensions: Set[Dimension] = set()
         names: Set[str] = set()
         descriptions: Set[str] = set()
@@ -298,7 +298,7 @@ class DbtManifestTransformer:
 
             # ensure any unique sub elements get added to the set of sub elements
             measures = measures.union(set(data_source.measures)) if data_source.measures else measures
-            identifiers = identifiers.union(set(data_source.identifiers)) if data_source.identifiers else identifiers
+            entities = entities.union(set(data_source.entities)) if data_source.entities else entities
             dimensions = dimensions.union(set(data_source.dimensions)) if data_source.dimensions else dimensions
 
         assert len(names) == 1, "Cannot merge data sources, all data sources to merge must have same name"
@@ -325,7 +325,7 @@ class DbtManifestTransformer:
             sql_query=list(sql_queries)[0] if sql_queries else None,
             dbt_model=list(dbt_models)[0] if dbt_models else None,
             dimensions=list(dimensions),
-            identifiers=list(identifiers),
+            entities=list(entities),
             measures=list(measures),
         )
 

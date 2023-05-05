@@ -57,15 +57,15 @@ def test_reserved_keywords_in_measures(simple_model__with_primary_transforms: Us
     assert issues[0].level == ValidationIssueLevel.ERROR
 
 
-def test_reserved_keywords_in_identifiers(  # noqa: D
+def test_reserved_keywords_in_entities(  # noqa: D
     simple_model__with_primary_transforms: UserConfiguredModel,
 ) -> None:
     model = copied_model(simple_model__with_primary_transforms)
     (data_source, _index) = find_data_source_with(
-        model=model, function=lambda data_source: len(data_source.identifiers) > 0
+        model=model, function=lambda data_source: len(data_source.entities) > 0
     )
-    identifier = data_source.identifiers[0]
-    identifier.name = random_keyword()
+    entity = data_source.entities[0]
+    entity.name = random_keyword()
 
     issues = ReservedKeywordsRule.validate_model(model)
     assert len(issues) == 1

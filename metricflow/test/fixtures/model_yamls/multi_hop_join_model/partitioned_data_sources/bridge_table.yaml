@@ -15,7 +15,7 @@ data_source:
         time_granularity: day
       is_partition: true
 
-  identifiers:
+  entities:
     - name: account_id
       type: primary
     - name: customer_id

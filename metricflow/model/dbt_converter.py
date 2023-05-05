@@ -115,8 +115,8 @@ class DbtConverter:
         # Move dimensions, entities, and measures on to their respective data sources
         for data_source_name, dimensions_map in copied_objects.dimensions.items():
             copied_objects.data_sources[data_source_name]["dimensions"] = list(dimensions_map.values())
-        for data_source_name, entities_map in copied_objects.identifiers.items():
-            copied_objects.data_sources[data_source_name]["identifiers"] = list(entities_map.values())
+        for data_source_name, entities_map in copied_objects.entities.items():
+            copied_objects.data_sources[data_source_name]["entities"] = list(entities_map.values())
         for data_source_name, measure_map in copied_objects.measures.items():
             copied_objects.data_sources[data_source_name]["measures"] = list(measure_map.values())
 

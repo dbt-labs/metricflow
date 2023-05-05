@@ -69,7 +69,7 @@ EXTENDED_BOOKINGS_YAML = textwrap.dedent(
             is_primary: True
             time_granularity: day
 
-      identifiers:
+      entities:
         - name: listing
           type: foreign
           expr: listing_id
@@ -107,7 +107,7 @@ LISTINGS_YAML = textwrap.dedent(
           type: categorical
           expr: capacity
 
-      identifiers:
+      entities:
         - name: listing
           type: primary
           expr: listing_id

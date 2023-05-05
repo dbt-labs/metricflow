@@ -64,7 +64,7 @@ def test_render_configs(tmpdir: Path) -> None:  # noqa: D
         "data_source": {
             "name": "test_table",
             "sql_table": "db.schema.test_table",
-            "identifiers": [{"type": "primary", "name": "id"}],
+            "entities": [{"type": "primary", "name": "id"}],
             "dimensions": [
                 {"type": "time", "name": "time_dim", "type_params": {"time_granularity": "day"}},
                 {

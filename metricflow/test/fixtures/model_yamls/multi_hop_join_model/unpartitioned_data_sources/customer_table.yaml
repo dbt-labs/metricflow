@@ -11,7 +11,7 @@ data_source:
     - name: customer_atomic_weight
       type: categorical
 
-  identifiers:
+  entities:
     - name: customer_id
       type: primary
 

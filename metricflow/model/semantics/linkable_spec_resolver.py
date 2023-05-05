@@ -342,7 +342,7 @@ class DataSourceJoinPath:
             else:
                 raise RuntimeError(f"Unhandled type: {dimension_type}")
 
-        for entity in data_source.identifiers:
+        for entity in data_source.entities:
             # Avoid creating "booking_id__booking_id"
             if entity.reference.element_name != entity_links[-1]:
                 linkable_entities.append(
@@ -399,7 +399,7 @@ class ValidLinkableSpecResolver:
         self._measure_to_data_source: Dict[str, List[DataSource]] = defaultdict(list)
 
         for data_source in self._data_sources:
-            for entity in data_source.identifiers:
+            for entity in data_source.entities:
                 self._entity_to_data_source[entity.reference.element_name].append(data_source)
 
         self._metric_to_linkable_element_sets: Dict[str, List[LinkableElementSet]] = {}
@@ -455,7 +455,7 @@ class ValidLinkableSpecResolver:
                 raise RuntimeError(f"Unhandled type: {dimension_type}")
 
         additional_linkable_dimensions = []
-        for entity in data_source.identifiers:
+        for entity in data_source.entities:
             linkable_entities.append(
                 LinkableEntity(
                     element_name=entity.reference.element_name,
@@ -511,7 +511,7 @@ class ValidLinkableSpecResolver:
         join_paths = []
 
         # Create 1-hop elements
-        for entity in measure_data_source.identifiers:
+        for entity in measure_data_source.entities:
             data_sources = self._get_data_sources_with_joinable_entity(
                 left_data_source_reference=measure_data_source.reference,
                 entity_reference=entity.reference,
@@ -588,7 +588,7 @@ class ValidLinkableSpecResolver:
         last_data_source_in_path = current_join_path.last_data_source
         new_join_paths = []
 
-        for entity in last_data_source_in_path.identifiers:
+        for entity in last_data_source_in_path.entities:
             entity_name = entity.reference.element_name
 
             # Don't create cycles in the join path by joining on the same entity.

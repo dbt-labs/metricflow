@@ -2,7 +2,7 @@ data_source:
   name: shopify_product_variant
   owners:  # This will throw an error unless you add a list of owners or remove this entry.
   sql_table: SHOPIFY.PRODUCT_VARIANT ### Update to your product_variant schema.table
-  identifiers:
+  entities:
     - name: product
       type: primary
       expr: product_id

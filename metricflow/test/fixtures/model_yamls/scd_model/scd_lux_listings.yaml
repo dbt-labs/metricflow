@@ -5,7 +5,7 @@ data_source:
 
   sql_table: $source_schema.dim_lux_listing_id_mapping
 
-  identifiers:
+  entities:
     - name: listing
       type: primary
       expr: listing_id
@@ -37,7 +37,7 @@ data_source:
     - name: is_confirmed_lux
       type: categorical
 
-  identifiers:
+  entities:
     - name: lux_listing
       type: natural
       expr: lux_listing_id

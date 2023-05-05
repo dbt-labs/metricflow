@@ -5,7 +5,7 @@ data_source:
   sql_table: salesforce.user ### Update to your users schema.table
   mutability:
     type: immutable
-  identifiers:
+  entities:
     - name: owner
       type: primary
       expr: id

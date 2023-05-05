@@ -9,7 +9,7 @@ data_source:
     - name: country
       type: categorical
 
-  identifiers:
+  entities:
     - name: customer_id
       type: primary
     - name: customer_third_hop_id

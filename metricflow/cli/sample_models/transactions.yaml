@@ -9,7 +9,7 @@ data_source:
     customer id. The `ds` or date is reflected in UTC.
   owners: 
     - support@transformdata.io
-  identifiers:
+  entities:
     - name: transaction
       type: primary
       expr: id_transaction

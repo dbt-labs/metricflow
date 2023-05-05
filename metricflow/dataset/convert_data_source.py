@@ -355,7 +355,7 @@ class DataSourceToDataSetConverter:
         # the dimensions "country" and "user_id__country" both mean the same thing. To make matching easier, create both
         # instances in the instance set. We'll create a different instance for each "possible_entity_links".
         possible_entity_links: List[Tuple[EntityReference, ...]] = [()]
-        for entity in data_source.identifiers:
+        for entity in data_source.entities:
             if entity.is_linkable_entity_type:
                 possible_entity_links.append((entity.reference,))
 
@@ -398,7 +398,7 @@ class DataSourceToDataSetConverter:
         for entity_links in possible_entity_links:
             entity_instances, select_columns = self._create_entity_instances(
                 data_source_name=data_source.name,
-                entities=data_source.identifiers,
+                entities=data_source.entities,
                 entity_links=entity_links,
                 table_alias=from_source_alias,
             )

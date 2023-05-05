@@ -22,8 +22,8 @@ def base_model_file() -> YamlConfigFile:
         data_source:
           name: sample_data_source
           sql_table: some_schema.source_table
-          identifiers:
-            - name: example_identifier
+          entities:
+            - name: example_entity
               type: primary
               role: test_role
               expr: example_id
@@ -85,7 +85,7 @@ def data_source_with_guaranteed_meta(
     sql_query: Optional[str] = None,
     dbt_model: Optional[str] = None,
     metadata: Metadata = default_meta(),
-    identifiers: Sequence[Entity] = [],
+    entities: Sequence[Entity] = [],
     measures: Sequence[Measure] = [],
     dimensions: Sequence[Dimension] = [],
     origin: DataSourceOrigin = DataSourceOrigin.SOURCE,
@@ -99,7 +99,7 @@ def data_source_with_guaranteed_meta(
         sql_table=sql_table,
         sql_query=sql_query,
         dbt_model=dbt_model,
-        identifiers=identifiers,
+        entities=entities,
         measures=measures,
         dimensions=dimensions,
         origin=origin,

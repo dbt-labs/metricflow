@@ -27,7 +27,7 @@ data_source:
     - name: capacity
       type: categorical
 
-  identifiers:
+  entities:
     - name: listing
       type: natural
       expr: listing_id

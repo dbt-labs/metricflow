@@ -2,7 +2,7 @@ data_source:
   name: shopify_inventory_level
   owners:  # This will throw an error unless you add a list of owners or remove this entry.
   sql_table: SHOPIFY.INVENTORY_LEVEL ### Update to your inventory_level schema.table
-  identifiers:
+  entities:
     - name: inventory_item
       type: primary
       expr: inventory_item_id
