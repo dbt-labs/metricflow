@@ -1,7 +1,7 @@
-from enum import Enum
+from dbt_semantic_interfaces.enum_extension import ExtendedEnum
 
 
-class AggregationType(Enum):
+class AggregationType(ExtendedEnum):
     """Aggregation methods for measures"""
 
     SUM = "sum"
