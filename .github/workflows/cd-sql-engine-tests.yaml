@@ -36,7 +36,7 @@ jobs:
         run: cd metricflow && poetry install
 
       - name: Run MetricFlow unit tests with Snowflake configs
-        run: poetry run pytest -v --use-persistent-source-schema metricflow/test/ --ignore=metricflow/test/model/dbt_cloud_parsing
+        run: poetry run pytest -v metricflow/test/ --ignore=metricflow/test/model/dbt_cloud_parsing
         env:
           MF_SQL_ENGINE_URL: ${{ secrets.MF_SNOWFLAKE_URL }}
           MF_SQL_ENGINE_PASSWORD: ${{ secrets.MF_SNOWFLAKE_PWD }}
@@ -69,7 +69,7 @@ jobs:
         run: cd metricflow && poetry install
 
       - name: Run MetricFlow unit tests with Redshift configs
-        run: poetry run pytest -v --use-persistent-source-schema metricflow/test/ --ignore=metricflow/test/model/dbt_cloud_parsing
+        run: poetry run pytest -v metricflow/test/ --ignore=metricflow/test/model/dbt_cloud_parsing
         env:
           MF_SQL_ENGINE_URL: ${{ secrets.MF_REDSHIFT_URL }}
           MF_SQL_ENGINE_PASSWORD: ${{ secrets.MF_REDSHIFT_PWD }}
@@ -102,7 +102,7 @@ jobs:
         run: cd metricflow && poetry install
 
       - name: Run MetricFlow unit tests with BigQuery configs
-        run: poetry run pytest -v --use-persistent-source-schema metricflow/test/ --ignore=metricflow/test/model/dbt_cloud_parsing
+        run: poetry run pytest -v metricflow/test/ --ignore=metricflow/test/model/dbt_cloud_parsing
         env:
           MF_SQL_ENGINE_URL: ${{ secrets.MF_BIGQUERY_URL }}
           MF_SQL_ENGINE_PASSWORD: ${{ secrets.MF_BIGQUERY_PWD }}
@@ -135,7 +135,7 @@ jobs:
         run: cd metricflow && poetry install
 
       - name: Run MetricFlow unit tests with Databricks configs
-        run: poetry run pytest -v --use-persistent-source-schema metricflow/test/ --ignore=metricflow/test/model/dbt_cloud_parsing
+        run: poetry run pytest -v metricflow/test/ --ignore=metricflow/test/model/dbt_cloud_parsing
         env:
           MF_SQL_ENGINE_URL: ${{ secrets.MF_DATABRICKS_CLUSTER_URL }}
           MF_SQL_ENGINE_PASSWORD: ${{ secrets.MF_DATABRICKS_PWD }}
@@ -168,7 +168,7 @@ jobs:
         run: cd metricflow && poetry install
 
       - name: Run MetricFlow unit tests with Databricks configs
-        run: poetry run pytest -v --use-persistent-source-schema metricflow/test/ --ignore=metricflow/test/model/dbt_cloud_parsing
+        run: poetry run pytest -v metricflow/test/ --ignore=metricflow/test/model/dbt_cloud_parsing
         env:
           MF_SQL_ENGINE_URL: ${{ secrets.MF_DATABRICKS_SQL_WAREHOUSE_URL }}
           MF_SQL_ENGINE_PASSWORD: ${{ secrets.MF_DATABRICKS_PWD }}
@@ -216,7 +216,7 @@ jobs:
         run: cd metricflow && poetry install
 
       - name: Run MetricFlow unit tests with PostgreSQL configs
-        run: poetry run pytest -v --use-persistent-source-schema metricflow/test/ --ignore=metricflow/test/model/dbt_cloud_parsing
+        run: poetry run pytest -v metricflow/test/ --ignore=metricflow/test/model/dbt_cloud_parsing
         env:
           MF_SQL_ENGINE_URL: postgresql://postgres@localhost:5432/metricflow
           MF_SQL_ENGINE_PASSWORD: postgres
