@@ -6,8 +6,10 @@ from metricflow.dataflow.builder.costing import DefaultCostFunction
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.model.semantic_model import SemanticModel
+from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource, TimeSpineTableBuilder
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.specs import ColumnAssociationResolver
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.fixtures.sql_client_fixtures import sql_client  # noqa: F401, F403
@@ -17,6 +19,11 @@ Using 'function' scope to make ID generation more deterministic for the dataflow
 
 Using 'session' scope can result in other 'session' scope fixtures causing ID consistency issues.
 """
+
+
+@pytest.fixture
+def column_association_resolver(simple_semantic_model: SemanticModel) -> ColumnAssociationResolver:
+    return DefaultColumnAssociationResolver(simple_semantic_model)
 
 
 @pytest.fixture

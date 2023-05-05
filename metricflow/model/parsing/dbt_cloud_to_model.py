@@ -1,12 +1,14 @@
-from dbt_metadata_client.client import Client, Operation
-from dbt_metadata_client.dbt_metadata_api_schema import dbt_metadata_api_schema, MetricNode
-from metricflow.model.dbt_converter import DbtConverter
-from dbt_semantic_interfaces.model_transformer import ModelTransformer
-from dbt_semantic_interfaces.parsing.dir_to_model import ModelBuildResult
 from typing import List
 
+from dbt_metadata_client.client import Client, Operation
+from dbt_metadata_client.dbt_metadata_api_schema import dbt_metadata_api_schema, MetricNode
 
-def get_dbt_cloud_metrics(auth: str, job_id: str) -> list[MetricNode]:
+from dbt_semantic_interfaces.model_transformer import ModelTransformer
+from dbt_semantic_interfaces.parsing.dir_to_model import ModelBuildResult
+from metricflow.model.dbt_converter import DbtConverter
+
+
+def get_dbt_cloud_metrics(auth: str, job_id: str) -> List[MetricNode]:
     """Builds the dbt Manifest object from the dbt project"""
 
     client = Client(api_token=auth)

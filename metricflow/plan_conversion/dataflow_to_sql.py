@@ -61,6 +61,7 @@ from metricflow.plan_conversion.select_column_gen import (
 from metricflow.plan_conversion.spec_transforms import (
     CreateSelectCoalescedColumnsForLinkableSpecs,
     SelectOnlyLinkableSpecs,
+    CreateColumnAssociations,
 )
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.sql_join_builder import (
@@ -829,6 +830,10 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         output_instance_set = from_data_set.instance_set
         from_data_set_alias = self._next_unique_table_alias()
 
+        column_associations_in_where_sql: Sequence[ColumnAssociation] = CreateColumnAssociations(
+            column_association_resolver=self._column_association_resolver
+        ).transform(spec_set=node.where.linkable_spec_set.as_spec_set)
+
         return SqlDataSet(
             instance_set=output_instance_set,
             sql_select_node=SqlSelectStatementNode(
@@ -842,9 +847,11 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 joins_descs=(),
                 group_bys=(),
                 where=SqlStringExpression(
-                    sql_expr=node.where.where_condition,
-                    used_columns=tuple(node.where.linkable_names),
-                    execution_parameters=node.where.execution_parameters,
+                    sql_expr=node.where.where_sql,
+                    used_columns=tuple(
+                        column_association.column_name for column_association in column_associations_in_where_sql
+                    ),
+                    execution_parameters=node.where.bind_parameters,
                 ),
                 order_bys=(),
             ),

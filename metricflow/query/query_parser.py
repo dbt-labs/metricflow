@@ -6,7 +6,6 @@ import time
 from dataclasses import dataclass
 from typing import List, Optional, Tuple, Dict, Sequence
 
-from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
 from dbt_semantic_interfaces.objects.metric import MetricType
@@ -23,9 +22,7 @@ from metricflow.dataflow.dataflow_plan import BaseOutput
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
-from metricflow.model.resolved_where_filter import ResolvedWhereFilter
 from metricflow.model.semantic_model import SemanticModel
-from metricflow.model.spec_converters import WhereConstraintConverter
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from metricflow.query.query_exceptions import InvalidQueryException
@@ -38,9 +35,9 @@ from metricflow.specs import (
     LinkableInstanceSpec,
     OrderBySpec,
     OutputColumnNameOverride,
-    SpecWhereClauseConstraint,
     LinkableSpecSet,
     ColumnAssociationResolver,
+    ResolvedWhereFilter,
 )
 from metricflow.time.time_granularity_solver import (
     TimeGranularitySolver,
@@ -267,11 +264,12 @@ class MetricFlowQueryParser:
         metric_specs = []
         for metric_reference in metric_references:
             metric = self._metric_semantics.get_metric(metric_reference)
-            metric_where_constraint: Optional[SpecWhereClauseConstraint] = None
+            metric_where_constraint: Optional[ResolvedWhereFilter] = None
             if metric.constraint:
                 # add constraint to MetricSpec
-                metric_where_constraint = WhereConstraintConverter.convert_to_spec_where_constraint(
-                    self._data_source_semantics, metric.constraint
+                metric_where_constraint = ResolvedWhereFilter.create_from_where_filter(
+                    where_filter=metric.constraint,
+                    column_association_resolver=self._column_association_resolver,
                 )
             # TODO: Directly initializing Spec object instead of using a factory method since
             #       importing WhereConstraintConverter is a problem in specs.py
@@ -299,11 +297,11 @@ class MetricFlowQueryParser:
             where_constraint and where_constraint_str
         ), "Both where_constraint and where_constraint_str should not be set"
 
-        parsed_where_constraint: Optional[WhereFilter]
+        where_filter: Optional[WhereFilter]
         if where_constraint_str:
-            parsed_where_constraint = WhereFilter(where_sql_template=where_constraint_str)
+            where_filter = WhereFilter(where_sql_template=where_constraint_str)
         else:
-            parsed_where_constraint = where_constraint
+            where_filter = where_constraint
 
         # Get metric references used for validations
         # In a case of derived metric, all the input metrics would be here.
@@ -352,6 +350,24 @@ class MetricFlowQueryParser:
             time_constraint = None
 
         requested_linkable_specs = self._parse_linkable_element_names(group_by_names, metric_references)
+        resolved_where_filter: Optional[ResolvedWhereFilter] = None
+        if where_filter is not None:
+            resolved_where_filter = ResolvedWhereFilter.create_from_where_filter(
+                where_filter=where_filter,
+                column_association_resolver=self._column_association_resolver,
+            )
+            where_spec_set = QueryTimeLinkableSpecSet.create_from_linkable_spec_set(
+                resolved_where_filter.linkable_spec_set
+            )
+            requested_linkable_specs_with_requested_filter_specs = QueryTimeLinkableSpecSet.combine(
+                (
+                    requested_linkable_specs,
+                    where_spec_set,
+                )
+            )
+        else:
+            requested_linkable_specs_with_requested_filter_specs = requested_linkable_specs
+
         partial_time_dimension_spec_replacements = (
             self._time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
                 metric_references=metric_references,
@@ -360,10 +376,6 @@ class MetricFlowQueryParser:
                 time_granularity=time_granularity,
             )
         )
-
-        # all_group_by_names = list(group_by_names)
-        # if parsed_where_constraint is not None:
-        #     all_group_by_names += parsed_where_constraint.linkable_names
 
         time_dimension_specs = requested_linkable_specs.time_dimension_specs + tuple(
             time_dimension_spec for _, time_dimension_spec in partial_time_dimension_spec_replacements.items()
@@ -375,10 +387,13 @@ class MetricFlowQueryParser:
 
         order_by_specs = self._parse_order_by(order or [], partial_time_dimension_spec_replacements)
 
+        # For each metric, verify that it's possible to retrieve all group by elements, including the ones as required
+        # by the filters.
+        # TODO: Consider moving this logic into _validate_linkable_specs().
         for metric_reference in metric_references:
             metric = self._metric_semantics.get_metric(metric_reference)
             if metric.constraint is not None:
-                query_time_specs = self._parse_linkable_element_names(
+                group_by_specs_for_one_metric = self._parse_linkable_element_names(
                     qualified_linkable_names=group_by_names,
                     metric_references=(metric_reference,),
                 )
@@ -389,7 +404,7 @@ class MetricFlowQueryParser:
                     metric_references=(metric_reference,),
                     all_linkable_specs=QueryTimeLinkableSpecSet.combine(
                         (
-                            query_time_specs,
+                            group_by_specs_for_one_metric,
                             QueryTimeLinkableSpecSet.create_from_linkable_spec_set(
                                 ResolvedWhereFilter.create_from_where_filter(
                                     where_filter=metric.constraint,
@@ -400,13 +415,11 @@ class MetricFlowQueryParser:
                     ),
                     time_dimension_specs=time_dimension_specs,
                 )
-        specs_from_query = self._parse_linkable_element_names(
-            qualified_linkable_names=group_by_names,
-            metric_references=metric_references,
-        )
+
+        # Validate all of them together.
         self._validate_linkable_specs(
             metric_references=metric_references,
-            all_linkable_specs=specs_from_query,
+            all_linkable_specs=requested_linkable_specs_with_requested_filter_specs,
             time_dimension_specs=time_dimension_specs,
         )
 
@@ -453,16 +466,10 @@ class MetricFlowQueryParser:
         if limit is not None and limit < 0:
             raise InvalidQueryException(f"Limit was specified as {limit}, which is < 0.")
 
-        spec_where_constraint: Optional[SpecWhereClauseConstraint] = None
-        if parsed_where_constraint:
-            spec_where_constraint = WhereConstraintConverter.convert_to_spec_where_constraint(
-                data_source_semantics=self._data_source_semantics,
-                where_constraint=parsed_where_constraint,
-            )
-            where_time_specs = spec_where_constraint.linkable_spec_set.time_dimension_specs
-
+        if resolved_where_filter:
             self._time_granularity_solver.validate_time_granularity(
-                metric_references=metric_references, time_dimension_specs=where_time_specs
+                metric_references=metric_references,
+                time_dimension_specs=resolved_where_filter.linkable_spec_set.time_dimension_specs,
             )
 
         base_metric_references = self._parse_metric_names(metric_names, traverse_metric_inputs=False)
@@ -476,7 +483,7 @@ class MetricFlowQueryParser:
             order_by_specs=order_by_specs,
             output_column_name_overrides=tuple(output_column_name_overrides),
             time_range_constraint=time_constraint,
-            where_constraint=spec_where_constraint,
+            where_constraint=resolved_where_filter,
             limit=limit,
         )
 

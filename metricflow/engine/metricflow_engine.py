@@ -338,6 +338,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         self._executor = SequentialPlanExecutor()
 
         self._query_parser = MetricFlowQueryParser(
+            column_association_resolver=self._column_association_resolver,
             model=self._semantic_model,
             source_nodes=source_nodes,
             node_output_resolver=node_output_resolver,

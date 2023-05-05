@@ -3,6 +3,7 @@ import logging
 import pytest
 from _pytest.fixtures import FixtureRequest
 
+from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
@@ -13,18 +14,17 @@ from metricflow.specs import (
     MetricFlowQuerySpec,
     MetricSpec,
     DimensionSpec,
-    SpecWhereClauseConstraint,
-    LinkableSpecSet,
     EntityReference,
+    ColumnAssociationResolver,
+    ResolvedWhereFilter,
 )
 from metricflow.specs import (
     OrderBySpec,
 )
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.plan_utils import assert_plan_snapshot_text_equal
-from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY, MTD, MTD_SPEC_MONTH
+from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_MONTH
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +64,7 @@ def test_simple_plan(  # noqa: D
 def test_joined_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
+    column_association_resolver: ColumnAssociationResolver,
     dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
 ) -> None:
     """Tests a plan getting a measure and a joined dimension."""
@@ -332,6 +333,7 @@ def test_multihop_join_plan(  # noqa: D
 def test_where_constrained_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
+    column_association_resolver: ColumnAssociationResolver,
     dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
 ) -> None:
     """Tests a simple plan getting a metric and a local dimension."""
@@ -344,18 +346,11 @@ def test_where_constrained_plan(  # noqa: D
                     entity_links=(),
                 ),
             ),
-            where_constraint=SpecWhereClauseConstraint(
-                where_condition="listing__country_latest = 'us'",
-                linkable_names=("listing__country_latest",),
-                linkable_spec_set=LinkableSpecSet(
-                    dimension_specs=(
-                        DimensionSpec(
-                            element_name="country_latest",
-                            entity_links=(EntityReference(element_name="listing"),),
-                        ),
-                    )
+            where_constraint=ResolvedWhereFilter.create_from_where_filter(
+                where_filter=WhereFilter(
+                    where_sql_template="{{ dimension('country_latest', entity_path=['listing']) }} = 'us'",
                 ),
-                execution_parameters=SqlBindParameters(),
+                column_association_resolver=column_association_resolver,
             ),
         )
     )
@@ -377,6 +372,7 @@ def test_where_constrained_plan(  # noqa: D
 def test_where_constrained_plan_time_dimension(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
+    column_association_resolver: ColumnAssociationResolver,
     dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
 ) -> None:
     """Tests a simple plan getting a metric and a local dimension."""
@@ -389,11 +385,11 @@ def test_where_constrained_plan_time_dimension(  # noqa: D
                     entity_links=(),
                 ),
             ),
-            where_constraint=SpecWhereClauseConstraint(
-                where_condition=f"{MTD} >= '2020-01-01'",
-                linkable_names=(MTD,),
-                linkable_spec_set=LinkableSpecSet(time_dimension_specs=(MTD_SPEC_DAY,)),
-                execution_parameters=SqlBindParameters(),
+            where_constraint=ResolvedWhereFilter.create_from_where_filter(
+                where_filter=WhereFilter(
+                    where_sql_template="{{ time_dimension('metric_time', 'day') }} >= '2020-01-01'",
+                ),
+                column_association_resolver=column_association_resolver,
             ),
         )
     )
@@ -415,6 +411,7 @@ def test_where_constrained_plan_time_dimension(  # noqa: D
 def test_where_constrained_with_common_linkable_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
+    column_association_resolver: ColumnAssociationResolver,
     dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
 ) -> None:
     """Tests a dataflow plan where the where clause has a common linkable with the query."""
@@ -427,18 +424,11 @@ def test_where_constrained_with_common_linkable_plan(  # noqa: D
                     entity_links=(EntityReference(element_name="listing"),),
                 ),
             ),
-            where_constraint=SpecWhereClauseConstraint(
-                where_condition="listing__country_latest = 'us'",
-                linkable_names=("listing__country_latest",),
-                linkable_spec_set=LinkableSpecSet(
-                    dimension_specs=(
-                        DimensionSpec(
-                            element_name="country_latest",
-                            entity_links=(EntityReference(element_name="listing"),),
-                        ),
-                    )
+            where_constraint=ResolvedWhereFilter.create_from_where_filter(
+                where_filter=WhereFilter(
+                    where_sql_template="{{ dimension('country_latest', entity_path=['listing']) }} = 'us'",
                 ),
-                execution_parameters=SqlBindParameters(),
+                column_association_resolver=column_association_resolver,
             ),
         )
     )

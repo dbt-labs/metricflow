@@ -89,7 +89,7 @@ class SelectOnlyLinkableSpecs(InstanceSpecSetTransform[InstanceSpecSet]):
 
 
 class CreateColumnAssociations(InstanceSpecSetTransform[Sequence[ColumnAssociation]]):
-    """Using the specs in the instance set, generate the associated column associations.
+    """Using the specs in the instance set, generate a list of the associated column associations.
 
     Initial use case is to figure out names of the columns present in the SQL of a WhereFilter.
     """
@@ -108,7 +108,7 @@ class CreateColumnAssociations(InstanceSpecSetTransform[Sequence[ColumnAssociati
                 self._column_association_resolver.resolve_time_dimension_spec(time_dimension_spec)
             )
         for entity_spec in spec_set.entity_specs:
-            column_associations.extend(self._column_association_resolver.resolve_entity_spec(entity_spec))
+            column_associations.append(self._column_association_resolver.resolve_entity_spec(entity_spec))
         for metric_spec in spec_set.metric_specs:
             column_associations.append(self._column_association_resolver.resolve_metric_spec(metric_spec))
         for metadata_spec in spec_set.metadata_specs:

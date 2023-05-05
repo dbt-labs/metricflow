@@ -59,6 +59,7 @@ def query_parser_from_yaml(
     ModelValidator().checked_validations(semantic_model.user_configured_model)
     source_nodes = _data_set_to_source_nodes(semantic_model, create_data_sets(semantic_model))
     return MetricFlowQueryParser(
+        column_association_resolver=DefaultColumnAssociationResolver(semantic_model),
         model=semantic_model,
         source_nodes=source_nodes,
         node_output_resolver=DataflowPlanNodeOutputDataSetResolver(

@@ -9,7 +9,6 @@ from metricflow.model.semantics.data_source_join_evaluator import MAX_JOIN_HOPS
 from metricflow.model.semantics.data_source_semantics import DataSourceSemantics
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.linkable_spec_resolver import ValidLinkableSpecResolver
-from metricflow.model.spec_converters import WhereConstraintConverter
 from metricflow.protocols.semantics import MetricSemanticsAccessor
 from metricflow.specs import (
     MetricSpec,
@@ -17,6 +16,7 @@ from metricflow.specs import (
     MetricInputMeasureSpec,
     MeasureSpec,
     ColumnAssociationResolver,
+    ResolvedWhereFilter,
 )
 
 logger = logging.getLogger(__name__)
@@ -24,7 +24,9 @@ logger = logging.getLogger(__name__)
 
 class MetricSemantics(MetricSemanticsAccessor):  # noqa: D
     def __init__(  # noqa: D
-        self, user_configured_model: UserConfiguredModel, data_source_semantics: DataSourceSemantics
+        self,
+        user_configured_model: UserConfiguredModel,
+        data_source_semantics: DataSourceSemantics,
     ) -> None:
         self._user_configured_model = user_configured_model
         self._metrics: Dict[MetricReference, Metric] = {}
@@ -97,14 +99,6 @@ class MetricSemantics(MetricSemanticsAccessor):  # noqa: D
         input_measure_specs: List[MetricInputMeasureSpec] = []
 
         for input_measure in metric.input_measures:
-            spec_constraint = (
-                WhereConstraintConverter.convert_to_spec_where_constraint(
-                    data_source_semantics=self._data_source_semantics,
-                    where_constraint=input_measure.constraint,
-                )
-                if input_measure.constraint is not None
-                else None
-            )
             measure_spec = MeasureSpec(
                 element_name=input_measure.name,
                 non_additive_dimension_spec=self._data_source_semantics.non_additive_dimension_specs_by_measure.get(
@@ -113,7 +107,12 @@ class MetricSemantics(MetricSemanticsAccessor):  # noqa: D
             )
             spec = MetricInputMeasureSpec(
                 measure_spec=measure_spec,
-                constraint=spec_constraint,
+                constraint=ResolvedWhereFilter.create_from_where_filter(
+                    where_filter=input_measure.constraint,
+                    column_association_resolver=column_association_resolver,
+                )
+                if input_measure.constraint is not None
+                else None,
                 alias=input_measure.alias,
             )
             input_measure_specs.append(spec)
@@ -145,10 +144,10 @@ class MetricSemantics(MetricSemanticsAccessor):  # noqa: D
             original_metric_obj = self.get_metric(input_metric.as_reference)
 
             # This is the constraint parameter added to the input metric in the derived metric definition
-            combined_spec_constraint = (
-                WhereConstraintConverter.convert_to_spec_where_constraint(
-                    data_source_semantics=self._data_source_semantics,
-                    where_constraint=input_metric.constraint,
+            combined_filter = (
+                ResolvedWhereFilter.create_from_where_filter(
+                    where_filter=input_metric.constraint,
+                    column_association_resolver=column_association_resolver,
                 )
                 if input_metric.constraint is not None
                 else None
@@ -156,19 +155,27 @@ class MetricSemantics(MetricSemanticsAccessor):  # noqa: D
 
             # This is the constraint parameter included in the original input metric definition
             if original_metric_obj.constraint:
-                original_metric_constraint = WhereConstraintConverter.convert_to_spec_where_constraint(
-                    data_source_semantics=self._data_source_semantics,
-                    where_constraint=original_metric_obj.constraint,
+                # original_metric_constraint = WhereConstraintConverter.convert_to_spec_where_constraint(
+                #     data_source_semantics=self._data_source_semantics,
+                #     where_constraint=original_metric_obj.constraint,
+                # )
+                # combined_spec_constraint = (
+                #     combined_spec_constraint.combine(original_metric_constraint)
+                #     if combined_spec_constraint
+                #     else original_metric_constraint
+                # )
+
+                original_metric_filter = ResolvedWhereFilter.create_from_where_filter(
+                    where_filter=original_metric_obj.constraint,
+                    column_association_resolver=column_association_resolver,
                 )
-                combined_spec_constraint = (
-                    combined_spec_constraint.combine(original_metric_constraint)
-                    if combined_spec_constraint
-                    else original_metric_constraint
+                combined_filter = (
+                    combined_filter.combine(original_metric_filter) if combined_filter else original_metric_filter
                 )
 
             spec = MetricSpec(
                 element_name=input_metric.name,
-                constraint=combined_spec_constraint,
+                constraint=combined_filter,
                 alias=input_metric.alias,
                 offset_window=input_metric.offset_window,
                 offset_to_grain=input_metric.offset_to_grain,

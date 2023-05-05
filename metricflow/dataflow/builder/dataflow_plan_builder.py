@@ -6,7 +6,11 @@ import time
 from dataclasses import dataclass
 from typing import DefaultDict, List, TypeVar, Optional, Generic, Dict, Tuple, Sequence, Set, Union
 
+from dbt_semantic_interfaces.objects.metric import MetricType, MetricTimeWindow
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.references import TimeDimensionReference
+from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dag.id_generation import IdGeneratorRegistry, DATAFLOW_PLAN_PREFIX
 from metricflow.dataflow.builder.costing import DefaultCostFunction, DataflowPlanNodeCostFunction
@@ -42,10 +46,7 @@ from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOp
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
-from dbt_semantic_interfaces.objects.metric import MetricType, MetricTimeWindow
 from metricflow.model.semantic_model import SemanticModel
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
-from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.node_processor import PreDimensionJoinNodeProcessor
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
@@ -61,7 +62,6 @@ from metricflow.specs import (
     DimensionSpec,
     OrderBySpec,
     NonAdditiveDimensionSpec,
-    SpecWhereClauseConstraint,
     LinkableSpecSet,
     ColumnAssociationResolver,
     LinklessEntitySpec,
@@ -69,7 +69,6 @@ from metricflow.specs import (
     ResolvedWhereFilter,
 )
 from metricflow.sql.sql_plan import SqlJoinType
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -170,7 +169,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         self,
         metric_specs: Sequence[MetricSpec],
         queried_linkable_specs: LinkableSpecSet,
-        where_constraint: Optional[SpecWhereClauseConstraint] = None,
+        where_constraint: Optional[ResolvedWhereFilter] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         combine_metrics_join_type: SqlJoinType = SqlJoinType.FULL_OUTER,
     ) -> BaseOutput[SqlDataSetT]:
@@ -611,7 +610,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         self,
         metric_input_measure_specs: Sequence[MetricInputMeasureSpec],
         queried_linkable_specs: LinkableSpecSet,
-        where_constraint: Optional[SpecWhereClauseConstraint] = None,
+        where_constraint: Optional[ResolvedWhereFilter] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         cumulative: Optional[bool] = False,
         cumulative_window: Optional[MetricTimeWindow] = None,
@@ -625,7 +624,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         """
         output_nodes: List[BaseOutput[SqlDataSetT]] = []
         data_sources_and_constraints_to_measures: DefaultDict[
-            tuple[str, Optional[SpecWhereClauseConstraint]], List[MetricInputMeasureSpec]
+            tuple[str, Optional[ResolvedWhereFilter]], List[MetricInputMeasureSpec]
         ] = collections.defaultdict(list)
         for input_spec in metric_input_measure_specs:
             data_source_names = [
@@ -696,7 +695,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         self,
         metric_input_measure_specs: Sequence[MetricInputMeasureSpec],
         queried_linkable_specs: LinkableSpecSet,
-        where_constraint: Optional[SpecWhereClauseConstraint] = None,
+        where_constraint: Optional[ResolvedWhereFilter] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         cumulative: Optional[bool] = False,
         cumulative_window: Optional[MetricTimeWindow] = None,

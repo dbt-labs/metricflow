@@ -264,7 +264,7 @@ def test_parse_and_validate_where_constraint_dims(time_spine_source: TimeSpineSo
             group_by_names=[MTD],
             time_constraint_start=as_datetime("2020-01-15"),
             time_constraint_end=as_datetime("2020-02-15"),
-            where_constraint_str="WHERE invalid_dim = '1'",
+            where_constraint_str="{{ dimension('invalid_dim') }} = '1'",
         )
 
     query_spec = query_parser.parse_and_validate_query(
@@ -272,7 +272,7 @@ def test_parse_and_validate_where_constraint_dims(time_spine_source: TimeSpineSo
         group_by_names=[MTD],
         time_constraint_start=as_datetime("2020-01-15"),
         time_constraint_end=as_datetime("2020-02-15"),
-        where_constraint_str="WHERE is_instant = '1'",
+        where_constraint_str="{{ dimension('is_instant') }} = '1'",
     )
     assert DimensionSpec(element_name="is_instant", entity_links=()) not in query_spec.dimension_specs
 
@@ -286,7 +286,7 @@ def test_parse_and_validate_where_constraint_metric_time(time_spine_source: Time
         query_parser.parse_and_validate_query(
             metric_names=["revenue"],
             group_by_names=[MTD],
-            where_constraint_str="WHERE metric_time__day > '2020-01-15'",
+            where_constraint_str="{{ time_dimension('metric_time', 'day') }} > '2020-01-15'",
         )
 
 
