@@ -424,7 +424,7 @@ class MeasureSpec(InstanceSpec):  # noqa: D
 class MetricSpec(InstanceSpec):  # noqa: D
     # Time-over-time could go here
     element_name: str
-    constraint: Optional[SpecWhereClauseConstraint] = None
+    constraint: Optional[ResolvedWhereFilter] = None
     alias: Optional[str] = None
     offset_window: Optional[MetricTimeWindow] = None
     offset_to_grain: Optional[TimeGranularity] = None
@@ -473,7 +473,7 @@ class MetricInputMeasureSpec(SerializableDataclass):
     """
 
     measure_spec: MeasureSpec
-    constraint: Optional[SpecWhereClauseConstraint] = None
+    constraint: Optional[ResolvedWhereFilter] = None
     alias: Optional[str] = None
 
     @property
@@ -624,7 +624,7 @@ class MetricFlowQuerySpec(SerializableDataclass):
     order_by_specs: Tuple[OrderBySpec, ...] = ()
     output_column_name_overrides: Tuple[OutputColumnNameOverride, ...] = ()
     time_range_constraint: Optional[TimeRangeConstraint] = None
-    where_constraint: Optional[SpecWhereClauseConstraint] = None
+    where_constraint: Optional[ResolvedWhereFilter] = None
     limit: Optional[int] = None
 
     @property

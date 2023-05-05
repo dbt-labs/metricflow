@@ -8,26 +8,26 @@ from typing import List, Dict, Sequence
 
 import pytest
 
-from metricflow.dataflow.builder.source_node import SourceNodeBuilder
-from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, BaseOutput
-from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from dbt_semantic_interfaces.model_transformer import ModelTransformer
-from metricflow.model.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.parsing.dir_to_model import (
     parse_directory_of_yaml_files_to_model,
     parse_yaml_files_to_validation_ready_model,
 )
+from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
+from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
+from metricflow.dataflow.builder.source_node import SourceNodeBuilder
+from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, BaseOutput
+from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
+from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
+from metricflow.model.model_validator import ModelValidator
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
-from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
-from metricflow.test.fixtures.id_fixtures import IdNumberSpace, patch_id_generators_helper
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
-from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
-from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.query.query_parser import MetricFlowQueryParser
+from metricflow.test.fixtures.id_fixtures import IdNumberSpace, patch_id_generators_helper
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 
 logger = logging.getLogger(__name__)
 
@@ -62,6 +62,7 @@ def query_parser_from_yaml(
     source_nodes = _data_set_to_source_nodes(semantic_manifest_lookup, create_data_sets(semantic_manifest_lookup))
     return MetricFlowQueryParser(
         model=semantic_manifest_lookup,
+        column_association_resolver=DefaultColumnAssociationResolver(semantic_manifest_lookup),
         source_nodes=source_nodes,
         node_output_resolver=DataflowPlanNodeOutputDataSetResolver(
             column_association_resolver=DefaultColumnAssociationResolver(semantic_manifest_lookup),
