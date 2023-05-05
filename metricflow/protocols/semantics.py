@@ -33,6 +33,7 @@ from metricflow.specs import (
     MetricInputMeasureSpec,
     MetricSpec,
     NonAdditiveDimensionSpec,
+    ColumnAssociationResolver,
 )
 
 
@@ -158,7 +159,11 @@ class MetricSemanticsAccessor(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def measures_for_metric(self, metric_reference: MetricReference) -> Sequence[MetricInputMeasureSpec]:
+    def measures_for_metric(
+        self,
+        metric_reference: MetricReference,
+        column_association_resolver: ColumnAssociationResolver,
+    ) -> Sequence[MetricInputMeasureSpec]:
         """Return the measure specs required to compute the metric."""
         raise NotImplementedError
 
@@ -168,6 +173,10 @@ class MetricSemanticsAccessor(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def metric_input_specs_for_metric(self, metric_spec: MetricReference) -> Sequence[MetricSpec]:
+    def metric_input_specs_for_metric(
+        self,
+        metric_reference: MetricReference,
+        column_association_resolver: ColumnAssociationResolver,
+    ) -> Sequence[MetricSpec]:
         """Returns the metric input specs required to compute the metric."""
         raise NotImplementedError
