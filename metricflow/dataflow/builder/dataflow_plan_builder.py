@@ -6,7 +6,11 @@ import time
 from dataclasses import dataclass
 from typing import DefaultDict, List, TypeVar, Optional, Generic, Dict, Tuple, Sequence, Set, Union
 
+from dbt_semantic_interfaces.objects.metric import MetricType, MetricTimeWindow
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.references import TimeDimensionReference
+from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dag.id_generation import IdGeneratorRegistry, DATAFLOW_PLAN_PREFIX
 from metricflow.dataflow.builder.costing import DefaultCostFunction, DataflowPlanNodeCostFunction
@@ -42,10 +46,7 @@ from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOp
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
-from dbt_semantic_interfaces.objects.metric import MetricType, MetricTimeWindow
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
-from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.node_processor import PreDimensionJoinNodeProcessor
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
@@ -66,10 +67,8 @@ from metricflow.specs import (
     ColumnAssociationResolver,
     LinklessEntitySpec,
     InstanceSpecSet,
-    ResolvedWhereFilter,
 )
 from metricflow.sql.sql_plan import SqlJoinType
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -118,6 +117,11 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         self._metric_time_dimension_reference = DataSet.metric_time_dimension_reference()
         self._cost_function = cost_function
         self._source_nodes = source_nodes
+        self._column_association_resolver = (
+            DefaultColumnAssociationResolver(semantic_manifest_lookup)
+            if not column_association_resolver
+            else column_association_resolver
+        )
         self._node_data_set_resolver = (
             DataflowPlanNodeOutputDataSetResolver[SqlDataSetT](
                 column_association_resolver=(
@@ -189,7 +193,10 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             metric = self._metric_semantics.get_metric(metric_reference)
 
             if metric.type == MetricType.DERIVED:
-                metric_input_specs = self._metric_semantics.metric_input_specs_for_metric(metric_reference)
+                metric_input_specs = self._metric_semantics.metric_input_specs_for_metric(
+                    metric_reference=metric_reference,
+                    column_association_resolver=self._column_association_resolver,
+                )
                 logger.info(
                     f"For derived metric: {metric_spec}, needed metrics are:\n"
                     f"{pformat_big_objects(metric_input_specs=metric_input_specs)}"
@@ -206,7 +213,10 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                     metric_specs=[metric_spec],
                 )
             else:
-                metric_input_measure_specs = self._metric_semantics.measures_for_metric(metric_reference)
+                metric_input_measure_specs = self._metric_semantics.measures_for_metric(
+                    metric_reference=metric_reference,
+                    column_association_resolver=self._column_association_resolver,
+                )
 
                 logger.info(
                     f"For {metric_spec}, needed measures are:\n"
