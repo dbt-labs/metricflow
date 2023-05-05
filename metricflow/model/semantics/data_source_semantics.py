@@ -3,7 +3,7 @@ from collections import defaultdict
 from copy import deepcopy
 from typing import Dict, List, Optional, Set, Sequence
 
-from dbt_semantic_interfaces.objects.data_source import DataSource, DataSourceOrigin
+from dbt_semantic_interfaces.objects.data_source import DataSource
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension
 from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.elements.measure import Measure
@@ -62,13 +62,9 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
     def get_dimension_references(self) -> Sequence[DimensionReference]:  # noqa: D
         return tuple(self._dimension_index.keys())
 
-    def get_dimension(
-        self, dimension_reference: DimensionReference, origin: Optional[DataSourceOrigin] = None
-    ) -> Dimension:
+    def get_dimension(self, dimension_reference: DimensionReference) -> Dimension:
         """Retrieves a full dimension object by name"""
         for dimension_source in self._dimension_index[dimension_reference]:
-            if origin and dimension_source.origin != origin:
-                continue
             dimension = dimension_source.get_dimension(dimension_reference)
             # find the data source that has the requested dimension by the requested entity
 
