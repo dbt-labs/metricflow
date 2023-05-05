@@ -5,7 +5,6 @@ from metricflow.aggregation_properties import AggregationState
 from metricflow.column_assoc import (
     SingleColumnCorrelationKey,
     ColumnAssociation,
-    CompositeColumnCorrelationKey,
 )
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.specs import (
@@ -71,36 +70,6 @@ class DefaultColumnAssociationResolver(ColumnAssociationResolver):
         )
 
     def resolve_entity_spec(self, entity_spec: EntitySpec) -> Tuple[ColumnAssociation, ...]:  # noqa: D
-        sub_entity_references = []
-        for data_source in self._semantic_model.user_configured_model.data_sources:
-            for entity in data_source.identifiers:
-                if entity.reference.element_name == entity_spec.element_name:
-                    sub_entity_references = [sub_entity.reference for sub_entity in entity.entities]
-                    break
-
-        # composite entity case
-        if len(sub_entity_references) != 0:
-            column_associations: Tuple[ColumnAssociation, ...] = ()
-            for sub_entity_reference in sub_entity_references:
-                if sub_entity_reference is not None:
-                    sub_entity_name = f"{entity_spec.element_name}___{sub_entity_reference.element_name}"
-                    sub_entity = StructuredLinkableSpecName(
-                        entity_link_names=tuple(x.element_name for x in entity_spec.entity_links),
-                        element_name=sub_entity_name,
-                    ).qualified_name
-                    column_associations += (
-                        ColumnAssociation(
-                            column_name=sub_entity,
-                            composite_column_correlation_key=CompositeColumnCorrelationKey(
-                                sub_entity=StructuredLinkableSpecName(
-                                    entity_link_names=(),
-                                    element_name=sub_entity_name,
-                                ).qualified_name
-                            ),
-                        ),
-                    )
-            return column_associations
-
         return (
             ColumnAssociation(
                 column_name=StructuredLinkableSpecName(
