@@ -175,35 +175,6 @@ def test_node_evaluator_with_local_spec_using_primary_entity(  # noqa: D
     )
 
 
-def test_node_evaluator_with_local_spec_using_primary_composite_entity(  # noqa: D
-    consistent_id_object_repository: ConsistentIdObjectRepository,
-    node_evaluator: NodeEvaluatorForLinkableInstances,
-) -> None:
-    """Similar to test_node_evaluator_with_local_spec_using_primary_entity, but with a composite entity"""
-    bookings_source_node = consistent_id_object_repository.composite_model_read_nodes["users_source"]
-    evaluation = node_evaluator.evaluate_node(
-        required_linkable_specs=[
-            DimensionSpec(element_name="country", entity_links=(EntityReference(element_name="user_team"),))
-        ],
-        start_node=bookings_source_node,
-    )
-
-    assert (
-        LinkableInstanceSatisfiabilityEvaluation(
-            local_linkable_specs=(
-                DimensionSpec(
-                    element_name="country",
-                    entity_links=(EntityReference(element_name="user_team"),),
-                ),
-            ),
-            joinable_linkable_specs=(),
-            join_recipes=(),
-            unjoinable_linkable_specs=(),
-        )
-        == evaluation
-    )
-
-
 def test_node_evaluator_with_joined_spec(  # noqa: D
     consistent_id_object_repository: ConsistentIdObjectRepository,
     node_evaluator: NodeEvaluatorForLinkableInstances,

@@ -84,12 +84,8 @@ class ReservedKeywordsRule(ModelValidationRule):
                 )
 
         for entity in data_source.identifiers:
-            if entity.is_composite:
-                msg = "'{name}' is an SQL reserved keyword, and thus cannot be used as a sub-entity 'name'"
-                names = [sub_entity.name for sub_entity in entity.entities if sub_entity.name is not None]
-            else:
-                msg = "'{name}' is an SQL reserved keyword, and thus cannot be used as an entity 'name'"
-                names = [entity.name]
+            msg = "'{name}' is an SQL reserved keyword, and thus cannot be used as an entity 'name'"
+            names = [entity.name]
 
             for name in names:
                 if name.upper() in RESERVED_KEYWORDS:

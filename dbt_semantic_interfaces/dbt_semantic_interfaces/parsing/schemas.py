@@ -91,17 +91,6 @@ metric_type_params_schema = {
     "additionalProperties": False,
 }
 
-composite_sub_entity_schema = {
-    "$id": "composite_sub_entity_schema",
-    "type": "object",
-    "properties": {
-        "name": {"type": "string"},
-        "expr": {"type": ["string", "boolean"]},
-        "ref": {"type": "string"},
-    },
-    "additionalProperties": False,
-}
-
 entity_schema = {
     "$id": "entity_schema",
     "type": "object",
@@ -114,10 +103,6 @@ entity_schema = {
         "role": {"type": "string"},
         "expr": {"type": ["string", "boolean"]},
         "entity": {"type": "string"},
-        "entities": {
-            "type": "array",
-            "items": {"$ref": "composite_sub_entity_schema"},
-        },
     },
     "additionalProperties": False,
     "required": ["name", "type"],
@@ -320,7 +305,6 @@ schema_store = {
     aggregation_type_params_schema["$id"]: aggregation_type_params_schema,
     mutability_schema["$id"]: mutability_schema,
     mutability_type_params_schema["$id"]: mutability_type_params_schema,
-    composite_sub_entity_schema["$id"]: composite_sub_entity_schema,
     non_additive_dimension_schema["$id"]: non_additive_dimension_schema,
     metric_input_schema["$id"]: metric_input_schema,
 }

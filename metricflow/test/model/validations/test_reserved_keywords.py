@@ -1,6 +1,5 @@
 import copy
 import random
-from dbt_semantic_interfaces.objects.elements.entity import CompositeSubEntity
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.reserved_keywords import RESERVED_KEYWORDS, ReservedKeywordsRule
 from metricflow.model.validations.validator_helpers import ValidationIssueLevel
@@ -67,28 +66,7 @@ def test_reserved_keywords_in_identifiers(  # noqa: D
     )
     identifier = data_source.identifiers[0]
     identifier.name = random_keyword()
-    identifier.entities = []
 
     issues = ReservedKeywordsRule.validate_model(model)
     assert len(issues) == 1
     assert issues[0].level == ValidationIssueLevel.ERROR
-
-
-def test_reserved_keywords_in_composite_identifiers(  # noqa: D
-    simple_model__with_primary_transforms: UserConfiguredModel,
-) -> None:
-    model = copied_model(simple_model__with_primary_transforms)
-    (data_source, _index) = find_data_source_with(
-        model=model, function=lambda data_source: len(data_source.identifiers) > 0
-    )
-    identifier = data_source.identifiers[0]
-    identifier.entities = [
-        CompositeSubEntity(name=random_keyword()),  # should error
-        CompositeSubEntity(name=random_keyword()),  # should error
-        CompositeSubEntity(expr="SELECT TRUE AS col1"),  # shouldn't error
-    ]
-
-    issues = ReservedKeywordsRule.validate_model(model)
-    assert len(issues) == 2
-    assert issues[0].level == ValidationIssueLevel.ERROR
-    assert issues[1].level == ValidationIssueLevel.ERROR

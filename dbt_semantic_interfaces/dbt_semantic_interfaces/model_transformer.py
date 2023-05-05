@@ -17,9 +17,6 @@ from dbt_semantic_interfaces.transformations.convert_count import ConvertCountTo
 from dbt_semantic_interfaces.transformations.convert_median import (
     ConvertMedianToPercentileRule,
 )
-from dbt_semantic_interfaces.transformations.entities import (
-    CompositeEntityExpressionRule,
-)
 from dbt_semantic_interfaces.transformations.names import LowerCaseNamesRule
 from dbt_semantic_interfaces.transformations.proxy_measure import CreateProxyMeasureRule
 from dbt_semantic_interfaces.transformations.transform_rule import ModelTransformRule
@@ -41,7 +38,6 @@ class ModelTransformer:
     SECONDARY_RULES: Sequence[ModelTransformRule] = (
         CreateProxyMeasureRule(),
         BooleanMeasureAggregationRule(),
-        CompositeEntityExpressionRule(),
         ConvertCountToSumRule(),
         ConvertMedianToPercentileRule(),
         AddInputMetricMeasuresRule(),

@@ -80,9 +80,6 @@ class ConsistentIdObjectRepository:
     multihop_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]]
     multihop_model_source_nodes: Sequence[BaseOutput[DataSourceDataSet]]
 
-    composite_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]]
-    composite_model_source_nodes: Sequence[BaseOutput[DataSourceDataSet]]
-
     scd_model_data_sets: OrderedDict[str, DataSourceDataSet]
     scd_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]]
     scd_model_source_nodes: Sequence[BaseOutput[DataSourceDataSet]]
@@ -92,7 +89,6 @@ class ConsistentIdObjectRepository:
 def consistent_id_object_repository(
     simple_semantic_model: SemanticModel,
     multi_hop_join_semantic_model: SemanticModel,
-    composite_entity_semantic_model: SemanticModel,
     scd_semantic_model: SemanticModel,
 ) -> ConsistentIdObjectRepository:  # noqa: D
     """Create objects that have incremental numeric IDs with a consistent value.
@@ -104,7 +100,6 @@ def consistent_id_object_repository(
     with patch_id_generators_helper(start_value=IdNumberSpace.CONSISTENT_ID_REPOSITORY):
         sm_data_sets = create_data_sets(simple_semantic_model)
         multihop_data_sets = create_data_sets(multi_hop_join_semantic_model)
-        composite_data_sets = create_data_sets(composite_entity_semantic_model)
         scd_data_sets = create_data_sets(scd_semantic_model)
 
         return ConsistentIdObjectRepository(
@@ -113,10 +108,6 @@ def consistent_id_object_repository(
             simple_model_source_nodes=_data_set_to_source_nodes(simple_semantic_model, sm_data_sets),
             multihop_model_read_nodes=_data_set_to_read_nodes(multihop_data_sets),
             multihop_model_source_nodes=_data_set_to_source_nodes(multi_hop_join_semantic_model, multihop_data_sets),
-            composite_model_read_nodes=_data_set_to_read_nodes(composite_data_sets),
-            composite_model_source_nodes=_data_set_to_source_nodes(
-                composite_entity_semantic_model, composite_data_sets
-            ),
             scd_model_data_sets=scd_data_sets,
             scd_model_read_nodes=_data_set_to_read_nodes(scd_data_sets),
             scd_model_source_nodes=_data_set_to_source_nodes(
@@ -163,17 +154,6 @@ def simple_semantic_model_non_ds(template_mapping: Dict[str, str]) -> SemanticMo
 def simple_semantic_model(template_mapping: Dict[str, str]) -> SemanticModel:  # noqa: D
     model_build_result = parse_directory_of_yaml_files_to_model(
         os.path.join(os.path.dirname(__file__), "model_yamls/simple_model"), template_mapping=template_mapping
-    )
-    return SemanticModel(model_build_result.model)
-
-
-@pytest.fixture(scope="session")
-def composite_entity_semantic_model(  # noqa: D
-    template_mapping: Dict[str, str], mf_test_session_state: MetricFlowTestSessionState
-) -> SemanticModel:
-    model_build_result = parse_directory_of_yaml_files_to_model(
-        os.path.join(os.path.dirname(__file__), "model_yamls/composite_identifier_model"),
-        template_mapping=template_mapping,
     )
     return SemanticModel(model_build_result.model)
 

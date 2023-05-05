@@ -41,11 +41,6 @@ class EntityReference(LinkableElementReference):  # noqa: D
 
 
 @dataclass(frozen=True)
-class CompositeSubEntityReference(ElementReference):  # noqa: D
-    pass
-
-
-@dataclass(frozen=True)
 class TimeDimensionReference(DimensionReference):  # noqa: D
     pass
 

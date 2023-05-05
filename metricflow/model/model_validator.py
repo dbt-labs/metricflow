@@ -9,8 +9,6 @@ from metricflow.model.validations.data_sources import DataSourceTimeDimensionWar
 from metricflow.model.validations.dimension_const import DimensionConsistencyRule
 from metricflow.model.validations.element_const import ElementConsistencyRule
 from metricflow.model.validations.entities import (
-    EntityConfigRule,
-    EntityConsistencyRule,
     NaturalEntityConfigurationRule,
     OnePrimaryEntityPerDataSourceRule,
 )
@@ -47,8 +45,6 @@ class ModelValidator:
         DataSourceValidityWindowRule(),
         DimensionConsistencyRule(),
         ElementConsistencyRule(),
-        EntityConfigRule(),
-        EntityConsistencyRule(),
         NaturalEntityConfigurationRule(),
         OnePrimaryEntityPerDataSourceRule(),
         MeasureConstraintAliasesRule(),

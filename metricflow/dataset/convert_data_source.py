@@ -316,39 +316,16 @@ class DataSourceToDataSetConverter:
             )
 
             entity_instances.append(entity_instance)
-            if entity.is_composite:
-                for idx in range(len(entity.entities)):
-                    sub_entity = entity.entities[idx]
-                    column_name = entity_instance.associated_columns[idx].column_name
-
-                    expr = sub_entity.expr
-                    if expr is None:
-                        assert sub_entity.name is not None
-                        expr = sub_entity.name
-                    sub_entity_name = sub_entity.ref or sub_entity.name
-                    assert sub_entity_name, f"Sub-entity {sub_entity} must have 'name' or 'ref' defined"
-
-                    select_columns.append(
-                        SqlSelectColumn(
-                            expr=DataSourceToDataSetConverter._make_element_sql_expr(
-                                table_alias=table_alias,
-                                element_name=sub_entity_name,
-                                element_expr=expr,
-                            ),
-                            column_alias=column_name,
-                        )
-                    )
-            else:
-                select_columns.append(
-                    SqlSelectColumn(
-                        expr=DataSourceToDataSetConverter._make_element_sql_expr(
-                            table_alias=table_alias,
-                            element_name=entity.reference.element_name,
-                            element_expr=entity.expr,
-                        ),
-                        column_alias=entity_instance.associated_column.column_name,
-                    )
+            select_columns.append(
+                SqlSelectColumn(
+                    expr=DataSourceToDataSetConverter._make_element_sql_expr(
+                        table_alias=table_alias,
+                        element_name=entity.reference.element_name,
+                        element_expr=entity.expr,
+                    ),
+                    column_alias=entity_instance.associated_column.column_name,
                 )
+            )
         return entity_instances, select_columns
 
     def create_sql_source_data_set(self, data_source: DataSource) -> DataSourceDataSet:
