@@ -20,6 +20,3 @@ data_source:
   entities:
     - name: customer_id
       type: primary
-
-  mutability:
-    type: immutable

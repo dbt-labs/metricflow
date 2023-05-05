@@ -13,6 +13,3 @@ data_source:
     - name: listing
       type: primary
       expr: listing_id
-
-  mutability:
-    type: immutable

@@ -11,5 +11,3 @@ data_source:
       description: The region associated with the country.
       type: categorical
   sql_table: $countries_table
-  mutability:
-    type: immutable

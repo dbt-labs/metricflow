@@ -114,9 +114,6 @@ LISTINGS_YAML = textwrap.dedent(
         - name: user
           type: foreign
           expr: user_id
-
-      mutability:
-        type: immutable
     """
 )
 

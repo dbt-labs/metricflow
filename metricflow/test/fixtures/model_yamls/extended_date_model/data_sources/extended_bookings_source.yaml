@@ -29,6 +29,3 @@ data_source:
       type: primary
     - name: listing_id
       type: foreign
-
-  mutability:
-    type: immutable

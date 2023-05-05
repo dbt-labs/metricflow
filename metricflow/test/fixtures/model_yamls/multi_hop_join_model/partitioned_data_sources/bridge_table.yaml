@@ -20,8 +20,3 @@ data_source:
       type: primary
     - name: customer_id
       type: foreign
-
-  mutability:
-    type: immutable
-
-

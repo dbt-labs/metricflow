@@ -16,8 +16,6 @@ data_source:
       agg: sum
       expr: 1
       create_metric: True
-  mutability:
-    type: immutable
 data_source:
   name: foo
   description: bar buzz bazz
@@ -36,5 +34,3 @@ data_source:
       agg: sum
       expr: 1
       create_metric: True
-  mutability:
-    type: immutable

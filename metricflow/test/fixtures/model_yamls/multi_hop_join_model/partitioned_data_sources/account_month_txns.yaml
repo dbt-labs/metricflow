@@ -28,6 +28,3 @@ data_source:
   entities:
     - name: account_id
       type: primary
-
-  mutability:
-    type: immutable

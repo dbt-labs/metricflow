@@ -73,8 +73,6 @@ data_source:
         END
 
   sql_table: $transactions_table
-  mutability:
-    type: immutable
 
 ---
 metric: 

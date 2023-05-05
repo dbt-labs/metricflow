@@ -1,8 +1,7 @@
 import textwrap
 
 from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
-from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
-from dbt_semantic_interfaces.objects.data_source import DataSourceOrigin, MutabilityType
+from dbt_semantic_interfaces.objects.common import YamlConfigFile
 from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_model
@@ -15,13 +14,6 @@ def test_base_data_source_attribute_parsing() -> None:
         """\
         data_source:
           name: base_property_test
-          mutability:
-            type: append_only
-            type_params:
-              min: minimum_value
-              max: maximum_value
-              update_cron: "* * 1 * *"
-              along: dimension_column
         """
     )
     file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
@@ -31,13 +23,6 @@ def test_base_data_source_attribute_parsing() -> None:
     assert len(build_result.model.data_sources) == 1
     data_source = build_result.model.data_sources[0]
     assert data_source.name == "base_property_test"
-    assert data_source.origin == DataSourceOrigin.SOURCE  # auto-filled from default, not user-configurable
-    assert data_source.mutability.type == MutabilityType.APPEND_ONLY
-    assert data_source.mutability.type_params is not None
-    assert data_source.mutability.type_params.min == "minimum_value"
-    assert data_source.mutability.type_params.max == "maximum_value"
-    assert data_source.mutability.type_params.update_cron == "* * 1 * *"
-    assert data_source.mutability.type_params.along == "dimension_column"
 
 
 def test_data_source_metadata_parsing() -> None:
@@ -46,8 +31,6 @@ def test_data_source_metadata_parsing() -> None:
         """\
         data_source:
           name: metadata_test
-          mutability:
-            type: immutable
         """
     )
     file = YamlConfigFile(filepath="test_dir/inline_for_test", contents=yaml_contents)
@@ -62,8 +45,6 @@ def test_data_source_metadata_parsing() -> None:
     expected_metadata_content = textwrap.dedent(
         """\
         name: metadata_test
-        mutability:
-          type: immutable
         """
     )
     assert data_source.metadata.file_slice.content == expected_metadata_content
@@ -75,8 +56,6 @@ def test_data_source_sql_table_parsing() -> None:
         """\
         data_source:
           name: sql_table_test
-          mutability:
-            type: immutable
           sql_table: "some_schema.source_table"
         """
     )
@@ -95,8 +74,6 @@ def test_data_source_sql_query_parsing() -> None:
         """\
         data_source:
           name: sql_query_test
-          mutability:
-            type: immutable
           sql_query: "SELECT * FROM some_schema.source_table"
         """
     )
@@ -115,8 +92,6 @@ def test_data_source_dbt_model_parsing() -> None:
         """\
         data_source:
           name: dbt_model_test
-          mutability:
-            type: immutable
           dbt_model: "dbt_source.some_model"
         """
     )
@@ -135,8 +110,6 @@ def test_data_source_entity_parsing() -> None:
         """\
         data_source:
           name: entity_test
-          mutability:
-            type: immutable
           sql_table: some_schema.source_table
           entities:
             - name: example_entity
@@ -165,8 +138,6 @@ def test_data_source_entity_metadata_parsing() -> None:
         """\
         data_source:
           name: entity_test
-          mutability:
-            type: immutable
           sql_table: some_schema.source_table
           entities:
             - name: example_entity
@@ -201,8 +172,6 @@ def test_data_source_measure_parsing() -> None:
         """\
         data_source:
           name: measure_parsing_test
-          mutability:
-            type: immutable
           sql_table: some_schema.source_table
           measures:
             - name: example_measure
@@ -230,8 +199,6 @@ def test_data_source_measure_metadata_parsing() -> None:
         """\
         data_source:
           name: measure_metadata_parsing_test
-          mutability:
-            type: immutable
           sql_table: some_schema.source_table
           measures:
             - name: example_measure_with_metadata
@@ -266,8 +233,6 @@ def test_data_source_create_metric_measure_parsing() -> None:
         """\
         data_source:
           name: measure_parsing_create_metric_test
-          mutability:
-            type: immutable
           sql_table: some_schema.source_table
           measures:
             - name: example_measure
@@ -292,8 +257,6 @@ def test_data_source_categorical_dimension_parsing() -> None:
         """\
         data_source:
           name: dimension_parsing_test
-          mutability:
-            type: immutable
           sql_table: some_schema.source_table
           dimensions:
             - name: example_categorical_dimension
@@ -320,8 +283,6 @@ def test_data_source_partition_dimension_parsing() -> None:
         """\
         data_source:
           name: dimension_parsing_test
-          mutability:
-            type: immutable
           sql_table: some_schema.source_table
           dimensions:
             - name: example_categorical_dimension
@@ -346,8 +307,6 @@ def test_data_source_time_dimension_parsing() -> None:
         """\
         data_source:
           name: dimension_parsing_test
-          mutability:
-            type: immutable
           sql_table: some_schema.source_table
           dimensions:
             - name: example_time_dimension
@@ -376,8 +335,6 @@ def test_data_source_primary_time_dimension_parsing() -> None:
         """\
         data_source:
           name: dimension_parsing_test
-          mutability:
-            type: immutable
           sql_table: some_schema.source_table
           dimensions:
             - name: example_time_dimension
@@ -406,8 +363,6 @@ def test_data_source_dimension_metadata_parsing() -> None:
         """\
         data_source:
           name: dimension_parsing_test
-          mutability:
-            type: immutable
           sql_table: some_schema.source_table
           dimensions:
             - name: example_categorical_dimension
@@ -442,8 +397,6 @@ def test_data_source_dimension_validity_params_parsing() -> None:
         """\
         data_source:
           name: scd_parsing_test
-          mutability:
-            type: immutable
           sql_table: some_schema.source_table
           dimensions:
             - name: start_time_dimension

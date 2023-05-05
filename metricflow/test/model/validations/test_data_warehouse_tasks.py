@@ -11,7 +11,6 @@ from metricflow.model.data_warehouse_model_validator import (
     DataWarehouseValidationTask,
 )
 from dbt_semantic_interfaces.model_transformer import ModelTransformer
-from dbt_semantic_interfaces.objects.data_source import Mutability, MutabilityType
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
 from dbt_semantic_interfaces.objects.elements.entity import Entity, EntityType
 from dbt_semantic_interfaces.objects.elements.measure import Measure
@@ -101,7 +100,6 @@ def test_validate_data_sources(  # noqa: D
             name="test_data_source2",
             sql_table="doesnt.exist",
             dimensions=[],
-            mutability=Mutability(type=MutabilityType.IMMUTABLE),
         )
     )
 

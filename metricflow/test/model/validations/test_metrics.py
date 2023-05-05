@@ -2,7 +2,6 @@ import pytest
 
 from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
 from metricflow.model.model_validator import ModelValidator
-from dbt_semantic_interfaces.objects.data_source import Mutability, MutabilityType
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from dbt_semantic_interfaces.objects.elements.entity import Entity, EntityType
 from dbt_semantic_interfaces.objects.elements.measure import Measure
@@ -29,7 +28,6 @@ def test_metric_no_time_dim_dim_only_source() -> None:  # noqa:D
                     sql_query="SELECT foo, country FROM bar",
                     measures=[],
                     dimensions=[Dimension(name=dim_name, type=DimensionType.CATEGORICAL)],
-                    mutability=Mutability(type=MutabilityType.IMMUTABLE),
                 ),
                 data_source_with_guaranteed_meta(
                     name="sum_measure2",
@@ -52,7 +50,6 @@ def test_metric_no_time_dim_dim_only_source() -> None:  # noqa:D
                             ),
                         ),
                     ],
-                    mutability=Mutability(type=MutabilityType.IMMUTABLE),
                 ),
             ],
             metrics=[
@@ -84,7 +81,6 @@ def test_metric_no_time_dim() -> None:  # noqa:D
                                 type=DimensionType.CATEGORICAL,
                             )
                         ],
-                        mutability=Mutability(type=MutabilityType.IMMUTABLE),
                     )
                 ],
                 metrics=[
@@ -127,7 +123,6 @@ def test_metric_multiple_primary_time_dims() -> None:  # noqa:D
                                 ),
                             ),
                         ],
-                        mutability=Mutability(type=MutabilityType.IMMUTABLE),
                     )
                 ],
                 metrics=[
@@ -162,7 +157,6 @@ def test_generated_metrics_only() -> None:  # noqa:D
                 ),
             ),
         ],
-        mutability=Mutability(type=MutabilityType.IMMUTABLE),
         entities=[
             Entity(name=entity_reference.element_name, type=EntityType.PRIMARY),
         ],
@@ -203,7 +197,6 @@ def test_derived_metric() -> None:  # noqa: D
                             ),
                         ),
                     ],
-                    mutability=Mutability(type=MutabilityType.IMMUTABLE),
                 ),
             ],
             metrics=[

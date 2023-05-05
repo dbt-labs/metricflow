@@ -22,7 +22,3 @@ data_source:
     - name: listing
       type: foreign
       expr: listing_id
-
-
-  mutability:
-    type: immutable

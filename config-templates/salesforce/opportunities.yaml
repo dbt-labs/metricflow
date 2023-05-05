@@ -3,8 +3,6 @@ data_source:
   owners:
     - support@transformdata.io
   sql_table: salesforce.opportunity ### Update to your opportunities schema.table
-  mutability:
-    type: immutable
   entities:
     - name: opportunity
       type: primary

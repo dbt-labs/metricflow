@@ -12,7 +12,3 @@ data_source:
     - name: lux_listing
       type: foreign
       expr: lux_listing_id
-
-
-  mutability:
-    type: immutable

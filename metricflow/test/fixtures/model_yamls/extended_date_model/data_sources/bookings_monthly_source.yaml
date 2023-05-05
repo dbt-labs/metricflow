@@ -18,6 +18,3 @@ data_source:
         time_granularity: month
     - name: is_instant
       type: categorical
-
-  mutability:
-    type: immutable

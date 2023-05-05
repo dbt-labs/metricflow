@@ -3,8 +3,6 @@ data_source:
   owners:
     - support@transformdata.io
   sql_table: SALESFORCE.account ### Update to your account schema.table
-  mutability:
-    type: immutable
   entities:
     - name: account
       type: primary

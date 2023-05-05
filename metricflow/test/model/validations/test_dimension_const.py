@@ -2,7 +2,7 @@ import pytest
 
 from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
 from metricflow.model.model_validator import ModelValidator
-from dbt_semantic_interfaces.objects.data_source import Mutability, MutabilityType, DataSource
+from dbt_semantic_interfaces.objects.data_source import DataSource
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.metric import MetricType, MetricTypeParams, Metric
@@ -37,13 +37,11 @@ def test_incompatible_dimension_type() -> None:  # noqa:D
                                 ),
                             )
                         ],
-                        mutability=Mutability(type=MutabilityType.IMMUTABLE),
                     ),
                     data_source_with_guaranteed_meta(
                         name="categoricaldim",
                         sql_query="SELECT foo FROM bar",
                         dimensions=[Dimension(name=dim_name, type=DimensionType.CATEGORICAL)],
-                        mutability=Mutability(type=MutabilityType.IMMUTABLE),
                     ),
                 ],
                 metrics=[
@@ -80,7 +78,6 @@ def test_incompatible_dimension_is_partition() -> None:  # noqa:D
                                 ),
                             )
                         ],
-                        mutability=Mutability(type=MutabilityType.IMMUTABLE),
                     ),
                     data_source_with_guaranteed_meta(
                         name="dim2",
@@ -95,7 +92,6 @@ def test_incompatible_dimension_is_partition() -> None:  # noqa:D
                                 ),
                             )
                         ],
-                        mutability=Mutability(type=MutabilityType.IMMUTABLE),
                     ),
                 ],
                 metrics=[
@@ -146,7 +142,6 @@ def test_multiple_primary_time_dimensions() -> None:  # noqa:D
                                 ),
                             ),
                         ],
-                        mutability=Mutability(type=MutabilityType.IMMUTABLE),
                     ),
                 ],
                 metrics=[

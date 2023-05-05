@@ -23,5 +23,3 @@ data_source:
     - name: id
       type: primary
       expr: "1"
-  mutability:
-    type: immutable

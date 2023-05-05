@@ -95,8 +95,3 @@ data_source:
     - name: create_a_cycle_in_the_join_graph
       type: primary
       expr: guest_id
-
-  mutability:
-    type: full_mutation
-    type_params:
-      update_cron: 0 1 * * *

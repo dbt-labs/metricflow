@@ -3,8 +3,6 @@ data_source:
   owners:
     - support@transformdata.io
   sql_table: salesforce.lead ### Update to your leads schema.table
-  mutability: 
-    type: immutable
   entities:
     - name: lead
       type: primary

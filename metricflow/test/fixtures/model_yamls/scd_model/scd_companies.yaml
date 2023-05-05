@@ -16,6 +16,3 @@ data_source:
     - name: user
       type: unique
       expr: user_id
-
-  mutability:
-    type: immutable
