@@ -17,25 +17,6 @@
             },
             "type": "object"
         },
-        "composite_sub_entity_schema": {
-            "$id": "composite_sub_entity_schema",
-            "additionalProperties": false,
-            "properties": {
-                "expr": {
-                    "type": [
-                        "string",
-                        "boolean"
-                    ]
-                },
-                "name": {
-                    "type": "string"
-                },
-                "ref": {
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
         "data_source": {
             "$id": "data_source",
             "additionalProperties": false,
@@ -191,12 +172,6 @@
             "$id": "entity_schema",
             "additionalProperties": false,
             "properties": {
-                "entities": {
-                    "items": {
-                        "$ref": "#/definitions/composite_sub_entity_schema"
-                    },
-                    "type": "array"
-                },
                 "entity": {
                     "type": "string"
                 },
