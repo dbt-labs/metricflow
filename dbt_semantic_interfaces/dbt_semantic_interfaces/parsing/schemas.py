@@ -9,9 +9,6 @@ TRANSFORM_OBJECT_NAME_PATTERN = "(?!.*__).*^[a-z][a-z0-9_]*[a-z0-9]$"
 metric_types_enum_values = ["MEASURE_PROXY", "RATIO", "EXPR", "CUMULATIVE", "DERIVED"]
 metric_types_enum_values += [x.lower() for x in metric_types_enum_values]
 
-mutability_type_values = ["IMMUTABLE", "APPEND_ONLY", "FULL_MUTATION", "DS_APPEND_ONLY"]
-mutability_type_values += [x.lower() for x in mutability_type_values]
-
 entity_type_enum_values = ["PRIMARY", "UNIQUE", "FOREIGN", "NATURAL"]
 entity_type_enum_values += [x.lower() for x in entity_type_enum_values]
 
@@ -207,30 +204,6 @@ dimension_schema = {
     "required": ["name", "type"],
 }
 
-mutability_type_params_schema = {
-    "$id": "mutability_type_params_schema",
-    "type": "object",
-    "properties": {
-        "min": {"type": "string"},
-        "max": {"type": "string"},
-        "update_cron": {"type": "string"},
-        "along": {"type": "string"},
-    },
-    "additionalProperties": False,
-}
-
-mutability_schema = {
-    "$id": "mutability_schema",
-    "type": "object",
-    "properties": {
-        "type": {"enum": mutability_type_values},
-        "type_params": {"$ref": "mutability_type_params_schema"},
-    },
-    "additionalProperties": False,
-    "required": ["type"],
-}
-
-
 # Top level object schemas
 metric_schema = {
     "$id": "metric",
@@ -250,6 +223,19 @@ metric_schema = {
     "required": ["name", "type", "type_params"],
 }
 
+node_relation_schema = {
+    "$id": "node_relation_schema",
+    "type": "object",
+    "properties": {
+        "alias": {"type": "string"},
+        "schema_name": {"type": "string"},
+        "database": {"type": "string"},
+        "relation_name": {"type": "string"},
+    },
+    "additionalProperties": False,
+    "required": ["alias", "schema_name"],
+}
+
 data_source_schema = {
     "$id": "data_source",
     "type": "object",
@@ -258,13 +244,10 @@ data_source_schema = {
             "type": "string",
             "pattern": TRANSFORM_OBJECT_NAME_PATTERN,
         },
-        "sql_table": {"type": "string"},
-        "sql_query": {"type": "string"},
-        "dbt_model": {"type": "string"},
-        "identifiers": {"type": "array", "items": {"$ref": "entity_schema"}},
+        "node_relation": {"$ref": "node_relation_schema"},
+        "entities": {"type": "array", "items": {"$ref": "entity_schema"}},
         "measures": {"type": "array", "items": {"$ref": "measure_schema"}},
         "dimensions": {"type": "array", "items": {"$ref": "dimension_schema"}},
-        "mutability": {"$ref": "mutability_schema"},
         "description": {"type": "string"},
     },
     "additionalProperties": False,
@@ -303,10 +286,9 @@ schema_store = {
     validity_params_schema["$id"]: validity_params_schema,
     dimension_type_params_schema["$id"]: dimension_type_params_schema,
     aggregation_type_params_schema["$id"]: aggregation_type_params_schema,
-    mutability_schema["$id"]: mutability_schema,
-    mutability_type_params_schema["$id"]: mutability_type_params_schema,
     non_additive_dimension_schema["$id"]: non_additive_dimension_schema,
     metric_input_schema["$id"]: metric_input_schema,
+    node_relation_schema["$id"]: node_relation_schema,
 }
 
 

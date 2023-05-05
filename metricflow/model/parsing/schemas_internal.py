@@ -5,6 +5,7 @@ from dbt_semantic_interfaces.parsing.schema_validator import SchemaValidator
 
 from dbt_semantic_interfaces.parsing.schemas import (
     metric_schema,
+    node_relation_schema,
     data_source_schema,
     derived_group_by_element_schema,
     metric_input_schema,
@@ -16,8 +17,6 @@ from dbt_semantic_interfaces.parsing.schemas import (
     validity_params_schema,
     dimension_type_params_schema,
     aggregation_type_params_schema,
-    mutability_schema,
-    mutability_type_params_schema,
     non_additive_dimension_schema,
 )
 
@@ -104,10 +103,9 @@ schema_store = {
     validity_params_schema["$id"]: validity_params_schema,
     dimension_type_params_schema["$id"]: dimension_type_params_schema,
     aggregation_type_params_schema["$id"]: aggregation_type_params_schema,
-    mutability_schema["$id"]: mutability_schema,
-    mutability_type_params_schema["$id"]: mutability_type_params_schema,
     non_additive_dimension_schema["$id"]: non_additive_dimension_schema,
     metric_input_schema["$id"]: metric_input_schema,
+    node_relation_schema["$id"]: node_relation_schema,
 }
 
 resolver = RefResolver.from_schema(schema=metric_schema, store=schema_store)
