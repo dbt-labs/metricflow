@@ -18,12 +18,10 @@ from typing import (
     get_origin,
     get_type_hints,
 )
-from typing_extensions import TypeAlias
 
 import pydantic
 from pydantic import BaseModel
-
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
+from typing_extensions import TypeAlias
 
 logger = logging.getLogger(__name__)
 
@@ -328,16 +326,12 @@ class DataClassTypeToPydanticTypeConverter:  # noqa: D
 
         # Maps the name of the field to (type of field, default value)
         fields_for_pydantic_model: Dict[str, Tuple[Type, AnyValueType]] = {}
-        logger.debug(f"Need to add: {pformat_big_objects(field_dict.keys())}")
         for field_name, field_definition in field_dict.items():
             field_definition = DataClassTypeToPydanticTypeConverter._convert_nested_fields(field_definition)
             fields_for_pydantic_model[field_name] = field_definition.as_pydantic_field_tuple()
             logger.debug(f"Adding {field_name} with type {field_definition.annotated_field_type}")
 
         class_name = dataclass_type.__name__ + "AsPydantic"
-        logger.debug(
-            f"Creating Pydantic model {class_name} with fields:\n{pformat_big_objects(fields_for_pydantic_model)}"
-        )
         pydantic_model = pydantic.create_model(class_name, **fields_for_pydantic_model)
         logger.debug(f"Finished creating Pydantic model {class_name}")
         logger.debug(f"Finished converting {dataclass_type.__name__} to a pydantic class")
