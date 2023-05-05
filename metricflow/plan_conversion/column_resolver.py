@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, Tuple
+from typing import Optional
 
 from metricflow.aggregation_properties import AggregationState
 from metricflow.column_assoc import (
@@ -69,15 +69,13 @@ class DefaultColumnAssociationResolver(ColumnAssociationResolver):
             single_column_correlation_key=SingleColumnCorrelationKey(),
         )
 
-    def resolve_entity_spec(self, entity_spec: EntitySpec) -> Tuple[ColumnAssociation, ...]:  # noqa: D
-        return (
-            ColumnAssociation(
-                column_name=StructuredLinkableSpecName(
-                    entity_link_names=tuple(x.element_name for x in entity_spec.entity_links),
-                    element_name=entity_spec.element_name,
-                ).qualified_name,
-                single_column_correlation_key=SingleColumnCorrelationKey(),
-            ),
+    def resolve_entity_spec(self, entity_spec: EntitySpec) -> ColumnAssociation:  # noqa: D
+        return ColumnAssociation(
+            column_name=StructuredLinkableSpecName(
+                entity_link_names=tuple(x.element_name for x in entity_spec.entity_links),
+                element_name=entity_spec.element_name,
+            ).qualified_name,
+            single_column_correlation_key=SingleColumnCorrelationKey(),
         )
 
     def resolve_metadata_spec(self, metadata_spec: MetadataSpec) -> ColumnAssociation:  # noqa: D

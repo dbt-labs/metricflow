@@ -70,7 +70,7 @@ class ColumnAssociationResolver(ABC):
         pass
 
     @abstractmethod
-    def resolve_entity_spec(self, entity_spec: EntitySpec) -> Tuple[ColumnAssociation, ...]:  # noqa: D
+    def resolve_entity_spec(self, entity_spec: EntitySpec) -> ColumnAssociation:  # noqa: D
         pass
 
     @abstractmethod
@@ -179,7 +179,7 @@ class LinkableInstanceSpec(InstanceSpec, ABC):
 @dataclass(frozen=True)
 class EntitySpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
     def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
-        return resolver.resolve_entity_spec(self)
+        return (resolver.resolve_entity_spec(self),)
 
     @property
     def without_first_entity_link(self) -> EntitySpec:  # noqa: D

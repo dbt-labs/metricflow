@@ -1223,9 +1223,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         # Build optional window grouping SqlSelectColumn
         entity_select_columns: List[SqlSelectColumn] = []
         for entity_spec in node.entity_specs:
-            entity_column_associations = self.column_association_resolver.resolve_entity_spec(entity_spec)
-            assert len(entity_column_associations) == 1, "Composite entities not supported"
-            entity_column_name = entity_column_associations[0].column_name
+            entity_column_name = self.column_association_resolver.resolve_entity_spec(entity_spec).column_name
             entity_select_columns.append(
                 SqlSelectColumn(
                     expr=SqlColumnReferenceExpression(

@@ -38,8 +38,7 @@ class MdoInstance(ABC, Generic[SpecT]):
     granularity.
     """
 
-    # The columns associated with this instance. Some instances may have multiple columns associated with it, e.g.
-    # composite entities.
+    # The columns associated with this instance.
     associated_columns: Tuple[ColumnAssociation, ...]
     # The spec that describes this instance.
     spec: SpecT
