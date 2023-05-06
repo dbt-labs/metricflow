@@ -32,16 +32,6 @@ class Version(HashableBaseModel):  # noqa: D
         return f"{self.__class__.__name__}(major={self.major}, minor={self.minor})"
 
 
-class SourceFile(HashableBaseModel):  # noqa: D
-    path: str
-    contents: str
-
-
-class Commit(HashableBaseModel):  # noqa: D
-    commit: str
-    timestamp: int
-
-
 class FileSlice(HashableBaseModel):  # noqa: D
     filename: str
     content: str
