@@ -1,16 +1,10 @@
 from __future__ import annotations
-import logging
 import pprint
 import textwrap
 from collections.abc import Mapping
 from dataclasses import is_dataclass, fields
-from hashlib import sha1
-from typing import Sequence
 
 from dbt_semantic_interfaces.objects.base import HashableBaseModel
-from metricflow.sql.sql_column_type import SqlColumnType
-
-logger = logging.getLogger(__name__)
 
 
 def is_hashable_base_model(obj):  # type:ignore # noqa: D
@@ -108,11 +102,3 @@ def pformat_big_objects(*args, **kwargs) -> str:  # type: ignore
         items.append(f"{key}:")
         items.append(textwrap.indent(pretty_format(value), prefix="    "))
     return "\n".join(items)
-
-
-def hash_items(items: Sequence[SqlColumnType]) -> str:
-    """Produces a hash from a list of strings."""
-    hash_builder = sha1()
-    for item in items:
-        hash_builder.update(str(item).encode("utf-8"))
-    return hash_builder.hexdigest()

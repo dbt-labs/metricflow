@@ -6,7 +6,7 @@ import textwrap
 import jinja2
 
 from metricflow.dag.mf_dag import DagNodeVisitor, DagNode
-from metricflow.object_utils import pformat_big_objects
+from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 
 logger = logging.getLogger(__name__)
 
