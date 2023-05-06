@@ -1,7 +1,7 @@
 import textwrap
 
 from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
-from dbt_semantic_interfaces.objects.common import YamlConfigFile
+from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from dbt_semantic_interfaces.objects.data_source import DataSourceOrigin, MutabilityType
 from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
