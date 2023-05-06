@@ -2,7 +2,7 @@ import textwrap
 from typing import Optional, Sequence
 
 from metricflow.engine.models import Dimension
-from dbt_semantic_interfaces.objects.common import FileSlice, Metadata
+from dbt_semantic_interfaces.objects.metadata import FileSlice, Metadata
 from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
 from dbt_semantic_interfaces.objects.data_source import DataSource, DataSourceOrigin, Mutability
 from dbt_semantic_interfaces.objects.elements.entity import Entity
