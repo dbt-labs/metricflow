@@ -12,6 +12,7 @@ from __future__ import annotations
 import itertools
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from hashlib import sha1
 from typing import List, Optional, Sequence, Tuple, TypeVar, Generic, Any
 
 from dbt_semantic_interfaces.objects.metric import MetricTimeWindow
@@ -29,9 +30,17 @@ from metricflow.column_assoc import ColumnAssociation
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
-from metricflow.object_utils import hash_items
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.sql.sql_column_type import SqlColumnType
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+
+
+def hash_items(items: Sequence[SqlColumnType]) -> str:
+    """Produces a hash from a list of strings."""
+    hash_builder = sha1()
+    for item in items:
+        hash_builder.update(str(item).encode("utf-8"))
+    return hash_builder.hexdigest()
 
 
 class ColumnAssociationResolver(ABC):
