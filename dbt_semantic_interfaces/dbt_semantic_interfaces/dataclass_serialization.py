@@ -23,7 +23,7 @@ from typing_extensions import TypeAlias
 import pydantic
 from pydantic import BaseModel
 
-from dbt_semantic_interfaces.object_utils import pformat_big_objects
+from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 
 logger = logging.getLogger(__name__)
 

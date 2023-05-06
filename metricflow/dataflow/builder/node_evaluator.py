@@ -30,7 +30,7 @@ from metricflow.dataflow.dataflow_plan import (
 )
 from metricflow.instances import InstanceSet
 from metricflow.model.semantics.data_source_join_evaluator import DataSourceJoinEvaluator
-from dbt_semantic_interfaces.object_utils import pformat_big_objects
+from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
 

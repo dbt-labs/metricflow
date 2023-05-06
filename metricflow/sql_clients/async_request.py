@@ -7,7 +7,7 @@ from typing import Optional, List
 
 from pydantic import ValidationError
 
-from dbt_semantic_interfaces.object_utils import pformat_big_objects
+from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from metricflow.protocols.sql_request import SqlRequestTagSet, SqlJsonTag
 
 logger = logging.getLogger(__name__)

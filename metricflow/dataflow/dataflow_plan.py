@@ -38,7 +38,7 @@ from metricflow.dataflow.builder.partitions import (
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.dataset import DataSet
 from dbt_semantic_interfaces.objects.metric import MetricTimeWindow
-from dbt_semantic_interfaces.object_utils import pformat_big_objects
+from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from metricflow.specs import (
     MetricInputMeasureSpec,
     OrderBySpec,

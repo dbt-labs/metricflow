@@ -10,7 +10,7 @@ from dbt_semantic_interfaces.references import (
     EntityReference,
 )
 from metricflow.instances import EntityInstance, InstanceSet
-from dbt_semantic_interfaces.object_utils import pformat_big_objects
+from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from metricflow.protocols.semantics import DataSourceSemanticsAccessor
 
 MAX_JOIN_HOPS = 2
