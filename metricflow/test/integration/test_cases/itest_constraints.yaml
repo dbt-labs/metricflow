@@ -5,7 +5,7 @@ integration_test:
   model: SIMPLE_MODEL
   metrics: ["booking_value"]
   group_bys: ["metric_time", "is_instant"]
-  where_constraint: "is_instant"
+  where_constraint: '{{ render_dimension_template("is_instant") }}'
   check_query: |
     SELECT  SUM(booking_value) AS booking_value
       , is_instant
@@ -22,7 +22,7 @@ integration_test:
   model: SIMPLE_MODEL
   metrics: ["booking_value"]
   group_bys: ["metric_time"]
-  where_constraint: "is_instant"
+  where_constraint: "{{ render_dimension_template('is_instant') }}"
   check_query: |
     SELECT SUM(booking_value) AS booking_value
       , ds AS metric_time
@@ -37,7 +37,7 @@ integration_test:
   model: SIMPLE_MODEL
   metrics: ["booking_value"]
   group_bys: ["is_instant"]
-  where_constraint: "listing__country_latest = 'us'"
+  where_constraint: "{{ render_dimension_template('country_latest', entity_path=['listing']) }} = 'us'"
   check_query: |
     SELECT SUM(booking_value) AS booking_value
       , is_instant
@@ -67,7 +67,7 @@ integration_test:
   model: SIMPLE_MODEL
   metrics: ["booking_value"]
   group_bys: ["metric_time"]
-  where_constraint: "is_instant"
+  where_constraint: "{{ render_dimension_template('is_instant') }}"
   time_constraint: ["2020-01-01", "2020-01-01"]
   check_query: |
     SELECT  SUM(booking_value) AS booking_value
@@ -83,7 +83,7 @@ integration_test:
   model: SIMPLE_MODEL
   metrics: ["booking_value"]
   group_bys: ["metric_time", "is_instant"]
-  where_constraint: "is_instant"
+  where_constraint: "{{ render_dimension_template('is_instant') }}"
   check_query: |
     SELECT  SUM(booking_value) AS booking_value
       , is_instant
@@ -99,7 +99,7 @@ integration_test:
   model: SIMPLE_MODEL
   metrics: ["booking_value"]
   group_bys: ["metric_time"]
-  where_constraint: "listing__capacity_latest >= 4"
+  where_constraint: "{{ render_dimension_template('capacity_latest', entity_path=['listing']) }} >= 4"
   check_query: |
     SELECT  SUM(b.booking_value) AS booking_value
       , b.ds AS metric_time

@@ -12,7 +12,7 @@ metric:
   description: Bookings of units with capacity for more than 2 people.
   type: measure_proxy
   constraint:
-    listing__capacity > 2
+    "{{ dimension('capacity', entity_path=['listing']) }} > 2"
   type_params:
     measures:
       - bookings
@@ -22,7 +22,7 @@ metric:
   description: raw booking count for listings that are lux, or unknown
   type: measure_proxy
   constraint:
-    listing__is_lux OR listing__is_lux IS NULL
+    "{{ dimension('is_lux', entity_path=['listing']) }} OR {{ dimension('is_lux', entity_path=['listing']) }} IS NULL"
   type_params:
     measures:
       - bookings

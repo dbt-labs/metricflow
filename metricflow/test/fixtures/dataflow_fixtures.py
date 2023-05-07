@@ -22,7 +22,7 @@ Using 'session' scope can result in other 'session' scope fixtures causing ID co
 
 
 @pytest.fixture
-def column_association_resolver(simple_semantic_model: SemanticModel) -> ColumnAssociationResolver:
+def column_association_resolver(simple_semantic_model: SemanticModel) -> ColumnAssociationResolver:  # noqa: D
     return DefaultColumnAssociationResolver(simple_semantic_model)
 
 

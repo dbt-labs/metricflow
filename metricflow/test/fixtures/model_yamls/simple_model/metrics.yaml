@@ -54,8 +54,7 @@ metric:
   type_params:
     measures:
       - booking_value
-  constraint: |
-    is_instant
+  constraint: "{{ dimension('is_instant') }}"
 ---
 metric:
   name: "average_instant_booking_value"
@@ -64,8 +63,7 @@ metric:
   type_params:
     measures:
       - average_booking_value
-  constraint: |
-    is_instant
+  constraint:  "{{ dimension('is_instant') }}"
 ---
 metric:
   name: "booking_value_for_non_null_listing_id"
@@ -74,8 +72,7 @@ metric:
   type_params:
     measures:
       - booking_value
-  constraint: |
-    listing IS NOT NULL
+  constraint: "{{ entity('listing') }} IS NOT NULL"
 ---
 metric:
   name: "bookers"
@@ -116,8 +113,7 @@ metric:
   type_params:
     measures:
       - listings
-  constraint: |
-    is_lux_latest
+  constraint: "{{ dimension('is_lux_latest') }}"
 ---
 metric:
   name: "smallest_listing"
@@ -185,15 +181,6 @@ metric:
     measures:
       - txn_revenue
     grain_to_date: month
----
-metric:
-  name: non_lux_test_listings
-  description: Listings where the lux listing ID is not from a test.
-  type: measure_proxy
-  constraint: lux_or_normal_listing != 'LUX_TEST_ID'
-  type_params:
-    measures:
-      - listings
 ---
 metric:
   name: booking_fees
@@ -281,7 +268,7 @@ metric:
   type_params:
     numerator:
       name: average_booking_value
-      constraint: is_instant
+      constraint: "{{ dimension('is_instant') }}"
     denominator:
       name: max_booking_value
 ---
@@ -294,7 +281,7 @@ metric:
   type_params:
     numerator:
       name: average_booking_value
-      constraint: listing__is_lux_latest
+      constraint: "{{ dimension('is_lux_latest', entity_path=['listing']) }}"
     denominator:
       name: max_booking_value
 ---
@@ -308,9 +295,9 @@ metric:
     expr: "average_booking_value * bookings / NULLIF(booking_value, 0)"
     measures:
       - name: average_booking_value
-        constraint: listing__is_lux_latest
+        constraint: "{{ dimension('is_lux_latest', entity_path=['listing']) }}"
       - name: bookings
-        constraint: listing__is_lux_latest
+        constraint: "{{ dimension('is_lux_latest', entity_path=['listing']) }}"
       - name: booking_value
 ---
 metric:
@@ -322,7 +309,7 @@ metric:
   type_params:
     numerator:
       name: booking_value
-      constraint: is_instant
+      constraint: "{{ dimension('is_instant') }}"
       alias: booking_value_with_is_instant_constraint
     denominator:
       name: booking_value
@@ -336,11 +323,11 @@ metric:
   type_params:
     numerator:
       name: total_account_balance_first_day
-      constraint: "user__home_state_latest IN ('CA', 'HI', 'WA')"
+      constraint: "{{ dimension('home_state_latest', entity_path=['user']) }} IN ('CA', 'HI', 'WA')"
       alias: west_coast_balance_first_day
     denominator:
       name: total_account_balance_first_day
-      constraint: "user__home_state_latest IN ('MD', 'NY', 'TX')"
+      constraint: "{{ dimension('home_state_latest', entity_path=['user']) }} IN ('MD', 'NY', 'TX')"
       alias: east_coast_balance_first_dat
 ---
 metric:
@@ -352,7 +339,7 @@ metric:
     expr: delayed_bookings * 2
     measures:
       - name: bookings
-        constraint: NOT is_instant
+        constraint: "NOT {{ dimension('is_instant') }}"
         alias: delayed_bookings
 ---
 metric:
@@ -403,7 +390,7 @@ metric:
       - name: bookings
       - name: listings
         alias: lux_listing
-        constraint: is_lux_latest
+        constraint: "{{ dimension('is_lux_latest') }}"
 ---
 metric:
   name: "instant_plus_non_referred_bookings_pct"

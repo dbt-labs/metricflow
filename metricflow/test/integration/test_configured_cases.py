@@ -134,6 +134,34 @@ class CheckQueryHelpers:
         """Return the name of the double data type for the relevant SQL engine"""
         return self._sql_client.sql_engine_attributes.double_data_type_name
 
+    def render_dimension_template(self, dimension_name: str, entity_path: Sequence[str] = ()) -> str:
+        """Renders a template that can be used to retrieve a dimension.
+
+        For example:
+
+         "{{ render_dimension_template('country_latest', entity_path=['listing']) }}"
+
+         ->
+
+         "{{ dimension('country_latest', entity_path=['listing'] }}"
+
+         This is needed as the where_constraint field in the definition files are rendered twice through Jinja - once
+         by the test framework, and again by MF.
+        """
+        return f"{{{{ dimension('{dimension_name}', entity_path={repr(entity_path)}) }}}}"
+
+    def render_entity_template(self, entity_name: str, entity_path: Sequence[str] = ()) -> str:
+        """Similar to render_dimension_template() but for entities."""
+        return f"{{{{ entity('{entity_name}', entity_path={repr(entity_path)}) }}}}"
+
+    def render_time_dimension_template(
+        self, time_dimension_name: str, time_granularity: str, entity_path: Sequence[str] = ()
+    ) -> str:
+        """Similar to render_dimension_template() but for time dimensions."""
+        return (
+            f"{{{{ time_dimension('{time_dimension_name}', '{time_granularity}', entity_path={repr(entity_path)}) }}}}"
+        )
+
 
 def filter_not_supported_features(
     sql_client: SqlClient, required_features: Tuple[RequiredDwEngineFeatures, ...]
@@ -235,6 +263,9 @@ def test_case(
                 render_percentile_expr=check_query_helpers.render_percentile_expr,
                 mf_time_spine_source=time_spine_source.spine_table.sql,
                 double_data_type_name=check_query_helpers.double_data_type_name,
+                render_dimension_template=check_query_helpers.render_dimension_template,
+                render_entity_template=check_query_helpers.render_entity_template,
+                render_time_dimension_template=check_query_helpers.render_time_dimension_template,
             )
             if case.where_constraint
             else None,

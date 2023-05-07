@@ -1,12 +1,9 @@
 import logging
 
-import pytest
-
 from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.references import EntityReference
 from metricflow.model.semantic_model import SemanticModel
-from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.specs import (
     ColumnAssociationResolver,
     LinkableSpecSet,
@@ -17,11 +14,6 @@ from metricflow.specs import (
 )
 
 logger = logging.getLogger(__name__)
-
-
-@pytest.fixture
-def column_association_resolver(simple_semantic_model: SemanticModel) -> ColumnAssociationResolver:  # noqa: D
-    return DefaultColumnAssociationResolver(simple_semantic_model)
 
 
 def test_dimension_in_filter(  # noqa: D
