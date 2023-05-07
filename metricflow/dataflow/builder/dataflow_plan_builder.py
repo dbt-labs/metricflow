@@ -684,7 +684,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 parent_node=JoinAggregatedMeasuresByGroupByColumnsNode(parent_nodes=output_nodes),
                 include_specs=InstanceSpecSet.merge(
                     (
-                        queried_linkable_specs.as_instance_set,
+                        queried_linkable_specs.as_spec_set,
                         InstanceSpecSet(
                             measure_specs=tuple(x.post_aggregation_spec for x in metric_input_measure_specs)
                         ),
@@ -838,7 +838,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             specs_to_keep_after_join = InstanceSpecSet.merge(
                 (
                     InstanceSpecSet(measure_specs=measure_specs),
-                    required_linkable_specs.as_instance_set,
+                    required_linkable_specs.as_spec_set,
                 )
             )
 
@@ -898,7 +898,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             pre_aggregate_node = FilterElementsNode[SqlDataSetT](
                 parent_node=pre_aggregate_node,
                 include_specs=InstanceSpecSet.merge(
-                    (InstanceSpecSet(measure_specs=measure_specs), queried_linkable_specs.as_instance_set)
+                    (InstanceSpecSet(measure_specs=measure_specs), queried_linkable_specs.as_spec_set)
                 ),
             )
         return AggregateMeasuresNode[SqlDataSetT](
