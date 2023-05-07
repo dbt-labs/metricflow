@@ -103,7 +103,7 @@ integration_test:
   model: SIMPLE_MODEL
   metrics: ["current_account_balance_by_user"]
   group_bys: ["user"]
-  where_constraint: "user__home_state_latest = 'CA'"
+  where_constraint: "{{ render_dimension_template('home_state_latest', entity_path=['user']) }} = 'CA'"
   check_query: |
     SELECT
       e.user AS user
@@ -180,7 +180,7 @@ integration_test:
   model: SIMPLE_MODEL
   metrics: ["current_account_balance_by_user"]
   group_bys: ["user"]
-  where_constraint: "account_type = 'savings'"
+  where_constraint: "{{ render_dimension_template('account_type') }} = 'savings'"
   check_query: |
     SELECT
       b.user AS user
@@ -226,7 +226,7 @@ integration_test:
   model: SIMPLE_MODEL
   metrics: ["total_account_balance_first_day"]
   group_bys: ["account_type"]
-  where_constraint: "ds >= '2020-01-03'"
+  where_constraint: "{{ render_time_dimension_template('ds', 'day') }} >= '2020-01-03'"
   check_query: |
     SELECT
       b.account_type AS account_type

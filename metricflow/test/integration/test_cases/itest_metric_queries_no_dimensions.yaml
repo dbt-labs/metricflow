@@ -29,7 +29,7 @@ integration_test:
   model: SIMPLE_MODEL
   metrics: ["booking_value"]
   group_bys: []
-  where_constraint: "is_instant"
+  where_constraint: "{{ render_dimension_template('is_instant') }}"
   check_query: |
     SELECT
       SUM(booking_value) AS booking_value
