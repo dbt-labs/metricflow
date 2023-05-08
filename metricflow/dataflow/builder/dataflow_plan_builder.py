@@ -11,7 +11,7 @@ from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.references import TimeDimensionReference
 from metricflow.assert_one_arg import assert_exactly_one_arg_set
-from metricflow.constraints.time_constraint import TimeRangeConstraint
+from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.dag.id_generation import IdGeneratorRegistry, DATAFLOW_PLAN_PREFIX
 from metricflow.dataflow.builder.costing import DefaultCostFunction, DataflowPlanNodeCostFunction
 from metricflow.dataflow.builder.measure_additiveness import group_measure_specs_by_additiveness

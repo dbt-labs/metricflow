@@ -4,7 +4,7 @@ from typing import Generic, Sequence, List, TypeVar, Optional, Set
 
 from dbt_semantic_interfaces.references import TimeDimensionReference, EntityReference
 
-from metricflow.constraints.time_constraint import TimeRangeConstraint
+from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.partitions import PartitionJoinResolver
 from metricflow.dataflow.dataflow_plan import (
