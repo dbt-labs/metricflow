@@ -3,7 +3,7 @@ from __future__ import annotations
 from enum import Enum
 from typing import Optional, Protocol
 
-from dbt_semantic_interfaces.objects.metadata import Metadata
+from dbt_semantic_interfaces.protocols.metadata import Metadata
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 
