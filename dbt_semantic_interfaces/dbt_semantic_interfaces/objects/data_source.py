@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import List, Optional, Sequence
+from pydantic import validator
+from typing import Any, List, Optional, Sequence
 
 from dbt_semantic_interfaces.objects.base import ModelWithMetadataParsing, HashableBaseModel
 from dbt_semantic_interfaces.objects.metadata import Metadata
@@ -8,6 +9,40 @@ from dbt_semantic_interfaces.objects.elements.dimension import Dimension
 from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.references import DataSourceReference, LinkableElementReference, MeasureReference
+
+
+class NodeRelation(HashableBaseModel):
+    """Path object to where the data should be"""
+
+    alias: str
+    schema_name: str
+    database: Optional[str] = None
+    relation_name: str = ""
+
+    @validator("relation_name", always=True)
+    @classmethod
+    def create_default_relation_name(cls, value: Any, values: Any) -> str:  # type: ignore[misc]
+        """Dynamically build the dot path for `relation_name`, if not specified"""
+        if value:
+            return value
+        alias, schema, database = values.get("alias"), values.get("schema_name"), values.get("database")
+        if database is not None:
+            value = f"{database}.{schema}.{alias}"
+        else:
+            value = f"{schema}.{alias}"
+        return value
+
+    @staticmethod
+    def from_string(sql_str: str) -> NodeRelation:  # noqa: D
+        sql_str_split = sql_str.split(".")
+        if len(sql_str_split) == 2:
+            return NodeRelation(schema_name=sql_str_split[0], alias=sql_str_split[1])
+        elif len(sql_str_split) == 3:
+            return NodeRelation(database=sql_str_split[0], schema_name=sql_str_split[1], alias=sql_str_split[2])
+        raise RuntimeError(
+            f"Invalid input for a SQL table, expected form '<schema>.<table>' or '<db>.<schema>.<table>' "
+            f"but got: {sql_str}"
+        )
 
 
 class DataSource(HashableBaseModel, ModelWithMetadataParsing):
