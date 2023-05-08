@@ -2,7 +2,7 @@ import logging
 from typing import Optional
 
 from dbt_semantic_interfaces.objects.data_source import DataSource
-from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
+from dbt_semantic_interfaces.type_enums.dimension_type import DimensionType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.transformations.transform_rule import ModelTransformRule
 from dbt_semantic_interfaces.references import TimeDimensionReference

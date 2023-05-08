@@ -4,8 +4,9 @@ from typing import Tuple
 
 from metricflow.model.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.data_source import DataSource
-from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
+from dbt_semantic_interfaces.objects.elements.dimension import Dimension
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.type_enums.dimension_type import DimensionType
 from metricflow.model.validations.element_const import ElementConsistencyRule
 from metricflow.model.validations.validator_helpers import DataSourceElementType, ModelValidationException
 from metricflow.test.test_utils import find_data_source_with

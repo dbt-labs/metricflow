@@ -16,9 +16,10 @@ from metricflow.instances import (
     InstanceSet,
 )
 from dbt_semantic_interfaces.objects.data_source import DataSource
-from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
+from dbt_semantic_interfaces.objects.elements.dimension import Dimension
 from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.elements.measure import Measure
+from dbt_semantic_interfaces.type_enums.dimension_type import DimensionType
 from metricflow.model.spec_converters import MeasureConverter
 from metricflow.specs import (
     TimeDimensionSpec,

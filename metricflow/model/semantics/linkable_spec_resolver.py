@@ -8,10 +8,11 @@ from dataclasses import dataclass
 from typing import Tuple, Sequence, Dict, List, Optional, FrozenSet
 
 from dbt_semantic_interfaces.objects.data_source import DataSource
-from dbt_semantic_interfaces.objects.elements.dimension import DimensionType, Dimension
+from dbt_semantic_interfaces.objects.elements.dimension import Dimension
 from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.references import DataSourceReference, MeasureReference, MetricReference
+from dbt_semantic_interfaces.type_enums.dimension_type import DimensionType
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.data_source_join_evaluator import DataSourceJoinEvaluator
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects

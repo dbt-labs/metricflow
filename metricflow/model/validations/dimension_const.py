@@ -1,7 +1,7 @@
 from typing import Dict, List
 
 from dbt_semantic_interfaces.objects.data_source import DataSource
-from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
+from dbt_semantic_interfaces.objects.elements.dimension import Dimension
 from metricflow.model.validations.validator_helpers import (
     DataSourceElementContext,
     DataSourceElementType,
@@ -14,6 +14,7 @@ from metricflow.model.validations.validator_helpers import (
 )
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.references import DataSourceElementReference, DimensionReference
+from dbt_semantic_interfaces.type_enums.dimension_type import DimensionType
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 

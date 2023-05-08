@@ -7,7 +7,8 @@ from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
     MappedObjects,
     assert_metric_model_name,
 )
-from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
+from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionTypeParams
+from dbt_semantic_interfaces.type_enums.dimension_type import DimensionType
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow.model.validations.validator_helpers import ModelValidationResults, ValidationIssue, ValidationError
 from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint

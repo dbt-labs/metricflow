@@ -3,12 +3,13 @@ import pytest
 from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
 from metricflow.model.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.data_source import Mutability, MutabilityType
-from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
+from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionTypeParams
 from dbt_semantic_interfaces.objects.elements.entity import Entity, EntityType
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.metric import MetricInput, MetricType, MetricTypeParams
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.references import DimensionReference, EntityReference, TimeDimensionReference
+from dbt_semantic_interfaces.type_enums.dimension_type import DimensionType
 from metricflow.model.validations.metrics import DerivedMetricRule
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.test.fixtures.table_fixtures import DEFAULT_DS

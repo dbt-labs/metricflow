@@ -13,7 +13,7 @@ from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
 from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
-from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
+from dbt_semantic_interfaces.type_enums.dimension_type import DimensionType
 from dbt_semantic_interfaces.objects.metric import MetricType
 from dbt_semantic_interfaces.references import (
     DimensionReference,

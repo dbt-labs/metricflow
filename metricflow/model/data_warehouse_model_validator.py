@@ -18,9 +18,10 @@ from metricflow.dataset.dataset import DataSet
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
 from dbt_semantic_interfaces.references import DataSourceElementReference, DataSourceReference, MetricModelReference
 from dbt_semantic_interfaces.objects.data_source import DataSource
-from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
+from dbt_semantic_interfaces.objects.elements.dimension import Dimension
 from dbt_semantic_interfaces.objects.metric import Metric
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.type_enums.dimension_type import DimensionType
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,

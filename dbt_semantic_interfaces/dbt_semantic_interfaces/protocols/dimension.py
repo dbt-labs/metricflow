@@ -1,17 +1,10 @@
 from __future__ import annotations
 
-from enum import Enum
 from typing import Optional, Protocol
 
 from dbt_semantic_interfaces.protocols.metadata import Metadata
+from dbt_semantic_interfaces.type_enums.dimension_type import DimensionType
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-
-
-class DimensionType(Enum):
-    """Determines types of values expected of dimensions."""
-
-    CATEGORICAL = "categorical"
-    TIME = "time"
 
 
 class DimensionValidityParams(Protocol):

@@ -12,7 +12,7 @@ from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
     DbtMappingRule,
     get_and_assert_calc_method_mapping,
 )
-from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
+from dbt_semantic_interfaces.type_enums.dimension_type import DimensionType
 from dbt_semantic_interfaces.objects.metric import MetricType
 
 
