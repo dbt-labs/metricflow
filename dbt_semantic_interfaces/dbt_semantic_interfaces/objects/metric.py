@@ -13,7 +13,7 @@ from dbt_semantic_interfaces.objects.metadata import Metadata
 from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
 from dbt_semantic_interfaces.references import MeasureReference, MetricReference
 from dbt_semantic_interfaces.enum_extension import ExtendedEnum
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity, string_to_time_granularity
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity, string_to_time_granularity
 
 
 class MetricType(ExtendedEnum):

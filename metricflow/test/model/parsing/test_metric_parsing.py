@@ -6,7 +6,7 @@ from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_mod
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 
 def test_legacy_measure_metric_parsing() -> None:

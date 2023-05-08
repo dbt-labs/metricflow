@@ -6,7 +6,7 @@ from dbt_semantic_interfaces.objects.data_source import DataSourceOrigin, Mutabi
 from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_model
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 
 def test_base_data_source_attribute_parsing() -> None:

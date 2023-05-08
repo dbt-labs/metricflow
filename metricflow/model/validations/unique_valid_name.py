@@ -25,7 +25,7 @@ from metricflow.model.validations.validator_helpers import (
     ValidationIssue,
     validate_safely,
 )
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 
 @enum.unique

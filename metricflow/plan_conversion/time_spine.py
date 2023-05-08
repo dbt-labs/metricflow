@@ -12,7 +12,7 @@ from metricflow.protocols.sql_client import SqlClient
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.time.time_constants import ISO8601_PYTHON_FORMAT
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 

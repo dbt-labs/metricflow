@@ -4,7 +4,7 @@ from enum import Enum
 from typing import Optional, Protocol
 
 from dbt_semantic_interfaces.protocols.metadata import Metadata
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 
 class DimensionType(Enum):

@@ -17,7 +17,7 @@ from metricflow.specs import (
     ColumnAssociationResolver,
 )
 from metricflow.model.semantic_model import SemanticModel
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 
