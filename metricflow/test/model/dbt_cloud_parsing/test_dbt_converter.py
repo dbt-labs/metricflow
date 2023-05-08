@@ -1,10 +1,12 @@
 from typing import Tuple
 
+import pytest
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode
 from metricflow.model.dbt_converter import DbtConverter
 from dbt_semantic_interfaces.objects.metric import MetricType
 
 
+@pytest.mark.skip("dbt model conversion no longer needed.")
 def test_for_breaking_model_changes(dbt_metrics: Tuple[MetricNode, ...]) -> None:
     """This is intended to be a comprehensive test such that if the MetricFlow model changes in a breaking way, this should break
 
