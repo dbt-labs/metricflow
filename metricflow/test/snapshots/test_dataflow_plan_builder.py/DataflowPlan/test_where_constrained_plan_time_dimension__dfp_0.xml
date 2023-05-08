@@ -29,17 +29,16 @@
                         <!-- description = Constrain Output with WHERE -->
                         <!-- node_id = wcc_0 -->
                         <!-- where_condition =                                                                               -->
-                        <!--   {'class': 'SpecWhereClauseConstraint',                                                        -->
-                        <!--    'where_condition': "metric_time >= '2020-01-01'",                                            -->
-                        <!--    'linkable_names': ('metric_time',),                                                          -->
+                        <!--   {'class': 'WhereFilterSpec',                                                                  -->
+                        <!--    'where_sql': "metric_time >= '2020-01-01'",                                                  -->
+                        <!--    'bind_parameters': {'class': 'SqlBindParameters', 'param_items': ()},                        -->
                         <!--    'linkable_spec_set': {'class': 'LinkableSpecSet',                                            -->
                         <!--                          'dimension_specs': (),                                                 -->
                         <!--                          'time_dimension_specs': ({'class': 'TimeDimensionSpec',                -->
                         <!--                                                    'element_name': 'metric_time',               -->
                         <!--                                                    'entity_links': (),                          -->
                         <!--                                                    'time_granularity': TimeGranularity.DAY},),  -->
-                        <!--                          'entity_specs': ()},                                                   -->
-                        <!--    'execution_parameters': {'class': 'SqlBindParameters', 'param_items': ()}}                   -->
+                        <!--                          'entity_specs': ()}}                                                   -->
                         <FilterElementsNode>
                             <!-- description =                                  -->
                             <!--   Pass Only Elements:                          -->
