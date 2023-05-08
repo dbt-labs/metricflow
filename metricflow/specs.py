@@ -591,29 +591,6 @@ class LinkableSpecSet(SerializableDataclass):
 
 
 @dataclass(frozen=True)
-class SpecWhereClauseConstraint(SerializableDataclass):
-    """Similar to a WhereClauseConstraint, but with specs instead of strings"""
-
-    # e.g. "listing__capacity_latest > 4"
-    where_condition: str
-    # e.g. {DimensionSpec(element_name="capacity_latest", entity_links=("listing",))
-    linkable_names: Tuple[str, ...]
-    linkable_spec_set: LinkableSpecSet
-    execution_parameters: SqlBindParameters
-
-    def combine(self, other: SpecWhereClauseConstraint) -> SpecWhereClauseConstraint:  # noqa: D
-        linkable_names = list(set(self.linkable_names).union(set(other.linkable_names)))
-        where_condition = f"({self.where_condition}) AND ({other.where_condition})"
-
-        return SpecWhereClauseConstraint(
-            where_condition=where_condition,
-            linkable_names=tuple(linkable_names),
-            linkable_spec_set=LinkableSpecSet.merge([self.linkable_spec_set, other.linkable_spec_set]),
-            execution_parameters=self.execution_parameters.combine(other.execution_parameters),
-        )
-
-
-@dataclass(frozen=True)
 class MetricFlowQuerySpec(SerializableDataclass):
     """Specs needed for running a query."""
 
