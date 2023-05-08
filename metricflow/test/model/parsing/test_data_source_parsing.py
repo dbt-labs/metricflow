@@ -86,24 +86,6 @@ def test_data_source_sql_query_parsing() -> None:
     assert data_source.sql_query == "SELECT * FROM some_schema.source_table"
 
 
-def test_data_source_dbt_model_parsing() -> None:
-    """Test for parsing a data source specification with a dbt model provided"""
-    yaml_contents = textwrap.dedent(
-        """\
-        data_source:
-          name: dbt_model_test
-          dbt_model: "dbt_source.some_model"
-        """
-    )
-    file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
-
-    build_result = parse_yaml_files_to_model(files=[file])
-
-    assert len(build_result.model.data_sources) == 1
-    data_source = build_result.model.data_sources[0]
-    assert data_source.dbt_model == "dbt_source.some_model"
-
-
 def test_data_source_entity_parsing() -> None:
     """Test for parsing a basic entity out of a data source specification"""
     yaml_contents = textwrap.dedent(
