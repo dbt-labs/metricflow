@@ -1,5 +1,6 @@
 from typing import Any, Dict, Tuple
 
+import pytest
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode
 from metricflow.model.dbt_converter import DbtConverter
 from metricflow.model.dbt_mapping_rules.dbt_metric_to_dimensions_rules import (
@@ -83,6 +84,7 @@ def test_dbt_timestamp_to_dimension_missing_timestamp_issue(dbt_metrics: Tuple[M
     ), f"DbtTimestampToDimension didn't raise blocking issues when it should have: {issues.to_pretty_json()}"
 
 
+@pytest.mark.skip("dbt model conversion no longer needed.")
 def test_dbt_filters_to_dimensions(  # type: ignore[misc]  # noqa: D
     num_domesticated_cats_metric: Dict[str, Any],
     num_cats_with_max_age_close_to_average_age_metric: Dict[str, Any],
