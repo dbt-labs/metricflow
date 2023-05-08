@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from hashlib import sha1
 from typing import List, Optional, Sequence, Tuple, TypeVar, Generic, Any
 
-from dbt_semantic_interfaces.objects.constraints.filter_renderer import (
+from dbt_semantic_interfaces.objects.where_filter.filter_renderer import (
     DimensionCallParameterSet,
     TimeDimensionCallParameterSet,
     EntityCallParameterSet,
@@ -36,7 +36,7 @@ from metricflow.aggregation_properties import AggregationState
 from metricflow.aggregation_properties import AggregationType
 from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.column_assoc import ColumnAssociation
-from metricflow.constraints.time_constraint import TimeRangeConstraint
+from metricflow.filters.time_constraint import TimeRangeConstraint
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.sql.sql_bind_parameters import SqlBindParameters

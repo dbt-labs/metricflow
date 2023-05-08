@@ -8,7 +8,7 @@ from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
 from dbt_semantic_interfaces.objects.metric import MetricTimeWindow
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.references import TimeDimensionReference, EntityReference
-from metricflow.constraints.time_constraint import TimeRangeConstraint
+from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan import (
     DataflowPlan,

@@ -8,7 +8,7 @@ from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
 from dbt_semantic_interfaces.references import MetricModelReference
 from metricflow.aggregation_properties import AggregationState
 from metricflow.column_assoc import ColumnAssociation, SingleColumnCorrelationKey
-from metricflow.constraints.time_constraint import TimeRangeConstraint
+from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.dag.id_generation import IdGeneratorRegistry
 from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNodeVisitor,

@@ -7,7 +7,7 @@ from typing import Tuple, List, Dict, Sequence, Set, Optional
 
 import pandas as pd
 
-from metricflow.constraints.time_constraint import TimeRangeConstraint
+from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import BaseOutput
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
