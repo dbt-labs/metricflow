@@ -1,11 +1,22 @@
 from __future__ import annotations
 
 import re
-
 from typing import Optional
 
 from dbt_semantic_interfaces.errors import ParsingException
 from dbt_semantic_interfaces.objects.base import HashableBaseModel
+
+
+class YamlConfigFile(HashableBaseModel):
+    """Serializable container for customer model YAML contents
+
+    The serialization support is included here for scenarios where persisting the contents in non-filesystem storage
+    services is necessary or desirable.
+    """
+
+    filepath: str
+    contents: str
+    url: Optional[str]
 
 
 class Version(HashableBaseModel):  # noqa: D
@@ -30,37 +41,3 @@ class Version(HashableBaseModel):  # noqa: D
 
     def __str__(self) -> str:  # noqa: D
         return f"{self.__class__.__name__}(major={self.major}, minor={self.minor})"
-
-
-class SourceFile(HashableBaseModel):  # noqa: D
-    path: str
-    contents: str
-
-
-class Commit(HashableBaseModel):  # noqa: D
-    commit: str
-    timestamp: int
-
-
-class FileSlice(HashableBaseModel):  # noqa: D
-    filename: str
-    content: str
-    start_line_number: int
-    end_line_number: int
-
-
-class YamlConfigFile(HashableBaseModel):
-    """Serializable container for customer model YAML contents
-
-    The serialization support is included here for scenarios where persisting the contents in non-filesystem storage
-    services is necessary or desirable.
-    """
-
-    filepath: str
-    contents: str
-    url: Optional[str]
-
-
-class Metadata(HashableBaseModel):  # noqa: D
-    repo_file_path: str
-    file_slice: FileSlice

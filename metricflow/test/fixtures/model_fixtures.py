@@ -25,7 +25,7 @@ from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.test.fixtures.id_fixtures import IdNumberSpace, patch_id_generators_helper
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
-from dbt_semantic_interfaces.objects.common import YamlConfigFile
+from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.query.query_parser import MetricFlowQueryParser
 

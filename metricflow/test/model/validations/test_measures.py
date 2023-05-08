@@ -2,10 +2,10 @@ import re
 import textwrap
 
 import pytest
-from dbt_semantic_interfaces.objects.common import YamlConfigFile
 from dbt_semantic_interfaces.model_transformer import ModelTransformer
 from metricflow.model.model_validator import ModelValidator
 from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_validation_ready_model
+from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from metricflow.model.validations.measures import (
     CountAggregationExprRule,
     DataSourceMeasuresUniqueRule,

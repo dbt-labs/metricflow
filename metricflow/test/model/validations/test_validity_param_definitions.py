@@ -1,8 +1,8 @@
 import pytest
 import textwrap
 
-from dbt_semantic_interfaces.objects.common import YamlConfigFile
 from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_validation_ready_model
+from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from metricflow.model.model_validator import ModelValidator
 from metricflow.model.validations.data_sources import DataSourceValidityWindowRule
 from metricflow.model.validations.validator_helpers import ModelValidationException

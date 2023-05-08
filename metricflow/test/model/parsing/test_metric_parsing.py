@@ -1,9 +1,9 @@
 import textwrap
 
-from dbt_semantic_interfaces.objects.common import YamlConfigFile
 from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
 from dbt_semantic_interfaces.objects.metric import MetricTimeWindow, MetricInput, MetricInputMeasure, MetricType
 from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_model
+from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
