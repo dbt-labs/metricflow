@@ -16,7 +16,7 @@ from metricflow.specs import (
     EntitySpec,
     ColumnAssociationResolver,
 )
-from metricflow.model.semantic_model import SemanticModel
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
@@ -25,8 +25,8 @@ logger = logging.getLogger(__name__)
 class DefaultColumnAssociationResolver(ColumnAssociationResolver):
     """Implements the ColumnAssociationResolver."""
 
-    def __init__(self, semantic_model: SemanticModel) -> None:  # noqa: D
-        self._semantic_model = semantic_model
+    def __init__(self, semantic_manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D
+        self._semantic_manifest_lookup = semantic_manifest_lookup
 
     def resolve_metric_spec(self, metric_spec: MetricSpec) -> ColumnAssociation:  # noqa: D
         return ColumnAssociation(

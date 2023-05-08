@@ -7,7 +7,7 @@ from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanCon
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.specs import ColumnAssociationResolver
-from metricflow.model.semantic_model import SemanticModel
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 
 SourceDataSetT = TypeVar("SourceDataSetT", bound=SqlDataSet)
 
@@ -58,13 +58,13 @@ class DataflowPlanNodeOutputDataSetResolver(Generic[SourceDataSetT], DataflowToS
     def __init__(  # noqa: D
         self,
         column_association_resolver: ColumnAssociationResolver,
-        semantic_model: SemanticModel,
+        semantic_manifest_lookup: SemanticManifestLookup,
         time_spine_source: TimeSpineSource,
     ) -> None:
         self._node_to_output_data_set: Dict[DataflowPlanNode[SourceDataSetT], SqlDataSet] = {}
         super().__init__(
             column_association_resolver=column_association_resolver,
-            semantic_model=semantic_model,
+            semantic_manifest_lookup=semantic_manifest_lookup,
             time_spine_source=time_spine_source,
         )
 

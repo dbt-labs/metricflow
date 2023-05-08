@@ -16,7 +16,7 @@ from metricflow.engine.models import Dimension, Metric
 from metricflow.engine.utils import build_user_configured_model_from_config, convert_to_datetime
 from metricflow.model.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.semantic_model import SemanticModel
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.model.validations.validator_helpers import ModelValidationResults
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
@@ -66,9 +66,9 @@ class MetricFlowClient:
         self.sql_client = sql_client
         self.user_configured_model = user_configured_model
         self.system_schema = system_schema
-        self.semantic_model = SemanticModel(self.user_configured_model)
+        self.semantic_manifest_lookup = SemanticManifestLookup(self.user_configured_model)
         self.engine = MetricFlowEngine(
-            semantic_model=self.semantic_model,
+            semantic_manifest_lookup=self.semantic_manifest_lookup,
             sql_client=self.sql_client,
             system_schema=self.system_schema,
         )

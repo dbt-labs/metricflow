@@ -34,7 +34,7 @@ from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
 from metricflow.execution.execution_plan_to_text import execution_plan_to_text
 from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.logging.formatting import indent_log_line
-from metricflow.model.semantic_model import SemanticModel
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from metricflow.random_id import random_id
@@ -252,30 +252,30 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             dbt_profile = handler.get_value(CONFIG_DBT_PROFILE)
             dbt_target = handler.get_value(CONFIG_DBT_TARGET)
 
-            semantic_model = SemanticModel(
+            semantic_manifest_lookup = SemanticManifestLookup(
                 build_user_configured_model_from_dbt_config(handler=handler, profile=dbt_profile, target=dbt_target)
             )
         elif dbt_cloud_job_id != "":
             dbt_cloud_service_token = handler.get_value(CONFIG_DBT_CLOUD_SERVICE_TOKEN) or ""
             assert dbt_cloud_service_token != "", "A dbt cloud service token is required for using MF with dbt cloud"
 
-            semantic_model = SemanticModel(
+            semantic_manifest_lookup = SemanticManifestLookup(
                 build_user_configured_model_from_dbt_cloud(
                     job_id=dbt_cloud_job_id, service_token=dbt_cloud_service_token
                 )
             )
         else:
-            semantic_model = SemanticModel(build_user_configured_model_from_config(handler))
+            semantic_manifest_lookup = SemanticManifestLookup(build_user_configured_model_from_config(handler))
         system_schema = not_empty(handler.get_value(CONFIG_DWH_SCHEMA), CONFIG_DWH_SCHEMA, handler.url)
         return MetricFlowEngine(
-            semantic_model=semantic_model,
+            semantic_manifest_lookup=semantic_manifest_lookup,
             sql_client=sql_client,
             system_schema=system_schema,
         )
 
     def __init__(
         self,
-        semantic_model: SemanticModel,
+        semantic_manifest_lookup: SemanticManifestLookup,
         sql_client: AsyncSqlClient,
         system_schema: str,
         time_source: TimeSource = ServerTimeSource(),
@@ -291,10 +291,10 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         These parameters are mainly there to be overridden during tests.
         """
 
-        self._semantic_model = semantic_model
+        self._semantic_manifest_lookup = semantic_manifest_lookup
         self._sql_client = sql_client
         self._column_association_resolver = column_association_resolver or (
-            DefaultColumnAssociationResolver(semantic_model)
+            DefaultColumnAssociationResolver(semantic_manifest_lookup)
         )
         self._time_source = time_source
         self._time_spine_source = time_spine_source or TimeSpineSource(schema_name=system_schema)
@@ -306,28 +306,28 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
         self._source_data_sets: List[DataSourceDataSet] = []
         converter = DataSourceToDataSetConverter(column_association_resolver=self._column_association_resolver)
-        for data_source in self._semantic_model.user_configured_model.data_sources:
+        for data_source in self._semantic_manifest_lookup.user_configured_model.data_sources:
             data_set = converter.create_sql_source_data_set(data_source)
             self._source_data_sets.append(data_set)
             logger.info(f"Created source dataset from data source '{data_source.name}'")
 
-        source_node_builder = SourceNodeBuilder(self._semantic_model)
+        source_node_builder = SourceNodeBuilder(self._semantic_manifest_lookup)
         source_nodes = source_node_builder.create_from_data_sets(self._source_data_sets)
 
         node_output_resolver = DataflowPlanNodeOutputDataSetResolver[DataSourceDataSet](
-            column_association_resolver=DefaultColumnAssociationResolver(semantic_model),
-            semantic_model=semantic_model,
+            column_association_resolver=DefaultColumnAssociationResolver(semantic_manifest_lookup),
+            semantic_manifest_lookup=semantic_manifest_lookup,
             time_spine_source=self._time_spine_source,
         )
 
         self._dataflow_plan_builder = DataflowPlanBuilder[DataSourceDataSet](
             source_nodes=source_nodes,
-            semantic_model=self._semantic_model,
+            semantic_manifest_lookup=self._semantic_manifest_lookup,
             time_spine_source=self._time_spine_source,
         )
         self._to_sql_query_plan_converter = DataflowToSqlQueryPlanConverter[DataSourceDataSet](
             column_association_resolver=self._column_association_resolver,
-            semantic_model=self._semantic_model,
+            semantic_manifest_lookup=self._semantic_manifest_lookup,
             time_spine_source=self._time_spine_source,
         )
         self._to_execution_plan_converter = DataflowToExecutionPlanConverter[DataSourceDataSet](
@@ -338,7 +338,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         self._executor = SequentialPlanExecutor()
 
         self._query_parser = MetricFlowQueryParser(
-            model=self._semantic_model,
+            model=self._semantic_manifest_lookup,
             source_nodes=source_nodes,
             node_output_resolver=node_output_resolver,
         )
@@ -389,7 +389,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         )
         logger.info(f"Query spec is:\n{pformat_big_objects(query_spec)}")
 
-        if self._semantic_model.metric_semantics.contains_cumulative_or_time_offset_metric(
+        if self._semantic_manifest_lookup.metric_semantics.contains_cumulative_or_time_offset_metric(
             tuple(m.as_reference for m in query_spec.metric_specs)
         ):
             self._time_spine_table_builder.create_if_necessary()
@@ -450,7 +450,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     def simple_dimensions_for_metrics(self, metric_names: List[str]) -> List[Dimension]:  # noqa: D
         return [
             Dimension(name=dim.qualified_name)
-            for dim in self._semantic_model.metric_semantics.element_specs_for_metrics(
+            for dim in self._semantic_manifest_lookup.metric_semantics.element_specs_for_metrics(
                 metric_references=[MetricReference(element_name=mname) for mname in metric_names],
                 without_any_property=frozenset(
                     {
@@ -464,8 +464,8 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def list_metrics(self) -> List[Metric]:  # noqa: D
-        metric_references = self._semantic_model.metric_semantics.metric_references
-        metrics = self._semantic_model.metric_semantics.get_metrics(metric_references)
+        metric_references = self._semantic_manifest_lookup.metric_semantics.metric_references
+        metrics = self._semantic_manifest_lookup.metric_semantics.get_metrics(metric_references)
         return [
             Metric(
                 name=metric.name,

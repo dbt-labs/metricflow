@@ -9,7 +9,7 @@ from dbt_semantic_interfaces.objects.metadata import Metadata
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.parsing.yaml_loader import YamlConfigLoader
-from metricflow.model.semantic_model import SemanticModel
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 
 
 def test_data_source_metadata_parsing(simple_user_configured_model: UserConfiguredModel) -> None:
@@ -43,7 +43,9 @@ def test_metric_metadata_parsing(simple_user_configured_model: UserConfiguredMod
 
 
 @pytest.mark.skip("TODO: Determine what to do with measure proxy metric metadata")
-def test_metric_metadata_parsing_with_measure_proxy(multi_hop_join_semantic_model: SemanticModel) -> None:
+def test_metric_metadata_parsing_with_measure_proxy(
+    multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
+) -> None:
     """Tests internal metadata object parsing from a file into the Metric model object via measure proxy
 
     The simple model has a broader array of metric definitions, but it does not appear to have a measure proxy
@@ -53,8 +55,8 @@ def test_metric_metadata_parsing_with_measure_proxy(multi_hop_join_semantic_mode
     to be collected in the same file in the simple model, and the output here has been transformed
     so the YAML contents might or might not match.
     """
-    assert len(multi_hop_join_semantic_model.user_configured_model.metrics) > 0
-    for metric in multi_hop_join_semantic_model.user_configured_model.metrics:
+    assert len(multi_hop_join_semantic_manifest_lookup.user_configured_model.metrics) > 0
+    for metric in multi_hop_join_semantic_manifest_lookup.user_configured_model.metrics:
         assert (
             metric.metadata is not None
         ), f"Metadata should always be parsed out of the model, but None found for metric: {metric}!"

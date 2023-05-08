@@ -3,7 +3,7 @@ from typing import Dict, Sequence
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.references import DataSourceReference, EntityReference
-from metricflow.model.semantic_model import SemanticModel
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.model.semantics.data_source_join_evaluator import (
     DataSourceEntityJoinType,
     DataSourceJoinEvaluator,
@@ -53,16 +53,18 @@ def test_join_type_coverage() -> None:
 
 
 def __get_simple_model_user_data_source_references_by_type(
-    semantic_model: SemanticModel,
+    semantic_manifest_lookup: SemanticManifestLookup,
 ) -> Dict[EntityType, DataSourceReference]:
     """Helper to get a set of data sources with the `user` identifier organized by identifier type"""
-    foreign_user_data_source = semantic_model.data_source_semantics.get_by_reference(
+    foreign_user_data_source = semantic_manifest_lookup.data_source_semantics.get_by_reference(
         DataSourceReference("listings_latest")
     )
-    primary_user_data_source = semantic_model.data_source_semantics.get_by_reference(
+    primary_user_data_source = semantic_manifest_lookup.data_source_semantics.get_by_reference(
         DataSourceReference("users_latest")
     )
-    unique_user_data_source = semantic_model.data_source_semantics.get_by_reference(DataSourceReference("companies"))
+    unique_user_data_source = semantic_manifest_lookup.data_source_semantics.get_by_reference(
+        DataSourceReference("companies")
+    )
 
     assert foreign_user_data_source, "Could not find `listings_latest` data source in simple model!"
     assert primary_user_data_source, "Could not find `users_latest` data source in simple model!"
@@ -75,15 +77,17 @@ def __get_simple_model_user_data_source_references_by_type(
     }
 
 
-def test_distinct_target_data_source_join_validation(simple_semantic_model: SemanticModel) -> None:
+def test_distinct_target_data_source_join_validation(simple_semantic_manifest_lookup: SemanticManifestLookup) -> None:
     """Tests data source join validation to a PRIMARY or UNIQUE identifier
 
     PRIMARY and UNIQUE identifier targets should be valid for any join at the data source level because they both
     represent identifier columns with distinct value sets, and as such there is no risk of inadvertent fanout joins.
     """
-    data_source_references = __get_simple_model_user_data_source_references_by_type(simple_semantic_model)
+    data_source_references = __get_simple_model_user_data_source_references_by_type(simple_semantic_manifest_lookup)
     user_entity_reference = EntityReference(element_name="user")
-    join_evaluator = DataSourceJoinEvaluator(data_source_semantics=simple_semantic_model.data_source_semantics)
+    join_evaluator = DataSourceJoinEvaluator(
+        data_source_semantics=simple_semantic_manifest_lookup.data_source_semantics
+    )
 
     foreign_primary = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=data_source_references[EntityType.FOREIGN],
@@ -130,14 +134,16 @@ def test_distinct_target_data_source_join_validation(simple_semantic_model: Sema
     )
 
 
-def test_foreign_target_data_source_join_validation(simple_semantic_model: SemanticModel) -> None:
+def test_foreign_target_data_source_join_validation(simple_semantic_manifest_lookup: SemanticManifestLookup) -> None:
     """Tests data source join validation to FOREIGN identifier types
 
     These should all fail by default, as fanout joins are not supported
     """
-    data_source_references = __get_simple_model_user_data_source_references_by_type(simple_semantic_model)
+    data_source_references = __get_simple_model_user_data_source_references_by_type(simple_semantic_manifest_lookup)
     user_entity_reference = EntityReference(element_name="user")
-    join_evaluator = DataSourceJoinEvaluator(data_source_semantics=simple_semantic_model.data_source_semantics)
+    join_evaluator = DataSourceJoinEvaluator(
+        data_source_semantics=simple_semantic_manifest_lookup.data_source_semantics
+    )
 
     foreign_foreign = join_evaluator.is_valid_data_source_join(
         left_data_source_reference=data_source_references[EntityType.FOREIGN],
@@ -166,18 +172,20 @@ def test_foreign_target_data_source_join_validation(simple_semantic_model: Seman
     )
 
 
-def test_data_source_join_validation_on_missing_entity(simple_semantic_model: SemanticModel) -> None:
+def test_data_source_join_validation_on_missing_entity(simple_semantic_manifest_lookup: SemanticManifestLookup) -> None:
     """Tests data source join validation where the identifier is missing from one or both data sources"""
-    primary_listing_data_source = simple_semantic_model.data_source_semantics.get_by_reference(
+    primary_listing_data_source = simple_semantic_manifest_lookup.data_source_semantics.get_by_reference(
         DataSourceReference("listings_latest")
     )
     assert primary_listing_data_source, "Could not find data source `listings_latest` in the simple model!"
-    no_listing_data_source = simple_semantic_model.data_source_semantics.get_by_reference(
+    no_listing_data_source = simple_semantic_manifest_lookup.data_source_semantics.get_by_reference(
         DataSourceReference("id_verifications")
     )
     assert no_listing_data_source, "Could not find data source `id_verifications` in the simple model!"
     listing_entity_reference = EntityReference(element_name="listing")
-    join_evaluator = DataSourceJoinEvaluator(data_source_semantics=simple_semantic_model.data_source_semantics)
+    join_evaluator = DataSourceJoinEvaluator(
+        data_source_semantics=simple_semantic_manifest_lookup.data_source_semantics
+    )
 
     assert not join_evaluator.is_valid_data_source_join(
         left_data_source_reference=no_listing_data_source.reference,
@@ -190,14 +198,17 @@ def test_data_source_join_validation_on_missing_entity(simple_semantic_model: Se
 
 
 def test_distinct_target_instance_set_join_validation(
-    consistent_id_object_repository: ConsistentIdObjectRepository, simple_semantic_model: SemanticModel
+    consistent_id_object_repository: ConsistentIdObjectRepository,
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Tests instance set join validation to a PRIMARY or UNIQUE identifier"""
     foreign_user_instance_set = consistent_id_object_repository.simple_model_data_sets["listings_latest"].instance_set
     primary_user_instance_set = consistent_id_object_repository.simple_model_data_sets["users_latest"].instance_set
     unique_user_instance_set = consistent_id_object_repository.simple_model_data_sets["companies"].instance_set
     user_entity_reference = EntityReference(element_name="user")
-    join_evaluator = DataSourceJoinEvaluator(data_source_semantics=simple_semantic_model.data_source_semantics)
+    join_evaluator = DataSourceJoinEvaluator(
+        data_source_semantics=simple_semantic_manifest_lookup.data_source_semantics
+    )
 
     foreign_primary = join_evaluator.is_valid_instance_set_join(
         left_instance_set=foreign_user_instance_set,
@@ -245,14 +256,17 @@ def test_distinct_target_instance_set_join_validation(
 
 
 def test_foreign_target_instance_set_join_validation(
-    consistent_id_object_repository: ConsistentIdObjectRepository, simple_semantic_model: SemanticModel
+    consistent_id_object_repository: ConsistentIdObjectRepository,
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Tests data source join validation to FOREIGN identifier types"""
     foreign_user_instance_set = consistent_id_object_repository.simple_model_data_sets["listings_latest"].instance_set
     primary_user_instance_set = consistent_id_object_repository.simple_model_data_sets["users_latest"].instance_set
     unique_user_instance_set = consistent_id_object_repository.simple_model_data_sets["companies"].instance_set
     user_entity_reference = EntityReference(element_name="user")
-    join_evaluator = DataSourceJoinEvaluator(data_source_semantics=simple_semantic_model.data_source_semantics)
+    join_evaluator = DataSourceJoinEvaluator(
+        data_source_semantics=simple_semantic_manifest_lookup.data_source_semantics
+    )
 
     foreign_foreign = join_evaluator.is_valid_instance_set_join(
         left_instance_set=foreign_user_instance_set,
@@ -281,9 +295,13 @@ def test_foreign_target_instance_set_join_validation(
     )
 
 
-def test_get_joinable_data_sources_single_hop(multi_hop_join_semantic_model: SemanticModel) -> None:  # noqa: D
+def test_get_joinable_data_sources_single_hop(  # noqa: D
+    multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
+) -> None:
     data_source_reference = DataSourceReference(data_source_name="account_month_txns")
-    join_evaluator = DataSourceJoinEvaluator(data_source_semantics=multi_hop_join_semantic_model.data_source_semantics)
+    join_evaluator = DataSourceJoinEvaluator(
+        data_source_semantics=multi_hop_join_semantic_manifest_lookup.data_source_semantics
+    )
 
     # Single-hop
     joinable_data_sources = join_evaluator.get_joinable_data_sources(left_data_source_reference=data_source_reference)
@@ -302,9 +320,13 @@ def test_get_joinable_data_sources_single_hop(multi_hop_join_semantic_model: Sem
     )
 
 
-def test_get_joinable_data_sources_multi_hop(multi_hop_join_semantic_model: SemanticModel) -> None:  # noqa: D
+def test_get_joinable_data_sources_multi_hop(  # noqa: D
+    multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
+) -> None:
     data_source_reference = DataSourceReference(data_source_name="account_month_txns")
-    join_evaluator = DataSourceJoinEvaluator(data_source_semantics=multi_hop_join_semantic_model.data_source_semantics)
+    join_evaluator = DataSourceJoinEvaluator(
+        data_source_semantics=multi_hop_join_semantic_manifest_lookup.data_source_semantics
+    )
 
     # 2-hop
     joinable_data_sources = join_evaluator.get_joinable_data_sources(
@@ -363,25 +385,25 @@ def test_get_joinable_data_sources_multi_hop(multi_hop_join_semantic_model: Sema
     )
 
 
-def test_natural_entity_data_source_validation(scd_semantic_model: SemanticModel) -> None:
+def test_natural_entity_data_source_validation(scd_semantic_manifest_lookup: SemanticManifestLookup) -> None:
     """Tests data source validation for NATURAL target identifier types
 
-    These tests rely on the scd_semantic_model, which makes extensive use of NATURAL key types.
+    These tests rely on the scd_semantic_manifest_lookup, which makes extensive use of NATURAL key types.
     """
-    natural_user_data_source = scd_semantic_model.data_source_semantics.get_by_reference(
+    natural_user_data_source = scd_semantic_manifest_lookup.data_source_semantics.get_by_reference(
         DataSourceReference("primary_accounts")
     )
-    primary_user_data_source = scd_semantic_model.data_source_semantics.get_by_reference(
+    primary_user_data_source = scd_semantic_manifest_lookup.data_source_semantics.get_by_reference(
         DataSourceReference("users_latest")
     )
-    foreign_user_data_source = scd_semantic_model.data_source_semantics.get_by_reference(
+    foreign_user_data_source = scd_semantic_manifest_lookup.data_source_semantics.get_by_reference(
         DataSourceReference("bookings_source")
     )
-    unique_user_data_source = scd_semantic_model.data_source_semantics.get_by_reference(
+    unique_user_data_source = scd_semantic_manifest_lookup.data_source_semantics.get_by_reference(
         DataSourceReference("companies")
     )
     user_entity_reference = EntityReference(element_name="user")
-    join_evaluator = DataSourceJoinEvaluator(data_source_semantics=scd_semantic_model.data_source_semantics)
+    join_evaluator = DataSourceJoinEvaluator(data_source_semantics=scd_semantic_manifest_lookup.data_source_semantics)
     # Type refinement
     assert natural_user_data_source, "Could not find `primary_accounts` data source in scd model!"
     assert foreign_user_data_source, "Could not find `bookings_source` data source in scd model!"
@@ -445,18 +467,18 @@ def test_natural_entity_data_source_validation(scd_semantic_model: SemanticModel
 
 
 def test_natural_entity_instance_set_validation(
-    consistent_id_object_repository: ConsistentIdObjectRepository, scd_semantic_model: SemanticModel
+    consistent_id_object_repository: ConsistentIdObjectRepository, scd_semantic_manifest_lookup: SemanticManifestLookup
 ) -> None:
     """Tests instance set validation for NATURAL target identifier types
 
-    These tests rely on the scd_semantic_model, which makes extensive use of NATURAL key types.
+    These tests rely on the scd_semantic_manifest_lookup, which makes extensive use of NATURAL key types.
     """
     natural_user_instance_set = consistent_id_object_repository.scd_model_data_sets["primary_accounts"].instance_set
     primary_user_instance_set = consistent_id_object_repository.scd_model_data_sets["users_latest"].instance_set
     foreign_user_instance_set = consistent_id_object_repository.scd_model_data_sets["bookings_source"].instance_set
     unique_user_instance_set = consistent_id_object_repository.scd_model_data_sets["companies"].instance_set
     user_entity_reference = EntityReference(element_name="user")
-    join_evaluator = DataSourceJoinEvaluator(data_source_semantics=scd_semantic_model.data_source_semantics)
+    join_evaluator = DataSourceJoinEvaluator(data_source_semantics=scd_semantic_manifest_lookup.data_source_semantics)
 
     # Valid cases
     natural_primary = join_evaluator.is_valid_instance_set_join(

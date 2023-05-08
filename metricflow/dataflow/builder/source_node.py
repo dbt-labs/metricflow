@@ -6,7 +6,7 @@ from metricflow.dataflow.dataflow_plan import (
     ReadSqlSourceNode,
 )
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
-from metricflow.model.semantic_model import SemanticModel
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 
 
 class SourceNodeBuilder:
@@ -16,8 +16,8 @@ class SourceNodeBuilder:
     dimensions. Each data set is converted into k DataFlowPlan nodes.
     """
 
-    def __init__(self, semantic_model: SemanticModel) -> None:  # noqa: D
-        self._semantic_model = semantic_model
+    def __init__(self, semantic_manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D
+        self._semantic_manifest_lookup = semantic_manifest_lookup
 
     def create_from_data_sets(self, data_sets: Sequence[DataSourceDataSet]) -> Sequence[BaseOutput[DataSourceDataSet]]:
         """Creates source nodes from DataSourceDataSets."""
@@ -25,7 +25,7 @@ class SourceNodeBuilder:
         for data_set in data_sets:
             read_node = ReadSqlSourceNode[DataSourceDataSet](data_set)
             agg_time_dim_to_measures_grouper = (
-                self._semantic_model.data_source_semantics.get_aggregation_time_dimensions_with_measures(
+                self._semantic_manifest_lookup.data_source_semantics.get_aggregation_time_dimensions_with_measures(
                     data_set.data_source_reference
                 )
             )

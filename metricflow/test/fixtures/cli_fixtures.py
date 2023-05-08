@@ -9,7 +9,7 @@ from click.testing import CliRunner, Result
 from metricflow.cli.cli_context import CLIContext
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.semantic_model import SemanticModel
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.async_sql_client import AsyncSqlClient
@@ -26,11 +26,11 @@ def cli_context(  # noqa: D
     mf_test_session_state: MetricFlowTestSessionState,
     create_source_tables: bool,
 ) -> CLIContext:
-    semantic_model = SemanticModel(simple_user_configured_model)
+    semantic_manifest_lookup = SemanticManifestLookup(simple_user_configured_model)
     mf_engine = MetricFlowEngine(
-        semantic_model=semantic_model,
+        semantic_manifest_lookup=semantic_manifest_lookup,
         sql_client=async_sql_client,
-        column_association_resolver=DefaultColumnAssociationResolver(semantic_model=semantic_model),
+        column_association_resolver=DefaultColumnAssociationResolver(semantic_manifest_lookup=semantic_manifest_lookup),
         time_source=ConfigurableTimeSource(as_datetime("2020-01-01")),
         time_spine_source=time_spine_source,
         system_schema=mf_test_session_state.mf_system_schema,
@@ -39,7 +39,7 @@ def cli_context(  # noqa: D
     context._mf = mf_engine
     context._sql_client = async_sql_client
     context._user_configured_model = simple_user_configured_model
-    context._semantic_model = semantic_model
+    context._semantic_manifest_lookup = semantic_manifest_lookup
     context._mf_system_schema = mf_test_session_state.mf_system_schema
     return context
 

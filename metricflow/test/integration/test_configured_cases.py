@@ -9,7 +9,7 @@ from dateutil import parser
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowQueryRequest
 from dbt_semantic_interfaces.objects.elements.measure import MeasureAggregationParameters
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from metricflow.model.semantic_model import SemanticModel
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import (
     DefaultColumnAssociationResolver,
 )
@@ -172,12 +172,12 @@ def filter_not_supported_features(
 def test_case(
     name: str,
     mf_test_session_state: MetricFlowTestSessionState,
-    simple_semantic_model: SemanticModel,
-    simple_semantic_model_non_ds: SemanticModel,
-    unpartitioned_multi_hop_join_semantic_model: SemanticModel,
-    multi_hop_join_semantic_model: SemanticModel,
-    extended_date_semantic_model: SemanticModel,
-    scd_semantic_model: SemanticModel,
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
+    simple_semantic_manifest_lookup_non_ds: SemanticManifestLookup,
+    unpartitioned_multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
+    multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
+    extended_date_semantic_manifest_lookup: SemanticManifestLookup,
+    scd_semantic_manifest_lookup: SemanticManifestLookup,
     async_sql_client: AsyncSqlClient,
     create_source_tables: bool,
     time_spine_source: TimeSpineSource,
@@ -190,28 +190,28 @@ def test_case(
     if missing_required_features:
         pytest.skip(f"DW does not support {missing_required_features}")
 
-    semantic_model: Optional[SemanticModel] = None
+    semantic_manifest_lookup: Optional[SemanticManifestLookup] = None
     if case.model is IntegrationTestModel.SIMPLE_MODEL:
-        semantic_model = simple_semantic_model
+        semantic_manifest_lookup = simple_semantic_manifest_lookup
     elif case.model is IntegrationTestModel.SIMPLE_MODEL_NON_DS:
-        semantic_model = simple_semantic_model_non_ds
+        semantic_manifest_lookup = simple_semantic_manifest_lookup_non_ds
     elif case.model is IntegrationTestModel.UNPARTITIONED_MULTI_HOP_JOIN_MODEL:
-        semantic_model = unpartitioned_multi_hop_join_semantic_model
+        semantic_manifest_lookup = unpartitioned_multi_hop_join_semantic_manifest_lookup
     elif case.model is IntegrationTestModel.PARTITIONED_MULTI_HOP_JOIN_MODEL:
-        semantic_model = multi_hop_join_semantic_model
+        semantic_manifest_lookup = multi_hop_join_semantic_manifest_lookup
     elif case.model is IntegrationTestModel.EXTENDED_DATE_MODEL:
-        semantic_model = extended_date_semantic_model
+        semantic_manifest_lookup = extended_date_semantic_manifest_lookup
     elif case.model is IntegrationTestModel.SCD_MODEL:
-        semantic_model = scd_semantic_model
+        semantic_manifest_lookup = scd_semantic_manifest_lookup
     else:
         assert_values_exhausted(case.model)
 
-    assert semantic_model
+    assert semantic_manifest_lookup
 
     engine = MetricFlowEngine(
-        semantic_model=semantic_model,
+        semantic_manifest_lookup=semantic_manifest_lookup,
         sql_client=async_sql_client,
-        column_association_resolver=DefaultColumnAssociationResolver(semantic_model),
+        column_association_resolver=DefaultColumnAssociationResolver(semantic_manifest_lookup),
         time_source=ConfigurableTimeSource(as_datetime("2021-01-04")),
         time_spine_source=time_spine_source,
         system_schema=mf_test_session_state.mf_system_schema,

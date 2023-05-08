@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import pytest
 
 from metricflow.engine.metricflow_engine import MetricFlowEngine
-from metricflow.model.semantic_model import SemanticModel
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.async_sql_client import AsyncSqlClient
@@ -27,15 +27,17 @@ class IntegrationTestHelpers:
 def it_helpers(  # noqa: D
     async_sql_client: AsyncSqlClient,
     create_source_tables: bool,
-    simple_semantic_model: SemanticModel,
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
     time_spine_source: TimeSpineSource,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> IntegrationTestHelpers:
     return IntegrationTestHelpers(
         mf_engine=MetricFlowEngine(
-            semantic_model=simple_semantic_model,
+            semantic_manifest_lookup=simple_semantic_manifest_lookup,
             sql_client=async_sql_client,
-            column_association_resolver=DefaultColumnAssociationResolver(semantic_model=simple_semantic_model),
+            column_association_resolver=DefaultColumnAssociationResolver(
+                semantic_manifest_lookup=simple_semantic_manifest_lookup
+            ),
             time_source=ConfigurableTimeSource(as_datetime("2020-01-01")),
             time_spine_source=time_spine_source,
             system_schema=mf_test_session_state.mf_system_schema,

@@ -43,7 +43,7 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
 from dbt_semantic_interfaces.objects.metric import MetricType, MetricTimeWindow
-from metricflow.model.semantic_model import SemanticModel
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
@@ -106,25 +106,25 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
     def __init__(  # noqa: D
         self,
         source_nodes: Sequence[BaseOutput[SqlDataSetT]],
-        semantic_model: SemanticModel,
+        semantic_manifest_lookup: SemanticManifestLookup,
         time_spine_source: TimeSpineSource,
         cost_function: DataflowPlanNodeCostFunction = DefaultCostFunction[SqlDataSetT](),
         node_output_resolver: Optional[DataflowPlanNodeOutputDataSetResolver[SqlDataSetT]] = None,
         column_association_resolver: Optional[ColumnAssociationResolver] = None,
     ) -> None:
-        self._data_source_semantics = semantic_model.data_source_semantics
-        self._metric_semantics = semantic_model.metric_semantics
+        self._data_source_semantics = semantic_manifest_lookup.data_source_semantics
+        self._metric_semantics = semantic_manifest_lookup.metric_semantics
         self._metric_time_dimension_reference = DataSet.metric_time_dimension_reference()
         self._cost_function = cost_function
         self._source_nodes = source_nodes
         self._node_data_set_resolver = (
             DataflowPlanNodeOutputDataSetResolver[SqlDataSetT](
                 column_association_resolver=(
-                    DefaultColumnAssociationResolver(semantic_model)
+                    DefaultColumnAssociationResolver(semantic_manifest_lookup)
                     if not column_association_resolver
                     else column_association_resolver
                 ),
-                semantic_model=semantic_model,
+                semantic_manifest_lookup=semantic_manifest_lookup,
                 time_spine_source=time_spine_source,
             )
             if not node_output_resolver

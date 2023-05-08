@@ -26,7 +26,7 @@ from metricflow.dataflow.dataflow_plan import (
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.dataset.dataset import DataSet
-from metricflow.model.semantic_model import SemanticModel
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.time_spine import TimeSpineSource
@@ -61,24 +61,24 @@ from dbt_semantic_interfaces.objects.metric import MetricTimeWindow
 
 @pytest.fixture(scope="session")
 def multihop_dataflow_to_sql_converter(  # noqa: D
-    multi_hop_join_semantic_model: SemanticModel,
+    multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
     time_spine_source: TimeSpineSource,
 ) -> DataflowToSqlQueryPlanConverter[DataSourceDataSet]:
     return DataflowToSqlQueryPlanConverter[DataSourceDataSet](
-        column_association_resolver=DefaultColumnAssociationResolver(multi_hop_join_semantic_model),
-        semantic_model=multi_hop_join_semantic_model,
+        column_association_resolver=DefaultColumnAssociationResolver(multi_hop_join_semantic_manifest_lookup),
+        semantic_manifest_lookup=multi_hop_join_semantic_manifest_lookup,
         time_spine_source=time_spine_source,
     )
 
 
 @pytest.fixture(scope="session")
 def scd_dataflow_to_sql_converter(  # noqa: D
-    scd_semantic_model: SemanticModel,
+    scd_semantic_manifest_lookup: SemanticManifestLookup,
     time_spine_source: TimeSpineSource,
 ) -> DataflowToSqlQueryPlanConverter[DataSourceDataSet]:
     return DataflowToSqlQueryPlanConverter[DataSourceDataSet](
-        column_association_resolver=DefaultColumnAssociationResolver(scd_semantic_model),
-        semantic_model=scd_semantic_model,
+        column_association_resolver=DefaultColumnAssociationResolver(scd_semantic_manifest_lookup),
+        semantic_manifest_lookup=scd_semantic_manifest_lookup,
         time_spine_source=time_spine_source,
     )
 

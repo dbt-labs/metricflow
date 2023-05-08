@@ -4,7 +4,7 @@ from metricflow.model.semantics.metric_semantics import MetricSemantics
 from metricflow.protocols.semantics import DataSourceSemanticsAccessor, MetricSemanticsAccessor
 
 
-class SemanticModel:
+class SemanticManifestLookup:
     """Adds semantics information to the user configured model."""
 
     def __init__(self, user_configured_model: UserConfiguredModel) -> None:  # noqa: D

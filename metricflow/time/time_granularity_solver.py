@@ -20,7 +20,7 @@ from dbt_semantic_interfaces.references import (
     MetricReference,
     EntityReference,
 )
-from metricflow.model.semantic_model import SemanticModel
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.specs import (
     TimeDimensionSpec,
@@ -69,13 +69,13 @@ class TimeGranularitySolver:
 
     def __init__(  # noqa: D
         self,
-        semantic_model: SemanticModel,
+        semantic_manifest_lookup: SemanticManifestLookup,
         source_nodes: Sequence[BaseOutput[DataSourceDataSet]],
         node_output_resolver: DataflowPlanNodeOutputDataSetResolver[DataSourceDataSet],
     ) -> None:
-        self._semantic_model = semantic_model
+        self._semantic_manifest_lookup = semantic_manifest_lookup
         self._metric_reference_to_measure_reference = TimeGranularitySolver._measures_for_metric(
-            self._semantic_model.user_configured_model
+            self._semantic_manifest_lookup.user_configured_model
         )
 
         self._local_time_dimension_granularities: Dict[
@@ -167,7 +167,7 @@ class TimeGranularitySolver:
                 # If there is a cumulative metric, granularity changes aren't supported. We need to check the granularity
                 # specified in the configs for the cumulative metric alone, since `min_granularity_for_querying` may not be supported.
                 for metric_reference in metric_references:
-                    metric = self._semantic_model.metric_semantics.get_metric(metric_reference)
+                    metric = self._semantic_manifest_lookup.metric_semantics.get_metric(metric_reference)
                     if metric.type == MetricType.CUMULATIVE:
                         _, only_queryable_granularity = self.local_dimension_granularity_range(
                             metric_references=[metric_reference],
