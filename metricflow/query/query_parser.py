@@ -17,12 +17,12 @@ from dbt_semantic_interfaces.references import (
     MetricReference,
     TimeDimensionReference,
 )
-from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import BaseOutput
 from metricflow.dataset.dataset import DataSet
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
+from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.query.query_exceptions import InvalidQueryException
@@ -34,7 +34,6 @@ from metricflow.specs import (
     EntitySpec,
     LinkableInstanceSpec,
     OrderBySpec,
-    OutputColumnNameOverride,
     LinkableSpecSet,
     ColumnAssociationResolver,
     WhereFilterSpec,
@@ -441,26 +440,6 @@ class MetricFlowQueryParser:
             )
             logger.info(f"Time constraint after adjustment is {time_constraint}")
 
-        # In some cases, the old framework does not use dundered suffixes in the output column name for the primary
-        # time dimension. We should aim to get rid of this logic.
-        output_column_name_overrides = []
-        if (
-            self._metric_time_dimension_specified_without_granularity(
-                requested_linkable_specs.partial_time_dimension_specs
-            )
-            and not time_granularity
-        ):
-            if self._metrics_have_same_time_granularities(metric_references=metric_references):
-                _, replace_with_time_dimension_spec = self._find_replacement_for_metric_time_dimension(
-                    partial_time_dimension_spec_replacements
-                )
-                output_column_name_overrides.append(
-                    OutputColumnNameOverride(
-                        time_dimension_spec=replace_with_time_dimension_spec,
-                        output_column_name=self._metric_time_dimension_reference.element_name,
-                    )
-                )
-
         if limit is not None and limit < 0:
             raise InvalidQueryException(f"Limit was specified as {limit}, which is < 0.")
 
@@ -479,7 +458,6 @@ class MetricFlowQueryParser:
             entity_specs=requested_linkable_specs.entity_specs,
             time_dimension_specs=time_dimension_specs,
             order_by_specs=order_by_specs,
-            output_column_name_overrides=tuple(output_column_name_overrides),
             time_range_constraint=time_constraint,
             where_constraint=where_filter_spec,
             limit=limit,
