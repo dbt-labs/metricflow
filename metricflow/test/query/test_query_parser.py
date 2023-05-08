@@ -3,6 +3,7 @@ import textwrap
 
 import pytest
 
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.errors.errors import UnableToSatisfyQueryError
@@ -13,13 +14,11 @@ from metricflow.specs import (
     TimeDimensionSpec,
     EntitySpec,
     OrderBySpec,
-    OutputColumnNameOverride,
 )
+from metricflow.test.fixtures.model_fixtures import query_parser_from_yaml
 from metricflow.test.test_utils import as_datetime
 from metricflow.test.time.metric_time_dimension import MTD
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 from metricflow.time.time_granularity_solver import RequestTimeGranularityException
-from metricflow.test.fixtures.model_fixtures import query_parser_from_yaml
 
 logger = logging.getLogger(__name__)
 
@@ -218,36 +217,6 @@ def test_time_range_constraint_conversion(time_spine_source: TimeSpineSource) ->
     assert (
         TimeRangeConstraint(start_time=as_datetime("2020-01-01"), end_time=as_datetime("2020-02-29"))
     ) == query_spec.time_range_constraint
-
-
-def test_column_override(time_spine_source: TimeSpineSource) -> None:
-    """Tests that the output column override is set.
-
-    Should be set in cases where the metrics have a non-day granularity, but ds is specified.
-    """
-
-    revenue_yaml_file = YamlConfigFile(filepath="inline_for_test_2", contents=REVENUE_YAML)
-
-    query_parser = query_parser_from_yaml([revenue_yaml_file], time_spine_source)
-
-    # "revenue" has a granularity of MONTH
-    query_spec = query_parser.parse_and_validate_query(
-        metric_names=["revenue"],
-        group_by_names=[MTD],
-        time_constraint_start=as_datetime("2020-01-15"),
-        time_constraint_end=as_datetime("2020-02-15"),
-    )
-
-    assert (
-        OutputColumnNameOverride(
-            time_dimension_spec=TimeDimensionSpec(
-                element_name=MTD,
-                entity_links=(),
-                time_granularity=TimeGranularity.MONTH,
-            ),
-            output_column_name=MTD,
-        ),
-    ) == query_spec.output_column_name_overrides
 
 
 def test_parse_and_validate_where_constraint_dims(time_spine_source: TimeSpineSource) -> None:

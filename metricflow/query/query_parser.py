@@ -6,25 +6,26 @@ import time
 from dataclasses import dataclass
 from typing import List, Optional, Tuple, Dict, Sequence
 
-from metricflow.constraints.time_constraint import TimeRangeConstraint
-from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
-from metricflow.dataflow.dataflow_plan import BaseOutput
-from metricflow.dataset.data_source_adapter import DataSourceDataSet
-from metricflow.dataset.dataset import DataSet
-from metricflow.errors.errors import UnableToSatisfyQueryError
 from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.metric import MetricType
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.references import (
     DimensionReference,
     EntityReference,
     MetricReference,
     TimeDimensionReference,
 )
+from metricflow.constraints.time_constraint import TimeRangeConstraint
+from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
+from metricflow.dataflow.dataflow_plan import BaseOutput
+from metricflow.dataset.data_source_adapter import DataSourceDataSet
+from metricflow.dataset.dataset import DataSet
+from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.model.semantic_model import SemanticModel
 from metricflow.model.spec_converters import WhereConstraintConverter
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.specs import (
     MetricFlowQuerySpec,
@@ -34,11 +35,9 @@ from metricflow.specs import (
     EntitySpec,
     LinkableInstanceSpec,
     OrderBySpec,
-    OutputColumnNameOverride,
     SpecWhereClauseConstraint,
     LinkableSpecSet,
 )
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 from metricflow.time.time_granularity_solver import (
     TimeGranularitySolver,
     PartialTimeDimensionSpec,
@@ -382,26 +381,6 @@ class MetricFlowQueryParser:
             )
             logger.info(f"Time constraint after adjustment is {time_constraint}")
 
-        # In some cases, the old framework does not use dundered suffixes in the output column name for the primary
-        # time dimension. We should aim to get rid of this logic.
-        output_column_name_overrides = []
-        if (
-            self._metric_time_dimension_specified_without_granularity(
-                requested_linkable_specs.partial_time_dimension_specs
-            )
-            and not time_granularity
-        ):
-            if self._metrics_have_same_time_granularities(metric_references=metric_references):
-                _, replace_with_time_dimension_spec = self._find_replacement_for_metric_time_dimension(
-                    partial_time_dimension_spec_replacements
-                )
-                output_column_name_overrides.append(
-                    OutputColumnNameOverride(
-                        time_dimension_spec=replace_with_time_dimension_spec,
-                        output_column_name=self._metric_time_dimension_reference.element_name,
-                    )
-                )
-
         if limit is not None and limit < 0:
             raise InvalidQueryException(f"Limit was specified as {limit}, which is < 0.")
 
@@ -426,7 +405,6 @@ class MetricFlowQueryParser:
             entity_specs=requested_linkable_specs.entity_specs,
             time_dimension_specs=time_dimension_specs,
             order_by_specs=order_by_specs,
-            output_column_name_overrides=tuple(output_column_name_overrides),
             time_range_constraint=time_constraint,
             where_constraint=spec_where_constraint,
             limit=limit,
