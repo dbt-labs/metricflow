@@ -2,7 +2,7 @@ import datetime
 
 import pytest
 
-from metricflow.constraints.time_constraint import TimeRangeConstraint
+from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter

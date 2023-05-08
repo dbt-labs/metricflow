@@ -1,6 +1,6 @@
 import logging
 
-from dbt_semantic_interfaces.objects.constraints.filter_renderer import (
+from dbt_semantic_interfaces.objects.where_filter.filter_renderer import (
     FilterRenderer,
     FilterCallParameterSets,
     DimensionCallParameterSet,

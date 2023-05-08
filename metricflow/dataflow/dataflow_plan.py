@@ -15,7 +15,7 @@ from dbt_semantic_interfaces.objects.metric import MetricTimeWindow
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.references import TimeDimensionReference
-from metricflow.constraints.time_constraint import TimeRangeConstraint
+from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.dag.id_generation import (
     DATAFLOW_NODE_AGGREGATE_MEASURES_ID_PREFIX,
     DATAFLOW_NODE_SEMI_ADDITIVE_JOIN_ID_PREFIX,

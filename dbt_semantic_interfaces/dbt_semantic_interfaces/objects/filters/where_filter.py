@@ -5,7 +5,7 @@ from dbt_semantic_interfaces.objects.base import (
     HashableBaseModel,
     PydanticParseableValueType,
 )
-from dbt_semantic_interfaces.objects.constraints.filter_renderer import FilterCallParameterSets, FilterRenderer
+from dbt_semantic_interfaces.objects.where_filter.filter_renderer import FilterCallParameterSets, FilterRenderer
 
 
 class WhereFilter(PydanticCustomInputParser, HashableBaseModel):
