@@ -16,7 +16,7 @@ from metricflow.specs import (
     DimensionSpec,
     EntityReference,
     ColumnAssociationResolver,
-    ResolvedWhereFilter,
+    WhereFilterSpec,
 )
 from metricflow.specs import (
     OrderBySpec,
@@ -346,7 +346,7 @@ def test_where_constrained_plan(  # noqa: D
                     entity_links=(),
                 ),
             ),
-            where_constraint=ResolvedWhereFilter.create_from_where_filter(
+            where_constraint=WhereFilterSpec.create_from_where_filter(
                 where_filter=WhereFilter(
                     where_sql_template="{{ dimension('country_latest', entity_path=['listing']) }} = 'us'",
                 ),
@@ -385,7 +385,7 @@ def test_where_constrained_plan_time_dimension(  # noqa: D
                     entity_links=(),
                 ),
             ),
-            where_constraint=ResolvedWhereFilter.create_from_where_filter(
+            where_constraint=WhereFilterSpec.create_from_where_filter(
                 where_filter=WhereFilter(
                     where_sql_template="{{ time_dimension('metric_time', 'day') }} >= '2020-01-01'",
                 ),
@@ -424,7 +424,7 @@ def test_where_constrained_with_common_linkable_plan(  # noqa: D
                     entity_links=(EntityReference(element_name="listing"),),
                 ),
             ),
-            where_constraint=ResolvedWhereFilter.create_from_where_filter(
+            where_constraint=WhereFilterSpec.create_from_where_filter(
                 where_filter=WhereFilter(
                     where_sql_template="{{ dimension('country_latest', entity_path=['listing']) }} = 'us'",
                 ),
