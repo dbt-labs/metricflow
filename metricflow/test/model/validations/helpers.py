@@ -1,8 +1,6 @@
 import textwrap
 from typing import Optional, Sequence
 
-from dbt_semantic_interfaces.objects.common import FileSlice, Metadata, YamlConfigFile
-
 from dbt_semantic_interfaces.objects.data_source import DataSource, DataSourceOrigin, Mutability
 from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.elements.measure import Measure

@@ -66,7 +66,7 @@ from metricflow.specs import (
     ColumnAssociationResolver,
     LinklessEntitySpec,
     InstanceSpecSet,
-    ResolvedWhereFilter,
+    WhereFilterSpec,
 )
 from metricflow.sql.sql_plan import SqlJoinType
 
@@ -169,7 +169,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         self,
         metric_specs: Sequence[MetricSpec],
         queried_linkable_specs: LinkableSpecSet,
-        where_constraint: Optional[ResolvedWhereFilter] = None,
+        where_constraint: Optional[WhereFilterSpec] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         combine_metrics_join_type: SqlJoinType = SqlJoinType.FULL_OUTER,
     ) -> BaseOutput[SqlDataSetT]:
@@ -610,7 +610,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         self,
         metric_input_measure_specs: Sequence[MetricInputMeasureSpec],
         queried_linkable_specs: LinkableSpecSet,
-        where_constraint: Optional[ResolvedWhereFilter] = None,
+        where_constraint: Optional[WhereFilterSpec] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         cumulative: Optional[bool] = False,
         cumulative_window: Optional[MetricTimeWindow] = None,
@@ -624,7 +624,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         """
         output_nodes: List[BaseOutput[SqlDataSetT]] = []
         data_sources_and_constraints_to_measures: DefaultDict[
-            tuple[str, Optional[ResolvedWhereFilter]], List[MetricInputMeasureSpec]
+            tuple[str, Optional[WhereFilterSpec]], List[MetricInputMeasureSpec]
         ] = collections.defaultdict(list)
         for input_spec in metric_input_measure_specs:
             data_source_names = [
@@ -695,7 +695,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         self,
         metric_input_measure_specs: Sequence[MetricInputMeasureSpec],
         queried_linkable_specs: LinkableSpecSet,
-        where_constraint: Optional[ResolvedWhereFilter] = None,
+        where_constraint: Optional[WhereFilterSpec] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         cumulative: Optional[bool] = False,
         cumulative_window: Optional[MetricTimeWindow] = None,

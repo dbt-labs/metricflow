@@ -16,7 +16,7 @@ from metricflow.specs import (
     MetricInputMeasureSpec,
     MeasureSpec,
     ColumnAssociationResolver,
-    ResolvedWhereFilter,
+    WhereFilterSpec,
 )
 
 logger = logging.getLogger(__name__)
@@ -107,7 +107,7 @@ class MetricSemantics(MetricSemanticsAccessor):  # noqa: D
             )
             spec = MetricInputMeasureSpec(
                 measure_spec=measure_spec,
-                constraint=ResolvedWhereFilter.create_from_where_filter(
+                constraint=WhereFilterSpec.create_from_where_filter(
                     where_filter=input_measure.constraint,
                     column_association_resolver=column_association_resolver,
                 )
@@ -145,7 +145,7 @@ class MetricSemantics(MetricSemanticsAccessor):  # noqa: D
 
             # This is the constraint parameter added to the input metric in the derived metric definition
             combined_filter = (
-                ResolvedWhereFilter.create_from_where_filter(
+                WhereFilterSpec.create_from_where_filter(
                     where_filter=input_metric.constraint,
                     column_association_resolver=column_association_resolver,
                 )
@@ -165,7 +165,7 @@ class MetricSemantics(MetricSemanticsAccessor):  # noqa: D
                 #     else original_metric_constraint
                 # )
 
-                original_metric_filter = ResolvedWhereFilter.create_from_where_filter(
+                original_metric_filter = WhereFilterSpec.create_from_where_filter(
                     where_filter=original_metric_obj.constraint,
                     column_association_resolver=column_association_resolver,
                 )

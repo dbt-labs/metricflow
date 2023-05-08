@@ -40,7 +40,7 @@ from metricflow.specs import (
     MetricFlowQuerySpec,
     MetricSpec,
     ColumnAssociationResolver,
-    ResolvedWhereFilter,
+    WhereFilterSpec,
 )
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
@@ -243,7 +243,7 @@ def test_constrained_metric_not_combined(  # noqa: D
                 MetricSpec(element_name="booking_value"),
                 MetricSpec(
                     element_name="instant_booking_value",
-                    constraint=ResolvedWhereFilter.create_from_where_filter(
+                    constraint=WhereFilterSpec.create_from_where_filter(
                         where_filter=WhereFilter(where_sql_template="{{ dimension('is_instant') }} "),
                         column_association_resolver=column_association_resolver,
                     ),
