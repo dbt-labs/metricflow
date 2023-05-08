@@ -2,7 +2,7 @@ import traceback
 from typing import List, Tuple
 
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode
-from metricflow.dataflow.sql_table import SqlTable
+from dbt_semantic_interfaces.objects.data_source import NodeRelation
 from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
     DbtMappingRule,
     MappedObjects,
@@ -55,8 +55,8 @@ class DbtMapToDataSourceDescription(DbtMappingRule):
         return ModelValidationResults.from_issues_sequence(issues=issues)
 
 
-class DbtMapDataSourceSqlTable(DbtMappingRule):
-    """Rule for mapping dbt metric models to data source sql tables"""
+class DbtMapDataSourceNodeRelation(DbtMappingRule):
+    """Rule for mapping dbt metric models to data source node relations"""
 
     @staticmethod
     def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
@@ -70,11 +70,11 @@ class DbtMapDataSourceSqlTable(DbtMappingRule):
                         metric.model.database
                     ), f"Expected a `database` for `{metric.name}` metric's `model`, got `None`"
                     assert metric.model.schema, f"Expected a `schema` for `{metric.name}` metric's `model`, got `None`"
-                    objects.data_sources[metric.model.name]["sql_table"] = SqlTable(
-                        db_name=metric.model.database,
+                    objects.data_sources[metric.model.name]["node_relation"] = NodeRelation(
+                        alias=metric.model.name,
                         schema_name=metric.model.schema,
-                        table_name=metric.model.name,
-                    ).sql
+                        database=metric.model.database,
+                    )
 
                 except Exception as e:
                     issues.append(

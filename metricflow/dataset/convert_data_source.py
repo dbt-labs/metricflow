@@ -40,7 +40,6 @@ from metricflow.sql.sql_plan import (
     SqlSelectStatementNode,
     SqlSelectColumn,
     SqlQueryPlanNode,
-    SqlSelectQueryFromClauseNode,
 )
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
@@ -407,12 +406,7 @@ class DataSourceToDataSetConverter:
 
         # Generate the "from" clause depending on whether it's an SQL query or an SQL table.
         from_source: Optional[SqlQueryPlanNode] = None
-        if data_source.sql_table:
-            from_source = SqlTableFromClauseNode(sql_table=SqlTable.from_string(data_source.sql_table))
-        elif data_source.sql_query:
-            from_source = SqlSelectQueryFromClauseNode(select_query=data_source.sql_query)
-        else:
-            raise RuntimeError(f"Data source does not have sql_table or sql_query set: {data_source}")
+        from_source = SqlTableFromClauseNode(sql_table=SqlTable.from_string(data_source.node_relation.relation_name))
 
         select_statement_node = SqlSelectStatementNode(
             description=f"Read Elements From Data Source '{data_source.name}'",
