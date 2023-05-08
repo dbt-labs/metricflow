@@ -599,7 +599,6 @@ class MetricFlowQuerySpec(SerializableDataclass):
     entity_specs: Tuple[EntitySpec, ...] = ()
     time_dimension_specs: Tuple[TimeDimensionSpec, ...] = ()
     order_by_specs: Tuple[OrderBySpec, ...] = ()
-    output_column_name_overrides: Tuple[OutputColumnNameOverride, ...] = ()
     time_range_constraint: Optional[TimeRangeConstraint] = None
     where_constraint: Optional[WhereFilterSpec] = None
     limit: Optional[int] = None
