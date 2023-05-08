@@ -46,7 +46,7 @@ from metricflow.specs import (
     TimeDimensionSpec,
     InstanceSpecSet,
     ColumnAssociationResolver,
-    ResolvedWhereFilter,
+    WhereFilterSpec,
 )
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
@@ -205,7 +205,7 @@ def test_filter_with_where_constraint_node(  # noqa: D
     )  # need to include ds_spec because where constraint operates on ds
     where_constraint_node = WhereConstraintNode[SemanticModelDataSet](
         parent_node=filter_node,
-        where_constraint=ResolvedWhereFilter.create_from_where_filter(
+        where_constraint=WhereFilterSpec.create_from_where_filter(
             where_filter=WhereFilter(
                 where_sql_template="{{ time_dimension('ds', 'day') }} = '2020-01-01'",
             ),
@@ -941,7 +941,7 @@ def test_filter_with_where_constraint_on_join_dim(
                     entity_links=(),
                 ),
             ),
-            where_constraint=ResolvedWhereFilter.create_from_where_filter(
+            where_constraint=WhereFilterSpec.create_from_where_filter(
                 where_filter=WhereFilter(
                     where_sql_template="{{ dimension('country_latest', entity_path=['listing']) }} = 'us'",
                 ),
@@ -1530,7 +1530,7 @@ def test_join_to_scd_dimension(
             metric_specs=(
                 MetricSpec(
                     element_name="family_bookings",
-                    constraint=ResolvedWhereFilter.create_from_where_filter(
+                    constraint=WhereFilterSpec.create_from_where_filter(
                         where_filter=WhereFilter(
                             where_sql_template="{{ dimension('capacity', entity_path=['listing']) }} > 2",
                         ),

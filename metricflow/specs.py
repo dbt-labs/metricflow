@@ -424,7 +424,7 @@ class MeasureSpec(InstanceSpec):  # noqa: D
 class MetricSpec(InstanceSpec):  # noqa: D
     # Time-over-time could go here
     element_name: str
-    constraint: Optional[ResolvedWhereFilter] = None
+    constraint: Optional[WhereFilterSpec] = None
     alias: Optional[str] = None
     offset_window: Optional[MetricTimeWindow] = None
     offset_to_grain: Optional[TimeGranularity] = None
@@ -473,7 +473,7 @@ class MetricInputMeasureSpec(SerializableDataclass):
     """
 
     measure_spec: MeasureSpec
-    constraint: Optional[ResolvedWhereFilter] = None
+    constraint: Optional[WhereFilterSpec] = None
     alias: Optional[str] = None
 
     @property
@@ -624,7 +624,7 @@ class MetricFlowQuerySpec(SerializableDataclass):
     order_by_specs: Tuple[OrderBySpec, ...] = ()
     output_column_name_overrides: Tuple[OutputColumnNameOverride, ...] = ()
     time_range_constraint: Optional[TimeRangeConstraint] = None
-    where_constraint: Optional[ResolvedWhereFilter] = None
+    where_constraint: Optional[WhereFilterSpec] = None
     limit: Optional[int] = None
 
     @property
@@ -772,10 +772,8 @@ def convert_to_entity_spec(parameter_set: EntityCallParameterSet) -> EntitySpec:
 
 
 @dataclass(frozen=True)
-class ResolvedWhereFilter(SerializableDataclass):
+class WhereFilterSpec(SerializableDataclass):
     """Similar to the WhereFilter, but with the where_sql_template rendered and used elements extracted.
-
-    # TODO: This will be renamed to ResolvedWhereFilterSpec in a later commit in the PR stack.
 
     For example:
 
@@ -807,7 +805,7 @@ class ResolvedWhereFilter(SerializableDataclass):
         where_filter: WhereFilter,
         column_association_resolver: ColumnAssociationResolver,
         bind_parameters: SqlBindParameters = SqlBindParameters(),
-    ) -> ResolvedWhereFilter:
+    ) -> WhereFilterSpec:
         class _CallRenderer(FilterFunctionCallRenderer):  # noqa: D
             def render_dimension_call(self, dimension_call_parameter_set: DimensionCallParameterSet) -> str:  # noqa: D
                 return column_association_resolver.resolve_dimension_spec(
@@ -832,7 +830,7 @@ class ResolvedWhereFilter(SerializableDataclass):
         )
 
         parameter_sets = where_filter.call_parameter_sets
-        return ResolvedWhereFilter(
+        return WhereFilterSpec(
             where_sql=where_sql,
             bind_parameters=bind_parameters,
             # dict.fromkeys() does a dedupe while preserving order.
@@ -852,8 +850,8 @@ class ResolvedWhereFilter(SerializableDataclass):
             ),
         )
 
-    def combine(self, other: ResolvedWhereFilter) -> ResolvedWhereFilter:  # noqa: D
-        return ResolvedWhereFilter(
+    def combine(self, other: WhereFilterSpec) -> WhereFilterSpec:  # noqa: D
+        return WhereFilterSpec(
             where_sql=f"({self.where_sql}) AND ({other.where_sql})",
             bind_parameters=self.bind_parameters.combine(other.bind_parameters),
             linkable_spec_set=LinkableSpecSet.merge([self.linkable_spec_set, other.linkable_spec_set]),

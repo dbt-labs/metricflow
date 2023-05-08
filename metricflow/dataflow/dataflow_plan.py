@@ -47,7 +47,7 @@ from metricflow.specs import (
     LinklessEntitySpec,
     TimeDimensionSpec,
     InstanceSpecSet,
-    ResolvedWhereFilter,
+    WhereFilterSpec,
 )
 from metricflow.sql.sql_plan import SqlJoinType
 from metricflow.visitor import Visitable, VisitorOutputT
@@ -1190,7 +1190,7 @@ class WhereConstraintNode(AggregatedMeasuresOutput[SourceDataSetT]):
     def __init__(  # noqa: D
         self,
         parent_node: BaseOutput[SourceDataSetT],
-        where_constraint: ResolvedWhereFilter,
+        where_constraint: WhereFilterSpec,
     ) -> None:
         self._where = where_constraint
         self.parent_node = parent_node
@@ -1201,7 +1201,7 @@ class WhereConstraintNode(AggregatedMeasuresOutput[SourceDataSetT]):
         return DATAFLOW_NODE_WHERE_CONSTRAINT_ID_PREFIX
 
     @property
-    def where(self) -> ResolvedWhereFilter:
+    def where(self) -> WhereFilterSpec:
         """Returns the specs for the elements that it should pass."""
         return self._where
 

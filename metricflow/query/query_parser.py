@@ -37,7 +37,7 @@ from metricflow.specs import (
     OutputColumnNameOverride,
     LinkableSpecSet,
     ColumnAssociationResolver,
-    ResolvedWhereFilter,
+    WhereFilterSpec,
 )
 from metricflow.time.time_granularity_solver import (
     TimeGranularitySolver,
@@ -264,10 +264,10 @@ class MetricFlowQueryParser:
         metric_specs = []
         for metric_reference in metric_references:
             metric = self._metric_semantics.get_metric(metric_reference)
-            metric_where_constraint: Optional[ResolvedWhereFilter] = None
+            metric_where_constraint: Optional[WhereFilterSpec] = None
             if metric.constraint:
                 # add constraint to MetricSpec
-                metric_where_constraint = ResolvedWhereFilter.create_from_where_filter(
+                metric_where_constraint = WhereFilterSpec.create_from_where_filter(
                     where_filter=metric.constraint,
                     column_association_resolver=self._column_association_resolver,
                 )
@@ -350,15 +350,13 @@ class MetricFlowQueryParser:
             time_constraint = None
 
         requested_linkable_specs = self._parse_linkable_element_names(group_by_names, metric_references)
-        resolved_where_filter: Optional[ResolvedWhereFilter] = None
+        where_filter_spec: Optional[WhereFilterSpec] = None
         if where_filter is not None:
-            resolved_where_filter = ResolvedWhereFilter.create_from_where_filter(
+            where_filter_spec = WhereFilterSpec.create_from_where_filter(
                 where_filter=where_filter,
                 column_association_resolver=self._column_association_resolver,
             )
-            where_spec_set = QueryTimeLinkableSpecSet.create_from_linkable_spec_set(
-                resolved_where_filter.linkable_spec_set
-            )
+            where_spec_set = QueryTimeLinkableSpecSet.create_from_linkable_spec_set(where_filter_spec.linkable_spec_set)
             requested_linkable_specs_with_requested_filter_specs = QueryTimeLinkableSpecSet.combine(
                 (
                     requested_linkable_specs,
@@ -406,7 +404,7 @@ class MetricFlowQueryParser:
                         (
                             group_by_specs_for_one_metric,
                             QueryTimeLinkableSpecSet.create_from_linkable_spec_set(
-                                ResolvedWhereFilter.create_from_where_filter(
+                                WhereFilterSpec.create_from_where_filter(
                                     where_filter=metric.constraint,
                                     column_association_resolver=self._column_association_resolver,
                                 ).linkable_spec_set
@@ -466,10 +464,10 @@ class MetricFlowQueryParser:
         if limit is not None and limit < 0:
             raise InvalidQueryException(f"Limit was specified as {limit}, which is < 0.")
 
-        if resolved_where_filter:
+        if where_filter_spec:
             self._time_granularity_solver.validate_time_granularity(
                 metric_references=metric_references,
-                time_dimension_specs=resolved_where_filter.linkable_spec_set.time_dimension_specs,
+                time_dimension_specs=where_filter_spec.linkable_spec_set.time_dimension_specs,
             )
 
         base_metric_references = self._parse_metric_names(metric_names, traverse_metric_inputs=False)
@@ -483,7 +481,7 @@ class MetricFlowQueryParser:
             order_by_specs=order_by_specs,
             output_column_name_overrides=tuple(output_column_name_overrides),
             time_range_constraint=time_constraint,
-            where_constraint=resolved_where_filter,
+            where_constraint=where_filter_spec,
             limit=limit,
         )
 
