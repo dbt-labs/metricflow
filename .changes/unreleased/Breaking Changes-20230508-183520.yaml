@@ -1,0 +1,6 @@
+kind: Breaking Changes
+body: Rename Metric.constraint to Metric.filter
+time: 2023-05-08T18:35:20.139708-07:00
+custom:
+  Author: plypaul
+  Issue: "511"
