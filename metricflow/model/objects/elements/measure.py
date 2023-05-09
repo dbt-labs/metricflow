@@ -11,6 +11,7 @@ from dbt_semantic_interfaces.protocols.measure import (
     MeasureAggregationParametersProtocol,
 )
 
+
 class NonAdditiveDimensionParameters(HashableBaseModel, NonAdditiveDimensionParametersProtocol):
     """Describes the params for specifying non-additive dimensions in a measure.
 
