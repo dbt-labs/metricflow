@@ -33,7 +33,7 @@ def list_of_issues() -> List[ValidationIssue]:  # noqa: D
         ValidationWarning(
             context=SemanticModelContext(
                 file_context=file_context,
-                data_source=SemanticModelReference(semantic_model_name=semantic_model_name),
+                semantic_model=SemanticModelReference(semantic_model_name=semantic_model_name),
             ),
             message="Something caused a warning, problem #1",
         )

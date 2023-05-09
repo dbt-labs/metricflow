@@ -19,7 +19,7 @@ def base_model_file() -> YamlConfigFile:
     """
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: sample_semantic_model
           node_relation:
             schema_name: some_schema

@@ -151,7 +151,7 @@ def template_mapping(mf_test_session_state: MetricFlowTestSessionState) -> Dict[
 @pytest.fixture(scope="session")
 def simple_semantic_manifest_lookup_non_ds(template_mapping: Dict[str, str]) -> SemanticManifestLookup:  # noqa: D
     model_build_result = parse_directory_of_yaml_files_to_model(
-        os.path.join(os.path.dirname(__file__), "model_yamls/non_ds_model"), template_mapping=template_mapping
+        os.path.join(os.path.dirname(__file__), "model_yamls/non_sm_model"), template_mapping=template_mapping
     )
     return SemanticManifestLookup(model_build_result.model)
 

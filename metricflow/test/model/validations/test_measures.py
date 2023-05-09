@@ -46,7 +46,7 @@ def test_metric_missing_measure() -> None:
 def test_measures_only_exist_in_one_semantic_model() -> None:  # noqa: D
     yaml_contents_1 = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: sample_semantic_model
           node_relation:
             schema_name: some_schema
@@ -84,7 +84,7 @@ def test_measures_only_exist_in_one_semantic_model() -> None:  # noqa: D
 
     yaml_contents_2 = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: sample_semantic_model_2
           node_relation:
             schema_name: some_schema
@@ -124,7 +124,7 @@ def test_measure_alias_is_set_when_required() -> None:
     measure_name = "num_sample_rows"
     yaml_contents = textwrap.dedent(
         f"""\
-        data_source:
+        semantic_model:
           name: sample_semantic_model
           node_relation:
             schema_name: some_schema
@@ -177,7 +177,7 @@ def test_invalid_measure_alias_name() -> None:
 
     yaml_contents = textwrap.dedent(
         f"""\
-        data_source:
+        semantic_model:
           name: sample_semantic_model
           node_relation:
             schema_name: some_schema
@@ -228,7 +228,7 @@ def test_measure_alias_measure_name_conflict() -> None:
     measure_name = "num_sample_rows"
     yaml_contents = textwrap.dedent(
         f"""\
-        data_source:
+        semantic_model:
           name: sample_semantic_model
           node_relation:
             schema_name: some_schema
@@ -283,7 +283,7 @@ def test_reused_measure_alias() -> None:
 
     yaml_contents = textwrap.dedent(
         f"""\
-        data_source:
+        semantic_model:
           name: sample_semantic_model
           node_relation:
             schema_name: some_schema
@@ -348,7 +348,7 @@ def test_reused_measure_alias_within_metric() -> None:
     invalid_alias = "duplicate_alias"
     yaml_contents = textwrap.dedent(
         f"""\
-        data_source:
+        semantic_model:
           name: sample_semantic_model
           node_relation:
             schema_name: some_schema
@@ -403,7 +403,7 @@ def test_invalid_non_additive_dimension_properties() -> None:
 
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: sample_semantic_model_2
           node_relation:
             schema_name: some_schema
@@ -479,7 +479,7 @@ def test_count_measure_missing_expr() -> None:
     """Tests that all measures with COUNT agg should have expr provided."""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: sample_semantic_model_2
           node_relation:
             schema_name: some_schema
@@ -528,7 +528,7 @@ def test_count_measure_with_distinct_expr() -> None:
     """Tests that measures with COUNT agg can NOT use the DISTINCT keyword."""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: sample_semantic_model_2
           node_relation:
             schema_name: some_schema
@@ -575,7 +575,7 @@ def test_percentile_measure_missing_agg_params() -> None:
     """Tests that only measures with PERCENTILE agg should have percentile and discrete provided."""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: sample_semantic_model
           node_relation:
             schema_name: some_schema
@@ -634,7 +634,7 @@ def test_percentile_measure_bad_percentile_values() -> None:
     """Tests that all measures with PERCENTILE agg should have the correct percentile value range."""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: sample_semantic_model
           node_relation:
             schema_name: some_schema

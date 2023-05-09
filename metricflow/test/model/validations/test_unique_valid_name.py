@@ -29,8 +29,8 @@ def copied_model(simple_model__with_primary_transforms: UserConfiguredModel) -> 
 
 def test_duplicate_semantic_model_name(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa: D
     model = copied_model(simple_model__with_primary_transforms)
-    duplicated_semantic_model = model.data_sources[0]
-    model.data_sources.append(duplicated_semantic_model)
+    duplicated_semantic_model = model.semantic_models[0]
+    model.semantic_models.append(duplicated_semantic_model)
     with pytest.raises(
         ModelValidationException,
         match=rf"Can't use name `{duplicated_semantic_model.name}` for a semantic model when it was already used for a semantic model",
@@ -56,7 +56,7 @@ def test_top_level_metric_can_have_same_name_as_any_other_top_level_item(
 
     model_semantic_model = copied_model(simple_model__with_primary_transforms)
 
-    model_semantic_model.data_sources[0].name = metric_name
+    model_semantic_model.semantic_models[0].name = metric_name
 
     ModelValidator([UniqueAndValidNameRule()]).checked_validations(model_semantic_model)
 
@@ -77,7 +77,9 @@ def test_duplicate_measure_name(simple_model__with_primary_transforms: UserConfi
     model = copied_model(simple_model__with_primary_transforms)
 
     # Ensure we have a usable semantic model for the test
-    semantic_model_with_measures, _ = find_semantic_model_with(model, lambda data_source: len(data_source.measures) > 0)
+    semantic_model_with_measures, _ = find_semantic_model_with(
+        model, lambda semantic_model: len(semantic_model.measures) > 0
+    )
 
     duplicated_measure = semantic_model_with_measures.measures[0]
     duplicated_measures_tuple = (semantic_model_with_measures.measures, (duplicated_measure,))
@@ -95,7 +97,7 @@ def test_duplicate_dimension_name(simple_model__with_primary_transforms: UserCon
 
     # Ensure we have a usable semantic model for the test
     semantic_model_with_dimensions, _ = find_semantic_model_with(
-        model, lambda data_source: len(data_source.dimensions) > 0
+        model, lambda semantic_model: len(semantic_model.dimensions) > 0
     )
 
     duplicated_dimension = semantic_model_with_dimensions.dimensions[0]
@@ -114,7 +116,9 @@ def test_duplicate_entity_name(simple_model__with_primary_transforms: UserConfig
     model = copied_model(simple_model__with_primary_transforms)
 
     # Ensure we have a usable semantic model for the test
-    semantic_model_with_entities, _ = find_semantic_model_with(model, lambda data_source: len(data_source.entities) > 0)
+    semantic_model_with_entities, _ = find_semantic_model_with(
+        model, lambda semantic_model: len(semantic_model.entities) > 0
+    )
 
     duplicated_entity = semantic_model_with_entities.entities[0]
     duplicated_entities_tuple = (semantic_model_with_entities.entities, (duplicated_entity,))

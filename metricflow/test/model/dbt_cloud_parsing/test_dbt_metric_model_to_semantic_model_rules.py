@@ -27,7 +27,7 @@ def test_dbt_metric_model_to_semantic_model_rules_skip_derived_metrics(  # noqa:
     converter = DbtConverter(rules=rules)
     result = converter._map_dbt_to_metricflow(dbt_metrics=derived_metrics)
     assert (
-        len(result.mapped_objects.data_sources.keys()) == 0
+        len(result.mapped_objects.semantic_models.keys()) == 0
     ), "Derived dbt metrics created semantic models, and they shouldn't"
 
 
@@ -41,7 +41,7 @@ def test_dbt_map_to_semantic_model_name(dbt_metrics: Tuple[MetricNode, ...]) -> 
         metric_type = get_and_assert_calc_method_mapping(dbt_metric=dbt_metric)
         if metric_type != MetricType.DERIVED:
             assert (
-                objects.data_sources[dbt_metric.model.name].get("name") is not None
+                objects.semantic_models[dbt_metric.model.name].get("name") is not None
             ), "Expected semantic model to have name, got `None`"
 
 
@@ -66,8 +66,8 @@ def test_dbt_map_to_semantic_model_description(dbt_metrics: Tuple[MetricNode, ..
         metric_type = get_and_assert_calc_method_mapping(dbt_metric=dbt_metric)
         if metric_type != MetricType.DERIVED:
             assert (
-                objects.data_sources[dbt_metric.model.name]["description"] == dbt_metric.model.description
-            ), f"Got description `{objects.data_sources[dbt_metric.model.name]['description']}`, but expected `{dbt_metric.model.description}`"
+                objects.semantic_models[dbt_metric.model.name]["description"] == dbt_metric.model.description
+            ), f"Got description `{objects.semantic_models[dbt_metric.model.name]['description']}`, but expected `{dbt_metric.model.description}`"
 
 
 def test_dbt_map_to_semantic_model_description_can_be_optional(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
@@ -91,7 +91,7 @@ def test_dbt_map_semantic_model_sql_table(dbt_metrics: Tuple[MetricNode, ...]) -
         metric_type = get_and_assert_calc_method_mapping(dbt_metric=dbt_metric)
         if metric_type != MetricType.DERIVED:
             assert (
-                objects.data_sources[dbt_metric.model.name]["node_relation"].relation_name
+                objects.semantic_models[dbt_metric.model.name]["node_relation"].relation_name
                 == f"{dbt_metric.model.database}.{dbt_metric.model.schema}.{dbt_metric.model.name}"
             )
 

@@ -4,7 +4,7 @@ import textwrap
 from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_validation_ready_model
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from metricflow.model.model_validator import ModelValidator
-from metricflow.model.validations.data_sources import SemanticModelValidityWindowRule
+from metricflow.model.validations.semantic_models import SemanticModelValidityWindowRule
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.test.model.validations.helpers import base_model_file
 
@@ -13,7 +13,7 @@ def test_validity_window_configuration() -> None:
     """Tests to ensure a semantic model with a properly configured validity window passes validation"""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: scd_semantic_model
           node_relation:
             schema_name: some_schema
@@ -53,7 +53,7 @@ def test_validity_window_must_have_a_start() -> None:
     """Tests validation asserting a validity window end has a corresponding start"""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: scd_semantic_model
           node_relation:
             schema_name: some_schema
@@ -83,7 +83,7 @@ def test_validity_window_must_have_an_end() -> None:
     """Tests validation asserting a validity window start has a corresponding end"""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: scd_semantic_model
           node_relation:
             schema_name: some_schema
@@ -116,7 +116,7 @@ def test_validity_window_uses_two_dimensions() -> None:
     """
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: scd_semantic_model
           node_relation:
             schema_name: some_schema
@@ -147,7 +147,7 @@ def test_two_dimension_validity_windows_must_not_overload_start_and_end() -> Non
     """Tests validation asserting that a validity window does not set is_start and is_end on one dimension"""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: scd_semantic_model
           node_relation:
             schema_name: some_schema
@@ -184,7 +184,7 @@ def test_multiple_validity_windows_are_invalid() -> None:
     """Tests validation asserting that no more than 1 validity window can exist in a semantic model"""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: scd_semantic_model
           node_relation:
             schema_name: some_schema
@@ -233,7 +233,7 @@ def test_empty_validity_windows_are_invalid() -> None:
 
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: scd_semantic_model
           node_relation:
             schema_name: some_schema
@@ -274,7 +274,7 @@ def test_measures_are_prevented() -> None:
 
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: scd_semantic_model
           node_relation:
             schema_name: some_schema
@@ -316,7 +316,7 @@ def test_validity_window_must_have_a_natural_key() -> None:
 
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: scd_semantic_model
           node_relation:
             schema_name: some_schema
@@ -358,7 +358,7 @@ def test_validity_window_does_not_use_primary_key() -> None:
 
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: scd_semantic_model
           node_relation:
             schema_name: some_schema

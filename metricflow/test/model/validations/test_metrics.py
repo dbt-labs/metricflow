@@ -22,7 +22,7 @@ def test_metric_no_time_dim_dim_only_source() -> None:  # noqa:D
     model_validator = ModelValidator()
     model_validator.checked_validations(
         UserConfiguredModel(
-            data_sources=[
+            semantic_models=[
                 semantic_model_with_guaranteed_meta(
                     name="sum_measure",
                     measures=[],
@@ -68,7 +68,7 @@ def test_metric_no_time_dim() -> None:  # noqa:D
         model_validator = ModelValidator()
         model_validator.checked_validations(
             UserConfiguredModel(
-                data_sources=[
+                semantic_models=[
                     semantic_model_with_guaranteed_meta(
                         name="sum_measure",
                         measures=[Measure(name=measure_name, agg=AggregationType.SUM)],
@@ -99,7 +99,7 @@ def test_metric_multiple_primary_time_dims() -> None:  # noqa:D
         model_validator = ModelValidator()
         model_validator.checked_validations(
             UserConfiguredModel(
-                data_sources=[
+                semantic_models=[
                     semantic_model_with_guaranteed_meta(
                         name="sum_measure",
                         measures=[Measure(name=measure_name, agg=AggregationType.SUM)],
@@ -138,7 +138,7 @@ def test_generated_metrics_only() -> None:  # noqa:D
     dim2_reference = TimeDimensionReference(element_name=DEFAULT_DS)
     measure_name = "measure"
     entity_reference = EntityReference(element_name="primary")
-    data_source = semantic_model_with_guaranteed_meta(
+    semantic_model = semantic_model_with_guaranteed_meta(
         name="dim1",
         measures=[Measure(name=measure_name, agg=AggregationType.SUM, agg_time_dimension=dim2_reference.element_name)],
         dimensions=[
@@ -156,11 +156,11 @@ def test_generated_metrics_only() -> None:  # noqa:D
             Entity(name=entity_reference.element_name, type=EntityType.PRIMARY),
         ],
     )
-    data_source.measures[0].create_metric = True
+    semantic_model.measures[0].create_metric = True
 
     ModelValidator().checked_validations(
         UserConfiguredModel(
-            data_sources=[data_source],
+            semantic_models=[semantic_model],
             metrics=[],
         )
     )
@@ -171,7 +171,7 @@ def test_derived_metric() -> None:  # noqa: D
     model_validator = ModelValidator([DerivedMetricRule()])
     model_issues = model_validator.validate_model(
         UserConfiguredModel(
-            data_sources=[
+            semantic_models=[
                 semantic_model_with_guaranteed_meta(
                     name="sum_measure",
                     measures=[

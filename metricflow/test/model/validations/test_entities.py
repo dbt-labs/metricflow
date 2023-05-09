@@ -25,7 +25,7 @@ def test_semantic_model_cant_have_more_than_one_primary_entity(
 ) -> None:  # noqa: D
     """Add an additional primary entity to a semantic model and assert that it cannot have two"""
     model = copy.deepcopy(simple_model__with_primary_transforms)
-    func: Callable[[SemanticModel], bool] = lambda data_source: len(data_source.entities) > 1
+    func: Callable[[SemanticModel], bool] = lambda semantic_model: len(semantic_model.entities) > 1
 
     multiple_entity_semantic_model, _ = find_semantic_model_with(model, func)
 
@@ -55,7 +55,7 @@ def test_multiple_natural_entities() -> None:
     """Test validation enforcing that a single semantic model cannot have more than one natural entity"""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: too_many_natural_entities
           node_relation:
             schema_name: some_schema
@@ -93,7 +93,7 @@ def test_natural_entity_used_in_wrong_context() -> None:
     """Test validation enforcing that a single semantic model cannot have more than one natural entity"""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: random_natural_entity
           node_relation:
             schema_name: some_schema

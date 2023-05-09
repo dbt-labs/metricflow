@@ -44,11 +44,11 @@ def find_semantic_model_with(
     allows us to guarantee that a semantic model will be returned which meets the requirements of what a test needs,
     unless none of the semantic models will work.
     """
-    for index, data_source in enumerate(model.data_sources):
-        if function(data_source):
-            return data_source, index
+    for index, semantic_model in enumerate(model.semantic_models):
+        if function(semantic_model):
+            return semantic_model, index
 
-    raise Exception("Unable to find a data_source matching function criteria")
+    raise Exception("Unable to find a semantic_model matching function criteria")
 
 
 def find_metric_with(model: UserConfiguredModel, function: Callable[[Metric], bool]) -> Tuple[Metric, int]:

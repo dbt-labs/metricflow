@@ -8,7 +8,7 @@ from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.metric import MetricType, MetricTypeParams, Metric
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.references import DimensionReference, MeasureReference, TimeDimensionReference
-from metricflow.model.validations.data_sources import SemanticModelTimeDimensionWarningsRule
+from metricflow.model.validations.semantic_models import SemanticModelTimeDimensionWarningsRule
 from metricflow.model.validations.dimension_const import DimensionConsistencyRule
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.test.model.validations.helpers import semantic_model_with_guaranteed_meta, metric_with_guaranteed_meta
@@ -22,7 +22,7 @@ def test_incompatible_dimension_type() -> None:  # noqa:D
         model_validator = ModelValidator([DimensionConsistencyRule()])
         model_validator.checked_validations(
             UserConfiguredModel(
-                data_sources=[
+                semantic_models=[
                     semantic_model_with_guaranteed_meta(
                         name="dim1",
                         measures=[Measure(name=measure_name, agg=AggregationType.SUM)],
@@ -60,7 +60,7 @@ def test_incompatible_dimension_is_partition() -> None:  # noqa:D
         model_validator = ModelValidator([DimensionConsistencyRule()])
         model_validator.checked_validations(
             UserConfiguredModel(
-                data_sources=[
+                semantic_models=[
                     semantic_model_with_guaranteed_meta(
                         name="dim1",
                         measures=[Measure(name=measure_name, agg=AggregationType.SUM)],
@@ -109,7 +109,7 @@ def test_multiple_primary_time_dimensions() -> None:  # noqa:D
         model_validator = ModelValidator([SemanticModelTimeDimensionWarningsRule()])
         model_validator.checked_validations(
             model=UserConfiguredModel(
-                data_sources=[
+                semantic_models=[
                     SemanticModel(
                         name="dim1",
                         node_relation=NodeRelation(

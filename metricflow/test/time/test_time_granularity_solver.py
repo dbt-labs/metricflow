@@ -35,7 +35,7 @@ def time_granularity_solver(  # noqa: D
     to_data_set_converter = SemanticModelToDataSetConverter(column_association_resolver)
     source_data_sets = [
         to_data_set_converter.create_sql_source_data_set(x)
-        for x in extended_date_semantic_manifest_lookup.user_configured_model.data_sources
+        for x in extended_date_semantic_manifest_lookup.user_configured_model.semantic_models
     ]
 
     source_node_builder = SourceNodeBuilder(extended_date_semantic_manifest_lookup)

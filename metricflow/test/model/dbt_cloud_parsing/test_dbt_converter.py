@@ -55,7 +55,8 @@ def test_for_breaking_model_changes(dbt_metrics: Tuple[MetricNode, ...]) -> None
         # Ensure semantic model created from metric's model (if it has one) was created properly
         if dbt_metric.model is not None and hasattr(dbt_metric.model, "name"):
             mf_semantic_model = next(
-                (mf_ds for mf_ds in dbt_convert_result.model.data_sources if mf_ds.name == dbt_metric.model.name), None
+                (mf_ds for mf_ds in dbt_convert_result.model.semantic_models if mf_ds.name == dbt_metric.model.name),
+                None,
             )
             assert (
                 mf_semantic_model is not None

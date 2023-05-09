@@ -16,7 +16,7 @@ def test_lonely_entity_raises_issue(simple_model__with_primary_transforms: UserC
     model = copy.deepcopy(simple_model__with_primary_transforms)
     lonely_entity_name = "hi_im_lonely"
 
-    func: Callable[[SemanticModel], bool] = lambda data_source: len(data_source.entities) > 0
+    func: Callable[[SemanticModel], bool] = lambda semantic_model: len(semantic_model.entities) > 0
     semantic_model_with_entities, _ = find_semantic_model_with(model, func)
     semantic_model_with_entities.entities[0].name = EntitySpec.from_name(lonely_entity_name).element_name
     model_validator = ModelValidator([CommonEntitysRule()])

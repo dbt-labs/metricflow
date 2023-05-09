@@ -13,7 +13,7 @@ def test_invalid_aggregation_time_dimension(simple_user_configured_model: UserCo
     model = copied_model(simple_user_configured_model)
     semantic_model_with_measures, _ = find_semantic_model_with(
         model,
-        lambda data_source: len(data_source.measures) > 0,
+        lambda semantic_model: len(semantic_model.measures) > 0,
     )
 
     semantic_model_with_measures.measures[0].agg_time_dimension = "invalid_time_dimension"
@@ -33,7 +33,7 @@ def test_unset_aggregation_time_dimension(data_warehouse_validation_model: UserC
     model = copied_model(data_warehouse_validation_model)
     semantic_model_with_measures, _ = find_semantic_model_with(
         model,
-        lambda data_source: len(data_source.measures) > 0,
+        lambda semantic_model: len(semantic_model.measures) > 0,
     )
 
     semantic_model_with_measures.measures[0].agg_time_dimension = None
@@ -52,7 +52,7 @@ def test_missing_primary_time_ok_if_all_measures_have_agg_time_dim(
     model = copied_model(data_warehouse_validation_model)
     semantic_model_with_measures, _ = find_semantic_model_with(
         model,
-        lambda data_source: len(data_source.measures) > 0,
+        lambda semantic_model: len(semantic_model.measures) > 0,
     )
 
     for dimension in semantic_model_with_measures.dimensions:

@@ -12,7 +12,7 @@ def test_semantic_model_metadata_parsing() -> None:
     """Test for asserting that internal metadata is parsed into the SemanticModel object"""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: metadata_test
           node_relation:
             alias: source_table
@@ -23,11 +23,11 @@ def test_semantic_model_metadata_parsing() -> None:
 
     build_result = parse_yaml_files_to_model(files=[file])
 
-    assert len(build_result.model.data_sources) == 1
-    data_source = build_result.model.data_sources[0]
-    assert data_source.metadata is not None
-    assert data_source.metadata.repo_file_path == "test_dir/inline_for_test"
-    assert data_source.metadata.file_slice.filename == "inline_for_test"
+    assert len(build_result.model.semantic_models) == 1
+    semantic_model = build_result.model.semantic_models[0]
+    assert semantic_model.metadata is not None
+    assert semantic_model.metadata.repo_file_path == "test_dir/inline_for_test"
+    assert semantic_model.metadata.file_slice.filename == "inline_for_test"
     expected_metadata_content = textwrap.dedent(
         """\
         name: metadata_test
@@ -36,14 +36,14 @@ def test_semantic_model_metadata_parsing() -> None:
           schema_name: some_schema
         """
     )
-    assert data_source.metadata.file_slice.content == expected_metadata_content
+    assert semantic_model.metadata.file_slice.content == expected_metadata_content
 
 
 def test_semantic_model_node_relation_parsing() -> None:
     """Test for parsing a semantic model specification with a node_relation provided"""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: sql_table_test
           node_relation:
             alias: source_table
@@ -54,16 +54,16 @@ def test_semantic_model_node_relation_parsing() -> None:
 
     build_result = parse_yaml_files_to_model(files=[file])
 
-    assert len(build_result.model.data_sources) == 1
-    data_source = build_result.model.data_sources[0]
-    assert data_source.node_relation.relation_name == "some_schema.source_table"
+    assert len(build_result.model.semantic_models) == 1
+    semantic_model = build_result.model.semantic_models[0]
+    assert semantic_model.node_relation.relation_name == "some_schema.source_table"
 
 
 def test_semantic_model_entity_parsing() -> None:
     """Test for parsing a basic entity out of a semantic model specification"""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: entity_test
           node_relation:
             alias: source_table
@@ -79,10 +79,10 @@ def test_semantic_model_entity_parsing() -> None:
 
     build_result = parse_yaml_files_to_model(files=[file])
 
-    assert len(build_result.model.data_sources) == 1
-    data_source = build_result.model.data_sources[0]
-    assert len(data_source.entities) == 1
-    entity = data_source.entities[0]
+    assert len(build_result.model.semantic_models) == 1
+    semantic_model = build_result.model.semantic_models[0]
+    assert len(semantic_model.entities) == 1
+    entity = semantic_model.entities[0]
     assert entity.name == "example_entity"
     assert entity.type is EntityType.PRIMARY
     assert entity.role == "test_role"
@@ -93,7 +93,7 @@ def test_semantic_model_entity_metadata_parsing() -> None:
     """Test for parsing metadata for an entity object defined in a semantic model specification"""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: entity_test
           node_relation:
             alias: source_table
@@ -108,10 +108,10 @@ def test_semantic_model_entity_metadata_parsing() -> None:
 
     build_result = parse_yaml_files_to_model(files=[file])
 
-    assert len(build_result.model.data_sources) == 1
-    data_source = build_result.model.data_sources[0]
-    assert len(data_source.entities) == 1
-    entity = data_source.entities[0]
+    assert len(build_result.model.semantic_models) == 1
+    semantic_model = build_result.model.semantic_models[0]
+    assert len(semantic_model.entities) == 1
+    entity = semantic_model.entities[0]
     assert entity.metadata is not None
     assert entity.metadata.repo_file_path == "test_dir/inline_for_test"
     assert entity.metadata.file_slice.filename == "inline_for_test"
@@ -129,7 +129,7 @@ def test_semantic_model_measure_parsing() -> None:
     """Test for parsing a measure out of a semantic model specification"""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: measure_parsing_test
           node_relation:
             alias: source_table
@@ -144,10 +144,10 @@ def test_semantic_model_measure_parsing() -> None:
 
     build_result = parse_yaml_files_to_model(files=[file])
 
-    assert len(build_result.model.data_sources) == 1
-    data_source = build_result.model.data_sources[0]
-    assert len(data_source.measures) == 1
-    measure = data_source.measures[0]
+    assert len(build_result.model.semantic_models) == 1
+    semantic_model = build_result.model.semantic_models[0]
+    assert len(semantic_model.measures) == 1
+    measure = semantic_model.measures[0]
     assert measure.name == "example_measure"
     assert measure.agg is AggregationType.COUNT_DISTINCT
     assert measure.create_metric is not True
@@ -158,7 +158,7 @@ def test_semantic_model_measure_metadata_parsing() -> None:
     """Test for parsing metadata for a measure object defined in a semantic model specification"""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: measure_metadata_parsing_test
           node_relation:
             alias: source_table
@@ -173,10 +173,10 @@ def test_semantic_model_measure_metadata_parsing() -> None:
 
     build_result = parse_yaml_files_to_model(files=[file])
 
-    assert len(build_result.model.data_sources) == 1
-    data_source = build_result.model.data_sources[0]
-    assert len(data_source.measures) == 1
-    measure = data_source.measures[0]
+    assert len(build_result.model.semantic_models) == 1
+    semantic_model = build_result.model.semantic_models[0]
+    assert len(semantic_model.measures) == 1
+    measure = semantic_model.measures[0]
     assert measure.metadata is not None
     assert measure.metadata.repo_file_path == "test_dir/inline_for_test"
     assert measure.metadata.file_slice.filename == "inline_for_test"
@@ -194,7 +194,7 @@ def test_semantic_model_create_metric_measure_parsing() -> None:
     """Test for parsing a measure out of a semantic model specification when create metric is set"""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: measure_parsing_create_metric_test
           node_relation:
             alias: source_table
@@ -209,10 +209,10 @@ def test_semantic_model_create_metric_measure_parsing() -> None:
 
     build_result = parse_yaml_files_to_model(files=[file])
 
-    assert len(build_result.model.data_sources) == 1
-    data_source = build_result.model.data_sources[0]
-    assert len(data_source.measures) == 1
-    measure = data_source.measures[0]
+    assert len(build_result.model.semantic_models) == 1
+    semantic_model = build_result.model.semantic_models[0]
+    assert len(semantic_model.measures) == 1
+    measure = semantic_model.measures[0]
     assert measure.create_metric is True
 
 
@@ -220,7 +220,7 @@ def test_semantic_model_categorical_dimension_parsing() -> None:
     """Test for parsing a categorical dimension out of a semantic model specification"""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: dimension_parsing_test
           node_relation:
             alias: source_table
@@ -235,10 +235,10 @@ def test_semantic_model_categorical_dimension_parsing() -> None:
 
     build_result = parse_yaml_files_to_model(files=[file])
 
-    assert len(build_result.model.data_sources) == 1
-    data_source = build_result.model.data_sources[0]
-    assert len(data_source.dimensions) == 1
-    dimension = data_source.dimensions[0]
+    assert len(build_result.model.semantic_models) == 1
+    semantic_model = build_result.model.semantic_models[0]
+    assert len(semantic_model.dimensions) == 1
+    dimension = semantic_model.dimensions[0]
     assert dimension.name == "example_categorical_dimension"
     assert dimension.type is DimensionType.CATEGORICAL
     assert dimension.is_partition is not True
@@ -248,7 +248,7 @@ def test_semantic_model_partition_dimension_parsing() -> None:
     """Test for parsing a partition dimension out of a semantic model specification"""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: dimension_parsing_test
           node_relation:
             alias: source_table
@@ -263,10 +263,10 @@ def test_semantic_model_partition_dimension_parsing() -> None:
 
     build_result = parse_yaml_files_to_model(files=[file])
 
-    assert len(build_result.model.data_sources) == 1
-    data_source = build_result.model.data_sources[0]
-    assert len(data_source.dimensions) == 1
-    dimension = data_source.dimensions[0]
+    assert len(build_result.model.semantic_models) == 1
+    semantic_model = build_result.model.semantic_models[0]
+    assert len(semantic_model.dimensions) == 1
+    dimension = semantic_model.dimensions[0]
     assert dimension.is_partition is True
 
 
@@ -274,7 +274,7 @@ def test_semantic_model_time_dimension_parsing() -> None:
     """Test for parsing a time dimension out of a semantic model specification"""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: dimension_parsing_test
           node_relation:
             alias: source_table
@@ -290,10 +290,10 @@ def test_semantic_model_time_dimension_parsing() -> None:
 
     build_result = parse_yaml_files_to_model(files=[file])
 
-    assert len(build_result.model.data_sources) == 1
-    data_source = build_result.model.data_sources[0]
-    assert len(data_source.dimensions) == 1
-    dimension = data_source.dimensions[0]
+    assert len(build_result.model.semantic_models) == 1
+    semantic_model = build_result.model.semantic_models[0]
+    assert len(semantic_model.dimensions) == 1
+    dimension = semantic_model.dimensions[0]
     assert dimension.type is DimensionType.TIME
     assert dimension.type_params is not None
     assert dimension.type_params.is_primary is not True
@@ -304,7 +304,7 @@ def test_semantic_model_primary_time_dimension_parsing() -> None:
     """Test for parsing a primary time dimension out of a semantic model specification"""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: dimension_parsing_test
           node_relation:
             alias: source_table
@@ -321,10 +321,10 @@ def test_semantic_model_primary_time_dimension_parsing() -> None:
 
     build_result = parse_yaml_files_to_model(files=[file])
 
-    assert len(build_result.model.data_sources) == 1
-    data_source = build_result.model.data_sources[0]
-    assert len(data_source.dimensions) == 1
-    dimension = data_source.dimensions[0]
+    assert len(build_result.model.semantic_models) == 1
+    semantic_model = build_result.model.semantic_models[0]
+    assert len(semantic_model.dimensions) == 1
+    dimension = semantic_model.dimensions[0]
     assert dimension.type is DimensionType.TIME
     assert dimension.type_params is not None
     assert dimension.type_params.is_primary is True
@@ -334,7 +334,7 @@ def test_semantic_model_dimension_metadata_parsing() -> None:
     """Test for parsing metadata for an dimension object defined in a semantic model specification"""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: dimension_parsing_test
           node_relation:
             alias: source_table
@@ -349,10 +349,10 @@ def test_semantic_model_dimension_metadata_parsing() -> None:
 
     build_result = parse_yaml_files_to_model(files=[file])
 
-    assert len(build_result.model.data_sources) == 1
-    data_source = build_result.model.data_sources[0]
-    assert len(data_source.dimensions) == 1
-    dimension = data_source.dimensions[0]
+    assert len(build_result.model.semantic_models) == 1
+    semantic_model = build_result.model.semantic_models[0]
+    assert len(semantic_model.dimensions) == 1
+    dimension = semantic_model.dimensions[0]
     assert dimension.metadata is not None
     assert dimension.metadata.repo_file_path == "test_dir/inline_for_test"
     assert dimension.metadata.file_slice.filename == "inline_for_test"
@@ -370,7 +370,7 @@ def test_semantic_model_dimension_validity_params_parsing() -> None:
     """Test for parsing dimension validity info out of a semantic model specification"""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: scd_parsing_test
           node_relation:
             alias: source_table
@@ -394,15 +394,15 @@ def test_semantic_model_dimension_validity_params_parsing() -> None:
 
     build_result = parse_yaml_files_to_model(files=[file])
 
-    assert len(build_result.model.data_sources) == 1
-    data_source = build_result.model.data_sources[0]
-    assert len(data_source.dimensions) == 2
-    start_dimension = data_source.dimensions[0]
+    assert len(build_result.model.semantic_models) == 1
+    semantic_model = build_result.model.semantic_models[0]
+    assert len(semantic_model.dimensions) == 2
+    start_dimension = semantic_model.dimensions[0]
     assert start_dimension.type_params is not None
     assert start_dimension.type_params.validity_params is not None
     assert start_dimension.type_params.validity_params.is_start is True
     assert start_dimension.type_params.validity_params.is_end is False
-    end_dimension = data_source.dimensions[1]
+    end_dimension = semantic_model.dimensions[1]
     assert end_dimension.type_params is not None
     assert end_dimension.type_params.validity_params is not None
     assert end_dimension.type_params.validity_params.is_start is False
