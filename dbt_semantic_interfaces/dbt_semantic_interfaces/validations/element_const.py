@@ -3,7 +3,7 @@ from typing import List, DefaultDict
 
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.references import DataSourceReference
-from metricflow.model.validations.validator_helpers import (
+from dbt_semantic_interfaces.validations.validator_helpers import (
     DataSourceContext,
     DataSourceElementType,
     FileContext,

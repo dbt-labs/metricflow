@@ -4,15 +4,18 @@ import logging
 from typing import List, Sequence
 
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.validations.agg_time_dimension import AggregationTimeDimensionRule
-from metricflow.model.validations.data_sources import DataSourceTimeDimensionWarningsRule, DataSourceValidityWindowRule
-from metricflow.model.validations.dimension_const import DimensionConsistencyRule
-from metricflow.model.validations.element_const import ElementConsistencyRule
-from metricflow.model.validations.entities import (
+from dbt_semantic_interfaces.validations.agg_time_dimension import AggregationTimeDimensionRule
+from dbt_semantic_interfaces.validations.data_sources import (
+    DataSourceTimeDimensionWarningsRule,
+    DataSourceValidityWindowRule,
+)
+from dbt_semantic_interfaces.validations.dimension_const import DimensionConsistencyRule
+from dbt_semantic_interfaces.validations.element_const import ElementConsistencyRule
+from dbt_semantic_interfaces.validations.entities import (
     NaturalEntityConfigurationRule,
     OnePrimaryEntityPerDataSourceRule,
 )
-from metricflow.model.validations.measures import (
+from dbt_semantic_interfaces.validations.measures import (
     PercentileAggregationRule,
     CountAggregationExprRule,
     DataSourceMeasuresUniqueRule,
@@ -20,11 +23,11 @@ from metricflow.model.validations.measures import (
     MetricMeasuresRule,
     MeasuresNonAdditiveDimensionRule,
 )
-from metricflow.model.validations.metrics import CumulativeMetricRule, DerivedMetricRule
-from metricflow.model.validations.non_empty import NonEmptyRule
-from metricflow.model.validations.reserved_keywords import ReservedKeywordsRule
-from metricflow.model.validations.unique_valid_name import UniqueAndValidNameRule
-from metricflow.model.validations.validator_helpers import (
+from dbt_semantic_interfaces.validations.metrics import CumulativeMetricRule, DerivedMetricRule
+from dbt_semantic_interfaces.validations.non_empty import NonEmptyRule
+from dbt_semantic_interfaces.validations.reserved_keywords import ReservedKeywordsRule
+from dbt_semantic_interfaces.validations.unique_valid_name import UniqueAndValidNameRule
+from dbt_semantic_interfaces.validations.validator_helpers import (
     ModelValidationResults,
     ModelValidationRule,
     ModelValidationException,

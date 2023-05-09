@@ -5,17 +5,17 @@ from typing import Callable
 
 import pytest
 
-from metricflow.model.model_validator import ModelValidator
+from dbt_semantic_interfaces.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.data_source import DataSource
 from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_validation_ready_model
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
-from metricflow.model.validations.entities import (
+from dbt_semantic_interfaces.validations.entities import (
     NaturalEntityConfigurationRule,
     OnePrimaryEntityPerDataSourceRule,
 )
-from metricflow.model.validations.validator_helpers import ModelValidationException
+from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationException
 from metricflow.test.model.validations.helpers import base_model_file
 from metricflow.test.test_utils import find_data_source_with
 

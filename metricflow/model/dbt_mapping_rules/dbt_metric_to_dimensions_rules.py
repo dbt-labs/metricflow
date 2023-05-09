@@ -10,7 +10,11 @@ from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
     MappedObjects,
     assert_metric_model_name,
 )
-from metricflow.model.validations.validator_helpers import ModelValidationResults, ValidationIssue, ValidationError
+from dbt_semantic_interfaces.validations.validator_helpers import (
+    ModelValidationResults,
+    ValidationIssue,
+    ValidationError,
+)
 
 DBT_COLUMN_TYPES_TO_DIMENSION_TYPES: Dict[str, DimensionType] = {
     "DATE": DimensionType.TIME,

@@ -13,7 +13,7 @@ from dbt_semantic_interfaces.references import (
 )
 from dbt_semantic_interfaces.references import ElementReference
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from metricflow.model.validations.validator_helpers import (
+from dbt_semantic_interfaces.validations.validator_helpers import (
     DataSourceContext,
     DataSourceElementContext,
     DataSourceElementType,

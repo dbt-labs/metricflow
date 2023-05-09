@@ -10,7 +10,11 @@ from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
     get_and_assert_calc_method_mapping,
 )
 from dbt_semantic_interfaces.objects.metric import MetricType
-from metricflow.model.validations.validator_helpers import ModelValidationResults, ValidationIssue, ValidationError
+from dbt_semantic_interfaces.validations.validator_helpers import (
+    ModelValidationResults,
+    ValidationIssue,
+    ValidationError,
+)
 
 CALC_METHOD_TO_MEASURE_TYPE: Dict[str, AggregationType] = {
     "count": AggregationType.COUNT,

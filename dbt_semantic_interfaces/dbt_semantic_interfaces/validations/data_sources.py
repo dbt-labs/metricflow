@@ -6,7 +6,7 @@ from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.references import DataSourceReference
-from metricflow.model.validations.validator_helpers import (
+from dbt_semantic_interfaces.validations.validator_helpers import (
     DataSourceContext,
     FileContext,
     ModelValidationRule,

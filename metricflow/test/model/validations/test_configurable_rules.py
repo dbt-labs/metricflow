@@ -1,10 +1,10 @@
 import pytest
 import copy
 
-from metricflow.model.model_validator import ModelValidator
+from dbt_semantic_interfaces.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.objects.metric import MetricTypeParams, MetricInput, MetricType
-from metricflow.model.validations.metrics import DerivedMetricRule
+from dbt_semantic_interfaces.validations.metrics import DerivedMetricRule
 from metricflow.test.model.validations.helpers import metric_with_guaranteed_meta
 
 
