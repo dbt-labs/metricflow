@@ -105,7 +105,7 @@ class MeasureConstraintAliasesRule(ModelValidationRule):
                 continue
 
             constrained_measures_without_aliases = [
-                measure for measure in input_measures if measure.constraint is not None and measure.alias is None
+                measure for measure in input_measures if measure.filter is not None and measure.alias is None
             ]
             if constrained_measures_without_aliases:
                 issues.append(

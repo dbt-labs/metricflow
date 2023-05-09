@@ -252,7 +252,7 @@ class DbtManifestTransformer:
             type_params=MetricTypeParams(
                 measure=MetricInputMeasure(name=dbt_metric.name),
             ),
-            constraint=where_filter,
+            filter=where_filter,
         )
 
     def dbt_metric_to_metricflow_elements(self, dbt_metric: DbtMetric) -> TransformedDbtMetric:

@@ -51,7 +51,7 @@ def test_for_breaking_model_changes(dbt_metrics: Tuple[MetricNode, ...]) -> None
             ), f"Metric `{mf_metric.name}` created from dbt metric `{dbt_metric.name}` is missing a `description`"
         if dbt_metric.filters is not None:
             assert (
-                mf_metric.constraint is not None
+                mf_metric.filter is not None
             ), f"Metric `{mf_metric.name}` created from dbt metric `{dbt_metric.name}` is missing a `constraint`"
 
         # Ensure data source created from metric's model (if it has one) was created properly

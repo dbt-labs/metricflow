@@ -265,10 +265,10 @@ class MetricFlowQueryParser:
         for metric_reference in metric_references:
             metric = self._metric_semantics.get_metric(metric_reference)
             metric_where_constraint: Optional[WhereFilterSpec] = None
-            if metric.constraint:
+            if metric.filter:
                 # add constraint to MetricSpec
                 metric_where_constraint = WhereFilterSpec.create_from_where_filter(
-                    where_filter=metric.constraint,
+                    where_filter=metric.filter,
                     column_association_resolver=self._column_association_resolver,
                 )
             # TODO: Directly initializing Spec object instead of using a factory method since
@@ -390,7 +390,7 @@ class MetricFlowQueryParser:
         # TODO: Consider moving this logic into _validate_linkable_specs().
         for metric_reference in metric_references:
             metric = self._metric_semantics.get_metric(metric_reference)
-            if metric.constraint is not None:
+            if metric.filter is not None:
                 group_by_specs_for_one_metric = self._parse_linkable_element_names(
                     qualified_linkable_names=group_by_names,
                     metric_references=(metric_reference,),
@@ -405,7 +405,7 @@ class MetricFlowQueryParser:
                             group_by_specs_for_one_metric,
                             QueryTimeLinkableSpecSet.create_from_linkable_spec_set(
                                 WhereFilterSpec.create_from_where_filter(
-                                    where_filter=metric.constraint,
+                                    where_filter=metric.filter,
                                     column_association_resolver=self._column_association_resolver,
                                 ).linkable_spec_set
                             ),
