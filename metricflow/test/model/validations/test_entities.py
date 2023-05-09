@@ -6,7 +6,7 @@ from typing import Callable
 import pytest
 
 from metricflow.model.model_validator import ModelValidator
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_validation_ready_model
@@ -25,7 +25,7 @@ def test_data_source_cant_have_more_than_one_primary_entity(
 ) -> None:  # noqa: D
     """Add an additional primary entity to a data source and assert that it cannot have two"""
     model = copy.deepcopy(simple_model__with_primary_transforms)
-    func: Callable[[DataSource], bool] = lambda data_source: len(data_source.entities) > 1
+    func: Callable[[SemanticModel], bool] = lambda data_source: len(data_source.entities) > 1
 
     multiple_entity_data_source, _ = find_data_source_with(model, func)
 

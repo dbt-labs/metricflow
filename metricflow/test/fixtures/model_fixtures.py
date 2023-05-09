@@ -13,7 +13,7 @@ from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, BaseOutput
 from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
 from dbt_semantic_interfaces.model_transformer import ModelTransformer
 from metricflow.model.model_validator import ModelValidator
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.parsing.dir_to_model import (
     parse_directory_of_yaml_files_to_model,
@@ -125,7 +125,7 @@ def create_data_sets(multihop_semantic_manifest_lookup: SemanticManifestLookup) 
     """
     # Use ordered dict and sort by name to get consistency when running tests.
     data_sets = OrderedDict()
-    data_sources: List[DataSource] = multihop_semantic_manifest_lookup.user_configured_model.data_sources
+    data_sources: List[SemanticModel] = multihop_semantic_manifest_lookup.user_configured_model.data_sources
     data_sources.sort(key=lambda x: x.name)
 
     converter = DataSourceToDataSetConverter(

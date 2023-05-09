@@ -1,6 +1,6 @@
 from typing import Dict, List, Set
 
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.references import DataSourceElementReference, EntityReference
@@ -19,7 +19,7 @@ class CommonEntitysRule(ModelValidationRule):
     """Checks that entities exist on more than one data source"""
 
     @staticmethod
-    def _map_data_source_entities(data_sources: List[DataSource]) -> Dict[EntityReference, Set[str]]:
+    def _map_data_source_entities(data_sources: List[SemanticModel]) -> Dict[EntityReference, Set[str]]:
         """Generate mapping of entity names to the set of data_sources where it is defined"""
         entities_to_data_sources: Dict[EntityReference, Set[str]] = {}
         for data_source in data_sources or []:
@@ -34,7 +34,7 @@ class CommonEntitysRule(ModelValidationRule):
     @validate_safely(whats_being_done="checking entity exists on more than one data source")
     def _check_entity(
         entity: Entity,
-        data_source: DataSource,
+        data_source: SemanticModel,
         entities_to_data_sources: Dict[EntityReference, Set[str]],
     ) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []

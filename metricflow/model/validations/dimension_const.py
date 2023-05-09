@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
 from metricflow.model.validations.validator_helpers import (
     DataSourceElementContext,
@@ -52,7 +52,7 @@ class DimensionConsistencyRule(ModelValidationRule):
     def _validate_dimension(
         dimension: Dimension,
         time_dims_to_granularity: Dict[DimensionReference, TimeGranularity],
-        data_source: DataSource,
+        data_source: SemanticModel,
     ) -> List[ValidationIssue]:
         """Checks that time dimensions of the same name that aren't primary have the same time granularity specifications
 
@@ -98,7 +98,7 @@ class DimensionConsistencyRule(ModelValidationRule):
         whats_being_done="checking that the data source has dimensions consistent with the given invariants"
     )
     def _validate_data_source(
-        data_source: DataSource,
+        data_source: SemanticModel,
         dimension_to_invariant: Dict[DimensionReference, DimensionInvariants],
         update_invariant_dict: bool,
     ) -> List[ValidationIssue]:

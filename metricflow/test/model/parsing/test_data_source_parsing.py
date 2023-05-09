@@ -9,7 +9,7 @@ from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 
 def test_data_source_metadata_parsing() -> None:
-    """Test for asserting that internal metadata is parsed into the DataSource object"""
+    """Test for asserting that internal metadata is parsed into the SemanticModel object"""
     yaml_contents = textwrap.dedent(
         """\
         data_source:

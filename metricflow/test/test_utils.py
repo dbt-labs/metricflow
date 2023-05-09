@@ -5,7 +5,7 @@ import dateutil.parser
 from _pytest.fixtures import FixtureRequest
 from typing import Callable, Tuple
 
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.metric import Metric
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.protocols.sql_client import SqlClient
@@ -33,7 +33,9 @@ def should_skip_multi_threaded(
     return False
 
 
-def find_data_source_with(model: UserConfiguredModel, function: Callable[[DataSource], bool]) -> Tuple[DataSource, int]:
+def find_data_source_with(
+    model: UserConfiguredModel, function: Callable[[SemanticModel], bool]
+) -> Tuple[SemanticModel, int]:
     """Returns a data source from the model which matches the criteria defined by the passed in function'
 
     This is useful because the order of data sources in the list is non determinant, thus it's impossible to

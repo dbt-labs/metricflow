@@ -4,7 +4,7 @@ from typing import Optional, Sequence
 from metricflow.engine.models import Dimension
 from dbt_semantic_interfaces.objects.metadata import FileSlice, Metadata
 from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
-from dbt_semantic_interfaces.objects.data_source import DataSource, NodeRelation
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel, NodeRelation
 from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.metric import Metric, MetricType, MetricTypeParams
@@ -87,7 +87,7 @@ def data_source_with_guaranteed_meta(
     entities: Sequence[Entity] = [],
     measures: Sequence[Measure] = [],
     dimensions: Sequence[Dimension] = [],
-) -> DataSource:
+) -> SemanticModel:
     """Creates a data source with the given input. If a metadata object is not supplied, a default metadata object is used"""
 
     created_node_relation = node_relation
@@ -97,7 +97,7 @@ def data_source_with_guaranteed_meta(
             alias="table",
         )
 
-    return DataSource(
+    return SemanticModel(
         name=name,
         description=description,
         node_relation=created_node_relation,

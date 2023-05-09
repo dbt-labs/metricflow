@@ -9,7 +9,7 @@ from dbt.exceptions import ref_invalid_args
 from dbt.contracts.graph.manifest import Manifest as DbtManifest
 from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
 from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.elements.measure import Measure
@@ -22,7 +22,7 @@ from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 @dataclass
 class TransformedDbtMetric:  # noqa: D
-    data_source: DataSource
+    data_source: SemanticModel
     metric: Metric
 
 
@@ -187,7 +187,7 @@ class DbtManifestTransformer:
             agg_time_dimension=dbt_metric.timestamp,
         )
 
-    def build_data_source_for_metric(self, dbt_metric: DbtMetric) -> DataSource:
+    def build_data_source_for_metric(self, dbt_metric: DbtMetric) -> SemanticModel:
         """Attemps to build a data source for a given DbtMetric
 
         Raises:
@@ -198,7 +198,7 @@ class DbtManifestTransformer:
 
         metric_model_ref = self.resolve_metric_model(dbt_metric=dbt_metric)
         data_source_table = self.db_table_from_model_node(metric_model_ref)
-        return DataSource(
+        return SemanticModel(
             name=metric_model_ref.name,
             description=metric_model_ref.description,
             sql_table=data_source_table,
@@ -258,7 +258,7 @@ class DbtManifestTransformer:
         return TransformedDbtMetric(data_source=data_source, metric=proxy_metric)
 
     @classmethod
-    def deduplicate_data_sources(cls, data_sources: List[DataSource]) -> DataSource:
+    def deduplicate_data_sources(cls, data_sources: List[SemanticModel]) -> SemanticModel:
         """Attempts to deduplicate a list of data sources into a single data source
 
         Because each DbtMetric (which isn't `derived`) creates a data source,
@@ -312,7 +312,7 @@ class DbtManifestTransformer:
             len(sql_tables) == 1, len(sql_queries) == 1
         ), "Cannot merge data sources, definitions for both sql_table and sql_query exist"
 
-        return DataSource(
+        return SemanticModel(
             name=list(names)[0],
             description=list(descriptions)[0] if descriptions else None,
             sql_table=list(sql_tables)[0] if sql_tables else None,
@@ -367,7 +367,7 @@ class DbtManifestTransformer:
             supports derived metrics, we'll need to add that functionality to
             handle dbt derived metrics -> metricflow derived metrics.
         """
-        data_sources_map: DefaultDict[str, List[DataSource]] = defaultdict(list)
+        data_sources_map: DefaultDict[str, List[SemanticModel]] = defaultdict(list)
         metrics = []
         issues: List[ValidationIssue] = []
 

@@ -15,7 +15,7 @@ from metricflow.instances import (
     EntityInstance,
     InstanceSet,
 )
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
 from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.elements.measure import Measure
@@ -327,7 +327,7 @@ class DataSourceToDataSetConverter:
             )
         return entity_instances, select_columns
 
-    def create_sql_source_data_set(self, data_source: DataSource) -> DataSourceDataSet:
+    def create_sql_source_data_set(self, data_source: SemanticModel) -> DataSourceDataSet:
         """Create an SQL source data set from a data source in the model."""
 
         # Gather all instances and columns from all data sources.

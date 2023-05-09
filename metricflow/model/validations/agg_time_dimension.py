@@ -1,6 +1,6 @@
 from typing import List
 
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.references import DataSourceElementReference, TimeDimensionReference
@@ -28,7 +28,7 @@ class AggregationTimeDimensionRule(ModelValidationRule):
         return issues
 
     @staticmethod
-    def _time_dimension_in_model(time_dimension_reference: TimeDimensionReference, data_source: DataSource) -> bool:
+    def _time_dimension_in_model(time_dimension_reference: TimeDimensionReference, data_source: SemanticModel) -> bool:
         for dimension in data_source.dimensions:
             if dimension.type == DimensionType.TIME and dimension.name == time_dimension_reference.element_name:
                 return True
@@ -36,7 +36,7 @@ class AggregationTimeDimensionRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking aggregation time dimension for a data source")
-    def _validate_data_source(data_source: DataSource) -> List[ValidationIssue]:
+    def _validate_data_source(data_source: SemanticModel) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
 
         for measure in data_source.measures:

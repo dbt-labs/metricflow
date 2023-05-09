@@ -33,7 +33,7 @@ from metricflow.model.dbt_mapping_rules.dbt_metric_to_measure import (
     DbtToMeasureAgg,
     DbtToMeasureAggTimeDimension,
 )
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.metric import Metric
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.parsing.dir_to_model import ModelBuildResult
@@ -82,14 +82,14 @@ class DbtConverter:
     def __init__(
         self,
         rules: Collection[DbtMappingRule] = DEFAULT_RULES,
-        data_source_class: Type[DataSource] = DataSource,
+        data_source_class: Type[SemanticModel] = SemanticModel,
         metric_class: Type[Metric] = Metric,
     ) -> None:
         """Initializer for DbtConverter class
 
         Args:
             rules: A collection of DbtMappingRules which get saved as a FrozenSet (immutable and unordered). Defaults to DEFAULT_RULES.
-            data_source_class: DataSource class to parse the mapped data sources to. Defaults to MetricFlow DataSource class.
+            data_source_class: SemanticModel class to parse the mapped data sources to. Defaults to MetricFlow SemanticModel class.
             metric_class: Metric class to parse the mapped metrics to. Defaults to MetricFlow Metric class.
         """
         self._unordered_rules = frozenset(rules)
@@ -122,7 +122,7 @@ class DbtConverter:
 
         issues: List[ValidationIssue] = []
 
-        data_sources: List[Type[DataSource]] = []
+        data_sources: List[Type[SemanticModel]] = []
         for data_source_dict in copied_objects.data_sources.values():
             try:
                 data_sources.append(self.data_source_class.parse_obj(data_source_dict))

@@ -64,8 +64,8 @@ class ModelReference(SerializableDataclass):
 
 
 @dataclass(frozen=True)
-class DataSourceReference(ModelReference):
-    """A reference to a data source definition in the model."""
+class SemanticModelReference(ModelReference):
+    """A reference to a semantic model definition in the model."""
 
     data_source_name: str
 
@@ -74,8 +74,8 @@ class DataSourceReference(ModelReference):
 
 
 @dataclass(frozen=True)
-class DataSourceElementReference(ModelReference):
-    """A reference to an element definition in a data source definition in the model.
+class SemanticModelElementReference(ModelReference):
+    """A reference to an element definition in a semantic model definition in the model.
 
     TODO: Fields should be *Reference objects.
     """
@@ -85,19 +85,19 @@ class DataSourceElementReference(ModelReference):
 
     @staticmethod
     def create_from_references(  # noqa: D
-        data_source_reference: DataSourceReference, element_reference: ElementReference
-    ) -> DataSourceElementReference:
-        return DataSourceElementReference(
+        data_source_reference: SemanticModelReference, element_reference: ElementReference
+    ) -> SemanticModelElementReference:
+        return SemanticModelElementReference(
             data_source_name=data_source_reference.data_source_name,
             element_name=element_reference.element_name,
         )
 
     @property
-    def data_source_reference(self) -> DataSourceReference:  # noqa: D
-        return DataSourceReference(self.data_source_name)
+    def data_source_reference(self) -> SemanticModelReference:  # noqa: D
+        return SemanticModelReference(self.data_source_name)
 
-    def is_from(self, ref: DataSourceReference) -> bool:
-        """Returns true if this reference is from the same data source as the supplied reference."""
+    def is_from(self, ref: SemanticModelReference) -> bool:
+        """Returns true if this reference is from the same semantic model as the supplied reference."""
         return self.data_source_name == ref.data_source_name
 
 

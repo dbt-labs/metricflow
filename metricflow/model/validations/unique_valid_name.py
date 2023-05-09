@@ -4,7 +4,7 @@ import enum
 import re
 from typing import Dict, Tuple, List, Optional
 
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.references import (
     DataSourceElementReference,
@@ -91,7 +91,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking data source sub element names are unique")
-    def _validate_data_source_elements(data_source: DataSource) -> List[ValidationIssue]:
+    def _validate_data_source_elements(data_source: SemanticModel) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
         element_info_tuples: List[Tuple[ElementReference, str, ValidationContext]] = []
 

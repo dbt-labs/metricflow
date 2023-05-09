@@ -11,7 +11,7 @@ from __future__ import annotations
 from abc import abstractmethod, ABC
 from typing import Dict, FrozenSet, Optional, Sequence, Set
 
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension
 from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.elements.measure import Measure
@@ -86,7 +86,7 @@ class DataSourceSemanticsAccessor(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_data_sources_for_measure(self, measure_reference: MeasureReference) -> Sequence[DataSource]:
+    def get_data_sources_for_measure(self, measure_reference: MeasureReference) -> Sequence[SemanticModel]:
         """Retrieve a list of all data source model objects associated with the measure reference"""
         raise NotImplementedError
 
@@ -100,7 +100,7 @@ class DataSourceSemanticsAccessor(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_by_reference(self, data_source_reference: DataSourceReference) -> Optional[DataSource]:
+    def get_by_reference(self, data_source_reference: DataSourceReference) -> Optional[SemanticModel]:
         """Retrieve the data source model object matching the input data source reference, if any"""
         raise NotImplementedError
 
@@ -118,7 +118,7 @@ class DataSourceSemanticsAccessor(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_data_sources_for_entity(self, entity_reference: EntityReference) -> Set[DataSource]:
+    def get_data_sources_for_entity(self, entity_reference: EntityReference) -> Set[SemanticModel]:
         """Return all data sources associated with an entity reference"""
         raise NotImplementedError
 

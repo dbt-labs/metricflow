@@ -2,7 +2,7 @@ import pytest
 
 from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
 from metricflow.model.model_validator import ModelValidator
-from dbt_semantic_interfaces.objects.data_source import DataSource, NodeRelation
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel, NodeRelation
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.metric import MetricType, MetricTypeParams, Metric
@@ -110,7 +110,7 @@ def test_multiple_primary_time_dimensions() -> None:  # noqa:D
         model_validator.checked_validations(
             model=UserConfiguredModel(
                 data_sources=[
-                    DataSource(
+                    SemanticModel(
                         name="dim1",
                         node_relation=NodeRelation(
                             alias="table",

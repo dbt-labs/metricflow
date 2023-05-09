@@ -3,7 +3,7 @@ import pytest
 from typing import Tuple
 
 from metricflow.model.model_validator import ModelValidator
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.element_const import ElementConsistencyRule
@@ -11,7 +11,7 @@ from metricflow.model.validations.validator_helpers import DataSourceElementType
 from metricflow.test.test_utils import find_data_source_with
 
 
-def _categorical_dimensions(data_source: DataSource) -> Tuple[Dimension, ...]:
+def _categorical_dimensions(data_source: SemanticModel) -> Tuple[Dimension, ...]:
     return tuple(dim for dim in data_source.dimensions if dim.type == DimensionType.CATEGORICAL)
 
 

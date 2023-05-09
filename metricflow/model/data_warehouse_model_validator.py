@@ -17,7 +17,7 @@ from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.dataset.dataset import DataSet
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
 from dbt_semantic_interfaces.references import DataSourceElementReference, DataSourceReference, MetricModelReference
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
 from dbt_semantic_interfaces.objects.metric import Metric
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
@@ -101,7 +101,7 @@ class DataWarehouseTaskBuilder:
 
     @staticmethod
     def _data_source_nodes(
-        render_tools: QueryRenderingTools, data_source: DataSource
+        render_tools: QueryRenderingTools, data_source: SemanticModel
     ) -> Sequence[BaseOutput[DataSourceDataSet]]:
         """Builds and returns the DataSourceDataSet node for the given data source"""
         data_source_semantics = render_tools.semantic_manifest_lookup.data_source_semantics.get_by_reference(

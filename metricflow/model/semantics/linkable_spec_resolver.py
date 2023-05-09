@@ -7,7 +7,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Tuple, Sequence, Dict, List, Optional, FrozenSet
 
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType, Dimension
 from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
@@ -266,7 +266,7 @@ class LinkableElementSet:
 class DataSourceJoinPathElement:
     """Describes joining a data source by the given entity."""
 
-    data_source: DataSource
+    data_source: SemanticModel
     join_on_entity: str
 
 
@@ -361,7 +361,7 @@ class DataSourceJoinPath:
         )
 
     @property
-    def last_data_source(self) -> DataSource:
+    def last_data_source(self) -> SemanticModel:
         """The last data source that would be joined in this path."""
         assert len(self.path_elements) > 0
         return self.path_elements[-1].data_source
@@ -395,8 +395,8 @@ class ValidLinkableSpecResolver:
         self._max_entity_links = max_entity_links
 
         # Map measures / entities to data sources that contain them.
-        self._entity_to_data_source: Dict[str, List[DataSource]] = defaultdict(list)
-        self._measure_to_data_source: Dict[str, List[DataSource]] = defaultdict(list)
+        self._entity_to_data_source: Dict[str, List[SemanticModel]] = defaultdict(list)
+        self._measure_to_data_source: Dict[str, List[SemanticModel]] = defaultdict(list)
 
         for data_source in self._data_sources:
             for entity in data_source.entities:
@@ -413,7 +413,7 @@ class ValidLinkableSpecResolver:
             self._metric_to_linkable_element_sets[metric.name] = linkable_sets_for_measure
         logger.info(f"Building the [metric -> valid linkable element] index took: {time.time() - start_time:.2f}s")
 
-    def _get_data_source_for_measure(self, measure_reference: MeasureReference) -> DataSource:  # noqa: D
+    def _get_data_source_for_measure(self, measure_reference: MeasureReference) -> SemanticModel:  # noqa: D
         data_sources_where_measure_was_found = []
         for data_source in self._data_sources:
             if any([x.reference.element_name == measure_reference.element_name for x in data_source.measures]):
@@ -428,7 +428,7 @@ class ValidLinkableSpecResolver:
             )
         return data_sources_where_measure_was_found[0]
 
-    def _get_local_set(self, data_source: DataSource) -> LinkableElementSet:
+    def _get_local_set(self, data_source: SemanticModel) -> LinkableElementSet:
         """Gets the local elements for a given data source."""
         linkable_dimensions = []
         linkable_entities = []
@@ -489,7 +489,7 @@ class ValidLinkableSpecResolver:
         self,
         left_data_source_reference: DataSourceReference,
         entity_reference: EntityReference,
-    ) -> Sequence[DataSource]:
+    ) -> Sequence[SemanticModel]:
         # May switch to non-cached implementation.
         data_sources = self._entity_to_data_source[entity_reference.element_name]
         valid_data_sources = []
@@ -582,7 +582,7 @@ class ValidLinkableSpecResolver:
         return LinkableElementSet.intersection(linkable_element_sets)
 
     def _find_next_possible_paths(
-        self, measure_data_source: DataSource, current_join_path: DataSourceJoinPath
+        self, measure_data_source: SemanticModel, current_join_path: DataSourceJoinPath
     ) -> Sequence[DataSourceJoinPath]:
         """Generate the set of possible paths that are 1 data source join longer that the "current_join_path"."""
         last_data_source_in_path = current_join_path.last_data_source

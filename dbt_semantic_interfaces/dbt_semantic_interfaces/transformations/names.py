@@ -1,6 +1,6 @@
 import logging
 
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.transformations.transform_rule import ModelTransformRule
 
@@ -19,7 +19,7 @@ class LowerCaseNamesRule(ModelTransformRule):
         return model
 
     @staticmethod
-    def _lowercase_data_source_elements(data_source: DataSource) -> None:
+    def _lowercase_data_source_elements(data_source: SemanticModel) -> None:
         """Lowercases the names of data source elements."""
         if data_source.measures:
             for measure in data_source.measures:

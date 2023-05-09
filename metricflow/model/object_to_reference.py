@@ -1,4 +1,4 @@
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension
 from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.elements.measure import Measure
@@ -24,7 +24,7 @@ class ObjectToReference:
     """
 
     @staticmethod
-    def from_data_source(data_source: DataSource) -> DataSourceReference:  # noqa: D
+    def from_data_source(data_source: SemanticModel) -> DataSourceReference:  # noqa: D
         return DataSourceReference(data_source_name=data_source.name)
 
     @staticmethod

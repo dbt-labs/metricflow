@@ -1,7 +1,7 @@
 import logging
 from typing import List
 
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
@@ -32,7 +32,7 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking validity of the data source's time dimensions")
-    def _validate_data_source(data_source: DataSource) -> List[ValidationIssue]:
+    def _validate_data_source(data_source: SemanticModel) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
 
         primary_time_dimensions = []
@@ -93,7 +93,7 @@ class DataSourceValidityWindowRule(ModelValidationRule):
     @validate_safely(
         whats_being_done="checking the data source's validity parameters for compatibility with runtime requirements"
     )
-    def _validate_data_source(data_source: DataSource) -> List[ValidationIssue]:
+    def _validate_data_source(data_source: SemanticModel) -> List[ValidationIssue]:
         """Runs assertions on data sources with validity parameters set on one or more time dimensions"""
 
         issues: List[ValidationIssue] = []

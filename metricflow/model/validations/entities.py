@@ -2,7 +2,7 @@ import logging
 from datetime import date
 from typing import List, MutableSet
 
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.references import DataSourceReference
@@ -29,7 +29,7 @@ class NaturalEntityConfigurationRule(ModelValidationRule):
             "natural entities are used in the appropriate contexts"
         )
     )
-    def _validate_data_source_natural_entities(data_source: DataSource) -> List[ValidationIssue]:
+    def _validate_data_source_natural_entities(data_source: SemanticModel) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
         context = DataSourceContext(
             file_context=FileContext.from_metadata(metadata=data_source.metadata),
@@ -75,7 +75,7 @@ class OnePrimaryEntityPerDataSourceRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking data source has only one primary entity")
-    def _only_one_primary_entity(data_source: DataSource) -> List[ValidationIssue]:
+    def _only_one_primary_entity(data_source: SemanticModel) -> List[ValidationIssue]:
         primary_entity_names: MutableSet[str] = set()
         for entity in data_source.entities or []:
             if entity.type == EntityType.PRIMARY:

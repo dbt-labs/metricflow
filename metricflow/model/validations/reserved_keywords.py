@@ -2,7 +2,7 @@ from typing import List
 from dbt_semantic_interfaces.references import DataSourceElementReference
 
 
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,
@@ -65,7 +65,7 @@ class ReservedKeywordsRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking that data source sub element names aren't reserved sql keywords")
-    def _validate_data_source_sub_elements(data_source: DataSource) -> List[ValidationIssue]:
+    def _validate_data_source_sub_elements(data_source: SemanticModel) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
 
         for dimension in data_source.dimensions:

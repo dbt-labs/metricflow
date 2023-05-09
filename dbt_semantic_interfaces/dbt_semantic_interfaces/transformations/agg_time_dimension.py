@@ -1,7 +1,7 @@
 import logging
 from typing import Optional
 
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.transformations.transform_rule import ModelTransformRule
@@ -14,7 +14,7 @@ class SetMeasureAggregationTimeDimensionRule(ModelTransformRule):
     """Sets the aggregation time dimension for measures to the primary time dimension if not defined."""
 
     @staticmethod
-    def _find_primary_time_dimension(data_source: DataSource) -> Optional[TimeDimensionReference]:
+    def _find_primary_time_dimension(data_source: SemanticModel) -> Optional[TimeDimensionReference]:
         for dimension in data_source.dimensions:
             if dimension.type == DimensionType.TIME and dimension.type_params and dimension.type_params.is_primary:
                 return dimension.time_dimension_reference
