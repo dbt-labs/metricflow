@@ -1185,7 +1185,7 @@ class FilterElementsNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
 
 
 class WhereConstraintNode(AggregatedMeasuresOutput[SourceDataSetT]):
-    """Only passes the listed elements."""
+    """Remove rows using a WHERE clause."""
 
     def __init__(  # noqa: D
         self,
