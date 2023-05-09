@@ -5,9 +5,12 @@ from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.objects.metadata import Metadata
 from dbt_semantic_interfaces.objects.base import ModelWithMetadataParsing, HashableBaseModel
 from dbt_semantic_interfaces.references import MeasureReference, TimeDimensionReference
+from dbt_semantic_interfaces.protocols.measure import (
+    NonAdditiveDimensionParametersProtocol
+)
 
 
-class NonAdditiveDimensionParameters(HashableBaseModel):
+class NonAdditiveDimensionParameters(HashableBaseModel, NonAdditiveDimensionParametersProtocol):
     """Describes the params for specifying non-additive dimensions in a measure.
 
     NOTE: Currently, only TimeDimensions are supported for this filter

@@ -6,7 +6,7 @@ from typing import Sequence
 import pytest
 
 from dbt_semantic_interfaces.objects.metadata import Metadata
-from metricflow.model.objects.elements.measure import Measure
+from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.parsing.yaml_loader import YamlConfigLoader
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
