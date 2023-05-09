@@ -34,7 +34,7 @@ class MetricInputMeasure(PydanticCustomInputParser, HashableBaseModel):
     """
 
     name: str
-    constraint: Optional[WhereFilter]
+    filter: Optional[WhereFilter]
     alias: Optional[str]
 
     @classmethod
@@ -123,7 +123,7 @@ class MetricInput(HashableBaseModel):
     """Provides a pointer to a metric along with the additional properties used on that metric."""
 
     name: str
-    constraint: Optional[WhereFilter]
+    filter: Optional[WhereFilter]
     alias: Optional[str]
     offset_window: Optional[MetricTimeWindow]
     offset_to_grain: Optional[TimeGranularity]
@@ -163,7 +163,7 @@ class Metric(HashableBaseModel, ModelWithMetadataParsing):
     description: Optional[str]
     type: MetricType
     type_params: MetricTypeParams
-    constraint: Optional[WhereFilter]
+    filter: Optional[WhereFilter]
     metadata: Optional[Metadata]
 
     @property

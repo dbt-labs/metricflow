@@ -45,7 +45,7 @@ metric_input_measure_schema = {
             "type": "object",
             "properties": {
                 "name": {"type": "string"},
-                "constraint": {"type": "string"},
+                "filter": {"type": "string"},
                 "alias": {"type": "string"},
             },
             "additionalProperties": False,
@@ -58,7 +58,7 @@ metric_input_schema = {
     "type": "object",
     "properties": {
         "name": {"type": "string"},
-        "constraint": {"type": "string"},
+        "filter": {"type": "string"},
         "alias": {"type": "string"},
         "offset_window": {"type": "string"},
         "offset_to_grain": {"type": "string"},
@@ -215,8 +215,7 @@ metric_schema = {
         },
         "type": {"enum": metric_types_enum_values},
         "type_params": {"$ref": "metric_type_params"},
-        "constraint": {"type": "string"},
-        "where_constraint": {"type": "string"},
+        "filter": {"type": "string"},
         "description": {"type": "string"},
     },
     "additionalProperties": False,

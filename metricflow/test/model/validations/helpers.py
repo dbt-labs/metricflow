@@ -74,7 +74,7 @@ def metric_with_guaranteed_meta(
         description=description,
         type=type,
         type_params=type_params,
-        constraint=constraint,
+        filter=constraint,
         metadata=metadata,
     )
 
