@@ -7,7 +7,7 @@ from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.references import SemanticModelReference
 from metricflow.model.validations.validator_helpers import (
-    DataSourceContext,
+    SemanticModelContext,
     FileContext,
     ModelValidationRule,
     ValidationIssue,
@@ -31,7 +31,7 @@ class NaturalEntityConfigurationRule(ModelValidationRule):
     )
     def _validate_semantic_model_natural_entities(data_source: SemanticModel) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
-        context = DataSourceContext(
+        context = SemanticModelContext(
             file_context=FileContext.from_metadata(metadata=data_source.metadata),
             data_source=SemanticModelReference(semantic_model_name=data_source.name),
         )
@@ -70,7 +70,7 @@ class NaturalEntityConfigurationRule(ModelValidationRule):
         return issues
 
 
-class OnePrimaryEntityPerDataSourceRule(ModelValidationRule):
+class OnePrimaryEntityPerSemanticModelRule(ModelValidationRule):
     """Ensures that each data source has only one primary entity"""
 
     @staticmethod
@@ -84,7 +84,7 @@ class OnePrimaryEntityPerDataSourceRule(ModelValidationRule):
         if len(primary_entity_names) > 1:
             return [
                 ValidationFutureError(
-                    context=DataSourceContext(
+                    context=SemanticModelContext(
                         file_context=FileContext.from_metadata(metadata=data_source.metadata),
                         data_source=SemanticModelReference(semantic_model_name=data_source.name),
                     ),
@@ -101,6 +101,6 @@ class OnePrimaryEntityPerDataSourceRule(ModelValidationRule):
         issues = []
 
         for data_source in model.data_sources:
-            issues += OnePrimaryEntityPerDataSourceRule._only_one_primary_entity(data_source=data_source)
+            issues += OnePrimaryEntityPerSemanticModelRule._only_one_primary_entity(data_source=data_source)
 
         return issues

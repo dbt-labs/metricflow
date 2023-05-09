@@ -4,7 +4,7 @@ import textwrap
 from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_validation_ready_model
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from metricflow.model.model_validator import ModelValidator
-from metricflow.model.validations.data_sources import DataSourceValidityWindowRule
+from metricflow.model.validations.data_sources import SemanticModelValidityWindowRule
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.test.model.validations.helpers import base_model_file
 
@@ -76,7 +76,7 @@ def test_validity_window_must_have_a_start() -> None:
     model = parse_yaml_files_to_validation_ready_model([base_model_file(), validity_window_file])
 
     with pytest.raises(ModelValidationException, match="has 1 dimensions defined with validity params"):
-        ModelValidator([DataSourceValidityWindowRule()]).checked_validations(model.model)
+        ModelValidator([SemanticModelValidityWindowRule()]).checked_validations(model.model)
 
 
 def test_validity_window_must_have_an_end() -> None:
@@ -106,7 +106,7 @@ def test_validity_window_must_have_an_end() -> None:
     model = parse_yaml_files_to_validation_ready_model([base_model_file(), validity_window_file])
 
     with pytest.raises(ModelValidationException, match="has 1 dimensions defined with validity params"):
-        ModelValidator([DataSourceValidityWindowRule()]).checked_validations(model.model)
+        ModelValidator([SemanticModelValidityWindowRule()]).checked_validations(model.model)
 
 
 def test_validity_window_uses_two_dimensions() -> None:
@@ -140,7 +140,7 @@ def test_validity_window_uses_two_dimensions() -> None:
     model = parse_yaml_files_to_validation_ready_model([base_model_file(), validity_window_file])
 
     with pytest.raises(ModelValidationException, match="single validity param dimension that defines its window"):
-        ModelValidator([DataSourceValidityWindowRule()]).checked_validations(model.model)
+        ModelValidator([SemanticModelValidityWindowRule()]).checked_validations(model.model)
 
 
 def test_two_dimension_validity_windows_must_not_overload_start_and_end() -> None:
@@ -177,7 +177,7 @@ def test_two_dimension_validity_windows_must_not_overload_start_and_end() -> Non
     model = parse_yaml_files_to_validation_ready_model([base_model_file(), validity_window_file])
 
     with pytest.raises(ModelValidationException, match="does not have exactly one each"):
-        ModelValidator([DataSourceValidityWindowRule()]).checked_validations(model.model)
+        ModelValidator([SemanticModelValidityWindowRule()]).checked_validations(model.model)
 
 
 def test_multiple_validity_windows_are_invalid() -> None:
@@ -225,7 +225,7 @@ def test_multiple_validity_windows_are_invalid() -> None:
     model = parse_yaml_files_to_validation_ready_model([base_model_file(), validity_window_file])
 
     with pytest.raises(ModelValidationException, match="has 4 dimensions defined with validity params"):
-        ModelValidator([DataSourceValidityWindowRule()]).checked_validations(model.model)
+        ModelValidator([SemanticModelValidityWindowRule()]).checked_validations(model.model)
 
 
 def test_empty_validity_windows_are_invalid() -> None:
@@ -262,7 +262,7 @@ def test_empty_validity_windows_are_invalid() -> None:
     model = parse_yaml_files_to_validation_ready_model([base_model_file(), validity_window_file])
 
     with pytest.raises(ModelValidationException, match="does not have exactly one each"):
-        ModelValidator([DataSourceValidityWindowRule()]).checked_validations(model.model)
+        ModelValidator([SemanticModelValidityWindowRule()]).checked_validations(model.model)
 
 
 def test_measures_are_prevented() -> None:
@@ -308,7 +308,7 @@ def test_measures_are_prevented() -> None:
     model = parse_yaml_files_to_validation_ready_model([base_model_file(), validity_window_file])
 
     with pytest.raises(ModelValidationException, match="has both measures and validity param dimensions defined"):
-        ModelValidator([DataSourceValidityWindowRule()]).checked_validations(model.model)
+        ModelValidator([SemanticModelValidityWindowRule()]).checked_validations(model.model)
 
 
 def test_validity_window_must_have_a_natural_key() -> None:
@@ -345,7 +345,7 @@ def test_validity_window_must_have_a_natural_key() -> None:
     model = parse_yaml_files_to_validation_ready_model([base_model_file(), validity_window_file])
 
     with pytest.raises(ModelValidationException, match="does not have an entity with type `natural` set"):
-        ModelValidator([DataSourceValidityWindowRule()]).checked_validations(model.model)
+        ModelValidator([SemanticModelValidityWindowRule()]).checked_validations(model.model)
 
 
 def test_validity_window_does_not_use_primary_key() -> None:
@@ -389,4 +389,4 @@ def test_validity_window_does_not_use_primary_key() -> None:
     model = parse_yaml_files_to_validation_ready_model([base_model_file(), validity_window_file])
 
     with pytest.raises(ModelValidationException, match="has one or more entities designated as `primary`"):
-        ModelValidator([DataSourceValidityWindowRule()]).checked_validations(model.model)
+        ModelValidator([SemanticModelValidityWindowRule()]).checked_validations(model.model)

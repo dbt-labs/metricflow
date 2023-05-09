@@ -7,7 +7,7 @@ from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.element_const import ElementConsistencyRule
-from metricflow.model.validations.validator_helpers import DataSourceElementType, ModelValidationException
+from metricflow.model.validations.validator_helpers import SemanticModelElementType, ModelValidationException
 from metricflow.test.test_utils import find_semantic_model_with
 
 
@@ -44,8 +44,8 @@ def test_cross_element_names(simple_model__with_primary_transforms: UserConfigur
     with pytest.raises(
         ModelValidationException,
         match=(
-            f"element `{measure_reference.element_name}` is of type {DataSourceElementType.DIMENSION}, but it is used as "
-            f"types .*?DataSourceElementType.DIMENSION.*?DataSourceElementType.MEASURE.*? across the model"
+            f"element `{measure_reference.element_name}` is of type {SemanticModelElementType.DIMENSION}, but it is used as "
+            f"types .*?SemanticModelElementType.DIMENSION.*?SemanticModelElementType.MEASURE.*? across the model"
         ),
     ):
         ModelValidator([ElementConsistencyRule()]).checked_validations(model)
@@ -54,8 +54,8 @@ def test_cross_element_names(simple_model__with_primary_transforms: UserConfigur
     with pytest.raises(
         ModelValidationException,
         match=(
-            f"element `{measure_reference.element_name}` is of type {DataSourceElementType.ENTITY}, but it is used as "
-            f"types .*?DataSourceElementType.ENTITY.*?DataSourceElementType.MEASURE.*? across the model"
+            f"element `{measure_reference.element_name}` is of type {SemanticModelElementType.ENTITY}, but it is used as "
+            f"types .*?SemanticModelElementType.ENTITY.*?SemanticModelElementType.MEASURE.*? across the model"
         ),
     ):
         ModelValidator([ElementConsistencyRule()]).checked_validations(model)
@@ -64,8 +64,8 @@ def test_cross_element_names(simple_model__with_primary_transforms: UserConfigur
     with pytest.raises(
         ModelValidationException,
         match=(
-            f"element `{dimension_reference.element_name}` is of type {DataSourceElementType.DIMENSION}, but it is used as "
-            f"types .*?DataSourceElementType.DIMENSION.*?DataSourceElementType.ENTITY.*? across the model"
+            f"element `{dimension_reference.element_name}` is of type {SemanticModelElementType.DIMENSION}, but it is used as "
+            f"types .*?SemanticModelElementType.DIMENSION.*?SemanticModelElementType.ENTITY.*? across the model"
         ),
     ):
         ModelValidator([ElementConsistencyRule()]).checked_validations(model)

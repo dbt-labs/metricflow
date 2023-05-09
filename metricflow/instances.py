@@ -54,7 +54,7 @@ class MdoInstance(ABC, Generic[SpecT]):
 
 
 @dataclass(frozen=True)
-class DataSourceElementInstance(SerializableDataclass):  # noqa: D
+class SemanticModelElementInstance(SerializableDataclass):  # noqa: D
     # This instance is derived from something defined in a data source.
     defined_from: Tuple[SemanticModelElementReference, ...]
 
@@ -69,7 +69,7 @@ class DataSourceElementInstance(SerializableDataclass):  # noqa: D
         """
         if len(self.defined_from) != 1:
             raise ValueError(
-                f"DataSourceElementInstances should have exactly one entry in the `defined_from` property, because "
+                f"SemanticModelElementInstances should have exactly one entry in the `defined_from` property, because "
                 f"otherwise there is no way to ensure that the first element is always the origin data source! Found "
                 f"{len(self.defined_from)} elements in this particular instance: {self.defined_from}."
             )
@@ -78,26 +78,26 @@ class DataSourceElementInstance(SerializableDataclass):  # noqa: D
 
 
 @dataclass(frozen=True)
-class MeasureInstance(MdoInstance[MeasureSpec], DataSourceElementInstance):  # noqa: D
+class MeasureInstance(MdoInstance[MeasureSpec], SemanticModelElementInstance):  # noqa: D
     associated_columns: Tuple[ColumnAssociation, ...]
     spec: MeasureSpec
     aggregation_state: AggregationState
 
 
 @dataclass(frozen=True)
-class DimensionInstance(MdoInstance[DimensionSpec], DataSourceElementInstance):  # noqa: D
+class DimensionInstance(MdoInstance[DimensionSpec], SemanticModelElementInstance):  # noqa: D
     associated_columns: Tuple[ColumnAssociation, ...]
     spec: DimensionSpec
 
 
 @dataclass(frozen=True)
-class TimeDimensionInstance(MdoInstance[TimeDimensionSpec], DataSourceElementInstance):  # noqa: D
+class TimeDimensionInstance(MdoInstance[TimeDimensionSpec], SemanticModelElementInstance):  # noqa: D
     associated_columns: Tuple[ColumnAssociation, ...]
     spec: TimeDimensionSpec
 
 
 @dataclass(frozen=True)
-class EntityInstance(MdoInstance[EntitySpec], DataSourceElementInstance):  # noqa: D
+class EntityInstance(MdoInstance[EntitySpec], SemanticModelElementInstance):  # noqa: D
     associated_columns: Tuple[ColumnAssociation, ...]
     spec: EntitySpec
 

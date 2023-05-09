@@ -36,11 +36,11 @@ from metricflow.specs import (
 )
 
 
-class DataSourceSemanticsAccessor(ABC):
+class SemanticModelSemanticsAccessor(ABC):
     """Interface for accessing semantic information about a set of data source objects
 
     This is primarily useful for restricting caller access to the subset of container methods and imports we want
-    them to use. For example, the DataSourceSemantics class might implement this protocol but also include some
+    them to use. For example, the SemanticModelSemantics class might implement this protocol but also include some
     public methods for adding or removing data sources from the container, while this protocol only allows the
     caller to invoke the accessor methods which retrieve semantic information about the collected data sources.
     """

@@ -5,8 +5,8 @@ from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.references import SemanticModelElementReference, TimeDimensionReference
 from metricflow.model.validations.validator_helpers import (
-    DataSourceElementContext,
-    DataSourceElementType,
+    SemanticModelElementContext,
+    SemanticModelElementType,
     FileContext,
     ModelValidationRule,
     ValidationIssue,
@@ -40,12 +40,12 @@ class AggregationTimeDimensionRule(ModelValidationRule):
         issues: List[ValidationIssue] = []
 
         for measure in data_source.measures:
-            measure_context = DataSourceElementContext(
+            measure_context = SemanticModelElementContext(
                 file_context=FileContext.from_metadata(metadata=data_source.metadata),
                 semantic_model_element=SemanticModelElementReference(
                     semantic_model_name=data_source.name, element_name=measure.name
                 ),
-                element_type=DataSourceElementType.MEASURE,
+                element_type=SemanticModelElementType.MEASURE,
             )
             agg_time_dimension_reference = measure.checked_agg_time_dimension
             if not AggregationTimeDimensionRule._time_dimension_in_model(

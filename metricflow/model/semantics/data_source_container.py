@@ -4,7 +4,7 @@ from typing import Generic, List, TypeVar
 T = TypeVar("T")
 
 
-class DataSourceContainer(ABC, Generic[T]):  # noqa: D
+class SemanticModelContainer(ABC, Generic[T]):  # noqa: D
     @abstractmethod
     def get(self, semantic_model_name: str) -> T:  # noqa: D
         pass

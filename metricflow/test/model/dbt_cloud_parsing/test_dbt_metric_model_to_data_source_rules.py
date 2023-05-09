@@ -3,9 +3,9 @@ from typing import Tuple
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode
 from metricflow.model.dbt_converter import DbtConverter
 from metricflow.model.dbt_mapping_rules.dbt_metric_model_to_semantic_model_rules import (
-    DbtMapToDataSourceName,
-    DbtMapToDataSourceDescription,
-    DbtMapDataSourceNodeRelation,
+    DbtMapToSemanticModelName,
+    DbtMapToSemanticModelDescription,
+    DbtMapSemanticModelNodeRelation,
 )
 from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
     MappedObjects,
@@ -20,9 +20,9 @@ def test_dbt_metric_model_to_semantic_model_rules_skip_derived_metrics(  # noqa:
 ) -> None:
     derived_metrics = tuple(dbt_metric for dbt_metric in dbt_metrics if dbt_metric.calculation_method == "derived")
     rules: Tuple[DbtMappingRule, ...] = (
-        DbtMapToDataSourceName(),
-        DbtMapToDataSourceDescription(),
-        DbtMapDataSourceNodeRelation(),
+        DbtMapToSemanticModelName(),
+        DbtMapToSemanticModelDescription(),
+        DbtMapSemanticModelNodeRelation(),
     )
     converter = DbtConverter(rules=rules)
     result = converter._map_dbt_to_metricflow(dbt_metrics=derived_metrics)
@@ -33,10 +33,10 @@ def test_dbt_metric_model_to_semantic_model_rules_skip_derived_metrics(  # noqa:
 
 def test_dbt_map_to_semantic_model_name(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
     objects = MappedObjects()
-    issues = DbtMapToDataSourceName().run(dbt_metrics=dbt_metrics, objects=objects)
+    issues = DbtMapToSemanticModelName().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
         not issues.has_blocking_issues
-    ), f"DbtMapToDataSourceName raised blocking issues when it shouldn't: {issues.to_pretty_json()}"
+    ), f"DbtMapToSemanticModelName raised blocking issues when it shouldn't: {issues.to_pretty_json()}"
     for dbt_metric in dbt_metrics:
         metric_type = get_and_assert_calc_method_mapping(dbt_metric=dbt_metric)
         if metric_type != MetricType.DERIVED:
@@ -50,18 +50,18 @@ def test_dbt_map_to_semantic_model_name_missing_model_name(dbt_metrics: Tuple[Me
     # Remove a model name from a metric
     dbt_metrics[0].model.name = None
 
-    issues = DbtMapToDataSourceName().run(dbt_metrics=dbt_metrics, objects=objects)
+    issues = DbtMapToSemanticModelName().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
         issues.has_blocking_issues
-    ), f"DbtMapToDataSourceName didn't raise blocking issues when it should have: {issues.to_pretty_json()}"
+    ), f"DbtMapToSemanticModelName didn't raise blocking issues when it should have: {issues.to_pretty_json()}"
 
 
 def test_dbt_map_to_semantic_model_description(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
     objects = MappedObjects()
-    issues = DbtMapToDataSourceDescription().run(dbt_metrics=dbt_metrics, objects=objects)
+    issues = DbtMapToSemanticModelDescription().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
         not issues.has_blocking_issues
-    ), f"DbtMapToDataSourceDescription raised blocking issues when it shouldn't: {issues.to_pretty_json()}"
+    ), f"DbtMapToSemanticModelDescription raised blocking issues when it shouldn't: {issues.to_pretty_json()}"
     for dbt_metric in dbt_metrics:
         metric_type = get_and_assert_calc_method_mapping(dbt_metric=dbt_metric)
         if metric_type != MetricType.DERIVED:
@@ -74,19 +74,19 @@ def test_dbt_map_to_semantic_model_description_can_be_optional(dbt_metrics: Tupl
     objects = MappedObjects()
     # Remove a model description from a metric
     dbt_metrics[0].model.description = None
-    issues = DbtMapToDataSourceDescription().run(dbt_metrics=dbt_metrics, objects=objects)
+    issues = DbtMapToSemanticModelDescription().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
         not issues.has_blocking_issues
-    ), f"DbtMapToDataSourceDescription raised blocking issues when it shouldn't: {issues.to_pretty_json()}"
+    ), f"DbtMapToSemanticModelDescription raised blocking issues when it shouldn't: {issues.to_pretty_json()}"
 
 
 def test_dbt_map_semantic_model_sql_table(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
     objects = MappedObjects()
 
-    issues = DbtMapDataSourceNodeRelation().run(dbt_metrics=dbt_metrics, objects=objects)
+    issues = DbtMapSemanticModelNodeRelation().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
         not issues.has_blocking_issues
-    ), f"DbtMapToDataSourceSqlTable raised blocking issues when it shouldn't have: {issues.to_pretty_json()}"
+    ), f"DbtMapToSemanticModelSqlTable raised blocking issues when it shouldn't have: {issues.to_pretty_json()}"
     for dbt_metric in dbt_metrics:
         metric_type = get_and_assert_calc_method_mapping(dbt_metric=dbt_metric)
         if metric_type != MetricType.DERIVED:
@@ -103,10 +103,10 @@ def test_dbt_map_semantic_model_sql_table_issues_when_missing_name(  # noqa: D
     # remove model name
     dbt_metrics[0].model.name = None
 
-    issues = DbtMapDataSourceNodeRelation().run(dbt_metrics=dbt_metrics, objects=objects)
+    issues = DbtMapSemanticModelNodeRelation().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
         issues.has_blocking_issues
-    ), f"DbtMapToDataSourceSqlTable didn't raise blocking issues when it should have: {issues.to_pretty_json()}"
+    ), f"DbtMapToSemanticModelSqlTable didn't raise blocking issues when it should have: {issues.to_pretty_json()}"
 
 
 def test_dbt_map_semantic_model_sql_table_issues_when_missing_schema(  # noqa: D
@@ -116,10 +116,10 @@ def test_dbt_map_semantic_model_sql_table_issues_when_missing_schema(  # noqa: D
     # remove model schema
     dbt_metrics[0].model.schema = None
 
-    issues = DbtMapDataSourceNodeRelation().run(dbt_metrics=dbt_metrics, objects=objects)
+    issues = DbtMapSemanticModelNodeRelation().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
         issues.has_blocking_issues
-    ), f"DbtMapToDataSourceSqlTable didn't raise blocking issues when it should have: {issues.to_pretty_json()}"
+    ), f"DbtMapToSemanticModelSqlTable didn't raise blocking issues when it should have: {issues.to_pretty_json()}"
 
 
 def test_dbt_map_semantic_model_sql_table_issues_when_missing_database(  # noqa: D
@@ -129,7 +129,7 @@ def test_dbt_map_semantic_model_sql_table_issues_when_missing_database(  # noqa:
     # remove model database
     dbt_metrics[0].model.database = None
 
-    issues = DbtMapDataSourceNodeRelation().run(dbt_metrics=dbt_metrics, objects=objects)
+    issues = DbtMapSemanticModelNodeRelation().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
         issues.has_blocking_issues
-    ), f"DbtMapToDataSourceSqlTable didn't raise blocking issues when it should have: {issues.to_pretty_json()}"
+    ), f"DbtMapToSemanticModelSqlTable didn't raise blocking issues when it should have: {issues.to_pretty_json()}"

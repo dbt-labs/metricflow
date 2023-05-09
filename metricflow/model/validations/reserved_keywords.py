@@ -5,9 +5,9 @@ from dbt_semantic_interfaces.references import SemanticModelElementReference
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.validator_helpers import (
-    DataSourceContext,
-    DataSourceElementContext,
-    DataSourceElementType,
+    SemanticModelContext,
+    SemanticModelElementContext,
+    SemanticModelElementType,
     FileContext,
     ModelValidationRule,
     ValidationError,
@@ -72,12 +72,12 @@ class ReservedKeywordsRule(ModelValidationRule):
             if dimension.name.upper() in RESERVED_KEYWORDS:
                 issues.append(
                     ValidationError(
-                        context=DataSourceElementContext(
+                        context=SemanticModelElementContext(
                             file_context=FileContext.from_metadata(data_source.metadata),
                             semantic_model_element=SemanticModelElementReference(
                                 semantic_model_name=data_source.name, element_name=dimension.name
                             ),
-                            element_type=DataSourceElementType.DIMENSION,
+                            element_type=SemanticModelElementType.DIMENSION,
                         ),
                         message=f"'{dimension.name}' is an SQL reserved keyword, and thus cannot be used as a dimension 'name'.",
                     )
@@ -91,12 +91,12 @@ class ReservedKeywordsRule(ModelValidationRule):
                 if name.upper() in RESERVED_KEYWORDS:
                     issues.append(
                         ValidationError(
-                            context=DataSourceElementContext(
+                            context=SemanticModelElementContext(
                                 file_context=FileContext.from_metadata(data_source.metadata),
                                 semantic_model_element=SemanticModelElementReference(
                                     semantic_model_name=data_source.name, element_name=entity.name
                                 ),
-                                element_type=DataSourceElementType.ENTITY,
+                                element_type=SemanticModelElementType.ENTITY,
                             ),
                             message=msg.format(name=name),
                         )
@@ -106,12 +106,12 @@ class ReservedKeywordsRule(ModelValidationRule):
             if measure.name.upper() in RESERVED_KEYWORDS:
                 issues.append(
                     ValidationError(
-                        context=DataSourceElementContext(
+                        context=SemanticModelElementContext(
                             file_context=FileContext.from_metadata(data_source.metadata),
                             semantic_model_element=SemanticModelElementReference(
                                 semantic_model_name=data_source.name, element_name=measure.name
                             ),
-                            element_type=DataSourceElementType.MEASURE,
+                            element_type=SemanticModelElementType.MEASURE,
                         ),
                         message=f"'{measure.name}' is an SQL reserved keyword, and thus cannot be used as an measure 'name'.",
                     )
@@ -135,7 +135,7 @@ class ReservedKeywordsRule(ModelValidationRule):
             if len(keyword_intersection) > 0:
                 issues.append(
                     ValidationError(
-                        context=DataSourceContext(
+                        context=SemanticModelContext(
                             file_context=FileContext.from_metadata(data_source.metadata),
                             data_source=data_source.reference,
                         ),

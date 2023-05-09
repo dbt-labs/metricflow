@@ -7,7 +7,7 @@ from dbt_semantic_interfaces.references import SemanticModelReference, SemanticM
 from metricflow.aggregation_properties import AggregationState
 from metricflow.dag.id_generation import IdGeneratorRegistry
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.dataset.semantic_model_adapter import DataSourceDataSet
+from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.instances import (
     MeasureInstance,
     DimensionInstance,
@@ -55,7 +55,7 @@ class DimensionConversionResult:
     select_columns: Sequence[SqlSelectColumn]
 
 
-class DataSourceToDataSetConverter:
+class SemanticModelToDataSetConverter:
     """Converts a data source in the model to a data set that can be used with the dataflow plan builder.
 
     Entity links generally refer to the entities used to join the measure source to the dimension source. For
@@ -151,7 +151,9 @@ class DataSourceToDataSetConverter:
     ) -> SqlExpressionNode:
         """Create an expression that can be used for reading the element from the data source's SQL."""
         if element_expr:
-            if DataSourceToDataSetConverter._SQL_IDENTIFIER_REGEX.match(element_expr) and element_expr.upper() not in (
+            if SemanticModelToDataSetConverter._SQL_IDENTIFIER_REGEX.match(
+                element_expr
+            ) and element_expr.upper() not in (
                 "TRUE",
                 "FALSE",
                 "NULL",
@@ -196,7 +198,7 @@ class DataSourceToDataSetConverter:
             measure_instances.append(measure_instance)
             select_columns.append(
                 SqlSelectColumn(
-                    expr=DataSourceToDataSetConverter._make_element_sql_expr(
+                    expr=SemanticModelToDataSetConverter._make_element_sql_expr(
                         table_alias=table_alias,
                         element_name=measure.reference.element_name,
                         element_expr=measure.expr,
@@ -228,7 +230,7 @@ class DataSourceToDataSetConverter:
                 dimension_instances.append(dimension_instance)
                 select_columns.append(
                     SqlSelectColumn(
-                        expr=DataSourceToDataSetConverter._make_element_sql_expr(
+                        expr=SemanticModelToDataSetConverter._make_element_sql_expr(
                             table_alias=table_alias,
                             element_name=dimension.reference.element_name,
                             element_expr=dimension.expr,
@@ -251,7 +253,7 @@ class DataSourceToDataSetConverter:
                 time_dimension_instances.append(time_dimension_instance)
                 select_columns.append(
                     SqlSelectColumn(
-                        expr=DataSourceToDataSetConverter._make_element_sql_expr(
+                        expr=SemanticModelToDataSetConverter._make_element_sql_expr(
                             table_alias=table_alias,
                             element_name=dimension.reference.element_name,
                             element_expr=dimension.expr,
@@ -275,7 +277,7 @@ class DataSourceToDataSetConverter:
                             SqlSelectColumn(
                                 expr=SqlDateTruncExpression(
                                     time_granularity=time_granularity,
-                                    arg=DataSourceToDataSetConverter._make_element_sql_expr(
+                                    arg=SemanticModelToDataSetConverter._make_element_sql_expr(
                                         table_alias=table_alias,
                                         element_name=dimension.reference.element_name,
                                         element_expr=dimension.expr,
@@ -317,7 +319,7 @@ class DataSourceToDataSetConverter:
             entity_instances.append(entity_instance)
             select_columns.append(
                 SqlSelectColumn(
-                    expr=DataSourceToDataSetConverter._make_element_sql_expr(
+                    expr=SemanticModelToDataSetConverter._make_element_sql_expr(
                         table_alias=table_alias,
                         element_name=entity.reference.element_name,
                         element_expr=entity.expr,
@@ -327,7 +329,7 @@ class DataSourceToDataSetConverter:
             )
         return entity_instances, select_columns
 
-    def create_sql_source_data_set(self, data_source: SemanticModel) -> DataSourceDataSet:
+    def create_sql_source_data_set(self, data_source: SemanticModel) -> SemanticModelDataSet:
         """Create an SQL source data set from a data source in the model."""
 
         # Gather all instances and columns from all data sources.
@@ -419,7 +421,7 @@ class DataSourceToDataSetConverter:
             order_bys=(),
         )
 
-        return DataSourceDataSet(
+        return SemanticModelDataSet(
             semantic_model_reference=SemanticModelReference(semantic_model_name=data_source.name),
             instance_set=InstanceSet(
                 measure_instances=tuple(all_measure_instances),

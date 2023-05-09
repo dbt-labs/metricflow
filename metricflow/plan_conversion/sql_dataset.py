@@ -7,7 +7,7 @@ from metricflow.column_assoc import ColumnAssociation
 from metricflow.dataset.dataset import DataSet
 from metricflow.instances import (
     InstanceSet,
-    DataSourceElementInstance,
+    SemanticModelElementInstance,
     InstanceSetTransform,
 )
 from metricflow.specs import DimensionSpec, TimeDimensionSpec, EntitySpec
@@ -126,7 +126,7 @@ class SameSemanticModelReferenceChecker(InstanceSetTransform[bool]):
         self._semantic_model_reference = semantic_model_reference
 
     def transform(self, instance_set: InstanceSet) -> bool:  # noqa: D
-        combined: List[DataSourceElementInstance] = []
+        combined: List[SemanticModelElementInstance] = []
         combined.extend(instance_set.measure_instances)
         combined.extend(instance_set.dimension_instances)
         combined.extend(instance_set.time_dimension_instances)

@@ -4,7 +4,7 @@ from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.sql.sql_plan import SqlSelectStatementNode
 
 
-class DataSourceDataSet(SqlDataSet):
+class SemanticModelDataSet(SqlDataSet):
     """Similar to SqlDataSet, but contains metadata on the data source that was used to create this."""
 
     def __init__(  # noqa: D

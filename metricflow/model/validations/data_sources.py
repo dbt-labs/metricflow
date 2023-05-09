@@ -7,7 +7,7 @@ from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.references import SemanticModelReference
 from metricflow.model.validations.validator_helpers import (
-    DataSourceContext,
+    SemanticModelContext,
     FileContext,
     ModelValidationRule,
     ValidationIssue,
@@ -18,7 +18,7 @@ from metricflow.model.validations.validator_helpers import (
 logger = logging.getLogger(__name__)
 
 
-class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
+class SemanticModelTimeDimensionWarningsRule(ModelValidationRule):
     """Checks time dimensions in data sources."""
 
     @staticmethod
@@ -27,7 +27,7 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
         issues: List[ValidationIssue] = []
 
         for data_source in model.data_sources:
-            issues.extend(DataSourceTimeDimensionWarningsRule._validate_semantic_model(data_source=data_source))
+            issues.extend(SemanticModelTimeDimensionWarningsRule._validate_semantic_model(data_source=data_source))
         return issues
 
     @staticmethod
@@ -50,7 +50,7 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
         ):
             issues.append(
                 ValidationError(
-                    context=DataSourceContext(
+                    context=SemanticModelContext(
                         file_context=FileContext.from_metadata(metadata=data_source.metadata),
                         data_source=SemanticModelReference(semantic_model_name=data_source.name),
                     ),
@@ -62,7 +62,7 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
             for primary_time_dimension in primary_time_dimensions:
                 issues.append(
                     ValidationError(
-                        context=DataSourceContext(
+                        context=SemanticModelContext(
                             file_context=FileContext.from_metadata(metadata=data_source.metadata),
                             data_source=SemanticModelReference(semantic_model_name=data_source.name),
                         ),
@@ -75,7 +75,7 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
         return issues
 
 
-class DataSourceValidityWindowRule(ModelValidationRule):
+class SemanticModelValidityWindowRule(ModelValidationRule):
     """Checks validity windows in data sources to ensure they comply with runtime requirements"""
 
     @staticmethod
@@ -85,7 +85,7 @@ class DataSourceValidityWindowRule(ModelValidationRule):
         issues: List[ValidationIssue] = []
 
         for data_source in model.data_sources:
-            issues.extend(DataSourceValidityWindowRule._validate_semantic_model(data_source=data_source))
+            issues.extend(SemanticModelValidityWindowRule._validate_semantic_model(data_source=data_source))
 
         return issues
 
@@ -103,7 +103,7 @@ class DataSourceValidityWindowRule(ModelValidationRule):
         if not validity_param_dims:
             return issues
 
-        context = DataSourceContext(
+        context = SemanticModelContext(
             file_context=FileContext.from_metadata(metadata=data_source.metadata),
             data_source=SemanticModelReference(semantic_model_name=data_source.name),
         )

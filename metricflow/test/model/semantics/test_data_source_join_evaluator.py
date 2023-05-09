@@ -5,15 +5,15 @@ from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.references import SemanticModelReference, EntityReference
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.model.semantics.semantic_model_join_evaluator import (
-    DataSourceEntityJoinType,
-    DataSourceJoinEvaluator,
-    DataSourceLink,
-    DataSourceEntityJoin,
+    SemanticModelEntityJoinType,
+    SemanticModelJoinEvaluator,
+    SemanticModelLink,
+    SemanticModelEntityJoin,
 )
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 
 
-def _get_join_types_for_entity_type(entity_type: EntityType) -> Sequence[DataSourceEntityJoinType]:
+def _get_join_types_for_entity_type(entity_type: EntityType) -> Sequence[SemanticModelEntityJoinType]:
     """Exhaustively evaluate entity types and return a sequence of all possible join type pairs
 
     The exhaustive conditional statically enforces that every entity type is handled on the left.
@@ -27,7 +27,7 @@ def _get_join_types_for_entity_type(entity_type: EntityType) -> Sequence[DataSou
         or entity_type is EntityType.NATURAL
     ):
         join_types = tuple(
-            DataSourceEntityJoinType(left_entity_type=entity_type, right_entity_type=join_type)
+            SemanticModelEntityJoinType(left_entity_type=entity_type, right_entity_type=join_type)
             for join_type in EntityType
         )
         return join_types
@@ -41,7 +41,9 @@ def test_join_type_coverage() -> None:
     This will prevent surprise RuntimeErrors in production by raising static exceptions for unhandled entity types
     and triggering a test failure for types which are handled in a non-exhaustive fashion
     """
-    all_join_types = set(DataSourceJoinEvaluator._INVALID_ENTITY_JOINS + DataSourceJoinEvaluator._VALID_ENTITY_JOINS)
+    all_join_types = set(
+        SemanticModelJoinEvaluator._INVALID_ENTITY_JOINS + SemanticModelJoinEvaluator._VALID_ENTITY_JOINS
+    )
     for entity_type in EntityType:
         join_types = _get_join_types_for_entity_type(entity_type=entity_type)
         for join_type in join_types:
@@ -87,7 +89,7 @@ def test_distinct_target_semantic_model_join_validation(
         simple_semantic_manifest_lookup
     )
     user_entity_reference = EntityReference(element_name="user")
-    join_evaluator = DataSourceJoinEvaluator(
+    join_evaluator = SemanticModelJoinEvaluator(
         semantic_model_semantics=simple_semantic_manifest_lookup.semantic_model_semantics
     )
 
@@ -145,7 +147,7 @@ def test_foreign_target_semantic_model_join_validation(simple_semantic_manifest_
         simple_semantic_manifest_lookup
     )
     user_entity_reference = EntityReference(element_name="user")
-    join_evaluator = DataSourceJoinEvaluator(
+    join_evaluator = SemanticModelJoinEvaluator(
         semantic_model_semantics=simple_semantic_manifest_lookup.semantic_model_semantics
     )
 
@@ -189,7 +191,7 @@ def test_semantic_model_join_validation_on_missing_entity(
     )
     assert no_listing_semantic_model, "Could not find data source `id_verifications` in the simple model!"
     listing_entity_reference = EntityReference(element_name="listing")
-    join_evaluator = DataSourceJoinEvaluator(
+    join_evaluator = SemanticModelJoinEvaluator(
         semantic_model_semantics=simple_semantic_manifest_lookup.semantic_model_semantics
     )
 
@@ -212,7 +214,7 @@ def test_distinct_target_instance_set_join_validation(
     primary_user_instance_set = consistent_id_object_repository.simple_model_data_sets["users_latest"].instance_set
     unique_user_instance_set = consistent_id_object_repository.simple_model_data_sets["companies"].instance_set
     user_entity_reference = EntityReference(element_name="user")
-    join_evaluator = DataSourceJoinEvaluator(
+    join_evaluator = SemanticModelJoinEvaluator(
         semantic_model_semantics=simple_semantic_manifest_lookup.semantic_model_semantics
     )
 
@@ -270,7 +272,7 @@ def test_foreign_target_instance_set_join_validation(
     primary_user_instance_set = consistent_id_object_repository.simple_model_data_sets["users_latest"].instance_set
     unique_user_instance_set = consistent_id_object_repository.simple_model_data_sets["companies"].instance_set
     user_entity_reference = EntityReference(element_name="user")
-    join_evaluator = DataSourceJoinEvaluator(
+    join_evaluator = SemanticModelJoinEvaluator(
         semantic_model_semantics=simple_semantic_manifest_lookup.semantic_model_semantics
     )
 
@@ -305,7 +307,7 @@ def test_get_joinable_semantic_models_single_hop(  # noqa: D
     multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     semantic_model_reference = SemanticModelReference(semantic_model_name="account_month_txns")
-    join_evaluator = DataSourceJoinEvaluator(
+    join_evaluator = SemanticModelJoinEvaluator(
         semantic_model_semantics=multi_hop_join_semantic_manifest_lookup.semantic_model_semantics
     )
 
@@ -314,13 +316,13 @@ def test_get_joinable_semantic_models_single_hop(  # noqa: D
         left_semantic_model_reference=semantic_model_reference
     )
     assert set(joinable_semantic_models.keys()) == {"bridge_table"}
-    assert joinable_semantic_models["bridge_table"] == DataSourceLink(
+    assert joinable_semantic_models["bridge_table"] == SemanticModelLink(
         left_semantic_model_reference=SemanticModelReference(semantic_model_name="account_month_txns"),
         join_path=[
-            DataSourceEntityJoin(
+            SemanticModelEntityJoin(
                 right_semantic_model_reference=SemanticModelReference(semantic_model_name="bridge_table"),
                 entity_reference=EntityReference(element_name="account_id"),
-                join_type=DataSourceEntityJoinType(
+                join_type=SemanticModelEntityJoinType(
                     left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.PRIMARY
                 ),
             )
@@ -332,7 +334,7 @@ def test_get_joinable_semantic_models_multi_hop(  # noqa: D
     multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     semantic_model_reference = SemanticModelReference(semantic_model_name="account_month_txns")
-    join_evaluator = DataSourceJoinEvaluator(
+    join_evaluator = SemanticModelJoinEvaluator(
         semantic_model_semantics=multi_hop_join_semantic_manifest_lookup.semantic_model_semantics
     )
 
@@ -341,51 +343,51 @@ def test_get_joinable_semantic_models_multi_hop(  # noqa: D
         left_semantic_model_reference=semantic_model_reference, include_multi_hop=True
     )
     assert set(joinable_semantic_models.keys()) == {"bridge_table", "customer_other_data", "customer_table"}
-    assert joinable_semantic_models["bridge_table"] == DataSourceLink(
+    assert joinable_semantic_models["bridge_table"] == SemanticModelLink(
         left_semantic_model_reference=SemanticModelReference(semantic_model_name="account_month_txns"),
         join_path=[
-            DataSourceEntityJoin(
+            SemanticModelEntityJoin(
                 right_semantic_model_reference=SemanticModelReference(semantic_model_name="bridge_table"),
                 entity_reference=EntityReference(element_name="account_id"),
-                join_type=DataSourceEntityJoinType(
+                join_type=SemanticModelEntityJoinType(
                     left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.PRIMARY
                 ),
             )
         ],
     )
-    assert joinable_semantic_models["customer_other_data"] == DataSourceLink(
+    assert joinable_semantic_models["customer_other_data"] == SemanticModelLink(
         left_semantic_model_reference=SemanticModelReference(semantic_model_name="account_month_txns"),
         join_path=[
-            DataSourceEntityJoin(
+            SemanticModelEntityJoin(
                 right_semantic_model_reference=SemanticModelReference(semantic_model_name="bridge_table"),
                 entity_reference=EntityReference(element_name="account_id"),
-                join_type=DataSourceEntityJoinType(
+                join_type=SemanticModelEntityJoinType(
                     left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.PRIMARY
                 ),
             ),
-            DataSourceEntityJoin(
+            SemanticModelEntityJoin(
                 right_semantic_model_reference=SemanticModelReference(semantic_model_name="customer_other_data"),
                 entity_reference=EntityReference(element_name="customer_id"),
-                join_type=DataSourceEntityJoinType(
+                join_type=SemanticModelEntityJoinType(
                     left_entity_type=EntityType.FOREIGN, right_entity_type=EntityType.PRIMARY
                 ),
             ),
         ],
     )
-    assert joinable_semantic_models["customer_table"] == DataSourceLink(
+    assert joinable_semantic_models["customer_table"] == SemanticModelLink(
         left_semantic_model_reference=SemanticModelReference(semantic_model_name="account_month_txns"),
         join_path=[
-            DataSourceEntityJoin(
+            SemanticModelEntityJoin(
                 right_semantic_model_reference=SemanticModelReference(semantic_model_name="bridge_table"),
                 entity_reference=EntityReference(element_name="account_id"),
-                join_type=DataSourceEntityJoinType(
+                join_type=SemanticModelEntityJoinType(
                     left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.PRIMARY
                 ),
             ),
-            DataSourceEntityJoin(
+            SemanticModelEntityJoin(
                 right_semantic_model_reference=SemanticModelReference(semantic_model_name="customer_table"),
                 entity_reference=EntityReference(element_name="customer_id"),
-                join_type=DataSourceEntityJoinType(
+                join_type=SemanticModelEntityJoinType(
                     left_entity_type=EntityType.FOREIGN, right_entity_type=EntityType.PRIMARY
                 ),
             ),
@@ -411,7 +413,7 @@ def test_natural_entity_semantic_model_validation(scd_semantic_manifest_lookup: 
         SemanticModelReference("companies")
     )
     user_entity_reference = EntityReference(element_name="user")
-    join_evaluator = DataSourceJoinEvaluator(
+    join_evaluator = SemanticModelJoinEvaluator(
         semantic_model_semantics=scd_semantic_manifest_lookup.semantic_model_semantics
     )
     # Type refinement
@@ -488,7 +490,7 @@ def test_natural_entity_instance_set_validation(
     foreign_user_instance_set = consistent_id_object_repository.scd_model_data_sets["bookings_source"].instance_set
     unique_user_instance_set = consistent_id_object_repository.scd_model_data_sets["companies"].instance_set
     user_entity_reference = EntityReference(element_name="user")
-    join_evaluator = DataSourceJoinEvaluator(
+    join_evaluator = SemanticModelJoinEvaluator(
         semantic_model_semantics=scd_semantic_manifest_lookup.semantic_model_semantics
     )
 

@@ -10,9 +10,9 @@ from dbt_semantic_interfaces.objects.user_configured_model import UserConfigured
 from dbt_semantic_interfaces.references import MetricModelReference, MeasureReference
 from metricflow.model.validations.unique_valid_name import UniqueAndValidNameRule
 from metricflow.model.validations.validator_helpers import (
-    DataSourceElementContext,
+    SemanticModelElementContext,
     SemanticModelElementReference,
-    DataSourceElementType,
+    SemanticModelElementType,
     FileContext,
     MetricContext,
     ModelValidationRule,
@@ -23,7 +23,7 @@ from metricflow.model.validations.validator_helpers import (
 )
 
 
-class DataSourceMeasuresUniqueRule(ModelValidationRule):
+class SemanticModelMeasuresUniqueRule(ModelValidationRule):
     """Asserts all measure names are unique across the model."""
 
     @staticmethod
@@ -39,12 +39,12 @@ class DataSourceMeasuresUniqueRule(ModelValidationRule):
                 if measure.reference in measure_references_to_semantic_models:
                     issues.append(
                         ValidationError(
-                            context=DataSourceElementContext(
+                            context=SemanticModelElementContext(
                                 file_context=FileContext.from_metadata(metadata=data_source.metadata),
                                 semantic_model_element=SemanticModelElementReference(
                                     semantic_model_name=data_source.name, element_name=measure.name
                                 ),
-                                element_type=DataSourceElementType.MEASURE,
+                                element_type=SemanticModelElementType.MEASURE,
                             ),
                             message=f"Found measure with name {measure.name} in multiple data sources with names "
                             f"({measure_references_to_semantic_models[measure.reference]})",
@@ -241,12 +241,12 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                     # Sanity check, should never hit this
                     issues.append(
                         ValidationError(
-                            context=DataSourceElementContext(
+                            context=SemanticModelElementContext(
                                 file_context=FileContext.from_metadata(metadata=data_source.metadata),
                                 semantic_model_element=SemanticModelElementReference(
                                     semantic_model_name=data_source.name, element_name=measure.name
                                 ),
-                                element_type=DataSourceElementType.MEASURE,
+                                element_type=SemanticModelElementType.MEASURE,
                             ),
                             message=(
                                 f"Measure '{measure.name}' has a agg_time_dimension of {measure.checked_agg_time_dimension.element_name} "
@@ -263,12 +263,12 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                 if matching_dimension is None:
                     issues.append(
                         ValidationError(
-                            context=DataSourceElementContext(
+                            context=SemanticModelElementContext(
                                 file_context=FileContext.from_metadata(metadata=data_source.metadata),
                                 semantic_model_element=SemanticModelElementReference(
                                     semantic_model_name=data_source.name, element_name=measure.name
                                 ),
-                                element_type=DataSourceElementType.MEASURE,
+                                element_type=SemanticModelElementType.MEASURE,
                             ),
                             message=(
                                 f"Measure '{measure.name}' has a non_additive_dimension with name '{non_additive_dimension.name}' "
@@ -281,12 +281,12 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                     if matching_dimension.type != DimensionType.TIME:
                         issues.append(
                             ValidationError(
-                                context=DataSourceElementContext(
+                                context=SemanticModelElementContext(
                                     file_context=FileContext.from_metadata(metadata=data_source.metadata),
                                     semantic_model_element=SemanticModelElementReference(
                                         semantic_model_name=data_source.name, element_name=measure.name
                                     ),
-                                    element_type=DataSourceElementType.MEASURE,
+                                    element_type=SemanticModelElementType.MEASURE,
                                 ),
                                 message=(
                                     f"Measure '{measure.name}' has a non_additive_dimension with name '{non_additive_dimension.name}' "
@@ -306,12 +306,12 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                     ):
                         issues.append(
                             ValidationError(
-                                context=DataSourceElementContext(
+                                context=SemanticModelElementContext(
                                     file_context=FileContext.from_metadata(metadata=data_source.metadata),
                                     semantic_model_element=SemanticModelElementReference(
                                         semantic_model_name=data_source.name, element_name=measure.name
                                     ),
-                                    element_type=DataSourceElementType.MEASURE,
+                                    element_type=SemanticModelElementType.MEASURE,
                                 ),
                                 message=(
                                     f"Measure '{measure.name}' has a non_additive_dimension with name '{non_additive_dimension.name}' that has "
@@ -325,12 +325,12 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                 if non_additive_dimension.window_choice not in {AggregationType.MIN, AggregationType.MAX}:
                     issues.append(
                         ValidationError(
-                            context=DataSourceElementContext(
+                            context=SemanticModelElementContext(
                                 file_context=FileContext.from_metadata(metadata=data_source.metadata),
                                 semantic_model_element=SemanticModelElementReference(
                                     semantic_model_name=data_source.name, element_name=measure.name
                                 ),
-                                element_type=DataSourceElementType.MEASURE,
+                                element_type=SemanticModelElementType.MEASURE,
                             ),
                             message=(
                                 f"Measure '{measure.name}' has a non_additive_dimension with an invalid 'window_choice' of '{non_additive_dimension.window_choice.value}'. "
@@ -346,12 +346,12 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                 if len(intersected_entities) != len(window_groupings):
                     issues.append(
                         ValidationError(
-                            context=DataSourceElementContext(
+                            context=SemanticModelElementContext(
                                 file_context=FileContext.from_metadata(metadata=data_source.metadata),
                                 semantic_model_element=SemanticModelElementReference(
                                     semantic_model_name=data_source.name, element_name=measure.name
                                 ),
-                                element_type=DataSourceElementType.MEASURE,
+                                element_type=SemanticModelElementType.MEASURE,
                             ),
                             message=(
                                 f"Measure '{measure.name}' has a non_additive_dimension with an invalid 'window_groupings'. "
@@ -375,12 +375,12 @@ class CountAggregationExprRule(ModelValidationRule):
 
         for data_source in model.data_sources:
             for measure in data_source.measures:
-                context = DataSourceElementContext(
+                context = SemanticModelElementContext(
                     file_context=FileContext.from_metadata(metadata=data_source.metadata),
                     semantic_model_element=SemanticModelElementReference(
                         semantic_model_name=data_source.name, element_name=measure.name
                     ),
-                    element_type=DataSourceElementType.MEASURE,
+                    element_type=SemanticModelElementType.MEASURE,
                 )
                 if measure.agg == AggregationType.COUNT and measure.expr is None:
                     issues.append(
@@ -426,12 +426,12 @@ class PercentileAggregationRule(ModelValidationRule):
 
         for data_source in model.data_sources:
             for measure in data_source.measures:
-                context = DataSourceElementContext(
+                context = SemanticModelElementContext(
                     file_context=FileContext.from_metadata(metadata=data_source.metadata),
                     semantic_model_element=SemanticModelElementReference(
                         semantic_model_name=data_source.name, element_name=measure.name
                     ),
-                    element_type=DataSourceElementType.MEASURE,
+                    element_type=SemanticModelElementType.MEASURE,
                 )
                 if measure.agg == AggregationType.PERCENTILE:
                     if measure.agg_params is None or measure.agg_params.percentile is None:

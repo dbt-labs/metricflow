@@ -18,19 +18,19 @@ from dbt_semantic_interfaces.references import (
     LinkableElementReference,
     EntityReference,
 )
-from metricflow.errors.errors import InvalidDataSourceError
+from metricflow.errors.errors import InvalidSemanticModelError
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.spec_converters import MeasureConverter
-from metricflow.protocols.semantics import DataSourceSemanticsAccessor
+from metricflow.protocols.semantics import SemanticModelSemanticsAccessor
 from metricflow.specs import NonAdditiveDimensionSpec, MeasureSpec
 
 logger = logging.getLogger(__name__)
 
 
-class DataSourceSemantics(DataSourceSemanticsAccessor):
-    """Tracks semantic information for data source held in a set of DataSourceContainers
+class SemanticModelSemantics(SemanticModelSemanticsAccessor):
+    """Tracks semantic information for data source held in a set of SemanticModelContainers
 
-    This implements both the DataSourceSemanticsAccessors protocol, the interface type we use throughout the codebase.
+    This implements both the SemanticModelSemanticsAccessors protocol, the interface type we use throughout the codebase.
     That interface prevents unwanted calls to methods for adding data sources to the container.
     """
 
@@ -149,7 +149,7 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
                 )
 
         if len(errors) > 0:
-            raise InvalidDataSourceError(f"Error adding {data_source.reference}. Got errors: {errors}")
+            raise InvalidSemanticModelError(f"Error adding {data_source.reference}. Got errors: {errors}")
 
         self._semantic_model_to_aggregation_time_dimensions[data_source.reference] = ElementGrouper[
             TimeDimensionReference, MeasureSpec

@@ -29,12 +29,12 @@ from metricflow.dataflow.dataflow_plan import (
     ValidityWindowJoinDescription,
 )
 from metricflow.instances import InstanceSet
-from metricflow.model.semantics.semantic_model_join_evaluator import DataSourceJoinEvaluator
+from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
 
-from metricflow.protocols.semantics import DataSourceSemanticsAccessor
+from metricflow.protocols.semantics import SemanticModelSemanticsAccessor
 from metricflow.specs import (
     LinkableInstanceSpec,
     LinklessEntitySpec,
@@ -112,7 +112,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
 
     def __init__(
         self,
-        semantic_model_semantics: DataSourceSemanticsAccessor,
+        semantic_model_semantics: SemanticModelSemanticsAccessor,
         nodes_available_for_joins: Sequence[BaseOutput[SourceDataSetT]],
         node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver[SourceDataSetT],
     ) -> None:
@@ -128,7 +128,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
         self._nodes_available_for_joins = nodes_available_for_joins
         self._node_data_set_resolver = node_data_set_resolver
         self._partition_resolver = PartitionJoinResolver(self._semantic_model_semantics)
-        self._join_evaluator = DataSourceJoinEvaluator(self._semantic_model_semantics)
+        self._join_evaluator = SemanticModelJoinEvaluator(self._semantic_model_semantics)
 
     def _find_joinable_candidate_nodes_that_can_satisfy_linkable_specs(
         self,

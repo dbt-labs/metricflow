@@ -13,7 +13,7 @@ from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_val
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from metricflow.model.validations.entities import (
     NaturalEntityConfigurationRule,
-    OnePrimaryEntityPerDataSourceRule,
+    OnePrimaryEntityPerSemanticModelRule,
 )
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.test.model.validations.helpers import base_model_file
@@ -34,7 +34,7 @@ def test_semantic_model_cant_have_more_than_one_primary_entity(
         entity.type = EntityType.PRIMARY
         entity_references.add(entity.reference)
 
-    model_issues = ModelValidator([OnePrimaryEntityPerDataSourceRule()]).validate_model(model)
+    model_issues = ModelValidator([OnePrimaryEntityPerSemanticModelRule()]).validate_model(model)
 
     future_issue = (
         f"Data sources can have only one primary entity. The data source"

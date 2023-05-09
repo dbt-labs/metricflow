@@ -6,7 +6,7 @@ from dbt_semantic_interfaces.references import SemanticModelReference
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, FilterElementsNode, MetricTimeDimensionTransformNode
-from metricflow.dataset.convert_semantic_model import DataSourceToDataSetConverter
+from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
@@ -36,7 +36,7 @@ def test_view_sql_generated_at_a_node(
     column_association_resolver = DefaultColumnAssociationResolver(
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
     )
-    to_data_set_converter = DataSourceToDataSetConverter(column_association_resolver)
+    to_data_set_converter = SemanticModelToDataSetConverter(column_association_resolver)
 
     to_sql_plan_converter = DataflowToSqlQueryPlanConverter[SqlDataSet](
         column_association_resolver=DefaultColumnAssociationResolver(simple_semantic_manifest_lookup),

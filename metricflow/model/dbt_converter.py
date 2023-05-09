@@ -10,9 +10,9 @@ from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
     MappedObjects,
 )
 from metricflow.model.dbt_mapping_rules.dbt_metric_model_to_semantic_model_rules import (
-    DbtMapToDataSourceName,
-    DbtMapToDataSourceDescription,
-    DbtMapDataSourceNodeRelation,
+    DbtMapToSemanticModelName,
+    DbtMapToSemanticModelDescription,
+    DbtMapSemanticModelNodeRelation,
 )
 from metricflow.model.dbt_mapping_rules.dbt_metric_to_metrics_rules import (
     DbtToMetricName,
@@ -44,9 +44,9 @@ logger = logging.getLogger(__name__)
 DEFAULT_RULES: FrozenSet[DbtMappingRule] = frozenset(
     [
         # Build data sources
-        DbtMapToDataSourceName(),
-        DbtMapToDataSourceDescription(),
-        DbtMapDataSourceNodeRelation(),
+        DbtMapToSemanticModelName(),
+        DbtMapToSemanticModelDescription(),
+        DbtMapSemanticModelNodeRelation(),
         # Build Metrics
         DbtToMetricName(),
         DbtToMetricDescription(),

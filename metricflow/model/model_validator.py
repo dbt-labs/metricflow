@@ -5,17 +5,20 @@ from typing import List, Sequence
 
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.agg_time_dimension import AggregationTimeDimensionRule
-from metricflow.model.validations.data_sources import DataSourceTimeDimensionWarningsRule, DataSourceValidityWindowRule
+from metricflow.model.validations.data_sources import (
+    SemanticModelTimeDimensionWarningsRule,
+    SemanticModelValidityWindowRule,
+)
 from metricflow.model.validations.dimension_const import DimensionConsistencyRule
 from metricflow.model.validations.element_const import ElementConsistencyRule
 from metricflow.model.validations.entities import (
     NaturalEntityConfigurationRule,
-    OnePrimaryEntityPerDataSourceRule,
+    OnePrimaryEntityPerSemanticModelRule,
 )
 from metricflow.model.validations.measures import (
     PercentileAggregationRule,
     CountAggregationExprRule,
-    DataSourceMeasuresUniqueRule,
+    SemanticModelMeasuresUniqueRule,
     MeasureConstraintAliasesRule,
     MetricMeasuresRule,
     MeasuresNonAdditiveDimensionRule,
@@ -40,13 +43,13 @@ class ModelValidator:
         PercentileAggregationRule(),
         DerivedMetricRule(),
         CountAggregationExprRule(),
-        DataSourceMeasuresUniqueRule(),
-        DataSourceTimeDimensionWarningsRule(),
-        DataSourceValidityWindowRule(),
+        SemanticModelMeasuresUniqueRule(),
+        SemanticModelTimeDimensionWarningsRule(),
+        SemanticModelValidityWindowRule(),
         DimensionConsistencyRule(),
         ElementConsistencyRule(),
         NaturalEntityConfigurationRule(),
-        OnePrimaryEntityPerDataSourceRule(),
+        OnePrimaryEntityPerSemanticModelRule(),
         MeasureConstraintAliasesRule(),
         MetricMeasuresRule(),
         CumulativeMetricRule(),

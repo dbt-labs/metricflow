@@ -3,8 +3,8 @@ from typing import Dict, List
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
 from metricflow.model.validations.validator_helpers import (
-    DataSourceElementContext,
-    DataSourceElementType,
+    SemanticModelElementContext,
+    SemanticModelElementType,
     FileContext,
     ModelValidationRule,
     DimensionInvariants,
@@ -63,12 +63,12 @@ class DimensionConsistencyRule(ModelValidationRule):
         Throws: MdoValidationError if there is an inconsistent dimension in the data source.
         """
         issues: List[ValidationIssue] = []
-        context = DataSourceElementContext(
+        context = SemanticModelElementContext(
             file_context=FileContext.from_metadata(metadata=data_source.metadata),
             semantic_model_element=SemanticModelElementReference(
                 semantic_model_name=data_source.name, element_name=dimension.name
             ),
-            element_type=DataSourceElementType.DIMENSION,
+            element_type=SemanticModelElementType.DIMENSION,
         )
 
         if dimension.type == DimensionType.TIME:
@@ -127,12 +127,12 @@ class DimensionConsistencyRule(ModelValidationRule):
             # is_partition might not be specified in the configs, so default to False.
             is_partition = dimension.is_partition or False
 
-            context = DataSourceElementContext(
+            context = SemanticModelElementContext(
                 file_context=FileContext.from_metadata(metadata=data_source.metadata),
                 semantic_model_element=SemanticModelElementReference(
                     semantic_model_name=data_source.name, element_name=dimension.name
                 ),
-                element_type=DataSourceElementType.DIMENSION,
+                element_type=SemanticModelElementType.DIMENSION,
             )
 
             if dimension_invariant.type != dimension.type:

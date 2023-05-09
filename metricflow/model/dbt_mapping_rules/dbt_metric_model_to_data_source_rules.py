@@ -11,7 +11,7 @@ from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
 from metricflow.model.validations.validator_helpers import ModelValidationResults, ValidationIssue, ValidationError
 
 
-class DbtMapToDataSourceName(DbtMappingRule):
+class DbtMapToSemanticModelName(DbtMappingRule):
     """Rule for mapping dbt metric model names to data source names"""
 
     @staticmethod
@@ -32,7 +32,7 @@ class DbtMapToDataSourceName(DbtMappingRule):
         return ModelValidationResults.from_issues_sequence(issues=issues)
 
 
-class DbtMapToDataSourceDescription(DbtMappingRule):
+class DbtMapToSemanticModelDescription(DbtMappingRule):
     """Rule for mapping dbt metric model descriptions to data source descriptions"""
 
     @staticmethod
@@ -55,7 +55,7 @@ class DbtMapToDataSourceDescription(DbtMappingRule):
         return ModelValidationResults.from_issues_sequence(issues=issues)
 
 
-class DbtMapDataSourceNodeRelation(DbtMappingRule):
+class DbtMapSemanticModelNodeRelation(DbtMappingRule):
     """Rule for mapping dbt metric models to data source node relations"""
 
     @staticmethod

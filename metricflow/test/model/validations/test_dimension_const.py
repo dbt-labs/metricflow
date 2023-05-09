@@ -8,7 +8,7 @@ from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.metric import MetricType, MetricTypeParams, Metric
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.references import DimensionReference, MeasureReference, TimeDimensionReference
-from metricflow.model.validations.data_sources import DataSourceTimeDimensionWarningsRule
+from metricflow.model.validations.data_sources import SemanticModelTimeDimensionWarningsRule
 from metricflow.model.validations.dimension_const import DimensionConsistencyRule
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.test.model.validations.helpers import semantic_model_with_guaranteed_meta, metric_with_guaranteed_meta
@@ -106,7 +106,7 @@ def test_multiple_primary_time_dimensions() -> None:  # noqa:D
         dimension_reference = TimeDimensionReference(element_name="ds")
         dimension_reference2 = DimensionReference(element_name="not_ds")
         measure_reference = MeasureReference(element_name="measure")
-        model_validator = ModelValidator([DataSourceTimeDimensionWarningsRule()])
+        model_validator = ModelValidator([SemanticModelTimeDimensionWarningsRule()])
         model_validator.checked_validations(
             model=UserConfiguredModel(
                 data_sources=[

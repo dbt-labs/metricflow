@@ -13,9 +13,9 @@ from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.references import SemanticModelReference, MeasureReference, MetricReference
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
-from metricflow.model.semantics.semantic_model_join_evaluator import DataSourceJoinEvaluator
+from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
-from metricflow.protocols.semantics import DataSourceSemanticsAccessor
+from metricflow.protocols.semantics import SemanticModelSemanticsAccessor
 from metricflow.specs import (
     DEFAULT_TIME_GRANULARITY,
     LinkableSpecSet,
@@ -263,7 +263,7 @@ class LinkableElementSet:
 
 
 @dataclass(frozen=True)
-class DataSourceJoinPathElement:
+class SemanticModelJoinPathElement:
     """Describes joining a data source by the given entity."""
 
     data_source: SemanticModel
@@ -299,7 +299,7 @@ def _generate_linkable_time_dimensions(
 
 
 @dataclass(frozen=True)
-class DataSourceJoinPath:
+class SemanticModelJoinPath:
     """Describes a series of joins between the measure data source, and other data sources by entity.
 
     For example:
@@ -309,7 +309,7 @@ class DataSourceJoinPath:
     would be represented by 2 path elements [(data_source0, A), (dimension_source1, B)]
     """
 
-    path_elements: Tuple[DataSourceJoinPathElement, ...]
+    path_elements: Tuple[SemanticModelJoinPathElement, ...]
 
     def create_linkable_element_set(self, with_properties: FrozenSet[LinkableElementProperties]) -> LinkableElementSet:
         """Given the current path, generate the respective linkable elements from the last data source in the path."""
@@ -376,7 +376,7 @@ class ValidLinkableSpecResolver:
     def __init__(
         self,
         user_configured_model: UserConfiguredModel,
-        semantic_model_semantics: DataSourceSemanticsAccessor,
+        semantic_model_semantics: SemanticModelSemanticsAccessor,
         max_entity_links: int,
     ) -> None:
         """Constructor.
@@ -389,7 +389,7 @@ class ValidLinkableSpecResolver:
         self._user_configured_model = user_configured_model
         # Sort data sources by name for consistency in building derived objects.
         self._semantic_models = sorted(self._user_configured_model.data_sources, key=lambda x: x.name)
-        self._join_evaluator = DataSourceJoinEvaluator(semantic_model_semantics)
+        self._join_evaluator = SemanticModelJoinEvaluator(semantic_model_semantics)
 
         assert max_entity_links >= 0
         self._max_entity_links = max_entity_links
@@ -520,9 +520,9 @@ class ValidLinkableSpecResolver:
                 if data_source.name == measure_semantic_model.name:
                     continue
                 join_paths.append(
-                    DataSourceJoinPath(
+                    SemanticModelJoinPath(
                         path_elements=(
-                            DataSourceJoinPathElement(
+                            SemanticModelJoinPathElement(
                                 data_source=data_source, join_on_entity=entity.reference.element_name
                             ),
                         )
@@ -539,7 +539,7 @@ class ValidLinkableSpecResolver:
         # Create multi-hop elements. At each iteration, we generate the list of valid elements based on the current join
         # path, extend all paths to include the next valid data source, then repeat.
         for i in range(self._max_entity_links - 1):
-            new_join_paths: List[DataSourceJoinPath] = []
+            new_join_paths: List[SemanticModelJoinPath] = []
             for join_path in join_paths:
                 new_join_paths.extend(
                     self._find_next_possible_paths(
@@ -584,8 +584,8 @@ class ValidLinkableSpecResolver:
         return LinkableElementSet.intersection(linkable_element_sets)
 
     def _find_next_possible_paths(
-        self, measure_semantic_model: SemanticModel, current_join_path: DataSourceJoinPath
-    ) -> Sequence[DataSourceJoinPath]:
+        self, measure_semantic_model: SemanticModel, current_join_path: SemanticModelJoinPath
+    ) -> Sequence[SemanticModelJoinPath]:
         """Generate the set of possible paths that are 1 data source join longer that the "current_join_path"."""
         last_semantic_model_in_path = current_join_path.last_semantic_model
         new_join_paths = []
@@ -608,9 +608,9 @@ class ValidLinkableSpecResolver:
                 ):
                     continue
 
-                new_join_path = DataSourceJoinPath(
+                new_join_path = SemanticModelJoinPath(
                     path_elements=current_join_path.path_elements
-                    + (DataSourceJoinPathElement(data_source=data_source, join_on_entity=entity_name),)
+                    + (SemanticModelJoinPathElement(data_source=data_source, join_on_entity=entity_name),)
                 )
                 new_join_paths.append(new_join_path)
 

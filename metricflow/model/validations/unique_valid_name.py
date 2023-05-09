@@ -14,9 +14,9 @@ from dbt_semantic_interfaces.references import (
 from dbt_semantic_interfaces.references import ElementReference
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from metricflow.model.validations.validator_helpers import (
-    DataSourceContext,
-    DataSourceElementContext,
-    DataSourceElementType,
+    SemanticModelContext,
+    SemanticModelElementContext,
+    SemanticModelElementType,
     FileContext,
     MetricContext,
     ModelValidationRule,
@@ -101,12 +101,12 @@ class UniqueAndValidNameRule(ModelValidationRule):
                     (
                         measure.reference,
                         "measure",
-                        DataSourceElementContext(
+                        SemanticModelElementContext(
                             file_context=FileContext.from_metadata(metadata=data_source.metadata),
                             semantic_model_element=SemanticModelElementReference(
                                 semantic_model_name=data_source.name, element_name=measure.name
                             ),
-                            element_type=DataSourceElementType.MEASURE,
+                            element_type=SemanticModelElementType.MEASURE,
                         ),
                     )
                 )
@@ -116,12 +116,12 @@ class UniqueAndValidNameRule(ModelValidationRule):
                     (
                         entity.reference,
                         "entity",
-                        DataSourceElementContext(
+                        SemanticModelElementContext(
                             file_context=FileContext.from_metadata(metadata=data_source.metadata),
                             semantic_model_element=SemanticModelElementReference(
                                 semantic_model_name=data_source.name, element_name=entity.name
                             ),
-                            element_type=DataSourceElementType.ENTITY,
+                            element_type=SemanticModelElementType.ENTITY,
                         ),
                     )
                 )
@@ -131,12 +131,12 @@ class UniqueAndValidNameRule(ModelValidationRule):
                     (
                         dimension.reference,
                         "dimension",
-                        DataSourceElementContext(
+                        SemanticModelElementContext(
                             file_context=FileContext.from_metadata(metadata=data_source.metadata),
                             semantic_model_element=SemanticModelElementReference(
                                 semantic_model_name=data_source.name, element_name=dimension.name
                             ),
-                            element_type=DataSourceElementType.DIMENSION,
+                            element_type=SemanticModelElementType.DIMENSION,
                         ),
                     )
                 )
@@ -170,7 +170,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
                     (
                         data_source.name,
                         "data source",
-                        DataSourceContext(
+                        SemanticModelContext(
                             file_context=FileContext.from_metadata(metadata=data_source.metadata),
                             data_source=SemanticModelReference(semantic_model_name=data_source.name),
                         ),

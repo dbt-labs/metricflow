@@ -11,8 +11,8 @@ from typing import Callable, DefaultDict, Dict, List, Optional, Sequence, Tuple,
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import BaseOutput, FilterElementsNode
-from metricflow.dataset.convert_semantic_model import DataSourceToDataSetConverter
-from metricflow.dataset.semantic_model_adapter import DataSourceDataSet
+from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
+from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 
 from metricflow.dataset.dataset import DataSet
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
@@ -27,9 +27,9 @@ from dbt_semantic_interfaces.objects.metric import Metric
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.model.validations.validator_helpers import (
-    DataSourceContext,
-    DataSourceElementContext,
-    DataSourceElementType,
+    SemanticModelContext,
+    SemanticModelElementContext,
+    SemanticModelElementType,
     FileContext,
     MetricContext,
     ModelValidationResults,
@@ -57,7 +57,7 @@ class QueryRenderingTools:
 
     semantic_manifest_lookup: SemanticManifestLookup
     source_node_builder: SourceNodeBuilder
-    converter: DataSourceToDataSetConverter
+    converter: SemanticModelToDataSetConverter
     time_spine_source: TimeSpineSource
     plan_converter: DataflowToSqlQueryPlanConverter
 
@@ -65,7 +65,7 @@ class QueryRenderingTools:
         self.semantic_manifest_lookup = SemanticManifestLookup(user_configured_model=model)
         self.source_node_builder = SourceNodeBuilder(semantic_manifest_lookup=self.semantic_manifest_lookup)
         self.time_spine_source = TimeSpineSource(schema_name=system_schema)
-        self.converter = DataSourceToDataSetConverter(
+        self.converter = SemanticModelToDataSetConverter(
             column_association_resolver=DefaultColumnAssociationResolver(
                 semantic_manifest_lookup=self.semantic_manifest_lookup
             )
@@ -75,7 +75,7 @@ class QueryRenderingTools:
             semantic_manifest_lookup=self.semantic_manifest_lookup,
             time_spine_source=self.time_spine_source,
         )
-        self.node_resolver = DataflowPlanNodeOutputDataSetResolver[DataSourceDataSet](
+        self.node_resolver = DataflowPlanNodeOutputDataSetResolver[SemanticModelDataSet](
             column_association_resolver=DefaultColumnAssociationResolver(self.semantic_manifest_lookup),
             semantic_manifest_lookup=self.semantic_manifest_lookup,
             time_spine_source=self.time_spine_source,
@@ -106,8 +106,8 @@ class DataWarehouseTaskBuilder:
     @staticmethod
     def _semantic_model_nodes(
         render_tools: QueryRenderingTools, data_source: SemanticModel
-    ) -> Sequence[BaseOutput[DataSourceDataSet]]:
-        """Builds and returns the DataSourceDataSet node for the given data source"""
+    ) -> Sequence[BaseOutput[SemanticModelDataSet]]:
+        """Builds and returns the SemanticModelDataSet node for the given data source"""
         semantic_model_semantics = render_tools.semantic_manifest_lookup.semantic_model_semantics.get_by_reference(
             SemanticModelReference(semantic_model_name=data_source.name)
         )
@@ -169,7 +169,7 @@ class DataWarehouseTaskBuilder:
                         plan_id=f"{data_source.name}_validation",
                         nodes=filter_elements_node,
                     ),
-                    context=DataSourceContext(
+                    context=SemanticModelContext(
                         file_context=FileContext.from_metadata(metadata=data_source.metadata),
                         data_source=SemanticModelReference(semantic_model_name=data_source.name),
                     ),
@@ -242,12 +242,12 @@ class DataWarehouseTaskBuilder:
                             plan_id=f"{data_source.name}_dim_{spec.element_name}_validation",
                             nodes=filter_elements_node,
                         ),
-                        context=DataSourceElementContext(
+                        context=SemanticModelElementContext(
                             file_context=FileContext.from_metadata(metadata=data_source.metadata),
                             semantic_model_element=SemanticModelElementReference(
                                 semantic_model_name=data_source.name, element_name=spec.element_name
                             ),
-                            element_type=DataSourceElementType.DIMENSION,
+                            element_type=SemanticModelElementType.DIMENSION,
                         ),
                         error_message=f"Unable to query dimension `{spec.element_name}` on data source `{data_source.name}` in data warehouse",
                     )
@@ -269,7 +269,7 @@ class DataWarehouseTaskBuilder:
                         plan_id=f"{data_source.name}_all_dimensions_validation",
                         nodes=filter_elements_node,
                     ),
-                    context=DataSourceContext(
+                    context=SemanticModelContext(
                         file_context=FileContext.from_metadata(metadata=data_source.metadata),
                         data_source=SemanticModelReference(semantic_model_name=data_source.name),
                     ),
@@ -318,12 +318,12 @@ class DataWarehouseTaskBuilder:
                             plan_id=f"{data_source.name}_entity_{spec.element_name}_validation",
                             nodes=filter_elements_node,
                         ),
-                        context=DataSourceElementContext(
+                        context=SemanticModelElementContext(
                             file_context=FileContext.from_metadata(metadata=data_source.metadata),
                             semantic_model_element=SemanticModelElementReference(
                                 semantic_model_name=data_source.name, element_name=spec.element_name
                             ),
-                            element_type=DataSourceElementType.ENTITY,
+                            element_type=SemanticModelElementType.ENTITY,
                         ),
                         error_message=f"Unable to query entity `{spec.element_name}` on data source `{data_source.name}` in data warehouse",
                     )
@@ -344,7 +344,7 @@ class DataWarehouseTaskBuilder:
                         plan_id=f"{data_source.name}_all_entities_validation",
                         nodes=filter_elements_node,
                     ),
-                    context=DataSourceContext(
+                    context=SemanticModelContext(
                         file_context=FileContext.from_metadata(metadata=data_source.metadata),
                         data_source=SemanticModelReference(semantic_model_name=data_source.name),
                     ),
@@ -378,7 +378,7 @@ class DataWarehouseTaskBuilder:
             dataset = render_tools.converter.create_sql_source_data_set(data_source)
             semantic_model_specs = dataset.instance_set.spec_set.measure_specs
 
-            source_node_by_measure_spec: Dict[MeasureSpec, BaseOutput[DataSourceDataSet]] = {}
+            source_node_by_measure_spec: Dict[MeasureSpec, BaseOutput[SemanticModelDataSet]] = {}
             measure_specs_source_node_pair = []
             for source_node in source_nodes:
                 measure_specs = render_tools.node_resolver.get_output_data_set(
@@ -388,7 +388,7 @@ class DataWarehouseTaskBuilder:
                 measure_specs_source_node_pair.append((measure_specs, source_node))
 
             source_node_to_sub_task: DefaultDict[
-                BaseOutput[DataSourceDataSet], List[DataWarehouseValidationTask]
+                BaseOutput[SemanticModelDataSet], List[DataWarehouseValidationTask]
             ] = collections.defaultdict(list)
             for spec in semantic_model_specs:
                 obtained_source_node = source_node_by_measure_spec.get(spec)
@@ -409,12 +409,12 @@ class DataWarehouseTaskBuilder:
                             plan_id=f"{data_source.name}_measure_{spec.element_name}_validation",
                             nodes=filter_elements_node,
                         ),
-                        context=DataSourceElementContext(
+                        context=SemanticModelElementContext(
                             file_context=FileContext.from_metadata(metadata=data_source.metadata),
                             semantic_model_element=SemanticModelElementReference(
                                 semantic_model_name=data_source.name, element_name=spec.element_name
                             ),
-                            element_type=DataSourceElementType.MEASURE,
+                            element_type=SemanticModelElementType.MEASURE,
                         ),
                         error_message=f"Unable to query measure `{spec.element_name}` on data source `{data_source.name}` in data warehouse",
                     )
@@ -433,7 +433,7 @@ class DataWarehouseTaskBuilder:
                             plan_id=f"{data_source.name}_all_measures_validation",
                             nodes=filter_elements_node,
                         ),
-                        context=DataSourceContext(
+                        context=SemanticModelContext(
                             file_context=FileContext.from_metadata(metadata=data_source.metadata),
                             data_source=SemanticModelReference(semantic_model_name=data_source.name),
                         ),

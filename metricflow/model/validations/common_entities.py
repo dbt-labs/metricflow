@@ -5,8 +5,8 @@ from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.references import SemanticModelElementReference, EntityReference
 from metricflow.model.validations.validator_helpers import (
-    DataSourceElementContext,
-    DataSourceElementType,
+    SemanticModelElementContext,
+    SemanticModelElementType,
     FileContext,
     ModelValidationRule,
     ValidationWarning,
@@ -46,12 +46,12 @@ class CommonEntitysRule(ModelValidationRule):
         ):
             issues.append(
                 ValidationWarning(
-                    context=DataSourceElementContext(
+                    context=SemanticModelElementContext(
                         file_context=FileContext.from_metadata(metadata=data_source.metadata),
                         semantic_model_element=SemanticModelElementReference(
                             semantic_model_name=data_source.name, element_name=entity.name
                         ),
-                        element_type=DataSourceElementType.ENTITY,
+                        element_type=SemanticModelElementType.ENTITY,
                     ),
                     message=f"Entity `{entity.reference.element_name}` "
                     f"only found in one data source `{data_source.name}` "

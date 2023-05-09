@@ -51,7 +51,7 @@ ISSUE_COLOR_MAP = {
 }
 
 
-class DataSourceElementType(Enum):
+class SemanticModelElementType(Enum):
     """Maps data source element types to a readable string."""
 
     MEASURE = "measure"
@@ -103,7 +103,7 @@ class MetricContext(BaseModel):
         return f"with metric `{self.metric.metric_name}` {self.file_context.context_str()}"
 
 
-class DataSourceContext(BaseModel):
+class SemanticModelContext(BaseModel):
     """The context class for validation issues involving data sources"""
 
     file_context: FileContext
@@ -114,12 +114,12 @@ class DataSourceContext(BaseModel):
         return f"with data source `{self.data_source.semantic_model_name}` {self.file_context.context_str()}"
 
 
-class DataSourceElementContext(BaseModel):
+class SemanticModelElementContext(BaseModel):
     """The context class for validation issues involving dimensions"""
 
     file_context: FileContext
     semantic_model_element: SemanticModelElementReference
-    element_type: DataSourceElementType
+    element_type: SemanticModelElementType
 
     def context_str(self) -> str:
         """Human readable stringified representation of the context"""
@@ -129,8 +129,8 @@ class DataSourceElementContext(BaseModel):
 ValidationContext = Union[
     FileContext,
     MetricContext,
-    DataSourceContext,
-    DataSourceElementContext,
+    SemanticModelContext,
+    SemanticModelElementContext,
 ]
 
 

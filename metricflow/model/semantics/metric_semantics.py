@@ -6,7 +6,7 @@ from dbt_semantic_interfaces.objects.user_configured_model import UserConfigured
 from dbt_semantic_interfaces.references import MetricReference
 from metricflow.errors.errors import MetricNotFoundError, DuplicateMetricError, NonExistentMeasureError
 from metricflow.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
-from metricflow.model.semantics.semantic_model_semantics import DataSourceSemantics
+from metricflow.model.semantics.semantic_model_semantics import SemanticModelSemantics
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.linkable_spec_resolver import ValidLinkableSpecResolver
 from metricflow.model.spec_converters import WhereConstraintConverter
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 class MetricSemantics(MetricSemanticsAccessor):  # noqa: D
     def __init__(  # noqa: D
-        self, user_configured_model: UserConfiguredModel, semantic_model_semantics: DataSourceSemantics
+        self, user_configured_model: UserConfiguredModel, semantic_model_semantics: SemanticModelSemantics
     ) -> None:
         self._user_configured_model = user_configured_model
         self._metrics: Dict[MetricReference, Metric] = {}
