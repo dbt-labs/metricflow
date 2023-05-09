@@ -106,10 +106,10 @@ class MetricSemantics(MetricSemanticsAccessor):  # noqa: D
             spec = MetricInputMeasureSpec(
                 measure_spec=measure_spec,
                 constraint=WhereFilterSpec.create_from_where_filter(
-                    where_filter=input_measure.constraint,
+                    where_filter=input_measure.filter,
                     column_association_resolver=column_association_resolver,
                 )
-                if input_measure.constraint is not None
+                if input_measure.filter is not None
                 else None,
                 alias=input_measure.alias,
             )
@@ -144,17 +144,17 @@ class MetricSemantics(MetricSemanticsAccessor):  # noqa: D
             # This is the constraint parameter added to the input metric in the derived metric definition
             combined_filter = (
                 WhereFilterSpec.create_from_where_filter(
-                    where_filter=input_metric.constraint,
+                    where_filter=input_metric.filter,
                     column_association_resolver=column_association_resolver,
                 )
-                if input_metric.constraint is not None
+                if input_metric.filter is not None
                 else None
             )
 
             # This is the constraint parameter included in the original input metric definition
-            if original_metric_obj.constraint:
+            if original_metric_obj.filter:
                 original_metric_filter = WhereFilterSpec.create_from_where_filter(
-                    where_filter=original_metric_obj.constraint,
+                    where_filter=original_metric_obj.filter,
                     column_association_resolver=column_association_resolver,
                 )
                 combined_filter = (
