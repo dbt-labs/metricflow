@@ -45,8 +45,8 @@ class NodeRelation(HashableBaseModel):
         )
 
 
-class DataSource(HashableBaseModel, ModelWithMetadataParsing):
-    """Describes a data source"""
+class SemanticModel(HashableBaseModel, ModelWithMetadataParsing):
+    """Describes a semantic model"""
 
     name: str
     description: Optional[str]
@@ -76,7 +76,7 @@ class DataSource(HashableBaseModel, ModelWithMetadataParsing):
                 return measure
 
         raise ValueError(
-            f"No dimension with name ({measure_reference.element_name}) in data source with name ({self.name})"
+            f"No dimension with name ({measure_reference.element_name}) in semantic_model with name ({self.name})"
         )
 
     def get_dimension(self, dimension_reference: LinkableElementReference) -> Dimension:  # noqa: D
@@ -84,14 +84,14 @@ class DataSource(HashableBaseModel, ModelWithMetadataParsing):
             if dim.reference == dimension_reference:
                 return dim
 
-        raise ValueError(f"No dimension with name ({dimension_reference}) in data source with name ({self.name})")
+        raise ValueError(f"No dimension with name ({dimension_reference}) in semantic_model with name ({self.name})")
 
     def get_entity(self, entity_reference: LinkableElementReference) -> Entity:  # noqa: D
         for entity in self.entities:
             if entity.reference == entity_reference:
                 return entity
 
-        raise ValueError(f"No entity with name ({entity_reference}) in data source with name ({self.name})")
+        raise ValueError(f"No entity with name ({entity_reference}) in semantic_model with name ({self.name})")
 
     @property
     def has_validity_dimensions(self) -> bool:
@@ -130,7 +130,7 @@ class DataSource(HashableBaseModel, ModelWithMetadataParsing):
         if not partitions:
             return None
         if len(partitions) > 1:
-            raise ValueError(f"too many partitions for data source {self.name}")
+            raise ValueError(f"too many partitions for semantic_model {self.name}")
         return partitions[0]
 
     @property
