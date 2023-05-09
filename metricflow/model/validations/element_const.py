@@ -37,7 +37,7 @@ class ElementConsistencyRule(ModelValidationRule):
             types_used = [SemanticModelElementType(v) for v in sorted(k.value for k in type_to_context.keys())]
             for element_type in types_used:
                 semantic_model_contexts = type_to_context[element_type]
-                semantic_model_names = {ctx.data_source.semantic_model_name for ctx in semantic_model_contexts}
+                semantic_model_names = {ctx.semantic_model.semantic_model_name for ctx in semantic_model_contexts}
                 semantic_model_context = semantic_model_contexts[0]
                 issues.append(
                     ValidationError(
@@ -57,18 +57,18 @@ class ElementConsistencyRule(ModelValidationRule):
         element_types: DefaultDict[
             str, DefaultDict[SemanticModelElementType, List[SemanticModelContext]]
         ] = defaultdict(lambda: defaultdict(list))
-        for data_source in model.data_sources:
+        for semantic_model in model.semantic_models:
             semantic_model_context = SemanticModelContext(
-                file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                data_source=SemanticModelReference(semantic_model_name=data_source.name),
+                file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
+                semantic_model=SemanticModelReference(semantic_model_name=semantic_model.name),
             )
-            if data_source.measures:
-                for measure in data_source.measures:
+            if semantic_model.measures:
+                for measure in semantic_model.measures:
                     element_types[measure.name][SemanticModelElementType.MEASURE].append(semantic_model_context)
-            if data_source.dimensions:
-                for dimension in data_source.dimensions:
+            if semantic_model.dimensions:
+                for dimension in semantic_model.dimensions:
                     element_types[dimension.name][SemanticModelElementType.DIMENSION].append(semantic_model_context)
-            if data_source.entities:
-                for entity in data_source.entities:
+            if semantic_model.entities:
+                for entity in semantic_model.entities:
                     element_types[entity.name][SemanticModelElementType.ENTITY].append(semantic_model_context)
         return element_types

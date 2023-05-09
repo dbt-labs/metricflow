@@ -22,7 +22,7 @@ class DbtMapToSemanticModelName(DbtMappingRule):
             if metric.model:
                 try:
                     assert_metric_model_name(metric=metric)
-                    objects.data_sources[metric.model.name]["name"] = metric.model.name
+                    objects.semantic_models[metric.model.name]["name"] = metric.model.name
 
                 except Exception as e:
                     issues.append(
@@ -45,7 +45,7 @@ class DbtMapToSemanticModelDescription(DbtMappingRule):
                     assert_metric_model_name(metric=metric)
                     # Don't need to assert `metric.model.description` because
                     # it's optional and can be set to None
-                    objects.data_sources[metric.model.name]["description"] = metric.model.description
+                    objects.semantic_models[metric.model.name]["description"] = metric.model.description
 
                 except Exception as e:
                     issues.append(
@@ -70,7 +70,7 @@ class DbtMapSemanticModelNodeRelation(DbtMappingRule):
                         metric.model.database
                     ), f"Expected a `database` for `{metric.name}` metric's `model`, got `None`"
                     assert metric.model.schema, f"Expected a `schema` for `{metric.name}` metric's `model`, got `None`"
-                    objects.data_sources[metric.model.name]["node_relation"] = NodeRelation(
+                    objects.semantic_models[metric.model.name]["node_relation"] = NodeRelation(
                         alias=metric.model.name,
                         schema_name=metric.model.schema,
                         database=metric.model.database,

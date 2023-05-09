@@ -105,11 +105,11 @@ class DataWarehouseTaskBuilder:
 
     @staticmethod
     def _semantic_model_nodes(
-        render_tools: QueryRenderingTools, data_source: SemanticModel
+        render_tools: QueryRenderingTools, semantic_model: SemanticModel
     ) -> Sequence[BaseOutput[SemanticModelDataSet]]:
         """Builds and returns the SemanticModelDataSet node for the given data source"""
         semantic_model_semantics = render_tools.semantic_manifest_lookup.semantic_model_semantics.get_by_reference(
-            SemanticModelReference(semantic_model_name=data_source.name)
+            SemanticModelReference(semantic_model_name=semantic_model.name)
         )
         assert semantic_model_semantics
 
@@ -145,17 +145,17 @@ class DataWarehouseTaskBuilder:
         # Additionally, we don't want to modify the original model, so we
         # first make a deep copy of it
         model = deepcopy(model)
-        for data_source in model.data_sources:
-            data_source.dimensions = list(data_source.dimensions) + [
-                Dimension(name=f"validation_dim_for_{data_source.name}", type=DimensionType.CATEGORICAL, expr="1")
+        for semantic_model in model.semantic_models:
+            semantic_model.dimensions = list(semantic_model.dimensions) + [
+                Dimension(name=f"validation_dim_for_{semantic_model.name}", type=DimensionType.CATEGORICAL, expr="1")
             ]
 
         render_tools = QueryRenderingTools(model=model, system_schema=system_schema)
 
         tasks: List[DataWarehouseValidationTask] = []
-        for data_source in model.data_sources:
-            source_node = cls._semantic_model_nodes(render_tools=render_tools, data_source=data_source)[0]
-            spec = DimensionSpec.from_name(name=f"validation_dim_for_{data_source.name}")
+        for semantic_model in model.semantic_models:
+            source_node = cls._semantic_model_nodes(render_tools=render_tools, semantic_model=semantic_model)[0]
+            spec = DimensionSpec.from_name(name=f"validation_dim_for_{semantic_model.name}")
             filter_elements_node = FilterElementsNode(
                 parent_node=source_node, include_specs=InstanceSpecSet(dimension_specs=(spec,))
             )
@@ -166,14 +166,14 @@ class DataWarehouseTaskBuilder:
                         cls.renderize,
                         sql_client=sql_client,
                         plan_converter=render_tools.plan_converter,
-                        plan_id=f"{data_source.name}_validation",
+                        plan_id=f"{semantic_model.name}_validation",
                         nodes=filter_elements_node,
                     ),
                     context=SemanticModelContext(
-                        file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                        data_source=SemanticModelReference(semantic_model_name=data_source.name),
+                        file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
+                        semantic_model=SemanticModelReference(semantic_model_name=semantic_model.name),
                     ),
-                    error_message=f"Unable to access data source `{data_source.name}` in data warehouse",
+                    error_message=f"Unable to access data source `{semantic_model.name}` in data warehouse",
                 )
             )
 
@@ -195,14 +195,14 @@ class DataWarehouseTaskBuilder:
         render_tools = QueryRenderingTools(model=model, system_schema=system_schema)
 
         tasks: List[DataWarehouseValidationTask] = []
-        for data_source in model.data_sources:
-            if not data_source.dimensions:
+        for semantic_model in model.semantic_models:
+            if not semantic_model.dimensions:
                 continue
 
-            source_node = cls._semantic_model_nodes(render_tools=render_tools, data_source=data_source)[0]
+            source_node = cls._semantic_model_nodes(render_tools=render_tools, semantic_model=semantic_model)[0]
 
             semantic_model_sub_tasks: List[DataWarehouseValidationTask] = []
-            dataset = render_tools.converter.create_sql_source_data_set(data_source)
+            dataset = render_tools.converter.create_sql_source_data_set(semantic_model)
 
             dimension_specs = DataWarehouseTaskBuilder._remove_entity_link_specs(
                 dataset.instance_set.spec_set.dimension_specs
@@ -239,17 +239,17 @@ class DataWarehouseTaskBuilder:
                             cls.renderize,
                             sql_client=sql_client,
                             plan_converter=render_tools.plan_converter,
-                            plan_id=f"{data_source.name}_dim_{spec.element_name}_validation",
+                            plan_id=f"{semantic_model.name}_dim_{spec.element_name}_validation",
                             nodes=filter_elements_node,
                         ),
                         context=SemanticModelElementContext(
-                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                            file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
                             semantic_model_element=SemanticModelElementReference(
-                                semantic_model_name=data_source.name, element_name=spec.element_name
+                                semantic_model_name=semantic_model.name, element_name=spec.element_name
                             ),
                             element_type=SemanticModelElementType.DIMENSION,
                         ),
-                        error_message=f"Unable to query dimension `{spec.element_name}` on data source `{data_source.name}` in data warehouse",
+                        error_message=f"Unable to query dimension `{spec.element_name}` on data source `{semantic_model.name}` in data warehouse",
                     )
                 )
 
@@ -266,14 +266,14 @@ class DataWarehouseTaskBuilder:
                         cls.renderize,
                         sql_client=sql_client,
                         plan_converter=render_tools.plan_converter,
-                        plan_id=f"{data_source.name}_all_dimensions_validation",
+                        plan_id=f"{semantic_model.name}_all_dimensions_validation",
                         nodes=filter_elements_node,
                     ),
                     context=SemanticModelContext(
-                        file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                        data_source=SemanticModelReference(semantic_model_name=data_source.name),
+                        file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
+                        semantic_model=SemanticModelReference(semantic_model_name=semantic_model.name),
                     ),
-                    error_message=f"Failed to query dimensions in data warehouse for data source `{data_source.name}`",
+                    error_message=f"Failed to query dimensions in data warehouse for data source `{semantic_model.name}`",
                     on_fail_subtasks=semantic_model_sub_tasks,
                 )
             )
@@ -295,13 +295,13 @@ class DataWarehouseTaskBuilder:
         render_tools = QueryRenderingTools(model=model, system_schema=system_schema)
 
         tasks: List[DataWarehouseValidationTask] = []
-        for data_source in model.data_sources:
-            if not data_source.entities:
+        for semantic_model in model.semantic_models:
+            if not semantic_model.entities:
                 continue
-            source_node = cls._semantic_model_nodes(render_tools=render_tools, data_source=data_source)[0]
+            source_node = cls._semantic_model_nodes(render_tools=render_tools, semantic_model=semantic_model)[0]
 
             semantic_model_sub_tasks: List[DataWarehouseValidationTask] = []
-            dataset = render_tools.converter.create_sql_source_data_set(data_source)
+            dataset = render_tools.converter.create_sql_source_data_set(semantic_model)
             semantic_model_specs = DataWarehouseTaskBuilder._remove_entity_link_specs(
                 dataset.instance_set.spec_set.entity_specs
             )
@@ -315,17 +315,17 @@ class DataWarehouseTaskBuilder:
                             cls.renderize,
                             sql_client=sql_client,
                             plan_converter=render_tools.plan_converter,
-                            plan_id=f"{data_source.name}_entity_{spec.element_name}_validation",
+                            plan_id=f"{semantic_model.name}_entity_{spec.element_name}_validation",
                             nodes=filter_elements_node,
                         ),
                         context=SemanticModelElementContext(
-                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                            file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
                             semantic_model_element=SemanticModelElementReference(
-                                semantic_model_name=data_source.name, element_name=spec.element_name
+                                semantic_model_name=semantic_model.name, element_name=spec.element_name
                             ),
                             element_type=SemanticModelElementType.ENTITY,
                         ),
-                        error_message=f"Unable to query entity `{spec.element_name}` on data source `{data_source.name}` in data warehouse",
+                        error_message=f"Unable to query entity `{spec.element_name}` on data source `{semantic_model.name}` in data warehouse",
                     )
                 )
 
@@ -341,14 +341,14 @@ class DataWarehouseTaskBuilder:
                         cls.renderize,
                         sql_client=sql_client,
                         plan_converter=render_tools.plan_converter,
-                        plan_id=f"{data_source.name}_all_entities_validation",
+                        plan_id=f"{semantic_model.name}_all_entities_validation",
                         nodes=filter_elements_node,
                     ),
                     context=SemanticModelContext(
-                        file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                        data_source=SemanticModelReference(semantic_model_name=data_source.name),
+                        file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
+                        semantic_model=SemanticModelReference(semantic_model_name=semantic_model.name),
                     ),
-                    error_message=f"Failed to query entities in data warehouse for data source `{data_source.name}`",
+                    error_message=f"Failed to query entities in data warehouse for data source `{semantic_model.name}`",
                     on_fail_subtasks=semantic_model_sub_tasks,
                 )
             )
@@ -370,12 +370,12 @@ class DataWarehouseTaskBuilder:
         render_tools = QueryRenderingTools(model=model, system_schema=system_schema)
 
         tasks: List[DataWarehouseValidationTask] = []
-        for data_source in model.data_sources:
-            if not data_source.measures:
+        for semantic_model in model.semantic_models:
+            if not semantic_model.measures:
                 continue
 
-            source_nodes = cls._semantic_model_nodes(render_tools=render_tools, data_source=data_source)
-            dataset = render_tools.converter.create_sql_source_data_set(data_source)
+            source_nodes = cls._semantic_model_nodes(render_tools=render_tools, semantic_model=semantic_model)
+            dataset = render_tools.converter.create_sql_source_data_set(semantic_model)
             semantic_model_specs = dataset.instance_set.spec_set.measure_specs
 
             source_node_by_measure_spec: Dict[MeasureSpec, BaseOutput[SemanticModelDataSet]] = {}
@@ -406,17 +406,17 @@ class DataWarehouseTaskBuilder:
                             cls.renderize,
                             sql_client=sql_client,
                             plan_converter=render_tools.plan_converter,
-                            plan_id=f"{data_source.name}_measure_{spec.element_name}_validation",
+                            plan_id=f"{semantic_model.name}_measure_{spec.element_name}_validation",
                             nodes=filter_elements_node,
                         ),
                         context=SemanticModelElementContext(
-                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                            file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
                             semantic_model_element=SemanticModelElementReference(
-                                semantic_model_name=data_source.name, element_name=spec.element_name
+                                semantic_model_name=semantic_model.name, element_name=spec.element_name
                             ),
                             element_type=SemanticModelElementType.MEASURE,
                         ),
-                        error_message=f"Unable to query measure `{spec.element_name}` on data source `{data_source.name}` in data warehouse",
+                        error_message=f"Unable to query measure `{spec.element_name}` on data source `{semantic_model.name}` in data warehouse",
                     )
                 )
 
@@ -430,14 +430,14 @@ class DataWarehouseTaskBuilder:
                             cls.renderize,
                             sql_client=sql_client,
                             plan_converter=render_tools.plan_converter,
-                            plan_id=f"{data_source.name}_all_measures_validation",
+                            plan_id=f"{semantic_model.name}_all_measures_validation",
                             nodes=filter_elements_node,
                         ),
                         context=SemanticModelContext(
-                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source=SemanticModelReference(semantic_model_name=data_source.name),
+                            file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
+                            semantic_model=SemanticModelReference(semantic_model_name=semantic_model.name),
                         ),
-                        error_message=f"Failed to query measures in data warehouse for data source `{data_source.name}`",
+                        error_message=f"Failed to query measures in data warehouse for data source `{semantic_model.name}`",
                         on_fail_subtasks=source_node_to_sub_task[source_node],
                     )
                 )

@@ -266,7 +266,7 @@ class LinkableElementSet:
 class SemanticModelJoinPathElement:
     """Describes joining a data source by the given entity."""
 
-    data_source: SemanticModel
+    semantic_model: SemanticModel
     join_on_entity: str
 
 
@@ -306,7 +306,7 @@ class SemanticModelJoinPath:
 
     (measure_source JOIN dimension_source0 ON entity A) JOIN dimension_source1 ON entity B
 
-    would be represented by 2 path elements [(data_source0, A), (dimension_source1, B)]
+    would be represented by 2 path elements [(semantic_model0, A), (dimension_source1, B)]
     """
 
     path_elements: Tuple[SemanticModelJoinPathElement, ...]
@@ -316,12 +316,12 @@ class SemanticModelJoinPath:
         entity_links = tuple(x.join_on_entity for x in self.path_elements)
 
         assert len(self.path_elements) > 0
-        data_source = self.path_elements[-1].data_source
+        semantic_model = self.path_elements[-1].semantic_model
 
         linkable_dimensions = []
         linkable_entities = []
 
-        for dimension in data_source.dimensions:
+        for dimension in semantic_model.dimensions:
             dimension_type = dimension.type
             if dimension_type == DimensionType.CATEGORICAL:
                 linkable_dimensions.append(
@@ -342,7 +342,7 @@ class SemanticModelJoinPath:
             else:
                 raise RuntimeError(f"Unhandled type: {dimension_type}")
 
-        for entity in data_source.entities:
+        for entity in semantic_model.entities:
             # Avoid creating "booking_id__booking_id"
             if entity.reference.element_name != entity_links[-1]:
                 linkable_entities.append(
@@ -364,7 +364,7 @@ class SemanticModelJoinPath:
     def last_semantic_model(self) -> SemanticModel:
         """The last data source that would be joined in this path."""
         assert len(self.path_elements) > 0
-        return self.path_elements[-1].data_source
+        return self.path_elements[-1].semantic_model
 
 
 class ValidLinkableSpecResolver:
@@ -388,7 +388,7 @@ class ValidLinkableSpecResolver:
         """
         self._user_configured_model = user_configured_model
         # Sort data sources by name for consistency in building derived objects.
-        self._semantic_models = sorted(self._user_configured_model.data_sources, key=lambda x: x.name)
+        self._semantic_models = sorted(self._user_configured_model.semantic_models, key=lambda x: x.name)
         self._join_evaluator = SemanticModelJoinEvaluator(semantic_model_semantics)
 
         assert max_entity_links >= 0
@@ -398,9 +398,9 @@ class ValidLinkableSpecResolver:
         self._entity_to_semantic_model: Dict[str, List[SemanticModel]] = defaultdict(list)
         self._measure_to_semantic_model: Dict[str, List[SemanticModel]] = defaultdict(list)
 
-        for data_source in self._semantic_models:
-            for entity in data_source.entities:
-                self._entity_to_semantic_model[entity.reference.element_name].append(data_source)
+        for semantic_model in self._semantic_models:
+            for entity in semantic_model.entities:
+                self._entity_to_semantic_model[entity.reference.element_name].append(semantic_model)
 
         self._metric_to_linkable_element_sets: Dict[str, List[LinkableElementSet]] = {}
 
@@ -414,26 +414,26 @@ class ValidLinkableSpecResolver:
         logger.info(f"Building the [metric -> valid linkable element] index took: {time.time() - start_time:.2f}s")
 
     def _get_semantic_model_for_measure(self, measure_reference: MeasureReference) -> SemanticModel:  # noqa: D
-        data_sources_where_measure_was_found = []
-        for data_source in self._semantic_models:
-            if any([x.reference.element_name == measure_reference.element_name for x in data_source.measures]):
-                data_sources_where_measure_was_found.append(data_source)
+        semantic_models_where_measure_was_found = []
+        for semantic_model in self._semantic_models:
+            if any([x.reference.element_name == measure_reference.element_name for x in semantic_model.measures]):
+                semantic_models_where_measure_was_found.append(semantic_model)
 
-        if len(data_sources_where_measure_was_found) == 0:
+        if len(semantic_models_where_measure_was_found) == 0:
             raise ValueError(f"No data sources were found with {measure_reference} in the model")
-        elif len(data_sources_where_measure_was_found) > 1:
+        elif len(semantic_models_where_measure_was_found) > 1:
             raise ValueError(
                 f"Measure {measure_reference} was found in multiple data sources:\n"
-                f"{pformat_big_objects(data_sources_where_measure_was_found)}"
+                f"{pformat_big_objects(semantic_models_where_measure_was_found)}"
             )
-        return data_sources_where_measure_was_found[0]
+        return semantic_models_where_measure_was_found[0]
 
-    def _get_local_set(self, data_source: SemanticModel) -> LinkableElementSet:
+    def _get_local_set(self, semantic_model: SemanticModel) -> LinkableElementSet:
         """Gets the local elements for a given data source."""
         linkable_dimensions = []
         linkable_entities = []
 
-        for dimension in data_source.dimensions:
+        for dimension in semantic_model.dimensions:
             dimension_type = dimension.type
             if dimension_type == DimensionType.CATEGORICAL:
                 linkable_dimensions.append(
@@ -455,7 +455,7 @@ class ValidLinkableSpecResolver:
                 raise RuntimeError(f"Unhandled type: {dimension_type}")
 
         additional_linkable_dimensions = []
-        for entity in data_source.entities:
+        for entity in semantic_model.entities:
             linkable_entities.append(
                 LinkableEntity(
                     element_name=entity.reference.element_name,
@@ -491,15 +491,15 @@ class ValidLinkableSpecResolver:
         entity_reference: EntityReference,
     ) -> Sequence[SemanticModel]:
         # May switch to non-cached implementation.
-        data_sources = self._entity_to_semantic_model[entity_reference.element_name]
+        semantic_models = self._entity_to_semantic_model[entity_reference.element_name]
         valid_semantic_models = []
-        for data_source in data_sources:
+        for semantic_model in semantic_models:
             if self._join_evaluator.is_valid_semantic_model_join(
                 left_semantic_model_reference=left_semantic_model_reference,
-                right_semantic_model_reference=data_source.reference,
+                right_semantic_model_reference=semantic_model.reference,
                 on_entity_reference=entity_reference,
             ):
-                valid_semantic_models.append(data_source)
+                valid_semantic_models.append(semantic_model)
         return valid_semantic_models
 
     def _get_linkable_element_set_for_measure(self, measure_reference: MeasureReference) -> LinkableElementSet:
@@ -512,18 +512,18 @@ class ValidLinkableSpecResolver:
 
         # Create 1-hop elements
         for entity in measure_semantic_model.entities:
-            data_sources = self._get_semantic_models_with_joinable_entity(
+            semantic_models = self._get_semantic_models_with_joinable_entity(
                 left_semantic_model_reference=measure_semantic_model.reference,
                 entity_reference=entity.reference,
             )
-            for data_source in data_sources:
-                if data_source.name == measure_semantic_model.name:
+            for semantic_model in semantic_models:
+                if semantic_model.name == measure_semantic_model.name:
                     continue
                 join_paths.append(
                     SemanticModelJoinPath(
                         path_elements=(
                             SemanticModelJoinPathElement(
-                                data_source=data_source, join_on_entity=entity.reference.element_name
+                                semantic_model=semantic_model, join_on_entity=entity.reference.element_name
                             ),
                         )
                     )
@@ -597,20 +597,20 @@ class ValidLinkableSpecResolver:
             if entity_name in set(x.join_on_entity for x in current_join_path.path_elements):
                 continue
 
-            data_sources_that_can_be_joined = self._get_semantic_models_with_joinable_entity(
+            semantic_models_that_can_be_joined = self._get_semantic_models_with_joinable_entity(
                 left_semantic_model_reference=last_semantic_model_in_path.reference,
                 entity_reference=entity.reference,
             )
-            for data_source in data_sources_that_can_be_joined:
+            for semantic_model in semantic_models_that_can_be_joined:
                 # Don't create cycles in the join path by repeating a data source in the path.
-                if data_source.name == measure_semantic_model.name or any(
-                    tuple(x.data_source.name == data_source.name for x in current_join_path.path_elements)
+                if semantic_model.name == measure_semantic_model.name or any(
+                    tuple(x.semantic_model.name == semantic_model.name for x in current_join_path.path_elements)
                 ):
                     continue
 
                 new_join_path = SemanticModelJoinPath(
                     path_elements=current_join_path.path_elements
-                    + (SemanticModelJoinPathElement(data_source=data_source, join_on_entity=entity_name),)
+                    + (SemanticModelJoinPathElement(semantic_model=semantic_model, join_on_entity=entity_name),)
                 )
                 new_join_paths.append(new_join_path)
 

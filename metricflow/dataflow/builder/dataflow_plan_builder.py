@@ -415,11 +415,11 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         """Ensures that the group of MeasureSpecs has the same non_additive_dimension_spec and agg_time_dimension"""
         if len(measure_specs) == 0:
             raise ValueError("Cannot build MeasureParametersForRecipe when given an empty sequence of measure_specs.")
-        data_sources = self._get_semantic_model_names_for_measures(measure_specs)
-        if len(data_sources) > 1:
+        semantic_models = self._get_semantic_model_names_for_measures(measure_specs)
+        if len(semantic_models) > 1:
             raise ValueError(
                 f"Cannot find common properties for measures {measure_specs} coming from multiple "
-                f"data sources: {data_sources}. This suggests the measure_specs were not correctly filtered."
+                f"data sources: {semantic_models}. This suggests the measure_specs were not correctly filtered."
             )
 
         agg_time_dimension = agg_time_dimension = self._semantic_model_semantics.get_agg_time_dimension_for_measure(
@@ -436,7 +436,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 raise ValueError(f"measure_specs {measure_specs} do not have the same agg_time_dimension.")
         return MeasureSpecProperties(
             measure_specs=measure_specs,
-            semantic_model_name=data_sources.pop(),
+            semantic_model_name=semantic_models.pop(),
             agg_time_dimension=agg_time_dimension,
             non_additive_dimension_spec=non_additive_dimension_spec,
         )
@@ -619,7 +619,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         aggregated set of measures.
         """
         output_nodes: List[BaseOutput[SqlDataSetT]] = []
-        data_sources_and_constraints_to_measures: DefaultDict[
+        semantic_models_and_constraints_to_measures: DefaultDict[
             tuple[str, Optional[SpecWhereClauseConstraint]], List[MetricInputMeasureSpec]
         ] = collections.defaultdict(list)
         for input_spec in metric_input_measure_specs:
@@ -632,13 +632,13 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             assert (
                 len(semantic_model_names) == 1
             ), f"Validation should enforce one data source per measure, but found {semantic_model_names} for {input_spec}!"
-            data_sources_and_constraints_to_measures[(semantic_model_names[0], input_spec.constraint)].append(
+            semantic_models_and_constraints_to_measures[(semantic_model_names[0], input_spec.constraint)].append(
                 input_spec
             )
 
-        for (data_source, measure_constraint), measures in data_sources_and_constraints_to_measures.items():
+        for (semantic_model, measure_constraint), measures in semantic_models_and_constraints_to_measures.items():
             logger.info(
-                f"Building aggregated measures for {data_source}. "
+                f"Building aggregated measures for {semantic_model}. "
                 f" Input measures: {measures} with constraints: {measure_constraint}"
             )
             if measure_constraint is None:
@@ -660,7 +660,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 if non_additive_spec is not None:
                     non_additive_message = f" with non-additive dimension spec: {non_additive_spec}"
 
-                logger.info(f"Building aggregated measures for {data_source}{non_additive_message}")
+                logger.info(f"Building aggregated measures for {semantic_model}{non_additive_message}")
                 input_specs = tuple(input_specs_by_measure_spec[measure_spec] for measure_spec in measure_specs)
                 output_nodes.append(
                     self._build_aggregated_measures_from_measure_source_node(

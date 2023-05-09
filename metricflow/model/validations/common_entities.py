@@ -19,22 +19,22 @@ class CommonEntitysRule(ModelValidationRule):
     """Checks that entities exist on more than one data source"""
 
     @staticmethod
-    def _map_semantic_model_entities(data_sources: List[SemanticModel]) -> Dict[EntityReference, Set[str]]:
-        """Generate mapping of entity names to the set of data_sources where it is defined"""
+    def _map_semantic_model_entities(semantic_models: List[SemanticModel]) -> Dict[EntityReference, Set[str]]:
+        """Generate mapping of entity names to the set of semantic_models where it is defined"""
         entities_to_semantic_models: Dict[EntityReference, Set[str]] = {}
-        for data_source in data_sources or []:
-            for entity in data_source.entities or []:
+        for semantic_model in semantic_models or []:
+            for entity in semantic_model.entities or []:
                 if entity.reference in entities_to_semantic_models:
-                    entities_to_semantic_models[entity.reference].add(data_source.name)
+                    entities_to_semantic_models[entity.reference].add(semantic_model.name)
                 else:
-                    entities_to_semantic_models[entity.reference] = {data_source.name}
+                    entities_to_semantic_models[entity.reference] = {semantic_model.name}
         return entities_to_semantic_models
 
     @staticmethod
     @validate_safely(whats_being_done="checking entity exists on more than one data source")
     def _check_entity(
         entity: Entity,
-        data_source: SemanticModel,
+        semantic_model: SemanticModel,
         entities_to_semantic_models: Dict[EntityReference, Set[str]],
     ) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
@@ -42,19 +42,19 @@ class CommonEntitysRule(ModelValidationRule):
         # then we warn the user that their entity will be unused in joins
         if (
             entity.reference in entities_to_semantic_models
-            and len(entities_to_semantic_models[entity.reference].difference({data_source.name})) == 0
+            and len(entities_to_semantic_models[entity.reference].difference({semantic_model.name})) == 0
         ):
             issues.append(
                 ValidationWarning(
                     context=SemanticModelElementContext(
-                        file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                        file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
                         semantic_model_element=SemanticModelElementReference(
-                            semantic_model_name=data_source.name, element_name=entity.name
+                            semantic_model_name=semantic_model.name, element_name=entity.name
                         ),
                         element_type=SemanticModelElementType.ENTITY,
                     ),
                     message=f"Entity `{entity.reference.element_name}` "
-                    f"only found in one data source `{data_source.name}` "
+                    f"only found in one data source `{semantic_model.name}` "
                     f"which means it will be unused in joins.",
                 )
             )
@@ -63,15 +63,15 @@ class CommonEntitysRule(ModelValidationRule):
     @staticmethod
     @validate_safely(whats_being_done="running model validation warning if entities are only one one data source")
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:
-        """Issues a warning for any entity that is associated with only one data_source"""
+        """Issues a warning for any entity that is associated with only one semantic_model"""
         issues = []
 
-        entities_to_semantic_models = CommonEntitysRule._map_semantic_model_entities(model.data_sources)
-        for data_source in model.data_sources or []:
-            for entity in data_source.entities or []:
+        entities_to_semantic_models = CommonEntitysRule._map_semantic_model_entities(model.semantic_models)
+        for semantic_model in model.semantic_models or []:
+            for entity in semantic_model.entities or []:
                 issues += CommonEntitysRule._check_entity(
                     entity=entity,
-                    data_source=data_source,
+                    semantic_model=semantic_model,
                     entities_to_semantic_models=entities_to_semantic_models,
                 )
 

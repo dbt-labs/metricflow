@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 
 VERSION_KEY = "mf_config_schema"
 METRIC_TYPE = "metric"
-DATA_SOURCE_TYPE = "data_source"
+DATA_SOURCE_TYPE = "semantic_model"
 DOCUMENT_TYPES = [METRIC_TYPE, DATA_SOURCE_TYPE]
 
 
@@ -198,7 +198,7 @@ def parse_yaml_files_to_model(
 
     Note: this function does not finalize the model
     """
-    data_sources = []
+    semantic_models = []
     metrics = []
     valid_object_classes = [semantic_model_class.__name__, metric_class.__name__]
     issues: List[ValidationIssue] = []
@@ -212,7 +212,7 @@ def parse_yaml_files_to_model(
         file_issues = parsing_result.issues
         for obj in parsing_result.elements:
             if isinstance(obj, semantic_model_class):
-                data_sources.append(obj)
+                semantic_models.append(obj)
             elif isinstance(obj, metric_class):
                 metrics.append(obj)
             else:
@@ -227,7 +227,7 @@ def parse_yaml_files_to_model(
 
     return ModelBuildResult(
         model=UserConfiguredModel(
-            data_sources=data_sources,
+            semantic_models=semantic_models,
             metrics=metrics,
         ),
         issues=ModelValidationResults.from_issues_sequence(issues),

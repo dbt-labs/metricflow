@@ -29,30 +29,30 @@ class NaturalEntityConfigurationRule(ModelValidationRule):
             "natural entities are used in the appropriate contexts"
         )
     )
-    def _validate_semantic_model_natural_entities(data_source: SemanticModel) -> List[ValidationIssue]:
+    def _validate_semantic_model_natural_entities(semantic_model: SemanticModel) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
         context = SemanticModelContext(
-            file_context=FileContext.from_metadata(metadata=data_source.metadata),
-            data_source=SemanticModelReference(semantic_model_name=data_source.name),
+            file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
+            semantic_model=SemanticModelReference(semantic_model_name=semantic_model.name),
         )
 
         natural_entity_names = set(
-            [entity.name for entity in data_source.entities if entity.type is EntityType.NATURAL]
+            [entity.name for entity in semantic_model.entities if entity.type is EntityType.NATURAL]
         )
         if len(natural_entity_names) > 1:
             error = ValidationError(
                 context=context,
                 message=f"Data sources can have at most one natural entity, but data source "
-                f"`{data_source.name}` has {len(natural_entity_names)} distinct natural entities set! "
+                f"`{semantic_model.name}` has {len(natural_entity_names)} distinct natural entities set! "
                 f"{natural_entity_names}.",
             )
             issues.append(error)
-        if natural_entity_names and not [dim for dim in data_source.dimensions if dim.validity_params]:
+        if natural_entity_names and not [dim for dim in semantic_model.dimensions if dim.validity_params]:
             error = ValidationError(
                 context=context,
                 message=f"The use of `natural` entities is currently supported only in conjunction with a validity "
                 f"window defined in the set of time dimensions associated with the data source. Data source "
-                f"`{data_source.name}` uses a natural entity ({natural_entity_names}) but does not define a "
+                f"`{semantic_model.name}` uses a natural entity ({natural_entity_names}) but does not define a "
                 f"validity window!",
             )
             issues.append(error)
@@ -64,8 +64,10 @@ class NaturalEntityConfigurationRule(ModelValidationRule):
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:
         """Validate entities marked as EntityType.NATURAL"""
         issues: List[ValidationIssue] = []
-        for data_source in model.data_sources:
-            issues += NaturalEntityConfigurationRule._validate_semantic_model_natural_entities(data_source=data_source)
+        for semantic_model in model.semantic_models:
+            issues += NaturalEntityConfigurationRule._validate_semantic_model_natural_entities(
+                semantic_model=semantic_model
+            )
 
         return issues
 
@@ -75,9 +77,9 @@ class OnePrimaryEntityPerSemanticModelRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking data source has only one primary entity")
-    def _only_one_primary_entity(data_source: SemanticModel) -> List[ValidationIssue]:
+    def _only_one_primary_entity(semantic_model: SemanticModel) -> List[ValidationIssue]:
         primary_entity_names: MutableSet[str] = set()
-        for entity in data_source.entities or []:
+        for entity in semantic_model.entities or []:
             if entity.type == EntityType.PRIMARY:
                 primary_entity_names.add(entity.reference.element_name)
 
@@ -85,11 +87,11 @@ class OnePrimaryEntityPerSemanticModelRule(ModelValidationRule):
             return [
                 ValidationFutureError(
                     context=SemanticModelContext(
-                        file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                        data_source=SemanticModelReference(semantic_model_name=data_source.name),
+                        file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
+                        semantic_model=SemanticModelReference(semantic_model_name=semantic_model.name),
                     ),
                     message=f"Data sources can have only one primary entity. The data source"
-                    f" `{data_source.name}` has {len(primary_entity_names)}: {', '.join(primary_entity_names)}",
+                    f" `{semantic_model.name}` has {len(primary_entity_names)}: {', '.join(primary_entity_names)}",
                     error_date=date(2022, 1, 12),  # Wed January 12th 2022
                 )
             ]
@@ -100,7 +102,7 @@ class OnePrimaryEntityPerSemanticModelRule(ModelValidationRule):
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
         issues = []
 
-        for data_source in model.data_sources:
-            issues += OnePrimaryEntityPerSemanticModelRule._only_one_primary_entity(data_source=data_source)
+        for semantic_model in model.semantic_models:
+            issues += OnePrimaryEntityPerSemanticModelRule._only_one_primary_entity(semantic_model=semantic_model)
 
         return issues

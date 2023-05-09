@@ -16,7 +16,7 @@ class NonEmptyRule(ModelValidationRule):
     @validate_safely(whats_being_done="checking that the model has data sources")
     def _check_model_has_semantic_models(model: UserConfiguredModel) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
-        if not model.data_sources:
+        if not model.semantic_models:
             issues.append(
                 ValidationError(
                     message="No data sources present in the model.",
@@ -31,8 +31,8 @@ class NonEmptyRule(ModelValidationRule):
 
         # If we are going to generate measure proxy metrics that is sufficient as well
         create_measure_proxy_metrics = False
-        for data_source in model.data_sources:
-            for measure in data_source.measures:
+        for semantic_model in model.semantic_models:
+            for measure in semantic_model.measures:
                 if measure.create_metric is True:
                     create_measure_proxy_metrics = True
                     break

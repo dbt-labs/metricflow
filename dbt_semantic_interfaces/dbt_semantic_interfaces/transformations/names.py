@@ -13,27 +13,27 @@ class LowerCaseNamesRule(ModelTransformRule):
     @staticmethod
     def transform_model(model: UserConfiguredModel) -> UserConfiguredModel:  # noqa: D
         LowerCaseNamesRule._lowercase_top_level_objects(model)
-        for data_source in model.data_sources:
-            LowerCaseNamesRule._lowercase_semantic_model_elements(data_source)
+        for semantic_model in model.semantic_models:
+            LowerCaseNamesRule._lowercase_semantic_model_elements(semantic_model)
 
         return model
 
     @staticmethod
-    def _lowercase_semantic_model_elements(data_source: SemanticModel) -> None:
+    def _lowercase_semantic_model_elements(semantic_model: SemanticModel) -> None:
         """Lowercases the names of data source elements."""
-        if data_source.measures:
-            for measure in data_source.measures:
+        if semantic_model.measures:
+            for measure in semantic_model.measures:
                 measure.name = measure.name.lower()
-        if data_source.entities:
-            for entity in data_source.entities:
+        if semantic_model.entities:
+            for entity in semantic_model.entities:
                 entity.name = entity.name.lower()
-        if data_source.dimensions:
-            for dimension in data_source.dimensions:
+        if semantic_model.dimensions:
+            for dimension in semantic_model.dimensions:
                 dimension.name = dimension.name.lower()
 
     @staticmethod
     def _lowercase_top_level_objects(model: UserConfiguredModel) -> None:
         """Lowercases the names of model objects"""
-        if model.data_sources:
-            for data_source in model.data_sources:
-                data_source.name = data_source.name.lower()
+        if model.semantic_models:
+            for semantic_model in model.semantic_models:
+                semantic_model.name = semantic_model.name.lower()

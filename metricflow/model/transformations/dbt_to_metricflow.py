@@ -22,7 +22,7 @@ from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 @dataclass
 class TransformedDbtMetric:  # noqa: D
-    data_source: SemanticModel
+    semantic_model: SemanticModel
     metric: Metric
 
 
@@ -253,12 +253,12 @@ class DbtManifestTransformer:
 
     def dbt_metric_to_metricflow_elements(self, dbt_metric: DbtMetric) -> TransformedDbtMetric:
         """Builds a MetricFlow data source and proxy metric for the given DbtMetric"""
-        data_source = self.build_semantic_model_for_metric(dbt_metric)
+        semantic_model = self.build_semantic_model_for_metric(dbt_metric)
         proxy_metric = self.build_proxy_metric(dbt_metric)
-        return TransformedDbtMetric(data_source=data_source, metric=proxy_metric)
+        return TransformedDbtMetric(semantic_model=semantic_model, metric=proxy_metric)
 
     @classmethod
-    def deduplicate_semantic_models(cls, data_sources: List[SemanticModel]) -> SemanticModel:
+    def deduplicate_semantic_models(cls, semantic_models: List[SemanticModel]) -> SemanticModel:
         """Attempts to deduplicate a list of data sources into a single data source
 
         Because each DbtMetric (which isn't `derived`) creates a data source,
@@ -270,8 +270,8 @@ class DbtManifestTransformer:
         attributes.
         """
 
-        if len(data_sources) == 1:
-            return data_sources[0]
+        if len(semantic_models) == 1:
+            return semantic_models[0]
 
         # collect the variations of data source properties
         measures: Set[Measure] = set()
@@ -281,22 +281,22 @@ class DbtManifestTransformer:
         descriptions: Set[str] = set()
         sql_tables: Set[str] = set()
         sql_queries: Set[str] = set()
-        for data_source in data_sources:
+        for semantic_model in semantic_models:
             # This is an atypical pattern but results in less work. The following
             # five lines are ternaries wherein the attribute is added to tracking
             # set for the attribute, but only if the attribute is defined for the
             # data source. The `else None` is required because python ternaries
             # require an `else` statement. Having the else be `None` is simply
             # saying nothing happens, i.e. the set is not modified.
-            names.add(data_source.name) if data_source.name else None
-            descriptions.add(data_source.description) if data_source.description else None
-            sql_tables.add(data_source.sql_table) if data_source.sql_table else None
-            sql_queries.add(data_source.sql_query) if data_source.sql_query else None
+            names.add(semantic_model.name) if semantic_model.name else None
+            descriptions.add(semantic_model.description) if semantic_model.description else None
+            sql_tables.add(semantic_model.sql_table) if semantic_model.sql_table else None
+            sql_queries.add(semantic_model.sql_query) if semantic_model.sql_query else None
 
             # ensure any unique sub elements get added to the set of sub elements
-            measures = measures.union(set(data_source.measures)) if data_source.measures else measures
-            entities = entities.union(set(data_source.entities)) if data_source.entities else entities
-            dimensions = dimensions.union(set(data_source.dimensions)) if data_source.dimensions else dimensions
+            measures = measures.union(set(semantic_model.measures)) if semantic_model.measures else measures
+            entities = entities.union(set(semantic_model.entities)) if semantic_model.entities else entities
+            dimensions = dimensions.union(set(semantic_model.dimensions)) if semantic_model.dimensions else dimensions
 
         assert len(names) == 1, "Cannot merge data sources, all data sources to merge must have same name"
         assert (
@@ -367,7 +367,7 @@ class DbtManifestTransformer:
             supports derived metrics, we'll need to add that functionality to
             handle dbt derived metrics -> metricflow derived metrics.
         """
-        data_sources_map: DefaultDict[str, List[SemanticModel]] = defaultdict(list)
+        semantic_models_map: DefaultDict[str, List[SemanticModel]] = defaultdict(list)
         metrics = []
         issues: List[ValidationIssue] = []
 
@@ -377,15 +377,17 @@ class DbtManifestTransformer:
                 continue
             else:
                 transformed_dbt_metric = self.dbt_metric_to_metricflow_elements(dbt_metric=dbt_metric)
-                data_sources_map[transformed_dbt_metric.data_source.name].append(transformed_dbt_metric.data_source)
+                semantic_models_map[transformed_dbt_metric.semantic_model.name].append(
+                    transformed_dbt_metric.semantic_model
+                )
                 metrics.append(transformed_dbt_metric.metric)
 
         # As it might be the case that we generated many of the same data source,
         # we need to merge / dedupe them
         deduped_semantic_models = []
-        for name, data_sources in data_sources_map.items():
+        for name, semantic_models in semantic_models_map.items():
             try:
-                deduped_semantic_models.append(self.deduplicate_semantic_models(data_sources))
+                deduped_semantic_models.append(self.deduplicate_semantic_models(semantic_models))
             except Exception as e:
                 issues.append(
                     ValidationError(
@@ -395,6 +397,6 @@ class DbtManifestTransformer:
                 )
 
         return ModelBuildResult(
-            model=UserConfiguredModel(data_sources=list(deduped_semantic_models), metrics=metrics),
+            model=UserConfiguredModel(semantic_models=list(deduped_semantic_models), metrics=metrics),
             issues=ModelValidationResults.from_issues_sequence(issues=issues),
         )

@@ -65,17 +65,17 @@ class ReservedKeywordsRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking that data source sub element names aren't reserved sql keywords")
-    def _validate_semantic_model_sub_elements(data_source: SemanticModel) -> List[ValidationIssue]:
+    def _validate_semantic_model_sub_elements(semantic_model: SemanticModel) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
 
-        for dimension in data_source.dimensions:
+        for dimension in semantic_model.dimensions:
             if dimension.name.upper() in RESERVED_KEYWORDS:
                 issues.append(
                     ValidationError(
                         context=SemanticModelElementContext(
-                            file_context=FileContext.from_metadata(data_source.metadata),
+                            file_context=FileContext.from_metadata(semantic_model.metadata),
                             semantic_model_element=SemanticModelElementReference(
-                                semantic_model_name=data_source.name, element_name=dimension.name
+                                semantic_model_name=semantic_model.name, element_name=dimension.name
                             ),
                             element_type=SemanticModelElementType.DIMENSION,
                         ),
@@ -83,7 +83,7 @@ class ReservedKeywordsRule(ModelValidationRule):
                     )
                 )
 
-        for entity in data_source.entities:
+        for entity in semantic_model.entities:
             msg = "'{name}' is an SQL reserved keyword, and thus cannot be used as an entity 'name'"
             names = [entity.name]
 
@@ -92,9 +92,9 @@ class ReservedKeywordsRule(ModelValidationRule):
                     issues.append(
                         ValidationError(
                             context=SemanticModelElementContext(
-                                file_context=FileContext.from_metadata(data_source.metadata),
+                                file_context=FileContext.from_metadata(semantic_model.metadata),
                                 semantic_model_element=SemanticModelElementReference(
-                                    semantic_model_name=data_source.name, element_name=entity.name
+                                    semantic_model_name=semantic_model.name, element_name=entity.name
                                 ),
                                 element_type=SemanticModelElementType.ENTITY,
                             ),
@@ -102,14 +102,14 @@ class ReservedKeywordsRule(ModelValidationRule):
                         )
                     )
 
-        for measure in data_source.measures:
+        for measure in semantic_model.measures:
             if measure.name.upper() in RESERVED_KEYWORDS:
                 issues.append(
                     ValidationError(
                         context=SemanticModelElementContext(
-                            file_context=FileContext.from_metadata(data_source.metadata),
+                            file_context=FileContext.from_metadata(semantic_model.metadata),
                             semantic_model_element=SemanticModelElementReference(
-                                semantic_model_name=data_source.name, element_name=measure.name
+                                semantic_model_name=semantic_model.name, element_name=measure.name
                             ),
                             element_type=SemanticModelElementType.MEASURE,
                         ),
@@ -120,15 +120,15 @@ class ReservedKeywordsRule(ModelValidationRule):
         return issues
 
     @classmethod
-    @validate_safely(whats_being_done="checking that data_source node_relations are not sql reserved keywords")
+    @validate_safely(whats_being_done="checking that semantic_model node_relations are not sql reserved keywords")
     def _validate_semantic_models(cls, model: UserConfiguredModel) -> List[ValidationIssue]:
         """Checks names of objects that are not nested."""
         issues: List[ValidationIssue] = []
         set_keywords = set(RESERVED_KEYWORDS)
 
-        for data_source in model.data_sources:
+        for semantic_model in model.semantic_models:
             set_sql_table_path_parts = set(
-                [part.upper() for part in data_source.node_relation.relation_name.split(".")]
+                [part.upper() for part in semantic_model.node_relation.relation_name.split(".")]
             )
             keyword_intersection = set_keywords.intersection(set_sql_table_path_parts)
 
@@ -136,13 +136,13 @@ class ReservedKeywordsRule(ModelValidationRule):
                 issues.append(
                     ValidationError(
                         context=SemanticModelContext(
-                            file_context=FileContext.from_metadata(data_source.metadata),
-                            data_source=data_source.reference,
+                            file_context=FileContext.from_metadata(semantic_model.metadata),
+                            semantic_model=semantic_model.reference,
                         ),
-                        message=f"'{data_source.node_relation.relation_name}' contains the SQL reserved keyword(s) {keyword_intersection}, and thus cannot be used for 'node_relation'.",
+                        message=f"'{semantic_model.node_relation.relation_name}' contains the SQL reserved keyword(s) {keyword_intersection}, and thus cannot be used for 'node_relation'.",
                     )
                 )
-            issues += cls._validate_semantic_model_sub_elements(data_source=data_source)
+            issues += cls._validate_semantic_model_sub_elements(semantic_model=semantic_model)
 
         return issues
 

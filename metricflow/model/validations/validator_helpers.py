@@ -107,11 +107,11 @@ class SemanticModelContext(BaseModel):
     """The context class for validation issues involving data sources"""
 
     file_context: FileContext
-    data_source: SemanticModelReference
+    semantic_model: SemanticModelReference
 
     def context_str(self) -> str:
         """Human readable stringified representation of the context"""
-        return f"with data source `{self.data_source.semantic_model_name}` {self.file_context.context_str()}"
+        return f"with data source `{self.semantic_model.semantic_model_name}` {self.file_context.context_str()}"
 
 
 class SemanticModelElementContext(BaseModel):

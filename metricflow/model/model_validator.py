@@ -5,7 +5,7 @@ from typing import List, Sequence
 
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.agg_time_dimension import AggregationTimeDimensionRule
-from metricflow.model.validations.data_sources import (
+from metricflow.model.validations.semantic_models import (
     SemanticModelTimeDimensionWarningsRule,
     SemanticModelValidityWindowRule,
 )

@@ -329,7 +329,7 @@ class SemanticModelToDataSetConverter:
             )
         return entity_instances, select_columns
 
-    def create_sql_source_data_set(self, data_source: SemanticModel) -> SemanticModelDataSet:
+    def create_sql_source_data_set(self, semantic_model: SemanticModel) -> SemanticModelDataSet:
         """Create an SQL source data set from a data source in the model."""
 
         # Gather all instances and columns from all data sources.
@@ -339,13 +339,13 @@ class SemanticModelToDataSetConverter:
         all_entity_instances: List[EntityInstance] = []
 
         all_select_columns: List[SqlSelectColumn] = []
-        from_source_alias = IdGeneratorRegistry.for_class(self.__class__).create_id(f"{data_source.name}_src")
+        from_source_alias = IdGeneratorRegistry.for_class(self.__class__).create_id(f"{semantic_model.name}_src")
 
         # Handle measures
-        if len(data_source.measures) > 0:
+        if len(semantic_model.measures) > 0:
             measure_instances, select_columns = self._convert_measures(
-                semantic_model_name=data_source.name,
-                measures=data_source.measures,
+                semantic_model_name=semantic_model.name,
+                measures=semantic_model.measures,
                 table_alias=from_source_alias,
             )
             all_measure_instances.extend(measure_instances)
@@ -356,15 +356,15 @@ class SemanticModelToDataSetConverter:
         # the dimensions "country" and "user_id__country" both mean the same thing. To make matching easier, create both
         # instances in the instance set. We'll create a different instance for each "possible_entity_links".
         possible_entity_links: List[Tuple[EntityReference, ...]] = [()]
-        for entity in data_source.entities:
+        for entity in semantic_model.entities:
             if entity.is_linkable_entity_type:
                 possible_entity_links.append((entity.reference,))
 
         # Handle dimensions
         conversion_results = [
             self._convert_dimensions(
-                semantic_model_name=data_source.name,
-                dimensions=data_source.dimensions,
+                semantic_model_name=semantic_model.name,
+                dimensions=semantic_model.dimensions,
                 entity_links=entity_links,
                 table_alias=from_source_alias,
             )
@@ -398,8 +398,8 @@ class SemanticModelToDataSetConverter:
         # Handle entities
         for entity_links in possible_entity_links:
             entity_instances, select_columns = self._create_entity_instances(
-                semantic_model_name=data_source.name,
-                entities=data_source.entities,
+                semantic_model_name=semantic_model.name,
+                entities=semantic_model.entities,
                 entity_links=entity_links,
                 table_alias=from_source_alias,
             )
@@ -408,10 +408,10 @@ class SemanticModelToDataSetConverter:
 
         # Generate the "from" clause depending on whether it's an SQL query or an SQL table.
         from_source: Optional[SqlQueryPlanNode] = None
-        from_source = SqlTableFromClauseNode(sql_table=SqlTable.from_string(data_source.node_relation.relation_name))
+        from_source = SqlTableFromClauseNode(sql_table=SqlTable.from_string(semantic_model.node_relation.relation_name))
 
         select_statement_node = SqlSelectStatementNode(
-            description=f"Read Elements From Data Source '{data_source.name}'",
+            description=f"Read Elements From Data Source '{semantic_model.name}'",
             select_columns=tuple(all_select_columns),
             from_source=from_source,
             from_source_alias=from_source_alias,
@@ -422,7 +422,7 @@ class SemanticModelToDataSetConverter:
         )
 
         return SemanticModelDataSet(
-            semantic_model_reference=SemanticModelReference(semantic_model_name=data_source.name),
+            semantic_model_reference=SemanticModelReference(semantic_model_name=semantic_model.name),
             instance_set=InstanceSet(
                 measure_instances=tuple(all_measure_instances),
                 dimension_instances=tuple(all_dimension_instances),

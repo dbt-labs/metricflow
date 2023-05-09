@@ -12,11 +12,11 @@ class BooleanMeasureAggregationRule(ModelTransformRule):
 
     @staticmethod
     def transform_model(model: UserConfiguredModel) -> UserConfiguredModel:  # noqa: D
-        for data_source in model.data_sources:
-            for measure in data_source.measures:
+        for semantic_model in model.semantic_models:
+            for measure in semantic_model.measures:
                 if measure.agg == AggregationType.BOOLEAN:
                     logger.warning(
-                        f"In data source {data_source.name}, measure `{measure.reference.element_name}` "
+                        f"In data source {semantic_model.name}, measure `{measure.reference.element_name}` "
                         f"is configured as aggregation type `boolean`, which has been deprecated. Please use "
                         f"`sum_boolean` instead."
                     )

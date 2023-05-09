@@ -91,50 +91,50 @@ class UniqueAndValidNameRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking data source sub element names are unique")
-    def _validate_semantic_model_elements(data_source: SemanticModel) -> List[ValidationIssue]:
+    def _validate_semantic_model_elements(semantic_model: SemanticModel) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
         element_info_tuples: List[Tuple[ElementReference, str, ValidationContext]] = []
 
-        if data_source.measures:
-            for measure in data_source.measures:
+        if semantic_model.measures:
+            for measure in semantic_model.measures:
                 element_info_tuples.append(
                     (
                         measure.reference,
                         "measure",
                         SemanticModelElementContext(
-                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                            file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
                             semantic_model_element=SemanticModelElementReference(
-                                semantic_model_name=data_source.name, element_name=measure.name
+                                semantic_model_name=semantic_model.name, element_name=measure.name
                             ),
                             element_type=SemanticModelElementType.MEASURE,
                         ),
                     )
                 )
-        if data_source.entities:
-            for entity in data_source.entities:
+        if semantic_model.entities:
+            for entity in semantic_model.entities:
                 element_info_tuples.append(
                     (
                         entity.reference,
                         "entity",
                         SemanticModelElementContext(
-                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                            file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
                             semantic_model_element=SemanticModelElementReference(
-                                semantic_model_name=data_source.name, element_name=entity.name
+                                semantic_model_name=semantic_model.name, element_name=entity.name
                             ),
                             element_type=SemanticModelElementType.ENTITY,
                         ),
                     )
                 )
-        if data_source.dimensions:
-            for dimension in data_source.dimensions:
+        if semantic_model.dimensions:
+            for dimension in semantic_model.dimensions:
                 element_info_tuples.append(
                     (
                         dimension.reference,
                         "dimension",
                         SemanticModelElementContext(
-                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                            file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
                             semantic_model_element=SemanticModelElementReference(
-                                semantic_model_name=data_source.name, element_name=dimension.name
+                                semantic_model_name=semantic_model.name, element_name=dimension.name
                             ),
                             element_type=SemanticModelElementType.DIMENSION,
                         ),
@@ -147,7 +147,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
                 issues.append(
                     ValidationError(
                         context=context,
-                        message=f"In data source `{data_source.name}`, can't use name `{name.element_name}` for a "
+                        message=f"In data source `{semantic_model.name}`, can't use name `{name.element_name}` for a "
                         f"{_type} when it was already used for a {name_to_type[name]}",
                     )
                 )
@@ -164,15 +164,15 @@ class UniqueAndValidNameRule(ModelValidationRule):
     def _validate_top_level_objects(model: UserConfiguredModel) -> List[ValidationIssue]:
         """Checks names of objects that are not nested."""
         object_info_tuples = []
-        if model.data_sources:
-            for data_source in model.data_sources:
+        if model.semantic_models:
+            for semantic_model in model.semantic_models:
                 object_info_tuples.append(
                     (
-                        data_source.name,
+                        semantic_model.name,
                         "data source",
                         SemanticModelContext(
-                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source=SemanticModelReference(semantic_model_name=data_source.name),
+                            file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
+                            semantic_model=SemanticModelReference(semantic_model_name=semantic_model.name),
                         ),
                     )
                 )
@@ -220,7 +220,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
         issues = []
         issues += UniqueAndValidNameRule._validate_top_level_objects(model=model)
 
-        for data_source in model.data_sources:
-            issues += UniqueAndValidNameRule._validate_semantic_model_elements(data_source=data_source)
+        for semantic_model in model.semantic_models:
+            issues += UniqueAndValidNameRule._validate_semantic_model_elements(semantic_model=semantic_model)
 
         return issues

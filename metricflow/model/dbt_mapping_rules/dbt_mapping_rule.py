@@ -16,7 +16,7 @@ TransformedObjectsValueType: TypeAlias = Any  # type: ignore[misc]
 class MappedObjects:
     """Model elements, and sub elements, mapped by element name path"""
 
-    data_sources: DefaultDict[str, Dict[str, TransformedObjectsValueType]] = field(
+    semantic_models: DefaultDict[str, Dict[str, TransformedObjectsValueType]] = field(
         default_factory=lambda: defaultdict(dict)
     )
     metrics: DefaultDict[str, Dict[str, TransformedObjectsValueType]] = field(default_factory=lambda: defaultdict(dict))

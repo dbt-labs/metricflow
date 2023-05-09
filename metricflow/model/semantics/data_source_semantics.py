@@ -56,8 +56,8 @@ class SemanticModelSemantics(SemanticModelSemanticsAccessor):
         ] = {}
 
         self._semantic_model_reference_to_semantic_model: Dict[SemanticModelReference, SemanticModel] = {}
-        for data_source in self._model.data_sources:
-            self._add_semantic_model(data_source)
+        for semantic_model in self._model.semantic_models:
+            self._add_semantic_model(semantic_model)
 
     def get_dimension_references(self) -> Sequence[DimensionReference]:  # noqa: D
         return tuple(self._dimension_index.keys())
@@ -121,11 +121,11 @@ class SemanticModelSemantics(SemanticModelSemanticsAccessor):
         return self._measure_agg_time_dimension[measure_reference]
 
     def get_entity_in_semantic_model(self, ref: SemanticModelElementReference) -> Optional[Entity]:  # Noqa: d
-        data_source = self.get_by_reference(ref.semantic_model_reference)
-        if not data_source:
+        semantic_model = self.get_by_reference(ref.semantic_model_reference)
+        if not semantic_model:
             return None
 
-        for entity in data_source.entities:
+        for entity in semantic_model.entities:
             if entity.reference.element_name == ref.element_name:
                 return entity
 
@@ -134,14 +134,14 @@ class SemanticModelSemantics(SemanticModelSemanticsAccessor):
     def get_by_reference(self, semantic_model_reference: SemanticModelReference) -> Optional[SemanticModel]:  # noqa: D
         return self._semantic_model_reference_to_semantic_model.get(semantic_model_reference)
 
-    def _add_semantic_model(self, data_source: SemanticModel) -> None:
+    def _add_semantic_model(self, semantic_model: SemanticModel) -> None:
         """Add data source semantic information, validating consistency with existing data sources."""
         errors = []
 
-        if data_source.reference in self._semantic_model_reference_to_semantic_model:
-            errors.append(f"Data source {data_source.reference} already added.")
+        if semantic_model.reference in self._semantic_model_reference_to_semantic_model:
+            errors.append(f"Data source {semantic_model.reference} already added.")
 
-        for measure in data_source.measures:
+        for measure in semantic_model.measures:
             if measure.reference in self._measure_aggs and self._measure_aggs[measure.reference] != measure.agg:
                 errors.append(
                     f"Conflicting aggregation (agg) for measure {measure.reference}. Currently registered as "
@@ -149,17 +149,17 @@ class SemanticModelSemantics(SemanticModelSemanticsAccessor):
                 )
 
         if len(errors) > 0:
-            raise InvalidSemanticModelError(f"Error adding {data_source.reference}. Got errors: {errors}")
+            raise InvalidSemanticModelError(f"Error adding {semantic_model.reference}. Got errors: {errors}")
 
-        self._semantic_model_to_aggregation_time_dimensions[data_source.reference] = ElementGrouper[
+        self._semantic_model_to_aggregation_time_dimensions[semantic_model.reference] = ElementGrouper[
             TimeDimensionReference, MeasureSpec
         ]()
 
-        for measure in data_source.measures:
+        for measure in semantic_model.measures:
             self._measure_aggs[measure.reference] = measure.agg
-            self._measure_index[measure.reference].append(data_source)
+            self._measure_index[measure.reference].append(semantic_model)
             agg_time_dimension = measure.checked_agg_time_dimension
-            self._semantic_model_to_aggregation_time_dimensions[data_source.reference].add_value(
+            self._semantic_model_to_aggregation_time_dimensions[semantic_model.reference].add_value(
                 key=agg_time_dimension,
                 value=MeasureConverter.convert_to_measure_spec(measure=measure),
             )
@@ -171,15 +171,15 @@ class SemanticModelSemantics(SemanticModelSemanticsAccessor):
                     window_groupings=tuple(measure.non_additive_dimension.window_groupings),
                 )
                 self._measure_non_additive_dimension_specs[measure.reference] = non_additive_dimension_spec
-        for dim in data_source.dimensions:
-            self._linkable_reference_index[dim.reference].append(data_source)
-            self._dimension_index[dim.reference].append(data_source)
-        for entity in data_source.entities:
+        for dim in semantic_model.dimensions:
+            self._linkable_reference_index[dim.reference].append(semantic_model)
+            self._dimension_index[dim.reference].append(semantic_model)
+        for entity in semantic_model.entities:
             self._entity_ref_to_entity[entity.reference] = entity.name
-            self._entity_index[entity.name].append(data_source)
-            self._linkable_reference_index[entity.reference].append(data_source)
+            self._entity_index[entity.name].append(semantic_model)
+            self._linkable_reference_index[entity.reference].append(semantic_model)
 
-        self._semantic_model_reference_to_semantic_model[data_source.reference] = data_source
+        self._semantic_model_reference_to_semantic_model[semantic_model.reference] = semantic_model
 
     @property
     def semantic_model_references(self) -> Sequence[SemanticModelReference]:  # noqa: D

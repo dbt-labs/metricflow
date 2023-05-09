@@ -114,18 +114,18 @@ class DbtConverter:
 
         # Move dimensions, entities, and measures on to their respective data sources
         for semantic_model_name, dimensions_map in copied_objects.dimensions.items():
-            copied_objects.data_sources[semantic_model_name]["dimensions"] = list(dimensions_map.values())
+            copied_objects.semantic_models[semantic_model_name]["dimensions"] = list(dimensions_map.values())
         for semantic_model_name, entities_map in copied_objects.entities.items():
-            copied_objects.data_sources[semantic_model_name]["entities"] = list(entities_map.values())
+            copied_objects.semantic_models[semantic_model_name]["entities"] = list(entities_map.values())
         for semantic_model_name, measure_map in copied_objects.measures.items():
-            copied_objects.data_sources[semantic_model_name]["measures"] = list(measure_map.values())
+            copied_objects.semantic_models[semantic_model_name]["measures"] = list(measure_map.values())
 
         issues: List[ValidationIssue] = []
 
-        data_sources: List[Type[SemanticModel]] = []
-        for semantic_model_dict in copied_objects.data_sources.values():
+        semantic_models: List[Type[SemanticModel]] = []
+        for semantic_model_dict in copied_objects.semantic_models.values():
             try:
-                data_sources.append(self.semantic_model_class.parse_obj(semantic_model_dict))
+                semantic_models.append(self.semantic_model_class.parse_obj(semantic_model_dict))
             except Exception as e:
                 issues.append(
                     ValidationError(
@@ -147,7 +147,7 @@ class DbtConverter:
                 )
 
         return ModelBuildResult(
-            model=UserConfiguredModel(data_sources=data_sources, metrics=metrics),
+            model=UserConfiguredModel(semantic_models=semantic_models, metrics=metrics),
             issues=ModelValidationResults.from_issues_sequence(issues=issues),
         )
 
@@ -157,7 +157,7 @@ class DbtConverter:
 
         if mapping_result.validation_results.has_blocking_issues:
             return ModelBuildResult(
-                model=UserConfiguredModel(data_sources=[], metrics=[]), issues=mapping_result.validation_results
+                model=UserConfiguredModel(semantic_models=[], metrics=[]), issues=mapping_result.validation_results
             )
 
         build_result = self._build_metricflow_model(mapped_objects=mapping_result.mapped_objects)

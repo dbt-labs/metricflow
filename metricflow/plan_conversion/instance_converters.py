@@ -281,11 +281,11 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
         self, semantic_model_reference: SemanticModelReference
     ) -> Optional[Tuple[_DimensionValidityParams, _DimensionValidityParams]]:
         """Returns a 2-tuple (start, end) of validity window dimensions info, if any exist in the data source"""
-        data_source = self._semantic_model_semantics.get_by_reference(semantic_model_reference)
-        assert data_source, f"Could not find data source {semantic_model_reference} after data set conversion!"
+        semantic_model = self._semantic_model_semantics.get_by_reference(semantic_model_reference)
+        assert semantic_model, f"Could not find data source {semantic_model_reference} after data set conversion!"
 
-        start_dim = data_source.validity_start_dimension
-        end_dim = data_source.validity_end_dimension
+        start_dim = semantic_model.validity_start_dimension
+        end_dim = semantic_model.validity_end_dimension
 
         # We do this instead of relying on has_validity_dimensions because this also does type refinement
         if not start_dim or not end_dim:

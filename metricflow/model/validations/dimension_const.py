@@ -31,16 +31,16 @@ class DimensionConsistencyRule(ModelValidationRule):
         time_dims_to_granularity: Dict[DimensionReference, TimeGranularity] = {}
         issues: List[ValidationIssue] = []
 
-        for data_source in model.data_sources:
+        for semantic_model in model.semantic_models:
             issues += DimensionConsistencyRule._validate_semantic_model(
-                data_source=data_source, dimension_to_invariant=dimension_to_invariant, update_invariant_dict=True
+                semantic_model=semantic_model, dimension_to_invariant=dimension_to_invariant, update_invariant_dict=True
             )
 
-            for dimension in data_source.dimensions:
+            for dimension in semantic_model.dimensions:
                 issues += DimensionConsistencyRule._validate_dimension(
                     dimension=dimension,
                     time_dims_to_granularity=time_dims_to_granularity,
-                    data_source=data_source,
+                    semantic_model=semantic_model,
                 )
         return issues
 
@@ -52,21 +52,21 @@ class DimensionConsistencyRule(ModelValidationRule):
     def _validate_dimension(
         dimension: Dimension,
         time_dims_to_granularity: Dict[DimensionReference, TimeGranularity],
-        data_source: SemanticModel,
+        semantic_model: SemanticModel,
     ) -> List[ValidationIssue]:
         """Checks that time dimensions of the same name that aren't primary have the same time granularity specifications
 
         Args:
             dimension: the dimension to check
             time_dims_to_granularity: a dict from the dimension to the time granularity it should have
-            data_source: the associated data source. Used for generated issue messages
+            semantic_model: the associated data source. Used for generated issue messages
         Throws: MdoValidationError if there is an inconsistent dimension in the data source.
         """
         issues: List[ValidationIssue] = []
         context = SemanticModelElementContext(
-            file_context=FileContext.from_metadata(metadata=data_source.metadata),
+            file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
             semantic_model_element=SemanticModelElementReference(
-                semantic_model_name=data_source.name, element_name=dimension.name
+                semantic_model_name=semantic_model.name, element_name=dimension.name
             ),
             element_type=SemanticModelElementType.DIMENSION,
         )
@@ -87,7 +87,7 @@ class DimensionConsistencyRule(ModelValidationRule):
                             context=context,
                             message=f"Time granularity must be the same for time dimensions with the same name. "
                             f"Problematic dimension: {dimension.name} in data source with name: "
-                            f"`{data_source.name}`. Expected granularity is {expected_granularity.name}.",
+                            f"`{semantic_model.name}`. Expected granularity is {expected_granularity.name}.",
                         )
                     )
 
@@ -98,21 +98,21 @@ class DimensionConsistencyRule(ModelValidationRule):
         whats_being_done="checking that the data source has dimensions consistent with the given invariants"
     )
     def _validate_semantic_model(
-        data_source: SemanticModel,
+        semantic_model: SemanticModel,
         dimension_to_invariant: Dict[DimensionReference, DimensionInvariants],
         update_invariant_dict: bool,
     ) -> List[ValidationIssue]:
         """Checks that the given data source has dimensions consistent with the given invariants.
 
         Args:
-            data_source: the data source to check
+            semantic_model: the data source to check
             dimension_to_invariant: a dict from the dimension name to the properties it should have
             update_invariant_dict: whether to insert an entry into the dict if the given dimension name doesn't exist.
         Throws: MdoValidationError if there is an inconsistent dimension in the data source.
         """
         issues: List[ValidationIssue] = []
 
-        for dimension in data_source.dimensions:
+        for dimension in semantic_model.dimensions:
             dimension_invariant = dimension_to_invariant.get(dimension.reference)
 
             if dimension_invariant is None:
@@ -128,9 +128,9 @@ class DimensionConsistencyRule(ModelValidationRule):
             is_partition = dimension.is_partition or False
 
             context = SemanticModelElementContext(
-                file_context=FileContext.from_metadata(metadata=data_source.metadata),
+                file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
                 semantic_model_element=SemanticModelElementReference(
-                    semantic_model_name=data_source.name, element_name=dimension.name
+                    semantic_model_name=semantic_model.name, element_name=dimension.name
                 ),
                 element_type=SemanticModelElementType.DIMENSION,
             )
@@ -139,7 +139,7 @@ class DimensionConsistencyRule(ModelValidationRule):
                 issues.append(
                     ValidationError(
                         context=context,
-                        message=f"In data source `{data_source.name}`, type conflict for dimension `{dimension.name}` "
+                        message=f"In data source `{semantic_model.name}`, type conflict for dimension `{dimension.name}` "
                         f"- already in model as type `{dimension_invariant.type}` but got `{dimension.type}`",
                     )
                 )
@@ -147,7 +147,7 @@ class DimensionConsistencyRule(ModelValidationRule):
                 issues.append(
                     ValidationError(
                         context=context,
-                        message=f"In data source `{data_source.name}, conflicting is_partition attribute for dimension "
+                        message=f"In data source `{semantic_model.name}, conflicting is_partition attribute for dimension "
                         f"`{dimension.reference}` - already in model"
                         f" with is_partition as `{dimension_invariant.is_partition}` but got "
                         f"`{is_partition}``",
