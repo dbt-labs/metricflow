@@ -1,8 +1,6 @@
 data_source:
   name: countries
   description: Regions mapped to countries.
-  owners:
-    - support@transformdata.io
   identifiers:
     - name: country
       type: primary

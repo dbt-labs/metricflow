@@ -1,8 +1,6 @@
 data_source:
   name: customers
   description: Location and description of all customers.
-  owners:
-    - support@transformdata.io
   identifiers:
     - name: customer
       type: primary
