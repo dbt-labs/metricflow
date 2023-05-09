@@ -254,7 +254,7 @@ def test_case(
             limit=case.limit,
             time_constraint_start=parser.parse(case.time_constraint[0]) if case.time_constraint else None,
             time_constraint_end=parser.parse(case.time_constraint[1]) if case.time_constraint else None,
-            where_constraint=jinja2.Template(case.where_constraint, undefined=jinja2.StrictUndefined,).render(
+            where_constraint=jinja2.Template(case.where_filter, undefined=jinja2.StrictUndefined,).render(
                 source_schema=mf_test_session_state.mf_source_schema,
                 render_time_constraint=check_query_helpers.render_time_constraint,
                 TimeGranularity=TimeGranularity,
@@ -267,7 +267,7 @@ def test_case(
                 render_entity_template=check_query_helpers.render_entity_template,
                 render_time_dimension_template=check_query_helpers.render_time_dimension_template,
             )
-            if case.where_constraint
+            if case.where_filter
             else None,
             order_by_names=case.order_bys,
         )
