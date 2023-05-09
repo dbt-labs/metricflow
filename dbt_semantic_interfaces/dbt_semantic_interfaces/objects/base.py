@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import os
 from abc import ABC, abstractmethod
-from typing import Any, Callable, ClassVar, Generic, Iterator, TypeVar, Protocol
+from typing import Any, Callable, ClassVar, Generic, Iterator, TypeVar
 
 from pydantic import BaseModel, root_validator
 
