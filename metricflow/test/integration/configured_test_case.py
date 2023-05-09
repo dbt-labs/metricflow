@@ -63,7 +63,7 @@ class ConfiguredIntegrationTestCase(FrozenBaseModel):
     check_order: bool = False
     allow_empty: bool = False
     time_constraint: Optional[Tuple[str, str]] = None
-    where_constraint: Optional[str] = None
+    where_filter: Optional[str] = None
     limit: Optional[int] = None
     description: Optional[str] = None
 

@@ -61,7 +61,7 @@ def metric_with_guaranteed_meta(
     name: str,
     type: MetricType,
     type_params: MetricTypeParams,
-    constraint: Optional[WhereFilter] = None,
+    where_filter: Optional[WhereFilter] = None,
     metadata: Metadata = default_meta(),
     description: str = "adhoc metric",
 ) -> Metric:
@@ -72,7 +72,7 @@ def metric_with_guaranteed_meta(
         description=description,
         type=type,
         type_params=type_params,
-        filter=constraint,
+        filter=where_filter,
         metadata=metadata,
     )
 
