@@ -1,8 +1,6 @@
 semantic_model:
   name: customers
   description: Location and description of all customers.
-  owners:
-    - support@transformdata.io
   entities:
     - name: customer
       type: primary
