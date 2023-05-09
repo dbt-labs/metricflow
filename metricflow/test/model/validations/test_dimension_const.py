@@ -1,6 +1,6 @@
 import pytest
 
-from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
+from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from metricflow.model.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.data_source import Mutability, MutabilityType, DataSource
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams

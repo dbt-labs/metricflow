@@ -10,7 +10,7 @@ from typing import List, TypeVar, Generic, Optional, Sequence, Tuple, Union, Typ
 
 import jinja2
 
-from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
+from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.references import TimeDimensionReference
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dag.id_generation import (

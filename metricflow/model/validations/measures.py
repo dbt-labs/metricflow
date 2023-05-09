@@ -3,7 +3,7 @@ from typing import DefaultDict, Dict, List, Set
 
 from more_itertools import bucket
 
-from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
+from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.metric import Metric
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel

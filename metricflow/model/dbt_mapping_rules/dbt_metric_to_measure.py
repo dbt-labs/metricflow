@@ -2,7 +2,7 @@ import traceback
 from typing import Dict, List, Tuple
 
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode
-from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
+from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
     DbtMappingRule,
     MappedObjects,

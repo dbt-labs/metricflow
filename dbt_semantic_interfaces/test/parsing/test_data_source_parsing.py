@@ -1,9 +1,9 @@
 import textwrap
 
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
-from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
+from dbt_semantic_interfaces.objects.common import YamlConfigFile
 from dbt_semantic_interfaces.objects.data_source import DataSourceOrigin, MutabilityType
-from dbt_semantic_interfaces.objects.elements.entity import EntityType
+from dbt_semantic_interfaces.objects.elements.identifier import IdentifierType
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_model
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
@@ -142,6 +142,7 @@ def test_data_source_identifier_parsing() -> None:
             - name: example_identifier
               type: primary
               role: test_role
+              entity: other_identifier
               expr: example_id
         """
     )
@@ -154,8 +155,9 @@ def test_data_source_identifier_parsing() -> None:
     assert len(data_source.identifiers) == 1
     identifier = data_source.identifiers[0]
     assert identifier.name == "example_identifier"
-    assert identifier.type is EntityType.PRIMARY
+    assert identifier.type is IdentifierType.PRIMARY
     assert identifier.role == "test_role"
+    assert identifier.entity == "other_identifier"
     assert identifier.expr == "example_id"
 
 
@@ -193,6 +195,97 @@ def test_data_source_identifier_metadata_parsing() -> None:
       """
     )
     assert identifier.metadata.file_slice.content == expected_metadata_content
+
+
+def test_data_source_identifier_default_entity_parsing() -> None:
+    """Test for parsing an identifier with no entity specified out of a data source specification"""
+    yaml_contents = textwrap.dedent(
+        """\
+        data_source:
+          name: entity_default_test
+          mutability:
+            type: immutable
+          sql_table: some_schema.source_table
+          identifiers:
+            - name: example_default_entity_identifier
+              type: primary
+        """
+    )
+    file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+
+    build_result = parse_yaml_files_to_model(files=[file])
+
+    assert len(build_result.model.data_sources) == 1
+    data_source = build_result.model.data_sources[0]
+    assert len(data_source.identifiers) == 1
+    identifier = data_source.identifiers[0]
+    assert identifier.entity == "example_default_entity_identifier"
+
+
+def test_data_source_composite_sub_identifier_ref_parsing() -> None:
+    """Test for parsing a ref-based composite sub-identifier out of a data source specification"""
+    yaml_contents = textwrap.dedent(
+        """\
+        data_source:
+          name: composite_sub_identifier_ref_test
+          mutability:
+            type: immutable
+          sql_table: some_schema.source_table
+          identifiers:
+            - name: example_identifier
+              type: primary
+              identifiers:
+                - name: composite_ref_identifier
+                  ref: other_identifier
+        """
+    )
+    file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+
+    build_result = parse_yaml_files_to_model(files=[file])
+
+    assert len(build_result.model.data_sources) == 1
+    data_source = build_result.model.data_sources[0]
+    assert len(data_source.identifiers) == 1
+    identifier = data_source.identifiers[0]
+    assert len(identifier.identifiers) == 1
+
+    ref_sub_identifier = identifier.identifiers[0]
+    assert ref_sub_identifier.name == "composite_ref_identifier"
+    assert ref_sub_identifier.ref == "other_identifier"
+    assert ref_sub_identifier.expr is None
+
+
+def test_data_source_composite_sub_identifier_expr_parsing() -> None:
+    """Test for parsing an expr-based composite sub-identifier out of a data source specification"""
+    yaml_contents = textwrap.dedent(
+        """\
+        data_source:
+          name: composite_sub_identifier_expr_test
+          mutability:
+            type: immutable
+          sql_table: some_schema.source_table
+          identifiers:
+            - name: example_identifier
+              type: primary
+              identifiers:
+                - name: composite_expr_identifier
+                  expr: CAST(expr_identifier AS BIGINT)
+        """
+    )
+    file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+
+    build_result = parse_yaml_files_to_model(files=[file])
+
+    assert len(build_result.model.data_sources) == 1
+    data_source = build_result.model.data_sources[0]
+    assert len(data_source.identifiers) == 1
+    identifier = data_source.identifiers[0]
+    assert len(identifier.identifiers) == 1
+
+    expr_sub_identifier = identifier.identifiers[0]
+    assert expr_sub_identifier.name == "composite_expr_identifier"
+    assert expr_sub_identifier.expr == "CAST(expr_identifier AS BIGINT)"
+    assert expr_sub_identifier.ref is None
 
 
 def test_data_source_measure_parsing() -> None:

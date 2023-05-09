@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import List, Optional, Protocol
-from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
+from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 
 
 class NonAdditiveDimensionParameters(Protocol):

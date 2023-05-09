@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from enum import Enum
 
-from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
+from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 
 
