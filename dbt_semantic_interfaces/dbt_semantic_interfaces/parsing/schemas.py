@@ -190,6 +190,7 @@ dimension_schema = {
             "type": "string",
             "pattern": TRANSFORM_OBJECT_NAME_PATTERN,
         },
+        "description": {"type": "string"},
         "type": {"enum": dimension_type_values},
         "is_partition": {"type": "boolean"},
         "expr": {"type": ["string", "boolean"]},
