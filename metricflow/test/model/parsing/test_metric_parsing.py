@@ -41,7 +41,7 @@ def test_legacy_metric_input_measure_object_parsing() -> None:
           type_params:
             measure:
               name: legacy_measure_from_object
-              constraint: "{{ dimension('some_bool') }}"
+              filter: "{{ dimension('some_bool') }}"
         """
     )
     file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
@@ -124,7 +124,7 @@ def test_ratio_metric_input_measure_object_parsing() -> None:
           type_params:
             numerator:
               name: numerator_measure_from_object
-              constraint: "some_number > 5"
+              filter: "some_number > 5"
             denominator:
               name: denominator_measure_from_object
         """
@@ -181,7 +181,7 @@ def test_expr_metric_input_measure_object_parsing() -> None:
           type_params:
             measures:
               - name: measure_one_from_object
-                constraint: some_bool
+                filter: some_bool
               - name: measure_two_from_object
         """
     )
@@ -331,7 +331,7 @@ def test_constraint_metric_parsing() -> None:
           type_params:
             measures:
               - input_measure
-          constraint: "{{ dimension('some_dimension') }} IN ('value1', 'value2')"
+          filter: "{{ dimension('some_dimension') }} IN ('value1', 'value2')"
         """
     )
     file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
@@ -358,7 +358,7 @@ def test_derived_metric_input_parsing() -> None:
               - name: input_metric
               - name: input_metric
                 alias: constrained_input_metric
-                constraint: input_metric < 10
+                filter: input_metric < 10
         """
     )
     file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)

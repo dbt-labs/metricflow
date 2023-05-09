@@ -145,7 +145,7 @@ class CheckQueryHelpers:
 
          "{{ dimension('country_latest', entity_path=['listing'] }}"
 
-         This is needed as the where_constraint field in the definition files are rendered twice through Jinja - once
+         This is needed as the where_filter field in the definition files are rendered twice through Jinja - once
          by the test framework, and again by MF.
         """
         return f"{{{{ dimension('{dimension_name}', entity_path={repr(entity_path)}) }}}}"
