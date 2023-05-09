@@ -1,7 +1,8 @@
 from __future__ import annotations
 from pydantic.main import ModelMetaclass
 
-from typing import Optional, List, _ProtocolMeta
+from typing import Optional, List
+from typing import _ProtocolMeta  # type: ignore[attr-defined]
 
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.objects.metadata import Metadata

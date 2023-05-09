@@ -21,8 +21,11 @@ class MeasureAggregationParametersProtocol(Protocol):
 
 
 class MeasureProtocol(Protocol):
-    """Describes a measure, which is a field in the underlying semantic model that can be
-    aggregated in a specific way."""
+    """Describes a measure.
+
+    Measure is a field in the underlying semantic model that can be aggregated
+    in a specific way.
+    """
 
     name: str
     agg: AggregationType
