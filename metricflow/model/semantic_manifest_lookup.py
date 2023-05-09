@@ -9,8 +9,8 @@ class SemanticManifestLookup:
 
     def __init__(self, user_configured_model: UserConfiguredModel) -> None:  # noqa: D
         self._user_configured_model = user_configured_model
-        self._data_source_semantics = DataSourceSemantics(user_configured_model)
-        self._metric_semantics = MetricSemantics(self._user_configured_model, self._data_source_semantics)
+        self._semantic_model_semantics = DataSourceSemantics(user_configured_model)
+        self._metric_semantics = MetricSemantics(self._user_configured_model, self._semantic_model_semantics)
 
     @property
     def user_configured_model(self) -> UserConfiguredModel:  # noqa: D
@@ -18,7 +18,7 @@ class SemanticManifestLookup:
 
     @property
     def data_source_semantics(self) -> DataSourceSemanticsAccessor:  # noqa: D
-        return self._data_source_semantics
+        return self._semantic_model_semantics
 
     @property
     def metric_semantics(self) -> MetricSemanticsAccessor:  # noqa: D

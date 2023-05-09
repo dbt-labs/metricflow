@@ -43,11 +43,11 @@ def test_metric_missing_measure() -> None:
         ModelValidator([MetricMeasuresRule()]).checked_validations(model=model.model)
 
 
-def test_measures_only_exist_in_one_data_source() -> None:  # noqa: D
+def test_measures_only_exist_in_one_semantic_model() -> None:  # noqa: D
     yaml_contents_1 = textwrap.dedent(
         """\
         data_source:
-          name: sample_data_source
+          name: sample_semantic_model
           node_relation:
             schema_name: some_schema
             alias: source_table
@@ -85,7 +85,7 @@ def test_measures_only_exist_in_one_data_source() -> None:  # noqa: D
     yaml_contents_2 = textwrap.dedent(
         """\
         data_source:
-          name: sample_data_source_2
+          name: sample_semantic_model_2
           node_relation:
             schema_name: some_schema
             alias: source_table
@@ -125,7 +125,7 @@ def test_measure_alias_is_set_when_required() -> None:
     yaml_contents = textwrap.dedent(
         f"""\
         data_source:
-          name: sample_data_source
+          name: sample_semantic_model
           node_relation:
             schema_name: some_schema
             alias: source_table
@@ -178,7 +178,7 @@ def test_invalid_measure_alias_name() -> None:
     yaml_contents = textwrap.dedent(
         f"""\
         data_source:
-          name: sample_data_source
+          name: sample_semantic_model
           node_relation:
             schema_name: some_schema
             alias: source_table
@@ -229,7 +229,7 @@ def test_measure_alias_measure_name_conflict() -> None:
     yaml_contents = textwrap.dedent(
         f"""\
         data_source:
-          name: sample_data_source
+          name: sample_semantic_model
           node_relation:
             schema_name: some_schema
             alias: source_table
@@ -284,7 +284,7 @@ def test_reused_measure_alias() -> None:
     yaml_contents = textwrap.dedent(
         f"""\
         data_source:
-          name: sample_data_source
+          name: sample_semantic_model
           node_relation:
             schema_name: some_schema
             alias: source_table
@@ -349,7 +349,7 @@ def test_reused_measure_alias_within_metric() -> None:
     yaml_contents = textwrap.dedent(
         f"""\
         data_source:
-          name: sample_data_source
+          name: sample_semantic_model
           node_relation:
             schema_name: some_schema
             alias: source_table
@@ -404,7 +404,7 @@ def test_invalid_non_additive_dimension_properties() -> None:
     yaml_contents = textwrap.dedent(
         """\
         data_source:
-          name: sample_data_source_2
+          name: sample_semantic_model_2
           node_relation:
             schema_name: some_schema
             alias: source_table
@@ -457,7 +457,7 @@ def test_invalid_non_additive_dimension_properties() -> None:
     )
 
     model_issues = ModelValidator([MeasuresNonAdditiveDimensionRule()]).validate_model(transformed_model)
-    expected_error_substring_1 = "that is not defined as a dimension in data source 'sample_data_source_2'."
+    expected_error_substring_1 = "that is not defined as a dimension in data source 'sample_semantic_model_2'."
     expected_error_substring_2 = "has a non_additive_dimension with an invalid 'window_groupings'"
     expected_error_substring_3 = "that is defined as a categorical dimension which is not supported."
     expected_error_substring_4 = "that is not equal to the measure's agg_time_dimension"
@@ -480,7 +480,7 @@ def test_count_measure_missing_expr() -> None:
     yaml_contents = textwrap.dedent(
         """\
         data_source:
-          name: sample_data_source_2
+          name: sample_semantic_model_2
           node_relation:
             schema_name: some_schema
             alias: source_table
@@ -529,7 +529,7 @@ def test_count_measure_with_distinct_expr() -> None:
     yaml_contents = textwrap.dedent(
         """\
         data_source:
-          name: sample_data_source_2
+          name: sample_semantic_model_2
           node_relation:
             schema_name: some_schema
             alias: source_table
@@ -576,7 +576,7 @@ def test_percentile_measure_missing_agg_params() -> None:
     yaml_contents = textwrap.dedent(
         """\
         data_source:
-          name: sample_data_source
+          name: sample_semantic_model
           node_relation:
             schema_name: some_schema
             alias: source_table
@@ -635,7 +635,7 @@ def test_percentile_measure_bad_percentile_values() -> None:
     yaml_contents = textwrap.dedent(
         """\
         data_source:
-          name: sample_data_source
+          name: sample_semantic_model
           node_relation:
             schema_name: some_schema
             alias: source_table

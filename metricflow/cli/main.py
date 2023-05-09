@@ -599,7 +599,7 @@ def _data_warehouse_validations_runner(
     """Helper which calls the individual data warehouse validations to run and prints collected issues"""
 
     data_source_results = _run_dw_validations(
-        dw_validator.validate_data_sources, model=model, validation_type="data sources", timeout=timeout
+        dw_validator.validate_semantic_models, model=model, validation_type="data sources", timeout=timeout
     )
     dimension_results = _run_dw_validations(
         dw_validator.validate_dimensions, model=model, validation_type="dimensions", timeout=timeout

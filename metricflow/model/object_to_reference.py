@@ -24,7 +24,7 @@ class ObjectToReference:
     """
 
     @staticmethod
-    def from_data_source(data_source: SemanticModel) -> SemanticModelReference:  # noqa: D
+    def from_semantic_model(data_source: SemanticModel) -> SemanticModelReference:  # noqa: D
         return SemanticModelReference(semantic_model_name=data_source.name)
 
     @staticmethod

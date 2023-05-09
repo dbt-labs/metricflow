@@ -11,7 +11,7 @@ from typing import Callable, DefaultDict, Dict, List, Optional, Sequence, Tuple,
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import BaseOutput, FilterElementsNode
-from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
+from metricflow.dataset.convert_semantic_model import DataSourceToDataSetConverter
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
 
 from metricflow.dataset.dataset import DataSet
@@ -104,7 +104,7 @@ class DataWarehouseTaskBuilder:
         return tuple(spec for spec in specs if not spec.entity_links)
 
     @staticmethod
-    def _data_source_nodes(
+    def _semantic_model_nodes(
         render_tools: QueryRenderingTools, data_source: SemanticModel
     ) -> Sequence[BaseOutput[DataSourceDataSet]]:
         """Builds and returns the DataSourceDataSet node for the given data source"""
@@ -135,7 +135,7 @@ class DataWarehouseTaskBuilder:
         return (rendered_plan.sql, rendered_plan.execution_parameters)
 
     @classmethod
-    def gen_data_source_tasks(
+    def gen_semantic_model_tasks(
         cls, model: UserConfiguredModel, sql_client: SqlClient, system_schema: str
     ) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the data sources of the model"""
@@ -154,7 +154,7 @@ class DataWarehouseTaskBuilder:
 
         tasks: List[DataWarehouseValidationTask] = []
         for data_source in model.data_sources:
-            source_node = cls._data_source_nodes(render_tools=render_tools, data_source=data_source)[0]
+            source_node = cls._semantic_model_nodes(render_tools=render_tools, data_source=data_source)[0]
             spec = DimensionSpec.from_name(name=f"validation_dim_for_{data_source.name}")
             filter_elements_node = FilterElementsNode(
                 parent_node=source_node, include_specs=InstanceSpecSet(dimension_specs=(spec,))
@@ -199,7 +199,7 @@ class DataWarehouseTaskBuilder:
             if not data_source.dimensions:
                 continue
 
-            source_node = cls._data_source_nodes(render_tools=render_tools, data_source=data_source)[0]
+            source_node = cls._semantic_model_nodes(render_tools=render_tools, data_source=data_source)[0]
 
             data_source_sub_tasks: List[DataWarehouseValidationTask] = []
             dataset = render_tools.converter.create_sql_source_data_set(data_source)
@@ -298,7 +298,7 @@ class DataWarehouseTaskBuilder:
         for data_source in model.data_sources:
             if not data_source.entities:
                 continue
-            source_node = cls._data_source_nodes(render_tools=render_tools, data_source=data_source)[0]
+            source_node = cls._semantic_model_nodes(render_tools=render_tools, data_source=data_source)[0]
 
             data_source_sub_tasks: List[DataWarehouseValidationTask] = []
             dataset = render_tools.converter.create_sql_source_data_set(data_source)
@@ -374,7 +374,7 @@ class DataWarehouseTaskBuilder:
             if not data_source.measures:
                 continue
 
-            source_nodes = cls._data_source_nodes(render_tools=render_tools, data_source=data_source)
+            source_nodes = cls._semantic_model_nodes(render_tools=render_tools, data_source=data_source)
             dataset = render_tools.converter.create_sql_source_data_set(data_source)
             data_source_specs = dataset.instance_set.spec_set.measure_specs
 
@@ -539,7 +539,7 @@ class DataWarehouseModelValidator:
 
         return ModelValidationResults.from_issues_sequence(issues)
 
-    def validate_data_sources(
+    def validate_semantic_models(
         self, model: UserConfiguredModel, timeout: Optional[int] = None
     ) -> ModelValidationResults:
         """Generates a list of tasks for validating the data sources of the model and then runs them
@@ -551,7 +551,7 @@ class DataWarehouseModelValidator:
         Returns:
             A list of validation issues discovered when running the passed in tasks against the data warehosue
         """
-        tasks = DataWarehouseTaskBuilder.gen_data_source_tasks(
+        tasks = DataWarehouseTaskBuilder.gen_semantic_model_tasks(
             model=model, sql_client=self._sql_client, system_schema=self._sql_schema
         )
         return self.run_tasks(tasks=tasks, timeout=timeout)

@@ -14,7 +14,7 @@ class NonEmptyRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking that the model has data sources")
-    def _check_model_has_data_sources(model: UserConfiguredModel) -> List[ValidationIssue]:
+    def _check_model_has_semantic_models(model: UserConfiguredModel) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
         if not model.data_sources:
             issues.append(
@@ -49,6 +49,6 @@ class NonEmptyRule(ModelValidationRule):
     @validate_safely("running model validation rule ensuring metrics and data sources are defined")
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
         issues: List[ValidationIssue] = []
-        issues += NonEmptyRule._check_model_has_data_sources(model=model)
+        issues += NonEmptyRule._check_model_has_semantic_models(model=model)
         issues += NonEmptyRule._check_model_has_metrics(model=model)
         return issues

@@ -187,7 +187,7 @@ class DbtManifestTransformer:
             agg_time_dimension=dbt_metric.timestamp,
         )
 
-    def build_data_source_for_metric(self, dbt_metric: DbtMetric) -> SemanticModel:
+    def build_semantic_model_for_metric(self, dbt_metric: DbtMetric) -> SemanticModel:
         """Attemps to build a data source for a given DbtMetric
 
         Raises:
@@ -253,12 +253,12 @@ class DbtManifestTransformer:
 
     def dbt_metric_to_metricflow_elements(self, dbt_metric: DbtMetric) -> TransformedDbtMetric:
         """Builds a MetricFlow data source and proxy metric for the given DbtMetric"""
-        data_source = self.build_data_source_for_metric(dbt_metric)
+        data_source = self.build_semantic_model_for_metric(dbt_metric)
         proxy_metric = self.build_proxy_metric(dbt_metric)
         return TransformedDbtMetric(data_source=data_source, metric=proxy_metric)
 
     @classmethod
-    def deduplicate_data_sources(cls, data_sources: List[SemanticModel]) -> SemanticModel:
+    def deduplicate_semantic_models(cls, data_sources: List[SemanticModel]) -> SemanticModel:
         """Attempts to deduplicate a list of data sources into a single data source
 
         Because each DbtMetric (which isn't `derived`) creates a data source,
@@ -382,10 +382,10 @@ class DbtManifestTransformer:
 
         # As it might be the case that we generated many of the same data source,
         # we need to merge / dedupe them
-        deduped_data_sources = []
+        deduped_semantic_models = []
         for name, data_sources in data_sources_map.items():
             try:
-                deduped_data_sources.append(self.deduplicate_data_sources(data_sources))
+                deduped_semantic_models.append(self.deduplicate_semantic_models(data_sources))
             except Exception as e:
                 issues.append(
                     ValidationError(
@@ -395,6 +395,6 @@ class DbtManifestTransformer:
                 )
 
         return ModelBuildResult(
-            model=UserConfiguredModel(data_sources=list(deduped_data_sources), metrics=metrics),
+            model=UserConfiguredModel(data_sources=list(deduped_semantic_models), metrics=metrics),
             issues=ModelValidationResults.from_issues_sequence(issues=issues),
         )

@@ -24,7 +24,7 @@ from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import DataflowPlan
 from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import SourceScanOptimizer
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
+from metricflow.dataset.convert_semantic_model import DataSourceToDataSetConverter
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.engine.models import Dimension, Metric
 from metricflow.engine.time_source import ServerTimeSource

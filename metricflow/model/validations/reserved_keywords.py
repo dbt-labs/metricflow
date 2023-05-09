@@ -65,7 +65,7 @@ class ReservedKeywordsRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking that data source sub element names aren't reserved sql keywords")
-    def _validate_data_source_sub_elements(data_source: SemanticModel) -> List[ValidationIssue]:
+    def _validate_semantic_model_sub_elements(data_source: SemanticModel) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
 
         for dimension in data_source.dimensions:
@@ -121,7 +121,7 @@ class ReservedKeywordsRule(ModelValidationRule):
 
     @classmethod
     @validate_safely(whats_being_done="checking that data_source node_relations are not sql reserved keywords")
-    def _validate_data_sources(cls, model: UserConfiguredModel) -> List[ValidationIssue]:
+    def _validate_semantic_models(cls, model: UserConfiguredModel) -> List[ValidationIssue]:
         """Checks names of objects that are not nested."""
         issues: List[ValidationIssue] = []
         set_keywords = set(RESERVED_KEYWORDS)
@@ -142,7 +142,7 @@ class ReservedKeywordsRule(ModelValidationRule):
                         message=f"'{data_source.node_relation.relation_name}' contains the SQL reserved keyword(s) {keyword_intersection}, and thus cannot be used for 'node_relation'.",
                     )
                 )
-            issues += cls._validate_data_source_sub_elements(data_source=data_source)
+            issues += cls._validate_semantic_model_sub_elements(data_source=data_source)
 
         return issues
 
@@ -151,4 +151,4 @@ class ReservedKeywordsRule(ModelValidationRule):
         whats_being_done="running model validation ensuring elements that aren't selected via a defined expr don't contain reserved keywords"
     )
     def validate_model(cls, model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
-        return cls._validate_data_sources(model=model)
+        return cls._validate_semantic_models(model=model)

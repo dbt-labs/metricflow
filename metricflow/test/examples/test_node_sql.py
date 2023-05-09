@@ -6,7 +6,7 @@ from dbt_semantic_interfaces.references import SemanticModelReference
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, FilterElementsNode, MetricTimeDimensionTransformNode
-from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
+from metricflow.dataset.convert_semantic_model import DataSourceToDataSetConverter
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
@@ -29,10 +29,10 @@ def test_view_sql_generated_at_a_node(
     time_spine_source: TimeSpineSource,
 ) -> None:
     """Example that shows how to view generated SQL for nodes in a dataflow plan."""
-    bookings_data_source = simple_semantic_manifest_lookup.data_source_semantics.get_by_reference(
+    bookings_semantic_model = simple_semantic_manifest_lookup.data_source_semantics.get_by_reference(
         SemanticModelReference(semantic_model_name="bookings_source")
     )
-    assert bookings_data_source
+    assert bookings_semantic_model
     column_association_resolver = DefaultColumnAssociationResolver(
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
     )
@@ -51,7 +51,7 @@ def test_view_sql_generated_at_a_node(
     )
 
     # Show SQL and spec set at a source node.
-    bookings_source_data_set = to_data_set_converter.create_sql_source_data_set(bookings_data_source)
+    bookings_source_data_set = to_data_set_converter.create_sql_source_data_set(bookings_semantic_model)
     read_source_node = ReadSqlSourceNode[SqlDataSet](bookings_source_data_set)
     sql_plan_at_read_node = to_sql_plan_converter.convert_to_sql_query_plan(
         sql_engine_attributes=sql_client.sql_engine_attributes,

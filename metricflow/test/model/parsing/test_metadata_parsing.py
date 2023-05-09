@@ -12,7 +12,7 @@ from dbt_semantic_interfaces.parsing.yaml_loader import YamlConfigLoader
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 
 
-def test_data_source_metadata_parsing(simple_user_configured_model: UserConfiguredModel) -> None:
+def test_semantic_model_metadata_parsing(simple_user_configured_model: UserConfiguredModel) -> None:
     """Tests internal metadata object parsing from a file into the Data Source model object
 
     This only tests some basic file name parsing for each data source since they are not guaranteed

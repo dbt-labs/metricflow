@@ -112,7 +112,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         node_output_resolver: Optional[DataflowPlanNodeOutputDataSetResolver[SqlDataSetT]] = None,
         column_association_resolver: Optional[ColumnAssociationResolver] = None,
     ) -> None:
-        self._data_source_semantics = semantic_manifest_lookup.data_source_semantics
+        self._semantic_model_semantics = semantic_manifest_lookup.data_source_semantics
         self._metric_semantics = semantic_manifest_lookup.metric_semantics
         self._metric_time_dimension_reference = DataSet.metric_time_dimension_reference()
         self._cost_function = cost_function
@@ -348,7 +348,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         """Returns true if any of the linkable specs requires a multi-hop join to realize."""
         return any(len(x.entity_links) > 1 for x in linkable_specs)
 
-    def _get_data_source_names_for_measures(self, measure_names: Sequence[MeasureSpec]) -> Set[str]:
+    def _get_semantic_model_names_for_measures(self, measure_names: Sequence[MeasureSpec]) -> Set[str]:
         """Return the names of the data sources needed to compute the input measures
 
         This is a temporary method for use in assertion boundaries while we implement support for multiple data sources
@@ -356,7 +356,10 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         data_source_names: Set[str] = set()
         for measure_name in measure_names:
             data_source_names = data_source_names.union(
-                {d.name for d in self._data_source_semantics.get_data_sources_for_measure(measure_name.as_reference)}
+                {
+                    d.name
+                    for d in self._semantic_model_semantics.get_semantic_models_for_measure(measure_name.as_reference)
+                }
             )
         return data_source_names
 
@@ -412,21 +415,21 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         """Ensures that the group of MeasureSpecs has the same non_additive_dimension_spec and agg_time_dimension"""
         if len(measure_specs) == 0:
             raise ValueError("Cannot build MeasureParametersForRecipe when given an empty sequence of measure_specs.")
-        data_sources = self._get_data_source_names_for_measures(measure_specs)
+        data_sources = self._get_semantic_model_names_for_measures(measure_specs)
         if len(data_sources) > 1:
             raise ValueError(
                 f"Cannot find common properties for measures {measure_specs} coming from multiple "
                 f"data sources: {data_sources}. This suggests the measure_specs were not correctly filtered."
             )
 
-        agg_time_dimension = agg_time_dimension = self._data_source_semantics.get_agg_time_dimension_for_measure(
+        agg_time_dimension = agg_time_dimension = self._semantic_model_semantics.get_agg_time_dimension_for_measure(
             measure_specs[0].as_reference
         )
         non_additive_dimension_spec = measure_specs[0].non_additive_dimension_spec
         for measure_spec in measure_specs:
             if non_additive_dimension_spec != measure_spec.non_additive_dimension_spec:
                 raise ValueError(f"measure_specs {measure_specs} do not have the same non_additive_dimension_spec.")
-            measure_agg_time_dimension = self._data_source_semantics.get_agg_time_dimension_for_measure(
+            measure_agg_time_dimension = self._semantic_model_semantics.get_agg_time_dimension_for_measure(
                 measure_spec.as_reference
             )
             if measure_agg_time_dimension != agg_time_dimension:
@@ -451,7 +454,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         """
         measure_specs = measure_spec_properties.measure_specs
         node_processor = PreDimensionJoinNodeProcessor(
-            data_source_semantics=self._data_source_semantics,
+            data_source_semantics=self._semantic_model_semantics,
             node_data_set_resolver=self._node_data_set_resolver,
         )
 
@@ -493,7 +496,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         logger.info(f"Processing nodes took: {time.time()-start_time:.2f}s")
 
         node_evaluator = NodeEvaluatorForLinkableInstances(
-            data_source_semantics=self._data_source_semantics,
+            data_source_semantics=self._semantic_model_semantics,
             nodes_available_for_joins=self._sort_by_suitability(nodes_available_for_joins),
             node_data_set_resolver=self._node_data_set_resolver,
         )
@@ -622,7 +625,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         for input_spec in metric_input_measure_specs:
             data_source_names = [
                 dsource.name
-                for dsource in self._data_source_semantics.get_data_sources_for_measure(
+                for dsource in self._semantic_model_semantics.get_semantic_models_for_measure(
                     measure_reference=input_spec.measure_spec.as_reference
                 )
             ]

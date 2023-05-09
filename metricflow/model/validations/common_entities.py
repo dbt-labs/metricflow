@@ -19,30 +19,30 @@ class CommonEntitysRule(ModelValidationRule):
     """Checks that entities exist on more than one data source"""
 
     @staticmethod
-    def _map_data_source_entities(data_sources: List[SemanticModel]) -> Dict[EntityReference, Set[str]]:
+    def _map_semantic_model_entities(data_sources: List[SemanticModel]) -> Dict[EntityReference, Set[str]]:
         """Generate mapping of entity names to the set of data_sources where it is defined"""
-        entities_to_data_sources: Dict[EntityReference, Set[str]] = {}
+        entities_to_semantic_models: Dict[EntityReference, Set[str]] = {}
         for data_source in data_sources or []:
             for entity in data_source.entities or []:
-                if entity.reference in entities_to_data_sources:
-                    entities_to_data_sources[entity.reference].add(data_source.name)
+                if entity.reference in entities_to_semantic_models:
+                    entities_to_semantic_models[entity.reference].add(data_source.name)
                 else:
-                    entities_to_data_sources[entity.reference] = {data_source.name}
-        return entities_to_data_sources
+                    entities_to_semantic_models[entity.reference] = {data_source.name}
+        return entities_to_semantic_models
 
     @staticmethod
     @validate_safely(whats_being_done="checking entity exists on more than one data source")
     def _check_entity(
         entity: Entity,
         data_source: SemanticModel,
-        entities_to_data_sources: Dict[EntityReference, Set[str]],
+        entities_to_semantic_models: Dict[EntityReference, Set[str]],
     ) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
         # If the entity is the dict and if the set of data sources minus this data source is empty,
         # then we warn the user that their entity will be unused in joins
         if (
-            entity.reference in entities_to_data_sources
-            and len(entities_to_data_sources[entity.reference].difference({data_source.name})) == 0
+            entity.reference in entities_to_semantic_models
+            and len(entities_to_semantic_models[entity.reference].difference({data_source.name})) == 0
         ):
             issues.append(
                 ValidationWarning(
@@ -66,13 +66,13 @@ class CommonEntitysRule(ModelValidationRule):
         """Issues a warning for any entity that is associated with only one data_source"""
         issues = []
 
-        entities_to_data_sources = CommonEntitysRule._map_data_source_entities(model.data_sources)
+        entities_to_semantic_models = CommonEntitysRule._map_semantic_model_entities(model.data_sources)
         for data_source in model.data_sources or []:
             for entity in data_source.entities or []:
                 issues += CommonEntitysRule._check_entity(
                     entity=entity,
                     data_source=data_source,
-                    entities_to_data_sources=entities_to_data_sources,
+                    entities_to_semantic_models=entities_to_semantic_models,
                 )
 
         return issues

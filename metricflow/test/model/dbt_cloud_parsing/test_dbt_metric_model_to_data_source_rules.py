@@ -2,7 +2,7 @@ from typing import Tuple
 
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode
 from metricflow.model.dbt_converter import DbtConverter
-from metricflow.model.dbt_mapping_rules.dbt_metric_model_to_data_source_rules import (
+from metricflow.model.dbt_mapping_rules.dbt_metric_model_to_semantic_model_rules import (
     DbtMapToDataSourceName,
     DbtMapToDataSourceDescription,
     DbtMapDataSourceNodeRelation,
@@ -15,7 +15,7 @@ from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
 from dbt_semantic_interfaces.objects.metric import MetricType
 
 
-def test_dbt_metric_model_to_data_source_rules_skip_derived_metrics(  # noqa: D
+def test_dbt_metric_model_to_semantic_model_rules_skip_derived_metrics(  # noqa: D
     dbt_metrics: Tuple[MetricNode, ...]
 ) -> None:
     derived_metrics = tuple(dbt_metric for dbt_metric in dbt_metrics if dbt_metric.calculation_method == "derived")
@@ -31,7 +31,7 @@ def test_dbt_metric_model_to_data_source_rules_skip_derived_metrics(  # noqa: D
     ), "Derived dbt metrics created data sources, and they shouldn't"
 
 
-def test_dbt_map_to_data_source_name(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
+def test_dbt_map_to_semantic_model_name(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
     objects = MappedObjects()
     issues = DbtMapToDataSourceName().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
@@ -45,7 +45,7 @@ def test_dbt_map_to_data_source_name(dbt_metrics: Tuple[MetricNode, ...]) -> Non
             ), "Expected data source to have name, got `None`"
 
 
-def test_dbt_map_to_data_source_name_missing_model_name(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
+def test_dbt_map_to_semantic_model_name_missing_model_name(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
     objects = MappedObjects()
     # Remove a model name from a metric
     dbt_metrics[0].model.name = None
@@ -56,7 +56,7 @@ def test_dbt_map_to_data_source_name_missing_model_name(dbt_metrics: Tuple[Metri
     ), f"DbtMapToDataSourceName didn't raise blocking issues when it should have: {issues.to_pretty_json()}"
 
 
-def test_dbt_map_to_data_source_description(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
+def test_dbt_map_to_semantic_model_description(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
     objects = MappedObjects()
     issues = DbtMapToDataSourceDescription().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
@@ -70,7 +70,7 @@ def test_dbt_map_to_data_source_description(dbt_metrics: Tuple[MetricNode, ...])
             ), f"Got description `{objects.data_sources[dbt_metric.model.name]['description']}`, but expected `{dbt_metric.model.description}`"
 
 
-def test_dbt_map_to_data_source_description_can_be_optional(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
+def test_dbt_map_to_semantic_model_description_can_be_optional(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
     objects = MappedObjects()
     # Remove a model description from a metric
     dbt_metrics[0].model.description = None
@@ -80,7 +80,7 @@ def test_dbt_map_to_data_source_description_can_be_optional(dbt_metrics: Tuple[M
     ), f"DbtMapToDataSourceDescription raised blocking issues when it shouldn't: {issues.to_pretty_json()}"
 
 
-def test_dbt_map_data_source_sql_table(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
+def test_dbt_map_semantic_model_sql_table(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
     objects = MappedObjects()
 
     issues = DbtMapDataSourceNodeRelation().run(dbt_metrics=dbt_metrics, objects=objects)
@@ -96,7 +96,9 @@ def test_dbt_map_data_source_sql_table(dbt_metrics: Tuple[MetricNode, ...]) -> N
             )
 
 
-def test_dbt_map_data_source_sql_table_issues_when_missing_name(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
+def test_dbt_map_semantic_model_sql_table_issues_when_missing_name(  # noqa: D
+    dbt_metrics: Tuple[MetricNode, ...]
+) -> None:
     objects = MappedObjects()
     # remove model name
     dbt_metrics[0].model.name = None
@@ -107,7 +109,7 @@ def test_dbt_map_data_source_sql_table_issues_when_missing_name(dbt_metrics: Tup
     ), f"DbtMapToDataSourceSqlTable didn't raise blocking issues when it should have: {issues.to_pretty_json()}"
 
 
-def test_dbt_map_data_source_sql_table_issues_when_missing_schema(  # noqa: D
+def test_dbt_map_semantic_model_sql_table_issues_when_missing_schema(  # noqa: D
     dbt_metrics: Tuple[MetricNode, ...]
 ) -> None:
     objects = MappedObjects()
@@ -120,7 +122,7 @@ def test_dbt_map_data_source_sql_table_issues_when_missing_schema(  # noqa: D
     ), f"DbtMapToDataSourceSqlTable didn't raise blocking issues when it should have: {issues.to_pretty_json()}"
 
 
-def test_dbt_map_data_source_sql_table_issues_when_missing_database(  # noqa: D
+def test_dbt_map_semantic_model_sql_table_issues_when_missing_database(  # noqa: D
     dbt_metrics: Tuple[MetricNode, ...]
 ) -> None:
     objects = MappedObjects()

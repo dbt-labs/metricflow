@@ -155,7 +155,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         """
         self._column_association_resolver = column_association_resolver
         self._metric_semantics = semantic_manifest_lookup.metric_semantics
-        self._data_source_semantics = semantic_manifest_lookup.data_source_semantics
+        self._semantic_model_semantics = semantic_manifest_lookup.data_source_semantics
         self._time_spine_source = time_spine_source
 
     @property
@@ -583,7 +583,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             CreateSelectColumnsWithMeasuresAggregated(
                 table_alias=from_data_set_alias,
                 column_resolver=self._column_association_resolver,
-                data_source_semantics=self._data_source_semantics,
+                data_source_semantics=self._semantic_model_semantics,
                 metric_input_measure_specs=node.metric_input_measure_specs,
             )
         )
@@ -1097,7 +1097,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         # Only these measures will be in the output data set.
         output_measure_instances = []
         for measure_instance in input_data_set.instance_set.measure_instances:
-            measure = self._data_source_semantics.get_measure(measure_instance.spec.as_reference)
+            measure = self._semantic_model_semantics.get_measure(measure_instance.spec.as_reference)
             if measure.checked_agg_time_dimension == node.aggregation_time_dimension_reference:
                 output_measure_instances.append(measure_instance)
 

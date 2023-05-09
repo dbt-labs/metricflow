@@ -70,55 +70,57 @@ class DataSourceJoinEvaluator:
     )
 
     def __init__(self, data_source_semantics: DataSourceSemanticsAccessor) -> None:  # noqa: D
-        self._data_source_semantics = data_source_semantics
+        self._semantic_model_semantics = data_source_semantics
 
-    def get_joinable_data_sources(
+    def get_joinable_semantic_models(
         self, left_semantic_model_reference: SemanticModelReference, include_multi_hop: bool = False
     ) -> Dict[str, DataSourceLink]:
         """List all data sources that can join to given data source, and the entities to join them."""
         data_source_joins: Dict[str, DataSourceLink] = {}
-        self._get_remaining_hops_of_joinable_data_sources(
+        self._get_remaining_hops_of_joinable_semantic_models(
             left_semantic_model_reference=left_semantic_model_reference,
-            parent_data_source_to_join_paths={left_semantic_model_reference: []},
-            known_data_source_joins=data_source_joins,
+            parent_semantic_model_to_join_paths={left_semantic_model_reference: []},
+            known_semantic_model_joins=data_source_joins,
             join_hops_remaining=(MAX_JOIN_HOPS if include_multi_hop else 1),
         )
         return data_source_joins
 
-    def _get_remaining_hops_of_joinable_data_sources(
+    def _get_remaining_hops_of_joinable_semantic_models(
         self,
         left_semantic_model_reference: SemanticModelReference,
-        parent_data_source_to_join_paths: Dict[SemanticModelReference, List[DataSourceEntityJoin]],
-        known_data_source_joins: Dict[str, DataSourceLink],
+        parent_semantic_model_to_join_paths: Dict[SemanticModelReference, List[DataSourceEntityJoin]],
+        known_semantic_model_joins: Dict[str, DataSourceLink],
         join_hops_remaining: int,
     ) -> None:
         assert join_hops_remaining > 0, "No join hops remaining. This is unexpected with proper use of this method."
-        for parent_semantic_model_reference, parent_join_path in parent_data_source_to_join_paths.items():
-            parent_data_source = self._data_source_semantics.get_by_reference(
+        for parent_semantic_model_reference, parent_join_path in parent_semantic_model_to_join_paths.items():
+            parent_semantic_model = self._semantic_model_semantics.get_by_reference(
                 semantic_model_reference=parent_semantic_model_reference
             )
-            assert parent_data_source is not None
+            assert parent_semantic_model is not None
 
             # We'll get all joinable data sources in this hop before recursing to ensure we find the most
             # efficient path to each data source.
             join_paths_to_visit_next: List[List[DataSourceEntityJoin]] = []
-            for entity in parent_data_source.entities:
+            for entity in parent_semantic_model.entities:
                 entity_reference = EntityReference(element_name=entity.name)
-                entity_data_sources = self._data_source_semantics.get_data_sources_for_entity(
+                entity_semantic_models = self._semantic_model_semantics.get_semantic_models_for_entity(
                     entity_reference=entity_reference
                 )
 
-                for right_data_source in entity_data_sources:
+                for right_semantic_model in entity_semantic_models:
                     # Check if we've seen this data source already
                     if (
-                        right_data_source.name == left_semantic_model_reference.semantic_model_name
-                        or right_data_source.name in known_data_source_joins
+                        right_semantic_model.name == left_semantic_model_reference.semantic_model_name
+                        or right_semantic_model.name in known_semantic_model_joins
                     ):
                         continue
 
                     # Check if there is a valid way to join this data source to existing join path
-                    right_semantic_model_reference = SemanticModelReference(semantic_model_name=right_data_source.name)
-                    valid_join_type = self.get_valid_data_source_entity_join_type(
+                    right_semantic_model_reference = SemanticModelReference(
+                        semantic_model_name=right_semantic_model.name
+                    )
+                    valid_join_type = self.get_valid_semantic_model_entity_join_type(
                         left_semantic_model_reference=parent_semantic_model_reference,
                         right_semantic_model_reference=right_semantic_model_reference,
                         on_entity_reference=entity_reference,
@@ -126,57 +128,58 @@ class DataSourceJoinEvaluator:
                     if valid_join_type is None:
                         continue
 
-                    join_path_for_data_source = parent_join_path + [
+                    join_path_for_semantic_model = parent_join_path + [
                         DataSourceEntityJoin(
                             right_semantic_model_reference=right_semantic_model_reference,
                             entity_reference=entity_reference,
                             join_type=valid_join_type,
                         )
                     ]
-                    join_paths_to_visit_next.append(join_path_for_data_source)
-                    known_data_source_joins[right_semantic_model_reference.semantic_model_name] = DataSourceLink(
-                        left_semantic_model_reference=left_semantic_model_reference, join_path=join_path_for_data_source
+                    join_paths_to_visit_next.append(join_path_for_semantic_model)
+                    known_semantic_model_joins[right_semantic_model_reference.semantic_model_name] = DataSourceLink(
+                        left_semantic_model_reference=left_semantic_model_reference,
+                        join_path=join_path_for_semantic_model,
                     )
 
         join_hops_remaining -= 1
         if not join_hops_remaining:
             return
 
-        right_data_sources_to_join_paths: Dict[SemanticModelReference, List[DataSourceEntityJoin]] = {}
+        right_semantic_models_to_join_paths: Dict[SemanticModelReference, List[DataSourceEntityJoin]] = {}
         for join_path in join_paths_to_visit_next:
             assert len(join_path) > 0
-            right_data_sources_to_join_paths[join_path[-1].right_semantic_model_reference] = join_path
+            right_semantic_models_to_join_paths[join_path[-1].right_semantic_model_reference] = join_path
 
-        self._get_remaining_hops_of_joinable_data_sources(
+        self._get_remaining_hops_of_joinable_semantic_models(
             left_semantic_model_reference=left_semantic_model_reference,
-            parent_data_source_to_join_paths=right_data_sources_to_join_paths,
-            known_data_source_joins=known_data_source_joins,
+            parent_semantic_model_to_join_paths=right_semantic_models_to_join_paths,
+            known_semantic_model_joins=known_semantic_model_joins,
             join_hops_remaining=join_hops_remaining,
         )
 
-    def get_valid_data_source_entity_join_type(
+    def get_valid_semantic_model_entity_join_type(
         self,
         left_semantic_model_reference: SemanticModelReference,
         right_semantic_model_reference: SemanticModelReference,
         on_entity_reference: EntityReference,
     ) -> Optional[DataSourceEntityJoinType]:
         """Get valid join type used to join data sources on given entity, if exists."""
-        left_entity = self._data_source_semantics.get_entity_in_data_source(
+        left_entity = self._semantic_model_semantics.get_entity_in_semantic_model(
             SemanticModelElementReference.create_from_references(left_semantic_model_reference, on_entity_reference)
         )
 
-        right_entity = self._data_source_semantics.get_entity_in_data_source(
+        right_entity = self._semantic_model_semantics.get_entity_in_semantic_model(
             SemanticModelElementReference.create_from_references(right_semantic_model_reference, on_entity_reference)
         )
         if left_entity is None or right_entity is None:
             return None
 
-        left_data_source = self._data_source_semantics.get_by_reference(left_semantic_model_reference)
-        right_data_source = self._data_source_semantics.get_by_reference(right_semantic_model_reference)
-        assert left_data_source, "Type refinement. If you see this error something has refactored wrongly"
-        assert right_data_source, "Type refinement. If you see this error something has refactored wrongly"
+        left_semantic_model = self._semantic_model_semantics.get_by_reference(left_semantic_model_reference)
+        right_semantic_model = self._semantic_model_semantics.get_by_reference(right_semantic_model_reference)
+        assert left_semantic_model, "Type refinement. If you see this error something has refactored wrongly"
+        assert right_semantic_model, "Type refinement. If you see this error something has refactored wrongly"
 
-        if left_data_source.has_validity_dimensions and right_data_source.has_validity_dimensions:
+        if left_semantic_model.has_validity_dimensions and right_semantic_model.has_validity_dimensions:
             # We cannot join two data sources with validity dimensions due to concerns with unexpected fanout
             # due to the key structure of these data sources. Applying multi-stage validity window filters can
             # also lead to unexpected removal of interim join keys. Note this will need to be updated if we enable
@@ -185,7 +188,7 @@ class DataSourceJoinEvaluator:
             return None
 
         if right_entity.type is EntityType.NATURAL:
-            if not right_data_source.has_validity_dimensions:
+            if not right_semantic_model.has_validity_dimensions:
                 # There is no way to refine this to a single row per key, so we cannot support this join
                 return None
 
@@ -198,7 +201,7 @@ class DataSourceJoinEvaluator:
 
         raise RuntimeError(f"Join type not handled: {join_type}")
 
-    def is_valid_data_source_join(
+    def is_valid_semantic_model_join(
         self,
         left_semantic_model_reference: SemanticModelReference,
         right_semantic_model_reference: SemanticModelReference,
@@ -206,7 +209,7 @@ class DataSourceJoinEvaluator:
     ) -> bool:
         """Return true if we should allow a join with the given parameters to resolve a query."""
         return (
-            self.get_valid_data_source_entity_join_type(
+            self.get_valid_semantic_model_entity_join_type(
                 left_semantic_model_reference=left_semantic_model_reference,
                 right_semantic_model_reference=right_semantic_model_reference,
                 on_entity_reference=on_entity_reference,
@@ -215,7 +218,7 @@ class DataSourceJoinEvaluator:
         )
 
     @staticmethod
-    def _data_source_of_entity_in_instance_set(
+    def _semantic_model_of_entity_in_instance_set(
         instance_set: InstanceSet,
         entity_reference: EntityReference,
     ) -> SemanticModelReference:
@@ -239,11 +242,11 @@ class DataSourceJoinEvaluator:
         on_entity_reference: EntityReference,
     ) -> bool:
         """Return true if the instance sets can be joined using the given entity."""
-        return self.is_valid_data_source_join(
-            left_semantic_model_reference=DataSourceJoinEvaluator._data_source_of_entity_in_instance_set(
+        return self.is_valid_semantic_model_join(
+            left_semantic_model_reference=DataSourceJoinEvaluator._semantic_model_of_entity_in_instance_set(
                 instance_set=left_instance_set, entity_reference=on_entity_reference
             ),
-            right_semantic_model_reference=DataSourceJoinEvaluator._data_source_of_entity_in_instance_set(
+            right_semantic_model_reference=DataSourceJoinEvaluator._semantic_model_of_entity_in_instance_set(
                 instance_set=right_instance_set,
                 entity_reference=on_entity_reference,
             ),

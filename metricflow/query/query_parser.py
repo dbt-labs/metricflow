@@ -82,15 +82,15 @@ class MetricFlowQueryParser:
     ) -> None:
         self._model = model
         self._metric_semantics = model.metric_semantics
-        self._data_source_semantics = model.data_source_semantics
+        self._semantic_model_semantics = model.data_source_semantics
 
         # Set up containers for known element names
-        self._known_entity_element_references = self._data_source_semantics.get_entity_references()
+        self._known_entity_element_references = self._semantic_model_semantics.get_entity_references()
 
         self._known_time_dimension_element_references = [DataSet.metric_time_dimension_reference()]
         self._known_dimension_element_references = []
-        for dimension_reference in self._data_source_semantics.get_dimension_references():
-            dimension = self._data_source_semantics.get_dimension(dimension_reference)
+        for dimension_reference in self._semantic_model_semantics.get_dimension_references():
+            dimension = self._semantic_model_semantics.get_dimension(dimension_reference)
             if dimension.type == DimensionType.CATEGORICAL:
                 self._known_dimension_element_references.append(dimension_reference)
             elif dimension.type == DimensionType.TIME:
@@ -236,7 +236,7 @@ class MetricFlowQueryParser:
             if metric.constraint:
                 # add constraint to MetricSpec
                 metric_where_constraint = WhereConstraintConverter.convert_to_spec_where_constraint(
-                    self._data_source_semantics, metric.constraint
+                    self._semantic_model_semantics, metric.constraint
                 )
             # TODO: Directly initializing Spec object instead of using a factory method since
             #       importing WhereConstraintConverter is a problem in specs.py
@@ -408,7 +408,7 @@ class MetricFlowQueryParser:
         spec_where_constraint: Optional[SpecWhereClauseConstraint] = None
         if parsed_where_constraint:
             spec_where_constraint = WhereConstraintConverter.convert_to_spec_where_constraint(
-                data_source_semantics=self._data_source_semantics,
+                data_source_semantics=self._semantic_model_semantics,
                 where_constraint=parsed_where_constraint,
             )
             where_time_specs = spec_where_constraint.linkable_spec_set.time_dimension_specs

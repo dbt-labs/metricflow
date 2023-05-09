@@ -23,7 +23,7 @@ class AggregationTimeDimensionRule(ModelValidationRule):
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
         issues: List[ValidationIssue] = []
         for data_source in model.data_sources:
-            issues.extend(AggregationTimeDimensionRule._validate_data_source(data_source))
+            issues.extend(AggregationTimeDimensionRule._validate_semantic_model(data_source))
 
         return issues
 
@@ -36,7 +36,7 @@ class AggregationTimeDimensionRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking aggregation time dimension for a data source")
-    def _validate_data_source(data_source: SemanticModel) -> List[ValidationIssue]:
+    def _validate_semantic_model(data_source: SemanticModel) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
 
         for measure in data_source.measures:

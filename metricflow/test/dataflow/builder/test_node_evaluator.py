@@ -62,7 +62,7 @@ def make_multihop_node_evaluator(
     desired_linkable_specs: Sequence[LinkableInstanceSpec],
     time_spine_source: TimeSpineSource,
 ) -> NodeEvaluatorForLinkableInstances:  # noqa: D
-    """Return a node evaluator using the nodes in multihop_data_source_name_to_nodes"""
+    """Return a node evaluator using the nodes in multihop_semantic_model_name_to_nodes"""
     node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
         column_association_resolver=DefaultColumnAssociationResolver(semantic_manifest_lookup_with_multihop_links),
         semantic_manifest_lookup=semantic_manifest_lookup_with_multihop_links,

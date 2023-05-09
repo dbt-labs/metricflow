@@ -8,7 +8,7 @@ from dbt_semantic_interfaces.objects.elements.dimension import Dimension, Dimens
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.element_const import ElementConsistencyRule
 from metricflow.model.validations.validator_helpers import DataSourceElementType, ModelValidationException
-from metricflow.test.test_utils import find_data_source_with
+from metricflow.test.test_utils import find_semantic_model_with
 
 
 def _categorical_dimensions(data_source: SemanticModel) -> Tuple[Dimension, ...]:
@@ -19,7 +19,7 @@ def test_cross_element_names(simple_model__with_primary_transforms: UserConfigur
     model = copy.deepcopy(simple_model__with_primary_transforms)
 
     # ensure we have a usable data source for the test
-    usable_ds, usable_ds_index = find_data_source_with(
+    usable_ds, usable_ds_index = find_semantic_model_with(
         model,
         lambda data_source: len(data_source.measures) > 0
         and len(data_source.entities) > 0

@@ -29,7 +29,7 @@ class NaturalEntityConfigurationRule(ModelValidationRule):
             "natural entities are used in the appropriate contexts"
         )
     )
-    def _validate_data_source_natural_entities(data_source: SemanticModel) -> List[ValidationIssue]:
+    def _validate_semantic_model_natural_entities(data_source: SemanticModel) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
         context = DataSourceContext(
             file_context=FileContext.from_metadata(metadata=data_source.metadata),
@@ -65,7 +65,7 @@ class NaturalEntityConfigurationRule(ModelValidationRule):
         """Validate entities marked as EntityType.NATURAL"""
         issues: List[ValidationIssue] = []
         for data_source in model.data_sources:
-            issues += NaturalEntityConfigurationRule._validate_data_source_natural_entities(data_source=data_source)
+            issues += NaturalEntityConfigurationRule._validate_semantic_model_natural_entities(data_source=data_source)
 
         return issues
 

@@ -49,15 +49,15 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
         self._linkable_reference_index: Dict[LinkableElementReference, List[SemanticModel]] = defaultdict(list)
         self._entity_index: Dict[Optional[str], List[SemanticModel]] = defaultdict(list)
         self._entity_ref_to_entity: Dict[EntityReference, Optional[str]] = {}
-        self._data_source_names: Set[str] = set()
+        self._semantic_model_names: Set[str] = set()
 
-        self._data_source_to_aggregation_time_dimensions: Dict[
+        self._semantic_model_to_aggregation_time_dimensions: Dict[
             SemanticModelReference, ElementGrouper[TimeDimensionReference, MeasureSpec]
         ] = {}
 
-        self._semantic_model_reference_to_data_source: Dict[SemanticModelReference, SemanticModel] = {}
+        self._semantic_model_reference_to_semantic_model: Dict[SemanticModelReference, SemanticModel] = {}
         for data_source in self._model.data_sources:
-            self._add_data_source(data_source)
+            self._add_semantic_model(data_source)
 
     def get_dimension_references(self) -> Sequence[DimensionReference]:  # noqa: D
         return tuple(self._dimension_index.keys())
@@ -110,7 +110,9 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
         return list(self._entity_ref_to_entity.keys())
 
     # DSC interface
-    def get_data_sources_for_measure(self, measure_reference: MeasureReference) -> Sequence[SemanticModel]:  # noqa: D
+    def get_semantic_models_for_measure(  # noqa: D
+        self, measure_reference: MeasureReference
+    ) -> Sequence[SemanticModel]:
         return self._measure_index[measure_reference]
 
     def get_agg_time_dimension_for_measure(  # noqa: D
@@ -118,7 +120,7 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
     ) -> TimeDimensionReference:
         return self._measure_agg_time_dimension[measure_reference]
 
-    def get_entity_in_data_source(self, ref: SemanticModelElementReference) -> Optional[Entity]:  # Noqa: d
+    def get_entity_in_semantic_model(self, ref: SemanticModelElementReference) -> Optional[Entity]:  # Noqa: d
         data_source = self.get_by_reference(ref.semantic_model_reference)
         if not data_source:
             return None
@@ -130,13 +132,13 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
         return None
 
     def get_by_reference(self, semantic_model_reference: SemanticModelReference) -> Optional[SemanticModel]:  # noqa: D
-        return self._semantic_model_reference_to_data_source.get(semantic_model_reference)
+        return self._semantic_model_reference_to_semantic_model.get(semantic_model_reference)
 
-    def _add_data_source(self, data_source: SemanticModel) -> None:
+    def _add_semantic_model(self, data_source: SemanticModel) -> None:
         """Add data source semantic information, validating consistency with existing data sources."""
         errors = []
 
-        if data_source.reference in self._semantic_model_reference_to_data_source:
+        if data_source.reference in self._semantic_model_reference_to_semantic_model:
             errors.append(f"Data source {data_source.reference} already added.")
 
         for measure in data_source.measures:
@@ -149,7 +151,7 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
         if len(errors) > 0:
             raise InvalidDataSourceError(f"Error adding {data_source.reference}. Got errors: {errors}")
 
-        self._data_source_to_aggregation_time_dimensions[data_source.reference] = ElementGrouper[
+        self._semantic_model_to_aggregation_time_dimensions[data_source.reference] = ElementGrouper[
             TimeDimensionReference, MeasureSpec
         ]()
 
@@ -157,7 +159,7 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
             self._measure_aggs[measure.reference] = measure.agg
             self._measure_index[measure.reference].append(data_source)
             agg_time_dimension = measure.checked_agg_time_dimension
-            self._data_source_to_aggregation_time_dimensions[data_source.reference].add_value(
+            self._semantic_model_to_aggregation_time_dimensions[data_source.reference].add_value(
                 key=agg_time_dimension,
                 value=MeasureConverter.convert_to_measure_spec(measure=measure),
             )
@@ -177,11 +179,11 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
             self._entity_index[entity.name].append(data_source)
             self._linkable_reference_index[entity.reference].append(data_source)
 
-        self._semantic_model_reference_to_data_source[data_source.reference] = data_source
+        self._semantic_model_reference_to_semantic_model[data_source.reference] = data_source
 
     @property
     def semantic_model_references(self) -> Sequence[SemanticModelReference]:  # noqa: D
-        data_source_names_sorted = sorted(self._data_source_names)
+        data_source_names_sorted = sorted(self._semantic_model_names)
         return tuple(SemanticModelReference(semantic_model_name=x) for x in data_source_names_sorted)
 
     def get_aggregation_time_dimensions_with_measures(
@@ -189,11 +191,11 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
     ) -> ElementGrouper[TimeDimensionReference, MeasureSpec]:
         """Return all time dimensions in a data source with their associated measures."""
         assert (
-            semantic_model_reference in self._data_source_to_aggregation_time_dimensions
+            semantic_model_reference in self._semantic_model_to_aggregation_time_dimensions
         ), f"Data Source {semantic_model_reference} is not known"
-        return self._data_source_to_aggregation_time_dimensions[semantic_model_reference]
+        return self._semantic_model_to_aggregation_time_dimensions[semantic_model_reference]
 
-    def get_data_sources_for_entity(self, entity_reference: EntityReference) -> Set[SemanticModel]:
+    def get_semantic_models_for_entity(self, entity_reference: EntityReference) -> Set[SemanticModel]:
         """Return all data sources associated with an entity reference"""
         entity = self._entity_ref_to_entity[entity_reference]
         return set(self._entity_index[entity])

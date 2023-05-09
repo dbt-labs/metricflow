@@ -8,7 +8,7 @@ from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.common_entities import CommonEntitysRule
 from metricflow.specs import EntitySpec
-from metricflow.test.test_utils import find_data_source_with
+from metricflow.test.test_utils import find_semantic_model_with
 
 
 @pytest.mark.skip("TODO: re-enforce after validations improvements")
@@ -17,7 +17,7 @@ def test_lonely_entity_raises_issue(simple_model__with_primary_transforms: UserC
     lonely_entity_name = "hi_im_lonely"
 
     func: Callable[[SemanticModel], bool] = lambda data_source: len(data_source.entities) > 0
-    data_source_with_entities, _ = find_data_source_with(model, func)
+    data_source_with_entities, _ = find_semantic_model_with(model, func)
     data_source_with_entities.entities[0].name = EntitySpec.from_name(lonely_entity_name).element_name
     model_validator = ModelValidator([CommonEntitysRule()])
     model_issues = model_validator.validate_model(model)

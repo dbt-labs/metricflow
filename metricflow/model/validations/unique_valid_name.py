@@ -91,7 +91,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking data source sub element names are unique")
-    def _validate_data_source_elements(data_source: SemanticModel) -> List[ValidationIssue]:
+    def _validate_semantic_model_elements(data_source: SemanticModel) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
         element_info_tuples: List[Tuple[ElementReference, str, ValidationContext]] = []
 
@@ -221,6 +221,6 @@ class UniqueAndValidNameRule(ModelValidationRule):
         issues += UniqueAndValidNameRule._validate_top_level_objects(model=model)
 
         for data_source in model.data_sources:
-            issues += UniqueAndValidNameRule._validate_data_source_elements(data_source=data_source)
+            issues += UniqueAndValidNameRule._validate_semantic_model_elements(data_source=data_source)
 
         return issues

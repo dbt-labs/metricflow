@@ -53,7 +53,7 @@ def test_no_parent_node_data_set(
                     ),
                     defined_from=(
                         SemanticModelElementReference(
-                            semantic_model_name="fct_bookings_data_source", element_name="bookings"
+                            semantic_model_name="fct_bookings_semantic_model", element_name="bookings"
                         ),
                     ),
                     spec=MeasureSpec(

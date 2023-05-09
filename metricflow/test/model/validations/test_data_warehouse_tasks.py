@@ -38,12 +38,12 @@ def dw_backed_warehouse_validation_model(
     return data_warehouse_validation_model
 
 
-def test_build_data_source_tasks(
+def test_build_semantic_model_tasks(
     mf_test_session_state: MetricFlowTestSessionState,
     data_warehouse_validation_model: UserConfiguredModel,
     async_sql_client: AsyncSqlClient,
 ) -> None:  # noqa:D
-    tasks = DataWarehouseTaskBuilder.gen_data_source_tasks(
+    tasks = DataWarehouseTaskBuilder.gen_semantic_model_tasks(
         model=data_warehouse_validation_model,
         sql_client=async_sql_client,
         system_schema=mf_test_session_state.mf_system_schema,
@@ -81,7 +81,7 @@ def test_task_runner(  # noqa: D
     assert err_msg_bad in issues.errors[0].message
 
 
-def test_validate_data_sources(  # noqa: D
+def test_validate_semantic_models(  # noqa: D
     dw_backed_warehouse_validation_model: UserConfiguredModel,
     async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -92,20 +92,20 @@ def test_validate_data_sources(  # noqa: D
         sql_client=async_sql_client, system_schema=mf_test_session_state.mf_system_schema
     )
 
-    issues = dw_validator.validate_data_sources(model)
+    issues = dw_validator.validate_semantic_models(model)
     assert len(issues.all_issues) == 0
 
     model.data_sources.append(
         data_source_with_guaranteed_meta(
-            name="test_data_source2",
+            name="test_semantic_model2",
             dimensions=[],
         )
     )
 
-    issues = dw_validator.validate_data_sources(model)
+    issues = dw_validator.validate_semantic_models(model)
     assert len(issues.all_issues) == 1
     assert len(issues.errors) == 1
-    assert "Unable to access data source `test_data_source2`" in issues.all_issues[0].message
+    assert "Unable to access data source `test_semantic_model2`" in issues.all_issues[0].message
 
 
 def test_build_dimension_tasks(  # noqa: D

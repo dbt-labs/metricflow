@@ -10,7 +10,7 @@ import pytest
 
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, BaseOutput
-from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
+from metricflow.dataset.convert_semantic_model import DataSourceToDataSetConverter
 from dbt_semantic_interfaces.model_transformer import ModelTransformer
 from metricflow.model.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
@@ -165,7 +165,7 @@ def simple_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> Semanti
 @pytest.fixture(scope="session")
 def multi_hop_join_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> SemanticManifestLookup:  # noqa: D
     model_build_result = parse_directory_of_yaml_files_to_model(
-        os.path.join(os.path.dirname(__file__), "model_yamls/multi_hop_join_model/partitioned_data_sources"),
+        os.path.join(os.path.dirname(__file__), "model_yamls/multi_hop_join_model/partitioned_semantic_models"),
         template_mapping=template_mapping,
     )
     return SemanticManifestLookup(model_build_result.model)
@@ -176,7 +176,7 @@ def unpartitioned_multi_hop_join_semantic_manifest_lookup(  # noqa: D
     template_mapping: Dict[str, str]
 ) -> SemanticManifestLookup:
     model_build_result = parse_directory_of_yaml_files_to_model(
-        os.path.join(os.path.dirname(__file__), "model_yamls/multi_hop_join_model/unpartitioned_data_sources"),
+        os.path.join(os.path.dirname(__file__), "model_yamls/multi_hop_join_model/unpartitioned_semantic_models"),
         template_mapping=template_mapping,
     )
     return SemanticManifestLookup(model_build_result.model)

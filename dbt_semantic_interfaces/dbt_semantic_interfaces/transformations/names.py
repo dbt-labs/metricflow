@@ -14,12 +14,12 @@ class LowerCaseNamesRule(ModelTransformRule):
     def transform_model(model: UserConfiguredModel) -> UserConfiguredModel:  # noqa: D
         LowerCaseNamesRule._lowercase_top_level_objects(model)
         for data_source in model.data_sources:
-            LowerCaseNamesRule._lowercase_data_source_elements(data_source)
+            LowerCaseNamesRule._lowercase_semantic_model_elements(data_source)
 
         return model
 
     @staticmethod
-    def _lowercase_data_source_elements(data_source: SemanticModel) -> None:
+    def _lowercase_semantic_model_elements(data_source: SemanticModel) -> None:
         """Lowercases the names of data source elements."""
         if data_source.measures:
             for measure in data_source.measures:

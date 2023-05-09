@@ -86,7 +86,7 @@ class DataSourceSemanticsAccessor(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_data_sources_for_measure(self, measure_reference: MeasureReference) -> Sequence[SemanticModel]:
+    def get_semantic_models_for_measure(self, measure_reference: MeasureReference) -> Sequence[SemanticModel]:
         """Retrieve a list of all data source model objects associated with the measure reference"""
         raise NotImplementedError
 
@@ -95,7 +95,7 @@ class DataSourceSemanticsAccessor(ABC):
         """Retrieves the aggregate time dimension that is associated with the measure reference"""
 
     @abstractmethod
-    def get_entity_in_data_source(self, ref: SemanticModelElementReference) -> Optional[Entity]:
+    def get_entity_in_semantic_model(self, ref: SemanticModelElementReference) -> Optional[Entity]:
         """Retrieve the entity matching the element -> data source mapping, if any"""
         raise NotImplementedError
 
@@ -118,7 +118,7 @@ class DataSourceSemanticsAccessor(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_data_sources_for_entity(self, entity_reference: EntityReference) -> Set[SemanticModel]:
+    def get_semantic_models_for_entity(self, entity_reference: EntityReference) -> Set[SemanticModel]:
         """Return all data sources associated with an entity reference"""
         raise NotImplementedError
 

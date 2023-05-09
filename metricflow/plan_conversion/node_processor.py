@@ -84,7 +84,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
     ):
         self._node_data_set_resolver = node_data_set_resolver
         self._partition_resolver = PartitionJoinResolver(data_source_semantics)
-        self._data_source_semantics = data_source_semantics
+        self._semantic_model_semantics = data_source_semantics
         self._join_evaluator = DataSourceJoinEvaluator(data_source_semantics)
 
     def add_time_range_constraint(
@@ -139,7 +139,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                 len(entity_instance_in_first_node.defined_from) == 1
             ), "Multiple items in defined_from not yet supported"
 
-            entity = self._data_source_semantics.get_entity_in_data_source(
+            entity = self._semantic_model_semantics.get_entity_in_semantic_model(
                 entity_instance_in_first_node.defined_from[0]
             )
             if entity is None:

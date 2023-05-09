@@ -97,16 +97,16 @@ def test_get_elements(data_source_semantics: DataSourceSemantics) -> None:  # no
         assert data_source_semantics.get_measure(measure_reference=measure_reference).reference == measure_reference
 
 
-def test_get_data_sources_for_measure(data_source_semantics: DataSourceSemantics) -> None:  # noqa: D
-    bookings_sources = data_source_semantics.get_data_sources_for_measure(MeasureReference(element_name="bookings"))
+def test_get_semantic_models_for_measure(data_source_semantics: DataSourceSemantics) -> None:  # noqa: D
+    bookings_sources = data_source_semantics.get_semantic_models_for_measure(MeasureReference(element_name="bookings"))
     assert len(bookings_sources) == 1
     assert bookings_sources[0].name == "bookings_source"
 
-    views_sources = data_source_semantics.get_data_sources_for_measure(MeasureReference(element_name="views"))
+    views_sources = data_source_semantics.get_semantic_models_for_measure(MeasureReference(element_name="views"))
     assert len(views_sources) == 1
     assert views_sources[0].name == "views_source"
 
-    listings_sources = data_source_semantics.get_data_sources_for_measure(MeasureReference(element_name="listings"))
+    listings_sources = data_source_semantics.get_semantic_models_for_measure(MeasureReference(element_name="listings"))
     assert len(listings_sources) == 1
     assert listings_sources[0].name == "listings_latest"
 
@@ -194,7 +194,7 @@ def test_local_linked_elements_for_metric(metric_semantics: MetricSemantics) -> 
     }
 
 
-def test_get_data_sources_for_entity(data_source_semantics: DataSourceSemantics) -> None:  # noqa: D
+def test_get_semantic_models_for_entity(data_source_semantics: DataSourceSemantics) -> None:  # noqa: D
     entity_reference = EntityReference(element_name="user")
-    linked_data_sources = data_source_semantics.get_data_sources_for_entity(entity_reference=entity_reference)
-    assert len(linked_data_sources) == 8
+    linked_semantic_models = data_source_semantics.get_semantic_models_for_entity(entity_reference=entity_reference)
+    assert len(linked_semantic_models) == 8

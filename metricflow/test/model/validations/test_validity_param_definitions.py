@@ -14,7 +14,7 @@ def test_validity_window_configuration() -> None:
     yaml_contents = textwrap.dedent(
         """\
         data_source:
-          name: scd_data_source
+          name: scd_semantic_model
           node_relation:
             schema_name: some_schema
             alias: scd_table
@@ -54,7 +54,7 @@ def test_validity_window_must_have_a_start() -> None:
     yaml_contents = textwrap.dedent(
         """\
         data_source:
-          name: scd_data_source
+          name: scd_semantic_model
           node_relation:
             schema_name: some_schema
             alias: scd_table
@@ -84,7 +84,7 @@ def test_validity_window_must_have_an_end() -> None:
     yaml_contents = textwrap.dedent(
         """\
         data_source:
-          name: scd_data_source
+          name: scd_semantic_model
           node_relation:
             schema_name: some_schema
             alias: scd_table
@@ -117,7 +117,7 @@ def test_validity_window_uses_two_dimensions() -> None:
     yaml_contents = textwrap.dedent(
         """\
         data_source:
-          name: scd_data_source
+          name: scd_semantic_model
           node_relation:
             schema_name: some_schema
             alias: scd_table
@@ -148,7 +148,7 @@ def test_two_dimension_validity_windows_must_not_overload_start_and_end() -> Non
     yaml_contents = textwrap.dedent(
         """\
         data_source:
-          name: scd_data_source
+          name: scd_semantic_model
           node_relation:
             schema_name: some_schema
             alias: scd_table
@@ -185,7 +185,7 @@ def test_multiple_validity_windows_are_invalid() -> None:
     yaml_contents = textwrap.dedent(
         """\
         data_source:
-          name: scd_data_source
+          name: scd_semantic_model
           node_relation:
             schema_name: some_schema
             alias: scd_table
@@ -234,7 +234,7 @@ def test_empty_validity_windows_are_invalid() -> None:
     yaml_contents = textwrap.dedent(
         """\
         data_source:
-          name: scd_data_source
+          name: scd_semantic_model
           node_relation:
             schema_name: some_schema
             alias: scd_table
@@ -275,7 +275,7 @@ def test_measures_are_prevented() -> None:
     yaml_contents = textwrap.dedent(
         """\
         data_source:
-          name: scd_data_source
+          name: scd_semantic_model
           node_relation:
             schema_name: some_schema
             alias: scd_table
@@ -317,7 +317,7 @@ def test_validity_window_must_have_a_natural_key() -> None:
     yaml_contents = textwrap.dedent(
         """\
         data_source:
-          name: scd_data_source
+          name: scd_semantic_model
           node_relation:
             schema_name: some_schema
             alias: scd_table
@@ -359,7 +359,7 @@ def test_validity_window_does_not_use_primary_key() -> None:
     yaml_contents = textwrap.dedent(
         """\
         data_source:
-          name: scd_data_source
+          name: scd_semantic_model
           node_relation:
             schema_name: some_schema
             alias: scd_table

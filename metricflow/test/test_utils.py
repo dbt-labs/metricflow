@@ -33,7 +33,7 @@ def should_skip_multi_threaded(
     return False
 
 
-def find_data_source_with(
+def find_semantic_model_with(
     model: UserConfiguredModel, function: Callable[[SemanticModel], bool]
 ) -> Tuple[SemanticModel, int]:
     """Returns a data source from the model which matches the criteria defined by the passed in function'

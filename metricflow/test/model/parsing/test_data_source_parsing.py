@@ -8,7 +8,7 @@ from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 
-def test_data_source_metadata_parsing() -> None:
+def test_semantic_model_metadata_parsing() -> None:
     """Test for asserting that internal metadata is parsed into the SemanticModel object"""
     yaml_contents = textwrap.dedent(
         """\
@@ -39,7 +39,7 @@ def test_data_source_metadata_parsing() -> None:
     assert data_source.metadata.file_slice.content == expected_metadata_content
 
 
-def test_data_source_node_relation_parsing() -> None:
+def test_semantic_model_node_relation_parsing() -> None:
     """Test for parsing a data source specification with a node_relation provided"""
     yaml_contents = textwrap.dedent(
         """\
@@ -59,7 +59,7 @@ def test_data_source_node_relation_parsing() -> None:
     assert data_source.node_relation.relation_name == "some_schema.source_table"
 
 
-def test_data_source_entity_parsing() -> None:
+def test_semantic_model_entity_parsing() -> None:
     """Test for parsing a basic entity out of a data source specification"""
     yaml_contents = textwrap.dedent(
         """\
@@ -89,7 +89,7 @@ def test_data_source_entity_parsing() -> None:
     assert entity.expr == "example_id"
 
 
-def test_data_source_entity_metadata_parsing() -> None:
+def test_semantic_model_entity_metadata_parsing() -> None:
     """Test for parsing metadata for an entity object defined in a data source specification"""
     yaml_contents = textwrap.dedent(
         """\
@@ -125,7 +125,7 @@ def test_data_source_entity_metadata_parsing() -> None:
     assert entity.metadata.file_slice.content == expected_metadata_content
 
 
-def test_data_source_measure_parsing() -> None:
+def test_semantic_model_measure_parsing() -> None:
     """Test for parsing a measure out of a data source specification"""
     yaml_contents = textwrap.dedent(
         """\
@@ -154,7 +154,7 @@ def test_data_source_measure_parsing() -> None:
     assert measure.expr == "example_input"
 
 
-def test_data_source_measure_metadata_parsing() -> None:
+def test_semantic_model_measure_metadata_parsing() -> None:
     """Test for parsing metadata for a measure object defined in a data source specification"""
     yaml_contents = textwrap.dedent(
         """\
@@ -190,7 +190,7 @@ def test_data_source_measure_metadata_parsing() -> None:
     assert measure.metadata.file_slice.content == expected_metadata_content
 
 
-def test_data_source_create_metric_measure_parsing() -> None:
+def test_semantic_model_create_metric_measure_parsing() -> None:
     """Test for parsing a measure out of a data source specification when create metric is set"""
     yaml_contents = textwrap.dedent(
         """\
@@ -216,7 +216,7 @@ def test_data_source_create_metric_measure_parsing() -> None:
     assert measure.create_metric is True
 
 
-def test_data_source_categorical_dimension_parsing() -> None:
+def test_semantic_model_categorical_dimension_parsing() -> None:
     """Test for parsing a categorical dimension out of a data source specification"""
     yaml_contents = textwrap.dedent(
         """\
@@ -244,7 +244,7 @@ def test_data_source_categorical_dimension_parsing() -> None:
     assert dimension.is_partition is not True
 
 
-def test_data_source_partition_dimension_parsing() -> None:
+def test_semantic_model_partition_dimension_parsing() -> None:
     """Test for parsing a partition dimension out of a data source specification"""
     yaml_contents = textwrap.dedent(
         """\
@@ -270,7 +270,7 @@ def test_data_source_partition_dimension_parsing() -> None:
     assert dimension.is_partition is True
 
 
-def test_data_source_time_dimension_parsing() -> None:
+def test_semantic_model_time_dimension_parsing() -> None:
     """Test for parsing a time dimension out of a data source specification"""
     yaml_contents = textwrap.dedent(
         """\
@@ -300,7 +300,7 @@ def test_data_source_time_dimension_parsing() -> None:
     assert dimension.type_params.time_granularity is TimeGranularity.MONTH
 
 
-def test_data_source_primary_time_dimension_parsing() -> None:
+def test_semantic_model_primary_time_dimension_parsing() -> None:
     """Test for parsing a primary time dimension out of a data source specification"""
     yaml_contents = textwrap.dedent(
         """\
@@ -330,7 +330,7 @@ def test_data_source_primary_time_dimension_parsing() -> None:
     assert dimension.type_params.is_primary is True
 
 
-def test_data_source_dimension_metadata_parsing() -> None:
+def test_semantic_model_dimension_metadata_parsing() -> None:
     """Test for parsing metadata for an dimension object defined in a data source specification"""
     yaml_contents = textwrap.dedent(
         """\
@@ -366,7 +366,7 @@ def test_data_source_dimension_metadata_parsing() -> None:
     assert dimension.metadata.file_slice.content == expected_metadata_content
 
 
-def test_data_source_dimension_validity_params_parsing() -> None:
+def test_semantic_model_dimension_validity_params_parsing() -> None:
     """Test for parsing dimension validity info out of a data source specification"""
     yaml_contents = textwrap.dedent(
         """\

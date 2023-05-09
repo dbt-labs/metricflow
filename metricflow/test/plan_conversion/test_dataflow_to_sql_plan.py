@@ -725,7 +725,7 @@ def test_join_to_time_spine_node_with_offset_to_grain(
 # TODO: write test case for both offset window and offset to grain to date once allowed via derived metrics
 
 
-def test_compute_metrics_node_ratio_from_single_data_source(
+def test_compute_metrics_node_ratio_from_single_semantic_model(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
@@ -792,7 +792,7 @@ def test_compute_metrics_node_ratio_from_single_data_source(
     )
 
 
-def test_compute_metrics_node_ratio_from_multiple_data_sources(
+def test_compute_metrics_node_ratio_from_multiple_semantic_models(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -1666,7 +1666,7 @@ def test_metric_with_measures_from_multiple_sources_no_dimensions(  # noqa: D
     )
 
 
-def test_common_data_source(  # noqa: D
+def test_common_semantic_model(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],

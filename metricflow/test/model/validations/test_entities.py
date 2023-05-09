@@ -17,20 +17,20 @@ from metricflow.model.validations.entities import (
 )
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.test.model.validations.helpers import base_model_file
-from metricflow.test.test_utils import find_data_source_with
+from metricflow.test.test_utils import find_semantic_model_with
 
 
-def test_data_source_cant_have_more_than_one_primary_entity(
+def test_semantic_model_cant_have_more_than_one_primary_entity(
     simple_model__with_primary_transforms: UserConfiguredModel,
 ) -> None:  # noqa: D
     """Add an additional primary entity to a data source and assert that it cannot have two"""
     model = copy.deepcopy(simple_model__with_primary_transforms)
     func: Callable[[SemanticModel], bool] = lambda data_source: len(data_source.entities) > 1
 
-    multiple_entity_data_source, _ = find_data_source_with(model, func)
+    multiple_entity_semantic_model, _ = find_semantic_model_with(model, func)
 
     entity_references = set()
-    for entity in multiple_entity_data_source.entities:
+    for entity in multiple_entity_semantic_model.entities:
         entity.type = EntityType.PRIMARY
         entity_references.add(entity.reference)
 
@@ -38,7 +38,7 @@ def test_data_source_cant_have_more_than_one_primary_entity(
 
     future_issue = (
         f"Data sources can have only one primary entity. The data source"
-        f" `{multiple_entity_data_source.name}` has {len(entity_references)}"
+        f" `{multiple_entity_semantic_model.name}` has {len(entity_references)}"
     )
 
     found_future_issue = False

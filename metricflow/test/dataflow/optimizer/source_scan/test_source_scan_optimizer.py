@@ -155,7 +155,7 @@ def check_optimization(  # noqa: D
     assert source_counter.count_source_nodes(optimized_dataflow_plan) == expected_num_sources_in_optimized
 
 
-def test_2_metrics_from_1_data_source(  # noqa: D
+def test_2_metrics_from_1_semantic_model(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
@@ -180,7 +180,7 @@ def test_2_metrics_from_1_data_source(  # noqa: D
     )
 
 
-def test_2_metrics_from_2_data_sources(  # noqa: D
+def test_2_metrics_from_2_semantic_models(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
@@ -200,7 +200,7 @@ def test_2_metrics_from_2_data_sources(  # noqa: D
     )
 
 
-def test_3_metrics_from_2_data_sources(  # noqa: D
+def test_3_metrics_from_2_semantic_models(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
@@ -340,7 +340,7 @@ def test_derived_metric_with_non_derived_metric(  # noqa: D
     )
 
 
-def test_2_ratio_metrics_from_1_data_source(  # noqa: D
+def test_2_ratio_metrics_from_1_semantic_model(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],

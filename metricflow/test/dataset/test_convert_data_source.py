@@ -21,7 +21,7 @@ from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 logger = logging.getLogger(__name__)
 
 
-def test_convert_table_data_source_without_measures(  # noqa: D
+def test_convert_table_semantic_model_without_measures(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     sql_client: SqlClient,
@@ -86,7 +86,7 @@ def test_convert_table_data_source_without_measures(  # noqa: D
     )
 
 
-def test_convert_table_data_source_with_measures(  # noqa: D
+def test_convert_table_semantic_model_with_measures(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     sql_client: SqlClient,
@@ -194,7 +194,7 @@ def test_convert_table_data_source_with_measures(  # noqa: D
     )
 
 
-def test_convert_query_data_source(  # noqa: D
+def test_convert_query_semantic_model(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     sql_client: SqlClient,

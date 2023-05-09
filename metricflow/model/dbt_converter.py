@@ -9,7 +9,7 @@ from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
     DbtMappingResults,
     MappedObjects,
 )
-from metricflow.model.dbt_mapping_rules.dbt_metric_model_to_data_source_rules import (
+from metricflow.model.dbt_mapping_rules.dbt_metric_model_to_semantic_model_rules import (
     DbtMapToDataSourceName,
     DbtMapToDataSourceDescription,
     DbtMapDataSourceNodeRelation,

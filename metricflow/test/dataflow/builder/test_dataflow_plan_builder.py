@@ -228,7 +228,7 @@ def test_expr_metrics_plan(
     )
 
 
-def test_single_data_source_ratio_metrics_plan(
+def test_single_semantic_model_ratio_metrics_plan(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
@@ -261,7 +261,7 @@ def test_single_data_source_ratio_metrics_plan(
     )
 
 
-def test_multi_data_source_ratio_metrics_plan(
+def test_multi_semantic_model_ratio_metrics_plan(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
@@ -592,7 +592,7 @@ def test_measure_constraint_with_reused_measure_plan(
     )
 
 
-def test_common_data_source(  # noqa: D
+def test_common_semantic_model(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],

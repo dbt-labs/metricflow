@@ -7,7 +7,7 @@ from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 
 @pytest.mark.skip("TODO: Will convert to validation rule")
-def test_data_source_invalid_sql() -> None:  # noqa:D
+def test_semantic_model_invalid_sql() -> None:  # noqa:D
     with pytest.raises(ModelValidationException, match=r"Invalid SQL"):
         data_source_with_guaranteed_meta(
             name="invalid_sql_source",

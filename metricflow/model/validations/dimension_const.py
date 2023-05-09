@@ -32,7 +32,7 @@ class DimensionConsistencyRule(ModelValidationRule):
         issues: List[ValidationIssue] = []
 
         for data_source in model.data_sources:
-            issues += DimensionConsistencyRule._validate_data_source(
+            issues += DimensionConsistencyRule._validate_semantic_model(
                 data_source=data_source, dimension_to_invariant=dimension_to_invariant, update_invariant_dict=True
             )
 
@@ -97,7 +97,7 @@ class DimensionConsistencyRule(ModelValidationRule):
     @validate_safely(
         whats_being_done="checking that the data source has dimensions consistent with the given invariants"
     )
-    def _validate_data_source(
+    def _validate_semantic_model(
         data_source: SemanticModel,
         dimension_to_invariant: Dict[DimensionReference, DimensionInvariants],
         update_invariant_dict: bool,

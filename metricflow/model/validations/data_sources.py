@@ -27,12 +27,12 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
         issues: List[ValidationIssue] = []
 
         for data_source in model.data_sources:
-            issues.extend(DataSourceTimeDimensionWarningsRule._validate_data_source(data_source=data_source))
+            issues.extend(DataSourceTimeDimensionWarningsRule._validate_semantic_model(data_source=data_source))
         return issues
 
     @staticmethod
     @validate_safely(whats_being_done="checking validity of the data source's time dimensions")
-    def _validate_data_source(data_source: SemanticModel) -> List[ValidationIssue]:
+    def _validate_semantic_model(data_source: SemanticModel) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
 
         primary_time_dimensions = []
@@ -85,7 +85,7 @@ class DataSourceValidityWindowRule(ModelValidationRule):
         issues: List[ValidationIssue] = []
 
         for data_source in model.data_sources:
-            issues.extend(DataSourceValidityWindowRule._validate_data_source(data_source=data_source))
+            issues.extend(DataSourceValidityWindowRule._validate_semantic_model(data_source=data_source))
 
         return issues
 
@@ -93,7 +93,7 @@ class DataSourceValidityWindowRule(ModelValidationRule):
     @validate_safely(
         whats_being_done="checking the data source's validity parameters for compatibility with runtime requirements"
     )
-    def _validate_data_source(data_source: SemanticModel) -> List[ValidationIssue]:
+    def _validate_semantic_model(data_source: SemanticModel) -> List[ValidationIssue]:
         """Runs assertions on data sources with validity parameters set on one or more time dimensions"""
 
         issues: List[ValidationIssue] = []

@@ -22,7 +22,7 @@ class MetricSemantics(MetricSemanticsAccessor):  # noqa: D
     ) -> None:
         self._user_configured_model = user_configured_model
         self._metrics: Dict[MetricReference, Metric] = {}
-        self._data_source_semantics = data_source_semantics
+        self._semantic_model_semantics = data_source_semantics
 
         for metric in self._user_configured_model.metrics:
             self.add_metric(metric)
@@ -75,7 +75,7 @@ class MetricSemantics(MetricSemanticsAccessor):  # noqa: D
         if metric_reference in self._metrics:
             raise DuplicateMetricError(f"Metric `{metric.name}` has already been registered")
         for measure_reference in metric.measure_references:
-            if measure_reference not in self._data_source_semantics.measure_references:
+            if measure_reference not in self._semantic_model_semantics.measure_references:
                 raise NonExistentMeasureError(
                     f"Metric `{metric.name}` references measure `{measure_reference}` which has not been registered"
                 )
@@ -89,7 +89,7 @@ class MetricSemantics(MetricSemanticsAccessor):  # noqa: D
         for input_measure in metric.input_measures:
             spec_constraint = (
                 WhereConstraintConverter.convert_to_spec_where_constraint(
-                    data_source_semantics=self._data_source_semantics,
+                    data_source_semantics=self._semantic_model_semantics,
                     where_constraint=input_measure.constraint,
                 )
                 if input_measure.constraint is not None
@@ -97,7 +97,7 @@ class MetricSemantics(MetricSemanticsAccessor):  # noqa: D
             )
             measure_spec = MeasureSpec(
                 element_name=input_measure.name,
-                non_additive_dimension_spec=self._data_source_semantics.non_additive_dimension_specs_by_measure.get(
+                non_additive_dimension_spec=self._semantic_model_semantics.non_additive_dimension_specs_by_measure.get(
                     input_measure.measure_reference
                 ),
             )
@@ -133,7 +133,7 @@ class MetricSemantics(MetricSemanticsAccessor):  # noqa: D
             # This is the constraint parameter added to the input metric in the derived metric definition
             combined_spec_constraint = (
                 WhereConstraintConverter.convert_to_spec_where_constraint(
-                    data_source_semantics=self._data_source_semantics,
+                    data_source_semantics=self._semantic_model_semantics,
                     where_constraint=input_metric.constraint,
                 )
                 if input_metric.constraint is not None
@@ -143,7 +143,7 @@ class MetricSemantics(MetricSemanticsAccessor):  # noqa: D
             # This is the constraint parameter included in the original input metric definition
             if original_metric_obj.constraint:
                 original_metric_constraint = WhereConstraintConverter.convert_to_spec_where_constraint(
-                    data_source_semantics=self._data_source_semantics,
+                    data_source_semantics=self._semantic_model_semantics,
                     where_constraint=original_metric_obj.constraint,
                 )
                 combined_spec_constraint = (

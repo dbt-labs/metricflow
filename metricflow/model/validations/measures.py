@@ -33,10 +33,10 @@ class DataSourceMeasuresUniqueRule(ModelValidationRule):
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
         issues: List[ValidationIssue] = []
 
-        measure_references_to_data_sources: Dict[MeasureReference, List] = defaultdict(list)
+        measure_references_to_semantic_models: Dict[MeasureReference, List] = defaultdict(list)
         for data_source in model.data_sources:
             for measure in data_source.measures:
-                if measure.reference in measure_references_to_data_sources:
+                if measure.reference in measure_references_to_semantic_models:
                     issues.append(
                         ValidationError(
                             context=DataSourceElementContext(
@@ -47,10 +47,10 @@ class DataSourceMeasuresUniqueRule(ModelValidationRule):
                                 element_type=DataSourceElementType.MEASURE,
                             ),
                             message=f"Found measure with name {measure.name} in multiple data sources with names "
-                            f"({measure_references_to_data_sources[measure.reference]})",
+                            f"({measure_references_to_semantic_models[measure.reference]})",
                         )
                     )
-                measure_references_to_data_sources[measure.reference].append(data_source.name)
+                measure_references_to_semantic_models[measure.reference].append(data_source.name)
 
         return issues
 
@@ -340,9 +340,9 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                     )
 
                 # Validates that all window_groupings are entities
-                entities_in_data_source = {entity.name for entity in data_source.entities}
+                entities_in_semantic_model = {entity.name for entity in data_source.entities}
                 window_groupings = set(non_additive_dimension.window_groupings)
-                intersected_entities = window_groupings.intersection(entities_in_data_source)
+                intersected_entities = window_groupings.intersection(entities_in_semantic_model)
                 if len(intersected_entities) != len(window_groupings):
                     issues.append(
                         ValidationError(
