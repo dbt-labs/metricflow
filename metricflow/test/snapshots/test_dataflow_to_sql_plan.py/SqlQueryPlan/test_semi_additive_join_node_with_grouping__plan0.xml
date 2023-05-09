@@ -93,12 +93,13 @@
             <!--   {'class': 'SqlSelectColumn',                              -->
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10009),  -->
             <!--    'column_alias': 'user'}                                  -->
-            <!-- from_source = SqlSelectQueryFromClauseNode(node_id=tfc_10000) -->
+            <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10000) -->
             <!-- where = None -->
-            <SqlSelectQueryFromClauseNode>
-                <!-- description = Read From a Select Query -->
+            <SqlTableFromClauseNode>
+                <!-- description = Read from ***************************.fct_accounts -->
                 <!-- node_id = tfc_10000 -->
-            </SqlSelectQueryFromClauseNode>
+                <!-- table_id = ***************************.fct_accounts -->
+            </SqlTableFromClauseNode>
         </SqlSelectStatementNode>
         <SqlSelectStatementNode>
             <!-- description = Filter row on MAX(ds) -->
@@ -160,12 +161,13 @@
                 <!--   {'class': 'SqlSelectColumn',                              -->
                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10009),  -->
                 <!--    'column_alias': 'user'}                                  -->
-                <!-- from_source = SqlSelectQueryFromClauseNode(node_id=tfc_10000) -->
+                <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10000) -->
                 <!-- where = None -->
-                <SqlSelectQueryFromClauseNode>
-                    <!-- description = Read From a Select Query -->
+                <SqlTableFromClauseNode>
+                    <!-- description = Read from ***************************.fct_accounts -->
                     <!-- node_id = tfc_10000 -->
-                </SqlSelectQueryFromClauseNode>
+                    <!-- table_id = ***************************.fct_accounts -->
+                </SqlTableFromClauseNode>
             </SqlSelectStatementNode>
         </SqlSelectStatementNode>
     </SqlSelectStatementNode>

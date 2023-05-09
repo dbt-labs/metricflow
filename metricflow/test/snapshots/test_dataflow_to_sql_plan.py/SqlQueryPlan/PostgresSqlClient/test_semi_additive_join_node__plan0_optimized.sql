@@ -23,20 +23,14 @@ FROM (
     , DATE_TRUNC('year', ds) AS ds__year
     , account_type
     , user_id AS user
-  FROM (
-    -- User Defined SQL Query
-    SELECT * FROM ***************************.fct_accounts
-  ) accounts_source_src_10000
+  FROM ***************************.fct_accounts accounts_source_src_10000
 ) subq_3
 INNER JOIN (
   -- Read Elements From Data Source 'accounts_source'
   -- Filter row on MIN(ds)
   SELECT
     MIN(ds) AS ds__complete
-  FROM (
-    -- User Defined SQL Query
-    SELECT * FROM ***************************.fct_accounts
-  ) accounts_source_src_10000
+  FROM ***************************.fct_accounts accounts_source_src_10000
 ) subq_5
 ON
   subq_3.ds = subq_5.ds__complete

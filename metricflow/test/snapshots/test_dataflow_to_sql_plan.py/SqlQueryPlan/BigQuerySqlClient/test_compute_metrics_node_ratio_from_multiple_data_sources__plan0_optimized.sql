@@ -24,10 +24,7 @@ FROM (
       ds
       , listing_id AS listing
       , 1 AS bookings
-    FROM (
-      -- User Defined SQL Query
-      SELECT * FROM ***************************.fct_bookings
-    ) bookings_source_src_10001
+    FROM ***************************.fct_bookings bookings_source_src_10001
   ) subq_22
   LEFT OUTER JOIN
     ***************************.dim_listings_latest listings_latest_src_10004
@@ -55,10 +52,7 @@ INNER JOIN (
       ds
       , listing_id AS listing
       , 1 AS views
-    FROM (
-      -- User Defined SQL Query
-      SELECT user_id, listing_id, ds, ds_partitioned FROM ***************************.fct_views
-    ) views_source_src_10009
+    FROM ***************************.fct_views views_source_src_10009
   ) subq_31
   LEFT OUTER JOIN
     ***************************.dim_listings_latest listings_latest_src_10004

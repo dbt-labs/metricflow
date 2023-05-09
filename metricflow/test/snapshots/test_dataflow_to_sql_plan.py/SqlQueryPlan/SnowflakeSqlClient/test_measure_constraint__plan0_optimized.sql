@@ -39,10 +39,7 @@ FROM (
           , listing_id AS listing
           , 1 AS bookings
           , booking_value AS average_booking_value
-        FROM (
-          -- User Defined SQL Query
-          SELECT * FROM ***************************.fct_bookings
-        ) bookings_source_src_10001
+        FROM ***************************.fct_bookings bookings_source_src_10001
       ) subq_19
       LEFT OUTER JOIN
         ***************************.dim_listings_latest listings_latest_src_10004
@@ -62,10 +59,7 @@ FROM (
     SELECT
       ds AS metric_time
       , SUM(booking_value) AS booking_value
-    FROM (
-      -- User Defined SQL Query
-      SELECT * FROM ***************************.fct_bookings
-    ) bookings_source_src_10001
+    FROM ***************************.fct_bookings bookings_source_src_10001
     GROUP BY
       ds
   ) subq_31

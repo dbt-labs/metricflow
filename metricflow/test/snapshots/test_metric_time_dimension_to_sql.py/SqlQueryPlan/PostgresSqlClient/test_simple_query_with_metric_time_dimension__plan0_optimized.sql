@@ -17,10 +17,7 @@ FROM (
     SELECT
       ds AS metric_time
       , 1 AS bookings
-    FROM (
-      -- User Defined SQL Query
-      SELECT * FROM ***************************.fct_bookings
-    ) bookings_source_src_10001
+    FROM ***************************.fct_bookings bookings_source_src_10001
   ) subq_12
   GROUP BY
     metric_time
@@ -35,10 +32,7 @@ FULL OUTER JOIN (
   SELECT
     booking_paid_at AS metric_time
     , SUM(booking_value) AS booking_payments
-  FROM (
-    -- User Defined SQL Query
-    SELECT * FROM ***************************.fct_bookings
-  ) bookings_source_src_10001
+  FROM ***************************.fct_bookings bookings_source_src_10001
   GROUP BY
     booking_paid_at
 ) subq_19

@@ -19,10 +19,7 @@ FROM (
       ds AS metric_time
       , is_instant
       , 1 AS bookings
-    FROM (
-      -- User Defined SQL Query
-      SELECT * FROM ***************************.fct_bookings
-    ) bookings_source_src_10001
+    FROM ***************************.fct_bookings bookings_source_src_10001
   ) subq_8
   WHERE NOT is_instant
   GROUP BY

@@ -12,10 +12,7 @@ FROM (
   -- Aggregate Measures
   SELECT
     SUM(1) AS bookings
-  FROM (
-    -- User Defined SQL Query
-    SELECT * FROM ***************************.fct_bookings
-  ) bookings_source_src_10001
+  FROM ***************************.fct_bookings bookings_source_src_10001
 ) subq_13
 CROSS JOIN (
   -- Read Elements From Data Source 'listings_latest'

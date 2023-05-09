@@ -314,11 +314,11 @@
                                 <!--   {'class': 'SqlSelectColumn',                              -->
                                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10227),  -->
                                 <!--    'column_alias': 'account_id'}                            -->
-                                <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10006) -->
+                                <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10010) -->
                                 <!-- where = None -->
                                 <SqlTableFromClauseNode>
                                     <!-- description = Read from ***************************.account_month_txns -->
-                                    <!-- node_id = tfc_10006 -->
+                                    <!-- node_id = tfc_10010 -->
                                     <!-- table_id = ***************************.account_month_txns -->
                                 </SqlTableFromClauseNode>
                             </SqlSelectStatementNode>
@@ -505,11 +505,11 @@
                                 <!--   {'class': 'SqlSelectColumn',                              -->
                                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10242),  -->
                                 <!--    'column_alias': 'account_id__customer_id'}               -->
-                                <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10007) -->
+                                <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10011) -->
                                 <!-- where = None -->
                                 <SqlTableFromClauseNode>
                                     <!-- description = Read from ***************************.bridge_table -->
-                                    <!-- node_id = tfc_10007 -->
+                                    <!-- node_id = tfc_10011 -->
                                     <!-- table_id = ***************************.bridge_table -->
                                 </SqlTableFromClauseNode>
                             </SqlSelectStatementNode>
@@ -657,11 +657,11 @@
                                     <!--   {'class': 'SqlSelectColumn',                              -->
                                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10264),  -->
                                     <!--    'column_alias': 'customer_id'}                           -->
-                                    <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10009) -->
+                                    <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10013) -->
                                     <!-- where = None -->
                                     <SqlTableFromClauseNode>
                                         <!-- description = Read from ***************************.customer_table -->
-                                        <!-- node_id = tfc_10009 -->
+                                        <!-- node_id = tfc_10013 -->
                                         <!-- table_id = ***************************.customer_table -->
                                     </SqlTableFromClauseNode>
                                 </SqlSelectStatementNode>

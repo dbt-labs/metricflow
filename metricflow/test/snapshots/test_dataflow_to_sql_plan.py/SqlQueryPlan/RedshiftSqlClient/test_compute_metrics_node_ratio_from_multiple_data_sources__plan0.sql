@@ -161,10 +161,7 @@ FROM (
                   , bookings_source_src_10001.listing_id AS create_a_cycle_in_the_join_graph__listing
                   , bookings_source_src_10001.guest_id AS create_a_cycle_in_the_join_graph__guest
                   , bookings_source_src_10001.host_id AS create_a_cycle_in_the_join_graph__host
-                FROM (
-                  -- User Defined SQL Query
-                  SELECT * FROM ***************************.fct_bookings
-                ) bookings_source_src_10001
+                FROM ***************************.fct_bookings bookings_source_src_10001
               ) subq_0
             ) subq_1
           ) subq_2
@@ -351,10 +348,7 @@ FROM (
                   , views_source_src_10009.user_id AS create_a_cycle_in_the_join_graph
                   , views_source_src_10009.listing_id AS create_a_cycle_in_the_join_graph__listing
                   , views_source_src_10009.user_id AS create_a_cycle_in_the_join_graph__user
-                FROM (
-                  -- User Defined SQL Query
-                  SELECT user_id, listing_id, ds, ds_partitioned FROM ***************************.fct_views
-                ) views_source_src_10009
+                FROM ***************************.fct_views views_source_src_10009
               ) subq_9
             ) subq_10
           ) subq_11

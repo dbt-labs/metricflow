@@ -330,11 +330,11 @@
                                 <!--   {'class': 'SqlSelectColumn',                              -->
                                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10091),  -->
                                 <!--    'column_alias': 'verification__user'}                    -->
-                                <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10001) -->
+                                <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10003) -->
                                 <!-- where = None -->
                                 <SqlTableFromClauseNode>
                                     <!-- description = Read from ***************************.fct_id_verifications -->
-                                    <!-- node_id = tfc_10001 -->
+                                    <!-- node_id = tfc_10003 -->
                                     <!-- table_id = ***************************.fct_id_verifications -->
                                 </SqlTableFromClauseNode>
                             </SqlSelectStatementNode>
@@ -494,11 +494,11 @@
                             <!--   {'class': 'SqlSelectColumn',                              -->
                             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10165),  -->
                             <!--    'column_alias': 'user'}                                  -->
-                            <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10004) -->
+                            <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10007) -->
                             <!-- where = None -->
                             <SqlTableFromClauseNode>
                                 <!-- description = Read from ***************************.dim_users -->
-                                <!-- node_id = tfc_10004 -->
+                                <!-- node_id = tfc_10007 -->
                                 <!-- table_id = ***************************.dim_users -->
                             </SqlTableFromClauseNode>
                         </SqlSelectStatementNode>
