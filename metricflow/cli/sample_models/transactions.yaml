@@ -71,8 +71,9 @@ data_source:
           WHEN transaction_type_name = 'quick-buy' THEN 'Quick Buy'
           ELSE 'Not Quick Buy' 
         END
-
-  sql_table: $transactions_table
+  node_relation:
+    alias: $transactions_table
+    schema_name: $system_schema
 
 ---
 metric: 

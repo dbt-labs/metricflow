@@ -10,4 +10,6 @@ data_source:
     - name: region
       description: The region associated with the country.
       type: categorical
-  sql_table: $countries_table
+  node_relation:
+    alias: $countries_table
+    schema_name: $system_schema
