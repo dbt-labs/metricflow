@@ -149,7 +149,7 @@ def test_measure_alias_is_set_when_required() -> None:
             measures:
               - name: {measure_name}
               - name: {measure_name}
-                constraint: is_instant
+                filter: is_instant
         """
     )
     missing_alias_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
