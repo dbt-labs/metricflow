@@ -122,8 +122,8 @@ class SqlDataSet(DataSet):
 class SameSemanticModelReferenceChecker(InstanceSetTransform[bool]):
     """Checks to see that all elements in the instance set come from the same data source."""
 
-    def __init__(self, data_source_reference: SemanticModelReference) -> None:  # noqa: D
-        self._data_source_reference = data_source_reference
+    def __init__(self, semantic_model_reference: SemanticModelReference) -> None:  # noqa: D
+        self._semantic_model_reference = semantic_model_reference
 
     def transform(self, instance_set: InstanceSet) -> bool:  # noqa: D
         combined: List[DataSourceElementInstance] = []
@@ -132,4 +132,4 @@ class SameSemanticModelReferenceChecker(InstanceSetTransform[bool]):
         combined.extend(instance_set.time_dimension_instances)
         combined.extend(instance_set.entity_instances)
 
-        return all([all([y.is_from(self._data_source_reference) for y in x.defined_from]) for x in combined])
+        return all([all([y.is_from(self._semantic_model_reference) for y in x.defined_from]) for x in combined])

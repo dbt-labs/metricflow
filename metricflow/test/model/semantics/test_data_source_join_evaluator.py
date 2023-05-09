@@ -50,7 +50,7 @@ def test_join_type_coverage() -> None:
             ), f"Unhandled entity join type {join_type} not in valid or invalid entity join lists!"
 
 
-def __get_simple_model_user_data_source_references_by_type(
+def __get_simple_model_user_semantic_model_references_by_type(
     semantic_manifest_lookup: SemanticManifestLookup,
 ) -> Dict[EntityType, SemanticModelReference]:
     """Helper to get a set of data sources with the `user` identifier organized by identifier type"""
@@ -81,40 +81,42 @@ def test_distinct_target_data_source_join_validation(simple_semantic_manifest_lo
     PRIMARY and UNIQUE entity targets should be valid for any join at the data source level because they both
     represent entity columns with distinct value sets, and as such there is no risk of inadvertent fanout joins.
     """
-    data_source_references = __get_simple_model_user_data_source_references_by_type(simple_semantic_manifest_lookup)
+    semantic_model_references = __get_simple_model_user_semantic_model_references_by_type(
+        simple_semantic_manifest_lookup
+    )
     user_entity_reference = EntityReference(element_name="user")
     join_evaluator = DataSourceJoinEvaluator(
         data_source_semantics=simple_semantic_manifest_lookup.data_source_semantics
     )
 
     foreign_primary = join_evaluator.is_valid_data_source_join(
-        left_data_source_reference=data_source_references[EntityType.FOREIGN],
-        right_data_source_reference=data_source_references[EntityType.PRIMARY],
+        left_semantic_model_reference=semantic_model_references[EntityType.FOREIGN],
+        right_semantic_model_reference=semantic_model_references[EntityType.PRIMARY],
         on_entity_reference=user_entity_reference,
     )
     primary_primary = join_evaluator.is_valid_data_source_join(
-        left_data_source_reference=data_source_references[EntityType.PRIMARY],
-        right_data_source_reference=data_source_references[EntityType.PRIMARY],
+        left_semantic_model_reference=semantic_model_references[EntityType.PRIMARY],
+        right_semantic_model_reference=semantic_model_references[EntityType.PRIMARY],
         on_entity_reference=user_entity_reference,
     )
     unique_primary = join_evaluator.is_valid_data_source_join(
-        left_data_source_reference=data_source_references[EntityType.UNIQUE],
-        right_data_source_reference=data_source_references[EntityType.PRIMARY],
+        left_semantic_model_reference=semantic_model_references[EntityType.UNIQUE],
+        right_semantic_model_reference=semantic_model_references[EntityType.PRIMARY],
         on_entity_reference=user_entity_reference,
     )
     foreign_unique = join_evaluator.is_valid_data_source_join(
-        left_data_source_reference=data_source_references[EntityType.FOREIGN],
-        right_data_source_reference=data_source_references[EntityType.UNIQUE],
+        left_semantic_model_reference=semantic_model_references[EntityType.FOREIGN],
+        right_semantic_model_reference=semantic_model_references[EntityType.UNIQUE],
         on_entity_reference=user_entity_reference,
     )
     primary_unique = join_evaluator.is_valid_data_source_join(
-        left_data_source_reference=data_source_references[EntityType.PRIMARY],
-        right_data_source_reference=data_source_references[EntityType.UNIQUE],
+        left_semantic_model_reference=semantic_model_references[EntityType.PRIMARY],
+        right_semantic_model_reference=semantic_model_references[EntityType.UNIQUE],
         on_entity_reference=user_entity_reference,
     )
     unique_unique = join_evaluator.is_valid_data_source_join(
-        left_data_source_reference=data_source_references[EntityType.UNIQUE],
-        right_data_source_reference=data_source_references[EntityType.UNIQUE],
+        left_semantic_model_reference=semantic_model_references[EntityType.UNIQUE],
+        right_semantic_model_reference=semantic_model_references[EntityType.UNIQUE],
         on_entity_reference=user_entity_reference,
     )
 
@@ -137,25 +139,27 @@ def test_foreign_target_data_source_join_validation(simple_semantic_manifest_loo
 
     These should all fail by default, as fanout joins are not supported
     """
-    data_source_references = __get_simple_model_user_data_source_references_by_type(simple_semantic_manifest_lookup)
+    semantic_model_references = __get_simple_model_user_semantic_model_references_by_type(
+        simple_semantic_manifest_lookup
+    )
     user_entity_reference = EntityReference(element_name="user")
     join_evaluator = DataSourceJoinEvaluator(
         data_source_semantics=simple_semantic_manifest_lookup.data_source_semantics
     )
 
     foreign_foreign = join_evaluator.is_valid_data_source_join(
-        left_data_source_reference=data_source_references[EntityType.FOREIGN],
-        right_data_source_reference=data_source_references[EntityType.FOREIGN],
+        left_semantic_model_reference=semantic_model_references[EntityType.FOREIGN],
+        right_semantic_model_reference=semantic_model_references[EntityType.FOREIGN],
         on_entity_reference=user_entity_reference,
     )
     primary_foreign = join_evaluator.is_valid_data_source_join(
-        left_data_source_reference=data_source_references[EntityType.PRIMARY],
-        right_data_source_reference=data_source_references[EntityType.FOREIGN],
+        left_semantic_model_reference=semantic_model_references[EntityType.PRIMARY],
+        right_semantic_model_reference=semantic_model_references[EntityType.FOREIGN],
         on_entity_reference=user_entity_reference,
     )
     unique_foreign = join_evaluator.is_valid_data_source_join(
-        left_data_source_reference=data_source_references[EntityType.UNIQUE],
-        right_data_source_reference=data_source_references[EntityType.FOREIGN],
+        left_semantic_model_reference=semantic_model_references[EntityType.UNIQUE],
+        right_semantic_model_reference=semantic_model_references[EntityType.FOREIGN],
         on_entity_reference=user_entity_reference,
     )
 
@@ -186,8 +190,8 @@ def test_data_source_join_validation_on_missing_entity(simple_semantic_manifest_
     )
 
     assert not join_evaluator.is_valid_data_source_join(
-        left_data_source_reference=no_listing_data_source.reference,
-        right_data_source_reference=primary_listing_data_source.reference,
+        left_semantic_model_reference=no_listing_data_source.reference,
+        right_semantic_model_reference=primary_listing_data_source.reference,
         on_entity_reference=listing_entity_reference,
     ), (
         "Found valid join on `listing` involving the `id_verifications` data source, which does not include the "
@@ -296,19 +300,21 @@ def test_foreign_target_instance_set_join_validation(
 def test_get_joinable_data_sources_single_hop(  # noqa: D
     multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
-    data_source_reference = SemanticModelReference(semantic_model_name="account_month_txns")
+    semantic_model_reference = SemanticModelReference(semantic_model_name="account_month_txns")
     join_evaluator = DataSourceJoinEvaluator(
         data_source_semantics=multi_hop_join_semantic_manifest_lookup.data_source_semantics
     )
 
     # Single-hop
-    joinable_data_sources = join_evaluator.get_joinable_data_sources(left_data_source_reference=data_source_reference)
+    joinable_data_sources = join_evaluator.get_joinable_data_sources(
+        left_semantic_model_reference=semantic_model_reference
+    )
     assert set(joinable_data_sources.keys()) == {"bridge_table"}
     assert joinable_data_sources["bridge_table"] == DataSourceLink(
-        left_data_source_reference=SemanticModelReference(semantic_model_name="account_month_txns"),
+        left_semantic_model_reference=SemanticModelReference(semantic_model_name="account_month_txns"),
         join_path=[
             DataSourceEntityJoin(
-                right_data_source_reference=SemanticModelReference(semantic_model_name="bridge_table"),
+                right_semantic_model_reference=SemanticModelReference(semantic_model_name="bridge_table"),
                 entity_reference=EntityReference(element_name="account_id"),
                 join_type=DataSourceEntityJoinType(
                     left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.PRIMARY
@@ -321,21 +327,21 @@ def test_get_joinable_data_sources_single_hop(  # noqa: D
 def test_get_joinable_data_sources_multi_hop(  # noqa: D
     multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
-    data_source_reference = SemanticModelReference(semantic_model_name="account_month_txns")
+    semantic_model_reference = SemanticModelReference(semantic_model_name="account_month_txns")
     join_evaluator = DataSourceJoinEvaluator(
         data_source_semantics=multi_hop_join_semantic_manifest_lookup.data_source_semantics
     )
 
     # 2-hop
     joinable_data_sources = join_evaluator.get_joinable_data_sources(
-        left_data_source_reference=data_source_reference, include_multi_hop=True
+        left_semantic_model_reference=semantic_model_reference, include_multi_hop=True
     )
     assert set(joinable_data_sources.keys()) == {"bridge_table", "customer_other_data", "customer_table"}
     assert joinable_data_sources["bridge_table"] == DataSourceLink(
-        left_data_source_reference=SemanticModelReference(semantic_model_name="account_month_txns"),
+        left_semantic_model_reference=SemanticModelReference(semantic_model_name="account_month_txns"),
         join_path=[
             DataSourceEntityJoin(
-                right_data_source_reference=SemanticModelReference(semantic_model_name="bridge_table"),
+                right_semantic_model_reference=SemanticModelReference(semantic_model_name="bridge_table"),
                 entity_reference=EntityReference(element_name="account_id"),
                 join_type=DataSourceEntityJoinType(
                     left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.PRIMARY
@@ -344,17 +350,17 @@ def test_get_joinable_data_sources_multi_hop(  # noqa: D
         ],
     )
     assert joinable_data_sources["customer_other_data"] == DataSourceLink(
-        left_data_source_reference=SemanticModelReference(semantic_model_name="account_month_txns"),
+        left_semantic_model_reference=SemanticModelReference(semantic_model_name="account_month_txns"),
         join_path=[
             DataSourceEntityJoin(
-                right_data_source_reference=SemanticModelReference(semantic_model_name="bridge_table"),
+                right_semantic_model_reference=SemanticModelReference(semantic_model_name="bridge_table"),
                 entity_reference=EntityReference(element_name="account_id"),
                 join_type=DataSourceEntityJoinType(
                     left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.PRIMARY
                 ),
             ),
             DataSourceEntityJoin(
-                right_data_source_reference=SemanticModelReference(semantic_model_name="customer_other_data"),
+                right_semantic_model_reference=SemanticModelReference(semantic_model_name="customer_other_data"),
                 entity_reference=EntityReference(element_name="customer_id"),
                 join_type=DataSourceEntityJoinType(
                     left_entity_type=EntityType.FOREIGN, right_entity_type=EntityType.PRIMARY
@@ -363,17 +369,17 @@ def test_get_joinable_data_sources_multi_hop(  # noqa: D
         ],
     )
     assert joinable_data_sources["customer_table"] == DataSourceLink(
-        left_data_source_reference=SemanticModelReference(semantic_model_name="account_month_txns"),
+        left_semantic_model_reference=SemanticModelReference(semantic_model_name="account_month_txns"),
         join_path=[
             DataSourceEntityJoin(
-                right_data_source_reference=SemanticModelReference(semantic_model_name="bridge_table"),
+                right_semantic_model_reference=SemanticModelReference(semantic_model_name="bridge_table"),
                 entity_reference=EntityReference(element_name="account_id"),
                 join_type=DataSourceEntityJoinType(
                     left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.PRIMARY
                 ),
             ),
             DataSourceEntityJoin(
-                right_data_source_reference=SemanticModelReference(semantic_model_name="customer_table"),
+                right_semantic_model_reference=SemanticModelReference(semantic_model_name="customer_table"),
                 entity_reference=EntityReference(element_name="customer_id"),
                 join_type=DataSourceEntityJoinType(
                     left_entity_type=EntityType.FOREIGN, right_entity_type=EntityType.PRIMARY
@@ -410,39 +416,39 @@ def test_natural_entity_data_source_validation(scd_semantic_manifest_lookup: Sem
 
     # Valid cases
     natural_primary = join_evaluator.is_valid_data_source_join(
-        left_data_source_reference=natural_user_data_source.reference,
-        right_data_source_reference=primary_user_data_source.reference,
+        left_semantic_model_reference=natural_user_data_source.reference,
+        right_semantic_model_reference=primary_user_data_source.reference,
         on_entity_reference=user_entity_reference,
     )
     natural_unique = join_evaluator.is_valid_data_source_join(
-        left_data_source_reference=natural_user_data_source.reference,
-        right_data_source_reference=unique_user_data_source.reference,
+        left_semantic_model_reference=natural_user_data_source.reference,
+        right_semantic_model_reference=unique_user_data_source.reference,
         on_entity_reference=user_entity_reference,
     )
     foreign_natural = join_evaluator.is_valid_data_source_join(
-        left_data_source_reference=foreign_user_data_source.reference,
-        right_data_source_reference=natural_user_data_source.reference,
+        left_semantic_model_reference=foreign_user_data_source.reference,
+        right_semantic_model_reference=natural_user_data_source.reference,
         on_entity_reference=user_entity_reference,
     )
     primary_natural = join_evaluator.is_valid_data_source_join(
-        left_data_source_reference=primary_user_data_source.reference,
-        right_data_source_reference=natural_user_data_source.reference,
+        left_semantic_model_reference=primary_user_data_source.reference,
+        right_semantic_model_reference=natural_user_data_source.reference,
         on_entity_reference=user_entity_reference,
     )
     unique_natural = join_evaluator.is_valid_data_source_join(
-        left_data_source_reference=unique_user_data_source.reference,
-        right_data_source_reference=natural_user_data_source.reference,
+        left_semantic_model_reference=unique_user_data_source.reference,
+        right_semantic_model_reference=natural_user_data_source.reference,
         on_entity_reference=user_entity_reference,
     )
     # Invalid cases
     natural_foreign = join_evaluator.is_valid_data_source_join(
-        left_data_source_reference=natural_user_data_source.reference,
-        right_data_source_reference=foreign_user_data_source.reference,
+        left_semantic_model_reference=natural_user_data_source.reference,
+        right_semantic_model_reference=foreign_user_data_source.reference,
         on_entity_reference=user_entity_reference,
     )
     natural_natural = join_evaluator.is_valid_data_source_join(
-        left_data_source_reference=natural_user_data_source.reference,
-        right_data_source_reference=natural_user_data_source.reference,
+        left_semantic_model_reference=natural_user_data_source.reference,
+        right_semantic_model_reference=natural_user_data_source.reference,
         on_entity_reference=user_entity_reference,
     )
 

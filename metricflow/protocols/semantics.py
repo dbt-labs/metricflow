@@ -100,19 +100,19 @@ class DataSourceSemanticsAccessor(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_by_reference(self, data_source_reference: SemanticModelReference) -> Optional[SemanticModel]:
+    def get_by_reference(self, semantic_model_reference: SemanticModelReference) -> Optional[SemanticModel]:
         """Retrieve the data source model object matching the input data source reference, if any"""
         raise NotImplementedError
 
     @property
     @abstractmethod
-    def data_source_references(self) -> Sequence[SemanticModelReference]:
+    def semantic_model_references(self) -> Sequence[SemanticModelReference]:
         """Return all SemanticModelReference objects associated with the data sources in the collection"""
         raise NotImplementedError
 
     @abstractmethod
     def get_aggregation_time_dimensions_with_measures(
-        self, data_source_reference: SemanticModelReference
+        self, semantic_model_reference: SemanticModelReference
     ) -> ElementGrouper[TimeDimensionReference, MeasureSpec]:
         """Return all aggregation time dimensions in the given data source with their associated measures"""
         raise NotImplementedError

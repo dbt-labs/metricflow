@@ -487,7 +487,7 @@ class ValidLinkableSpecResolver:
 
     def _get_data_sources_with_joinable_entity(
         self,
-        left_data_source_reference: SemanticModelReference,
+        left_semantic_model_reference: SemanticModelReference,
         entity_reference: EntityReference,
     ) -> Sequence[SemanticModel]:
         # May switch to non-cached implementation.
@@ -495,8 +495,8 @@ class ValidLinkableSpecResolver:
         valid_data_sources = []
         for data_source in data_sources:
             if self._join_evaluator.is_valid_data_source_join(
-                left_data_source_reference=left_data_source_reference,
-                right_data_source_reference=data_source.reference,
+                left_semantic_model_reference=left_semantic_model_reference,
+                right_semantic_model_reference=data_source.reference,
                 on_entity_reference=entity_reference,
             ):
                 valid_data_sources.append(data_source)
@@ -513,7 +513,7 @@ class ValidLinkableSpecResolver:
         # Create 1-hop elements
         for entity in measure_data_source.entities:
             data_sources = self._get_data_sources_with_joinable_entity(
-                left_data_source_reference=measure_data_source.reference,
+                left_semantic_model_reference=measure_data_source.reference,
                 entity_reference=entity.reference,
             )
             for data_source in data_sources:
@@ -596,7 +596,7 @@ class ValidLinkableSpecResolver:
                 continue
 
             data_sources_that_can_be_joined = self._get_data_sources_with_joinable_entity(
-                left_data_source_reference=last_data_source_in_path.reference,
+                left_semantic_model_reference=last_data_source_in_path.reference,
                 entity_reference=entity.reference,
             )
             for data_source in data_sources_that_can_be_joined:

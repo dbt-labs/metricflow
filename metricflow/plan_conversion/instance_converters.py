@@ -278,11 +278,11 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
         self._data_source_semantics = data_source_semantics
 
     def _get_validity_window_dimensions_for_data_source(
-        self, data_source_reference: SemanticModelReference
+        self, semantic_model_reference: SemanticModelReference
     ) -> Optional[Tuple[_DimensionValidityParams, _DimensionValidityParams]]:
         """Returns a 2-tuple (start, end) of validity window dimensions info, if any exist in the data source"""
-        data_source = self._data_source_semantics.get_by_reference(data_source_reference)
-        assert data_source, f"Could not find data source {data_source_reference} after data set conversion!"
+        data_source = self._data_source_semantics.get_by_reference(semantic_model_reference)
+        assert data_source, f"Could not find data source {semantic_model_reference} after data set conversion!"
 
         start_dim = data_source.validity_start_dimension
         end_dim = data_source.validity_end_dimension
@@ -312,15 +312,15 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
         """
         data_source_to_window: Dict[str, ValidityWindowJoinDescription] = {}
         instances_by_data_source = bucket(
-            instance_set.time_dimension_instances, lambda x: x.origin_data_source_reference.data_source_reference
+            instance_set.time_dimension_instances, lambda x: x.origin_semantic_model_reference.semantic_model_reference
         )
-        for data_source_reference in instances_by_data_source:
-            validity_dims = self._get_validity_window_dimensions_for_data_source(data_source_reference)
+        for semantic_model_reference in instances_by_data_source:
+            validity_dims = self._get_validity_window_dimensions_for_data_source(semantic_model_reference)
             if validity_dims is None:
                 continue
 
             start_dim, end_dim = validity_dims
-            specs = {instance.spec for instance in instances_by_data_source[data_source_reference]}
+            specs = {instance.spec for instance in instances_by_data_source[semantic_model_reference]}
             start_specs = [
                 spec
                 for spec in specs
@@ -334,7 +334,7 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
             linkless_start_specs = {spec.without_entity_links for spec in start_specs}
             linkless_end_specs = {spec.without_entity_links for spec in end_specs}
             assert len(linkless_start_specs) == 1 and len(linkless_end_specs) == 1, (
-                f"Did not find exactly one pair of specs from data source `{data_source_reference}` matching the validity "
+                f"Did not find exactly one pair of specs from data source `{semantic_model_reference}` matching the validity "
                 f"window end points defined in the data source. This means we cannot process an SCD join, because we "
                 f"require exactly one validity window to be specified for the query! The window in the data source "
                 f"is defined by start dimension `{start_dim}` and end dimension `{end_dim}`. We found "
@@ -346,7 +346,7 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
             # entity links so that the subquery uses the correct reference in the ON statement
             start_specs = sorted(start_specs, key=lambda x: len(x.entity_links))
             end_specs = sorted(end_specs, key=lambda x: len(x.entity_links))
-            data_source_to_window[data_source_reference] = ValidityWindowJoinDescription(
+            data_source_to_window[semantic_model_reference] = ValidityWindowJoinDescription(
                 window_start_dimension=start_specs[0], window_end_dimension=end_specs[0]
             )
 

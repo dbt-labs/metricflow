@@ -85,15 +85,15 @@ class SemanticModelElementReference(ModelReference):
 
     @staticmethod
     def create_from_references(  # noqa: D
-        data_source_reference: SemanticModelReference, element_reference: ElementReference
+        semantic_model_reference: SemanticModelReference, element_reference: ElementReference
     ) -> SemanticModelElementReference:
         return SemanticModelElementReference(
-            semantic_model_name=data_source_reference.semantic_model_name,
+            semantic_model_name=semantic_model_reference.semantic_model_name,
             element_name=element_reference.element_name,
         )
 
     @property
-    def data_source_reference(self) -> SemanticModelReference:  # noqa: D
+    def semantic_model_reference(self) -> SemanticModelReference:  # noqa: D
         return SemanticModelReference(self.semantic_model_name)
 
     def is_from(self, ref: SemanticModelReference) -> bool:

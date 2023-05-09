@@ -420,7 +420,7 @@ class DataSourceToDataSetConverter:
         )
 
         return DataSourceDataSet(
-            data_source_reference=SemanticModelReference(semantic_model_name=data_source.name),
+            semantic_model_reference=SemanticModelReference(semantic_model_name=data_source.name),
             instance_set=InstanceSet(
                 measure_instances=tuple(all_measure_instances),
                 dimension_instances=tuple(all_dimension_instances),

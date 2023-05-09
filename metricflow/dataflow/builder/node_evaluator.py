@@ -192,8 +192,10 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                 assert len(entity_instance_in_right_node.defined_from) == 1
 
                 if not self._join_evaluator.is_valid_data_source_join(
-                    left_data_source_reference=entity_instance_in_left_node.defined_from[0].data_source_reference,
-                    right_data_source_reference=entity_instance_in_right_node.defined_from[0].data_source_reference,
+                    left_semantic_model_reference=entity_instance_in_left_node.defined_from[0].semantic_model_reference,
+                    right_semantic_model_reference=entity_instance_in_right_node.defined_from[
+                        0
+                    ].semantic_model_reference,
                     on_entity_reference=entity_spec_in_right_node.reference,
                 ):
                     continue

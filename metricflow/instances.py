@@ -59,7 +59,7 @@ class DataSourceElementInstance(SerializableDataclass):  # noqa: D
     defined_from: Tuple[SemanticModelElementReference, ...]
 
     @property
-    def origin_data_source_reference(self) -> SemanticModelElementReference:
+    def origin_semantic_model_reference(self) -> SemanticModelElementReference:
         """Property to grab the element reference pointing to the origin data source for this element instance
 
         By convention this is the zeroth element in the Tuple. At this time these tuples are always of exactly

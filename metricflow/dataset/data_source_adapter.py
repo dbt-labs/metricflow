@@ -9,16 +9,16 @@ class DataSourceDataSet(SqlDataSet):
 
     def __init__(  # noqa: D
         self,
-        data_source_reference: SemanticModelReference,
+        semantic_model_reference: SemanticModelReference,
         instance_set: InstanceSet,
         sql_select_node: SqlSelectStatementNode,
     ) -> None:
-        self._data_source_reference = data_source_reference
+        self._semantic_model_reference = semantic_model_reference
         super().__init__(instance_set=instance_set, sql_select_node=sql_select_node)
 
     def __repr__(self) -> str:  # noqa: D
-        return f"{self.__class__.__name__}({self._data_source_reference})"
+        return f"{self.__class__.__name__}({self._semantic_model_reference})"
 
     @property
-    def data_source_reference(self) -> SemanticModelReference:  # noqa: D
-        return self._data_source_reference
+    def semantic_model_reference(self) -> SemanticModelReference:  # noqa: D
+        return self._semantic_model_reference
