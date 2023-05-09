@@ -2,7 +2,9 @@ data_source:
   name: salesforce_lead
   owners:
     - support@transformdata.io
-  sql_table: salesforce.lead ### Update to your leads schema.table
+  node_relation:  ### Update to your lead schema.table
+    alias: lead
+    schema_name: salesforce
   entities:
     - name: lead
       type: primary

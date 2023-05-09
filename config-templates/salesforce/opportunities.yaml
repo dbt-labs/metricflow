@@ -2,7 +2,9 @@ data_source:
   name: salesforce_oppportunities
   owners:
     - support@transformdata.io
-  sql_table: salesforce.opportunity ### Update to your opportunities schema.table
+  node_relation:  ### Update to your opportunity schema.table
+    alias: opportunity
+    schema_name: salesforce
   entities:
     - name: opportunity
       type: primary
