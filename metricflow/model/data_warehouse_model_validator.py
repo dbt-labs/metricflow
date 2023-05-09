@@ -21,7 +21,7 @@ from dbt_semantic_interfaces.objects.data_source import DataSource
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
 from dbt_semantic_interfaces.objects.metric import Metric
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.semantic_model import SemanticModel
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,
     DataSourceElementContext,
@@ -51,27 +51,29 @@ class QueryRenderingTools:
     (e.g., selecting a single dimension column).
     """
 
-    semantic_model: SemanticModel
+    semantic_manifest_lookup: SemanticManifestLookup
     source_node_builder: SourceNodeBuilder
     converter: DataSourceToDataSetConverter
     time_spine_source: TimeSpineSource
     plan_converter: DataflowToSqlQueryPlanConverter
 
     def __init__(self, model: UserConfiguredModel, system_schema: str) -> None:  # noqa: D
-        self.semantic_model = SemanticModel(user_configured_model=model)
-        self.source_node_builder = SourceNodeBuilder(semantic_model=self.semantic_model)
+        self.semantic_manifest_lookup = SemanticManifestLookup(user_configured_model=model)
+        self.source_node_builder = SourceNodeBuilder(semantic_manifest_lookup=self.semantic_manifest_lookup)
         self.time_spine_source = TimeSpineSource(schema_name=system_schema)
         self.converter = DataSourceToDataSetConverter(
-            column_association_resolver=DefaultColumnAssociationResolver(semantic_model=self.semantic_model)
+            column_association_resolver=DefaultColumnAssociationResolver(
+                semantic_manifest_lookup=self.semantic_manifest_lookup
+            )
         )
         self.plan_converter = DataflowToSqlQueryPlanConverter(
-            column_association_resolver=DefaultColumnAssociationResolver(self.semantic_model),
-            semantic_model=self.semantic_model,
+            column_association_resolver=DefaultColumnAssociationResolver(self.semantic_manifest_lookup),
+            semantic_manifest_lookup=self.semantic_manifest_lookup,
             time_spine_source=self.time_spine_source,
         )
         self.node_resolver = DataflowPlanNodeOutputDataSetResolver[DataSourceDataSet](
-            column_association_resolver=DefaultColumnAssociationResolver(self.semantic_model),
-            semantic_model=self.semantic_model,
+            column_association_resolver=DefaultColumnAssociationResolver(self.semantic_manifest_lookup),
+            semantic_manifest_lookup=self.semantic_manifest_lookup,
             time_spine_source=self.time_spine_source,
         )
 
@@ -102,7 +104,7 @@ class DataWarehouseTaskBuilder:
         render_tools: QueryRenderingTools, data_source: DataSource
     ) -> Sequence[BaseOutput[DataSourceDataSet]]:
         """Builds and returns the DataSourceDataSet node for the given data source"""
-        data_source_semantics = render_tools.semantic_model.data_source_semantics.get_by_reference(
+        data_source_semantics = render_tools.semantic_manifest_lookup.data_source_semantics.get_by_reference(
             DataSourceReference(data_source_name=data_source.name)
         )
         assert data_source_semantics
@@ -453,7 +455,7 @@ class DataWarehouseTaskBuilder:
     ) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the metrics of the model"""
         mf_engine = MetricFlowEngine(
-            semantic_model=SemanticModel(user_configured_model=model),
+            semantic_manifest_lookup=SemanticManifestLookup(user_configured_model=model),
             sql_client=sql_client,
             system_schema=system_schema,
         )

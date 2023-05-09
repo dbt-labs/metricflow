@@ -21,7 +21,7 @@ from dbt_semantic_interfaces.references import (
     MetricReference,
     TimeDimensionReference,
 )
-from metricflow.model.semantic_model import SemanticModel
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.model.spec_converters import WhereConstraintConverter
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
@@ -76,7 +76,7 @@ class MetricFlowQueryParser:
 
     def __init__(  # noqa: D
         self,
-        model: SemanticModel,
+        model: SemanticManifestLookup,
         source_nodes: Sequence[BaseOutput[DataSourceDataSet]],
         node_output_resolver: DataflowPlanNodeOutputDataSetResolver[DataSourceDataSet],
     ) -> None:
@@ -101,7 +101,7 @@ class MetricFlowQueryParser:
         self._known_metric_names = set(self._metric_semantics.metric_references)
         self._metric_time_dimension_reference = DataSet.metric_time_dimension_reference()
         self._time_granularity_solver = TimeGranularitySolver(
-            semantic_model=self._model,
+            semantic_manifest_lookup=self._model,
             source_nodes=source_nodes,
             node_output_resolver=node_output_resolver,
         )

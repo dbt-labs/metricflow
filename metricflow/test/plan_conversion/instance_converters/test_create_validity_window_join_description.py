@@ -2,7 +2,7 @@ import pytest
 
 from metricflow.dataflow.dataflow_plan import ValidityWindowJoinDescription
 from metricflow.instances import InstanceSet
-from metricflow.model.semantic_model import SemanticModel
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
 from metricflow.specs import TimeDimensionSpec
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
@@ -10,14 +10,14 @@ from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 
 def test_no_validity_dims(
-    consistent_id_object_repository: ConsistentIdObjectRepository, scd_semantic_model: SemanticModel
+    consistent_id_object_repository: ConsistentIdObjectRepository, scd_semantic_manifest_lookup: SemanticManifestLookup
 ) -> None:
     """Tests converting an instance set with no matching dimensions to a ValidityWindowJoinDescription"""
     # bookings_source is a fact table, and has no validity window dimensions
     dataset = consistent_id_object_repository.scd_model_data_sets["bookings_source"]
 
     validity_window_join_description = CreateValidityWindowJoinDescription(
-        data_source_semantics=scd_semantic_model.data_source_semantics
+        data_source_semantics=scd_semantic_manifest_lookup.data_source_semantics
     ).transform(instance_set=dataset.instance_set)
 
     assert validity_window_join_description is None, (
@@ -27,7 +27,7 @@ def test_no_validity_dims(
 
 
 def test_validity_window_conversion(
-    consistent_id_object_repository: ConsistentIdObjectRepository, scd_semantic_model: SemanticModel
+    consistent_id_object_repository: ConsistentIdObjectRepository, scd_semantic_manifest_lookup: SemanticManifestLookup
 ) -> None:
     """Tests converting an instance set with a single validity window into a ValidityWindowJoinDescription"""
     # The listings data source uses a 2-column SCD Type III layout
@@ -44,7 +44,7 @@ def test_validity_window_conversion(
     )
 
     validity_window_join_description = CreateValidityWindowJoinDescription(
-        data_source_semantics=scd_semantic_model.data_source_semantics
+        data_source_semantics=scd_semantic_manifest_lookup.data_source_semantics
     ).transform(instance_set=dataset.instance_set)
 
     assert (
@@ -56,13 +56,13 @@ def test_validity_window_conversion(
 
 
 def test_multiple_validity_windows(
-    consistent_id_object_repository: ConsistentIdObjectRepository, scd_semantic_model: SemanticModel
+    consistent_id_object_repository: ConsistentIdObjectRepository, scd_semantic_manifest_lookup: SemanticManifestLookup
 ) -> None:
     """Tests the behavior of this converter when it encounters an instance set with multiple validity windows"""
     first_dataset = consistent_id_object_repository.scd_model_data_sets["listings"]
     second_dataset = consistent_id_object_repository.scd_model_data_sets["primary_accounts"]
     merged_instance_set = InstanceSet.merge([first_dataset.instance_set, second_dataset.instance_set])
     with pytest.raises(AssertionError, match="Found more than 1 set of validity window specs"):
-        CreateValidityWindowJoinDescription(data_source_semantics=scd_semantic_model.data_source_semantics).transform(
-            merged_instance_set
-        )
+        CreateValidityWindowJoinDescription(
+            data_source_semantics=scd_semantic_manifest_lookup.data_source_semantics
+        ).transform(merged_instance_set)

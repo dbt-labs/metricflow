@@ -1,5 +1,5 @@
 from metricflow.instances import InstanceSet
-from metricflow.model.semantic_model import SemanticModel
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.instance_converters import (
     CreateSelectColumnsWithMeasuresAggregated,
@@ -31,7 +31,7 @@ def __get_filtered_measure_instance_set(
 
 def test_sum_aggregation(
     consistent_id_object_repository: ConsistentIdObjectRepository,
-    simple_semantic_model: SemanticModel,
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Checks for function expression handling for booking_value, a SUM type metric in the simple model"""
     measure_name = "booking_value"
@@ -39,8 +39,8 @@ def test_sum_aggregation(
 
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
-        DefaultColumnAssociationResolver(simple_semantic_model),
-        simple_semantic_model.data_source_semantics,
+        DefaultColumnAssociationResolver(simple_semantic_manifest_lookup),
+        simple_semantic_manifest_lookup.data_source_semantics,
         (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="booking_value")),),
     ).transform(instance_set=instance_set)
 
@@ -53,7 +53,7 @@ def test_sum_aggregation(
 
 def test_sum_boolean_aggregation(
     consistent_id_object_repository: ConsistentIdObjectRepository,
-    simple_semantic_model: SemanticModel,
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Checks for function expression handling for instant_bookings, a SUM_BOOLEAN type metric in the simple model"""
     measure_name = "instant_bookings"
@@ -61,8 +61,8 @@ def test_sum_boolean_aggregation(
 
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
-        DefaultColumnAssociationResolver(simple_semantic_model),
-        simple_semantic_model.data_source_semantics,
+        DefaultColumnAssociationResolver(simple_semantic_manifest_lookup),
+        simple_semantic_manifest_lookup.data_source_semantics,
         (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="instant_bookings")),),
     ).transform(instance_set=instance_set)
 
@@ -76,7 +76,7 @@ def test_sum_boolean_aggregation(
 
 def test_avg_aggregation(
     consistent_id_object_repository: ConsistentIdObjectRepository,
-    simple_semantic_model: SemanticModel,
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Checks for function expression handling for average_booking_value, an AVG type metric in the simple model"""
     measure_name = "average_booking_value"
@@ -84,8 +84,8 @@ def test_avg_aggregation(
 
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
-        DefaultColumnAssociationResolver(simple_semantic_model),
-        simple_semantic_model.data_source_semantics,
+        DefaultColumnAssociationResolver(simple_semantic_manifest_lookup),
+        simple_semantic_manifest_lookup.data_source_semantics,
         (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="average_booking_value")),),
     ).transform(instance_set=instance_set)
 
@@ -98,7 +98,7 @@ def test_avg_aggregation(
 
 def test_count_distinct_aggregation(
     consistent_id_object_repository: ConsistentIdObjectRepository,
-    simple_semantic_model: SemanticModel,
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Checks for function expression handling for bookers, a COUNT_DISTINCT type metric in the simple model"""
     measure_name = "bookers"
@@ -106,8 +106,8 @@ def test_count_distinct_aggregation(
 
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
-        DefaultColumnAssociationResolver(simple_semantic_model),
-        simple_semantic_model.data_source_semantics,
+        DefaultColumnAssociationResolver(simple_semantic_manifest_lookup),
+        simple_semantic_manifest_lookup.data_source_semantics,
         (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="bookers")),),
     ).transform(instance_set=instance_set)
 
@@ -120,7 +120,7 @@ def test_count_distinct_aggregation(
 
 def test_max_aggregation(
     consistent_id_object_repository: ConsistentIdObjectRepository,
-    simple_semantic_model: SemanticModel,
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Checks for function expression handling for largest_listing, a MAX type metric in the simple model"""
     measure_name = "largest_listing"
@@ -128,8 +128,8 @@ def test_max_aggregation(
 
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
-        DefaultColumnAssociationResolver(simple_semantic_model),
-        simple_semantic_model.data_source_semantics,
+        DefaultColumnAssociationResolver(simple_semantic_manifest_lookup),
+        simple_semantic_manifest_lookup.data_source_semantics,
         (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="largest_listing")),),
     ).transform(instance_set=instance_set)
 
@@ -142,7 +142,7 @@ def test_max_aggregation(
 
 def test_min_aggregation(
     consistent_id_object_repository: ConsistentIdObjectRepository,
-    simple_semantic_model: SemanticModel,
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Checks for function expression handling for smallest_listing, a MIN type metric in the simple model"""
     measure_name = "smallest_listing"
@@ -150,8 +150,8 @@ def test_min_aggregation(
 
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
-        DefaultColumnAssociationResolver(simple_semantic_model),
-        simple_semantic_model.data_source_semantics,
+        DefaultColumnAssociationResolver(simple_semantic_manifest_lookup),
+        simple_semantic_manifest_lookup.data_source_semantics,
         (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="smallest_listing")),),
     ).transform(instance_set=instance_set)
 
@@ -164,7 +164,7 @@ def test_min_aggregation(
 
 def test_aliased_sum(
     consistent_id_object_repository: ConsistentIdObjectRepository,
-    simple_semantic_model: SemanticModel,
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Checks for function expression handling for booking_value, a SUM type metric in the simple model, with an alias"""
     measure_name = "booking_value"
@@ -172,8 +172,8 @@ def test_aliased_sum(
 
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
-        DefaultColumnAssociationResolver(simple_semantic_model),
-        simple_semantic_model.data_source_semantics,
+        DefaultColumnAssociationResolver(simple_semantic_manifest_lookup),
+        simple_semantic_manifest_lookup.data_source_semantics,
         (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="booking_value"), alias="bvalue"),),
     ).transform(instance_set=instance_set)
 
@@ -187,7 +187,7 @@ def test_aliased_sum(
 
 def test_percentile_aggregation(
     consistent_id_object_repository: ConsistentIdObjectRepository,
-    simple_semantic_model: SemanticModel,
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Checks for function expression handling for booking_value, a percentile type metric in the simple model"""
     measure_name = "booking_value_p99"
@@ -195,8 +195,8 @@ def test_percentile_aggregation(
 
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
-        DefaultColumnAssociationResolver(simple_semantic_model),
-        simple_semantic_model.data_source_semantics,
+        DefaultColumnAssociationResolver(simple_semantic_manifest_lookup),
+        simple_semantic_manifest_lookup.data_source_semantics,
         (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="booking_value_p99")),),
     ).transform(instance_set=instance_set)
 

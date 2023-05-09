@@ -8,7 +8,7 @@ from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
 from metricflow.dataset.data_source_adapter import DataSourceDataSet
 from metricflow.dataset.dataset import DataSet
-from metricflow.model.semantic_model import SemanticModel
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from dbt_semantic_interfaces.references import MetricReference
@@ -23,25 +23,25 @@ from metricflow.time.time_granularity_solver import (
 
 @pytest.fixture(scope="session")
 def time_granularity_solver(  # noqa: D
-    extended_date_semantic_model: SemanticModel,
+    extended_date_semantic_manifest_lookup: SemanticManifestLookup,
     time_spine_source: TimeSpineSource,
 ) -> TimeGranularitySolver:
-    column_association_resolver = DefaultColumnAssociationResolver(extended_date_semantic_model)
+    column_association_resolver = DefaultColumnAssociationResolver(extended_date_semantic_manifest_lookup)
     node_output_resolver = DataflowPlanNodeOutputDataSetResolver[DataSourceDataSet](
         column_association_resolver=column_association_resolver,
-        semantic_model=extended_date_semantic_model,
+        semantic_manifest_lookup=extended_date_semantic_manifest_lookup,
         time_spine_source=time_spine_source,
     )
     to_data_set_converter = DataSourceToDataSetConverter(column_association_resolver)
     source_data_sets = [
         to_data_set_converter.create_sql_source_data_set(x)
-        for x in extended_date_semantic_model.user_configured_model.data_sources
+        for x in extended_date_semantic_manifest_lookup.user_configured_model.data_sources
     ]
 
-    source_node_builder = SourceNodeBuilder(extended_date_semantic_model)
+    source_node_builder = SourceNodeBuilder(extended_date_semantic_manifest_lookup)
     source_nodes = source_node_builder.create_from_data_sets(source_data_sets)
     return TimeGranularitySolver(
-        semantic_model=extended_date_semantic_model,
+        semantic_manifest_lookup=extended_date_semantic_manifest_lookup,
         source_nodes=source_nodes,
         node_output_resolver=node_output_resolver,
     )

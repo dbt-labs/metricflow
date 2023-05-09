@@ -40,7 +40,7 @@ from metricflow.instances import (
     TimeDimensionInstance,
 )
 from dbt_semantic_interfaces.objects.metric import MetricType
-from metricflow.model.semantic_model import SemanticModel
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.instance_converters import (
     AliasAggregatedMeasures,
     RemoveMeasures,
@@ -142,7 +142,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
     def __init__(
         self,
         column_association_resolver: ColumnAssociationResolver,
-        semantic_model: SemanticModel,
+        semantic_manifest_lookup: SemanticManifestLookup,
         time_spine_source: TimeSpineSource,
     ) -> None:
         """Constructor.
@@ -150,12 +150,12 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         Args:
             column_association_resolver: controls how columns for instances are generated and used between nested
             queries.
-            semantic_model: Self-explanatory.
+            semantic_manifest_lookup: Self-explanatory.
             time_spine_source: Allows getting dates for use in cumulative joins
         """
         self._column_association_resolver = column_association_resolver
-        self._metric_semantics = semantic_model.metric_semantics
-        self._data_source_semantics = semantic_model.data_source_semantics
+        self._metric_semantics = semantic_manifest_lookup.metric_semantics
+        self._data_source_semantics = semantic_manifest_lookup.data_source_semantics
         self._time_spine_source = time_spine_source
 
     @property

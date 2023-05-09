@@ -16,7 +16,7 @@ from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.engine.utils import build_user_configured_model_from_config, build_user_configured_model_from_dbt_config
 from metricflow.errors.errors import SqlClientCreationException, MetricFlowInitException
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.semantic_model import SemanticModel
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.sql_clients.sql_utils import make_sql_client_from_config
 
@@ -39,7 +39,7 @@ class CLIContext:
         self._mf: Optional[MetricFlowEngine] = None
         self._sql_client: Optional[AsyncSqlClient] = None
         self._user_configured_model: Optional[UserConfiguredModel] = None
-        self._semantic_model: Optional[SemanticModel] = None
+        self._semantic_manifest_lookup: Optional[SemanticManifestLookup] = None
         self._mf_system_schema: Optional[str] = None
         self._model_path_is_for_dbt: Optional[bool] = None
         self._use_dbt_cloud: Optional[bool] = None
@@ -112,16 +112,16 @@ class CLIContext:
         assert self._mf is not None
         return self._mf
 
-    def _build_semantic_model(self) -> None:
-        """Get the path to the models and create a corresponding SemanticModel."""
-        self._semantic_model = SemanticModel(self.user_configured_model)
+    def _build_semantic_manifest_lookup(self) -> None:
+        """Get the path to the models and create a corresponding SemanticManifestLookup."""
+        self._semantic_manifest_lookup = SemanticManifestLookup(self.user_configured_model)
 
     @property
-    def semantic_model(self) -> SemanticModel:  # noqa: D
-        if self._semantic_model is None:
-            self._build_semantic_model()
-        assert self._semantic_model is not None
-        return self._semantic_model
+    def semantic_manifest_lookup(self) -> SemanticManifestLookup:  # noqa: D
+        if self._semantic_manifest_lookup is None:
+            self._build_semantic_manifest_lookup()
+        assert self._semantic_manifest_lookup is not None
+        return self._semantic_manifest_lookup
 
     @property
     def model_path_is_for_dbt(self) -> bool:  # noqa: D

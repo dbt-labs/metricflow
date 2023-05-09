@@ -5,7 +5,7 @@ import pytest
 
 from dbt_semantic_interfaces.references import MetricReference
 
-from metricflow.model.semantic_model import SemanticModel
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.model.semantics.linkable_spec_resolver import (
     ValidLinkableSpecResolver,
 )
@@ -16,10 +16,12 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.fixture
-def simple_model_spec_resolver(simple_semantic_model: SemanticModel) -> ValidLinkableSpecResolver:  # noqa: D
+def simple_model_spec_resolver(  # noqa: D
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
+) -> ValidLinkableSpecResolver:
     return ValidLinkableSpecResolver(
-        user_configured_model=simple_semantic_model.user_configured_model,
-        data_source_semantics=simple_semantic_model.data_source_semantics,
+        user_configured_model=simple_semantic_manifest_lookup.user_configured_model,
+        data_source_semantics=simple_semantic_manifest_lookup.data_source_semantics,
         max_entity_links=MAX_JOIN_HOPS,
     )
 
@@ -168,10 +170,10 @@ def test_joined_property(simple_model_spec_resolver: ValidLinkableSpecResolver) 
     )
 
 
-def test_multi_hop_property(multi_hop_join_semantic_model: SemanticModel) -> None:  # noqa: D
+def test_multi_hop_property(multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D
     multi_hop_spec_resolver = ValidLinkableSpecResolver(
-        user_configured_model=multi_hop_join_semantic_model.user_configured_model,
-        data_source_semantics=multi_hop_join_semantic_model.data_source_semantics,
+        user_configured_model=multi_hop_join_semantic_manifest_lookup.user_configured_model,
+        data_source_semantics=multi_hop_join_semantic_manifest_lookup.data_source_semantics,
         max_entity_links=MAX_JOIN_HOPS,
     )
     property_check_helper(
