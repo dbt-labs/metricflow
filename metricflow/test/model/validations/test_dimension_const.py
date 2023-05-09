@@ -4,7 +4,7 @@ from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from metricflow.model.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.data_source import Mutability, MutabilityType, DataSource
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
-from dbt_semantic_interfaces.objects.elements.measure import Measure
+from metricflow.model.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.metric import MetricType, MetricTypeParams, Metric
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.references import DimensionReference, MeasureReference, TimeDimensionReference

@@ -6,7 +6,7 @@ from dbt_semantic_interfaces.objects.base import ModelWithMetadataParsing, Hasha
 from dbt_semantic_interfaces.objects.metadata import Metadata
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension
 from dbt_semantic_interfaces.objects.elements.entity import Entity
-from dbt_semantic_interfaces.objects.elements.measure import Measure
+from metricflow.model.objects.elements.measure import Measure
 from dbt_semantic_interfaces.references import DataSourceReference, LinkableElementReference, MeasureReference
 from dbt_semantic_interfaces.enum_extension import ExtendedEnum
 

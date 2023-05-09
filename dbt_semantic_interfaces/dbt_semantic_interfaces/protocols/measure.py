@@ -18,7 +18,7 @@ class MeasureAggregationParameters(Protocol):
     use_approximate_percentile: bool
 
 
-class MeasureProtocol(Protocol):
+class Measure(Protocol):
     """Describes a measure, which is a field in the underlying semantic model that can be 
     aggregated in a specific way."""
     name: str

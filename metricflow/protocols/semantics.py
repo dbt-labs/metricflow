@@ -14,7 +14,7 @@ from typing import Dict, FrozenSet, Optional, Sequence, Set
 from dbt_semantic_interfaces.objects.data_source import DataSource, DataSourceOrigin
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension
 from dbt_semantic_interfaces.objects.elements.entity import Entity
-from dbt_semantic_interfaces.objects.elements.measure import Measure
+from metricflow.model.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.metric import Metric
 from dbt_semantic_interfaces.references import (
     DataSourceElementReference,
