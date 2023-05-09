@@ -120,7 +120,7 @@ class SqlDataSet(DataSet):
 
 
 class SameSemanticModelReferenceChecker(InstanceSetTransform[bool]):
-    """Checks to see that all elements in the instance set come from the same data source."""
+    """Checks to see that all elements in the instance set come from the same semantic model."""
 
     def __init__(self, semantic_model_reference: SemanticModelReference) -> None:  # noqa: D
         self._semantic_model_reference = semantic_model_reference

@@ -4,7 +4,7 @@ from dbt_semantic_interfaces.transformations.transform_rule import ModelTransfor
 
 
 class SliceNamesRule(ModelTransformRule):
-    """Slice the names of data source elements in a model
+    """Slice the names of semantic model elements in a model
 
     NOTE: specifically for testing
     """

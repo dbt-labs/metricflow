@@ -35,12 +35,12 @@ logger = logging.getLogger(__name__)
 def _data_set_to_read_nodes(
     data_sets: OrderedDict[str, SemanticModelDataSet]
 ) -> OrderedDict[str, ReadSqlSourceNode[SemanticModelDataSet]]:
-    """Return a mapping from the name of the data source to the dataflow plan node that reads from it."""
+    """Return a mapping from the name of the semantic model to the dataflow plan node that reads from it."""
     return_dict: OrderedDict[str, ReadSqlSourceNode[SemanticModelDataSet]] = OrderedDict()
     for semantic_model_name, data_set in data_sets.items():
         return_dict[semantic_model_name] = ReadSqlSourceNode[SemanticModelDataSet](data_set)
         logger.debug(
-            f"For data source {semantic_model_name}, creating node_id {return_dict[semantic_model_name].node_id}"
+            f"For semantic model {semantic_model_name}, creating node_id {return_dict[semantic_model_name].node_id}"
         )
 
     return return_dict
@@ -125,7 +125,7 @@ def create_data_sets(
 ) -> OrderedDict[str, SemanticModelDataSet]:
     """Convert the SemanticModels in the model to SqlDataSets.
 
-    Key is the name of the data source, value is the associated data set.
+    Key is the name of the semantic model, value is the associated data set.
     """
     # Use ordered dict and sort by name to get consistency when running tests.
     data_sets = OrderedDict()

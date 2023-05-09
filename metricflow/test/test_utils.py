@@ -36,13 +36,13 @@ def should_skip_multi_threaded(
 def find_semantic_model_with(
     model: UserConfiguredModel, function: Callable[[SemanticModel], bool]
 ) -> Tuple[SemanticModel, int]:
-    """Returns a data source from the model which matches the criteria defined by the passed in function'
+    """Returns a semantic model from the model which matches the criteria defined by the passed in function'
 
-    This is useful because the order of data sources in the list is non determinant, thus it's impossible to
-    hard code which data source you want by index. Using data source names isn't great for consistency because
-    data sources change and might no longer have the necessary parts to be useful for a given test. This
-    allows us to guarantee that a data source will be returned which meets the requirements of what a test needs,
-    unless none of the data sources will work.
+    This is useful because the order of semantic models in the list is non determinant, thus it's impossible to
+    hard code which semantic model you want by index. Using semantic model names isn't great for consistency because
+    semantic models change and might no longer have the necessary parts to be useful for a given test. This
+    allows us to guarantee that a semantic model will be returned which meets the requirements of what a test needs,
+    unless none of the semantic models will work.
     """
     for index, data_source in enumerate(model.data_sources):
         if function(data_source):

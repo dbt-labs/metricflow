@@ -68,10 +68,10 @@ class MetricFlowQueryParser:
     """Parse input strings from the user into a metric query specification.
 
     Definitions:
-    element name - the name of an element (measure, dimension, entity) in a data source, or a metric name.
+    element name - the name of an element (measure, dimension, entity) in a semantic model, or a metric name.
     qualified name - an element name with prefixes and suffixes added to it that further describe transformations or
     conditions for the element to retrieve. e.g. "ds__month" is the "ds" time dimension at the "month" granularity. Or
-    "user_id__country" is the "country" dimension that is retrieved by joining "user_id" to the measure data source.
+    "user_id__country" is the "country" dimension that is retrieved by joining "user_id" to the measure semantic model.
     """
 
     def __init__(  # noqa: D

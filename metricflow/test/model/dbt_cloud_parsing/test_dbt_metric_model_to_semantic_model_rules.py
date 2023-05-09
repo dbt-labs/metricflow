@@ -28,7 +28,7 @@ def test_dbt_metric_model_to_semantic_model_rules_skip_derived_metrics(  # noqa:
     result = converter._map_dbt_to_metricflow(dbt_metrics=derived_metrics)
     assert (
         len(result.mapped_objects.data_sources.keys()) == 0
-    ), "Derived dbt metrics created data sources, and they shouldn't"
+    ), "Derived dbt metrics created semantic models, and they shouldn't"
 
 
 def test_dbt_map_to_semantic_model_name(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
@@ -42,7 +42,7 @@ def test_dbt_map_to_semantic_model_name(dbt_metrics: Tuple[MetricNode, ...]) -> 
         if metric_type != MetricType.DERIVED:
             assert (
                 objects.data_sources[dbt_metric.model.name].get("name") is not None
-            ), "Expected data source to have name, got `None`"
+            ), "Expected semantic model to have name, got `None`"
 
 
 def test_dbt_map_to_semantic_model_name_missing_model_name(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D

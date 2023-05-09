@@ -160,9 +160,9 @@ def test_2_metrics_from_1_semantic_model(  # noqa: D
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
 ) -> None:
-    """Tests that optimizing the plan for 2 metrics from 2 measure data sources results in half the number of scans.
+    """Tests that optimizing the plan for 2 metrics from 2 measure semantic models results in half the number of scans.
 
-    Each metric is computed from the same measure data source and the dimension data source.
+    Each metric is computed from the same measure semantic model and the dimension semantic model.
     """
     check_optimization(
         request=request,
@@ -185,7 +185,7 @@ def test_2_metrics_from_2_semantic_models(  # noqa: D
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
 ) -> None:
-    """Tests that 2 metrics from the 2 data sources results in 2 scans."""
+    """Tests that 2 metrics from the 2 semantic models results in 2 scans."""
 
     check_optimization(
         request=request,
@@ -205,7 +205,7 @@ def test_3_metrics_from_2_semantic_models(  # noqa: D
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
 ) -> None:
-    """Tests that 3 metrics from the 2 data sources results in 2 scans."""
+    """Tests that 3 metrics from the 2 semantic models results in 2 scans."""
 
     check_optimization(
         request=request,
@@ -229,7 +229,7 @@ def test_constrained_metric_not_combined(  # noqa: D
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
 ) -> None:
-    """Tests that 2 metrics from the same data source but where 1 is constrained results in 2 scans.
+    """Tests that 2 metrics from the same semantic model but where 1 is constrained results in 2 scans.
 
     If there is a constraint, need needs to be handled in a separate query because the constraint applies to all rows.
     """
@@ -269,7 +269,7 @@ def test_derived_metric(  # noqa: D
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
 ) -> None:
-    """Tests optimization of a query that use a derived metrics with measures coming from a single data source.
+    """Tests optimization of a query that use a derived metrics with measures coming from a single semantic model.
 
     non_referred_bookings_pct is a derived metric that uses measures [bookings, referred_bookings]
     """
@@ -291,7 +291,7 @@ def test_nested_derived_metric(  # noqa: D
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
 ) -> None:
-    """Tests optimization of a query that use a nested derived metric from a single data source.
+    """Tests optimization of a query that use a nested derived metric from a single semantic model.
 
     The optimal solution would reduce this to 1 source scan, but there are challenges with derived metrics e.g. aliases,
     so that is left as a future improvement.
@@ -319,7 +319,7 @@ def test_derived_metric_with_non_derived_metric(  # noqa: D
     non_referred_bookings_pct is a derived metric that uses measures [bookings, referred_bookings]
     booking_value is a proxy metric that uses measures [bookings]
 
-    All these measures are from a single data source.
+    All these measures are from a single semantic model.
 
     Computation of non_referred_bookings_pct can be optimized to a single source, but isn't combined with the
     computation for booking_value as it's not yet supported e.g. alias needed to be handled.
@@ -345,7 +345,7 @@ def test_2_ratio_metrics_from_1_semantic_model(  # noqa: D
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
 ) -> None:
-    """Tests that 2 ratio metrics with measures from a 1 data source result in 1 scan."""
+    """Tests that 2 ratio metrics with measures from a 1 semantic model result in 1 scan."""
     check_optimization(
         request=request,
         mf_test_session_state=mf_test_session_state,

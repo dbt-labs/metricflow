@@ -42,7 +42,7 @@ def test_dbt_dimensions_to_dimensions(dbt_metrics: Tuple[MetricNode, ...]) -> No
             for dimension in dbt_metric.dimensions:
                 assert (
                     objects.dimensions[dbt_metric.model.name].get(dimension) is not None
-                ), f"Failed to build dimension `{dimension}` for data source `{dbt_metric.model.name}` of dbt metric `{dbt_metric.name}`"
+                ), f"Failed to build dimension `{dimension}` for semantic model `{dbt_metric.model.name}` of dbt metric `{dbt_metric.name}`"
 
 
 def test_dbt_dimensions_to_dimensions_no_issues_when_no_dimensions(  # noqa: D

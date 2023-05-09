@@ -48,7 +48,7 @@ logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True)
 class DimensionConversionResult:
-    """Helper class for returning the results of converting dimensions from a data source."""
+    """Helper class for returning the results of converting dimensions from a semantic model."""
 
     dimension_instances: Sequence[DimensionInstance]
     time_dimension_instances: Sequence[TimeDimensionInstance]
@@ -56,7 +56,7 @@ class DimensionConversionResult:
 
 
 class SemanticModelToDataSetConverter:
-    """Converts a data source in the model to a data set that can be used with the dataflow plan builder.
+    """Converts a semantic model in the model to a data set that can be used with the dataflow plan builder.
 
     Entity links generally refer to the entities used to join the measure source to the dimension source. For
     example, the dimension name "user_id__device_id__platform" has entity links "user_id" and "device_id" and would
@@ -101,7 +101,7 @@ class SemanticModelToDataSetConverter:
         entity_links: Tuple[EntityReference, ...],
         time_granularity: TimeGranularity = DEFAULT_TIME_GRANULARITY,
     ) -> TimeDimensionInstance:
-        """Create a time dimension instance from the dimension object from a data source in the model."""
+        """Create a time dimension instance from the dimension object from a semantic model in the model."""
         time_dimension_spec = TimeDimensionSpec(
             element_name=time_dimension.reference.element_name,
             entity_links=entity_links,
@@ -127,7 +127,7 @@ class SemanticModelToDataSetConverter:
         entity: Entity,
         entity_links: Tuple[EntityReference, ...],
     ) -> EntityInstance:
-        """Create an entity instance from the entity object from a data sourcein the model."""
+        """Create an entity instance from the entity object from a semantic modelin the model."""
         entity_spec = EntitySpec(
             element_name=entity.reference.element_name,
             entity_links=entity_links,
@@ -149,7 +149,7 @@ class SemanticModelToDataSetConverter:
     def _make_element_sql_expr(
         table_alias: str, element_name: str, element_expr: Optional[str] = None
     ) -> SqlExpressionNode:
-        """Create an expression that can be used for reading the element from the data source's SQL."""
+        """Create an expression that can be used for reading the element from the semantic model's SQL."""
         if element_expr:
             if SemanticModelToDataSetConverter._SQL_IDENTIFIER_REGEX.match(
                 element_expr
@@ -330,9 +330,9 @@ class SemanticModelToDataSetConverter:
         return entity_instances, select_columns
 
     def create_sql_source_data_set(self, semantic_model: SemanticModel) -> SemanticModelDataSet:
-        """Create an SQL source data set from a data source in the model."""
+        """Create an SQL source data set from a semantic model in the model."""
 
-        # Gather all instances and columns from all data sources.
+        # Gather all instances and columns from all semantic models.
         all_measure_instances: List[MeasureInstance] = []
         all_dimension_instances: List[DimensionInstance] = []
         all_time_dimension_instances: List[TimeDimensionInstance] = []
@@ -351,8 +351,8 @@ class SemanticModelToDataSetConverter:
             all_measure_instances.extend(measure_instances)
             all_select_columns.extend(select_columns)
 
-        # For dimensions in a data source, we can access them through the local form, or the dundered form.
-        # e.g. in the "users" data source, with the "country" dimension and the "user_id" entity,
+        # For dimensions in a semantic model, we can access them through the local form, or the dundered form.
+        # e.g. in the "users" semantic model, with the "country" dimension and the "user_id" entity,
         # the dimensions "country" and "user_id__country" both mean the same thing. To make matching easier, create both
         # instances in the instance set. We'll create a different instance for each "possible_entity_links".
         possible_entity_links: List[Tuple[EntityReference, ...]] = [()]

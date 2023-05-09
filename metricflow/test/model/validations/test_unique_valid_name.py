@@ -33,7 +33,7 @@ def test_duplicate_semantic_model_name(simple_model__with_primary_transforms: Us
     model.data_sources.append(duplicated_semantic_model)
     with pytest.raises(
         ModelValidationException,
-        match=rf"Can't use name `{duplicated_semantic_model.name}` for a data source when it was already used for a data source",
+        match=rf"Can't use name `{duplicated_semantic_model.name}` for a semantic model when it was already used for a semantic model",
     ):
         ModelValidator([UniqueAndValidNameRule()]).checked_validations(model)
 
@@ -63,20 +63,20 @@ def test_top_level_metric_can_have_same_name_as_any_other_top_level_item(
 
 """
     Data Source Element Tests
-    There are three types of data source elements
+    There are three types of semantic model elements
     - measures
     - entities
     - dimensions
 
     A name for any of these elements must be unique to all other element names
-    for the given data source.
+    for the given semantic model.
 """
 
 
 def test_duplicate_measure_name(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa:D
     model = copied_model(simple_model__with_primary_transforms)
 
-    # Ensure we have a usable data source for the test
+    # Ensure we have a usable semantic model for the test
     semantic_model_with_measures, _ = find_semantic_model_with(model, lambda data_source: len(data_source.measures) > 0)
 
     duplicated_measure = semantic_model_with_measures.measures[0]
@@ -93,7 +93,7 @@ def test_duplicate_measure_name(simple_model__with_primary_transforms: UserConfi
 def test_duplicate_dimension_name(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa:D
     model = copied_model(simple_model__with_primary_transforms)
 
-    # Ensure we have a usable data source for the test
+    # Ensure we have a usable semantic model for the test
     semantic_model_with_dimensions, _ = find_semantic_model_with(
         model, lambda data_source: len(data_source.dimensions) > 0
     )
@@ -113,7 +113,7 @@ def test_duplicate_dimension_name(simple_model__with_primary_transforms: UserCon
 def test_duplicate_entity_name(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa:D
     model = copied_model(simple_model__with_primary_transforms)
 
-    # Ensure we have a usable data source for the test
+    # Ensure we have a usable semantic model for the test
     semantic_model_with_entities, _ = find_semantic_model_with(model, lambda data_source: len(data_source.entities) > 0)
 
     duplicated_entity = semantic_model_with_entities.entities[0]

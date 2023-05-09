@@ -52,8 +52,8 @@ class MetricFlowReservedKeywords(enum.Enum):
 class UniqueAndValidNameRule(ModelValidationRule):
     """Check that names are unique and valid.
 
-    * Names of elements in data sources are unique / valid within the data source.
-    * Names of data sources, dimension sets and metric sets in the model are unique / valid.
+    * Names of elements in semantic models are unique / valid within the semantic model.
+    * Names of semantic models, dimension sets and metric sets in the model are unique / valid.
     """
 
     NAME_REGEX = re.compile(r"\A[a-z][a-z0-9_]*[a-z0-9]\Z")
@@ -90,7 +90,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
         return issues
 
     @staticmethod
-    @validate_safely(whats_being_done="checking data source sub element names are unique")
+    @validate_safely(whats_being_done="checking semantic model sub element names are unique")
     def _validate_semantic_model_elements(semantic_model: SemanticModel) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
         element_info_tuples: List[Tuple[ElementReference, str, ValidationContext]] = []
@@ -147,7 +147,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
                 issues.append(
                     ValidationError(
                         context=context,
-                        message=f"In data source `{semantic_model.name}`, can't use name `{name.element_name}` for a "
+                        message=f"In semantic model `{semantic_model.name}`, can't use name `{name.element_name}` for a "
                         f"{_type} when it was already used for a {name_to_type[name]}",
                     )
                 )
@@ -169,7 +169,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
                 object_info_tuples.append(
                     (
                         semantic_model.name,
-                        "data source",
+                        "semantic model",
                         SemanticModelContext(
                             file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
                             semantic_model=SemanticModelReference(semantic_model_name=semantic_model.name),

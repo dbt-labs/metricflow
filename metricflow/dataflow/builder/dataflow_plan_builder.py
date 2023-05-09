@@ -349,9 +349,9 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         return any(len(x.entity_links) > 1 for x in linkable_specs)
 
     def _get_semantic_model_names_for_measures(self, measure_names: Sequence[MeasureSpec]) -> Set[str]:
-        """Return the names of the data sources needed to compute the input measures
+        """Return the names of the semantic models needed to compute the input measures
 
-        This is a temporary method for use in assertion boundaries while we implement support for multiple data sources
+        This is a temporary method for use in assertion boundaries while we implement support for multiple semantic models
         """
         semantic_model_names: Set[str] = set()
         for measure_name in measure_names:
@@ -419,7 +419,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         if len(semantic_models) > 1:
             raise ValueError(
                 f"Cannot find common properties for measures {measure_specs} coming from multiple "
-                f"data sources: {semantic_models}. This suggests the measure_specs were not correctly filtered."
+                f"semantic models: {semantic_models}. This suggests the measure_specs were not correctly filtered."
             )
 
         agg_time_dimension = agg_time_dimension = self._semantic_model_semantics.get_agg_time_dimension_for_measure(
@@ -450,7 +450,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         """Find a recipe for getting measure_specs along with the linkable specs.
 
         Prior to calling this method we should always be checking that all input measure specs come from
-        the same base data source, otherwise the internal conditions here will be impossible to satisfy
+        the same base semantic model, otherwise the internal conditions here will be impossible to satisfy
         """
         measure_specs = measure_spec_properties.measure_specs
         node_processor = PreDimensionJoinNodeProcessor(
@@ -614,8 +614,8 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
     ) -> BaseOutput[SqlDataSetT]:
         """Returns a node where the measures are aggregated by the linkable specs and constrained appropriately.
 
-        This might be a node representing a single aggregation over one data source, or a node representing
-        a composite set of aggregations originating from multiple data sources, and joined into a single
+        This might be a node representing a single aggregation over one semantic model, or a node representing
+        a composite set of aggregations originating from multiple semantic models, and joined into a single
         aggregated set of measures.
         """
         output_nodes: List[BaseOutput[SqlDataSetT]] = []
@@ -631,7 +631,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             ]
             assert (
                 len(semantic_model_names) == 1
-            ), f"Validation should enforce one data source per measure, but found {semantic_model_names} for {input_spec}!"
+            ), f"Validation should enforce one semantic model per measure, but found {semantic_model_names} for {input_spec}!"
             semantic_models_and_constraints_to_measures[(semantic_model_names[0], input_spec.constraint)].append(
                 input_spec
             )

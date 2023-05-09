@@ -22,7 +22,7 @@ def test_no_validity_dims(
 
     assert validity_window_join_description is None, (
         f"We managed to create a validity window join description `{validity_window_join_description}` from a "
-        f"data source that does not have one defined!"
+        f"semantic model that does not have one defined!"
     )
 
 
@@ -30,7 +30,7 @@ def test_validity_window_conversion(
     consistent_id_object_repository: ConsistentIdObjectRepository, scd_semantic_manifest_lookup: SemanticManifestLookup
 ) -> None:
     """Tests converting an instance set with a single validity window into a ValidityWindowJoinDescription"""
-    # The listings data source uses a 2-column SCD Type III layout
+    # The listings semantic model uses a 2-column SCD Type III layout
     dataset = consistent_id_object_repository.scd_model_data_sets["listings"]
     expected_join_description = ValidityWindowJoinDescription(
         window_start_dimension=TimeDimensionSpec(

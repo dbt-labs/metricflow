@@ -51,7 +51,7 @@ from metricflow.sql.sql_bind_parameters import SqlBindParameters
 class QueryRenderingTools:
     """General tools that data warehosue validations use for rendering the validation queries
 
-    This is necessary for the validation steps that generate raw partial queries against the individual data sources
+    This is necessary for the validation steps that generate raw partial queries against the individual semantic models
     (e.g., selecting a single dimension column).
     """
 
@@ -107,7 +107,7 @@ class DataWarehouseTaskBuilder:
     def _semantic_model_nodes(
         render_tools: QueryRenderingTools, semantic_model: SemanticModel
     ) -> Sequence[BaseOutput[SemanticModelDataSet]]:
-        """Builds and returns the SemanticModelDataSet node for the given data source"""
+        """Builds and returns the SemanticModelDataSet node for the given semantic model"""
         semantic_model_semantics = render_tools.semantic_manifest_lookup.semantic_model_semantics.get_by_reference(
             SemanticModelReference(semantic_model_name=semantic_model.name)
         )
@@ -138,10 +138,10 @@ class DataWarehouseTaskBuilder:
     def gen_semantic_model_tasks(
         cls, model: UserConfiguredModel, sql_client: SqlClient, system_schema: str
     ) -> List[DataWarehouseValidationTask]:
-        """Generates a list of tasks for validating the data sources of the model"""
+        """Generates a list of tasks for validating the semantic models of the model"""
 
         # we need a dimension to query that we know exists (i.e. the dimension
-        # is guaranteed to not cause a problem) on each data source.
+        # is guaranteed to not cause a problem) on each semantic model.
         # Additionally, we don't want to modify the original model, so we
         # first make a deep copy of it
         model = deepcopy(model)
@@ -173,7 +173,7 @@ class DataWarehouseTaskBuilder:
                         file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
                         semantic_model=SemanticModelReference(semantic_model_name=semantic_model.name),
                     ),
-                    error_message=f"Unable to access data source `{semantic_model.name}` in data warehouse",
+                    error_message=f"Unable to access semantic model `{semantic_model.name}` in data warehouse",
                 )
             )
 
@@ -186,10 +186,10 @@ class DataWarehouseTaskBuilder:
         """Generates a list of tasks for validating the dimensions of the model
 
         The high level tasks returned are "short cut" queries which try to
-        query all the dimensions for a given data source. If that query fails,
+        query all the dimensions for a given semantic model. If that query fails,
         one or more of the dimensions is incorrectly specified. Thus if the
         query fails, there are subtasks which query the individual dimensions
-        on the data source to identify which have issues.
+        on the semantic model to identify which have issues.
         """
 
         render_tools = QueryRenderingTools(model=model, system_schema=system_schema)
@@ -249,7 +249,7 @@ class DataWarehouseTaskBuilder:
                             ),
                             element_type=SemanticModelElementType.DIMENSION,
                         ),
-                        error_message=f"Unable to query dimension `{spec.element_name}` on data source `{semantic_model.name}` in data warehouse",
+                        error_message=f"Unable to query dimension `{spec.element_name}` on semantic model `{semantic_model.name}` in data warehouse",
                     )
                 )
 
@@ -273,7 +273,7 @@ class DataWarehouseTaskBuilder:
                         file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
                         semantic_model=SemanticModelReference(semantic_model_name=semantic_model.name),
                     ),
-                    error_message=f"Failed to query dimensions in data warehouse for data source `{semantic_model.name}`",
+                    error_message=f"Failed to query dimensions in data warehouse for semantic model `{semantic_model.name}`",
                     on_fail_subtasks=semantic_model_sub_tasks,
                 )
             )
@@ -286,10 +286,10 @@ class DataWarehouseTaskBuilder:
         """Generates a list of tasks for validating the entities of the model
 
         The high level tasks returned are "short cut" queries which try to
-        query all the entities for a given data source. If that query fails,
+        query all the entities for a given semantic model. If that query fails,
         one or more of the entities is incorrectly specified. Thus if the
         query fails, there are subtasks which query the individual entities
-        on the data source to identify which have issues.
+        on the semantic model to identify which have issues.
         """
 
         render_tools = QueryRenderingTools(model=model, system_schema=system_schema)
@@ -325,7 +325,7 @@ class DataWarehouseTaskBuilder:
                             ),
                             element_type=SemanticModelElementType.ENTITY,
                         ),
-                        error_message=f"Unable to query entity `{spec.element_name}` on data source `{semantic_model.name}` in data warehouse",
+                        error_message=f"Unable to query entity `{spec.element_name}` on semantic model `{semantic_model.name}` in data warehouse",
                     )
                 )
 
@@ -348,7 +348,7 @@ class DataWarehouseTaskBuilder:
                         file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
                         semantic_model=SemanticModelReference(semantic_model_name=semantic_model.name),
                     ),
-                    error_message=f"Failed to query entities in data warehouse for data source `{semantic_model.name}`",
+                    error_message=f"Failed to query entities in data warehouse for semantic model `{semantic_model.name}`",
                     on_fail_subtasks=semantic_model_sub_tasks,
                 )
             )
@@ -361,10 +361,10 @@ class DataWarehouseTaskBuilder:
         """Generates a list of tasks for validating the measures of the model
 
         The high level tasks returned are "short cut" queries which try to
-        query all the measures for a given data source. If that query fails,
+        query all the measures for a given semantic model. If that query fails,
         one or more of the measures is incorrectly specified. Thus if the
         query fails, there are subtasks which query the individual measures
-        on the data source to identify which have issues.
+        on the semantic model to identify which have issues.
         """
 
         render_tools = QueryRenderingTools(model=model, system_schema=system_schema)
@@ -416,7 +416,7 @@ class DataWarehouseTaskBuilder:
                             ),
                             element_type=SemanticModelElementType.MEASURE,
                         ),
-                        error_message=f"Unable to query measure `{spec.element_name}` on data source `{semantic_model.name}` in data warehouse",
+                        error_message=f"Unable to query measure `{spec.element_name}` on semantic model `{semantic_model.name}` in data warehouse",
                     )
                 )
 
@@ -437,7 +437,7 @@ class DataWarehouseTaskBuilder:
                             file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
                             semantic_model=SemanticModelReference(semantic_model_name=semantic_model.name),
                         ),
-                        error_message=f"Failed to query measures in data warehouse for data source `{semantic_model.name}`",
+                        error_message=f"Failed to query measures in data warehouse for semantic model `{semantic_model.name}`",
                         on_fail_subtasks=source_node_to_sub_task[source_node],
                     )
                 )
@@ -542,7 +542,7 @@ class DataWarehouseModelValidator:
     def validate_semantic_models(
         self, model: UserConfiguredModel, timeout: Optional[int] = None
     ) -> ModelValidationResults:
-        """Generates a list of tasks for validating the data sources of the model and then runs them
+        """Generates a list of tasks for validating the semantic models of the model and then runs them
 
         Args:
             model: Model which to run data warehouse validations on

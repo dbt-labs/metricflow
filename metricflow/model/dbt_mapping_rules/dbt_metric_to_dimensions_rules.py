@@ -48,7 +48,7 @@ def dimension_for_dimension_in_columns(dimension_name: str, columns: List[Catalo
 
 
 class DbtDimensionsToDimensions(DbtMappingRule):
-    """Rule for mapping dbt metric dimensions to data source dimensions"""
+    """Rule for mapping dbt metric dimensions to semantic model dimensions"""
 
     @staticmethod
     def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
@@ -79,13 +79,13 @@ class DbtDimensionsToDimensions(DbtMappingRule):
 
 
 class DbtTimestampToDimension(DbtMappingRule):
-    """Rule for mapping dbt metric timestamps to data source dimensions"""
+    """Rule for mapping dbt metric timestamps to semantic model dimensions"""
 
     @staticmethod
     def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
         issues: List[ValidationIssue] = []
         for metric in dbt_metrics:
-            # Creating dimensions only matters if there is a data source (model) to attach them too
+            # Creating dimensions only matters if there is a semantic model (model) to attach them too
             if metric.model:
                 try:
                     assert_metric_model_name(metric=metric)
@@ -107,7 +107,7 @@ class DbtTimestampToDimension(DbtMappingRule):
 
 
 class DbtFiltersToDimensions(DbtMappingRule):
-    """Rule for mapping dbt metric filters to data source dimensions
+    """Rule for mapping dbt metric filters to semantic model dimensions
 
     To get the dimensions from a dbt metric's filters we:
     1. build each filter into an SQL clause

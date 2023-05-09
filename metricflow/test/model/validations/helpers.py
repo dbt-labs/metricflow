@@ -88,7 +88,7 @@ def semantic_model_with_guaranteed_meta(
     measures: Sequence[Measure] = [],
     dimensions: Sequence[Dimension] = [],
 ) -> SemanticModel:
-    """Creates a data source with the given input. If a metadata object is not supplied, a default metadata object is used"""
+    """Creates a semantic model with the given input. If a metadata object is not supplied, a default metadata object is used"""
 
     created_node_relation = node_relation
     if created_node_relation is None:

@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 class SemanticModelTimeDimensionWarningsRule(ModelValidationRule):
-    """Checks time dimensions in data sources."""
+    """Checks time dimensions in semantic models."""
 
     @staticmethod
     @validate_safely(whats_being_done="running model validation ensuring time dimensions are defined properly")
@@ -33,7 +33,7 @@ class SemanticModelTimeDimensionWarningsRule(ModelValidationRule):
         return issues
 
     @staticmethod
-    @validate_safely(whats_being_done="checking validity of the data source's time dimensions")
+    @validate_safely(whats_being_done="checking validity of the semantic model's time dimensions")
     def _validate_semantic_model(semantic_model: SemanticModel) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
 
@@ -43,7 +43,7 @@ class SemanticModelTimeDimensionWarningsRule(ModelValidationRule):
             if dim.type == DimensionType.TIME and dim.type_params is not None and dim.type_params.is_primary:
                 primary_time_dimensions.append(dim)
 
-        # A data source must have a primary time dimension if it has
+        # A semantic model must have a primary time dimension if it has
         # any measures that don't have an `agg_time_dimension` set
         if (
             len(primary_time_dimensions) == 0
@@ -56,7 +56,7 @@ class SemanticModelTimeDimensionWarningsRule(ModelValidationRule):
                         file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
                         semantic_model=SemanticModelReference(semantic_model_name=semantic_model.name),
                     ),
-                    message=f"No primary time dimension in data source with name ({semantic_model.name}). Please add one",
+                    message=f"No primary time dimension in semantic model with name ({semantic_model.name}). Please add one",
                 )
             )
 
@@ -68,7 +68,7 @@ class SemanticModelTimeDimensionWarningsRule(ModelValidationRule):
                             file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
                             semantic_model=SemanticModelReference(semantic_model_name=semantic_model.name),
                         ),
-                        message=f"In data source {semantic_model.name}, "
+                        message=f"In semantic model {semantic_model.name}, "
                         f"Primary time dimension with name: {primary_time_dimension.name} "
                         f"is one of many defined as primary.",
                     )
@@ -78,12 +78,12 @@ class SemanticModelTimeDimensionWarningsRule(ModelValidationRule):
 
 
 class SemanticModelValidityWindowRule(ModelValidationRule):
-    """Checks validity windows in data sources to ensure they comply with runtime requirements"""
+    """Checks validity windows in semantic models to ensure they comply with runtime requirements"""
 
     @staticmethod
     @validate_safely(whats_being_done="checking correctness of the time dimension validity parameters in the model")
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:
-        """Checks the validity param definitions in every data source in the model"""
+        """Checks the validity param definitions in every semantic model in the model"""
         issues: List[ValidationIssue] = []
 
         for semantic_model in model.semantic_models:
@@ -93,10 +93,10 @@ class SemanticModelValidityWindowRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(
-        whats_being_done="checking the data source's validity parameters for compatibility with runtime requirements"
+        whats_being_done="checking the semantic model's validity parameters for compatibility with runtime requirements"
     )
     def _validate_semantic_model(semantic_model: SemanticModel) -> List[ValidationIssue]:
-        """Runs assertions on data sources with validity parameters set on one or more time dimensions"""
+        """Runs assertions on semantic models with validity parameters set on one or more time dimensions"""
 
         issues: List[ValidationIssue] = []
 
@@ -140,7 +140,7 @@ class SemanticModelValidityWindowRule(ModelValidationRule):
                 message=(
                     f"Data source {semantic_model.name} has {len(validity_param_dims)} dimensions defined with validity "
                     f"params. They are: {validity_param_dimension_names}. There must be either zero or two! "
-                    f"If you wish to define a validity window for this data source, please follow these requirements: "
+                    f"If you wish to define a validity window for this semantic model, please follow these requirements: "
                     f"{requirements}"
                 ),
             )
@@ -166,7 +166,7 @@ class SemanticModelValidityWindowRule(ModelValidationRule):
                 context=context,
                 message=(
                     f"Data source {semantic_model.name} has validity param dimensions defined, but does not have an "
-                    f"entity with type `natural` set. The natural key for this data source is what we use to "
+                    f"entity with type `natural` set. The natural key for this semantic model is what we use to "
                     f"process a validity window join. Primary or unique entities, if any, might be suitable for "
                     f"use as natural keys: ({[entity.name for entity in primary_or_unique_entities]})."
                 ),
@@ -179,14 +179,14 @@ class SemanticModelValidityWindowRule(ModelValidationRule):
                 message=(
                     f"Data source {semantic_model.name} has validity param dimensions defined and also has one or more "
                     f"entities designated as `primary` or `unique`. This is not yet supported, as we do not "
-                    f"currently process joins against these key types for data sources with validity windows "
+                    f"currently process joins against these key types for semantic models with validity windows "
                     f"specified."
                 ),
             )
             issues.append(error)
 
         if semantic_model.measures:
-            # Temporarily block measure definitions in data sources with validity windows set
+            # Temporarily block measure definitions in semantic models with validity windows set
             measure_names = [measure.name for measure in semantic_model.measures]
             error = ValidationError(
                 context=context,

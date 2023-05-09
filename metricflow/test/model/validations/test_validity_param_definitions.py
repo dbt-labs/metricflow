@@ -10,7 +10,7 @@ from metricflow.test.model.validations.helpers import base_model_file
 
 
 def test_validity_window_configuration() -> None:
-    """Tests to ensure a data source with a properly configured validity window passes validation"""
+    """Tests to ensure a semantic model with a properly configured validity window passes validation"""
     yaml_contents = textwrap.dedent(
         """\
         data_source:
@@ -181,7 +181,7 @@ def test_two_dimension_validity_windows_must_not_overload_start_and_end() -> Non
 
 
 def test_multiple_validity_windows_are_invalid() -> None:
-    """Tests validation asserting that no more than 1 validity window can exist in a data source"""
+    """Tests validation asserting that no more than 1 validity window can exist in a semantic model"""
     yaml_contents = textwrap.dedent(
         """\
         data_source:
@@ -266,9 +266,9 @@ def test_empty_validity_windows_are_invalid() -> None:
 
 
 def test_measures_are_prevented() -> None:
-    """Tests validation asserting that measures are not allowed in a data source with validity windows
+    """Tests validation asserting that measures are not allowed in a semantic model with validity windows
 
-    This block is temporary while we sort out the proper syntax for defining a measure in SCD-style data sources
+    This block is temporary while we sort out the proper syntax for defining a measure in SCD-style semantic models
     and implement whatever additional functionality is needed for measures which are semi-additive to the window.
     """
 
@@ -312,7 +312,7 @@ def test_measures_are_prevented() -> None:
 
 
 def test_validity_window_must_have_a_natural_key() -> None:
-    """Tests validation asserting that data sources with validity windows use an entity with type NATURAL"""
+    """Tests validation asserting that semantic models with validity windows use an entity with type NATURAL"""
 
     yaml_contents = textwrap.dedent(
         """\
@@ -349,9 +349,9 @@ def test_validity_window_must_have_a_natural_key() -> None:
 
 
 def test_validity_window_does_not_use_primary_key() -> None:
-    """Tests validation asserting that data sources with validity windows do not use primary keys
+    """Tests validation asserting that semantic models with validity windows do not use primary keys
 
-    This is useful because we currently do not support joins against SCD-style data sources without using the
+    This is useful because we currently do not support joins against SCD-style semantic models without using the
     validity window filter, and so enabling a primary key would be confusing. Subsequent changes may add support
     for this in which case we should of course remove this validation requirement.
     """

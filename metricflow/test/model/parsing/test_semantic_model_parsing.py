@@ -40,7 +40,7 @@ def test_semantic_model_metadata_parsing() -> None:
 
 
 def test_semantic_model_node_relation_parsing() -> None:
-    """Test for parsing a data source specification with a node_relation provided"""
+    """Test for parsing a semantic model specification with a node_relation provided"""
     yaml_contents = textwrap.dedent(
         """\
         data_source:
@@ -60,7 +60,7 @@ def test_semantic_model_node_relation_parsing() -> None:
 
 
 def test_semantic_model_entity_parsing() -> None:
-    """Test for parsing a basic entity out of a data source specification"""
+    """Test for parsing a basic entity out of a semantic model specification"""
     yaml_contents = textwrap.dedent(
         """\
         data_source:
@@ -90,7 +90,7 @@ def test_semantic_model_entity_parsing() -> None:
 
 
 def test_semantic_model_entity_metadata_parsing() -> None:
-    """Test for parsing metadata for an entity object defined in a data source specification"""
+    """Test for parsing metadata for an entity object defined in a semantic model specification"""
     yaml_contents = textwrap.dedent(
         """\
         data_source:
@@ -126,7 +126,7 @@ def test_semantic_model_entity_metadata_parsing() -> None:
 
 
 def test_semantic_model_measure_parsing() -> None:
-    """Test for parsing a measure out of a data source specification"""
+    """Test for parsing a measure out of a semantic model specification"""
     yaml_contents = textwrap.dedent(
         """\
         data_source:
@@ -155,7 +155,7 @@ def test_semantic_model_measure_parsing() -> None:
 
 
 def test_semantic_model_measure_metadata_parsing() -> None:
-    """Test for parsing metadata for a measure object defined in a data source specification"""
+    """Test for parsing metadata for a measure object defined in a semantic model specification"""
     yaml_contents = textwrap.dedent(
         """\
         data_source:
@@ -191,7 +191,7 @@ def test_semantic_model_measure_metadata_parsing() -> None:
 
 
 def test_semantic_model_create_metric_measure_parsing() -> None:
-    """Test for parsing a measure out of a data source specification when create metric is set"""
+    """Test for parsing a measure out of a semantic model specification when create metric is set"""
     yaml_contents = textwrap.dedent(
         """\
         data_source:
@@ -217,7 +217,7 @@ def test_semantic_model_create_metric_measure_parsing() -> None:
 
 
 def test_semantic_model_categorical_dimension_parsing() -> None:
-    """Test for parsing a categorical dimension out of a data source specification"""
+    """Test for parsing a categorical dimension out of a semantic model specification"""
     yaml_contents = textwrap.dedent(
         """\
         data_source:
@@ -245,7 +245,7 @@ def test_semantic_model_categorical_dimension_parsing() -> None:
 
 
 def test_semantic_model_partition_dimension_parsing() -> None:
-    """Test for parsing a partition dimension out of a data source specification"""
+    """Test for parsing a partition dimension out of a semantic model specification"""
     yaml_contents = textwrap.dedent(
         """\
         data_source:
@@ -271,7 +271,7 @@ def test_semantic_model_partition_dimension_parsing() -> None:
 
 
 def test_semantic_model_time_dimension_parsing() -> None:
-    """Test for parsing a time dimension out of a data source specification"""
+    """Test for parsing a time dimension out of a semantic model specification"""
     yaml_contents = textwrap.dedent(
         """\
         data_source:
@@ -301,7 +301,7 @@ def test_semantic_model_time_dimension_parsing() -> None:
 
 
 def test_semantic_model_primary_time_dimension_parsing() -> None:
-    """Test for parsing a primary time dimension out of a data source specification"""
+    """Test for parsing a primary time dimension out of a semantic model specification"""
     yaml_contents = textwrap.dedent(
         """\
         data_source:
@@ -331,7 +331,7 @@ def test_semantic_model_primary_time_dimension_parsing() -> None:
 
 
 def test_semantic_model_dimension_metadata_parsing() -> None:
-    """Test for parsing metadata for an dimension object defined in a data source specification"""
+    """Test for parsing metadata for an dimension object defined in a semantic model specification"""
     yaml_contents = textwrap.dedent(
         """\
         data_source:
@@ -367,7 +367,7 @@ def test_semantic_model_dimension_metadata_parsing() -> None:
 
 
 def test_semantic_model_dimension_validity_params_parsing() -> None:
-    """Test for parsing dimension validity info out of a data source specification"""
+    """Test for parsing dimension validity info out of a semantic model specification"""
     yaml_contents = textwrap.dedent(
         """\
         data_source:

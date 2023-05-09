@@ -15,10 +15,10 @@ from metricflow.model.validations.validator_helpers import (
 
 
 class ElementConsistencyRule(ModelValidationRule):
-    """Checks that elements in data sources with the same name are of the same element type across the model
+    """Checks that elements in semantic models with the same name are of the same element type across the model
 
     This reduces the potential confusion that might arise from having an entity named `country` and a dimension
-    named `country` while allowing for things like the `user` entity to exist in multiple data sources. Note not
+    named `country` while allowing for things like the `user` entity to exist in multiple semantic models. Note not
     all element types allow duplicates, and there are separate validation rules for those cases. See, for example,
     the SemanticModelMeasuresUniqueRule.
     """
@@ -42,7 +42,7 @@ class ElementConsistencyRule(ModelValidationRule):
                 issues.append(
                     ValidationError(
                         context=semantic_model_context,
-                        message=f"In data sources {semantic_model_names}, element `{element_name}` is of type "
+                        message=f"In semantic models {semantic_model_names}, element `{element_name}` is of type "
                         f"{element_type}, but it is used as types {types_used} across the model.",
                     )
                 )

@@ -105,7 +105,7 @@ def test_validate_semantic_models(  # noqa: D
     issues = dw_validator.validate_semantic_models(model)
     assert len(issues.all_issues) == 1
     assert len(issues.errors) == 1
-    assert "Unable to access data source `test_semantic_model2`" in issues.all_issues[0].message
+    assert "Unable to access semantic model `test_semantic_model2`" in issues.all_issues[0].message
 
 
 def test_build_dimension_tasks(  # noqa: D
@@ -118,7 +118,7 @@ def test_build_dimension_tasks(  # noqa: D
         sql_client=async_sql_client,
         system_schema=mf_test_session_state.mf_system_schema,
     )
-    # on data source query with all dimensions
+    # on semantic model query with all dimensions
     assert len(tasks) == 1
     # 1 categorical dimension task, 1 time dimension task, 4 granularity based time dimension tasks
     assert len(tasks[0].on_fail_subtasks) == 6
@@ -158,8 +158,8 @@ def test_build_entities_tasks(  # noqa: D
         sql_client=async_sql_client,
         system_schema=mf_test_session_state.mf_system_schema,
     )
-    assert len(tasks) == 1  # on data source query with all entities
-    assert len(tasks[0].on_fail_subtasks) == 1  # a sub task for each entity on the data source
+    assert len(tasks) == 1  # on semantic model query with all entities
+    assert len(tasks[0].on_fail_subtasks) == 1  # a sub task for each entity on the semantic model
 
 
 def test_validate_entities(  # noqa: D
@@ -196,8 +196,8 @@ def test_build_measure_tasks(  # noqa: D
         sql_client=async_sql_client,
         system_schema=mf_test_session_state.mf_system_schema,
     )
-    assert len(tasks) == 1  # on data source query with all measures
-    assert len(tasks[0].on_fail_subtasks) == 1  # a sub task for each measure on the data source
+    assert len(tasks) == 1  # on semantic model query with all measures
+    assert len(tasks[0].on_fail_subtasks) == 1  # a sub task for each measure on the semantic model
 
 
 def test_validate_measures(  # noqa: D

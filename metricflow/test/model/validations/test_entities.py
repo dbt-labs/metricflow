@@ -23,7 +23,7 @@ from metricflow.test.test_utils import find_semantic_model_with
 def test_semantic_model_cant_have_more_than_one_primary_entity(
     simple_model__with_primary_transforms: UserConfiguredModel,
 ) -> None:  # noqa: D
-    """Add an additional primary entity to a data source and assert that it cannot have two"""
+    """Add an additional primary entity to a semantic model and assert that it cannot have two"""
     model = copy.deepcopy(simple_model__with_primary_transforms)
     func: Callable[[SemanticModel], bool] = lambda data_source: len(data_source.entities) > 1
 
@@ -37,7 +37,7 @@ def test_semantic_model_cant_have_more_than_one_primary_entity(
     model_issues = ModelValidator([OnePrimaryEntityPerSemanticModelRule()]).validate_model(model)
 
     future_issue = (
-        f"Data sources can have only one primary entity. The data source"
+        f"Data sources can have only one primary entity. The semantic model"
         f" `{multiple_entity_semantic_model.name}` has {len(entity_references)}"
     )
 
@@ -52,7 +52,7 @@ def test_semantic_model_cant_have_more_than_one_primary_entity(
 
 
 def test_multiple_natural_entities() -> None:
-    """Test validation enforcing that a single data source cannot have more than one natural entity"""
+    """Test validation enforcing that a single semantic model cannot have more than one natural entity"""
     yaml_contents = textwrap.dedent(
         """\
         data_source:
@@ -90,7 +90,7 @@ def test_multiple_natural_entities() -> None:
 
 
 def test_natural_entity_used_in_wrong_context() -> None:
-    """Test validation enforcing that a single data source cannot have more than one natural entity"""
+    """Test validation enforcing that a single semantic model cannot have more than one natural entity"""
     yaml_contents = textwrap.dedent(
         """\
         data_source:

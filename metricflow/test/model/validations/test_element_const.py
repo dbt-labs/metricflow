@@ -18,7 +18,7 @@ def _categorical_dimensions(data_source: SemanticModel) -> Tuple[Dimension, ...]
 def test_cross_element_names(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa:D
     model = copy.deepcopy(simple_model__with_primary_transforms)
 
-    # ensure we have a usable data source for the test
+    # ensure we have a usable semantic model for the test
     usable_ds, usable_ds_index = find_semantic_model_with(
         model,
         lambda data_source: len(data_source.measures) > 0

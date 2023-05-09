@@ -16,10 +16,10 @@ from metricflow.model.validations.validator_helpers import (
 
 
 class AggregationTimeDimensionRule(ModelValidationRule):
-    """Checks that the aggregation time dimension for a measure points to a valid time dimension in the data source."""
+    """Checks that the aggregation time dimension for a measure points to a valid time dimension in the semantic model."""
 
     @staticmethod
-    @validate_safely(whats_being_done="checking aggregation time dimension for data sources in the model")
+    @validate_safely(whats_being_done="checking aggregation time dimension for semantic models in the model")
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
         issues: List[ValidationIssue] = []
         for semantic_model in model.semantic_models:
@@ -37,7 +37,7 @@ class AggregationTimeDimensionRule(ModelValidationRule):
         return False
 
     @staticmethod
-    @validate_safely(whats_being_done="checking aggregation time dimension for a data source")
+    @validate_safely(whats_being_done="checking aggregation time dimension for a semantic model")
     def _validate_semantic_model(semantic_model: SemanticModel) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
 
@@ -56,9 +56,9 @@ class AggregationTimeDimensionRule(ModelValidationRule):
                 issues.append(
                     ValidationError(
                         context=measure_context,
-                        message=f"In data source '{semantic_model.name}', measure '{measure.name}' has the aggregation "
+                        message=f"In semantic model '{semantic_model.name}', measure '{measure.name}' has the aggregation "
                         f"time dimension set to '{agg_time_dimension_reference.element_name}', "
-                        f"which is not a valid time dimension in the data source",
+                        f"which is not a valid time dimension in the semantic model",
                     )
                 )
 

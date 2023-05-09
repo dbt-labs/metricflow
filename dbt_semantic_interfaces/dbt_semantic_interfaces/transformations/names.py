@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 class LowerCaseNamesRule(ModelTransformRule):
-    """Lowercases the names of both top level objects and data source elements in a model"""
+    """Lowercases the names of both top level objects and semantic model elements in a model"""
 
     @staticmethod
     def transform_model(model: UserConfiguredModel) -> UserConfiguredModel:  # noqa: D
@@ -20,7 +20,7 @@ class LowerCaseNamesRule(ModelTransformRule):
 
     @staticmethod
     def _lowercase_semantic_model_elements(semantic_model: SemanticModel) -> None:
-        """Lowercases the names of data source elements."""
+        """Lowercases the names of semantic model elements."""
         if semantic_model.measures:
             for measure in semantic_model.measures:
                 measure.name = measure.name.lower()

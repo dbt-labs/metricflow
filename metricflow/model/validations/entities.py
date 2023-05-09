@@ -25,7 +25,7 @@ class NaturalEntityConfigurationRule(ModelValidationRule):
     @staticmethod
     @validate_safely(
         whats_being_done=(
-            "checking that each data source has no more than one natural entity, and that "
+            "checking that each semantic model has no more than one natural entity, and that "
             "natural entities are used in the appropriate contexts"
         )
     )
@@ -42,7 +42,7 @@ class NaturalEntityConfigurationRule(ModelValidationRule):
         if len(natural_entity_names) > 1:
             error = ValidationError(
                 context=context,
-                message=f"Data sources can have at most one natural entity, but data source "
+                message=f"Data sources can have at most one natural entity, but semantic model "
                 f"`{semantic_model.name}` has {len(natural_entity_names)} distinct natural entities set! "
                 f"{natural_entity_names}.",
             )
@@ -51,7 +51,7 @@ class NaturalEntityConfigurationRule(ModelValidationRule):
             error = ValidationError(
                 context=context,
                 message=f"The use of `natural` entities is currently supported only in conjunction with a validity "
-                f"window defined in the set of time dimensions associated with the data source. Data source "
+                f"window defined in the set of time dimensions associated with the semantic model. Data source "
                 f"`{semantic_model.name}` uses a natural entity ({natural_entity_names}) but does not define a "
                 f"validity window!",
             )
@@ -73,10 +73,10 @@ class NaturalEntityConfigurationRule(ModelValidationRule):
 
 
 class OnePrimaryEntityPerSemanticModelRule(ModelValidationRule):
-    """Ensures that each data source has only one primary entity"""
+    """Ensures that each semantic model has only one primary entity"""
 
     @staticmethod
-    @validate_safely(whats_being_done="checking data source has only one primary entity")
+    @validate_safely(whats_being_done="checking semantic model has only one primary entity")
     def _only_one_primary_entity(semantic_model: SemanticModel) -> List[ValidationIssue]:
         primary_entity_names: MutableSet[str] = set()
         for entity in semantic_model.entities or []:
@@ -90,7 +90,7 @@ class OnePrimaryEntityPerSemanticModelRule(ModelValidationRule):
                         file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
                         semantic_model=SemanticModelReference(semantic_model_name=semantic_model.name),
                     ),
-                    message=f"Data sources can have only one primary entity. The data source"
+                    message=f"Data sources can have only one primary entity. The semantic model"
                     f" `{semantic_model.name}` has {len(primary_entity_names)}: {', '.join(primary_entity_names)}",
                     error_date=date(2022, 1, 12),  # Wed January 12th 2022
                 )
@@ -98,7 +98,9 @@ class OnePrimaryEntityPerSemanticModelRule(ModelValidationRule):
         return []
 
     @staticmethod
-    @validate_safely(whats_being_done="running model validation ensuring each data source has only one primary entity")
+    @validate_safely(
+        whats_being_done="running model validation ensuring each semantic model has only one primary entity"
+    )
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
         issues = []
 

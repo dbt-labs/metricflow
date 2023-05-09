@@ -12,7 +12,7 @@ from metricflow.model.validations.validator_helpers import ModelValidationResult
 
 
 class DbtMapToSemanticModelName(DbtMappingRule):
-    """Rule for mapping dbt metric model names to data source names"""
+    """Rule for mapping dbt metric model names to semantic model names"""
 
     @staticmethod
     def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
@@ -33,7 +33,7 @@ class DbtMapToSemanticModelName(DbtMappingRule):
 
 
 class DbtMapToSemanticModelDescription(DbtMappingRule):
-    """Rule for mapping dbt metric model descriptions to data source descriptions"""
+    """Rule for mapping dbt metric model descriptions to semantic model descriptions"""
 
     @staticmethod
     def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
@@ -56,7 +56,7 @@ class DbtMapToSemanticModelDescription(DbtMappingRule):
 
 
 class DbtMapSemanticModelNodeRelation(DbtMappingRule):
-    """Rule for mapping dbt metric models to data source node relations"""
+    """Rule for mapping dbt metric models to semantic model node relations"""
 
     @staticmethod
     def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D

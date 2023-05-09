@@ -16,7 +16,7 @@ class BooleanMeasureAggregationRule(ModelTransformRule):
             for measure in semantic_model.measures:
                 if measure.agg == AggregationType.BOOLEAN:
                     logger.warning(
-                        f"In data source {semantic_model.name}, measure `{measure.reference.element_name}` "
+                        f"In semantic model {semantic_model.name}, measure `{measure.reference.element_name}` "
                         f"is configured as aggregation type `boolean`, which has been deprecated. Please use "
                         f"`sum_boolean` instead."
                     )

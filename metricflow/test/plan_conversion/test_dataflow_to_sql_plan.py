@@ -732,7 +732,7 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
-    """Tests the compute metrics node for ratio type metrics sourced from a single data source"""
+    """Tests the compute metrics node for ratio type metrics sourced from a single semantic model"""
     numerator_spec = MeasureSpec(
         element_name="bookings",
     )

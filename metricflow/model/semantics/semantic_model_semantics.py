@@ -28,10 +28,10 @@ logger = logging.getLogger(__name__)
 
 
 class SemanticModelSemantics(SemanticModelSemanticsAccessor):
-    """Tracks semantic information for data source held in a set of SemanticModelContainers
+    """Tracks semantic information for semantic model held in a set of SemanticModelContainers
 
     This implements both the SemanticModelSemanticsAccessors protocol, the interface type we use throughout the codebase.
-    That interface prevents unwanted calls to methods for adding data sources to the container.
+    That interface prevents unwanted calls to methods for adding semantic models to the container.
     """
 
     def __init__(  # noqa: D
@@ -66,12 +66,12 @@ class SemanticModelSemantics(SemanticModelSemanticsAccessor):
         """Retrieves a full dimension object by name"""
         for dimension_source in self._dimension_index[dimension_reference]:
             dimension = dimension_source.get_dimension(dimension_reference)
-            # find the data source that has the requested dimension by the requested entity
+            # find the semantic model that has the requested dimension by the requested entity
 
             return deepcopy(dimension)
 
         raise ValueError(
-            f"Could not find dimension with name ({dimension_reference.element_name}) in configured data sources"
+            f"Could not find dimension with name ({dimension_reference.element_name}) in configured semantic models"
         )
 
     def get_time_dimension(self, time_dimension_reference: TimeDimensionReference) -> Dimension:
@@ -80,7 +80,7 @@ class SemanticModelSemantics(SemanticModelSemanticsAccessor):
 
         if dimension_reference not in self._dimension_index:
             raise ValueError(
-                f"Could not find dimension with name ({dimension_reference.element_name}) in configured data sources"
+                f"Could not find dimension with name ({dimension_reference.element_name}) in configured semantic models"
             )
 
         for dimension_source in self._dimension_index[dimension_reference]:
@@ -100,10 +100,10 @@ class SemanticModelSemantics(SemanticModelSemanticsAccessor):
 
     def get_measure(self, measure_reference: MeasureReference) -> Measure:  # noqa: D
         if measure_reference not in self._measure_index:
-            raise ValueError(f"Could not find measure with name ({measure_reference}) in configured data sources")
+            raise ValueError(f"Could not find measure with name ({measure_reference}) in configured semantic models")
 
         assert len(self._measure_index[measure_reference]) >= 1
-        # Measures should be consistent across data sources, so just use the first one.
+        # Measures should be consistent across semantic models, so just use the first one.
         return list(self._measure_index[measure_reference])[0].get_measure(measure_reference)
 
     def get_entity_references(self) -> Sequence[EntityReference]:  # noqa: D
@@ -135,7 +135,7 @@ class SemanticModelSemantics(SemanticModelSemanticsAccessor):
         return self._semantic_model_reference_to_semantic_model.get(semantic_model_reference)
 
     def _add_semantic_model(self, semantic_model: SemanticModel) -> None:
-        """Add data source semantic information, validating consistency with existing data sources."""
+        """Add semantic model semantic information, validating consistency with existing semantic models."""
         errors = []
 
         if semantic_model.reference in self._semantic_model_reference_to_semantic_model:
@@ -189,13 +189,13 @@ class SemanticModelSemantics(SemanticModelSemanticsAccessor):
     def get_aggregation_time_dimensions_with_measures(
         self, semantic_model_reference: SemanticModelReference
     ) -> ElementGrouper[TimeDimensionReference, MeasureSpec]:
-        """Return all time dimensions in a data source with their associated measures."""
+        """Return all time dimensions in a semantic model with their associated measures."""
         assert (
             semantic_model_reference in self._semantic_model_to_aggregation_time_dimensions
         ), f"Data Source {semantic_model_reference} is not known"
         return self._semantic_model_to_aggregation_time_dimensions[semantic_model_reference]
 
     def get_semantic_models_for_entity(self, entity_reference: EntityReference) -> Set[SemanticModel]:
-        """Return all data sources associated with an entity reference"""
+        """Return all semantic models associated with an entity reference"""
         entity = self._entity_ref_to_entity[entity_reference]
         return set(self._entity_index[entity])

@@ -24,7 +24,7 @@ def test_lonely_entity_raises_issue(simple_model__with_primary_transforms: UserC
 
     found_warning = False
     warning = (
-        f"Entity `{lonely_entity_name}` only found in one data source `{semantic_model_with_entities.name}` "
+        f"Entity `{lonely_entity_name}` only found in one semantic model `{semantic_model_with_entities.name}` "
         f"which means it will be unused in joins."
     )
     if model_issues is not None:

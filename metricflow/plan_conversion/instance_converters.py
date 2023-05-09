@@ -280,9 +280,9 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
     def _get_validity_window_dimensions_for_semantic_model(
         self, semantic_model_reference: SemanticModelReference
     ) -> Optional[Tuple[_DimensionValidityParams, _DimensionValidityParams]]:
-        """Returns a 2-tuple (start, end) of validity window dimensions info, if any exist in the data source"""
+        """Returns a 2-tuple (start, end) of validity window dimensions info, if any exist in the semantic model"""
         semantic_model = self._semantic_model_semantics.get_by_reference(semantic_model_reference)
-        assert semantic_model, f"Could not find data source {semantic_model_reference} after data set conversion!"
+        assert semantic_model, f"Could not find semantic model {semantic_model_reference} after data set conversion!"
 
         start_dim = semantic_model.validity_start_dimension
         end_dim = semantic_model.validity_end_dimension
@@ -307,7 +307,7 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
         """Find the Time Dimension specs defining a validity window, if any, and return it
 
         This currently throws an exception if more than one such window is found, and effectively prevents
-        us from processing a dataset composed of a join between two SCD data sources. This restriction is in
+        us from processing a dataset composed of a join between two SCD semantic models. This restriction is in
         place as a temporary simplification - if there is need for this feature we can enable it.
         """
         semantic_model_to_window: Dict[str, ValidityWindowJoinDescription] = {}
@@ -334,9 +334,9 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
             linkless_start_specs = {spec.without_entity_links for spec in start_specs}
             linkless_end_specs = {spec.without_entity_links for spec in end_specs}
             assert len(linkless_start_specs) == 1 and len(linkless_end_specs) == 1, (
-                f"Did not find exactly one pair of specs from data source `{semantic_model_reference}` matching the validity "
-                f"window end points defined in the data source. This means we cannot process an SCD join, because we "
-                f"require exactly one validity window to be specified for the query! The window in the data source "
+                f"Did not find exactly one pair of specs from semantic model `{semantic_model_reference}` matching the validity "
+                f"window end points defined in the semantic model. This means we cannot process an SCD join, because we "
+                f"require exactly one validity window to be specified for the query! The window in the semantic model "
                 f"is defined by start dimension `{start_dim}` and end dimension `{end_dim}`. We found "
                 f"{len(linkless_start_specs)} linkless specs for window start ({linkless_start_specs}) and "
                 f"{len(linkless_end_specs)} linkless specs for window end ({linkless_end_specs})."
@@ -352,7 +352,7 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
 
         assert len(semantic_model_to_window) < 2, (
             f"Found more than 1 set of validity window specs in the input instance set. This is not currently "
-            f"supported, as joins between SCD data sources are not yet allowed! {semantic_model_to_window}"
+            f"supported, as joins between SCD semantic models are not yet allowed! {semantic_model_to_window}"
         )
 
         if semantic_model_to_window:
@@ -587,9 +587,9 @@ class AliasAggregatedMeasures(InstanceSetTransform[InstanceSet]):
         """Initializer stores the input specs, which contain the aliases for each measure
 
         Note this class only works if used in conjunction with an AggregateMeasuresNode that has been generated
-        by querying a single data source for a single set of aggregated measures. This is currently enforced
+        by querying a single semantic model for a single set of aggregated measures. This is currently enforced
         by the structure of the DataflowPlanBuilder, which ensures each AggregateMeasuresNode corresponds to
-        a single data source set of measures for a single metric, and that these outputs will then be
+        a single semantic model set of measures for a single metric, and that these outputs will then be
         combinded via joins.
         """
         self.metric_input_measure_specs = metric_input_measure_specs

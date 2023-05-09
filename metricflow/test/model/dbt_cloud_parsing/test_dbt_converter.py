@@ -52,14 +52,14 @@ def test_for_breaking_model_changes(dbt_metrics: Tuple[MetricNode, ...]) -> None
                 mf_metric.constraint is not None
             ), f"Metric `{mf_metric.name}` created from dbt metric `{dbt_metric.name}` is missing a `constraint`"
 
-        # Ensure data source created from metric's model (if it has one) was created properly
+        # Ensure semantic model created from metric's model (if it has one) was created properly
         if dbt_metric.model is not None and hasattr(dbt_metric.model, "name"):
             mf_semantic_model = next(
                 (mf_ds for mf_ds in dbt_convert_result.model.data_sources if mf_ds.name == dbt_metric.model.name), None
             )
             assert (
                 mf_semantic_model is not None
-            ), f"Failed to create data source `{dbt_metric.model.name}` from dbt metric `{dbt_metric.name}`"
+            ), f"Failed to create semantic model `{dbt_metric.model.name}` from dbt metric `{dbt_metric.name}`"
             assert (
                 mf_semantic_model.node_relation is not None
             ), f"Data source `{mf_semantic_model.name}` created from dbt metric `{dbt_metric.name}` is missing an `node_relation`"
@@ -72,7 +72,7 @@ def test_for_breaking_model_changes(dbt_metrics: Tuple[MetricNode, ...]) -> None
             if dbt_metric.dimensions is not None or dbt_metric.timestamp is not None or dbt_metric.filters is not None:
                 assert (
                     mf_semantic_model.dimensions is not None and len(mf_semantic_model.dimensions) > 0
-                ), f"Expected dimensions to be created on data source `{mf_semantic_model.name}` from dbt metric `{dbt_metric.name}`, but none were"
+                ), f"Expected dimensions to be created on semantic model `{mf_semantic_model.name}` from dbt metric `{dbt_metric.name}`, but none were"
 
             # Ensure measure created correctly
             mf_measure = next(
@@ -80,7 +80,7 @@ def test_for_breaking_model_changes(dbt_metrics: Tuple[MetricNode, ...]) -> None
             )
             assert (
                 mf_measure is not None
-            ), f"Expected a measure `{dbt_metric.name}` to exist on data source `{mf_semantic_model.name}` from dbt metric `{dbt_metric.name}`"
+            ), f"Expected a measure `{dbt_metric.name}` to exist on semantic model `{mf_semantic_model.name}` from dbt metric `{dbt_metric.name}`"
             assert (
                 mf_measure.agg_time_dimension is not None
             ), f"Measure `{mf_measure.name}` created from dbt metric `{dbt_metric.name}` is missing an `agg_time_dimension`"

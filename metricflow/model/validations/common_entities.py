@@ -16,7 +16,7 @@ from metricflow.model.validations.validator_helpers import (
 
 
 class CommonEntitysRule(ModelValidationRule):
-    """Checks that entities exist on more than one data source"""
+    """Checks that entities exist on more than one semantic model"""
 
     @staticmethod
     def _map_semantic_model_entities(semantic_models: List[SemanticModel]) -> Dict[EntityReference, Set[str]]:
@@ -31,14 +31,14 @@ class CommonEntitysRule(ModelValidationRule):
         return entities_to_semantic_models
 
     @staticmethod
-    @validate_safely(whats_being_done="checking entity exists on more than one data source")
+    @validate_safely(whats_being_done="checking entity exists on more than one semantic model")
     def _check_entity(
         entity: Entity,
         semantic_model: SemanticModel,
         entities_to_semantic_models: Dict[EntityReference, Set[str]],
     ) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
-        # If the entity is the dict and if the set of data sources minus this data source is empty,
+        # If the entity is the dict and if the set of semantic models minus this semantic model is empty,
         # then we warn the user that their entity will be unused in joins
         if (
             entity.reference in entities_to_semantic_models
@@ -54,14 +54,14 @@ class CommonEntitysRule(ModelValidationRule):
                         element_type=SemanticModelElementType.ENTITY,
                     ),
                     message=f"Entity `{entity.reference.element_name}` "
-                    f"only found in one data source `{semantic_model.name}` "
+                    f"only found in one semantic model `{semantic_model.name}` "
                     f"which means it will be unused in joins.",
                 )
             )
         return issues
 
     @staticmethod
-    @validate_safely(whats_being_done="running model validation warning if entities are only one one data source")
+    @validate_safely(whats_being_done="running model validation warning if entities are only one one semantic model")
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:
         """Issues a warning for any entity that is associated with only one semantic_model"""
         issues = []

@@ -55,7 +55,7 @@ def test_join_type_coverage() -> None:
 def __get_simple_model_user_semantic_model_references_by_type(
     semantic_manifest_lookup: SemanticManifestLookup,
 ) -> Dict[EntityType, SemanticModelReference]:
-    """Helper to get a set of data sources with the `user` identifier organized by identifier type"""
+    """Helper to get a set of semantic models with the `user` identifier organized by identifier type"""
     foreign_user_semantic_model = semantic_manifest_lookup.semantic_model_semantics.get_by_reference(
         SemanticModelReference("listings_latest")
     )
@@ -66,9 +66,9 @@ def __get_simple_model_user_semantic_model_references_by_type(
         SemanticModelReference("companies")
     )
 
-    assert foreign_user_semantic_model, "Could not find `listings_latest` data source in simple model!"
-    assert primary_user_semantic_model, "Could not find `users_latest` data source in simple model!"
-    assert unique_user_semantic_model, "Could not find `companies` data source in simple model!"
+    assert foreign_user_semantic_model, "Could not find `listings_latest` semantic model in simple model!"
+    assert primary_user_semantic_model, "Could not find `users_latest` semantic model in simple model!"
+    assert unique_user_semantic_model, "Could not find `companies` semantic model in simple model!"
 
     return {
         EntityType.FOREIGN: foreign_user_semantic_model.reference,
@@ -80,9 +80,9 @@ def __get_simple_model_user_semantic_model_references_by_type(
 def test_distinct_target_semantic_model_join_validation(
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
-    """Tests data source join validation to a PRIMARY or UNIQUE entity
+    """Tests semantic model join validation to a PRIMARY or UNIQUE entity
 
-    PRIMARY and UNIQUE entity targets should be valid for any join at the data source level because they both
+    PRIMARY and UNIQUE entity targets should be valid for any join at the semantic model level because they both
     represent entity columns with distinct value sets, and as such there is no risk of inadvertent fanout joins.
     """
     semantic_model_references = __get_simple_model_user_semantic_model_references_by_type(
@@ -133,13 +133,13 @@ def test_distinct_target_semantic_model_join_validation(
         "unique to unique": unique_unique,
     }
     assert all(results.values()), (
-        f"All data source level join types for primary and unique targets should be valid, but we found "
+        f"All semantic model level join types for primary and unique targets should be valid, but we found "
         f"at least one that was not! Incorrectly failing types: {[k for k,v in results.items() if not v]}."
     )
 
 
 def test_foreign_target_semantic_model_join_validation(simple_semantic_manifest_lookup: SemanticManifestLookup) -> None:
-    """Tests data source join validation to FOREIGN entity types
+    """Tests semantic model join validation to FOREIGN entity types
 
     These should all fail by default, as fanout joins are not supported
     """
@@ -173,7 +173,7 @@ def test_foreign_target_semantic_model_join_validation(simple_semantic_manifest_
         "unique to foreign": unique_foreign,
     }
     assert not any(results.values()), (
-        f"All data source level joins against foreign targets should be invalid, but we found at least one "
+        f"All semantic model level joins against foreign targets should be invalid, but we found at least one "
         f"that was not! Incorrectly passing types: {[k for k,v in results.items() if v]}."
     )
 
@@ -181,15 +181,15 @@ def test_foreign_target_semantic_model_join_validation(simple_semantic_manifest_
 def test_semantic_model_join_validation_on_missing_entity(
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
-    """Tests data source join validation where the entity is missing from one or both data sources"""
+    """Tests semantic model join validation where the entity is missing from one or both semantic models"""
     primary_listing_semantic_model = simple_semantic_manifest_lookup.semantic_model_semantics.get_by_reference(
         SemanticModelReference("listings_latest")
     )
-    assert primary_listing_semantic_model, "Could not find data source `listings_latest` in the simple model!"
+    assert primary_listing_semantic_model, "Could not find semantic model `listings_latest` in the simple model!"
     no_listing_semantic_model = simple_semantic_manifest_lookup.semantic_model_semantics.get_by_reference(
         SemanticModelReference("id_verifications")
     )
-    assert no_listing_semantic_model, "Could not find data source `id_verifications` in the simple model!"
+    assert no_listing_semantic_model, "Could not find semantic model `id_verifications` in the simple model!"
     listing_entity_reference = EntityReference(element_name="listing")
     join_evaluator = SemanticModelJoinEvaluator(
         semantic_model_semantics=simple_semantic_manifest_lookup.semantic_model_semantics
@@ -200,7 +200,7 @@ def test_semantic_model_join_validation_on_missing_entity(
         right_semantic_model_reference=primary_listing_semantic_model.reference,
         on_entity_reference=listing_entity_reference,
     ), (
-        "Found valid join on `listing` involving the `id_verifications` data source, which does not include the "
+        "Found valid join on `listing` involving the `id_verifications` semantic model, which does not include the "
         "`listing` entity!"
     )
 
@@ -267,7 +267,7 @@ def test_foreign_target_instance_set_join_validation(
     consistent_id_object_repository: ConsistentIdObjectRepository,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
-    """Tests data source join validation to FOREIGN entity types"""
+    """Tests semantic model join validation to FOREIGN entity types"""
     foreign_user_instance_set = consistent_id_object_repository.simple_model_data_sets["listings_latest"].instance_set
     primary_user_instance_set = consistent_id_object_repository.simple_model_data_sets["users_latest"].instance_set
     unique_user_instance_set = consistent_id_object_repository.simple_model_data_sets["companies"].instance_set
@@ -298,7 +298,7 @@ def test_foreign_target_instance_set_join_validation(
         "unique to foreign": unique_foreign,
     }
     assert not any(results.values()), (
-        f"All data source level joins against foreign targets should be invalid, but we found at least one "
+        f"All semantic model level joins against foreign targets should be invalid, but we found at least one "
         f"that was not! Incorrectly passing types: {[k for k,v in results.items() if v]}."
     )
 
@@ -396,7 +396,7 @@ def test_get_joinable_semantic_models_multi_hop(  # noqa: D
 
 
 def test_natural_entity_semantic_model_validation(scd_semantic_manifest_lookup: SemanticManifestLookup) -> None:
-    """Tests data source validation for NATURAL target entity types
+    """Tests semantic model validation for NATURAL target entity types
 
     These tests rely on the scd_semantic_manifest_lookup, which makes extensive use of NATURAL key types.
     """
@@ -417,10 +417,10 @@ def test_natural_entity_semantic_model_validation(scd_semantic_manifest_lookup: 
         semantic_model_semantics=scd_semantic_manifest_lookup.semantic_model_semantics
     )
     # Type refinement
-    assert natural_user_semantic_model, "Could not find `primary_accounts` data source in scd model!"
-    assert foreign_user_semantic_model, "Could not find `bookings_source` data source in scd model!"
-    assert primary_user_semantic_model, "Could not find `users_latest` data source in scd model!"
-    assert unique_user_semantic_model, "Could not find `companies` data source in scd model!"
+    assert natural_user_semantic_model, "Could not find `primary_accounts` semantic model in scd model!"
+    assert foreign_user_semantic_model, "Could not find `bookings_source` semantic model in scd model!"
+    assert primary_user_semantic_model, "Could not find `users_latest` semantic model in scd model!"
+    assert unique_user_semantic_model, "Could not find `companies` semantic model in scd model!"
 
     # Valid cases
     natural_primary = join_evaluator.is_valid_semantic_model_join(

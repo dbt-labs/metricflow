@@ -188,13 +188,13 @@ class DbtManifestTransformer:
         )
 
     def build_semantic_model_for_metric(self, dbt_metric: DbtMetric) -> SemanticModel:
-        """Attemps to build a data source for a given DbtMetric
+        """Attemps to build a semantic model for a given DbtMetric
 
         Raises:
-            RuntimeError: A data source can't be built for `derived` dbt metrics
+            RuntimeError: A semantic model can't be built for `derived` dbt metrics
         """
         if dbt_metric.calculation_method == "derived":
-            raise RuntimeError("Cannot build a MetricFlow data source for `derived` DbtMetric")
+            raise RuntimeError("Cannot build a MetricFlow semantic model for `derived` DbtMetric")
 
         metric_model_ref = self.resolve_metric_model(dbt_metric=dbt_metric)
         semantic_model_table = self.db_table_from_model_node(metric_model_ref)
@@ -252,20 +252,20 @@ class DbtManifestTransformer:
         )
 
     def dbt_metric_to_metricflow_elements(self, dbt_metric: DbtMetric) -> TransformedDbtMetric:
-        """Builds a MetricFlow data source and proxy metric for the given DbtMetric"""
+        """Builds a MetricFlow semantic model and proxy metric for the given DbtMetric"""
         semantic_model = self.build_semantic_model_for_metric(dbt_metric)
         proxy_metric = self.build_proxy_metric(dbt_metric)
         return TransformedDbtMetric(semantic_model=semantic_model, metric=proxy_metric)
 
     @classmethod
     def deduplicate_semantic_models(cls, semantic_models: List[SemanticModel]) -> SemanticModel:
-        """Attempts to deduplicate a list of data sources into a single data source
+        """Attempts to deduplicate a list of semantic models into a single semantic model
 
-        Because each DbtMetric (which isn't `derived`) creates a data source,
-        and many DbtMetric can create the same data source with differring
+        Because each DbtMetric (which isn't `derived`) creates a semantic model,
+        and many DbtMetric can create the same semantic model with differring
         defintions for dimensions and measures, we need a way to deduplicate/merge
         them. This function does that. It requires that the base information
-        (name/table/query/description/etc) of the data source not be variable and
+        (name/table/query/description/etc) of the semantic model not be variable and
         that dimensions/measures/identifers with the same name have the same
         attributes.
         """
@@ -273,7 +273,7 @@ class DbtManifestTransformer:
         if len(semantic_models) == 1:
             return semantic_models[0]
 
-        # collect the variations of data source properties
+        # collect the variations of semantic model properties
         measures: Set[Measure] = set()
         entities: Set[Entity] = set()
         dimensions: Set[Dimension] = set()
@@ -285,7 +285,7 @@ class DbtManifestTransformer:
             # This is an atypical pattern but results in less work. The following
             # five lines are ternaries wherein the attribute is added to tracking
             # set for the attribute, but only if the attribute is defined for the
-            # data source. The `else None` is required because python ternaries
+            # semantic model. The `else None` is required because python ternaries
             # require an `else` statement. Having the else be `None` is simply
             # saying nothing happens, i.e. the set is not modified.
             names.add(semantic_model.name) if semantic_model.name else None
@@ -298,19 +298,19 @@ class DbtManifestTransformer:
             entities = entities.union(set(semantic_model.entities)) if semantic_model.entities else entities
             dimensions = dimensions.union(set(semantic_model.dimensions)) if semantic_model.dimensions else dimensions
 
-        assert len(names) == 1, "Cannot merge data sources, all data sources to merge must have same name"
+        assert len(names) == 1, "Cannot merge semantic models, all semantic models to merge must have same name"
         assert (
             len(descriptions) <= 1
-        ), "Cannot merge data sources, all data sources to merge must have same descritpion (or none)"
+        ), "Cannot merge semantic models, all semantic models to merge must have same descritpion (or none)"
         assert (
             len(sql_tables) <= 1
-        ), "Cannot merge data sources, all data sources to merge must have same sql_table (or none)"
+        ), "Cannot merge semantic models, all semantic models to merge must have same sql_table (or none)"
         assert (
             len(sql_queries) <= 1
-        ), "Cannot merge data sources, all data sources to merge must have same sql_query (or none)"
+        ), "Cannot merge semantic models, all semantic models to merge must have same sql_query (or none)"
         assert xor(
             len(sql_tables) == 1, len(sql_queries) == 1
-        ), "Cannot merge data sources, definitions for both sql_table and sql_query exist"
+        ), "Cannot merge semantic models, definitions for both sql_table and sql_query exist"
 
         return SemanticModel(
             name=list(names)[0],
@@ -335,7 +335,7 @@ class DbtManifestTransformer:
         # Map each `DbtMetric.model` value to counts of how many times each time
         # dimension is associated with it. The time dimension that is associated
         # with a `DbtMetric.model` the most will be considered the primary time
-        # dimenson for the data source that is built for the `DbtMetric.model`
+        # dimenson for the semantic model that is built for the `DbtMetric.model`
         time_stats_for_metric_models: Dict[str, Dict[str, int]] = {}
         for dbt_metric in dbt_metrics:
             if (
@@ -382,7 +382,7 @@ class DbtManifestTransformer:
                 )
                 metrics.append(transformed_dbt_metric.metric)
 
-        # As it might be the case that we generated many of the same data source,
+        # As it might be the case that we generated many of the same semantic model,
         # we need to merge / dedupe them
         deduped_semantic_models = []
         for name, semantic_models in semantic_models_map.items():
@@ -391,7 +391,7 @@ class DbtManifestTransformer:
             except Exception as e:
                 issues.append(
                     ValidationError(
-                        message=f"Failed to merge data sources with the name `{name}`",
+                        message=f"Failed to merge semantic models with the name `{name}`",
                         extra_detail="".join(traceback.format_tb(e.__traceback__)),
                     )
                 )

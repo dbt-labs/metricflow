@@ -28,7 +28,7 @@ class SemanticModelMeasuresUniqueRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(
-        whats_being_done="running model validation ensuring measures exist in only one configured data source"
+        whats_being_done="running model validation ensuring measures exist in only one configured semantic model"
     )
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
         issues: List[ValidationIssue] = []
@@ -46,7 +46,7 @@ class SemanticModelMeasuresUniqueRule(ModelValidationRule):
                                 ),
                                 element_type=SemanticModelElementType.MEASURE,
                             ),
-                            message=f"Found measure with name {measure.name} in multiple data sources with names "
+                            message=f"Found measure with name {measure.name} in multiple semantic models with names "
                             f"({measure_references_to_semantic_models[measure.reference]})",
                         )
                     )
@@ -169,7 +169,7 @@ class MeasureConstraintAliasesRule(ModelValidationRule):
                                 f"Measure alias {measure.alias} conflicts with a measure alias used elsewhere in the "
                                 f"model! This can cause ambiguity for certain types of query. Please choose another "
                                 f"alias, or, if the measures are constrained in the same way, consider centralizing "
-                                f"that definition in a new data source. Measure specification: {measure}. Existing "
+                                f"that definition in a new semantic model. Measure specification: {measure}. Existing "
                                 f"metrics with that measure alias used: {measure_alias_to_metrics[measure.alias]}"
                             ),
                         )
@@ -250,13 +250,13 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                             ),
                             message=(
                                 f"Measure '{measure.name}' has a agg_time_dimension of {measure.checked_agg_time_dimension.element_name} "
-                                f"that is not defined as a dimension in data source '{semantic_model.name}'."
+                                f"that is not defined as a dimension in semantic model '{semantic_model.name}'."
                             ),
                         )
                     )
                     continue
 
-                # Validates that the non_additive_dimension exists as a time dimension in the data source
+                # Validates that the non_additive_dimension exists as a time dimension in the semantic model
                 matching_dimension = next(
                     (dim for dim in semantic_model.dimensions if non_additive_dimension.name == dim.name), None
                 )
@@ -272,7 +272,7 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                             ),
                             message=(
                                 f"Measure '{measure.name}' has a non_additive_dimension with name '{non_additive_dimension.name}' "
-                                f"that is not defined as a dimension in data source '{semantic_model.name}'."
+                                f"that is not defined as a dimension in semantic model '{semantic_model.name}'."
                             ),
                         )
                     )
@@ -355,7 +355,7 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                             ),
                             message=(
                                 f"Measure '{measure.name}' has a non_additive_dimension with an invalid 'window_groupings'. "
-                                f"These entities {window_groupings.difference(intersected_entities)} do not exist in the data source."
+                                f"These entities {window_groupings.difference(intersected_entities)} do not exist in the semantic model."
                             ),
                         )
                     )

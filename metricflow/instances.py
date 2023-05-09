@@ -55,12 +55,12 @@ class MdoInstance(ABC, Generic[SpecT]):
 
 @dataclass(frozen=True)
 class SemanticModelElementInstance(SerializableDataclass):  # noqa: D
-    # This instance is derived from something defined in a data source.
+    # This instance is derived from something defined in a semantic model.
     defined_from: Tuple[SemanticModelElementReference, ...]
 
     @property
     def origin_semantic_model_reference(self) -> SemanticModelElementReference:
-        """Property to grab the element reference pointing to the origin data source for this element instance
+        """Property to grab the element reference pointing to the origin semantic model for this element instance
 
         By convention this is the zeroth element in the Tuple. At this time these tuples are always of exactly
         length 1, so the simple assertions here work.
@@ -70,7 +70,7 @@ class SemanticModelElementInstance(SerializableDataclass):  # noqa: D
         if len(self.defined_from) != 1:
             raise ValueError(
                 f"SemanticModelElementInstances should have exactly one entry in the `defined_from` property, because "
-                f"otherwise there is no way to ensure that the first element is always the origin data source! Found "
+                f"otherwise there is no way to ensure that the first element is always the origin semantic model! Found "
                 f"{len(self.defined_from)} elements in this particular instance: {self.defined_from}."
             )
 

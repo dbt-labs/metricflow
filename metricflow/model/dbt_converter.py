@@ -43,7 +43,7 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_RULES: FrozenSet[DbtMappingRule] = frozenset(
     [
-        # Build data sources
+        # Build semantic models
         DbtMapToSemanticModelName(),
         DbtMapToSemanticModelDescription(),
         DbtMapSemanticModelNodeRelation(),
@@ -89,7 +89,7 @@ class DbtConverter:
 
         Args:
             rules: A collection of DbtMappingRules which get saved as a FrozenSet (immutable and unordered). Defaults to DEFAULT_RULES.
-            semantic_model_class: SemanticModel class to parse the mapped data sources to. Defaults to MetricFlow SemanticModel class.
+            semantic_model_class: SemanticModel class to parse the mapped semantic models to. Defaults to MetricFlow SemanticModel class.
             metric_class: Metric class to parse the mapped metrics to. Defaults to MetricFlow Metric class.
         """
         self._unordered_rules = frozenset(rules)
@@ -112,7 +112,7 @@ class DbtConverter:
         # we don't want to modify the passed in objects, so we decopy them
         copied_objects = deepcopy(mapped_objects)
 
-        # Move dimensions, entities, and measures on to their respective data sources
+        # Move dimensions, entities, and measures on to their respective semantic models
         for semantic_model_name, dimensions_map in copied_objects.dimensions.items():
             copied_objects.semantic_models[semantic_model_name]["dimensions"] = list(dimensions_map.values())
         for semantic_model_name, entities_map in copied_objects.entities.items():
@@ -129,7 +129,7 @@ class DbtConverter:
             except Exception as e:
                 issues.append(
                     ValidationError(
-                        message=f"Failed to parse dict of data source {semantic_model_dict.get('name')} to object",
+                        message=f"Failed to parse dict of semantic model {semantic_model_dict.get('name')} to object",
                         extra_detail="".join(traceback.format_tb(e.__traceback__)),
                     )
                 )

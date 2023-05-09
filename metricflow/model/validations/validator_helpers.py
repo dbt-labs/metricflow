@@ -52,7 +52,7 @@ ISSUE_COLOR_MAP = {
 
 
 class SemanticModelElementType(Enum):
-    """Maps data source element types to a readable string."""
+    """Maps semantic model element types to a readable string."""
 
     MEASURE = "measure"
     DIMENSION = "dimension"
@@ -104,14 +104,14 @@ class MetricContext(BaseModel):
 
 
 class SemanticModelContext(BaseModel):
-    """The context class for validation issues involving data sources"""
+    """The context class for validation issues involving semantic models"""
 
     file_context: FileContext
     semantic_model: SemanticModelReference
 
     def context_str(self) -> str:
         """Human readable stringified representation of the context"""
-        return f"with data source `{self.semantic_model.semantic_model_name}` {self.file_context.context_str()}"
+        return f"with semantic model `{self.semantic_model.semantic_model_name}` {self.file_context.context_str()}"
 
 
 class SemanticModelElementContext(BaseModel):
@@ -123,7 +123,7 @@ class SemanticModelElementContext(BaseModel):
 
     def context_str(self) -> str:
         """Human readable stringified representation of the context"""
-        return f"with {self.element_type.value} `{self.semantic_model_element.element_name}` in data source `{self.semantic_model_element.semantic_model_name}` {self.file_context.context_str()}"
+        return f"with {self.element_type.value} `{self.semantic_model_element.element_name}` in semantic model `{self.semantic_model_element.semantic_model_name}` {self.file_context.context_str()}"
 
 
 ValidationContext = Union[
@@ -329,9 +329,9 @@ def validate_safely(whats_being_done: str) -> Callable:
 
 @dataclass(frozen=True)
 class DimensionInvariants:
-    """Helper object to ensure consistent dimension attributes across data sources.
+    """Helper object to ensure consistent dimension attributes across semantic models.
 
-    All dimensions with a given name in all data sources should have attributes matching these values.
+    All dimensions with a given name in all semantic models should have attributes matching these values.
     """
 
     type: DimensionType

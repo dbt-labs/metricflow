@@ -196,7 +196,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                 ):
                     continue
 
-                # Avoid loops between the same data sources.
+                # Avoid loops between the same semantic models.
                 if second_node_that_could_be_joined.node_id == first_node_that_could_be_joined.node_id:
                     continue
 

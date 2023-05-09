@@ -114,10 +114,10 @@ class TimeGranularitySolver:
         For example, let's say we're querying for two metrics that are based on 'bookings' and 'bookings_monthly'
         respectively.
 
-        The 'bookings' measure defined is in the 'fct_bookings' data source. 'fct_bookings' has a local time dimension
+        The 'bookings' measure defined is in the 'fct_bookings' semantic model. 'fct_bookings' has a local time dimension
         named 'ds' with granularity DAY.
 
-        The 'monthly_bookings' measure is in defined in the 'fct_bookings_monthly' data source. 'fct_bookings_monthly'
+        The 'monthly_bookings' measure is in defined in the 'fct_bookings_monthly' semantic model. 'fct_bookings_monthly'
         has a local time dimension named 'ds' with granularity MONTH.
 
         Then this would return [DAY, MONTH].

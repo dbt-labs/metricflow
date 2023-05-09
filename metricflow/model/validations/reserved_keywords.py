@@ -64,7 +64,7 @@ class ReservedKeywordsRule(ModelValidationRule):
     """
 
     @staticmethod
-    @validate_safely(whats_being_done="checking that data source sub element names aren't reserved sql keywords")
+    @validate_safely(whats_being_done="checking that semantic model sub element names aren't reserved sql keywords")
     def _validate_semantic_model_sub_elements(semantic_model: SemanticModel) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
 
