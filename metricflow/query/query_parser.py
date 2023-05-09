@@ -9,7 +9,7 @@ from typing import List, Optional, Tuple, Dict, Sequence
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import BaseOutput
-from metricflow.dataset.data_source_adapter import DataSourceDataSet
+from metricflow.dataset.semantic_model_adapter import DataSourceDataSet
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
 from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
@@ -82,7 +82,7 @@ class MetricFlowQueryParser:
     ) -> None:
         self._model = model
         self._metric_semantics = model.metric_semantics
-        self._semantic_model_semantics = model.data_source_semantics
+        self._semantic_model_semantics = model.semantic_model_semantics
 
         # Set up containers for known element names
         self._known_entity_element_references = self._semantic_model_semantics.get_entity_references()
@@ -408,7 +408,7 @@ class MetricFlowQueryParser:
         spec_where_constraint: Optional[SpecWhereClauseConstraint] = None
         if parsed_where_constraint:
             spec_where_constraint = WhereConstraintConverter.convert_to_spec_where_constraint(
-                data_source_semantics=self._semantic_model_semantics,
+                semantic_model_semantics=self._semantic_model_semantics,
                 where_constraint=parsed_where_constraint,
             )
             where_time_specs = spec_where_constraint.linkable_spec_set.time_dimension_specs

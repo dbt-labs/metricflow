@@ -7,7 +7,7 @@ from metricflow.dataflow.dataflow_plan import (
     JoinToBaseOutputNode,
     JoinDescription,
 )
-from metricflow.dataset.data_source_adapter import DataSourceDataSet
+from metricflow.dataset.semantic_model_adapter import DataSourceDataSet
 from metricflow.specs import (
     MeasureSpec,
     EntitySpec,

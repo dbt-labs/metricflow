@@ -17,14 +17,14 @@ def test_lonely_entity_raises_issue(simple_model__with_primary_transforms: UserC
     lonely_entity_name = "hi_im_lonely"
 
     func: Callable[[SemanticModel], bool] = lambda data_source: len(data_source.entities) > 0
-    data_source_with_entities, _ = find_semantic_model_with(model, func)
-    data_source_with_entities.entities[0].name = EntitySpec.from_name(lonely_entity_name).element_name
+    semantic_model_with_entities, _ = find_semantic_model_with(model, func)
+    semantic_model_with_entities.entities[0].name = EntitySpec.from_name(lonely_entity_name).element_name
     model_validator = ModelValidator([CommonEntitysRule()])
     model_issues = model_validator.validate_model(model)
 
     found_warning = False
     warning = (
-        f"Entity `{lonely_entity_name}` only found in one data source `{data_source_with_entities.name}` "
+        f"Entity `{lonely_entity_name}` only found in one data source `{semantic_model_with_entities.name}` "
         f"which means it will be unused in joins."
     )
     if model_issues is not None:

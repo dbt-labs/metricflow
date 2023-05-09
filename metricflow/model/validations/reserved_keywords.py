@@ -74,7 +74,7 @@ class ReservedKeywordsRule(ModelValidationRule):
                     ValidationError(
                         context=DataSourceElementContext(
                             file_context=FileContext.from_metadata(data_source.metadata),
-                            data_source_element=SemanticModelElementReference(
+                            semantic_model_element=SemanticModelElementReference(
                                 semantic_model_name=data_source.name, element_name=dimension.name
                             ),
                             element_type=DataSourceElementType.DIMENSION,
@@ -93,7 +93,7 @@ class ReservedKeywordsRule(ModelValidationRule):
                         ValidationError(
                             context=DataSourceElementContext(
                                 file_context=FileContext.from_metadata(data_source.metadata),
-                                data_source_element=SemanticModelElementReference(
+                                semantic_model_element=SemanticModelElementReference(
                                     semantic_model_name=data_source.name, element_name=entity.name
                                 ),
                                 element_type=DataSourceElementType.ENTITY,
@@ -108,7 +108,7 @@ class ReservedKeywordsRule(ModelValidationRule):
                     ValidationError(
                         context=DataSourceElementContext(
                             file_context=FileContext.from_metadata(data_source.metadata),
-                            data_source_element=SemanticModelElementReference(
+                            semantic_model_element=SemanticModelElementReference(
                                 semantic_model_name=data_source.name, element_name=measure.name
                             ),
                             element_type=DataSourceElementType.MEASURE,

@@ -65,7 +65,7 @@ class DimensionConsistencyRule(ModelValidationRule):
         issues: List[ValidationIssue] = []
         context = DataSourceElementContext(
             file_context=FileContext.from_metadata(metadata=data_source.metadata),
-            data_source_element=SemanticModelElementReference(
+            semantic_model_element=SemanticModelElementReference(
                 semantic_model_name=data_source.name, element_name=dimension.name
             ),
             element_type=DataSourceElementType.DIMENSION,
@@ -129,7 +129,7 @@ class DimensionConsistencyRule(ModelValidationRule):
 
             context = DataSourceElementContext(
                 file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                data_source_element=SemanticModelElementReference(
+                semantic_model_element=SemanticModelElementReference(
                     semantic_model_name=data_source.name, element_name=dimension.name
                 ),
                 element_type=DataSourceElementType.DIMENSION,

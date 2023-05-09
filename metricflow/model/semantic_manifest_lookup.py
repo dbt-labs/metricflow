@@ -1,5 +1,5 @@
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.semantics.data_source_semantics import DataSourceSemantics
+from metricflow.model.semantics.semantic_model_semantics import DataSourceSemantics
 from metricflow.model.semantics.metric_semantics import MetricSemantics
 from metricflow.protocols.semantics import DataSourceSemanticsAccessor, MetricSemanticsAccessor
 
@@ -17,7 +17,7 @@ class SemanticManifestLookup:
         return self._user_configured_model
 
     @property
-    def data_source_semantics(self) -> DataSourceSemanticsAccessor:  # noqa: D
+    def semantic_model_semantics(self) -> DataSourceSemanticsAccessor:  # noqa: D
         return self._semantic_model_semantics
 
     @property

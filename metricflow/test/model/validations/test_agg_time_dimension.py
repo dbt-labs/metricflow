@@ -11,12 +11,12 @@ from metricflow.test.test_utils import find_semantic_model_with
 
 def test_invalid_aggregation_time_dimension(simple_user_configured_model: UserConfiguredModel) -> None:  # noqa:D
     model = copied_model(simple_user_configured_model)
-    data_source_with_measures, _ = find_semantic_model_with(
+    semantic_model_with_measures, _ = find_semantic_model_with(
         model,
         lambda data_source: len(data_source.measures) > 0,
     )
 
-    data_source_with_measures.measures[0].agg_time_dimension = "invalid_time_dimension"
+    semantic_model_with_measures.measures[0].agg_time_dimension = "invalid_time_dimension"
 
     with pytest.raises(
         ModelValidationException,
@@ -31,12 +31,12 @@ def test_invalid_aggregation_time_dimension(simple_user_configured_model: UserCo
 
 def test_unset_aggregation_time_dimension(data_warehouse_validation_model: UserConfiguredModel) -> None:  # noqa:D
     model = copied_model(data_warehouse_validation_model)
-    data_source_with_measures, _ = find_semantic_model_with(
+    semantic_model_with_measures, _ = find_semantic_model_with(
         model,
         lambda data_source: len(data_source.measures) > 0,
     )
 
-    data_source_with_measures.measures[0].agg_time_dimension = None
+    semantic_model_with_measures.measures[0].agg_time_dimension = None
 
     with pytest.raises(
         ModelValidationException,
@@ -50,12 +50,12 @@ def test_missing_primary_time_ok_if_all_measures_have_agg_time_dim(
     data_warehouse_validation_model: UserConfiguredModel,
 ) -> None:  # noqa:D
     model = copied_model(data_warehouse_validation_model)
-    data_source_with_measures, _ = find_semantic_model_with(
+    semantic_model_with_measures, _ = find_semantic_model_with(
         model,
         lambda data_source: len(data_source.measures) > 0,
     )
 
-    for dimension in data_source_with_measures.dimensions:
+    for dimension in semantic_model_with_measures.dimensions:
         if dimension.type == DimensionType.TIME:
             assert dimension.type_params, f"Time dimension `{dimension.name}` is missing `type_params`"
             dimension.type_params.is_primary = False

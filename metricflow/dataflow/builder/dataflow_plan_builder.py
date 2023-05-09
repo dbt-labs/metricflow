@@ -112,7 +112,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         node_output_resolver: Optional[DataflowPlanNodeOutputDataSetResolver[SqlDataSetT]] = None,
         column_association_resolver: Optional[ColumnAssociationResolver] = None,
     ) -> None:
-        self._semantic_model_semantics = semantic_manifest_lookup.data_source_semantics
+        self._semantic_model_semantics = semantic_manifest_lookup.semantic_model_semantics
         self._metric_semantics = semantic_manifest_lookup.metric_semantics
         self._metric_time_dimension_reference = DataSet.metric_time_dimension_reference()
         self._cost_function = cost_function
@@ -353,15 +353,15 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
 
         This is a temporary method for use in assertion boundaries while we implement support for multiple data sources
         """
-        data_source_names: Set[str] = set()
+        semantic_model_names: Set[str] = set()
         for measure_name in measure_names:
-            data_source_names = data_source_names.union(
+            semantic_model_names = semantic_model_names.union(
                 {
                     d.name
                     for d in self._semantic_model_semantics.get_semantic_models_for_measure(measure_name.as_reference)
                 }
             )
-        return data_source_names
+        return semantic_model_names
 
     def _sort_by_suitability(self, nodes: Sequence[BaseOutput[SqlDataSetT]]) -> Sequence[BaseOutput[SqlDataSetT]]:
         """Sort nodes by the cost, then by the number of linkable specs.
@@ -454,7 +454,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         """
         measure_specs = measure_spec_properties.measure_specs
         node_processor = PreDimensionJoinNodeProcessor(
-            data_source_semantics=self._semantic_model_semantics,
+            semantic_model_semantics=self._semantic_model_semantics,
             node_data_set_resolver=self._node_data_set_resolver,
         )
 
@@ -496,7 +496,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         logger.info(f"Processing nodes took: {time.time()-start_time:.2f}s")
 
         node_evaluator = NodeEvaluatorForLinkableInstances(
-            data_source_semantics=self._semantic_model_semantics,
+            semantic_model_semantics=self._semantic_model_semantics,
             nodes_available_for_joins=self._sort_by_suitability(nodes_available_for_joins),
             node_data_set_resolver=self._node_data_set_resolver,
         )
@@ -623,16 +623,18 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             tuple[str, Optional[SpecWhereClauseConstraint]], List[MetricInputMeasureSpec]
         ] = collections.defaultdict(list)
         for input_spec in metric_input_measure_specs:
-            data_source_names = [
+            semantic_model_names = [
                 dsource.name
                 for dsource in self._semantic_model_semantics.get_semantic_models_for_measure(
                     measure_reference=input_spec.measure_spec.as_reference
                 )
             ]
             assert (
-                len(data_source_names) == 1
-            ), f"Validation should enforce one data source per measure, but found {data_source_names} for {input_spec}!"
-            data_sources_and_constraints_to_measures[(data_source_names[0], input_spec.constraint)].append(input_spec)
+                len(semantic_model_names) == 1
+            ), f"Validation should enforce one data source per measure, but found {semantic_model_names} for {input_spec}!"
+            data_sources_and_constraints_to_measures[(semantic_model_names[0], input_spec.constraint)].append(
+                input_spec
+            )
 
         for (data_source, measure_constraint), measures in data_sources_and_constraints_to_measures.items():
             logger.info(

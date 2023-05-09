@@ -11,7 +11,7 @@ from dbt_semantic_interfaces.references import DimensionReference, MeasureRefere
 from metricflow.model.validations.data_sources import DataSourceTimeDimensionWarningsRule
 from metricflow.model.validations.dimension_const import DimensionConsistencyRule
 from metricflow.model.validations.validator_helpers import ModelValidationException
-from metricflow.test.model.validations.helpers import data_source_with_guaranteed_meta, metric_with_guaranteed_meta
+from metricflow.test.model.validations.helpers import semantic_model_with_guaranteed_meta, metric_with_guaranteed_meta
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 
@@ -23,7 +23,7 @@ def test_incompatible_dimension_type() -> None:  # noqa:D
         model_validator.checked_validations(
             UserConfiguredModel(
                 data_sources=[
-                    data_source_with_guaranteed_meta(
+                    semantic_model_with_guaranteed_meta(
                         name="dim1",
                         measures=[Measure(name=measure_name, agg=AggregationType.SUM)],
                         dimensions=[
@@ -37,7 +37,7 @@ def test_incompatible_dimension_type() -> None:  # noqa:D
                             )
                         ],
                     ),
-                    data_source_with_guaranteed_meta(
+                    semantic_model_with_guaranteed_meta(
                         name="categoricaldim",
                         dimensions=[Dimension(name=dim_name, type=DimensionType.CATEGORICAL)],
                     ),
@@ -61,7 +61,7 @@ def test_incompatible_dimension_is_partition() -> None:  # noqa:D
         model_validator.checked_validations(
             UserConfiguredModel(
                 data_sources=[
-                    data_source_with_guaranteed_meta(
+                    semantic_model_with_guaranteed_meta(
                         name="dim1",
                         measures=[Measure(name=measure_name, agg=AggregationType.SUM)],
                         dimensions=[
@@ -76,7 +76,7 @@ def test_incompatible_dimension_is_partition() -> None:  # noqa:D
                             )
                         ],
                     ),
-                    data_source_with_guaranteed_meta(
+                    semantic_model_with_guaranteed_meta(
                         name="dim2",
                         dimensions=[
                             Dimension(

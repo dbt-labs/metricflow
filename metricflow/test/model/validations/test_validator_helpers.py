@@ -42,7 +42,7 @@ def list_of_issues() -> List[ValidationIssue]:  # noqa: D
         ValidationWarning(
             context=DataSourceElementContext(
                 file_context=file_context,
-                data_source_element=SemanticModelElementReference(
+                semantic_model_element=SemanticModelElementReference(
                     semantic_model_name=semantic_model_name, element_name="My dimension"
                 ),
                 element_type=DataSourceElementType.DIMENSION,
@@ -54,7 +54,7 @@ def list_of_issues() -> List[ValidationIssue]:  # noqa: D
         ValidationFutureError(
             context=DataSourceElementContext(
                 file_context=file_context,
-                data_source_element=SemanticModelElementReference(
+                semantic_model_element=SemanticModelElementReference(
                     semantic_model_name=semantic_model_name, element_name="My entity"
                 ),
                 element_type=DataSourceElementType.ENTITY,
@@ -68,7 +68,7 @@ def list_of_issues() -> List[ValidationIssue]:  # noqa: D
             context=DataSourceElementContext(
                 file_context=file_context,
                 semantic_model_name=semantic_model_name,
-                data_source_element=SemanticModelElementReference(
+                semantic_model_element=SemanticModelElementReference(
                     semantic_model_name=semantic_model_name, element_name="My measure"
                 ),
                 element_type=DataSourceElementType.MEASURE,

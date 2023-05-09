@@ -12,7 +12,7 @@ from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputData
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import BaseOutput, FilterElementsNode
 from metricflow.dataset.convert_semantic_model import DataSourceToDataSetConverter
-from metricflow.dataset.data_source_adapter import DataSourceDataSet
+from metricflow.dataset.semantic_model_adapter import DataSourceDataSet
 
 from metricflow.dataset.dataset import DataSet
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
@@ -108,13 +108,13 @@ class DataWarehouseTaskBuilder:
         render_tools: QueryRenderingTools, data_source: SemanticModel
     ) -> Sequence[BaseOutput[DataSourceDataSet]]:
         """Builds and returns the DataSourceDataSet node for the given data source"""
-        data_source_semantics = render_tools.semantic_manifest_lookup.data_source_semantics.get_by_reference(
+        semantic_model_semantics = render_tools.semantic_manifest_lookup.semantic_model_semantics.get_by_reference(
             SemanticModelReference(semantic_model_name=data_source.name)
         )
-        assert data_source_semantics
+        assert semantic_model_semantics
 
         source_nodes = render_tools.source_node_builder.create_from_data_sets(
-            (render_tools.converter.create_sql_source_data_set(data_source_semantics),)
+            (render_tools.converter.create_sql_source_data_set(semantic_model_semantics),)
         )
 
         assert len(source_nodes) >= 1
@@ -201,7 +201,7 @@ class DataWarehouseTaskBuilder:
 
             source_node = cls._semantic_model_nodes(render_tools=render_tools, data_source=data_source)[0]
 
-            data_source_sub_tasks: List[DataWarehouseValidationTask] = []
+            semantic_model_sub_tasks: List[DataWarehouseValidationTask] = []
             dataset = render_tools.converter.create_sql_source_data_set(data_source)
 
             dimension_specs = DataWarehouseTaskBuilder._remove_entity_link_specs(
@@ -233,7 +233,7 @@ class DataWarehouseTaskBuilder:
                 )
 
             for spec, filter_elements_node in spec_filter_tuples:
-                data_source_sub_tasks.append(
+                semantic_model_sub_tasks.append(
                     DataWarehouseValidationTask(
                         query_and_params_callable=partial(
                             cls.renderize,
@@ -244,7 +244,7 @@ class DataWarehouseTaskBuilder:
                         ),
                         context=DataSourceElementContext(
                             file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source_element=SemanticModelElementReference(
+                            semantic_model_element=SemanticModelElementReference(
                                 semantic_model_name=data_source.name, element_name=spec.element_name
                             ),
                             element_type=DataSourceElementType.DIMENSION,
@@ -274,7 +274,7 @@ class DataWarehouseTaskBuilder:
                         data_source=SemanticModelReference(semantic_model_name=data_source.name),
                     ),
                     error_message=f"Failed to query dimensions in data warehouse for data source `{data_source.name}`",
-                    on_fail_subtasks=data_source_sub_tasks,
+                    on_fail_subtasks=semantic_model_sub_tasks,
                 )
             )
         return tasks
@@ -300,16 +300,16 @@ class DataWarehouseTaskBuilder:
                 continue
             source_node = cls._semantic_model_nodes(render_tools=render_tools, data_source=data_source)[0]
 
-            data_source_sub_tasks: List[DataWarehouseValidationTask] = []
+            semantic_model_sub_tasks: List[DataWarehouseValidationTask] = []
             dataset = render_tools.converter.create_sql_source_data_set(data_source)
-            data_source_specs = DataWarehouseTaskBuilder._remove_entity_link_specs(
+            semantic_model_specs = DataWarehouseTaskBuilder._remove_entity_link_specs(
                 dataset.instance_set.spec_set.entity_specs
             )
-            for spec in data_source_specs:
+            for spec in semantic_model_specs:
                 filter_elements_node = FilterElementsNode(
                     parent_node=source_node, include_specs=InstanceSpecSet(entity_specs=(spec,))
                 )
-                data_source_sub_tasks.append(
+                semantic_model_sub_tasks.append(
                     DataWarehouseValidationTask(
                         query_and_params_callable=partial(
                             cls.renderize,
@@ -320,7 +320,7 @@ class DataWarehouseTaskBuilder:
                         ),
                         context=DataSourceElementContext(
                             file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source_element=SemanticModelElementReference(
+                            semantic_model_element=SemanticModelElementReference(
                                 semantic_model_name=data_source.name, element_name=spec.element_name
                             ),
                             element_type=DataSourceElementType.ENTITY,
@@ -332,7 +332,7 @@ class DataWarehouseTaskBuilder:
             filter_elements_node = FilterElementsNode(
                 parent_node=source_node,
                 include_specs=InstanceSpecSet(
-                    entity_specs=tuple(data_source_specs),
+                    entity_specs=tuple(semantic_model_specs),
                 ),
             )
             tasks.append(
@@ -349,7 +349,7 @@ class DataWarehouseTaskBuilder:
                         data_source=SemanticModelReference(semantic_model_name=data_source.name),
                     ),
                     error_message=f"Failed to query entities in data warehouse for data source `{data_source.name}`",
-                    on_fail_subtasks=data_source_sub_tasks,
+                    on_fail_subtasks=semantic_model_sub_tasks,
                 )
             )
         return tasks
@@ -376,7 +376,7 @@ class DataWarehouseTaskBuilder:
 
             source_nodes = cls._semantic_model_nodes(render_tools=render_tools, data_source=data_source)
             dataset = render_tools.converter.create_sql_source_data_set(data_source)
-            data_source_specs = dataset.instance_set.spec_set.measure_specs
+            semantic_model_specs = dataset.instance_set.spec_set.measure_specs
 
             source_node_by_measure_spec: Dict[MeasureSpec, BaseOutput[DataSourceDataSet]] = {}
             measure_specs_source_node_pair = []
@@ -390,7 +390,7 @@ class DataWarehouseTaskBuilder:
             source_node_to_sub_task: DefaultDict[
                 BaseOutput[DataSourceDataSet], List[DataWarehouseValidationTask]
             ] = collections.defaultdict(list)
-            for spec in data_source_specs:
+            for spec in semantic_model_specs:
                 obtained_source_node = source_node_by_measure_spec.get(spec)
                 assert obtained_source_node, f"Unable to find generated source node for measure: {spec.element_name}"
 
@@ -411,7 +411,7 @@ class DataWarehouseTaskBuilder:
                         ),
                         context=DataSourceElementContext(
                             file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source_element=SemanticModelElementReference(
+                            semantic_model_element=SemanticModelElementReference(
                                 semantic_model_name=data_source.name, element_name=spec.element_name
                             ),
                             element_type=DataSourceElementType.MEASURE,

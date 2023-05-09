@@ -77,11 +77,11 @@ def test_duplicate_measure_name(simple_model__with_primary_transforms: UserConfi
     model = copied_model(simple_model__with_primary_transforms)
 
     # Ensure we have a usable data source for the test
-    data_source_with_measures, _ = find_semantic_model_with(model, lambda data_source: len(data_source.measures) > 0)
+    semantic_model_with_measures, _ = find_semantic_model_with(model, lambda data_source: len(data_source.measures) > 0)
 
-    duplicated_measure = data_source_with_measures.measures[0]
-    duplicated_measures_tuple = (data_source_with_measures.measures, (duplicated_measure,))
-    data_source_with_measures.measures = tuple(more_itertools.flatten(duplicated_measures_tuple))
+    duplicated_measure = semantic_model_with_measures.measures[0]
+    duplicated_measures_tuple = (semantic_model_with_measures.measures, (duplicated_measure,))
+    semantic_model_with_measures.measures = tuple(more_itertools.flatten(duplicated_measures_tuple))
 
     with pytest.raises(
         ModelValidationException,
@@ -94,13 +94,13 @@ def test_duplicate_dimension_name(simple_model__with_primary_transforms: UserCon
     model = copied_model(simple_model__with_primary_transforms)
 
     # Ensure we have a usable data source for the test
-    data_source_with_dimensions, _ = find_semantic_model_with(
+    semantic_model_with_dimensions, _ = find_semantic_model_with(
         model, lambda data_source: len(data_source.dimensions) > 0
     )
 
-    duplicated_dimension = data_source_with_dimensions.dimensions[0]
-    duplicated_dimensions_tuple = (data_source_with_dimensions.dimensions, (duplicated_dimension,))
-    data_source_with_dimensions.dimensions = tuple(more_itertools.flatten(duplicated_dimensions_tuple))
+    duplicated_dimension = semantic_model_with_dimensions.dimensions[0]
+    duplicated_dimensions_tuple = (semantic_model_with_dimensions.dimensions, (duplicated_dimension,))
+    semantic_model_with_dimensions.dimensions = tuple(more_itertools.flatten(duplicated_dimensions_tuple))
 
     with pytest.raises(
         ModelValidationException,
@@ -114,11 +114,11 @@ def test_duplicate_entity_name(simple_model__with_primary_transforms: UserConfig
     model = copied_model(simple_model__with_primary_transforms)
 
     # Ensure we have a usable data source for the test
-    data_source_with_entities, _ = find_semantic_model_with(model, lambda data_source: len(data_source.entities) > 0)
+    semantic_model_with_entities, _ = find_semantic_model_with(model, lambda data_source: len(data_source.entities) > 0)
 
-    duplicated_entity = data_source_with_entities.entities[0]
-    duplicated_entities_tuple = (data_source_with_entities.entities, (duplicated_entity,))
-    data_source_with_entities.entities = tuple(more_itertools.flatten(duplicated_entities_tuple))
+    duplicated_entity = semantic_model_with_entities.entities[0]
+    duplicated_entities_tuple = (semantic_model_with_entities.entities, (duplicated_entity,))
+    semantic_model_with_entities.entities = tuple(more_itertools.flatten(duplicated_entities_tuple))
 
     with pytest.raises(
         ModelValidationException,

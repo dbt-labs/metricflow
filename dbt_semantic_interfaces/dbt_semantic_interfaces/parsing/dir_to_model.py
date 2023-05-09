@@ -15,7 +15,7 @@ from dbt_semantic_interfaces.objects.metric import Metric
 from dbt_semantic_interfaces.parsing.objects import Version, YamlConfigFile
 from dbt_semantic_interfaces.parsing.schemas import (
     metric_validator,
-    data_source_validator,
+    semantic_model_validator,
 )
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.parsing.yaml_loader import (
@@ -188,7 +188,7 @@ def parse_yaml_files_to_validation_ready_model(
 
 def parse_yaml_files_to_model(
     files: List[YamlConfigFile],
-    data_source_class: Type[SemanticModel] = SemanticModel,
+    semantic_model_class: Type[SemanticModel] = SemanticModel,
     metric_class: Type[Metric] = Metric,
 ) -> ModelBuildResult:
     """Builds UserConfiguredModel from list of config files (as strings).
@@ -200,18 +200,18 @@ def parse_yaml_files_to_model(
     """
     data_sources = []
     metrics = []
-    valid_object_classes = [data_source_class.__name__, metric_class.__name__]
+    valid_object_classes = [semantic_model_class.__name__, metric_class.__name__]
     issues: List[ValidationIssue] = []
 
     for config_file in files:
         parsing_result = parse_config_yaml(  # parse config file
             config_file,
-            data_source_class=data_source_class,
+            semantic_model_class=semantic_model_class,
             metric_class=metric_class,
         )
         file_issues = parsing_result.issues
         for obj in parsing_result.elements:
-            if isinstance(obj, data_source_class):
+            if isinstance(obj, semantic_model_class):
                 data_sources.append(obj)
             elif isinstance(obj, metric_class):
                 metrics.append(obj)
@@ -236,7 +236,7 @@ def parse_yaml_files_to_model(
 
 def parse_config_yaml(
     config_yaml: YamlConfigFile,
-    data_source_class: Type[SemanticModel] = SemanticModel,
+    semantic_model_class: Type[SemanticModel] = SemanticModel,
     metric_class: Type[Metric] = Metric,
 ) -> FileParsingResult:
     """Parses transform config file passed as string - Returns list of model objects"""
@@ -304,8 +304,8 @@ def parse_config_yaml(
                     metric_validator.validate(config_document[document_type])
                     results.append(metric_class.parse_obj(object_cfg))
                 elif document_type == DATA_SOURCE_TYPE:
-                    data_source_validator.validate(config_document[document_type])
-                    results.append(data_source_class.parse_obj(object_cfg))
+                    semantic_model_validator.validate(config_document[document_type])
+                    results.append(semantic_model_class.parse_obj(object_cfg))
                 else:
                     issues.append(
                         ValidationError(

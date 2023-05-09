@@ -41,7 +41,7 @@ class DataSourceMeasuresUniqueRule(ModelValidationRule):
                         ValidationError(
                             context=DataSourceElementContext(
                                 file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                                data_source_element=SemanticModelElementReference(
+                                semantic_model_element=SemanticModelElementReference(
                                     semantic_model_name=data_source.name, element_name=measure.name
                                 ),
                                 element_type=DataSourceElementType.MEASURE,
@@ -243,7 +243,7 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                         ValidationError(
                             context=DataSourceElementContext(
                                 file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                                data_source_element=SemanticModelElementReference(
+                                semantic_model_element=SemanticModelElementReference(
                                     semantic_model_name=data_source.name, element_name=measure.name
                                 ),
                                 element_type=DataSourceElementType.MEASURE,
@@ -265,7 +265,7 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                         ValidationError(
                             context=DataSourceElementContext(
                                 file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                                data_source_element=SemanticModelElementReference(
+                                semantic_model_element=SemanticModelElementReference(
                                     semantic_model_name=data_source.name, element_name=measure.name
                                 ),
                                 element_type=DataSourceElementType.MEASURE,
@@ -283,7 +283,7 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                             ValidationError(
                                 context=DataSourceElementContext(
                                     file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                                    data_source_element=SemanticModelElementReference(
+                                    semantic_model_element=SemanticModelElementReference(
                                         semantic_model_name=data_source.name, element_name=measure.name
                                     ),
                                     element_type=DataSourceElementType.MEASURE,
@@ -308,7 +308,7 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                             ValidationError(
                                 context=DataSourceElementContext(
                                     file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                                    data_source_element=SemanticModelElementReference(
+                                    semantic_model_element=SemanticModelElementReference(
                                         semantic_model_name=data_source.name, element_name=measure.name
                                     ),
                                     element_type=DataSourceElementType.MEASURE,
@@ -327,7 +327,7 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                         ValidationError(
                             context=DataSourceElementContext(
                                 file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                                data_source_element=SemanticModelElementReference(
+                                semantic_model_element=SemanticModelElementReference(
                                     semantic_model_name=data_source.name, element_name=measure.name
                                 ),
                                 element_type=DataSourceElementType.MEASURE,
@@ -348,7 +348,7 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                         ValidationError(
                             context=DataSourceElementContext(
                                 file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                                data_source_element=SemanticModelElementReference(
+                                semantic_model_element=SemanticModelElementReference(
                                     semantic_model_name=data_source.name, element_name=measure.name
                                 ),
                                 element_type=DataSourceElementType.MEASURE,
@@ -377,7 +377,7 @@ class CountAggregationExprRule(ModelValidationRule):
             for measure in data_source.measures:
                 context = DataSourceElementContext(
                     file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                    data_source_element=SemanticModelElementReference(
+                    semantic_model_element=SemanticModelElementReference(
                         semantic_model_name=data_source.name, element_name=measure.name
                     ),
                     element_type=DataSourceElementType.MEASURE,
@@ -428,7 +428,7 @@ class PercentileAggregationRule(ModelValidationRule):
             for measure in data_source.measures:
                 context = DataSourceElementContext(
                     file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                    data_source_element=SemanticModelElementReference(
+                    semantic_model_element=SemanticModelElementReference(
                         semantic_model_name=data_source.name, element_name=measure.name
                     ),
                     element_type=DataSourceElementType.MEASURE,

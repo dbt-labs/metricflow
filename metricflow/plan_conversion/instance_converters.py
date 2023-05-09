@@ -167,10 +167,10 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
         self,
         table_alias: str,
         column_resolver: ColumnAssociationResolver,
-        data_source_semantics: DataSourceSemanticsAccessor,
+        semantic_model_semantics: DataSourceSemanticsAccessor,
         metric_input_measure_specs: Sequence[MetricInputMeasureSpec],
     ) -> None:
-        self._semantic_model_semantics = data_source_semantics
+        self._semantic_model_semantics = semantic_model_semantics
         self.metric_input_measure_specs = metric_input_measure_specs
         super().__init__(table_alias=table_alias, column_resolver=column_resolver)
 
@@ -273,9 +273,9 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
     an SCD source, and extracting validity window information accordingly.
     """
 
-    def __init__(self, data_source_semantics: DataSourceSemanticsAccessor) -> None:
+    def __init__(self, semantic_model_semantics: DataSourceSemanticsAccessor) -> None:
         """Initializer. The DataSourceSemanticsAccessor is needed for getting the original model definition."""
-        self._semantic_model_semantics = data_source_semantics
+        self._semantic_model_semantics = semantic_model_semantics
 
     def _get_validity_window_dimensions_for_semantic_model(
         self, semantic_model_reference: SemanticModelReference
@@ -310,7 +310,7 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
         us from processing a dataset composed of a join between two SCD data sources. This restriction is in
         place as a temporary simplification - if there is need for this feature we can enable it.
         """
-        data_source_to_window: Dict[str, ValidityWindowJoinDescription] = {}
+        semantic_model_to_window: Dict[str, ValidityWindowJoinDescription] = {}
         instances_by_semantic_model = bucket(
             instance_set.time_dimension_instances, lambda x: x.origin_semantic_model_reference.semantic_model_reference
         )
@@ -346,17 +346,17 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
             # entity links so that the subquery uses the correct reference in the ON statement
             start_specs = sorted(start_specs, key=lambda x: len(x.entity_links))
             end_specs = sorted(end_specs, key=lambda x: len(x.entity_links))
-            data_source_to_window[semantic_model_reference] = ValidityWindowJoinDescription(
+            semantic_model_to_window[semantic_model_reference] = ValidityWindowJoinDescription(
                 window_start_dimension=start_specs[0], window_end_dimension=end_specs[0]
             )
 
-        assert len(data_source_to_window) < 2, (
+        assert len(semantic_model_to_window) < 2, (
             f"Found more than 1 set of validity window specs in the input instance set. This is not currently "
-            f"supported, as joins between SCD data sources are not yet allowed! {data_source_to_window}"
+            f"supported, as joins between SCD data sources are not yet allowed! {semantic_model_to_window}"
         )
 
-        if data_source_to_window:
-            return list(data_source_to_window.values())[0]
+        if semantic_model_to_window:
+            return list(semantic_model_to_window.values())[0]
 
         return None
 

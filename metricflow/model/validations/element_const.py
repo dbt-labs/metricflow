@@ -36,13 +36,13 @@ class ElementConsistencyRule(ModelValidationRule):
             # Sort these by value to ensure consistent error messaging
             types_used = [DataSourceElementType(v) for v in sorted(k.value for k in type_to_context.keys())]
             for element_type in types_used:
-                data_source_contexts = type_to_context[element_type]
-                data_source_names = {ctx.data_source.semantic_model_name for ctx in data_source_contexts}
-                data_source_context = data_source_contexts[0]
+                semantic_model_contexts = type_to_context[element_type]
+                semantic_model_names = {ctx.data_source.semantic_model_name for ctx in semantic_model_contexts}
+                semantic_model_context = semantic_model_contexts[0]
                 issues.append(
                     ValidationError(
-                        context=data_source_context,
-                        message=f"In data sources {data_source_names}, element `{element_name}` is of type "
+                        context=semantic_model_context,
+                        message=f"In data sources {semantic_model_names}, element `{element_name}` is of type "
                         f"{element_type}, but it is used as types {types_used} across the model.",
                     )
                 )
@@ -58,17 +58,17 @@ class ElementConsistencyRule(ModelValidationRule):
             lambda: defaultdict(list)
         )
         for data_source in model.data_sources:
-            data_source_context = DataSourceContext(
+            semantic_model_context = DataSourceContext(
                 file_context=FileContext.from_metadata(metadata=data_source.metadata),
                 data_source=SemanticModelReference(semantic_model_name=data_source.name),
             )
             if data_source.measures:
                 for measure in data_source.measures:
-                    element_types[measure.name][DataSourceElementType.MEASURE].append(data_source_context)
+                    element_types[measure.name][DataSourceElementType.MEASURE].append(semantic_model_context)
             if data_source.dimensions:
                 for dimension in data_source.dimensions:
-                    element_types[dimension.name][DataSourceElementType.DIMENSION].append(data_source_context)
+                    element_types[dimension.name][DataSourceElementType.DIMENSION].append(semantic_model_context)
             if data_source.entities:
                 for entity in data_source.entities:
-                    element_types[entity.name][DataSourceElementType.ENTITY].append(data_source_context)
+                    element_types[entity.name][DataSourceElementType.ENTITY].append(semantic_model_context)
         return element_types

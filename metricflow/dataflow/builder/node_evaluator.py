@@ -29,7 +29,7 @@ from metricflow.dataflow.dataflow_plan import (
     ValidityWindowJoinDescription,
 )
 from metricflow.instances import InstanceSet
-from metricflow.model.semantics.data_source_join_evaluator import DataSourceJoinEvaluator
+from metricflow.model.semantics.semantic_model_join_evaluator import DataSourceJoinEvaluator
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
@@ -112,19 +112,19 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
 
     def __init__(
         self,
-        data_source_semantics: DataSourceSemanticsAccessor,
+        semantic_model_semantics: DataSourceSemanticsAccessor,
         nodes_available_for_joins: Sequence[BaseOutput[SourceDataSetT]],
         node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver[SourceDataSetT],
     ) -> None:
         """Constructor
 
         Args:
-            data_source_semantics: Needed to resolve partition dimensions.
+            semantic_model_semantics: Needed to resolve partition dimensions.
             nodes_available_for_joins: Nodes that contain linkable instances and may be joined with the "start_node"
             (e.g. the node containing a desired measure) to retrieve the needed linkable instances.
             node_data_set_resolver: Figures out what data set is output by a node.
         """
-        self._semantic_model_semantics = data_source_semantics
+        self._semantic_model_semantics = semantic_model_semantics
         self._nodes_available_for_joins = nodes_available_for_joins
         self._node_data_set_resolver = node_data_set_resolver
         self._partition_resolver = PartitionJoinResolver(self._semantic_model_semantics)

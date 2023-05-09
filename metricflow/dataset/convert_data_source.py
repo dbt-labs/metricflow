@@ -7,7 +7,7 @@ from dbt_semantic_interfaces.references import SemanticModelReference, SemanticM
 from metricflow.aggregation_properties import AggregationState
 from metricflow.dag.id_generation import IdGeneratorRegistry
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.dataset.data_source_adapter import DataSourceDataSet
+from metricflow.dataset.semantic_model_adapter import DataSourceDataSet
 from metricflow.instances import (
     MeasureInstance,
     DimensionInstance,

@@ -4,7 +4,7 @@ import pytest
 
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.references import EntityReference, MeasureReference, MetricReference
-from metricflow.model.semantics.data_source_semantics import DataSourceSemantics
+from metricflow.model.semantics.semantic_model_semantics import DataSourceSemantics
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.metric_semantics import MetricSemantics
 
@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.fixture
-def data_source_semantics(simple_user_configured_model: UserConfiguredModel) -> DataSourceSemantics:  # Noqa: D
+def semantic_model_semantics(simple_user_configured_model: UserConfiguredModel) -> DataSourceSemantics:  # Noqa: D
     return DataSourceSemantics(
         model=simple_user_configured_model,
     )
@@ -20,15 +20,15 @@ def data_source_semantics(simple_user_configured_model: UserConfiguredModel) -> 
 
 @pytest.fixture
 def metric_semantics(  # Noqa: D
-    simple_user_configured_model: UserConfiguredModel, data_source_semantics: DataSourceSemantics
+    simple_user_configured_model: UserConfiguredModel, semantic_model_semantics: DataSourceSemantics
 ) -> MetricSemantics:
     return MetricSemantics(
         user_configured_model=simple_user_configured_model,
-        data_source_semantics=data_source_semantics,
+        semantic_model_semantics=semantic_model_semantics,
     )
 
 
-def test_get_names(data_source_semantics: DataSourceSemantics) -> None:  # noqa: D
+def test_get_names(semantic_model_semantics: DataSourceSemantics) -> None:  # noqa: D
     expected = [
         "account_type",
         "booking_paid_at",
@@ -44,7 +44,7 @@ def test_get_names(data_source_semantics: DataSourceSemantics) -> None:  # noqa:
         "is_lux_latest",
         "verification_type",
     ]
-    assert sorted([d.element_name for d in data_source_semantics.get_dimension_references()]) == expected
+    assert sorted([d.element_name for d in semantic_model_semantics.get_dimension_references()]) == expected
 
     expected = [
         "account_balance",
@@ -71,7 +71,7 @@ def test_get_names(data_source_semantics: DataSourceSemantics) -> None:  # noqa:
         "txn_revenue",
         "views",
     ]
-    assert sorted([m.element_name for m in data_source_semantics.measure_references]) == expected
+    assert sorted([m.element_name for m in semantic_model_semantics.measure_references]) == expected
 
     expected = [
         "company",
@@ -83,30 +83,34 @@ def test_get_names(data_source_semantics: DataSourceSemantics) -> None:  # noqa:
         "user",
         "verification",
     ]
-    assert sorted([i.element_name for i in data_source_semantics.get_entity_references()]) == expected
+    assert sorted([i.element_name for i in semantic_model_semantics.get_entity_references()]) == expected
 
 
-def test_get_elements(data_source_semantics: DataSourceSemantics) -> None:  # noqa: D
-    for dimension_reference in data_source_semantics.get_dimension_references():
+def test_get_elements(semantic_model_semantics: DataSourceSemantics) -> None:  # noqa: D
+    for dimension_reference in semantic_model_semantics.get_dimension_references():
         assert (
-            data_source_semantics.get_dimension(dimension_reference=dimension_reference).reference
+            semantic_model_semantics.get_dimension(dimension_reference=dimension_reference).reference
             == dimension_reference
         )
-    for measure_reference in data_source_semantics.measure_references:
+    for measure_reference in semantic_model_semantics.measure_references:
         measure_reference = MeasureReference(element_name=measure_reference.element_name)
-        assert data_source_semantics.get_measure(measure_reference=measure_reference).reference == measure_reference
+        assert semantic_model_semantics.get_measure(measure_reference=measure_reference).reference == measure_reference
 
 
-def test_get_semantic_models_for_measure(data_source_semantics: DataSourceSemantics) -> None:  # noqa: D
-    bookings_sources = data_source_semantics.get_semantic_models_for_measure(MeasureReference(element_name="bookings"))
+def test_get_semantic_models_for_measure(semantic_model_semantics: DataSourceSemantics) -> None:  # noqa: D
+    bookings_sources = semantic_model_semantics.get_semantic_models_for_measure(
+        MeasureReference(element_name="bookings")
+    )
     assert len(bookings_sources) == 1
     assert bookings_sources[0].name == "bookings_source"
 
-    views_sources = data_source_semantics.get_semantic_models_for_measure(MeasureReference(element_name="views"))
+    views_sources = semantic_model_semantics.get_semantic_models_for_measure(MeasureReference(element_name="views"))
     assert len(views_sources) == 1
     assert views_sources[0].name == "views_source"
 
-    listings_sources = data_source_semantics.get_semantic_models_for_measure(MeasureReference(element_name="listings"))
+    listings_sources = semantic_model_semantics.get_semantic_models_for_measure(
+        MeasureReference(element_name="listings")
+    )
     assert len(listings_sources) == 1
     assert listings_sources[0].name == "listings_latest"
 
@@ -194,7 +198,7 @@ def test_local_linked_elements_for_metric(metric_semantics: MetricSemantics) -> 
     }
 
 
-def test_get_semantic_models_for_entity(data_source_semantics: DataSourceSemantics) -> None:  # noqa: D
+def test_get_semantic_models_for_entity(semantic_model_semantics: DataSourceSemantics) -> None:  # noqa: D
     entity_reference = EntityReference(element_name="user")
-    linked_semantic_models = data_source_semantics.get_semantic_models_for_entity(entity_reference=entity_reference)
+    linked_semantic_models = semantic_model_semantics.get_semantic_models_for_entity(entity_reference=entity_reference)
     assert len(linked_semantic_models) == 8

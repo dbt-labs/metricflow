@@ -118,12 +118,12 @@ class DataSourceElementContext(BaseModel):
     """The context class for validation issues involving dimensions"""
 
     file_context: FileContext
-    data_source_element: SemanticModelElementReference
+    semantic_model_element: SemanticModelElementReference
     element_type: DataSourceElementType
 
     def context_str(self) -> str:
         """Human readable stringified representation of the context"""
-        return f"with {self.element_type.value} `{self.data_source_element.element_name}` in data source `{self.data_source_element.semantic_model_name}` {self.file_context.context_str()}"
+        return f"with {self.element_type.value} `{self.semantic_model_element.element_name}` in data source `{self.semantic_model_element.semantic_model_name}` {self.file_context.context_str()}"
 
 
 ValidationContext = Union[

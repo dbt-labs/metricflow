@@ -69,21 +69,21 @@ class DataSourceJoinEvaluator:
         DataSourceEntityJoinType(left_entity_type=EntityType.NATURAL, right_entity_type=EntityType.NATURAL),
     )
 
-    def __init__(self, data_source_semantics: DataSourceSemanticsAccessor) -> None:  # noqa: D
-        self._semantic_model_semantics = data_source_semantics
+    def __init__(self, semantic_model_semantics: DataSourceSemanticsAccessor) -> None:  # noqa: D
+        self._semantic_model_semantics = semantic_model_semantics
 
     def get_joinable_semantic_models(
         self, left_semantic_model_reference: SemanticModelReference, include_multi_hop: bool = False
     ) -> Dict[str, DataSourceLink]:
         """List all data sources that can join to given data source, and the entities to join them."""
-        data_source_joins: Dict[str, DataSourceLink] = {}
+        semantic_model_joins: Dict[str, DataSourceLink] = {}
         self._get_remaining_hops_of_joinable_semantic_models(
             left_semantic_model_reference=left_semantic_model_reference,
             parent_semantic_model_to_join_paths={left_semantic_model_reference: []},
-            known_semantic_model_joins=data_source_joins,
+            known_semantic_model_joins=semantic_model_joins,
             join_hops_remaining=(MAX_JOIN_HOPS if include_multi_hop else 1),
         )
-        return data_source_joins
+        return semantic_model_joins
 
     def _get_remaining_hops_of_joinable_semantic_models(
         self,

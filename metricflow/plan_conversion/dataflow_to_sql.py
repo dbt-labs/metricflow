@@ -155,7 +155,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         """
         self._column_association_resolver = column_association_resolver
         self._metric_semantics = semantic_manifest_lookup.metric_semantics
-        self._semantic_model_semantics = semantic_manifest_lookup.data_source_semantics
+        self._semantic_model_semantics = semantic_manifest_lookup.semantic_model_semantics
         self._time_spine_source = time_spine_source
 
     @property
@@ -583,7 +583,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             CreateSelectColumnsWithMeasuresAggregated(
                 table_alias=from_data_set_alias,
                 column_resolver=self._column_association_resolver,
-                data_source_semantics=self._semantic_model_semantics,
+                semantic_model_semantics=self._semantic_model_semantics,
                 metric_input_measure_specs=node.metric_input_measure_specs,
             )
         )

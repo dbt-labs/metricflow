@@ -5,7 +5,7 @@ from metricflow.dataflow.dataflow_plan import (
     MetricTimeDimensionTransformNode,
     ReadSqlSourceNode,
 )
-from metricflow.dataset.data_source_adapter import DataSourceDataSet
+from metricflow.dataset.semantic_model_adapter import DataSourceDataSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 
 
@@ -25,7 +25,7 @@ class SourceNodeBuilder:
         for data_set in data_sets:
             read_node = ReadSqlSourceNode[DataSourceDataSet](data_set)
             agg_time_dim_to_measures_grouper = (
-                self._semantic_manifest_lookup.data_source_semantics.get_aggregation_time_dimensions_with_measures(
+                self._semantic_manifest_lookup.semantic_model_semantics.get_aggregation_time_dimensions_with_measures(
                     data_set.semantic_model_reference
                 )
             )

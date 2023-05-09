@@ -183,8 +183,8 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
 
     @property
     def semantic_model_references(self) -> Sequence[SemanticModelReference]:  # noqa: D
-        data_source_names_sorted = sorted(self._semantic_model_names)
-        return tuple(SemanticModelReference(semantic_model_name=x) for x in data_source_names_sorted)
+        semantic_model_names_sorted = sorted(self._semantic_model_names)
+        return tuple(SemanticModelReference(semantic_model_name=x) for x in semantic_model_names_sorted)
 
     def get_aggregation_time_dimensions_with_measures(
         self, semantic_model_reference: SemanticModelReference

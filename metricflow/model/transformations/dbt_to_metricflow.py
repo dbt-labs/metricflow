@@ -197,11 +197,11 @@ class DbtManifestTransformer:
             raise RuntimeError("Cannot build a MetricFlow data source for `derived` DbtMetric")
 
         metric_model_ref = self.resolve_metric_model(dbt_metric=dbt_metric)
-        data_source_table = self.db_table_from_model_node(metric_model_ref)
+        semantic_model_table = self.db_table_from_model_node(metric_model_ref)
         return SemanticModel(
             name=metric_model_ref.name,
             description=metric_model_ref.description,
-            sql_table=data_source_table,
+            sql_table=semantic_model_table,
             dimensions=self.build_dimensions(dbt_metric),
             measures=[self.build_measure(dbt_metric)],
         )

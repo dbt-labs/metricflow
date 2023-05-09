@@ -33,8 +33,8 @@ class PartitionTimeDimensionJoinDescription:
 class PartitionJoinResolver:
     """When joining data sets, this class helps to figure out the necessary partition specs to join on."""
 
-    def __init__(self, data_source_semantics: DataSourceSemanticsAccessor) -> None:  # noqa: D
-        self._semantic_model_semantics = data_source_semantics
+    def __init__(self, semantic_model_semantics: DataSourceSemanticsAccessor) -> None:  # noqa: D
+        self._semantic_model_semantics = semantic_model_semantics
 
     def _get_partitions(self, spec_set: InstanceSpecSet) -> PartitionSpecSet:
         """Returns the specs from the instance set that correspond to partition specs."""

@@ -82,18 +82,18 @@ class DbtConverter:
     def __init__(
         self,
         rules: Collection[DbtMappingRule] = DEFAULT_RULES,
-        data_source_class: Type[SemanticModel] = SemanticModel,
+        semantic_model_class: Type[SemanticModel] = SemanticModel,
         metric_class: Type[Metric] = Metric,
     ) -> None:
         """Initializer for DbtConverter class
 
         Args:
             rules: A collection of DbtMappingRules which get saved as a FrozenSet (immutable and unordered). Defaults to DEFAULT_RULES.
-            data_source_class: SemanticModel class to parse the mapped data sources to. Defaults to MetricFlow SemanticModel class.
+            semantic_model_class: SemanticModel class to parse the mapped data sources to. Defaults to MetricFlow SemanticModel class.
             metric_class: Metric class to parse the mapped metrics to. Defaults to MetricFlow Metric class.
         """
         self._unordered_rules = frozenset(rules)
-        self.data_source_class = data_source_class
+        self.semantic_model_class = semantic_model_class
         self.metric_class = metric_class
 
     def _map_dbt_to_metricflow(self, dbt_metrics: Tuple[MetricNode, ...]) -> DbtMappingResults:
@@ -123,13 +123,13 @@ class DbtConverter:
         issues: List[ValidationIssue] = []
 
         data_sources: List[Type[SemanticModel]] = []
-        for data_source_dict in copied_objects.data_sources.values():
+        for semantic_model_dict in copied_objects.data_sources.values():
             try:
-                data_sources.append(self.data_source_class.parse_obj(data_source_dict))
+                data_sources.append(self.semantic_model_class.parse_obj(semantic_model_dict))
             except Exception as e:
                 issues.append(
                     ValidationError(
-                        message=f"Failed to parse dict of data source {data_source_dict.get('name')} to object",
+                        message=f"Failed to parse dict of data source {semantic_model_dict.get('name')} to object",
                         extra_detail="".join(traceback.format_tb(e.__traceback__)),
                     )
                 )

@@ -13,7 +13,7 @@ from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.references import SemanticModelReference, MeasureReference, MetricReference
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
-from metricflow.model.semantics.data_source_join_evaluator import DataSourceJoinEvaluator
+from metricflow.model.semantics.semantic_model_join_evaluator import DataSourceJoinEvaluator
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from metricflow.protocols.semantics import DataSourceSemanticsAccessor
 from metricflow.specs import (
@@ -376,20 +376,20 @@ class ValidLinkableSpecResolver:
     def __init__(
         self,
         user_configured_model: UserConfiguredModel,
-        data_source_semantics: DataSourceSemanticsAccessor,
+        semantic_model_semantics: DataSourceSemanticsAccessor,
         max_entity_links: int,
     ) -> None:
         """Constructor.
 
         Args:
             user_configured_model: the model to use.
-            data_source_semantics: used to look up entities for a data source.
+            semantic_model_semantics: used to look up entities for a data source.
             max_entity_links: the maximum number of joins to do when computing valid elements.
         """
         self._user_configured_model = user_configured_model
         # Sort data sources by name for consistency in building derived objects.
         self._semantic_models = sorted(self._user_configured_model.data_sources, key=lambda x: x.name)
-        self._join_evaluator = DataSourceJoinEvaluator(data_source_semantics)
+        self._join_evaluator = DataSourceJoinEvaluator(semantic_model_semantics)
 
         assert max_entity_links >= 0
         self._max_entity_links = max_entity_links

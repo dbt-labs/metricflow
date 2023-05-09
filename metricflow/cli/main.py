@@ -598,7 +598,7 @@ def _data_warehouse_validations_runner(
 ) -> ModelValidationResults:
     """Helper which calls the individual data warehouse validations to run and prints collected issues"""
 
-    data_source_results = _run_dw_validations(
+    semantic_model_results = _run_dw_validations(
         dw_validator.validate_semantic_models, model=model, validation_type="data sources", timeout=timeout
     )
     dimension_results = _run_dw_validations(
@@ -615,7 +615,7 @@ def _data_warehouse_validations_runner(
     )
 
     return ModelValidationResults.merge(
-        [data_source_results, dimension_results, entity_results, measure_results, metric_results]
+        [semantic_model_results, dimension_results, entity_results, measure_results, metric_results]
     )
 
 

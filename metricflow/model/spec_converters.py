@@ -62,12 +62,12 @@ class WhereConstraintConverter:
 
     @staticmethod
     def _convert_to_linkable_specs(
-        data_source_semantics: DataSourceSemanticsAccessor, where_constraint_names: List[str]
+        semantic_model_semantics: DataSourceSemanticsAccessor, where_constraint_names: List[str]
     ) -> LinkableSpecSet:
         """Processes where_clause_constraint.linkable_names into associated LinkableInstanceSpecs (dims, times, ids)
 
         where_constraint_names: WhereConstraintClause.linkable_names
-        data_source_semantics: DataSourceSemanticsAccessor from the instantiated class
+        semantic_model_semantics: DataSourceSemanticsAccessor from the instantiated class
 
         output: InstanceSpecSet of Tuple(DimensionSpec), Tuple(TimeDimensionSpec), Tuple(EntitySpec)
         """
@@ -79,18 +79,18 @@ class WhereConstraintConverter:
         ]
         dimension_references = {
             dimension_reference.element_name: dimension_reference
-            for dimension_reference in data_source_semantics.get_dimension_references()
+            for dimension_reference in semantic_model_semantics.get_dimension_references()
         }
         entity_references = {
             entity_reference.element_name: entity_reference
-            for entity_reference in data_source_semantics.get_entity_references()
+            for entity_reference in semantic_model_semantics.get_entity_references()
         }
 
         for spec_name in linkable_spec_names:
             if spec_name.element_name == DataSet.metric_time_dimension_name():
                 where_constraint_time_dimensions.append(TimeDimensionSpec.from_name(spec_name.qualified_name))
             elif spec_name.element_name in dimension_references:
-                dimension = data_source_semantics.get_dimension(dimension_references[spec_name.element_name])
+                dimension = semantic_model_semantics.get_dimension(dimension_references[spec_name.element_name])
                 if dimension.type == DimensionType.CATEGORICAL:
                     where_constraint_dimensions.append(DimensionSpec.from_name(spec_name.qualified_name))
                 elif dimension.type == DimensionType.TIME:
@@ -110,14 +110,14 @@ class WhereConstraintConverter:
 
     @staticmethod
     def convert_to_spec_where_constraint(
-        data_source_semantics: DataSourceSemanticsAccessor, where_constraint: WhereClauseConstraint
+        semantic_model_semantics: DataSourceSemanticsAccessor, where_constraint: WhereClauseConstraint
     ) -> SpecWhereClauseConstraint:
         """Converts a where constraint to one using specs."""
         return SpecWhereClauseConstraint(
             where_condition=where_constraint.where,
             linkable_names=tuple(where_constraint.linkable_names),
             linkable_spec_set=WhereConstraintConverter._convert_to_linkable_specs(
-                data_source_semantics=data_source_semantics,
+                semantic_model_semantics=semantic_model_semantics,
                 where_constraint_names=where_constraint.linkable_names,
             ),
             execution_parameters=where_constraint.sql_params,

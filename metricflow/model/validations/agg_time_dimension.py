@@ -42,7 +42,7 @@ class AggregationTimeDimensionRule(ModelValidationRule):
         for measure in data_source.measures:
             measure_context = DataSourceElementContext(
                 file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                data_source_element=SemanticModelElementReference(
+                semantic_model_element=SemanticModelElementReference(
                     semantic_model_name=data_source.name, element_name=measure.name
                 ),
                 element_type=DataSourceElementType.MEASURE,

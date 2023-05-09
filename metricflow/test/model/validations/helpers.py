@@ -79,7 +79,7 @@ def metric_with_guaranteed_meta(
     )
 
 
-def data_source_with_guaranteed_meta(
+def semantic_model_with_guaranteed_meta(
     name: str,
     description: Optional[str] = None,
     node_relation: Optional[NodeRelation] = None,
