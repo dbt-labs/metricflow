@@ -1,13 +1,29 @@
 from __future__ import annotations
+from pydantic.main import ModelMetaclass
 
 from typing import Optional, List
+from typing import _ProtocolMeta  # type: ignore[attr-defined]
+
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.objects.metadata import Metadata
 from dbt_semantic_interfaces.objects.base import ModelWithMetadataParsing, HashableBaseModel
 from dbt_semantic_interfaces.references import MeasureReference, TimeDimensionReference
+from dbt_semantic_interfaces.protocols.measure import (
+    NonAdditiveDimensionParametersProtocol,
+    MeasureAggregationParametersProtocol,
+    MeasureProtocol,
+)
 
 
-class NonAdditiveDimensionParameters(HashableBaseModel):
+class CombinedMetaClass(ModelMetaclass, _ProtocolMeta):
+    """A metaclass that combines the functionality of a pydantic model metaclass and a protocol metaclass."""
+
+    pass
+
+
+class NonAdditiveDimensionParameters(
+    HashableBaseModel, NonAdditiveDimensionParametersProtocol, metaclass=CombinedMetaClass
+):
     """Describes the params for specifying non-additive dimensions in a measure.
 
     NOTE: Currently, only TimeDimensions are supported for this filter
@@ -20,7 +36,9 @@ class NonAdditiveDimensionParameters(HashableBaseModel):
     window_groupings: List[str] = []
 
 
-class MeasureAggregationParameters(HashableBaseModel):
+class MeasureAggregationParameters(
+    HashableBaseModel, MeasureAggregationParametersProtocol, metaclass=CombinedMetaClass
+):
     """Describes parameters for aggregations"""
 
     percentile: Optional[float] = None
@@ -28,7 +46,7 @@ class MeasureAggregationParameters(HashableBaseModel):
     use_approximate_percentile: bool = False
 
 
-class Measure(HashableBaseModel, ModelWithMetadataParsing):
+class Measure(HashableBaseModel, ModelWithMetadataParsing, MeasureProtocol, metaclass=CombinedMetaClass):
     """Describes a measure"""
 
     name: str
