@@ -1,5 +1,5 @@
 ---
-data_source:
+semantic_model:
   name: bookings_monthly_source
   description: bookings_monthly_source
 

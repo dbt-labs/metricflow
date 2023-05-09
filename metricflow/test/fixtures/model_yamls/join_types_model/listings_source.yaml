@@ -1,5 +1,5 @@
 ---
-data_source:
+semantic_model:
   name: listings_source
   description: listings_source
 

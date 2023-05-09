@@ -1,5 +1,5 @@
 ---
-data_source:
+semantic_model:
   name: views_source
   description: views_source
 

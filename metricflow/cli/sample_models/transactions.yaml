@@ -1,4 +1,4 @@
-data_source: 
+semantic_model: 
   name: transactions 
   description: |
     Each row represents one transaction. There

@@ -1,4 +1,4 @@
-data_source:
+semantic_model:
   name: foo
   description: bar buzz bazz
   node_relation:
@@ -18,7 +18,7 @@ data_source:
       agg: sum
       expr: 1
       create_metric: True
-data_source:
+semantic_model:
   name: foo
   description: bar buzz bazz
   node_relation:

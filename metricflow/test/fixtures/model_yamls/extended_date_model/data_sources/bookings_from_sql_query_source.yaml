@@ -1,5 +1,5 @@
 ---
-data_source:
+semantic_model:
   name: bookings_from_sql_query_source
   description: bookings_from_sql_query_source
 

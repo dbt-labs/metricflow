@@ -1,5 +1,5 @@
 ---
-data_source:
+semantic_model:
   name: accounts_source
   description: accounts_source
 

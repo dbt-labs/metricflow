@@ -1,5 +1,5 @@
 ---
-data_source:
+semantic_model:
   name: primary_accounts
   description: SCD Type II table of primary account history
 

@@ -129,15 +129,15 @@ def create_data_sets(
     """
     # Use ordered dict and sort by name to get consistency when running tests.
     data_sets = OrderedDict()
-    data_sources: List[SemanticModel] = multihop_semantic_manifest_lookup.user_configured_model.data_sources
-    data_sources.sort(key=lambda x: x.name)
+    semantic_models: List[SemanticModel] = multihop_semantic_manifest_lookup.user_configured_model.semantic_models
+    semantic_models.sort(key=lambda x: x.name)
 
     converter = SemanticModelToDataSetConverter(
         column_association_resolver=DefaultColumnAssociationResolver(multihop_semantic_manifest_lookup)
     )
 
-    for data_source in data_sources:
-        data_sets[data_source.name] = converter.create_sql_source_data_set(data_source)
+    for semantic_model in semantic_models:
+        data_sets[semantic_model.name] = converter.create_sql_source_data_set(semantic_model)
 
     return data_sets
 

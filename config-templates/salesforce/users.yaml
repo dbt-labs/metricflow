@@ -1,4 +1,4 @@
-data_source:
+semantic_model:
   name: salesforce_users
   owners:
     - support@transformdata.io
