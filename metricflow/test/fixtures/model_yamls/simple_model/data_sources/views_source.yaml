@@ -3,9 +3,9 @@ data_source:
   name: views_source
   description: views_source
 
-  sql_query: |
-    -- User Defined SQL Query
-    SELECT user_id, listing_id, ds, ds_partitioned FROM $source_schema.fct_views
+  node_relation:
+    schema_name: $source_schema
+    alias: fct_views
 
   measures:
     - name: views

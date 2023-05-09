@@ -3,7 +3,9 @@ data_source:
   name: extended_bookings_source
   description: extended_bookings_source
 
-  sql_table: $source_schema.fct_bookings_extended
+  node_relation:
+    schema_name: $source_schema
+    alias: fct_bookings_extended
 
   measures:
     - name: bookings

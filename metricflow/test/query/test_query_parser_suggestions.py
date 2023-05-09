@@ -19,9 +19,9 @@ EXTENDED_BOOKINGS_YAML = textwrap.dedent(
     data_source:
       name: bookings_source
 
-      sql_query: |
-        -- User Defined SQL Query
-        SELECT * FROM bookings_source_table
+      node_relation:
+        schema_name: some_schema
+        alias: bookings_source_table
 
       measures:
         - name: bookings
@@ -82,7 +82,9 @@ LISTINGS_YAML = textwrap.dedent(
       name: listings_latest
       description: listings_latest
 
-      sql_table: schema.table
+      node_relation:
+        schema_name: schema
+        alias: table
 
       measures:
         - name: listings

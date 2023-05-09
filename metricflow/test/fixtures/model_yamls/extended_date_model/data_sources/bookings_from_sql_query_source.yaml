@@ -3,7 +3,9 @@ data_source:
   name: bookings_from_sql_query_source
   description: bookings_from_sql_query_source
 
-  sql_query: SELECT * FROM $source_schema.fct_bookings_extended
+  node_relation:
+    schema_name: $source_schema
+    alias: fct_bookings_extended
 
   measures:
     - name: bookings_from_sql_query

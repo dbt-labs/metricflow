@@ -29,9 +29,9 @@ BOOKINGS_YAML = textwrap.dedent(
     data_source:
       name: bookings_source
 
-      sql_query: |
-        -- User Defined SQL Query
-        SELECT * FROM bookings_source_table
+      node_relation:
+        schema_name: some_schema
+        alias: bookings_source_table
 
       measures:
         - name: bookings
@@ -62,9 +62,9 @@ REVENUE_YAML = textwrap.dedent(
       name: revenue_source
       description: revenue
 
-      sql_query: |
-        -- User Defined SQL Query
-        SELECT * FROM fct_revenue_table
+      node_relation:
+        schema_name: some_schema
+        alias: fct_revenue_table
 
       measures:
         - name: revenue

@@ -98,7 +98,6 @@ def test_validate_data_sources(  # noqa: D
     model.data_sources.append(
         data_source_with_guaranteed_meta(
             name="test_data_source2",
-            sql_table="doesnt.exist",
             dimensions=[],
         )
     )

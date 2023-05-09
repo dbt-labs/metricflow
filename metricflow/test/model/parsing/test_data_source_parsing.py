@@ -1,28 +1,11 @@
 import textwrap
 
 from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
-from dbt_semantic_interfaces.objects.common import YamlConfigFile
 from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_model
+from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
-
-
-def test_base_data_source_attribute_parsing() -> None:
-    """Test for parsing a data source specification without regard for measures, entities, or dimensions"""
-    yaml_contents = textwrap.dedent(
-        """\
-        data_source:
-          name: base_property_test
-        """
-    )
-    file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
-
-    build_result = parse_yaml_files_to_model(files=[file])
-
-    assert len(build_result.model.data_sources) == 1
-    data_source = build_result.model.data_sources[0]
-    assert data_source.name == "base_property_test"
 
 
 def test_data_source_metadata_parsing() -> None:
@@ -31,6 +14,9 @@ def test_data_source_metadata_parsing() -> None:
         """\
         data_source:
           name: metadata_test
+          node_relation:
+            alias: source_table
+            schema_name: some_schema
         """
     )
     file = YamlConfigFile(filepath="test_dir/inline_for_test", contents=yaml_contents)
@@ -45,18 +31,23 @@ def test_data_source_metadata_parsing() -> None:
     expected_metadata_content = textwrap.dedent(
         """\
         name: metadata_test
+        node_relation:
+          alias: source_table
+          schema_name: some_schema
         """
     )
     assert data_source.metadata.file_slice.content == expected_metadata_content
 
 
-def test_data_source_sql_table_parsing() -> None:
-    """Test for parsing a data source specification with a sql_table provided"""
+def test_data_source_node_relation_parsing() -> None:
+    """Test for parsing a data source specification with a node_relation provided"""
     yaml_contents = textwrap.dedent(
         """\
         data_source:
           name: sql_table_test
-          sql_table: "some_schema.source_table"
+          node_relation:
+            alias: source_table
+            schema_name: some_schema
         """
     )
     file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
@@ -65,25 +56,7 @@ def test_data_source_sql_table_parsing() -> None:
 
     assert len(build_result.model.data_sources) == 1
     data_source = build_result.model.data_sources[0]
-    assert data_source.sql_table == "some_schema.source_table"
-
-
-def test_data_source_sql_query_parsing() -> None:
-    """Test for parsing a data source specification with a sql_query provided"""
-    yaml_contents = textwrap.dedent(
-        """\
-        data_source:
-          name: sql_query_test
-          sql_query: "SELECT * FROM some_schema.source_table"
-        """
-    )
-    file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
-
-    build_result = parse_yaml_files_to_model(files=[file])
-
-    assert len(build_result.model.data_sources) == 1
-    data_source = build_result.model.data_sources[0]
-    assert data_source.sql_query == "SELECT * FROM some_schema.source_table"
+    assert data_source.node_relation.relation_name == "some_schema.source_table"
 
 
 def test_data_source_entity_parsing() -> None:
@@ -92,7 +65,9 @@ def test_data_source_entity_parsing() -> None:
         """\
         data_source:
           name: entity_test
-          sql_table: some_schema.source_table
+          node_relation:
+            alias: source_table
+            schema_name: some_schema
           entities:
             - name: example_entity
               type: primary
@@ -120,7 +95,9 @@ def test_data_source_entity_metadata_parsing() -> None:
         """\
         data_source:
           name: entity_test
-          sql_table: some_schema.source_table
+          node_relation:
+            alias: source_table
+            schema_name: some_schema
           entities:
             - name: example_entity
               type: primary
@@ -154,7 +131,9 @@ def test_data_source_measure_parsing() -> None:
         """\
         data_source:
           name: measure_parsing_test
-          sql_table: some_schema.source_table
+          node_relation:
+            alias: source_table
+            schema_name: some_schema
           measures:
             - name: example_measure
               agg: count_distinct
@@ -181,7 +160,9 @@ def test_data_source_measure_metadata_parsing() -> None:
         """\
         data_source:
           name: measure_metadata_parsing_test
-          sql_table: some_schema.source_table
+          node_relation:
+            alias: source_table
+            schema_name: some_schema
           measures:
             - name: example_measure_with_metadata
               agg: count_distinct
@@ -215,7 +196,9 @@ def test_data_source_create_metric_measure_parsing() -> None:
         """\
         data_source:
           name: measure_parsing_create_metric_test
-          sql_table: some_schema.source_table
+          node_relation:
+            alias: source_table
+            schema_name: some_schema
           measures:
             - name: example_measure
               agg: count_distinct
@@ -239,7 +222,9 @@ def test_data_source_categorical_dimension_parsing() -> None:
         """\
         data_source:
           name: dimension_parsing_test
-          sql_table: some_schema.source_table
+          node_relation:
+            alias: source_table
+            schema_name: some_schema
           dimensions:
             - name: example_categorical_dimension
               type: categorical
@@ -265,7 +250,9 @@ def test_data_source_partition_dimension_parsing() -> None:
         """\
         data_source:
           name: dimension_parsing_test
-          sql_table: some_schema.source_table
+          node_relation:
+            alias: source_table
+            schema_name: some_schema
           dimensions:
             - name: example_categorical_dimension
               type: categorical
@@ -289,7 +276,9 @@ def test_data_source_time_dimension_parsing() -> None:
         """\
         data_source:
           name: dimension_parsing_test
-          sql_table: some_schema.source_table
+          node_relation:
+            alias: source_table
+            schema_name: some_schema
           dimensions:
             - name: example_time_dimension
               type: time
@@ -317,7 +306,9 @@ def test_data_source_primary_time_dimension_parsing() -> None:
         """\
         data_source:
           name: dimension_parsing_test
-          sql_table: some_schema.source_table
+          node_relation:
+            alias: source_table
+            schema_name: some_schema
           dimensions:
             - name: example_time_dimension
               type: time
@@ -345,7 +336,9 @@ def test_data_source_dimension_metadata_parsing() -> None:
         """\
         data_source:
           name: dimension_parsing_test
-          sql_table: some_schema.source_table
+          node_relation:
+            alias: source_table
+            schema_name: some_schema
           dimensions:
             - name: example_categorical_dimension
               type: categorical
@@ -379,7 +372,9 @@ def test_data_source_dimension_validity_params_parsing() -> None:
         """\
         data_source:
           name: scd_parsing_test
-          sql_table: some_schema.source_table
+          node_relation:
+            alias: source_table
+            schema_name: some_schema
           dimensions:
             - name: start_time_dimension
               type: time

@@ -63,7 +63,12 @@ def test_render_configs(tmpdir: Path) -> None:  # noqa: D
     assert file_contents == {
         "data_source": {
             "name": "test_table",
-            "sql_table": "db.schema.test_table",
+            "node_relation": {
+                "alias": "test_table",
+                "schema_name": "schema",
+                "database": "db",
+                "relation_name": "db.schema.test_table",
+            },
             "entities": [{"type": "primary", "name": "id"}],
             "dimensions": [
                 {"type": "time", "name": "time_dim", "type_params": {"time_granularity": "day"}},

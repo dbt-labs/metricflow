@@ -3,7 +3,9 @@ data_source:
   name: id_verifications
   description: id_verifications
 
-  sql_table: $source_schema.fct_id_verifications
+  node_relation:
+    schema_name: $source_schema
+    alias: fct_id_verifications
 
   measures:
     - name: identity_verifications

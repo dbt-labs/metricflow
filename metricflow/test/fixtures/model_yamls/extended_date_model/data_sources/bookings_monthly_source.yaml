@@ -3,7 +3,9 @@ data_source:
   name: bookings_monthly_source
   description: bookings_monthly_source
 
-  sql_table: $source_schema.fct_bookings_extended_monthly
+  node_relation:
+    schema_name: $source_schema
+    alias: fct_bookings_extended_monthly
 
   measures:
     - name: bookings_monthly

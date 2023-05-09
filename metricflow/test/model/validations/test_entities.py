@@ -57,7 +57,9 @@ def test_multiple_natural_entities() -> None:
         """\
         data_source:
           name: too_many_natural_entities
-          sql_table: some_schema.natural_entity_table
+          node_relation:
+            schema_name: some_schema
+            alias: natural_entity_table
           entities:
             - name: natural_key_one
               type: natural
@@ -93,7 +95,9 @@ def test_natural_entity_used_in_wrong_context() -> None:
         """\
         data_source:
           name: random_natural_entity
-          sql_table: some_schema.random_natural_entity_table
+          node_relation:
+            schema_name: some_schema
+            alias: random_natural_entity_table
           entities:
             - name: natural_key
               type: natural

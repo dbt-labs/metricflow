@@ -25,13 +25,11 @@ def test_metric_no_time_dim_dim_only_source() -> None:  # noqa:D
             data_sources=[
                 data_source_with_guaranteed_meta(
                     name="sum_measure",
-                    sql_query="SELECT foo, country FROM bar",
                     measures=[],
                     dimensions=[Dimension(name=dim_name, type=DimensionType.CATEGORICAL)],
                 ),
                 data_source_with_guaranteed_meta(
                     name="sum_measure2",
-                    sql_query="SELECT foo, country FROM bar",
                     measures=[
                         Measure(
                             name=measure_name,
@@ -73,7 +71,6 @@ def test_metric_no_time_dim() -> None:  # noqa:D
                 data_sources=[
                     data_source_with_guaranteed_meta(
                         name="sum_measure",
-                        sql_query="SELECT foo, country FROM bar",
                         measures=[Measure(name=measure_name, agg=AggregationType.SUM)],
                         dimensions=[
                             Dimension(
@@ -105,7 +102,6 @@ def test_metric_multiple_primary_time_dims() -> None:  # noqa:D
                 data_sources=[
                     data_source_with_guaranteed_meta(
                         name="sum_measure",
-                        sql_query="SELECT foo, date_created, date_deleted FROM bar",
                         measures=[Measure(name=measure_name, agg=AggregationType.SUM)],
                         dimensions=[
                             Dimension(
@@ -144,7 +140,6 @@ def test_generated_metrics_only() -> None:  # noqa:D
     entity_reference = EntityReference(element_name="primary")
     data_source = data_source_with_guaranteed_meta(
         name="dim1",
-        sql_query=f"SELECT {dim_reference.element_name}, {measure_name} FROM bar",
         measures=[Measure(name=measure_name, agg=AggregationType.SUM, agg_time_dimension=dim2_reference.element_name)],
         dimensions=[
             Dimension(name=dim_reference.element_name, type=DimensionType.CATEGORICAL),
@@ -179,7 +174,6 @@ def test_derived_metric() -> None:  # noqa: D
             data_sources=[
                 data_source_with_guaranteed_meta(
                     name="sum_measure",
-                    sql_query="SELECT foo, ds FROM bar",
                     measures=[
                         Measure(
                             name=measure_name,

@@ -2,7 +2,7 @@ import pytest
 
 from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
 from metricflow.model.model_validator import ModelValidator
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.data_source import DataSource, NodeRelation
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.metric import MetricType, MetricTypeParams, Metric
@@ -25,7 +25,6 @@ def test_incompatible_dimension_type() -> None:  # noqa:D
                 data_sources=[
                     data_source_with_guaranteed_meta(
                         name="dim1",
-                        sql_query=f"SELECT {dim_name}, {measure_name} FROM bar",
                         measures=[Measure(name=measure_name, agg=AggregationType.SUM)],
                         dimensions=[
                             Dimension(
@@ -40,7 +39,6 @@ def test_incompatible_dimension_type() -> None:  # noqa:D
                     ),
                     data_source_with_guaranteed_meta(
                         name="categoricaldim",
-                        sql_query="SELECT foo FROM bar",
                         dimensions=[Dimension(name=dim_name, type=DimensionType.CATEGORICAL)],
                     ),
                 ],
@@ -65,7 +63,6 @@ def test_incompatible_dimension_is_partition() -> None:  # noqa:D
                 data_sources=[
                     data_source_with_guaranteed_meta(
                         name="dim1",
-                        sql_query=f"SELECT {dim_name}, {measure_name} FROM bar",
                         measures=[Measure(name=measure_name, agg=AggregationType.SUM)],
                         dimensions=[
                             Dimension(
@@ -81,7 +78,6 @@ def test_incompatible_dimension_is_partition() -> None:  # noqa:D
                     ),
                     data_source_with_guaranteed_meta(
                         name="dim2",
-                        sql_query="SELECT foo1 FROM bar",
                         dimensions=[
                             Dimension(
                                 name=dim_name,
@@ -116,7 +112,10 @@ def test_multiple_primary_time_dimensions() -> None:  # noqa:D
                 data_sources=[
                     DataSource(
                         name="dim1",
-                        sql_query=f"SELECT ds, {measure_reference.element_name} FROM bar",
+                        node_relation=NodeRelation(
+                            alias="table",
+                            schema_name="schema",
+                        ),
                         measures=[
                             Measure(
                                 name=measure_reference.element_name,

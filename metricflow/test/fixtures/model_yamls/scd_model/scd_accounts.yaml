@@ -3,7 +3,9 @@ data_source:
   name: primary_accounts
   description: SCD Type II table of primary account history
 
-  sql_table: $source_schema.dim_primary_accounts
+  node_relation:
+    schema_name: $source_schema
+    alias: dim_primary_accounts
 
   dimensions:
     - name: primary_from

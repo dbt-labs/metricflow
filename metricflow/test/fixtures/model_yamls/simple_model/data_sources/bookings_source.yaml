@@ -3,9 +3,9 @@ data_source:
   name: bookings_source
   description: bookings_source
 
-  sql_query: |
-    -- User Defined SQL Query
-    SELECT * FROM $source_schema.fct_bookings
+  node_relation:
+    schema_name: $source_schema
+    alias: fct_bookings
 
   measures:
     - name: bookings

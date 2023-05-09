@@ -3,7 +3,9 @@ data_source:
   name: bookings_source
   description: bookings_source
 
-  sql_table: $source_schema.fct_bookings_for_joins
+  node_relation:
+    schema_name: $source_schema
+    alias: fct_bookings_for_joins
 
   measures:
     - name: bookings

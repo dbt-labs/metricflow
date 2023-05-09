@@ -3,7 +3,9 @@ data_source:
   name: listings_latest
   description: listings_latest
 
-  sql_table: $source_schema.dim_listings_latest
+  node_relation:
+    schema_name: $source_schema
+    alias: dim_listings_latest
 
   measures:
     - name: listings
