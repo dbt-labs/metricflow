@@ -10,8 +10,8 @@ from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
 from dbt_semantic_interfaces.references import (
-    DataSourceReference,
-    DataSourceElementReference,
+    SemanticModelReference,
+    SemanticModelElementReference,
     MeasureReference,
     TimeDimensionReference,
     DimensionReference,
@@ -52,10 +52,10 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
         self._data_source_names: Set[str] = set()
 
         self._data_source_to_aggregation_time_dimensions: Dict[
-            DataSourceReference, ElementGrouper[TimeDimensionReference, MeasureSpec]
+            SemanticModelReference, ElementGrouper[TimeDimensionReference, MeasureSpec]
         ] = {}
 
-        self._data_source_reference_to_data_source: Dict[DataSourceReference, SemanticModel] = {}
+        self._data_source_reference_to_data_source: Dict[SemanticModelReference, SemanticModel] = {}
         for data_source in self._model.data_sources:
             self._add_data_source(data_source)
 
@@ -118,7 +118,7 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
     ) -> TimeDimensionReference:
         return self._measure_agg_time_dimension[measure_reference]
 
-    def get_entity_in_data_source(self, ref: DataSourceElementReference) -> Optional[Entity]:  # Noqa: d
+    def get_entity_in_data_source(self, ref: SemanticModelElementReference) -> Optional[Entity]:  # Noqa: d
         data_source = self.get_by_reference(ref.data_source_reference)
         if not data_source:
             return None
@@ -129,7 +129,7 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
 
         return None
 
-    def get_by_reference(self, data_source_reference: DataSourceReference) -> Optional[SemanticModel]:  # noqa: D
+    def get_by_reference(self, data_source_reference: SemanticModelReference) -> Optional[SemanticModel]:  # noqa: D
         return self._data_source_reference_to_data_source.get(data_source_reference)
 
     def _add_data_source(self, data_source: SemanticModel) -> None:
@@ -180,12 +180,12 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
         self._data_source_reference_to_data_source[data_source.reference] = data_source
 
     @property
-    def data_source_references(self) -> Sequence[DataSourceReference]:  # noqa: D
+    def data_source_references(self) -> Sequence[SemanticModelReference]:  # noqa: D
         data_source_names_sorted = sorted(self._data_source_names)
-        return tuple(DataSourceReference(data_source_name=x) for x in data_source_names_sorted)
+        return tuple(SemanticModelReference(semantic_model_name=x) for x in data_source_names_sorted)
 
     def get_aggregation_time_dimensions_with_measures(
-        self, data_source_reference: DataSourceReference
+        self, data_source_reference: SemanticModelReference
     ) -> ElementGrouper[TimeDimensionReference, MeasureSpec]:
         """Return all time dimensions in a data source with their associated measures."""
         assert (

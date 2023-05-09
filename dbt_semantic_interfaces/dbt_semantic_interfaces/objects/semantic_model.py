@@ -8,7 +8,7 @@ from dbt_semantic_interfaces.objects.metadata import Metadata
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension
 from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.elements.measure import Measure
-from dbt_semantic_interfaces.references import DataSourceReference, LinkableElementReference, MeasureReference
+from dbt_semantic_interfaces.references import SemanticModelReference, LinkableElementReference, MeasureReference
 
 
 class NodeRelation(HashableBaseModel):
@@ -134,5 +134,5 @@ class SemanticModel(HashableBaseModel, ModelWithMetadataParsing):
         return partitions[0]
 
     @property
-    def reference(self) -> DataSourceReference:  # noqa: D
-        return DataSourceReference(data_source_name=self.name)
+    def reference(self) -> SemanticModelReference:  # noqa: D
+        return SemanticModelReference(semantic_model_name=self.name)

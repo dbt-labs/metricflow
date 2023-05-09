@@ -67,10 +67,10 @@ class ModelReference(SerializableDataclass):
 class SemanticModelReference(ModelReference):
     """A reference to a semantic model definition in the model."""
 
-    data_source_name: str
+    semantic_model_name: str
 
     def __hash__(self) -> int:  # noqa: D
-        return hash(self.data_source_name)
+        return hash(self.semantic_model_name)
 
 
 @dataclass(frozen=True)
@@ -80,7 +80,7 @@ class SemanticModelElementReference(ModelReference):
     TODO: Fields should be *Reference objects.
     """
 
-    data_source_name: str
+    semantic_model_name: str
     element_name: str
 
     @staticmethod
@@ -88,17 +88,17 @@ class SemanticModelElementReference(ModelReference):
         data_source_reference: SemanticModelReference, element_reference: ElementReference
     ) -> SemanticModelElementReference:
         return SemanticModelElementReference(
-            data_source_name=data_source_reference.data_source_name,
+            semantic_model_name=data_source_reference.semantic_model_name,
             element_name=element_reference.element_name,
         )
 
     @property
     def data_source_reference(self) -> SemanticModelReference:  # noqa: D
-        return SemanticModelReference(self.data_source_name)
+        return SemanticModelReference(self.semantic_model_name)
 
     def is_from(self, ref: SemanticModelReference) -> bool:
         """Returns true if this reference is from the same semantic model as the supplied reference."""
-        return self.data_source_name == ref.data_source_name
+        return self.semantic_model_name == ref.semantic_model_name
 
 
 @dataclass(frozen=True)

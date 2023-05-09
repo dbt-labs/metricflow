@@ -5,8 +5,8 @@ from typing import List, Dict, Optional
 
 from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.references import (
-    DataSourceReference,
-    DataSourceElementReference,
+    SemanticModelReference,
+    SemanticModelElementReference,
     EntityReference,
 )
 from metricflow.instances import EntityInstance, InstanceSet
@@ -28,7 +28,7 @@ class DataSourceEntityJoinType:
 class DataSourceEntityJoin:
     """How to join one data source onto another, using a specific entity and join type."""
 
-    right_data_source_reference: DataSourceReference
+    right_data_source_reference: SemanticModelReference
     entity_reference: EntityReference
     join_type: DataSourceEntityJoinType
 
@@ -37,7 +37,7 @@ class DataSourceEntityJoin:
 class DataSourceLink:
     """The valid join path to link two data sources. Might include multiple joins."""
 
-    left_data_source_reference: DataSourceReference
+    left_data_source_reference: SemanticModelReference
     join_path: List[DataSourceEntityJoin]
 
 
@@ -73,7 +73,7 @@ class DataSourceJoinEvaluator:
         self._data_source_semantics = data_source_semantics
 
     def get_joinable_data_sources(
-        self, left_data_source_reference: DataSourceReference, include_multi_hop: bool = False
+        self, left_data_source_reference: SemanticModelReference, include_multi_hop: bool = False
     ) -> Dict[str, DataSourceLink]:
         """List all data sources that can join to given data source, and the entities to join them."""
         data_source_joins: Dict[str, DataSourceLink] = {}
@@ -87,8 +87,8 @@ class DataSourceJoinEvaluator:
 
     def _get_remaining_hops_of_joinable_data_sources(
         self,
-        left_data_source_reference: DataSourceReference,
-        parent_data_source_to_join_paths: Dict[DataSourceReference, List[DataSourceEntityJoin]],
+        left_data_source_reference: SemanticModelReference,
+        parent_data_source_to_join_paths: Dict[SemanticModelReference, List[DataSourceEntityJoin]],
         known_data_source_joins: Dict[str, DataSourceLink],
         join_hops_remaining: int,
     ) -> None:
@@ -111,13 +111,13 @@ class DataSourceJoinEvaluator:
                 for right_data_source in entity_data_sources:
                     # Check if we've seen this data source already
                     if (
-                        right_data_source.name == left_data_source_reference.data_source_name
+                        right_data_source.name == left_data_source_reference.semantic_model_name
                         or right_data_source.name in known_data_source_joins
                     ):
                         continue
 
                     # Check if there is a valid way to join this data source to existing join path
-                    right_data_source_reference = DataSourceReference(data_source_name=right_data_source.name)
+                    right_data_source_reference = SemanticModelReference(semantic_model_name=right_data_source.name)
                     valid_join_type = self.get_valid_data_source_entity_join_type(
                         left_data_source_reference=parent_data_source_reference,
                         right_data_source_reference=right_data_source_reference,
@@ -134,7 +134,7 @@ class DataSourceJoinEvaluator:
                         )
                     ]
                     join_paths_to_visit_next.append(join_path_for_data_source)
-                    known_data_source_joins[right_data_source_reference.data_source_name] = DataSourceLink(
+                    known_data_source_joins[right_data_source_reference.semantic_model_name] = DataSourceLink(
                         left_data_source_reference=left_data_source_reference, join_path=join_path_for_data_source
                     )
 
@@ -142,7 +142,7 @@ class DataSourceJoinEvaluator:
         if not join_hops_remaining:
             return
 
-        right_data_sources_to_join_paths: Dict[DataSourceReference, List[DataSourceEntityJoin]] = {}
+        right_data_sources_to_join_paths: Dict[SemanticModelReference, List[DataSourceEntityJoin]] = {}
         for join_path in join_paths_to_visit_next:
             assert len(join_path) > 0
             right_data_sources_to_join_paths[join_path[-1].right_data_source_reference] = join_path
@@ -156,17 +156,17 @@ class DataSourceJoinEvaluator:
 
     def get_valid_data_source_entity_join_type(
         self,
-        left_data_source_reference: DataSourceReference,
-        right_data_source_reference: DataSourceReference,
+        left_data_source_reference: SemanticModelReference,
+        right_data_source_reference: SemanticModelReference,
         on_entity_reference: EntityReference,
     ) -> Optional[DataSourceEntityJoinType]:
         """Get valid join type used to join data sources on given entity, if exists."""
         left_entity = self._data_source_semantics.get_entity_in_data_source(
-            DataSourceElementReference.create_from_references(left_data_source_reference, on_entity_reference)
+            SemanticModelElementReference.create_from_references(left_data_source_reference, on_entity_reference)
         )
 
         right_entity = self._data_source_semantics.get_entity_in_data_source(
-            DataSourceElementReference.create_from_references(right_data_source_reference, on_entity_reference)
+            SemanticModelElementReference.create_from_references(right_data_source_reference, on_entity_reference)
         )
         if left_entity is None or right_entity is None:
             return None
@@ -200,8 +200,8 @@ class DataSourceJoinEvaluator:
 
     def is_valid_data_source_join(
         self,
-        left_data_source_reference: DataSourceReference,
-        right_data_source_reference: DataSourceReference,
+        left_data_source_reference: SemanticModelReference,
+        right_data_source_reference: SemanticModelReference,
         on_entity_reference: EntityReference,
     ) -> bool:
         """Return true if we should allow a join with the given parameters to resolve a query."""
@@ -218,7 +218,7 @@ class DataSourceJoinEvaluator:
     def _data_source_of_entity_in_instance_set(
         instance_set: InstanceSet,
         entity_reference: EntityReference,
-    ) -> DataSourceReference:
+    ) -> SemanticModelReference:
         """Return the data source where the entity was defined in the instance set."""
         matching_instances: List[EntityInstance] = []
         for entity_instance in instance_set.entity_instances:

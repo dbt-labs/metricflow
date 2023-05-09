@@ -18,10 +18,10 @@ __SOURCE_TABLE_ALIAS = "a"
 
 
 def __get_filtered_measure_instance_set(
-    data_source_name: str, measure_name: str, object_repo: ConsistentIdObjectRepository
+    semantic_model_name: str, measure_name: str, object_repo: ConsistentIdObjectRepository
 ) -> InstanceSet:
     """Gets an InstanceSet consisting of only the measure instance matching the given name and data source"""
-    dataset = object_repo.simple_model_data_sets[data_source_name]
+    dataset = object_repo.simple_model_data_sets[semantic_model_name]
     instance_set = dataset.instance_set
     include_specs = tuple(
         instance.spec for instance in instance_set.measure_instances if instance.spec.element_name == measure_name

@@ -7,8 +7,8 @@ from typing import Dict, Tuple, List, Optional
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.references import (
-    DataSourceElementReference,
-    DataSourceReference,
+    SemanticModelElementReference,
+    SemanticModelReference,
     MetricModelReference,
 )
 from dbt_semantic_interfaces.references import ElementReference
@@ -103,8 +103,8 @@ class UniqueAndValidNameRule(ModelValidationRule):
                         "measure",
                         DataSourceElementContext(
                             file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source_element=DataSourceElementReference(
-                                data_source_name=data_source.name, element_name=measure.name
+                            data_source_element=SemanticModelElementReference(
+                                semantic_model_name=data_source.name, element_name=measure.name
                             ),
                             element_type=DataSourceElementType.MEASURE,
                         ),
@@ -118,8 +118,8 @@ class UniqueAndValidNameRule(ModelValidationRule):
                         "entity",
                         DataSourceElementContext(
                             file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source_element=DataSourceElementReference(
-                                data_source_name=data_source.name, element_name=entity.name
+                            data_source_element=SemanticModelElementReference(
+                                semantic_model_name=data_source.name, element_name=entity.name
                             ),
                             element_type=DataSourceElementType.ENTITY,
                         ),
@@ -133,8 +133,8 @@ class UniqueAndValidNameRule(ModelValidationRule):
                         "dimension",
                         DataSourceElementContext(
                             file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source_element=DataSourceElementReference(
-                                data_source_name=data_source.name, element_name=dimension.name
+                            data_source_element=SemanticModelElementReference(
+                                semantic_model_name=data_source.name, element_name=dimension.name
                             ),
                             element_type=DataSourceElementType.DIMENSION,
                         ),
@@ -172,7 +172,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
                         "data source",
                         DataSourceContext(
                             file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source=DataSourceReference(data_source_name=data_source.name),
+                            data_source=SemanticModelReference(semantic_model_name=data_source.name),
                         ),
                     )
                 )

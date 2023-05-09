@@ -95,7 +95,7 @@ class MeasureSpecProperties:
     """Input dataclass for grouping properties of a sequence of MeasureSpecs."""
 
     measure_specs: Sequence[MeasureSpec]
-    data_source_name: str
+    semantic_model_name: str
     agg_time_dimension: TimeDimensionReference
     non_additive_dimension_spec: Optional[NonAdditiveDimensionSpec] = None
 
@@ -433,7 +433,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 raise ValueError(f"measure_specs {measure_specs} do not have the same agg_time_dimension.")
         return MeasureSpecProperties(
             measure_specs=measure_specs,
-            data_source_name=data_sources.pop(),
+            semantic_model_name=data_sources.pop(),
             agg_time_dimension=agg_time_dimension,
             non_additive_dimension_spec=non_additive_dimension_spec,
         )

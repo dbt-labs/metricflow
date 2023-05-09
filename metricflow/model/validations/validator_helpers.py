@@ -16,8 +16,8 @@ from dbt_semantic_interfaces.objects.metadata import Metadata
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.references import (
-    DataSourceElementReference,
-    DataSourceReference,
+    SemanticModelElementReference,
+    SemanticModelReference,
     MetricModelReference,
 )
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
@@ -107,23 +107,23 @@ class DataSourceContext(BaseModel):
     """The context class for validation issues involving data sources"""
 
     file_context: FileContext
-    data_source: DataSourceReference
+    data_source: SemanticModelReference
 
     def context_str(self) -> str:
         """Human readable stringified representation of the context"""
-        return f"with data source `{self.data_source.data_source_name}` {self.file_context.context_str()}"
+        return f"with data source `{self.data_source.semantic_model_name}` {self.file_context.context_str()}"
 
 
 class DataSourceElementContext(BaseModel):
     """The context class for validation issues involving dimensions"""
 
     file_context: FileContext
-    data_source_element: DataSourceElementReference
+    data_source_element: SemanticModelElementReference
     element_type: DataSourceElementType
 
     def context_str(self) -> str:
         """Human readable stringified representation of the context"""
-        return f"with {self.element_type.value} `{self.data_source_element.element_name}` in data source `{self.data_source_element.data_source_name}` {self.file_context.context_str()}"
+        return f"with {self.element_type.value} `{self.data_source_element.element_name}` in data source `{self.data_source_element.semantic_model_name}` {self.file_context.context_str()}"
 
 
 ValidationContext = Union[

@@ -144,7 +144,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
             )
             if entity is None:
                 raise RuntimeError(
-                    f"Invalid DataSourceElementReference {entity_instance_in_first_node.defined_from[0]}"
+                    f"Invalid SemanticModelElementReference {entity_instance_in_first_node.defined_from[0]}"
                 )
 
             return True

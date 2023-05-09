@@ -5,7 +5,7 @@ from typing import List, MutableSet
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from dbt_semantic_interfaces.references import DataSourceReference
+from dbt_semantic_interfaces.references import SemanticModelReference
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,
     FileContext,
@@ -33,7 +33,7 @@ class NaturalEntityConfigurationRule(ModelValidationRule):
         issues: List[ValidationIssue] = []
         context = DataSourceContext(
             file_context=FileContext.from_metadata(metadata=data_source.metadata),
-            data_source=DataSourceReference(data_source_name=data_source.name),
+            data_source=SemanticModelReference(semantic_model_name=data_source.name),
         )
 
         natural_entity_names = set(
@@ -86,7 +86,7 @@ class OnePrimaryEntityPerDataSourceRule(ModelValidationRule):
                 ValidationFutureError(
                     context=DataSourceContext(
                         file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                        data_source=DataSourceReference(data_source_name=data_source.name),
+                        data_source=SemanticModelReference(semantic_model_name=data_source.name),
                     ),
                     message=f"Data sources can have only one primary entity. The data source"
                     f" `{data_source.name}` has {len(primary_entity_names)}: {', '.join(primary_entity_names)}",

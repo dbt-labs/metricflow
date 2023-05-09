@@ -5,7 +5,7 @@ from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from dbt_semantic_interfaces.references import DataSourceReference
+from dbt_semantic_interfaces.references import SemanticModelReference
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,
     FileContext,
@@ -52,7 +52,7 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
                 ValidationError(
                     context=DataSourceContext(
                         file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                        data_source=DataSourceReference(data_source_name=data_source.name),
+                        data_source=SemanticModelReference(semantic_model_name=data_source.name),
                     ),
                     message=f"No primary time dimension in data source with name ({data_source.name}). Please add one",
                 )
@@ -64,7 +64,7 @@ class DataSourceTimeDimensionWarningsRule(ModelValidationRule):
                     ValidationError(
                         context=DataSourceContext(
                             file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source=DataSourceReference(data_source_name=data_source.name),
+                            data_source=SemanticModelReference(semantic_model_name=data_source.name),
                         ),
                         message=f"In data source {data_source.name}, "
                         f"Primary time dimension with name: {primary_time_dimension.name} "
@@ -105,7 +105,7 @@ class DataSourceValidityWindowRule(ModelValidationRule):
 
         context = DataSourceContext(
             file_context=FileContext.from_metadata(metadata=data_source.metadata),
-            data_source=DataSourceReference(data_source_name=data_source.name),
+            data_source=SemanticModelReference(semantic_model_name=data_source.name),
         )
         requirements = (
             "Data sources using dimension validity params to define a validity window must have exactly two time "

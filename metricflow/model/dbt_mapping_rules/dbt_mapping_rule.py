@@ -20,15 +20,15 @@ class MappedObjects:
         default_factory=lambda: defaultdict(dict)
     )
     metrics: DefaultDict[str, Dict[str, TransformedObjectsValueType]] = field(default_factory=lambda: defaultdict(dict))
-    # access path is ["data_source_name"]["dimension_name"] -> dict dimension representation
+    # access path is ["semantic_model_name"]["dimension_name"] -> dict dimension representation
     dimensions: DefaultDict[str, DefaultDict[str, Dict[str, TransformedObjectsValueType]]] = field(
         default_factory=lambda: defaultdict(lambda: defaultdict(dict))
     )
-    # access path is ["data_source_name"]["entity_name"] -> dict entity representation
+    # access path is ["semantic_model_name"]["entity_name"] -> dict entity representation
     entities: DefaultDict[str, DefaultDict[str, Dict[str, TransformedObjectsValueType]]] = field(
         default_factory=lambda: defaultdict(lambda: defaultdict(dict))
     )
-    # access path is ["data_source_name"]["measure_name"] -> dict measure representation
+    # access path is ["semantic_model_name"]["measure_name"] -> dict measure representation
     measures: DefaultDict[str, DefaultDict[str, Dict[str, TransformedObjectsValueType]]] = field(
         default_factory=lambda: defaultdict(lambda: defaultdict(dict))
     )

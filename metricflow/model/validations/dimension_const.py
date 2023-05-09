@@ -13,7 +13,7 @@ from metricflow.model.validations.validator_helpers import (
     validate_safely,
 )
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from dbt_semantic_interfaces.references import DataSourceElementReference, DimensionReference
+from dbt_semantic_interfaces.references import SemanticModelElementReference, DimensionReference
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 
@@ -65,8 +65,8 @@ class DimensionConsistencyRule(ModelValidationRule):
         issues: List[ValidationIssue] = []
         context = DataSourceElementContext(
             file_context=FileContext.from_metadata(metadata=data_source.metadata),
-            data_source_element=DataSourceElementReference(
-                data_source_name=data_source.name, element_name=dimension.name
+            data_source_element=SemanticModelElementReference(
+                semantic_model_name=data_source.name, element_name=dimension.name
             ),
             element_type=DataSourceElementType.DIMENSION,
         )
@@ -129,8 +129,8 @@ class DimensionConsistencyRule(ModelValidationRule):
 
             context = DataSourceElementContext(
                 file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                data_source_element=DataSourceElementReference(
-                    data_source_name=data_source.name, element_name=dimension.name
+                data_source_element=SemanticModelElementReference(
+                    semantic_model_name=data_source.name, element_name=dimension.name
                 ),
                 element_type=DataSourceElementType.DIMENSION,
             )

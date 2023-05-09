@@ -16,7 +16,11 @@ from metricflow.dataset.data_source_adapter import DataSourceDataSet
 
 from metricflow.dataset.dataset import DataSet
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
-from dbt_semantic_interfaces.references import DataSourceElementReference, DataSourceReference, MetricModelReference
+from dbt_semantic_interfaces.references import (
+    SemanticModelElementReference,
+    SemanticModelReference,
+    MetricModelReference,
+)
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
 from dbt_semantic_interfaces.objects.metric import Metric
@@ -105,7 +109,7 @@ class DataWarehouseTaskBuilder:
     ) -> Sequence[BaseOutput[DataSourceDataSet]]:
         """Builds and returns the DataSourceDataSet node for the given data source"""
         data_source_semantics = render_tools.semantic_manifest_lookup.data_source_semantics.get_by_reference(
-            DataSourceReference(data_source_name=data_source.name)
+            SemanticModelReference(semantic_model_name=data_source.name)
         )
         assert data_source_semantics
 
@@ -167,7 +171,7 @@ class DataWarehouseTaskBuilder:
                     ),
                     context=DataSourceContext(
                         file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                        data_source=DataSourceReference(data_source_name=data_source.name),
+                        data_source=SemanticModelReference(semantic_model_name=data_source.name),
                     ),
                     error_message=f"Unable to access data source `{data_source.name}` in data warehouse",
                 )
@@ -240,8 +244,8 @@ class DataWarehouseTaskBuilder:
                         ),
                         context=DataSourceElementContext(
                             file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source_element=DataSourceElementReference(
-                                data_source_name=data_source.name, element_name=spec.element_name
+                            data_source_element=SemanticModelElementReference(
+                                semantic_model_name=data_source.name, element_name=spec.element_name
                             ),
                             element_type=DataSourceElementType.DIMENSION,
                         ),
@@ -267,7 +271,7 @@ class DataWarehouseTaskBuilder:
                     ),
                     context=DataSourceContext(
                         file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                        data_source=DataSourceReference(data_source_name=data_source.name),
+                        data_source=SemanticModelReference(semantic_model_name=data_source.name),
                     ),
                     error_message=f"Failed to query dimensions in data warehouse for data source `{data_source.name}`",
                     on_fail_subtasks=data_source_sub_tasks,
@@ -316,8 +320,8 @@ class DataWarehouseTaskBuilder:
                         ),
                         context=DataSourceElementContext(
                             file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source_element=DataSourceElementReference(
-                                data_source_name=data_source.name, element_name=spec.element_name
+                            data_source_element=SemanticModelElementReference(
+                                semantic_model_name=data_source.name, element_name=spec.element_name
                             ),
                             element_type=DataSourceElementType.ENTITY,
                         ),
@@ -342,7 +346,7 @@ class DataWarehouseTaskBuilder:
                     ),
                     context=DataSourceContext(
                         file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                        data_source=DataSourceReference(data_source_name=data_source.name),
+                        data_source=SemanticModelReference(semantic_model_name=data_source.name),
                     ),
                     error_message=f"Failed to query entities in data warehouse for data source `{data_source.name}`",
                     on_fail_subtasks=data_source_sub_tasks,
@@ -407,8 +411,8 @@ class DataWarehouseTaskBuilder:
                         ),
                         context=DataSourceElementContext(
                             file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source_element=DataSourceElementReference(
-                                data_source_name=data_source.name, element_name=spec.element_name
+                            data_source_element=SemanticModelElementReference(
+                                semantic_model_name=data_source.name, element_name=spec.element_name
                             ),
                             element_type=DataSourceElementType.MEASURE,
                         ),
@@ -431,7 +435,7 @@ class DataWarehouseTaskBuilder:
                         ),
                         context=DataSourceContext(
                             file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source=DataSourceReference(data_source_name=data_source.name),
+                            data_source=SemanticModelReference(semantic_model_name=data_source.name),
                         ),
                         error_message=f"Failed to query measures in data warehouse for data source `{data_source.name}`",
                         on_fail_subtasks=source_node_to_sub_task[source_node],

@@ -1,5 +1,5 @@
 from typing import List
-from dbt_semantic_interfaces.references import DataSourceElementReference
+from dbt_semantic_interfaces.references import SemanticModelElementReference
 
 
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
@@ -74,8 +74,8 @@ class ReservedKeywordsRule(ModelValidationRule):
                     ValidationError(
                         context=DataSourceElementContext(
                             file_context=FileContext.from_metadata(data_source.metadata),
-                            data_source_element=DataSourceElementReference(
-                                data_source_name=data_source.name, element_name=dimension.name
+                            data_source_element=SemanticModelElementReference(
+                                semantic_model_name=data_source.name, element_name=dimension.name
                             ),
                             element_type=DataSourceElementType.DIMENSION,
                         ),
@@ -93,8 +93,8 @@ class ReservedKeywordsRule(ModelValidationRule):
                         ValidationError(
                             context=DataSourceElementContext(
                                 file_context=FileContext.from_metadata(data_source.metadata),
-                                data_source_element=DataSourceElementReference(
-                                    data_source_name=data_source.name, element_name=entity.name
+                                data_source_element=SemanticModelElementReference(
+                                    semantic_model_name=data_source.name, element_name=entity.name
                                 ),
                                 element_type=DataSourceElementType.ENTITY,
                             ),
@@ -108,8 +108,8 @@ class ReservedKeywordsRule(ModelValidationRule):
                     ValidationError(
                         context=DataSourceElementContext(
                             file_context=FileContext.from_metadata(data_source.metadata),
-                            data_source_element=DataSourceElementReference(
-                                data_source_name=data_source.name, element_name=measure.name
+                            data_source_element=SemanticModelElementReference(
+                                semantic_model_name=data_source.name, element_name=measure.name
                             ),
                             element_type=DataSourceElementType.MEASURE,
                         ),

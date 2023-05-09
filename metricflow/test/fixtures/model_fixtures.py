@@ -37,9 +37,11 @@ def _data_set_to_read_nodes(
 ) -> OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]]:
     """Return a mapping from the name of the data source to the dataflow plan node that reads from it."""
     return_dict: OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]] = OrderedDict()
-    for data_source_name, data_set in data_sets.items():
-        return_dict[data_source_name] = ReadSqlSourceNode[DataSourceDataSet](data_set)
-        logger.debug(f"For data source {data_source_name}, creating node_id {return_dict[data_source_name].node_id}")
+    for semantic_model_name, data_set in data_sets.items():
+        return_dict[semantic_model_name] = ReadSqlSourceNode[DataSourceDataSet](data_set)
+        logger.debug(
+            f"For data source {semantic_model_name}, creating node_id {return_dict[semantic_model_name].node_id}"
+        )
 
     return return_dict
 

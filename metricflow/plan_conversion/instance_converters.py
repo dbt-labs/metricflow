@@ -9,7 +9,7 @@ from itertools import chain
 from more_itertools import bucket
 from typing import Dict, List, Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.references import DataSourceReference
+from dbt_semantic_interfaces.references import SemanticModelReference
 from metricflow.aggregation_properties import AggregationState
 from metricflow.dataflow.dataflow_plan import ValidityWindowJoinDescription
 from metricflow.instances import (
@@ -278,7 +278,7 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
         self._data_source_semantics = data_source_semantics
 
     def _get_validity_window_dimensions_for_data_source(
-        self, data_source_reference: DataSourceReference
+        self, data_source_reference: SemanticModelReference
     ) -> Optional[Tuple[_DimensionValidityParams, _DimensionValidityParams]]:
         """Returns a 2-tuple (start, end) of validity window dimensions info, if any exist in the data source"""
         data_source = self._data_source_semantics.get_by_reference(data_source_reference)

@@ -2,7 +2,7 @@ import logging
 
 import pytest
 
-from dbt_semantic_interfaces.references import DataSourceReference
+from dbt_semantic_interfaces.references import SemanticModelReference
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, FilterElementsNode, MetricTimeDimensionTransformNode
@@ -30,7 +30,7 @@ def test_view_sql_generated_at_a_node(
 ) -> None:
     """Example that shows how to view generated SQL for nodes in a dataflow plan."""
     bookings_data_source = simple_semantic_manifest_lookup.data_source_semantics.get_by_reference(
-        DataSourceReference(data_source_name="bookings_source")
+        SemanticModelReference(semantic_model_name="bookings_source")
     )
     assert bookings_data_source
     column_association_resolver = DefaultColumnAssociationResolver(

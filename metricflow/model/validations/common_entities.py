@@ -3,7 +3,7 @@ from typing import Dict, List, Set
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from dbt_semantic_interfaces.references import DataSourceElementReference, EntityReference
+from dbt_semantic_interfaces.references import SemanticModelElementReference, EntityReference
 from metricflow.model.validations.validator_helpers import (
     DataSourceElementContext,
     DataSourceElementType,
@@ -48,8 +48,8 @@ class CommonEntitysRule(ModelValidationRule):
                 ValidationWarning(
                     context=DataSourceElementContext(
                         file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                        data_source_element=DataSourceElementReference(
-                            data_source_name=data_source.name, element_name=entity.name
+                        data_source_element=SemanticModelElementReference(
+                            semantic_model_name=data_source.name, element_name=entity.name
                         ),
                         element_type=DataSourceElementType.ENTITY,
                     ),

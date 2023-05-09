@@ -11,7 +11,7 @@ from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType, Dimension
 from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from dbt_semantic_interfaces.references import DataSourceReference, MeasureReference, MetricReference
+from dbt_semantic_interfaces.references import SemanticModelReference, MeasureReference, MetricReference
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.data_source_join_evaluator import DataSourceJoinEvaluator
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
@@ -487,7 +487,7 @@ class ValidLinkableSpecResolver:
 
     def _get_data_sources_with_joinable_entity(
         self,
-        left_data_source_reference: DataSourceReference,
+        left_data_source_reference: SemanticModelReference,
         entity_reference: EntityReference,
     ) -> Sequence[SemanticModel]:
         # May switch to non-cached implementation.

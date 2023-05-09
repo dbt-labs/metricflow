@@ -3,7 +3,7 @@ from typing import List
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from dbt_semantic_interfaces.references import DataSourceElementReference, TimeDimensionReference
+from dbt_semantic_interfaces.references import SemanticModelElementReference, TimeDimensionReference
 from metricflow.model.validations.validator_helpers import (
     DataSourceElementContext,
     DataSourceElementType,
@@ -42,8 +42,8 @@ class AggregationTimeDimensionRule(ModelValidationRule):
         for measure in data_source.measures:
             measure_context = DataSourceElementContext(
                 file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                data_source_element=DataSourceElementReference(
-                    data_source_name=data_source.name, element_name=measure.name
+                data_source_element=SemanticModelElementReference(
+                    semantic_model_name=data_source.name, element_name=measure.name
                 ),
                 element_type=DataSourceElementType.MEASURE,
             )

@@ -2,7 +2,7 @@ from typing import Sequence, List
 
 import more_itertools
 
-from dbt_semantic_interfaces.references import DataSourceReference
+from dbt_semantic_interfaces.references import SemanticModelReference
 from metricflow.column_assoc import ColumnAssociation
 from metricflow.dataset.dataset import DataSet
 from metricflow.instances import (
@@ -119,10 +119,10 @@ class SqlDataSet(DataSet):
         return tuple(more_itertools.flatten([instance.associated_columns for instance in instances]))
 
 
-class SameDataSourceReferenceChecker(InstanceSetTransform[bool]):
+class SameSemanticModelReferenceChecker(InstanceSetTransform[bool]):
     """Checks to see that all elements in the instance set come from the same data source."""
 
-    def __init__(self, data_source_reference: DataSourceReference) -> None:  # noqa: D
+    def __init__(self, data_source_reference: SemanticModelReference) -> None:  # noqa: D
         self._data_source_reference = data_source_reference
 
     def transform(self, instance_set: InstanceSet) -> bool:  # noqa: D

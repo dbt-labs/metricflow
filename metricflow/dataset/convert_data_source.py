@@ -3,7 +3,7 @@ import re
 from dataclasses import dataclass
 from typing import Optional, List, Tuple, Sequence
 
-from dbt_semantic_interfaces.references import DataSourceReference, DataSourceElementReference
+from dbt_semantic_interfaces.references import SemanticModelReference, SemanticModelElementReference
 from metricflow.aggregation_properties import AggregationState
 from metricflow.dag.id_generation import IdGeneratorRegistry
 from metricflow.dataflow.sql_table import SqlTable
@@ -72,7 +72,7 @@ class DataSourceToDataSetConverter:
 
     def _create_dimension_instance(
         self,
-        data_source_name: str,
+        semantic_model_name: str,
         dimension: Dimension,
         entity_links: Tuple[EntityReference, ...],
     ) -> DimensionInstance:
@@ -87,8 +87,8 @@ class DataSourceToDataSetConverter:
             associated_columns=column_associations,
             spec=dimension_spec,
             defined_from=(
-                DataSourceElementReference(
-                    data_source_name=data_source_name,
+                SemanticModelElementReference(
+                    semantic_model_name=semantic_model_name,
                     element_name=dimension.reference.element_name,
                 ),
             ),
@@ -96,7 +96,7 @@ class DataSourceToDataSetConverter:
 
     def _create_time_dimension_instance(
         self,
-        data_source_name: str,
+        semantic_model_name: str,
         time_dimension: Dimension,
         entity_links: Tuple[EntityReference, ...],
         time_granularity: TimeGranularity = DEFAULT_TIME_GRANULARITY,
@@ -114,8 +114,8 @@ class DataSourceToDataSetConverter:
             associated_columns=column_associations,
             spec=time_dimension_spec,
             defined_from=(
-                DataSourceElementReference(
-                    data_source_name=data_source_name,
+                SemanticModelElementReference(
+                    semantic_model_name=semantic_model_name,
                     element_name=time_dimension.reference.element_name,
                 ),
             ),
@@ -123,7 +123,7 @@ class DataSourceToDataSetConverter:
 
     def _create_entity_instance(
         self,
-        data_source_name: str,
+        semantic_model_name: str,
         entity: Entity,
         entity_links: Tuple[EntityReference, ...],
     ) -> EntityInstance:
@@ -138,8 +138,8 @@ class DataSourceToDataSetConverter:
             associated_columns=column_associations,
             spec=entity_spec,
             defined_from=(
-                DataSourceElementReference(
-                    data_source_name=data_source_name,
+                SemanticModelElementReference(
+                    semantic_model_name=semantic_model_name,
                     element_name=entity.reference.element_name,
                 ),
             ),
@@ -173,7 +173,7 @@ class DataSourceToDataSetConverter:
 
     def _convert_measures(
         self,
-        data_source_name: str,
+        semantic_model_name: str,
         measures: Sequence[Measure],
         table_alias: str,
     ) -> Tuple[Sequence[MeasureInstance], Sequence[SqlSelectColumn]]:
@@ -186,8 +186,8 @@ class DataSourceToDataSetConverter:
                 associated_columns=measure_spec.column_associations(self._column_association_resolver),
                 spec=measure_spec,
                 defined_from=(
-                    DataSourceElementReference(
-                        data_source_name=data_source_name,
+                    SemanticModelElementReference(
+                        semantic_model_name=semantic_model_name,
                         element_name=measure.reference.element_name,
                     ),
                 ),
@@ -209,7 +209,7 @@ class DataSourceToDataSetConverter:
 
     def _convert_dimensions(
         self,
-        data_source_name: str,
+        semantic_model_name: str,
         dimensions: Sequence[Dimension],
         entity_links: Tuple[EntityReference, ...],
         table_alias: str,
@@ -221,7 +221,7 @@ class DataSourceToDataSetConverter:
         for dimension in dimensions or []:
             if dimension.type == DimensionType.CATEGORICAL:
                 dimension_instance = self._create_dimension_instance(
-                    data_source_name=data_source_name,
+                    semantic_model_name=semantic_model_name,
                     dimension=dimension,
                     entity_links=entity_links,
                 )
@@ -243,7 +243,7 @@ class DataSourceToDataSetConverter:
                     defined_time_granularity = dimension.type_params.time_granularity
 
                 time_dimension_instance = self._create_time_dimension_instance(
-                    data_source_name=data_source_name,
+                    semantic_model_name=semantic_model_name,
                     time_dimension=dimension,
                     entity_links=entity_links,
                     time_granularity=defined_time_granularity,
@@ -264,7 +264,7 @@ class DataSourceToDataSetConverter:
                 for time_granularity in TimeGranularity:
                     if time_granularity.to_int() > defined_time_granularity.to_int():
                         time_dimension_instance = self._create_time_dimension_instance(
-                            data_source_name=data_source_name,
+                            semantic_model_name=semantic_model_name,
                             time_dimension=dimension,
                             entity_links=entity_links,
                             time_granularity=time_granularity,
@@ -295,7 +295,7 @@ class DataSourceToDataSetConverter:
 
     def _create_entity_instances(
         self,
-        data_source_name: str,
+        semantic_model_name: str,
         entities: Sequence[Entity],
         entity_links: Tuple[EntityReference, ...],
         table_alias: str,
@@ -309,7 +309,7 @@ class DataSourceToDataSetConverter:
                 continue
 
             entity_instance = self._create_entity_instance(
-                data_source_name=data_source_name,
+                semantic_model_name=semantic_model_name,
                 entity=entity,
                 entity_links=entity_links,
             )
@@ -342,7 +342,7 @@ class DataSourceToDataSetConverter:
         # Handle measures
         if len(data_source.measures) > 0:
             measure_instances, select_columns = self._convert_measures(
-                data_source_name=data_source.name,
+                semantic_model_name=data_source.name,
                 measures=data_source.measures,
                 table_alias=from_source_alias,
             )
@@ -361,7 +361,7 @@ class DataSourceToDataSetConverter:
         # Handle dimensions
         conversion_results = [
             self._convert_dimensions(
-                data_source_name=data_source.name,
+                semantic_model_name=data_source.name,
                 dimensions=data_source.dimensions,
                 entity_links=entity_links,
                 table_alias=from_source_alias,
@@ -396,7 +396,7 @@ class DataSourceToDataSetConverter:
         # Handle entities
         for entity_links in possible_entity_links:
             entity_instances, select_columns = self._create_entity_instances(
-                data_source_name=data_source.name,
+                semantic_model_name=data_source.name,
                 entities=data_source.entities,
                 entity_links=entity_links,
                 table_alias=from_source_alias,
@@ -420,7 +420,7 @@ class DataSourceToDataSetConverter:
         )
 
         return DataSourceDataSet(
-            data_source_reference=DataSourceReference(data_source_name=data_source.name),
+            data_source_reference=SemanticModelReference(semantic_model_name=data_source.name),
             instance_set=InstanceSet(
                 measure_instances=tuple(all_measure_instances),
                 dimension_instances=tuple(all_dimension_instances),

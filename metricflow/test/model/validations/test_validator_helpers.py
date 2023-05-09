@@ -3,8 +3,8 @@ from typing import List
 
 import pytest
 from dbt_semantic_interfaces.references import (
-    DataSourceElementReference,
-    DataSourceReference,
+    SemanticModelElementReference,
+    SemanticModelReference,
     MetricModelReference,
 )
 
@@ -26,14 +26,14 @@ from metricflow.model.validations.validator_helpers import (
 @pytest.fixture
 def list_of_issues() -> List[ValidationIssue]:  # noqa: D
     file_context = FileContext(file_name="foo", line_number=1337)
-    data_source_name = "My data source"
+    semantic_model_name = "My data source"
 
     issues: List[ValidationIssue] = []
     issues.append(
         ValidationWarning(
             context=DataSourceContext(
                 file_context=file_context,
-                data_source=DataSourceReference(data_source_name=data_source_name),
+                data_source=SemanticModelReference(semantic_model_name=semantic_model_name),
             ),
             message="Something caused a warning, problem #1",
         )
@@ -42,8 +42,8 @@ def list_of_issues() -> List[ValidationIssue]:  # noqa: D
         ValidationWarning(
             context=DataSourceElementContext(
                 file_context=file_context,
-                data_source_element=DataSourceElementReference(
-                    data_source_name=data_source_name, element_name="My dimension"
+                data_source_element=SemanticModelElementReference(
+                    semantic_model_name=semantic_model_name, element_name="My dimension"
                 ),
                 element_type=DataSourceElementType.DIMENSION,
             ),
@@ -54,8 +54,8 @@ def list_of_issues() -> List[ValidationIssue]:  # noqa: D
         ValidationFutureError(
             context=DataSourceElementContext(
                 file_context=file_context,
-                data_source_element=DataSourceElementReference(
-                    data_source_name=data_source_name, element_name="My entity"
+                data_source_element=SemanticModelElementReference(
+                    semantic_model_name=semantic_model_name, element_name="My entity"
                 ),
                 element_type=DataSourceElementType.ENTITY,
             ),
@@ -67,9 +67,9 @@ def list_of_issues() -> List[ValidationIssue]:  # noqa: D
         ValidationError(
             context=DataSourceElementContext(
                 file_context=file_context,
-                data_source_name=data_source_name,
-                data_source_element=DataSourceElementReference(
-                    data_source_name=data_source_name, element_name="My measure"
+                semantic_model_name=semantic_model_name,
+                data_source_element=SemanticModelElementReference(
+                    semantic_model_name=semantic_model_name, element_name="My measure"
                 ),
                 element_type=DataSourceElementType.MEASURE,
             ),

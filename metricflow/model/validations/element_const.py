@@ -2,7 +2,7 @@ from collections import defaultdict
 from typing import List, DefaultDict
 
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from dbt_semantic_interfaces.references import DataSourceReference
+from dbt_semantic_interfaces.references import SemanticModelReference
 from metricflow.model.validations.validator_helpers import (
     DataSourceContext,
     DataSourceElementType,
@@ -37,7 +37,7 @@ class ElementConsistencyRule(ModelValidationRule):
             types_used = [DataSourceElementType(v) for v in sorted(k.value for k in type_to_context.keys())]
             for element_type in types_used:
                 data_source_contexts = type_to_context[element_type]
-                data_source_names = {ctx.data_source.data_source_name for ctx in data_source_contexts}
+                data_source_names = {ctx.data_source.semantic_model_name for ctx in data_source_contexts}
                 data_source_context = data_source_contexts[0]
                 issues.append(
                     ValidationError(
@@ -60,7 +60,7 @@ class ElementConsistencyRule(ModelValidationRule):
         for data_source in model.data_sources:
             data_source_context = DataSourceContext(
                 file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                data_source=DataSourceReference(data_source_name=data_source.name),
+                data_source=SemanticModelReference(semantic_model_name=data_source.name),
             )
             if data_source.measures:
                 for measure in data_source.measures:

@@ -1,4 +1,4 @@
-from dbt_semantic_interfaces.references import DataSourceReference
+from dbt_semantic_interfaces.references import SemanticModelReference
 from metricflow.instances import InstanceSet
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.sql.sql_plan import SqlSelectStatementNode
@@ -9,7 +9,7 @@ class DataSourceDataSet(SqlDataSet):
 
     def __init__(  # noqa: D
         self,
-        data_source_reference: DataSourceReference,
+        data_source_reference: SemanticModelReference,
         instance_set: InstanceSet,
         sql_select_node: SqlSelectStatementNode,
     ) -> None:
@@ -20,5 +20,5 @@ class DataSourceDataSet(SqlDataSet):
         return f"{self.__class__.__name__}({self._data_source_reference})"
 
     @property
-    def data_source_reference(self) -> DataSourceReference:  # noqa: D
+    def data_source_reference(self) -> SemanticModelReference:  # noqa: D
         return self._data_source_reference

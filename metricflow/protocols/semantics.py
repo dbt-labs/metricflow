@@ -17,8 +17,8 @@ from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.metric import Metric
 from dbt_semantic_interfaces.references import (
-    DataSourceElementReference,
-    DataSourceReference,
+    SemanticModelElementReference,
+    SemanticModelReference,
     DimensionReference,
     EntityReference,
     MeasureReference,
@@ -95,24 +95,24 @@ class DataSourceSemanticsAccessor(ABC):
         """Retrieves the aggregate time dimension that is associated with the measure reference"""
 
     @abstractmethod
-    def get_entity_in_data_source(self, ref: DataSourceElementReference) -> Optional[Entity]:
+    def get_entity_in_data_source(self, ref: SemanticModelElementReference) -> Optional[Entity]:
         """Retrieve the entity matching the element -> data source mapping, if any"""
         raise NotImplementedError
 
     @abstractmethod
-    def get_by_reference(self, data_source_reference: DataSourceReference) -> Optional[SemanticModel]:
+    def get_by_reference(self, data_source_reference: SemanticModelReference) -> Optional[SemanticModel]:
         """Retrieve the data source model object matching the input data source reference, if any"""
         raise NotImplementedError
 
     @property
     @abstractmethod
-    def data_source_references(self) -> Sequence[DataSourceReference]:
-        """Return all DataSourceReference objects associated with the data sources in the collection"""
+    def data_source_references(self) -> Sequence[SemanticModelReference]:
+        """Return all SemanticModelReference objects associated with the data sources in the collection"""
         raise NotImplementedError
 
     @abstractmethod
     def get_aggregation_time_dimensions_with_measures(
-        self, data_source_reference: DataSourceReference
+        self, data_source_reference: SemanticModelReference
     ) -> ElementGrouper[TimeDimensionReference, MeasureSpec]:
         """Return all aggregation time dimensions in the given data source with their associated measures"""
         raise NotImplementedError

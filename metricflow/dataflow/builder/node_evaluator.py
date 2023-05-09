@@ -175,7 +175,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                 )
                 if entity_in_right_node is None:
                     raise RuntimeError(
-                        f"Invalid DataSourceElementReference {entity_instance_in_right_node.defined_from[0]}"
+                        f"Invalid SemanticModelElementReference {entity_instance_in_right_node.defined_from[0]}"
                     )
 
                 entity_instance_in_left_node = None

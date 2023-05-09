@@ -113,12 +113,12 @@ class DbtConverter:
         copied_objects = deepcopy(mapped_objects)
 
         # Move dimensions, entities, and measures on to their respective data sources
-        for data_source_name, dimensions_map in copied_objects.dimensions.items():
-            copied_objects.data_sources[data_source_name]["dimensions"] = list(dimensions_map.values())
-        for data_source_name, entities_map in copied_objects.entities.items():
-            copied_objects.data_sources[data_source_name]["entities"] = list(entities_map.values())
-        for data_source_name, measure_map in copied_objects.measures.items():
-            copied_objects.data_sources[data_source_name]["measures"] = list(measure_map.values())
+        for semantic_model_name, dimensions_map in copied_objects.dimensions.items():
+            copied_objects.data_sources[semantic_model_name]["dimensions"] = list(dimensions_map.values())
+        for semantic_model_name, entities_map in copied_objects.entities.items():
+            copied_objects.data_sources[semantic_model_name]["entities"] = list(entities_map.values())
+        for semantic_model_name, measure_map in copied_objects.measures.items():
+            copied_objects.data_sources[semantic_model_name]["measures"] = list(measure_map.values())
 
         issues: List[ValidationIssue] = []
 

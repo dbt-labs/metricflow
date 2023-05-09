@@ -6,7 +6,7 @@ T = TypeVar("T")
 
 class DataSourceContainer(ABC, Generic[T]):  # noqa: D
     @abstractmethod
-    def get(self, data_source_name: str) -> T:  # noqa: D
+    def get(self, semantic_model_name: str) -> T:  # noqa: D
         pass
 
     @abstractmethod

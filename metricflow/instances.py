@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import List, TypeVar, Generic, Tuple
 
-from dbt_semantic_interfaces.references import DataSourceElementReference, MetricModelReference
+from dbt_semantic_interfaces.references import SemanticModelElementReference, MetricModelReference
 from metricflow.aggregation_properties import AggregationState
 from metricflow.column_assoc import ColumnAssociation
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
@@ -56,10 +56,10 @@ class MdoInstance(ABC, Generic[SpecT]):
 @dataclass(frozen=True)
 class DataSourceElementInstance(SerializableDataclass):  # noqa: D
     # This instance is derived from something defined in a data source.
-    defined_from: Tuple[DataSourceElementReference, ...]
+    defined_from: Tuple[SemanticModelElementReference, ...]
 
     @property
-    def origin_data_source_reference(self) -> DataSourceElementReference:
+    def origin_data_source_reference(self) -> SemanticModelElementReference:
         """Property to grab the element reference pointing to the origin data source for this element instance
 
         By convention this is the zeroth element in the Tuple. At this time these tuples are always of exactly
