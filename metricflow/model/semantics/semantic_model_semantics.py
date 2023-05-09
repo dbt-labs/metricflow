@@ -139,7 +139,7 @@ class SemanticModelSemantics(SemanticModelSemanticsAccessor):
         errors = []
 
         if semantic_model.reference in self._semantic_model_reference_to_semantic_model:
-            errors.append(f"Data source {semantic_model.reference} already added.")
+            errors.append(f"Semantic model {semantic_model.reference} already added.")
 
         for measure in semantic_model.measures:
             if measure.reference in self._measure_aggs and self._measure_aggs[measure.reference] != measure.agg:

@@ -42,7 +42,7 @@ class NaturalEntityConfigurationRule(ModelValidationRule):
         if len(natural_entity_names) > 1:
             error = ValidationError(
                 context=context,
-                message=f"Data sources can have at most one natural entity, but semantic model "
+                message=f"Semantic models can have at most one natural entity, but semantic model "
                 f"`{semantic_model.name}` has {len(natural_entity_names)} distinct natural entities set! "
                 f"{natural_entity_names}.",
             )
@@ -51,7 +51,7 @@ class NaturalEntityConfigurationRule(ModelValidationRule):
             error = ValidationError(
                 context=context,
                 message=f"The use of `natural` entities is currently supported only in conjunction with a validity "
-                f"window defined in the set of time dimensions associated with the semantic model. Data source "
+                f"window defined in the set of time dimensions associated with the semantic model. Semantic model "
                 f"`{semantic_model.name}` uses a natural entity ({natural_entity_names}) but does not define a "
                 f"validity window!",
             )
@@ -90,7 +90,7 @@ class OnePrimaryEntityPerSemanticModelRule(ModelValidationRule):
                         file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
                         semantic_model=SemanticModelReference(semantic_model_name=semantic_model.name),
                     ),
-                    message=f"Data sources can have only one primary entity. The semantic model"
+                    message=f"Semantic models can have only one primary entity. The semantic model"
                     f" `{semantic_model.name}` has {len(primary_entity_names)}: {', '.join(primary_entity_names)}",
                     error_date=date(2022, 1, 12),  # Wed January 12th 2022
                 )

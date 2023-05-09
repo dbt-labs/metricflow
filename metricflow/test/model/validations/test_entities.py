@@ -37,7 +37,7 @@ def test_semantic_model_cant_have_more_than_one_primary_entity(
     model_issues = ModelValidator([OnePrimaryEntityPerSemanticModelRule()]).validate_model(model)
 
     future_issue = (
-        f"Data sources can have only one primary entity. The semantic model"
+        f"Semantic models can have only one primary entity. The semantic model"
         f" `{multiple_entity_semantic_model.name}` has {len(entity_references)}"
     )
 

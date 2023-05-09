@@ -110,7 +110,7 @@ class SemanticModelValidityWindowRule(ModelValidationRule):
             semantic_model=SemanticModelReference(semantic_model_name=semantic_model.name),
         )
         requirements = (
-            "Data sources using dimension validity params to define a validity window must have exactly two time "
+            "Semantic models using dimension validity params to define a validity window must have exactly two time "
             "dimensions with validity params specified - one marked `is_start` and the other marked `is_end`."
         )
         validity_param_dimension_names = [dim.name for dim in validity_param_dims]
@@ -127,7 +127,7 @@ class SemanticModelValidityWindowRule(ModelValidationRule):
             error = ValidationError(
                 context=context,
                 message=(
-                    f"Data source {semantic_model.name} has a single validity param dimension that defines its window: "
+                    f"Semantic model {semantic_model.name} has a single validity param dimension that defines its window: "
                     f"`{validity_param_dimension_names[0]}`. This is not a currently supported configuration! "
                     f"{requirements} If you have one column defining a window, as in a daily snapshot table, you can "
                     f"define a separate dimension and increment the time value in the `expr` field as a work-around."
@@ -138,7 +138,7 @@ class SemanticModelValidityWindowRule(ModelValidationRule):
             error = ValidationError(
                 context=context,
                 message=(
-                    f"Data source {semantic_model.name} has {len(validity_param_dims)} dimensions defined with validity "
+                    f"Semantic model {semantic_model.name} has {len(validity_param_dims)} dimensions defined with validity "
                     f"params. They are: {validity_param_dimension_names}. There must be either zero or two! "
                     f"If you wish to define a validity window for this semantic model, please follow these requirements: "
                     f"{requirements}"
@@ -151,7 +151,7 @@ class SemanticModelValidityWindowRule(ModelValidationRule):
             error = ValidationError(
                 context=context,
                 message=(
-                    f"Data source {semantic_model.name} has two validity param dimensions defined, but does not have "
+                    f"Semantic model {semantic_model.name} has two validity param dimensions defined, but does not have "
                     f"exactly one each marked with is_start and is_end! Dimensions: {validity_param_dimension_names}. "
                     f"is_start dimensions: {start_dim_names}. is_end dimensions: {end_dim_names}. {requirements}"
                 ),
@@ -165,7 +165,7 @@ class SemanticModelValidityWindowRule(ModelValidationRule):
             error = ValidationError(
                 context=context,
                 message=(
-                    f"Data source {semantic_model.name} has validity param dimensions defined, but does not have an "
+                    f"Semantic model {semantic_model.name} has validity param dimensions defined, but does not have an "
                     f"entity with type `natural` set. The natural key for this semantic model is what we use to "
                     f"process a validity window join. Primary or unique entities, if any, might be suitable for "
                     f"use as natural keys: ({[entity.name for entity in primary_or_unique_entities]})."
@@ -177,7 +177,7 @@ class SemanticModelValidityWindowRule(ModelValidationRule):
             error = ValidationError(
                 context=context,
                 message=(
-                    f"Data source {semantic_model.name} has validity param dimensions defined and also has one or more "
+                    f"Semantic model {semantic_model.name} has validity param dimensions defined and also has one or more "
                     f"entities designated as `primary` or `unique`. This is not yet supported, as we do not "
                     f"currently process joins against these key types for semantic models with validity windows "
                     f"specified."
@@ -191,7 +191,7 @@ class SemanticModelValidityWindowRule(ModelValidationRule):
             error = ValidationError(
                 context=context,
                 message=(
-                    f"Data source {semantic_model.name} has both measures and validity param dimensions defined. This "
+                    f"Semantic model {semantic_model.name} has both measures and validity param dimensions defined. This "
                     f"is not currently supported! Please remove either the measures or the validity params. "
                     f"Measure names: {measure_names}. Validity param dimension names: "
                     f"{validity_param_dimension_names}."

@@ -63,11 +63,11 @@ def test_for_breaking_model_changes(dbt_metrics: Tuple[MetricNode, ...]) -> None
             ), f"Failed to create semantic model `{dbt_metric.model.name}` from dbt metric `{dbt_metric.name}`"
             assert (
                 mf_semantic_model.node_relation is not None
-            ), f"Data source `{mf_semantic_model.name}` created from dbt metric `{dbt_metric.name}` is missing an `node_relation`"
+            ), f"Semantic model `{mf_semantic_model.name}` created from dbt metric `{dbt_metric.name}` is missing an `node_relation`"
             if dbt_metric.model.description is not None:
                 assert (
                     mf_semantic_model.description is not None
-                ), f"Data source `{mf_semantic_model.name}` created from dbt metric `{dbt_metric.name}` is missing a `description`"
+                ), f"Semantic model `{mf_semantic_model.name}` created from dbt metric `{dbt_metric.name}` is missing a `description`"
 
             # Ensure dimensions were created
             if dbt_metric.dimensions is not None or dbt_metric.timestamp is not None or dbt_metric.filters is not None:

@@ -35,8 +35,8 @@ logger = logging.getLogger(__name__)
 
 VERSION_KEY = "mf_config_schema"
 METRIC_TYPE = "metric"
-DATA_SOURCE_TYPE = "semantic_model"
-DOCUMENT_TYPES = [METRIC_TYPE, DATA_SOURCE_TYPE]
+SEMANTIC_MODEL_TYPE = "semantic_model"
+DOCUMENT_TYPES = [METRIC_TYPE, SEMANTIC_MODEL_TYPE]
 
 
 @dataclass(frozen=True)
@@ -303,7 +303,7 @@ def parse_config_yaml(
                 if document_type == METRIC_TYPE:
                     metric_validator.validate(config_document[document_type])
                     results.append(metric_class.parse_obj(object_cfg))
-                elif document_type == DATA_SOURCE_TYPE:
+                elif document_type == SEMANTIC_MODEL_TYPE:
                     semantic_model_validator.validate(config_document[document_type])
                     results.append(semantic_model_class.parse_obj(object_cfg))
                 else:
