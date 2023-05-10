@@ -1341,6 +1341,19 @@ def test_measure_constraint_with_reused_measure(  # noqa: D
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="instant_booking_value"),),
             time_dimension_specs=(MTD_SPEC_DAY,),
+            where_constraint=SpecWhereClauseConstraint(
+                where_condition="is_instant",
+                linkable_names=("is_instant",),
+                linkable_spec_set=LinkableSpecSet(
+                    dimension_specs=(
+                        DimensionSpec(
+                            element_name="is_instant",
+                            entity_links=(),
+                        ),
+                    )
+                ),
+                execution_parameters=SqlBindParameters(),
+            ),
         )
     )
 
