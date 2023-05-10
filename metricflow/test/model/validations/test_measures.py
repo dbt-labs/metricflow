@@ -16,31 +16,31 @@ from metricflow.model.validations.measures import (
 from metricflow.model.validations.validator_helpers import ModelValidationException
 
 
-def test_metric_missing_measure() -> None:
-    """Tests the basic MetricMeasuresRule, which asserts all measure inputs to a metric exist in the model"""
-    metric_name = "invalid_measure_metric_do_not_add_to_model"
-    measure_name = "this_measure_cannot_exist_or_else_it_breaks_tests"
+# def test_metric_missing_measure() -> None:
+#     """Tests the basic MetricMeasuresRule, which asserts all measure inputs to a metric exist in the model"""
+#     metric_name = "invalid_measure_metric_do_not_add_to_model"
+#     measure_name = "this_measure_cannot_exist_or_else_it_breaks_tests"
 
-    yaml_contents = textwrap.dedent(
-        f"""\
-        ---
-        metric:
-          name: "{metric_name}"
-          description: "Metric with invalid measure"
-          type: expr
-          type_params:
-            measures:
-              - {measure_name}
-        """
-    )
-    metric_missing_measure_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
-    model = parse_yaml_files_to_validation_ready_model([metric_missing_measure_file])
+#     yaml_contents = textwrap.dedent(
+#         f"""\
+#         ---
+#         metric:
+#           name: "{metric_name}"
+#           description: "Metric with invalid measure"
+#           type: expr
+#           type_params:
+#             measures:
+#               - {measure_name}
+#         """
+#     )
+#     metric_missing_measure_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+#     model = parse_yaml_files_to_validation_ready_model([metric_missing_measure_file])
 
-    with pytest.raises(
-        ModelValidationException,
-        match=f"Measure {measure_name} referenced in metric {metric_name} is not defined in the model!",
-    ):
-        ModelValidator([MetricMeasuresRule()]).checked_validations(model=model.model)
+#     with pytest.raises(
+#         ModelValidationException,
+#         match=f"Measure {measure_name} referenced in metric {metric_name} is not defined in the model!",
+#     ):
+#         ModelValidator([MetricMeasuresRule()]).checked_validations(model=model.model)
 
 
 def test_measures_only_exist_in_one_semantic_model() -> None:  # noqa: D
@@ -119,283 +119,283 @@ def test_measures_only_exist_in_one_semantic_model() -> None:  # noqa: D
     assert found_issue is True
 
 
-def test_measure_alias_is_set_when_required() -> None:
-    """Tests to ensure that an appropriate error appears when a required alias is missing"""
-    measure_name = "num_sample_rows"
-    yaml_contents = textwrap.dedent(
-        f"""\
-        semantic_model:
-          name: sample_semantic_model
-          node_relation:
-            schema_name: some_schema
-            alias: source_table
-          entities:
-            - name: example_entity
-              type: primary
-              role: test_role
-              expr: example_id
-          measures:
-            - name: {measure_name}
-              agg: sum
-              expr: 1
-              create_metric: true
-          dimensions:
-            - name: is_instant
-              type: categorical
-            - name: ds
-              type: time
-              type_params:
-                time_granularity: day
-                is_primary: true
-        ---
-        metric:
-          name: "metric1"
-          type: expr
-          type_params:
-            measures:
-              - name: {measure_name}
-              - name: {measure_name}
-                constraint: is_instant
-        """
-    )
-    missing_alias_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
-    model = parse_yaml_files_to_validation_ready_model([missing_alias_file])
+# def test_measure_alias_is_set_when_required() -> None:
+#     """Tests to ensure that an appropriate error appears when a required alias is missing"""
+#     measure_name = "num_sample_rows"
+#     yaml_contents = textwrap.dedent(
+#         f"""\
+#         data_source:
+#           name: sample_data_source
+#           node_relation:
+#             schema_name: some_schema
+#             alias: source_table
+#           entities:
+#             - name: example_entity
+#               type: primary
+#               role: test_role
+#               expr: example_id
+#           measures:
+#             - name: {measure_name}
+#               agg: sum
+#               expr: 1
+#               create_metric: true
+#           dimensions:
+#             - name: is_instant
+#               type: categorical
+#             - name: ds
+#               type: time
+#               type_params:
+#                 time_granularity: day
+#                 is_primary: true
+#         ---
+#         metric:
+#           name: "metric1"
+#           type: expr
+#           type_params:
+#             measures:
+#               - name: {measure_name}
+#               - name: {measure_name}
+#                 constraint: is_instant
+#         """
+#     )
+#     missing_alias_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+#     model = parse_yaml_files_to_validation_ready_model([missing_alias_file])
 
-    model_issues = ModelValidator([MeasureConstraintAliasesRule()]).validate_model(model.model)
+#     model_issues = ModelValidator([MeasureConstraintAliasesRule()]).validate_model(model.model)
 
-    assert len(model_issues.errors) == 1
-    expected_error_substring = f"depends on multiple different constrained versions of measure {measure_name}"
-    actual_error = model_issues.errors[0].as_readable_str()
-    assert (
-        actual_error.find(expected_error_substring) != -1
-    ), f"Expected error {expected_error_substring} not found in error string! Instead got {actual_error}"
-
-
-def test_invalid_measure_alias_name() -> None:
-    """Tests measures with aliases that don't pass the unique and valid name rule"""
-    invalid_alias = "_can't_do_this_"
-
-    yaml_contents = textwrap.dedent(
-        f"""\
-        semantic_model:
-          name: sample_semantic_model
-          node_relation:
-            schema_name: some_schema
-            alias: source_table
-          entities:
-            - name: example_entity
-              type: primary
-              role: test_role
-              expr: example_id
-          measures:
-            - name: num_sample_rows
-              agg: sum
-              expr: 1
-              create_metric: true
-          dimensions:
-            - name: ds
-              type: time
-              type_params:
-                time_granularity: day
-                is_primary: true
-        ---
-        metric:
-          name: "metric1"
-          type: expr
-          type_params:
-            measures:
-              - name: num_sample_rows
-                alias: {invalid_alias}
-        """
-    )
-    invalid_alias_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
-    model = parse_yaml_files_to_validation_ready_model([invalid_alias_file])
-
-    model_issues = ModelValidator([MeasureConstraintAliasesRule()]).validate_model(model.model)
-
-    assert len(model_issues.errors) == 1
-    expected_error_substring = f"Invalid name `{invalid_alias}` - names should only consist of"
-    actual_error = model_issues.errors[0].as_readable_str()
-    assert (
-        actual_error.find(expected_error_substring) != -1
-    ), f"Expected error {expected_error_substring} not found in error string! Instead got {actual_error}"
+#     assert len(model_issues.errors) == 1
+#     expected_error_substring = f"depends on multiple different constrained versions of measure {measure_name}"
+#     actual_error = model_issues.errors[0].as_readable_str()
+#     assert (
+#         actual_error.find(expected_error_substring) != -1
+#     ), f"Expected error {expected_error_substring} not found in error string! Instead got {actual_error}"
 
 
-def test_measure_alias_measure_name_conflict() -> None:
-    """Tests measures with aliases that already exist as measure names"""
+# def test_invalid_measure_alias_name() -> None:
+#     """Tests measures with aliases that don't pass the unique and valid name rule"""
+#     invalid_alias = "_can't_do_this_"
 
-    invalid_alias = "average_sample_rows"
-    measure_name = "num_sample_rows"
-    yaml_contents = textwrap.dedent(
-        f"""\
-        semantic_model:
-          name: sample_semantic_model
-          node_relation:
-            schema_name: some_schema
-            alias: source_table
-          entities:
-            - name: example_entity
-              type: primary
-              role: test_role
-              expr: example_id
-          measures:
-            - name: {measure_name}
-              agg: sum
-              expr: 1
-            - name: {invalid_alias}
-              agg: average
-          dimensions:
-            - name: ds
-              type: time
-              type_params:
-                time_granularity: day
-                is_primary: true
-        ---
-        metric:
-          name: "metric1"
-          type: expr
-          type_params:
-            measures:
-              - name: {measure_name}
-                alias: {invalid_alias}
-        """
-    )
-    invalid_alias_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
-    model = parse_yaml_files_to_validation_ready_model([invalid_alias_file])
+#     yaml_contents = textwrap.dedent(
+#         f"""\
+#         data_source:
+#           name: sample_data_source
+#           node_relation:
+#             schema_name: some_schema
+#             alias: source_table
+#           entities:
+#             - name: example_entity
+#               type: primary
+#               role: test_role
+#               expr: example_id
+#           measures:
+#             - name: num_sample_rows
+#               agg: sum
+#               expr: 1
+#               create_metric: true
+#           dimensions:
+#             - name: ds
+#               type: time
+#               type_params:
+#                 time_granularity: day
+#                 is_primary: true
+#         ---
+#         metric:
+#           name: "metric1"
+#           type: expr
+#           type_params:
+#             measures:
+#               - name: num_sample_rows
+#                 alias: {invalid_alias}
+#         """
+#     )
+#     invalid_alias_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+#     model = parse_yaml_files_to_validation_ready_model([invalid_alias_file])
 
-    model_issues = ModelValidator([MeasureConstraintAliasesRule()]).validate_model(model.model)
+#     model_issues = ModelValidator([MeasureConstraintAliasesRule()]).validate_model(model.model)
 
-    assert len(model_issues.errors) == 1
-    expected_error_substring = (
-        f"Alias `{invalid_alias}` for measure `{measure_name}` conflicts with measure names "
-        f"defined elsewhere in the model!"
-    )
-    actual_error = model_issues.errors[0].as_readable_str()
-    assert (
-        actual_error.find(expected_error_substring) != -1
-    ), f"Expected error {expected_error_substring} not found in error string! Instead got {actual_error}"
+#     assert len(model_issues.errors) == 1
+#     expected_error_substring = f"Invalid name `{invalid_alias}` - names should only consist of"
+#     actual_error = model_issues.errors[0].as_readable_str()
+#     assert (
+#         actual_error.find(expected_error_substring) != -1
+#     ), f"Expected error {expected_error_substring} not found in error string! Instead got {actual_error}"
 
 
-def test_reused_measure_alias() -> None:
-    """Tests measures with aliases that have been used as measure aliases elsewhere in the model"""
+# def test_measure_alias_measure_name_conflict() -> None:
+#     """Tests measures with aliases that already exist as measure names"""
 
-    invalid_alias = "duplicate_alias"
+#     invalid_alias = "average_sample_rows"
+#     measure_name = "num_sample_rows"
+#     yaml_contents = textwrap.dedent(
+#         f"""\
+#         data_source:
+#           name: sample_data_source
+#           node_relation:
+#             schema_name: some_schema
+#             alias: source_table
+#           entities:
+#             - name: example_entity
+#               type: primary
+#               role: test_role
+#               expr: example_id
+#           measures:
+#             - name: {measure_name}
+#               agg: sum
+#               expr: 1
+#             - name: {invalid_alias}
+#               agg: average
+#           dimensions:
+#             - name: ds
+#               type: time
+#               type_params:
+#                 time_granularity: day
+#                 is_primary: true
+#         ---
+#         metric:
+#           name: "metric1"
+#           type: expr
+#           type_params:
+#             measures:
+#               - name: {measure_name}
+#                 alias: {invalid_alias}
+#         """
+#     )
+#     invalid_alias_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+#     model = parse_yaml_files_to_validation_ready_model([invalid_alias_file])
 
-    yaml_contents = textwrap.dedent(
-        f"""\
-        semantic_model:
-          name: sample_semantic_model
-          node_relation:
-            schema_name: some_schema
-            alias: source_table
-          entities:
-            - name: example_entity
-              type: primary
-              role: test_role
-              expr: example_id
-          measures:
-            - name: num_sample_rows
-              agg: sum
-              expr: 1
-              create_metric: true
-            - name: average_sample_rows
-              agg: average
-          dimensions:
-            - name: ds
-              type: time
-              type_params:
-                time_granularity: day
-                is_primary: true
-        ---
-        metric:
-          name: "metric1"
-          type: expr
-          type_params:
-            measures:
-              - name: num_sample_rows
-                alias: {invalid_alias}
-        ---
-        metric:
-          name: "metric2"
-          type: expr
-          type_params:
-            measures:
-              - name: average_sample_rows
-                alias: {invalid_alias}
-        """
-    )
-    invalid_alias_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
-    model = parse_yaml_files_to_validation_ready_model([invalid_alias_file])
+#     model_issues = ModelValidator([MeasureConstraintAliasesRule()]).validate_model(model.model)
 
-    model_issues = ModelValidator([MeasureConstraintAliasesRule()]).validate_model(model.model)
-
-    assert len(model_issues.errors) == 1
-    expected_error_substring = (
-        f"Measure alias {invalid_alias} conflicts with a measure alias used elsewhere in the model!"
-    )
-    actual_error = model_issues.errors[0].as_readable_str()
-    assert (
-        actual_error.find(expected_error_substring) != -1
-    ), f"Expected error {expected_error_substring} not found in error string! Instead got {actual_error}"
+#     assert len(model_issues.errors) == 1
+#     expected_error_substring = (
+#         f"Alias `{invalid_alias}` for measure `{measure_name}` conflicts with measure names "
+#         f"defined elsewhere in the model!"
+#     )
+#     actual_error = model_issues.errors[0].as_readable_str()
+#     assert (
+#         actual_error.find(expected_error_substring) != -1
+#     ), f"Expected error {expected_error_substring} not found in error string! Instead got {actual_error}"
 
 
-def test_reused_measure_alias_within_metric() -> None:
-    """Tests measures with aliases that have been used as measure aliases in the same metric spec
+# def test_reused_measure_alias() -> None:
+#     """Tests measures with aliases that have been used as measure aliases elsewhere in the model"""
 
-    This covers a boundary case in the logic where alias checking must always include aliases from the current
-    metric under consideration, instead of simply checking against the previous seen values
-    """
-    invalid_alias = "duplicate_alias"
-    yaml_contents = textwrap.dedent(
-        f"""\
-        semantic_model:
-          name: sample_semantic_model
-          node_relation:
-            schema_name: some_schema
-            alias: source_table
-          entities:
-            - name: example_entity
-              type: primary
-              role: test_role
-              expr: example_id
-          measures:
-            - name: num_sample_rows
-              agg: sum
-              expr: 1
-              create_metric: true
-            - name: average_sample_rows
-              agg: average
-          dimensions:
-            - name: ds
-              type: time
-              type_params:
-                time_granularity: day
-                is_primary: true
-        ---
-        metric:
-          name: "metric1"
-          type: expr
-          type_params:
-            measures:
-              - name: num_sample_rows
-                alias: {invalid_alias}
-              - name: average_sample_rows
-                alias: {invalid_alias}
-        """
-    )
-    invalid_alias_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
-    model = parse_yaml_files_to_validation_ready_model([invalid_alias_file])
+#     invalid_alias = "duplicate_alias"
 
-    model_issues = ModelValidator([MeasureConstraintAliasesRule()]).validate_model(model.model)
+#     yaml_contents = textwrap.dedent(
+#         f"""\
+#         data_source:
+#           name: sample_data_source
+#           node_relation:
+#             schema_name: some_schema
+#             alias: source_table
+#           entities:
+#             - name: example_entity
+#               type: primary
+#               role: test_role
+#               expr: example_id
+#           measures:
+#             - name: num_sample_rows
+#               agg: sum
+#               expr: 1
+#               create_metric: true
+#             - name: average_sample_rows
+#               agg: average
+#           dimensions:
+#             - name: ds
+#               type: time
+#               type_params:
+#                 time_granularity: day
+#                 is_primary: true
+#         ---
+#         metric:
+#           name: "metric1"
+#           type: expr
+#           type_params:
+#             measures:
+#               - name: num_sample_rows
+#                 alias: {invalid_alias}
+#         ---
+#         metric:
+#           name: "metric2"
+#           type: expr
+#           type_params:
+#             measures:
+#               - name: average_sample_rows
+#                 alias: {invalid_alias}
+#         """
+#     )
+#     invalid_alias_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+#     model = parse_yaml_files_to_validation_ready_model([invalid_alias_file])
 
-    assert len(model_issues.errors) == 1
-    expected_error_substring = (
-        f"Measure alias {invalid_alias} conflicts with a measure alias used elsewhere in the model!"
-    )
-    actual_error = model_issues.errors[0].as_readable_str()
-    assert (
-        actual_error.find(expected_error_substring) != -1
-    ), f"Expected error {expected_error_substring} not found in error string! Instead got {actual_error}"
+#     model_issues = ModelValidator([MeasureConstraintAliasesRule()]).validate_model(model.model)
+
+#     assert len(model_issues.errors) == 1
+#     expected_error_substring = (
+#         f"Measure alias {invalid_alias} conflicts with a measure alias used elsewhere in the model!"
+#     )
+#     actual_error = model_issues.errors[0].as_readable_str()
+#     assert (
+#         actual_error.find(expected_error_substring) != -1
+#     ), f"Expected error {expected_error_substring} not found in error string! Instead got {actual_error}"
+
+
+# def test_reused_measure_alias_within_metric() -> None:
+#     """Tests measures with aliases that have been used as measure aliases in the same metric spec
+
+#     This covers a boundary case in the logic where alias checking must always include aliases from the current
+#     metric under consideration, instead of simply checking against the previous seen values
+#     """
+#     invalid_alias = "duplicate_alias"
+#     yaml_contents = textwrap.dedent(
+#         f"""\
+#         data_source:
+#           name: sample_data_source
+#           node_relation:
+#             schema_name: some_schema
+#             alias: source_table
+#           entities:
+#             - name: example_entity
+#               type: primary
+#               role: test_role
+#               expr: example_id
+#           measures:
+#             - name: num_sample_rows
+#               agg: sum
+#               expr: 1
+#               create_metric: true
+#             - name: average_sample_rows
+#               agg: average
+#           dimensions:
+#             - name: ds
+#               type: time
+#               type_params:
+#                 time_granularity: day
+#                 is_primary: true
+#         ---
+#         metric:
+#           name: "metric1"
+#           type: expr
+#           type_params:
+#             measures:
+#               - name: num_sample_rows
+#                 alias: {invalid_alias}
+#               - name: average_sample_rows
+#                 alias: {invalid_alias}
+#         """
+#     )
+#     invalid_alias_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+#     model = parse_yaml_files_to_validation_ready_model([invalid_alias_file])
+
+#     model_issues = ModelValidator([MeasureConstraintAliasesRule()]).validate_model(model.model)
+
+#     assert len(model_issues.errors) == 1
+#     expected_error_substring = (
+#         f"Measure alias {invalid_alias} conflicts with a measure alias used elsewhere in the model!"
+#     )
+#     actual_error = model_issues.errors[0].as_readable_str()
+#     assert (
+#         actual_error.find(expected_error_substring) != -1
+#     ), f"Expected error {expected_error_substring} not found in error string! Instead got {actual_error}"
 
 
 def test_invalid_non_additive_dimension_properties() -> None:

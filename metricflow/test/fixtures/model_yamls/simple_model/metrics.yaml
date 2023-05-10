@@ -197,32 +197,32 @@ metric:
 ---
 metric:
   name: booking_fees
-  description: Booking value multiplied by constant - simple expr metric test
-  type: expr
+  description: Booking value multiplied by constant - simple derived metric test
+  type: derived
   type_params:
     expr: "booking_value * 0.05"
-    measures:
-      - booking_value
+    metrics:
+      - name: booking_value
 ---
 metric:
   name: booking_fees_per_booker
-  description: booking_fees divided by bookers - single source multi measure expr test
-  type: expr
+  description: booking_fees divided by bookers - single source multi measure derived test
+  type: derived
   type_params:
     expr: "booking_value * 0.05 / bookers"
-    measures:
-      - booking_value
-      - bookers
+    metrics:
+      - name: booking_value
+      - name: bookers
 ---
 metric:
   name: views_times_booking_value
   description: Booking_value multiplied by views - expr metric test
-  type: expr
+  type: derived
   type_params:
     expr: "booking_value * views"
-    measures:
-      - booking_value
-      - views
+    metrics:
+      - name: booking_value
+      - name: views
 ---
 metric:
   name: "total_account_balance_first_day"
@@ -243,12 +243,12 @@ metric:
 metric:
   name: lux_booking_value_rate_expr
   description: |
-    Lux booking value defined as an expr with lux booking value, lux bookings, and total value as inputs.
-    Tests constrained measure expr metric with external dimension join.
-  type: expr
+    Lux booking value defined as an derived metric with lux booking value, lux bookings, and total value as inputs.
+    Tests constrained measure derived metric with external dimension join.
+  type: derived
   type_params:
     expr: "average_booking_value * bookings / NULLIF(booking_value, 0)"
-    measures:
+    metrics:
       - name: average_booking_value
         constraint: listing__is_lux_latest
       - name: bookings
@@ -259,10 +259,10 @@ metric:
   name: double_counted_delayed_bookings
   description: |
     Minimal repro case for an expr with a single constrained and aliased measure as input.
-  type: expr
+  type: derived
   type_params:
     expr: delayed_bookings * 2
-    measures:
+    metrics:
       - name: bookings
         constraint: NOT is_instant
         alias: delayed_bookings

@@ -92,17 +92,17 @@ def test_metric_metadata_parsing() -> None:
     assert metric.metadata.file_slice.content == expected_metadata_content
 
 
-def test_expr_metric_parsing() -> None:
-    """Test for parsing a metric specification with an expr and a list of measures"""
+def test_derived_metric_parsing() -> None:
+    """Test for parsing a metric specification with a derived metric and a list of measures"""
     yaml_contents = textwrap.dedent(
         """\
         metric:
-          name: expr_test
-          type: expr
+          name: derived_test
+          type: derived
           type_params:
-            measures:
-              - measure_one
-              - measure_two
+            metrics:
+              - name: metric_one
+              - name: metric_two
         """
     )
     file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
@@ -111,26 +111,26 @@ def test_expr_metric_parsing() -> None:
 
     assert len(build_result.model.metrics) == 1
     metric = build_result.model.metrics[0]
-    assert metric.name == "expr_test"
-    assert metric.type is MetricType.EXPR
-    assert metric.type_params.measures == [
-        MetricInputMeasure(name="measure_one"),
-        MetricInputMeasure(name="measure_two"),
+    assert metric.name == "derived_test"
+    assert metric.type is MetricType.DERIVED
+    assert metric.type_params.metrics == [
+        MetricInputMeasure(name="metric_one"),
+        MetricInputMeasure(name="metric_two"),
     ]
 
 
-def test_expr_metric_input_measure_object_parsing() -> None:
+def test_derived_metric_input_measure_object_parsing() -> None:
     """Test for parsing a metric specification with object inputs for the list of measures"""
     yaml_contents = textwrap.dedent(
         """\
         metric:
-          name: expr_test
-          type: expr
+          name: derived_test
+          type: derived
           type_params:
-            measures:
-              - name: measure_one_from_object
+            metrics:
+              - name: metric_one_from_object
                 constraint: some_bool
-              - name: measure_two_from_object
+              - name: metric_two_from_object
         """
     )
     file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
@@ -139,11 +139,11 @@ def test_expr_metric_input_measure_object_parsing() -> None:
 
     assert len(build_result.model.metrics) == 1
     metric = build_result.model.metrics[0]
-    assert metric.name == "expr_test"
-    assert metric.type is MetricType.EXPR
-    assert metric.type_params.measures == [
+    assert metric.name == "derived_test"
+    assert metric.type is MetricType.DERIVED
+    assert metric.type_params.metrics == [
         MetricInputMeasure(
-            name="measure_one_from_object",
+            name="metric_one_from_object",
             constraint=WhereClauseConstraint(
                 where="some_bool", linkable_names=["some_bool"], sql_params=SqlBindParameters()
             ),

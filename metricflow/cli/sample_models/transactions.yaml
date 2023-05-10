@@ -46,11 +46,13 @@ semantic_model:
                    cancelled.
       expr: CASE WHEN transaction_type_name = 'cancellation' THEN transaction_amount_usd ELSE 0 END
       agg: SUM
+      create_metric: true
     - name: alterations_usd
       description: The total USD value of the transactions that were 
                    altered.
       expr: CASE WHEN transaction_type_name = 'alteration' THEN transaction_amount_usd ELSE 0 END
       agg: SUM
+      create_metric: true
     - name: transacting_customers
       description: The distinct count of customers transacting on any given day.
       expr: id_customer
@@ -88,7 +90,7 @@ metric:
   name: revenue_usd
   owners:
     - support@transformdata.io
-  type: expr 
+  type: derived 
   type_params:
     expr: transaction_amount_usd - cancellations_usd + alterations_usd
     measures:
