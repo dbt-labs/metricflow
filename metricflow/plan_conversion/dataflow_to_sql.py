@@ -86,7 +86,6 @@ from metricflow.sql.sql_exprs import (
     SqlColumnReference,
     SqlStringExpression,
     SqlCastToTimestampExpression,
-    SqlRatioComputationExpression,
     SqlDateTruncExpression,
     SqlStringLiteralExpression,
     SqlBetweenExpression,
@@ -643,34 +642,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             metric = self._metric_semantics.get_metric(metric_spec.as_reference)
 
             metric_expr: Optional[SqlExpressionNode] = None
-            if metric.type is MetricType.RATIO:
-                numerator = metric.type_params.numerator
-                denominator = metric.type_params.denominator
-                assert (
-                    numerator is not None and denominator is not None
-                ), "Missing numerator or denominator for ratio metric, this should have been caught in validation!"
-                numerator_column_name = self._column_association_resolver.resolve_measure_spec(
-                    MeasureSpec(element_name=numerator.post_aggregation_measure_reference.element_name)
-                ).column_name
-                denominator_column_name = self._column_association_resolver.resolve_measure_spec(
-                    MeasureSpec(element_name=denominator.post_aggregation_measure_reference.element_name)
-                ).column_name
-
-                metric_expr = SqlRatioComputationExpression(
-                    numerator=SqlColumnReferenceExpression(
-                        SqlColumnReference(
-                            table_alias=from_data_set_alias,
-                            column_name=numerator_column_name,
-                        )
-                    ),
-                    denominator=SqlColumnReferenceExpression(
-                        SqlColumnReference(
-                            table_alias=from_data_set_alias,
-                            column_name=denominator_column_name,
-                        )
-                    ),
-                )
-            elif metric.type is MetricType.MEASURE_PROXY:
+            if metric.type is MetricType.MEASURE_PROXY:
                 if len(metric.input_measures) > 0:
                     assert (
                         len(metric.input_measures) == 1

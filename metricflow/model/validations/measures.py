@@ -61,65 +61,65 @@ class MeasureConstraintAliasesRule(ModelValidationRule):
     These are, currently, only applicable for Metric types, since the MetricInputMeasure is only
     """
 
-    @staticmethod
-    @validate_safely(whats_being_done="ensuring measures aliases are set when required")
-    def _validate_required_aliases_are_set(metric: Metric, metric_context: MetricContext) -> List[ValidationIssue]:
-        """Checks if valid aliases are set on the input measure references where they are required
+    # @staticmethod
+    # @validate_safely(whats_being_done="ensuring measures aliases are set when required")
+    # def _validate_required_aliases_are_set(metric: Metric, metric_context: MetricContext) -> List[ValidationIssue]:
+    #     """Checks if valid aliases are set on the input measure references where they are required
 
-        Aliases are required whenever there are 2 or more input measures with the same measure
-        reference with different constraints. When this happens, we require aliases for all
-        constrained measures for the sake of clarity. Any unconstrained measure does not
-        need an alias, since it always relies on the original measure specification.
+    #     Aliases are required whenever there are 2 or more input measures with the same measure
+    #     reference with different constraints. When this happens, we require aliases for all
+    #     constrained measures for the sake of clarity. Any unconstrained measure does not
+    #     need an alias, since it always relies on the original measure specification.
 
-        At this time aliases are required for ratio metrics, but eventually we could relax that requirement
-        if we can find an automatic aliasing scheme for numerator/denominator that we feel comfortable using.
-        """
-        issues: List[ValidationIssue] = []
+    #     At this time aliases are required for ratio metrics, but eventually we could relax that requirement
+    #     if we can find an automatic aliasing scheme for numerator/denominator that we feel comfortable using.
+    #     """
+    #     issues: List[ValidationIssue] = []
 
-        if len(metric.measure_references) == len(set(metric.measure_references)):
-            # All measure references are unique, so disambiguation via aliasing is not necessary
-            return issues
+    #     if len(metric.measure_references) == len(set(metric.measure_references)):
+    #         # All measure references are unique, so disambiguation via aliasing is not necessary
+    #         return issues
 
-        # Note: more_itertools.bucket does not produce empty groups
-        input_measures_by_name = bucket(metric.input_measures, lambda x: x.name)
-        for name in input_measures_by_name:
-            input_measures = list(input_measures_by_name[name])
+    #     # Note: more_itertools.bucket does not produce empty groups
+    #     input_measures_by_name = bucket(metric.input_measures, lambda x: x.name)
+    #     for name in input_measures_by_name:
+    #         input_measures = list(input_measures_by_name[name])
 
-            if len(input_measures) == 1:
-                continue
+    #         if len(input_measures) == 1:
+    #             continue
 
-            distinct_input_measures = set(input_measures)
-            if len(distinct_input_measures) == 1:
-                # Warn whenever multiple identical references exist - we will consolidate these but it might be
-                # a meaningful oversight if constraints and aliases are specified
-                issues.append(
-                    ValidationWarning(
-                        context=metric_context,
-                        message=(
-                            f"Metric {metric.name} has multiple identical input measures specifications for measure "
-                            f"{name}. This might be hiding a semantic error. Input measure specification: "
-                            f"{input_measures[0]}."
-                        ),
-                    )
-                )
-                continue
+    #         distinct_input_measures = set(input_measures)
+    #         if len(distinct_input_measures) == 1:
+    #             # Warn whenever multiple identical references exist - we will consolidate these but it might be
+    #             # a meaningful oversight if constraints and aliases are specified
+    #             issues.append(
+    #                 ValidationWarning(
+    #                     context=metric_context,
+    #                     message=(
+    #                         f"Metric {metric.name} has multiple identical input measures specifications for measure "
+    #                         f"{name}. This might be hiding a semantic error. Input measure specification: "
+    #                         f"{input_measures[0]}."
+    #                     ),
+    #                 )
+    #             )
+    #             continue
 
-            constrained_measures_without_aliases = [
-                measure for measure in input_measures if measure.constraint is not None and measure.alias is None
-            ]
-            if constrained_measures_without_aliases:
-                issues.append(
-                    ValidationError(
-                        context=metric_context,
-                        message=(
-                            f"Metric {metric.name} depends on multiple different constrained versions of measure "
-                            f"{name}. In such cases, aliases must be provided, but the following input measures have "
-                            f"constraints specified without an alias: {constrained_measures_without_aliases}."
-                        ),
-                    )
-                )
+    #         constrained_measures_without_aliases = [
+    #             measure for measure in input_measures if measure.constraint is not None and measure.alias is None
+    #         ]
+    #         if constrained_measures_without_aliases:
+    #             issues.append(
+    #                 ValidationError(
+    #                     context=metric_context,
+    #                     message=(
+    #                         f"Metric {metric.name} depends on multiple different constrained versions of measure "
+    #                         f"{name}. In such cases, aliases must be provided, but the following input measures have "
+    #                         f"constraints specified without an alias: {constrained_measures_without_aliases}."
+    #                     ),
+    #                 )
+    #             )
 
-        return issues
+    #     return issues
 
     @staticmethod
     @validate_safely(whats_being_done="checking constrained measures are aliased properly")

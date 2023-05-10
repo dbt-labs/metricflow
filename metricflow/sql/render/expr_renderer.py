@@ -27,7 +27,6 @@ from metricflow.sql.sql_exprs import (
     SqlCastToTimestampExpression,
     SqlDateTruncExpression,
     SqlTimeDeltaExpression,
-    SqlRatioComputationExpression,
     SqlColumnAliasReferenceExpression,
     SqlBetweenExpression,
     SqlWindowFunctionExpression,
@@ -254,27 +253,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
             execution_parameters=arg_rendered.execution_parameters,
         )
 
-    def visit_ratio_computation_expr(self, node: SqlRatioComputationExpression) -> SqlExpressionRenderResult:
-        """Render the ratio computation for a ratio metric
-
-        This requires both a type cast to a floating point type (default to DOUBLE, engine-permitting) and
-        the requisite division between numerator and denominator
-        """
-        rendered_numerator = self.render_sql_expr(node.numerator)
-        rendered_denominator = self.render_sql_expr(node.denominator)
-
-        numerator_sql = f"CAST({rendered_numerator.sql} AS {self.double_data_type})"
-        denominator_sql = f"CAST(NULLIF({rendered_denominator.sql}, 0) AS {self.double_data_type})"
-
-        execution_parameters = SqlBindParameters()
-        execution_parameters = execution_parameters.combine(rendered_numerator.execution_parameters)
-        execution_parameters = execution_parameters.combine(rendered_denominator.execution_parameters)
-
-        return SqlExpressionRenderResult(
-            sql=f"{numerator_sql} / {denominator_sql}",
-            execution_parameters=execution_parameters,
-        )
-
+    
     def visit_between_expr(self, node: SqlBetweenExpression) -> SqlExpressionRenderResult:  # noqa: D
         rendered_column_arg = self.render_sql_expr(node.column_arg)
         rendered_start_expr = self.render_sql_expr(node.start_expr)

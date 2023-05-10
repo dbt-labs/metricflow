@@ -23,7 +23,6 @@ from metricflow.dag.id_generation import (
     SQL_EXPR_STRING_LITERAL_PREFIX,
     SQL_EXPR_IS_NULL_PREFIX,
     SQL_EXPR_DATE_TRUNC,
-    SQL_EXPR_RATIO_COMPUTATION,
     SQL_EXPR_BETWEEN_PREFIX,
     SQL_EXPR_WINDOW_FUNCTION_ID_PREFIX,
 )
@@ -219,10 +218,6 @@ class SqlExpressionNodeVisitor(Generic[VisitorOutputT], ABC):
 
     @abstractmethod
     def visit_time_delta_expr(self, node: SqlTimeDeltaExpression) -> VisitorOutputT:  # noqa: D
-        pass
-
-    @abstractmethod
-    def visit_ratio_computation_expr(self, node: SqlRatioComputationExpression) -> VisitorOutputT:  # noqa: D
         pass
 
     @abstractmethod
@@ -1419,71 +1414,6 @@ class SqlDateTruncExpression(SqlExpressionNode):
         if not isinstance(other, SqlDateTruncExpression):
             return False
         return self.time_granularity == other.time_granularity and self._parents_match(other)
-
-
-class SqlRatioComputationExpression(SqlExpressionNode):
-    """Node for expressing Ratio metrics to allow for appropriate casting to float/double in each engine
-
-    In future we might wish to break this up into a set of nodes, e.g., SqlCastExpression and SqlMathExpression
-    or even add CAST to SqlFunctionExpression. However, at this time the only mathematical operation we encode
-    is division, and we only use that for ratios. Similarly, the only times we do typecasting are when we are
-    coercing timestamps (already handled) or computing ratio metrics.
-    """
-
-    def __init__(self, numerator: SqlExpressionNode, denominator: SqlExpressionNode) -> None:
-        """Initialize this node for computing a ratio. Expression renderers should handle the casting
-
-        Args:
-            numerator: the expression for the numerator in the ratio
-            denominator: the expression for the denominator in the ratio
-        """
-        self._numerator = numerator
-        self._denominator = denominator
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=[numerator, denominator])
-
-    @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
-        return SQL_EXPR_RATIO_COMPUTATION
-
-    @property
-    def requires_parenthesis(self) -> bool:  # noqa: D
-        return False
-
-    def accept(self, visitor: SqlExpressionNodeVisitor) -> VisitorOutputT:  # noqa: D
-        return visitor.visit_ratio_computation_expr(self)
-
-    @property
-    def description(self) -> str:  # noqa: D
-        return "Divide numerator by denominator, with appropriate casting"
-
-    @property
-    def numerator(self) -> SqlExpressionNode:  # noqa: D
-        return self._numerator
-
-    @property
-    def denominator(self) -> SqlExpressionNode:  # noqa: D
-        return self._denominator
-
-    def rewrite(  # noqa: D
-        self,
-        column_replacements: Optional[SqlColumnReplacements] = None,
-        should_render_table_alias: Optional[bool] = None,
-    ) -> SqlExpressionNode:
-        return SqlRatioComputationExpression(
-            numerator=self.numerator.rewrite(column_replacements, should_render_table_alias),
-            denominator=self.denominator.rewrite(column_replacements, should_render_table_alias),
-        )
-
-    @property
-    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D
-        return SqlExpressionTreeLineage.combine(
-            tuple(x.lineage for x in self.parent_nodes) + (SqlExpressionTreeLineage(other_exprs=(self,)),)
-        )
-
-    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
-        if not isinstance(other, SqlRatioComputationExpression):
-            return False
-        return self._parents_match(other)
 
 
 class SqlBetweenExpression(SqlExpressionNode):

@@ -85,15 +85,6 @@ metric:
     measure: cancellations_usd
 ---
 metric:
-  name: cancellation_rate
-  owners:
-    - support@transformdata.io
-  type: ratio
-  type_params:
-    numerator: cancellations_usd
-    denominator: transaction_amount_usd
----
-metric:
   name: revenue_usd
   owners:
     - support@transformdata.io
