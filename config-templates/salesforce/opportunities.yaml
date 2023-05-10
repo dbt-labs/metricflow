@@ -84,7 +84,9 @@ metric:
 ---
 metric: 
   name: win_rate
-  type: ratio
+  type: derived
   type_params:
-    numerator: won_opps
-    denominator: closed_opps
+    expr: won_opps/closed_opps
+    metrics:
+      - name: won_opps
+      - name: closed_opps

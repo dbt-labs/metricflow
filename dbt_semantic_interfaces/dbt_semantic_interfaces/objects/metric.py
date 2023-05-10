@@ -137,8 +137,6 @@ class MetricTypeParams(HashableBaseModel):
 
     measure: Optional[MetricInputMeasure]
     measures: Optional[List[MetricInputMeasure]]
-    numerator: Optional[MetricInputMeasure]
-    denominator: Optional[MetricInputMeasure]
     expr: Optional[str]
     window: Optional[MetricTimeWindow]
     grain_to_date: Optional[TimeGranularity]
@@ -162,10 +160,6 @@ class Metric(HashableBaseModel, ModelWithMetadataParsing):
         res = tp.measures or []
         if tp.measure:
             res.append(tp.measure)
-        if tp.numerator:
-            res.append(tp.numerator)
-        if tp.denominator:
-            res.append(tp.denominator)
 
         return res
 

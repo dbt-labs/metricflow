@@ -70,8 +70,6 @@ metric_type_params_schema = {
     "$id": "metric_type_params",
     "type": "object",
     "properties": {
-        "numerator": {"$ref": "metric_input_measure_schema"},
-        "denominator": {"$ref": "metric_input_measure_schema"},
         "measure": {"$ref": "metric_input_measure_schema"},
         "measures": {
             "type": "array",
