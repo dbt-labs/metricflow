@@ -1,51 +1,22 @@
--- Read Elements From Data Source 'bookings_source'
--- Metric Time Dimension 'ds'
+-- Constrain Output with WHERE
 -- Pass Only Elements:
 --   ['booking_value', 'metric_time']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  subq_17.metric_time AS metric_time
-  , CAST(subq_17.booking_value_with_is_instant_constraint AS DOUBLE) / CAST(NULLIF(subq_21.booking_value, 0) AS DOUBLE) AS instant_booking_value_ratio
+  metric_time
+  , SUM(booking_value) AS instant_booking_value
 FROM (
-  -- Constrain Output with WHERE
-  -- Pass Only Elements:
-  --   ['booking_value', 'metric_time']
-  -- Aggregate Measures
-  SELECT
-    metric_time
-    , SUM(booking_value) AS booking_value_with_is_instant_constraint
-  FROM (
-    -- Read Elements From Semantic Model 'bookings_source'
-    -- Metric Time Dimension 'ds'
-    -- Pass Only Elements:
-    --   ['booking_value', 'is_instant', 'metric_time']
-    SELECT
-      ds AS metric_time
-      , is_instant
-      , booking_value
-    FROM ***************************.fct_bookings bookings_source_src_10001
-  ) subq_14
-  WHERE is_instant
-  GROUP BY
-    metric_time
-) subq_17
-INNER JOIN (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements:
-  --   ['booking_value', 'metric_time']
-  -- Aggregate Measures
+  --   ['booking_value', 'is_instant', 'metric_time']
   SELECT
     ds AS metric_time
-    , SUM(booking_value) AS booking_value
+    , is_instant
+    , booking_value
   FROM ***************************.fct_bookings bookings_source_src_10001
-  GROUP BY
-    ds
-) subq_21
-ON
-  (
-    subq_17.metric_time = subq_21.metric_time
-  ) OR (
-    (subq_17.metric_time IS NULL) AND (subq_21.metric_time IS NULL)
-  )
+) subq_8
+WHERE is_instant
+GROUP BY
+  metric_time
