@@ -1,4 +1,4 @@
--- Read Elements From Data Source 'users_latest'
+-- Read Elements From Semantic Model 'users_latest'
 SELECT
   users_latest_src_10008.ds
   , DATE_TRUNC('week', users_latest_src_10008.ds) AS ds__week

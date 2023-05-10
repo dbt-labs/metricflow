@@ -90,7 +90,7 @@ FROM (
             , subq_0.approximate_continuous_booking_value_p99
             , subq_0.approximate_discrete_booking_value_p99
           FROM (
-            -- Read Elements From Data Source 'bookings_source'
+            -- Read Elements From Semantic Model 'bookings_source'
             SELECT
               1 AS bookings
               , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings

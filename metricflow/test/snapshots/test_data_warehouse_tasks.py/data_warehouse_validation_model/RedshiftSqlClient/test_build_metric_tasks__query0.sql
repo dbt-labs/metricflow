@@ -4,7 +4,7 @@ SELECT
   metric_time
   , SUM(count_dogs) AS count_dogs
 FROM (
-  -- Read Elements From Data Source 'animals'
+  -- Read Elements From Semantic Model 'animals'
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements:
   --   ['count_dogs', 'metric_time']

@@ -106,7 +106,7 @@ FROM (
                 , subq_0.approximate_continuous_booking_value_p99
                 , subq_0.approximate_discrete_booking_value_p99
               FROM (
-                -- Read Elements From Data Source 'bookings_source'
+                -- Read Elements From Semantic Model 'bookings_source'
                 SELECT
                   1 AS bookings
                   , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
@@ -212,7 +212,7 @@ FROM (
                 , subq_3.largest_listing
                 , subq_3.smallest_listing
               FROM (
-                -- Read Elements From Data Source 'listings_latest'
+                -- Read Elements From Semantic Model 'listings_latest'
                 SELECT
                   1 AS listings
                   , listings_latest_src_10004.capacity AS largest_listing
@@ -320,7 +320,7 @@ FROM (
                 , subq_9.create_a_cycle_in_the_join_graph__user
                 , subq_9.views
               FROM (
-                -- Read Elements From Data Source 'views_source'
+                -- Read Elements From Semantic Model 'views_source'
                 SELECT
                   1 AS views
                   , views_source_src_10009.ds
@@ -399,7 +399,7 @@ FROM (
                 , subq_12.largest_listing
                 , subq_12.smallest_listing
               FROM (
-                -- Read Elements From Data Source 'listings_latest'
+                -- Read Elements From Semantic Model 'listings_latest'
                 SELECT
                   1 AS listings
                   , listings_latest_src_10004.capacity AS largest_listing

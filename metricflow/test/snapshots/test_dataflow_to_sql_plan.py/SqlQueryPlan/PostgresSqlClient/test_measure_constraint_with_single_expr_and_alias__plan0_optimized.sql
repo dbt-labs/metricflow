@@ -11,7 +11,7 @@ FROM (
     metric_time
     , SUM(bookings) AS delayed_bookings
   FROM (
-    -- Read Elements From Data Source 'bookings_source'
+    -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
     -- Pass Only Elements:
     --   ['bookings', 'is_instant', 'metric_time']

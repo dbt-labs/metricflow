@@ -3,7 +3,7 @@
 SELECT
   subq_0.bookings
 FROM (
-  -- Read Elements From Data Source 'bookings_source'
+  -- Read Elements From Semantic Model 'bookings_source'
   SELECT
     1 AS bookings
     , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings

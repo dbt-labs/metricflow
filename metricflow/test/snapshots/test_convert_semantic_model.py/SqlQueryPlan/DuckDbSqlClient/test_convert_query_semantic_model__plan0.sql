@@ -1,4 +1,4 @@
--- Read Elements From Data Source 'revenue'
+-- Read Elements From Semantic Model 'revenue'
 SELECT
   revenue_src_10006.revenue AS txn_revenue
   , revenue_src_10006.created_at AS ds

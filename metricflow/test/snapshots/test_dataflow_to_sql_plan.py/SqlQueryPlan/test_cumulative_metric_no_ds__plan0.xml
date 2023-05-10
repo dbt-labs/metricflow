@@ -82,7 +82,7 @@
                     <!-- from_source = SqlSelectStatementNode(node_id=ss_10006) -->
                     <!-- where = None -->
                     <SqlSelectStatementNode>
-                        <!-- description = Read Elements From Data Source 'revenue' -->
+                        <!-- description = Read Elements From Semantic Model 'revenue' -->
                         <!-- node_id = ss_10006 -->
                         <!-- col0 =                                                      -->
                         <!--   {'class': 'SqlSelectColumn',                              -->

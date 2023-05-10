@@ -1,4 +1,4 @@
--- Read Elements From Data Source 'id_verifications'
+-- Read Elements From Semantic Model 'id_verifications'
 SELECT
   1 AS identity_verifications
   , id_verifications_src_10003.ds

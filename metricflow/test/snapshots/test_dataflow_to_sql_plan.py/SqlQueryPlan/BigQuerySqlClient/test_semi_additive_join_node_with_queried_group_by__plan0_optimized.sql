@@ -11,7 +11,7 @@ SELECT
   , subq_3.total_account_balance_first_day AS total_account_balance_first_day
   , subq_3.current_account_balance_by_user AS current_account_balance_by_user
 FROM (
-  -- Read Elements From Data Source 'accounts_source'
+  -- Read Elements From Semantic Model 'accounts_source'
   SELECT
     account_balance
     , account_balance AS total_account_balance_first_day
@@ -26,7 +26,7 @@ FROM (
   FROM ***************************.fct_accounts accounts_source_src_10000
 ) subq_3
 INNER JOIN (
-  -- Read Elements From Data Source 'accounts_source'
+  -- Read Elements From Semantic Model 'accounts_source'
   -- Filter row on MIN(ds)
   SELECT
     DATE_TRUNC(ds, isoweek) AS ds__week

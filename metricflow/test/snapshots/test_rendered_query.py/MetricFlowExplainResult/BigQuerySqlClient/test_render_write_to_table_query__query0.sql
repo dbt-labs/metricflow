@@ -5,7 +5,7 @@ CREATE TABLE ***************************.test_table AS (
     ds
     , SUM(bookings) AS bookings
   FROM (
-    -- Read Elements From Data Source 'bookings_source'
+    -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
     -- Pass Only Elements:
     --   ['bookings', 'ds']

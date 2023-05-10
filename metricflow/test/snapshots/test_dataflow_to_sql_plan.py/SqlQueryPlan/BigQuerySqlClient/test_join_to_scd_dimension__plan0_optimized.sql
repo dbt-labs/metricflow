@@ -15,7 +15,7 @@ FROM (
     , listings_src_10017.capacity AS listing__capacity
     , subq_12.bookings AS bookings
   FROM (
-    -- Read Elements From Data Source 'bookings_source'
+    -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
     -- Pass Only Elements:
     --   ['bookings', 'metric_time', 'listing']
