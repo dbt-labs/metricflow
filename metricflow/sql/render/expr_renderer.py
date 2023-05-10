@@ -253,7 +253,6 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
             execution_parameters=arg_rendered.execution_parameters,
         )
 
-    
     def visit_between_expr(self, node: SqlBetweenExpression) -> SqlExpressionRenderResult:  # noqa: D
         rendered_column_arg = self.render_sql_expr(node.column_arg)
         rendered_start_expr = self.render_sql_expr(node.start_expr)
