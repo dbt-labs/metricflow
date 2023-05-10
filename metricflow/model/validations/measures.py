@@ -70,9 +70,6 @@ class MeasureConstraintAliasesRule(ModelValidationRule):
         reference with different constraints. When this happens, we require aliases for all
         constrained measures for the sake of clarity. Any unconstrained measure does not
         need an alias, since it always relies on the original measure specification.
-
-        At this time aliases are required for ratio metrics, but eventually we could relax that requirement
-        if we can find an automatic aliasing scheme for numerator/denominator that we feel comfortable using.
         """
         issues: List[ValidationIssue] = []
 
