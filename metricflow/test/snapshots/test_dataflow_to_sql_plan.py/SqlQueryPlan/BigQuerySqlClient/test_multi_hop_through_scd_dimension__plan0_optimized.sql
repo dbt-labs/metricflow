@@ -8,7 +8,7 @@ SELECT
   , subq_18.user__home_state_latest AS listing__user__home_state_latest
   , SUM(subq_13.bookings) AS bookings
 FROM (
-  -- Read Elements From Data Source 'bookings_source'
+  -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements:
   --   ['bookings', 'metric_time', 'listing']

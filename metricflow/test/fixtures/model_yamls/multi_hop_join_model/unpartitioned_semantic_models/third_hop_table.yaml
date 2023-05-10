@@ -1,0 +1,16 @@
+--- 
+semantic_model:
+  name: third_hop_table
+  description: third_hop_table
+
+  node_relation:
+    schema_name: $source_schema
+    alias: third_hop_table
+
+  dimensions:
+    - name: value
+      type: categorical
+
+  entities:
+    - name: customer_third_hop_id
+      type: primary

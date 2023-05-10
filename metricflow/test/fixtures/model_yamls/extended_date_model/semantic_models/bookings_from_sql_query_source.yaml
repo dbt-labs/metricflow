@@ -1,0 +1,27 @@
+---
+semantic_model:
+  name: bookings_from_sql_query_source
+  description: bookings_from_sql_query_source
+
+  node_relation:
+    schema_name: $source_schema
+    alias: fct_bookings_extended
+
+  measures:
+    - name: bookings_from_sql_query
+      expr: booking
+      agg: sum
+      create_metric: true
+
+  dimensions:
+    - name: ds
+      type: time
+      type_params:
+        is_primary: True
+        time_granularity: day
+
+  entities:
+    - name: booking_id
+      type: primary
+    - name: listing_id
+      type: foreign

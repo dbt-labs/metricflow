@@ -226,7 +226,7 @@ metric:
 ---
 metric:
   name: bookings_per_booker
-  description: bookings divided by bookers - single data source ratio metric test
+  description: bookings divided by bookers - single semantic model ratio metric test
   type: ratio
   type_params:
     numerator: bookings

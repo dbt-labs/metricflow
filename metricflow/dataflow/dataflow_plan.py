@@ -518,9 +518,9 @@ class AggregateMeasuresNode(Generic[SourceDataSetT], AggregatedMeasuresOutput[So
 class JoinAggregatedMeasuresByGroupByColumnsNode(Generic[SourceDataSetT], AggregatedMeasuresOutput[SourceDataSetT]):
     """A node that joins aggregated measures with group by elements.
 
-    This is designed to link two separate data sources with measures aggregated by the complete set of group by
+    This is designed to link two separate semantic models with measures aggregated by the complete set of group by
     elements shared across both measures. Due to the way the DataflowPlan currently processes joins, this means
-    each separate data source will be pre-aggregated, and this final join will be run across fully aggregated
+    each separate semantic model will be pre-aggregated, and this final join will be run across fully aggregated
     sets of input data. As such, all this requires is the list of aggregated measure outputs, since they can be
     transformed into a SqlDataSet containing the complete list of non-measure specs for joining.
     """

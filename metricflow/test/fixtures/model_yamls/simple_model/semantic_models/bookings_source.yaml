@@ -1,0 +1,97 @@
+---
+semantic_model:
+  name: bookings_source
+  description: bookings_source
+
+  node_relation:
+    schema_name: $source_schema
+    alias: fct_bookings
+
+  measures:
+    - name: bookings
+      expr: "1"
+      agg: sum
+    - name: instant_bookings
+      expr: is_instant
+      agg: sum_boolean
+    - name: booking_value
+      agg: sum
+    - name: max_booking_value
+      agg: max
+      expr: booking_value
+    - name: min_booking_value
+      agg: min
+      expr: booking_value
+    - name: bookers
+      expr: guest_id
+      agg: count_distinct
+    - name: average_booking_value
+      expr: booking_value
+      agg: average
+    - name: booking_payments
+      expr: booking_value
+      agg: sum
+      agg_time_dimension: booking_paid_at
+    - name: referred_bookings
+      expr: referrer_id
+      agg: count
+    - name: median_booking_value
+      expr: booking_value
+      agg: median
+    - name: booking_value_p99
+      expr: booking_value
+      agg: percentile
+      agg_params:
+        percentile: 0.99
+    - name: discrete_booking_value_p99
+      expr: booking_value
+      agg: percentile
+      agg_params:
+        percentile: 0.99
+        use_discrete_percentile: true
+    - name: approximate_continuous_booking_value_p99
+      expr: booking_value
+      agg: percentile
+      agg_params:
+        percentile: 0.99
+        use_approximate_percentile: true
+    - name: approximate_discrete_booking_value_p99
+      expr: booking_value
+      agg: percentile
+      agg_params:
+        percentile: 0.99
+        use_discrete_percentile: true
+        use_approximate_percentile: true
+
+
+  dimensions:
+    - name: is_instant
+      type: categorical
+    - name: ds
+      type: time
+      type_params:
+        is_primary: True
+        time_granularity: day
+    - name: ds_partitioned
+      type: time
+      is_partition: true
+      type_params:
+        time_granularity: day
+    - name: booking_paid_at
+      type: time
+      type_params:
+        time_granularity: day
+
+  entities:
+    - name: listing
+      type: foreign
+      expr: listing_id
+    - name: guest
+      type: foreign
+      expr: guest_id
+    - name: host
+      type: foreign
+      expr: host_id
+    - name: create_a_cycle_in_the_join_graph
+      type: primary
+      expr: guest_id

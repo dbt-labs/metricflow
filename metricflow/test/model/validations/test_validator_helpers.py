@@ -3,15 +3,15 @@ from typing import List
 
 import pytest
 from dbt_semantic_interfaces.references import (
-    DataSourceElementReference,
-    DataSourceReference,
+    SemanticModelElementReference,
+    SemanticModelReference,
     MetricModelReference,
 )
 
 from metricflow.model.validations.validator_helpers import (
-    DataSourceContext,
-    DataSourceElementContext,
-    DataSourceElementType,
+    SemanticModelContext,
+    SemanticModelElementContext,
+    SemanticModelElementType,
     FileContext,
     MetricContext,
     ModelValidationResults,
@@ -26,38 +26,38 @@ from metricflow.model.validations.validator_helpers import (
 @pytest.fixture
 def list_of_issues() -> List[ValidationIssue]:  # noqa: D
     file_context = FileContext(file_name="foo", line_number=1337)
-    data_source_name = "My data source"
+    semantic_model_name = "My semantic model"
 
     issues: List[ValidationIssue] = []
     issues.append(
         ValidationWarning(
-            context=DataSourceContext(
+            context=SemanticModelContext(
                 file_context=file_context,
-                data_source=DataSourceReference(data_source_name=data_source_name),
+                semantic_model=SemanticModelReference(semantic_model_name=semantic_model_name),
             ),
             message="Something caused a warning, problem #1",
         )
     )
     issues.append(
         ValidationWarning(
-            context=DataSourceElementContext(
+            context=SemanticModelElementContext(
                 file_context=file_context,
-                data_source_element=DataSourceElementReference(
-                    data_source_name=data_source_name, element_name="My dimension"
+                semantic_model_element=SemanticModelElementReference(
+                    semantic_model_name=semantic_model_name, element_name="My dimension"
                 ),
-                element_type=DataSourceElementType.DIMENSION,
+                element_type=SemanticModelElementType.DIMENSION,
             ),
             message="Something caused a warning, problem #2",
         )
     )
     issues.append(
         ValidationFutureError(
-            context=DataSourceElementContext(
+            context=SemanticModelElementContext(
                 file_context=file_context,
-                data_source_element=DataSourceElementReference(
-                    data_source_name=data_source_name, element_name="My entity"
+                semantic_model_element=SemanticModelElementReference(
+                    semantic_model_name=semantic_model_name, element_name="My entity"
                 ),
-                element_type=DataSourceElementType.ENTITY,
+                element_type=SemanticModelElementType.ENTITY,
             ),
             message="Something caused a future error, problem #3",
             error_date=date(2022, 6, 13),
@@ -65,13 +65,13 @@ def list_of_issues() -> List[ValidationIssue]:  # noqa: D
     )
     issues.append(
         ValidationError(
-            context=DataSourceElementContext(
+            context=SemanticModelElementContext(
                 file_context=file_context,
-                data_source_name=data_source_name,
-                data_source_element=DataSourceElementReference(
-                    data_source_name=data_source_name, element_name="My measure"
+                semantic_model_name=semantic_model_name,
+                semantic_model_element=SemanticModelElementReference(
+                    semantic_model_name=semantic_model_name, element_name="My measure"
                 ),
-                element_type=DataSourceElementType.MEASURE,
+                element_type=SemanticModelElementType.MEASURE,
             ),
             message="Something caused an error, problem #4",
         )

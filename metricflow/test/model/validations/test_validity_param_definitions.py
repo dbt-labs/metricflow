@@ -4,17 +4,17 @@ import textwrap
 from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_validation_ready_model
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from metricflow.model.model_validator import ModelValidator
-from metricflow.model.validations.data_sources import DataSourceValidityWindowRule
+from metricflow.model.validations.semantic_models import SemanticModelValidityWindowRule
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.test.model.validations.helpers import base_model_file
 
 
 def test_validity_window_configuration() -> None:
-    """Tests to ensure a data source with a properly configured validity window passes validation"""
+    """Tests to ensure a semantic model with a properly configured validity window passes validation"""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
-          name: scd_data_source
+        semantic_model:
+          name: scd_semantic_model
           node_relation:
             schema_name: some_schema
             alias: scd_table
@@ -53,8 +53,8 @@ def test_validity_window_must_have_a_start() -> None:
     """Tests validation asserting a validity window end has a corresponding start"""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
-          name: scd_data_source
+        semantic_model:
+          name: scd_semantic_model
           node_relation:
             schema_name: some_schema
             alias: scd_table
@@ -76,15 +76,15 @@ def test_validity_window_must_have_a_start() -> None:
     model = parse_yaml_files_to_validation_ready_model([base_model_file(), validity_window_file])
 
     with pytest.raises(ModelValidationException, match="has 1 dimensions defined with validity params"):
-        ModelValidator([DataSourceValidityWindowRule()]).checked_validations(model.model)
+        ModelValidator([SemanticModelValidityWindowRule()]).checked_validations(model.model)
 
 
 def test_validity_window_must_have_an_end() -> None:
     """Tests validation asserting a validity window start has a corresponding end"""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
-          name: scd_data_source
+        semantic_model:
+          name: scd_semantic_model
           node_relation:
             schema_name: some_schema
             alias: scd_table
@@ -106,7 +106,7 @@ def test_validity_window_must_have_an_end() -> None:
     model = parse_yaml_files_to_validation_ready_model([base_model_file(), validity_window_file])
 
     with pytest.raises(ModelValidationException, match="has 1 dimensions defined with validity params"):
-        ModelValidator([DataSourceValidityWindowRule()]).checked_validations(model.model)
+        ModelValidator([SemanticModelValidityWindowRule()]).checked_validations(model.model)
 
 
 def test_validity_window_uses_two_dimensions() -> None:
@@ -116,8 +116,8 @@ def test_validity_window_uses_two_dimensions() -> None:
     """
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
-          name: scd_data_source
+        semantic_model:
+          name: scd_semantic_model
           node_relation:
             schema_name: some_schema
             alias: scd_table
@@ -140,15 +140,15 @@ def test_validity_window_uses_two_dimensions() -> None:
     model = parse_yaml_files_to_validation_ready_model([base_model_file(), validity_window_file])
 
     with pytest.raises(ModelValidationException, match="single validity param dimension that defines its window"):
-        ModelValidator([DataSourceValidityWindowRule()]).checked_validations(model.model)
+        ModelValidator([SemanticModelValidityWindowRule()]).checked_validations(model.model)
 
 
 def test_two_dimension_validity_windows_must_not_overload_start_and_end() -> None:
     """Tests validation asserting that a validity window does not set is_start and is_end on one dimension"""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
-          name: scd_data_source
+        semantic_model:
+          name: scd_semantic_model
           node_relation:
             schema_name: some_schema
             alias: scd_table
@@ -177,15 +177,15 @@ def test_two_dimension_validity_windows_must_not_overload_start_and_end() -> Non
     model = parse_yaml_files_to_validation_ready_model([base_model_file(), validity_window_file])
 
     with pytest.raises(ModelValidationException, match="does not have exactly one each"):
-        ModelValidator([DataSourceValidityWindowRule()]).checked_validations(model.model)
+        ModelValidator([SemanticModelValidityWindowRule()]).checked_validations(model.model)
 
 
 def test_multiple_validity_windows_are_invalid() -> None:
-    """Tests validation asserting that no more than 1 validity window can exist in a data source"""
+    """Tests validation asserting that no more than 1 validity window can exist in a semantic model"""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
-          name: scd_data_source
+        semantic_model:
+          name: scd_semantic_model
           node_relation:
             schema_name: some_schema
             alias: scd_table
@@ -225,7 +225,7 @@ def test_multiple_validity_windows_are_invalid() -> None:
     model = parse_yaml_files_to_validation_ready_model([base_model_file(), validity_window_file])
 
     with pytest.raises(ModelValidationException, match="has 4 dimensions defined with validity params"):
-        ModelValidator([DataSourceValidityWindowRule()]).checked_validations(model.model)
+        ModelValidator([SemanticModelValidityWindowRule()]).checked_validations(model.model)
 
 
 def test_empty_validity_windows_are_invalid() -> None:
@@ -233,8 +233,8 @@ def test_empty_validity_windows_are_invalid() -> None:
 
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
-          name: scd_data_source
+        semantic_model:
+          name: scd_semantic_model
           node_relation:
             schema_name: some_schema
             alias: scd_table
@@ -262,20 +262,20 @@ def test_empty_validity_windows_are_invalid() -> None:
     model = parse_yaml_files_to_validation_ready_model([base_model_file(), validity_window_file])
 
     with pytest.raises(ModelValidationException, match="does not have exactly one each"):
-        ModelValidator([DataSourceValidityWindowRule()]).checked_validations(model.model)
+        ModelValidator([SemanticModelValidityWindowRule()]).checked_validations(model.model)
 
 
 def test_measures_are_prevented() -> None:
-    """Tests validation asserting that measures are not allowed in a data source with validity windows
+    """Tests validation asserting that measures are not allowed in a semantic model with validity windows
 
-    This block is temporary while we sort out the proper syntax for defining a measure in SCD-style data sources
+    This block is temporary while we sort out the proper syntax for defining a measure in SCD-style semantic models
     and implement whatever additional functionality is needed for measures which are semi-additive to the window.
     """
 
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
-          name: scd_data_source
+        semantic_model:
+          name: scd_semantic_model
           node_relation:
             schema_name: some_schema
             alias: scd_table
@@ -308,16 +308,16 @@ def test_measures_are_prevented() -> None:
     model = parse_yaml_files_to_validation_ready_model([base_model_file(), validity_window_file])
 
     with pytest.raises(ModelValidationException, match="has both measures and validity param dimensions defined"):
-        ModelValidator([DataSourceValidityWindowRule()]).checked_validations(model.model)
+        ModelValidator([SemanticModelValidityWindowRule()]).checked_validations(model.model)
 
 
 def test_validity_window_must_have_a_natural_key() -> None:
-    """Tests validation asserting that data sources with validity windows use an entity with type NATURAL"""
+    """Tests validation asserting that semantic models with validity windows use an entity with type NATURAL"""
 
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
-          name: scd_data_source
+        semantic_model:
+          name: scd_semantic_model
           node_relation:
             schema_name: some_schema
             alias: scd_table
@@ -345,21 +345,21 @@ def test_validity_window_must_have_a_natural_key() -> None:
     model = parse_yaml_files_to_validation_ready_model([base_model_file(), validity_window_file])
 
     with pytest.raises(ModelValidationException, match="does not have an entity with type `natural` set"):
-        ModelValidator([DataSourceValidityWindowRule()]).checked_validations(model.model)
+        ModelValidator([SemanticModelValidityWindowRule()]).checked_validations(model.model)
 
 
 def test_validity_window_does_not_use_primary_key() -> None:
-    """Tests validation asserting that data sources with validity windows do not use primary keys
+    """Tests validation asserting that semantic models with validity windows do not use primary keys
 
-    This is useful because we currently do not support joins against SCD-style data sources without using the
+    This is useful because we currently do not support joins against SCD-style semantic models without using the
     validity window filter, and so enabling a primary key would be confusing. Subsequent changes may add support
     for this in which case we should of course remove this validation requirement.
     """
 
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
-          name: scd_data_source
+        semantic_model:
+          name: scd_semantic_model
           node_relation:
             schema_name: some_schema
             alias: scd_table
@@ -389,4 +389,4 @@ def test_validity_window_does_not_use_primary_key() -> None:
     model = parse_yaml_files_to_validation_ready_model([base_model_file(), validity_window_file])
 
     with pytest.raises(ModelValidationException, match="has one or more entities designated as `primary`"):
-        ModelValidator([DataSourceValidityWindowRule()]).checked_validations(model.model)
+        ModelValidator([SemanticModelValidityWindowRule()]).checked_validations(model.model)

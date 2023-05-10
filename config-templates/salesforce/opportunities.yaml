@@ -1,4 +1,4 @@
-data_source:
+semantic_model:
   name: salesforce_oppportunities
   owners:
     - support@transformdata.io

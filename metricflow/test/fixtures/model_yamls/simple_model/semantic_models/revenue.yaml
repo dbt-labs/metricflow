@@ -1,0 +1,26 @@
+---
+semantic_model:
+  name: revenue
+  description: revenue
+
+  node_relation:
+    schema_name: $source_schema
+    alias: fct_revenue
+
+  measures:
+    - name: txn_revenue
+      expr: revenue
+      agg: sum
+
+  dimensions:
+    - name: ds
+      type: time
+      expr: created_at
+      type_params:
+        is_primary: True
+        time_granularity: day
+
+  entities:
+    - name: user
+      type: foreign
+      expr: user_id

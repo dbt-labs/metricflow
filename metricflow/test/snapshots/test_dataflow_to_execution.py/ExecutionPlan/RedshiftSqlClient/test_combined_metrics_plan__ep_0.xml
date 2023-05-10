@@ -18,7 +18,7 @@
         <!--       , is_instant                                                                      -->
         <!--       , SUM(bookings) AS bookings                                                       -->
         <!--     FROM (                                                                              -->
-        <!--       -- Read Elements From Data Source 'bookings_source'                               -->
+        <!--       -- Read Elements From Semantic Model 'bookings_source'                            -->
         <!--       -- Metric Time Dimension 'ds'                                                     -->
         <!--       -- Pass Only Elements:                                                            -->
         <!--       --   ['bookings', 'is_instant', 'ds']                                             -->
@@ -40,7 +40,7 @@
         <!--       , is_instant                                                                      -->
         <!--       , SUM(instant_bookings) AS instant_bookings                                       -->
         <!--     FROM (                                                                              -->
-        <!--       -- Read Elements From Data Source 'bookings_source'                               -->
+        <!--       -- Read Elements From Semantic Model 'bookings_source'                            -->
         <!--       -- Metric Time Dimension 'ds'                                                     -->
         <!--       -- Pass Only Elements:                                                            -->
         <!--       --   ['instant_bookings', 'is_instant', 'ds']                                     -->
@@ -57,7 +57,7 @@
         <!--   ON                                                                                    -->
         <!--     (subq_4.is_instant = subq_9.is_instant) AND (subq_4.ds = subq_9.ds)                 -->
         <!--   FULL OUTER JOIN (                                                                     -->
-        <!--     -- Read Elements From Data Source 'bookings_source'                                 -->
+        <!--     -- Read Elements From Semantic Model 'bookings_source'                              -->
         <!--     -- Metric Time Dimension 'ds'                                                       -->
         <!--     -- Pass Only Elements:                                                              -->
         <!--     --   ['booking_value', 'is_instant', 'ds']                                          -->

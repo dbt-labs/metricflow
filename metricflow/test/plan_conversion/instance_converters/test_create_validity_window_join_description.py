@@ -17,12 +17,12 @@ def test_no_validity_dims(
     dataset = consistent_id_object_repository.scd_model_data_sets["bookings_source"]
 
     validity_window_join_description = CreateValidityWindowJoinDescription(
-        data_source_semantics=scd_semantic_manifest_lookup.data_source_semantics
+        semantic_model_semantics=scd_semantic_manifest_lookup.semantic_model_semantics
     ).transform(instance_set=dataset.instance_set)
 
     assert validity_window_join_description is None, (
         f"We managed to create a validity window join description `{validity_window_join_description}` from a "
-        f"data source that does not have one defined!"
+        f"semantic model that does not have one defined!"
     )
 
 
@@ -30,7 +30,7 @@ def test_validity_window_conversion(
     consistent_id_object_repository: ConsistentIdObjectRepository, scd_semantic_manifest_lookup: SemanticManifestLookup
 ) -> None:
     """Tests converting an instance set with a single validity window into a ValidityWindowJoinDescription"""
-    # The listings data source uses a 2-column SCD Type III layout
+    # The listings semantic model uses a 2-column SCD Type III layout
     dataset = consistent_id_object_repository.scd_model_data_sets["listings"]
     expected_join_description = ValidityWindowJoinDescription(
         window_start_dimension=TimeDimensionSpec(
@@ -44,7 +44,7 @@ def test_validity_window_conversion(
     )
 
     validity_window_join_description = CreateValidityWindowJoinDescription(
-        data_source_semantics=scd_semantic_manifest_lookup.data_source_semantics
+        semantic_model_semantics=scd_semantic_manifest_lookup.semantic_model_semantics
     ).transform(instance_set=dataset.instance_set)
 
     assert (
@@ -64,5 +64,5 @@ def test_multiple_validity_windows(
     merged_instance_set = InstanceSet.merge([first_dataset.instance_set, second_dataset.instance_set])
     with pytest.raises(AssertionError, match="Found more than 1 set of validity window specs"):
         CreateValidityWindowJoinDescription(
-            data_source_semantics=scd_semantic_manifest_lookup.data_source_semantics
+            semantic_model_semantics=scd_semantic_manifest_lookup.semantic_model_semantics
         ).transform(merged_instance_set)

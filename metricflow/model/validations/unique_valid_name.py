@@ -4,19 +4,19 @@ import enum
 import re
 from typing import Dict, Tuple, List, Optional
 
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.references import (
-    DataSourceElementReference,
-    DataSourceReference,
+    SemanticModelElementReference,
+    SemanticModelReference,
     MetricModelReference,
 )
 from dbt_semantic_interfaces.references import ElementReference
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from metricflow.model.validations.validator_helpers import (
-    DataSourceContext,
-    DataSourceElementContext,
-    DataSourceElementType,
+    SemanticModelContext,
+    SemanticModelElementContext,
+    SemanticModelElementType,
     FileContext,
     MetricContext,
     ModelValidationRule,
@@ -52,8 +52,8 @@ class MetricFlowReservedKeywords(enum.Enum):
 class UniqueAndValidNameRule(ModelValidationRule):
     """Check that names are unique and valid.
 
-    * Names of elements in data sources are unique / valid within the data source.
-    * Names of data sources, dimension sets and metric sets in the model are unique / valid.
+    * Names of elements in semantic models are unique / valid within the semantic model.
+    * Names of semantic models, dimension sets and metric sets in the model are unique / valid.
     """
 
     NAME_REGEX = re.compile(r"\A[a-z][a-z0-9_]*[a-z0-9]\Z")
@@ -90,53 +90,53 @@ class UniqueAndValidNameRule(ModelValidationRule):
         return issues
 
     @staticmethod
-    @validate_safely(whats_being_done="checking data source sub element names are unique")
-    def _validate_data_source_elements(data_source: DataSource) -> List[ValidationIssue]:
+    @validate_safely(whats_being_done="checking semantic model sub element names are unique")
+    def _validate_semantic_model_elements(semantic_model: SemanticModel) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
         element_info_tuples: List[Tuple[ElementReference, str, ValidationContext]] = []
 
-        if data_source.measures:
-            for measure in data_source.measures:
+        if semantic_model.measures:
+            for measure in semantic_model.measures:
                 element_info_tuples.append(
                     (
                         measure.reference,
                         "measure",
-                        DataSourceElementContext(
-                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source_element=DataSourceElementReference(
-                                data_source_name=data_source.name, element_name=measure.name
+                        SemanticModelElementContext(
+                            file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
+                            semantic_model_element=SemanticModelElementReference(
+                                semantic_model_name=semantic_model.name, element_name=measure.name
                             ),
-                            element_type=DataSourceElementType.MEASURE,
+                            element_type=SemanticModelElementType.MEASURE,
                         ),
                     )
                 )
-        if data_source.entities:
-            for entity in data_source.entities:
+        if semantic_model.entities:
+            for entity in semantic_model.entities:
                 element_info_tuples.append(
                     (
                         entity.reference,
                         "entity",
-                        DataSourceElementContext(
-                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source_element=DataSourceElementReference(
-                                data_source_name=data_source.name, element_name=entity.name
+                        SemanticModelElementContext(
+                            file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
+                            semantic_model_element=SemanticModelElementReference(
+                                semantic_model_name=semantic_model.name, element_name=entity.name
                             ),
-                            element_type=DataSourceElementType.ENTITY,
+                            element_type=SemanticModelElementType.ENTITY,
                         ),
                     )
                 )
-        if data_source.dimensions:
-            for dimension in data_source.dimensions:
+        if semantic_model.dimensions:
+            for dimension in semantic_model.dimensions:
                 element_info_tuples.append(
                     (
                         dimension.reference,
                         "dimension",
-                        DataSourceElementContext(
-                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source_element=DataSourceElementReference(
-                                data_source_name=data_source.name, element_name=dimension.name
+                        SemanticModelElementContext(
+                            file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
+                            semantic_model_element=SemanticModelElementReference(
+                                semantic_model_name=semantic_model.name, element_name=dimension.name
                             ),
-                            element_type=DataSourceElementType.DIMENSION,
+                            element_type=SemanticModelElementType.DIMENSION,
                         ),
                     )
                 )
@@ -147,7 +147,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
                 issues.append(
                     ValidationError(
                         context=context,
-                        message=f"In data source `{data_source.name}`, can't use name `{name.element_name}` for a "
+                        message=f"In semantic model `{semantic_model.name}`, can't use name `{name.element_name}` for a "
                         f"{_type} when it was already used for a {name_to_type[name]}",
                     )
                 )
@@ -164,15 +164,15 @@ class UniqueAndValidNameRule(ModelValidationRule):
     def _validate_top_level_objects(model: UserConfiguredModel) -> List[ValidationIssue]:
         """Checks names of objects that are not nested."""
         object_info_tuples = []
-        if model.data_sources:
-            for data_source in model.data_sources:
+        if model.semantic_models:
+            for semantic_model in model.semantic_models:
                 object_info_tuples.append(
                     (
-                        data_source.name,
-                        "data source",
-                        DataSourceContext(
-                            file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                            data_source=DataSourceReference(data_source_name=data_source.name),
+                        semantic_model.name,
+                        "semantic model",
+                        SemanticModelContext(
+                            file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
+                            semantic_model=SemanticModelReference(semantic_model_name=semantic_model.name),
                         ),
                     )
                 )
@@ -220,7 +220,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
         issues = []
         issues += UniqueAndValidNameRule._validate_top_level_objects(model=model)
 
-        for data_source in model.data_sources:
-            issues += UniqueAndValidNameRule._validate_data_source_elements(data_source=data_source)
+        for semantic_model in model.semantic_models:
+            issues += UniqueAndValidNameRule._validate_semantic_model_elements(semantic_model=semantic_model)
 
         return issues

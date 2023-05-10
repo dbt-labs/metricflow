@@ -61,7 +61,7 @@ def test_render_configs(tmpdir: Path) -> None:  # noqa: D
         file_contents = yaml.load(f)
 
     assert file_contents == {
-        "data_source": {
+        "semantic_model": {
             "name": "test_table",
             "node_relation": {
                 "alias": "test_table",

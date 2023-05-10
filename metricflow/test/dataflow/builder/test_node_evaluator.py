@@ -14,7 +14,7 @@ from metricflow.dataflow.builder.partitions import PartitionTimeDimensionJoinDes
 from metricflow.dataflow.dataflow_plan import BaseOutput, ValidityWindowJoinDescription
 from metricflow.dataset.dataset import DataSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.dataset.data_source_adapter import DataSourceDataSet
+from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.node_processor import PreDimensionJoinNodeProcessor
 from metricflow.plan_conversion.time_spine import TimeSpineSource
@@ -36,10 +36,10 @@ logger = logging.getLogger(__name__)
 def node_evaluator(
     consistent_id_object_repository: ConsistentIdObjectRepository,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
-    dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
     time_spine_source: TimeSpineSource,
 ) -> NodeEvaluatorForLinkableInstances:  # noqa: D
-    """Return a node evaluator using the nodes in data_source_name_to_nodes"""
+    """Return a node evaluator using the nodes in semantic_model_name_to_nodes"""
     node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
         column_association_resolver=DefaultColumnAssociationResolver(simple_semantic_manifest_lookup),
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
@@ -49,7 +49,7 @@ def node_evaluator(
     source_nodes = tuple(consistent_id_object_repository.simple_model_read_nodes.values())
 
     return NodeEvaluatorForLinkableInstances(
-        data_source_semantics=simple_semantic_manifest_lookup.data_source_semantics,
+        semantic_model_semantics=simple_semantic_manifest_lookup.semantic_model_semantics,
         # Use all nodes in the simple model as candidates for joins.
         nodes_available_for_joins=source_nodes,
         node_data_set_resolver=node_data_set_resolver,
@@ -57,12 +57,12 @@ def node_evaluator(
 
 
 def make_multihop_node_evaluator(
-    model_source_nodes: Sequence[BaseOutput[DataSourceDataSet]],
+    model_source_nodes: Sequence[BaseOutput[SemanticModelDataSet]],
     semantic_manifest_lookup_with_multihop_links: SemanticManifestLookup,
     desired_linkable_specs: Sequence[LinkableInstanceSpec],
     time_spine_source: TimeSpineSource,
 ) -> NodeEvaluatorForLinkableInstances:  # noqa: D
-    """Return a node evaluator using the nodes in multihop_data_source_name_to_nodes"""
+    """Return a node evaluator using the nodes in multihop_semantic_model_name_to_nodes"""
     node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
         column_association_resolver=DefaultColumnAssociationResolver(semantic_manifest_lookup_with_multihop_links),
         semantic_manifest_lookup=semantic_manifest_lookup_with_multihop_links,
@@ -70,7 +70,7 @@ def make_multihop_node_evaluator(
     )
 
     node_processor = PreDimensionJoinNodeProcessor(
-        data_source_semantics=semantic_manifest_lookup_with_multihop_links.data_source_semantics,
+        semantic_model_semantics=semantic_manifest_lookup_with_multihop_links.semantic_model_semantics,
         node_data_set_resolver=node_data_set_resolver,
     )
 
@@ -85,7 +85,7 @@ def make_multihop_node_evaluator(
     )
 
     return NodeEvaluatorForLinkableInstances(
-        data_source_semantics=semantic_manifest_lookup_with_multihop_links.data_source_semantics,
+        semantic_model_semantics=semantic_manifest_lookup_with_multihop_links.semantic_model_semantics,
         nodes_available_for_joins=nodes_available_for_joins,
         node_data_set_resolver=node_data_set_resolver,
     )
@@ -475,7 +475,7 @@ def test_node_evaluator_with_scd_target(
     source_nodes = tuple(consistent_id_object_repository.scd_model_read_nodes.values())
 
     node_evaluator = NodeEvaluatorForLinkableInstances(
-        data_source_semantics=scd_semantic_manifest_lookup.data_source_semantics,
+        semantic_model_semantics=scd_semantic_manifest_lookup.semantic_model_semantics,
         # Use all nodes in the simple model as candidates for joins.
         nodes_available_for_joins=source_nodes,
         node_data_set_resolver=node_data_set_resolver,

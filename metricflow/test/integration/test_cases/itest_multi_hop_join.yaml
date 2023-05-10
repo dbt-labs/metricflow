@@ -19,7 +19,7 @@ integration_test:
 ---
 integration_test:
   name: multihop_join_two_dims_different_sources
-  description: Tests a query requesting mulitple multi-hop join dims that dont come from the same data source
+  description: Tests a query requesting mulitple multi-hop join dims that dont come from the same semantic model
   model: UNPARTITIONED_MULTI_HOP_JOIN_MODEL
   metrics: ["txn_count"]
   group_bys:

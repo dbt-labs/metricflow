@@ -1,0 +1,18 @@
+---
+semantic_model:
+  name: customer_other_data
+  description: customer_other_data
+
+  node_relation:
+    schema_name: $source_schema
+    alias: customer_other_data
+
+  dimensions:
+    - name: country
+      type: categorical
+
+  entities:
+    - name: customer_id
+      type: primary
+    - name: customer_third_hop_id
+      type: unique

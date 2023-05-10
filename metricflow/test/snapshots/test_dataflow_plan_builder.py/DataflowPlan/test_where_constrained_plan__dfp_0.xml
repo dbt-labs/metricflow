@@ -82,11 +82,11 @@
                                         <!-- node_id = sma_10001 -->
                                         <!-- aggregation_time_dimension = ds -->
                                         <ReadSqlSourceNode>
-                                            <!-- description =                                                                           -->
-                                            <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                                            <!-- description =                                                                                    -->
+                                            <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->
                                             <!-- node_id = rss_10011 -->
-                                            <!-- data_set =                                                                    -->
-                                            <!--   DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                                            <!-- data_set =                                                                             -->
+                                            <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->
                                         </ReadSqlSourceNode>
                                     </MetricTimeDimensionTransformNode>
                                 </FilterElementsNode>
@@ -103,11 +103,11 @@
                                         <!-- node_id = sma_10004 -->
                                         <!-- aggregation_time_dimension = ds -->
                                         <ReadSqlSourceNode>
-                                            <!-- description =                                                                           -->
-                                            <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='listings_latest'))  -->
+                                            <!-- description =                                                                                    -->
+                                            <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->
                                             <!-- node_id = rss_10014 -->
-                                            <!-- data_set =                                                                    -->
-                                            <!--   DataSourceDataSet(DataSourceReference(data_source_name='listings_latest'))  -->
+                                            <!-- data_set =                                                                             -->
+                                            <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->
                                         </ReadSqlSourceNode>
                                     </MetricTimeDimensionTransformNode>
                                 </FilterElementsNode>

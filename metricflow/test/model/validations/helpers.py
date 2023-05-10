@@ -4,7 +4,7 @@ from typing import Optional, Sequence
 from metricflow.engine.models import Dimension
 from dbt_semantic_interfaces.objects.metadata import FileSlice, Metadata
 from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
-from dbt_semantic_interfaces.objects.data_source import DataSource, NodeRelation
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel, NodeRelation
 from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.metric import Metric, MetricType, MetricTypeParams
@@ -19,8 +19,8 @@ def base_model_file() -> YamlConfigFile:
     """
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
-          name: sample_data_source
+        semantic_model:
+          name: sample_semantic_model
           node_relation:
             schema_name: some_schema
             alias: source_table
@@ -79,7 +79,7 @@ def metric_with_guaranteed_meta(
     )
 
 
-def data_source_with_guaranteed_meta(
+def semantic_model_with_guaranteed_meta(
     name: str,
     description: Optional[str] = None,
     node_relation: Optional[NodeRelation] = None,
@@ -87,8 +87,8 @@ def data_source_with_guaranteed_meta(
     entities: Sequence[Entity] = [],
     measures: Sequence[Measure] = [],
     dimensions: Sequence[Dimension] = [],
-) -> DataSource:
-    """Creates a data source with the given input. If a metadata object is not supplied, a default metadata object is used"""
+) -> SemanticModel:
+    """Creates a semantic model with the given input. If a metadata object is not supplied, a default metadata object is used"""
 
     created_node_relation = node_relation
     if created_node_relation is None:
@@ -97,7 +97,7 @@ def data_source_with_guaranteed_meta(
             alias="table",
         )
 
-    return DataSource(
+    return SemanticModel(
         name=name,
         description=description,
         node_relation=created_node_relation,

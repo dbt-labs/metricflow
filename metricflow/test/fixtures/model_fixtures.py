@@ -10,10 +10,10 @@ import pytest
 
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, BaseOutput
-from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
+from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from dbt_semantic_interfaces.model_transformer import ModelTransformer
 from metricflow.model.model_validator import ModelValidator
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.parsing.dir_to_model import (
     parse_directory_of_yaml_files_to_model,
@@ -21,7 +21,7 @@ from dbt_semantic_interfaces.parsing.dir_to_model import (
 )
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
-from metricflow.dataset.data_source_adapter import DataSourceDataSet
+from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.test.fixtures.id_fixtures import IdNumberSpace, patch_id_generators_helper
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
@@ -33,20 +33,22 @@ logger = logging.getLogger(__name__)
 
 
 def _data_set_to_read_nodes(
-    data_sets: OrderedDict[str, DataSourceDataSet]
-) -> OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]]:
-    """Return a mapping from the name of the data source to the dataflow plan node that reads from it."""
-    return_dict: OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]] = OrderedDict()
-    for data_source_name, data_set in data_sets.items():
-        return_dict[data_source_name] = ReadSqlSourceNode[DataSourceDataSet](data_set)
-        logger.debug(f"For data source {data_source_name}, creating node_id {return_dict[data_source_name].node_id}")
+    data_sets: OrderedDict[str, SemanticModelDataSet]
+) -> OrderedDict[str, ReadSqlSourceNode[SemanticModelDataSet]]:
+    """Return a mapping from the name of the semantic model to the dataflow plan node that reads from it."""
+    return_dict: OrderedDict[str, ReadSqlSourceNode[SemanticModelDataSet]] = OrderedDict()
+    for semantic_model_name, data_set in data_sets.items():
+        return_dict[semantic_model_name] = ReadSqlSourceNode[SemanticModelDataSet](data_set)
+        logger.debug(
+            f"For semantic model {semantic_model_name}, creating node_id {return_dict[semantic_model_name].node_id}"
+        )
 
     return return_dict
 
 
 def _data_set_to_source_nodes(
-    semantic_manifest_lookup: SemanticManifestLookup, data_sets: OrderedDict[str, DataSourceDataSet]
-) -> Sequence[BaseOutput[DataSourceDataSet]]:
+    semantic_manifest_lookup: SemanticManifestLookup, data_sets: OrderedDict[str, SemanticModelDataSet]
+) -> Sequence[BaseOutput[SemanticModelDataSet]]:
     source_node_builder = SourceNodeBuilder(semantic_manifest_lookup)
     return source_node_builder.create_from_data_sets(list(data_sets.values()))
 
@@ -73,16 +75,16 @@ def query_parser_from_yaml(
 class ConsistentIdObjectRepository:
     """Stores all objects that should have consistent IDs in tests."""
 
-    simple_model_data_sets: OrderedDict[str, DataSourceDataSet]
-    simple_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]]
-    simple_model_source_nodes: Sequence[BaseOutput[DataSourceDataSet]]
+    simple_model_data_sets: OrderedDict[str, SemanticModelDataSet]
+    simple_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[SemanticModelDataSet]]
+    simple_model_source_nodes: Sequence[BaseOutput[SemanticModelDataSet]]
 
-    multihop_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]]
-    multihop_model_source_nodes: Sequence[BaseOutput[DataSourceDataSet]]
+    multihop_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[SemanticModelDataSet]]
+    multihop_model_source_nodes: Sequence[BaseOutput[SemanticModelDataSet]]
 
-    scd_model_data_sets: OrderedDict[str, DataSourceDataSet]
-    scd_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]]
-    scd_model_source_nodes: Sequence[BaseOutput[DataSourceDataSet]]
+    scd_model_data_sets: OrderedDict[str, SemanticModelDataSet]
+    scd_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[SemanticModelDataSet]]
+    scd_model_source_nodes: Sequence[BaseOutput[SemanticModelDataSet]]
 
 
 @pytest.fixture(scope="session")
@@ -118,22 +120,24 @@ def consistent_id_object_repository(
         )
 
 
-def create_data_sets(multihop_semantic_manifest_lookup: SemanticManifestLookup) -> OrderedDict[str, DataSourceDataSet]:
-    """Convert the DataSources in the model to SqlDataSets.
+def create_data_sets(
+    multihop_semantic_manifest_lookup: SemanticManifestLookup,
+) -> OrderedDict[str, SemanticModelDataSet]:
+    """Convert the SemanticModels in the model to SqlDataSets.
 
-    Key is the name of the data source, value is the associated data set.
+    Key is the name of the semantic model, value is the associated data set.
     """
     # Use ordered dict and sort by name to get consistency when running tests.
     data_sets = OrderedDict()
-    data_sources: List[DataSource] = multihop_semantic_manifest_lookup.user_configured_model.data_sources
-    data_sources.sort(key=lambda x: x.name)
+    semantic_models: List[SemanticModel] = multihop_semantic_manifest_lookup.user_configured_model.semantic_models
+    semantic_models.sort(key=lambda x: x.name)
 
-    converter = DataSourceToDataSetConverter(
+    converter = SemanticModelToDataSetConverter(
         column_association_resolver=DefaultColumnAssociationResolver(multihop_semantic_manifest_lookup)
     )
 
-    for data_source in data_sources:
-        data_sets[data_source.name] = converter.create_sql_source_data_set(data_source)
+    for semantic_model in semantic_models:
+        data_sets[semantic_model.name] = converter.create_sql_source_data_set(semantic_model)
 
     return data_sets
 
@@ -147,7 +151,7 @@ def template_mapping(mf_test_session_state: MetricFlowTestSessionState) -> Dict[
 @pytest.fixture(scope="session")
 def simple_semantic_manifest_lookup_non_ds(template_mapping: Dict[str, str]) -> SemanticManifestLookup:  # noqa: D
     model_build_result = parse_directory_of_yaml_files_to_model(
-        os.path.join(os.path.dirname(__file__), "model_yamls/non_ds_model"), template_mapping=template_mapping
+        os.path.join(os.path.dirname(__file__), "model_yamls/non_sm_model"), template_mapping=template_mapping
     )
     return SemanticManifestLookup(model_build_result.model)
 
@@ -163,7 +167,7 @@ def simple_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> Semanti
 @pytest.fixture(scope="session")
 def multi_hop_join_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> SemanticManifestLookup:  # noqa: D
     model_build_result = parse_directory_of_yaml_files_to_model(
-        os.path.join(os.path.dirname(__file__), "model_yamls/multi_hop_join_model/partitioned_data_sources"),
+        os.path.join(os.path.dirname(__file__), "model_yamls/multi_hop_join_model/partitioned_semantic_models"),
         template_mapping=template_mapping,
     )
     return SemanticManifestLookup(model_build_result.model)
@@ -174,7 +178,7 @@ def unpartitioned_multi_hop_join_semantic_manifest_lookup(  # noqa: D
     template_mapping: Dict[str, str]
 ) -> SemanticManifestLookup:
     model_build_result = parse_directory_of_yaml_files_to_model(
-        os.path.join(os.path.dirname(__file__), "model_yamls/multi_hop_join_model/unpartitioned_data_sources"),
+        os.path.join(os.path.dirname(__file__), "model_yamls/multi_hop_join_model/unpartitioned_semantic_models"),
         template_mapping=template_mapping,
     )
     return SemanticManifestLookup(model_build_result.model)

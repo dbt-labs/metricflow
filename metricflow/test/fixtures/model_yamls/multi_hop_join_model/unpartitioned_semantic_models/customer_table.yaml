@@ -1,0 +1,18 @@
+--- 
+semantic_model:
+  name: customer_table
+  description: customer_table
+
+  node_relation:
+    schema_name: $source_schema
+    alias: customer_table
+
+  dimensions:
+    - name: customer_name
+      type: categorical
+    - name: customer_atomic_weight
+      type: categorical
+
+  entities:
+    - name: customer_id
+      type: primary

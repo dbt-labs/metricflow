@@ -2,16 +2,16 @@ import pytest
 
 from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
 from metricflow.model.model_validator import ModelValidator
-from dbt_semantic_interfaces.objects.data_source import DataSource, NodeRelation
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel, NodeRelation
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.metric import MetricType, MetricTypeParams, Metric
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.references import DimensionReference, MeasureReference, TimeDimensionReference
-from metricflow.model.validations.data_sources import DataSourceTimeDimensionWarningsRule
+from metricflow.model.validations.semantic_models import SemanticModelTimeDimensionWarningsRule
 from metricflow.model.validations.dimension_const import DimensionConsistencyRule
 from metricflow.model.validations.validator_helpers import ModelValidationException
-from metricflow.test.model.validations.helpers import data_source_with_guaranteed_meta, metric_with_guaranteed_meta
+from metricflow.test.model.validations.helpers import semantic_model_with_guaranteed_meta, metric_with_guaranteed_meta
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 
@@ -22,8 +22,8 @@ def test_incompatible_dimension_type() -> None:  # noqa:D
         model_validator = ModelValidator([DimensionConsistencyRule()])
         model_validator.checked_validations(
             UserConfiguredModel(
-                data_sources=[
-                    data_source_with_guaranteed_meta(
+                semantic_models=[
+                    semantic_model_with_guaranteed_meta(
                         name="dim1",
                         measures=[Measure(name=measure_name, agg=AggregationType.SUM)],
                         dimensions=[
@@ -37,7 +37,7 @@ def test_incompatible_dimension_type() -> None:  # noqa:D
                             )
                         ],
                     ),
-                    data_source_with_guaranteed_meta(
+                    semantic_model_with_guaranteed_meta(
                         name="categoricaldim",
                         dimensions=[Dimension(name=dim_name, type=DimensionType.CATEGORICAL)],
                     ),
@@ -60,8 +60,8 @@ def test_incompatible_dimension_is_partition() -> None:  # noqa:D
         model_validator = ModelValidator([DimensionConsistencyRule()])
         model_validator.checked_validations(
             UserConfiguredModel(
-                data_sources=[
-                    data_source_with_guaranteed_meta(
+                semantic_models=[
+                    semantic_model_with_guaranteed_meta(
                         name="dim1",
                         measures=[Measure(name=measure_name, agg=AggregationType.SUM)],
                         dimensions=[
@@ -76,7 +76,7 @@ def test_incompatible_dimension_is_partition() -> None:  # noqa:D
                             )
                         ],
                     ),
-                    data_source_with_guaranteed_meta(
+                    semantic_model_with_guaranteed_meta(
                         name="dim2",
                         dimensions=[
                             Dimension(
@@ -106,11 +106,11 @@ def test_multiple_primary_time_dimensions() -> None:  # noqa:D
         dimension_reference = TimeDimensionReference(element_name="ds")
         dimension_reference2 = DimensionReference(element_name="not_ds")
         measure_reference = MeasureReference(element_name="measure")
-        model_validator = ModelValidator([DataSourceTimeDimensionWarningsRule()])
+        model_validator = ModelValidator([SemanticModelTimeDimensionWarningsRule()])
         model_validator.checked_validations(
             model=UserConfiguredModel(
-                data_sources=[
-                    DataSource(
+                semantic_models=[
+                    SemanticModel(
                         name="dim1",
                         node_relation=NodeRelation(
                             alias="table",

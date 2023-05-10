@@ -15,7 +15,7 @@ FROM (
       metric_time
       , SUM(bookings) AS bookings
     FROM (
-      -- Read Elements From Data Source 'bookings_source'
+      -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
       -- Pass Only Elements:
       --   ['bookings', 'metric_time']
@@ -40,7 +40,7 @@ FROM (
         metric_time
         , SUM(bookings) AS bookings_2_weeks_ago
       FROM (
-        -- Read Elements From Data Source 'bookings_source'
+        -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
         -- Pass Only Elements:
         --   ['bookings', 'metric_time']

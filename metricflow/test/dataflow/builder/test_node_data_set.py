@@ -1,6 +1,6 @@
 import logging
 
-from dbt_semantic_interfaces.references import DataSourceElementReference
+from dbt_semantic_interfaces.references import SemanticModelElementReference
 from metricflow.aggregation_properties import AggregationState
 from metricflow.column_assoc import ColumnAssociation, SingleColumnCorrelationKey
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
@@ -52,8 +52,8 @@ def test_no_parent_node_data_set(
                         ),
                     ),
                     defined_from=(
-                        DataSourceElementReference(
-                            data_source_name="fct_bookings_data_source", element_name="bookings"
+                        SemanticModelElementReference(
+                            semantic_model_name="fct_bookings_semantic_model", element_name="bookings"
                         ),
                     ),
                     spec=MeasureSpec(

@@ -6,7 +6,7 @@ from metricflow.model.model_validator import ModelValidator
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.model.validations.unique_valid_name import MetricFlowReservedKeywords, UniqueAndValidNameRule
-from metricflow.test.test_utils import find_data_source_with
+from metricflow.test.test_utils import find_semantic_model_with
 
 
 def copied_model(simple_model__with_primary_transforms: UserConfiguredModel) -> UserConfiguredModel:  # noqa: D
@@ -16,7 +16,7 @@ def copied_model(simple_model__with_primary_transforms: UserConfiguredModel) -> 
 """
     Top Level Tests
     Top level elements include
-    - Data Sources
+    - Semantic Models
     - Metrics
     - Metric Sets
     - Dimension Sets
@@ -27,13 +27,13 @@ def copied_model(simple_model__with_primary_transforms: UserConfiguredModel) -> 
 """
 
 
-def test_duplicate_data_source_name(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa: D
+def test_duplicate_semantic_model_name(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa: D
     model = copied_model(simple_model__with_primary_transforms)
-    duplicated_data_source = model.data_sources[0]
-    model.data_sources.append(duplicated_data_source)
+    duplicated_semantic_model = model.semantic_models[0]
+    model.semantic_models.append(duplicated_semantic_model)
     with pytest.raises(
         ModelValidationException,
-        match=rf"Can't use name `{duplicated_data_source.name}` for a data source when it was already used for a data source",
+        match=rf"Can't use name `{duplicated_semantic_model.name}` for a semantic model when it was already used for a semantic model",
     ):
         ModelValidator([UniqueAndValidNameRule()]).checked_validations(model)
 
@@ -54,34 +54,36 @@ def test_top_level_metric_can_have_same_name_as_any_other_top_level_item(
 ) -> None:  # noqa:D
     metric_name = simple_model__with_primary_transforms.metrics[0].name
 
-    model_data_source = copied_model(simple_model__with_primary_transforms)
+    model_semantic_model = copied_model(simple_model__with_primary_transforms)
 
-    model_data_source.data_sources[0].name = metric_name
+    model_semantic_model.semantic_models[0].name = metric_name
 
-    ModelValidator([UniqueAndValidNameRule()]).checked_validations(model_data_source)
+    ModelValidator([UniqueAndValidNameRule()]).checked_validations(model_semantic_model)
 
 
 """
-    Data Source Element Tests
-    There are three types of data source elements
+    Semantic Model Element Tests
+    There are three types of semantic model elements
     - measures
     - entities
     - dimensions
 
     A name for any of these elements must be unique to all other element names
-    for the given data source.
+    for the given semantic model.
 """
 
 
 def test_duplicate_measure_name(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa:D
     model = copied_model(simple_model__with_primary_transforms)
 
-    # Ensure we have a usable data source for the test
-    data_source_with_measures, _ = find_data_source_with(model, lambda data_source: len(data_source.measures) > 0)
+    # Ensure we have a usable semantic model for the test
+    semantic_model_with_measures, _ = find_semantic_model_with(
+        model, lambda semantic_model: len(semantic_model.measures) > 0
+    )
 
-    duplicated_measure = data_source_with_measures.measures[0]
-    duplicated_measures_tuple = (data_source_with_measures.measures, (duplicated_measure,))
-    data_source_with_measures.measures = tuple(more_itertools.flatten(duplicated_measures_tuple))
+    duplicated_measure = semantic_model_with_measures.measures[0]
+    duplicated_measures_tuple = (semantic_model_with_measures.measures, (duplicated_measure,))
+    semantic_model_with_measures.measures = tuple(more_itertools.flatten(duplicated_measures_tuple))
 
     with pytest.raises(
         ModelValidationException,
@@ -93,12 +95,14 @@ def test_duplicate_measure_name(simple_model__with_primary_transforms: UserConfi
 def test_duplicate_dimension_name(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa:D
     model = copied_model(simple_model__with_primary_transforms)
 
-    # Ensure we have a usable data source for the test
-    data_source_with_dimensions, _ = find_data_source_with(model, lambda data_source: len(data_source.dimensions) > 0)
+    # Ensure we have a usable semantic model for the test
+    semantic_model_with_dimensions, _ = find_semantic_model_with(
+        model, lambda semantic_model: len(semantic_model.dimensions) > 0
+    )
 
-    duplicated_dimension = data_source_with_dimensions.dimensions[0]
-    duplicated_dimensions_tuple = (data_source_with_dimensions.dimensions, (duplicated_dimension,))
-    data_source_with_dimensions.dimensions = tuple(more_itertools.flatten(duplicated_dimensions_tuple))
+    duplicated_dimension = semantic_model_with_dimensions.dimensions[0]
+    duplicated_dimensions_tuple = (semantic_model_with_dimensions.dimensions, (duplicated_dimension,))
+    semantic_model_with_dimensions.dimensions = tuple(more_itertools.flatten(duplicated_dimensions_tuple))
 
     with pytest.raises(
         ModelValidationException,
@@ -111,12 +115,14 @@ def test_duplicate_dimension_name(simple_model__with_primary_transforms: UserCon
 def test_duplicate_entity_name(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa:D
     model = copied_model(simple_model__with_primary_transforms)
 
-    # Ensure we have a usable data source for the test
-    data_source_with_entities, _ = find_data_source_with(model, lambda data_source: len(data_source.entities) > 0)
+    # Ensure we have a usable semantic model for the test
+    semantic_model_with_entities, _ = find_semantic_model_with(
+        model, lambda semantic_model: len(semantic_model.entities) > 0
+    )
 
-    duplicated_entity = data_source_with_entities.entities[0]
-    duplicated_entities_tuple = (data_source_with_entities.entities, (duplicated_entity,))
-    data_source_with_entities.entities = tuple(more_itertools.flatten(duplicated_entities_tuple))
+    duplicated_entity = semantic_model_with_entities.entities[0]
+    duplicated_entities_tuple = (semantic_model_with_entities.entities, (duplicated_entity,))
+    semantic_model_with_entities.entities = tuple(more_itertools.flatten(duplicated_entities_tuple))
 
     with pytest.raises(
         ModelValidationException,

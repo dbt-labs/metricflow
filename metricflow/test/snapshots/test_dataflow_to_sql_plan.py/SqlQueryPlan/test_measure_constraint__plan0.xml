@@ -435,7 +435,7 @@
                                             <!-- from_source = SqlSelectStatementNode(node_id=ss_10001) -->
                                             <!-- where = None -->
                                             <SqlSelectStatementNode>
-                                                <!-- description = Read Elements From Data Source 'bookings_source' -->
+                                                <!-- description = Read Elements From Semantic Model 'bookings_source' -->
                                                 <!-- node_id = ss_10001 -->
                                                 <!-- col0 =                                                         -->
                                                 <!--   {'class': 'SqlSelectColumn',                                 -->
@@ -828,7 +828,7 @@
                                             <!-- from_source = SqlSelectStatementNode(node_id=ss_10004) -->
                                             <!-- where = None -->
                                             <SqlSelectStatementNode>
-                                                <!-- description = Read Elements From Data Source 'listings_latest' -->
+                                                <!-- description = Read Elements From Semantic Model 'listings_latest' -->
                                                 <!-- node_id = ss_10004 -->
                                                 <!-- col0 =                                                         -->
                                                 <!--   {'class': 'SqlSelectColumn',                                 -->
@@ -1239,7 +1239,7 @@
                             <!-- from_source = SqlSelectStatementNode(node_id=ss_10001) -->
                             <!-- where = None -->
                             <SqlSelectStatementNode>
-                                <!-- description = Read Elements From Data Source 'bookings_source' -->
+                                <!-- description = Read Elements From Semantic Model 'bookings_source' -->
                                 <!-- node_id = ss_10001 -->
                                 <!-- col0 =                                                         -->
                                 <!--   {'class': 'SqlSelectColumn',                                 -->

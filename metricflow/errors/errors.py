@@ -39,7 +39,7 @@ class NonExistentMeasureError(SemanticException):  # noqa:D
     pass
 
 
-class InvalidDataSourceError(SemanticException):  # noqa:D
+class InvalidSemanticModelError(SemanticException):  # noqa:D
     pass
 
 

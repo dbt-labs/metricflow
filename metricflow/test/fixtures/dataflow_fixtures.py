@@ -4,7 +4,7 @@ import pytest
 
 from metricflow.dataflow.builder.costing import DefaultCostFunction
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.dataset.data_source_adapter import DataSourceDataSet
+from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.time_spine import TimeSpineSource, TimeSpineTableBuilder
 from metricflow.protocols.sql_client import SqlClient
@@ -24,12 +24,12 @@ def dataflow_plan_builder(  # noqa: D
     simple_semantic_manifest_lookup: SemanticManifestLookup,
     consistent_id_object_repository: ConsistentIdObjectRepository,
     time_spine_source: TimeSpineSource,
-) -> DataflowPlanBuilder[DataSourceDataSet]:
+) -> DataflowPlanBuilder[SemanticModelDataSet]:
 
     return DataflowPlanBuilder(
         source_nodes=consistent_id_object_repository.simple_model_source_nodes,
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
-        cost_function=DefaultCostFunction[DataSourceDataSet](),
+        cost_function=DefaultCostFunction[SemanticModelDataSet](),
         time_spine_source=time_spine_source,
     )
 
@@ -39,12 +39,12 @@ def multihop_dataflow_plan_builder(  # noqa: D
     multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
     consistent_id_object_repository: ConsistentIdObjectRepository,
     time_spine_source: TimeSpineSource,
-) -> DataflowPlanBuilder[DataSourceDataSet]:
+) -> DataflowPlanBuilder[SemanticModelDataSet]:
 
     return DataflowPlanBuilder(
         source_nodes=consistent_id_object_repository.multihop_model_source_nodes,
         semantic_manifest_lookup=multi_hop_join_semantic_manifest_lookup,
-        cost_function=DefaultCostFunction[DataSourceDataSet](),
+        cost_function=DefaultCostFunction[SemanticModelDataSet](),
         time_spine_source=time_spine_source,
     )
 
@@ -54,12 +54,12 @@ def scd_dataflow_plan_builder(  # noqa: D
     scd_semantic_manifest_lookup: SemanticManifestLookup,
     consistent_id_object_repository: ConsistentIdObjectRepository,
     time_spine_source: TimeSpineSource,
-) -> DataflowPlanBuilder[DataSourceDataSet]:
+) -> DataflowPlanBuilder[SemanticModelDataSet]:
 
     return DataflowPlanBuilder(
         source_nodes=consistent_id_object_repository.scd_model_source_nodes,
         semantic_manifest_lookup=scd_semantic_manifest_lookup,
-        cost_function=DefaultCostFunction[DataSourceDataSet](),
+        cost_function=DefaultCostFunction[SemanticModelDataSet](),
         time_spine_source=time_spine_source,
     )
 

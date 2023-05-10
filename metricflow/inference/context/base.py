@@ -14,7 +14,7 @@ TContext = TypeVar("TContext", bound=InferenceContext)
 
 
 class InferenceContextProvider(Generic[TContext], ABC):
-    """Provides a populated inference context from some datasource."""
+    """Provides a populated inference context from some SemanticModel."""
 
     @abstractmethod
     def get_context(self) -> TContext:

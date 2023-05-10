@@ -24,7 +24,7 @@ CALC_METHOD_TO_MEASURE_TYPE: Dict[str, AggregationType] = {
 
 
 class DbtToMeasureName(DbtMappingRule):
-    """Rule for mapping non-derived dbt metric names to data source measure names"""
+    """Rule for mapping non-derived dbt metric names to semantic model measure names"""
 
     @staticmethod
     def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
@@ -45,7 +45,7 @@ class DbtToMeasureName(DbtMappingRule):
 
 
 class DbtToMeasureAgg(DbtMappingRule):
-    """Rule for mapping non-derived dbt metric calculation method to data source measure agg"""
+    """Rule for mapping non-derived dbt metric calculation method to semantic model measure agg"""
 
     @staticmethod
     def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
@@ -68,7 +68,7 @@ class DbtToMeasureAgg(DbtMappingRule):
 
 
 class DbtToMeasureExpr(DbtMappingRule):
-    """Rule for mapping non-derived dbt metric expression to data source measure expression"""
+    """Rule for mapping non-derived dbt metric expression to semantic model measure expression"""
 
     @staticmethod
     def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
@@ -90,7 +90,7 @@ class DbtToMeasureExpr(DbtMappingRule):
 
 
 class DbtToMeasureAggTimeDimension(DbtMappingRule):
-    """Rule for mapping non-derived dbt metric timestamp to data source measure agg_time_dimension"""
+    """Rule for mapping non-derived dbt metric timestamp to semantic model measure agg_time_dimension"""
 
     @staticmethod
     def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D

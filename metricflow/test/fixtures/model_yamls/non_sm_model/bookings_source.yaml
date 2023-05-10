@@ -1,0 +1,28 @@
+---
+semantic_model:
+  name: bookings_source
+  description: bookings_source
+
+  node_relation:
+    schema_name: $source_schema
+    alias: fct_bookings_dt
+
+  measures:
+    - name: bookings
+      expr: "1"
+      agg: sum
+      create_metric: true
+
+  dimensions:
+    - name: is_instant
+      type: categorical
+    - name: dt
+      type: time
+      type_params:
+        is_primary: True
+        time_granularity: day
+
+  entities:
+    - name: listing
+      type: foreign
+      expr: listing_id
