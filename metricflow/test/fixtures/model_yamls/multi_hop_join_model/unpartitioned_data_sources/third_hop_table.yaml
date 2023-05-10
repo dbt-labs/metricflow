@@ -3,15 +3,14 @@ data_source:
   name: third_hop_table
   description: third_hop_table
 
-  sql_table: $source_schema.third_hop_table
+  node_relation:
+    schema_name: $source_schema
+    alias: third_hop_table
 
   dimensions:
     - name: value
       type: categorical
 
-  identifiers:
+  entities:
     - name: customer_third_hop_id
       type: primary
-
-  mutability:
-    type: immutable

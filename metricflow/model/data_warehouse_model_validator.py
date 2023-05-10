@@ -292,7 +292,7 @@ class DataWarehouseTaskBuilder:
 
         tasks: List[DataWarehouseValidationTask] = []
         for data_source in model.data_sources:
-            if not data_source.identifiers:
+            if not data_source.entities:
                 continue
             source_node = cls._data_source_nodes(render_tools=render_tools, data_source=data_source)[0]
 

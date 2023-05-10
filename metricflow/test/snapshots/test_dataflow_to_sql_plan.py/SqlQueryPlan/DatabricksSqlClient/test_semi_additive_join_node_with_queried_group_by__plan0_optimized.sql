@@ -23,10 +23,7 @@ FROM (
     , DATE_TRUNC('year', ds) AS ds__year
     , account_type
     , user_id AS user
-  FROM (
-    -- User Defined SQL Query
-    SELECT * FROM ***************************.fct_accounts
-  ) accounts_source_src_10000
+  FROM ***************************.fct_accounts accounts_source_src_10000
 ) subq_3
 INNER JOIN (
   -- Read Elements From Data Source 'accounts_source'
@@ -34,10 +31,7 @@ INNER JOIN (
   SELECT
     DATE_TRUNC('week', ds) AS ds__week
     , MIN(ds) AS ds__complete
-  FROM (
-    -- User Defined SQL Query
-    SELECT * FROM ***************************.fct_accounts
-  ) accounts_source_src_10000
+  FROM ***************************.fct_accounts accounts_source_src_10000
   GROUP BY
     DATE_TRUNC('week', ds)
 ) subq_5

@@ -7,9 +7,6 @@
 SELECT
   DATE_TRUNC('month', created_at) AS ds__month
   , SUM(revenue) AS trailing_2_months_revenue
-FROM (
-  -- User Defined SQL Query
-  SELECT * FROM ***************************.fct_revenue
-) revenue_src_10006
+FROM ***************************.fct_revenue revenue_src_10006
 GROUP BY
   DATE_TRUNC('month', created_at)

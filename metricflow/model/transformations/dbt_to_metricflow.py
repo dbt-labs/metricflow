@@ -202,7 +202,6 @@ class DbtManifestTransformer:
             name=metric_model_ref.name,
             description=metric_model_ref.description,
             sql_table=data_source_table,
-            dbt_model=data_source_table,
             dimensions=self.build_dimensions(dbt_metric),
             measures=[self.build_measure(dbt_metric)],
         )
@@ -276,13 +275,12 @@ class DbtManifestTransformer:
 
         # collect the variations of data source properties
         measures: Set[Measure] = set()
-        identifiers: Set[Entity] = set()
+        entities: Set[Entity] = set()
         dimensions: Set[Dimension] = set()
         names: Set[str] = set()
         descriptions: Set[str] = set()
         sql_tables: Set[str] = set()
         sql_queries: Set[str] = set()
-        dbt_models: Set[str] = set()
         for data_source in data_sources:
             # This is an atypical pattern but results in less work. The following
             # five lines are ternaries wherein the attribute is added to tracking
@@ -294,11 +292,10 @@ class DbtManifestTransformer:
             descriptions.add(data_source.description) if data_source.description else None
             sql_tables.add(data_source.sql_table) if data_source.sql_table else None
             sql_queries.add(data_source.sql_query) if data_source.sql_query else None
-            dbt_models.add(data_source.dbt_model) if data_source.dbt_model else None
 
             # ensure any unique sub elements get added to the set of sub elements
             measures = measures.union(set(data_source.measures)) if data_source.measures else measures
-            identifiers = identifiers.union(set(data_source.identifiers)) if data_source.identifiers else identifiers
+            entities = entities.union(set(data_source.entities)) if data_source.entities else entities
             dimensions = dimensions.union(set(data_source.dimensions)) if data_source.dimensions else dimensions
 
         assert len(names) == 1, "Cannot merge data sources, all data sources to merge must have same name"
@@ -314,18 +311,14 @@ class DbtManifestTransformer:
         assert xor(
             len(sql_tables) == 1, len(sql_queries) == 1
         ), "Cannot merge data sources, definitions for both sql_table and sql_query exist"
-        assert (
-            len(dbt_models) <= 1
-        ), "Cannot merge data sources, all data sources to merge must have same dbt_model (or none)"
 
         return DataSource(
             name=list(names)[0],
             description=list(descriptions)[0] if descriptions else None,
             sql_table=list(sql_tables)[0] if sql_tables else None,
             sql_query=list(sql_queries)[0] if sql_queries else None,
-            dbt_model=list(dbt_models)[0] if dbt_models else None,
             dimensions=list(dimensions),
-            identifiers=list(identifiers),
+            entities=list(entities),
             measures=list(measures),
         )
 

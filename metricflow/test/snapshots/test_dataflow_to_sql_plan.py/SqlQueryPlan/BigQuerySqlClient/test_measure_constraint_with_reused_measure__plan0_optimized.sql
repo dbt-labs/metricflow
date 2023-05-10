@@ -22,10 +22,7 @@ FROM (
       ds AS metric_time
       , is_instant
       , booking_value
-    FROM (
-      -- User Defined SQL Query
-      SELECT * FROM ***************************.fct_bookings
-    ) bookings_source_src_10001
+    FROM ***************************.fct_bookings bookings_source_src_10001
   ) subq_14
   WHERE is_instant
   GROUP BY
@@ -40,10 +37,7 @@ INNER JOIN (
   SELECT
     ds AS metric_time
     , SUM(booking_value) AS booking_value
-  FROM (
-    -- User Defined SQL Query
-    SELECT * FROM ***************************.fct_bookings
-  ) bookings_source_src_10001
+  FROM ***************************.fct_bookings bookings_source_src_10001
   GROUP BY
     metric_time
 ) subq_21

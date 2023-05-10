@@ -10,10 +10,7 @@ FROM (
   SELECT
     listing_id AS listing
     , 1 AS bookings
-  FROM (
-    -- User Defined SQL Query
-    SELECT * FROM ***************************.fct_bookings
-  ) bookings_source_src_10001
+  FROM ***************************.fct_bookings bookings_source_src_10001
 ) subq_5
 LEFT OUTER JOIN
   ***************************.dim_listings_latest listings_latest_src_10004

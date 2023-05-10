@@ -14,9 +14,9 @@ from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 
 
 def _get_join_types_for_entity_type(entity_type: EntityType) -> Sequence[DataSourceEntityJoinType]:
-    """Exhaustively evaluate identifier types and return a sequence of all possible join type pairs
+    """Exhaustively evaluate entity types and return a sequence of all possible join type pairs
 
-    The exhaustive conditional statically enforces that every identifier type is handled on the left.
+    The exhaustive conditional statically enforces that every entity type is handled on the left.
     The complete set of matching join types ensures that all pairs are used.
     """
 
@@ -36,20 +36,18 @@ def _get_join_types_for_entity_type(entity_type: EntityType) -> Sequence[DataSou
 
 
 def test_join_type_coverage() -> None:
-    """Ensures all identifier type pairs are handled somewhere in the valid/invalid join mapping sets
+    """Ensures all entity type pairs are handled somewhere in the valid/invalid join mapping sets
 
-    This will prevent surprise RuntimeErrors in production by raising static exceptions for unhandled identifier types
+    This will prevent surprise RuntimeErrors in production by raising static exceptions for unhandled entity types
     and triggering a test failure for types which are handled in a non-exhaustive fashion
     """
-    all_join_types = set(
-        DataSourceJoinEvaluator._INVALID_IDENTIFIER_JOINS + DataSourceJoinEvaluator._VALID_IDENTIFIER_JOINS
-    )
-    for identifier_type in EntityType:
-        join_types = _get_join_types_for_entity_type(entity_type=identifier_type)
+    all_join_types = set(DataSourceJoinEvaluator._INVALID_ENTITY_JOINS + DataSourceJoinEvaluator._VALID_ENTITY_JOINS)
+    for entity_type in EntityType:
+        join_types = _get_join_types_for_entity_type(entity_type=entity_type)
         for join_type in join_types:
             assert (
                 join_type in all_join_types
-            ), f"Unhandled identifier join type {join_type} not in valid or invalid identifier join lists!"
+            ), f"Unhandled entity join type {join_type} not in valid or invalid entity join lists!"
 
 
 def __get_simple_model_user_data_source_references_by_type(
@@ -78,10 +76,10 @@ def __get_simple_model_user_data_source_references_by_type(
 
 
 def test_distinct_target_data_source_join_validation(simple_semantic_manifest_lookup: SemanticManifestLookup) -> None:
-    """Tests data source join validation to a PRIMARY or UNIQUE identifier
+    """Tests data source join validation to a PRIMARY or UNIQUE entity
 
-    PRIMARY and UNIQUE identifier targets should be valid for any join at the data source level because they both
-    represent identifier columns with distinct value sets, and as such there is no risk of inadvertent fanout joins.
+    PRIMARY and UNIQUE entity targets should be valid for any join at the data source level because they both
+    represent entity columns with distinct value sets, and as such there is no risk of inadvertent fanout joins.
     """
     data_source_references = __get_simple_model_user_data_source_references_by_type(simple_semantic_manifest_lookup)
     user_entity_reference = EntityReference(element_name="user")
@@ -135,7 +133,7 @@ def test_distinct_target_data_source_join_validation(simple_semantic_manifest_lo
 
 
 def test_foreign_target_data_source_join_validation(simple_semantic_manifest_lookup: SemanticManifestLookup) -> None:
-    """Tests data source join validation to FOREIGN identifier types
+    """Tests data source join validation to FOREIGN entity types
 
     These should all fail by default, as fanout joins are not supported
     """
@@ -173,7 +171,7 @@ def test_foreign_target_data_source_join_validation(simple_semantic_manifest_loo
 
 
 def test_data_source_join_validation_on_missing_entity(simple_semantic_manifest_lookup: SemanticManifestLookup) -> None:
-    """Tests data source join validation where the identifier is missing from one or both data sources"""
+    """Tests data source join validation where the entity is missing from one or both data sources"""
     primary_listing_data_source = simple_semantic_manifest_lookup.data_source_semantics.get_by_reference(
         DataSourceReference("listings_latest")
     )
@@ -193,7 +191,7 @@ def test_data_source_join_validation_on_missing_entity(simple_semantic_manifest_
         on_entity_reference=listing_entity_reference,
     ), (
         "Found valid join on `listing` involving the `id_verifications` data source, which does not include the "
-        "`listing` identifier!"
+        "`listing` entity!"
     )
 
 
@@ -201,7 +199,7 @@ def test_distinct_target_instance_set_join_validation(
     consistent_id_object_repository: ConsistentIdObjectRepository,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
-    """Tests instance set join validation to a PRIMARY or UNIQUE identifier"""
+    """Tests instance set join validation to a PRIMARY or UNIQUE entity"""
     foreign_user_instance_set = consistent_id_object_repository.simple_model_data_sets["listings_latest"].instance_set
     primary_user_instance_set = consistent_id_object_repository.simple_model_data_sets["users_latest"].instance_set
     unique_user_instance_set = consistent_id_object_repository.simple_model_data_sets["companies"].instance_set
@@ -259,7 +257,7 @@ def test_foreign_target_instance_set_join_validation(
     consistent_id_object_repository: ConsistentIdObjectRepository,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
-    """Tests data source join validation to FOREIGN identifier types"""
+    """Tests data source join validation to FOREIGN entity types"""
     foreign_user_instance_set = consistent_id_object_repository.simple_model_data_sets["listings_latest"].instance_set
     primary_user_instance_set = consistent_id_object_repository.simple_model_data_sets["users_latest"].instance_set
     unique_user_instance_set = consistent_id_object_repository.simple_model_data_sets["companies"].instance_set
@@ -386,7 +384,7 @@ def test_get_joinable_data_sources_multi_hop(  # noqa: D
 
 
 def test_natural_entity_data_source_validation(scd_semantic_manifest_lookup: SemanticManifestLookup) -> None:
-    """Tests data source validation for NATURAL target identifier types
+    """Tests data source validation for NATURAL target entity types
 
     These tests rely on the scd_semantic_manifest_lookup, which makes extensive use of NATURAL key types.
     """
@@ -469,7 +467,7 @@ def test_natural_entity_data_source_validation(scd_semantic_manifest_lookup: Sem
 def test_natural_entity_instance_set_validation(
     consistent_id_object_repository: ConsistentIdObjectRepository, scd_semantic_manifest_lookup: SemanticManifestLookup
 ) -> None:
-    """Tests instance set validation for NATURAL target identifier types
+    """Tests instance set validation for NATURAL target entity types
 
     These tests rely on the scd_semantic_manifest_lookup, which makes extensive use of NATURAL key types.
     """

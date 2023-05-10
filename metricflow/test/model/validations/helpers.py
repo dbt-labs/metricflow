@@ -4,7 +4,7 @@ from typing import Optional, Sequence
 from metricflow.engine.models import Dimension
 from dbt_semantic_interfaces.objects.metadata import FileSlice, Metadata
 from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
-from dbt_semantic_interfaces.objects.data_source import DataSource, DataSourceOrigin, Mutability
+from dbt_semantic_interfaces.objects.data_source import DataSource, NodeRelation
 from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.metric import Metric, MetricType, MetricTypeParams
@@ -21,9 +21,11 @@ def base_model_file() -> YamlConfigFile:
         """\
         data_source:
           name: sample_data_source
-          sql_table: some_schema.source_table
-          identifiers:
-            - name: example_identifier
+          node_relation:
+            schema_name: some_schema
+            alias: source_table
+          entities:
+            - name: example_entity
               type: primary
               role: test_role
               expr: example_id
@@ -79,29 +81,28 @@ def metric_with_guaranteed_meta(
 
 def data_source_with_guaranteed_meta(
     name: str,
-    mutability: Mutability,
     description: Optional[str] = None,
-    sql_table: Optional[str] = None,
-    sql_query: Optional[str] = None,
-    dbt_model: Optional[str] = None,
+    node_relation: Optional[NodeRelation] = None,
     metadata: Metadata = default_meta(),
-    identifiers: Sequence[Entity] = [],
+    entities: Sequence[Entity] = [],
     measures: Sequence[Measure] = [],
     dimensions: Sequence[Dimension] = [],
-    origin: DataSourceOrigin = DataSourceOrigin.SOURCE,
 ) -> DataSource:
     """Creates a data source with the given input. If a metadata object is not supplied, a default metadata object is used"""
 
+    created_node_relation = node_relation
+    if created_node_relation is None:
+        created_node_relation = NodeRelation(
+            schema_name="schema",
+            alias="table",
+        )
+
     return DataSource(
         name=name,
-        mutability=mutability,
         description=description,
-        sql_table=sql_table,
-        sql_query=sql_query,
-        dbt_model=dbt_model,
-        identifiers=identifiers,
+        node_relation=created_node_relation,
+        entities=entities,
         measures=measures,
         dimensions=dimensions,
-        origin=origin,
         metadata=metadata,
     )

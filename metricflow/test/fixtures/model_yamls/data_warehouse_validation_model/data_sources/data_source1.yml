@@ -3,7 +3,9 @@ data_source:
   name: animals
   description: If a user is a company / business, this defines the mapping.
 
-  sql_query: "SELECT * FROM $source_schema.fct_animals"
+  node_relation:
+    schema_name: $source_schema
+    alias: fct_animals
 
   dimensions:
     - name: ds
@@ -19,9 +21,7 @@ data_source:
       agg: sum
       expr: 1
       create_metric: True
-  identifiers:
+  entities:
     - name: id
       type: primary
       expr: "1"
-  mutability:
-    type: immutable

@@ -1,8 +1,11 @@
 data_source:
   name: shopify_order
   owners:  # This will throw an error unless you add a list of owners or remove this entry.
-  sql_table: SHOPIFY."ORDER" ### Update to your order schema.table
-  identifiers:
+  node_relation:  ### Update to your order schema.table
+    alias: ORDER
+    schema_name: SHOPIFY
+    relation_name: SHOPIFY."ORDER"
+  entities:
     - name: order
       type: primary
       expr: id

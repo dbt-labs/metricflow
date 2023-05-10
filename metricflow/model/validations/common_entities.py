@@ -23,7 +23,7 @@ class CommonEntitysRule(ModelValidationRule):
         """Generate mapping of entity names to the set of data_sources where it is defined"""
         entities_to_data_sources: Dict[EntityReference, Set[str]] = {}
         for data_source in data_sources or []:
-            for entity in data_source.identifiers or []:
+            for entity in data_source.entities or []:
                 if entity.reference in entities_to_data_sources:
                     entities_to_data_sources[entity.reference].add(data_source.name)
                 else:
@@ -68,7 +68,7 @@ class CommonEntitysRule(ModelValidationRule):
 
         entities_to_data_sources = CommonEntitysRule._map_data_source_entities(model.data_sources)
         for data_source in model.data_sources or []:
-            for entity in data_source.identifiers or []:
+            for entity in data_source.entities or []:
                 issues += CommonEntitysRule._check_entity(
                     entity=entity,
                     data_source=data_source,

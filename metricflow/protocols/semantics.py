@@ -11,7 +11,7 @@ from __future__ import annotations
 from abc import abstractmethod, ABC
 from typing import Dict, FrozenSet, Optional, Sequence, Set
 
-from dbt_semantic_interfaces.objects.data_source import DataSource, DataSourceOrigin
+from dbt_semantic_interfaces.objects.data_source import DataSource
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension
 from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.elements.measure import Measure
@@ -51,9 +51,7 @@ class DataSourceSemanticsAccessor(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_dimension(
-        self, dimension_reference: DimensionReference, origin: Optional[DataSourceOrigin] = None
-    ) -> Dimension:
+    def get_dimension(self, dimension_reference: DimensionReference) -> Dimension:
         """Retrieve the dimension model object associated with the time dimension reference"""
         raise NotImplementedError
 

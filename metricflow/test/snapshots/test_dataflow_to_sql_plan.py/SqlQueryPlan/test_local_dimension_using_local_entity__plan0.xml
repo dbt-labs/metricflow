@@ -328,11 +328,11 @@
                         <!--   {'class': 'SqlSelectColumn',                              -->
                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10122),  -->
                         <!--    'column_alias': 'listing__user'}                         -->
-                        <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10002) -->
+                        <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10004) -->
                         <!-- where = None -->
                         <SqlTableFromClauseNode>
                             <!-- description = Read from ***************************.dim_listings_latest -->
-                            <!-- node_id = tfc_10002 -->
+                            <!-- node_id = tfc_10004 -->
                             <!-- table_id = ***************************.dim_listings_latest -->
                         </SqlTableFromClauseNode>
                     </SqlSelectStatementNode>

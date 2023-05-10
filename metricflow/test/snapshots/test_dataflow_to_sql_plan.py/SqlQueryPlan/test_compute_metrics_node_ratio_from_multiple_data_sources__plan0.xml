@@ -604,12 +604,13 @@
                                         <!--   {'class': 'SqlSelectColumn',                                -->
                                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10059),    -->
                                         <!--    'column_alias': 'create_a_cycle_in_the_join_graph__host'}  -->
-                                        <!-- from_source = SqlSelectQueryFromClauseNode(node_id=tfc_10001) -->
+                                        <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10001) -->
                                         <!-- where = None -->
-                                        <SqlSelectQueryFromClauseNode>
-                                            <!-- description = Read From a Select Query -->
+                                        <SqlTableFromClauseNode>
+                                            <!-- description = Read from ***************************.fct_bookings -->
                                             <!-- node_id = tfc_10001 -->
-                                        </SqlSelectQueryFromClauseNode>
+                                            <!-- table_id = ***************************.fct_bookings -->
+                                        </SqlTableFromClauseNode>
                                     </SqlSelectStatementNode>
                                 </SqlSelectStatementNode>
                             </SqlSelectStatementNode>
@@ -912,11 +913,11 @@
                                         <!--   {'class': 'SqlSelectColumn',                              -->
                                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10122),  -->
                                         <!--    'column_alias': 'listing__user'}                         -->
-                                        <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10002) -->
+                                        <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10004) -->
                                         <!-- where = None -->
                                         <SqlTableFromClauseNode>
                                             <!-- description = Read from ***************************.dim_listings_latest -->
-                                            <!-- node_id = tfc_10002 -->
+                                            <!-- node_id = tfc_10004 -->
                                             <!-- table_id = ***************************.dim_listings_latest -->
                                         </SqlTableFromClauseNode>
                                     </SqlSelectStatementNode>
@@ -1251,12 +1252,13 @@
                                         <!--   {'class': 'SqlSelectColumn',                                -->
                                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10203),    -->
                                         <!--    'column_alias': 'create_a_cycle_in_the_join_graph__user'}  -->
-                                        <!-- from_source = SqlSelectQueryFromClauseNode(node_id=tfc_10003) -->
+                                        <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10009) -->
                                         <!-- where = None -->
-                                        <SqlSelectQueryFromClauseNode>
-                                            <!-- description = Read From a Select Query -->
-                                            <!-- node_id = tfc_10003 -->
-                                        </SqlSelectQueryFromClauseNode>
+                                        <SqlTableFromClauseNode>
+                                            <!-- description = Read from ***************************.fct_views -->
+                                            <!-- node_id = tfc_10009 -->
+                                            <!-- table_id = ***************************.fct_views -->
+                                        </SqlTableFromClauseNode>
                                     </SqlSelectStatementNode>
                                 </SqlSelectStatementNode>
                             </SqlSelectStatementNode>
@@ -1559,11 +1561,11 @@
                                         <!--   {'class': 'SqlSelectColumn',                              -->
                                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10122),  -->
                                         <!--    'column_alias': 'listing__user'}                         -->
-                                        <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10002) -->
+                                        <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10004) -->
                                         <!-- where = None -->
                                         <SqlTableFromClauseNode>
                                             <!-- description = Read from ***************************.dim_listings_latest -->
-                                            <!-- node_id = tfc_10002 -->
+                                            <!-- node_id = tfc_10004 -->
                                             <!-- table_id = ***************************.dim_listings_latest -->
                                         </SqlTableFromClauseNode>
                                     </SqlSelectStatementNode>

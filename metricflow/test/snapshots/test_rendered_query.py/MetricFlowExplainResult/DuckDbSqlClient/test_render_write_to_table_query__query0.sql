@@ -12,10 +12,7 @@ CREATE TABLE ***************************.test_table AS (
     SELECT
       ds
       , 1 AS bookings
-    FROM (
-      -- User Defined SQL Query
-      SELECT * FROM ***************************.fct_bookings
-    ) bookings_source_src_1
+    FROM ***************************.fct_bookings bookings_source_src_1
   ) subq_2
   GROUP BY
     ds

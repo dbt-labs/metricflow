@@ -3,9 +3,9 @@ data_source:
   name: accounts_source
   description: accounts_source
 
-  sql_query: |
-    -- User Defined SQL Query
-    SELECT * FROM $source_schema.fct_accounts
+  node_relation:
+    schema_name: $source_schema
+    alias: fct_accounts
 
   measures:
     - name: account_balance
@@ -36,7 +36,7 @@ data_source:
     - name: account_type
       type: categorical
 
-  identifiers:
+  entities:
     - name: user
       type: foreign
       expr: user_id

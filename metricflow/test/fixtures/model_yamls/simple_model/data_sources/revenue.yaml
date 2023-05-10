@@ -3,9 +3,9 @@ data_source:
   name: revenue
   description: revenue
 
-  sql_query: |
-    -- User Defined SQL Query
-    SELECT * FROM $source_schema.fct_revenue
+  node_relation:
+    schema_name: $source_schema
+    alias: fct_revenue
 
   measures:
     - name: txn_revenue
@@ -20,10 +20,7 @@ data_source:
         is_primary: True
         time_granularity: day
 
-  identifiers:
+  entities:
     - name: user
       type: foreign
       expr: user_id
-
-  mutability:
-    type: immutable

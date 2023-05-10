@@ -40,7 +40,6 @@ from metricflow.sql.sql_plan import (
     SqlSelectStatementNode,
     SqlSelectColumn,
     SqlQueryPlanNode,
-    SqlSelectQueryFromClauseNode,
 )
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
@@ -355,7 +354,7 @@ class DataSourceToDataSetConverter:
         # the dimensions "country" and "user_id__country" both mean the same thing. To make matching easier, create both
         # instances in the instance set. We'll create a different instance for each "possible_entity_links".
         possible_entity_links: List[Tuple[EntityReference, ...]] = [()]
-        for entity in data_source.identifiers:
+        for entity in data_source.entities:
             if entity.is_linkable_entity_type:
                 possible_entity_links.append((entity.reference,))
 
@@ -398,7 +397,7 @@ class DataSourceToDataSetConverter:
         for entity_links in possible_entity_links:
             entity_instances, select_columns = self._create_entity_instances(
                 data_source_name=data_source.name,
-                entities=data_source.identifiers,
+                entities=data_source.entities,
                 entity_links=entity_links,
                 table_alias=from_source_alias,
             )
@@ -407,12 +406,7 @@ class DataSourceToDataSetConverter:
 
         # Generate the "from" clause depending on whether it's an SQL query or an SQL table.
         from_source: Optional[SqlQueryPlanNode] = None
-        if data_source.sql_table:
-            from_source = SqlTableFromClauseNode(sql_table=SqlTable.from_string(data_source.sql_table))
-        elif data_source.sql_query:
-            from_source = SqlSelectQueryFromClauseNode(select_query=data_source.sql_query)
-        else:
-            raise RuntimeError(f"Data source does not have sql_table or sql_query set: {data_source}")
+        from_source = SqlTableFromClauseNode(sql_table=SqlTable.from_string(data_source.node_relation.relation_name))
 
         select_statement_node = SqlSelectStatementNode(
             description=f"Read Elements From Data Source '{data_source.name}'",

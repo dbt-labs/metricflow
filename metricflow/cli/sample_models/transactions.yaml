@@ -9,7 +9,7 @@ data_source:
     customer id. The `ds` or date is reflected in UTC.
   owners: 
     - support@transformdata.io
-  identifiers:
+  entities:
     - name: transaction
       type: primary
       expr: id_transaction
@@ -71,10 +71,9 @@ data_source:
           WHEN transaction_type_name = 'quick-buy' THEN 'Quick Buy'
           ELSE 'Not Quick Buy' 
         END
-
-  sql_table: $transactions_table
-  mutability:
-    type: immutable
+  node_relation:
+    alias: $transactions_table
+    schema_name: $system_schema
 
 ---
 metric: 

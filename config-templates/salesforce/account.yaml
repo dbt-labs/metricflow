@@ -2,10 +2,10 @@ data_source:
   name: salesforce_account
   owners:
     - support@transformdata.io
-  sql_table: SALESFORCE.account ### Update to your account schema.table
-  mutability:
-    type: immutable
-  identifiers:
+  node_relation:  ### Update to your account schema.table
+    alias: account
+    schema_name: SALESFORCE
+  entities:
     - name: account
       type: primary
       expr: id

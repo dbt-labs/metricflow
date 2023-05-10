@@ -21,9 +21,6 @@
             "$id": "data_source",
             "additionalProperties": false,
             "properties": {
-                "dbt_model": {
-                    "type": "string"
-                },
                 "description": {
                     "type": "string"
                 },
@@ -33,7 +30,7 @@
                     },
                     "type": "array"
                 },
-                "identifiers": {
+                "entities": {
                     "items": {
                         "$ref": "#/definitions/entity_schema"
                     },
@@ -45,18 +42,12 @@
                     },
                     "type": "array"
                 },
-                "mutability": {
-                    "$ref": "#/definitions/mutability_schema"
-                },
                 "name": {
                     "pattern": "(?!.*__).*^[a-z][a-z0-9_]*[a-z0-9]$",
                     "type": "string"
                 },
-                "sql_query": {
-                    "type": "string"
-                },
-                "sql_table": {
-                    "type": "string"
+                "node_relation": {
+                    "$ref": "#/definitions/node_relation_schema"
                 }
             },
             "required": [
@@ -412,48 +403,27 @@
             },
             "type": "object"
         },
-        "mutability_schema": {
-            "$id": "mutability_schema",
+        "node_relation_schema": {
+            "$id": "node_relation_schema",
             "additionalProperties": false,
             "properties": {
-                "type": {
-                    "enum": [
-                        "IMMUTABLE",
-                        "APPEND_ONLY",
-                        "FULL_MUTATION",
-                        "DS_APPEND_ONLY",
-                        "immutable",
-                        "append_only",
-                        "full_mutation",
-                        "ds_append_only"
-                    ]
+                "alias": {
+                    "type": "string"
                 },
-                "type_params": {
-                    "$ref": "#/definitions/mutability_type_params_schema"
+                "database": {
+                    "type": "string"
+                },
+                "relation_name": {
+                    "type": "string"
+                },
+                "schema_name": {
+                    "type": "string"
                 }
             },
             "required": [
-                "type"
+                "alias",
+                "schema_name"
             ],
-            "type": "object"
-        },
-        "mutability_type_params_schema": {
-            "$id": "mutability_type_params_schema",
-            "additionalProperties": false,
-            "properties": {
-                "along": {
-                    "type": "string"
-                },
-                "max": {
-                    "type": "string"
-                },
-                "min": {
-                    "type": "string"
-                },
-                "update_cron": {
-                    "type": "string"
-                }
-            },
             "type": "object"
         },
         "non_additive_dimension_schema": {

@@ -61,8 +61,8 @@ def test_for_breaking_model_changes(dbt_metrics: Tuple[MetricNode, ...]) -> None
                 mf_data_source is not None
             ), f"Failed to create data source `{dbt_metric.model.name}` from dbt metric `{dbt_metric.name}`"
             assert (
-                mf_data_source.sql_table is not None
-            ), f"Data source `{mf_data_source.name}` created from dbt metric `{dbt_metric.name}` is missing an `sql_table`"
+                mf_data_source.node_relation is not None
+            ), f"Data source `{mf_data_source.name}` created from dbt metric `{dbt_metric.name}` is missing an `node_relation`"
             if dbt_metric.model.description is not None:
                 assert (
                     mf_data_source.description is not None

@@ -3,16 +3,14 @@ data_source:
   name: lux_listing_mapping
   description: lux_listing_mapping
 
-  sql_table: $source_schema.dim_lux_listing_id_mapping
+  node_relation:
+    schema_name: $source_schema
+    alias: dim_lux_listing_id_mapping
 
-  identifiers:
+  entities:
     - name: listing
       type: primary
       expr: listing_id
     - name: lux_listing
       type: foreign
       expr: lux_listing_id
-
-
-  mutability:
-    type: immutable

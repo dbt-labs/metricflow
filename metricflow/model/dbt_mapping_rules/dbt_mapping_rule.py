@@ -25,7 +25,7 @@ class MappedObjects:
         default_factory=lambda: defaultdict(lambda: defaultdict(dict))
     )
     # access path is ["data_source_name"]["entity_name"] -> dict entity representation
-    identifiers: DefaultDict[str, DefaultDict[str, Dict[str, TransformedObjectsValueType]]] = field(
+    entities: DefaultDict[str, DefaultDict[str, Dict[str, TransformedObjectsValueType]]] = field(
         default_factory=lambda: defaultdict(lambda: defaultdict(dict))
     )
     # access path is ["data_source_name"]["measure_name"] -> dict measure representation

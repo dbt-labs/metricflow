@@ -8,10 +8,7 @@
 SELECT
   DATE_TRUNC('month', created_at) AS ds__month
   , SUM(revenue) AS revenue_all_time
-FROM (
-  -- User Defined SQL Query
-  SELECT * FROM ***************************.fct_revenue
-) revenue_src_10006
+FROM ***************************.fct_revenue revenue_src_10006
 WHERE created_at BETWEEN CAST('2000-01-01' AS TIMESTAMP) AND CAST('2020-01-01' AS TIMESTAMP)
 GROUP BY
   DATE_TRUNC('month', created_at)

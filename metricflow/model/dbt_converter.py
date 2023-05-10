@@ -12,7 +12,7 @@ from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
 from metricflow.model.dbt_mapping_rules.dbt_metric_model_to_data_source_rules import (
     DbtMapToDataSourceName,
     DbtMapToDataSourceDescription,
-    DbtMapDataSourceSqlTable,
+    DbtMapDataSourceNodeRelation,
 )
 from metricflow.model.dbt_mapping_rules.dbt_metric_to_metrics_rules import (
     DbtToMetricName,
@@ -46,7 +46,7 @@ DEFAULT_RULES: FrozenSet[DbtMappingRule] = frozenset(
         # Build data sources
         DbtMapToDataSourceName(),
         DbtMapToDataSourceDescription(),
-        DbtMapDataSourceSqlTable(),
+        DbtMapDataSourceNodeRelation(),
         # Build Metrics
         DbtToMetricName(),
         DbtToMetricDescription(),
@@ -115,8 +115,8 @@ class DbtConverter:
         # Move dimensions, entities, and measures on to their respective data sources
         for data_source_name, dimensions_map in copied_objects.dimensions.items():
             copied_objects.data_sources[data_source_name]["dimensions"] = list(dimensions_map.values())
-        for data_source_name, entities_map in copied_objects.identifiers.items():
-            copied_objects.data_sources[data_source_name]["identifiers"] = list(entities_map.values())
+        for data_source_name, entities_map in copied_objects.entities.items():
+            copied_objects.data_sources[data_source_name]["entities"] = list(entities_map.values())
         for data_source_name, measure_map in copied_objects.measures.items():
             copied_objects.data_sources[data_source_name]["measures"] = list(measure_map.values())
 

@@ -22,10 +22,7 @@ FROM (
       SELECT
         ds AS metric_time
         , 1 AS bookings
-      FROM (
-        -- User Defined SQL Query
-        SELECT * FROM ***************************.fct_bookings
-      ) bookings_source_src_10001
+      FROM ***************************.fct_bookings bookings_source_src_10001
     ) subq_10
     GROUP BY
       metric_time

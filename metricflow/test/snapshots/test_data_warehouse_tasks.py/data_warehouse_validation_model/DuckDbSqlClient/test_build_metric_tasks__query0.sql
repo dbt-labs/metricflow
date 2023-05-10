@@ -11,9 +11,7 @@ FROM (
   SELECT
     ds AS metric_time
     , 1 AS count_dogs
-  FROM (
-    SELECT * FROM ***************************.fct_animals
-  ) animals_src_0
+  FROM ***************************.fct_animals animals_src_0
 ) subq_2
 GROUP BY
   metric_time

@@ -26,10 +26,7 @@
         <!--         ds                                                                              -->
         <!--         , is_instant                                                                    -->
         <!--         , 1 AS bookings                                                                 -->
-        <!--       FROM (                                                                            -->
-        <!--         -- User Defined SQL Query                                                       -->
-        <!--         SELECT * FROM ***************************.fct_bookings                          -->
-        <!--       ) bookings_source_src_10001                                                       -->
+        <!--       FROM ***************************.fct_bookings bookings_source_src_10001           -->
         <!--     ) subq_2                                                                            -->
         <!--     GROUP BY                                                                            -->
         <!--       ds                                                                                -->
@@ -51,10 +48,7 @@
         <!--         ds                                                                              -->
         <!--         , is_instant                                                                    -->
         <!--         , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings                    -->
-        <!--       FROM (                                                                            -->
-        <!--         -- User Defined SQL Query                                                       -->
-        <!--         SELECT * FROM ***************************.fct_bookings                          -->
-        <!--       ) bookings_source_src_10001                                                       -->
+        <!--       FROM ***************************.fct_bookings bookings_source_src_10001           -->
         <!--     ) subq_7                                                                            -->
         <!--     GROUP BY                                                                            -->
         <!--       ds                                                                                -->
@@ -73,10 +67,7 @@
         <!--       ds                                                                                -->
         <!--       , is_instant                                                                      -->
         <!--       , SUM(booking_value) AS booking_value                                             -->
-        <!--     FROM (                                                                              -->
-        <!--       -- User Defined SQL Query                                                         -->
-        <!--       SELECT * FROM ***************************.fct_bookings                            -->
-        <!--     ) bookings_source_src_10001                                                         -->
+        <!--     FROM ***************************.fct_bookings bookings_source_src_10001             -->
         <!--     GROUP BY                                                                            -->
         <!--       ds                                                                                -->
         <!--       , is_instant                                                                      -->

@@ -140,16 +140,22 @@ def gen_sample_model_configs(dir_path: str, system_schema: str) -> None:
     """Generates the sample model configs to a specified directory."""
 
     with open(CUSTOMERS_YAML_FILE) as f:
-        contents = Template(f.read()).substitute({"customers_table": f"{system_schema}.{CUSTOMERS_TABLE}"})
+        contents = Template(f.read()).substitute(
+            {"customers_table": f"{CUSTOMERS_TABLE}", "system_schema": system_schema}
+        )
     with open(f"{dir_path}/{CUSTOMERS_TABLE}.yaml", "w") as file:
         file.write(contents)
 
     with open(TRANSACTIONS_YAML_FILE) as f:
-        contents = Template(f.read()).substitute({"transactions_table": f"{system_schema}.{TRANSACTIONS_TABLE}"})
+        contents = Template(f.read()).substitute(
+            {"transactions_table": f"{TRANSACTIONS_TABLE}", "system_schema": system_schema}
+        )
     with open(f"{dir_path}/{TRANSACTIONS_TABLE}.yaml", "w") as file:
         file.write(contents)
 
     with open(COUNTRIES_YAML_FILE) as f:
-        contents = Template(f.read()).substitute({"countries_table": f"{system_schema}.{COUNTRIES_TABLE}"})
+        contents = Template(f.read()).substitute(
+            {"countries_table": f"{COUNTRIES_TABLE}", "system_schema": system_schema}
+        )
     with open(f"{dir_path}/{COUNTRIES_TABLE}.yaml", "w") as file:
         file.write(contents)

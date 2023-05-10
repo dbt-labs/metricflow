@@ -22,10 +22,7 @@ FROM (
       SELECT
         ds AS metric_time
         , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
-      FROM (
-        -- User Defined SQL Query
-        SELECT * FROM ***************************.fct_bookings
-      ) bookings_source_src_10001
+      FROM ***************************.fct_bookings bookings_source_src_10001
     ) subq_13
     GROUP BY
       metric_time
@@ -44,10 +41,7 @@ FROM (
       SELECT
         ds AS metric_time
         , 1 AS bookings
-      FROM (
-        -- User Defined SQL Query
-        SELECT * FROM ***************************.fct_bookings
-      ) bookings_source_src_10001
+      FROM ***************************.fct_bookings bookings_source_src_10001
     ) subq_18
     GROUP BY
       metric_time

@@ -3,7 +3,7 @@ from collections import defaultdict
 from copy import deepcopy
 from typing import Dict, List, Optional, Set, Sequence
 
-from dbt_semantic_interfaces.objects.data_source import DataSource, DataSourceOrigin
+from dbt_semantic_interfaces.objects.data_source import DataSource
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension
 from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.elements.measure import Measure
@@ -62,13 +62,9 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
     def get_dimension_references(self) -> Sequence[DimensionReference]:  # noqa: D
         return tuple(self._dimension_index.keys())
 
-    def get_dimension(
-        self, dimension_reference: DimensionReference, origin: Optional[DataSourceOrigin] = None
-    ) -> Dimension:
+    def get_dimension(self, dimension_reference: DimensionReference) -> Dimension:
         """Retrieves a full dimension object by name"""
         for dimension_source in self._dimension_index[dimension_reference]:
-            if origin and dimension_source.origin != origin:
-                continue
             dimension = dimension_source.get_dimension(dimension_reference)
             # find the data source that has the requested dimension by the requested entity
 
@@ -127,7 +123,7 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
         if not data_source:
             return None
 
-        for entity in data_source.identifiers:
+        for entity in data_source.entities:
             if entity.reference.element_name == ref.element_name:
                 return entity
 
@@ -176,7 +172,7 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
         for dim in data_source.dimensions:
             self._linkable_reference_index[dim.reference].append(data_source)
             self._dimension_index[dim.reference].append(data_source)
-        for entity in data_source.identifiers:
+        for entity in data_source.entities:
             self._entity_ref_to_entity[entity.reference] = entity.name
             self._entity_index[entity.name].append(data_source)
             self._linkable_reference_index[entity.reference].append(data_source)
@@ -198,6 +194,6 @@ class DataSourceSemantics(DataSourceSemanticsAccessor):
         return self._data_source_to_aggregation_time_dimensions[data_source_reference]
 
     def get_data_sources_for_entity(self, entity_reference: EntityReference) -> Set[DataSource]:
-        """Return all data sources associated with an identifier reference"""
+        """Return all data sources associated with an entity reference"""
         entity = self._entity_ref_to_entity[entity_reference]
         return set(self._entity_index[entity])

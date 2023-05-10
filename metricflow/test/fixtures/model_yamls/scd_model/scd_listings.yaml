@@ -3,7 +3,9 @@ data_source:
   name: listings
   description: SCD Type II table of listings history
 
-  sql_table: $source_schema.dim_listings
+  node_relation:
+    schema_name: $source_schema
+    alias: dim_listings
 
   dimensions:
     - name: window_start
@@ -27,7 +29,7 @@ data_source:
     - name: capacity
       type: categorical
 
-  identifiers:
+  entities:
     - name: listing
       type: natural
       expr: listing_id

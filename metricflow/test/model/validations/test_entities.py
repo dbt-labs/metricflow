@@ -20,25 +20,25 @@ from metricflow.test.model.validations.helpers import base_model_file
 from metricflow.test.test_utils import find_data_source_with
 
 
-def test_data_source_cant_have_more_than_one_primary_identifier(
+def test_data_source_cant_have_more_than_one_primary_entity(
     simple_model__with_primary_transforms: UserConfiguredModel,
 ) -> None:  # noqa: D
-    """Add an additional primary identifier to a data source and assert that it cannot have two"""
+    """Add an additional primary entity to a data source and assert that it cannot have two"""
     model = copy.deepcopy(simple_model__with_primary_transforms)
-    func: Callable[[DataSource], bool] = lambda data_source: len(data_source.identifiers) > 1
+    func: Callable[[DataSource], bool] = lambda data_source: len(data_source.entities) > 1
 
-    multiple_identifier_data_source, _ = find_data_source_with(model, func)
+    multiple_entity_data_source, _ = find_data_source_with(model, func)
 
     entity_references = set()
-    for identifier in multiple_identifier_data_source.identifiers:
-        identifier.type = EntityType.PRIMARY
-        entity_references.add(identifier.reference)
+    for entity in multiple_entity_data_source.entities:
+        entity.type = EntityType.PRIMARY
+        entity_references.add(entity.reference)
 
     model_issues = ModelValidator([OnePrimaryEntityPerDataSourceRule()]).validate_model(model)
 
     future_issue = (
         f"Data sources can have only one primary entity. The data source"
-        f" `{multiple_identifier_data_source.name}` has {len(entity_references)}"
+        f" `{multiple_entity_data_source.name}` has {len(entity_references)}"
     )
 
     found_future_issue = False
@@ -51,14 +51,16 @@ def test_data_source_cant_have_more_than_one_primary_identifier(
     assert found_future_issue
 
 
-def test_multiple_natural_identifiers() -> None:
+def test_multiple_natural_entities() -> None:
     """Test validation enforcing that a single data source cannot have more than one natural entity"""
     yaml_contents = textwrap.dedent(
         """\
         data_source:
-          name: too_many_natural_identifiers
-          sql_table: some_schema.natural_identifier_table
-          identifiers:
+          name: too_many_natural_entities
+          node_relation:
+            schema_name: some_schema
+            alias: natural_entity_table
+          entities:
             - name: natural_key_one
               type: natural
             - name: natural_key_two
@@ -80,21 +82,23 @@ def test_multiple_natural_identifiers() -> None:
                   is_end: true
         """
     )
-    natural_identifier_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
-    model = parse_yaml_files_to_validation_ready_model([base_model_file(), natural_identifier_file])
+    natural_entity_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+    model = parse_yaml_files_to_validation_ready_model([base_model_file(), natural_entity_file])
 
     with pytest.raises(ModelValidationException, match="can have at most one natural entity"):
         ModelValidator([NaturalEntityConfigurationRule()]).checked_validations(model.model)
 
 
-def test_natural_identifier_used_in_wrong_context() -> None:
+def test_natural_entity_used_in_wrong_context() -> None:
     """Test validation enforcing that a single data source cannot have more than one natural entity"""
     yaml_contents = textwrap.dedent(
         """\
         data_source:
-          name: random_natural_identifier
-          sql_table: some_schema.random_natural_identifier_table
-          identifiers:
+          name: random_natural_entity
+          node_relation:
+            schema_name: some_schema
+            alias: random_natural_entity_table
+          entities:
             - name: natural_key
               type: natural
           dimensions:
@@ -102,8 +106,8 @@ def test_natural_identifier_used_in_wrong_context() -> None:
               type: categorical
         """
     )
-    natural_identifier_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
-    model = parse_yaml_files_to_validation_ready_model([base_model_file(), natural_identifier_file])
+    natural_entity_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+    model = parse_yaml_files_to_validation_ready_model([base_model_file(), natural_entity_file])
 
     with pytest.raises(ModelValidationException, match="use of `natural` entities is currently supported only in"):
         ModelValidator([NaturalEntityConfigurationRule()]).checked_validations(model.model)

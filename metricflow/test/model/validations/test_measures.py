@@ -48,9 +48,11 @@ def test_measures_only_exist_in_one_data_source() -> None:  # noqa: D
         """\
         data_source:
           name: sample_data_source
-          sql_table: some_schema.source_table
-          identifiers:
-            - name: example_identifier
+          node_relation:
+            schema_name: some_schema
+            alias: source_table
+          entities:
+            - name: example_entity
               type: primary
               role: test_role
               expr: example_id
@@ -84,9 +86,11 @@ def test_measures_only_exist_in_one_data_source() -> None:  # noqa: D
         """\
         data_source:
           name: sample_data_source_2
-          sql_table: some_schema.source_table
-          identifiers:
-            - name: example_identifier_2
+          node_relation:
+            schema_name: some_schema
+            alias: source_table
+          entities:
+            - name: example_entity_2
               type: primary
               role: test_role
               expr: example_id
@@ -122,9 +126,11 @@ def test_measure_alias_is_set_when_required() -> None:
         f"""\
         data_source:
           name: sample_data_source
-          sql_table: some_schema.source_table
-          identifiers:
-            - name: example_identifier
+          node_relation:
+            schema_name: some_schema
+            alias: source_table
+          entities:
+            - name: example_entity
               type: primary
               role: test_role
               expr: example_id
@@ -173,9 +179,11 @@ def test_invalid_measure_alias_name() -> None:
         f"""\
         data_source:
           name: sample_data_source
-          sql_table: some_schema.source_table
-          identifiers:
-            - name: example_identifier
+          node_relation:
+            schema_name: some_schema
+            alias: source_table
+          entities:
+            - name: example_entity
               type: primary
               role: test_role
               expr: example_id
@@ -222,9 +230,11 @@ def test_measure_alias_measure_name_conflict() -> None:
         f"""\
         data_source:
           name: sample_data_source
-          sql_table: some_schema.source_table
-          identifiers:
-            - name: example_identifier
+          node_relation:
+            schema_name: some_schema
+            alias: source_table
+          entities:
+            - name: example_entity
               type: primary
               role: test_role
               expr: example_id
@@ -275,9 +285,11 @@ def test_reused_measure_alias() -> None:
         f"""\
         data_source:
           name: sample_data_source
-          sql_table: some_schema.source_table
-          identifiers:
-            - name: example_identifier
+          node_relation:
+            schema_name: some_schema
+            alias: source_table
+          entities:
+            - name: example_entity
               type: primary
               role: test_role
               expr: example_id
@@ -338,9 +350,11 @@ def test_reused_measure_alias_within_metric() -> None:
         f"""\
         data_source:
           name: sample_data_source
-          sql_table: some_schema.source_table
-          identifiers:
-            - name: example_identifier
+          node_relation:
+            schema_name: some_schema
+            alias: source_table
+          entities:
+            - name: example_entity
               type: primary
               role: test_role
               expr: example_id
@@ -391,9 +405,11 @@ def test_invalid_non_additive_dimension_properties() -> None:
         """\
         data_source:
           name: sample_data_source_2
-          sql_table: some_schema.source_table
-          identifiers:
-            - name: example_identifier
+          node_relation:
+            schema_name: some_schema
+            alias: source_table
+          entities:
+            - name: example_entity
               type: primary
               role: test_role
               expr: example_id
@@ -405,7 +421,7 @@ def test_invalid_non_additive_dimension_properties() -> None:
                 name: doesntexist
                 window_choice: min
                 window_groupings:
-                  - wherethisidentifier
+                  - wherethisentity
             - name: bad_measure2
               agg: sum
               agg_time_dimension: ds
@@ -465,9 +481,11 @@ def test_count_measure_missing_expr() -> None:
         """\
         data_source:
           name: sample_data_source_2
-          sql_table: some_schema.source_table
-          identifiers:
-            - name: example_identifier
+          node_relation:
+            schema_name: some_schema
+            alias: source_table
+          entities:
+            - name: example_entity
               type: primary
               role: test_role
               expr: example_id
@@ -512,9 +530,11 @@ def test_count_measure_with_distinct_expr() -> None:
         """\
         data_source:
           name: sample_data_source_2
-          sql_table: some_schema.source_table
-          identifiers:
-            - name: example_identifier
+          node_relation:
+            schema_name: some_schema
+            alias: source_table
+          entities:
+            - name: example_entity
               type: primary
               role: test_role
               expr: example_id
@@ -557,9 +577,11 @@ def test_percentile_measure_missing_agg_params() -> None:
         """\
         data_source:
           name: sample_data_source
-          sql_table: some_schema.source_table
-          identifiers:
-            - name: example_identifier
+          node_relation:
+            schema_name: some_schema
+            alias: source_table
+          entities:
+            - name: example_entity
               type: primary
               role: test_role
               expr: example_id
@@ -614,9 +636,11 @@ def test_percentile_measure_bad_percentile_values() -> None:
         """\
         data_source:
           name: sample_data_source
-          sql_table: some_schema.source_table
-          identifiers:
-            - name: example_identifier
+          node_relation:
+            schema_name: some_schema
+            alias: source_table
+          entities:
+            - name: example_entity
               type: primary
               role: test_role
               expr: example_id

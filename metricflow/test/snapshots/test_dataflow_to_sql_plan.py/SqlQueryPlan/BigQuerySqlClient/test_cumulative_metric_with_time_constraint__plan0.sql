@@ -53,10 +53,7 @@ FROM (
             , DATE_TRUNC(revenue_src_10006.created_at, quarter) AS ds__quarter
             , DATE_TRUNC(revenue_src_10006.created_at, isoyear) AS ds__year
             , revenue_src_10006.user_id AS user
-          FROM (
-            -- User Defined SQL Query
-            SELECT * FROM ***************************.fct_revenue
-          ) revenue_src_10006
+          FROM ***************************.fct_revenue revenue_src_10006
         ) subq_0
       ) subq_1
       WHERE subq_1.metric_time BETWEEN CAST('2019-12-01' AS DATETIME) AND CAST('2020-01-01' AS DATETIME)

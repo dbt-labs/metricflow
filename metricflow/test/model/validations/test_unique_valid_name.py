@@ -65,7 +65,7 @@ def test_top_level_metric_can_have_same_name_as_any_other_top_level_item(
     Data Source Element Tests
     There are three types of data source elements
     - measures
-    - identifiers
+    - entities
     - dimensions
 
     A name for any of these elements must be unique to all other element names
@@ -112,15 +112,15 @@ def test_duplicate_entity_name(simple_model__with_primary_transforms: UserConfig
     model = copied_model(simple_model__with_primary_transforms)
 
     # Ensure we have a usable data source for the test
-    data_source_with_identifiers, _ = find_data_source_with(model, lambda data_source: len(data_source.identifiers) > 0)
+    data_source_with_entities, _ = find_data_source_with(model, lambda data_source: len(data_source.entities) > 0)
 
-    duplicated_identifier = data_source_with_identifiers.identifiers[0]
-    duplicated_identifiers_tuple = (data_source_with_identifiers.identifiers, (duplicated_identifier,))
-    data_source_with_identifiers.identifiers = tuple(more_itertools.flatten(duplicated_identifiers_tuple))
+    duplicated_entity = data_source_with_entities.entities[0]
+    duplicated_entities_tuple = (data_source_with_entities.entities, (duplicated_entity,))
+    data_source_with_entities.entities = tuple(more_itertools.flatten(duplicated_entities_tuple))
 
     with pytest.raises(
         ModelValidationException,
-        match=rf"can't use name `{duplicated_identifier.reference.element_name}` for a entity when it was already used for a entity",
+        match=rf"can't use name `{duplicated_entity.reference.element_name}` for a entity when it was already used for a entity",
     ):
         ModelValidator([UniqueAndValidNameRule()]).checked_validations(model)
 

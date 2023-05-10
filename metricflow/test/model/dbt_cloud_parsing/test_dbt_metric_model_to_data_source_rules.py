@@ -5,7 +5,7 @@ from metricflow.model.dbt_converter import DbtConverter
 from metricflow.model.dbt_mapping_rules.dbt_metric_model_to_data_source_rules import (
     DbtMapToDataSourceName,
     DbtMapToDataSourceDescription,
-    DbtMapDataSourceSqlTable,
+    DbtMapDataSourceNodeRelation,
 )
 from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
     MappedObjects,
@@ -22,7 +22,7 @@ def test_dbt_metric_model_to_data_source_rules_skip_derived_metrics(  # noqa: D
     rules: Tuple[DbtMappingRule, ...] = (
         DbtMapToDataSourceName(),
         DbtMapToDataSourceDescription(),
-        DbtMapDataSourceSqlTable(),
+        DbtMapDataSourceNodeRelation(),
     )
     converter = DbtConverter(rules=rules)
     result = converter._map_dbt_to_metricflow(dbt_metrics=derived_metrics)
@@ -83,7 +83,7 @@ def test_dbt_map_to_data_source_description_can_be_optional(dbt_metrics: Tuple[M
 def test_dbt_map_data_source_sql_table(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
     objects = MappedObjects()
 
-    issues = DbtMapDataSourceSqlTable().run(dbt_metrics=dbt_metrics, objects=objects)
+    issues = DbtMapDataSourceNodeRelation().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
         not issues.has_blocking_issues
     ), f"DbtMapToDataSourceSqlTable raised blocking issues when it shouldn't have: {issues.to_pretty_json()}"
@@ -91,7 +91,7 @@ def test_dbt_map_data_source_sql_table(dbt_metrics: Tuple[MetricNode, ...]) -> N
         metric_type = get_and_assert_calc_method_mapping(dbt_metric=dbt_metric)
         if metric_type != MetricType.DERIVED:
             assert (
-                objects.data_sources[dbt_metric.model.name]["sql_table"]
+                objects.data_sources[dbt_metric.model.name]["node_relation"].relation_name
                 == f"{dbt_metric.model.database}.{dbt_metric.model.schema}.{dbt_metric.model.name}"
             )
 
@@ -101,7 +101,7 @@ def test_dbt_map_data_source_sql_table_issues_when_missing_name(dbt_metrics: Tup
     # remove model name
     dbt_metrics[0].model.name = None
 
-    issues = DbtMapDataSourceSqlTable().run(dbt_metrics=dbt_metrics, objects=objects)
+    issues = DbtMapDataSourceNodeRelation().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
         issues.has_blocking_issues
     ), f"DbtMapToDataSourceSqlTable didn't raise blocking issues when it should have: {issues.to_pretty_json()}"
@@ -114,7 +114,7 @@ def test_dbt_map_data_source_sql_table_issues_when_missing_schema(  # noqa: D
     # remove model schema
     dbt_metrics[0].model.schema = None
 
-    issues = DbtMapDataSourceSqlTable().run(dbt_metrics=dbt_metrics, objects=objects)
+    issues = DbtMapDataSourceNodeRelation().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
         issues.has_blocking_issues
     ), f"DbtMapToDataSourceSqlTable didn't raise blocking issues when it should have: {issues.to_pretty_json()}"
@@ -127,7 +127,7 @@ def test_dbt_map_data_source_sql_table_issues_when_missing_database(  # noqa: D
     # remove model database
     dbt_metrics[0].model.database = None
 
-    issues = DbtMapDataSourceSqlTable().run(dbt_metrics=dbt_metrics, objects=objects)
+    issues = DbtMapDataSourceNodeRelation().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
         issues.has_blocking_issues
     ), f"DbtMapToDataSourceSqlTable didn't raise blocking issues when it should have: {issues.to_pretty_json()}"

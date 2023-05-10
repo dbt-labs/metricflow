@@ -83,7 +83,7 @@ class ReservedKeywordsRule(ModelValidationRule):
                     )
                 )
 
-        for entity in data_source.identifiers:
+        for entity in data_source.entities:
             msg = "'{name}' is an SQL reserved keyword, and thus cannot be used as an entity 'name'"
             names = [entity.name]
 
@@ -120,27 +120,28 @@ class ReservedKeywordsRule(ModelValidationRule):
         return issues
 
     @classmethod
-    @validate_safely(whats_being_done="checking that data_source sql_tables are not sql reserved keywords")
+    @validate_safely(whats_being_done="checking that data_source node_relations are not sql reserved keywords")
     def _validate_data_sources(cls, model: UserConfiguredModel) -> List[ValidationIssue]:
         """Checks names of objects that are not nested."""
         issues: List[ValidationIssue] = []
         set_keywords = set(RESERVED_KEYWORDS)
 
         for data_source in model.data_sources:
-            if data_source.sql_table is not None:
-                set_sql_table_path_parts = set([part.upper() for part in data_source.sql_table.split(".")])
-                keyword_intersection = set_keywords.intersection(set_sql_table_path_parts)
+            set_sql_table_path_parts = set(
+                [part.upper() for part in data_source.node_relation.relation_name.split(".")]
+            )
+            keyword_intersection = set_keywords.intersection(set_sql_table_path_parts)
 
-                if len(keyword_intersection) > 0:
-                    issues.append(
-                        ValidationError(
-                            context=DataSourceContext(
-                                file_context=FileContext.from_metadata(data_source.metadata),
-                                data_source=data_source.reference,
-                            ),
-                            message=f"'{data_source.sql_table}' contains the SQL reserved keyword(s) {keyword_intersection}, and thus cannot be used for 'sql_table'.",
-                        )
+            if len(keyword_intersection) > 0:
+                issues.append(
+                    ValidationError(
+                        context=DataSourceContext(
+                            file_context=FileContext.from_metadata(data_source.metadata),
+                            data_source=data_source.reference,
+                        ),
+                        message=f"'{data_source.node_relation.relation_name}' contains the SQL reserved keyword(s) {keyword_intersection}, and thus cannot be used for 'node_relation'.",
                     )
+                )
             issues += cls._validate_data_source_sub_elements(data_source=data_source)
 
         return issues

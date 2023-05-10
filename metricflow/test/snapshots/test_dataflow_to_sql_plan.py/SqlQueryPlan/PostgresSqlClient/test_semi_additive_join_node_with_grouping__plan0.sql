@@ -23,10 +23,7 @@ FROM (
     , DATE_TRUNC('year', accounts_source_src_10000.ds) AS ds__year
     , accounts_source_src_10000.account_type
     , accounts_source_src_10000.user_id AS user
-  FROM (
-    -- User Defined SQL Query
-    SELECT * FROM ***************************.fct_accounts
-  ) accounts_source_src_10000
+  FROM ***************************.fct_accounts accounts_source_src_10000
 ) subq_0
 INNER JOIN (
   -- Filter row on MAX(ds)
@@ -46,10 +43,7 @@ INNER JOIN (
       , DATE_TRUNC('year', accounts_source_src_10000.ds) AS ds__year
       , accounts_source_src_10000.account_type
       , accounts_source_src_10000.user_id AS user
-    FROM (
-      -- User Defined SQL Query
-      SELECT * FROM ***************************.fct_accounts
-    ) accounts_source_src_10000
+    FROM ***************************.fct_accounts accounts_source_src_10000
   ) subq_1
   GROUP BY
     subq_1.user

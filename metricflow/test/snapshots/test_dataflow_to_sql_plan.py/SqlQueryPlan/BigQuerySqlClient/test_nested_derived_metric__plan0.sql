@@ -152,10 +152,7 @@ FROM (
                   , bookings_source_src_10001.listing_id AS create_a_cycle_in_the_join_graph__listing
                   , bookings_source_src_10001.guest_id AS create_a_cycle_in_the_join_graph__guest
                   , bookings_source_src_10001.host_id AS create_a_cycle_in_the_join_graph__host
-                FROM (
-                  -- User Defined SQL Query
-                  SELECT * FROM ***************************.fct_bookings
-                ) bookings_source_src_10001
+                FROM ***************************.fct_bookings bookings_source_src_10001
               ) subq_0
             ) subq_1
           ) subq_2
@@ -295,10 +292,7 @@ FROM (
                   , bookings_source_src_10001.listing_id AS create_a_cycle_in_the_join_graph__listing
                   , bookings_source_src_10001.guest_id AS create_a_cycle_in_the_join_graph__guest
                   , bookings_source_src_10001.host_id AS create_a_cycle_in_the_join_graph__host
-                FROM (
-                  -- User Defined SQL Query
-                  SELECT * FROM ***************************.fct_bookings
-                ) bookings_source_src_10001
+                FROM ***************************.fct_bookings bookings_source_src_10001
               ) subq_5
             ) subq_6
           ) subq_7
@@ -446,10 +440,7 @@ FROM (
               , bookings_source_src_10001.listing_id AS create_a_cycle_in_the_join_graph__listing
               , bookings_source_src_10001.guest_id AS create_a_cycle_in_the_join_graph__guest
               , bookings_source_src_10001.host_id AS create_a_cycle_in_the_join_graph__host
-            FROM (
-              -- User Defined SQL Query
-              SELECT * FROM ***************************.fct_bookings
-            ) bookings_source_src_10001
+            FROM ***************************.fct_bookings bookings_source_src_10001
           ) subq_12
         ) subq_13
       ) subq_14
@@ -595,10 +586,7 @@ FROM (
               , bookings_source_src_10001.listing_id AS create_a_cycle_in_the_join_graph__listing
               , bookings_source_src_10001.guest_id AS create_a_cycle_in_the_join_graph__guest
               , bookings_source_src_10001.host_id AS create_a_cycle_in_the_join_graph__host
-            FROM (
-              -- User Defined SQL Query
-              SELECT * FROM ***************************.fct_bookings
-            ) bookings_source_src_10001
+            FROM ***************************.fct_bookings bookings_source_src_10001
           ) subq_17
         ) subq_18
       ) subq_19

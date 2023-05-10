@@ -55,7 +55,7 @@ def list_of_issues() -> List[ValidationIssue]:  # noqa: D
             context=DataSourceElementContext(
                 file_context=file_context,
                 data_source_element=DataSourceElementReference(
-                    data_source_name=data_source_name, element_name="My identifier"
+                    data_source_name=data_source_name, element_name="My entity"
                 ),
                 element_type=DataSourceElementType.ENTITY,
             ),

@@ -3,7 +3,9 @@ data_source:
   name: account_month_txns
   description: account_month_txns
 
-  sql_table: $source_schema.account_month_txns
+  node_relation:
+    schema_name: $source_schema
+    alias: account_month_txns
 
   measures:
     - name: txn_count
@@ -25,9 +27,6 @@ data_source:
     - name: account_month
       type: categorical
 
-  identifiers:
+  entities:
     - name: account_id
       type: primary
-
-  mutability:
-    type: immutable

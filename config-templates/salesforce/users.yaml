@@ -2,10 +2,10 @@ data_source:
   name: salesforce_users
   owners:
     - support@transformdata.io
-  sql_table: salesforce.user ### Update to your users schema.table
-  mutability:
-    type: immutable
-  identifiers:
+  node_relation:  ### Update to your users schema.table
+    alias: user
+    schema_name: salesforce
+  entities:
     - name: owner
       type: primary
       expr: id

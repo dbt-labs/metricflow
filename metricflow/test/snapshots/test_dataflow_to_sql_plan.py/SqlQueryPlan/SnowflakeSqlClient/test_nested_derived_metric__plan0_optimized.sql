@@ -34,10 +34,7 @@ FROM (
           SELECT
             ds AS metric_time
             , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
-          FROM (
-            -- User Defined SQL Query
-            SELECT * FROM ***************************.fct_bookings
-          ) bookings_source_src_10001
+          FROM ***************************.fct_bookings bookings_source_src_10001
         ) subq_25
         GROUP BY
           metric_time
@@ -56,10 +53,7 @@ FROM (
           SELECT
             ds AS metric_time
             , 1 AS bookings
-          FROM (
-            -- User Defined SQL Query
-            SELECT * FROM ***************************.fct_bookings
-          ) bookings_source_src_10001
+          FROM ***************************.fct_bookings bookings_source_src_10001
         ) subq_30
         GROUP BY
           metric_time
@@ -86,10 +80,7 @@ FROM (
       SELECT
         ds AS metric_time
         , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
-      FROM (
-        -- User Defined SQL Query
-        SELECT * FROM ***************************.fct_bookings
-      ) bookings_source_src_10001
+      FROM ***************************.fct_bookings bookings_source_src_10001
     ) subq_37
     GROUP BY
       metric_time
@@ -114,10 +105,7 @@ FROM (
       SELECT
         ds AS metric_time
         , 1 AS bookings
-      FROM (
-        -- User Defined SQL Query
-        SELECT * FROM ***************************.fct_bookings
-      ) bookings_source_src_10001
+      FROM ***************************.fct_bookings bookings_source_src_10001
     ) subq_42
     GROUP BY
       metric_time

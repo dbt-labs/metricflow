@@ -110,8 +110,8 @@ class UniqueAndValidNameRule(ModelValidationRule):
                         ),
                     )
                 )
-        if data_source.identifiers:
-            for entity in data_source.identifiers:
+        if data_source.entities:
+            for entity in data_source.entities:
                 element_info_tuples.append(
                     (
                         entity.reference,

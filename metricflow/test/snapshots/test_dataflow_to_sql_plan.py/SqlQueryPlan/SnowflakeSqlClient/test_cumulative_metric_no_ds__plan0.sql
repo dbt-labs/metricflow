@@ -35,10 +35,7 @@ FROM (
           , DATE_TRUNC('quarter', revenue_src_10006.created_at) AS ds__quarter
           , DATE_TRUNC('year', revenue_src_10006.created_at) AS ds__year
           , revenue_src_10006.user_id AS user
-        FROM (
-          -- User Defined SQL Query
-          SELECT * FROM ***************************.fct_revenue
-        ) revenue_src_10006
+        FROM ***************************.fct_revenue revenue_src_10006
       ) subq_0
     ) subq_1
   ) subq_3

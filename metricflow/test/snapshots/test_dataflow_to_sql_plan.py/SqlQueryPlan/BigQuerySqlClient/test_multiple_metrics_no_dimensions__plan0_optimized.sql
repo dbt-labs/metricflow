@@ -12,10 +12,7 @@ FROM (
   -- Compute Metrics via Expressions
   SELECT
     SUM(1) AS bookings
-  FROM (
-    -- User Defined SQL Query
-    SELECT * FROM ***************************.fct_bookings
-  ) bookings_source_src_10001
+  FROM ***************************.fct_bookings bookings_source_src_10001
   WHERE ds BETWEEN CAST('2020-01-01' AS DATETIME) AND CAST('2020-01-01' AS DATETIME)
 ) subq_17
 CROSS JOIN (

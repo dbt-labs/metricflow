@@ -26,10 +26,7 @@ INNER JOIN (
       ds AS metric_time
       , listing_id AS listing
       , SUM(booking_value) AS booking_value
-    FROM (
-      -- User Defined SQL Query
-      SELECT * FROM ***************************.fct_bookings
-    ) bookings_source_src_10001
+    FROM ***************************.fct_bookings bookings_source_src_10001
     GROUP BY
       ds
       , listing_id

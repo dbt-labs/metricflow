@@ -3,7 +3,9 @@ data_source:
   name: customer_table
   description: customer_table
 
-  sql_table: $source_schema.customer_table
+  node_relation:
+    schema_name: $source_schema
+    alias: customer_table
 
   dimensions:
     - name: customer_name
@@ -11,9 +13,6 @@ data_source:
     - name: customer_atomic_weight
       type: categorical
 
-  identifiers:
+  entities:
     - name: customer_id
       type: primary
-
-  mutability:
-    type: immutable

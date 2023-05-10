@@ -37,7 +37,7 @@ class NaturalEntityConfigurationRule(ModelValidationRule):
         )
 
         natural_entity_names = set(
-            [entity.name for entity in data_source.identifiers if entity.type is EntityType.NATURAL]
+            [entity.name for entity in data_source.entities if entity.type is EntityType.NATURAL]
         )
         if len(natural_entity_names) > 1:
             error = ValidationError(
@@ -77,7 +77,7 @@ class OnePrimaryEntityPerDataSourceRule(ModelValidationRule):
     @validate_safely(whats_being_done="checking data source has only one primary entity")
     def _only_one_primary_entity(data_source: DataSource) -> List[ValidationIssue]:
         primary_entity_names: MutableSet[str] = set()
-        for entity in data_source.identifiers or []:
+        for entity in data_source.entities or []:
             if entity.type == EntityType.PRIMARY:
                 primary_entity_names.add(entity.reference.element_name)
 
