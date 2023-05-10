@@ -829,14 +829,14 @@ def infer(
     """Infer semantic model configurations from warehouse information."""
 
     click.echo(
-        click.style("‼️ Warning: Data Source Inference is still in Beta 🧪. ", fg="red", bold=True)
+        click.style("‼️ Warning: Semantic Model Inference is still in Beta 🧪. ", fg="red", bold=True)
         + "As such, you should not expect it to be 100% stable or be free of bugs. Any public CLI or Python interfaces may change without prior notice."
         " If you find any bugs or feel like something is not behaving as it should, feel free to open an issue on the Metricflow Github repo: https://github.com/transform-data/metricflow/issues \n"
     )
 
     if cfg.sql_client.sql_engine_attributes.sql_engine_type is not SqlEngine.SNOWFLAKE:
         click.echo(
-            "Data Source Inference is currently only supported for Snowflake. "
+            "Semantic Model Inference is currently only supported for Snowflake. "
             "We will add support for all the other warehouses before it becomes a "
             "stable feature. Stay tuned!"
         )

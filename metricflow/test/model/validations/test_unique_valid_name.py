@@ -16,7 +16,7 @@ def copied_model(simple_model__with_primary_transforms: UserConfiguredModel) -> 
 """
     Top Level Tests
     Top level elements include
-    - Data Sources
+    - Semantic Models
     - Metrics
     - Metric Sets
     - Dimension Sets
@@ -62,7 +62,7 @@ def test_top_level_metric_can_have_same_name_as_any_other_top_level_item(
 
 
 """
-    Data Source Element Tests
+    Semantic Model Element Tests
     There are three types of semantic model elements
     - measures
     - entities

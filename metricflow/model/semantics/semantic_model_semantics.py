@@ -192,7 +192,7 @@ class SemanticModelSemantics(SemanticModelSemanticsAccessor):
         """Return all time dimensions in a semantic model with their associated measures."""
         assert (
             semantic_model_reference in self._semantic_model_to_aggregation_time_dimensions
-        ), f"Data Source {semantic_model_reference} is not known"
+        ), f"Semantic Model {semantic_model_reference} is not known"
         return self._semantic_model_to_aggregation_time_dimensions[semantic_model_reference]
 
     def get_semantic_models_for_entity(self, entity_reference: EntityReference) -> Set[SemanticModel]:

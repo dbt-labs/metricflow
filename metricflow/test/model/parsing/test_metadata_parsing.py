@@ -13,7 +13,7 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 
 
 def test_semantic_model_metadata_parsing(simple_user_configured_model: UserConfiguredModel) -> None:
-    """Tests internal metadata object parsing from a file into the Data Source model object
+    """Tests internal metadata object parsing from a file into the Semantic Model model object
 
     This only tests some basic file name parsing for each semantic model since they are not guaranteed
     to be collected in the same file in the simple model, and the output here has been transformed

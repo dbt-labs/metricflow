@@ -58,7 +58,7 @@ integration_test:
 ---
 integration_test:
   name: query_with_metric_with_multiple_source
-  description: Tests query with metric from multiple measures from multiple data source.
+  description: Tests query with metric from multiple measures from multiple semantic model.
   model: SIMPLE_MODEL
   metrics: ["bookings_per_listing"]
   group_bys: []

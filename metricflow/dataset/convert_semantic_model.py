@@ -411,7 +411,7 @@ class SemanticModelToDataSetConverter:
         from_source = SqlTableFromClauseNode(sql_table=SqlTable.from_string(semantic_model.node_relation.relation_name))
 
         select_statement_node = SqlSelectStatementNode(
-            description=f"Read Elements From Data Source '{semantic_model.name}'",
+            description=f"Read Elements From Semantic Model '{semantic_model.name}'",
             select_columns=tuple(all_select_columns),
             from_source=from_source,
             from_source_alias=from_source_alias,

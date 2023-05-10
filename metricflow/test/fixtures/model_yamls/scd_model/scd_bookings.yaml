@@ -1,7 +1,7 @@
 ---
 semantic_model:
   name: bookings_source
-  description: bookings data source for use in the SCD model
+  description: bookings semantic model for use in the SCD model
 
   node_relation:
     schema_name: $source_schema
