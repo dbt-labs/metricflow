@@ -6,39 +6,39 @@ from typing import Callable
 import pytest
 
 from metricflow.model.model_validator import ModelValidator
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_validation_ready_model
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from metricflow.model.validations.entities import (
     NaturalEntityConfigurationRule,
-    OnePrimaryEntityPerDataSourceRule,
+    OnePrimaryEntityPerSemanticModelRule,
 )
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.test.model.validations.helpers import base_model_file
-from metricflow.test.test_utils import find_data_source_with
+from metricflow.test.test_utils import find_semantic_model_with
 
 
-def test_data_source_cant_have_more_than_one_primary_entity(
+def test_semantic_model_cant_have_more_than_one_primary_entity(
     simple_model__with_primary_transforms: UserConfiguredModel,
 ) -> None:  # noqa: D
-    """Add an additional primary entity to a data source and assert that it cannot have two"""
+    """Add an additional primary entity to a semantic model and assert that it cannot have two"""
     model = copy.deepcopy(simple_model__with_primary_transforms)
-    func: Callable[[DataSource], bool] = lambda data_source: len(data_source.entities) > 1
+    func: Callable[[SemanticModel], bool] = lambda semantic_model: len(semantic_model.entities) > 1
 
-    multiple_entity_data_source, _ = find_data_source_with(model, func)
+    multiple_entity_semantic_model, _ = find_semantic_model_with(model, func)
 
     entity_references = set()
-    for entity in multiple_entity_data_source.entities:
+    for entity in multiple_entity_semantic_model.entities:
         entity.type = EntityType.PRIMARY
         entity_references.add(entity.reference)
 
-    model_issues = ModelValidator([OnePrimaryEntityPerDataSourceRule()]).validate_model(model)
+    model_issues = ModelValidator([OnePrimaryEntityPerSemanticModelRule()]).validate_model(model)
 
     future_issue = (
-        f"Data sources can have only one primary entity. The data source"
-        f" `{multiple_entity_data_source.name}` has {len(entity_references)}"
+        f"Semantic models can have only one primary entity. The semantic model"
+        f" `{multiple_entity_semantic_model.name}` has {len(entity_references)}"
     )
 
     found_future_issue = False
@@ -52,10 +52,10 @@ def test_data_source_cant_have_more_than_one_primary_entity(
 
 
 def test_multiple_natural_entities() -> None:
-    """Test validation enforcing that a single data source cannot have more than one natural entity"""
+    """Test validation enforcing that a single semantic model cannot have more than one natural entity"""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: too_many_natural_entities
           node_relation:
             schema_name: some_schema
@@ -90,10 +90,10 @@ def test_multiple_natural_entities() -> None:
 
 
 def test_natural_entity_used_in_wrong_context() -> None:
-    """Test validation enforcing that a single data source cannot have more than one natural entity"""
+    """Test validation enforcing that a single semantic model cannot have more than one natural entity"""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
+        semantic_model:
           name: random_natural_entity
           node_relation:
             schema_name: some_schema

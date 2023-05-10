@@ -1,12 +1,12 @@
 from typing import Dict, List, Set
 
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from dbt_semantic_interfaces.references import DataSourceElementReference, EntityReference
+from dbt_semantic_interfaces.references import SemanticModelElementReference, EntityReference
 from metricflow.model.validations.validator_helpers import (
-    DataSourceElementContext,
-    DataSourceElementType,
+    SemanticModelElementContext,
+    SemanticModelElementType,
     FileContext,
     ModelValidationRule,
     ValidationWarning,
@@ -16,63 +16,63 @@ from metricflow.model.validations.validator_helpers import (
 
 
 class CommonEntitysRule(ModelValidationRule):
-    """Checks that entities exist on more than one data source"""
+    """Checks that entities exist on more than one semantic model"""
 
     @staticmethod
-    def _map_data_source_entities(data_sources: List[DataSource]) -> Dict[EntityReference, Set[str]]:
-        """Generate mapping of entity names to the set of data_sources where it is defined"""
-        entities_to_data_sources: Dict[EntityReference, Set[str]] = {}
-        for data_source in data_sources or []:
-            for entity in data_source.entities or []:
-                if entity.reference in entities_to_data_sources:
-                    entities_to_data_sources[entity.reference].add(data_source.name)
+    def _map_semantic_model_entities(semantic_models: List[SemanticModel]) -> Dict[EntityReference, Set[str]]:
+        """Generate mapping of entity names to the set of semantic_models where it is defined"""
+        entities_to_semantic_models: Dict[EntityReference, Set[str]] = {}
+        for semantic_model in semantic_models or []:
+            for entity in semantic_model.entities or []:
+                if entity.reference in entities_to_semantic_models:
+                    entities_to_semantic_models[entity.reference].add(semantic_model.name)
                 else:
-                    entities_to_data_sources[entity.reference] = {data_source.name}
-        return entities_to_data_sources
+                    entities_to_semantic_models[entity.reference] = {semantic_model.name}
+        return entities_to_semantic_models
 
     @staticmethod
-    @validate_safely(whats_being_done="checking entity exists on more than one data source")
+    @validate_safely(whats_being_done="checking entity exists on more than one semantic model")
     def _check_entity(
         entity: Entity,
-        data_source: DataSource,
-        entities_to_data_sources: Dict[EntityReference, Set[str]],
+        semantic_model: SemanticModel,
+        entities_to_semantic_models: Dict[EntityReference, Set[str]],
     ) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
-        # If the entity is the dict and if the set of data sources minus this data source is empty,
+        # If the entity is the dict and if the set of semantic models minus this semantic model is empty,
         # then we warn the user that their entity will be unused in joins
         if (
-            entity.reference in entities_to_data_sources
-            and len(entities_to_data_sources[entity.reference].difference({data_source.name})) == 0
+            entity.reference in entities_to_semantic_models
+            and len(entities_to_semantic_models[entity.reference].difference({semantic_model.name})) == 0
         ):
             issues.append(
                 ValidationWarning(
-                    context=DataSourceElementContext(
-                        file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                        data_source_element=DataSourceElementReference(
-                            data_source_name=data_source.name, element_name=entity.name
+                    context=SemanticModelElementContext(
+                        file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
+                        semantic_model_element=SemanticModelElementReference(
+                            semantic_model_name=semantic_model.name, element_name=entity.name
                         ),
-                        element_type=DataSourceElementType.ENTITY,
+                        element_type=SemanticModelElementType.ENTITY,
                     ),
                     message=f"Entity `{entity.reference.element_name}` "
-                    f"only found in one data source `{data_source.name}` "
+                    f"only found in one semantic model `{semantic_model.name}` "
                     f"which means it will be unused in joins.",
                 )
             )
         return issues
 
     @staticmethod
-    @validate_safely(whats_being_done="running model validation warning if entities are only one one data source")
+    @validate_safely(whats_being_done="running model validation warning if entities are only one one semantic model")
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:
-        """Issues a warning for any entity that is associated with only one data_source"""
+        """Issues a warning for any entity that is associated with only one semantic_model"""
         issues = []
 
-        entities_to_data_sources = CommonEntitysRule._map_data_source_entities(model.data_sources)
-        for data_source in model.data_sources or []:
-            for entity in data_source.entities or []:
+        entities_to_semantic_models = CommonEntitysRule._map_semantic_model_entities(model.semantic_models)
+        for semantic_model in model.semantic_models or []:
+            for entity in semantic_model.entities or []:
                 issues += CommonEntitysRule._check_entity(
                     entity=entity,
-                    data_source=data_source,
-                    entities_to_data_sources=entities_to_data_sources,
+                    semantic_model=semantic_model,
+                    entities_to_semantic_models=entities_to_semantic_models,
                 )
 
         return issues

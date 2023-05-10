@@ -1,0 +1,18 @@
+--- 
+semantic_model:
+  name: bridge_table
+  description: bridge_table
+
+  node_relation:
+    schema_name: $source_schema
+    alias: bridge_table
+
+  dimensions:
+    - name: extra_dim
+      type: categorical
+
+  entities:
+    - name: account_id
+      type: primary
+    - name: customer_id
+      type: foreign

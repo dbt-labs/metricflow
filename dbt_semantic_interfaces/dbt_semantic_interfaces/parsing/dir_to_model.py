@@ -10,12 +10,12 @@ from jsonschema import exceptions
 
 from dbt_semantic_interfaces.errors import ParsingException
 from dbt_semantic_interfaces.model_transformer import ModelTransformer
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.metric import Metric
 from dbt_semantic_interfaces.parsing.objects import Version, YamlConfigFile
 from dbt_semantic_interfaces.parsing.schemas import (
     metric_validator,
-    data_source_validator,
+    semantic_model_validator,
 )
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.parsing.yaml_loader import (
@@ -35,8 +35,8 @@ logger = logging.getLogger(__name__)
 
 VERSION_KEY = "mf_config_schema"
 METRIC_TYPE = "metric"
-DATA_SOURCE_TYPE = "data_source"
-DOCUMENT_TYPES = [METRIC_TYPE, DATA_SOURCE_TYPE]
+SEMANTIC_MODEL_TYPE = "semantic_model"
+DOCUMENT_TYPES = [METRIC_TYPE, SEMANTIC_MODEL_TYPE]
 
 
 @dataclass(frozen=True)
@@ -55,7 +55,7 @@ class FileParsingResult:
         issues: Issues found when trying to parse the file
     """
 
-    elements: List[Union[DataSource, Metric]]
+    elements: List[Union[SemanticModel, Metric]]
     issues: List[ValidationIssue]
 
 
@@ -188,7 +188,7 @@ def parse_yaml_files_to_validation_ready_model(
 
 def parse_yaml_files_to_model(
     files: List[YamlConfigFile],
-    data_source_class: Type[DataSource] = DataSource,
+    semantic_model_class: Type[SemanticModel] = SemanticModel,
     metric_class: Type[Metric] = Metric,
 ) -> ModelBuildResult:
     """Builds UserConfiguredModel from list of config files (as strings).
@@ -198,21 +198,21 @@ def parse_yaml_files_to_model(
 
     Note: this function does not finalize the model
     """
-    data_sources = []
+    semantic_models = []
     metrics = []
-    valid_object_classes = [data_source_class.__name__, metric_class.__name__]
+    valid_object_classes = [semantic_model_class.__name__, metric_class.__name__]
     issues: List[ValidationIssue] = []
 
     for config_file in files:
         parsing_result = parse_config_yaml(  # parse config file
             config_file,
-            data_source_class=data_source_class,
+            semantic_model_class=semantic_model_class,
             metric_class=metric_class,
         )
         file_issues = parsing_result.issues
         for obj in parsing_result.elements:
-            if isinstance(obj, data_source_class):
-                data_sources.append(obj)
+            if isinstance(obj, semantic_model_class):
+                semantic_models.append(obj)
             elif isinstance(obj, metric_class):
                 metrics.append(obj)
             else:
@@ -227,7 +227,7 @@ def parse_yaml_files_to_model(
 
     return ModelBuildResult(
         model=UserConfiguredModel(
-            data_sources=data_sources,
+            semantic_models=semantic_models,
             metrics=metrics,
         ),
         issues=ModelValidationResults.from_issues_sequence(issues),
@@ -236,11 +236,11 @@ def parse_yaml_files_to_model(
 
 def parse_config_yaml(
     config_yaml: YamlConfigFile,
-    data_source_class: Type[DataSource] = DataSource,
+    semantic_model_class: Type[SemanticModel] = SemanticModel,
     metric_class: Type[Metric] = Metric,
 ) -> FileParsingResult:
     """Parses transform config file passed as string - Returns list of model objects"""
-    results: List[Union[DataSource, Metric]] = []
+    results: List[Union[SemanticModel, Metric]] = []
     ctx: Optional[ParsingContext] = None
     issues: List[ValidationIssue] = []
     try:
@@ -303,9 +303,9 @@ def parse_config_yaml(
                 if document_type == METRIC_TYPE:
                     metric_validator.validate(config_document[document_type])
                     results.append(metric_class.parse_obj(object_cfg))
-                elif document_type == DATA_SOURCE_TYPE:
-                    data_source_validator.validate(config_document[document_type])
-                    results.append(data_source_class.parse_obj(object_cfg))
+                elif document_type == SEMANTIC_MODEL_TYPE:
+                    semantic_model_validator.validate(config_document[document_type])
+                    results.append(semantic_model_class.parse_obj(object_cfg))
                 else:
                     issues.append(
                         ValidationError(

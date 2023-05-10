@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 BOOKINGS_YAML = textwrap.dedent(
     """\
-    data_source:
+    semantic_model:
       name: bookings_source
 
       node_relation:
@@ -58,7 +58,7 @@ BOOKINGS_YAML = textwrap.dedent(
 
 REVENUE_YAML = textwrap.dedent(
     """\
-    data_source:
+    semantic_model:
       name: revenue_source
       description: revenue
 

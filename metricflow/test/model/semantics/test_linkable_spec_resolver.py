@@ -10,7 +10,7 @@ from metricflow.model.semantics.linkable_spec_resolver import (
     ValidLinkableSpecResolver,
 )
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
-from metricflow.model.semantics.data_source_join_evaluator import MAX_JOIN_HOPS
+from metricflow.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ def simple_model_spec_resolver(  # noqa: D
 ) -> ValidLinkableSpecResolver:
     return ValidLinkableSpecResolver(
         user_configured_model=simple_semantic_manifest_lookup.user_configured_model,
-        data_source_semantics=simple_semantic_manifest_lookup.data_source_semantics,
+        semantic_model_semantics=simple_semantic_manifest_lookup.semantic_model_semantics,
         max_entity_links=MAX_JOIN_HOPS,
     )
 
@@ -173,7 +173,7 @@ def test_joined_property(simple_model_spec_resolver: ValidLinkableSpecResolver) 
 def test_multi_hop_property(multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D
     multi_hop_spec_resolver = ValidLinkableSpecResolver(
         user_configured_model=multi_hop_join_semantic_manifest_lookup.user_configured_model,
-        data_source_semantics=multi_hop_join_semantic_manifest_lookup.data_source_semantics,
+        semantic_model_semantics=multi_hop_join_semantic_manifest_lookup.semantic_model_semantics,
         max_entity_links=MAX_JOIN_HOPS,
     )
     property_check_helper(

@@ -5,7 +5,7 @@
 SELECT
   CAST(subq_13.bookings AS FLOAT64) / CAST(NULLIF(subq_17.listings, 0) AS FLOAT64) AS bookings_per_listing
 FROM (
-  -- Read Elements From Data Source 'bookings_source'
+  -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements:
   --   ['bookings']
@@ -15,7 +15,7 @@ FROM (
   FROM ***************************.fct_bookings bookings_source_src_10001
 ) subq_13
 CROSS JOIN (
-  -- Read Elements From Data Source 'listings_latest'
+  -- Read Elements From Semantic Model 'listings_latest'
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements:
   --   ['listings']

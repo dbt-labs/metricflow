@@ -8,7 +8,7 @@ from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_val
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from metricflow.model.validations.measures import (
     CountAggregationExprRule,
-    DataSourceMeasuresUniqueRule,
+    SemanticModelMeasuresUniqueRule,
     MeasureConstraintAliasesRule,
     MeasuresNonAdditiveDimensionRule,
     MetricMeasuresRule,
@@ -43,11 +43,11 @@ def test_metric_missing_measure() -> None:
         ModelValidator([MetricMeasuresRule()]).checked_validations(model=model.model)
 
 
-def test_measures_only_exist_in_one_data_source() -> None:  # noqa: D
+def test_measures_only_exist_in_one_semantic_model() -> None:  # noqa: D
     yaml_contents_1 = textwrap.dedent(
         """\
-        data_source:
-          name: sample_data_source
+        semantic_model:
+          name: sample_semantic_model
           node_relation:
             schema_name: some_schema
             alias: source_table
@@ -72,7 +72,7 @@ def test_measures_only_exist_in_one_data_source() -> None:  # noqa: D
     base_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents_1)
     model = parse_yaml_files_to_validation_ready_model([base_file])
     model_issues = ModelValidator().validate_model(model.model)
-    duplicate_measure_message = "Found measure with name .* in multiple data sources with names"
+    duplicate_measure_message = "Found measure with name .* in multiple semantic models with names"
     found_issue = False
 
     if model_issues is not None:
@@ -84,8 +84,8 @@ def test_measures_only_exist_in_one_data_source() -> None:  # noqa: D
 
     yaml_contents_2 = textwrap.dedent(
         """\
-        data_source:
-          name: sample_data_source_2
+        semantic_model:
+          name: sample_semantic_model_2
           node_relation:
             schema_name: some_schema
             alias: source_table
@@ -109,7 +109,7 @@ def test_measures_only_exist_in_one_data_source() -> None:  # noqa: D
     )
     dup_measure_file = YamlConfigFile(filepath="inline_for_test_2", contents=yaml_contents_2)
     dup_model = parse_yaml_files_to_validation_ready_model([base_file, dup_measure_file])
-    model_issues = ModelValidator([DataSourceMeasuresUniqueRule()]).validate_model(dup_model.model)
+    model_issues = ModelValidator([SemanticModelMeasuresUniqueRule()]).validate_model(dup_model.model)
 
     if model_issues is not None:
         for issue in model_issues.all_issues:
@@ -124,8 +124,8 @@ def test_measure_alias_is_set_when_required() -> None:
     measure_name = "num_sample_rows"
     yaml_contents = textwrap.dedent(
         f"""\
-        data_source:
-          name: sample_data_source
+        semantic_model:
+          name: sample_semantic_model
           node_relation:
             schema_name: some_schema
             alias: source_table
@@ -177,8 +177,8 @@ def test_invalid_measure_alias_name() -> None:
 
     yaml_contents = textwrap.dedent(
         f"""\
-        data_source:
-          name: sample_data_source
+        semantic_model:
+          name: sample_semantic_model
           node_relation:
             schema_name: some_schema
             alias: source_table
@@ -228,8 +228,8 @@ def test_measure_alias_measure_name_conflict() -> None:
     measure_name = "num_sample_rows"
     yaml_contents = textwrap.dedent(
         f"""\
-        data_source:
-          name: sample_data_source
+        semantic_model:
+          name: sample_semantic_model
           node_relation:
             schema_name: some_schema
             alias: source_table
@@ -283,8 +283,8 @@ def test_reused_measure_alias() -> None:
 
     yaml_contents = textwrap.dedent(
         f"""\
-        data_source:
-          name: sample_data_source
+        semantic_model:
+          name: sample_semantic_model
           node_relation:
             schema_name: some_schema
             alias: source_table
@@ -348,8 +348,8 @@ def test_reused_measure_alias_within_metric() -> None:
     invalid_alias = "duplicate_alias"
     yaml_contents = textwrap.dedent(
         f"""\
-        data_source:
-          name: sample_data_source
+        semantic_model:
+          name: sample_semantic_model
           node_relation:
             schema_name: some_schema
             alias: source_table
@@ -403,8 +403,8 @@ def test_invalid_non_additive_dimension_properties() -> None:
 
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
-          name: sample_data_source_2
+        semantic_model:
+          name: sample_semantic_model_2
           node_relation:
             schema_name: some_schema
             alias: source_table
@@ -457,7 +457,7 @@ def test_invalid_non_additive_dimension_properties() -> None:
     )
 
     model_issues = ModelValidator([MeasuresNonAdditiveDimensionRule()]).validate_model(transformed_model)
-    expected_error_substring_1 = "that is not defined as a dimension in data source 'sample_data_source_2'."
+    expected_error_substring_1 = "that is not defined as a dimension in semantic model 'sample_semantic_model_2'."
     expected_error_substring_2 = "has a non_additive_dimension with an invalid 'window_groupings'"
     expected_error_substring_3 = "that is defined as a categorical dimension which is not supported."
     expected_error_substring_4 = "that is not equal to the measure's agg_time_dimension"
@@ -479,8 +479,8 @@ def test_count_measure_missing_expr() -> None:
     """Tests that all measures with COUNT agg should have expr provided."""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
-          name: sample_data_source_2
+        semantic_model:
+          name: sample_semantic_model_2
           node_relation:
             schema_name: some_schema
             alias: source_table
@@ -528,8 +528,8 @@ def test_count_measure_with_distinct_expr() -> None:
     """Tests that measures with COUNT agg can NOT use the DISTINCT keyword."""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
-          name: sample_data_source_2
+        semantic_model:
+          name: sample_semantic_model_2
           node_relation:
             schema_name: some_schema
             alias: source_table
@@ -575,8 +575,8 @@ def test_percentile_measure_missing_agg_params() -> None:
     """Tests that only measures with PERCENTILE agg should have percentile and discrete provided."""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
-          name: sample_data_source
+        semantic_model:
+          name: sample_semantic_model
           node_relation:
             schema_name: some_schema
             alias: source_table
@@ -634,8 +634,8 @@ def test_percentile_measure_bad_percentile_values() -> None:
     """Tests that all measures with PERCENTILE agg should have the correct percentile value range."""
     yaml_contents = textwrap.dedent(
         """\
-        data_source:
-          name: sample_data_source
+        semantic_model:
+          name: sample_semantic_model
           node_relation:
             schema_name: some_schema
             alias: source_table

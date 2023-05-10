@@ -11,14 +11,14 @@ from __future__ import annotations
 from abc import abstractmethod, ABC
 from typing import Dict, FrozenSet, Optional, Sequence, Set
 
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension
 from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.metric import Metric
 from dbt_semantic_interfaces.references import (
-    DataSourceElementReference,
-    DataSourceReference,
+    SemanticModelElementReference,
+    SemanticModelReference,
     DimensionReference,
     EntityReference,
     MeasureReference,
@@ -36,18 +36,18 @@ from metricflow.specs import (
 )
 
 
-class DataSourceSemanticsAccessor(ABC):
-    """Interface for accessing semantic information about a set of data source objects
+class SemanticModelSemanticsAccessor(ABC):
+    """Interface for accessing semantic information about a set of semantic model objects
 
     This is primarily useful for restricting caller access to the subset of container methods and imports we want
-    them to use. For example, the DataSourceSemantics class might implement this protocol but also include some
-    public methods for adding or removing data sources from the container, while this protocol only allows the
-    caller to invoke the accessor methods which retrieve semantic information about the collected data sources.
+    them to use. For example, the SemanticModelSemantics class might implement this protocol but also include some
+    public methods for adding or removing semantic models from the container, while this protocol only allows the
+    caller to invoke the accessor methods which retrieve semantic information about the collected semantic models.
     """
 
     @abstractmethod
     def get_dimension_references(self) -> Sequence[DimensionReference]:
-        """Retrieve all dimension references from the collection of data sources"""
+        """Retrieve all dimension references from the collection of semantic models"""
         raise NotImplementedError
 
     @abstractmethod
@@ -63,7 +63,7 @@ class DataSourceSemanticsAccessor(ABC):
     @property
     @abstractmethod
     def measure_references(self) -> Sequence[MeasureReference]:
-        """Return all measure references from the collection of data sources"""
+        """Return all measure references from the collection of semantic models"""
         raise NotImplementedError
 
     @property
@@ -71,7 +71,7 @@ class DataSourceSemanticsAccessor(ABC):
     def non_additive_dimension_specs_by_measure(self) -> Dict[MeasureReference, NonAdditiveDimensionSpec]:
         """Return a mapping from all semi-additive measures to their corresponding non additive dimension parameters
 
-        This includes all measures with non-additive dimension parameters, if any, from the collection of data sources.
+        This includes all measures with non-additive dimension parameters, if any, from the collection of semantic models.
         """
         raise NotImplementedError
 
@@ -82,12 +82,12 @@ class DataSourceSemanticsAccessor(ABC):
 
     @abstractmethod
     def get_entity_references(self) -> Sequence[EntityReference]:
-        """Retrieve all entity references from the collection of data sources"""
+        """Retrieve all entity references from the collection of semantic models"""
         raise NotImplementedError
 
     @abstractmethod
-    def get_data_sources_for_measure(self, measure_reference: MeasureReference) -> Sequence[DataSource]:
-        """Retrieve a list of all data source model objects associated with the measure reference"""
+    def get_semantic_models_for_measure(self, measure_reference: MeasureReference) -> Sequence[SemanticModel]:
+        """Retrieve a list of all semantic model model objects associated with the measure reference"""
         raise NotImplementedError
 
     @abstractmethod
@@ -95,31 +95,31 @@ class DataSourceSemanticsAccessor(ABC):
         """Retrieves the aggregate time dimension that is associated with the measure reference"""
 
     @abstractmethod
-    def get_entity_in_data_source(self, ref: DataSourceElementReference) -> Optional[Entity]:
-        """Retrieve the entity matching the element -> data source mapping, if any"""
+    def get_entity_in_semantic_model(self, ref: SemanticModelElementReference) -> Optional[Entity]:
+        """Retrieve the entity matching the element -> semantic model mapping, if any"""
         raise NotImplementedError
 
     @abstractmethod
-    def get_by_reference(self, data_source_reference: DataSourceReference) -> Optional[DataSource]:
-        """Retrieve the data source model object matching the input data source reference, if any"""
+    def get_by_reference(self, semantic_model_reference: SemanticModelReference) -> Optional[SemanticModel]:
+        """Retrieve the semantic model model object matching the input semantic model reference, if any"""
         raise NotImplementedError
 
     @property
     @abstractmethod
-    def data_source_references(self) -> Sequence[DataSourceReference]:
-        """Return all DataSourceReference objects associated with the data sources in the collection"""
+    def semantic_model_references(self) -> Sequence[SemanticModelReference]:
+        """Return all SemanticModelReference objects associated with the semantic models in the collection"""
         raise NotImplementedError
 
     @abstractmethod
     def get_aggregation_time_dimensions_with_measures(
-        self, data_source_reference: DataSourceReference
+        self, semantic_model_reference: SemanticModelReference
     ) -> ElementGrouper[TimeDimensionReference, MeasureSpec]:
-        """Return all aggregation time dimensions in the given data source with their associated measures"""
+        """Return all aggregation time dimensions in the given semantic model with their associated measures"""
         raise NotImplementedError
 
     @abstractmethod
-    def get_data_sources_for_entity(self, entity_reference: EntityReference) -> Set[DataSource]:
-        """Return all data sources associated with an entity reference"""
+    def get_semantic_models_for_entity(self, entity_reference: EntityReference) -> Set[SemanticModel]:
+        """Return all semantic models associated with an entity reference"""
         raise NotImplementedError
 
 

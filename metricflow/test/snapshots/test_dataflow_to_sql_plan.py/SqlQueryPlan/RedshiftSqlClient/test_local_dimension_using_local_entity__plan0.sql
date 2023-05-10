@@ -54,7 +54,7 @@ FROM (
         , subq_0.largest_listing
         , subq_0.smallest_listing
       FROM (
-        -- Read Elements From Data Source 'listings_latest'
+        -- Read Elements From Semantic Model 'listings_latest'
         SELECT
           1 AS listings
           , listings_latest_src_10004.capacity AS largest_listing

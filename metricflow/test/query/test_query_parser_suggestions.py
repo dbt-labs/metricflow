@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 EXTENDED_BOOKINGS_YAML = textwrap.dedent(
     """\
-    data_source:
+    semantic_model:
       name: bookings_source
 
       node_relation:
@@ -78,7 +78,7 @@ EXTENDED_BOOKINGS_YAML = textwrap.dedent(
 
 LISTINGS_YAML = textwrap.dedent(
     """\
-    data_source:
+    semantic_model:
       name: listings_latest
       description: listings_latest
 

@@ -29,12 +29,12 @@ from metricflow.dataflow.dataflow_plan import (
     ValidityWindowJoinDescription,
 )
 from metricflow.instances import InstanceSet
-from metricflow.model.semantics.data_source_join_evaluator import DataSourceJoinEvaluator
+from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
 
-from metricflow.protocols.semantics import DataSourceSemanticsAccessor
+from metricflow.protocols.semantics import SemanticModelSemanticsAccessor
 from metricflow.specs import (
     LinkableInstanceSpec,
     LinklessEntitySpec,
@@ -112,23 +112,23 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
 
     def __init__(
         self,
-        data_source_semantics: DataSourceSemanticsAccessor,
+        semantic_model_semantics: SemanticModelSemanticsAccessor,
         nodes_available_for_joins: Sequence[BaseOutput[SourceDataSetT]],
         node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver[SourceDataSetT],
     ) -> None:
         """Constructor
 
         Args:
-            data_source_semantics: Needed to resolve partition dimensions.
+            semantic_model_semantics: Needed to resolve partition dimensions.
             nodes_available_for_joins: Nodes that contain linkable instances and may be joined with the "start_node"
             (e.g. the node containing a desired measure) to retrieve the needed linkable instances.
             node_data_set_resolver: Figures out what data set is output by a node.
         """
-        self._data_source_semantics = data_source_semantics
+        self._semantic_model_semantics = semantic_model_semantics
         self._nodes_available_for_joins = nodes_available_for_joins
         self._node_data_set_resolver = node_data_set_resolver
-        self._partition_resolver = PartitionJoinResolver(self._data_source_semantics)
-        self._join_evaluator = DataSourceJoinEvaluator(self._data_source_semantics)
+        self._partition_resolver = PartitionJoinResolver(self._semantic_model_semantics)
+        self._join_evaluator = SemanticModelJoinEvaluator(self._semantic_model_semantics)
 
     def _find_joinable_candidate_nodes_that_can_satisfy_linkable_specs(
         self,
@@ -170,12 +170,12 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                     len(entity_instance_in_right_node.defined_from) == 1
                 ), f"Did not get exactly 1 defined_from in {entity_instance_in_right_node}"
 
-                entity_in_right_node = self._data_source_semantics.get_entity_in_data_source(
+                entity_in_right_node = self._semantic_model_semantics.get_entity_in_semantic_model(
                     entity_instance_in_right_node.defined_from[0]
                 )
                 if entity_in_right_node is None:
                     raise RuntimeError(
-                        f"Invalid DataSourceElementReference {entity_instance_in_right_node.defined_from[0]}"
+                        f"Invalid SemanticModelElementReference {entity_instance_in_right_node.defined_from[0]}"
                     )
 
                 entity_instance_in_left_node = None
@@ -191,9 +191,11 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                 assert len(entity_instance_in_left_node.defined_from) == 1
                 assert len(entity_instance_in_right_node.defined_from) == 1
 
-                if not self._join_evaluator.is_valid_data_source_join(
-                    left_data_source_reference=entity_instance_in_left_node.defined_from[0].data_source_reference,
-                    right_data_source_reference=entity_instance_in_right_node.defined_from[0].data_source_reference,
+                if not self._join_evaluator.is_valid_semantic_model_join(
+                    left_semantic_model_reference=entity_instance_in_left_node.defined_from[0].semantic_model_reference,
+                    right_semantic_model_reference=entity_instance_in_right_node.defined_from[
+                        0
+                    ].semantic_model_reference,
                     on_entity_reference=entity_spec_in_right_node.reference,
                 ):
                     continue
@@ -245,7 +247,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                         node_to_join_spec_set=data_set_in_right_node.instance_set.spec_set,
                     )
                     validity_window_join_description = CreateValidityWindowJoinDescription(
-                        self._data_source_semantics
+                        self._semantic_model_semantics
                     ).transform(instance_set=data_set_in_right_node.instance_set)
 
                     candidates_for_join.append(

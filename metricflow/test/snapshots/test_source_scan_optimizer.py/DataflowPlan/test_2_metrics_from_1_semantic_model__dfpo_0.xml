@@ -1,0 +1,117 @@
+<DataflowPlan>
+    <WriteToResultDataframeNode>
+        <!-- description = Write to Dataframe -->
+        <!-- node_id = wrd_1 -->
+        <ComputeMetricsNode>
+            <!-- description = Compute Metrics via Expressions -->
+            <!-- node_id = cm_4 -->
+            <!-- metric_spec =                   -->
+            <!--   {'class': 'MetricSpec',       -->
+            <!--    'element_name': 'bookings',  -->
+            <!--    'constraint': None,          -->
+            <!--    'alias': None,               -->
+            <!--    'offset_window': None,       -->
+            <!--    'offset_to_grain': None}     -->
+            <!-- metric_spec =                        -->
+            <!--   {'class': 'MetricSpec',            -->
+            <!--    'element_name': 'booking_value',  -->
+            <!--    'constraint': None,               -->
+            <!--    'alias': None,                    -->
+            <!--    'offset_window': None,            -->
+            <!--    'offset_to_grain': None}          -->
+            <AggregateMeasuresNode>
+                <!-- description = Aggregate Measures -->
+                <!-- node_id = am_4 -->
+                <FilterElementsNode>
+                    <!-- description =                                                                -->
+                    <!--   Pass Only Elements:                                                        -->
+                    <!--     ['bookings', 'booking_value', 'metric_time', 'listing__country_latest']  -->
+                    <!-- node_id = pfe_14 -->
+                    <!-- include_spec =                           -->
+                    <!--   {'class': 'MeasureSpec',               -->
+                    <!--    'element_name': 'bookings',           -->
+                    <!--    'non_additive_dimension_spec': None}  -->
+                    <!-- include_spec =                           -->
+                    <!--   {'class': 'MeasureSpec',               -->
+                    <!--    'element_name': 'booking_value',      -->
+                    <!--    'non_additive_dimension_spec': None}  -->
+                    <!-- include_spec =                               -->
+                    <!--   {'class': 'TimeDimensionSpec',             -->
+                    <!--    'element_name': 'metric_time',            -->
+                    <!--    'entity_links': (),                       -->
+                    <!--    'time_granularity': TimeGranularity.DAY}  -->
+                    <!-- include_spec =                                                                  -->
+                    <!--   {'class': 'DimensionSpec',                                                    -->
+                    <!--    'element_name': 'country_latest',                                            -->
+                    <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'listing'},)}  -->
+                    <JoinToBaseOutputNode>
+                        <!-- description = Join Standard Outputs -->
+                        <!-- node_id = jso_4 -->
+                        <!-- join0_for_node_id_pfe_13 =                            -->
+                        <!--   {'class': 'JoinDescription',                        -->
+                        <!--    'join_node': FilterElementsNode(node_id=pfe_13),   -->
+                        <!--    'join_on_entity': {'class': 'LinklessEntitySpec',  -->
+                        <!--                       'element_name': 'listing',      -->
+                        <!--                       'entity_links': ()},            -->
+                        <!--    'join_on_partition_dimensions': (),                -->
+                        <!--    'join_on_partition_time_dimensions': (),           -->
+                        <!--    'validity_window': None}                           -->
+                        <FilterElementsNode>
+                            <!-- description =                                                -->
+                            <!--   Pass Only Elements:                                        -->
+                            <!--     ['bookings', 'booking_value', 'metric_time', 'listing']  -->
+                            <!-- node_id = pfe_12 -->
+                            <!-- include_spec =                           -->
+                            <!--   {'class': 'MeasureSpec',               -->
+                            <!--    'element_name': 'bookings',           -->
+                            <!--    'non_additive_dimension_spec': None}  -->
+                            <!-- include_spec =                           -->
+                            <!--   {'class': 'MeasureSpec',               -->
+                            <!--    'element_name': 'booking_value',      -->
+                            <!--    'non_additive_dimension_spec': None}  -->
+                            <!-- include_spec =                               -->
+                            <!--   {'class': 'TimeDimensionSpec',             -->
+                            <!--    'element_name': 'metric_time',            -->
+                            <!--    'entity_links': (),                       -->
+                            <!--    'time_granularity': TimeGranularity.DAY}  -->
+                            <!-- include_spec = LinklessEntitySpec(element_name='listing', entity_links=()) -->
+                            <MetricTimeDimensionTransformNode>
+                                <!-- description = Metric Time Dimension 'ds' -->
+                                <!-- node_id = sma_4 -->
+                                <!-- aggregation_time_dimension = ds -->
+                                <ReadSqlSourceNode>
+                                    <!-- description =                                                                                    -->
+                                    <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->
+                                    <!-- node_id = rss_4 -->
+                                    <!-- data_set =                                                                             -->
+                                    <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->
+                                </ReadSqlSourceNode>
+                            </MetricTimeDimensionTransformNode>
+                        </FilterElementsNode>
+                        <FilterElementsNode>
+                            <!-- description =                      -->
+                            <!--   Pass Only Elements:              -->
+                            <!--     ['country_latest', 'listing']  -->
+                            <!-- node_id = pfe_13 -->
+                            <!-- include_spec =                                                                      -->
+                            <!--   {'class': 'DimensionSpec', 'element_name': 'country_latest', 'entity_links': ()}  -->
+                            <!-- include_spec = LinklessEntitySpec(element_name='listing', entity_links=()) -->
+                            <MetricTimeDimensionTransformNode>
+                                <!-- description = Metric Time Dimension 'ds' -->
+                                <!-- node_id = sma_5 -->
+                                <!-- aggregation_time_dimension = ds -->
+                                <ReadSqlSourceNode>
+                                    <!-- description =                                                                                    -->
+                                    <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->
+                                    <!-- node_id = rss_5 -->
+                                    <!-- data_set =                                                                             -->
+                                    <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->
+                                </ReadSqlSourceNode>
+                            </MetricTimeDimensionTransformNode>
+                        </FilterElementsNode>
+                    </JoinToBaseOutputNode>
+                </FilterElementsNode>
+            </AggregateMeasuresNode>
+        </ComputeMetricsNode>
+    </WriteToResultDataframeNode>
+</DataflowPlan>

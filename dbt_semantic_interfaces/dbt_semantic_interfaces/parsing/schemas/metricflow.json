@@ -17,44 +17,6 @@
             },
             "type": "object"
         },
-        "data_source": {
-            "$id": "data_source",
-            "additionalProperties": false,
-            "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "dimensions": {
-                    "items": {
-                        "$ref": "#/definitions/dimension_schema"
-                    },
-                    "type": "array"
-                },
-                "entities": {
-                    "items": {
-                        "$ref": "#/definitions/entity_schema"
-                    },
-                    "type": "array"
-                },
-                "measures": {
-                    "items": {
-                        "$ref": "#/definitions/measure_schema"
-                    },
-                    "type": "array"
-                },
-                "name": {
-                    "pattern": "(?!.*__).*^[a-z][a-z0-9_]*[a-z0-9]$",
-                    "type": "string"
-                },
-                "node_relation": {
-                    "$ref": "#/definitions/node_relation_schema"
-                }
-            },
-            "required": [
-                "name"
-            ],
-            "type": "object"
-        },
         "derived_group_by_element_schema": {
             "$id": "derived_group_by_element_schema",
             "additionalProperties": false,
@@ -453,6 +415,44 @@
             ],
             "type": "object"
         },
+        "semantic_model": {
+            "$id": "semantic_model",
+            "additionalProperties": false,
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "dimensions": {
+                    "items": {
+                        "$ref": "#/definitions/dimension_schema"
+                    },
+                    "type": "array"
+                },
+                "entities": {
+                    "items": {
+                        "$ref": "#/definitions/entity_schema"
+                    },
+                    "type": "array"
+                },
+                "measures": {
+                    "items": {
+                        "$ref": "#/definitions/measure_schema"
+                    },
+                    "type": "array"
+                },
+                "name": {
+                    "pattern": "(?!.*__).*^[a-z][a-z0-9_]*[a-z0-9]$",
+                    "type": "string"
+                },
+                "node_relation": {
+                    "$ref": "#/definitions/node_relation_schema"
+                }
+            },
+            "required": [
+                "name"
+            ],
+            "type": "object"
+        },
         "validity_params_schema": {
             "$id": "validity_params_schema",
             "additionalProperties": false,
@@ -468,14 +468,14 @@
         }
     },
     "properties": {
-        "data_source": {
-            "$ref": "#/definitions/data_source"
-        },
         "derived_identifier": {
             "$ref": "#/definitions/derived_group_by_element_schema"
         },
         "metric": {
             "$ref": "#/definitions/metric"
+        },
+        "semantic_model": {
+            "$ref": "#/definitions/semantic_model"
         }
     },
     "title": "MetricFlow file schema",

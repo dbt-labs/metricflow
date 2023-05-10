@@ -16,8 +16,8 @@ from dbt_semantic_interfaces.objects.metadata import Metadata
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.references import (
-    DataSourceElementReference,
-    DataSourceReference,
+    SemanticModelElementReference,
+    SemanticModelReference,
     MetricModelReference,
 )
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
@@ -51,8 +51,8 @@ ISSUE_COLOR_MAP = {
 }
 
 
-class DataSourceElementType(Enum):
-    """Maps data source element types to a readable string."""
+class SemanticModelElementType(Enum):
+    """Maps semantic model element types to a readable string."""
 
     MEASURE = "measure"
     DIMENSION = "dimension"
@@ -103,34 +103,34 @@ class MetricContext(BaseModel):
         return f"with metric `{self.metric.metric_name}` {self.file_context.context_str()}"
 
 
-class DataSourceContext(BaseModel):
-    """The context class for validation issues involving data sources"""
+class SemanticModelContext(BaseModel):
+    """The context class for validation issues involving semantic models"""
 
     file_context: FileContext
-    data_source: DataSourceReference
+    semantic_model: SemanticModelReference
 
     def context_str(self) -> str:
         """Human readable stringified representation of the context"""
-        return f"with data source `{self.data_source.data_source_name}` {self.file_context.context_str()}"
+        return f"with semantic model `{self.semantic_model.semantic_model_name}` {self.file_context.context_str()}"
 
 
-class DataSourceElementContext(BaseModel):
+class SemanticModelElementContext(BaseModel):
     """The context class for validation issues involving dimensions"""
 
     file_context: FileContext
-    data_source_element: DataSourceElementReference
-    element_type: DataSourceElementType
+    semantic_model_element: SemanticModelElementReference
+    element_type: SemanticModelElementType
 
     def context_str(self) -> str:
         """Human readable stringified representation of the context"""
-        return f"with {self.element_type.value} `{self.data_source_element.element_name}` in data source `{self.data_source_element.data_source_name}` {self.file_context.context_str()}"
+        return f"with {self.element_type.value} `{self.semantic_model_element.element_name}` in semantic model `{self.semantic_model_element.semantic_model_name}` {self.file_context.context_str()}"
 
 
 ValidationContext = Union[
     FileContext,
     MetricContext,
-    DataSourceContext,
-    DataSourceElementContext,
+    SemanticModelContext,
+    SemanticModelElementContext,
 ]
 
 
@@ -329,9 +329,9 @@ def validate_safely(whats_being_done: str) -> Callable:
 
 @dataclass(frozen=True)
 class DimensionInvariants:
-    """Helper object to ensure consistent dimension attributes across data sources.
+    """Helper object to ensure consistent dimension attributes across semantic models.
 
-    All dimensions with a given name in all data sources should have attributes matching these values.
+    All dimensions with a given name in all semantic models should have attributes matching these values.
     """
 
     type: DimensionType

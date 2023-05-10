@@ -12,19 +12,19 @@ from dbt_semantic_interfaces.parsing.yaml_loader import YamlConfigLoader
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 
 
-def test_data_source_metadata_parsing(simple_user_configured_model: UserConfiguredModel) -> None:
-    """Tests internal metadata object parsing from a file into the Data Source model object
+def test_semantic_model_metadata_parsing(simple_user_configured_model: UserConfiguredModel) -> None:
+    """Tests internal metadata object parsing from a file into the Semantic Model model object
 
-    This only tests some basic file name parsing for each data source since they are not guaranteed
+    This only tests some basic file name parsing for each semantic model since they are not guaranteed
     to be collected in the same file in the simple model, and the output here has been transformed
     so the YAML contents might or might not match.
     """
-    assert len(simple_user_configured_model.data_sources) > 0
-    for data_source in simple_user_configured_model.data_sources:
+    assert len(simple_user_configured_model.semantic_models) > 0
+    for semantic_model in simple_user_configured_model.semantic_models:
         assert (
-            data_source.metadata is not None
-        ), f"Metadata should always be parsed out of the model, but None found for data source: {data_source}!"
-        _assert_metadata_filename_is_valid(data_source.metadata)
+            semantic_model.metadata is not None
+        ), f"Metadata should always be parsed out of the model, but None found for semantic model: {semantic_model}!"
+        _assert_metadata_filename_is_valid(semantic_model.metadata)
 
 
 def test_metric_metadata_parsing(simple_user_configured_model: UserConfiguredModel) -> None:
@@ -71,9 +71,9 @@ def test_measure_metadata_parsing(simple_user_configured_model: UserConfiguredMo
     YAML contents themselves since they may change from the raw files into the UserConfiguredModel object we access
     here.
     """
-    assert len(simple_user_configured_model.data_sources) > 0
-    for data_source in simple_user_configured_model.data_sources:
-        _assert_measure_metadata_is_valid(data_source.measures)
+    assert len(simple_user_configured_model.semantic_models) > 0
+    for semantic_model in simple_user_configured_model.semantic_models:
+        _assert_measure_metadata_is_valid(semantic_model.measures)
 
 
 def _assert_metadata_filename_is_valid(metadata: Metadata) -> None:
@@ -97,7 +97,7 @@ def _assert_measure_metadata_is_valid(measures: Sequence[Measure]) -> None:
     The assertions check that:
     1. Metadata is always set by the parser
     2. Metadata always contains a reasonable repo file path and file name
-    3. Start and end line numbers are always increasing for every measure in the data source
+    3. Start and end line numbers are always increasing for every measure in the semantic model
 
     Since this test is operating on a transformed model, we do not make assertions about the raw YAML contents and how
     they relate to the properties of the measures themselves.

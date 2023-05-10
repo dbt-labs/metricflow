@@ -5,7 +5,7 @@ import dateutil.parser
 from _pytest.fixtures import FixtureRequest
 from typing import Callable, Tuple
 
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.metric import Metric
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from metricflow.protocols.sql_client import SqlClient
@@ -33,20 +33,22 @@ def should_skip_multi_threaded(
     return False
 
 
-def find_data_source_with(model: UserConfiguredModel, function: Callable[[DataSource], bool]) -> Tuple[DataSource, int]:
-    """Returns a data source from the model which matches the criteria defined by the passed in function'
+def find_semantic_model_with(
+    model: UserConfiguredModel, function: Callable[[SemanticModel], bool]
+) -> Tuple[SemanticModel, int]:
+    """Returns a semantic model from the model which matches the criteria defined by the passed in function'
 
-    This is useful because the order of data sources in the list is non determinant, thus it's impossible to
-    hard code which data source you want by index. Using data source names isn't great for consistency because
-    data sources change and might no longer have the necessary parts to be useful for a given test. This
-    allows us to guarantee that a data source will be returned which meets the requirements of what a test needs,
-    unless none of the data sources will work.
+    This is useful because the order of semantic models in the list is non determinant, thus it's impossible to
+    hard code which semantic model you want by index. Using semantic model names isn't great for consistency because
+    semantic models change and might no longer have the necessary parts to be useful for a given test. This
+    allows us to guarantee that a semantic model will be returned which meets the requirements of what a test needs,
+    unless none of the semantic models will work.
     """
-    for index, data_source in enumerate(model.data_sources):
-        if function(data_source):
-            return data_source, index
+    for index, semantic_model in enumerate(model.semantic_models):
+        if function(semantic_model):
+            return semantic_model, index
 
-    raise Exception("Unable to find a data_source matching function criteria")
+    raise Exception("Unable to find a semantic_model matching function criteria")
 
 
 def find_metric_with(model: UserConfiguredModel, function: Callable[[Metric], bool]) -> Tuple[Metric, int]:

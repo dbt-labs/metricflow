@@ -10,16 +10,16 @@ from metricflow.model.validations.validator_helpers import (
 
 
 class NonEmptyRule(ModelValidationRule):
-    """Check if the model contains data sources and metrics."""
+    """Check if the model contains semantic models and metrics."""
 
     @staticmethod
-    @validate_safely(whats_being_done="checking that the model has data sources")
-    def _check_model_has_data_sources(model: UserConfiguredModel) -> List[ValidationIssue]:
+    @validate_safely(whats_being_done="checking that the model has semantic models")
+    def _check_model_has_semantic_models(model: UserConfiguredModel) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
-        if not model.data_sources:
+        if not model.semantic_models:
             issues.append(
                 ValidationError(
-                    message="No data sources present in the model.",
+                    message="No semantic models present in the model.",
                 )
             )
         return issues
@@ -31,8 +31,8 @@ class NonEmptyRule(ModelValidationRule):
 
         # If we are going to generate measure proxy metrics that is sufficient as well
         create_measure_proxy_metrics = False
-        for data_source in model.data_sources:
-            for measure in data_source.measures:
+        for semantic_model in model.semantic_models:
+            for measure in semantic_model.measures:
                 if measure.create_metric is True:
                     create_measure_proxy_metrics = True
                     break
@@ -46,9 +46,9 @@ class NonEmptyRule(ModelValidationRule):
         return issues
 
     @staticmethod
-    @validate_safely("running model validation rule ensuring metrics and data sources are defined")
+    @validate_safely("running model validation rule ensuring metrics and semantic models are defined")
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
         issues: List[ValidationIssue] = []
-        issues += NonEmptyRule._check_model_has_data_sources(model=model)
+        issues += NonEmptyRule._check_model_has_semantic_models(model=model)
         issues += NonEmptyRule._check_model_has_metrics(model=model)
         return issues

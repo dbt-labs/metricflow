@@ -1,4 +1,4 @@
--- Read Elements From Data Source 'bookings_source'
+-- Read Elements From Semantic Model 'bookings_source'
 -- Metric Time Dimension 'booking_paid_at'
 SELECT
   ds

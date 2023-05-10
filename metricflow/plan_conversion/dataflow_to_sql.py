@@ -154,7 +154,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         """
         self._column_association_resolver = column_association_resolver
         self._metric_semantics = semantic_manifest_lookup.metric_semantics
-        self._data_source_semantics = semantic_manifest_lookup.data_source_semantics
+        self._semantic_model_semantics = semantic_manifest_lookup.semantic_model_semantics
         self._time_spine_source = time_spine_source
 
     @property
@@ -472,7 +472,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         This node is a straight inner join against all of the columns used for grouping in the input
         aggregation steps. Every column should be used, and at this point all inputs are fully aggregated,
         meaning we can make assumptions about things like NULL handling and there being one row per value
-        set in each data source.
+        set in each semantic model.
 
         In addition, this is used in cases where we expect a final metric to be computed using these
         measures as input. Therefore, we make the assumption that any mismatch should be discarded, as
@@ -519,7 +519,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 )
             )
             # All groupby columns are shared by all inputs, so we only want the measure/metric columns
-            # from the data sources on the right side of the join
+            # from the semantic models on the right side of the join
             table_alias_to_instance_set[right_data_set_alias] = InstanceSet(
                 measure_instances=right_data_set.instance_set.measure_instances,
                 metric_instances=right_data_set.instance_set.metric_instances,
@@ -544,7 +544,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
     def visit_aggregate_measures_node(self, node: AggregateMeasuresNode) -> SqlDataSet:
         """Generates the query that realizes the behavior of AggregateMeasuresNode.
 
-        This will produce a query that aggregates all measures from a given input data source per the
+        This will produce a query that aggregates all measures from a given input semantic model per the
         measure spec
 
         In the event the input aggregations are applied to measures with aliases set, in case of, e.g.,
@@ -582,7 +582,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             CreateSelectColumnsWithMeasuresAggregated(
                 table_alias=from_data_set_alias,
                 column_resolver=self._column_association_resolver,
-                data_source_semantics=self._data_source_semantics,
+                semantic_model_semantics=self._semantic_model_semantics,
                 metric_input_measure_specs=node.metric_input_measure_specs,
             )
         )
@@ -980,7 +980,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
     def visit_constrain_time_range_node(self, node: ConstrainTimeRangeNode[SourceDataSetT]) -> SqlDataSet:
         """Convert ConstrainTimeRangeNode to a SqlDataSet by building the time constraint comparison
 
-        Use the smallest time granularity to build the comparison since that's what was used in the data source
+        Use the smallest time granularity to build the comparison since that's what was used in the semantic model
         definition and it wouldn't have a DATE_TRUNC() in the expression. We want to build this:
 
             ds >= '2020-01-01' AND ds <= '2020-02-01'
@@ -1069,7 +1069,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         # Only these measures will be in the output data set.
         output_measure_instances = []
         for measure_instance in input_data_set.instance_set.measure_instances:
-            measure = self._data_source_semantics.get_measure(measure_instance.spec.as_reference)
+            measure = self._semantic_model_semantics.get_measure(measure_instance.spec.as_reference)
             if measure.checked_agg_time_dimension == node.aggregation_time_dimension_reference:
                 output_measure_instances.append(measure_instance)
 

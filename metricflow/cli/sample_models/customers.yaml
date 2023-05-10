@@ -1,4 +1,4 @@
-data_source:
+semantic_model:
   name: customers
   description: Location and description of all customers.
   owners:

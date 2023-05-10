@@ -5,7 +5,7 @@ SELECT
   , subq_11.country_latest AS listing__country_latest
   , subq_7.bookings AS bookings
 FROM (
-  -- Read Elements From Data Source 'bookings_source'
+  -- Read Elements From Semantic Model 'bookings_source'
   -- Pass Only Elements:
   --   ['bookings', 'listing']
   SELECT
@@ -14,7 +14,7 @@ FROM (
   FROM ***************************.fct_bookings bookings_source_src_10001
 ) subq_7
 LEFT OUTER JOIN (
-  -- Read Elements From Data Source 'listings_latest'
+  -- Read Elements From Semantic Model 'listings_latest'
   -- Pass Only Elements:
   --   ['country_latest', 'listing']
   SELECT
@@ -25,7 +25,7 @@ LEFT OUTER JOIN (
 ON
   subq_7.listing = subq_9.listing
 LEFT OUTER JOIN (
-  -- Read Elements From Data Source 'listings_latest'
+  -- Read Elements From Semantic Model 'listings_latest'
   -- Pass Only Elements:
   --   ['country_latest', 'listing']
   SELECT

@@ -1,7 +1,7 @@
 from _pytest.fixtures import FixtureRequest
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.dataset.data_source_adapter import DataSourceDataSet
+from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_execution import DataflowToExecutionPlanConverter
@@ -25,8 +25,8 @@ def make_execution_plan_converter(  # noqa: D
     sql_client: AsyncSqlClient,
     time_spine_source: TimeSpineSource,
 ) -> DataflowToExecutionPlanConverter:
-    return DataflowToExecutionPlanConverter[DataSourceDataSet](
-        sql_plan_converter=DataflowToSqlQueryPlanConverter[DataSourceDataSet](
+    return DataflowToExecutionPlanConverter[SemanticModelDataSet](
+        sql_plan_converter=DataflowToSqlQueryPlanConverter[SemanticModelDataSet](
             column_association_resolver=DefaultColumnAssociationResolver(semantic_manifest_lookup),
             semantic_manifest_lookup=semantic_manifest_lookup,
             time_spine_source=time_spine_source,
@@ -39,7 +39,7 @@ def make_execution_plan_converter(  # noqa: D
 def test_joined_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
     simple_semantic_manifest_lookup: SemanticManifestLookup,
     async_sql_client: AsyncSqlClient,
     time_spine_source: TimeSpineSource,
@@ -78,7 +78,7 @@ def test_small_combined_metrics_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     async_sql_client: AsyncSqlClient,
-    dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
     simple_semantic_manifest_lookup: SemanticManifestLookup,
     time_spine_source: TimeSpineSource,
 ) -> None:
@@ -116,7 +116,7 @@ def test_combined_metrics_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     async_sql_client: AsyncSqlClient,
-    dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
     simple_semantic_manifest_lookup: SemanticManifestLookup,
     time_spine_source: TimeSpineSource,
 ) -> None:
@@ -155,7 +155,7 @@ def test_combined_metrics_plan(  # noqa: D
 def test_multihop_joined_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    multihop_dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
+    multihop_dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
     multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
     async_sql_client: AsyncSqlClient,
     time_spine_source: TimeSpineSource,
@@ -177,7 +177,7 @@ def test_multihop_joined_plan(  # noqa: D
     )
 
     to_execution_plan_converter = DataflowToExecutionPlanConverter(
-        sql_plan_converter=DataflowToSqlQueryPlanConverter[DataSourceDataSet](
+        sql_plan_converter=DataflowToSqlQueryPlanConverter[SemanticModelDataSet](
             column_association_resolver=DefaultColumnAssociationResolver(multi_hop_join_semantic_manifest_lookup),
             semantic_manifest_lookup=multi_hop_join_semantic_manifest_lookup,
             time_spine_source=time_spine_source,

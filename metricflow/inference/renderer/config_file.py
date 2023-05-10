@@ -119,7 +119,7 @@ class ConfigFileRenderer(InferenceRenderer):
     def _get_configuration_data_for_table(self, table: SqlTable, results: List[InferenceResult]) -> Dict:
         data = CommentedMap(
             {
-                "data_source": {
+                "semantic_model": {
                     "name": table.table_name,
                     "node_relation": {
                         "alias": table.table_name,
@@ -138,7 +138,7 @@ class ConfigFileRenderer(InferenceRenderer):
             results
         )
         data.yaml_set_comment_before_after_key(
-            key="data_source",
+            key="semantic_model",
             before="\n".join(header_comments),
         )
 

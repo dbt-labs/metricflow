@@ -1,7 +1,7 @@
 import logging
 from typing import Optional
 
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.transformations.transform_rule import ModelTransformRule
@@ -14,24 +14,24 @@ class SetMeasureAggregationTimeDimensionRule(ModelTransformRule):
     """Sets the aggregation time dimension for measures to the primary time dimension if not defined."""
 
     @staticmethod
-    def _find_primary_time_dimension(data_source: DataSource) -> Optional[TimeDimensionReference]:
-        for dimension in data_source.dimensions:
+    def _find_primary_time_dimension(semantic_model: SemanticModel) -> Optional[TimeDimensionReference]:
+        for dimension in semantic_model.dimensions:
             if dimension.type == DimensionType.TIME and dimension.type_params and dimension.type_params.is_primary:
                 return dimension.time_dimension_reference
         return None
 
     @staticmethod
     def transform_model(model: UserConfiguredModel) -> UserConfiguredModel:  # noqa: D
-        for data_source in model.data_sources:
+        for semantic_model in model.semantic_models:
             primary_time_dimension_reference = SetMeasureAggregationTimeDimensionRule._find_primary_time_dimension(
-                data_source
+                semantic_model
             )
 
             if not primary_time_dimension_reference:
-                # Dimension data sources won't have a primary time dimension.
+                # Dimension semantic models won't have a primary time dimension.
                 continue
 
-            for measure in data_source.measures:
+            for measure in semantic_model.measures:
                 if not measure.agg_time_dimension:
                     measure.agg_time_dimension = primary_time_dimension_reference.element_name
 

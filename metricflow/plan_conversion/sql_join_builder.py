@@ -223,10 +223,10 @@ class SqlQueryPlanJoinBuilder:
         """Build a time window join condition if the join description includes a validity window description
 
         When the validity window is set, it means we are dealing with a dataset representing an SCD Type II
-        style data source, with a start and end boundary on the window. A base output join against such data
+        style semantic model, with a start and end boundary on the window. A base output join against such data
         sources requires a metric_time dimension to process the join.
 
-        By convention, the join description ties the validity window to the "right" side data source, and so
+        By convention, the join description ties the validity window to the "right" side semantic model, and so
         we extract the metric time instance from the left data set.
 
         We use the instance with the smallest granularity and shortest entity link path, since it will be

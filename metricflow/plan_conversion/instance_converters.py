@@ -9,7 +9,7 @@ from itertools import chain
 from more_itertools import bucket
 from typing import Dict, List, Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.references import DataSourceReference
+from dbt_semantic_interfaces.references import SemanticModelReference
 from metricflow.aggregation_properties import AggregationState
 from metricflow.dataflow.dataflow_plan import ValidityWindowJoinDescription
 from metricflow.instances import (
@@ -23,7 +23,7 @@ from metricflow.instances import (
     InstanceSetTransform,
     TimeDimensionInstance,
 )
-from metricflow.protocols.semantics import DataSourceSemanticsAccessor
+from metricflow.protocols.semantics import SemanticModelSemanticsAccessor
 from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.specs import (
@@ -167,10 +167,10 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
         self,
         table_alias: str,
         column_resolver: ColumnAssociationResolver,
-        data_source_semantics: DataSourceSemanticsAccessor,
+        semantic_model_semantics: SemanticModelSemanticsAccessor,
         metric_input_measure_specs: Sequence[MetricInputMeasureSpec],
     ) -> None:
-        self._data_source_semantics = data_source_semantics
+        self._semantic_model_semantics = semantic_model_semantics
         self.metric_input_measure_specs = metric_input_measure_specs
         super().__init__(table_alias=table_alias, column_resolver=column_resolver)
 
@@ -205,7 +205,7 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
 
         # Create an expression that will aggregate the given measure.
         # Figure out the aggregation function for the measure.
-        measure = self._data_source_semantics.get_measure(measure_instance.spec.as_reference)
+        measure = self._semantic_model_semantics.get_measure(measure_instance.spec.as_reference)
         aggregation_type = measure.agg
 
         expression_to_get_measure = SqlColumnReferenceExpression(
@@ -273,19 +273,19 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
     an SCD source, and extracting validity window information accordingly.
     """
 
-    def __init__(self, data_source_semantics: DataSourceSemanticsAccessor) -> None:
-        """Initializer. The DataSourceSemanticsAccessor is needed for getting the original model definition."""
-        self._data_source_semantics = data_source_semantics
+    def __init__(self, semantic_model_semantics: SemanticModelSemanticsAccessor) -> None:
+        """Initializer. The SemanticModelSemanticsAccessor is needed for getting the original model definition."""
+        self._semantic_model_semantics = semantic_model_semantics
 
-    def _get_validity_window_dimensions_for_data_source(
-        self, data_source_reference: DataSourceReference
+    def _get_validity_window_dimensions_for_semantic_model(
+        self, semantic_model_reference: SemanticModelReference
     ) -> Optional[Tuple[_DimensionValidityParams, _DimensionValidityParams]]:
-        """Returns a 2-tuple (start, end) of validity window dimensions info, if any exist in the data source"""
-        data_source = self._data_source_semantics.get_by_reference(data_source_reference)
-        assert data_source, f"Could not find data source {data_source_reference} after data set conversion!"
+        """Returns a 2-tuple (start, end) of validity window dimensions info, if any exist in the semantic model"""
+        semantic_model = self._semantic_model_semantics.get_by_reference(semantic_model_reference)
+        assert semantic_model, f"Could not find semantic model {semantic_model_reference} after data set conversion!"
 
-        start_dim = data_source.validity_start_dimension
-        end_dim = data_source.validity_end_dimension
+        start_dim = semantic_model.validity_start_dimension
+        end_dim = semantic_model.validity_end_dimension
 
         # We do this instead of relying on has_validity_dimensions because this also does type refinement
         if not start_dim or not end_dim:
@@ -307,20 +307,20 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
         """Find the Time Dimension specs defining a validity window, if any, and return it
 
         This currently throws an exception if more than one such window is found, and effectively prevents
-        us from processing a dataset composed of a join between two SCD data sources. This restriction is in
+        us from processing a dataset composed of a join between two SCD semantic models. This restriction is in
         place as a temporary simplification - if there is need for this feature we can enable it.
         """
-        data_source_to_window: Dict[str, ValidityWindowJoinDescription] = {}
-        instances_by_data_source = bucket(
-            instance_set.time_dimension_instances, lambda x: x.origin_data_source_reference.data_source_reference
+        semantic_model_to_window: Dict[str, ValidityWindowJoinDescription] = {}
+        instances_by_semantic_model = bucket(
+            instance_set.time_dimension_instances, lambda x: x.origin_semantic_model_reference.semantic_model_reference
         )
-        for data_source_reference in instances_by_data_source:
-            validity_dims = self._get_validity_window_dimensions_for_data_source(data_source_reference)
+        for semantic_model_reference in instances_by_semantic_model:
+            validity_dims = self._get_validity_window_dimensions_for_semantic_model(semantic_model_reference)
             if validity_dims is None:
                 continue
 
             start_dim, end_dim = validity_dims
-            specs = {instance.spec for instance in instances_by_data_source[data_source_reference]}
+            specs = {instance.spec for instance in instances_by_semantic_model[semantic_model_reference]}
             start_specs = [
                 spec
                 for spec in specs
@@ -334,9 +334,9 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
             linkless_start_specs = {spec.without_entity_links for spec in start_specs}
             linkless_end_specs = {spec.without_entity_links for spec in end_specs}
             assert len(linkless_start_specs) == 1 and len(linkless_end_specs) == 1, (
-                f"Did not find exactly one pair of specs from data source `{data_source_reference}` matching the validity "
-                f"window end points defined in the data source. This means we cannot process an SCD join, because we "
-                f"require exactly one validity window to be specified for the query! The window in the data source "
+                f"Did not find exactly one pair of specs from semantic model `{semantic_model_reference}` matching the validity "
+                f"window end points defined in the semantic model. This means we cannot process an SCD join, because we "
+                f"require exactly one validity window to be specified for the query! The window in the semantic model "
                 f"is defined by start dimension `{start_dim}` and end dimension `{end_dim}`. We found "
                 f"{len(linkless_start_specs)} linkless specs for window start ({linkless_start_specs}) and "
                 f"{len(linkless_end_specs)} linkless specs for window end ({linkless_end_specs})."
@@ -346,17 +346,17 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
             # entity links so that the subquery uses the correct reference in the ON statement
             start_specs = sorted(start_specs, key=lambda x: len(x.entity_links))
             end_specs = sorted(end_specs, key=lambda x: len(x.entity_links))
-            data_source_to_window[data_source_reference] = ValidityWindowJoinDescription(
+            semantic_model_to_window[semantic_model_reference] = ValidityWindowJoinDescription(
                 window_start_dimension=start_specs[0], window_end_dimension=end_specs[0]
             )
 
-        assert len(data_source_to_window) < 2, (
+        assert len(semantic_model_to_window) < 2, (
             f"Found more than 1 set of validity window specs in the input instance set. This is not currently "
-            f"supported, as joins between SCD data sources are not yet allowed! {data_source_to_window}"
+            f"supported, as joins between SCD semantic models are not yet allowed! {semantic_model_to_window}"
         )
 
-        if data_source_to_window:
-            return list(data_source_to_window.values())[0]
+        if semantic_model_to_window:
+            return list(semantic_model_to_window.values())[0]
 
         return None
 
@@ -587,9 +587,9 @@ class AliasAggregatedMeasures(InstanceSetTransform[InstanceSet]):
         """Initializer stores the input specs, which contain the aliases for each measure
 
         Note this class only works if used in conjunction with an AggregateMeasuresNode that has been generated
-        by querying a single data source for a single set of aggregated measures. This is currently enforced
+        by querying a single semantic model for a single set of aggregated measures. This is currently enforced
         by the structure of the DataflowPlanBuilder, which ensures each AggregateMeasuresNode corresponds to
-        a single data source set of measures for a single metric, and that these outputs will then be
+        a single semantic model set of measures for a single metric, and that these outputs will then be
         combinded via joins.
         """
         self.metric_input_measure_specs = metric_input_measure_specs

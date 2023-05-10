@@ -14,10 +14,10 @@ from metricflow.dataflow.dataflow_plan import (
     FilterElementsNode,
     JoinDescription,
 )
-from metricflow.model.semantics.data_source_join_evaluator import DataSourceJoinEvaluator, MAX_JOIN_HOPS
+from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator, MAX_JOIN_HOPS
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
-from metricflow.protocols.semantics import DataSourceSemanticsAccessor
+from metricflow.protocols.semantics import SemanticModelSemanticsAccessor
 from metricflow.spec_set_transforms import ToElementNameSet
 from metricflow.specs import LinkableInstanceSpec, LinklessEntitySpec, InstanceSpecSet
 
@@ -79,13 +79,13 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
 
     def __init__(  # noqa: D
         self,
-        data_source_semantics: DataSourceSemanticsAccessor,
+        semantic_model_semantics: SemanticModelSemanticsAccessor,
         node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver[SqlDataSetT],
     ):
         self._node_data_set_resolver = node_data_set_resolver
-        self._partition_resolver = PartitionJoinResolver(data_source_semantics)
-        self._data_source_semantics = data_source_semantics
-        self._join_evaluator = DataSourceJoinEvaluator(data_source_semantics)
+        self._partition_resolver = PartitionJoinResolver(semantic_model_semantics)
+        self._semantic_model_semantics = semantic_model_semantics
+        self._join_evaluator = SemanticModelJoinEvaluator(semantic_model_semantics)
 
     def add_time_range_constraint(
         self,
@@ -139,12 +139,12 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                 len(entity_instance_in_first_node.defined_from) == 1
             ), "Multiple items in defined_from not yet supported"
 
-            entity = self._data_source_semantics.get_entity_in_data_source(
+            entity = self._semantic_model_semantics.get_entity_in_semantic_model(
                 entity_instance_in_first_node.defined_from[0]
             )
             if entity is None:
                 raise RuntimeError(
-                    f"Invalid DataSourceElementReference {entity_instance_in_first_node.defined_from[0]}"
+                    f"Invalid SemanticModelElementReference {entity_instance_in_first_node.defined_from[0]}"
                 )
 
             return True
@@ -196,7 +196,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                 ):
                     continue
 
-                # Avoid loops between the same data sources.
+                # Avoid loops between the same semantic models.
                 if second_node_that_could_be_joined.node_id == first_node_that_could_be_joined.node_id:
                     continue
 

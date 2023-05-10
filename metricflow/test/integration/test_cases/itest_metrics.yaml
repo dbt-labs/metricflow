@@ -14,7 +14,7 @@ integration_test:
 ---
 integration_test:
   name: single_data_source_expr_metric
-  description: Tests querying an expression metric sourced from multiple measures, but one data source
+  description: Tests querying an expression metric sourced from multiple measures, but one semantic model
   model: SIMPLE_MODEL
   metrics: ["booking_fees_per_booker"]
   group_bys: ["metric_time"]
@@ -27,7 +27,7 @@ integration_test:
 ---
 integration_test:
   name: expr_metric
-  description: Tests querying an expression metric sourced from multiple measures, but one data source
+  description: Tests querying an expression metric sourced from multiple measures, but one semantic model
   model: SIMPLE_MODEL
   metrics: ["views_times_booking_value"]
   group_bys: ["metric_time"]

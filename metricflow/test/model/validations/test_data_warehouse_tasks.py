@@ -18,7 +18,7 @@ from dbt_semantic_interfaces.objects.user_configured_model import UserConfigured
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
-from metricflow.test.model.validations.helpers import data_source_with_guaranteed_meta
+from metricflow.test.model.validations.helpers import semantic_model_with_guaranteed_meta
 from metricflow.test.plan_utils import assert_snapshot_text_equal, make_schema_replacement_function
 
 
@@ -38,17 +38,17 @@ def dw_backed_warehouse_validation_model(
     return data_warehouse_validation_model
 
 
-def test_build_data_source_tasks(
+def test_build_semantic_model_tasks(
     mf_test_session_state: MetricFlowTestSessionState,
     data_warehouse_validation_model: UserConfiguredModel,
     async_sql_client: AsyncSqlClient,
 ) -> None:  # noqa:D
-    tasks = DataWarehouseTaskBuilder.gen_data_source_tasks(
+    tasks = DataWarehouseTaskBuilder.gen_semantic_model_tasks(
         model=data_warehouse_validation_model,
         sql_client=async_sql_client,
         system_schema=mf_test_session_state.mf_system_schema,
     )
-    assert len(tasks) == len(data_warehouse_validation_model.data_sources)
+    assert len(tasks) == len(data_warehouse_validation_model.semantic_models)
 
 
 def test_task_runner(  # noqa: D
@@ -81,7 +81,7 @@ def test_task_runner(  # noqa: D
     assert err_msg_bad in issues.errors[0].message
 
 
-def test_validate_data_sources(  # noqa: D
+def test_validate_semantic_models(  # noqa: D
     dw_backed_warehouse_validation_model: UserConfiguredModel,
     async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -92,20 +92,20 @@ def test_validate_data_sources(  # noqa: D
         sql_client=async_sql_client, system_schema=mf_test_session_state.mf_system_schema
     )
 
-    issues = dw_validator.validate_data_sources(model)
+    issues = dw_validator.validate_semantic_models(model)
     assert len(issues.all_issues) == 0
 
-    model.data_sources.append(
-        data_source_with_guaranteed_meta(
-            name="test_data_source2",
+    model.semantic_models.append(
+        semantic_model_with_guaranteed_meta(
+            name="test_semantic_model2",
             dimensions=[],
         )
     )
 
-    issues = dw_validator.validate_data_sources(model)
+    issues = dw_validator.validate_semantic_models(model)
     assert len(issues.all_issues) == 1
     assert len(issues.errors) == 1
-    assert "Unable to access data source `test_data_source2`" in issues.all_issues[0].message
+    assert "Unable to access semantic model `test_semantic_model2`" in issues.all_issues[0].message
 
 
 def test_build_dimension_tasks(  # noqa: D
@@ -118,7 +118,7 @@ def test_build_dimension_tasks(  # noqa: D
         sql_client=async_sql_client,
         system_schema=mf_test_session_state.mf_system_schema,
     )
-    # on data source query with all dimensions
+    # on semantic model query with all dimensions
     assert len(tasks) == 1
     # 1 categorical dimension task, 1 time dimension task, 4 granularity based time dimension tasks
     assert len(tasks[0].on_fail_subtasks) == 6
@@ -138,9 +138,9 @@ def test_validate_dimensions(  # noqa: D
     issues = dw_validator.validate_dimensions(model)
     assert len(issues.all_issues) == 0
 
-    dimensions = list(model.data_sources[0].dimensions)
+    dimensions = list(model.semantic_models[0].dimensions)
     dimensions.append(Dimension(name="doesnt_exist", type=DimensionType.CATEGORICAL))
-    model.data_sources[0].dimensions = dimensions
+    model.semantic_models[0].dimensions = dimensions
 
     issues = dw_validator.validate_dimensions(model)
     # One isssue is created for the short circuit query failure, and another is
@@ -158,8 +158,8 @@ def test_build_entities_tasks(  # noqa: D
         sql_client=async_sql_client,
         system_schema=mf_test_session_state.mf_system_schema,
     )
-    assert len(tasks) == 1  # on data source query with all entities
-    assert len(tasks[0].on_fail_subtasks) == 1  # a sub task for each entity on the data source
+    assert len(tasks) == 1  # on semantic model query with all entities
+    assert len(tasks[0].on_fail_subtasks) == 1  # a sub task for each entity on the semantic model
 
 
 def test_validate_entities(  # noqa: D
@@ -176,9 +176,9 @@ def test_validate_entities(  # noqa: D
     issues = dw_validator.validate_entities(model)
     assert len(issues.all_issues) == 0
 
-    entities = list(model.data_sources[0].entities)
+    entities = list(model.semantic_models[0].entities)
     entities.append(Entity(name="doesnt_exist", type=EntityType.UNIQUE))
-    model.data_sources[0].entities = entities
+    model.semantic_models[0].entities = entities
 
     issues = dw_validator.validate_entities(model)
     # One isssue is created for the short circuit query failure, and another is
@@ -196,8 +196,8 @@ def test_build_measure_tasks(  # noqa: D
         sql_client=async_sql_client,
         system_schema=mf_test_session_state.mf_system_schema,
     )
-    assert len(tasks) == 1  # on data source query with all measures
-    assert len(tasks[0].on_fail_subtasks) == 1  # a sub task for each measure on the data source
+    assert len(tasks) == 1  # on semantic model query with all measures
+    assert len(tasks[0].on_fail_subtasks) == 1  # a sub task for each measure on the semantic model
 
 
 def test_validate_measures(  # noqa: D
@@ -214,9 +214,9 @@ def test_validate_measures(  # noqa: D
     issues = dw_validator.validate_measures(model)
     assert len(issues.all_issues) == 0
 
-    measures = list(model.data_sources[0].measures)
+    measures = list(model.semantic_models[0].measures)
     measures.append(Measure(name="doesnt_exist", agg=AggregationType.SUM, agg_time_dimension="ds"))
-    model.data_sources[0].measures = measures
+    model.semantic_models[0].measures = measures
 
     issues = dw_validator.validate_measures(model)
     # One isssue is created for the short circuit query failure, and another is
@@ -265,7 +265,7 @@ def test_validate_metrics(  # noqa: D
     assert len(issues.all_issues) == 0
 
     # Update model to have a new measure which creates a new metric by proxy
-    new_measures = list(model.data_sources[0].measures)
+    new_measures = list(model.semantic_models[0].measures)
     new_measures.append(
         Measure(
             name="count_cats",
@@ -274,7 +274,7 @@ def test_validate_metrics(  # noqa: D
             create_metric=True,
         )
     )
-    model.data_sources[0].measures = new_measures
+    model.semantic_models[0].measures = new_measures
     model.metrics = []
     model = ModelTransformer.transform(model)
 

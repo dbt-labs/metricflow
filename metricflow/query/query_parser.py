@@ -9,7 +9,7 @@ from typing import List, Optional, Tuple, Dict, Sequence
 from metricflow.constraints.time_constraint import TimeRangeConstraint
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import BaseOutput
-from metricflow.dataset.data_source_adapter import DataSourceDataSet
+from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
 from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
@@ -68,29 +68,29 @@ class MetricFlowQueryParser:
     """Parse input strings from the user into a metric query specification.
 
     Definitions:
-    element name - the name of an element (measure, dimension, entity) in a data source, or a metric name.
+    element name - the name of an element (measure, dimension, entity) in a semantic model, or a metric name.
     qualified name - an element name with prefixes and suffixes added to it that further describe transformations or
     conditions for the element to retrieve. e.g. "ds__month" is the "ds" time dimension at the "month" granularity. Or
-    "user_id__country" is the "country" dimension that is retrieved by joining "user_id" to the measure data source.
+    "user_id__country" is the "country" dimension that is retrieved by joining "user_id" to the measure semantic model.
     """
 
     def __init__(  # noqa: D
         self,
         model: SemanticManifestLookup,
-        source_nodes: Sequence[BaseOutput[DataSourceDataSet]],
-        node_output_resolver: DataflowPlanNodeOutputDataSetResolver[DataSourceDataSet],
+        source_nodes: Sequence[BaseOutput[SemanticModelDataSet]],
+        node_output_resolver: DataflowPlanNodeOutputDataSetResolver[SemanticModelDataSet],
     ) -> None:
         self._model = model
         self._metric_semantics = model.metric_semantics
-        self._data_source_semantics = model.data_source_semantics
+        self._semantic_model_semantics = model.semantic_model_semantics
 
         # Set up containers for known element names
-        self._known_entity_element_references = self._data_source_semantics.get_entity_references()
+        self._known_entity_element_references = self._semantic_model_semantics.get_entity_references()
 
         self._known_time_dimension_element_references = [DataSet.metric_time_dimension_reference()]
         self._known_dimension_element_references = []
-        for dimension_reference in self._data_source_semantics.get_dimension_references():
-            dimension = self._data_source_semantics.get_dimension(dimension_reference)
+        for dimension_reference in self._semantic_model_semantics.get_dimension_references():
+            dimension = self._semantic_model_semantics.get_dimension(dimension_reference)
             if dimension.type == DimensionType.CATEGORICAL:
                 self._known_dimension_element_references.append(dimension_reference)
             elif dimension.type == DimensionType.TIME:
@@ -236,7 +236,7 @@ class MetricFlowQueryParser:
             if metric.constraint:
                 # add constraint to MetricSpec
                 metric_where_constraint = WhereConstraintConverter.convert_to_spec_where_constraint(
-                    self._data_source_semantics, metric.constraint
+                    self._semantic_model_semantics, metric.constraint
                 )
             # TODO: Directly initializing Spec object instead of using a factory method since
             #       importing WhereConstraintConverter is a problem in specs.py
@@ -408,7 +408,7 @@ class MetricFlowQueryParser:
         spec_where_constraint: Optional[SpecWhereClauseConstraint] = None
         if parsed_where_constraint:
             spec_where_constraint = WhereConstraintConverter.convert_to_spec_where_constraint(
-                data_source_semantics=self._data_source_semantics,
+                semantic_model_semantics=self._semantic_model_semantics,
                 where_constraint=parsed_where_constraint,
             )
             where_time_specs = spec_where_constraint.linkable_spec_set.time_dimension_specs

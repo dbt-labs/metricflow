@@ -1,4 +1,4 @@
--- Read Elements From Data Source 'revenue'
+-- Read Elements From Semantic Model 'revenue'
 -- Metric Time Dimension 'ds'
 -- Pass Only Elements:
 --   ['txn_revenue']

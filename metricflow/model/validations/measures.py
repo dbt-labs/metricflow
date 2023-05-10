@@ -10,9 +10,9 @@ from dbt_semantic_interfaces.objects.user_configured_model import UserConfigured
 from dbt_semantic_interfaces.references import MetricModelReference, MeasureReference
 from metricflow.model.validations.unique_valid_name import UniqueAndValidNameRule
 from metricflow.model.validations.validator_helpers import (
-    DataSourceElementContext,
-    DataSourceElementReference,
-    DataSourceElementType,
+    SemanticModelElementContext,
+    SemanticModelElementReference,
+    SemanticModelElementType,
     FileContext,
     MetricContext,
     ModelValidationRule,
@@ -23,34 +23,34 @@ from metricflow.model.validations.validator_helpers import (
 )
 
 
-class DataSourceMeasuresUniqueRule(ModelValidationRule):
+class SemanticModelMeasuresUniqueRule(ModelValidationRule):
     """Asserts all measure names are unique across the model."""
 
     @staticmethod
     @validate_safely(
-        whats_being_done="running model validation ensuring measures exist in only one configured data source"
+        whats_being_done="running model validation ensuring measures exist in only one configured semantic model"
     )
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
         issues: List[ValidationIssue] = []
 
-        measure_references_to_data_sources: Dict[MeasureReference, List] = defaultdict(list)
-        for data_source in model.data_sources:
-            for measure in data_source.measures:
-                if measure.reference in measure_references_to_data_sources:
+        measure_references_to_semantic_models: Dict[MeasureReference, List] = defaultdict(list)
+        for semantic_model in model.semantic_models:
+            for measure in semantic_model.measures:
+                if measure.reference in measure_references_to_semantic_models:
                     issues.append(
                         ValidationError(
-                            context=DataSourceElementContext(
-                                file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                                data_source_element=DataSourceElementReference(
-                                    data_source_name=data_source.name, element_name=measure.name
+                            context=SemanticModelElementContext(
+                                file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
+                                semantic_model_element=SemanticModelElementReference(
+                                    semantic_model_name=semantic_model.name, element_name=measure.name
                                 ),
-                                element_type=DataSourceElementType.MEASURE,
+                                element_type=SemanticModelElementType.MEASURE,
                             ),
-                            message=f"Found measure with name {measure.name} in multiple data sources with names "
-                            f"({measure_references_to_data_sources[measure.reference]})",
+                            message=f"Found measure with name {measure.name} in multiple semantic models with names "
+                            f"({measure_references_to_semantic_models[measure.reference]})",
                         )
                     )
-                measure_references_to_data_sources[measure.reference].append(data_source.name)
+                measure_references_to_semantic_models[measure.reference].append(semantic_model.name)
 
         return issues
 
@@ -166,7 +166,7 @@ class MeasureConstraintAliasesRule(ModelValidationRule):
                                 f"Measure alias {measure.alias} conflicts with a measure alias used elsewhere in the "
                                 f"model! This can cause ambiguity for certain types of query. Please choose another "
                                 f"alias, or, if the measures are constrained in the same way, consider centralizing "
-                                f"that definition in a new data source. Measure specification: {measure}. Existing "
+                                f"that definition in a new semantic model. Measure specification: {measure}. Existing "
                                 f"metrics with that measure alias used: {measure_alias_to_metrics[measure.alias]}"
                             ),
                         )
@@ -221,15 +221,15 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
     @validate_safely(whats_being_done="ensuring that a measure's non_additive_dimensions is valid")
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
         issues: List[ValidationIssue] = []
-        for data_source in model.data_sources or []:
-            for measure in data_source.measures:
+        for semantic_model in model.semantic_models or []:
+            for measure in semantic_model.measures:
                 non_additive_dimension = measure.non_additive_dimension
                 if non_additive_dimension is None:
                     continue
                 agg_time_dimension = next(
                     (
                         dim
-                        for dim in data_source.dimensions
+                        for dim in semantic_model.dimensions
                         if measure.checked_agg_time_dimension.element_name == dim.name
                     ),
                     None,
@@ -238,38 +238,38 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                     # Sanity check, should never hit this
                     issues.append(
                         ValidationError(
-                            context=DataSourceElementContext(
-                                file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                                data_source_element=DataSourceElementReference(
-                                    data_source_name=data_source.name, element_name=measure.name
+                            context=SemanticModelElementContext(
+                                file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
+                                semantic_model_element=SemanticModelElementReference(
+                                    semantic_model_name=semantic_model.name, element_name=measure.name
                                 ),
-                                element_type=DataSourceElementType.MEASURE,
+                                element_type=SemanticModelElementType.MEASURE,
                             ),
                             message=(
                                 f"Measure '{measure.name}' has a agg_time_dimension of {measure.checked_agg_time_dimension.element_name} "
-                                f"that is not defined as a dimension in data source '{data_source.name}'."
+                                f"that is not defined as a dimension in semantic model '{semantic_model.name}'."
                             ),
                         )
                     )
                     continue
 
-                # Validates that the non_additive_dimension exists as a time dimension in the data source
+                # Validates that the non_additive_dimension exists as a time dimension in the semantic model
                 matching_dimension = next(
-                    (dim for dim in data_source.dimensions if non_additive_dimension.name == dim.name), None
+                    (dim for dim in semantic_model.dimensions if non_additive_dimension.name == dim.name), None
                 )
                 if matching_dimension is None:
                     issues.append(
                         ValidationError(
-                            context=DataSourceElementContext(
-                                file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                                data_source_element=DataSourceElementReference(
-                                    data_source_name=data_source.name, element_name=measure.name
+                            context=SemanticModelElementContext(
+                                file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
+                                semantic_model_element=SemanticModelElementReference(
+                                    semantic_model_name=semantic_model.name, element_name=measure.name
                                 ),
-                                element_type=DataSourceElementType.MEASURE,
+                                element_type=SemanticModelElementType.MEASURE,
                             ),
                             message=(
                                 f"Measure '{measure.name}' has a non_additive_dimension with name '{non_additive_dimension.name}' "
-                                f"that is not defined as a dimension in data source '{data_source.name}'."
+                                f"that is not defined as a dimension in semantic model '{semantic_model.name}'."
                             ),
                         )
                     )
@@ -278,12 +278,12 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                     if matching_dimension.type != DimensionType.TIME:
                         issues.append(
                             ValidationError(
-                                context=DataSourceElementContext(
-                                    file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                                    data_source_element=DataSourceElementReference(
-                                        data_source_name=data_source.name, element_name=measure.name
+                                context=SemanticModelElementContext(
+                                    file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
+                                    semantic_model_element=SemanticModelElementReference(
+                                        semantic_model_name=semantic_model.name, element_name=measure.name
                                     ),
-                                    element_type=DataSourceElementType.MEASURE,
+                                    element_type=SemanticModelElementType.MEASURE,
                                 ),
                                 message=(
                                     f"Measure '{measure.name}' has a non_additive_dimension with name '{non_additive_dimension.name}' "
@@ -303,12 +303,12 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                     ):
                         issues.append(
                             ValidationError(
-                                context=DataSourceElementContext(
-                                    file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                                    data_source_element=DataSourceElementReference(
-                                        data_source_name=data_source.name, element_name=measure.name
+                                context=SemanticModelElementContext(
+                                    file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
+                                    semantic_model_element=SemanticModelElementReference(
+                                        semantic_model_name=semantic_model.name, element_name=measure.name
                                     ),
-                                    element_type=DataSourceElementType.MEASURE,
+                                    element_type=SemanticModelElementType.MEASURE,
                                 ),
                                 message=(
                                     f"Measure '{measure.name}' has a non_additive_dimension with name '{non_additive_dimension.name}' that has "
@@ -322,12 +322,12 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                 if non_additive_dimension.window_choice not in {AggregationType.MIN, AggregationType.MAX}:
                     issues.append(
                         ValidationError(
-                            context=DataSourceElementContext(
-                                file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                                data_source_element=DataSourceElementReference(
-                                    data_source_name=data_source.name, element_name=measure.name
+                            context=SemanticModelElementContext(
+                                file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
+                                semantic_model_element=SemanticModelElementReference(
+                                    semantic_model_name=semantic_model.name, element_name=measure.name
                                 ),
-                                element_type=DataSourceElementType.MEASURE,
+                                element_type=SemanticModelElementType.MEASURE,
                             ),
                             message=(
                                 f"Measure '{measure.name}' has a non_additive_dimension with an invalid 'window_choice' of '{non_additive_dimension.window_choice.value}'. "
@@ -337,22 +337,22 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                     )
 
                 # Validates that all window_groupings are entities
-                entities_in_data_source = {entity.name for entity in data_source.entities}
+                entities_in_semantic_model = {entity.name for entity in semantic_model.entities}
                 window_groupings = set(non_additive_dimension.window_groupings)
-                intersected_entities = window_groupings.intersection(entities_in_data_source)
+                intersected_entities = window_groupings.intersection(entities_in_semantic_model)
                 if len(intersected_entities) != len(window_groupings):
                     issues.append(
                         ValidationError(
-                            context=DataSourceElementContext(
-                                file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                                data_source_element=DataSourceElementReference(
-                                    data_source_name=data_source.name, element_name=measure.name
+                            context=SemanticModelElementContext(
+                                file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
+                                semantic_model_element=SemanticModelElementReference(
+                                    semantic_model_name=semantic_model.name, element_name=measure.name
                                 ),
-                                element_type=DataSourceElementType.MEASURE,
+                                element_type=SemanticModelElementType.MEASURE,
                             ),
                             message=(
                                 f"Measure '{measure.name}' has a non_additive_dimension with an invalid 'window_groupings'. "
-                                f"These entities {window_groupings.difference(intersected_entities)} do not exist in the data source."
+                                f"These entities {window_groupings.difference(intersected_entities)} do not exist in the semantic model."
                             ),
                         )
                     )
@@ -370,14 +370,14 @@ class CountAggregationExprRule(ModelValidationRule):
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
         issues: List[ValidationIssue] = []
 
-        for data_source in model.data_sources:
-            for measure in data_source.measures:
-                context = DataSourceElementContext(
-                    file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                    data_source_element=DataSourceElementReference(
-                        data_source_name=data_source.name, element_name=measure.name
+        for semantic_model in model.semantic_models:
+            for measure in semantic_model.measures:
+                context = SemanticModelElementContext(
+                    file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
+                    semantic_model_element=SemanticModelElementReference(
+                        semantic_model_name=semantic_model.name, element_name=measure.name
                     ),
-                    element_type=DataSourceElementType.MEASURE,
+                    element_type=SemanticModelElementType.MEASURE,
                 )
                 if measure.agg == AggregationType.COUNT and measure.expr is None:
                     issues.append(
@@ -421,14 +421,14 @@ class PercentileAggregationRule(ModelValidationRule):
     def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
         issues: List[ValidationIssue] = []
 
-        for data_source in model.data_sources:
-            for measure in data_source.measures:
-                context = DataSourceElementContext(
-                    file_context=FileContext.from_metadata(metadata=data_source.metadata),
-                    data_source_element=DataSourceElementReference(
-                        data_source_name=data_source.name, element_name=measure.name
+        for semantic_model in model.semantic_models:
+            for measure in semantic_model.measures:
+                context = SemanticModelElementContext(
+                    file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
+                    semantic_model_element=SemanticModelElementReference(
+                        semantic_model_name=semantic_model.name, element_name=measure.name
                     ),
-                    element_type=DataSourceElementType.MEASURE,
+                    element_type=SemanticModelElementType.MEASURE,
                 )
                 if measure.agg == AggregationType.PERCENTILE:
                     if measure.agg_params is None or measure.agg_params.percentile is None:
@@ -500,8 +500,8 @@ class PercentileAggregationRule(ModelValidationRule):
 def _get_measure_names_from_model(model: UserConfiguredModel) -> Set[str]:
     """Return every distinct measure name specified in the model"""
     measure_names = set()
-    for data_source in model.data_sources:
-        for measure in data_source.measures:
+    for semantic_model in model.semantic_models:
+        for measure in semantic_model.measures:
             measure_names.add(measure.reference.element_name)
 
     return measure_names
