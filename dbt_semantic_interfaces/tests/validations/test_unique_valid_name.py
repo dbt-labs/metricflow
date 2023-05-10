@@ -1,16 +1,12 @@
 import more_itertools
 import pytest
-import copy
+from copy import deepcopy
 
 from dbt_semantic_interfaces.model_validator import ModelValidator
 from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationException
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords, UniqueAndValidNameRule
 from metricflow.test.test_utils import find_data_source_with
-
-
-def copied_model(simple_model__with_primary_transforms: UserConfiguredModel) -> UserConfiguredModel:  # noqa: D
-    return copy.deepcopy(simple_model__with_primary_transforms)
 
 
 """
@@ -28,7 +24,7 @@ def copied_model(simple_model__with_primary_transforms: UserConfiguredModel) -> 
 
 
 def test_duplicate_data_source_name(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa: D
-    model = copied_model(simple_model__with_primary_transforms)
+    model = deepcopy(simple_model__with_primary_transforms)
     duplicated_data_source = model.data_sources[0]
     model.data_sources.append(duplicated_data_source)
     with pytest.raises(
@@ -39,7 +35,7 @@ def test_duplicate_data_source_name(simple_model__with_primary_transforms: UserC
 
 
 def test_duplicate_metric_name(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa:D
-    model = copied_model(simple_model__with_primary_transforms)
+    model = deepcopy(simple_model__with_primary_transforms)
     duplicated_metric = model.metrics[0]
     model.metrics.append(duplicated_metric)
     with pytest.raises(
@@ -54,7 +50,7 @@ def test_top_level_metric_can_have_same_name_as_any_other_top_level_item(
 ) -> None:  # noqa:D
     metric_name = simple_model__with_primary_transforms.metrics[0].name
 
-    model_data_source = copied_model(simple_model__with_primary_transforms)
+    model_data_source = deepcopy(simple_model__with_primary_transforms)
 
     model_data_source.data_sources[0].name = metric_name
 
@@ -74,7 +70,7 @@ def test_top_level_metric_can_have_same_name_as_any_other_top_level_item(
 
 
 def test_duplicate_measure_name(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa:D
-    model = copied_model(simple_model__with_primary_transforms)
+    model = deepcopy(simple_model__with_primary_transforms)
 
     # Ensure we have a usable data source for the test
     data_source_with_measures, _ = find_data_source_with(model, lambda data_source: len(data_source.measures) > 0)
@@ -91,7 +87,7 @@ def test_duplicate_measure_name(simple_model__with_primary_transforms: UserConfi
 
 
 def test_duplicate_dimension_name(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa:D
-    model = copied_model(simple_model__with_primary_transforms)
+    model = deepcopy(simple_model__with_primary_transforms)
 
     # Ensure we have a usable data source for the test
     data_source_with_dimensions, _ = find_data_source_with(model, lambda data_source: len(data_source.dimensions) > 0)
@@ -109,7 +105,7 @@ def test_duplicate_dimension_name(simple_model__with_primary_transforms: UserCon
 
 
 def test_duplicate_entity_name(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa:D
-    model = copied_model(simple_model__with_primary_transforms)
+    model = deepcopy(simple_model__with_primary_transforms)
 
     # Ensure we have a usable data source for the test
     data_source_with_identifiers, _ = find_data_source_with(model, lambda data_source: len(data_source.identifiers) > 0)

@@ -1,16 +1,16 @@
 import pytest
+from copy import deepcopy
 
 from dbt_semantic_interfaces.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.validations.agg_time_dimension import AggregationTimeDimensionRule
 from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationException
-from metricflow.test.model.validations.test_unique_valid_name import copied_model
 from metricflow.test.test_utils import find_data_source_with
 
 
 def test_invalid_aggregation_time_dimension(simple_user_configured_model: UserConfiguredModel) -> None:  # noqa:D
-    model = copied_model(simple_user_configured_model)
+    model = deepcopy(simple_user_configured_model)
     data_source_with_measures, _ = find_data_source_with(
         model,
         lambda data_source: len(data_source.measures) > 0,
@@ -30,7 +30,7 @@ def test_invalid_aggregation_time_dimension(simple_user_configured_model: UserCo
 
 
 def test_unset_aggregation_time_dimension(data_warehouse_validation_model: UserConfiguredModel) -> None:  # noqa:D
-    model = copied_model(data_warehouse_validation_model)
+    model = deepcopy(data_warehouse_validation_model)
     data_source_with_measures, _ = find_data_source_with(
         model,
         lambda data_source: len(data_source.measures) > 0,
@@ -49,7 +49,7 @@ def test_unset_aggregation_time_dimension(data_warehouse_validation_model: UserC
 def test_missing_primary_time_ok_if_all_measures_have_agg_time_dim(
     data_warehouse_validation_model: UserConfiguredModel,
 ) -> None:  # noqa:D
-    model = copied_model(data_warehouse_validation_model)
+    model = deepcopy(data_warehouse_validation_model)
     data_source_with_measures, _ = find_data_source_with(
         model,
         lambda data_source: len(data_source.measures) > 0,
