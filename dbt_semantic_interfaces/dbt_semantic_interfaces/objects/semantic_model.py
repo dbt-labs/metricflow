@@ -21,11 +21,18 @@ class NodeRelation(HashableBaseModel):
 
     @validator("relation_name", always=True)
     @classmethod
-    def create_default_relation_name(cls, value: Any, values: Any) -> str:  # type: ignore[misc]
+    def __create_default_relation_name(cls, value: Any, values: Any) -> str:  # type: ignore[misc]
         """Dynamically build the dot path for `relation_name`, if not specified"""
         if value:
+            # Only build the relation_name if it was not present in config.
             return value
+
         alias, schema, database = values.get("alias"), values.get("schema_name"), values.get("database")
+        if alias is None or schema is None:
+            raise ValueError(
+                f"Failed to build relation_name because alias and/or schema was None. schema: {schema}, alias: {alias}"
+            )
+
         if database is not None:
             value = f"{database}.{schema}.{alias}"
         else:
