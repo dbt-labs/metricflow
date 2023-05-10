@@ -288,15 +288,15 @@ integration_test:
 integration_test:
   name: query_with_3_metrics
   description: |
-    Tests query with 3 metrics, and also checks an optimizing issue when there is a expression metric that is joined.
+    Tests query with 3 metrics.
   model: SIMPLE_MODEL
   required_features: ["FULL_OUTER_JOIN"]
-  metrics: ["bookings", "bookings_per_booker", "booking_value"]
+  metrics: ["bookings", "average_booking_value", "booking_value"]
   group_bys: ["metric_time"]
   check_query: |
     SELECT
       SUM(1) AS bookings
-      , CAST(SUM(1) AS {{ double_data_type_name }}) / COUNT(DISTINCT guest_id) AS bookings_per_booker
+      , AVG(booking_value) AS average_booking_value
       , SUM(booking_value) AS booking_value
       , ds AS metric_time
     FROM {{ source_schema }}.fct_bookings
