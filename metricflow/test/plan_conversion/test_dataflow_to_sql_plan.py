@@ -725,112 +725,6 @@ def test_join_to_time_spine_node_with_offset_to_grain(
 # TODO: write test case for both offset window and offset to grain to date once allowed via derived metrics
 
 
-def test_compute_metrics_node_ratio_from_single_data_source(
-    request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
-    consistent_id_object_repository: ConsistentIdObjectRepository,
-    sql_client: SqlClient,
-) -> None:
-    """Tests the compute metrics node for ratio type metrics sourced from a single data source"""
-    numerator_spec = MeasureSpec(
-        element_name="bookings",
-    )
-    denominator_spec = MeasureSpec(
-        element_name="bookers",
-    )
-    entity_spec = LinklessEntitySpec.from_element_name(element_name="listing")
-    metric_input_measure_specs = (
-        MetricInputMeasureSpec(measure_spec=numerator_spec),
-        MetricInputMeasureSpec(measure_spec=denominator_spec),
-    )
-    measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
-    filtered_measures_node = FilterElementsNode[DataSourceDataSet](
-        parent_node=measure_source_node,
-        include_specs=InstanceSpecSet(measure_specs=(numerator_spec, denominator_spec), entity_specs=(entity_spec,)),
-    )
-
-    dimension_spec = DimensionSpec(
-        element_name="country_latest",
-        entity_links=(),
-    )
-    dimension_source_node = consistent_id_object_repository.simple_model_read_nodes["listings_latest"]
-    filtered_dimension_node = FilterElementsNode[DataSourceDataSet](
-        parent_node=dimension_source_node,
-        include_specs=InstanceSpecSet(
-            entity_specs=(entity_spec,),
-            dimension_specs=(dimension_spec,),
-        ),
-    )
-
-    join_node = JoinToBaseOutputNode[DataSourceDataSet](
-        left_node=filtered_measures_node,
-        join_targets=[
-            JoinDescription(
-                join_node=filtered_dimension_node,
-                join_on_entity=entity_spec,
-                join_on_partition_dimensions=(),
-                join_on_partition_time_dimensions=(),
-            )
-        ],
-    )
-
-    aggregated_measures_node = AggregateMeasuresNode[DataSourceDataSet](
-        parent_node=join_node, metric_input_measure_specs=metric_input_measure_specs
-    )
-    metric_spec = MetricSpec(element_name="bookings_per_booker")
-    compute_metrics_node = ComputeMetricsNode[DataSourceDataSet](
-        parent_node=aggregated_measures_node, metric_specs=[metric_spec]
-    )
-
-    convert_and_check(
-        request=request,
-        mf_test_session_state=mf_test_session_state,
-        dataflow_to_sql_converter=dataflow_to_sql_converter,
-        sql_client=sql_client,
-        node=compute_metrics_node,
-    )
-
-
-def test_compute_metrics_node_ratio_from_multiple_data_sources(
-    request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[DataSourceDataSet],
-    sql_client: SqlClient,
-) -> None:
-    """Tests the compute metrics node for ratio type metrics
-
-    This test exercises the functionality provided in JoinAggregatedMeasuresByGroupByColumnsNode for
-    merging multiple measures into a single input source for final metrics computation.
-    """
-    dimension_spec = DimensionSpec(
-        element_name="country_latest",
-        entity_links=(EntityReference(element_name="listing"),),
-    )
-    time_dimension_spec = TimeDimensionSpec(
-        element_name="ds",
-        entity_links=(),
-    )
-    metric_spec = MetricSpec(element_name="bookings_per_view")
-
-    dataflow_plan = dataflow_plan_builder.build_plan(
-        query_spec=MetricFlowQuerySpec(
-            metric_specs=(metric_spec,),
-            dimension_specs=(dimension_spec,),
-            time_dimension_specs=(time_dimension_spec,),
-        ),
-    )
-
-    convert_and_check(
-        request=request,
-        mf_test_session_state=mf_test_session_state,
-        dataflow_to_sql_converter=dataflow_to_sql_converter,
-        sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
-    )
-
-
 def test_order_by_node(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1445,7 +1339,7 @@ def test_measure_constraint_with_reused_measure(  # noqa: D
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="instant_booking_value_ratio"),),
+            metric_specs=(MetricSpec(element_name="instant_booking_value"),),
             time_dimension_specs=(MTD_SPEC_DAY,),
         )
     )

@@ -503,10 +503,10 @@ def test_measure_constraint_with_reused_measure_plan(
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
 ) -> None:
-    """Tests a plan for querying a metric with a constraint on one or more of its input measures."""
+    """Tests a plan for querying a metric with a constraint on its input measures."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="instant_booking_value_ratio"),),
+            metric_specs=(MetricSpec(element_name="instant_booking_value"),),
             dimension_specs=(),
             time_dimension_specs=(MTD_SPEC_DAY,),
         ),

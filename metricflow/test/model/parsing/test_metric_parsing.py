@@ -92,61 +92,6 @@ def test_metric_metadata_parsing() -> None:
     assert metric.metadata.file_slice.content == expected_metadata_content
 
 
-def test_ratio_metric_parsing() -> None:
-    """Test for parsing a ratio metric specification with numerator and denominator"""
-    yaml_contents = textwrap.dedent(
-        """\
-        metric:
-          name: ratio_test
-          type: ratio
-          type_params:
-            numerator: numerator_measure
-            denominator: denominator_measure
-        """
-    )
-    file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
-
-    build_result = parse_yaml_files_to_model(files=[file])
-
-    assert len(build_result.model.metrics) == 1
-    metric = build_result.model.metrics[0]
-    assert metric.name == "ratio_test"
-    assert metric.type is MetricType.RATIO
-    assert metric.type_params.numerator == MetricInputMeasure(name="numerator_measure")
-    assert metric.type_params.denominator == MetricInputMeasure(name="denominator_measure")
-    assert metric.type_params.measures is None
-
-
-def test_ratio_metric_input_measure_object_parsing() -> None:
-    """Test for parsing a ratio metric specification with object inputs for numerator and denominator"""
-    yaml_contents = textwrap.dedent(
-        """\
-        metric:
-          name: ratio_test
-          type: ratio
-          type_params:
-            numerator:
-              name: numerator_measure_from_object
-              constraint: "WHERE some_number > 5"
-            denominator:
-              name: denominator_measure_from_object
-        """
-    )
-    file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
-
-    build_result = parse_yaml_files_to_model(files=[file])
-
-    assert len(build_result.model.metrics) == 1
-    metric = build_result.model.metrics[0]
-    assert metric.type_params.numerator == MetricInputMeasure(
-        name="numerator_measure_from_object",
-        constraint=WhereClauseConstraint(
-            where="some_number > 5", linkable_names=["some_number"], sql_params=SqlBindParameters()
-        ),
-    )
-    assert metric.type_params.denominator == MetricInputMeasure(name="denominator_measure_from_object")
-
-
 def test_expr_metric_parsing() -> None:
     """Test for parsing a metric specification with an expr and a list of measures"""
     yaml_contents = textwrap.dedent(
