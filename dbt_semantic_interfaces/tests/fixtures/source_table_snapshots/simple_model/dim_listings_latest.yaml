@@ -1,0 +1,23 @@
+---
+table_snapshot:
+  table_name: dim_listings_latest
+  column_definitions:
+    - name: created_at
+      type: TIME
+    - name: listing_id
+      type: STRING
+    - name: country
+      type: STRING
+    - name: capacity
+      type: INT
+    - name: is_lux
+      type: BOOLEAN
+    - name: user_id
+      type: STRING
+  rows:
+    - ["2020-01-01", "l3141592", "us", "3", "True", "u0004114"]
+    - ["2020-01-02", "l5948301", "us", "5", "True", "u0004114"]
+    - ["2020-01-02", "l2718281", "cote d'ivoire", "4", "False", "u0005432"]
+    - ["2020-01-02", "l9658588-incomplete", "us", null, null, "u1004114"]
+    - ["2020-01-02", "l8912456-incomplete", null, null, null, "u1004114"]
+    - ["2020-01-02", "l7891283-incomplete", "ca", null, "False", "u1004114"]

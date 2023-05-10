@@ -1,0 +1,19 @@
+---
+data_source:
+  name: listings_extended_source
+  description: listings_extended_source
+
+  sql_table: $source_schema.dim_listings_extended
+
+  dimensions:
+    - name: listing_creation_ds
+      type: time
+      type_params:
+        time_granularity: day
+
+  identifiers:
+    - name: listing_id
+      type: primary
+
+  mutability:
+    type: immutable

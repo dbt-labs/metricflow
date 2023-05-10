@@ -1,0 +1,17 @@
+table_snapshot:
+  table_name: bridge_table
+  column_definitions:
+    - name: ds_partitioned
+      type: TIME
+    - name: account_id
+      type: STRING
+    - name: customer_id
+      type: STRING
+    - name: extra_dim
+      type: STRING
+  rows:
+    - ["2020-01-01", "a0", "0", "lux"]
+    - ["2020-01-01", "a1", "2", "not_lux"]
+    - ["2020-01-02", "a0", "1", "lux"]
+    - ["2020-01-04", "a2", "3", "super_lux"]
+

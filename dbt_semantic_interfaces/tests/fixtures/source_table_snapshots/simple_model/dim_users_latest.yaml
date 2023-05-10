@@ -1,0 +1,16 @@
+table_snapshot:
+  table_name: dim_users_latest
+  column_definitions:
+    - name: ds
+      type: TIME
+    - name: user_id
+      type: STRING
+    - name: home_state_latest
+      type: STRING
+  rows:
+    - ["2020-01-02", "u0004114", "CA"]
+    - ["2020-01-02", "u1612112", "WA"]
+    - ["2020-01-02", "u0005432", "TX"]
+    - ["2020-01-02", "u0003452", "HI"]
+    - ["2020-01-02", "u0003154", "MD"]
+    - ["2020-01-02", "u0003141", "NY"]

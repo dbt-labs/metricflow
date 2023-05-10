@@ -1,0 +1,18 @@
+---
+data_source:
+  name: listings_source
+  description: listings_source
+
+  sql_table: $source_schema.dim_listings_for_joins
+
+  dimensions:
+    - name: country
+      type: categorical
+
+  identifiers:
+    - name: listing
+      type: primary
+      expr: listing_id
+
+  mutability:
+    type: immutable

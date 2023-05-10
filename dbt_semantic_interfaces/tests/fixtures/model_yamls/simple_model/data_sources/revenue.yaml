@@ -1,0 +1,29 @@
+---
+data_source:
+  name: revenue
+  description: revenue
+
+  sql_query: |
+    -- User Defined SQL Query
+    SELECT * FROM $source_schema.fct_revenue
+
+  measures:
+    - name: txn_revenue
+      expr: revenue
+      agg: sum
+
+  dimensions:
+    - name: ds
+      type: time
+      expr: created_at
+      type_params:
+        is_primary: True
+        time_granularity: day
+
+  identifiers:
+    - name: user
+      type: foreign
+      expr: user_id
+
+  mutability:
+    type: immutable

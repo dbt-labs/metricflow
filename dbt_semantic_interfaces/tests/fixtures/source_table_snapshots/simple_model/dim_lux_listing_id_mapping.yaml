@@ -1,0 +1,11 @@
+table_snapshot:
+  table_name: dim_lux_listing_id_mapping
+  column_definitions:
+    - name: listing_id
+      type: STRING
+    - name: lux_listing_id
+      type: STRING
+  rows:
+    - ["l2718281", "ll_002"]
+    - ["l3141592", "ll_001"]
+    - ["l5948301", "LUX_TEST_ID"]

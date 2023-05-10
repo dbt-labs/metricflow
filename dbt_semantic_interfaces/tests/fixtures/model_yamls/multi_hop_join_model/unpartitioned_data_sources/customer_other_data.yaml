@@ -1,0 +1,19 @@
+---
+data_source:
+  name: customer_other_data
+  description: customer_other_data
+
+  sql_table: $source_schema.customer_other_data
+
+  dimensions:
+    - name: country
+      type: categorical
+
+  identifiers:
+    - name: customer_id
+      type: primary
+    - name: customer_third_hop_id
+      type: unique
+
+  mutability:
+    type: immutable

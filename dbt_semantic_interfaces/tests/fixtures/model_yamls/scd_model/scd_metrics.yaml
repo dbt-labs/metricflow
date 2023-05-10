@@ -1,0 +1,28 @@
+---
+metric:
+  name: bookings
+  description: raw booking count
+  type: measure_proxy
+  type_params:
+    measures:
+      - bookings
+---
+metric:
+  name: family_bookings
+  description: Bookings of units with capacity for more than 2 people.
+  type: measure_proxy
+  filter:
+    "{{ dimension('capacity', entity_path=['listing']) }} > 2"
+  type_params:
+    measures:
+      - bookings
+---
+metric:
+  name: potentially_lux_bookings
+  description: raw booking count for listings that are lux, or unknown
+  type: measure_proxy
+  filter:
+    "{{ dimension('is_lux', entity_path=['listing']) }} OR {{ dimension('is_lux', entity_path=['listing']) }} IS NULL"
+  type_params:
+    measures:
+      - bookings

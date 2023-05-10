@@ -1,0 +1,22 @@
+table_snapshot:
+  table_name: dim_primary_accounts
+  column_definitions:
+    - name: set_as_primary
+      type: TIME
+    - name: removed_as_primary
+      type: TIME
+    - name: user_id
+      type: STRING
+    - name: account_type
+      type: STRING
+  rows:
+    - ["2020-01-01", "2020-01-02", "u0004114", "savings"]
+    - ["2020-01-01", "2020-01-01", "u1612112", "checking"]
+    - ["2020-01-01", null, "u0003452", "checking"]
+    - ["2020-01-01", null, "u0003154", "checking"]
+    - ["2020-01-01", null, "u0003141", "checking"]
+    - ["2020-01-02", "2020-01-03", "u0005432", "savings"]
+    - ["2020-01-02", null, "u0004114", "savings"]
+    - ["2020-01-02", "2020-01-02", "u1612112", "checking"]
+    - ["2020-01-03", null, "u0005432", "checking"]
+
