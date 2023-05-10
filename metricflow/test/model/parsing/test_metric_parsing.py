@@ -114,8 +114,8 @@ def test_derived_metric_parsing() -> None:
     assert metric.name == "derived_test"
     assert metric.type is MetricType.DERIVED
     assert metric.type_params.metrics == [
-        MetricInputMeasure(name="metric_one"),
-        MetricInputMeasure(name="metric_two"),
+        MetricInput(name="metric_one"),
+        MetricInput(name="metric_two"),
     ]
 
 
@@ -142,13 +142,13 @@ def test_derived_metric_input_measure_object_parsing() -> None:
     assert metric.name == "derived_test"
     assert metric.type is MetricType.DERIVED
     assert metric.type_params.metrics == [
-        MetricInputMeasure(
+        MetricInput(
             name="metric_one_from_object",
             constraint=WhereClauseConstraint(
                 where="some_bool", linkable_names=["some_bool"], sql_params=SqlBindParameters()
             ),
         ),
-        MetricInputMeasure(name="measure_two_from_object"),
+        MetricInput(name="metric_two_from_object"),
     ]
 
 

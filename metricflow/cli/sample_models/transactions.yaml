@@ -93,7 +93,7 @@ metric:
   type: derived 
   type_params:
     expr: transaction_amount_usd - cancellations_usd + alterations_usd
-    measures:
+    metrics:
       - transaction_amount_usd
       - cancellations_usd
       - alterations_usd
@@ -124,8 +124,7 @@ metric:
     - support@transformdata.io
   type: cumulative 
   type_params:
-    measures:
-      - transaction_amount_usd
+    measure: transaction_amount_usd
     window: 7 days
   constraint: |
     customer__country = 'MX'
@@ -136,8 +135,7 @@ metric:
     - support@transformdata.io
   type: cumulative
   type_params:
-    measures:
-      - transaction_amount_usd
+    measure: transaction_amount_usd
     grain_to_date: month
 ---
 metric:
@@ -146,8 +144,7 @@ metric:
     - support@transformdata.io
   type: cumulative 
   type_params:
-    measures: 
-      - transaction_amount_usd
+    measure: transaction_amount_usd
     window: 7 days
   constraint: |
     customer__country__region = 'NA'

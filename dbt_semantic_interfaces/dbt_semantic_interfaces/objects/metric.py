@@ -135,8 +135,6 @@ class MetricTypeParams(HashableBaseModel):
     """Type params add additional context to certain metric types (the context depends on the metric type)"""
 
     measure: Optional[MetricInputMeasure]
-    measures: Optional[List[MetricInputMeasure]]
-    expr: Optional[str]
     window: Optional[MetricTimeWindow]
     grain_to_date: Optional[TimeGranularity]
     metrics: Optional[List[MetricInput]]
