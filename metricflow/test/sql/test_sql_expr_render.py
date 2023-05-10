@@ -18,7 +18,6 @@ from metricflow.sql.sql_exprs import (
     SqlStringLiteralExpression,
     SqlIsNullExpression,
     SqlDateTruncExpression,
-    SqlRatioComputationExpression,
     SqlColumnReplacements,
     SqlCastToTimestampExpression,
     SqlBetweenExpression,
@@ -189,18 +188,6 @@ def test_date_trunc_expr(default_expr_renderer: DefaultSqlExpressionRenderer) ->
         SqlDateTruncExpression(time_granularity=TimeGranularity.MONTH, arg=SqlStringExpression("ds"))
     ).sql
     assert actual == "DATE_TRUNC('month', ds)"
-
-
-def test_ratio_computation_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D
-    actual = default_expr_renderer.render_sql_expr(
-        SqlRatioComputationExpression(
-            numerator=SqlAggregateFunctionExpression(
-                SqlFunction.SUM, sql_function_args=[SqlStringExpression(sql_expr="1", requires_parenthesis=False)]
-            ),
-            denominator=SqlColumnReferenceExpression(SqlColumnReference(column_name="divide_by_me", table_alias="a")),
-        ),
-    ).sql
-    assert actual == "CAST(SUM(1) AS DOUBLE) / CAST(NULLIF(a.divide_by_me, 0) AS DOUBLE)"
 
 
 def test_expr_rewrite(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D

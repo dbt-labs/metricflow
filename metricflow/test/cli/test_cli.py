@@ -37,7 +37,7 @@ def test_list_dimensions(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
 def test_list_metrics(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
     resp = cli_runner.run(list_metrics)
 
-    assert "bookings_per_listing: ds" in resp.output
+    assert "listings: capacity_latest" in resp.output
     assert resp.exit_code == 0
 
 

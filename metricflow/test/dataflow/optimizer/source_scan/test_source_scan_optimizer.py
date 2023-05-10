@@ -338,25 +338,3 @@ def test_derived_metric_with_non_derived_metric(  # noqa: D
         expected_num_sources_in_unoptimized=3,
         expected_num_sources_in_optimized=2,
     )
-
-
-def test_2_ratio_metrics_from_1_data_source(  # noqa: D
-    request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
-) -> None:
-    """Tests that 2 ratio metrics with measures from a 1 data source result in 1 scan."""
-    check_optimization(
-        request=request,
-        mf_test_session_state=mf_test_session_state,
-        dataflow_plan_builder=dataflow_plan_builder,
-        query_spec=MetricFlowQuerySpec(
-            metric_specs=(
-                MetricSpec(element_name="bookings_per_booker"),
-                MetricSpec(element_name="bookings_per_dollar"),
-            ),
-            dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
-        ),
-        expected_num_sources_in_unoptimized=2,
-        expected_num_sources_in_optimized=1,
-    )

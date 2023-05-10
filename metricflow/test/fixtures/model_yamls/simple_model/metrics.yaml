@@ -225,38 +225,6 @@ metric:
       - views
 ---
 metric:
-  name: bookings_per_booker
-  description: bookings divided by bookers - single data source ratio metric test
-  type: ratio
-  type_params:
-    numerator: bookings
-    denominator: bookers
----
-metric:
-  name: bookings_per_view
-  description: Bookings divided by views - ratio metric test
-  type: ratio
-  type_params:
-    numerator: bookings
-    denominator: views
----
-metric:
-  name: bookings_per_listing
-  description: Bookings divided by listings - ratio with primary identifier test
-  type: ratio
-  type_params:
-    numerator: bookings
-    denominator: listings
----
-metric:
-  name: bookings_per_dollar
-  description: Number of bookings per dollar of value
-  type: ratio
-  type_params:
-    numerator: bookings
-    denominator: booking_value
----
-metric:
   name: "total_account_balance_first_day"
   description: "total_account_balance_first_day"
   type: measure_proxy
@@ -273,32 +241,6 @@ metric:
       - current_account_balance_by_user
 ---
 metric:
-  name: instant_booking_fraction_of_max_value
-  description: |
-    Average instant booking value as a ratio of overall max booking value.
-    Tests constrained ratio measure.
-  type: ratio
-  type_params:
-    numerator:
-      name: average_booking_value
-      constraint: is_instant
-    denominator:
-      name: max_booking_value
----
-metric:
-  name: lux_booking_fraction_of_max_value
-  description: |
-    Average lux booking value as a ratio of overall max booking value.
-    Tests constrained ratio measure with external dimension join.
-  type: ratio
-  type_params:
-    numerator:
-      name: average_booking_value
-      constraint: listing__is_lux_latest
-    denominator:
-      name: max_booking_value
----
-metric:
   name: lux_booking_value_rate_expr
   description: |
     Lux booking value defined as an expr with lux booking value, lux bookings, and total value as inputs.
@@ -312,36 +254,6 @@ metric:
       - name: bookings
         constraint: listing__is_lux_latest
       - name: booking_value
----
-metric:
-  name: instant_booking_value_ratio
-  description: |
-    Instant booking value defined as a ratio metric of instant booking value / booking value
-    Tests constrained measure ratio metric with re-use of the same base measure
-  type: ratio
-  type_params:
-    numerator:
-      name: booking_value
-      constraint: is_instant
-      alias: booking_value_with_is_instant_constraint
-    denominator:
-      name: booking_value
----
-metric:
-  name: regional_starting_balance_ratios
-  description: |
-    First day account balance ratio of western vs eastern region starting balance ratios,
-    used to test interaction between semi-additive measures and measure constraints
-  type: ratio
-  type_params:
-    numerator:
-      name: total_account_balance_first_day
-      constraint: "user__home_state_latest IN ('CA', 'HI', 'WA')"
-      alias: west_coast_balance_first_day
-    denominator:
-      name: total_account_balance_first_day
-      constraint: "user__home_state_latest IN ('MD', 'NY', 'TX')"
-      alias: east_coast_balance_first_dat
 ---
 metric:
   name: double_counted_delayed_bookings
