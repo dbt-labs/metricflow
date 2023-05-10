@@ -56,22 +56,3 @@ integration_test:
       FROM {{ source_schema }}.dim_listings_latest
     ) b
 ---
-integration_test:
-  name: query_with_metric_with_multiple_source
-  description: Tests query with metric from multiple measures from multiple data source.
-  model: SIMPLE_MODEL
-  metrics: ["bookings_per_listing"]
-  group_bys: []
-  check_query: |
-    SELECT
-      (CAST(a.bookings AS {{ double_data_type_name }}) / CAST(b.listings AS {{ double_data_type_name }})) AS bookings_per_listing
-    FROM (
-      SELECT
-        SUM(1) AS bookings
-      FROM {{ source_schema }}.fct_bookings
-    ) a CROSS JOIN (
-      SELECT
-        SUM(1) AS listings
-      FROM {{ source_schema }}.dim_listings_latest
-    ) b
----
