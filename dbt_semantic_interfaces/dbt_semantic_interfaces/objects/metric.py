@@ -20,7 +20,6 @@ class MetricType(ExtendedEnum):
     """Currently supported metric types"""
 
     MEASURE_PROXY = "measure_proxy"
-    EXPR = "expr"
     CUMULATIVE = "cumulative"
     DERIVED = "derived"
 
