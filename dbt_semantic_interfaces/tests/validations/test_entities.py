@@ -16,7 +16,7 @@ from dbt_semantic_interfaces.validations.entities import (
     OnePrimaryEntityPerDataSourceRule,
 )
 from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationException
-from metricflow.test.model.validations.helpers import base_model_file
+from .helpers import base_model_file
 from metricflow.test.test_utils import find_data_source_with
 
 

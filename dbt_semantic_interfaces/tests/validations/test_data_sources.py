@@ -3,7 +3,7 @@ import pytest
 from dbt_semantic_interfaces.objects.data_source import MutabilityType, Mutability
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationException
-from metricflow.test.model.validations.helpers import data_source_with_guaranteed_meta
+from .helpers import data_source_with_guaranteed_meta
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 

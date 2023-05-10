@@ -11,7 +11,7 @@ from dbt_semantic_interfaces.references import DimensionReference, MeasureRefere
 from dbt_semantic_interfaces.validations.data_sources import DataSourceTimeDimensionWarningsRule
 from dbt_semantic_interfaces.validations.dimension_const import DimensionConsistencyRule
 from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationException
-from metricflow.test.model.validations.helpers import data_source_with_guaranteed_meta, metric_with_guaranteed_meta
+from .helpers import data_source_with_guaranteed_meta, metric_with_guaranteed_meta
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 

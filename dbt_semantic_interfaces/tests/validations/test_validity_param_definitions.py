@@ -6,7 +6,7 @@ from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from dbt_semantic_interfaces.model_validator import ModelValidator
 from dbt_semantic_interfaces.validations.data_sources import DataSourceValidityWindowRule
 from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationException
-from metricflow.test.model.validations.helpers import base_model_file
+from .helpers import base_model_file
 
 
 def test_validity_window_configuration() -> None:

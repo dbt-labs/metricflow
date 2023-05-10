@@ -19,7 +19,7 @@ from dbt_semantic_interfaces.objects.user_configured_model import UserConfigured
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
-from metricflow.test.model.validations.helpers import data_source_with_guaranteed_meta
+from .helpers import data_source_with_guaranteed_meta
 from metricflow.test.plan_utils import assert_snapshot_text_equal, make_schema_replacement_function
 
 
