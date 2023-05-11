@@ -11,10 +11,10 @@ from dbt_semantic_interfaces.objects.semantic_model import SemanticModel, NodeRe
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 
 
-def base_model_file() -> YamlConfigFile:
-    """Returns a YamlConfigFile with the inputs for a basic valid model
+def base_semantic_manifest_file() -> YamlConfigFile:
+    """Returns a YamlConfigFile with the inputs for a basic valid semantic manifest
 
-    This is useful to seed a simple error-free model, which can easily be extended with YAML inputs
+    This is useful to seed a simple error-free semantic manifest, which can easily be extended with YAML inputs
     containing specific validation triggers.
     """
     yaml_contents = textwrap.dedent(
