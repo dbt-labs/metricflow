@@ -9,7 +9,7 @@ from metricflow.model.semantics.linkable_element_properties import LinkableEleme
 from metricflow.model.semantics.linkable_spec_resolver import ValidLinkableSpecResolver
 from metricflow.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
-from metricflow.protocols.semantics import MetricSemanticsAccessor
+from metricflow.protocols.semantics import MetricAccessor
 from metricflow.specs import (
     MetricSpec,
     LinkableInstanceSpec,
@@ -22,7 +22,7 @@ from metricflow.specs import (
 logger = logging.getLogger(__name__)
 
 
-class MetricSemantics(MetricSemanticsAccessor):  # noqa: D
+class MetricSemantics(MetricAccessor):  # noqa: D
     def __init__(  # noqa: D
         self, semantic_manifest: SemanticManifest, semantic_model_lookup: SemanticModelLookup
     ) -> None:

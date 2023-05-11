@@ -124,7 +124,7 @@ class SemanticModelAccessor(ABC):
         raise NotImplementedError
 
 
-class MetricSemanticsAccessor(ABC):
+class MetricAccessor(ABC):
     """Interface for accessing semantic information about a set of metric objects
 
     This is primarily useful for restricting caller access to the subset of container methods and imports we want

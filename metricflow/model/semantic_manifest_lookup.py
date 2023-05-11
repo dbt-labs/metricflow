@@ -1,7 +1,7 @@
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.model.semantics.metric_semantics import MetricSemantics
-from metricflow.protocols.semantics import SemanticModelAccessor, MetricSemanticsAccessor
+from metricflow.protocols.semantics import SemanticModelAccessor, MetricAccessor
 
 
 class SemanticManifestLookup:
@@ -21,5 +21,5 @@ class SemanticManifestLookup:
         return self._semantic_model_lookup
 
     @property
-    def metric_semantics(self) -> MetricSemanticsAccessor:  # noqa: D
+    def metric_semantics(self) -> MetricAccessor:  # noqa: D
         return self._metric_semantics
