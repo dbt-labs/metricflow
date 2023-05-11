@@ -1,6 +1,7 @@
 import textwrap
 from typing import Optional, Sequence
 
+from dbt_semantic_interfaces.objects.elements.dimension import Dimension
 from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
@@ -8,7 +9,6 @@ from dbt_semantic_interfaces.objects.metadata import FileSlice, Metadata
 from dbt_semantic_interfaces.objects.metric import Metric, MetricType, MetricTypeParams
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel, NodeRelation
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
-from metricflow.engine.models import Dimension
 
 
 def base_model_file() -> YamlConfigFile:
