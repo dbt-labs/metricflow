@@ -71,10 +71,6 @@ metric_type_params_schema = {
     "type": "object",
     "properties": {
         "measure": {"$ref": "metric_input_measure_schema"},
-        "measures": {
-            "type": "array",
-            "items": {"$ref": "metric_input_measure_schema"},
-        },
         "expr": {"type": ["string", "boolean"]},
         "window": {"type": "string"},
         "grain_to_date": {"type": "string"},

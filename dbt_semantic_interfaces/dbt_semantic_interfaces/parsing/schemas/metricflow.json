@@ -344,12 +344,6 @@
                 "measure": {
                     "$ref": "#/definitions/metric_input_measure_schema"
                 },
-                "measures": {
-                    "items": {
-                        "$ref": "#/definitions/metric_input_measure_schema"
-                    },
-                    "type": "array"
-                },
                 "metrics": {
                     "items": {
                         "$ref": "#/definitions/metric_input_schema"

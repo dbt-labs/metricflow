@@ -151,16 +151,6 @@ class Metric(HashableBaseModel, ModelWithMetadataParsing):
     metadata: Optional[Metadata]
 
     @property
-    def input_measures(self) -> List[MetricInputMeasure]:
-        """Return the complete list of input measure configurations for this metric"""
-        tp = self.type_params
-        res = tp.measures or []
-        if tp.measure:
-            res.append(tp.measure)
-
-        return res
-
-    @property
     def input_metrics(self) -> List[MetricInput]:
         """Return the associated input metrics for this metric"""
         return self.type_params.metrics or []
