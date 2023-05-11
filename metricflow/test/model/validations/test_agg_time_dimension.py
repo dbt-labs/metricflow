@@ -6,7 +6,7 @@ from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.validations.agg_time_dimension import AggregationTimeDimensionRule
 from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationException
 from metricflow.test.model.validations.test_unique_valid_name import copied_model
-from metricflow.test.test_utils import find_semantic_model_with
+from dbt_semantic_interfaces.test_utils import find_semantic_model_with
 
 
 def test_invalid_aggregation_time_dimension(simple_semantic_manifest: SemanticManifest) -> None:  # noqa:D

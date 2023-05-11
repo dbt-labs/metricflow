@@ -17,7 +17,7 @@ from dbt_semantic_interfaces.validations.entities import (
 )
 from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationException
 from metricflow.test.model.validations.helpers import base_semantic_manifest_file
-from metricflow.test.test_utils import find_semantic_model_with
+from dbt_semantic_interfaces.test_utils import find_semantic_model_with
 
 
 def test_semantic_model_cant_have_more_than_one_primary_entity(

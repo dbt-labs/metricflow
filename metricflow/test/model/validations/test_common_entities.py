@@ -8,7 +8,7 @@ from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.validations.common_entities import CommonEntitysRule
 from metricflow.specs import EntitySpec
-from metricflow.test.test_utils import find_semantic_model_with
+from dbt_semantic_interfaces.test_utils import find_semantic_model_with
 
 
 @pytest.mark.skip("TODO: re-enforce after validations improvements")

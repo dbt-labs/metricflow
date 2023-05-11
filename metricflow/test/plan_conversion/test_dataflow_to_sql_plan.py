@@ -55,7 +55,7 @@ from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.plan_utils import assert_plan_snapshot_text_equal
 from metricflow.test.sql.compare_sql_plan import assert_rendered_sql_from_plan_equal
 from metricflow.test.sql.compare_sql_plan import assert_sql_plan_text_equal
-from metricflow.test.test_utils import as_datetime
+from dbt_semantic_interfaces.test_utils import as_datetime
 from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY
 
 

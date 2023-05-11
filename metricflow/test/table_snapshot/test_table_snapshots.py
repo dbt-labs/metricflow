@@ -15,7 +15,7 @@ from metricflow.test.table_snapshot.table_snapshots import (
     SqlTableSnapshotRestorer,
     SqlTableSnapshotRepository,
 )
-from metricflow.test.test_utils import as_datetime
+from dbt_semantic_interfaces.test_utils import as_datetime
 
 
 @pytest.fixture

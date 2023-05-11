@@ -4,7 +4,7 @@ from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.objects.semantic_model import NodeRelation
 from dbt_semantic_interfaces.validations.reserved_keywords import RESERVED_KEYWORDS, ReservedKeywordsRule
 from dbt_semantic_interfaces.validations.validator_helpers import ValidationIssueLevel
-from metricflow.test.test_utils import find_semantic_model_with
+from dbt_semantic_interfaces.test_utils import find_semantic_model_with
 
 
 def random_keyword() -> str:  # noqa: D

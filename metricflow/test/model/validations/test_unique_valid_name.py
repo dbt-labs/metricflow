@@ -6,7 +6,7 @@ from dbt_semantic_interfaces.model_validator import ModelValidator
 from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationException
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords, UniqueAndValidNameRule
-from metricflow.test.test_utils import find_semantic_model_with
+from dbt_semantic_interfaces.test_utils import find_semantic_model_with
 
 
 def copied_model(simple_model__with_primary_transforms: SemanticManifest) -> SemanticManifest:  # noqa: D

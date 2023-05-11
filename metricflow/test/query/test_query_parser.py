@@ -16,7 +16,7 @@ from metricflow.specs import (
     OrderBySpec,
 )
 from metricflow.test.fixtures.model_fixtures import query_parser_from_yaml
-from metricflow.test.test_utils import as_datetime
+from dbt_semantic_interfaces.test_utils import as_datetime
 from metricflow.test.time.metric_time_dimension import MTD
 from metricflow.time.time_granularity_solver import RequestTimeGranularityException
 
