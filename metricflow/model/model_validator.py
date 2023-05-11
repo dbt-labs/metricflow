@@ -22,7 +22,7 @@ from metricflow.model.validations.measures import (
     MeasureConstraintAliasesRule,
     MeasuresNonAdditiveDimensionRule,
 )
-from metricflow.model.validations.metrics import CumulativeMetricRule, DerivedMetricRule
+from metricflow.model.validations.metrics import CumulativeMetricRule, DerivedMetricRule, MetricConstraintAliasesRule
 from metricflow.model.validations.non_empty import NonEmptyRule
 from metricflow.model.validations.reserved_keywords import ReservedKeywordsRule
 from metricflow.model.validations.unique_valid_name import UniqueAndValidNameRule
@@ -50,6 +50,7 @@ class ModelValidator:
         NaturalEntityConfigurationRule(),
         OnePrimaryEntityPerSemanticModelRule(),
         MeasureConstraintAliasesRule(),
+        MetricConstraintAliasesRule(),
         CumulativeMetricRule(),
         NonEmptyRule(),
         UniqueAndValidNameRule(),

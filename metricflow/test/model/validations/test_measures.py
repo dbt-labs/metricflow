@@ -91,56 +91,56 @@ def test_measures_only_exist_in_one_semantic_model() -> None:  # noqa: D
     assert found_issue is True
 
 
-# def test_measure_alias_is_set_when_required() -> None:
-#     """Tests to ensure that an appropriate error appears when a required alias is missing"""
-#     measure_name = "num_sample_rows"
-#     yaml_contents = textwrap.dedent(
-#         f"""\
-#         data_source:
-#           name: sample_data_source
-#           node_relation:
-#             schema_name: some_schema
-#             alias: source_table
-#           entities:
-#             - name: example_entity
-#               type: primary
-#               role: test_role
-#               expr: example_id
-#           measures:
-#             - name: {measure_name}
-#               agg: sum
-#               expr: 1
-#               create_metric: true
-#           dimensions:
-#             - name: is_instant
-#               type: categorical
-#             - name: ds
-#               type: time
-#               type_params:
-#                 time_granularity: day
-#                 is_primary: true
-#         ---
-#         metric:
-#           name: "metric1"
-#           type: expr
-#           type_params:
-#             measures:
-#               - name: {measure_name}
-#               - name: {measure_name}
-#                 constraint: is_instant
-#         """
-#     )
-#     missing_alias_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
-#     model = parse_yaml_files_to_validation_ready_model([missing_alias_file])
+def test_measure_alias_is_set_when_required() -> None:
+    """Tests to ensure that an appropriate error appears when a required alias is missing"""
+    metric_name = "num_sample_rows"
+    yaml_contents = textwrap.dedent(
+        f"""\
+        semantic_model:
+          name: sample_semantic_model
+          node_relation:
+            schema_name: some_schema
+            alias: source_table
+          entities:
+            - name: example_entity
+              type: primary
+              role: test_role
+              expr: example_id
+          measures:
+            - name: {metric_name}
+              agg: sum
+              expr: 1
+              create_metric: true
+          dimensions:
+            - name: is_instant
+              type: categorical
+            - name: ds
+              type: time
+              type_params:
+                time_granularity: day
+                is_primary: true
+        ---
+        metric:
+          name: "metric1"
+          type: expr
+          type_params:
+            metrics:
+              - name: {metric_name}
+              - name: {metric_name}
+                constraint: is_instant
+        """
+    )
+    missing_alias_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+    model = parse_yaml_files_to_validation_ready_model([missing_alias_file])
 
-#     model_issues = ModelValidator([MeasureConstraintAliasesRule()]).validate_model(model.model)
+    model_issues = ModelValidator([MeasureConstraintAliasesRule()]).validate_model(model.model)
 
-#     assert len(model_issues.errors) == 1
-#     expected_error_substring = f"depends on multiple different constrained versions of measure {measure_name}"
-#     actual_error = model_issues.errors[0].as_readable_str()
-#     assert (
-#         actual_error.find(expected_error_substring) != -1
-#     ), f"Expected error {expected_error_substring} not found in error string! Instead got {actual_error}"
+    assert len(model_issues.errors) == 1
+    expected_error_substring = f"depends on multiple different constrained versions of metric {metric_name}"
+    actual_error = model_issues.errors[0].as_readable_str()
+    assert (
+        actual_error.find(expected_error_substring) != -1
+    ), f"Expected error {expected_error_substring} not found in error string! Instead got {actual_error}"
 
 
 # def test_invalid_measure_alias_name() -> None:
