@@ -55,17 +55,16 @@
                 <!-- metric_spec =                                                                               -->
                 <!--   {'class': 'MetricSpec',                                                                   -->
                 <!--    'element_name': 'instant_booking_value',                                                 -->
-                <!--    'constraint': {'class': 'SpecWhereClauseConstraint',                                     -->
-                <!--                   'where_condition': 'is_instant',                                          -->
-                <!--                   'linkable_names': ('is_instant',),                                        -->
+                <!--    'constraint': {'class': 'WhereFilterSpec',                                               -->
+                <!--                   'where_sql': 'is_instant ',                                               -->
+                <!--                   'bind_parameters': {'class': 'SqlBindParameters',                         -->
+                <!--                                       'param_items': ()},                                   -->
                 <!--                   'linkable_spec_set': {'class': 'LinkableSpecSet',                         -->
                 <!--                                         'dimension_specs': ({'class': 'DimensionSpec',      -->
                 <!--                                                              'element_name': 'is_instant',  -->
                 <!--                                                              'entity_links': ()},),         -->
                 <!--                                         'time_dimension_specs': (),                         -->
-                <!--                                         'entity_specs': ()},                                -->
-                <!--                   'execution_parameters': {'class': 'SqlBindParameters',                    -->
-                <!--                                            'param_items': ()}},                             -->
+                <!--                                         'entity_specs': ()}},                               -->
                 <!--    'alias': None,                                                                           -->
                 <!--    'offset_window': None,                                                                   -->
                 <!--    'offset_to_grain': None}                                                                 -->
@@ -89,17 +88,16 @@
                         <WhereConstraintNode>
                             <!-- description = Constrain Output with WHERE -->
                             <!-- node_id = wcc_0 -->
-                            <!-- where_condition =                                                              -->
-                            <!--   {'class': 'SpecWhereClauseConstraint',                                       -->
-                            <!--    'where_condition': 'is_instant',                                            -->
-                            <!--    'linkable_names': ('is_instant',),                                          -->
-                            <!--    'linkable_spec_set': {'class': 'LinkableSpecSet',                           -->
-                            <!--                          'dimension_specs': ({'class': 'DimensionSpec',        -->
-                            <!--                                               'element_name': 'is_instant',    -->
-                            <!--                                               'entity_links': ()},),           -->
-                            <!--                          'time_dimension_specs': (),                           -->
-                            <!--                          'entity_specs': ()},                                  -->
-                            <!--    'execution_parameters': {'class': 'SqlBindParameters', 'param_items': ()}}  -->
+                            <!-- where_condition =                                                            -->
+                            <!--   {'class': 'WhereFilterSpec',                                               -->
+                            <!--    'where_sql': 'is_instant ',                                               -->
+                            <!--    'bind_parameters': {'class': 'SqlBindParameters', 'param_items': ()},     -->
+                            <!--    'linkable_spec_set': {'class': 'LinkableSpecSet',                         -->
+                            <!--                          'dimension_specs': ({'class': 'DimensionSpec',      -->
+                            <!--                                               'element_name': 'is_instant',  -->
+                            <!--                                               'entity_links': ()},),         -->
+                            <!--                          'time_dimension_specs': (),                         -->
+                            <!--                          'entity_specs': ()}}                                -->
                             <FilterElementsNode>
                                 <!-- description =                                       -->
                                 <!--   Pass Only Elements:                               -->

@@ -19,17 +19,16 @@
                     <!-- description = Constrain Output with WHERE -->
                     <!-- node_id = wcc_0 -->
                     <!-- where_condition =                                                                                 -->
-                    <!--   {'class': 'SpecWhereClauseConstraint',                                                          -->
-                    <!--    'where_condition': "listing__country_latest = 'us'",                                           -->
-                    <!--    'linkable_names': ('listing__country_latest',),                                                -->
+                    <!--   {'class': 'WhereFilterSpec',                                                                    -->
+                    <!--    'where_sql': "listing__country_latest = 'us'",                                                 -->
+                    <!--    'bind_parameters': {'class': 'SqlBindParameters', 'param_items': ()},                          -->
                     <!--    'linkable_spec_set': {'class': 'LinkableSpecSet',                                              -->
                     <!--                          'dimension_specs': ({'class': 'DimensionSpec',                           -->
                     <!--                                               'element_name': 'country_latest',                   -->
                     <!--                                               'entity_links': ({'class': 'EntityReference',       -->
                     <!--                                                                 'element_name': 'listing'},)},),  -->
                     <!--                          'time_dimension_specs': (),                                              -->
-                    <!--                          'entity_specs': ()},                                                     -->
-                    <!--    'execution_parameters': {'class': 'SqlBindParameters', 'param_items': ()}}                     -->
+                    <!--                          'entity_specs': ()}}                                                     -->
                     <FilterElementsNode>
                         <!-- description =                                -->
                         <!--   Pass Only Elements:                        -->
