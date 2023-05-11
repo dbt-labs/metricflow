@@ -155,7 +155,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             time_spine_source: Allows getting dates for use in cumulative joins
         """
         self._column_association_resolver = column_association_resolver
-        self._metric_semantics = semantic_manifest_lookup.metric_semantics
+        self._metric_lookup = semantic_manifest_lookup.metric_lookup
         self._semantic_model_lookup = semantic_manifest_lookup.semantic_model_lookup
         self._time_spine_source = time_spine_source
 
@@ -641,7 +641,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         metric_select_columns = []
         metric_instances = []
         for metric_spec in node.metric_specs:
-            metric = self._metric_semantics.get_metric(metric_spec.as_reference)
+            metric = self._metric_lookup.get_metric(metric_spec.as_reference)
 
             metric_expr: Optional[SqlExpressionNode] = None
             if metric.type is MetricType.RATIO:

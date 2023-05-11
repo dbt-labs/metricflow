@@ -388,7 +388,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         )
         logger.info(f"Query spec is:\n{pformat_big_objects(query_spec)}")
 
-        if self._semantic_manifest_lookup.metric_semantics.contains_cumulative_or_time_offset_metric(
+        if self._semantic_manifest_lookup.metric_lookup.contains_cumulative_or_time_offset_metric(
             tuple(m.as_reference for m in query_spec.metric_specs)
         ):
             self._time_spine_table_builder.create_if_necessary()
@@ -451,7 +451,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     def simple_dimensions_for_metrics(self, metric_names: List[str]) -> List[Dimension]:  # noqa: D
         return [
             Dimension(name=dim.qualified_name)
-            for dim in self._semantic_manifest_lookup.metric_semantics.element_specs_for_metrics(
+            for dim in self._semantic_manifest_lookup.metric_lookup.element_specs_for_metrics(
                 metric_references=[MetricReference(element_name=mname) for mname in metric_names],
                 without_any_property=frozenset(
                     {
@@ -465,8 +465,8 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def list_metrics(self) -> List[Metric]:  # noqa: D
-        metric_references = self._semantic_manifest_lookup.metric_semantics.metric_references
-        metrics = self._semantic_manifest_lookup.metric_semantics.get_metrics(metric_references)
+        metric_references = self._semantic_manifest_lookup.metric_lookup.metric_references
+        metrics = self._semantic_manifest_lookup.metric_lookup.get_metrics(metric_references)
         return [
             Metric(
                 name=metric.name,

@@ -22,7 +22,7 @@ from metricflow.specs import (
 logger = logging.getLogger(__name__)
 
 
-class MetricSemantics(MetricAccessor):  # noqa: D
+class MetricLookup(MetricAccessor):  # noqa: D
     def __init__(  # noqa: D
         self, semantic_manifest: SemanticManifest, semantic_model_lookup: SemanticModelLookup
     ) -> None:

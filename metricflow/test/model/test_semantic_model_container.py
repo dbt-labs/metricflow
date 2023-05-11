@@ -6,7 +6,7 @@ from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import EntityReference, MeasureReference, MetricReference
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
-from metricflow.model.semantics.metric_semantics import MetricSemantics
+from metricflow.model.semantics.metric_lookup import MetricLookup
 
 logger = logging.getLogger(__name__)
 
@@ -19,12 +19,11 @@ def semantic_model_lookup(simple_semantic_manifest: SemanticManifest) -> Semanti
 
 
 @pytest.fixture
-def metric_semantics(  # Noqa: D
+def metric_lookup(  # Noqa: D
     simple_semantic_manifest: SemanticManifest, semantic_model_lookup: SemanticModelLookup
 ) -> MetricSemantics:
-    return MetricSemantics(
+    return MetricLookup(
         semantic_manifest=simple_semantic_manifest,
-        semantic_model_lookup=semantic_model_lookup,
     )
 
 
@@ -111,11 +110,11 @@ def test_get_semantic_models_for_measure(semantic_model_lookup: SemanticModelLoo
     assert listings_sources[0].name == "listings_latest"
 
 
-def test_elements_for_metric(metric_semantics: MetricSemantics) -> None:  # noqa: D
+def test_elements_for_metric(metric_lookup: MetricLookup) -> None:  # noqa: D
     assert set(
         [
             x.qualified_name
-            for x in metric_semantics.element_specs_for_metrics(
+            for x in metric_lookup.element_specs_for_metrics(
                 [MetricReference(element_name="views")],
                 without_any_property=frozenset({LinkableElementProperties.DERIVED_TIME_GRANULARITY}),
             )
@@ -159,7 +158,7 @@ def test_elements_for_metric(metric_semantics: MetricSemantics) -> None:  # noqa
         "user__home_state_latest",
     }
 
-    local_specs = metric_semantics.element_specs_for_metrics(
+    local_specs = metric_lookup.element_specs_for_metrics(
         metric_references=[MetricReference(element_name="views")],
         with_any_property=frozenset({LinkableElementProperties.LOCAL}),
         without_any_property=frozenset({LinkableElementProperties.DERIVED_TIME_GRANULARITY}),
@@ -173,11 +172,11 @@ def test_elements_for_metric(metric_semantics: MetricSemantics) -> None:  # noqa
     }
 
 
-def test_local_linked_elements_for_metric(metric_semantics: MetricSemantics) -> None:  # noqa: D
+def test_local_linked_elements_for_metric(metric_lookup: MetricLookup) -> None:  # noqa: D
     result = set(
         [
             x.qualified_name
-            for x in metric_semantics.element_specs_for_metrics(
+            for x in metric_lookup.element_specs_for_metrics(
                 [MetricReference(element_name="listings")],
                 with_any_property=frozenset({LinkableElementProperties.LOCAL_LINKED}),
                 without_any_property=frozenset({LinkableElementProperties.DERIVED_TIME_GRANULARITY}),

@@ -167,7 +167,7 @@ class TimeGranularitySolver:
                 # If there is a cumulative metric, granularity changes aren't supported. We need to check the granularity
                 # specified in the configs for the cumulative metric alone, since `min_granularity_for_querying` may not be supported.
                 for metric_reference in metric_references:
-                    metric = self._semantic_manifest_lookup.metric_semantics.get_metric(metric_reference)
+                    metric = self._semantic_manifest_lookup.metric_lookup.get_metric(metric_reference)
                     if metric.type == MetricType.CUMULATIVE:
                         _, only_queryable_granularity = self.local_dimension_granularity_range(
                             metric_references=[metric_reference],

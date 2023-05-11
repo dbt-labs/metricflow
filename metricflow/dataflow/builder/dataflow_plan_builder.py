@@ -113,7 +113,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         column_association_resolver: Optional[ColumnAssociationResolver] = None,
     ) -> None:
         self._semantic_model_lookup = semantic_manifest_lookup.semantic_model_lookup
-        self._metric_semantics = semantic_manifest_lookup.metric_semantics
+        self._metric_lookup = semantic_manifest_lookup.metric_lookup
         self._metric_time_dimension_reference = DataSet.metric_time_dimension_reference()
         self._cost_function = cost_function
         self._source_nodes = source_nodes
@@ -190,10 +190,10 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         for metric_spec in metric_specs:
             logger.info(f"Generating compute metrics node for {metric_spec}")
             metric_reference = metric_spec.as_reference
-            metric = self._metric_semantics.get_metric(metric_reference)
+            metric = self._metric_lookup.get_metric(metric_reference)
 
             if metric.type == MetricType.DERIVED:
-                metric_input_specs = self._metric_semantics.metric_input_specs_for_metric(
+                metric_input_specs = self._metric_lookup.metric_input_specs_for_metric(
                     metric_reference=metric_reference,
                     column_association_resolver=self._column_association_resolver,
                 )
@@ -213,7 +213,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                     metric_specs=[metric_spec],
                 )
             else:
-                metric_input_measure_specs = self._metric_semantics.measures_for_metric(
+                metric_input_measure_specs = self._metric_lookup.measures_for_metric(
                     metric_reference=metric_reference,
                     column_association_resolver=self._column_association_resolver,
                 )
