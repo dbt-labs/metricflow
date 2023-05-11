@@ -3,7 +3,7 @@ import random
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.validations.reserved_keywords import RESERVED_KEYWORDS, ReservedKeywordsRule
 from dbt_semantic_interfaces.validations.validator_helpers import ValidationIssueLevel
-from metricflow.test.test_utils import find_data_source_with
+from dbt_semantic_interfaces.test_utils import find_data_source_with
 
 
 def random_keyword() -> str:  # noqa: D

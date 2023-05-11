@@ -8,7 +8,7 @@ from dbt_semantic_interfaces.objects.elements.dimension import Dimension, Dimens
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.validations.element_const import ElementConsistencyRule
 from dbt_semantic_interfaces.validations.validator_helpers import DataSourceElementType, ModelValidationException
-from metricflow.test.test_utils import find_data_source_with
+from dbt_semantic_interfaces.test_utils import find_data_source_with
 
 
 def _categorical_dimensions(data_source: DataSource) -> Tuple[Dimension, ...]:

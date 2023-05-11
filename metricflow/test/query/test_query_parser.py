@@ -15,7 +15,7 @@ from metricflow.specs import (
     OrderBySpec,
     OutputColumnNameOverride,
 )
-from metricflow.test.test_utils import as_datetime
+from dbt_semantic_interfaces.test_utils import as_datetime
 from metricflow.test.time.metric_time_dimension import MTD
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 from metricflow.time.time_granularity_solver import RequestTimeGranularityException

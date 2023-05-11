@@ -6,7 +6,7 @@ from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.validations.agg_time_dimension import AggregationTimeDimensionRule
 from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationException
-from metricflow.test.test_utils import find_data_source_with
+from dbt_semantic_interfaces.test_utils import find_data_source_with
 
 
 def test_invalid_aggregation_time_dimension(simple_user_configured_model: UserConfiguredModel) -> None:  # noqa:D

@@ -17,7 +17,7 @@ from dbt_semantic_interfaces.validations.entities import (
 )
 from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationException
 from .helpers import base_model_file
-from metricflow.test.test_utils import find_data_source_with
+from dbt_semantic_interfaces.test_utils import find_data_source_with
 
 
 def test_data_source_cant_have_more_than_one_primary_identifier(

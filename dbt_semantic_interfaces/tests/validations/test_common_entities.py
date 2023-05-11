@@ -8,7 +8,7 @@ from dbt_semantic_interfaces.objects.data_source import DataSource
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
 from dbt_semantic_interfaces.validations.common_entities import CommonEntitysRule
 from metricflow.specs import EntitySpec
-from metricflow.test.test_utils import find_data_source_with
+from dbt_semantic_interfaces.test_utils import find_data_source_with
 
 
 @pytest.mark.skip("TODO: re-enforce after validations improvements")

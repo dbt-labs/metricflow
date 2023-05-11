@@ -14,7 +14,7 @@ from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationR
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
-from metricflow.test.test_utils import as_datetime
+from dbt_semantic_interfaces.test_utils import as_datetime
 from metricflow.test.time.configurable_time_source import ConfigurableTimeSource
 
 
