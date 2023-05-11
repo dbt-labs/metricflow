@@ -265,9 +265,9 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
     def cancel_submitted_queries(self) -> None:  # noqa: D
         pass
 
-    def render_execution_param_key(self, execution_param_key: str) -> str:
+    def render_bind_parameter_key(self, bind_parameter_key: str) -> str:
         """Wrap execution parameter key with syntax accepted by engine."""
-        return f"%({execution_param_key})s"
+        return f"%({bind_parameter_key})s"
 
     @staticmethod
     def stmt_is_table_rename(stmt: str) -> bool:

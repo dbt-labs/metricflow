@@ -163,8 +163,8 @@ class SqlClient(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    def render_execution_param_key(self, execution_param_key: str) -> str:
-        """Wrap execution parameter key with syntax accepted by engine."""
+    def render_bind_parameter_key(self, bind_parameter_key: str) -> str:
+        """Wrap the bind parameter key with syntax accepted by engine."""
         raise NotImplementedError
 
 
