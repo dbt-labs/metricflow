@@ -5,7 +5,7 @@ from dbt_semantic_interfaces.objects.metric import Metric
 from dbt_semantic_interfaces.objects.base import HashableBaseModel
 
 
-class UserConfiguredModel(HashableBaseModel):
+class SemanticManifest(HashableBaseModel):
     """Model holds all the information the SemanticLayer needs to render a query"""
 
     semantic_models: List[SemanticModel]

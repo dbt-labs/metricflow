@@ -10,7 +10,7 @@ from typing import Tuple, Sequence, Dict, List, Optional, FrozenSet
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType, Dimension
 from dbt_semantic_interfaces.objects.elements.entity import EntityType
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
 from dbt_semantic_interfaces.references import SemanticModelReference, MeasureReference, MetricReference
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
@@ -375,7 +375,7 @@ class ValidLinkableSpecResolver:
 
     def __init__(
         self,
-        user_configured_model: UserConfiguredModel,
+        user_configured_model: SemanticManifest,
         semantic_model_semantics: SemanticModelSemanticsAccessor,
         max_entity_links: int,
     ) -> None:

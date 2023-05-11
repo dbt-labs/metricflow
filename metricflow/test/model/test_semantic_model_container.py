@@ -2,7 +2,7 @@ import logging
 
 import pytest
 
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
 from dbt_semantic_interfaces.references import EntityReference, MeasureReference, MetricReference
 from metricflow.model.semantics.semantic_model_semantics import SemanticModelSemantics
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.fixture
-def semantic_model_semantics(simple_user_configured_model: UserConfiguredModel) -> SemanticModelSemantics:  # Noqa: D
+def semantic_model_semantics(simple_user_configured_model: SemanticManifest) -> SemanticModelSemantics:  # Noqa: D
     return SemanticModelSemantics(
         model=simple_user_configured_model,
     )
@@ -20,7 +20,7 @@ def semantic_model_semantics(simple_user_configured_model: UserConfiguredModel) 
 
 @pytest.fixture
 def metric_semantics(  # Noqa: D
-    simple_user_configured_model: UserConfiguredModel, semantic_model_semantics: SemanticModelSemantics
+    simple_user_configured_model: SemanticManifest, semantic_model_semantics: SemanticModelSemantics
 ) -> MetricSemantics:
     return MetricSemantics(
         user_configured_model=simple_user_configured_model,

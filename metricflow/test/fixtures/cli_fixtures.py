@@ -8,7 +8,7 @@ from click.testing import CliRunner, Result
 
 from metricflow.cli.cli_context import CLIContext
 from metricflow.engine.metricflow_engine import MetricFlowEngine
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
@@ -21,7 +21,7 @@ from metricflow.test.time.configurable_time_source import ConfigurableTimeSource
 @pytest.fixture
 def cli_context(  # noqa: D
     async_sql_client: AsyncSqlClient,
-    simple_user_configured_model: UserConfiguredModel,
+    simple_user_configured_model: SemanticManifest,
     time_spine_source: TimeSpineSource,
     mf_test_session_state: MetricFlowTestSessionState,
     create_source_tables: bool,

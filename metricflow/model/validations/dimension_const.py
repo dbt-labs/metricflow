@@ -12,7 +12,7 @@ from metricflow.model.validations.validator_helpers import (
     ValidationError,
     validate_safely,
 )
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
 from dbt_semantic_interfaces.references import SemanticModelElementReference, DimensionReference
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
@@ -26,7 +26,7 @@ class DimensionConsistencyRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="running model validation ensuring dimension consistency")
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
+    def validate_model(model: SemanticManifest) -> List[ValidationIssue]:  # noqa: D
         dimension_to_invariant: Dict[DimensionReference, DimensionInvariants] = {}
         time_dims_to_granularity: Dict[DimensionReference, TimeGranularity] = {}
         issues: List[ValidationIssue] = []

@@ -10,7 +10,7 @@ import pytest
 
 from dbt_semantic_interfaces.model_transformer import ModelTransformer
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
 from dbt_semantic_interfaces.parsing.dir_to_model import (
     parse_directory_of_yaml_files_to_model,
     parse_yaml_files_to_validation_ready_model,
@@ -186,7 +186,7 @@ def unpartitioned_multi_hop_join_semantic_manifest_lookup(  # noqa: D
 
 
 @pytest.fixture(scope="session")
-def simple_user_configured_model(template_mapping: Dict[str, str]) -> UserConfiguredModel:
+def simple_user_configured_model(template_mapping: Dict[str, str]) -> SemanticManifest:
     """Model used for many tests."""
 
     model_build_result = parse_directory_of_yaml_files_to_model(
@@ -196,7 +196,7 @@ def simple_user_configured_model(template_mapping: Dict[str, str]) -> UserConfig
 
 
 @pytest.fixture(scope="session")
-def simple_model__with_primary_transforms(template_mapping: Dict[str, str]) -> UserConfiguredModel:
+def simple_model__with_primary_transforms(template_mapping: Dict[str, str]) -> SemanticManifest:
     """Model used for tests pre-transformations."""
 
     model_build_result = parse_directory_of_yaml_files_to_model(
@@ -229,7 +229,7 @@ def scd_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> SemanticMa
 
 
 @pytest.fixture(scope="session")
-def data_warehouse_validation_model(template_mapping: Dict[str, str]) -> UserConfiguredModel:
+def data_warehouse_validation_model(template_mapping: Dict[str, str]) -> SemanticManifest:
     """Model used for data warehouse validation tests"""
 
     model_build_result = parse_directory_of_yaml_files_to_model(

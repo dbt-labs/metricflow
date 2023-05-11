@@ -1,7 +1,7 @@
 import logging
 
 from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
 from dbt_semantic_interfaces.transformations.transform_rule import ModelTransformRule
 
 logger = logging.getLogger(__name__)
@@ -11,7 +11,7 @@ class BooleanMeasureAggregationRule(ModelTransformRule):
     """Converts the expression used in boolean measures so that it can be aggregated."""
 
     @staticmethod
-    def transform_model(model: UserConfiguredModel) -> UserConfiguredModel:  # noqa: D
+    def transform_model(model: SemanticManifest) -> SemanticManifest:  # noqa: D
         for semantic_model in model.semantic_models:
             for measure in semantic_model.measures:
                 if measure.agg == AggregationType.BOOLEAN:

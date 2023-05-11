@@ -17,7 +17,7 @@ from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
 from dbt_semantic_interfaces.objects.metric import Metric, MetricInputMeasure, MetricType, MetricTypeParams
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
 from dbt_semantic_interfaces.parsing.dir_to_model import ModelBuildResult
 from metricflow.model.validations.validator_helpers import ModelValidationResults, ValidationError, ValidationIssue
 
@@ -40,10 +40,10 @@ CALC_METHOD_TO_MEASURE_TYPE: Dict[str, AggregationType] = {
 
 
 class DbtManifestTransformer:
-    """The DbtManifestTransform is a class used to transform dbt Manifests into MetricFlow UserConfiguredModels
+    """The DbtManifestTransform is a class used to transform dbt Manifests into MetricFlow SemanticManifests
 
     This helps keep track of state objects while transforming the Manifest into a
-    UserConfiguredModel, ensuring like dbt Node elements are rendered only once and
+    SemanticManifest, ensuring like dbt Node elements are rendered only once and
     allowing us to pass around fewer arguments (reducing the mental load)
     """
 
@@ -363,7 +363,7 @@ class DbtManifestTransformer:
         return time_dimensions
 
     def build_user_configured_model(self) -> ModelBuildResult:
-        """Builds a UserConfiguredModel from the manifest of the instance
+        """Builds a SemanticManifest from the manifest of the instance
 
         Note:
             TODO: This currently skips DbtMetric that are `derived`. Once MetricFlow
@@ -400,6 +400,6 @@ class DbtManifestTransformer:
                 )
 
         return ModelBuildResult(
-            model=UserConfiguredModel(semantic_models=list(deduped_semantic_models), metrics=metrics),
+            model=SemanticManifest(semantic_models=list(deduped_semantic_models), metrics=metrics),
             issues=ModelValidationResults.from_issues_sequence(issues=issues),
         )

@@ -1,8 +1,8 @@
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
 
 
-def test_model_serialization_deserialization(simple_user_configured_model: UserConfiguredModel) -> None:
-    """Tests Pydantic serialization and deserialization of a UserConfiguredModel
+def test_model_serialization_deserialization(simple_user_configured_model: SemanticManifest) -> None:
+    """Tests Pydantic serialization and deserialization of a SemanticManifest
 
     This ensures any custom parsing operations internal to our Pydantic models are properly applied to not only
     user-provided YAML input, but also to internal parsing operations based on serialized model objects.

@@ -15,7 +15,7 @@ from metricflow.engine.metricflow_engine import (
 from metricflow.engine.models import Dimension, Metric
 from metricflow.engine.utils import build_user_configured_model_from_config, convert_to_datetime
 from metricflow.model.model_validator import ModelValidator
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.model.validations.validator_helpers import ModelValidationResults
 from metricflow.protocols.async_sql_client import AsyncSqlClient
@@ -53,7 +53,7 @@ class MetricFlowClient:
     def __init__(
         self,
         sql_client: AsyncSqlClient,
-        user_configured_model: UserConfiguredModel,
+        user_configured_model: SemanticManifest,
         system_schema: str,
     ):
         """Initializer for MetricFlowClient.

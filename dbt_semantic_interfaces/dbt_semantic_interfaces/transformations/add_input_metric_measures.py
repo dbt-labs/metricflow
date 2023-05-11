@@ -2,7 +2,7 @@ from typing import Set
 
 from dbt_semantic_interfaces.errors import ModelTransformError
 from dbt_semantic_interfaces.objects.metric import MetricType, MetricInputMeasure
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
 from dbt_semantic_interfaces.transformations.transform_rule import ModelTransformRule
 
 
@@ -10,7 +10,7 @@ class AddInputMetricMeasuresRule(ModelTransformRule):
     """Add all measures corresponding to the input metrics of the derived metric."""
 
     @staticmethod
-    def _get_measures_for_metric(model: UserConfiguredModel, metric_name: str) -> Set[MetricInputMeasure]:
+    def _get_measures_for_metric(model: SemanticManifest, metric_name: str) -> Set[MetricInputMeasure]:
         """Returns a unique set of input measures for a given metric."""
         measures = set()
         matched_metric = next(iter((metric for metric in model.metrics if metric.name == metric_name)), None)
@@ -25,7 +25,7 @@ class AddInputMetricMeasuresRule(ModelTransformRule):
         return measures
 
     @staticmethod
-    def transform_model(model: UserConfiguredModel) -> UserConfiguredModel:  # noqa: D
+    def transform_model(model: SemanticManifest) -> SemanticManifest:  # noqa: D
         for metric in model.metrics:
             if metric.type == MetricType.DERIVED:
                 measures = AddInputMetricMeasuresRule._get_measures_for_metric(model, metric.name)

@@ -4,12 +4,12 @@ import copy
 
 from metricflow.model.model_validator import ModelValidator
 from metricflow.model.validations.validator_helpers import ModelValidationException
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
 from metricflow.model.validations.unique_valid_name import MetricFlowReservedKeywords, UniqueAndValidNameRule
 from metricflow.test.test_utils import find_semantic_model_with
 
 
-def copied_model(simple_model__with_primary_transforms: UserConfiguredModel) -> UserConfiguredModel:  # noqa: D
+def copied_model(simple_model__with_primary_transforms: SemanticManifest) -> SemanticManifest:  # noqa: D
     return copy.deepcopy(simple_model__with_primary_transforms)
 
 
@@ -27,7 +27,7 @@ def copied_model(simple_model__with_primary_transforms: UserConfiguredModel) -> 
 """
 
 
-def test_duplicate_semantic_model_name(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa: D
+def test_duplicate_semantic_model_name(simple_model__with_primary_transforms: SemanticManifest) -> None:  # noqa: D
     model = copied_model(simple_model__with_primary_transforms)
     duplicated_semantic_model = model.semantic_models[0]
     model.semantic_models.append(duplicated_semantic_model)
@@ -38,7 +38,7 @@ def test_duplicate_semantic_model_name(simple_model__with_primary_transforms: Us
         ModelValidator([UniqueAndValidNameRule()]).checked_validations(model)
 
 
-def test_duplicate_metric_name(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa:D
+def test_duplicate_metric_name(simple_model__with_primary_transforms: SemanticManifest) -> None:  # noqa:D
     model = copied_model(simple_model__with_primary_transforms)
     duplicated_metric = model.metrics[0]
     model.metrics.append(duplicated_metric)
@@ -50,7 +50,7 @@ def test_duplicate_metric_name(simple_model__with_primary_transforms: UserConfig
 
 
 def test_top_level_metric_can_have_same_name_as_any_other_top_level_item(
-    simple_model__with_primary_transforms: UserConfiguredModel,
+    simple_model__with_primary_transforms: SemanticManifest,
 ) -> None:  # noqa:D
     metric_name = simple_model__with_primary_transforms.metrics[0].name
 
@@ -73,7 +73,7 @@ def test_top_level_metric_can_have_same_name_as_any_other_top_level_item(
 """
 
 
-def test_duplicate_measure_name(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa:D
+def test_duplicate_measure_name(simple_model__with_primary_transforms: SemanticManifest) -> None:  # noqa:D
     model = copied_model(simple_model__with_primary_transforms)
 
     # Ensure we have a usable semantic model for the test
@@ -92,7 +92,7 @@ def test_duplicate_measure_name(simple_model__with_primary_transforms: UserConfi
         ModelValidator([UniqueAndValidNameRule()]).checked_validations(model)
 
 
-def test_duplicate_dimension_name(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa:D
+def test_duplicate_dimension_name(simple_model__with_primary_transforms: SemanticManifest) -> None:  # noqa:D
     model = copied_model(simple_model__with_primary_transforms)
 
     # Ensure we have a usable semantic model for the test
@@ -112,7 +112,7 @@ def test_duplicate_dimension_name(simple_model__with_primary_transforms: UserCon
         ModelValidator([UniqueAndValidNameRule()]).checked_validations(model)
 
 
-def test_duplicate_entity_name(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa:D
+def test_duplicate_entity_name(simple_model__with_primary_transforms: SemanticManifest) -> None:  # noqa:D
     model = copied_model(simple_model__with_primary_transforms)
 
     # Ensure we have a usable semantic model for the test

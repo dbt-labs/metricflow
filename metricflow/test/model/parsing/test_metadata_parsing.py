@@ -7,12 +7,12 @@ import pytest
 
 from dbt_semantic_interfaces.objects.metadata import Metadata
 from dbt_semantic_interfaces.objects.elements.measure import Measure
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
 from dbt_semantic_interfaces.parsing.yaml_loader import YamlConfigLoader
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 
 
-def test_semantic_model_metadata_parsing(simple_user_configured_model: UserConfiguredModel) -> None:
+def test_semantic_model_metadata_parsing(simple_user_configured_model: SemanticManifest) -> None:
     """Tests internal metadata object parsing from a file into the Semantic Model model object
 
     This only tests some basic file name parsing for each semantic model since they are not guaranteed
@@ -27,7 +27,7 @@ def test_semantic_model_metadata_parsing(simple_user_configured_model: UserConfi
         _assert_metadata_filename_is_valid(semantic_model.metadata)
 
 
-def test_metric_metadata_parsing(simple_user_configured_model: UserConfiguredModel) -> None:
+def test_metric_metadata_parsing(simple_user_configured_model: SemanticManifest) -> None:
     """Tests internal metadata object parsing from a file into the Metric model object
 
     This only tests some basic file name parsing for each metric since they are not guaranteed
@@ -63,12 +63,12 @@ def test_metric_metadata_parsing_with_measure_proxy(
         _assert_metadata_filename_is_valid(metric.metadata)
 
 
-def test_measure_metadata_parsing(simple_user_configured_model: UserConfiguredModel) -> None:
+def test_measure_metadata_parsing(simple_user_configured_model: SemanticManifest) -> None:
     """Tests internal metadata object parsing from a file into the Measure model object
 
     This tests the complete parsing process for Measure object metadata, including some baseline testing of things
     like file line number extraction and propagation. As with other cases, no assertions are made on the
-    YAML contents themselves since they may change from the raw files into the UserConfiguredModel object we access
+    YAML contents themselves since they may change from the raw files into the SemanticManifest object we access
     here.
     """
     assert len(simple_user_configured_model.semantic_models) > 0

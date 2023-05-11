@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
 
 
 class ModelTransformRule(ABC):
@@ -8,6 +8,6 @@ class ModelTransformRule(ABC):
 
     @staticmethod
     @abstractmethod
-    def transform_model(model: UserConfiguredModel) -> UserConfiguredModel:
+    def transform_model(model: SemanticManifest) -> SemanticManifest:
         """Copy and transform the given model into a new model."""
         pass

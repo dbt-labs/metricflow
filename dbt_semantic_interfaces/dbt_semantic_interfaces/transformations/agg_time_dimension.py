@@ -3,7 +3,7 @@ from typing import Optional
 
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
 from dbt_semantic_interfaces.transformations.transform_rule import ModelTransformRule
 from dbt_semantic_interfaces.references import TimeDimensionReference
 
@@ -21,7 +21,7 @@ class SetMeasureAggregationTimeDimensionRule(ModelTransformRule):
         return None
 
     @staticmethod
-    def transform_model(model: UserConfiguredModel) -> UserConfiguredModel:  # noqa: D
+    def transform_model(model: SemanticManifest) -> SemanticManifest:  # noqa: D
         for semantic_model in model.semantic_models:
             primary_time_dimension_reference = SetMeasureAggregationTimeDimensionRule._find_primary_time_dimension(
                 semantic_model

@@ -3,7 +3,7 @@ from typing import List
 
 from dbt_semantic_interfaces.errors import ParsingException
 from dbt_semantic_interfaces.objects.metric import Metric, MetricType, MetricTimeWindow
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
 from dbt_semantic_interfaces.references import MetricModelReference
 from metricflow.model.validations.unique_valid_name import UniqueAndValidNameRule
 from metricflow.model.validations.validator_helpers import (
@@ -55,7 +55,7 @@ class CumulativeMetricRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="running model validation ensuring cumulative sum metrics are valid")
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
+    def validate_model(model: SemanticManifest) -> List[ValidationIssue]:  # noqa: D
         issues: List[ValidationIssue] = []
 
         for metric in model.metrics or []:
@@ -93,7 +93,7 @@ class DerivedMetricRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking that the input metrics exist")
-    def _validate_input_metrics_exist(model: UserConfiguredModel) -> List[ValidationIssue]:
+    def _validate_input_metrics_exist(model: SemanticManifest) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
 
         all_metrics = {m.name for m in model.metrics}
@@ -135,7 +135,7 @@ class DerivedMetricRule(ModelValidationRule):
     @validate_safely(
         whats_being_done="running model validation ensuring derived metrics properties are configured properly"
     )
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
+    def validate_model(model: SemanticManifest) -> List[ValidationIssue]:  # noqa: D
         issues: List[ValidationIssue] = []
 
         issues += DerivedMetricRule._validate_input_metrics_exist(model=model)

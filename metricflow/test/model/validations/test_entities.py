@@ -8,7 +8,7 @@ import pytest
 from metricflow.model.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.entity import EntityType
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
 from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_validation_ready_model
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from metricflow.model.validations.entities import (
@@ -21,7 +21,7 @@ from metricflow.test.test_utils import find_semantic_model_with
 
 
 def test_semantic_model_cant_have_more_than_one_primary_entity(
-    simple_model__with_primary_transforms: UserConfiguredModel,
+    simple_model__with_primary_transforms: SemanticManifest,
 ) -> None:  # noqa: D
     """Add an additional primary entity to a semantic model and assert that it cannot have two"""
     model = copy.deepcopy(simple_model__with_primary_transforms)

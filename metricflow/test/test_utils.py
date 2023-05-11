@@ -7,7 +7,7 @@ from typing import Callable, Tuple
 
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.metric import Metric
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
 from metricflow.protocols.sql_client import SqlClient
 
 logger = logging.getLogger(__name__)
@@ -34,7 +34,7 @@ def should_skip_multi_threaded(
 
 
 def find_semantic_model_with(
-    model: UserConfiguredModel, function: Callable[[SemanticModel], bool]
+    model: SemanticManifest, function: Callable[[SemanticModel], bool]
 ) -> Tuple[SemanticModel, int]:
     """Returns a semantic model from the model which matches the criteria defined by the passed in function'
 
@@ -51,7 +51,7 @@ def find_semantic_model_with(
     raise Exception("Unable to find a semantic_model matching function criteria")
 
 
-def find_metric_with(model: UserConfiguredModel, function: Callable[[Metric], bool]) -> Tuple[Metric, int]:
+def find_metric_with(model: SemanticManifest, function: Callable[[Metric], bool]) -> Tuple[Metric, int]:
     """Returns a metric from the model which matches the criteria defined by the passed in function'
 
     This is useful because the order of metrics in the list is non-determinant, thus it's impossible to

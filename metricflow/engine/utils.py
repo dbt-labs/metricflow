@@ -6,7 +6,7 @@ from typing import Optional
 from metricflow.configuration.constants import CONFIG_MODEL_PATH
 from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.errors.errors import ModelCreationException
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
 from dbt_semantic_interfaces.parsing.dir_to_model import ModelBuildResult, parse_directory_of_yaml_files_to_model
 from metricflow.sql_clients.common_client import not_empty
 
@@ -68,20 +68,20 @@ def model_build_result_from_dbt_config(
         raise ModelCreationException from e
 
 
-def build_user_configured_model_from_config(handler: YamlFileHandler) -> UserConfiguredModel:
-    """Given a yaml file, create a UserConfiguredModel."""
+def build_user_configured_model_from_config(handler: YamlFileHandler) -> SemanticManifest:
+    """Given a yaml file, create a SemanticManifest."""
     return model_build_result_from_config(handler=handler).model
 
 
 def build_user_configured_model_from_dbt_config(
     handler: YamlFileHandler, profile: Optional[str] = None, target: Optional[str] = None
-) -> UserConfiguredModel:
-    """Given a yaml file, create a UserConfiguredModel."""
+) -> SemanticManifest:
+    """Given a yaml file, create a SemanticManifest."""
     return model_build_result_from_dbt_config(handler=handler, profile=profile, target=target).model
 
 
-def build_user_configured_model_from_dbt_cloud(job_id: str, service_token: str) -> UserConfiguredModel:
-    """Given dbt cloud params, create a UserConfiguredModel"""
+def build_user_configured_model_from_dbt_cloud(job_id: str, service_token: str) -> SemanticManifest:
+    """Given dbt cloud params, create a SemanticManifest"""
     from dbt_semantic_interfaces.parsing.dbt_cloud_to_model import model_build_result_for_dbt_cloud_job
 
     return model_build_result_for_dbt_cloud_job(auth=service_token, job_id=job_id).model

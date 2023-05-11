@@ -12,7 +12,7 @@ from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputData
 from metricflow.dataflow.dataflow_plan import BaseOutput
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from dbt_semantic_interfaces.objects.metric import MetricType
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
 from dbt_semantic_interfaces.references import (
     TimeDimensionReference,
     MetricModelReference,
@@ -96,7 +96,7 @@ class TimeGranularitySolver:
                         ].add(time_dimension_spec.time_granularity)
 
     @staticmethod
-    def _measures_for_metric(model: UserConfiguredModel) -> Dict[MetricModelReference, List[MeasureReference]]:
+    def _measures_for_metric(model: SemanticManifest) -> Dict[MetricModelReference, List[MeasureReference]]:
         """Given a model, return a dict that maps the name of the metric to the names of the measures used"""
         metric_reference_to_measure_references: Dict[MetricModelReference, List[MeasureReference]] = {}
         for metric in model.metrics:

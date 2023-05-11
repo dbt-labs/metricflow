@@ -6,7 +6,7 @@ from dbt_semantic_interfaces.objects.elements.dimension import Dimension, Dimens
 from dbt_semantic_interfaces.objects.elements.entity import Entity, EntityType
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.metric import MetricInput, MetricType, MetricTypeParams
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
 from dbt_semantic_interfaces.references import DimensionReference, EntityReference, TimeDimensionReference
 from metricflow.model.validations.metrics import DerivedMetricRule
 from metricflow.model.validations.validator_helpers import ModelValidationException
@@ -21,7 +21,7 @@ def test_metric_no_time_dim_dim_only_source() -> None:  # noqa:D
     measure_name = "foo"
     model_validator = ModelValidator()
     model_validator.checked_validations(
-        UserConfiguredModel(
+        SemanticManifest(
             semantic_models=[
                 semantic_model_with_guaranteed_meta(
                     name="sum_measure",
@@ -67,7 +67,7 @@ def test_metric_no_time_dim() -> None:  # noqa:D
         measure_name = "foo"
         model_validator = ModelValidator()
         model_validator.checked_validations(
-            UserConfiguredModel(
+            SemanticManifest(
                 semantic_models=[
                     semantic_model_with_guaranteed_meta(
                         name="sum_measure",
@@ -98,7 +98,7 @@ def test_metric_multiple_primary_time_dims() -> None:  # noqa:D
         measure_name = "foo"
         model_validator = ModelValidator()
         model_validator.checked_validations(
-            UserConfiguredModel(
+            SemanticManifest(
                 semantic_models=[
                     semantic_model_with_guaranteed_meta(
                         name="sum_measure",
@@ -159,7 +159,7 @@ def test_generated_metrics_only() -> None:  # noqa:D
     semantic_model.measures[0].create_metric = True
 
     ModelValidator().checked_validations(
-        UserConfiguredModel(
+        SemanticManifest(
             semantic_models=[semantic_model],
             metrics=[],
         )
@@ -170,7 +170,7 @@ def test_derived_metric() -> None:  # noqa: D
     measure_name = "foo"
     model_validator = ModelValidator([DerivedMetricRule()])
     model_issues = model_validator.validate_model(
-        UserConfiguredModel(
+        SemanticManifest(
             semantic_models=[
                 semantic_model_with_guaranteed_meta(
                     name="sum_measure",

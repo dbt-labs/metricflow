@@ -1,5 +1,5 @@
 from dbt_semantic_interfaces.model_transformer import ModelTransformer
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
 from dbt_semantic_interfaces.transformations.transform_rule import ModelTransformRule
 
 
@@ -10,14 +10,14 @@ class SliceNamesRule(ModelTransformRule):
     """
 
     @staticmethod
-    def transform_model(model: UserConfiguredModel) -> UserConfiguredModel:  # noqa: D
+    def transform_model(model: SemanticManifest) -> SemanticManifest:  # noqa: D
         for semantic_model in model.semantic_models:
             semantic_model.name = semantic_model.name[:3]
         return model
 
 
 def test_can_configure_model_transform_rules(  # noqa: D
-    simple_model__with_primary_transforms: UserConfiguredModel,
+    simple_model__with_primary_transforms: SemanticManifest,
 ) -> None:
     pre_model = simple_model__with_primary_transforms
     assert not all(len(x.name) == 3 for x in pre_model.semantic_models)

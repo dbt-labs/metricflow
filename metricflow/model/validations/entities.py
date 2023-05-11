@@ -4,7 +4,7 @@ from typing import List, MutableSet
 
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.entity import EntityType
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
 from dbt_semantic_interfaces.references import SemanticModelReference
 from metricflow.model.validations.validator_helpers import (
     SemanticModelContext,
@@ -61,7 +61,7 @@ class NaturalEntityConfigurationRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking that entities marked as EntityType.NATURAL are properly configured")
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:
+    def validate_model(model: SemanticManifest) -> List[ValidationIssue]:
         """Validate entities marked as EntityType.NATURAL"""
         issues: List[ValidationIssue] = []
         for semantic_model in model.semantic_models:
@@ -101,7 +101,7 @@ class OnePrimaryEntityPerSemanticModelRule(ModelValidationRule):
     @validate_safely(
         whats_being_done="running model validation ensuring each semantic model has only one primary entity"
     )
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
+    def validate_model(model: SemanticManifest) -> List[ValidationIssue]:  # noqa: D
         issues = []
 
         for semantic_model in model.semantic_models:

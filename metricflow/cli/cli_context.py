@@ -15,7 +15,7 @@ from metricflow.configuration.constants import (
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.engine.utils import build_user_configured_model_from_config, build_user_configured_model_from_dbt_config
 from metricflow.errors.errors import SqlClientCreationException, MetricFlowInitException
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.sql_clients.sql_utils import make_sql_client_from_config
@@ -38,7 +38,7 @@ class CLIContext:
         self.verbose = False
         self._mf: Optional[MetricFlowEngine] = None
         self._sql_client: Optional[AsyncSqlClient] = None
-        self._user_configured_model: Optional[UserConfiguredModel] = None
+        self._user_configured_model: Optional[SemanticManifest] = None
         self._semantic_manifest_lookup: Optional[SemanticManifestLookup] = None
         self._mf_system_schema: Optional[str] = None
         self._model_path_is_for_dbt: Optional[bool] = None
@@ -150,7 +150,7 @@ class CLIContext:
         return self._dbt_cloud_configs
 
     @property
-    def user_configured_model(self) -> UserConfiguredModel:  # noqa: D
+    def user_configured_model(self) -> SemanticManifest:  # noqa: D
         if self._user_configured_model is None:
             if self.model_path_is_for_dbt:
                 dbt_profile = self.config.get_value(CONFIG_DBT_PROFILE)

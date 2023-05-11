@@ -17,7 +17,7 @@ from dbt_semantic_interfaces.parsing.schemas import (
     metric_validator,
     semantic_model_validator,
 )
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
 from dbt_semantic_interfaces.parsing.yaml_loader import (
     ParsingContext,
     YamlConfigLoader,
@@ -41,7 +41,7 @@ DOCUMENT_TYPES = [METRIC_TYPE, SEMANTIC_MODEL_TYPE]
 
 @dataclass(frozen=True)
 class ModelBuildResult:  # noqa: D
-    model: UserConfiguredModel
+    model: SemanticManifest
     # Issues found in the model.
     issues: ModelValidationResults = ModelValidationResults()
 
@@ -104,7 +104,7 @@ def parse_directory_of_yaml_files_to_model(
     apply_transformations: Optional[bool] = True,
     raise_issues_as_exceptions: bool = True,
 ) -> ModelBuildResult:
-    """Parse files in the given directory to a UserConfiguredModel.
+    """Parse files in the given directory to a SemanticManifest.
 
     Strings in the file following the Python string template format are replaced according to the template_mapping dict.
     """
@@ -123,7 +123,7 @@ def parse_yaml_file_paths_to_model(
     apply_transformations: Optional[bool] = True,
     raise_issues_as_exceptions: bool = True,
 ) -> ModelBuildResult:
-    """Parse files the given list of file paths to a UserConfiguredModel.
+    """Parse files the given list of file paths to a SemanticManifest.
 
     Strings in the files following the Python string template format are replaced according to the template_mapping dict.
     """
@@ -139,8 +139,8 @@ def parse_yaml_file_paths_to_model(
         except UnicodeDecodeError as e:
             # We could alternatively return this as a validation issue, but this
             # exception is hit *before* building the model. Currently the
-            # ModelBuildResult guarantees a UserConfiguredModel. We could make
-            # UserConfiguredModel optional on ModelBuildResult, but this has
+            # ModelBuildResult guarantees a SemanticManifest. We could make
+            # SemanticManifest optional on ModelBuildResult, but this has
             # undesirable consequences.
             raise Exception(
                 f"The content of file `{file_path}` doesn't match the encoding of the file."
@@ -191,7 +191,7 @@ def parse_yaml_files_to_model(
     semantic_model_class: Type[SemanticModel] = SemanticModel,
     metric_class: Type[Metric] = Metric,
 ) -> ModelBuildResult:
-    """Builds UserConfiguredModel from list of config files (as strings).
+    """Builds SemanticManifest from list of config files (as strings).
 
     Persistent storage connection may be passed to write parsed objects=
     to storage and populate object metadata
@@ -226,7 +226,7 @@ def parse_yaml_files_to_model(
         issues += file_issues
 
     return ModelBuildResult(
-        model=UserConfiguredModel(
+        model=SemanticManifest(
             semantic_models=semantic_models,
             metrics=metrics,
         ),
