@@ -2,10 +2,10 @@ import more_itertools
 import pytest
 import copy
 
-from metricflow.model.model_validator import ModelValidator
-from metricflow.model.validations.validator_helpers import ModelValidationException
+from dbt_semantic_interfaces.model_validator import ModelValidator
+from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationException
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
-from metricflow.model.validations.unique_valid_name import MetricFlowReservedKeywords, UniqueAndValidNameRule
+from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords, UniqueAndValidNameRule
 from metricflow.test.test_utils import find_semantic_model_with
 
 

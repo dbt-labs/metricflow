@@ -9,7 +9,11 @@ from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
     get_and_assert_calc_method_mapping,
 )
 from dbt_semantic_interfaces.objects.metric import MetricInputMeasure, MetricInput, MetricType, MetricTypeParams
-from metricflow.model.validations.validator_helpers import ModelValidationResults, ValidationIssue, ValidationError
+from dbt_semantic_interfaces.validations.validator_helpers import (
+    ModelValidationResults,
+    ValidationIssue,
+    ValidationError,
+)
 
 
 class DbtToMetricName(DbtMappingRule):

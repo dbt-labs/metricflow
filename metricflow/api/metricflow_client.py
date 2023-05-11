@@ -14,10 +14,10 @@ from metricflow.engine.metricflow_engine import (
 )
 from metricflow.engine.models import Dimension, Metric
 from metricflow.engine.utils import build_semantic_manifest_from_config, convert_to_datetime
-from metricflow.model.model_validator import ModelValidator
+from dbt_semantic_interfaces.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.model.validations.validator_helpers import ModelValidationResults
+from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationResults
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql_clients.common_client import not_empty

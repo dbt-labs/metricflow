@@ -2,7 +2,7 @@ from typing import Dict, List
 
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
-from metricflow.model.validations.validator_helpers import (
+from dbt_semantic_interfaces.validations.validator_helpers import (
     SemanticModelElementContext,
     SemanticModelElementType,
     FileContext,
