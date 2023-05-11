@@ -22,7 +22,9 @@ Using 'session' scope can result in other 'session' scope fixtures causing ID co
 
 
 @pytest.fixture
-def column_association_resolver(simple_semantic_manifest_lookup: SemanticManifestLookup) -> ColumnAssociationResolver:
+def column_association_resolver(  # noqa: D
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
+) -> ColumnAssociationResolver:
     return DefaultColumnAssociationResolver(simple_semantic_manifest_lookup)
 
 
@@ -58,7 +60,7 @@ def multihop_dataflow_plan_builder(  # noqa: D
 
 @pytest.fixture
 def scd_column_association_resolver(  # noqa: D
-        scd_semantic_manifest_lookup: SemanticManifestLookup
+    scd_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> ColumnAssociationResolver:
     return DefaultColumnAssociationResolver(scd_semantic_manifest_lookup)
 

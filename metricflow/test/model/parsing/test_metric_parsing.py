@@ -1,7 +1,5 @@
 import textwrap
 
-from dbt_semantic_interfaces.objects.common import YamlConfigFile
-
 from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
 from dbt_semantic_interfaces.objects.metric import MetricTimeWindow, MetricInput, MetricInputMeasure, MetricType
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity

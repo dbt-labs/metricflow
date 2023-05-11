@@ -1525,8 +1525,6 @@ def test_join_to_scd_dimension(
     sql_client: SqlClient,
 ) -> None:
     """Tests conversion of a plan using a dimension with a validity window inside a measure constraint"""
-
-    column_association_resolver = DefaultColumnAssociationResolver()
     dataflow_plan = scd_dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(
@@ -1536,7 +1534,7 @@ def test_join_to_scd_dimension(
                         where_filter=WhereFilter(
                             where_sql_template="{{ dimension('capacity', entity_path=['listing']) }} > 2",
                         ),
-                        column_association_resolver=column_association_resolver,
+                        column_association_resolver=scd_column_association_resolver,
                     ),
                 ),
             ),
