@@ -203,7 +203,10 @@ def parse_yaml_files_to_model(
     valid_object_classes = [semantic_model_class.__name__, metric_class.__name__]
     issues: List[ValidationIssue] = []
 
-    for config_file in files:
+    # Sort the file path so that tests run with consistency. e.g. node IDs are generated sequentially, and the order
+    # of node creation is based on the order of semantic models. If a snapshot includes a node ID, then inconsistent
+    # IDs will cause snapshot match failures.
+    for config_file in sorted(files, key=lambda file: file.filepath):
         parsing_result = parse_config_yaml(  # parse config file
             config_file,
             semantic_model_class=semantic_model_class,
