@@ -1,5 +1,4 @@
 import copy
-import pytest
 import re
 from typing import Callable
 
@@ -7,18 +6,16 @@ from dbt_semantic_interfaces.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.validations.common_entities import CommonEntitysRule
-from metricflow.specs import EntitySpec
 from dbt_semantic_interfaces.test_utils import find_semantic_model_with
 
 
-@pytest.mark.skip("TODO: re-enforce after validations improvements")
 def test_lonely_entity_raises_issue(simple_model__with_primary_transforms: SemanticManifest) -> None:  # noqa: D
     model = copy.deepcopy(simple_model__with_primary_transforms)
     lonely_entity_name = "hi_im_lonely"
 
     func: Callable[[SemanticModel], bool] = lambda semantic_model: len(semantic_model.entities) > 0
     semantic_model_with_entities, _ = find_semantic_model_with(model, func)
-    semantic_model_with_entities.entities[0].name = EntitySpec.from_name(lonely_entity_name).element_name
+    semantic_model_with_entities.entities[0].name = lonely_entity_name
     model_validator = ModelValidator([CommonEntitysRule()])
     model_issues = model_validator.validate_model(model)
 
