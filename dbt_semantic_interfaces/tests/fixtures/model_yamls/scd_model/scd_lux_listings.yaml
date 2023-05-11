@@ -1,0 +1,47 @@
+---
+semantic_model:
+  name: lux_listing_mapping
+  description: Mapping from listing_id to lux_listing_id
+
+  node_relation:
+    schema_name: $source_schema
+    alias: dim_lux_listing_id_mapping
+
+  entities:
+    - name: listing
+      type: primary
+      expr: listing_id
+    - name: lux_listing
+      type: foreign
+      expr: lux_listing_id
+---
+semantic_model:
+  name: lux_listings
+  description: SCD Type II table of lux listings history
+
+  node_relation:
+    schema_name: $source_schema
+    alias: dim_lux_listings
+
+  dimensions:
+    - name: window_start
+      type: time
+      expr: valid_from
+      type_params:
+        time_granularity: day
+        validity_params:
+          is_start: True
+    - name: window_end
+      type: time
+      expr: valid_to
+      type_params:
+        time_granularity: day
+        validity_params:
+          is_end: True
+    - name: is_confirmed_lux
+      type: categorical
+
+  entities:
+    - name: lux_listing
+      type: natural
+      expr: lux_listing_id

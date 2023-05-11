@@ -1,0 +1,26 @@
+table_snapshot:
+  table_name: account_month_txns
+  column_definitions:
+    - name: ds
+      type: TIME
+    - name: ds_partitioned
+      type: TIME
+    - name: account_id
+      type: STRING
+    - name: account_month
+      type: STRING
+    - name: txn_count
+      type: INT
+    - name: txns_value
+      type: INT
+  rows:
+    - ["2020-01-01", "2020-01-01", "a0", "JANUARY", "3", "300"]
+    - ["2020-01-01", "2020-01-01", "a1", "JANUARY", "2", "200"]
+    - ["2020-01-01", "2020-01-01", "a2", "JANUARY", "5", "500"]
+    - ["2020-02-01", "2020-02-01", "a0", "FEBRUARY", "4", "400"]
+    - ["2020-02-01", "2020-02-01", "a1", "FEBRUARY", "5", "250"]
+    - ["2020-03-01", "2020-03-01", "a0", "MARCH", "5", "1000"]
+    - ["2020-03-01", "2020-03-01", "a1", "MARCH", "6", "360"]
+    - ["2020-04-01", "2020-04-01", "a0", "APRIL", "4", "600"]
+    - ["2020-04-01", "2020-04-01", "a1", "APRIL", "10", "1000"]
+

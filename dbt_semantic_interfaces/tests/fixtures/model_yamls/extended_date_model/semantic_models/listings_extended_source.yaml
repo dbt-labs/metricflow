@@ -1,0 +1,18 @@
+---
+semantic_model:
+  name: listings_extended_source
+  description: listings_extended_source
+
+  node_relation:
+    schema_name: $source_schema
+    alias: dim_listings_extended
+
+  dimensions:
+    - name: listing_creation_ds
+      type: time
+      type_params:
+        time_granularity: day
+
+  entities:
+    - name: listing_id
+      type: primary

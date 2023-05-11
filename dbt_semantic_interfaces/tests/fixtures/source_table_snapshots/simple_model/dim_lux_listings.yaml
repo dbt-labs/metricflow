@@ -1,0 +1,16 @@
+table_snapshot:
+  table_name: dim_lux_listings
+  column_definitions:
+    - name: lux_listing_id
+      type: STRING
+    - name: valid_from
+      type: TIME
+    - name: valid_to
+      type: TIME
+    - name: is_confirmed_lux
+      type: BOOLEAN
+  rows:
+    - ["LUX_TEST_ID", "2020-01-02", null, "True"]
+    - ["ll_001", "2020-01-01", null, "True"]
+    - ["ll_002", "2020-01-01", "2020-01-02", "True"]
+    - ["ll_002", "2020-01-02", null, "False"]

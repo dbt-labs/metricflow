@@ -1,0 +1,20 @@
+---
+semantic_model:
+  name: companies
+  description: If a user is a company / business, this defines the mapping.
+
+  node_relation:
+    schema_name: $source_schema
+    alias: dim_companies
+
+  dimensions:
+    - name: company_name
+      type: categorical
+
+  entities:
+    - name: company
+      type: primary
+      expr: company_id
+    - name: user
+      type: unique
+      expr: user_id
