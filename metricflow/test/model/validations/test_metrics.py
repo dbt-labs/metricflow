@@ -292,6 +292,7 @@ def test_metric_alias_is_set_when_required() -> None:
           name: "metric1"
           type: derived
           type_params:
+            expr: {metric_name} + {metric_name}
             metrics:
               - name: {metric_name}
               - name: {metric_name}

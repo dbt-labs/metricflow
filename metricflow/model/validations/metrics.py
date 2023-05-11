@@ -273,6 +273,6 @@ def _get_metric_names_from_model(model: UserConfiguredModel) -> Set[str]:
     metric_names = set()
     for metric in model.metrics:
         for metric_reference in metric.input_metrics:
-            metric_names.add(metric_reference.reference.element_name)
+            metric_names.add(metric_reference.as_reference.element_name)
 
     return metric_names
