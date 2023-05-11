@@ -23,7 +23,7 @@ from dbt_semantic_interfaces.parsing.yaml_loader import (
     YamlConfigLoader,
     PARSING_CONTEXT_KEY,
 )
-from metricflow.model.validations.validator_helpers import (
+from dbt_semantic_interfaces.validations.validator_helpers import (
     FileContext,
     ModelValidationException,
     ModelValidationResults,

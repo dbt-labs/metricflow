@@ -8,7 +8,11 @@ from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
     MappedObjects,
     assert_metric_model_name,
 )
-from metricflow.model.validations.validator_helpers import ModelValidationResults, ValidationIssue, ValidationError
+from dbt_semantic_interfaces.validations.validator_helpers import (
+    ModelValidationResults,
+    ValidationIssue,
+    ValidationError,
+)
 
 
 class DbtMapToSemanticModelName(DbtMappingRule):

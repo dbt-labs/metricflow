@@ -3,9 +3,9 @@ import textwrap
 
 from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_validation_ready_model
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
-from metricflow.model.model_validator import ModelValidator
-from metricflow.model.validations.semantic_models import SemanticModelValidityWindowRule
-from metricflow.model.validations.validator_helpers import ModelValidationException
+from dbt_semantic_interfaces.model_validator import ModelValidator
+from dbt_semantic_interfaces.validations.semantic_models import SemanticModelValidityWindowRule
+from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationException
 from metricflow.test.model.validations.helpers import base_model_file
 
 
