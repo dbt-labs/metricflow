@@ -2,13 +2,11 @@ import datetime
 import logging
 
 import dateutil.parser
-from _pytest.fixtures import FixtureRequest
 from typing import Callable, Tuple
 
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.metric import Metric
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
-from metricflow.protocols.sql_client import SqlClient
 
 logger = logging.getLogger(__name__)
 
@@ -16,21 +14,6 @@ logger = logging.getLogger(__name__)
 def as_datetime(date_string: str) -> datetime.datetime:
     """Helper to convert a string like '2020-01-01' into a datetime object."""
     return dateutil.parser.parse(date_string)
-
-
-def should_skip_multi_threaded(
-    request: FixtureRequest,
-    sql_client: SqlClient,
-) -> bool:
-    """Returns whether to skip this test because multi-threading is not supported by the DB"""
-    if not sql_client.sql_engine_attributes.multi_threading_supported:
-        logger.warning(
-            f"Multi-threading is not supported with {sql_client.__class__.__name__}, so should skip "
-            f"{request.node.fspath}::{request.node.name}`"
-        )
-        return True
-
-    return False
 
 
 def find_semantic_model_with(
