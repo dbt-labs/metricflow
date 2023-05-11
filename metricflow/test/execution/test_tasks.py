@@ -40,7 +40,7 @@ def test_write_table_task(  # noqa: D
     task = SelectSqlQueryToTableTask(
         sql_client=async_sql_client,
         sql_query="SELECT 1 AS foo",
-        execution_parameters=SqlBindParameters(),
+        bind_parameters=SqlBindParameters(),
         output_table=output_table,
     )
     execution_plan = ExecutionPlan("plan0", leaf_tasks=[task])

@@ -31,7 +31,7 @@ class SqlPlanRenderResult:  # noqa: D
     # The SQL string that could be run.
     sql: str
     # The execution parameters that should be specified along with the SQL str to execute()
-    execution_parameters: SqlBindParameters
+    bind_parameters: SqlBindParameters
 
 
 class SqlQueryPlanRenderer(SqlQueryPlanNodeVisitor[SqlPlanRenderResult], ABC):
@@ -89,7 +89,7 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
         for select_column in select_columns:
             expr_rendered = self.EXPR_RENDERER.render_sql_expr(select_column.expr)
             # Merge all execution parameters together. Similar pattern follows below.
-            params = params.combine(expr_rendered.execution_parameters)
+            params = params.combine(expr_rendered.bind_parameters)
 
             column_select_str = f"{expr_rendered.sql} AS {select_column.column_alias}"
 
@@ -140,7 +140,7 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
             from_section_lines.append(f") {from_source_alias}")
         from_section = "\n".join(from_section_lines)
 
-        return from_section, from_render_result.execution_parameters
+        return from_section, from_render_result.bind_parameters
 
     def _render_joins_section(self, join_descriptions: Sequence[SqlJoinDescription]) -> Tuple[str, SqlBindParameters]:
         """Convert the join descriptions into a "JOIN" section.
@@ -159,13 +159,13 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
         for join_description in join_descriptions:
             # Render the source for the join
             right_source_rendered = self._render_node(join_description.right_source)
-            params = params.combine(right_source_rendered.execution_parameters)
+            params = params.combine(right_source_rendered.bind_parameters)
 
             # Render the on condition for the join
             on_condition_rendered: Optional[SqlExpressionRenderResult] = None
             if join_description.on_condition:
                 on_condition_rendered = self.EXPR_RENDERER.render_sql_expr(join_description.on_condition)
-                params = params.combine(on_condition_rendered.execution_parameters)
+                params = params.combine(on_condition_rendered.bind_parameters)
 
             if join_description.right_source.is_table:
                 join_section_lines.append(join_description.join_type.value)
@@ -199,7 +199,7 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
         first = True
         for group_by_column in group_by_columns:
             group_by_expr_rendered = self.EXPR_RENDERER.render_group_by_expr(group_by_column)
-            params = params.combine(group_by_expr_rendered.execution_parameters)
+            params = params.combine(group_by_expr_rendered.bind_parameters)
             if first:
                 first = False
                 group_by_section_lines.append("GROUP BY")
@@ -236,7 +236,7 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
         where_section = None
         if node.where:
             where_render_result = self.EXPR_RENDERER.render_sql_expr(node.where)
-            combined_params = combined_params.combine(where_render_result.execution_parameters)
+            combined_params = combined_params.combine(where_render_result.bind_parameters)
             where_section = f"WHERE {where_render_result.sql}"
 
         # Render "ORDER BY" section
@@ -246,7 +246,7 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
             for order_by in node.order_bys:
                 order_by_render_result = self.EXPR_RENDERER.render_sql_expr(order_by.expr)
                 order_by_items.append(order_by_render_result.sql + (" DESC" if order_by.desc else ""))
-                combined_params = combined_params.combine(order_by_render_result.execution_parameters)
+                combined_params = combined_params.combine(order_by_render_result.bind_parameters)
 
             order_by_section = "ORDER BY " + ", ".join(order_by_items)
 
@@ -281,19 +281,19 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
 
         return SqlPlanRenderResult(
             sql="\n".join(sections_to_render),
-            execution_parameters=combined_params,
+            bind_parameters=combined_params,
         )
 
     def visit_table_from_clause_node(self, node: SqlTableFromClauseNode) -> SqlPlanRenderResult:  # noqa: D
         return SqlPlanRenderResult(
             sql=node.sql_table.sql,
-            execution_parameters=SqlBindParameters(),
+            bind_parameters=SqlBindParameters(),
         )
 
     def visit_query_from_clause_node(self, node: SqlSelectQueryFromClauseNode) -> SqlPlanRenderResult:  # noqa: D
         return SqlPlanRenderResult(
             sql=node.select_query.rstrip(),
-            execution_parameters=SqlBindParameters(),
+            bind_parameters=SqlBindParameters(),
         )
 
     @property
