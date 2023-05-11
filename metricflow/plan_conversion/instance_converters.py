@@ -23,7 +23,7 @@ from metricflow.instances import (
     InstanceSetTransform,
     TimeDimensionInstance,
 )
-from metricflow.protocols.semantics import SemanticModelSemanticsAccessor
+from metricflow.protocols.semantics import SemanticModelAccessor
 from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.specs import (
@@ -167,7 +167,7 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
         self,
         table_alias: str,
         column_resolver: ColumnAssociationResolver,
-        semantic_model_semantics: SemanticModelSemanticsAccessor,
+        semantic_model_semantics: SemanticModelAccessor,
         metric_input_measure_specs: Sequence[MetricInputMeasureSpec],
     ) -> None:
         self._semantic_model_semantics = semantic_model_semantics
@@ -273,8 +273,8 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
     an SCD source, and extracting validity window information accordingly.
     """
 
-    def __init__(self, semantic_model_semantics: SemanticModelSemanticsAccessor) -> None:
-        """Initializer. The SemanticModelSemanticsAccessor is needed for getting the original model definition."""
+    def __init__(self, semantic_model_semantics: SemanticModelAccessor) -> None:
+        """Initializer. The SemanticModelAccessor is needed for getting the original model definition."""
         self._semantic_model_semantics = semantic_model_semantics
 
     def _get_validity_window_dimensions_for_semantic_model(

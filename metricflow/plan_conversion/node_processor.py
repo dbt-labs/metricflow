@@ -17,7 +17,7 @@ from metricflow.dataflow.dataflow_plan import (
 from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator, MAX_JOIN_HOPS
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
-from metricflow.protocols.semantics import SemanticModelSemanticsAccessor
+from metricflow.protocols.semantics import SemanticModelAccessor
 from metricflow.spec_set_transforms import ToElementNameSet
 from metricflow.specs import LinkableInstanceSpec, LinklessEntitySpec, InstanceSpecSet
 
@@ -79,7 +79,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
 
     def __init__(  # noqa: D
         self,
-        semantic_model_semantics: SemanticModelSemanticsAccessor,
+        semantic_model_semantics: SemanticModelAccessor,
         node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver[SqlDataSetT],
     ):
         self._node_data_set_resolver = node_data_set_resolver

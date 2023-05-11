@@ -37,7 +37,7 @@ from metricflow.specs import (
 )
 
 
-class SemanticModelSemanticsAccessor(ABC):
+class SemanticModelAccessor(ABC):
     """Interface for accessing semantic information about a set of semantic model objects
 
     This is primarily useful for restricting caller access to the subset of container methods and imports we want

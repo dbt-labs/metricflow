@@ -15,7 +15,7 @@ from dbt_semantic_interfaces.references import SemanticModelReference, MeasureRe
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
-from metricflow.protocols.semantics import SemanticModelSemanticsAccessor
+from metricflow.protocols.semantics import SemanticModelAccessor
 from metricflow.specs import (
     DEFAULT_TIME_GRANULARITY,
     LinkableSpecSet,
@@ -376,7 +376,7 @@ class ValidLinkableSpecResolver:
     def __init__(
         self,
         semantic_manifest: SemanticManifest,
-        semantic_model_semantics: SemanticModelSemanticsAccessor,
+        semantic_model_semantics: SemanticModelAccessor,
         max_entity_links: int,
     ) -> None:
         """Constructor.
