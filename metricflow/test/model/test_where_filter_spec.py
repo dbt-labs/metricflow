@@ -3,7 +3,6 @@ import logging
 from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.references import EntityReference
-from metricflow.model.semantic_model import SemanticModel
 from metricflow.specs import (
     ColumnAssociationResolver,
     LinkableSpecSet,
@@ -17,7 +16,6 @@ logger = logging.getLogger(__name__)
 
 
 def test_dimension_in_filter(  # noqa: D
-    simple_semantic_model: SemanticModel,
     column_association_resolver: ColumnAssociationResolver,
 ) -> None:
     where_filter = WhereFilter(where_sql_template="{{ dimension('country_latest', entity_path=['listing']) }} = 'US'")
@@ -38,7 +36,6 @@ def test_dimension_in_filter(  # noqa: D
 
 
 def test_time_dimension_in_filter(  # noqa: D
-    simple_semantic_model: SemanticModel,
     column_association_resolver: ColumnAssociationResolver,
 ) -> None:
     where_filter = WhereFilter(
@@ -65,7 +62,6 @@ def test_time_dimension_in_filter(  # noqa: D
 
 
 def test_entity_in_filter(  # noqa: D
-    simple_semantic_model: SemanticModel,
     column_association_resolver: ColumnAssociationResolver,
 ) -> None:
     where_filter = WhereFilter(where_sql_template="{{ entity('user', entity_path=['listing']) }} == 'example_user_id'")
