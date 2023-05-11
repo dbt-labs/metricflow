@@ -47,14 +47,3 @@ def simple_model__with_primary_transforms(template_mapping: Dict[str, str]) -> S
         model=model_build_result.model, ordered_rule_sequences=(ModelTransformer.PRIMARY_RULES,)
     )
     return transformed_model
-
-
-@pytest.fixture(scope="session")
-def data_warehouse_validation_model(template_mapping: Dict[str, str]) -> SemanticManifest:
-    """Model used for data warehouse validation tests"""
-
-    model_build_result = parse_directory_of_yaml_files_to_model(
-        os.path.join(os.path.dirname(__file__), "model_yamls/data_warehouse_validation_model"),
-        template_mapping=template_mapping,
-    )
-    return model_build_result.model
