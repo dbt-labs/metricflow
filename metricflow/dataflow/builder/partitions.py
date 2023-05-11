@@ -33,21 +33,21 @@ class PartitionTimeDimensionJoinDescription:
 class PartitionJoinResolver:
     """When joining data sets, this class helps to figure out the necessary partition specs to join on."""
 
-    def __init__(self, semantic_model_semantics: SemanticModelAccessor) -> None:  # noqa: D
-        self._semantic_model_semantics = semantic_model_semantics
+    def __init__(self, semantic_model_lookup: SemanticModelAccessor) -> None:  # noqa: D
+        self._semantic_model_lookup = semantic_model_lookup
 
     def _get_partitions(self, spec_set: InstanceSpecSet) -> PartitionSpecSet:
         """Returns the specs from the instance set that correspond to partition specs."""
         partition_dimension_specs = tuple(
             x
             for x in spec_set.dimension_specs
-            if self._semantic_model_semantics.get_dimension(dimension_reference=x.reference).is_partition
+            if self._semantic_model_lookup.get_dimension(dimension_reference=x.reference).is_partition
         )
         partition_time_dimension_specs = tuple(
             x
             for x in spec_set.time_dimension_specs
             if x.reference != DataSet.metric_time_dimension_reference()
-            and self._semantic_model_semantics.get_time_dimension(time_dimension_reference=x.reference).is_partition
+            and self._semantic_model_lookup.get_time_dimension(time_dimension_reference=x.reference).is_partition
         )
 
         return PartitionSpecSet(

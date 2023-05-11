@@ -8,7 +8,7 @@ from metricflow.errors.errors import MetricNotFoundError, DuplicateMetricError, 
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.linkable_spec_resolver import ValidLinkableSpecResolver
 from metricflow.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
-from metricflow.model.semantics.semantic_model_semantics import SemanticModelSemantics
+from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.protocols.semantics import MetricSemanticsAccessor
 from metricflow.specs import (
     MetricSpec,
@@ -24,18 +24,18 @@ logger = logging.getLogger(__name__)
 
 class MetricSemantics(MetricSemanticsAccessor):  # noqa: D
     def __init__(  # noqa: D
-        self, semantic_manifest: SemanticManifest, semantic_model_semantics: SemanticModelSemantics
+        self, semantic_manifest: SemanticManifest, semantic_model_lookup: SemanticModelLookup
     ) -> None:
         self._semantic_manifest = semantic_manifest
         self._metrics: Dict[MetricReference, Metric] = {}
-        self._semantic_model_semantics = semantic_model_semantics
+        self._semantic_model_lookup = semantic_model_lookup
 
         for metric in self._semantic_manifest.metrics:
             self.add_metric(metric)
 
         self._linkable_spec_resolver = ValidLinkableSpecResolver(
             semantic_manifest=self._semantic_manifest,
-            semantic_model_semantics=semantic_model_semantics,
+            semantic_model_lookup=semantic_model_lookup,
             max_entity_links=MAX_JOIN_HOPS,
         )
 
@@ -81,7 +81,7 @@ class MetricSemantics(MetricSemanticsAccessor):  # noqa: D
         if metric_reference in self._metrics:
             raise DuplicateMetricError(f"Metric `{metric.name}` has already been registered")
         for measure_reference in metric.measure_references:
-            if measure_reference not in self._semantic_model_semantics.measure_references:
+            if measure_reference not in self._semantic_model_lookup.measure_references:
                 raise NonExistentMeasureError(
                     f"Metric `{metric.name}` references measure `{measure_reference}` which has not been registered"
                 )
@@ -99,7 +99,7 @@ class MetricSemantics(MetricSemanticsAccessor):  # noqa: D
         for input_measure in metric.input_measures:
             measure_spec = MeasureSpec(
                 element_name=input_measure.name,
-                non_additive_dimension_spec=self._semantic_model_semantics.non_additive_dimension_specs_by_measure.get(
+                non_additive_dimension_spec=self._semantic_model_lookup.non_additive_dimension_specs_by_measure.get(
                     input_measure.measure_reference
                 ),
             )

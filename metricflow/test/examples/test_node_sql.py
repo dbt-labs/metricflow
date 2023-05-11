@@ -29,7 +29,7 @@ def test_view_sql_generated_at_a_node(
     time_spine_source: TimeSpineSource,
 ) -> None:
     """Example that shows how to view generated SQL for nodes in a dataflow plan."""
-    bookings_semantic_model = simple_semantic_manifest_lookup.semantic_model_semantics.get_by_reference(
+    bookings_semantic_model = simple_semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
         SemanticModelReference(semantic_model_name="bookings_source")
     )
     assert bookings_semantic_model

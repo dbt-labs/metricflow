@@ -113,15 +113,15 @@ class MetricFlowQueryParser:
         self._column_association_resolver = column_association_resolver
         self._model = model
         self._metric_semantics = model.metric_semantics
-        self._semantic_model_semantics = model.semantic_model_semantics
+        self._semantic_model_lookup = model.semantic_model_lookup
 
         # Set up containers for known element names
-        self._known_entity_element_references = self._semantic_model_semantics.get_entity_references()
+        self._known_entity_element_references = self._semantic_model_lookup.get_entity_references()
 
         self._known_time_dimension_element_references = [DataSet.metric_time_dimension_reference()]
         self._known_dimension_element_references = []
-        for dimension_reference in self._semantic_model_semantics.get_dimension_references():
-            dimension = self._semantic_model_semantics.get_dimension(dimension_reference)
+        for dimension_reference in self._semantic_model_lookup.get_dimension_references():
+            dimension = self._semantic_model_lookup.get_dimension(dimension_reference)
             if dimension.type == DimensionType.CATEGORICAL:
                 self._known_dimension_element_references.append(dimension_reference)
             elif dimension.type == DimensionType.TIME:

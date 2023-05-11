@@ -41,7 +41,7 @@ class SemanticModelAccessor(ABC):
     """Interface for accessing semantic information about a set of semantic model objects
 
     This is primarily useful for restricting caller access to the subset of container methods and imports we want
-    them to use. For example, the SemanticModelSemantics class might implement this protocol but also include some
+    them to use. For example, the SemanticModelLookup class might implement this protocol but also include some
     public methods for adding or removing semantic models from the container, while this protocol only allows the
     caller to invoke the accessor methods which retrieve semantic information about the collected semantic models.
     """

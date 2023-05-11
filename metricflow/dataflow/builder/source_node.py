@@ -27,7 +27,7 @@ class SourceNodeBuilder:
         for data_set in data_sets:
             read_node = ReadSqlSourceNode[SemanticModelDataSet](data_set)
             agg_time_dim_to_measures_grouper = (
-                self._semantic_manifest_lookup.semantic_model_semantics.get_aggregation_time_dimensions_with_measures(
+                self._semantic_manifest_lookup.semantic_model_lookup.get_aggregation_time_dimensions_with_measures(
                     data_set.semantic_model_reference
                 )
             )

@@ -27,7 +27,7 @@ from metricflow.specs import NonAdditiveDimensionSpec, MeasureSpec
 logger = logging.getLogger(__name__)
 
 
-class SemanticModelSemantics(SemanticModelAccessor):
+class SemanticModelLookup(SemanticModelAccessor):
     """Tracks semantic information for semantic model held in a set of SemanticModelContainers
 
     This implements both the SemanticModelAccessors protocol, the interface type we use throughout the codebase.
