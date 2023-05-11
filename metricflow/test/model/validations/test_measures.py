@@ -11,36 +11,8 @@ from metricflow.model.validations.measures import (
     SemanticModelMeasuresUniqueRule,
     MeasureConstraintAliasesRule,
     MeasuresNonAdditiveDimensionRule,
-    MetricMeasuresRule,
 )
 from metricflow.model.validations.validator_helpers import ModelValidationException
-
-
-# def test_metric_missing_measure() -> None:
-#     """Tests the basic MetricMeasuresRule, which asserts all measure inputs to a metric exist in the model"""
-#     metric_name = "invalid_measure_metric_do_not_add_to_model"
-#     measure_name = "this_measure_cannot_exist_or_else_it_breaks_tests"
-
-#     yaml_contents = textwrap.dedent(
-#         f"""\
-#         ---
-#         metric:
-#           name: "{metric_name}"
-#           description: "Metric with invalid measure"
-#           type: expr
-#           type_params:
-#             measures:
-#               - {measure_name}
-#         """
-#     )
-#     metric_missing_measure_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
-#     model = parse_yaml_files_to_validation_ready_model([metric_missing_measure_file])
-
-#     with pytest.raises(
-#         ModelValidationException,
-#         match=f"Measure {measure_name} referenced in metric {metric_name} is not defined in the model!",
-#     ):
-#         ModelValidator([MetricMeasuresRule()]).checked_validations(model=model.model)
 
 
 def test_measures_only_exist_in_one_semantic_model() -> None:  # noqa: D

@@ -177,43 +177,6 @@ class MeasureConstraintAliasesRule(ModelValidationRule):
         return issues
 
 
-class MetricMeasuresRule(ModelValidationRule):
-    """Checks that the measures referenced in the metrics exist."""
-
-    @staticmethod
-    @validate_safely(whats_being_done="checking all measures referenced by the metric exist")
-    def _validate_metric_measure_references(metric: Metric, valid_measure_names: Set[str]) -> List[ValidationIssue]:
-        issues: List[ValidationIssue] = []
-
-        for measure_reference in metric.measure_references:
-            if measure_reference.element_name not in valid_measure_names:
-                issues.append(
-                    ValidationError(
-                        context=MetricContext(
-                            file_context=FileContext.from_metadata(metadata=metric.metadata),
-                            metric=MetricModelReference(metric_name=metric.name),
-                        ),
-                        message=(
-                            f"Measure {measure_reference.element_name} referenced in metric {metric.name} is not "
-                            f"defined in the model!"
-                        ),
-                    )
-                )
-        return issues
-
-    @staticmethod
-    @validate_safely(whats_being_done="running model validation ensuring metric measures exist")
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
-        issues: List[ValidationIssue] = []
-        valid_measure_names = _get_measure_names_from_model(model)
-
-        for metric in model.metrics or []:
-            issues += MetricMeasuresRule._validate_metric_measure_references(
-                metric=metric, valid_measure_names=valid_measure_names
-            )
-        return issues
-
-
 class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
     """Checks that the measure's non_additive_dimensions are properly defined."""
 
