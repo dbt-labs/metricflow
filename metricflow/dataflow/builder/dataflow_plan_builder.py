@@ -65,7 +65,8 @@ from metricflow.specs import (
     LinkableSpecSet,
     ColumnAssociationResolver,
     LinklessEntitySpec,
-    InstanceSpecSet, ResolvedWhereFilter,
+    InstanceSpecSet,
+    ResolvedWhereFilter,
 )
 from metricflow.sql.sql_plan import SqlJoinType
 
