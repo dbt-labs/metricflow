@@ -55,7 +55,7 @@ def test_query_with_execution_params(sql_client: SqlClient) -> None:
         sql_execution_params = SqlBindParameters.create_from_dict(({"x": param}))
         assert sql_execution_params.param_dict["x"] == param  # check that pydantic did not coerce type unexpectedly
 
-        expr = f"SELECT {sql_client.render_execution_param_key('x')} as y"
+        expr = f"SELECT {sql_client.render_bind_parameter_key('x')} as y"
         df = sql_client.query(expr, sql_bind_parameters=sql_execution_params)
         assert isinstance(df, pd.DataFrame)
         assert df.shape == (1, 1)
@@ -81,7 +81,7 @@ def test_select_one_query(sql_client: SqlClient) -> None:  # noqa: D
 
 
 def test_failed_query_with_execution_params(sql_client: SqlClient) -> None:  # noqa: D
-    expr = f"SELECT {sql_client.render_execution_param_key('x')}"
+    expr = f"SELECT {sql_client.render_bind_parameter_key('x')}"
     sql_execution_params = SqlBindParameters.create_from_dict({"x": 1})
 
     sql_client.query(expr, sql_bind_parameters=sql_execution_params)
