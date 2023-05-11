@@ -2,7 +2,7 @@ import logging
 import textwrap
 
 from dbt_semantic_interfaces.pretty_print import pretty_format, pformat_big_objects
-from metricflow.specs import DimensionSpec, EntityReference
+from dbt_semantic_interfaces.test_utils import default_meta
 
 logger = logging.getLogger(__name__)
 
@@ -17,27 +17,30 @@ def test_pretty_print() -> None:  # noqa: D
 
 
 def test_pformat_big_objects() -> None:  # noqa: D
-    dimension_spec = DimensionSpec(
-        element_name="country_latest", entity_links=(EntityReference(element_name="listing"),)
-    )
-
-    assert pformat_big_objects(dimension_spec) == (
+    meta = default_meta()
+    assert pformat_big_objects(meta) == (
         textwrap.dedent(
             """\
-            {'class': 'DimensionSpec',
-             'element_name': 'country_latest',
-             'entity_links': ({'class': 'EntityReference', 'element_name': 'listing'},)}
+                {'class': 'Metadata',
+                 'repo_file_path': '/not/from/a/repo',
+                 'file_slice': {'filename': 'not_from_file.py',
+                                'content': 'N/A',
+                                'start_line_number': 0,
+                                'end_line_number': 0}}
             """
         ).rstrip()
     )
-    logger.error(f"Output:\n{pformat_big_objects(dimension_spec=dimension_spec)}")
-    assert pformat_big_objects(dimension_spec=dimension_spec) == (
+    logger.error(f"Output:\n{pformat_big_objects(meta=meta)}")
+    assert pformat_big_objects(meta=meta) == (
         textwrap.dedent(
             """\
-            dimension_spec:
-                {'class': 'DimensionSpec',
-                 'element_name': 'country_latest',
-                 'entity_links': ({'class': 'EntityReference', 'element_name': 'listing'},)}
+                meta:
+                    {'class': 'Metadata',
+                     'repo_file_path': '/not/from/a/repo',
+                     'file_slice': {'filename': 'not_from_file.py',
+                                    'content': 'N/A',
+                                    'start_line_number': 0,
+                                    'end_line_number': 0}}
             """
         ).rstrip()
     )
