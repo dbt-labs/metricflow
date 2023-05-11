@@ -164,7 +164,7 @@ class MetricConstraintAliasesRule(ModelValidationRule):
         """
         issues: List[ValidationIssue] = []
 
-        if len(metric.metric_references) == len(set(metric.metric_references)):
+        if len(metric.input_metrics) == len(set(metric.input_metrics)):
             # All measure references are unique, so disambiguation via aliasing is not necessary
             return issues
 
@@ -271,8 +271,8 @@ class MetricConstraintAliasesRule(ModelValidationRule):
 def _get_metric_names_from_model(model: UserConfiguredModel) -> Set[str]:
     """Return every distinct measure name specified in the model"""
     metric_names = set()
-    for semantic_model in model.semantic_models:
-        for metric in semantic_model.metrics:
-            metric_names.add(metric.reference.element_name)
+    for metric in model.metrics:
+        for metric_reference in metric.input_metrics:
+            metric_names.add(metric_reference.reference.element_name)
 
     return metric_names

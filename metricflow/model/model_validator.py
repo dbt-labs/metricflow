@@ -19,7 +19,6 @@ from metricflow.model.validations.measures import (
     PercentileAggregationRule,
     CountAggregationExprRule,
     SemanticModelMeasuresUniqueRule,
-    MeasureConstraintAliasesRule,
     MeasuresNonAdditiveDimensionRule,
 )
 from metricflow.model.validations.metrics import CumulativeMetricRule, DerivedMetricRule, MetricConstraintAliasesRule
@@ -49,7 +48,6 @@ class ModelValidator:
         ElementConsistencyRule(),
         NaturalEntityConfigurationRule(),
         OnePrimaryEntityPerSemanticModelRule(),
-        MeasureConstraintAliasesRule(),
         MetricConstraintAliasesRule(),
         CumulativeMetricRule(),
         NonEmptyRule(),

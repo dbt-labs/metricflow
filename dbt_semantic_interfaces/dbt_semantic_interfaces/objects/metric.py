@@ -161,11 +161,6 @@ class Metric(HashableBaseModel, ModelWithMetadataParsing):
         return res
 
     @property
-    def measure_references(self) -> List[MeasureReference]:
-        """Return the measure references associated with all input measure configurations for this metric"""
-        return [x.measure_reference for x in self.input_measures]
-
-    @property
     def input_metrics(self) -> List[MetricInput]:
         """Return the associated input metrics for this metric"""
         return self.type_params.metrics or []

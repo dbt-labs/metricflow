@@ -46,7 +46,7 @@ def test_incompatible_dimension_type() -> None:  # noqa:D
                     metric_with_guaranteed_meta(
                         name=measure_name,
                         type=MetricType.MEASURE_PROXY,
-                        type_params=MetricTypeParams(measures=[measure_name]),
+                        type_params=MetricTypeParams(measure=measure_name),
                     )
                 ],
             )
@@ -94,7 +94,7 @@ def test_incompatible_dimension_is_partition() -> None:  # noqa:D
                     metric_with_guaranteed_meta(
                         name=measure_name,
                         type=MetricType.MEASURE_PROXY,
-                        type_params=MetricTypeParams(measures=[measure_name]),
+                        type_params=MetricTypeParams(measure=measure_name),
                     )
                 ],
             )
@@ -147,7 +147,7 @@ def test_multiple_primary_time_dimensions() -> None:  # noqa:D
                     Metric(
                         name=measure_reference.element_name,
                         type=MetricType.MEASURE_PROXY,
-                        type_params=MetricTypeParams(measures=[measure_reference.element_name]),
+                        type_params=MetricTypeParams(measure=measure_reference.element_name),
                     )
                 ],
             )

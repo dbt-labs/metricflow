@@ -4,9 +4,6 @@ import logging
 from typing import Sequence, Tuple
 
 from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from dbt_semantic_interfaces.transformations.add_input_metric_measures import (
-    AddInputMetricMeasuresRule,
-)
 from dbt_semantic_interfaces.transformations.agg_time_dimension import (
     SetMeasureAggregationTimeDimensionRule,
 )
@@ -40,7 +37,6 @@ class ModelTransformer:
         BooleanMeasureAggregationRule(),
         ConvertCountToSumRule(),
         ConvertMedianToPercentileRule(),
-        AddInputMetricMeasuresRule(),
     )
 
     DEFAULT_RULES: Tuple[Sequence[ModelTransformRule], ...] = (

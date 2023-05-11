@@ -9,7 +9,6 @@ from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from metricflow.model.validations.measures import (
     CountAggregationExprRule,
     SemanticModelMeasuresUniqueRule,
-    MeasureConstraintAliasesRule,
     MeasuresNonAdditiveDimensionRule,
 )
 from metricflow.model.validations.validator_helpers import ModelValidationException
