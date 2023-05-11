@@ -11,7 +11,7 @@ from dbt_semantic_interfaces.references import DimensionReference, EntityReferen
 from dbt_semantic_interfaces.validations.metrics import DerivedMetricRule
 from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationException
 from metricflow.test.fixtures.table_fixtures import DEFAULT_DS
-from metricflow.test.model.validations.helpers import semantic_model_with_guaranteed_meta, metric_with_guaranteed_meta
+from dbt_semantic_interfaces.test_utils import semantic_model_with_guaranteed_meta, metric_with_guaranteed_meta
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 

@@ -16,7 +16,7 @@ from dbt_semantic_interfaces.validations.entities import (
     OnePrimaryEntityPerSemanticModelRule,
 )
 from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationException
-from metricflow.test.model.validations.helpers import base_semantic_manifest_file
+from dbt_semantic_interfaces.test_utils import base_semantic_manifest_file
 from dbt_semantic_interfaces.test_utils import find_semantic_model_with
 
 
