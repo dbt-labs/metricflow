@@ -10,7 +10,6 @@ from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import DimensionReference, EntityReference, TimeDimensionReference
 from dbt_semantic_interfaces.validations.metrics import DerivedMetricRule
 from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationException
-from metricflow.test.fixtures.table_fixtures import DEFAULT_DS
 from dbt_semantic_interfaces.test_utils import semantic_model_with_guaranteed_meta, metric_with_guaranteed_meta
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
@@ -135,7 +134,7 @@ def test_metric_multiple_primary_time_dims() -> None:  # noqa:D
 def test_generated_metrics_only() -> None:  # noqa:D
     dim_reference = DimensionReference(element_name="dim")
 
-    dim2_reference = TimeDimensionReference(element_name=DEFAULT_DS)
+    dim2_reference = TimeDimensionReference(element_name="ds")
     measure_name = "measure"
     entity_reference = EntityReference(element_name="primary")
     semantic_model = semantic_model_with_guaranteed_meta(

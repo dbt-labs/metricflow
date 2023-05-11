@@ -1,8 +1,0 @@
-metric:
-  name: "weekly_bookers"
-  description: "weekly_bookers"
-  type: cumulative
-  type_params:
-    measures:
-      - bookings
-    window: 7 days
