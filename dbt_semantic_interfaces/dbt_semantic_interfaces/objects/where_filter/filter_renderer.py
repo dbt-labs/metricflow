@@ -5,7 +5,7 @@ from typing import List, Tuple, Sequence
 import jinja2
 
 from dbt_semantic_interfaces.references import DimensionReference, EntityReference
-from metricflow.time.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 
 @dataclass(frozen=True)
