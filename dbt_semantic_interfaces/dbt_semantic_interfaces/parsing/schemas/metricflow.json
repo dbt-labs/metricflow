@@ -60,6 +60,9 @@
                 }
             ],
             "properties": {
+                "description": {
+                    "type": "string"
+                },
                 "expr": {
                     "type": [
                         "string",
@@ -242,10 +245,10 @@
             "$id": "metric",
             "additionalProperties": false,
             "properties": {
-                "constraint": {
+                "description": {
                     "type": "string"
                 },
-                "description": {
+                "filter": {
                     "type": "string"
                 },
                 "name": {
@@ -268,9 +271,6 @@
                 },
                 "type_params": {
                     "$ref": "#/definitions/metric_type_params"
-                },
-                "where_constraint": {
-                    "type": "string"
                 }
             },
             "required": [
@@ -292,7 +292,7 @@
                         "alias": {
                             "type": "string"
                         },
-                        "constraint": {
+                        "filter": {
                             "type": "string"
                         },
                         "name": {
@@ -310,7 +310,7 @@
                 "alias": {
                     "type": "string"
                 },
-                "constraint": {
+                "filter": {
                     "type": "string"
                 },
                 "name": {
