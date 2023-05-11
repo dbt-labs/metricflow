@@ -9,7 +9,6 @@ from dbt_semantic_interfaces.objects.metadata import Metadata
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.parsing.yaml_loader import YamlConfigLoader
-from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 
 
 def test_semantic_model_metadata_parsing(simple_semantic_manifest: SemanticManifest) -> None:
@@ -44,7 +43,7 @@ def test_metric_metadata_parsing(simple_semantic_manifest: SemanticManifest) -> 
 
 @pytest.mark.skip("TODO: Determine what to do with measure proxy metric metadata")
 def test_metric_metadata_parsing_with_measure_proxy(
-    multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
+    simple_semantic_manifest: SemanticManifest,
 ) -> None:
     """Tests internal metadata object parsing from a file into the Metric model object via measure proxy
 
@@ -55,8 +54,8 @@ def test_metric_metadata_parsing_with_measure_proxy(
     to be collected in the same file in the simple model, and the output here has been transformed
     so the YAML contents might or might not match.
     """
-    assert len(multi_hop_join_semantic_manifest_lookup.semantic_manifest.metrics) > 0
-    for metric in multi_hop_join_semantic_manifest_lookup.semantic_manifest.metrics:
+    assert len(simple_semantic_manifest.metrics) > 0
+    for metric in simple_semantic_manifest.metrics:
         assert (
             metric.metadata is not None
         ), f"Metadata should always be parsed out of the model, but None found for metric: {metric}!"
