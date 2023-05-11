@@ -20,7 +20,7 @@ class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
         """Render a percentile expression for Redshift."""
         arg_rendered = self.render_sql_expr(node.order_by_arg)
-        params = arg_rendered.execution_parameters
+        params = arg_rendered.bind_parameters
         percentile = node.percentile_args.percentile
 
         if node.percentile_args.function_type is SqlPercentileFunctionType.CONTINUOUS:
@@ -42,7 +42,7 @@ class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
 
         return SqlExpressionRenderResult(
             sql=f"{function_str}({percentile}) WITHIN GROUP (ORDER BY ({arg_rendered.sql}))",
-            execution_parameters=params,
+            bind_parameters=params,
         )
 
     def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> SqlExpressionRenderResult:  # noqa: D
@@ -55,7 +55,7 @@ class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         """
         return SqlExpressionRenderResult(
             sql="CONCAT(CAST(RANDOM()*100000000 AS INT)::VARCHAR,CAST(RANDOM()*100000000 AS INT)::VARCHAR)",
-            execution_parameters=SqlBindParameters(),
+            bind_parameters=SqlBindParameters(),
         )
 
 

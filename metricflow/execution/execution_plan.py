@@ -97,14 +97,14 @@ class SelectSqlQueryToDataFrameTask(ExecutionPlanTask):
         self,
         sql_client: AsyncSqlClient,
         sql_query: str,
-        execution_parameters: SqlBindParameters,
+        bind_parameters: SqlBindParameters,
         extra_sql_tags: SqlJsonTag = SqlJsonTag(),
         parent_nodes: Optional[List[ExecutionPlanTask]] = None,
     ) -> None:
 
         self._sql_client = sql_client
         self._sql_query = sql_query
-        self._execution_parameters = execution_parameters
+        self._bind_parameters = bind_parameters
         self._extra_sql_tags = extra_sql_tags
         super().__init__(task_id=self.create_unique_id(), parent_nodes=parent_nodes or [])
 
@@ -121,8 +121,8 @@ class SelectSqlQueryToDataFrameTask(ExecutionPlanTask):
         return super().displayed_properties + [DisplayedProperty(key="sql_query", value=self._sql_query)]
 
     @property
-    def execution_parameters(self) -> SqlBindParameters:  # noqa: D
-        return self._execution_parameters
+    def bind_parameters(self) -> SqlBindParameters:  # noqa: D
+        return self._bind_parameters
 
     def execute(self) -> TaskExecutionResult:  # noqa: D
         start_time = time.time()
@@ -130,20 +130,20 @@ class SelectSqlQueryToDataFrameTask(ExecutionPlanTask):
         df = sync_query(
             self._sql_client,
             self._sql_query,
-            bind_parameters=self.execution_parameters,
+            bind_parameters=self.bind_parameters,
             extra_sql_tags=self._extra_sql_tags,
         )
 
         end_time = time.time()
         return TaskExecutionResult(
-            start_time=start_time, end_time=end_time, sql=self._sql_query, bind_params=self.execution_parameters, df=df
+            start_time=start_time, end_time=end_time, sql=self._sql_query, bind_params=self.bind_parameters, df=df
         )
 
     @property
     def sql_query(self) -> Optional[SqlQuery]:  # noqa: D
         return SqlQuery(
             sql_query=self._sql_query,
-            bind_parameters=self._execution_parameters,
+            bind_parameters=self._bind_parameters,
         )
 
     def __repr__(self) -> str:  # noqa: D
@@ -157,7 +157,7 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
         self,
         sql_client: AsyncSqlClient,
         sql_query: str,
-        execution_parameters: SqlBindParameters,
+        bind_parameters: SqlBindParameters,
         output_table: SqlTable,
         extra_sql_tags: SqlJsonTag = SqlJsonTag(),
         parent_nodes: Optional[List[ExecutionPlanTask]] = None,
@@ -165,7 +165,7 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
         self._sql_client = sql_client
         self._sql_query = sql_query
         self._output_table = output_table
-        self._execution_parameters = execution_parameters
+        self._bind_parameters = bind_parameters
         self._extra_sql_tags = extra_sql_tags
         super().__init__(task_id=self.create_unique_id(), parent_nodes=parent_nodes or [])
 
@@ -182,7 +182,7 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
         return super().displayed_properties + [
             DisplayedProperty(key="sql_query", value=self._sql_query),
             DisplayedProperty(key="output_table", value=self._output_table),
-            DisplayedProperty(key="execution_parameters", value=self._execution_parameters),
+            DisplayedProperty(key="bind_parameters", value=self._bind_parameters),
         ]
 
     def execute(self) -> TaskExecutionResult:  # noqa: D
@@ -217,7 +217,7 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
 
         return SqlQuery(
             sql_query=query_text,
-            bind_parameters=self._execution_parameters,
+            bind_parameters=self._bind_parameters,
         )
 
     def __repr__(self) -> str:  # noqa: D

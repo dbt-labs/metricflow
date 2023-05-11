@@ -73,14 +73,14 @@ class DataflowToExecutionPlanConverter(Generic[SqlDataSetT], SinkNodeVisitor[Sql
             leaf_task = SelectSqlQueryToDataFrameTask(
                 sql_client=self._sql_client,
                 sql_query=render_result.sql,
-                execution_parameters=render_result.execution_parameters,
+                bind_parameters=render_result.bind_parameters,
                 extra_sql_tags=self._sql_tags,
             )
         else:
             leaf_task = SelectSqlQueryToTableTask(
                 sql_client=self._sql_client,
                 sql_query=render_result.sql,
-                execution_parameters=render_result.execution_parameters,
+                bind_parameters=render_result.bind_parameters,
                 output_table=output_table,
                 extra_sql_tags=self._sql_tags,
             )

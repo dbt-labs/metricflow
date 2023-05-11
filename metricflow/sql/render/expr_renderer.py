@@ -43,7 +43,7 @@ class SqlExpressionRenderResult:
     """The result of rendering an SQL expression tree to a string."""
 
     sql: str
-    execution_parameters: SqlBindParameters
+    bind_parameters: SqlBindParameters
 
 
 class SqlExpressionRenderer(SqlExpressionNodeVisitor[SqlExpressionRenderResult], ABC):
@@ -75,7 +75,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
 
     def visit_string_expr(self, node: SqlStringExpression) -> SqlExpressionRenderResult:  # noqa: D
         """Renders an arbitrary string expression like 1+1=2"""
-        return SqlExpressionRenderResult(sql=node.sql_expr, execution_parameters=node.execution_parameters)
+        return SqlExpressionRenderResult(sql=node.sql_expr, bind_parameters=node.bind_parameters)
 
     def visit_column_reference_expr(self, node: SqlColumnReferenceExpression) -> SqlExpressionRenderResult:  # noqa: D
         """Render a reference to a column in a table like my_table.my_col"""
@@ -85,7 +85,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
                 if node.should_render_table_alias
                 else node.col_ref.column_name
             ),
-            execution_parameters=SqlBindParameters(),
+            bind_parameters=SqlBindParameters(),
         )
 
     def visit_column_alias_reference_expr(  # noqa: D
@@ -94,7 +94,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         """Render a reference to a column without a known table alias. e.g. foo.bar vs bar."""
         return SqlExpressionRenderResult(
             sql=node.column_alias,
-            execution_parameters=SqlBindParameters(),
+            bind_parameters=SqlBindParameters(),
         )
 
     def visit_comparison_expr(self, node: SqlComparisonExpression) -> SqlExpressionRenderResult:
@@ -102,10 +102,10 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         combined_params = SqlBindParameters()
 
         left_expr_rendered = self.render_sql_expr(node.left_expr)
-        combined_params = combined_params.combine(left_expr_rendered.execution_parameters)
+        combined_params = combined_params.combine(left_expr_rendered.bind_parameters)
 
         right_expr_rendered = self.render_sql_expr(node.right_expr)
-        combined_params = combined_params.combine(right_expr_rendered.execution_parameters)
+        combined_params = combined_params.combine(right_expr_rendered.bind_parameters)
 
         # To avoid issues with operator precedence, use parenthesis to group the left / right expressions if they
         # contain operators.
@@ -116,7 +116,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
                 + f" {node.comparison.value} "
                 + (f"({right_expr_rendered.sql})" if node.right_expr.requires_parenthesis else right_expr_rendered.sql)
             ),
-            execution_parameters=combined_params,
+            bind_parameters=combined_params,
         )
 
     def visit_function_expr(self, node: SqlAggregateFunctionExpression) -> SqlExpressionRenderResult:  # noqa: D
@@ -124,14 +124,14 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         args_rendered = [self.render_sql_expr(x) for x in node.sql_function_args]
         combined_params = SqlBindParameters()
         for arg_rendered in args_rendered:
-            combined_params = combined_params.combine(arg_rendered.execution_parameters)
+            combined_params = combined_params.combine(arg_rendered.bind_parameters)
 
         distinct_prefix = "DISTINCT " if SqlFunction.is_distinct_aggregation(node.sql_function) else ""
         args_string = ", ".join([x.sql for x in args_rendered])
 
         return SqlExpressionRenderResult(
             sql=f"{node.sql_function.value}({distinct_prefix}{args_string})",
-            execution_parameters=combined_params,
+            bind_parameters=combined_params,
         )
 
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
@@ -143,13 +143,13 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
     def visit_null_expr(self, node: SqlNullExpression) -> SqlExpressionRenderResult:  # noqa: D
         return SqlExpressionRenderResult(
             sql="NULL",
-            execution_parameters=SqlBindParameters(),
+            bind_parameters=SqlBindParameters(),
         )
 
     def visit_string_literal_expr(self, node: SqlStringLiteralExpression) -> SqlExpressionRenderResult:  # noqa: D
         return SqlExpressionRenderResult(
             sql=f"'{node.literal_value}'",
-            execution_parameters=SqlBindParameters(),
+            bind_parameters=SqlBindParameters(),
         )
 
     def visit_logical_expr(self, node: SqlLogicalExpression) -> SqlExpressionRenderResult:  # noqa: D
@@ -161,7 +161,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         can_be_rendered_in_one_line = sum(len(x.expr.sql) for x in args_rendered) < 60
 
         for arg_rendered in args_rendered:
-            combined_parameters.combine(arg_rendered.expr.execution_parameters)
+            combined_parameters.combine(arg_rendered.expr.bind_parameters)
             arg_sql = self._render_logical_arg(
                 arg_rendered.expr, arg_rendered.requires_parenthesis, render_in_one_line=can_be_rendered_in_one_line
             )
@@ -171,7 +171,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
 
         return SqlExpressionRenderResult(
             sql=sql,
-            execution_parameters=combined_parameters,
+            bind_parameters=combined_parameters,
         )
 
     @staticmethod
@@ -218,14 +218,14 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
 
         return SqlExpressionRenderResult(
             sql=f"{arg_rendered.sql} IS NULL" if not node.arg.requires_parenthesis else f"({arg_rendered.sql}) IS NULL",
-            execution_parameters=arg_rendered.execution_parameters,
+            bind_parameters=arg_rendered.bind_parameters,
         )
 
     def visit_cast_to_timestamp_expr(self, node: SqlCastToTimestampExpression) -> SqlExpressionRenderResult:  # noqa: D
         arg_rendered = self.render_sql_expr(node.arg)
         return SqlExpressionRenderResult(
             sql=f"CAST({arg_rendered.sql} AS TIMESTAMP)",
-            execution_parameters=arg_rendered.execution_parameters,
+            bind_parameters=arg_rendered.bind_parameters,
         )
 
     def visit_date_trunc_expr(self, node: SqlDateTruncExpression) -> SqlExpressionRenderResult:  # noqa: D
@@ -233,7 +233,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
 
         return SqlExpressionRenderResult(
             sql=f"DATE_TRUNC('{node.time_granularity.value}', {arg_rendered.sql})",
-            execution_parameters=arg_rendered.execution_parameters,
+            bind_parameters=arg_rendered.bind_parameters,
         )
 
     def visit_time_delta_expr(self, node: SqlTimeDeltaExpression) -> SqlExpressionRenderResult:  # noqa: D
@@ -241,7 +241,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         if node.grain_to_date:
             return SqlExpressionRenderResult(
                 sql=f"DATE_TRUNC('{node.granularity.value}', {arg_rendered.sql}::timestamp)",
-                execution_parameters=arg_rendered.execution_parameters,
+                bind_parameters=arg_rendered.bind_parameters,
             )
 
         count = node.count
@@ -251,7 +251,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
             count *= 3
         return SqlExpressionRenderResult(
             sql=f"DATEADD({granularity.value}, -{count}, {arg_rendered.sql})",
-            execution_parameters=arg_rendered.execution_parameters,
+            bind_parameters=arg_rendered.bind_parameters,
         )
 
     def visit_ratio_computation_expr(self, node: SqlRatioComputationExpression) -> SqlExpressionRenderResult:
@@ -266,13 +266,13 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         numerator_sql = f"CAST({rendered_numerator.sql} AS {self.double_data_type})"
         denominator_sql = f"CAST(NULLIF({rendered_denominator.sql}, 0) AS {self.double_data_type})"
 
-        execution_parameters = SqlBindParameters()
-        execution_parameters = execution_parameters.combine(rendered_numerator.execution_parameters)
-        execution_parameters = execution_parameters.combine(rendered_denominator.execution_parameters)
+        bind_parameters = SqlBindParameters()
+        bind_parameters = bind_parameters.combine(rendered_numerator.bind_parameters)
+        bind_parameters = bind_parameters.combine(rendered_denominator.bind_parameters)
 
         return SqlExpressionRenderResult(
             sql=f"{numerator_sql} / {denominator_sql}",
-            execution_parameters=execution_parameters,
+            bind_parameters=bind_parameters,
         )
 
     def visit_between_expr(self, node: SqlBetweenExpression) -> SqlExpressionRenderResult:  # noqa: D
@@ -281,13 +281,13 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         rendered_end_expr = self.render_sql_expr(node.end_expr)
 
         bind_parameters = SqlBindParameters()
-        bind_parameters = bind_parameters.combine(rendered_column_arg.execution_parameters)
-        bind_parameters = bind_parameters.combine(rendered_start_expr.execution_parameters)
-        bind_parameters = bind_parameters.combine(rendered_end_expr.execution_parameters)
+        bind_parameters = bind_parameters.combine(rendered_column_arg.bind_parameters)
+        bind_parameters = bind_parameters.combine(rendered_start_expr.bind_parameters)
+        bind_parameters = bind_parameters.combine(rendered_end_expr.bind_parameters)
 
         return SqlExpressionRenderResult(
             sql=f"{rendered_column_arg.sql} BETWEEN {rendered_start_expr.sql} AND {rendered_end_expr.sql}",
-            execution_parameters=bind_parameters,
+            bind_parameters=bind_parameters,
         )
 
     def visit_window_function_expr(self, node: SqlWindowFunctionExpression) -> SqlExpressionRenderResult:  # noqa: D
@@ -304,7 +304,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         if order_by_args_rendered:
             args_rendered.extend(list(order_by_args_rendered.keys()))
         for arg_rendered in args_rendered:
-            combined_params = combined_params.combine(arg_rendered.execution_parameters)
+            combined_params = combined_params.combine(arg_rendered.bind_parameters)
 
         sql_function_args_string = ", ".join([x.sql for x in sql_function_args_rendered])
         partition_by_args_string = (
@@ -329,11 +329,11 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         window_string = " ".join(filter(bool, [partition_by_args_string, order_by_args_string]))
         return SqlExpressionRenderResult(
             sql=f"{node.sql_function.value}({sql_function_args_string}) OVER ({window_string})",
-            execution_parameters=combined_params,
+            bind_parameters=combined_params,
         )
 
     def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> SqlExpressionRenderResult:  # noqa: D
         return SqlExpressionRenderResult(
             sql="UUID()",
-            execution_parameters=SqlBindParameters(),
+            bind_parameters=SqlBindParameters(),
         )

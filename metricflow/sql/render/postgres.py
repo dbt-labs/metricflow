@@ -28,7 +28,7 @@ class PostgresSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         if node.grain_to_date:
             return SqlExpressionRenderResult(
                 sql=f"DATE_TRUNC('{node.granularity.value}', {arg_rendered.sql}::timestamp)",
-                execution_parameters=arg_rendered.execution_parameters,
+                bind_parameters=arg_rendered.bind_parameters,
             )
 
         count = node.count
@@ -38,19 +38,19 @@ class PostgresSqlExpressionRenderer(DefaultSqlExpressionRenderer):
             count *= 3
         return SqlExpressionRenderResult(
             sql=f"{arg_rendered.sql} - MAKE_INTERVAL({granularity.value}s => {count})",
-            execution_parameters=arg_rendered.execution_parameters,
+            bind_parameters=arg_rendered.bind_parameters,
         )
 
     def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> SqlExpressionRenderResult:  # noqa: D
         return SqlExpressionRenderResult(
             sql="GEN_RANDOM_UUID()",
-            execution_parameters=SqlBindParameters(),
+            bind_parameters=SqlBindParameters(),
         )
 
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
         """Render a percentile expression for Postgres."""
         arg_rendered = self.render_sql_expr(node.order_by_arg)
-        params = arg_rendered.execution_parameters
+        params = arg_rendered.bind_parameters
         percentile = node.percentile_args.percentile
 
         if node.percentile_args.function_type is SqlPercentileFunctionType.CONTINUOUS:
@@ -72,7 +72,7 @@ class PostgresSqlExpressionRenderer(DefaultSqlExpressionRenderer):
 
         return SqlExpressionRenderResult(
             sql=f"{function_str}({percentile}) WITHIN GROUP (ORDER BY ({arg_rendered.sql}))",
-            execution_parameters=params,
+            bind_parameters=params,
         )
 
 
