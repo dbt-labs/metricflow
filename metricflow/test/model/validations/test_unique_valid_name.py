@@ -1,16 +1,12 @@
 import more_itertools
 import pytest
-import copy
 
+from copy import deepcopy
 from dbt_semantic_interfaces.model_validator import ModelValidator
 from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationException
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords, UniqueAndValidNameRule
 from dbt_semantic_interfaces.test_utils import find_semantic_model_with
-
-
-def copied_model(simple_model__with_primary_transforms: SemanticManifest) -> SemanticManifest:  # noqa: D
-    return copy.deepcopy(simple_model__with_primary_transforms)
 
 
 """
@@ -28,7 +24,7 @@ def copied_model(simple_model__with_primary_transforms: SemanticManifest) -> Sem
 
 
 def test_duplicate_semantic_model_name(simple_model__with_primary_transforms: SemanticManifest) -> None:  # noqa: D
-    model = copied_model(simple_model__with_primary_transforms)
+    model = deepcopy(simple_model__with_primary_transforms)
     duplicated_semantic_model = model.semantic_models[0]
     model.semantic_models.append(duplicated_semantic_model)
     with pytest.raises(
@@ -39,7 +35,7 @@ def test_duplicate_semantic_model_name(simple_model__with_primary_transforms: Se
 
 
 def test_duplicate_metric_name(simple_model__with_primary_transforms: SemanticManifest) -> None:  # noqa:D
-    model = copied_model(simple_model__with_primary_transforms)
+    model = deepcopy(simple_model__with_primary_transforms)
     duplicated_metric = model.metrics[0]
     model.metrics.append(duplicated_metric)
     with pytest.raises(
@@ -54,7 +50,7 @@ def test_top_level_metric_can_have_same_name_as_any_other_top_level_item(
 ) -> None:  # noqa:D
     metric_name = simple_model__with_primary_transforms.metrics[0].name
 
-    model_semantic_model = copied_model(simple_model__with_primary_transforms)
+    model_semantic_model = deepcopy(simple_model__with_primary_transforms)
 
     model_semantic_model.semantic_models[0].name = metric_name
 
@@ -74,7 +70,7 @@ def test_top_level_metric_can_have_same_name_as_any_other_top_level_item(
 
 
 def test_duplicate_measure_name(simple_model__with_primary_transforms: SemanticManifest) -> None:  # noqa:D
-    model = copied_model(simple_model__with_primary_transforms)
+    model = deepcopy(simple_model__with_primary_transforms)
 
     # Ensure we have a usable semantic model for the test
     semantic_model_with_measures, _ = find_semantic_model_with(
@@ -93,7 +89,7 @@ def test_duplicate_measure_name(simple_model__with_primary_transforms: SemanticM
 
 
 def test_duplicate_dimension_name(simple_model__with_primary_transforms: SemanticManifest) -> None:  # noqa:D
-    model = copied_model(simple_model__with_primary_transforms)
+    model = deepcopy(simple_model__with_primary_transforms)
 
     # Ensure we have a usable semantic model for the test
     semantic_model_with_dimensions, _ = find_semantic_model_with(
@@ -113,7 +109,7 @@ def test_duplicate_dimension_name(simple_model__with_primary_transforms: Semanti
 
 
 def test_duplicate_entity_name(simple_model__with_primary_transforms: SemanticManifest) -> None:  # noqa:D
-    model = copied_model(simple_model__with_primary_transforms)
+    model = deepcopy(simple_model__with_primary_transforms)
 
     # Ensure we have a usable semantic model for the test
     semantic_model_with_entities, _ = find_semantic_model_with(
