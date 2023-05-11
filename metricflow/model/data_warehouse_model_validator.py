@@ -24,7 +24,7 @@ from dbt_semantic_interfaces.references import (
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
 from dbt_semantic_interfaces.objects.metric import Metric
-from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.model.validations.validator_helpers import (
     SemanticModelContext,
@@ -62,7 +62,7 @@ class QueryRenderingTools:
     plan_converter: DataflowToSqlQueryPlanConverter
 
     def __init__(self, model: SemanticManifest, system_schema: str) -> None:  # noqa: D
-        self.semantic_manifest_lookup = SemanticManifestLookup(user_configured_model=model)
+        self.semantic_manifest_lookup = SemanticManifestLookup(semantic_manifest=model)
         self.source_node_builder = SourceNodeBuilder(semantic_manifest_lookup=self.semantic_manifest_lookup)
         self.time_spine_source = TimeSpineSource(schema_name=system_schema)
         self.converter = SemanticModelToDataSetConverter(
@@ -459,7 +459,7 @@ class DataWarehouseTaskBuilder:
     ) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the metrics of the model"""
         mf_engine = MetricFlowEngine(
-            semantic_manifest_lookup=SemanticManifestLookup(user_configured_model=model),
+            semantic_manifest_lookup=SemanticManifestLookup(semantic_manifest=model),
             sql_client=sql_client,
             system_schema=system_schema,
         )

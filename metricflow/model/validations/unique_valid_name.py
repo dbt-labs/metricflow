@@ -5,7 +5,7 @@ import re
 from typing import Dict, Tuple, List, Optional
 
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
-from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import (
     SemanticModelElementReference,
     SemanticModelReference,

@@ -7,7 +7,7 @@ from typing import Callable, Tuple
 
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.metric import Metric
-from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from metricflow.protocols.sql_client import SqlClient
 
 logger = logging.getLogger(__name__)

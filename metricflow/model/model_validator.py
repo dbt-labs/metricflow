@@ -3,7 +3,7 @@ import copy
 import logging
 from typing import List, Sequence
 
-from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from metricflow.model.validations.agg_time_dimension import AggregationTimeDimensionRule
 from metricflow.model.validations.semantic_models import (
     SemanticModelTimeDimensionWarningsRule,

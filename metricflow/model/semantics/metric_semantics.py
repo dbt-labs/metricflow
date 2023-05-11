@@ -2,7 +2,7 @@ import logging
 from typing import Dict, List, FrozenSet, Sequence
 
 from dbt_semantic_interfaces.objects.metric import Metric, MetricType
-from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import MetricReference
 from metricflow.errors.errors import MetricNotFoundError, DuplicateMetricError, NonExistentMeasureError
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
@@ -24,17 +24,17 @@ logger = logging.getLogger(__name__)
 
 class MetricSemantics(MetricSemanticsAccessor):  # noqa: D
     def __init__(  # noqa: D
-        self, user_configured_model: SemanticManifest, semantic_model_semantics: SemanticModelSemantics
+        self, semantic_manifest: SemanticManifest, semantic_model_semantics: SemanticModelSemantics
     ) -> None:
-        self._user_configured_model = user_configured_model
+        self._semantic_manifest = semantic_manifest
         self._metrics: Dict[MetricReference, Metric] = {}
         self._semantic_model_semantics = semantic_model_semantics
 
-        for metric in self._user_configured_model.metrics:
+        for metric in self._semantic_manifest.metrics:
             self.add_metric(metric)
 
         self._linkable_spec_resolver = ValidLinkableSpecResolver(
-            user_configured_model=self._user_configured_model,
+            semantic_manifest=self._semantic_manifest,
             semantic_model_semantics=semantic_model_semantics,
             max_entity_links=MAX_JOIN_HOPS,
         )

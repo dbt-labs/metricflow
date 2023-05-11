@@ -20,7 +20,7 @@ def simple_model_spec_resolver(  # noqa: D
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> ValidLinkableSpecResolver:
     return ValidLinkableSpecResolver(
-        user_configured_model=simple_semantic_manifest_lookup.user_configured_model,
+        semantic_manifest=simple_semantic_manifest_lookup.semantic_manifest,
         semantic_model_semantics=simple_semantic_manifest_lookup.semantic_model_semantics,
         max_entity_links=MAX_JOIN_HOPS,
     )
@@ -172,7 +172,7 @@ def test_joined_property(simple_model_spec_resolver: ValidLinkableSpecResolver) 
 
 def test_multi_hop_property(multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D
     multi_hop_spec_resolver = ValidLinkableSpecResolver(
-        user_configured_model=multi_hop_join_semantic_manifest_lookup.user_configured_model,
+        semantic_manifest=multi_hop_join_semantic_manifest_lookup.semantic_manifest,
         semantic_model_semantics=multi_hop_join_semantic_manifest_lookup.semantic_model_semantics,
         max_entity_links=MAX_JOIN_HOPS,
     )

@@ -35,7 +35,7 @@ from metricflow.model.dbt_mapping_rules.dbt_metric_to_measure import (
 )
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.metric import Metric
-from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.parsing.dir_to_model import ModelBuildResult
 from metricflow.model.validations.validator_helpers import ModelValidationResults, ValidationError, ValidationIssue
 

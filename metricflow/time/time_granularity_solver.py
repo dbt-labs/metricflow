@@ -12,7 +12,7 @@ from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputData
 from metricflow.dataflow.dataflow_plan import BaseOutput
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from dbt_semantic_interfaces.objects.metric import MetricType
-from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import (
     TimeDimensionReference,
     MetricModelReference,
@@ -75,7 +75,7 @@ class TimeGranularitySolver:
     ) -> None:
         self._semantic_manifest_lookup = semantic_manifest_lookup
         self._metric_reference_to_measure_reference = TimeGranularitySolver._measures_for_metric(
-            self._semantic_manifest_lookup.user_configured_model
+            self._semantic_manifest_lookup.semantic_manifest
         )
 
         self._local_time_dimension_granularities: Dict[

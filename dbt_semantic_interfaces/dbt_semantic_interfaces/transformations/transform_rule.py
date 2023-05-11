@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 
 
 class ModelTransformRule(ABC):

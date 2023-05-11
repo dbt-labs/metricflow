@@ -10,7 +10,7 @@ from typing import Tuple, Sequence, Dict, List, Optional, FrozenSet
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType, Dimension
 from dbt_semantic_interfaces.objects.elements.entity import EntityType
-from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import SemanticModelReference, MeasureReference, MetricReference
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
@@ -375,20 +375,20 @@ class ValidLinkableSpecResolver:
 
     def __init__(
         self,
-        user_configured_model: SemanticManifest,
+        semantic_manifest: SemanticManifest,
         semantic_model_semantics: SemanticModelSemanticsAccessor,
         max_entity_links: int,
     ) -> None:
         """Constructor.
 
         Args:
-            user_configured_model: the model to use.
+            semantic_manifest: the model to use.
             semantic_model_semantics: used to look up entities for a semantic model.
             max_entity_links: the maximum number of joins to do when computing valid elements.
         """
-        self._user_configured_model = user_configured_model
+        self._semantic_manifest = semantic_manifest
         # Sort semantic models by name for consistency in building derived objects.
-        self._semantic_models = sorted(self._user_configured_model.semantic_models, key=lambda x: x.name)
+        self._semantic_models = sorted(self._semantic_manifest.semantic_models, key=lambda x: x.name)
         self._join_evaluator = SemanticModelJoinEvaluator(semantic_model_semantics)
 
         assert max_entity_links >= 0
@@ -405,7 +405,7 @@ class ValidLinkableSpecResolver:
         self._metric_to_linkable_element_sets: Dict[str, List[LinkableElementSet]] = {}
 
         start_time = time.time()
-        for metric in self._user_configured_model.metrics:
+        for metric in self._semantic_manifest.metrics:
             linkable_sets_for_measure = []
             for measure in metric.measure_references:
                 linkable_sets_for_measure.append(self._get_linkable_element_set_for_measure(measure))

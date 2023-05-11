@@ -14,7 +14,7 @@ from pydantic import BaseModel, Extra
 from dbt_semantic_interfaces.objects.base import FrozenBaseModel
 from dbt_semantic_interfaces.objects.metadata import Metadata
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
-from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import (
     SemanticModelElementReference,
     SemanticModelReference,

@@ -28,7 +28,7 @@ from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConv
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.engine.models import Dimension, Metric
 from metricflow.engine.time_source import ServerTimeSource
-from metricflow.engine.utils import build_user_configured_model_from_config, build_user_configured_model_from_dbt_cloud
+from metricflow.engine.utils import build_semantic_manifest_from_config, build_semantic_manifest_from_dbt_cloud
 from metricflow.errors.errors import ExecutionException
 from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
 from metricflow.execution.execution_plan_to_text import execution_plan_to_text
@@ -247,25 +247,23 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             # import is at the top ofthe file MetricFlow will blow up if dbt
             # isn't installed. Thus by importing it here, we only run into the
             # exception if this conditional is hit without dbt installed
-            from metricflow.engine.utils import build_user_configured_model_from_dbt_config
+            from metricflow.engine.utils import build_semantic_manifest_from_dbt_config
 
             dbt_profile = handler.get_value(CONFIG_DBT_PROFILE)
             dbt_target = handler.get_value(CONFIG_DBT_TARGET)
 
             semantic_manifest_lookup = SemanticManifestLookup(
-                build_user_configured_model_from_dbt_config(handler=handler, profile=dbt_profile, target=dbt_target)
+                build_semantic_manifest_from_dbt_config(handler=handler, profile=dbt_profile, target=dbt_target)
             )
         elif dbt_cloud_job_id != "":
             dbt_cloud_service_token = handler.get_value(CONFIG_DBT_CLOUD_SERVICE_TOKEN) or ""
             assert dbt_cloud_service_token != "", "A dbt cloud service token is required for using MF with dbt cloud"
 
             semantic_manifest_lookup = SemanticManifestLookup(
-                build_user_configured_model_from_dbt_cloud(
-                    job_id=dbt_cloud_job_id, service_token=dbt_cloud_service_token
-                )
+                build_semantic_manifest_from_dbt_cloud(job_id=dbt_cloud_job_id, service_token=dbt_cloud_service_token)
             )
         else:
-            semantic_manifest_lookup = SemanticManifestLookup(build_user_configured_model_from_config(handler))
+            semantic_manifest_lookup = SemanticManifestLookup(build_semantic_manifest_from_config(handler))
         system_schema = not_empty(handler.get_value(CONFIG_DWH_SCHEMA), CONFIG_DWH_SCHEMA, handler.url)
         return MetricFlowEngine(
             semantic_manifest_lookup=semantic_manifest_lookup,
@@ -306,7 +304,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
         self._source_data_sets: List[SemanticModelDataSet] = []
         converter = SemanticModelToDataSetConverter(column_association_resolver=self._column_association_resolver)
-        for semantic_model in self._semantic_manifest_lookup.user_configured_model.semantic_models:
+        for semantic_model in self._semantic_manifest_lookup.semantic_manifest.semantic_models:
             data_set = converter.create_sql_source_data_set(semantic_model)
             self._source_data_sets.append(data_set)
             logger.info(f"Created source dataset from semantic model '{semantic_model.name}'")

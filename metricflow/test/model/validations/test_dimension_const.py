@@ -6,7 +6,7 @@ from dbt_semantic_interfaces.objects.semantic_model import SemanticModel, NodeRe
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.metric import MetricType, MetricTypeParams, Metric
-from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import DimensionReference, MeasureReference, TimeDimensionReference
 from metricflow.model.validations.semantic_models import SemanticModelTimeDimensionWarningsRule
 from metricflow.model.validations.dimension_const import DimensionConsistencyRule

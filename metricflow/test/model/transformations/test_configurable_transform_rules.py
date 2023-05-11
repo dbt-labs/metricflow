@@ -1,5 +1,5 @@
 from dbt_semantic_interfaces.model_transformer import ModelTransformer
-from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.transformations.transform_rule import ModelTransformRule
 
 

@@ -5,7 +5,7 @@ from typing import Tuple
 from metricflow.model.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
-from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from metricflow.model.validations.element_const import ElementConsistencyRule
 from metricflow.model.validations.validator_helpers import SemanticModelElementType, ModelValidationException
 from metricflow.test.test_utils import find_semantic_model_with

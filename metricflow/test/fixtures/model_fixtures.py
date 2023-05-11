@@ -10,7 +10,7 @@ import pytest
 
 from dbt_semantic_interfaces.model_transformer import ModelTransformer
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
-from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.parsing.dir_to_model import (
     parse_directory_of_yaml_files_to_model,
     parse_yaml_files_to_validation_ready_model,
@@ -58,7 +58,7 @@ def query_parser_from_yaml(
 ) -> MetricFlowQueryParser:
     """Given yaml files, return a query parser using default source nodes, resolvers and time spine source"""
     semantic_manifest_lookup = SemanticManifestLookup(parse_yaml_files_to_validation_ready_model(yaml_contents).model)
-    ModelValidator().checked_validations(semantic_manifest_lookup.user_configured_model)
+    ModelValidator().checked_validations(semantic_manifest_lookup.semantic_manifest)
     source_nodes = _data_set_to_source_nodes(semantic_manifest_lookup, create_data_sets(semantic_manifest_lookup))
     return MetricFlowQueryParser(
         model=semantic_manifest_lookup,
@@ -130,7 +130,7 @@ def create_data_sets(
     """
     # Use ordered dict and sort by name to get consistency when running tests.
     data_sets = OrderedDict()
-    semantic_models: List[SemanticModel] = multihop_semantic_manifest_lookup.user_configured_model.semantic_models
+    semantic_models: List[SemanticModel] = multihop_semantic_manifest_lookup.semantic_manifest.semantic_models
     semantic_models.sort(key=lambda x: x.name)
 
     converter = SemanticModelToDataSetConverter(
@@ -186,7 +186,7 @@ def unpartitioned_multi_hop_join_semantic_manifest_lookup(  # noqa: D
 
 
 @pytest.fixture(scope="session")
-def simple_user_configured_model(template_mapping: Dict[str, str]) -> SemanticManifest:
+def simple_semantic_manifest(template_mapping: Dict[str, str]) -> SemanticManifest:
     """Model used for many tests."""
 
     model_build_result = parse_directory_of_yaml_files_to_model(

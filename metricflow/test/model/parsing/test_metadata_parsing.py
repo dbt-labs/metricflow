@@ -7,35 +7,35 @@ import pytest
 
 from dbt_semantic_interfaces.objects.metadata import Metadata
 from dbt_semantic_interfaces.objects.elements.measure import Measure
-from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.parsing.yaml_loader import YamlConfigLoader
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 
 
-def test_semantic_model_metadata_parsing(simple_user_configured_model: SemanticManifest) -> None:
+def test_semantic_model_metadata_parsing(simple_semantic_manifest: SemanticManifest) -> None:
     """Tests internal metadata object parsing from a file into the Semantic Model model object
 
     This only tests some basic file name parsing for each semantic model since they are not guaranteed
     to be collected in the same file in the simple model, and the output here has been transformed
     so the YAML contents might or might not match.
     """
-    assert len(simple_user_configured_model.semantic_models) > 0
-    for semantic_model in simple_user_configured_model.semantic_models:
+    assert len(simple_semantic_manifest.semantic_models) > 0
+    for semantic_model in simple_semantic_manifest.semantic_models:
         assert (
             semantic_model.metadata is not None
         ), f"Metadata should always be parsed out of the model, but None found for semantic model: {semantic_model}!"
         _assert_metadata_filename_is_valid(semantic_model.metadata)
 
 
-def test_metric_metadata_parsing(simple_user_configured_model: SemanticManifest) -> None:
+def test_metric_metadata_parsing(simple_semantic_manifest: SemanticManifest) -> None:
     """Tests internal metadata object parsing from a file into the Metric model object
 
     This only tests some basic file name parsing for each metric since they are not guaranteed
     to be collected in the same file in the simple model, and the output here has been transformed
     so the YAML contents might or might not match.
     """
-    assert len(simple_user_configured_model.metrics) > 0
-    for metric in simple_user_configured_model.metrics:
+    assert len(simple_semantic_manifest.metrics) > 0
+    for metric in simple_semantic_manifest.metrics:
         assert (
             metric.metadata is not None
         ), f"Metadata should always be parsed out of the model, but None found for metric: {metric}!"
@@ -55,15 +55,15 @@ def test_metric_metadata_parsing_with_measure_proxy(
     to be collected in the same file in the simple model, and the output here has been transformed
     so the YAML contents might or might not match.
     """
-    assert len(multi_hop_join_semantic_manifest_lookup.user_configured_model.metrics) > 0
-    for metric in multi_hop_join_semantic_manifest_lookup.user_configured_model.metrics:
+    assert len(multi_hop_join_semantic_manifest_lookup.semantic_manifest.metrics) > 0
+    for metric in multi_hop_join_semantic_manifest_lookup.semantic_manifest.metrics:
         assert (
             metric.metadata is not None
         ), f"Metadata should always be parsed out of the model, but None found for metric: {metric}!"
         _assert_metadata_filename_is_valid(metric.metadata)
 
 
-def test_measure_metadata_parsing(simple_user_configured_model: SemanticManifest) -> None:
+def test_measure_metadata_parsing(simple_semantic_manifest: SemanticManifest) -> None:
     """Tests internal metadata object parsing from a file into the Measure model object
 
     This tests the complete parsing process for Measure object metadata, including some baseline testing of things
@@ -71,8 +71,8 @@ def test_measure_metadata_parsing(simple_user_configured_model: SemanticManifest
     YAML contents themselves since they may change from the raw files into the SemanticManifest object we access
     here.
     """
-    assert len(simple_user_configured_model.semantic_models) > 0
-    for semantic_model in simple_user_configured_model.semantic_models:
+    assert len(simple_semantic_manifest.semantic_models) > 0
+    for semantic_model in simple_semantic_manifest.semantic_models:
         _assert_measure_metadata_is_valid(semantic_model.measures)
 
 

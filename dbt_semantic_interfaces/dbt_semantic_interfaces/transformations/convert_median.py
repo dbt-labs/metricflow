@@ -1,7 +1,7 @@
 from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
 from dbt_semantic_interfaces.errors import ModelTransformError
 from dbt_semantic_interfaces.objects.elements.measure import MeasureAggregationParameters
-from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.transformations.transform_rule import ModelTransformRule
 
 MEDIAN_PERCENTILE = 0.5

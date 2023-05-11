@@ -18,6 +18,6 @@ def mf_client(
     """Fixture for MetricFlowClient."""
     return MetricFlowClient(
         sql_client=async_sql_client,
-        user_configured_model=simple_semantic_manifest_lookup.user_configured_model,
+        semantic_manifest=simple_semantic_manifest_lookup.semantic_manifest,
         system_schema=mf_test_session_state.mf_system_schema,
     )

@@ -2,15 +2,15 @@ import pytest
 
 from metricflow.model.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
-from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from metricflow.model.validations.agg_time_dimension import AggregationTimeDimensionRule
 from metricflow.model.validations.validator_helpers import ModelValidationException
 from metricflow.test.model.validations.test_unique_valid_name import copied_model
 from metricflow.test.test_utils import find_semantic_model_with
 
 
-def test_invalid_aggregation_time_dimension(simple_user_configured_model: SemanticManifest) -> None:  # noqa:D
-    model = copied_model(simple_user_configured_model)
+def test_invalid_aggregation_time_dimension(simple_semantic_manifest: SemanticManifest) -> None:  # noqa:D
+    model = copied_model(simple_semantic_manifest)
     semantic_model_with_measures, _ = find_semantic_model_with(
         model,
         lambda semantic_model: len(semantic_model.measures) > 0,

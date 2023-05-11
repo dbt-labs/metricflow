@@ -17,7 +17,7 @@ from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
 from dbt_semantic_interfaces.objects.metric import Metric, MetricInputMeasure, MetricType, MetricTypeParams
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
-from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.parsing.dir_to_model import ModelBuildResult
 from metricflow.model.validations.validator_helpers import ModelValidationResults, ValidationError, ValidationIssue
 
@@ -362,7 +362,7 @@ class DbtManifestTransformer:
 
         return time_dimensions
 
-    def build_user_configured_model(self) -> ModelBuildResult:
+    def build_semantic_manifest(self) -> ModelBuildResult:
         """Builds a SemanticManifest from the manifest of the instance
 
         Note:

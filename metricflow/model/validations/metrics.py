@@ -3,7 +3,7 @@ from typing import List
 
 from dbt_semantic_interfaces.errors import ParsingException
 from dbt_semantic_interfaces.objects.metric import Metric, MetricType, MetricTimeWindow
-from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import MetricModelReference
 from metricflow.model.validations.unique_valid_name import UniqueAndValidNameRule
 from metricflow.model.validations.validator_helpers import (

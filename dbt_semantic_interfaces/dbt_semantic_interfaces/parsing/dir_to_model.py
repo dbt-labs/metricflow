@@ -17,7 +17,7 @@ from dbt_semantic_interfaces.parsing.schemas import (
     metric_validator,
     semantic_model_validator,
 )
-from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.parsing.yaml_loader import (
     ParsingContext,
     YamlConfigLoader,

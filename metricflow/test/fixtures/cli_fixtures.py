@@ -8,7 +8,7 @@ from click.testing import CliRunner, Result
 
 from metricflow.cli.cli_context import CLIContext
 from metricflow.engine.metricflow_engine import MetricFlowEngine
-from dbt_semantic_interfaces.objects.user_configured_model import SemanticManifest
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
@@ -21,12 +21,12 @@ from metricflow.test.time.configurable_time_source import ConfigurableTimeSource
 @pytest.fixture
 def cli_context(  # noqa: D
     async_sql_client: AsyncSqlClient,
-    simple_user_configured_model: SemanticManifest,
+    simple_semantic_manifest: SemanticManifest,
     time_spine_source: TimeSpineSource,
     mf_test_session_state: MetricFlowTestSessionState,
     create_source_tables: bool,
 ) -> CLIContext:
-    semantic_manifest_lookup = SemanticManifestLookup(simple_user_configured_model)
+    semantic_manifest_lookup = SemanticManifestLookup(simple_semantic_manifest)
     mf_engine = MetricFlowEngine(
         semantic_manifest_lookup=semantic_manifest_lookup,
         sql_client=async_sql_client,
@@ -38,7 +38,7 @@ def cli_context(  # noqa: D
     context = CLIContext()
     context._mf = mf_engine
     context._sql_client = async_sql_client
-    context._user_configured_model = simple_user_configured_model
+    context._semantic_manifest = simple_semantic_manifest
     context._semantic_manifest_lookup = semantic_manifest_lookup
     context._mf_system_schema = mf_test_session_state.mf_system_schema
     return context
