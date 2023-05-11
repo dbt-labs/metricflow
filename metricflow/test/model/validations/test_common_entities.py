@@ -5,14 +5,14 @@ from typing import Callable
 
 from metricflow.model.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from metricflow.model.validations.common_entities import CommonEntitysRule
 from metricflow.specs import EntitySpec
 from metricflow.test.test_utils import find_semantic_model_with
 
 
 @pytest.mark.skip("TODO: re-enforce after validations improvements")
-def test_lonely_entity_raises_issue(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa: D
+def test_lonely_entity_raises_issue(simple_model__with_primary_transforms: SemanticManifest) -> None:  # noqa: D
     model = copy.deepcopy(simple_model__with_primary_transforms)
     lonely_entity_name = "hi_im_lonely"
 

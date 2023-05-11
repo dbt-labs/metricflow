@@ -6,7 +6,7 @@ from dbt_semantic_interfaces.objects.semantic_model import SemanticModel, NodeRe
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.metric import MetricType, MetricTypeParams, Metric
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import DimensionReference, MeasureReference, TimeDimensionReference
 from metricflow.model.validations.semantic_models import SemanticModelTimeDimensionWarningsRule
 from metricflow.model.validations.dimension_const import DimensionConsistencyRule
@@ -21,7 +21,7 @@ def test_incompatible_dimension_type() -> None:  # noqa:D
         measure_name = "measure"
         model_validator = ModelValidator([DimensionConsistencyRule()])
         model_validator.checked_validations(
-            UserConfiguredModel(
+            SemanticManifest(
                 semantic_models=[
                     semantic_model_with_guaranteed_meta(
                         name="dim1",
@@ -59,7 +59,7 @@ def test_incompatible_dimension_is_partition() -> None:  # noqa:D
         measure_name = "measure"
         model_validator = ModelValidator([DimensionConsistencyRule()])
         model_validator.checked_validations(
-            UserConfiguredModel(
+            SemanticManifest(
                 semantic_models=[
                     semantic_model_with_guaranteed_meta(
                         name="dim1",
@@ -108,7 +108,7 @@ def test_multiple_primary_time_dimensions() -> None:  # noqa:D
         measure_reference = MeasureReference(element_name="measure")
         model_validator = ModelValidator([SemanticModelTimeDimensionWarningsRule()])
         model_validator.checked_validations(
-            model=UserConfiguredModel(
+            model=SemanticManifest(
                 semantic_models=[
                     SemanticModel(
                         name="dim1",

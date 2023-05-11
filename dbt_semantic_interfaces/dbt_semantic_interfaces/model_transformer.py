@@ -3,7 +3,7 @@ import logging
 
 from typing import Sequence, Tuple
 
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.transformations.add_input_metric_measures import (
     AddInputMetricMeasuresRule,
 )
@@ -50,9 +50,9 @@ class ModelTransformer:
 
     @staticmethod
     def transform(
-        model: UserConfiguredModel,
+        model: SemanticManifest,
         ordered_rule_sequences: Tuple[Sequence[ModelTransformRule], ...] = DEFAULT_RULES,
-    ) -> UserConfiguredModel:
+    ) -> SemanticManifest:
         """Copies the passed in model, applies the rules to the new model, and then returns that model
 
         It's important to note that some rules need to happen before or after other rules. Thus rules
@@ -70,8 +70,8 @@ class ModelTransformer:
 
     @staticmethod
     def pre_validation_transform_model(
-        model: UserConfiguredModel, rules: Sequence[ModelTransformRule] = PRIMARY_RULES
-    ) -> UserConfiguredModel:
+        model: SemanticManifest, rules: Sequence[ModelTransformRule] = PRIMARY_RULES
+    ) -> SemanticManifest:
         """Transform a model according to configured rules before validations are run."""
         logger.warning(
             "DEPRECATION: `ModelTransformer.pre_validation_transform_model` is deprecated. Please use `ModelTransformer.transform` instead."
@@ -81,9 +81,9 @@ class ModelTransformer:
 
     @staticmethod
     def post_validation_transform_model(
-        model: UserConfiguredModel,
+        model: SemanticManifest,
         rules: Sequence[ModelTransformRule] = SECONDARY_RULES,
-    ) -> UserConfiguredModel:
+    ) -> SemanticManifest:
         """Transform a model according to configured rules after validations are run."""
         logger.warning(
             "DEPRECATION: `ModelTransformer.post_validation_transform_model` is deprecated. Please use `ModelTransformer.transform` instead."

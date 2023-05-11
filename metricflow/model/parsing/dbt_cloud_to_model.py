@@ -40,7 +40,7 @@ def get_dbt_cloud_metrics(auth: str, job_id: str) -> List[MetricNode]:
 
 
 def parse_dbt_cloud_metrics_to_model(dbt_metrics: List[MetricNode]) -> ModelBuildResult:
-    """Builds a UserConfiguredModel from a list of dbt cloud MetricNodes"""
+    """Builds a SemanticManifest from a list of dbt cloud MetricNodes"""
     build_result = DbtConverter().convert(dbt_metrics=tuple(dbt_metrics))
     transformed_model = ModelTransformer.transform(model=build_result.model)
     return ModelBuildResult(model=transformed_model, issues=build_result.issues)

@@ -1,6 +1,6 @@
 from typing import List
 
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from metricflow.model.validations.validator_helpers import (
     ModelValidationRule,
     ValidationError,
@@ -14,7 +14,7 @@ class NonEmptyRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking that the model has semantic models")
-    def _check_model_has_semantic_models(model: UserConfiguredModel) -> List[ValidationIssue]:
+    def _check_model_has_semantic_models(model: SemanticManifest) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
         if not model.semantic_models:
             issues.append(
@@ -26,7 +26,7 @@ class NonEmptyRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking that the model has metrics")
-    def _check_model_has_metrics(model: UserConfiguredModel) -> List[ValidationIssue]:
+    def _check_model_has_metrics(model: SemanticManifest) -> List[ValidationIssue]:
         issues: List[ValidationIssue] = []
 
         # If we are going to generate measure proxy metrics that is sufficient as well
@@ -47,7 +47,7 @@ class NonEmptyRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely("running model validation rule ensuring metrics and semantic models are defined")
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
+    def validate_model(model: SemanticManifest) -> List[ValidationIssue]:  # noqa: D
         issues: List[ValidationIssue] = []
         issues += NonEmptyRule._check_model_has_semantic_models(model=model)
         issues += NonEmptyRule._check_model_has_metrics(model=model)

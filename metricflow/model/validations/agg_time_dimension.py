@@ -2,7 +2,7 @@ from typing import List
 
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import SemanticModelElementReference, TimeDimensionReference
 from metricflow.model.validations.validator_helpers import (
     SemanticModelElementContext,
@@ -20,7 +20,7 @@ class AggregationTimeDimensionRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking aggregation time dimension for semantic models in the model")
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
+    def validate_model(model: SemanticManifest) -> List[ValidationIssue]:  # noqa: D
         issues: List[ValidationIssue] = []
         for semantic_model in model.semantic_models:
             issues.extend(AggregationTimeDimensionRule._validate_semantic_model(semantic_model))

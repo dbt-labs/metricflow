@@ -37,8 +37,8 @@ def get_dbt_project_manifest(
 def parse_dbt_project_to_model(
     directory: str, profile: Optional[str] = None, target: Optional[str] = None
 ) -> ModelBuildResult:
-    """Parse dbt model files in the given directory to a UserConfiguredModel."""
+    """Parse dbt model files in the given directory to a SemanticManifest."""
     manifest = get_dbt_project_manifest(directory=directory, profile=profile, target=target)
-    build_result = DbtManifestTransformer(manifest=manifest).build_user_configured_model()
+    build_result = DbtManifestTransformer(manifest=manifest).build_semantic_manifest()
     transformed_model = ModelTransformer.transform(model=build_result.model)
     return ModelBuildResult(model=transformed_model, issues=build_result.issues)

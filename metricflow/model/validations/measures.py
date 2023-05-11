@@ -6,7 +6,7 @@ from more_itertools import bucket
 from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.metric import Metric
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import MetricModelReference, MeasureReference
 from metricflow.model.validations.unique_valid_name import UniqueAndValidNameRule
 from metricflow.model.validations.validator_helpers import (
@@ -30,7 +30,7 @@ class SemanticModelMeasuresUniqueRule(ModelValidationRule):
     @validate_safely(
         whats_being_done="running model validation ensuring measures exist in only one configured semantic model"
     )
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
+    def validate_model(model: SemanticManifest) -> List[ValidationIssue]:  # noqa: D
         issues: List[ValidationIssue] = []
 
         measure_references_to_semantic_models: Dict[MeasureReference, List] = defaultdict(list)
@@ -123,7 +123,7 @@ class MeasureConstraintAliasesRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking constrained measures are aliased properly")
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:
+    def validate_model(model: SemanticManifest) -> List[ValidationIssue]:
         """Ensures measures that might need an alias have one set, and that the alias is distinct
 
         We do not allow aliases to collide with other alias or measure names, since that could create
@@ -206,7 +206,7 @@ class MetricMeasuresRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="running model validation ensuring metric measures exist")
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
+    def validate_model(model: SemanticManifest) -> List[ValidationIssue]:  # noqa: D
         issues: List[ValidationIssue] = []
         valid_measure_names = _get_measure_names_from_model(model)
 
@@ -222,7 +222,7 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="ensuring that a measure's non_additive_dimensions is valid")
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
+    def validate_model(model: SemanticManifest) -> List[ValidationIssue]:  # noqa: D
         issues: List[ValidationIssue] = []
         for semantic_model in model.semantic_models or []:
             for measure in semantic_model.measures:
@@ -370,7 +370,7 @@ class CountAggregationExprRule(ModelValidationRule):
     @validate_safely(
         whats_being_done="running model validation ensuring expr exist for measures with count aggregation"
     )
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
+    def validate_model(model: SemanticManifest) -> List[ValidationIssue]:  # noqa: D
         issues: List[ValidationIssue] = []
 
         for semantic_model in model.semantic_models:
@@ -421,7 +421,7 @@ class PercentileAggregationRule(ModelValidationRule):
     @validate_safely(
         whats_being_done="running model validation ensuring the agg_params.percentile value exist for measures with percentile aggregation"
     )
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
+    def validate_model(model: SemanticManifest) -> List[ValidationIssue]:  # noqa: D
         issues: List[ValidationIssue] = []
 
         for semantic_model in model.semantic_models:
@@ -500,7 +500,7 @@ class PercentileAggregationRule(ModelValidationRule):
         return issues
 
 
-def _get_measure_names_from_model(model: UserConfiguredModel) -> Set[str]:
+def _get_measure_names_from_model(model: SemanticManifest) -> Set[str]:
     """Return every distinct measure name specified in the model"""
     measure_names = set()
     for semantic_model in model.semantic_models:

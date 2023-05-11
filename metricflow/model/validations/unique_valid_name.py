@@ -5,7 +5,7 @@ import re
 from typing import Dict, Tuple, List, Optional
 
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import (
     SemanticModelElementReference,
     SemanticModelReference,
@@ -161,7 +161,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="checking model top level element names are sufficiently unique")
-    def _validate_top_level_objects(model: UserConfiguredModel) -> List[ValidationIssue]:
+    def _validate_top_level_objects(model: SemanticManifest) -> List[ValidationIssue]:
         """Checks names of objects that are not nested."""
         object_info_tuples = []
         if model.semantic_models:
@@ -216,7 +216,7 @@ class UniqueAndValidNameRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="running model validation ensuring elements have adequately unique names")
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
+    def validate_model(model: SemanticManifest) -> List[ValidationIssue]:  # noqa: D
         issues = []
         issues += UniqueAndValidNameRule._validate_top_level_objects(model=model)
 

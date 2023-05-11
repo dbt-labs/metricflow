@@ -20,7 +20,7 @@ def test_for_breaking_model_changes(dbt_metrics: Tuple[MetricNode, ...]) -> None
     dbt_convert_result = DbtConverter().convert(dbt_metrics=dbt_metrics)
     assert (
         not dbt_convert_result.issues.has_blocking_issues
-    ), f"Unexpected issues found when buidling UserConfiguredModel from dbt metadata API metrics: {dbt_convert_result.issues.to_pretty_json()}"
+    ), f"Unexpected issues found when buidling SemanticManifest from dbt metadata API metrics: {dbt_convert_result.issues.to_pretty_json()}"
     assert not (
         len(dbt_convert_result.model.metrics) > len(dbt_metrics)
     ), f"Created more metrics ({len(dbt_convert_result.model.metrics)}) than there were dbt metrics ({len(dbt_metrics)}), possible duplication. "

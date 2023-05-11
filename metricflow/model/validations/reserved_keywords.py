@@ -3,7 +3,7 @@ from dbt_semantic_interfaces.references import SemanticModelElementReference
 
 
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from metricflow.model.validations.validator_helpers import (
     SemanticModelContext,
     SemanticModelElementContext,
@@ -121,7 +121,7 @@ class ReservedKeywordsRule(ModelValidationRule):
 
     @classmethod
     @validate_safely(whats_being_done="checking that semantic_model node_relations are not sql reserved keywords")
-    def _validate_semantic_models(cls, model: UserConfiguredModel) -> List[ValidationIssue]:
+    def _validate_semantic_models(cls, model: SemanticManifest) -> List[ValidationIssue]:
         """Checks names of objects that are not nested."""
         issues: List[ValidationIssue] = []
         set_keywords = set(RESERVED_KEYWORDS)
@@ -150,5 +150,5 @@ class ReservedKeywordsRule(ModelValidationRule):
     @validate_safely(
         whats_being_done="running model validation ensuring elements that aren't selected via a defined expr don't contain reserved keywords"
     )
-    def validate_model(cls, model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
+    def validate_model(cls, model: SemanticManifest) -> List[ValidationIssue]:  # noqa: D
         return cls._validate_semantic_models(model=model)

@@ -3,7 +3,7 @@ import copy
 import logging
 from typing import List, Sequence
 
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from metricflow.model.validations.agg_time_dimension import AggregationTimeDimensionRule
 from metricflow.model.validations.semantic_models import (
     SemanticModelTimeDimensionWarningsRule,
@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 
 
 class ModelValidator:
-    """A Validator that acts on UserConfiguredModel"""
+    """A Validator that acts on SemanticManifest"""
 
     DEFAULT_RULES = (
         PercentileAggregationRule(),
@@ -75,7 +75,7 @@ class ModelValidator:
         self._rules = rules
         self._executor = ProcessPoolExecutor(max_workers=max_workers)
 
-    def validate_model(self, model: UserConfiguredModel) -> ModelValidationResults:
+    def validate_model(self, model: SemanticManifest) -> ModelValidationResults:
         """Validate a model according to configured rules."""
         serialized_model = model.json()
 
@@ -92,7 +92,7 @@ class ModelValidator:
 
         return ModelValidationResults.merge(results)
 
-    def checked_validations(self, model: UserConfiguredModel) -> None:
+    def checked_validations(self, model: SemanticManifest) -> None:
         """Similar to validate(), but throws an exception if validation fails."""
         model_copy = copy.deepcopy(model)
         model_issues = self.validate_model(model_copy)

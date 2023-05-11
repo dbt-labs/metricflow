@@ -2,14 +2,14 @@ import pytest
 import copy
 
 from metricflow.model.model_validator import ModelValidator
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.objects.metric import MetricTypeParams, MetricInput, MetricType
 from metricflow.model.validations.metrics import DerivedMetricRule
 from metricflow.test.model.validations.helpers import metric_with_guaranteed_meta
 
 
 def test_can_configure_model_validator_rules(  # noqa: D
-    simple_model__with_primary_transforms: UserConfiguredModel,
+    simple_model__with_primary_transforms: SemanticManifest,
 ) -> None:
 
     model = copy.deepcopy(simple_model__with_primary_transforms)

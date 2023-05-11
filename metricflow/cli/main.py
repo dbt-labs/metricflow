@@ -49,7 +49,7 @@ from metricflow.inference.solver.weighted_tree import WeightedTypeTreeInferenceS
 from metricflow.inference.runner import InferenceProgressReporter, InferenceRunner
 from metricflow.model.data_warehouse_model_validator import DataWarehouseModelValidator
 from metricflow.model.model_validator import ModelValidator
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.engine.utils import model_build_result_from_config
 from metricflow.model.validations.validator_helpers import ModelValidationResults
@@ -573,9 +573,9 @@ def _print_issues(
 
 
 def _run_dw_validations(
-    validation_func: Callable[[UserConfiguredModel, Optional[int]], ModelValidationResults],
+    validation_func: Callable[[SemanticManifest, Optional[int]], ModelValidationResults],
     validation_type: str,
-    model: UserConfiguredModel,
+    model: SemanticManifest,
     timeout: Optional[int],
 ) -> ModelValidationResults:
     """Helper handles the calling of data warehouse issue generating functions"""
@@ -594,7 +594,7 @@ def _run_dw_validations(
 
 
 def _data_warehouse_validations_runner(
-    dw_validator: DataWarehouseModelValidator, model: UserConfiguredModel, timeout: Optional[int]
+    dw_validator: DataWarehouseModelValidator, model: SemanticManifest, timeout: Optional[int]
 ) -> ModelValidationResults:
     """Helper which calls the individual data warehouse validations to run and prints collected issues"""
 

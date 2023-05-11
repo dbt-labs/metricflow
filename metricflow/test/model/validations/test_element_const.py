@@ -5,7 +5,7 @@ from typing import Tuple
 from metricflow.model.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from metricflow.model.validations.element_const import ElementConsistencyRule
 from metricflow.model.validations.validator_helpers import SemanticModelElementType, ModelValidationException
 from metricflow.test.test_utils import find_semantic_model_with
@@ -15,7 +15,7 @@ def _categorical_dimensions(semantic_model: SemanticModel) -> Tuple[Dimension, .
     return tuple(dim for dim in semantic_model.dimensions if dim.type == DimensionType.CATEGORICAL)
 
 
-def test_cross_element_names(simple_model__with_primary_transforms: UserConfiguredModel) -> None:  # noqa:D
+def test_cross_element_names(simple_model__with_primary_transforms: SemanticManifest) -> None:  # noqa:D
     model = copy.deepcopy(simple_model__with_primary_transforms)
 
     # ensure we have a usable semantic model for the test

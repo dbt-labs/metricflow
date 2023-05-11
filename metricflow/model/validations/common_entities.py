@@ -2,7 +2,7 @@ from typing import Dict, List, Set
 
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.entity import Entity
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import SemanticModelElementReference, EntityReference
 from metricflow.model.validations.validator_helpers import (
     SemanticModelElementContext,
@@ -62,7 +62,7 @@ class CommonEntitysRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="running model validation warning if entities are only one one semantic model")
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:
+    def validate_model(model: SemanticManifest) -> List[ValidationIssue]:
         """Issues a warning for any entity that is associated with only one semantic_model"""
         issues = []
 

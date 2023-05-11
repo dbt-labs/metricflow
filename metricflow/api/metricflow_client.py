@@ -13,9 +13,9 @@ from metricflow.engine.metricflow_engine import (
     MetricFlowQueryResult,
 )
 from metricflow.engine.models import Dimension, Metric
-from metricflow.engine.utils import build_user_configured_model_from_config, convert_to_datetime
+from metricflow.engine.utils import build_semantic_manifest_from_config, convert_to_datetime
 from metricflow.model.model_validator import ModelValidator
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.model.validations.validator_helpers import ModelValidationResults
 from metricflow.protocols.async_sql_client import AsyncSqlClient
@@ -41,32 +41,32 @@ class MetricFlowClient:
             handler = ConfigHandler()
         logger.debug(f"Constructing a MetricFlowClient with the config in {handler.yaml_file_path}")
         sql_client = make_sql_client_from_config(handler)
-        user_configured_model = build_user_configured_model_from_config(handler)
+        semantic_manifest = build_semantic_manifest_from_config(handler)
         schema = not_empty(handler.get_value(CONFIG_DWH_SCHEMA), CONFIG_DWH_SCHEMA, handler.url)
 
         return MetricFlowClient(
             sql_client=sql_client,
-            user_configured_model=user_configured_model,
+            semantic_manifest=semantic_manifest,
             system_schema=schema,
         )
 
     def __init__(
         self,
         sql_client: AsyncSqlClient,
-        user_configured_model: UserConfiguredModel,
+        semantic_manifest: SemanticManifest,
         system_schema: str,
     ):
         """Initializer for MetricFlowClient.
 
         Args:
             sql_client: Client that is connected to your data warehouse.
-            user_configured_model: Model containing all the information about your metric configs.
+            semantic_manifest: Model containing all the information about your metric configs.
             system_schema: schema of where MF system tables are stored.
         """
         self.sql_client = sql_client
-        self.user_configured_model = user_configured_model
+        self.semantic_manifest = semantic_manifest
         self.system_schema = system_schema
-        self.semantic_manifest_lookup = SemanticManifestLookup(self.user_configured_model)
+        self.semantic_manifest_lookup = SemanticManifestLookup(self.semantic_manifest)
         self.engine = MetricFlowEngine(
             semantic_manifest_lookup=self.semantic_manifest_lookup,
             sql_client=self.sql_client,
@@ -234,4 +234,4 @@ class MetricFlowClient:
         Returns:
             Tuple of validation issues with the model provided.
         """
-        return ModelValidator().validate_model(self.user_configured_model)
+        return ModelValidator().validate_model(self.semantic_manifest)

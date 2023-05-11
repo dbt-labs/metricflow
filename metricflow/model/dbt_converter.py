@@ -35,7 +35,7 @@ from metricflow.model.dbt_mapping_rules.dbt_metric_to_measure import (
 )
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.metric import Metric
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.parsing.dir_to_model import ModelBuildResult
 from metricflow.model.validations.validator_helpers import ModelValidationResults, ValidationError, ValidationIssue
 
@@ -97,7 +97,7 @@ class DbtConverter:
         self.metric_class = metric_class
 
     def _map_dbt_to_metricflow(self, dbt_metrics: Tuple[MetricNode, ...]) -> DbtMappingResults:
-        """Using a series of rules transforms dbt metrics into a mapped dict representing UserConfiguredModel objects"""
+        """Using a series of rules transforms dbt metrics into a mapped dict representing SemanticManifest objects"""
         mapped_objects = MappedObjects()
         validation_results = ModelValidationResults()
 
@@ -108,7 +108,7 @@ class DbtConverter:
         return DbtMappingResults(mapped_objects=mapped_objects, validation_results=validation_results)
 
     def _build_metricflow_model(self, mapped_objects: MappedObjects) -> ModelBuildResult:
-        """Takes in a map of dicts representing UserConfiguredModel objects, and builds a UserConfiguredModel"""
+        """Takes in a map of dicts representing SemanticManifest objects, and builds a SemanticManifest"""
         # we don't want to modify the passed in objects, so we decopy them
         copied_objects = deepcopy(mapped_objects)
 
@@ -147,17 +147,17 @@ class DbtConverter:
                 )
 
         return ModelBuildResult(
-            model=UserConfiguredModel(semantic_models=semantic_models, metrics=metrics),
+            model=SemanticManifest(semantic_models=semantic_models, metrics=metrics),
             issues=ModelValidationResults.from_issues_sequence(issues=issues),
         )
 
     def convert(self, dbt_metrics: Tuple[MetricNode, ...]) -> ModelBuildResult:
-        """Builds a UserConfiguredModel from dbt MetricNodes"""
+        """Builds a SemanticManifest from dbt MetricNodes"""
         mapping_result = self._map_dbt_to_metricflow(dbt_metrics=dbt_metrics)
 
         if mapping_result.validation_results.has_blocking_issues:
             return ModelBuildResult(
-                model=UserConfiguredModel(semantic_models=[], metrics=[]), issues=mapping_result.validation_results
+                model=SemanticManifest(semantic_models=[], metrics=[]), issues=mapping_result.validation_results
             )
 
         build_result = self._build_metricflow_model(mapped_objects=mapping_result.mapped_objects)

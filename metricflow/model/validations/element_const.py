@@ -1,7 +1,7 @@
 from collections import defaultdict
 from typing import List, DefaultDict
 
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import SemanticModelReference
 from metricflow.model.validations.validator_helpers import (
     SemanticModelContext,
@@ -25,7 +25,7 @@ class ElementConsistencyRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(whats_being_done="running model validation ensuring model wide element consistency")
-    def validate_model(model: UserConfiguredModel) -> List[ValidationIssue]:  # noqa: D
+    def validate_model(model: SemanticManifest) -> List[ValidationIssue]:  # noqa: D
         issues = []
         element_name_to_types = ElementConsistencyRule._get_element_name_to_types(model=model)
         invalid_elements = {
@@ -51,7 +51,7 @@ class ElementConsistencyRule(ModelValidationRule):
 
     @staticmethod
     def _get_element_name_to_types(
-        model: UserConfiguredModel,
+        model: SemanticManifest,
     ) -> DefaultDict[str, DefaultDict[SemanticModelElementType, List[SemanticModelContext]]]:
         """Create a mapping of all element names in the model to types with a list of associated SemanticModelContexts"""
         element_types: DefaultDict[

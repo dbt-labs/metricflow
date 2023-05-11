@@ -14,7 +14,7 @@ from dbt_semantic_interfaces.model_transformer import ModelTransformer
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
 from dbt_semantic_interfaces.objects.elements.entity import Entity, EntityType
 from dbt_semantic_interfaces.objects.elements.measure import Measure
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
@@ -25,8 +25,8 @@ from metricflow.test.plan_utils import assert_snapshot_text_equal, make_schema_r
 @pytest.fixture(scope="session")
 def dw_backed_warehouse_validation_model(
     create_source_tables: None,
-    data_warehouse_validation_model: UserConfiguredModel,
-) -> UserConfiguredModel:
+    data_warehouse_validation_model: SemanticManifest,
+) -> SemanticManifest:
     """Model-generating fixture to ensure the underlying tables are created for querying
 
     Without an explicit invocation of the create_data_warehouse_validation_model_tables fixture the
@@ -40,7 +40,7 @@ def dw_backed_warehouse_validation_model(
 
 def test_build_semantic_model_tasks(
     mf_test_session_state: MetricFlowTestSessionState,
-    data_warehouse_validation_model: UserConfiguredModel,
+    data_warehouse_validation_model: SemanticManifest,
     async_sql_client: AsyncSqlClient,
 ) -> None:  # noqa:D
     tasks = DataWarehouseTaskBuilder.gen_semantic_model_tasks(
@@ -82,7 +82,7 @@ def test_task_runner(  # noqa: D
 
 
 def test_validate_semantic_models(  # noqa: D
-    dw_backed_warehouse_validation_model: UserConfiguredModel,
+    dw_backed_warehouse_validation_model: SemanticManifest,
     async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
@@ -109,7 +109,7 @@ def test_validate_semantic_models(  # noqa: D
 
 
 def test_build_dimension_tasks(  # noqa: D
-    data_warehouse_validation_model: UserConfiguredModel,
+    data_warehouse_validation_model: SemanticManifest,
     async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
@@ -125,7 +125,7 @@ def test_build_dimension_tasks(  # noqa: D
 
 
 def test_validate_dimensions(  # noqa: D
-    dw_backed_warehouse_validation_model: UserConfiguredModel,
+    dw_backed_warehouse_validation_model: SemanticManifest,
     async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
@@ -149,7 +149,7 @@ def test_validate_dimensions(  # noqa: D
 
 
 def test_build_entities_tasks(  # noqa: D
-    data_warehouse_validation_model: UserConfiguredModel,
+    data_warehouse_validation_model: SemanticManifest,
     async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
@@ -163,7 +163,7 @@ def test_build_entities_tasks(  # noqa: D
 
 
 def test_validate_entities(  # noqa: D
-    dw_backed_warehouse_validation_model: UserConfiguredModel,
+    dw_backed_warehouse_validation_model: SemanticManifest,
     async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
@@ -187,7 +187,7 @@ def test_validate_entities(  # noqa: D
 
 
 def test_build_measure_tasks(  # noqa: D
-    data_warehouse_validation_model: UserConfiguredModel,
+    data_warehouse_validation_model: SemanticManifest,
     async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
@@ -201,7 +201,7 @@ def test_build_measure_tasks(  # noqa: D
 
 
 def test_validate_measures(  # noqa: D
-    dw_backed_warehouse_validation_model: UserConfiguredModel,
+    dw_backed_warehouse_validation_model: SemanticManifest,
     async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
@@ -226,7 +226,7 @@ def test_validate_measures(  # noqa: D
 
 def test_build_metric_tasks(  # noqa: D
     request: FixtureRequest,
-    data_warehouse_validation_model: UserConfiguredModel,
+    data_warehouse_validation_model: SemanticManifest,
     async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
@@ -252,7 +252,7 @@ def test_build_metric_tasks(  # noqa: D
 
 
 def test_validate_metrics(  # noqa: D
-    dw_backed_warehouse_validation_model: UserConfiguredModel,
+    dw_backed_warehouse_validation_model: SemanticManifest,
     async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
