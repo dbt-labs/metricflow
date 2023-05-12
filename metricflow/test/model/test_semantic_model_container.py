@@ -21,10 +21,8 @@ def semantic_model_lookup(simple_semantic_manifest: SemanticManifest) -> Semanti
 @pytest.fixture
 def metric_lookup(  # Noqa: D
     simple_semantic_manifest: SemanticManifest, semantic_model_lookup: SemanticModelLookup
-) -> MetricSemantics:
-    return MetricLookup(
-        semantic_manifest=simple_semantic_manifest,
-    )
+) -> MetricLookup:
+    return MetricLookup(semantic_manifest=simple_semantic_manifest, semantic_model_lookup=semantic_model_lookup)
 
 
 def test_get_names(semantic_model_lookup: SemanticModelLookup) -> None:  # noqa: D

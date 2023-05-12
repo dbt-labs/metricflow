@@ -9,9 +9,8 @@ class SemanticManifestLookup:
 
     def __init__(self, semantic_manifest: SemanticManifest) -> None:  # noqa: D
         self._semantic_manifest = semantic_manifest
-        self._semantic_model_lookup = SemanticModelLookup(user_configured_model)
+        self._semantic_model_lookup = SemanticModelLookup(semantic_manifest)
         self._metric_lookup = MetricLookup(self._semantic_manifest, self._semantic_model_lookup)
-
 
     @property
     def semantic_manifest(self) -> SemanticManifest:  # noqa: D
