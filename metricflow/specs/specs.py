@@ -64,28 +64,8 @@ class ColumnAssociationResolver(ABC):
     """
 
     @abstractmethod
-    def resolve_metric_spec(self, metric_spec: MetricSpec) -> ColumnAssociation:  # noqa: D
-        pass
-
-    @abstractmethod
-    def resolve_measure_spec(self, measure_spec: MeasureSpec) -> ColumnAssociation:  # noqa: D
-        pass
-
-    @abstractmethod
-    def resolve_dimension_spec(self, dimension_spec: DimensionSpec) -> ColumnAssociation:  # noqa: D
-        pass
-
-    @abstractmethod
-    def resolve_time_dimension_spec(self, time_dimension_spec: TimeDimensionSpec) -> ColumnAssociation:  # noqa: D
-        pass
-
-    @abstractmethod
-    def resolve_entity_spec(self, entity_spec: EntitySpec) -> ColumnAssociation:  # noqa: D
-        pass
-
-    @abstractmethod
-    def resolve_metadata_spec(self, metadata_spec: MetadataSpec) -> ColumnAssociation:  # noqa: D
-        pass
+    def resolve_spec(self, spec: InstanceSpec) -> ColumnAssociation:  # noqa: D
+        raise NotImplementedError
 
 
 class InstanceSpecVisitor(Generic[VisitorOutputT], ABC):
