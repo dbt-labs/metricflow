@@ -112,16 +112,16 @@ class MetricFlowQueryParser:
     ) -> None:
         self._column_association_resolver = column_association_resolver
         self._model = model
-        self._metric_semantics = model.metric_semantics
-        self._semantic_model_semantics = model.semantic_model_semantics
+        self._metric_lookup = model.metric_lookup
+        self._semantic_model_lookup = model.semantic_model_lookup
 
         # Set up containers for known element names
-        self._known_entity_element_references = self._semantic_model_semantics.get_entity_references()
+        self._known_entity_element_references = self._semantic_model_lookup.get_entity_references()
 
         self._known_time_dimension_element_references = [DataSet.metric_time_dimension_reference()]
         self._known_dimension_element_references = []
-        for dimension_reference in self._semantic_model_semantics.get_dimension_references():
-            dimension = self._semantic_model_semantics.get_dimension(dimension_reference)
+        for dimension_reference in self._semantic_model_lookup.get_dimension_references():
+            dimension = self._semantic_model_lookup.get_dimension(dimension_reference)
             if dimension.type == DimensionType.CATEGORICAL:
                 self._known_dimension_element_references.append(dimension_reference)
             elif dimension.type == DimensionType.TIME:
@@ -129,7 +129,7 @@ class MetricFlowQueryParser:
             else:
                 raise RuntimeError(f"Unhandled linkable type: {dimension.type}")
 
-        self._known_metric_names = set(self._metric_semantics.metric_references)
+        self._known_metric_names = set(self._metric_lookup.metric_references)
         self._metric_time_dimension_reference = DataSet.metric_time_dimension_reference()
         self._time_granularity_solver = TimeGranularitySolver(
             semantic_manifest_lookup=self._model,
@@ -198,7 +198,7 @@ class MetricFlowQueryParser:
     def _validate_no_time_dimension_query(self, metric_references: Sequence[MetricReference]) -> None:
         """Validate if all requested metrics are queryable without a time dimension."""
         for metric_reference in metric_references:
-            metric = self._metric_semantics.get_metric(metric_reference)
+            metric = self._metric_lookup.get_metric(metric_reference)
             if metric.type == MetricType.CUMULATIVE:
                 # Cumulative metrics configured with a window/grain_to_date cannot be queried without a dimension.
                 if metric.type_params.window or metric.type_params.grain_to_date:
@@ -230,7 +230,7 @@ class MetricFlowQueryParser:
         if len(invalid_group_bys) > 0:
             valid_group_by_names_for_metrics = sorted(
                 x.qualified_name
-                for x in self._metric_semantics.element_specs_for_metrics(metric_references=list(metric_references))
+                for x in self._metric_lookup.element_specs_for_metrics(metric_references=list(metric_references))
             )
             # Create suggestions for invalid dimensions in case the user made a typo.
             suggestion_sections = {}
@@ -262,7 +262,7 @@ class MetricFlowQueryParser:
         """
         metric_specs = []
         for metric_reference in metric_references:
-            metric = self._metric_semantics.get_metric(metric_reference)
+            metric = self._metric_lookup.get_metric(metric_reference)
             metric_where_constraint: Optional[WhereFilterSpec] = None
             if metric.filter:
                 # add constraint to MetricSpec
@@ -388,7 +388,7 @@ class MetricFlowQueryParser:
         # by the filters.
         # TODO: Consider moving this logic into _validate_linkable_specs().
         for metric_reference in metric_references:
-            metric = self._metric_semantics.get_metric(metric_reference)
+            metric = self._metric_lookup.get_metric(metric_reference)
             if metric.filter is not None:
                 group_by_specs_for_one_metric = self._parse_linkable_element_names(
                     qualified_linkable_names=group_by_names,
@@ -568,7 +568,7 @@ class MetricFlowQueryParser:
         # The config must be lower-case, so we lower case for case-insensitivity against query inputs from the user.
         metric_names = [x.lower() for x in metric_names]
 
-        known_metric_names = set(self._metric_semantics.metric_references)
+        known_metric_names = set(self._metric_lookup.metric_references)
         metric_references: List[MetricReference] = []
         for metric_name in metric_names:
             metric_reference = MetricReference(element_name=metric_name)
@@ -577,7 +577,7 @@ class MetricFlowQueryParser:
                     f"Suggestions for '{metric_name}'": pformat_big_objects(
                         MetricFlowQueryParser._top_fuzzy_matches(
                             item=metric_name,
-                            candidate_items=[x.element_name for x in self._metric_semantics.metric_references],
+                            candidate_items=[x.element_name for x in self._metric_lookup.metric_references],
                         )
                     )
                 }
@@ -587,7 +587,7 @@ class MetricFlowQueryParser:
                 )
             metric_references.append(metric_reference)
             if traverse_metric_inputs:
-                metric = self._metric_semantics.get_metric(metric_reference)
+                metric = self._metric_lookup.get_metric(metric_reference)
                 if metric.type == MetricType.DERIVED:
                     input_metrics = self._parse_metric_names([metric.name for metric in metric.input_metrics])
                     metric_references.extend(list(input_metrics))
@@ -632,7 +632,7 @@ class MetricFlowQueryParser:
                 entity_specs.append(EntitySpec(element_name=element_name, entity_links=entity_links))
             else:
                 valid_group_by_names_for_metrics = sorted(
-                    x.qualified_name for x in self._metric_semantics.element_specs_for_metrics(list(metric_references))
+                    x.qualified_name for x in self._metric_lookup.element_specs_for_metrics(list(metric_references))
                 )
 
                 suggestions = {
@@ -665,9 +665,7 @@ class MetricFlowQueryParser:
         """Checks that each requested linkable instance can be retrieved for the given metric"""
         invalid_linkable_specs: List[LinkableInstanceSpec] = []
         # TODO: distinguish between dimensions that invalid via typo vs ambiguous join path
-        valid_linkable_specs = self._metric_semantics.element_specs_for_metrics(
-            metric_references=list(metric_references)
-        )
+        valid_linkable_specs = self._metric_lookup.element_specs_for_metrics(metric_references=list(metric_references))
 
         for dimension_spec in dimension_specs:
             if dimension_spec not in valid_linkable_specs:

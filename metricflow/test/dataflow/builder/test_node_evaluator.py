@@ -49,7 +49,7 @@ def node_evaluator(
     source_nodes = tuple(consistent_id_object_repository.simple_model_read_nodes.values())
 
     return NodeEvaluatorForLinkableInstances(
-        semantic_model_semantics=simple_semantic_manifest_lookup.semantic_model_semantics,
+        semantic_model_lookup=simple_semantic_manifest_lookup.semantic_model_lookup,
         # Use all nodes in the simple model as candidates for joins.
         nodes_available_for_joins=source_nodes,
         node_data_set_resolver=node_data_set_resolver,
@@ -70,7 +70,7 @@ def make_multihop_node_evaluator(
     )
 
     node_processor = PreDimensionJoinNodeProcessor(
-        semantic_model_semantics=semantic_manifest_lookup_with_multihop_links.semantic_model_semantics,
+        semantic_model_lookup=semantic_manifest_lookup_with_multihop_links.semantic_model_lookup,
         node_data_set_resolver=node_data_set_resolver,
     )
 
@@ -85,7 +85,7 @@ def make_multihop_node_evaluator(
     )
 
     return NodeEvaluatorForLinkableInstances(
-        semantic_model_semantics=semantic_manifest_lookup_with_multihop_links.semantic_model_semantics,
+        semantic_model_lookup=semantic_manifest_lookup_with_multihop_links.semantic_model_lookup,
         nodes_available_for_joins=nodes_available_for_joins,
         node_data_set_resolver=node_data_set_resolver,
     )
@@ -475,7 +475,7 @@ def test_node_evaluator_with_scd_target(
     source_nodes = tuple(consistent_id_object_repository.scd_model_read_nodes.values())
 
     node_evaluator = NodeEvaluatorForLinkableInstances(
-        semantic_model_semantics=scd_semantic_manifest_lookup.semantic_model_semantics,
+        semantic_model_lookup=scd_semantic_manifest_lookup.semantic_model_lookup,
         # Use all nodes in the simple model as candidates for joins.
         nodes_available_for_joins=source_nodes,
         node_data_set_resolver=node_data_set_resolver,

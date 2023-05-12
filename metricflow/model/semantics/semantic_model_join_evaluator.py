@@ -11,7 +11,7 @@ from dbt_semantic_interfaces.references import (
 )
 from metricflow.instances import EntityInstance, InstanceSet
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
-from metricflow.protocols.semantics import SemanticModelSemanticsAccessor
+from metricflow.protocols.semantics import SemanticModelAccessor
 
 MAX_JOIN_HOPS = 2
 
@@ -69,8 +69,8 @@ class SemanticModelJoinEvaluator:
         SemanticModelEntityJoinType(left_entity_type=EntityType.NATURAL, right_entity_type=EntityType.NATURAL),
     )
 
-    def __init__(self, semantic_model_semantics: SemanticModelSemanticsAccessor) -> None:  # noqa: D
-        self._semantic_model_semantics = semantic_model_semantics
+    def __init__(self, semantic_model_lookup: SemanticModelAccessor) -> None:  # noqa: D
+        self._semantic_model_lookup = semantic_model_lookup
 
     def get_joinable_semantic_models(
         self, left_semantic_model_reference: SemanticModelReference, include_multi_hop: bool = False
@@ -94,7 +94,7 @@ class SemanticModelJoinEvaluator:
     ) -> None:
         assert join_hops_remaining > 0, "No join hops remaining. This is unexpected with proper use of this method."
         for parent_semantic_model_reference, parent_join_path in parent_semantic_model_to_join_paths.items():
-            parent_semantic_model = self._semantic_model_semantics.get_by_reference(
+            parent_semantic_model = self._semantic_model_lookup.get_by_reference(
                 semantic_model_reference=parent_semantic_model_reference
             )
             assert parent_semantic_model is not None
@@ -104,7 +104,7 @@ class SemanticModelJoinEvaluator:
             join_paths_to_visit_next: List[List[SemanticModelEntityJoin]] = []
             for entity in parent_semantic_model.entities:
                 entity_reference = EntityReference(element_name=entity.name)
-                entity_semantic_models = self._semantic_model_semantics.get_semantic_models_for_entity(
+                entity_semantic_models = self._semantic_model_lookup.get_semantic_models_for_entity(
                     entity_reference=entity_reference
                 )
 
@@ -164,18 +164,18 @@ class SemanticModelJoinEvaluator:
         on_entity_reference: EntityReference,
     ) -> Optional[SemanticModelEntityJoinType]:
         """Get valid join type used to join semantic models on given entity, if exists."""
-        left_entity = self._semantic_model_semantics.get_entity_in_semantic_model(
+        left_entity = self._semantic_model_lookup.get_entity_in_semantic_model(
             SemanticModelElementReference.create_from_references(left_semantic_model_reference, on_entity_reference)
         )
 
-        right_entity = self._semantic_model_semantics.get_entity_in_semantic_model(
+        right_entity = self._semantic_model_lookup.get_entity_in_semantic_model(
             SemanticModelElementReference.create_from_references(right_semantic_model_reference, on_entity_reference)
         )
         if left_entity is None or right_entity is None:
             return None
 
-        left_semantic_model = self._semantic_model_semantics.get_by_reference(left_semantic_model_reference)
-        right_semantic_model = self._semantic_model_semantics.get_by_reference(right_semantic_model_reference)
+        left_semantic_model = self._semantic_model_lookup.get_by_reference(left_semantic_model_reference)
+        right_semantic_model = self._semantic_model_lookup.get_by_reference(right_semantic_model_reference)
         assert left_semantic_model, "Type refinement. If you see this error something has refactored wrongly"
         assert right_semantic_model, "Type refinement. If you see this error something has refactored wrongly"
 

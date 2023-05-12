@@ -56,13 +56,13 @@ def __get_simple_model_user_semantic_model_references_by_type(
     semantic_manifest_lookup: SemanticManifestLookup,
 ) -> Dict[EntityType, SemanticModelReference]:
     """Helper to get a set of semantic models with the `user` identifier organized by identifier type"""
-    foreign_user_semantic_model = semantic_manifest_lookup.semantic_model_semantics.get_by_reference(
+    foreign_user_semantic_model = semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
         SemanticModelReference("listings_latest")
     )
-    primary_user_semantic_model = semantic_manifest_lookup.semantic_model_semantics.get_by_reference(
+    primary_user_semantic_model = semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
         SemanticModelReference("users_latest")
     )
-    unique_user_semantic_model = semantic_manifest_lookup.semantic_model_semantics.get_by_reference(
+    unique_user_semantic_model = semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
         SemanticModelReference("companies")
     )
 
@@ -90,7 +90,7 @@ def test_distinct_target_semantic_model_join_validation(
     )
     user_entity_reference = EntityReference(element_name="user")
     join_evaluator = SemanticModelJoinEvaluator(
-        semantic_model_semantics=simple_semantic_manifest_lookup.semantic_model_semantics
+        semantic_model_lookup=simple_semantic_manifest_lookup.semantic_model_lookup
     )
 
     foreign_primary = join_evaluator.is_valid_semantic_model_join(
@@ -148,7 +148,7 @@ def test_foreign_target_semantic_model_join_validation(simple_semantic_manifest_
     )
     user_entity_reference = EntityReference(element_name="user")
     join_evaluator = SemanticModelJoinEvaluator(
-        semantic_model_semantics=simple_semantic_manifest_lookup.semantic_model_semantics
+        semantic_model_lookup=simple_semantic_manifest_lookup.semantic_model_lookup
     )
 
     foreign_foreign = join_evaluator.is_valid_semantic_model_join(
@@ -182,17 +182,17 @@ def test_semantic_model_join_validation_on_missing_entity(
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Tests semantic model join validation where the entity is missing from one or both semantic models"""
-    primary_listing_semantic_model = simple_semantic_manifest_lookup.semantic_model_semantics.get_by_reference(
+    primary_listing_semantic_model = simple_semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
         SemanticModelReference("listings_latest")
     )
     assert primary_listing_semantic_model, "Could not find semantic model `listings_latest` in the simple model!"
-    no_listing_semantic_model = simple_semantic_manifest_lookup.semantic_model_semantics.get_by_reference(
+    no_listing_semantic_model = simple_semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
         SemanticModelReference("id_verifications")
     )
     assert no_listing_semantic_model, "Could not find semantic model `id_verifications` in the simple model!"
     listing_entity_reference = EntityReference(element_name="listing")
     join_evaluator = SemanticModelJoinEvaluator(
-        semantic_model_semantics=simple_semantic_manifest_lookup.semantic_model_semantics
+        semantic_model_lookup=simple_semantic_manifest_lookup.semantic_model_lookup
     )
 
     assert not join_evaluator.is_valid_semantic_model_join(
@@ -215,7 +215,7 @@ def test_distinct_target_instance_set_join_validation(
     unique_user_instance_set = consistent_id_object_repository.simple_model_data_sets["companies"].instance_set
     user_entity_reference = EntityReference(element_name="user")
     join_evaluator = SemanticModelJoinEvaluator(
-        semantic_model_semantics=simple_semantic_manifest_lookup.semantic_model_semantics
+        semantic_model_lookup=simple_semantic_manifest_lookup.semantic_model_lookup
     )
 
     foreign_primary = join_evaluator.is_valid_instance_set_join(
@@ -273,7 +273,7 @@ def test_foreign_target_instance_set_join_validation(
     unique_user_instance_set = consistent_id_object_repository.simple_model_data_sets["companies"].instance_set
     user_entity_reference = EntityReference(element_name="user")
     join_evaluator = SemanticModelJoinEvaluator(
-        semantic_model_semantics=simple_semantic_manifest_lookup.semantic_model_semantics
+        semantic_model_lookup=simple_semantic_manifest_lookup.semantic_model_lookup
     )
 
     foreign_foreign = join_evaluator.is_valid_instance_set_join(
@@ -308,7 +308,7 @@ def test_get_joinable_semantic_models_single_hop(  # noqa: D
 ) -> None:
     semantic_model_reference = SemanticModelReference(semantic_model_name="account_month_txns")
     join_evaluator = SemanticModelJoinEvaluator(
-        semantic_model_semantics=multi_hop_join_semantic_manifest_lookup.semantic_model_semantics
+        semantic_model_lookup=multi_hop_join_semantic_manifest_lookup.semantic_model_lookup
     )
 
     # Single-hop
@@ -335,7 +335,7 @@ def test_get_joinable_semantic_models_multi_hop(  # noqa: D
 ) -> None:
     semantic_model_reference = SemanticModelReference(semantic_model_name="account_month_txns")
     join_evaluator = SemanticModelJoinEvaluator(
-        semantic_model_semantics=multi_hop_join_semantic_manifest_lookup.semantic_model_semantics
+        semantic_model_lookup=multi_hop_join_semantic_manifest_lookup.semantic_model_lookup
     )
 
     # 2-hop
@@ -400,21 +400,21 @@ def test_natural_entity_semantic_model_validation(scd_semantic_manifest_lookup: 
 
     These tests rely on the scd_semantic_manifest_lookup, which makes extensive use of NATURAL key types.
     """
-    natural_user_semantic_model = scd_semantic_manifest_lookup.semantic_model_semantics.get_by_reference(
+    natural_user_semantic_model = scd_semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
         SemanticModelReference("primary_accounts")
     )
-    primary_user_semantic_model = scd_semantic_manifest_lookup.semantic_model_semantics.get_by_reference(
+    primary_user_semantic_model = scd_semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
         SemanticModelReference("users_latest")
     )
-    foreign_user_semantic_model = scd_semantic_manifest_lookup.semantic_model_semantics.get_by_reference(
+    foreign_user_semantic_model = scd_semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
         SemanticModelReference("bookings_source")
     )
-    unique_user_semantic_model = scd_semantic_manifest_lookup.semantic_model_semantics.get_by_reference(
+    unique_user_semantic_model = scd_semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
         SemanticModelReference("companies")
     )
     user_entity_reference = EntityReference(element_name="user")
     join_evaluator = SemanticModelJoinEvaluator(
-        semantic_model_semantics=scd_semantic_manifest_lookup.semantic_model_semantics
+        semantic_model_lookup=scd_semantic_manifest_lookup.semantic_model_lookup
     )
     # Type refinement
     assert natural_user_semantic_model, "Could not find `primary_accounts` semantic model in scd model!"
@@ -491,7 +491,7 @@ def test_natural_entity_instance_set_validation(
     unique_user_instance_set = consistent_id_object_repository.scd_model_data_sets["companies"].instance_set
     user_entity_reference = EntityReference(element_name="user")
     join_evaluator = SemanticModelJoinEvaluator(
-        semantic_model_semantics=scd_semantic_manifest_lookup.semantic_model_semantics
+        semantic_model_lookup=scd_semantic_manifest_lookup.semantic_model_lookup
     )
 
     # Valid cases

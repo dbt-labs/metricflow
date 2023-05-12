@@ -112,8 +112,8 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         node_output_resolver: Optional[DataflowPlanNodeOutputDataSetResolver[SqlDataSetT]] = None,
         column_association_resolver: Optional[ColumnAssociationResolver] = None,
     ) -> None:
-        self._semantic_model_semantics = semantic_manifest_lookup.semantic_model_semantics
-        self._metric_semantics = semantic_manifest_lookup.metric_semantics
+        self._semantic_model_lookup = semantic_manifest_lookup.semantic_model_lookup
+        self._metric_lookup = semantic_manifest_lookup.metric_lookup
         self._metric_time_dimension_reference = DataSet.metric_time_dimension_reference()
         self._cost_function = cost_function
         self._source_nodes = source_nodes
@@ -190,10 +190,10 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         for metric_spec in metric_specs:
             logger.info(f"Generating compute metrics node for {metric_spec}")
             metric_reference = metric_spec.as_reference
-            metric = self._metric_semantics.get_metric(metric_reference)
+            metric = self._metric_lookup.get_metric(metric_reference)
 
             if metric.type == MetricType.DERIVED:
-                metric_input_specs = self._metric_semantics.metric_input_specs_for_metric(
+                metric_input_specs = self._metric_lookup.metric_input_specs_for_metric(
                     metric_reference=metric_reference,
                     column_association_resolver=self._column_association_resolver,
                 )
@@ -213,7 +213,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                     metric_specs=[metric_spec],
                 )
             else:
-                metric_input_measure_specs = self._metric_semantics.measures_for_metric(
+                metric_input_measure_specs = self._metric_lookup.measures_for_metric(
                     metric_reference=metric_reference,
                     column_association_resolver=self._column_association_resolver,
                 )
@@ -367,10 +367,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         semantic_model_names: Set[str] = set()
         for measure_name in measure_names:
             semantic_model_names = semantic_model_names.union(
-                {
-                    d.name
-                    for d in self._semantic_model_semantics.get_semantic_models_for_measure(measure_name.as_reference)
-                }
+                {d.name for d in self._semantic_model_lookup.get_semantic_models_for_measure(measure_name.as_reference)}
             )
         return semantic_model_names
 
@@ -433,14 +430,14 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 f"semantic models: {semantic_models}. This suggests the measure_specs were not correctly filtered."
             )
 
-        agg_time_dimension = agg_time_dimension = self._semantic_model_semantics.get_agg_time_dimension_for_measure(
+        agg_time_dimension = agg_time_dimension = self._semantic_model_lookup.get_agg_time_dimension_for_measure(
             measure_specs[0].as_reference
         )
         non_additive_dimension_spec = measure_specs[0].non_additive_dimension_spec
         for measure_spec in measure_specs:
             if non_additive_dimension_spec != measure_spec.non_additive_dimension_spec:
                 raise ValueError(f"measure_specs {measure_specs} do not have the same non_additive_dimension_spec.")
-            measure_agg_time_dimension = self._semantic_model_semantics.get_agg_time_dimension_for_measure(
+            measure_agg_time_dimension = self._semantic_model_lookup.get_agg_time_dimension_for_measure(
                 measure_spec.as_reference
             )
             if measure_agg_time_dimension != agg_time_dimension:
@@ -465,7 +462,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         """
         measure_specs = measure_spec_properties.measure_specs
         node_processor = PreDimensionJoinNodeProcessor(
-            semantic_model_semantics=self._semantic_model_semantics,
+            semantic_model_lookup=self._semantic_model_lookup,
             node_data_set_resolver=self._node_data_set_resolver,
         )
 
@@ -507,7 +504,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         logger.info(f"Processing nodes took: {time.time()-start_time:.2f}s")
 
         node_evaluator = NodeEvaluatorForLinkableInstances(
-            semantic_model_semantics=self._semantic_model_semantics,
+            semantic_model_lookup=self._semantic_model_lookup,
             nodes_available_for_joins=self._sort_by_suitability(nodes_available_for_joins),
             node_data_set_resolver=self._node_data_set_resolver,
         )
@@ -636,7 +633,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         for input_spec in metric_input_measure_specs:
             semantic_model_names = [
                 dsource.name
-                for dsource in self._semantic_model_semantics.get_semantic_models_for_measure(
+                for dsource in self._semantic_model_lookup.get_semantic_models_for_measure(
                     measure_reference=input_spec.measure_spec.as_reference
                 )
             ]

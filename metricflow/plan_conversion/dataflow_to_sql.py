@@ -155,8 +155,8 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             time_spine_source: Allows getting dates for use in cumulative joins
         """
         self._column_association_resolver = column_association_resolver
-        self._metric_semantics = semantic_manifest_lookup.metric_semantics
-        self._semantic_model_semantics = semantic_manifest_lookup.semantic_model_semantics
+        self._metric_lookup = semantic_manifest_lookup.metric_lookup
+        self._semantic_model_lookup = semantic_manifest_lookup.semantic_model_lookup
         self._time_spine_source = time_spine_source
 
     @property
@@ -584,7 +584,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             CreateSelectColumnsWithMeasuresAggregated(
                 table_alias=from_data_set_alias,
                 column_resolver=self._column_association_resolver,
-                semantic_model_semantics=self._semantic_model_semantics,
+                semantic_model_lookup=self._semantic_model_lookup,
                 metric_input_measure_specs=node.metric_input_measure_specs,
             )
         )
@@ -641,7 +641,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         metric_select_columns = []
         metric_instances = []
         for metric_spec in node.metric_specs:
-            metric = self._metric_semantics.get_metric(metric_spec.as_reference)
+            metric = self._metric_lookup.get_metric(metric_spec.as_reference)
 
             metric_expr: Optional[SqlExpressionNode] = None
             if metric.type is MetricType.RATIO:
@@ -1104,7 +1104,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         # Only these measures will be in the output data set.
         output_measure_instances = []
         for measure_instance in input_data_set.instance_set.measure_instances:
-            measure = self._semantic_model_semantics.get_measure(measure_instance.spec.as_reference)
+            measure = self._semantic_model_lookup.get_measure(measure_instance.spec.as_reference)
             if measure.checked_agg_time_dimension == node.aggregation_time_dimension_reference:
                 output_measure_instances.append(measure_instance)
 

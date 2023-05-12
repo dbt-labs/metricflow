@@ -108,13 +108,13 @@ class DataWarehouseTaskBuilder:
         render_tools: QueryRenderingTools, semantic_model: SemanticModel
     ) -> Sequence[BaseOutput[SemanticModelDataSet]]:
         """Builds and returns the SemanticModelDataSet node for the given semantic model"""
-        semantic_model_semantics = render_tools.semantic_manifest_lookup.semantic_model_semantics.get_by_reference(
+        semantic_model_lookup = render_tools.semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
             SemanticModelReference(semantic_model_name=semantic_model.name)
         )
-        assert semantic_model_semantics
+        assert semantic_model_lookup
 
         source_nodes = render_tools.source_node_builder.create_from_data_sets(
-            (render_tools.converter.create_sql_source_data_set(semantic_model_semantics),)
+            (render_tools.converter.create_sql_source_data_set(semantic_model_lookup),)
         )
 
         assert len(source_nodes) >= 1

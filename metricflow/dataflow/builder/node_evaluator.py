@@ -34,7 +34,7 @@ from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
 
-from metricflow.protocols.semantics import SemanticModelSemanticsAccessor
+from metricflow.protocols.semantics import SemanticModelAccessor
 from metricflow.specs import (
     LinkableInstanceSpec,
     LinklessEntitySpec,
@@ -112,23 +112,23 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
 
     def __init__(
         self,
-        semantic_model_semantics: SemanticModelSemanticsAccessor,
+        semantic_model_lookup: SemanticModelAccessor,
         nodes_available_for_joins: Sequence[BaseOutput[SourceDataSetT]],
         node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver[SourceDataSetT],
     ) -> None:
         """Constructor
 
         Args:
-            semantic_model_semantics: Needed to resolve partition dimensions.
+            semantic_model_lookup: Needed to resolve partition dimensions.
             nodes_available_for_joins: Nodes that contain linkable instances and may be joined with the "start_node"
             (e.g. the node containing a desired measure) to retrieve the needed linkable instances.
             node_data_set_resolver: Figures out what data set is output by a node.
         """
-        self._semantic_model_semantics = semantic_model_semantics
+        self._semantic_model_lookup = semantic_model_lookup
         self._nodes_available_for_joins = nodes_available_for_joins
         self._node_data_set_resolver = node_data_set_resolver
-        self._partition_resolver = PartitionJoinResolver(self._semantic_model_semantics)
-        self._join_evaluator = SemanticModelJoinEvaluator(self._semantic_model_semantics)
+        self._partition_resolver = PartitionJoinResolver(self._semantic_model_lookup)
+        self._join_evaluator = SemanticModelJoinEvaluator(self._semantic_model_lookup)
 
     def _find_joinable_candidate_nodes_that_can_satisfy_linkable_specs(
         self,
@@ -170,7 +170,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                     len(entity_instance_in_right_node.defined_from) == 1
                 ), f"Did not get exactly 1 defined_from in {entity_instance_in_right_node}"
 
-                entity_in_right_node = self._semantic_model_semantics.get_entity_in_semantic_model(
+                entity_in_right_node = self._semantic_model_lookup.get_entity_in_semantic_model(
                     entity_instance_in_right_node.defined_from[0]
                 )
                 if entity_in_right_node is None:
@@ -247,7 +247,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
                         node_to_join_spec_set=data_set_in_right_node.instance_set.spec_set,
                     )
                     validity_window_join_description = CreateValidityWindowJoinDescription(
-                        self._semantic_model_semantics
+                        self._semantic_model_lookup
                     ).transform(instance_set=data_set_in_right_node.instance_set)
 
                     candidates_for_join.append(

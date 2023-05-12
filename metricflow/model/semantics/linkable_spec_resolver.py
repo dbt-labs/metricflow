@@ -15,7 +15,7 @@ from dbt_semantic_interfaces.references import SemanticModelReference, MeasureRe
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
-from metricflow.protocols.semantics import SemanticModelSemanticsAccessor
+from metricflow.protocols.semantics import SemanticModelAccessor
 from metricflow.specs import (
     DEFAULT_TIME_GRANULARITY,
     LinkableSpecSet,
@@ -376,20 +376,20 @@ class ValidLinkableSpecResolver:
     def __init__(
         self,
         semantic_manifest: SemanticManifest,
-        semantic_model_semantics: SemanticModelSemanticsAccessor,
+        semantic_model_lookup: SemanticModelAccessor,
         max_entity_links: int,
     ) -> None:
         """Constructor.
 
         Args:
             semantic_manifest: the model to use.
-            semantic_model_semantics: used to look up entities for a semantic model.
+            semantic_model_lookup: used to look up entities for a semantic model.
             max_entity_links: the maximum number of joins to do when computing valid elements.
         """
         self._semantic_manifest = semantic_manifest
         # Sort semantic models by name for consistency in building derived objects.
         self._semantic_models = sorted(self._semantic_manifest.semantic_models, key=lambda x: x.name)
-        self._join_evaluator = SemanticModelJoinEvaluator(semantic_model_semantics)
+        self._join_evaluator = SemanticModelJoinEvaluator(semantic_model_lookup)
 
         assert max_entity_links >= 0
         self._max_entity_links = max_entity_links

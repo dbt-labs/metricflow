@@ -21,16 +21,16 @@ from dbt_semantic_interfaces.references import (
 from metricflow.errors.errors import InvalidSemanticModelError
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.spec_converters import MeasureConverter
-from metricflow.protocols.semantics import SemanticModelSemanticsAccessor
+from metricflow.protocols.semantics import SemanticModelAccessor
 from metricflow.specs import NonAdditiveDimensionSpec, MeasureSpec
 
 logger = logging.getLogger(__name__)
 
 
-class SemanticModelSemantics(SemanticModelSemanticsAccessor):
+class SemanticModelLookup(SemanticModelAccessor):
     """Tracks semantic information for semantic model held in a set of SemanticModelContainers
 
-    This implements both the SemanticModelSemanticsAccessors protocol, the interface type we use throughout the codebase.
+    This implements both the SemanticModelAccessors protocol, the interface type we use throughout the codebase.
     That interface prevents unwanted calls to methods for adding semantic models to the container.
     """
 

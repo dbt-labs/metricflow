@@ -17,7 +17,7 @@ from metricflow.dataflow.dataflow_plan import (
 from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator, MAX_JOIN_HOPS
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
-from metricflow.protocols.semantics import SemanticModelSemanticsAccessor
+from metricflow.protocols.semantics import SemanticModelAccessor
 from metricflow.spec_set_transforms import ToElementNameSet
 from metricflow.specs import LinkableInstanceSpec, LinklessEntitySpec, InstanceSpecSet
 
@@ -79,13 +79,13 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
 
     def __init__(  # noqa: D
         self,
-        semantic_model_semantics: SemanticModelSemanticsAccessor,
+        semantic_model_lookup: SemanticModelAccessor,
         node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver[SqlDataSetT],
     ):
         self._node_data_set_resolver = node_data_set_resolver
-        self._partition_resolver = PartitionJoinResolver(semantic_model_semantics)
-        self._semantic_model_semantics = semantic_model_semantics
-        self._join_evaluator = SemanticModelJoinEvaluator(semantic_model_semantics)
+        self._partition_resolver = PartitionJoinResolver(semantic_model_lookup)
+        self._semantic_model_lookup = semantic_model_lookup
+        self._join_evaluator = SemanticModelJoinEvaluator(semantic_model_lookup)
 
     def add_time_range_constraint(
         self,
@@ -139,7 +139,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
                 len(entity_instance_in_first_node.defined_from) == 1
             ), "Multiple items in defined_from not yet supported"
 
-            entity = self._semantic_model_semantics.get_entity_in_semantic_model(
+            entity = self._semantic_model_lookup.get_entity_in_semantic_model(
                 entity_instance_in_first_node.defined_from[0]
             )
             if entity is None:

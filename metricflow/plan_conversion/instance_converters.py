@@ -23,7 +23,7 @@ from metricflow.instances import (
     InstanceSetTransform,
     TimeDimensionInstance,
 )
-from metricflow.protocols.semantics import SemanticModelSemanticsAccessor
+from metricflow.protocols.semantics import SemanticModelAccessor
 from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.specs import (
@@ -167,10 +167,10 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
         self,
         table_alias: str,
         column_resolver: ColumnAssociationResolver,
-        semantic_model_semantics: SemanticModelSemanticsAccessor,
+        semantic_model_lookup: SemanticModelAccessor,
         metric_input_measure_specs: Sequence[MetricInputMeasureSpec],
     ) -> None:
-        self._semantic_model_semantics = semantic_model_semantics
+        self._semantic_model_lookup = semantic_model_lookup
         self.metric_input_measure_specs = metric_input_measure_specs
         super().__init__(table_alias=table_alias, column_resolver=column_resolver)
 
@@ -205,7 +205,7 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
 
         # Create an expression that will aggregate the given measure.
         # Figure out the aggregation function for the measure.
-        measure = self._semantic_model_semantics.get_measure(measure_instance.spec.as_reference)
+        measure = self._semantic_model_lookup.get_measure(measure_instance.spec.as_reference)
         aggregation_type = measure.agg
 
         expression_to_get_measure = SqlColumnReferenceExpression(
@@ -273,15 +273,15 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
     an SCD source, and extracting validity window information accordingly.
     """
 
-    def __init__(self, semantic_model_semantics: SemanticModelSemanticsAccessor) -> None:
-        """Initializer. The SemanticModelSemanticsAccessor is needed for getting the original model definition."""
-        self._semantic_model_semantics = semantic_model_semantics
+    def __init__(self, semantic_model_lookup: SemanticModelAccessor) -> None:
+        """Initializer. The SemanticModelAccessor is needed for getting the original model definition."""
+        self._semantic_model_lookup = semantic_model_lookup
 
     def _get_validity_window_dimensions_for_semantic_model(
         self, semantic_model_reference: SemanticModelReference
     ) -> Optional[Tuple[_DimensionValidityParams, _DimensionValidityParams]]:
         """Returns a 2-tuple (start, end) of validity window dimensions info, if any exist in the semantic model"""
-        semantic_model = self._semantic_model_semantics.get_by_reference(semantic_model_reference)
+        semantic_model = self._semantic_model_lookup.get_by_reference(semantic_model_reference)
         assert semantic_model, f"Could not find semantic model {semantic_model_reference} after data set conversion!"
 
         start_dim = semantic_model.validity_start_dimension
