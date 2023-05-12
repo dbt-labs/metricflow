@@ -18,7 +18,7 @@ from typing import List, Optional, Sequence, Tuple, TypeVar, Generic, Any
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.objects.metric import MetricTimeWindow
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.references import (
     DimensionReference,
     MeasureReference,
@@ -27,6 +27,8 @@ from dbt_semantic_interfaces.references import (
     EntityReference,
 )
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+
 from metricflow.aggregation_properties import AggregationState
 from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.filters.time_constraint import TimeRangeConstraint
@@ -34,6 +36,7 @@ from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.specs.column_assoc import ColumnAssociation
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_column_type import SqlColumnType
+from metricflow.visitor import VisitorOutputT
 
 
 def hash_items(items: Sequence[SqlColumnType]) -> str:
@@ -88,6 +91,34 @@ class ColumnAssociationResolver(ABC):
         pass
 
 
+class InstanceSpecVisitor(Generic[VisitorOutputT], ABC):
+    """Visitor for the InstanceSpec classes."""
+
+    @abstractmethod
+    def visit_measure_spec(self, measure_spec: MeasureSpec) -> VisitorOutputT:  # noqa: D
+        raise NotImplementedError
+
+    @abstractmethod
+    def visit_dimension_spec(self, dimension_spec: DimensionSpec) -> VisitorOutputT:  # noqa: D
+        raise NotImplementedError
+
+    @abstractmethod
+    def visit_time_dimension_spec(self, time_dimension_spec: TimeDimensionSpec) -> VisitorOutputT:  # noqa: D
+        raise NotImplementedError
+
+    @abstractmethod
+    def visit_entity_spec(self, entity_spec: EntitySpec) -> VisitorOutputT:  # noqa: D
+        raise NotImplementedError
+
+    @abstractmethod
+    def visit_metric_spec(self, metric_spec: MetricSpec) -> VisitorOutputT:  # noqa: D
+        raise NotImplementedError
+
+    @abstractmethod
+    def visit_metadata_spec(self, metadata_spec: MetadataSpec) -> VisitorOutputT:  # noqa: D
+        raise NotImplementedError
+
+
 @dataclass(frozen=True)
 class InstanceSpec(SerializableDataclass):
     """A specification for an instance of a metric definition object.
@@ -122,6 +153,10 @@ class InstanceSpec(SerializableDataclass):
         """Return the qualified name of this spec. e.g. "user_id__country"."""
         raise NotImplementedError()
 
+    def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:
+        """See Visitable."""
+        raise NotImplementedError()
+
 
 SelfTypeT = TypeVar("SelfTypeT", bound="LinkableInstanceSpec")
 
@@ -142,6 +177,9 @@ class MetadataSpec(InstanceSpec):
     @staticmethod
     def from_name(name: str) -> MetadataSpec:  # noqa: D
         return MetadataSpec(element_name=name)
+
+    def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+        return visitor.visit_metadata_spec(self)
 
 
 @dataclass(frozen=True)
@@ -232,6 +270,9 @@ class EntitySpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
     def as_linkable_spec_set(self) -> LinkableSpecSet:  # noqa: D
         return LinkableSpecSet(entity_specs=(self,))
 
+    def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+        return visitor.visit_entity_spec(self)
+
 
 @dataclass(frozen=True)
 class LinklessEntitySpec(EntitySpec, SerializableDataclass):
@@ -296,6 +337,9 @@ class DimensionSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
     def as_linkable_spec_set(self) -> LinkableSpecSet:  # noqa: D
         return LinkableSpecSet(dimension_specs=(self,))
 
+    def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+        return visitor.visit_dimension_spec(self)
+
 
 DEFAULT_TIME_GRANULARITY = TimeGranularity.DAY
 
@@ -348,6 +392,9 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
     @property
     def as_linkable_spec_set(self) -> LinkableSpecSet:  # noqa: D
         return LinkableSpecSet(time_dimension_specs=(self,))
+
+    def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+        return visitor.visit_time_dimension_spec(self)
 
 
 @dataclass(frozen=True)
@@ -411,6 +458,9 @@ class MeasureSpec(InstanceSpec):  # noqa: D
     def as_reference(self) -> MeasureReference:  # noqa: D
         return MeasureReference(element_name=self.element_name)
 
+    def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+        return visitor.visit_measure_spec(self)
+
 
 @dataclass(frozen=True)
 class MetricSpec(InstanceSpec):  # noqa: D
@@ -448,6 +498,9 @@ class MetricSpec(InstanceSpec):  # noqa: D
             element_name=self.alias or self.element_name,
             constraint=self.constraint,
         )
+
+    def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+        return visitor.visit_metric_spec(self)
 
 
 @dataclass(frozen=True)
