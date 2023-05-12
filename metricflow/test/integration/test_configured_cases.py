@@ -34,7 +34,7 @@ from metricflow.test.integration.configured_test_case import (
     RequiredDwEngineFeatures,
     CONFIGURED_INTEGRATION_TESTS_REPOSITORY,
 )
-from metricflow.test.test_utils import as_datetime
+from dbt_semantic_interfaces.test_utils import as_datetime
 from metricflow.test.time.configurable_time_source import (
     ConfigurableTimeSource,
 )

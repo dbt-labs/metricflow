@@ -16,8 +16,8 @@ from dbt_semantic_interfaces.validations.entities import (
     OnePrimaryEntityPerSemanticModelRule,
 )
 from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationException
-from metricflow.test.model.validations.helpers import base_model_file
-from metricflow.test.test_utils import find_semantic_model_with
+from dbt_semantic_interfaces.test_utils import base_semantic_manifest_file
+from dbt_semantic_interfaces.test_utils import find_semantic_model_with
 
 
 def test_semantic_model_cant_have_more_than_one_primary_entity(
@@ -83,7 +83,7 @@ def test_multiple_natural_entities() -> None:
         """
     )
     natural_entity_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
-    model = parse_yaml_files_to_validation_ready_model([base_model_file(), natural_entity_file])
+    model = parse_yaml_files_to_validation_ready_model([base_semantic_manifest_file(), natural_entity_file])
 
     with pytest.raises(ModelValidationException, match="can have at most one natural entity"):
         ModelValidator([NaturalEntityConfigurationRule()]).checked_validations(model.model)
@@ -107,7 +107,7 @@ def test_natural_entity_used_in_wrong_context() -> None:
         """
     )
     natural_entity_file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
-    model = parse_yaml_files_to_validation_ready_model([base_model_file(), natural_entity_file])
+    model = parse_yaml_files_to_validation_ready_model([base_semantic_manifest_file(), natural_entity_file])
 
     with pytest.raises(ModelValidationException, match="use of `natural` entities is currently supported only in"):
         ModelValidator([NaturalEntityConfigurationRule()]).checked_validations(model.model)
