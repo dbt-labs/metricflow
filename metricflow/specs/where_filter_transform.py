@@ -78,7 +78,7 @@ class ConvertToWhereSpec(WhereFilterTransform[WhereFilterSpec]):
                 )
             )
             dimension_specs.append(dimension_spec)
-            return self._column_association_resolver.resolve_dimension_spec(dimension_spec).column_name
+            return self._column_association_resolver.resolve_spec(dimension_spec).column_name
 
         def _time_dimension_call(
             time_dimension_name: str, time_granularity_name: str, entity_path: Sequence[str] = ()
@@ -92,7 +92,7 @@ class ConvertToWhereSpec(WhereFilterTransform[WhereFilterSpec]):
                 )
             )
             time_dimension_specs.append(time_dimension_spec)
-            return self._column_association_resolver.resolve_time_dimension_spec(time_dimension_spec).column_name
+            return self._column_association_resolver.resolve_spec(time_dimension_spec).column_name
 
         def _entity_call(entity_name: str, entity_path: Sequence[str] = ()) -> str:
             entity_spec = ConvertToWhereSpec._convert_to_entity_spec(
@@ -104,7 +104,7 @@ class ConvertToWhereSpec(WhereFilterTransform[WhereFilterSpec]):
 
             entity_specs.append(entity_spec)
             """Gets called by Jinja when rendering {{ entity(...) }}"""
-            return self._column_association_resolver.resolve_entity_spec(entity_spec).column_name
+            return self._column_association_resolver.resolve_spec(entity_spec).column_name
 
         try:
             rendered_sql_template = jinja2.Template(

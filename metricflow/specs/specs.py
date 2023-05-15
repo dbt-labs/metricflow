@@ -145,7 +145,7 @@ class MetadataSpec(InstanceSpec):
     element_name: str
 
     def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
-        return (resolver.resolve_metadata_spec(self),)
+        return (resolver.resolve_spec(self),)
 
     @property
     def qualified_name(self) -> str:  # noqa: D
@@ -204,7 +204,7 @@ class LinkableInstanceSpec(InstanceSpec, ABC):
 @dataclass(frozen=True)
 class EntitySpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
     def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
-        return (resolver.resolve_entity_spec(self),)
+        return (resolver.resolve_spec(self),)
 
     @property
     def without_first_entity_link(self) -> EntitySpec:  # noqa: D
@@ -282,7 +282,7 @@ class DimensionSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
     entity_links: Tuple[EntityReference, ...]
 
     def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
-        return (resolver.resolve_dimension_spec(self),)
+        return (resolver.resolve_spec(self),)
 
     @property
     def without_first_entity_link(self) -> DimensionSpec:  # noqa: D
@@ -329,7 +329,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
     aggregation_state: Optional[AggregationState] = None
 
     def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
-        return (resolver.resolve_time_dimension_spec(self),)
+        return (resolver.resolve_spec(self),)
 
     @property
     def without_first_entity_link(self) -> TimeDimensionSpec:  # noqa: D
@@ -426,7 +426,7 @@ class MeasureSpec(InstanceSpec):  # noqa: D
     non_additive_dimension_spec: Optional[NonAdditiveDimensionSpec] = None
 
     def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
-        return (resolver.resolve_measure_spec(self),)
+        return (resolver.resolve_spec(self),)
 
     @staticmethod
     def from_name(name: str) -> MeasureSpec:
@@ -464,7 +464,7 @@ class MetricSpec(InstanceSpec):  # noqa: D
         return MetricSpec(element_name=element_name)
 
     def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
-        return (resolver.resolve_metric_spec(self),)
+        return (resolver.resolve_spec(self),)
 
     @property
     def qualified_name(self) -> str:  # noqa: D

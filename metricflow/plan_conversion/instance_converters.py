@@ -220,7 +220,7 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
 
         # Get the output column name from the measure/alias
 
-        new_column_association_for_aggregated_measure = self._column_resolver.resolve_measure_spec(output_measure_spec)
+        new_column_association_for_aggregated_measure = self._column_resolver.resolve_spec(output_measure_spec)
         new_column_name_for_aggregated_measure = new_column_association_for_aggregated_measure.column_name
 
         return SqlSelectColumn(
@@ -730,11 +730,7 @@ class ChangeAssociatedColumns(InstanceSetTransform[InstanceSet]):
         for input_measure_instance in instance_set.measure_instances:
             output_measure_instances.append(
                 MeasureInstance(
-                    associated_columns=(
-                        self._column_association_resolver.resolve_measure_spec(
-                            measure_spec=input_measure_instance.spec
-                        ),
-                    ),
+                    associated_columns=(self._column_association_resolver.resolve_spec(input_measure_instance.spec),),
                     spec=input_measure_instance.spec,
                     defined_from=input_measure_instance.defined_from,
                     aggregation_state=input_measure_instance.aggregation_state,
@@ -745,11 +741,7 @@ class ChangeAssociatedColumns(InstanceSetTransform[InstanceSet]):
         for input_dimension_instance in instance_set.dimension_instances:
             output_dimension_instances.append(
                 DimensionInstance(
-                    associated_columns=(
-                        self._column_association_resolver.resolve_dimension_spec(
-                            dimension_spec=input_dimension_instance.spec
-                        ),
-                    ),
+                    associated_columns=(self._column_association_resolver.resolve_spec(input_dimension_instance.spec),),
                     spec=input_dimension_instance.spec,
                     defined_from=input_dimension_instance.defined_from,
                 )
@@ -760,9 +752,7 @@ class ChangeAssociatedColumns(InstanceSetTransform[InstanceSet]):
             output_time_dimension_instances.append(
                 TimeDimensionInstance(
                     associated_columns=(
-                        self._column_association_resolver.resolve_time_dimension_spec(
-                            time_dimension_spec=input_time_dimension_instance.spec
-                        ),
+                        self._column_association_resolver.resolve_spec(input_time_dimension_instance.spec),
                     ),
                     spec=input_time_dimension_instance.spec,
                     defined_from=input_time_dimension_instance.defined_from,
@@ -773,9 +763,7 @@ class ChangeAssociatedColumns(InstanceSetTransform[InstanceSet]):
         for input_entity_instance in instance_set.entity_instances:
             output_entity_instances.append(
                 EntityInstance(
-                    associated_columns=(
-                        self._column_association_resolver.resolve_entity_spec(entity_spec=input_entity_instance.spec),
-                    ),
+                    associated_columns=(self._column_association_resolver.resolve_spec(input_entity_instance.spec),),
                     spec=input_entity_instance.spec,
                     defined_from=input_entity_instance.defined_from,
                 )
@@ -785,9 +773,7 @@ class ChangeAssociatedColumns(InstanceSetTransform[InstanceSet]):
         for input_metric_instance in instance_set.metric_instances:
             output_metric_instances.append(
                 MetricInstance(
-                    associated_columns=(
-                        self._column_association_resolver.resolve_metric_spec(metric_spec=input_metric_instance.spec),
-                    ),
+                    associated_columns=(self._column_association_resolver.resolve_spec(input_metric_instance.spec),),
                     spec=input_metric_instance.spec,
                     defined_from=input_metric_instance.defined_from,
                 )
@@ -797,11 +783,7 @@ class ChangeAssociatedColumns(InstanceSetTransform[InstanceSet]):
         for input_metadata_instance in instance_set.metadata_instances:
             output_metadata_instances.append(
                 MetadataInstance(
-                    associated_columns=(
-                        self._column_association_resolver.resolve_metadata_spec(
-                            metadata_spec=input_metadata_instance.spec
-                        ),
-                    ),
+                    associated_columns=(self._column_association_resolver.resolve_spec(input_metadata_instance.spec),),
                     spec=input_metadata_instance.spec,
                 )
             )
