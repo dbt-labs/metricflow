@@ -755,18 +755,17 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
         order_by_descriptions = []
         for order_by_spec in node.order_by_specs:
-            column_associations = order_by_spec.item.column_associations(self._column_association_resolver)
-            for column_association in column_associations:
-                order_by_descriptions.append(
-                    SqlOrderByDescription(
-                        expr=SqlColumnReferenceExpression(
-                            col_ref=SqlColumnReference(
-                                table_alias=from_data_set_alias, column_name=column_association.column_name
-                            )
-                        ),
-                        desc=order_by_spec.descending,
-                    )
+            order_by_descriptions.append(
+                SqlOrderByDescription(
+                    expr=SqlColumnReferenceExpression(
+                        col_ref=SqlColumnReference(
+                            table_alias=from_data_set_alias,
+                            column_name=self._column_association_resolver.resolve_spec(order_by_spec.item).column_name,
+                        )
+                    ),
+                    desc=order_by_spec.descending,
                 )
+            )
 
         return SqlDataSet(
             instance_set=output_instance_set,
@@ -960,13 +959,10 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
         joins_descriptions: List[SqlJoinDescription] = []
         # TODO: refactor this loop into SqlQueryPlanJoinBuilder
-        column_associations = [
-            x.column_associations(self._column_association_resolver) for x in linkable_spec_set.all_specs
-        ]
-        assert all(
-            [len(associations) == 1 for associations in column_associations]
-        ), "Found more than 1 column association for a join key in the combine metrics node!"
-        column_names = [associations[0].column_name for associations in column_associations]
+        column_associations = tuple(
+            self._column_association_resolver.resolve_spec(spec) for spec in linkable_spec_set.all_specs
+        )
+        column_names = tuple(association.column_name for association in column_associations)
         aliases_seen = [from_data_set.alias]
         for join_data_set in join_data_sets:
             joins_descriptions.append(

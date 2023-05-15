@@ -109,14 +109,6 @@ class InstanceSpec(SerializableDataclass):
     """Name of the dimension or entity in the semantic model."""
     element_name: str
 
-    def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:
-        """Figures out what columns in an SQL query that this spec should be associated with given the resolver.
-
-        Debating whether this should be an abstract method, or whether it could just live in the different specs to
-        allow for different signatures.
-        """
-        raise NotImplementedError()
-
     @staticmethod
     def merge(*specs: Sequence[InstanceSpec]) -> List[InstanceSpec]:
         """Merge all specs into a single list."""
@@ -143,9 +135,6 @@ class MetadataSpec(InstanceSpec):
     """A specification for a specification that is built during the dataflow plan and not defined in config."""
 
     element_name: str
-
-    def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
-        return (resolver.resolve_spec(self),)
 
     @property
     def qualified_name(self) -> str:  # noqa: D
@@ -203,9 +192,6 @@ class LinkableInstanceSpec(InstanceSpec, ABC):
 
 @dataclass(frozen=True)
 class EntitySpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
-    def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
-        return (resolver.resolve_spec(self),)
-
     @property
     def without_first_entity_link(self) -> EntitySpec:  # noqa: D
         assert len(self.entity_links) > 0, f"Spec does not have any entity links: {self}"
@@ -281,9 +267,6 @@ class DimensionSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
     element_name: str
     entity_links: Tuple[EntityReference, ...]
 
-    def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
-        return (resolver.resolve_spec(self),)
-
     @property
     def without_first_entity_link(self) -> DimensionSpec:  # noqa: D
         assert len(self.entity_links) > 0, f"Spec does not have any entity links: {self}"
@@ -327,9 +310,6 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
 
     # Used for semi-additive joins. Some more thought is needed, but this may be useful in InstanceSpec.
     aggregation_state: Optional[AggregationState] = None
-
-    def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
-        return (resolver.resolve_spec(self),)
 
     @property
     def without_first_entity_link(self) -> TimeDimensionSpec:  # noqa: D
@@ -425,9 +405,6 @@ class MeasureSpec(InstanceSpec):  # noqa: D
     element_name: str
     non_additive_dimension_spec: Optional[NonAdditiveDimensionSpec] = None
 
-    def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
-        return (resolver.resolve_spec(self),)
-
     @staticmethod
     def from_name(name: str) -> MeasureSpec:
         """Construct from a name e.g. listing__ds__month."""
@@ -462,9 +439,6 @@ class MetricSpec(InstanceSpec):  # noqa: D
     @staticmethod
     def from_element_name(element_name: str) -> MetricSpec:  # noqa: D
         return MetricSpec(element_name=element_name)
-
-    def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
-        return (resolver.resolve_spec(self),)
 
     @property
     def qualified_name(self) -> str:  # noqa: D
