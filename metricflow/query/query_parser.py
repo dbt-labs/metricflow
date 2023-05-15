@@ -26,7 +26,7 @@ from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.query.query_exceptions import InvalidQueryException
-from metricflow.specs import (
+from metricflow.specs.specs import (
     MetricFlowQuerySpec,
     MetricSpec,
     DimensionSpec,

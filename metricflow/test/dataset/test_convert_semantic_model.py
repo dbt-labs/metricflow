@@ -4,7 +4,7 @@ from _pytest.fixtures import FixtureRequest
 
 from dbt_semantic_interfaces.references import SemanticModelReference
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.specs import (
+from metricflow.specs.specs import (
     DimensionSpec,
     EntitySpec,
     InstanceSpecSet,

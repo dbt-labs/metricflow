@@ -1,4 +1,4 @@
-from metricflow.specs import InstanceSpecSetTransform, InstanceSpecSet
+from metricflow.specs.specs import InstanceSpecSetTransform, InstanceSpecSet
 
 
 class MatchingLinkableSpecsTransform(InstanceSpecSetTransform[bool]):

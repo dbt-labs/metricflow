@@ -7,7 +7,7 @@ from metricflow.column_assoc import (
     ColumnAssociation,
 )
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
-from metricflow.specs import (
+from metricflow.specs.specs import (
     MetadataSpec,
     MetricSpec,
     MeasureSpec,

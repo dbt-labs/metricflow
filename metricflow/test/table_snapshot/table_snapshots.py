@@ -16,7 +16,7 @@ import yaml
 from dbt_semantic_interfaces.objects.base import FrozenBaseModel
 from metricflow.dataflow.sql_table import SqlTable
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from metricflow.specs import hash_items
+from metricflow.specs.specs import hash_items
 from metricflow.protocols.sql_client import SqlClient
 
 logger = logging.getLogger(__name__)

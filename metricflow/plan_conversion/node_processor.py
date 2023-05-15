@@ -19,7 +19,7 @@ from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.protocols.semantics import SemanticModelAccessor
 from metricflow.spec_set_transforms import ToElementNameSet
-from metricflow.specs import LinkableInstanceSpec, LinklessEntitySpec, InstanceSpecSet
+from metricflow.specs.specs import LinkableInstanceSpec, LinklessEntitySpec, InstanceSpecSet
 
 SqlDataSetT = TypeVar("SqlDataSetT", bound=SqlDataSet)
 

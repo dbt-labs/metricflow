@@ -34,7 +34,7 @@ from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationR
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.specs import (
+from metricflow.specs.specs import (
     DimensionSpec,
     MeasureSpec,
     MetricInputMeasureSpec,

@@ -26,7 +26,7 @@ from metricflow.instances import (
 from metricflow.protocols.semantics import SemanticModelAccessor
 from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
-from metricflow.specs import (
+from metricflow.specs.specs import (
     MeasureSpec,
     MetricInputMeasureSpec,
     InstanceSpec,

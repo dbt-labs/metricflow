@@ -10,7 +10,7 @@ from metricflow.model.semantics.linkable_spec_resolver import ValidLinkableSpecR
 from metricflow.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.protocols.semantics import MetricAccessor
-from metricflow.specs import (
+from metricflow.specs.specs import (
     MetricSpec,
     LinkableInstanceSpec,
     MetricInputMeasureSpec,

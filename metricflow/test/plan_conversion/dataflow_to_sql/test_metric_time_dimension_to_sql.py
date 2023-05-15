@@ -6,7 +6,7 @@ from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from dbt_semantic_interfaces.references import TimeDimensionReference
-from metricflow.specs import MetricFlowQuerySpec, MetricSpec
+from metricflow.specs.specs import MetricFlowQuerySpec, MetricSpec
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.plan_conversion.test_dataflow_to_sql_plan import convert_and_check

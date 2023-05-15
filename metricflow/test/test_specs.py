@@ -2,7 +2,7 @@ from typing import Sequence
 
 import pytest
 
-from metricflow.specs import (
+from metricflow.specs.specs import (
     DimensionSpec,
     EntitySpec,
     InstanceSpec,

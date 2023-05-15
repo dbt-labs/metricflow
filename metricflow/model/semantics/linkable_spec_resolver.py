@@ -16,7 +16,7 @@ from metricflow.model.semantics.linkable_element_properties import LinkableEleme
 from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from metricflow.protocols.semantics import SemanticModelAccessor
-from metricflow.specs import (
+from metricflow.specs.specs import (
     DEFAULT_TIME_GRANULARITY,
     LinkableSpecSet,
     DimensionSpec,

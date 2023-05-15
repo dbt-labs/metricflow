@@ -14,7 +14,7 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.time_spine import TimeSpineSource
-from metricflow.specs import (
+from metricflow.specs.specs import (
     EntitySpec,
     MeasureSpec,
     TimeDimensionSpec,

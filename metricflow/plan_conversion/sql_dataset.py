@@ -10,7 +10,7 @@ from metricflow.instances import (
     SemanticModelElementInstance,
     InstanceSetTransform,
 )
-from metricflow.specs import DimensionSpec, TimeDimensionSpec, EntitySpec
+from metricflow.specs.specs import DimensionSpec, TimeDimensionSpec, EntitySpec
 from metricflow.sql.sql_plan import (
     SqlSelectStatementNode,
 )

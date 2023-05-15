@@ -44,7 +44,7 @@ from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanCon
 from metricflow.plan_conversion.time_spine import TimeSpineSource, TimeSpineTableBuilder
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.query.query_parser import MetricFlowQueryParser
-from metricflow.specs import ColumnAssociationResolver, MetricFlowQuerySpec
+from metricflow.specs.specs import ColumnAssociationResolver, MetricFlowQuerySpec
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql_clients.common_client import not_empty
 from metricflow.sql_clients.sql_utils import make_sql_client_from_config

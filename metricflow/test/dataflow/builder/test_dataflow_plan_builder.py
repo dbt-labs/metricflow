@@ -10,7 +10,7 @@ from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.dataset.dataset import DataSet
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
-from metricflow.specs import (
+from metricflow.specs.specs import (
     MetricFlowQuerySpec,
     MetricSpec,
     DimensionSpec,
@@ -18,7 +18,7 @@ from metricflow.specs import (
     ColumnAssociationResolver,
     WhereFilterSpec,
 )
-from metricflow.specs import (
+from metricflow.specs.specs import (
     OrderBySpec,
 )
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
