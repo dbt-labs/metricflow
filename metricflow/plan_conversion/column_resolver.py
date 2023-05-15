@@ -2,7 +2,7 @@ import logging
 from typing import Optional
 
 from metricflow.aggregation_properties import AggregationState
-from metricflow.column_assoc import (
+from metricflow.specs.column_assoc import (
     SingleColumnCorrelationKey,
     ColumnAssociation,
 )

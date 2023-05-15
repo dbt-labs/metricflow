@@ -3,7 +3,7 @@ from typing import Sequence, List
 import more_itertools
 
 from dbt_semantic_interfaces.references import SemanticModelReference
-from metricflow.column_assoc import ColumnAssociation
+from metricflow.specs.column_assoc import ColumnAssociation
 from metricflow.dataset.dataset import DataSet
 from metricflow.instances import (
     InstanceSet,
