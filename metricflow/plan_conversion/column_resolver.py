@@ -1,12 +1,13 @@
 import logging
-from typing import Optional
 
-from metricflow.aggregation_properties import AggregationState
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.specs.column_assoc import (
     SingleColumnCorrelationKey,
     ColumnAssociation,
 )
-from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.specs.specs import (
     MetadataSpec,
     MetricSpec,
@@ -16,8 +17,6 @@ from metricflow.specs.specs import (
     EntitySpec,
     ColumnAssociationResolver,
 )
-from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +49,8 @@ class DefaultColumnAssociationResolver(ColumnAssociationResolver):
         )
 
     def resolve_time_dimension_spec(  # noqa: D
-        self, time_dimension_spec: TimeDimensionSpec, aggregation_state: Optional[AggregationState] = None
+        self,
+        time_dimension_spec: TimeDimensionSpec,
     ) -> ColumnAssociation:
         if time_dimension_spec.time_granularity == TimeGranularity.DAY:
             column_name = StructuredLinkableSpecName(
@@ -65,7 +65,12 @@ class DefaultColumnAssociationResolver(ColumnAssociationResolver):
             ).qualified_name
 
         return ColumnAssociation(
-            column_name=column_name + (f"__{aggregation_state.value.lower()}" if aggregation_state else ""),
+            column_name=column_name
+            + (
+                f"__{time_dimension_spec.aggregation_state.value.lower()}"
+                if time_dimension_spec.aggregation_state is not None
+                else ""
+            ),
             single_column_correlation_key=SingleColumnCorrelationKey(),
         )
 

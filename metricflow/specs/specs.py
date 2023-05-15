@@ -18,7 +18,6 @@ from typing import List, Optional, Sequence, Tuple, TypeVar, Generic, Any
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.objects.metric import MetricTimeWindow
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.references import (
     DimensionReference,
     MeasureReference,
@@ -77,9 +76,7 @@ class ColumnAssociationResolver(ABC):
         pass
 
     @abstractmethod
-    def resolve_time_dimension_spec(  # noqa: D
-        self, time_dimension_spec: TimeDimensionSpec, aggregation_state: Optional[AggregationState] = None
-    ) -> ColumnAssociation:
+    def resolve_time_dimension_spec(self, time_dimension_spec: TimeDimensionSpec) -> ColumnAssociation:  # noqa: D
         pass
 
     @abstractmethod
