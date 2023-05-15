@@ -35,7 +35,7 @@ from dbt_semantic_interfaces.references import (
 from metricflow.aggregation_properties import AggregationState
 from metricflow.aggregation_properties import AggregationType
 from metricflow.assert_one_arg import assert_exactly_one_arg_set
-from metricflow.column_assoc import ColumnAssociation
+from metricflow.specs.column_assoc import ColumnAssociation
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
