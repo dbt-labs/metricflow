@@ -295,7 +295,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
         time_spine_data_set_alias = self._next_unique_table_alias()
 
-        metric_time_dimension_column_name = self.column_association_resolver.resolve_time_dimension_spec(
+        metric_time_dimension_column_name = self.column_association_resolver.resolve_spec(
             metric_time_dimension_spec
         ).column_name
 
@@ -650,10 +650,10 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 assert (
                     numerator is not None and denominator is not None
                 ), "Missing numerator or denominator for ratio metric, this should have been caught in validation!"
-                numerator_column_name = self._column_association_resolver.resolve_measure_spec(
+                numerator_column_name = self._column_association_resolver.resolve_spec(
                     MeasureSpec(element_name=numerator.post_aggregation_measure_reference.element_name)
                 ).column_name
-                denominator_column_name = self._column_association_resolver.resolve_measure_spec(
+                denominator_column_name = self._column_association_resolver.resolve_spec(
                     MeasureSpec(element_name=denominator.post_aggregation_measure_reference.element_name)
                 ).column_name
 
@@ -676,7 +676,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                     assert (
                         len(metric.input_measures) == 1
                     ), "Measure proxy metrics should always source from exactly 1 measure."
-                    expr = self._column_association_resolver.resolve_measure_spec(
+                    expr = self._column_association_resolver.resolve_spec(
                         MeasureSpec(
                             element_name=metric.input_measures[0].post_aggregation_measure_reference.element_name
                         )
@@ -694,7 +694,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 assert (
                     len(metric.measure_references) == 1
                 ), "Cumulative metrics should always source from exactly 1 measure."
-                expr = self._column_association_resolver.resolve_measure_spec(
+                expr = self._column_association_resolver.resolve_spec(
                     MeasureSpec(element_name=metric.input_measures[0].post_aggregation_measure_reference.element_name)
                 ).column_name
                 metric_expr = SqlColumnReferenceExpression(
@@ -711,7 +711,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
             assert metric_expr
 
-            output_column_association = self._column_association_resolver.resolve_metric_spec(metric_spec.alias_spec)
+            output_column_association = self._column_association_resolver.resolve_spec(metric_spec.alias_spec)
             metric_select_columns.append(
                 SqlSelectColumn(
                     expr=metric_expr,
@@ -875,7 +875,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         select_columns = []
         for table_alias, metric_specs in table_alias_to_metric_specs.items():
             for metric_spec in metric_specs:
-                metric_column_name = self._column_association_resolver.resolve_metric_spec(metric_spec).column_name
+                metric_column_name = self._column_association_resolver.resolve_spec(metric_spec).column_name
                 column_reference_expression = SqlColumnReferenceExpression(
                     col_ref=SqlColumnReference(
                         table_alias=table_alias,
@@ -1133,15 +1133,13 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             metric_time_dimension_spec = DataSet.metric_time_dimension_spec(
                 matching_time_dimension_instance.spec.time_granularity
             )
-            metric_time_dimension_column_association = self._column_association_resolver.resolve_time_dimension_spec(
+            metric_time_dimension_column_association = self._column_association_resolver.resolve_spec(
                 metric_time_dimension_spec
             )
             output_time_dimension_instances.append(
                 TimeDimensionInstance(
                     defined_from=matching_time_dimension_instance.defined_from,
-                    associated_columns=(
-                        self._column_association_resolver.resolve_time_dimension_spec(metric_time_dimension_spec),
-                    ),
+                    associated_columns=(self._column_association_resolver.resolve_spec(metric_time_dimension_spec),),
                     spec=metric_time_dimension_spec,
                 )
             )
@@ -1201,11 +1199,9 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         column_equality_descriptions: List[ColumnEqualityDescription] = []
 
         # Build Time Dimension SqlSelectColumn
-        time_dimension_column_name = self.column_association_resolver.resolve_time_dimension_spec(
-            time_dimension_spec=node.time_dimension_spec
-        ).column_name
-        join_time_dimension_column_name = self.column_association_resolver.resolve_time_dimension_spec(
-            time_dimension_spec=node.time_dimension_spec.with_aggregation_state(AggregationState.COMPLETE),
+        time_dimension_column_name = self.column_association_resolver.resolve_spec(node.time_dimension_spec).column_name
+        join_time_dimension_column_name = self.column_association_resolver.resolve_spec(
+            node.time_dimension_spec.with_aggregation_state(AggregationState.COMPLETE),
         ).column_name
         time_dimension_select_column = SqlSelectColumn(
             expr=SqlFunctionExpression.build_expression_from_aggregation_type(
@@ -1229,7 +1225,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         # Build optional window grouping SqlSelectColumn
         entity_select_columns: List[SqlSelectColumn] = []
         for entity_spec in node.entity_specs:
-            entity_column_name = self.column_association_resolver.resolve_entity_spec(entity_spec).column_name
+            entity_column_name = self.column_association_resolver.resolve_spec(entity_spec).column_name
             entity_select_columns.append(
                 SqlSelectColumn(
                     expr=SqlColumnReferenceExpression(
@@ -1251,7 +1247,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         # Propogate additional group by during query time of the non-additive time dimension
         queried_time_dimension_select_column: Optional[SqlSelectColumn] = None
         if node.queried_time_dimension_spec:
-            query_time_dimension_column_name = self.column_association_resolver.resolve_time_dimension_spec(
+            query_time_dimension_column_name = self.column_association_resolver.resolve_spec(
                 node.queried_time_dimension_spec
             ).column_name
             queried_time_dimension_select_column = SqlSelectColumn(
@@ -1319,7 +1315,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         assert (
             metric_time_dimension_instance
         ), "Can't query offset metric without a time dimension. Validations should have prevented this."
-        metric_time_dimension_column_name = self.column_association_resolver.resolve_time_dimension_spec(
+        metric_time_dimension_column_name = self.column_association_resolver.resolve_spec(
             metric_time_dimension_instance.spec
         ).column_name
         time_spine_alias = self._next_unique_table_alias()
