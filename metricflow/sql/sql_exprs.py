@@ -705,11 +705,7 @@ class SqlFunction(Enum):
                 f"Unhandled aggregation type {aggregation_type} - this should have been transformed to PERCENTILE "
                 "during model parsing."
             )
-        elif (
-            aggregation_type is AggregationType.SUM_BOOLEAN
-            or aggregation_type is AggregationType.BOOLEAN
-            or aggregation_type is AggregationType.COUNT
-        ):
+        elif aggregation_type is AggregationType.SUM_BOOLEAN or aggregation_type is AggregationType.COUNT:
             raise RuntimeError(
                 f"Unhandled aggregation type {aggregation_type} - this should have been transformed to SUM "
                 "during model parsing."

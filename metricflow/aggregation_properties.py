@@ -15,7 +15,6 @@ def is_expansive(agg_type: AggregationType) -> bool:
         AggregationType.SUM,
         AggregationType.MIN,
         AggregationType.MAX,
-        AggregationType.BOOLEAN,
         AggregationType.COUNT,
     )
 
@@ -28,7 +27,6 @@ def is_additive(agg_type: AggregationType) -> bool:
         agg_type is AggregationType.MIN
         or agg_type is AggregationType.MAX
         or agg_type is AggregationType.COUNT_DISTINCT
-        or agg_type is AggregationType.BOOLEAN
         or agg_type is AggregationType.AVERAGE
         or agg_type is AggregationType.PERCENTILE
         or agg_type is AggregationType.MEDIAN
