@@ -4,9 +4,9 @@ from typing import Optional
 
 from dbt_semantic_interfaces.objects.base import HashableBaseModel, ModelWithMetadataParsing
 from dbt_semantic_interfaces.objects.metadata import Metadata
-from dbt_semantic_interfaces.references import DimensionReference, TimeDimensionReference
 from dbt_semantic_interfaces.type_enums.dimension_type import DimensionType
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.protocols.dimension import _DimensionMixin
 
 ISO8601_FMT = "YYYY-MM-DD"
 
@@ -33,7 +33,7 @@ class DimensionTypeParams(HashableBaseModel):
     validity_params: Optional[DimensionValidityParams] = None
 
 
-class Dimension(HashableBaseModel, ModelWithMetadataParsing):
+class Dimension(_DimensionMixin, HashableBaseModel, ModelWithMetadataParsing):
     """Describes a dimension"""
 
     name: str
@@ -43,30 +43,3 @@ class Dimension(HashableBaseModel, ModelWithMetadataParsing):
     type_params: Optional[DimensionTypeParams]
     expr: Optional[str] = None
     metadata: Optional[Metadata]
-
-    @property
-    def is_primary_time(self) -> bool:  # noqa: D
-        if self.type == DimensionType.TIME and self.type_params is not None:
-            return self.type_params.is_primary
-
-        return False
-
-    @property
-    def reference(self) -> DimensionReference:  # noqa: D
-        return DimensionReference(element_name=self.name)
-
-    @property
-    def time_dimension_reference(self) -> TimeDimensionReference:  # noqa: D
-        assert self.type == DimensionType.TIME, f"Got type as {self.type} instead of {DimensionType.TIME}"
-        return TimeDimensionReference(element_name=self.name)
-
-    @property
-    def validity_params(self) -> Optional[DimensionValidityParams]:
-        """Returns the DimensionValidityParams property, if it exists.
-
-        This is to avoid repeatedly checking that type params is not None before doing anything with ValidityParams
-        """
-        if self.type_params:
-            return self.type_params.validity_params
-
-        return None
