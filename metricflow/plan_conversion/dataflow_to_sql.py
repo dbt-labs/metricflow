@@ -1205,8 +1205,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             time_dimension_spec=node.time_dimension_spec
         ).column_name
         join_time_dimension_column_name = self.column_association_resolver.resolve_time_dimension_spec(
-            time_dimension_spec=node.time_dimension_spec,
-            aggregation_state=AggregationState.COMPLETE,
+            time_dimension_spec=node.time_dimension_spec.with_aggregation_state(AggregationState.COMPLETE),
         ).column_name
         time_dimension_select_column = SqlSelectColumn(
             expr=SqlFunctionExpression.build_expression_from_aggregation_type(
