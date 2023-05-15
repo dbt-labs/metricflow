@@ -348,6 +348,9 @@ DEFAULT_TIME_GRANULARITY = TimeGranularity.DAY
 class TimeDimensionSpec(DimensionSpec):  # noqa: D
     time_granularity: TimeGranularity = DEFAULT_TIME_GRANULARITY
 
+    # Used for semi-additive joins. Some more thought is needed, but this may be useful in InstanceSpec.
+    aggregation_state: Optional[AggregationState] = None
+
     def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
         return (resolver.resolve_time_dimension_spec(self),)
 
@@ -395,6 +398,14 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_time_dimension_spec(self)
+
+    def with_aggregation_state(self, aggregation_state: AggregationState) -> TimeDimensionSpec:  # noqa: D
+        return TimeDimensionSpec(
+            element_name=self.element_name,
+            entity_links=self.entity_links,
+            time_granularity=self.time_granularity,
+            aggregation_state=aggregation_state,
+        )
 
 
 @dataclass(frozen=True)
