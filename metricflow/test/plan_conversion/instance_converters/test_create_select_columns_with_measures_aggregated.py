@@ -6,7 +6,7 @@ from metricflow.plan_conversion.instance_converters import (
     FilterElements,
 )
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
-from metricflow.specs import MeasureSpec, MetricInputMeasureSpec, InstanceSpecSet
+from metricflow.specs.specs import MeasureSpec, MetricInputMeasureSpec, InstanceSpecSet
 from metricflow.sql.sql_exprs import (
     SqlFunction,
     SqlAggregateFunctionExpression,

@@ -4,7 +4,7 @@ from metricflow.dataflow.dataflow_plan import ValidityWindowJoinDescription
 from metricflow.instances import InstanceSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
-from metricflow.specs import TimeDimensionSpec
+from metricflow.specs.specs import TimeDimensionSpec
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 

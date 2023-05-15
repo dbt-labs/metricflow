@@ -40,7 +40,7 @@ from metricflow.dataflow.builder.partitions import (
 )
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.dataset import DataSet
-from metricflow.specs import (
+from metricflow.specs.specs import (
     MetricInputMeasureSpec,
     OrderBySpec,
     MetricSpec,

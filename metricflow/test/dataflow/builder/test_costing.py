@@ -8,7 +8,7 @@ from metricflow.dataflow.dataflow_plan import (
     JoinDescription,
 )
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
-from metricflow.specs import (
+from metricflow.specs.specs import (
     MeasureSpec,
     EntitySpec,
     DimensionSpec,

@@ -34,7 +34,7 @@ from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import SourceScanOptimizer
 from metricflow.dataset.dataset import DataSet
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
-from metricflow.specs import (
+from metricflow.specs.specs import (
     DimensionSpec,
     EntityReference,
     MetricFlowQuerySpec,

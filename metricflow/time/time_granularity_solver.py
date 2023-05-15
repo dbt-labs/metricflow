@@ -22,7 +22,7 @@ from dbt_semantic_interfaces.references import (
 )
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.query.query_exceptions import InvalidQueryException
-from metricflow.specs import (
+from metricflow.specs.specs import (
     TimeDimensionSpec,
     DEFAULT_TIME_GRANULARITY,
 )

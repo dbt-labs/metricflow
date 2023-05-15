@@ -14,7 +14,7 @@ from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanCon
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.specs import TimeDimensionSpec, TimeDimensionReference, InstanceSpecSet
+from metricflow.specs.specs import TimeDimensionSpec, TimeDimensionReference, InstanceSpecSet
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity

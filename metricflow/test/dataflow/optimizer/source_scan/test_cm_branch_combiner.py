@@ -15,7 +15,7 @@ from metricflow.dataflow.optimizer.source_scan.cm_branch_combiner import (
     ComputeMetricsBranchCombiner,
     ComputeMetricsBranchCombinerResult,
 )
-from metricflow.specs import MeasureSpec, InstanceSpecSet
+from metricflow.specs.specs import MeasureSpec, InstanceSpecSet
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState

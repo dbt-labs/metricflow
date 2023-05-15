@@ -18,7 +18,7 @@ from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.node_processor import PreDimensionJoinNodeProcessor
 from metricflow.plan_conversion.time_spine import TimeSpineSource
-from metricflow.specs import (
+from metricflow.specs.specs import (
     DimensionSpec,
     EntitySpec,
     LinklessEntitySpec,

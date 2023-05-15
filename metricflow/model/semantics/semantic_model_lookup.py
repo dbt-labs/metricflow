@@ -22,7 +22,7 @@ from metricflow.errors.errors import InvalidSemanticModelError
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.spec_converters import MeasureConverter
 from metricflow.protocols.semantics import SemanticModelAccessor
-from metricflow.specs import NonAdditiveDimensionSpec, MeasureSpec
+from metricflow.specs.specs import NonAdditiveDimensionSpec, MeasureSpec
 
 logger = logging.getLogger(__name__)
 

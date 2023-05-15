@@ -27,7 +27,7 @@ from metricflow.dataflow.dataflow_plan import (
     JoinToTimeSpineNode,
 )
 from metricflow.dataflow.optimizer.source_scan.matching_linkable_specs import MatchingLinkableSpecsTransform
-from metricflow.specs import InstanceSpecSet
+from metricflow.specs.specs import InstanceSpecSet
 
 logger = logging.getLogger(__name__)
 

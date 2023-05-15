@@ -27,7 +27,7 @@ from dbt_semantic_interfaces.references import (
 )
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
-from metricflow.specs import (
+from metricflow.specs.specs import (
     LinkableInstanceSpec,
     MeasureSpec,
     MetricInputMeasureSpec,

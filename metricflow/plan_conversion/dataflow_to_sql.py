@@ -71,7 +71,7 @@ from metricflow.plan_conversion.sql_join_builder import (
 )
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlEngineAttributes, SqlEngine
-from metricflow.specs import (
+from metricflow.specs.specs import (
     ColumnAssociationResolver,
     MetricSpec,
     TimeDimensionSpec,

@@ -8,7 +8,7 @@ from metricflow.plan_conversion.dataflow_to_execution import DataflowToExecution
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.async_sql_client import AsyncSqlClient
-from metricflow.specs import (
+from metricflow.specs.specs import (
     MetricFlowQuerySpec,
     MetricSpec,
     DimensionSpec,

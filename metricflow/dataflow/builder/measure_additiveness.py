@@ -3,7 +3,7 @@ import collections
 from dataclasses import dataclass
 from typing import Dict, Optional, Sequence, Tuple
 
-from metricflow.specs import MeasureSpec, NonAdditiveDimensionSpec
+from metricflow.specs.specs import MeasureSpec, NonAdditiveDimensionSpec
 
 
 @dataclass(frozen=True)

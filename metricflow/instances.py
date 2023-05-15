@@ -10,7 +10,7 @@ from dbt_semantic_interfaces.references import SemanticModelElementReference, Me
 from metricflow.aggregation_properties import AggregationState
 from metricflow.column_assoc import ColumnAssociation
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
-from metricflow.specs import (
+from metricflow.specs.specs import (
     MetadataSpec,
     MeasureSpec,
     DimensionSpec,

@@ -43,7 +43,7 @@ from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanCon
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.specs import DimensionSpec, LinkableInstanceSpec, MeasureSpec, InstanceSpecSet
+from metricflow.specs.specs import DimensionSpec, LinkableInstanceSpec, MeasureSpec, InstanceSpecSet
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 
 

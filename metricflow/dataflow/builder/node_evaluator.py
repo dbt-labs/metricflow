@@ -35,7 +35,7 @@ from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
 
 from metricflow.protocols.semantics import SemanticModelAccessor
-from metricflow.specs import (
+from metricflow.specs.specs import (
     LinkableInstanceSpec,
     LinklessEntitySpec,
 )
