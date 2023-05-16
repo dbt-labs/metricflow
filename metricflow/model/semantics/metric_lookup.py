@@ -16,8 +16,8 @@ from metricflow.specs.specs import (
     MetricInputMeasureSpec,
     MeasureSpec,
     ColumnAssociationResolver,
-    WhereFilterSpec,
 )
+from metricflow.specs.where_filter_transform import ConvertToWhereSpec
 
 logger = logging.getLogger(__name__)
 
@@ -105,9 +105,10 @@ class MetricLookup(MetricAccessor):  # noqa: D
             )
             spec = MetricInputMeasureSpec(
                 measure_spec=measure_spec,
-                constraint=WhereFilterSpec.create_from_where_filter(
-                    where_filter=input_measure.filter,
-                    column_association_resolver=column_association_resolver,
+                constraint=input_measure.filter.transform(
+                    ConvertToWhereSpec(
+                        column_association_resolver=column_association_resolver,
+                    )
                 )
                 if input_measure.filter is not None
                 else None,
@@ -143,9 +144,10 @@ class MetricLookup(MetricAccessor):  # noqa: D
 
             # This is the constraint parameter added to the input metric in the derived metric definition
             combined_filter = (
-                WhereFilterSpec.create_from_where_filter(
-                    where_filter=input_metric.filter,
-                    column_association_resolver=column_association_resolver,
+                input_metric.filter.transform(
+                    ConvertToWhereSpec(
+                        column_association_resolver=column_association_resolver,
+                    )
                 )
                 if input_metric.filter is not None
                 else None
@@ -153,9 +155,10 @@ class MetricLookup(MetricAccessor):  # noqa: D
 
             # This is the constraint parameter included in the original input metric definition
             if original_metric_obj.filter:
-                original_metric_filter = WhereFilterSpec.create_from_where_filter(
-                    where_filter=original_metric_obj.filter,
-                    column_association_resolver=column_association_resolver,
+                original_metric_filter = original_metric_obj.filter.transform(
+                    ConvertToWhereSpec(
+                        column_association_resolver=column_association_resolver,
+                    )
                 )
                 combined_filter = (
                     combined_filter.combine(original_metric_filter) if combined_filter else original_metric_filter

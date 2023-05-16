@@ -38,6 +38,7 @@ from metricflow.specs.specs import (
     ColumnAssociationResolver,
     WhereFilterSpec,
 )
+from metricflow.specs.where_filter_transform import ConvertToWhereSpec
 from metricflow.time.time_granularity_solver import (
     TimeGranularitySolver,
     PartialTimeDimensionSpec,
@@ -266,9 +267,10 @@ class MetricFlowQueryParser:
             metric_where_constraint: Optional[WhereFilterSpec] = None
             if metric.filter:
                 # add constraint to MetricSpec
-                metric_where_constraint = WhereFilterSpec.create_from_where_filter(
-                    where_filter=metric.filter,
-                    column_association_resolver=self._column_association_resolver,
+                metric_where_constraint = metric.filter.transform(
+                    ConvertToWhereSpec(
+                        column_association_resolver=self._column_association_resolver,
+                    )
                 )
             # TODO: Directly initializing Spec object instead of using a factory method since
             #       importing WhereConstraintConverter is a problem in specs.py
@@ -351,9 +353,10 @@ class MetricFlowQueryParser:
         requested_linkable_specs = self._parse_linkable_element_names(group_by_names, metric_references)
         where_filter_spec: Optional[WhereFilterSpec] = None
         if where_filter is not None:
-            where_filter_spec = WhereFilterSpec.create_from_where_filter(
-                where_filter=where_filter,
-                column_association_resolver=self._column_association_resolver,
+            where_filter_spec = where_filter.transform(
+                ConvertToWhereSpec(
+                    column_association_resolver=self._column_association_resolver,
+                )
             )
             where_spec_set = QueryTimeLinkableSpecSet.create_from_linkable_spec_set(where_filter_spec.linkable_spec_set)
             requested_linkable_specs_with_requested_filter_specs = QueryTimeLinkableSpecSet.combine(
@@ -403,9 +406,8 @@ class MetricFlowQueryParser:
                         (
                             group_by_specs_for_one_metric,
                             QueryTimeLinkableSpecSet.create_from_linkable_spec_set(
-                                WhereFilterSpec.create_from_where_filter(
-                                    where_filter=metric.filter,
-                                    column_association_resolver=self._column_association_resolver,
+                                metric.filter.transform(
+                                    ConvertToWhereSpec(column_association_resolver=self._column_association_resolver)
                                 ).linkable_spec_set
                             ),
                         ),
