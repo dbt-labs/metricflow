@@ -1,20 +1,24 @@
 from typing import Dict, List
 
+from dbt_semantic_interfaces.objects.elements.dimension import Dimension
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
-from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.references import (
+    DimensionReference,
+    SemanticModelElementReference,
+)
+from dbt_semantic_interfaces.type_enums.dimension_type import DimensionType
 from dbt_semantic_interfaces.validations.validator_helpers import (
-    SemanticModelElementContext,
-    SemanticModelElementType,
+    DimensionInvariants,
     FileContext,
     ModelValidationRule,
-    DimensionInvariants,
-    ValidationIssue,
+    SemanticModelElementContext,
+    SemanticModelElementType,
     ValidationError,
+    ValidationIssue,
     validate_safely,
 )
-from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.references import SemanticModelElementReference, DimensionReference
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 
 class DimensionConsistencyRule(ModelValidationRule):
@@ -54,7 +58,7 @@ class DimensionConsistencyRule(ModelValidationRule):
         time_dims_to_granularity: Dict[DimensionReference, TimeGranularity],
         semantic_model: SemanticModel,
     ) -> List[ValidationIssue]:
-        """Checks that time dimensions of the same name that aren't primary have the same time granularity specifications
+        """Check that time dimensions of the same name and aren't primary have the same time granularity.
 
         Args:
             dimension: the dimension to check
@@ -139,16 +143,17 @@ class DimensionConsistencyRule(ModelValidationRule):
                 issues.append(
                     ValidationError(
                         context=context,
-                        message=f"In semantic model `{semantic_model.name}`, type conflict for dimension `{dimension.name}` "
-                        f"- already in model as type `{dimension_invariant.type}` but got `{dimension.type}`",
+                        message=f"In semantic model `{semantic_model.name}`, type conflict for dimension "
+                        f"`{dimension.name}` - already in model as type `{dimension_invariant.type}` but got "
+                        f"`{dimension.type}`",
                     )
                 )
             if dimension_invariant.is_partition != is_partition:
                 issues.append(
                     ValidationError(
                         context=context,
-                        message=f"In semantic model `{semantic_model.name}, conflicting is_partition attribute for dimension "
-                        f"`{dimension.reference}` - already in model"
+                        message=f"In semantic model `{semantic_model.name}, conflicting is_partition attribute for "
+                        f"dimension `{dimension.reference}` - already in model"
                         f" with is_partition as `{dimension_invariant.is_partition}` but got "
                         f"`{is_partition}``",
                     )

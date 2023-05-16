@@ -2,7 +2,7 @@ import traceback
 from typing import List
 
 from dbt_semantic_interfaces.errors import ParsingException
-from dbt_semantic_interfaces.objects.metric import Metric, MetricType, MetricTimeWindow
+from dbt_semantic_interfaces.objects.metric import Metric, MetricTimeWindow, MetricType
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import MetricModelReference
 from dbt_semantic_interfaces.validations.unique_valid_name import UniqueAndValidNameRule
@@ -10,14 +10,14 @@ from dbt_semantic_interfaces.validations.validator_helpers import (
     FileContext,
     MetricContext,
     ModelValidationRule,
-    ValidationIssue,
     ValidationError,
+    ValidationIssue,
     validate_safely,
 )
 
 
 class CumulativeMetricRule(ModelValidationRule):
-    """Checks that cumulative sum metrics are configured properly"""
+    """Checks that cumulative sum metrics are configured properly."""
 
     @staticmethod
     @validate_safely(whats_being_done="checking that the params of metric are valid if it is a cumulative sum metric")
@@ -65,7 +65,7 @@ class CumulativeMetricRule(ModelValidationRule):
 
 
 class DerivedMetricRule(ModelValidationRule):
-    """Checks that derived metrics are configured properly"""
+    """Checks that derived metrics are configured properly."""
 
     @staticmethod
     @validate_safely(whats_being_done="checking that the alias set are not unique and distinct")
@@ -85,7 +85,8 @@ class DerivedMetricRule(ModelValidationRule):
                         issues.append(
                             ValidationError(
                                 context=metric_context,
-                                message=f"Alias '{input_metric.alias}' for input metric: '{input_metric.name}' is already being used. Please choose another alias.",
+                                message=f"Alias '{input_metric.alias}' for input metric: '{input_metric.name}' is "
+                                "already being used. Please choose another alias.",
                             )
                         )
                         used_names.add(input_metric.alias)
@@ -107,7 +108,8 @@ class DerivedMetricRule(ModelValidationRule):
                                     file_context=FileContext.from_metadata(metadata=metric.metadata),
                                     metric=MetricModelReference(metric_name=metric.name),
                                 ),
-                                message=f"For metric: {metric.name}, input metric: '{input_metric.name}' does not exist as a configured metric in the model.",
+                                message=f"For metric: {metric.name}, input metric: '{input_metric.name}' does not "
+                                "exist as a configured metric in the model.",
                             )
                         )
         return issues
@@ -125,7 +127,8 @@ class DerivedMetricRule(ModelValidationRule):
                             file_context=FileContext.from_metadata(metadata=metric.metadata),
                             metric=MetricModelReference(metric_name=metric.name),
                         ),
-                        message=f"Both offset_window and offset_to_grain set for derived metric '{metric.name}' on input metric '{input_metric.name}'. Please set one or the other.",
+                        message=f"Both offset_window and offset_to_grain set for derived metric '{metric.name}' on "
+                        f"input metric '{input_metric.name}'. Please set one or the other.",
                     )
                 )
 

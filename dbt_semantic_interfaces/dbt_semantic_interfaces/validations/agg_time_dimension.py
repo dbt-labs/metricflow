@@ -1,22 +1,25 @@
 from typing import List
 
-from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
-from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.references import SemanticModelElementReference, TimeDimensionReference
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
+from dbt_semantic_interfaces.references import (
+    SemanticModelElementReference,
+    TimeDimensionReference,
+)
+from dbt_semantic_interfaces.type_enums.dimension_type import DimensionType
 from dbt_semantic_interfaces.validations.validator_helpers import (
-    SemanticModelElementContext,
-    SemanticModelElementType,
     FileContext,
     ModelValidationRule,
+    SemanticModelElementContext,
+    SemanticModelElementType,
+    ValidationError,
     ValidationIssue,
     validate_safely,
-    ValidationError,
 )
 
 
 class AggregationTimeDimensionRule(ModelValidationRule):
-    """Checks that the aggregation time dimension for a measure points to a valid time dimension in the semantic model."""
+    """Checks that the agg time dimension for a measure points to a valid time dimension in the semantic model."""
 
     @staticmethod
     @validate_safely(whats_being_done="checking aggregation time dimension for semantic models in the model")
@@ -56,8 +59,8 @@ class AggregationTimeDimensionRule(ModelValidationRule):
                 issues.append(
                     ValidationError(
                         context=measure_context,
-                        message=f"In semantic model '{semantic_model.name}', measure '{measure.name}' has the aggregation "
-                        f"time dimension set to '{agg_time_dimension_reference.element_name}', "
+                        message=f"In semantic model '{semantic_model.name}', measure '{measure.name}' has the "
+                        f"aggregation time dimension set to '{agg_time_dimension_reference.element_name}', "
                         f"which is not a valid time dimension in the semantic model",
                     )
                 )

@@ -1,26 +1,29 @@
 from typing import Dict, List, Set
 
-from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.references import SemanticModelElementReference, EntityReference
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
+from dbt_semantic_interfaces.references import (
+    EntityReference,
+    SemanticModelElementReference,
+)
 from dbt_semantic_interfaces.validations.validator_helpers import (
-    SemanticModelElementContext,
-    SemanticModelElementType,
     FileContext,
     ModelValidationRule,
+    SemanticModelElementContext,
+    SemanticModelElementType,
+    ValidationIssue,
     ValidationWarning,
     validate_safely,
-    ValidationIssue,
 )
 
 
 class CommonEntitysRule(ModelValidationRule):
-    """Checks that entities exist on more than one semantic model"""
+    """Checks that entities exist on more than one semantic model."""
 
     @staticmethod
     def _map_semantic_model_entities(semantic_models: List[SemanticModel]) -> Dict[EntityReference, Set[str]]:
-        """Generate mapping of entity names to the set of semantic_models where it is defined"""
+        """Generate mapping of entity names to the set of semantic_models where it is defined."""
         entities_to_semantic_models: Dict[EntityReference, Set[str]] = {}
         for semantic_model in semantic_models or []:
             for entity in semantic_model.entities or []:
@@ -63,7 +66,7 @@ class CommonEntitysRule(ModelValidationRule):
     @staticmethod
     @validate_safely(whats_being_done="running model validation warning if entities are only one one semantic model")
     def validate_model(model: SemanticManifest) -> List[ValidationIssue]:
-        """Issues a warning for any entity that is associated with only one semantic_model"""
+        """Issues a warning for any entity that is associated with only one semantic_model."""
         issues = []
 
         entities_to_semantic_models = CommonEntitysRule._map_semantic_model_entities(model.semantic_models)

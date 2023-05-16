@@ -1,8 +1,9 @@
 from __future__ import annotations
+
 import pprint
 import textwrap
 from collections.abc import Mapping
-from dataclasses import is_dataclass, fields
+from dataclasses import fields, is_dataclass
 
 from dbt_semantic_interfaces.objects.base import HashableBaseModel
 

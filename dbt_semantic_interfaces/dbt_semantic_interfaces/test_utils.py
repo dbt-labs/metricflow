@@ -1,9 +1,9 @@
 import datetime
-import dateutil.parser
 import logging
 import textwrap
-
 from typing import Callable, Optional, Sequence, Tuple
+
+import dateutil.parser
 
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension
 from dbt_semantic_interfaces.objects.elements.entity import Entity
@@ -12,7 +12,7 @@ from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
 from dbt_semantic_interfaces.objects.metadata import FileSlice, Metadata
 from dbt_semantic_interfaces.objects.metric import Metric, MetricType, MetricTypeParams
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.objects.semantic_model import SemanticModel, NodeRelation
+from dbt_semantic_interfaces.objects.semantic_model import NodeRelation, SemanticModel
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 
 logger = logging.getLogger(__name__)
@@ -26,7 +26,7 @@ def as_datetime(date_string: str) -> datetime.datetime:
 def find_semantic_model_with(
     model: SemanticManifest, function: Callable[[SemanticModel], bool]
 ) -> Tuple[SemanticModel, int]:
-    """Returns a semantic model from the model which matches the criteria defined by the passed in function'
+    """Returns a semantic model from the model which matches the criteria defined by the passed in function'.
 
     This is useful because the order of semantic models in the list is non determinant, thus it's impossible to
     hard code which semantic model you want by index. Using semantic model names isn't great for consistency because
@@ -42,7 +42,7 @@ def find_semantic_model_with(
 
 
 def find_metric_with(model: SemanticManifest, function: Callable[[Metric], bool]) -> Tuple[Metric, int]:
-    """Returns a metric from the model which matches the criteria defined by the passed in function'
+    """Returns a metric from the model which matches the criteria defined by the passed in function'.
 
     This is useful because the order of metrics in the list is non-determinant, thus it's impossible to
     hard code which metric you want by index. Using metric names isn't great for consistency because
@@ -58,7 +58,7 @@ def find_metric_with(model: SemanticManifest, function: Callable[[Metric], bool]
 
 
 def base_semantic_manifest_file() -> YamlConfigFile:
-    """Returns a YamlConfigFile with the inputs for a basic valid semantic manifest
+    """Returns a YamlConfigFile with the inputs for a basic valid semantic manifest.
 
     This is useful to seed a simple error-free semantic manifest, which can easily be extended with YAML inputs
     containing specific validation triggers.
@@ -92,8 +92,7 @@ def base_semantic_manifest_file() -> YamlConfigFile:
 
 
 def default_meta() -> Metadata:
-    """Returns a Metadata object with the required information"""
-
+    """Returns a Metadata object with the required information."""
     return Metadata(
         repo_file_path="/not/from/a/repo",
         file_slice=FileSlice(
@@ -113,8 +112,10 @@ def metric_with_guaranteed_meta(
     metadata: Metadata = default_meta(),
     description: str = "adhoc metric",
 ) -> Metric:
-    """Creates a metric with the given input. If a metadata object is not supplied, a default metadata object is used"""
+    """Creates a metric with the given input.
 
+    If a metadata object is not supplied, a default metadata object is used.
+    """
     return Metric(
         name=name,
         description=description,
@@ -134,8 +135,10 @@ def semantic_model_with_guaranteed_meta(
     measures: Sequence[Measure] = (),
     dimensions: Sequence[Dimension] = (),
 ) -> SemanticModel:
-    """Creates a semantic model with the given input. If a metadata object is not supplied, a default metadata object is used"""
+    """Creates a semantic model with the given input.
 
+    If a metadata object is not supplied, a default metadata object is used.
+    """
     created_node_relation = node_relation
     if created_node_relation is None:
         created_node_relation = NodeRelation(

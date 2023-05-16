@@ -11,16 +11,16 @@ from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
 import click
 from pydantic import BaseModel, Extra
 
+from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.objects.base import FrozenBaseModel
 from dbt_semantic_interfaces.objects.metadata import Metadata
-from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import (
+    MetricModelReference,
     SemanticModelElementReference,
     SemanticModelReference,
-    MetricModelReference,
 )
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
+from dbt_semantic_interfaces.type_enums.dimension_type import DimensionType
 
 VALIDATE_SAFELY_ERROR_STR_TMPLT = ". Issue occurred in method `{method_name}` called with {arguments_str}"
 ValidationContextJSON = Dict[str, Union[str, int, None]]
@@ -39,8 +39,7 @@ class ValidationIssueLevel(Enum):
 
     @property
     def name_plural(self) -> str:
-        """Controlled pluralization of ValidationIssueLevel name value"""
-
+        """Controlled pluralization of ValidationIssueLevel name value."""
         return f"{self.name}S"
 
 
@@ -60,19 +59,18 @@ class SemanticModelElementType(Enum):
 
 
 class FileContext(BaseModel):
-    """The base context class for validation issues"""
+    """The base context class for validation issues."""
 
     file_name: Optional[str]
     line_number: Optional[int]
 
     class Config:
-        """Pydantic class configuration options"""
+        """Pydantic class configuration options."""
 
         extra = Extra.forbid
 
     def context_str(self) -> str:
-        """Human readable stringified representation of the context"""
-
+        """Human readable stringified representation of the context."""
         context_string = ""
 
         if self.file_name:
@@ -84,8 +82,7 @@ class FileContext(BaseModel):
 
     @classmethod
     def from_metadata(cls, metadata: Optional[Metadata] = None) -> FileContext:
-        """Creates a FileContext instance from a Metadata object"""
-
+        """Creates a FileContext instance from a Metadata object."""
         return cls(
             file_name=metadata.file_slice.filename if metadata else None,
             line_number=metadata.file_slice.start_line_number if metadata else None,
@@ -93,37 +90,40 @@ class FileContext(BaseModel):
 
 
 class MetricContext(BaseModel):
-    """The context class for validation issues involving metrics"""
+    """The context class for validation issues involving metrics."""
 
     file_context: FileContext
     metric: MetricModelReference
 
     def context_str(self) -> str:
-        """Human readable stringified representation of the context"""
+        """Human readable stringified representation of the context."""
         return f"with metric `{self.metric.metric_name}` {self.file_context.context_str()}"
 
 
 class SemanticModelContext(BaseModel):
-    """The context class for validation issues involving semantic models"""
+    """The context class for validation issues involving semantic models."""
 
     file_context: FileContext
     semantic_model: SemanticModelReference
 
     def context_str(self) -> str:
-        """Human readable stringified representation of the context"""
+        """Human readable stringified representation of the context."""
         return f"with semantic model `{self.semantic_model.semantic_model_name}` {self.file_context.context_str()}"
 
 
 class SemanticModelElementContext(BaseModel):
-    """The context class for validation issues involving dimensions"""
+    """The context class for validation issues involving dimensions."""
 
     file_context: FileContext
     semantic_model_element: SemanticModelElementReference
     element_type: SemanticModelElementType
 
     def context_str(self) -> str:
-        """Human readable stringified representation of the context"""
-        return f"with {self.element_type.value} `{self.semantic_model_element.element_name}` in semantic model `{self.semantic_model_element.semantic_model_name}` {self.file_context.context_str()}"
+        """Human readable stringified representation of the context."""
+        return (
+            f"with {self.element_type.value} `{self.semantic_model_element.element_name}` in semantic model "
+            f"`{self.semantic_model_element.semantic_model_name}` {self.file_context.context_str()}"
+        )
 
 
 ValidationContext = Union[
@@ -135,7 +135,7 @@ ValidationContext = Union[
 
 
 class ValidationIssue(ABC, BaseModel):
-    """The abstract base ValidationIsssue class that the specific ValidationIssue classes are built from"""
+    """The abstract base ValidationIsssue class that the specific ValidationIssue classes are built from."""
 
     message: str
     context: Optional[ValidationContext] = None
@@ -144,8 +144,7 @@ class ValidationIssue(ABC, BaseModel):
     @property
     @abstractmethod
     def level(self) -> ValidationIssueLevel:
-        """The level of of ValidationIssue"""
-
+        """The level of of ValidationIssue."""
         raise NotImplementedError
 
     def as_readable_str(self, verbose: bool = False, prefix: Optional[str] = None) -> str:
@@ -164,7 +163,7 @@ class ValidationIssue(ABC, BaseModel):
         return issue_str
 
     def as_cli_formatted_str(self, verbose: bool = False) -> str:
-        """Returns a color-coded readable string for rendering issues in the CLI"""
+        """Returns a color-coded readable string for rendering issues in the CLI."""
         return self.as_readable_str(
             verbose=verbose, prefix=click.style(self.level.name, bold=True, fg=ISSUE_COLOR_MAP[self.level])
         )
@@ -204,7 +203,7 @@ class ValidationError(ValidationIssue, BaseModel):
 
 
 class ModelValidationResults(FrozenBaseModel):
-    """Class for organizating the results of running validations"""
+    """Class for organizating the results of running validations."""
 
     warnings: Tuple[ValidationWarning, ...] = tuple()
     future_errors: Tuple[ValidationFutureError, ...] = tuple()
@@ -212,13 +211,12 @@ class ModelValidationResults(FrozenBaseModel):
 
     @property
     def has_blocking_issues(self) -> bool:
-        """Does the ModelValidationResults have ERROR issues"""
+        """Does the ModelValidationResults have ERROR issues."""
         return len(self.errors) != 0
 
     @classmethod
     def from_issues_sequence(cls, issues: Sequence[ValidationIssue]) -> ModelValidationResults:
-        """Constructs a ModelValidationResults class from a list of ValidationIssues"""
-
+        """Constructs a ModelValidationResults class from a list of ValidationIssues."""
         warnings: List[ValidationWarning] = []
         future_errors: List[ValidationFutureError] = []
         errors: List[ValidationError] = []
@@ -236,14 +234,13 @@ class ModelValidationResults(FrozenBaseModel):
 
     @classmethod
     def merge(cls, results: Sequence[ModelValidationResults]) -> ModelValidationResults:
-        """Creates a new ModelValidatorResults instance from multiple instances
+        """Creates a new ModelValidatorResults instance from multiple instances.
 
         This is useful when there are multiple validators that are run and the
         combined results are desireable. For instance there is a ModelValidator
         and a DataWarehouseModelValidator. These both return validation issues.
         If it's desireable to combine the results, the following makes it easy.
         """
-
         if not isinstance(results, List):
             results = list(results)
 
@@ -262,12 +259,11 @@ class ModelValidationResults(FrozenBaseModel):
 
     @property
     def all_issues(self) -> Tuple[ValidationIssue, ...]:
-        """For when a singular list of issues is needed"""
+        """For when a singular list of issues is needed."""
         return self.errors + self.future_errors + self.warnings
 
     def summary(self) -> str:
-        """Returns a stylized summary string for issues"""
-
+        """Returns a stylized summary string for issues."""
         errors = click.style(
             text=f"{ValidationIssueLevel.ERROR.name_plural}: {len(self.errors)}",
             fg=ISSUE_COLOR_MAP[ValidationIssueLevel.ERROR],
@@ -286,13 +282,14 @@ class ModelValidationResults(FrozenBaseModel):
 def generate_exception_issue(
     what_was_being_done: str, e: Exception, context: Optional[ValidationContext] = None, extras: Dict[str, str] = {}
 ) -> ValidationIssue:
-    """Generates a validation issue for exceptions"""
+    """Generates a validation issue for exceptions."""
     if "stacktrace" not in extras:
         extras["stacktrace"] = "".join(traceback.format_tb(e.__traceback__))
 
     return ValidationError(
         context=context,
-        message=f"An error occured while {what_was_being_done} - {''.join(traceback.format_exception_only(etype=type(e), value=e))}",
+        message=f"An error occured while {what_was_being_done} - "
+        f"{''.join(traceback.format_exception_only(etype=type(e), value=e))}",
         extra_detail="\n".join([f"{key}: {value}" for key, value in extras.items()]),
     )
 
@@ -302,12 +299,12 @@ def _func_args_to_string(*args: Any, **kwargs: Any) -> str:  # type: ignore
 
 
 def validate_safely(whats_being_done: str) -> Callable:
-    """Decorator to safely run validation checks"""
+    """Decorator to safely run validation checks."""
 
     def decorator_check_element_safely(func: Callable) -> Callable:  # noqa
         @functools.wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> List[ValidationIssue]:  # type: ignore
-            """Safely run a check on model elements"""
+            """Safely run a check on model elements."""
             issues: List[ValidationIssue]
             try:
                 issues = func(*args, **kwargs)
@@ -344,12 +341,12 @@ class ModelValidationRule(ABC):
     @classmethod
     @abstractmethod
     def validate_model(cls, model: SemanticManifest) -> List[ValidationIssue]:
-        """Check the given model and return a list of validation issues"""
+        """Check the given model and return a list of validation issues."""
         pass
 
     @classmethod
     def validate_model_serialized_for_multiprocessing(cls, serialized_model: str) -> str:
-        """Validate a model serialized via Pydantic's .json() method, and return a list of JSON serialized issues
+        """Validate a model serialized via Pydantic's .json() method, and return a list of JSON serialized issues.
 
         This method exists because our validations are forked into parallel processes via
         multiprocessing.ProcessPoolExecutor, and passing a model or validation results object can result in

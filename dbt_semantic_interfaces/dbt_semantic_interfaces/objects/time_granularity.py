@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from typing import Any
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted, ExtendedEnum
+
+from dbt_semantic_interfaces.enum_extension import ExtendedEnum, assert_values_exhausted
 
 
 class TimeGranularity(ExtendedEnum):

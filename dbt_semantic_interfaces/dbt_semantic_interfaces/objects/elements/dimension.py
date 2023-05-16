@@ -2,28 +2,23 @@ from __future__ import annotations
 
 from typing import Optional
 
-from dbt_semantic_interfaces.objects.base import HashableBaseModel, ModelWithMetadataParsing
+from dbt_semantic_interfaces.objects.base import (
+    HashableBaseModel,
+    ModelWithMetadataParsing,
+)
 from dbt_semantic_interfaces.objects.metadata import Metadata
-from dbt_semantic_interfaces.references import DimensionReference, TimeDimensionReference
-from dbt_semantic_interfaces.enum_extension import ExtendedEnum
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.references import (
+    DimensionReference,
+    TimeDimensionReference,
+)
+from dbt_semantic_interfaces.type_enums.dimension_type import DimensionType
 
 ISO8601_FMT = "YYYY-MM-DD"
 
 
-class DimensionType(ExtendedEnum):
-    """Determines types of values expected of dimensions."""
-
-    CATEGORICAL = "categorical"
-    TIME = "time"
-
-    def is_time_type(self) -> bool:
-        """Checks if this type of dimension is a time type"""
-        return self in [DimensionType.TIME]
-
-
 class DimensionValidityParams(HashableBaseModel):
-    """Parameters identifying a given dimension as an entity for validity state
+    """Parameters identifying a given dimension as an entity for validity state.
 
     This construct is used for supporting SCD Type II tables, such as might be
     created via dbt's snapshot feature, or generated via periodic loads from external
@@ -37,7 +32,7 @@ class DimensionValidityParams(HashableBaseModel):
 
 
 class DimensionTypeParams(HashableBaseModel):
-    """Dimension type params add additional context to some types (time) of dimensions"""
+    """Dimension type params add additional context to some types (time) of dimensions."""
 
     is_primary: bool = False
     time_granularity: TimeGranularity
@@ -45,7 +40,7 @@ class DimensionTypeParams(HashableBaseModel):
 
 
 class Dimension(HashableBaseModel, ModelWithMetadataParsing):
-    """Describes a dimension"""
+    """Describes a dimension."""
 
     name: str
     description: Optional[str]

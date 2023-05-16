@@ -2,42 +2,42 @@ from __future__ import annotations
 
 import enum
 import re
-from typing import Dict, Tuple, List, Optional
+from typing import Dict, List, Optional, Tuple
 
-from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
+from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.references import (
+    ElementReference,
+    MetricModelReference,
     SemanticModelElementReference,
     SemanticModelReference,
-    MetricModelReference,
 )
-from dbt_semantic_interfaces.references import ElementReference
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.validations.validator_helpers import (
-    SemanticModelContext,
-    SemanticModelElementContext,
-    SemanticModelElementType,
     FileContext,
     MetricContext,
     ModelValidationRule,
+    SemanticModelContext,
+    SemanticModelElementContext,
+    SemanticModelElementType,
     ValidationContext,
     ValidationError,
     ValidationIssue,
     validate_safely,
 )
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 
 @enum.unique
 class MetricFlowReservedKeywords(enum.Enum):
-    """Enumeration of reserved keywords with helper for accessing the reason they are reserved"""
+    """Enumeration of reserved keywords with helper for accessing the reason they are reserved."""
 
     METRIC_TIME = "metric_time"
     MF_INTERNAL_UUID = "mf_internal_uuid"
 
     @staticmethod
     def get_reserved_reason(keyword: MetricFlowReservedKeywords) -> str:
-        """Get the reason a given keyword is reserved. Guarantees an exhaustive switch"""
+        """Get the reason a given keyword is reserved. Guarantees an exhaustive switch."""
         if keyword is MetricFlowReservedKeywords.METRIC_TIME:
             return (
                 "Used as the query input for creating time series metrics from measures with "
@@ -147,8 +147,8 @@ class UniqueAndValidNameRule(ModelValidationRule):
                 issues.append(
                     ValidationError(
                         context=context,
-                        message=f"In semantic model `{semantic_model.name}`, can't use name `{name.element_name}` for a "
-                        f"{_type} when it was already used for a {name_to_type[name]}",
+                        message=f"In semantic model `{semantic_model.name}`, can't use name `{name.element_name}` for "
+                        f"a {_type} when it was already used for a {name_to_type[name]}",
                     )
                 )
             else:
@@ -203,7 +203,8 @@ class UniqueAndValidNameRule(ModelValidationRule):
                                 file_context=FileContext.from_metadata(metadata=metric.metadata),
                                 metric=MetricModelReference(metric_name=metric.name),
                             ),
-                            message=f"Can't use name `{metric.name}` for a metric when it was already used for a metric",
+                            message=f"Can't use name `{metric.name}` for a metric when it was already used for "
+                            "a metric",
                         )
                     )
                 else:

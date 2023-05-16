@@ -1,6 +1,5 @@
 import json
 from copy import deepcopy
-
 from pathlib import Path
 from typing import Dict, List, Union
 
@@ -67,8 +66,7 @@ def _rewrite_refs(obj: Union[Dict, List, bool, str], mapping: Dict) -> Union[Dic
 
 
 def write_schema(schema: Dict, output_dir: str, file_name: str) -> None:
-    """Writes the schema from the specified schema store to the given path"""
-
+    """Writes the schema from the specified schema store to the given path."""
     path = Path(output_dir).resolve()
     path.mkdir(exist_ok=True)
     with open(path / file_name, "w") as f:

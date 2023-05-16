@@ -1,4 +1,5 @@
 import re
+
 from jsonschema import Draft7Validator, ValidationError
 from jsonschema._utils import extras_msg
 from jsonschema.validators import extend
@@ -17,7 +18,6 @@ def custom_find_additional_properties(instance, schema):  # type: ignore[no-unty
 
     Assumes ``instance`` is dict-like already.
     """
-
     properties = schema.get("properties", {})
     schema_patterns = schema.get("patternProperties", {})
     # we ignore all things that match "^__(.+)__$" in all objects
@@ -31,7 +31,7 @@ def custom_find_additional_properties(instance, schema):  # type: ignore[no-unty
 
 
 def customAdditionalProperties(validator, aP, instance, schema):  # type: ignore[no-untyped-def]
-    """Validator for checking if a schema has additionalProperties when it shouldn't
+    """Validator for checking if a schema has additionalProperties when it shouldn't.
 
     NOTE: This is a modified copy of the ``additionalProperties`` method
     defined in jsonschema/_validators.py of jsonschema 3.2.0 found here

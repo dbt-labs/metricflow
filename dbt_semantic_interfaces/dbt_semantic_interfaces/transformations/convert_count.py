@@ -1,7 +1,7 @@
-from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
 from dbt_semantic_interfaces.errors import ModelTransformError
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.transformations.transform_rule import ModelTransformRule
+from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 
 ONE = "1"
 
@@ -16,8 +16,8 @@ class ConvertCountToSumRule(ModelTransformRule):
                 if measure.agg == AggregationType.COUNT:
                     if measure.expr is None:
                         raise ModelTransformError(
-                            f"Measure '{measure.name}' uses a COUNT aggregation, which requires an expr to be provided. "
-                            f"Provide 'expr: 1' if a count of all rows is desired."
+                            f"Measure '{measure.name}' uses a COUNT aggregation, which requires an expr to be "
+                            f"provided. Provide 'expr: 1' if a count of all rows is desired."
                         )
                     if measure.expr != ONE:
                         # Just leave it as SUM(1) if we want to count all

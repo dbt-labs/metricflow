@@ -1,10 +1,14 @@
 from __future__ import annotations
 
-from typing import Optional, List
-from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
+from typing import List, Optional
+
+from dbt_semantic_interfaces.objects.base import (
+    HashableBaseModel,
+    ModelWithMetadataParsing,
+)
 from dbt_semantic_interfaces.objects.metadata import Metadata
-from dbt_semantic_interfaces.objects.base import ModelWithMetadataParsing, HashableBaseModel
-from dbt_semantic_interfaces.references import MeasureReference, TimeDimensionReference
+from dbt_semantic_interfaces.protocols.measure import _MeasureMixin
+from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 
 
 class NonAdditiveDimensionParameters(HashableBaseModel):
@@ -21,15 +25,15 @@ class NonAdditiveDimensionParameters(HashableBaseModel):
 
 
 class MeasureAggregationParameters(HashableBaseModel):
-    """Describes parameters for aggregations"""
+    """Describes parameters for aggregations."""
 
     percentile: Optional[float] = None
     use_discrete_percentile: bool = False
     use_approximate_percentile: bool = False
 
 
-class Measure(HashableBaseModel, ModelWithMetadataParsing):
-    """Describes a measure"""
+class Measure(_MeasureMixin, HashableBaseModel, ModelWithMetadataParsing):
+    """Describes a measure."""
 
     name: str
     agg: AggregationType
@@ -39,21 +43,4 @@ class Measure(HashableBaseModel, ModelWithMetadataParsing):
     agg_params: Optional[MeasureAggregationParameters]
     metadata: Optional[Metadata]
     non_additive_dimension: Optional[NonAdditiveDimensionParameters] = None
-
-    # Defines the time dimension to aggregate this measure by. If not specified, it means to use the primary time
-    # dimension in the semantic model.
     agg_time_dimension: Optional[str] = None
-
-    @property
-    def checked_agg_time_dimension(self) -> TimeDimensionReference:
-        """Returns the aggregation time dimension, throwing an exception if it's not set."""
-        assert self.agg_time_dimension, (
-            f"Aggregation time dimension for measure {self.name} is not set! This should either be set directly on "
-            f"the measure specification in the model, or else defaulted to the primary time dimension in the data "
-            f"source containing the measure."
-        )
-        return TimeDimensionReference(element_name=self.agg_time_dimension)
-
-    @property
-    def reference(self) -> MeasureReference:  # noqa: D
-        return MeasureReference(element_name=self.name)

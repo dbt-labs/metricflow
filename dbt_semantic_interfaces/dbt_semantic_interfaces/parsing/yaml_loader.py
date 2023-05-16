@@ -11,7 +11,7 @@ PARSING_CONTEXT_KEY = "__parsing_context__"
 
 
 class ParsingContext:
-    """Container class for file slice information used to populate model metadata for certain objects"""
+    """Container class for file slice information used to populate model metadata for certain objects."""
 
     def __init__(self, start_line: int, end_line: int, filename: str, content_node: yaml.Node) -> None:
         """Initializer for the ParsingContext class.
@@ -26,7 +26,7 @@ class ParsingContext:
 
     @property
     def content(self) -> str:
-        """Serialized contents associated with the file slice represented by this ParsingContext object
+        """Serialized contents associated with the file slice represented by this ParsingContext object.
 
         This should only be called when a string representation of the contents are needed.
         """
@@ -37,11 +37,11 @@ class ParsingContext:
 
 
 class YamlConfigLoader:
-    """Helper class for loading YAML config strings into an iterator of YAML output"""
+    """Helper class for loading YAML config strings into an iterator of YAML output."""
 
     @staticmethod
     def load_all_with_context(name: str, contents: str) -> Iterator:
-        """Wraps the yaml.load_all method and returns the resulting iterator with parsing context added to output
+        """Wraps the yaml.load_all method and returns the resulting iterator with parsing context added to output.
 
         This replaces any calls to yaml.load_all(loader=SafeLineLoaderWithAddedContext), which internally adds
         ParsingContext info. Note PyYAML reads the name property from the input stream IF that input stream is a file
@@ -55,7 +55,7 @@ class YamlConfigLoader:
 
     @staticmethod
     def is_valid_yaml_file_ending(filename: str) -> bool:
-        """Checks if YAML file name ends with one of the supported suffixes"""
+        """Checks if YAML file name ends with one of the supported suffixes."""
         return filename.endswith(".yaml") or filename.endswith(".yml")
 
 
@@ -70,7 +70,7 @@ class SafeLineLoaderWithAddedContext(yaml.SafeLoader):
     # the more established road
     # https://stackoverflow.com/questions/55441300/how-can-i-get-the-parent-node-within-yaml-loader-add-contructor
     def construct_mapping(self, node: yaml.MappingNode, deep: bool = False) -> Dict:
-        """Override of the construct_mapping method in the PyYAML SafeLoader class
+        """Override of the construct_mapping method in the PyYAML SafeLoader class.
 
         This override exists in order to populate the parsing context object with file location
         and raw YAML content information, which will be used to populate the Metadata model construct
