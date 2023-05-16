@@ -8,7 +8,8 @@ from typing import Optional, List, Sequence
 
 import pandas as pd
 
-from dbt_semantic_interfaces.references import MetricReference
+from dbt_semantic_interfaces.references import MetricReference, DimensionReference
+from dbt_semantic_interfaces.objects.elements.dimension import Dimension
 from metricflow.configuration.constants import (
     CONFIG_DBT_CLOUD_JOB_ID,
     CONFIG_DBT_CLOUD_SERVICE_TOKEN,
@@ -26,7 +27,7 @@ from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import Sour
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
-from metricflow.engine.models import Dimension, Metric
+from metricflow.engine.models import Metric
 from metricflow.engine.time_source import ServerTimeSource
 from metricflow.engine.utils import build_semantic_manifest_from_config, build_semantic_manifest_from_dbt_cloud
 from metricflow.errors.errors import ExecutionException
@@ -450,7 +451,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
     def simple_dimensions_for_metrics(self, metric_names: List[str]) -> List[Dimension]:  # noqa: D
         return [
-            Dimension(name=dim.qualified_name)
+            self._semantic_manifest_lookup.semantic_model_lookup.get_dimension(DimensionReference(dim.qualified_name))
             for dim in self._semantic_manifest_lookup.metric_lookup.element_specs_for_metrics(
                 metric_references=[MetricReference(element_name=mname) for mname in metric_names],
                 without_any_property=frozenset(
@@ -468,10 +469,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         metric_references = self._semantic_manifest_lookup.metric_lookup.metric_references
         metrics = self._semantic_manifest_lookup.metric_lookup.get_metrics(metric_references)
         return [
-            Metric(
-                name=metric.name,
-                dimensions=self.simple_dimensions_for_metrics([metric.name]),
-            )
+            Metric.from_pydantic(pydantic_metric=metric, dimensions=self.simple_dimensions_for_metrics([metric.name]))
             for metric in metrics
         ]
 
@@ -483,7 +481,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
     ) -> List[str]:
-
         # Run query
         query_result = self.query(
             MetricFlowQueryRequest.create_with_random_request_id(
