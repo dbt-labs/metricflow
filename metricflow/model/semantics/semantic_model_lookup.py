@@ -64,14 +64,12 @@ class SemanticModelLookup(SemanticModelAccessor):
 
     def get_dimension(self, dimension_reference: DimensionReference) -> Dimension:
         """Retrieves a full dimension object by name"""
-        print("looking for:", dimension_reference.element_name)
-        print("source:", self._dimension_index[dimension_reference])
         for dimension_source in self._dimension_index[dimension_reference]:
             dimension = dimension_source.get_dimension(dimension_reference)
             # find the semantic model that has the requested dimension by the requested entity
 
             return deepcopy(dimension)
-        print("didn't find:", dimension_reference.element_name)
+
         raise ValueError(
             f"Could not find dimension with name ({dimension_reference.element_name}) in configured semantic models"
         )
