@@ -451,7 +451,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
     def simple_dimensions_for_metrics(self, metric_names: List[str]) -> List[Dimension]:  # noqa: D
         return [
-            self._semantic_manifest_lookup.semantic_model_lookup.get_dimension(DimensionReference(dim.qualified_name))
+            self._semantic_manifest_lookup.semantic_model_lookup.get_dimension(DimensionReference(dim.element_name))
             for dim in self._semantic_manifest_lookup.metric_lookup.element_specs_for_metrics(
                 metric_references=[MetricReference(element_name=mname) for mname in metric_names],
                 without_any_property=frozenset(
