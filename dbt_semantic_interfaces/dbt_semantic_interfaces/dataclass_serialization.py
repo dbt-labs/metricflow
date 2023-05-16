@@ -10,18 +10,18 @@ from typing import (
     Any,
     Dict,
     Optional,
+    Tuple,
     Type,
     TypeVar,
-    Tuple,
     Union,
     get_args,
     get_origin,
     get_type_hints,
 )
-from typing_extensions import TypeAlias
 
 import pydantic
 from pydantic import BaseModel
+from typing_extensions import TypeAlias
 
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 
@@ -35,7 +35,7 @@ AnyValueType: TypeAlias = Any  # type: ignore[misc]
 
 
 class UnknownClassError(Exception):
-    """Raised when there's an issue getting type information for a SerializableDataclass"""
+    """Raised when there's an issue getting type information for a SerializableDataclass."""
 
     pass
 
@@ -286,7 +286,6 @@ class DataClassDeserializer:
     def pydantic_deserialize(  # noqa: D
         self, dataclass_type: Type[SerializableDataclassT], serialized_obj: str
     ) -> SerializableDataclassT:
-
         try:
             ClassAsPydantic = self._to_pydantic_type_converter.to_pydantic_type(dataclass_type)
             logger.debug(f"Serialized object for creation of {ClassAsPydantic} is {serialized_obj}")
@@ -345,7 +344,7 @@ class DataClassTypeToPydanticTypeConverter:  # noqa: D
 
     @staticmethod
     def _convert_nested_fields(field_definition: FieldDefinition) -> FieldDefinition:
-        """Recursively converts a given field definition into a fully serializable type specification
+        """Recursively converts a given field definition into a fully serializable type specification.
 
         The initial set of FieldDefinitions sourced from the dataclass might contain arbitrarily
         nested SerializableDataclass objects, which would need further parsing in order to be fully
@@ -398,7 +397,7 @@ class FieldDefinition:
     default_value: Optional[AnyValueType] = ...
 
     def __post_init__(self) -> None:
-        """Validate the combination of default_value and field_type"""
+        """Validate the combination of default_value and field_type."""
         if self.default_value is None:
             assert _is_optional_type(self.field_type), (
                 f"Invalid default of None provided for field definition - type {self.field_type} will not allow it! "
@@ -406,7 +405,7 @@ class FieldDefinition:
             )
 
     def as_pydantic_field_tuple(self) -> Tuple[Type, AnyValueType]:
-        """Pydantic fields can be initialized with a Tuple[Type, Any], where the second parameter is the default value"""
+        """Pydantic fields can be initialized with a Tuple[Type, Any], the second parameter is the default value."""
         default = self.default_value if self.default_value != dataclasses.MISSING else ...
         return (self.annotated_field_type, default)
 

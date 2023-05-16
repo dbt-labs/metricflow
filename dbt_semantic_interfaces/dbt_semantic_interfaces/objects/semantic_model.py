@@ -1,18 +1,26 @@
 from __future__ import annotations
 
-from pydantic import validator
 from typing import Any, List, Optional, Sequence
 
-from dbt_semantic_interfaces.objects.base import ModelWithMetadataParsing, HashableBaseModel
-from dbt_semantic_interfaces.objects.metadata import Metadata
+from pydantic import validator
+
+from dbt_semantic_interfaces.objects.base import (
+    HashableBaseModel,
+    ModelWithMetadataParsing,
+)
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension
 from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.elements.measure import Measure
-from dbt_semantic_interfaces.references import SemanticModelReference, LinkableElementReference, MeasureReference
+from dbt_semantic_interfaces.objects.metadata import Metadata
+from dbt_semantic_interfaces.references import (
+    LinkableElementReference,
+    MeasureReference,
+    SemanticModelReference,
+)
 
 
 class NodeRelation(HashableBaseModel):
-    """Path object to where the data should be"""
+    """Path object to where the data should be."""
 
     alias: str
     schema_name: str
@@ -22,7 +30,7 @@ class NodeRelation(HashableBaseModel):
     @validator("relation_name", always=True)
     @classmethod
     def __create_default_relation_name(cls, value: Any, values: Any) -> str:  # type: ignore[misc]
-        """Dynamically build the dot path for `relation_name`, if not specified"""
+        """Dynamically build the dot path for `relation_name`, if not specified."""
         if value:
             # Only build the relation_name if it was not present in config.
             return value
@@ -53,7 +61,7 @@ class NodeRelation(HashableBaseModel):
 
 
 class SemanticModel(HashableBaseModel, ModelWithMetadataParsing):
-    """Describes a semantic model"""
+    """Describes a semantic model."""
 
     name: str
     description: Optional[str]
@@ -102,12 +110,12 @@ class SemanticModel(HashableBaseModel, ModelWithMetadataParsing):
 
     @property
     def has_validity_dimensions(self) -> bool:
-        """Returns True if there are validity params set on one or more dimensions"""
+        """Returns True if there are validity params set on one or more dimensions."""
         return any([dim.validity_params is not None for dim in self.dimensions])
 
     @property
     def validity_start_dimension(self) -> Optional[Dimension]:
-        """Returns the validity window start dimension, if one is set"""
+        """Returns the validity window start dimension, if one is set."""
         validity_start_dims = [dim for dim in self.dimensions if dim.validity_params and dim.validity_params.is_start]
         if not validity_start_dims:
             return None
@@ -118,7 +126,7 @@ class SemanticModel(HashableBaseModel, ModelWithMetadataParsing):
 
     @property
     def validity_end_dimension(self) -> Optional[Dimension]:
-        """Returns the validity window end dimension, if one is set"""
+        """Returns the validity window end dimension, if one is set."""
         validity_end_dims = [dim for dim in self.dimensions if dim.validity_params and dim.validity_params.is_end]
         if not validity_end_dims:
             return None

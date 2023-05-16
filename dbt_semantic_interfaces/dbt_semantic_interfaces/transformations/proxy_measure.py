@@ -1,7 +1,12 @@
 import logging
 
 from dbt_semantic_interfaces.errors import ModelTransformError
-from dbt_semantic_interfaces.objects.metric import Metric, MetricInputMeasure, MetricType, MetricTypeParams
+from dbt_semantic_interfaces.objects.metric import (
+    Metric,
+    MetricInputMeasure,
+    MetricType,
+    MetricTypeParams,
+)
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.transformations.transform_rule import ModelTransformRule
 
@@ -16,7 +21,7 @@ class CreateProxyMeasureRule(ModelTransformRule):
 
     @staticmethod
     def transform_model(model: SemanticManifest) -> SemanticManifest:
-        """Creates measure proxy metrics for measures with `create_metric==True`"""
+        """Creates measure proxy metrics for measures with `create_metric==True`."""
         for semantic_model in model.semantic_models:
             for measure in semantic_model.measures:
                 if not measure.create_metric:

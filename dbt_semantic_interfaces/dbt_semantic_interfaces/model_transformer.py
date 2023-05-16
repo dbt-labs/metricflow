@@ -1,6 +1,5 @@
 import copy
 import logging
-
 from typing import Sequence, Tuple
 
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
@@ -53,7 +52,7 @@ class ModelTransformer:
         model: SemanticManifest,
         ordered_rule_sequences: Tuple[Sequence[ModelTransformRule], ...] = DEFAULT_RULES,
     ) -> SemanticManifest:
-        """Copies the passed in model, applies the rules to the new model, and then returns that model
+        """Copies the passed in model, applies the rules to the new model, and then returns that model.
 
         It's important to note that some rules need to happen before or after other rules. Thus rules
         are passed in as an ordered tuple of rule sequences. Primary rules are run first, and then
@@ -74,7 +73,8 @@ class ModelTransformer:
     ) -> SemanticManifest:
         """Transform a model according to configured rules before validations are run."""
         logger.warning(
-            "DEPRECATION: `ModelTransformer.pre_validation_transform_model` is deprecated. Please use `ModelTransformer.transform` instead."
+            "DEPRECATION: `ModelTransformer.pre_validation_transform_model` is deprecated.",
+            "Please use `ModelTransformer.transform` instead.",
         )
 
         return ModelTransformer.transform(model=model, ordered_rule_sequences=(rules,))
@@ -86,7 +86,8 @@ class ModelTransformer:
     ) -> SemanticManifest:
         """Transform a model according to configured rules after validations are run."""
         logger.warning(
-            "DEPRECATION: `ModelTransformer.post_validation_transform_model` is deprecated. Please use `ModelTransformer.transform` instead."
+            "DEPRECATION: `ModelTransformer.post_validation_transform_model` is deprecated.",
+            "Please use `ModelTransformer.transform` instead.",
         )
 
         return ModelTransformer.transform(model=model, ordered_rule_sequences=(rules,))

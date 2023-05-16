@@ -1,17 +1,17 @@
 import logging
 from typing import List
 
-from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
-from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.references import SemanticModelReference
+from dbt_semantic_interfaces.type_enums.dimension_type import DimensionType
 from dbt_semantic_interfaces.validations.validator_helpers import (
-    SemanticModelContext,
     FileContext,
     ModelValidationRule,
-    ValidationIssue,
+    SemanticModelContext,
     ValidationError,
+    ValidationIssue,
     validate_safely,
 )
 
@@ -56,7 +56,8 @@ class SemanticModelTimeDimensionWarningsRule(ModelValidationRule):
                         file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
                         semantic_model=SemanticModelReference(semantic_model_name=semantic_model.name),
                     ),
-                    message=f"No primary time dimension in semantic model with name ({semantic_model.name}). Please add one",
+                    message=f"No primary time dimension in semantic model with name ({semantic_model.name}). "
+                    "Please add one",
                 )
             )
 
@@ -78,12 +79,12 @@ class SemanticModelTimeDimensionWarningsRule(ModelValidationRule):
 
 
 class SemanticModelValidityWindowRule(ModelValidationRule):
-    """Checks validity windows in semantic models to ensure they comply with runtime requirements"""
+    """Checks validity windows in semantic models to ensure they comply with runtime requirements."""
 
     @staticmethod
     @validate_safely(whats_being_done="checking correctness of the time dimension validity parameters in the model")
     def validate_model(model: SemanticManifest) -> List[ValidationIssue]:
-        """Checks the validity param definitions in every semantic model in the model"""
+        """Checks the validity param definitions in every semantic model in the model."""
         issues: List[ValidationIssue] = []
 
         for semantic_model in model.semantic_models:
@@ -93,11 +94,11 @@ class SemanticModelValidityWindowRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(
-        whats_being_done="checking the semantic model's validity parameters for compatibility with runtime requirements"
+        whats_being_done="checking the semantic model's validity parameters for compatibility with "
+        "runtime requirements"
     )
     def _validate_semantic_model(semantic_model: SemanticModel) -> List[ValidationIssue]:
-        """Runs assertions on semantic models with validity parameters set on one or more time dimensions"""
-
+        """Runs assertions on semantic models with validity parameters set on one or more time dimensions."""
         issues: List[ValidationIssue] = []
 
         validity_param_dims = [dim for dim in semantic_model.dimensions if dim.validity_params is not None]
@@ -127,8 +128,8 @@ class SemanticModelValidityWindowRule(ModelValidationRule):
             error = ValidationError(
                 context=context,
                 message=(
-                    f"Semantic model {semantic_model.name} has a single validity param dimension that defines its window: "
-                    f"`{validity_param_dimension_names[0]}`. This is not a currently supported configuration! "
+                    f"Semantic model {semantic_model.name} has a single validity param dimension that defines its "
+                    f"window: `{validity_param_dimension_names[0]}`. This is not a currently supported configuration! "
                     f"{requirements} If you have one column defining a window, as in a daily snapshot table, you can "
                     f"define a separate dimension and increment the time value in the `expr` field as a work-around."
                 ),
@@ -138,10 +139,10 @@ class SemanticModelValidityWindowRule(ModelValidationRule):
             error = ValidationError(
                 context=context,
                 message=(
-                    f"Semantic model {semantic_model.name} has {len(validity_param_dims)} dimensions defined with validity "
-                    f"params. They are: {validity_param_dimension_names}. There must be either zero or two! "
-                    f"If you wish to define a validity window for this semantic model, please follow these requirements: "
-                    f"{requirements}"
+                    f"Semantic model {semantic_model.name} has {len(validity_param_dims)} dimensions defined with "
+                    f"validity params. They are: {validity_param_dimension_names}. There must be either zero or two! "
+                    f"If you wish to define a validity window for this semantic model, please follow these "
+                    f"requirements: {requirements}"
                 ),
             )
             issues.append(error)
@@ -151,9 +152,10 @@ class SemanticModelValidityWindowRule(ModelValidationRule):
             error = ValidationError(
                 context=context,
                 message=(
-                    f"Semantic model {semantic_model.name} has two validity param dimensions defined, but does not have "
-                    f"exactly one each marked with is_start and is_end! Dimensions: {validity_param_dimension_names}. "
-                    f"is_start dimensions: {start_dim_names}. is_end dimensions: {end_dim_names}. {requirements}"
+                    f"Semantic model {semantic_model.name} has two validity param dimensions defined, but does not "
+                    f"have exactly one each marked with is_start and is_end! Dimensions: "
+                    f"{validity_param_dimension_names}. is_start dimensions: {start_dim_names}. is_end dimensions: "
+                    f"{end_dim_names}. {requirements}"
                 ),
             )
             issues.append(error)
@@ -165,8 +167,8 @@ class SemanticModelValidityWindowRule(ModelValidationRule):
             error = ValidationError(
                 context=context,
                 message=(
-                    f"Semantic model {semantic_model.name} has validity param dimensions defined, but does not have an "
-                    f"entity with type `natural` set. The natural key for this semantic model is what we use to "
+                    f"Semantic model {semantic_model.name} has validity param dimensions defined, but does not have "
+                    f"an entity with type `natural` set. The natural key for this semantic model is what we use to "
                     f"process a validity window join. Primary or unique entities, if any, might be suitable for "
                     f"use as natural keys: ({[entity.name for entity in primary_or_unique_entities]})."
                 ),
@@ -177,8 +179,8 @@ class SemanticModelValidityWindowRule(ModelValidationRule):
             error = ValidationError(
                 context=context,
                 message=(
-                    f"Semantic model {semantic_model.name} has validity param dimensions defined and also has one or more "
-                    f"entities designated as `primary` or `unique`. This is not yet supported, as we do not "
+                    f"Semantic model {semantic_model.name} has validity param dimensions defined and also has one or "
+                    f"more entities designated as `primary` or `unique`. This is not yet supported, as we do not "
                     f"currently process joins against these key types for semantic models with validity windows "
                     f"specified."
                 ),
@@ -191,8 +193,8 @@ class SemanticModelValidityWindowRule(ModelValidationRule):
             error = ValidationError(
                 context=context,
                 message=(
-                    f"Semantic model {semantic_model.name} has both measures and validity param dimensions defined. This "
-                    f"is not currently supported! Please remove either the measures or the validity params. "
+                    f"Semantic model {semantic_model.name} has both measures and validity param dimensions defined. "
+                    f"This is not currently supported! Please remove either the measures or the validity params. "
                     f"Measure names: {measure_names}. Validity param dimension names: "
                     f"{validity_param_dimension_names}."
                 ),

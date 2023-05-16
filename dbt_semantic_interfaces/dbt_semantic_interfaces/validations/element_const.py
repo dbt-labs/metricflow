@@ -1,13 +1,13 @@
 from collections import defaultdict
-from typing import List, DefaultDict
+from typing import DefaultDict, List
 
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import SemanticModelReference
 from dbt_semantic_interfaces.validations.validator_helpers import (
-    SemanticModelContext,
-    SemanticModelElementType,
     FileContext,
     ModelValidationRule,
+    SemanticModelContext,
+    SemanticModelElementType,
     ValidationError,
     ValidationIssue,
     validate_safely,
@@ -15,7 +15,7 @@ from dbt_semantic_interfaces.validations.validator_helpers import (
 
 
 class ElementConsistencyRule(ModelValidationRule):
-    """Checks that elements in semantic models with the same name are of the same element type across the model
+    """Checks that elements in semantic models with the same name are of the same element type across the model.
 
     This reduces the potential confusion that might arise from having an entity named `country` and a dimension
     named `country` while allowing for things like the `user` entity to exist in multiple semantic models. Note not
@@ -53,7 +53,7 @@ class ElementConsistencyRule(ModelValidationRule):
     def _get_element_name_to_types(
         model: SemanticManifest,
     ) -> DefaultDict[str, DefaultDict[SemanticModelElementType, List[SemanticModelContext]]]:
-        """Create a mapping of all element names in the model to types with a list of associated SemanticModelContexts"""
+        """Create a mapping of element names in the semantic manifest to types with a list of associated contexts."""
         element_types: DefaultDict[
             str, DefaultDict[SemanticModelElementType, List[SemanticModelContext]]
         ] = defaultdict(lambda: defaultdict(list))

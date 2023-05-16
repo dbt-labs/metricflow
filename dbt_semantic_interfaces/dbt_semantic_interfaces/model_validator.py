@@ -1,13 +1,11 @@
-from concurrent.futures import ProcessPoolExecutor, as_completed
 import copy
 import logging
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from typing import List, Sequence
 
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.validations.agg_time_dimension import AggregationTimeDimensionRule
-from dbt_semantic_interfaces.validations.semantic_models import (
-    SemanticModelTimeDimensionWarningsRule,
-    SemanticModelValidityWindowRule,
+from dbt_semantic_interfaces.validations.agg_time_dimension import (
+    AggregationTimeDimensionRule,
 )
 from dbt_semantic_interfaces.validations.dimension_const import DimensionConsistencyRule
 from dbt_semantic_interfaces.validations.element_const import ElementConsistencyRule
@@ -16,28 +14,35 @@ from dbt_semantic_interfaces.validations.entities import (
     OnePrimaryEntityPerSemanticModelRule,
 )
 from dbt_semantic_interfaces.validations.measures import (
-    PercentileAggregationRule,
     CountAggregationExprRule,
-    SemanticModelMeasuresUniqueRule,
     MeasureConstraintAliasesRule,
-    MetricMeasuresRule,
     MeasuresNonAdditiveDimensionRule,
+    MetricMeasuresRule,
+    PercentileAggregationRule,
+    SemanticModelMeasuresUniqueRule,
 )
-from dbt_semantic_interfaces.validations.metrics import CumulativeMetricRule, DerivedMetricRule
+from dbt_semantic_interfaces.validations.metrics import (
+    CumulativeMetricRule,
+    DerivedMetricRule,
+)
 from dbt_semantic_interfaces.validations.non_empty import NonEmptyRule
 from dbt_semantic_interfaces.validations.reserved_keywords import ReservedKeywordsRule
+from dbt_semantic_interfaces.validations.semantic_models import (
+    SemanticModelTimeDimensionWarningsRule,
+    SemanticModelValidityWindowRule,
+)
 from dbt_semantic_interfaces.validations.unique_valid_name import UniqueAndValidNameRule
 from dbt_semantic_interfaces.validations.validator_helpers import (
+    ModelValidationException,
     ModelValidationResults,
     ModelValidationRule,
-    ModelValidationException,
 )
 
 logger = logging.getLogger(__name__)
 
 
 class ModelValidator:
-    """A Validator that acts on SemanticManifest"""
+    """A Validator that acts on SemanticManifest."""
 
     DEFAULT_RULES = (
         PercentileAggregationRule(),
@@ -67,7 +72,6 @@ class ModelValidator:
             rules: List of validation rules to run. Defaults to DEFAULT_RULES
             max_workers: sets the max number of rules to run against the model concurrently
         """
-
         # Raises an error if 'rules' is an empty sequence or None
         if not rules:
             raise ValueError("ModelValidator 'rules' must be a sequence with at least one ModelValidationRule.")

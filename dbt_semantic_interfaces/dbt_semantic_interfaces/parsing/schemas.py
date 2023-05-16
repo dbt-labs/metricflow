@@ -18,7 +18,6 @@ aggregation_type_values = [
     "MAX",
     "AVERAGE",
     "COUNT_DISTINCT",
-    "BOOLEAN",
     "SUM_BOOLEAN",
     "COUNT",
     "PERCENTILE",

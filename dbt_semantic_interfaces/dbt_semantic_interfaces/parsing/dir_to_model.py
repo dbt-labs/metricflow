@@ -1,27 +1,26 @@
 import logging
 import os
+import traceback
 from dataclasses import dataclass
 from string import Template
-import traceback
-import git
-from typing import Optional, Dict, List, Union, Type
+from typing import Dict, List, Optional, Type, Union
 
 from jsonschema import exceptions
 
 from dbt_semantic_interfaces.errors import ParsingException
 from dbt_semantic_interfaces.model_transformer import ModelTransformer
-from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.metric import Metric
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.parsing.objects import Version, YamlConfigFile
 from dbt_semantic_interfaces.parsing.schemas import (
     metric_validator,
     semantic_model_validator,
 )
-from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.parsing.yaml_loader import (
+    PARSING_CONTEXT_KEY,
     ParsingContext,
     YamlConfigLoader,
-    PARSING_CONTEXT_KEY,
 )
 from dbt_semantic_interfaces.validations.validator_helpers import (
     FileContext,
@@ -48,7 +47,7 @@ class ModelBuildResult:  # noqa: D
 
 @dataclass(frozen=True)
 class FileParsingResult:
-    """Results of parsing a config file
+    """Results of parsing a config file.
 
     Attributes:
         elements: MetricFlow model elements parsed from the file
@@ -60,16 +59,13 @@ class FileParsingResult:
 
 
 def collect_yaml_config_file_paths(directory: str) -> List[str]:
-    """Collects a list of file paths for model config files
+    """Collects a list of file paths for model config files.
 
     Ignores files that are:
         - In hidden directories (i.e. directories starting with '.')
         - Hidden files (i.e. files starting with '.')
         - Non YAML files
         - Ignored by the repo's .gitignore file (if a repo is detected)
-
-    NOTE: We ignore files ignored by .gitignore because an issue cropped up wherein
-    sometimes dependencies of projects include YAML files in their package.
     """
     config_file_paths: List[str] = []
     for root, dirs, files in os.walk(directory):
@@ -86,15 +82,6 @@ def collect_yaml_config_file_paths(directory: str) -> List[str]:
             file_path = os.path.join(root, file)
             config_file_paths.append(file_path)
 
-    try:
-        repo = git.Repo(directory, search_parent_directories=True)
-        # repo.ignored returns a list of file paths which are the file paths
-        # that should be ignored as a subset of the handed in file paths
-        ignored_files = repo.ignored(config_file_paths)
-        config_file_paths = list(set(config_file_paths) - set(ignored_files))
-    except git.exc.InvalidGitRepositoryError:
-        pass
-
     return config_file_paths
 
 
@@ -106,7 +93,8 @@ def parse_directory_of_yaml_files_to_model(
 ) -> ModelBuildResult:
     """Parse files in the given directory to a SemanticManifest.
 
-    Strings in the file following the Python string template format are replaced according to the template_mapping dict.
+    Strings in the file following the Python string template format are replaced
+    according to the template_mapping dict.
     """
     file_paths = collect_yaml_config_file_paths(directory=directory)
     return parse_yaml_file_paths_to_model(
@@ -125,7 +113,8 @@ def parse_yaml_file_paths_to_model(
 ) -> ModelBuildResult:
     """Parse files the given list of file paths to a SemanticManifest.
 
-    Strings in the files following the Python string template format are replaced according to the template_mapping dict.
+    Strings in the files following the Python string template format are replaced
+    according to the template_mapping dict.
     """
     template_mapping = template_mapping or {}
     yaml_config_files = []
@@ -161,7 +150,7 @@ def parse_yaml_files_to_validation_ready_model(
     apply_transformations: Optional[bool] = True,
     raise_issues_as_exceptions: bool = True,
 ) -> ModelBuildResult:
-    """Parse and transform the given set of in-memory YamlConfigFiles to a UserConfigured model
+    """Parse and transform the given set of in-memory YamlConfigFiles to a UserConfigured model.
 
     This model result is, by default, validation-ready, although different callsites (mainly in testing)
     might wish to override the transformation state.
@@ -203,10 +192,7 @@ def parse_yaml_files_to_model(
     valid_object_classes = [semantic_model_class.__name__, metric_class.__name__]
     issues: List[ValidationIssue] = []
 
-    # Sort the file path so that tests run with consistency. e.g. node IDs are generated sequentially, and the order
-    # of node creation is based on the order of semantic models. If a snapshot includes a node ID, then inconsistent
-    # IDs will cause snapshot match failures.
-    for config_file in sorted(files, key=lambda file: file.filepath):
+    for config_file in files:
         parsing_result = parse_config_yaml(  # parse config file
             config_file,
             semantic_model_class=semantic_model_class,
@@ -242,7 +228,7 @@ def parse_config_yaml(
     semantic_model_class: Type[SemanticModel] = SemanticModel,
     metric_class: Type[Metric] = Metric,
 ) -> FileParsingResult:
-    """Parses transform config file passed as string - Returns list of model objects"""
+    """Parses transform config file passed as string - Returns list of model objects."""
     results: List[Union[SemanticModel, Metric]] = []
     ctx: Optional[ParsingContext] = None
     issues: List[ValidationIssue] = []

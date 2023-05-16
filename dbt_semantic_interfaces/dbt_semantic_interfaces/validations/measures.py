@@ -3,21 +3,21 @@ from typing import DefaultDict, Dict, List, Set
 
 from more_itertools import bucket
 
-from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
-from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.metric import Metric
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.references import MetricModelReference, MeasureReference
+from dbt_semantic_interfaces.references import MeasureReference, MetricModelReference
+from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
+from dbt_semantic_interfaces.type_enums.dimension_type import DimensionType
 from dbt_semantic_interfaces.validations.unique_valid_name import UniqueAndValidNameRule
 from dbt_semantic_interfaces.validations.validator_helpers import (
-    SemanticModelElementContext,
-    SemanticModelElementReference,
-    SemanticModelElementType,
     FileContext,
     MetricContext,
     ModelValidationRule,
-    ValidationIssue,
+    SemanticModelElementContext,
+    SemanticModelElementReference,
+    SemanticModelElementType,
     ValidationError,
+    ValidationIssue,
     ValidationWarning,
     validate_safely,
 )
@@ -56,7 +56,7 @@ class SemanticModelMeasuresUniqueRule(ModelValidationRule):
 
 
 class MeasureConstraintAliasesRule(ModelValidationRule):
-    """Checks that aliases are configured correctly for constrained measure references
+    """Checks that aliases are configured correctly for constrained measure references.
 
     These are, currently, only applicable for Metric types, since the MetricInputMeasure is only
     """
@@ -64,7 +64,7 @@ class MeasureConstraintAliasesRule(ModelValidationRule):
     @staticmethod
     @validate_safely(whats_being_done="ensuring measures aliases are set when required")
     def _validate_required_aliases_are_set(metric: Metric, metric_context: MetricContext) -> List[ValidationIssue]:
-        """Checks if valid aliases are set on the input measure references where they are required
+        """Checks if valid aliases are set on the input measure references where they are required.
 
         Aliases are required whenever there are 2 or more input measures with the same measure
         reference with different constraints. When this happens, we require aliases for all
@@ -124,7 +124,7 @@ class MeasureConstraintAliasesRule(ModelValidationRule):
     @staticmethod
     @validate_safely(whats_being_done="checking constrained measures are aliased properly")
     def validate_model(model: SemanticManifest) -> List[ValidationIssue]:
-        """Ensures measures that might need an alias have one set, and that the alias is distinct
+        """Ensures measures that might need an alias have one set, and that the alias is distinct.
 
         We do not allow aliases to collide with other alias or measure names, since that could create
         ambiguity at query time or cause issues if users ever restructure their models.
@@ -249,8 +249,9 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                                 element_type=SemanticModelElementType.MEASURE,
                             ),
                             message=(
-                                f"Measure '{measure.name}' has a agg_time_dimension of {measure.checked_agg_time_dimension.element_name} "
-                                f"that is not defined as a dimension in semantic model '{semantic_model.name}'."
+                                f"Measure '{measure.name}' has a agg_time_dimension of "
+                                f"{measure.checked_agg_time_dimension.element_name} ",
+                                f"that is not defined as a dimension in semantic model '{semantic_model.name}'.",
                             ),
                         )
                     )
@@ -271,8 +272,9 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                                 element_type=SemanticModelElementType.MEASURE,
                             ),
                             message=(
-                                f"Measure '{measure.name}' has a non_additive_dimension with name '{non_additive_dimension.name}' "
-                                f"that is not defined as a dimension in semantic model '{semantic_model.name}'."
+                                f"Measure '{measure.name}' has a non_additive_dimension with name "
+                                f"'{non_additive_dimension.name}' that is not defined as a dimension in semantic "
+                                f"model '{semantic_model.name}'."
                             ),
                         )
                     )
@@ -289,13 +291,15 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                                     element_type=SemanticModelElementType.MEASURE,
                                 ),
                                 message=(
-                                    f"Measure '{measure.name}' has a non_additive_dimension with name '{non_additive_dimension.name}' "
+                                    f"Measure '{measure.name}' has a non_additive_dimension with name"
+                                    f"'{non_additive_dimension.name}' "
                                     f"that is defined as a categorical dimension which is not supported."
                                 ),
                             )
                         )
 
-                    # Validates that the non_additive_dimension time_granularity is >= agg_time_dimension time_granularity
+                    # Validates that the non_additive_dimension time_granularity
+                    # is >= agg_time_dimension time_granularity
                     if (
                         matching_dimension.type_params
                         and agg_time_dimension.type_params
@@ -314,9 +318,11 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                                     element_type=SemanticModelElementType.MEASURE,
                                 ),
                                 message=(
-                                    f"Measure '{measure.name}' has a non_additive_dimension with name '{non_additive_dimension.name}' that has "
-                                    f"a base time granularity ({matching_dimension.type_params.time_granularity.name}) that is not equal to the measure's "
-                                    f"agg_time_dimension {agg_time_dimension.name} with a base granularity of ({agg_time_dimension.type_params.time_granularity.name})."
+                                    f"Measure '{measure.name}' has a non_additive_dimension with name "
+                                    f"'{non_additive_dimension.name}' that has a base time granularity "
+                                    f"({matching_dimension.type_params.time_granularity.name}) that is not equal to "
+                                    f"the measure's agg_time_dimension {agg_time_dimension.name} with a base "
+                                    f"granularity of ({agg_time_dimension.type_params.time_granularity.name})."
                                 ),
                             )
                         )
@@ -333,7 +339,8 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                                 element_type=SemanticModelElementType.MEASURE,
                             ),
                             message=(
-                                f"Measure '{measure.name}' has a non_additive_dimension with an invalid 'window_choice' of '{non_additive_dimension.window_choice.value}'. "
+                                f"Measure '{measure.name}' has a non_additive_dimension with an invalid "
+                                f"'window_choice' of '{non_additive_dimension.window_choice.value}'. "
                                 f"Only choices supported are 'min' or 'max'."
                             ),
                         )
@@ -354,8 +361,10 @@ class MeasuresNonAdditiveDimensionRule(ModelValidationRule):
                                 element_type=SemanticModelElementType.MEASURE,
                             ),
                             message=(
-                                f"Measure '{measure.name}' has a non_additive_dimension with an invalid 'window_groupings'. "
-                                f"These entities {window_groupings.difference(intersected_entities)} do not exist in the semantic model."
+                                f"Measure '{measure.name}' has a non_additive_dimension with an invalid "
+                                "'window_groupings'. These entities "
+                                f"{window_groupings.difference(intersected_entities)} do not exist in the "
+                                "semantic model."
                             ),
                         )
                     )
@@ -387,8 +396,8 @@ class CountAggregationExprRule(ModelValidationRule):
                         ValidationError(
                             context=context,
                             message=(
-                                f"Measure '{measure.name}' uses a COUNT aggregation, which requires an expr to be provided. "
-                                f"Provide 'expr: 1' if a count of all rows is desired."
+                                f"Measure '{measure.name}' uses a COUNT aggregation, which requires an expr to be "
+                                "provided. Provide 'expr: 1' if a count of all rows is desired."
                             ),
                         )
                     )
@@ -404,8 +413,8 @@ class CountAggregationExprRule(ModelValidationRule):
                         ValidationError(
                             context=context,
                             message=(
-                                f"Measure '{measure.name}' uses a '{measure.agg.value}' aggregation with a DISTINCT expr: "
-                                f"'{measure.expr}. This is not supported, as it effectively converts an additive "
+                                f"Measure '{measure.name}' uses a '{measure.agg.value}' aggregation with a DISTINCT "
+                                f"expr: '{measure.expr}. This is not supported as it effectively converts an additive "
                                 f"measure into a non-additive one, and this could cause certain queries to return "
                                 f"incorrect results. Please use the {measure.agg.value}_distinct aggregation type."
                             ),
@@ -419,7 +428,8 @@ class PercentileAggregationRule(ModelValidationRule):
 
     @staticmethod
     @validate_safely(
-        whats_being_done="running model validation ensuring the agg_params.percentile value exist for measures with percentile aggregation"
+        whats_being_done="running model validation ensuring the agg_params.percentile value exist for measures with "
+        "percentile aggregation"
     )
     def validate_model(model: SemanticManifest) -> List[ValidationIssue]:  # noqa: D
         issues: List[ValidationIssue] = []
@@ -439,7 +449,8 @@ class PercentileAggregationRule(ModelValidationRule):
                             ValidationError(
                                 context=context,
                                 message=(
-                                    f"Measure '{measure.name}' uses a PERCENTILE aggregation, which requires agg_params.percentile to be provided."
+                                    f"Measure '{measure.name}' uses a PERCENTILE aggregation, which requires "
+                                    "agg_params.percentile to be provided."
                                 ),
                             )
                         )
@@ -448,9 +459,11 @@ class PercentileAggregationRule(ModelValidationRule):
                             ValidationError(
                                 context=context,
                                 message=(
-                                    f"Percentile aggregation parameter for measure '{measure.name}' is '{measure.agg_params.percentile}', but"
-                                    "must be between 0 and 1 (non-inclusive). For example, to indicate the 65th percentile value, set 'percentile: 0.65'. "
-                                    "For percentile values of 0, please use MIN, for percentile values of 1, please use MAX."
+                                    f"Percentile aggregation parameter for measure '{measure.name}' is "
+                                    f"'{measure.agg_params.percentile}', but must be between 0 and 1 (non-inclusive). "
+                                    "For example, to indicate the 65th percentile value, set 'percentile: 0.65'. "
+                                    "For percentile values of 0, please use MIN, for percentile values of 1, please "
+                                    "use MAX."
                                 ),
                             )
                         )
@@ -460,17 +473,18 @@ class PercentileAggregationRule(ModelValidationRule):
                             issues.append(
                                 ValidationError(
                                     context=context,
-                                    message=f"Measure '{measure.name}' uses a MEDIAN aggregation, while percentile is set to "
-                                    f"'{measure.agg_params.percentile}', a conflicting value. Please remove the parameter "
-                                    "or set to '0.5'.",
+                                    message=f"Measure '{measure.name}' uses a MEDIAN aggregation, while percentile is "
+                                    f"set to '{measure.agg_params.percentile}', a conflicting value. Please remove "
+                                    "the parameter or set to '0.5'.",
                                 )
                             )
                         if measure.agg_params.use_discrete_percentile:
                             issues.append(
                                 ValidationError(
                                     context=context,
-                                    message=f"Measure '{measure.name}' uses a MEDIAN aggregation, while use_discrete_percentile"
-                                    f"is set to true. Please remove the parameter or set to False.",
+                                    message=f"Measure '{measure.name}' uses a MEDIAN aggregation, while "
+                                    "use_discrete_percentile is set to true. Please remove the parameter or set "
+                                    "to False.",
                                 )
                             )
                 elif measure.agg_params and (
@@ -501,7 +515,7 @@ class PercentileAggregationRule(ModelValidationRule):
 
 
 def _get_measure_names_from_model(model: SemanticManifest) -> Set[str]:
-    """Return every distinct measure name specified in the model"""
+    """Return every distinct measure name specified in the model."""
     measure_names = set()
     for semantic_model in model.semantic_models:
         for measure in semantic_model.measures:

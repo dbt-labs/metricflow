@@ -8,14 +8,17 @@ from typing import Any, Callable, ClassVar, Generic, Iterator, TypeVar
 from pydantic import BaseModel, root_validator
 
 from dbt_semantic_interfaces.errors import ParsingException
-from dbt_semantic_interfaces.parsing.yaml_loader import ParsingContext, PARSING_CONTEXT_KEY
+from dbt_semantic_interfaces.parsing.yaml_loader import (
+    PARSING_CONTEXT_KEY,
+    ParsingContext,
+)
 
 # Type alias for the implicit "Any" type used as input and output for Pydantic's parsing API
 PydanticParseableValueType = Any  # type: ignore[misc]
 
 
 class HashableBaseModel(BaseModel):
-    """Extends BaseModel with a generic hash function"""
+    """Extends BaseModel with a generic hash function."""
 
     def __hash__(self) -> int:  # noqa: D
         return hash(json.dumps(self.json(sort_keys=True), sort_keys=True))
@@ -40,7 +43,7 @@ class FrozenBaseModel(HashableBaseModel):
 
 
 class ModelWithMetadataParsing(BaseModel):
-    """Pydantic model object with a root validator for converting ParsingContext into Metadata]
+    """Pydantic model object with a root validator for converting ParsingContext into Metadata].
 
     To use this validator the model class in question MUST have a field with the following base
     specification:
@@ -58,7 +61,7 @@ class ModelWithMetadataParsing(BaseModel):
     @root_validator(pre=True)
     @classmethod
     def extract_metadata_from_parsing_context(cls, values: PydanticParseableValueType) -> PydanticParseableValueType:
-        """Takes info from parsing context and converts it to a Metadata model object
+        """Takes info from parsing context and converts it to a Metadata model object.
 
         Per Pydantic's processing logic, this runs on the collection of input data for whatever model
         object is doing its parser walk. Since we set pre to True this should happen before any of the
@@ -104,7 +107,7 @@ ModelObjectT_co = TypeVar("ModelObjectT_co", covariant=True, bound=BaseModel)
 
 
 class PydanticCustomInputParser(ABC, Generic[ModelObjectT_co]):
-    """Implements required methods for enabling custom parsing for Pydantic BaseModel objects
+    """Implements required methods for enabling custom parsing for Pydantic BaseModel objects.
 
     This abstract class helper is for the specific case where model object classes need to do custom parsing
     prior to object initialization, meaning that the inputs to the initializer itself must be parsed in a
@@ -119,7 +122,7 @@ class PydanticCustomInputParser(ABC, Generic[ModelObjectT_co]):
 
     @classmethod
     def __get_validators__(cls) -> Iterator[Callable]:
-        """Pydantic magic method for allowing parsing of arbitrary input on parse_obj invocation
+        """Pydantic magic method for allowing parsing of arbitrary input on parse_obj invocation.
 
         This allow for parsing and validation prior to object initialization. Most classes implementing this
         interface in our model are doing so because the input value from user-supplied YAML will be a string
@@ -129,7 +132,7 @@ class PydanticCustomInputParser(ABC, Generic[ModelObjectT_co]):
 
     @classmethod
     def __parse_with_custom_handling(cls: ModelObjectT_co, input: PydanticParseableValueType) -> ModelObjectT_co:
-        """Core method for handling common valid - or easily validated - input types
+        """Core method for handling common valid - or easily validated - input types.
 
         Pydantic objects can commonly appear as JSON object types (from, e.g., deserializing a Pydantic-serialized
         model) or direct instances of the model object class (from, e.g., initializing an object and passing it in
@@ -152,5 +155,5 @@ class PydanticCustomInputParser(ABC, Generic[ModelObjectT_co]):
     @classmethod
     @abstractmethod
     def _from_yaml_value(cls: ModelObjectT_co, input: PydanticParseableValueType) -> ModelObjectT_co:
-        """Abstract method for providing object-specific parsing logic"""
+        """Abstract method for providing object-specific parsing logic."""
         raise NotImplementedError()

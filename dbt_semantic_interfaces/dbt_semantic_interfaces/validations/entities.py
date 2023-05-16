@@ -2,25 +2,25 @@ import logging
 from datetime import date
 from typing import List, MutableSet
 
-from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.references import SemanticModelReference
 from dbt_semantic_interfaces.validations.validator_helpers import (
-    SemanticModelContext,
     FileContext,
     ModelValidationRule,
-    ValidationIssue,
+    SemanticModelContext,
     ValidationError,
+    ValidationFutureError,
+    ValidationIssue,
     validate_safely,
 )
-from dbt_semantic_interfaces.validations.validator_helpers import ValidationFutureError
 
 logger = logging.getLogger(__name__)
 
 
 class NaturalEntityConfigurationRule(ModelValidationRule):
-    """Ensures that entities marked as EntityType.NATURAL are configured correctly"""
+    """Ensures that entities marked as EntityType.NATURAL are configured correctly."""
 
     @staticmethod
     @validate_safely(
@@ -62,7 +62,7 @@ class NaturalEntityConfigurationRule(ModelValidationRule):
     @staticmethod
     @validate_safely(whats_being_done="checking that entities marked as EntityType.NATURAL are properly configured")
     def validate_model(model: SemanticManifest) -> List[ValidationIssue]:
-        """Validate entities marked as EntityType.NATURAL"""
+        """Validate entities marked as EntityType.NATURAL."""
         issues: List[ValidationIssue] = []
         for semantic_model in model.semantic_models:
             issues += NaturalEntityConfigurationRule._validate_semantic_model_natural_entities(
@@ -73,7 +73,7 @@ class NaturalEntityConfigurationRule(ModelValidationRule):
 
 
 class OnePrimaryEntityPerSemanticModelRule(ModelValidationRule):
-    """Ensures that each semantic model has only one primary entity"""
+    """Ensures that each semantic model has only one primary entity."""
 
     @staticmethod
     @validate_safely(whats_being_done="checking semantic model has only one primary entity")

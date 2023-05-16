@@ -21,7 +21,10 @@ class LinkableElementReference(ElementReference):
 
 @dataclass(frozen=True)
 class MeasureReference(ElementReference):
-    """Used when we need to refer to a measure (separate from LinkableElementReference because measures aren't linkable"""
+    """Used when we need to refer to a measure.
+
+    This is separate from LinkableElementReference because measures aren't linkable.
+    """
 
     pass
 

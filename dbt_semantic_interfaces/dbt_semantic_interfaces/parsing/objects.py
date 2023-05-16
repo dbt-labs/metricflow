@@ -8,7 +8,7 @@ from dbt_semantic_interfaces.objects.base import HashableBaseModel
 
 
 class YamlConfigFile(HashableBaseModel):
-    """Serializable container for customer model YAML contents
+    """Serializable container for customer model YAML contents.
 
     The serialization support is included here for scenarios where persisting the contents in non-filesystem storage
     services is necessary or desirable.

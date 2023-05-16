@@ -1,9 +1,9 @@
 from enum import Enum
-from typing import TypeVar, NoReturn, Type, Any, List
+from typing import Any, List, NoReturn, Type, TypeVar
 
 
 def assert_values_exhausted(value: NoReturn) -> NoReturn:
-    """Helper method to allow MyPy to guarantee an exhaustive switch through an enumeration or literal
+    """Helper method to allow MyPy to guarantee an exhaustive switch through an enumeration or literal.
 
     DO NOT MODIFY THE TYPE SIGNATURE OF THIS FUNCTION UNLESS MYPY CHANGES HOW IT HANDLES THINGS
 
@@ -29,11 +29,11 @@ T = TypeVar("T", bound="ExtendedEnum")
 
 
 class ExtendedEnum(Enum):
-    """Extension of standard Enum class with some extra utilities"""
+    """Extension of standard Enum class with some extra utilities."""
 
     @classmethod
     def _missing_(cls: Type[T], value: Any) -> "ExtendedEnum":  # type: ignore[misc]
-        """Make enums case insensitive"""
+        """Make enums case insensitive."""
         for member in cls:
             if member.value == value.lower():
                 return member
@@ -44,12 +44,12 @@ class ExtendedEnum(Enum):
 
     @classmethod
     def for_name(cls: Type[T], name: str) -> T:
-        """Return enum member with this name"""
+        """Return enum member with this name."""
         if name not in cls.__members__:
             raise KeyError(f"Unable to find name `{name}` in enum {cls.__name__}")
         return getattr(cls, name)
 
     @classmethod
     def list_names(cls) -> List[str]:
-        """List valid names within this enum class"""
+        """List valid names within this enum class."""
         return list(cls.__members__.keys())

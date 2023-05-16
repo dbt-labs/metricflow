@@ -1,11 +1,23 @@
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
+from typing import Generic, TypeVar
+
 from dbt_semantic_interfaces.objects.base import (
-    PydanticCustomInputParser,
     HashableBaseModel,
+    PydanticCustomInputParser,
     PydanticParseableValueType,
 )
-from dbt_semantic_interfaces.objects.where_filter.filter_renderer import FilterCallParameterSets, FilterRenderer
+
+TransformOutputT = TypeVar("TransformOutputT")
+
+
+class WhereFilterTransform(Generic[TransformOutputT], ABC):
+    """Function to use for transforming WhereFilters."""
+
+    @abstractmethod
+    def transform(self, where_filter: WhereFilter) -> TransformOutputT:  # noqa: D
+        raise NotImplementedError
 
 
 class WhereFilter(PydanticCustomInputParser, HashableBaseModel):
@@ -24,7 +36,7 @@ class WhereFilter(PydanticCustomInputParser, HashableBaseModel):
         cls,
         input: PydanticParseableValueType,
     ) -> WhereFilter:
-        """Parses a WhereFilter from a string found in a user-provided model specification
+        """Parses a WhereFilter from a string found in a user-provided model specification.
 
         User-provided constraint strings are SQL snippets conforming to the expectations of SQL WHERE clauses,
         and as such we parse them using our standard parse method below.
@@ -34,7 +46,5 @@ class WhereFilter(PydanticCustomInputParser, HashableBaseModel):
         else:
             raise ValueError(f"Expected input to be of type string, but got type {type(input)} with value: {input}")
 
-    @property
-    def call_parameter_sets(self) -> FilterCallParameterSets:
-        """Return the result of extracting the semantic objects referenced in the where SQL template string."""
-        return FilterRenderer.extract_parameter_sets(self.where_sql_template)
+    def transform(self, where_filter_transform: WhereFilterTransform[TransformOutputT]) -> TransformOutputT:  # noqa: D
+        return where_filter_transform.transform(self)

@@ -1,15 +1,14 @@
 from typing import List
-from dbt_semantic_interfaces.references import SemanticModelElementReference
 
-
-from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
+from dbt_semantic_interfaces.references import SemanticModelElementReference
 from dbt_semantic_interfaces.validations.validator_helpers import (
+    FileContext,
+    ModelValidationRule,
     SemanticModelContext,
     SemanticModelElementContext,
     SemanticModelElementType,
-    FileContext,
-    ModelValidationRule,
     ValidationError,
     ValidationIssue,
     validate_safely,
@@ -79,7 +78,8 @@ class ReservedKeywordsRule(ModelValidationRule):
                             ),
                             element_type=SemanticModelElementType.DIMENSION,
                         ),
-                        message=f"'{dimension.name}' is an SQL reserved keyword, and thus cannot be used as a dimension 'name'.",
+                        message=f"'{dimension.name}' is an SQL reserved keyword, and thus cannot be used as a "
+                        "dimension 'name'.",
                     )
                 )
 
@@ -113,7 +113,8 @@ class ReservedKeywordsRule(ModelValidationRule):
                             ),
                             element_type=SemanticModelElementType.MEASURE,
                         ),
-                        message=f"'{measure.name}' is an SQL reserved keyword, and thus cannot be used as an measure 'name'.",
+                        message=f"'{measure.name}' is an SQL reserved keyword, and thus cannot be used as a "
+                        "measure 'name'.",
                     )
                 )
 
@@ -139,7 +140,8 @@ class ReservedKeywordsRule(ModelValidationRule):
                             file_context=FileContext.from_metadata(semantic_model.metadata),
                             semantic_model=semantic_model.reference,
                         ),
-                        message=f"'{semantic_model.node_relation.relation_name}' contains the SQL reserved keyword(s) {keyword_intersection}, and thus cannot be used for 'node_relation'.",
+                        message=f"'{semantic_model.node_relation.relation_name}' contains the SQL reserved keyword(s) "
+                        f"{keyword_intersection}, and thus cannot be used for 'node_relation'.",
                     )
                 )
             issues += cls._validate_semantic_model_sub_elements(semantic_model=semantic_model)
@@ -148,7 +150,8 @@ class ReservedKeywordsRule(ModelValidationRule):
 
     @classmethod
     @validate_safely(
-        whats_being_done="running model validation ensuring elements that aren't selected via a defined expr don't contain reserved keywords"
+        whats_being_done="running model validation ensuring elements that aren't selected via a defined expr don't "
+        "contain reserved keywords"
     )
     def validate_model(cls, model: SemanticManifest) -> List[ValidationIssue]:  # noqa: D
         return cls._validate_semantic_models(model=model)

@@ -2,17 +2,17 @@ from __future__ import annotations
 
 from typing import Optional
 
+from dbt_semantic_interfaces.enum_extension import ExtendedEnum
 from dbt_semantic_interfaces.objects.base import (
     HashableBaseModel,
     ModelWithMetadataParsing,
 )
 from dbt_semantic_interfaces.objects.metadata import Metadata
-from dbt_semantic_interfaces.enum_extension import ExtendedEnum
 from dbt_semantic_interfaces.references import EntityReference
 
 
 class EntityType(ExtendedEnum):
-    """Defines uniqueness and the extent to which an entity represents the common entity for a semantic model"""
+    """Defines uniqueness and the extent to which an entity represents the common entity for a semantic model."""
 
     FOREIGN = "foreign"
     NATURAL = "natural"
@@ -21,7 +21,7 @@ class EntityType(ExtendedEnum):
 
 
 class Entity(HashableBaseModel, ModelWithMetadataParsing):
-    """Describes a entity"""
+    """Describes a entity."""
 
     name: str
     description: Optional[str]
@@ -36,7 +36,7 @@ class Entity(HashableBaseModel, ModelWithMetadataParsing):
 
     @property
     def is_linkable_entity_type(self) -> bool:
-        """Indicates whether or not this entity can be used as a linkable entity type for joins
+        """Indicates whether or not this entity can be used as a linkable entity type for joins.
 
         That is, can you use the entity as a linkable element in multi-hop dundered syntax. For example,
         the country dimension in the listings semantic model can be linked via listing__country, because listing
