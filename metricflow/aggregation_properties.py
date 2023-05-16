@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from enum import Enum
 
-from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
+from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 
 
@@ -15,7 +15,7 @@ def is_expansive(agg_type: AggregationType) -> bool:
         AggregationType.SUM,
         AggregationType.MIN,
         AggregationType.MAX,
-        AggregationType.BOOLEAN,
+        AggregationType.SUM_BOOLEAN,
         AggregationType.COUNT,
     )
 
@@ -28,7 +28,6 @@ def is_additive(agg_type: AggregationType) -> bool:
         agg_type is AggregationType.MIN
         or agg_type is AggregationType.MAX
         or agg_type is AggregationType.COUNT_DISTINCT
-        or agg_type is AggregationType.BOOLEAN
         or agg_type is AggregationType.AVERAGE
         or agg_type is AggregationType.PERCENTILE
         or agg_type is AggregationType.MEDIAN

@@ -9,7 +9,7 @@ from dbt.contracts.graph.nodes import Metric as DbtMetric, ModelNode as DbtModel
 from dbt.contracts.graph.unparsed import MetricFilter as DbtMetricFilter
 from dbt.exceptions import ref_invalid_args
 
-from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
+from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.elements.measure import Measure

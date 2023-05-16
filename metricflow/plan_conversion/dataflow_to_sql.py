@@ -4,7 +4,7 @@ import logging
 from collections import OrderedDict
 from typing import Generic, List, Optional, Sequence, TypeVar, Union
 
-from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
+from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.references import MetricModelReference
 from metricflow.aggregation_properties import AggregationState
 from metricflow.specs.column_assoc import ColumnAssociation, SingleColumnCorrelationKey
