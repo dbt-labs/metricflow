@@ -16,15 +16,9 @@ from dataclasses import dataclass
 from hashlib import sha1
 from typing import List, Optional, Sequence, Tuple, TypeVar, Generic, Any
 
-from dbt_semantic_interfaces.objects.where_filter.filter_renderer import (
-    DimensionCallParameterSet,
-    TimeDimensionCallParameterSet,
-    EntityCallParameterSet,
-    FilterFunctionCallRenderer,
-    FilterRenderer,
-)
-from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
+from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.objects.metric import MetricTimeWindow
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.references import (
     DimensionReference,
     MeasureReference,
@@ -32,16 +26,14 @@ from dbt_semantic_interfaces.references import (
     TimeDimensionReference,
     EntityReference,
 )
+from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from metricflow.aggregation_properties import AggregationState
-from metricflow.aggregation_properties import AggregationType
 from metricflow.assert_one_arg import assert_exactly_one_arg_set
-from metricflow.specs.column_assoc import ColumnAssociation
 from metricflow.filters.time_constraint import TimeRangeConstraint
-from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
+from metricflow.specs.column_assoc import ColumnAssociation
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_column_type import SqlColumnType
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 
 def hash_items(items: Sequence[SqlColumnType]) -> str:
@@ -725,28 +717,6 @@ class WhereFilterResolutionException(Exception):  # noqa: D
     pass
 
 
-def convert_to_dimension_spec(parameter_set: DimensionCallParameterSet) -> DimensionSpec:  # noqa: D
-    return DimensionSpec(
-        element_name=parameter_set.dimension_reference.element_name,
-        entity_links=parameter_set.entity_path,
-    )
-
-
-def convert_to_time_dimension_spec(parameter_set: TimeDimensionCallParameterSet) -> TimeDimensionSpec:  # noqa: D
-    return TimeDimensionSpec(
-        element_name=parameter_set.time_dimension_reference.element_name,
-        entity_links=parameter_set.entity_path,
-        time_granularity=parameter_set.time_granularity,
-    )
-
-
-def convert_to_entity_spec(parameter_set: EntityCallParameterSet) -> EntitySpec:  # noqa: D
-    return EntitySpec(
-        element_name=parameter_set.entity_reference.element_name,
-        entity_links=parameter_set.entity_path,
-    )
-
-
 @dataclass(frozen=True)
 class WhereFilterSpec(SerializableDataclass):
     """Similar to the WhereFilter, but with the where_sql_template rendered and used elements extracted.
@@ -775,56 +745,6 @@ class WhereFilterSpec(SerializableDataclass):
     where_sql: str
     bind_parameters: SqlBindParameters
     linkable_spec_set: LinkableSpecSet
-
-    @staticmethod
-    def create_from_where_filter(  # noqa: D
-        where_filter: WhereFilter,
-        column_association_resolver: ColumnAssociationResolver,
-        bind_parameters: SqlBindParameters = SqlBindParameters(),
-    ) -> WhereFilterSpec:
-        class _CallRenderer(FilterFunctionCallRenderer):  # noqa: D
-            def render_dimension_call(self, dimension_call_parameter_set: DimensionCallParameterSet) -> str:  # noqa: D
-                return column_association_resolver.resolve_dimension_spec(
-                    convert_to_dimension_spec(dimension_call_parameter_set)
-                ).column_name
-
-            def render_time_dimension_call(  # noqa: D
-                self, time_dimension_call_parameter_set: TimeDimensionCallParameterSet
-            ) -> str:
-                return column_association_resolver.resolve_time_dimension_spec(
-                    convert_to_time_dimension_spec(time_dimension_call_parameter_set)
-                ).column_name
-
-            def render_entity_call(self, entity_call_parameter_set: EntityCallParameterSet) -> str:  # noqa: D
-                return column_association_resolver.resolve_entity_spec(
-                    convert_to_entity_spec(entity_call_parameter_set)
-                ).column_name
-
-        where_sql = FilterRenderer.render(
-            templated_filter_sql=where_filter.where_sql_template,
-            call_renderer=_CallRenderer(),
-        )
-
-        parameter_sets = where_filter.call_parameter_sets
-        return WhereFilterSpec(
-            where_sql=where_sql,
-            bind_parameters=bind_parameters,
-            # dict.fromkeys() does a dedupe while preserving order.
-            linkable_spec_set=LinkableSpecSet(
-                dimension_specs=tuple(
-                    convert_to_dimension_spec(parameter_set)
-                    for parameter_set in dict.fromkeys(parameter_sets.dimension_call_parameter_sets)
-                ),
-                time_dimension_specs=tuple(
-                    convert_to_time_dimension_spec(parameter_set)
-                    for parameter_set in dict.fromkeys(parameter_sets.time_dimension_call_parameter_sets)
-                ),
-                entity_specs=tuple(
-                    convert_to_entity_spec(parameter_set)
-                    for parameter_set in dict.fromkeys(parameter_sets.entity_call_parameter_sets)
-                ),
-            ),
-        )
 
     def combine(self, other: WhereFilterSpec) -> WhereFilterSpec:  # noqa: D
         return WhereFilterSpec(
