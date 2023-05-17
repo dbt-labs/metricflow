@@ -48,11 +48,11 @@ from metricflow.inference.renderer.config_file import ConfigFileRenderer
 from metricflow.inference.solver.weighted_tree import WeightedTypeTreeInferenceSolver
 from metricflow.inference.runner import InferenceProgressReporter, InferenceRunner
 from metricflow.model.data_warehouse_model_validator import DataWarehouseModelValidator
-from metricflow.model.model_validator import ModelValidator
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.model_validator import ModelValidator
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.engine.utils import model_build_result_from_config
-from metricflow.model.validations.validator_helpers import ModelValidationResults
+from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationResults
 from metricflow.sql_clients.common_client import SqlDialect
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
@@ -573,9 +573,9 @@ def _print_issues(
 
 
 def _run_dw_validations(
-    validation_func: Callable[[UserConfiguredModel, Optional[int]], ModelValidationResults],
+    validation_func: Callable[[SemanticManifest, Optional[int]], ModelValidationResults],
     validation_type: str,
-    model: UserConfiguredModel,
+    model: SemanticManifest,
     timeout: Optional[int],
 ) -> ModelValidationResults:
     """Helper handles the calling of data warehouse issue generating functions"""
@@ -594,18 +594,18 @@ def _run_dw_validations(
 
 
 def _data_warehouse_validations_runner(
-    dw_validator: DataWarehouseModelValidator, model: UserConfiguredModel, timeout: Optional[int]
+    dw_validator: DataWarehouseModelValidator, model: SemanticManifest, timeout: Optional[int]
 ) -> ModelValidationResults:
     """Helper which calls the individual data warehouse validations to run and prints collected issues"""
 
-    data_source_results = _run_dw_validations(
-        dw_validator.validate_data_sources, model=model, validation_type="data sources", timeout=timeout
+    semantic_model_results = _run_dw_validations(
+        dw_validator.validate_semantic_models, model=model, validation_type="semantic models", timeout=timeout
     )
     dimension_results = _run_dw_validations(
         dw_validator.validate_dimensions, model=model, validation_type="dimensions", timeout=timeout
     )
-    identifier_results = _run_dw_validations(
-        dw_validator.validate_identifiers, model=model, validation_type="identifiers", timeout=timeout
+    entity_results = _run_dw_validations(
+        dw_validator.validate_entities, model=model, validation_type="entities", timeout=timeout
     )
     measure_results = _run_dw_validations(
         dw_validator.validate_measures, model=model, validation_type="measures", timeout=timeout
@@ -615,7 +615,7 @@ def _data_warehouse_validations_runner(
     )
 
     return ModelValidationResults.merge(
-        [data_source_results, dimension_results, identifier_results, measure_results, metric_results]
+        [semantic_model_results, dimension_results, entity_results, measure_results, metric_results]
     )
 
 
@@ -826,17 +826,17 @@ def infer(
     output_dir: str,
     overwrite: bool,
 ) -> None:
-    """Infer data source configurations from warehouse information."""
+    """Infer semantic model configurations from warehouse information."""
 
     click.echo(
-        click.style("‼️ Warning: Data Source Inference is still in Beta 🧪. ", fg="red", bold=True)
+        click.style("‼️ Warning: Semantic Model Inference is still in Beta 🧪. ", fg="red", bold=True)
         + "As such, you should not expect it to be 100% stable or be free of bugs. Any public CLI or Python interfaces may change without prior notice."
         " If you find any bugs or feel like something is not behaving as it should, feel free to open an issue on the Metricflow Github repo: https://github.com/transform-data/metricflow/issues \n"
     )
 
     if cfg.sql_client.sql_engine_attributes.sql_engine_type is not SqlEngine.SNOWFLAKE:
         click.echo(
-            "Data Source Inference is currently only supported for Snowflake. "
+            "Semantic Model Inference is currently only supported for Snowflake. "
             "We will add support for all the other warehouses before it becomes a "
             "stable feature. Stay tuned!"
         )
@@ -848,7 +848,7 @@ def infer(
     if len(tables) == 0 and schema is None:
         raise click.UsageError("Either `--tables` or `--schema` have to be provided.")
 
-    click.echo("Running data source inference...")
+    click.echo("Running semantic model inference...")
 
     start_ms = int(time.perf_counter() * 1000)
 

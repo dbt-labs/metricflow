@@ -7,7 +7,7 @@ SELECT
   users_ds_source_src_10007.home_state AS user__home_state
   , SUM(subq_10.identity_verifications) AS identity_verifications
 FROM (
-  -- Read Elements From Data Source 'id_verifications'
+  -- Read Elements From Semantic Model 'id_verifications'
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements:
   --   ['identity_verifications', 'ds_partitioned', 'user']

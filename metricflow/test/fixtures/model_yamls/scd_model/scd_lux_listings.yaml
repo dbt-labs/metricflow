@@ -1,11 +1,13 @@
 ---
-data_source:
+semantic_model:
   name: lux_listing_mapping
   description: Mapping from listing_id to lux_listing_id
 
-  sql_table: $dim_lux_listing_id_mapping_table
+  node_relation:
+    schema_name: $source_schema
+    alias: dim_lux_listing_id_mapping
 
-  identifiers:
+  entities:
     - name: listing
       type: primary
       expr: listing_id
@@ -13,11 +15,13 @@ data_source:
       type: foreign
       expr: lux_listing_id
 ---
-data_source:
+semantic_model:
   name: lux_listings
   description: SCD Type II table of lux listings history
 
-  sql_table: $dim_lux_listings_table
+  node_relation:
+    schema_name: $source_schema
+    alias: dim_lux_listings
 
   dimensions:
     - name: window_start
@@ -37,7 +41,7 @@ data_source:
     - name: is_confirmed_lux
       type: categorical
 
-  identifiers:
+  entities:
     - name: lux_listing
       type: natural
       expr: lux_listing_id

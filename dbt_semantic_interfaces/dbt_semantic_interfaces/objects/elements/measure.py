@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Optional, List
 from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
-from dbt_semantic_interfaces.objects.common import Metadata
+from dbt_semantic_interfaces.objects.metadata import Metadata
 from dbt_semantic_interfaces.objects.base import ModelWithMetadataParsing, HashableBaseModel
 from dbt_semantic_interfaces.references import MeasureReference, TimeDimensionReference
 
@@ -41,7 +41,7 @@ class Measure(HashableBaseModel, ModelWithMetadataParsing):
     non_additive_dimension: Optional[NonAdditiveDimensionParameters] = None
 
     # Defines the time dimension to aggregate this measure by. If not specified, it means to use the primary time
-    # dimension in the data source.
+    # dimension in the semantic model.
     agg_time_dimension: Optional[str] = None
 
     @property

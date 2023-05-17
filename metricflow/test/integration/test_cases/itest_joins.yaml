@@ -1,7 +1,7 @@
 ---
 integration_test:
   name: multiple_foreign_keys_guest
-  description: Query a metric and the first of two foreign identifiers in the measure data source.
+  description: Query a metric and the first of two foreign entities in the measure semantic model.
   model: SIMPLE_MODEL
   metrics: ["bookings"]
   group_bys: ["guest"]
@@ -15,7 +15,7 @@ integration_test:
 ---
 integration_test:
   name: multiple_foreign_keys_host
-  description: Query a metric and the second of two foreign identifiers in the measure data source.
+  description: Query a metric and the second of two foreign entities in the measure semantic model.
   model: SIMPLE_MODEL
   metrics: ["bookings"]
   group_bys: ["host"]
@@ -29,7 +29,7 @@ integration_test:
 ---
 integration_test:
   name: multiple_foreign_keys_host_and_guest
-  description: Query a metric and both foreign identifiers in the measure data source.
+  description: Query a metric and both foreign entities in the measure semantic model.
   model: SIMPLE_MODEL
   metrics: ["bookings"]
   group_bys: ["host", "guest"]

@@ -40,7 +40,7 @@ def test_dbt_to_measure_name(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # no
         if metric_type != MetricType.DERIVED:
             assert (
                 objects.measures[dbt_metric.model.name].get(dbt_metric.name) is not None
-            ), f"DbtToMeasureName didn't create the measure `{dbt_metric.name}` for data source `{dbt_metric.model.name}`"
+            ), f"DbtToMeasureName didn't create the measure `{dbt_metric.name}` for semantic model `{dbt_metric.model.name}`"
             assert (
                 objects.measures[dbt_metric.model.name][dbt_metric.name]["name"] == dbt_metric.name
             ), f"DbtToMeasureName, created a measure named `{objects.measures[dbt_metric.model.name][dbt_metric.name]['name']}` expected `{dbt_metric.name}`"
@@ -66,7 +66,7 @@ def test_dbt_to_measure_agg(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noq
         if metric_type != MetricType.DERIVED:
             assert (
                 objects.measures[dbt_metric.model.name].get(dbt_metric.name) is not None
-            ), f"DbtToMeasureAgg didn't create the measure `{dbt_metric.name}` for data source `{dbt_metric.model.name}`"
+            ), f"DbtToMeasureAgg didn't create the measure `{dbt_metric.name}` for semantic model `{dbt_metric.model.name}`"
             assert (
                 objects.measures[dbt_metric.model.name][dbt_metric.name].get("agg") is not None
             ), f"DbtToMeasureAgg, created a measure `{dbt_metric.name}` with no `agg` specified"
@@ -92,7 +92,7 @@ def test_dbt_to_measure_agg_time_dimension(dbt_metrics: Tuple[MetricNode, ...]) 
         if metric_type != MetricType.DERIVED:
             assert (
                 objects.measures[dbt_metric.model.name].get(dbt_metric.name) is not None
-            ), f"DbtToMeasureAggTimeDimension didn't create the measure `{dbt_metric.name}` for data source `{dbt_metric.model.name}`"
+            ), f"DbtToMeasureAggTimeDimension didn't create the measure `{dbt_metric.name}` for semantic model `{dbt_metric.model.name}`"
             assert (
                 objects.measures[dbt_metric.model.name][dbt_metric.name].get("agg_time_dimension") is not None
             ), f"DbtToMeasureAggTimeDimension, created a measure `{dbt_metric.name}` with no `agg_time_dimension` specified"
@@ -118,7 +118,7 @@ def test_dbt_to_measure_expr(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # no
         if metric_type != MetricType.DERIVED:
             assert (
                 objects.measures[dbt_metric.model.name].get(dbt_metric.name) is not None
-            ), f"DbtToMeasureExpr didn't create the measure `{dbt_metric.name}` for data source `{dbt_metric.model.name}`"
+            ), f"DbtToMeasureExpr didn't create the measure `{dbt_metric.name}` for semantic model `{dbt_metric.model.name}`"
             assert (
                 objects.measures[dbt_metric.model.name][dbt_metric.name].get("expr") is not None
             ), f"DbtToMeasureExpr, created a measure `{dbt_metric.name}` with no `expr` specified"

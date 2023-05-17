@@ -20,7 +20,6 @@ class IntegrationTestModel(Enum):
 
     SIMPLE_MODEL = "SIMPLE_MODEL"
     SIMPLE_MODEL_NON_DS = "SIMPLE_MODEL_NON_DS"
-    COMPOSITE_IDENTIFIER_MODEL = "COMPOSITE_IDENTIFIER_MODEL"
     UNPARTITIONED_MULTI_HOP_JOIN_MODEL = "UNPARTITIONED_MULTI_HOP_JOIN_MODEL"
     PARTITIONED_MULTI_HOP_JOIN_MODEL = "PARTITIONED_MULTI_HOP_JOIN_MODEL"
     EXTENDED_DATE_MODEL = "EXTENDED_DATE_MODEL"
@@ -64,7 +63,7 @@ class ConfiguredIntegrationTestCase(FrozenBaseModel):
     check_order: bool = False
     allow_empty: bool = False
     time_constraint: Optional[Tuple[str, str]] = None
-    where_constraint: Optional[str] = None
+    where_filter: Optional[str] = None
     limit: Optional[int] = None
     description: Optional[str] = None
 

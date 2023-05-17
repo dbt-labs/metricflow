@@ -16,12 +16,12 @@ class StructuredLinkableSpecName:
     """Parse a qualified name into different parts.
 
     e.g. listing__ds__week ->
-    identifier_links: ["listing"]
+    entity_links: ["listing"]
     element_name: "ds"
     granularity: TimeGranularity.WEEK
     """
 
-    identifier_link_names: Tuple[str, ...]
+    entity_link_names: Tuple[str, ...]
     element_name: str
     time_granularity: Optional[TimeGranularity] = None
 
@@ -54,7 +54,7 @@ class StructuredLinkableSpecName:
     @property
     def qualified_name(self) -> str:
         """Return the full name form. e.g. ds or listing__ds__month"""
-        items = list(self.identifier_link_names) + [self.element_name]
+        items = list(self.entity_link_names) + [self.element_name]
         if self.time_granularity and self.time_granularity != TimeGranularity.DAY:
             items.append(self.time_granularity.value)
         return DUNDER.join(items)
@@ -62,17 +62,17 @@ class StructuredLinkableSpecName:
     @property
     def qualified_name_without_granularity(self) -> str:
         """Return the name without the time granularity. e.g. listing__ds__month -> listing__ds"""
-        return DUNDER.join(list(self.identifier_link_names) + [self.element_name])
+        return DUNDER.join(list(self.entity_link_names) + [self.element_name])
 
     @property
-    def qualified_name_without_identifier(self) -> str:
-        """Return the name without the identifier. e.g. listing__ds__month -> ds__month"""
+    def qualified_name_without_entity(self) -> str:
+        """Return the name without the entity. e.g. listing__ds__month -> ds__month"""
         return DUNDER.join([self.element_name] + ([self.time_granularity.value] if self.time_granularity else []))
 
     @property
-    def identifier_prefix(self) -> Optional[str]:
-        """Return the identifier prefix. e.g. listing__ds__month -> listing"""
-        if len(self.identifier_link_names) > 0:
-            return DUNDER.join(self.identifier_link_names)
+    def entity_prefix(self) -> Optional[str]:
+        """Return the entity prefix. e.g. listing__ds__month -> listing"""
+        if len(self.entity_link_names) > 0:
+            return DUNDER.join(self.entity_link_names)
 
         return None

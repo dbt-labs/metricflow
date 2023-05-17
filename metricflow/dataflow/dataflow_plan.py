@@ -11,8 +11,11 @@ from typing import List, TypeVar, Generic, Optional, Sequence, Tuple, Union, Typ
 import jinja2
 
 from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
+from dbt_semantic_interfaces.objects.metric import MetricTimeWindow
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.references import TimeDimensionReference
-from metricflow.constraints.time_constraint import TimeRangeConstraint
+from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.dag.id_generation import (
     DATAFLOW_NODE_AGGREGATE_MEASURES_ID_PREFIX,
     DATAFLOW_NODE_SEMI_ADDITIVE_JOIN_ID_PREFIX,
@@ -37,19 +40,16 @@ from metricflow.dataflow.builder.partitions import (
 )
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.dataset import DataSet
-from dbt_semantic_interfaces.objects.metric import MetricTimeWindow
-from metricflow.object_utils import pformat_big_objects
-from metricflow.specs import (
+from metricflow.specs.specs import (
     MetricInputMeasureSpec,
     OrderBySpec,
     MetricSpec,
-    LinklessIdentifierSpec,
+    LinklessEntitySpec,
     TimeDimensionSpec,
-    SpecWhereClauseConstraint,
     InstanceSpecSet,
+    WhereFilterSpec,
 )
 from metricflow.sql.sql_plan import SqlJoinType
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 from metricflow.visitor import Visitable, VisitorOutputT
 
 logger = logging.getLogger(__name__)
@@ -194,7 +194,7 @@ class DataflowPlanNodeVisitor(Generic[SourceDataSetT, VisitorOutputT], ABC):
 class BaseOutput(Generic[SourceDataSetT], DataflowPlanNode[SourceDataSetT], ABC):
     """A node that outputs data in a "base" format.
 
-    The base format is where the columns represent un-aggregated measures, dimensions, and identifiers.
+    The base format is where the columns represent un-aggregated measures, dimensions, and entities.
     """
 
     pass
@@ -266,7 +266,7 @@ class JoinDescription(Generic[SourceDataSetT]):
     """Describes how data from a node should be joined to data from another node."""
 
     join_node: BaseOutput[SourceDataSetT]
-    join_on_identifier: LinklessIdentifierSpec
+    join_on_entity: LinklessEntitySpec
 
     join_on_partition_dimensions: Tuple[PartitionDimensionJoinDescription, ...]
     join_on_partition_time_dimensions: Tuple[PartitionTimeDimensionJoinDescription, ...]
@@ -275,7 +275,7 @@ class JoinDescription(Generic[SourceDataSetT]):
 
 
 class JoinToBaseOutputNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
-    """A node that joins data from other nodes to a standard output node, one by one via identifier."""
+    """A node that joins data from other nodes to a standard output node, one by one via entity."""
 
     def __init__(
         self,
@@ -331,7 +331,7 @@ class JoinToBaseOutputNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
 
         for i in range(len(self.join_targets)):
             if (
-                self.join_targets[i].join_on_identifier != other_node.join_targets[i].join_on_identifier
+                self.join_targets[i].join_on_entity != other_node.join_targets[i].join_on_entity
                 or self.join_targets[i].join_on_partition_dimensions
                 != other_node.join_targets[i].join_on_partition_dimensions
                 or self.join_targets[i].join_on_partition_time_dimensions
@@ -354,7 +354,7 @@ class JoinToBaseOutputNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
             join_targets=[
                 JoinDescription(
                     join_node=new_join_nodes[i],
-                    join_on_identifier=old_join_target.join_on_identifier,
+                    join_on_entity=old_join_target.join_on_entity,
                     join_on_partition_dimensions=old_join_target.join_on_partition_dimensions,
                     join_on_partition_time_dimensions=old_join_target.join_on_partition_time_dimensions,
                     validity_window=old_join_target.validity_window,
@@ -449,7 +449,7 @@ class JoinOverTimeRangeNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT])
 class AggregatedMeasuresOutput(Generic[SourceDataSetT], BaseOutput[SourceDataSetT], ABC):
     """A node that outputs data where the measures are aggregated.
 
-    The measures are aggregated with respect to the present identifiers and dimensions.
+    The measures are aggregated with respect to the present entities and dimensions.
     """
 
     pass
@@ -518,9 +518,9 @@ class AggregateMeasuresNode(Generic[SourceDataSetT], AggregatedMeasuresOutput[So
 class JoinAggregatedMeasuresByGroupByColumnsNode(Generic[SourceDataSetT], AggregatedMeasuresOutput[SourceDataSetT]):
     """A node that joins aggregated measures with group by elements.
 
-    This is designed to link two separate data sources with measures aggregated by the complete set of group by
+    This is designed to link two separate semantic models with measures aggregated by the complete set of group by
     elements shared across both measures. Due to the way the DataflowPlan currently processes joins, this means
-    each separate data source will be pre-aggregated, and this final join will be run across fully aggregated
+    each separate semantic model will be pre-aggregated, and this final join will be run across fully aggregated
     sets of input data. As such, all this requires is the list of aggregated measure outputs, since they can be
     transformed into a SqlDataSet containing the complete list of non-measure specs for joining.
     """
@@ -574,7 +574,7 @@ class SemiAdditiveJoinNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
 
     This is designed to filter a dataset down to singular non-additive time dimension values by aggregating
     the time dimension with MAX/MIN then joining back to the original dataset on that aggregated value.
-    Additionally, an optional sequence of identifiers can be passed in to group by and join on during the filtering.
+    Additionally, an optional sequence of entities can be passed in to group by and join on during the filtering.
 
     For example, if we have a data set that includes "account_balances,user,date", we can build a
     "latest_account_balance_by_user" data set using this node by filtering the data set such that for each user,
@@ -582,7 +582,7 @@ class SemiAdditiveJoinNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
 
     Data transformation example,
     | date       | account_balance | user |                             | date       | account_balance | user |
-    |:-----------|-----------------|-----:|     identifier_specs:       |:-----------|-----------------|-----:|
+    |:-----------|-----------------|-----:|     entity_specs:       |:-----------|-----------------|-----:|
     | 2019-12-31 |            1000 |    u1|       - user                | 2020-01-03 |            2000 |    u1|
     | 2020-01-03 |            2000 |    u1| ->  time_dimension_spec: -> | 2020-01-12              1500 |    u2|
     | 2020-01-09 |            3000 |    u2|       - date                | 2020-01-12 |            1000 |    u3|
@@ -590,12 +590,12 @@ class SemiAdditiveJoinNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
     | 2020-01-12 |            1000 |    u3|       - MAX
 
 
-    Similarly, if we don't provide any identifier_specs, it would end up performing the aggregation filter only on the
-    time_dimension_spec without any grouping by any identifiers.
+    Similarly, if we don't provide any entity_specs, it would end up performing the aggregation filter only on the
+    time_dimension_spec without any grouping by any entities.
 
     Data transformation example,
     | date       | account_balance | user |                             | date       | account_balance |
-    |:-----------|-----------------|-----:|     identifier_specs:       |:-----------|----------------:|
+    |:-----------|-----------------|-----:|     entity_specs:       |:-----------|----------------:|
     | 2019-12-31 |            1000 |    u1|                             | 2020-01-12 |            2500 |
     | 2020-01-03 |            2000 |    u1| ->  time_dimension_spec: ->
     | 2020-01-09 |            3000 |    u2|       - date
@@ -608,7 +608,7 @@ class SemiAdditiveJoinNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
 
     Data transformation example,
     | date       | account_balance | user |                                  | date       | account_balance |
-    |:-----------|-----------------|-----:|     identifier_specs:            |:-----------|----------------:|
+    |:-----------|-----------------|-----:|     entity_specs:            |:-----------|----------------:|
     | 2019-12-31 |            1500 |    u1|     time_dimension_spec:         | 2019-12-31 |            1500 |
     | 2020-01-03 |            2000 |    u1| ->    - date                  -> | 2020-01-07 |            3000 |
     | 2020-01-09 |            3000 |    u2|     agg_by_function:             | 2020-01-14 |            3250 |
@@ -621,7 +621,7 @@ class SemiAdditiveJoinNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
     def __init__(
         self,
         parent_node: BaseOutput[SourceDataSetT],
-        identifier_specs: Sequence[LinklessIdentifierSpec],
+        entity_specs: Sequence[LinklessEntitySpec],
         time_dimension_spec: TimeDimensionSpec,
         agg_by_function: AggregationType,
         queried_time_dimension_spec: Optional[TimeDimensionSpec] = None,
@@ -630,13 +630,13 @@ class SemiAdditiveJoinNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
 
         Args:
             parent_node: node with standard output
-            identifier_specs: the identifiers to group the join by
+            entity_specs: the entities to group the join by
             time_dimension_spec: the time dimension used for row filtering via an aggregation
             agg_by_function: the aggregation function used on the time dimension
             queried_time_dimension_spec: The group by provided in the query used to build the windows we want to filter on.
         """
         self._parent_node = parent_node
-        self._identifier_specs = identifier_specs
+        self._entity_specs = entity_specs
         self._time_dimension_spec = time_dimension_spec
         self._agg_by_function = agg_by_function
         self._queried_time_dimension_spec = queried_time_dimension_spec
@@ -654,15 +654,15 @@ class SemiAdditiveJoinNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
 
     @property
     def description(self) -> str:  # noqa: D
-        return f"""Join on {self.agg_by_function.name}({self.time_dimension_spec.element_name}) and {[i.element_name for i in self.identifier_specs]} grouping by {self.queried_time_dimension_spec.element_name if self.queried_time_dimension_spec else None}"""
+        return f"""Join on {self.agg_by_function.name}({self.time_dimension_spec.element_name}) and {[i.element_name for i in self.entity_specs]} grouping by {self.queried_time_dimension_spec.element_name if self.queried_time_dimension_spec else None}"""
 
     @property
     def parent_node(self) -> BaseOutput[SourceDataSetT]:  # noqa: D
         return self._parent_node
 
     @property
-    def identifier_specs(self) -> Sequence[LinklessIdentifierSpec]:  # noqa: D
-        return self._identifier_specs
+    def entity_specs(self) -> Sequence[LinklessEntitySpec]:  # noqa: D
+        return self._entity_specs
 
     @property
     def time_dimension_spec(self) -> TimeDimensionSpec:  # noqa: D
@@ -686,7 +686,7 @@ class SemiAdditiveJoinNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
 
         return (
             isinstance(other_node, self.__class__)
-            and other_node.identifier_specs == self.identifier_specs
+            and other_node.entity_specs == self.entity_specs
             and other_node.time_dimension_spec == self.time_dimension_spec
             and other_node.agg_by_function == self.agg_by_function
             and other_node.queried_time_dimension_spec == self.queried_time_dimension_spec
@@ -699,7 +699,7 @@ class SemiAdditiveJoinNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
 
         return SemiAdditiveJoinNode[SourceDataSetT](
             parent_node=new_parent_nodes[0],
-            identifier_specs=self.identifier_specs,
+            entity_specs=self.entity_specs,
             time_dimension_spec=self.time_dimension_spec,
             agg_by_function=self.agg_by_function,
             queried_time_dimension_spec=self.queried_time_dimension_spec,
@@ -802,7 +802,7 @@ class JoinToTimeSpineNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT], A
 
 
 class ComputeMetricsNode(Generic[SourceDataSetT], ComputedMetricsOutput[SourceDataSetT]):
-    """A node that computes metrics from input measures. Dimensions / identifiers are passed through."""
+    """A node that computes metrics from input measures. Dimensions / entities are passed through."""
 
     def __init__(self, parent_node: BaseOutput[SourceDataSetT], metric_specs: List[MetricSpec]) -> None:  # noqa: D
         """Constructor.
@@ -1185,12 +1185,12 @@ class FilterElementsNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
 
 
 class WhereConstraintNode(AggregatedMeasuresOutput[SourceDataSetT]):
-    """Only passes the listed elements."""
+    """Remove rows using a WHERE clause."""
 
     def __init__(  # noqa: D
         self,
         parent_node: BaseOutput[SourceDataSetT],
-        where_constraint: SpecWhereClauseConstraint,
+        where_constraint: WhereFilterSpec,
     ) -> None:
         self._where = where_constraint
         self.parent_node = parent_node
@@ -1201,7 +1201,7 @@ class WhereConstraintNode(AggregatedMeasuresOutput[SourceDataSetT]):
         return DATAFLOW_NODE_WHERE_CONSTRAINT_ID_PREFIX
 
     @property
-    def where(self) -> SpecWhereClauseConstraint:
+    def where(self) -> WhereFilterSpec:
         """Returns the specs for the elements that it should pass."""
         return self._where
 

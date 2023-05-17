@@ -100,7 +100,7 @@ FROM (
                 , subq_0.approximate_continuous_booking_value_p99
                 , subq_0.approximate_discrete_booking_value_p99
               FROM (
-                -- Read Elements From Data Source 'bookings_source'
+                -- Read Elements From Semantic Model 'bookings_source'
                 SELECT
                   1 AS bookings
                   , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
@@ -155,10 +155,7 @@ FROM (
                   , bookings_source_src_10001.listing_id AS create_a_cycle_in_the_join_graph__listing
                   , bookings_source_src_10001.guest_id AS create_a_cycle_in_the_join_graph__guest
                   , bookings_source_src_10001.host_id AS create_a_cycle_in_the_join_graph__host
-                FROM (
-                  -- User Defined SQL Query
-                  SELECT * FROM ***************************.fct_bookings
-                ) bookings_source_src_10001
+                FROM ***************************.fct_bookings bookings_source_src_10001
               ) subq_0
             ) subq_1
           ) subq_2
@@ -240,7 +237,7 @@ FROM (
             , subq_6.approximate_continuous_booking_value_p99
             , subq_6.approximate_discrete_booking_value_p99
           FROM (
-            -- Read Elements From Data Source 'bookings_source'
+            -- Read Elements From Semantic Model 'bookings_source'
             SELECT
               1 AS bookings
               , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
@@ -295,10 +292,7 @@ FROM (
               , bookings_source_src_10001.listing_id AS create_a_cycle_in_the_join_graph__listing
               , bookings_source_src_10001.guest_id AS create_a_cycle_in_the_join_graph__guest
               , bookings_source_src_10001.host_id AS create_a_cycle_in_the_join_graph__host
-            FROM (
-              -- User Defined SQL Query
-              SELECT * FROM ***************************.fct_bookings
-            ) bookings_source_src_10001
+            FROM ***************************.fct_bookings bookings_source_src_10001
           ) subq_6
         ) subq_7
       ) subq_8

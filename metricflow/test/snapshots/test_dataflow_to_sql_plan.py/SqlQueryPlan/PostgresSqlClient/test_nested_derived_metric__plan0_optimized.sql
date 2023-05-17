@@ -27,17 +27,14 @@ FROM (
           metric_time
           , SUM(referred_bookings) AS ref_bookings
         FROM (
-          -- Read Elements From Data Source 'bookings_source'
+          -- Read Elements From Semantic Model 'bookings_source'
           -- Metric Time Dimension 'ds'
           -- Pass Only Elements:
           --   ['referred_bookings', 'metric_time']
           SELECT
             ds AS metric_time
             , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
-          FROM (
-            -- User Defined SQL Query
-            SELECT * FROM ***************************.fct_bookings
-          ) bookings_source_src_10001
+          FROM ***************************.fct_bookings bookings_source_src_10001
         ) subq_25
         GROUP BY
           metric_time
@@ -49,17 +46,14 @@ FROM (
           metric_time
           , SUM(bookings) AS bookings
         FROM (
-          -- Read Elements From Data Source 'bookings_source'
+          -- Read Elements From Semantic Model 'bookings_source'
           -- Metric Time Dimension 'ds'
           -- Pass Only Elements:
           --   ['bookings', 'metric_time']
           SELECT
             ds AS metric_time
             , 1 AS bookings
-          FROM (
-            -- User Defined SQL Query
-            SELECT * FROM ***************************.fct_bookings
-          ) bookings_source_src_10001
+          FROM ***************************.fct_bookings bookings_source_src_10001
         ) subq_30
         GROUP BY
           metric_time
@@ -79,17 +73,14 @@ FROM (
       metric_time
       , SUM(instant_bookings) AS instant
     FROM (
-      -- Read Elements From Data Source 'bookings_source'
+      -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
       -- Pass Only Elements:
       --   ['instant_bookings', 'metric_time']
       SELECT
         ds AS metric_time
         , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
-      FROM (
-        -- User Defined SQL Query
-        SELECT * FROM ***************************.fct_bookings
-      ) bookings_source_src_10001
+      FROM ***************************.fct_bookings bookings_source_src_10001
     ) subq_37
     GROUP BY
       metric_time
@@ -107,17 +98,14 @@ FROM (
       metric_time
       , SUM(bookings) AS bookings
     FROM (
-      -- Read Elements From Data Source 'bookings_source'
+      -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
       -- Pass Only Elements:
       --   ['bookings', 'metric_time']
       SELECT
         ds AS metric_time
         , 1 AS bookings
-      FROM (
-        -- User Defined SQL Query
-        SELECT * FROM ***************************.fct_bookings
-      ) bookings_source_src_10001
+      FROM ***************************.fct_bookings bookings_source_src_10001
     ) subq_42
     GROUP BY
       metric_time

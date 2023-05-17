@@ -2,15 +2,15 @@ from typing import Sequence, List
 
 import more_itertools
 
-from dbt_semantic_interfaces.references import DataSourceReference
-from metricflow.column_assoc import ColumnAssociation
+from dbt_semantic_interfaces.references import SemanticModelReference
+from metricflow.specs.column_assoc import ColumnAssociation
 from metricflow.dataset.dataset import DataSet
 from metricflow.instances import (
     InstanceSet,
-    DataSourceElementInstance,
+    SemanticModelElementInstance,
     InstanceSetTransform,
 )
-from metricflow.specs import DimensionSpec, TimeDimensionSpec, IdentifierSpec
+from metricflow.specs.specs import DimensionSpec, TimeDimensionSpec, EntitySpec
 from metricflow.sql.sql_plan import (
     SqlSelectStatementNode,
 )
@@ -34,28 +34,28 @@ class SqlDataSet(DataSet):
         """Return a SELECT node that can be used to read data from the given SQL table or SQL query"""
         return self._sql_select_node
 
-    def column_associations_for_identifier(
+    def column_associations_for_entity(
         self,
-        identifier_spec: IdentifierSpec,
+        entity_spec: EntitySpec,
     ) -> Sequence[ColumnAssociation]:
-        """Given the name of the identifier, return the set of columns associated with it in the data set."""
+        """Given the name of the entity, return the set of columns associated with it in the data set."""
         matching_instances = 0
         column_associations_to_return = None
-        for linkable_instance in self.instance_set.identifier_instances:
+        for linkable_instance in self.instance_set.entity_instances:
             if (
-                identifier_spec.element_name == linkable_instance.spec.element_name
-                and identifier_spec.identifier_links == linkable_instance.spec.identifier_links
+                entity_spec.element_name == linkable_instance.spec.element_name
+                and entity_spec.entity_links == linkable_instance.spec.entity_links
             ):
                 column_associations_to_return = linkable_instance.associated_columns
                 matching_instances += 1
 
         if matching_instances > 1:
             raise RuntimeError(
-                f"More than one instance with spec {identifier_spec} in " f"instance set: {self.instance_set}"
+                f"More than one instance with spec {entity_spec} in " f"instance set: {self.instance_set}"
             )
 
         if not column_associations_to_return:
-            raise RuntimeError(f"No instances with spec {identifier_spec} in instance set: {self.instance_set}")
+            raise RuntimeError(f"No instances with spec {entity_spec} in instance set: {self.instance_set}")
 
         return column_associations_to_return
 
@@ -112,24 +112,24 @@ class SqlDataSet(DataSet):
     def groupable_column_associations(self) -> Sequence[ColumnAssociation]:
         """Return a flattened iterable with all groupable column associations for the current data set"""
         instances = (
-            self.instance_set.identifier_instances
+            self.instance_set.entity_instances
             + self.instance_set.dimension_instances
             + self.instance_set.time_dimension_instances
         )
         return tuple(more_itertools.flatten([instance.associated_columns for instance in instances]))
 
 
-class SameDataSourceReferenceChecker(InstanceSetTransform[bool]):
-    """Checks to see that all elements in the instance set come from the same data source."""
+class SameSemanticModelReferenceChecker(InstanceSetTransform[bool]):
+    """Checks to see that all elements in the instance set come from the same semantic model."""
 
-    def __init__(self, data_source_reference: DataSourceReference) -> None:  # noqa: D
-        self._data_source_reference = data_source_reference
+    def __init__(self, semantic_model_reference: SemanticModelReference) -> None:  # noqa: D
+        self._semantic_model_reference = semantic_model_reference
 
     def transform(self, instance_set: InstanceSet) -> bool:  # noqa: D
-        combined: List[DataSourceElementInstance] = []
+        combined: List[SemanticModelElementInstance] = []
         combined.extend(instance_set.measure_instances)
         combined.extend(instance_set.dimension_instances)
         combined.extend(instance_set.time_dimension_instances)
-        combined.extend(instance_set.identifier_instances)
+        combined.extend(instance_set.entity_instances)
 
-        return all([all([y.is_from(self._data_source_reference) for y in x.defined_from]) for x in combined])
+        return all([all([y.is_from(self._semantic_model_reference) for y in x.defined_from]) for x in combined])

@@ -1,0 +1,42 @@
+---
+semantic_model:
+  name: accounts_source
+  description: accounts_source
+
+  node_relation:
+    schema_name: $source_schema
+    alias: fct_accounts
+
+  measures:
+    - name: account_balance
+      agg: sum
+
+    - name: total_account_balance_first_day
+      agg: sum
+      expr: account_balance
+      non_additive_dimension:
+        name: ds
+        window_choice: min
+
+    - name: current_account_balance_by_user
+      agg: sum
+      expr: account_balance
+      non_additive_dimension:
+        name: ds
+        window_choice: max
+        window_groupings:
+          - user
+
+  dimensions:
+    - name: ds
+      type: time
+      type_params:
+        is_primary: True
+        time_granularity: day
+    - name: account_type
+      type: categorical
+
+  entities:
+    - name: user
+      type: foreign
+      expr: user_id

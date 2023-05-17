@@ -2,19 +2,19 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from metricflow.dataclass_serialization import SerializableDataclass
+from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 
 
 @dataclass(frozen=True)
 class ElementReference(SerializableDataclass):
-    """Used when we need to refer to a dimension, measure, identifier, but other attributes are unknown."""
+    """Used when we need to refer to a dimension, measure, entity, but other attributes are unknown."""
 
     element_name: str
 
 
 @dataclass(frozen=True)
 class LinkableElementReference(ElementReference):
-    """Used when we need to refer to a dimension or identifier, but other attributes are unknown."""
+    """Used when we need to refer to a dimension or entity, but other attributes are unknown."""
 
     pass
 
@@ -36,12 +36,7 @@ class DimensionReference(LinkableElementReference):  # noqa: D
 
 
 @dataclass(frozen=True)
-class IdentifierReference(LinkableElementReference):  # noqa: D
-    pass
-
-
-@dataclass(frozen=True)
-class CompositeSubIdentifierReference(ElementReference):  # noqa: D
+class EntityReference(LinkableElementReference):  # noqa: D
     pass
 
 
@@ -69,41 +64,41 @@ class ModelReference(SerializableDataclass):
 
 
 @dataclass(frozen=True)
-class DataSourceReference(ModelReference):
-    """A reference to a data source definition in the model."""
+class SemanticModelReference(ModelReference):
+    """A reference to a semantic model definition in the model."""
 
-    data_source_name: str
+    semantic_model_name: str
 
     def __hash__(self) -> int:  # noqa: D
-        return hash(self.data_source_name)
+        return hash(self.semantic_model_name)
 
 
 @dataclass(frozen=True)
-class DataSourceElementReference(ModelReference):
-    """A reference to an element definition in a data source definition in the model.
+class SemanticModelElementReference(ModelReference):
+    """A reference to an element definition in a semantic model definition in the model.
 
     TODO: Fields should be *Reference objects.
     """
 
-    data_source_name: str
+    semantic_model_name: str
     element_name: str
 
     @staticmethod
     def create_from_references(  # noqa: D
-        data_source_reference: DataSourceReference, element_reference: ElementReference
-    ) -> DataSourceElementReference:
-        return DataSourceElementReference(
-            data_source_name=data_source_reference.data_source_name,
+        semantic_model_reference: SemanticModelReference, element_reference: ElementReference
+    ) -> SemanticModelElementReference:
+        return SemanticModelElementReference(
+            semantic_model_name=semantic_model_reference.semantic_model_name,
             element_name=element_reference.element_name,
         )
 
     @property
-    def data_source_reference(self) -> DataSourceReference:  # noqa: D
-        return DataSourceReference(self.data_source_name)
+    def semantic_model_reference(self) -> SemanticModelReference:  # noqa: D
+        return SemanticModelReference(self.semantic_model_name)
 
-    def is_from(self, ref: DataSourceReference) -> bool:
-        """Returns true if this reference is from the same data source as the supplied reference."""
-        return self.data_source_name == ref.data_source_name
+    def is_from(self, ref: SemanticModelReference) -> bool:
+        """Returns true if this reference is from the same semantic model as the supplied reference."""
+        return self.semantic_model_name == ref.semantic_model_name
 
 
 @dataclass(frozen=True)

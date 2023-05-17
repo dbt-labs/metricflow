@@ -3,35 +3,34 @@ import textwrap
 
 import pytest
 
-from metricflow.constraints.time_constraint import TimeRangeConstraint
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
+from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.errors.errors import UnableToSatisfyQueryError
-from dbt_semantic_interfaces.objects.common import YamlConfigFile
 from metricflow.plan_conversion.time_spine import TimeSpineSource
-from metricflow.specs import (
+from metricflow.specs.specs import (
     MetricSpec,
     DimensionSpec,
     TimeDimensionSpec,
-    IdentifierSpec,
+    EntitySpec,
     OrderBySpec,
-    OutputColumnNameOverride,
 )
-from metricflow.test.test_utils import as_datetime
-from metricflow.test.time.metric_time_dimension import MTD
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
-from metricflow.time.time_granularity_solver import RequestTimeGranularityException
 from metricflow.test.fixtures.model_fixtures import query_parser_from_yaml
+from dbt_semantic_interfaces.test_utils import as_datetime
+from metricflow.test.time.metric_time_dimension import MTD
+from metricflow.time.time_granularity_solver import RequestTimeGranularityException
 
 logger = logging.getLogger(__name__)
 
 
 BOOKINGS_YAML = textwrap.dedent(
     """\
-    data_source:
+    semantic_model:
       name: bookings_source
 
-      sql_query: |
-        -- User Defined SQL Query
-        SELECT * FROM bookings_source_table
+      node_relation:
+        schema_name: some_schema
+        alias: bookings_source_table
 
       measures:
         - name: bookings
@@ -48,7 +47,7 @@ BOOKINGS_YAML = textwrap.dedent(
             is_primary: True
             time_granularity: day
 
-      identifiers:
+      entities:
         - name: listing
           type: foreign
           expr: listing_id
@@ -58,13 +57,13 @@ BOOKINGS_YAML = textwrap.dedent(
 
 REVENUE_YAML = textwrap.dedent(
     """\
-    data_source:
+    semantic_model:
       name: revenue_source
       description: revenue
 
-      sql_query: |
-        -- User Defined SQL Query
-        SELECT * FROM fct_revenue_table
+      node_relation:
+        schema_name: some_schema
+        alias: fct_revenue_table
 
       measures:
         - name: revenue
@@ -83,7 +82,7 @@ REVENUE_YAML = textwrap.dedent(
           type: categorical
           expr: country
 
-      identifiers:
+      entities:
         - name: user
           type: foreign
           expr: user_id
@@ -135,15 +134,15 @@ def test_query_parser(time_spine_source: TimeSpineSource) -> None:  # noqa: D
     )
 
     assert query_spec.metric_specs == (MetricSpec(element_name="bookings"),)
-    assert query_spec.dimension_specs == (DimensionSpec(element_name="is_instant", identifier_links=()),)
+    assert query_spec.dimension_specs == (DimensionSpec(element_name="is_instant", entity_links=()),)
     assert query_spec.time_dimension_specs == (
-        TimeDimensionSpec(element_name=MTD, identifier_links=(), time_granularity=TimeGranularity.DAY),
+        TimeDimensionSpec(element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY),
     )
-    assert query_spec.identifier_specs == (IdentifierSpec(element_name="listing", identifier_links=()),)
+    assert query_spec.entity_specs == (EntitySpec(element_name="listing", entity_links=()),)
     assert query_spec.order_by_specs == (
         OrderBySpec(
             time_dimension_spec=TimeDimensionSpec(
-                element_name=MTD, identifier_links=(), time_granularity=TimeGranularity.DAY
+                element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY
             ),
             descending=False,
         ),
@@ -174,7 +173,7 @@ def test_order_by_granularity_conversion(time_spine_source: TimeSpineSource) -> 
     assert (
         OrderBySpec(
             time_dimension_spec=TimeDimensionSpec(
-                element_name=MTD, identifier_links=(), time_granularity=TimeGranularity.MONTH
+                element_name=MTD, entity_links=(), time_granularity=TimeGranularity.MONTH
             ),
             descending=True,
         ),
@@ -193,7 +192,7 @@ def test_order_by_granularity_no_conversion(time_spine_source: TimeSpineSource) 
     assert (
         OrderBySpec(
             time_dimension_spec=TimeDimensionSpec(
-                element_name=MTD, identifier_links=(), time_granularity=TimeGranularity.DAY
+                element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY
             ),
             descending=False,
         ),
@@ -220,36 +219,6 @@ def test_time_range_constraint_conversion(time_spine_source: TimeSpineSource) ->
     ) == query_spec.time_range_constraint
 
 
-def test_column_override(time_spine_source: TimeSpineSource) -> None:
-    """Tests that the output column override is set.
-
-    Should be set in cases where the metrics have a non-day granularity, but ds is specified.
-    """
-
-    revenue_yaml_file = YamlConfigFile(filepath="inline_for_test_2", contents=REVENUE_YAML)
-
-    query_parser = query_parser_from_yaml([revenue_yaml_file], time_spine_source)
-
-    # "revenue" has a granularity of MONTH
-    query_spec = query_parser.parse_and_validate_query(
-        metric_names=["revenue"],
-        group_by_names=[MTD],
-        time_constraint_start=as_datetime("2020-01-15"),
-        time_constraint_end=as_datetime("2020-02-15"),
-    )
-
-    assert (
-        OutputColumnNameOverride(
-            time_dimension_spec=TimeDimensionSpec(
-                element_name=MTD,
-                identifier_links=(),
-                time_granularity=TimeGranularity.MONTH,
-            ),
-            output_column_name=MTD,
-        ),
-    ) == query_spec.output_column_name_overrides
-
-
 def test_parse_and_validate_where_constraint_dims(time_spine_source: TimeSpineSource) -> None:
     """Test that the returned time constraint in the query spec is adjusted to match the granularity of the query."""
     # check constraint on invalid_dim raises UnableToSatisfyQueryError
@@ -264,7 +233,7 @@ def test_parse_and_validate_where_constraint_dims(time_spine_source: TimeSpineSo
             group_by_names=[MTD],
             time_constraint_start=as_datetime("2020-01-15"),
             time_constraint_end=as_datetime("2020-02-15"),
-            where_constraint_str="WHERE invalid_dim = '1'",
+            where_constraint_str="{{ dimension('invalid_dim') }} = '1'",
         )
 
     query_spec = query_parser.parse_and_validate_query(
@@ -272,9 +241,9 @@ def test_parse_and_validate_where_constraint_dims(time_spine_source: TimeSpineSo
         group_by_names=[MTD],
         time_constraint_start=as_datetime("2020-01-15"),
         time_constraint_end=as_datetime("2020-02-15"),
-        where_constraint_str="WHERE is_instant = '1'",
+        where_constraint_str="{{ dimension('is_instant') }} = '1'",
     )
-    assert DimensionSpec(element_name="is_instant", identifier_links=()) not in query_spec.dimension_specs
+    assert DimensionSpec(element_name="is_instant", entity_links=()) not in query_spec.dimension_specs
 
 
 def test_parse_and_validate_where_constraint_metric_time(time_spine_source: TimeSpineSource) -> None:
@@ -286,7 +255,7 @@ def test_parse_and_validate_where_constraint_metric_time(time_spine_source: Time
         query_parser.parse_and_validate_query(
             metric_names=["revenue"],
             group_by_names=[MTD],
-            where_constraint_str="WHERE metric_time__day > '2020-01-15'",
+            where_constraint_str="{{ time_dimension('metric_time', 'day') }} > '2020-01-15'",
         )
 
 

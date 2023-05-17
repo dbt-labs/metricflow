@@ -70,7 +70,7 @@ class SqlQueryPlanJoinBuilder:
     ) -> SqlJoinDescription:
         """Make a join description where the base condition is a set of equality comparisons between columns.
 
-        Typically the columns in column_equality_descriptions are identifiers we are trying to match,
+        Typically the columns in column_equality_descriptions are entities we are trying to match,
         although they may include things like dimension partitions or time dimension columns where an
         equality is expected.
 
@@ -79,8 +79,8 @@ class SqlQueryPlanJoinBuilder:
 
         Args:
             right_source_node: node representing the join target, may be either a table or subquery
-            left_source_alias: string alias identifier for the join source
-            right_source_alias: string alias identifier for the join target
+            left_source_alias: string alias entity for the join source
+            right_source_alias: string alias entity for the join target
             column_equality_descriptions: set of equality constraints for the ON statement
             join_type: type of SQL join, e.g., LEFT, INNER, etc.
             additional_on_conditions: set of additional constraints to add in the ON statement (via AND)
@@ -144,40 +144,36 @@ class SqlQueryPlanJoinBuilder:
         right_data_set: AnnotatedSqlDataSet,
         join_description: JoinDescription,
     ) -> SqlJoinDescription:
-        """Make a join description to link two base output DataSets by matching identifiers
+        """Make a join description to link two base output DataSets by matching entities
 
-        In addition to the identifier equality condition, this will ensure datasets are joined on all partition
+        In addition to the entity equality condition, this will ensure datasets are joined on all partition
         columns and account for validity windows, if those are defined in one of the datasets.
         """
 
-        join_on_identifier = join_description.join_on_identifier
+        join_on_entity = join_description.join_on_entity
 
-        # Figure out which columns in the "left" data set correspond to the identifier that we want to join on.
+        # Figure out which columns in the "left" data set correspond to the entity that we want to join on.
         # The column associations tell us which columns correspond to which instances in the data set.
-        left_data_set_identifier_column_associations = left_data_set.data_set.column_associations_for_identifier(
-            join_on_identifier
-        )
-        left_data_set_identifier_cols = [c.column_name for c in left_data_set_identifier_column_associations]
+        left_data_set_entity_column_associations = left_data_set.data_set.column_associations_for_entity(join_on_entity)
+        left_data_set_entity_cols = [c.column_name for c in left_data_set_entity_column_associations]
 
-        # Figure out which columns in the "right" data set correspond to the identifier that we want to join on.
-        right_data_set_column_associations = right_data_set.data_set.column_associations_for_identifier(
-            join_on_identifier
-        )
-        right_data_set_identifier_cols = [c.column_name for c in right_data_set_column_associations]
+        # Figure out which columns in the "right" data set correspond to the entity that we want to join on.
+        right_data_set_column_associations = right_data_set.data_set.column_associations_for_entity(join_on_entity)
+        right_data_set_entity_cols = [c.column_name for c in right_data_set_column_associations]
 
-        assert len(left_data_set_identifier_cols) == len(right_data_set_identifier_cols), (
-            f"Cannot construct join - the number of columns on the left ({left_data_set_identifier_cols}) side of "
-            f"the join does not match the right ({right_data_set_identifier_cols})"
+        assert len(left_data_set_entity_cols) == len(right_data_set_entity_cols), (
+            f"Cannot construct join - the number of columns on the left ({left_data_set_entity_cols}) side of "
+            f"the join does not match the right ({right_data_set_entity_cols})"
         )
 
         # We have the columns that we need to "join on" in the query, so add it to the list of join descriptions to
         # use later.
         column_equality_descriptions = []
-        for idx in range(len(left_data_set_identifier_cols)):
+        for idx in range(len(left_data_set_entity_cols)):
             column_equality_descriptions.append(
                 ColumnEqualityDescription(
-                    left_column_alias=left_data_set_identifier_cols[idx],
-                    right_column_alias=right_data_set_identifier_cols[idx],
+                    left_column_alias=left_data_set_entity_cols[idx],
+                    right_column_alias=right_data_set_entity_cols[idx],
                 )
             )
         # Add the partition columns as well.
@@ -227,13 +223,13 @@ class SqlQueryPlanJoinBuilder:
         """Build a time window join condition if the join description includes a validity window description
 
         When the validity window is set, it means we are dealing with a dataset representing an SCD Type II
-        style data source, with a start and end boundary on the window. A base output join against such data
+        style semantic model, with a start and end boundary on the window. A base output join against such data
         sources requires a metric_time dimension to process the join.
 
-        By convention, the join description ties the validity window to the "right" side data source, and so
+        By convention, the join description ties the validity window to the "right" side semantic model, and so
         we extract the metric time instance from the left data set.
 
-        We use the instance with the smallest granularity and shortest identifier link path, since it will be
+        We use the instance with the smallest granularity and shortest entity link path, since it will be
         used in the ON statement for the join against the validity window.
         """
         if join_description.validity_window is None:
@@ -241,7 +237,7 @@ class SqlQueryPlanJoinBuilder:
 
         left_data_set_metric_time_dimension_instances = sorted(
             left_data_set.data_set.metric_time_dimension_instances,
-            key=lambda x: (x.spec.time_granularity.to_int(), len(x.spec.identifier_links)),
+            key=lambda x: (x.spec.time_granularity.to_int(), len(x.spec.entity_links)),
         )
         assert left_data_set_metric_time_dimension_instances, (
             f"Cannot process join to data set with alias {right_data_set.alias} because it has a validity "

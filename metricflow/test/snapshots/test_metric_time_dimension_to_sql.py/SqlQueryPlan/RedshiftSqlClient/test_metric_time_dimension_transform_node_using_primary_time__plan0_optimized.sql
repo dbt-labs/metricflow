@@ -1,4 +1,4 @@
--- Read Elements From Data Source 'bookings_source'
+-- Read Elements From Semantic Model 'bookings_source'
 -- Metric Time Dimension 'ds'
 SELECT
   ds
@@ -58,7 +58,4 @@ SELECT
   , booking_value AS discrete_booking_value_p99
   , booking_value AS approximate_continuous_booking_value_p99
   , booking_value AS approximate_discrete_booking_value_p99
-FROM (
-  -- User Defined SQL Query
-  SELECT * FROM ***************************.fct_bookings
-) bookings_source_src_10001
+FROM ***************************.fct_bookings bookings_source_src_10001

@@ -32,18 +32,18 @@
                         <!-- include_spec =                               -->
                         <!--   {'class': 'TimeDimensionSpec',             -->
                         <!--    'element_name': 'metric_time',            -->
-                        <!--    'identifier_links': (),                   -->
+                        <!--    'entity_links': (),                       -->
                         <!--    'time_granularity': TimeGranularity.DAY}  -->
                         <MetricTimeDimensionTransformNode>
                             <!-- description = Metric Time Dimension 'ds' -->
                             <!-- node_id = sma_10001 -->
                             <!-- aggregation_time_dimension = ds -->
                             <ReadSqlSourceNode>
-                                <!-- description =                                                                           -->
-                                <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                                <!-- description =                                                                                    -->
+                                <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->
                                 <!-- node_id = rss_10011 -->
-                                <!-- data_set =                                                                    -->
-                                <!--   DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                                <!-- data_set =                                                                             -->
+                                <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->
                             </ReadSqlSourceNode>
                         </MetricTimeDimensionTransformNode>
                     </FilterElementsNode>
@@ -55,17 +55,16 @@
                 <!-- metric_spec =                                                                               -->
                 <!--   {'class': 'MetricSpec',                                                                   -->
                 <!--    'element_name': 'instant_booking_value',                                                 -->
-                <!--    'constraint': {'class': 'SpecWhereClauseConstraint',                                     -->
-                <!--                   'where_condition': 'is_instant',                                          -->
-                <!--                   'linkable_names': ('is_instant',),                                        -->
+                <!--    'constraint': {'class': 'WhereFilterSpec',                                               -->
+                <!--                   'where_sql': 'is_instant ',                                               -->
+                <!--                   'bind_parameters': {'class': 'SqlBindParameters',                         -->
+                <!--                                       'param_items': ()},                                   -->
                 <!--                   'linkable_spec_set': {'class': 'LinkableSpecSet',                         -->
                 <!--                                         'dimension_specs': ({'class': 'DimensionSpec',      -->
                 <!--                                                              'element_name': 'is_instant',  -->
-                <!--                                                              'identifier_links': ()},),     -->
+                <!--                                                              'entity_links': ()},),         -->
                 <!--                                         'time_dimension_specs': (),                         -->
-                <!--                                         'identifier_specs': ()},                            -->
-                <!--                   'execution_parameters': {'class': 'SqlBindParameters',                    -->
-                <!--                                            'param_items': ()}},                             -->
+                <!--                                         'entity_specs': ()}},                               -->
                 <!--    'alias': None,                                                                           -->
                 <!--    'offset_window': None,                                                                   -->
                 <!--    'offset_to_grain': None}                                                                 -->
@@ -84,22 +83,21 @@
                         <!-- include_spec =                               -->
                         <!--   {'class': 'TimeDimensionSpec',             -->
                         <!--    'element_name': 'metric_time',            -->
-                        <!--    'identifier_links': (),                   -->
+                        <!--    'entity_links': (),                       -->
                         <!--    'time_granularity': TimeGranularity.DAY}  -->
                         <WhereConstraintNode>
                             <!-- description = Constrain Output with WHERE -->
                             <!-- node_id = wcc_0 -->
-                            <!-- where_condition =                                                              -->
-                            <!--   {'class': 'SpecWhereClauseConstraint',                                       -->
-                            <!--    'where_condition': 'is_instant',                                            -->
-                            <!--    'linkable_names': ('is_instant',),                                          -->
-                            <!--    'linkable_spec_set': {'class': 'LinkableSpecSet',                           -->
-                            <!--                          'dimension_specs': ({'class': 'DimensionSpec',        -->
-                            <!--                                               'element_name': 'is_instant',    -->
-                            <!--                                               'identifier_links': ()},),       -->
-                            <!--                          'time_dimension_specs': (),                           -->
-                            <!--                          'identifier_specs': ()},                              -->
-                            <!--    'execution_parameters': {'class': 'SqlBindParameters', 'param_items': ()}}  -->
+                            <!-- where_condition =                                                            -->
+                            <!--   {'class': 'WhereFilterSpec',                                               -->
+                            <!--    'where_sql': 'is_instant ',                                               -->
+                            <!--    'bind_parameters': {'class': 'SqlBindParameters', 'param_items': ()},     -->
+                            <!--    'linkable_spec_set': {'class': 'LinkableSpecSet',                         -->
+                            <!--                          'dimension_specs': ({'class': 'DimensionSpec',      -->
+                            <!--                                               'element_name': 'is_instant',  -->
+                            <!--                                               'entity_links': ()},),         -->
+                            <!--                          'time_dimension_specs': (),                         -->
+                            <!--                          'entity_specs': ()}}                                -->
                             <FilterElementsNode>
                                 <!-- description =                                       -->
                                 <!--   Pass Only Elements:                               -->
@@ -109,23 +107,22 @@
                                 <!--   {'class': 'MeasureSpec',               -->
                                 <!--    'element_name': 'booking_value',      -->
                                 <!--    'non_additive_dimension_spec': None}  -->
-                                <!-- include_spec =                                                                      -->
-                                <!--   {'class': 'DimensionSpec', 'element_name': 'is_instant', 'identifier_links': ()}  -->
+                                <!-- include_spec = DimensionSpec(element_name='is_instant', entity_links=()) -->
                                 <!-- include_spec =                               -->
                                 <!--   {'class': 'TimeDimensionSpec',             -->
                                 <!--    'element_name': 'metric_time',            -->
-                                <!--    'identifier_links': (),                   -->
+                                <!--    'entity_links': (),                       -->
                                 <!--    'time_granularity': TimeGranularity.DAY}  -->
                                 <MetricTimeDimensionTransformNode>
                                     <!-- description = Metric Time Dimension 'ds' -->
                                     <!-- node_id = sma_10001 -->
                                     <!-- aggregation_time_dimension = ds -->
                                     <ReadSqlSourceNode>
-                                        <!-- description =                                                                           -->
-                                        <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                                        <!-- description =                                                                                    -->
+                                        <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->
                                         <!-- node_id = rss_10011 -->
-                                        <!-- data_set =                                                                    -->
-                                        <!--   DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                                        <!-- data_set =                                                                             -->
+                                        <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->
                                     </ReadSqlSourceNode>
                                 </MetricTimeDimensionTransformNode>
                             </FilterElementsNode>

@@ -62,7 +62,7 @@ class SqlExpressionNode(DagNode, Generic[VisitorOutputT], Visitable, ABC):
         pass
 
     @property
-    def execution_parameters(self) -> SqlBindParameters:
+    def bind_parameters(self) -> SqlBindParameters:
         """Execution parameters when running a query containing this expression.
 
         * See: https://docs.sqlalchemy.org/en/14/core/tutorial.html#using-textual-sql
@@ -248,7 +248,7 @@ class SqlStringExpression(SqlExpressionNode):
     def __init__(
         self,
         sql_expr: str,
-        execution_parameters: Optional[SqlBindParameters] = None,
+        bind_parameters: Optional[SqlBindParameters] = None,
         requires_parenthesis: bool = True,
         used_columns: Optional[Tuple[str, ...]] = None,
     ) -> None:
@@ -256,14 +256,14 @@ class SqlStringExpression(SqlExpressionNode):
 
         Args:
             sql_expr: The SQL in string form.
-            execution_parameters: See SqlExpressionNode.execution_parameters
+            bind_parameters: See SqlExpressionNode.bind_parameters
             requires_parenthesis: Whether this should be rendered with () if nested in another expression.
             used_columns: If set, indicates that the expression represented by the string only uses those columns. e.g.
             sql_expr="a + b", used_columns=["a", "b"]. This may be used by optimizers, and if specified, it must be
             complete. e.g. sql_expr="a + b + c", used_columns=["a", "b"] will cause problems.
         """
         self._sql_expr = sql_expr
-        self._execution_parameters = execution_parameters or SqlBindParameters()
+        self._bind_parameters = bind_parameters or SqlBindParameters()
         self._requires_parenthesis = requires_parenthesis
         self._used_columns = used_columns
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[])
@@ -292,8 +292,8 @@ class SqlStringExpression(SqlExpressionNode):
         return self._requires_parenthesis
 
     @property
-    def execution_parameters(self) -> SqlBindParameters:  # noqa: D
-        return self._execution_parameters
+    def bind_parameters(self) -> SqlBindParameters:  # noqa: D
+        return self._bind_parameters
 
     @property
     def used_columns(self) -> Optional[Tuple[str, ...]]:  # noqa: D
@@ -321,7 +321,7 @@ class SqlStringExpression(SqlExpressionNode):
         return (
             self.sql_expr == other.sql_expr
             and self.used_columns == other.used_columns
-            and self.execution_parameters == other.execution_parameters
+            and self.bind_parameters == other.bind_parameters
         )
 
     def as_string_expression(self) -> Optional[SqlStringExpression]:
@@ -360,7 +360,7 @@ class SqlStringLiteralExpression(SqlExpressionNode):
         return False
 
     @property
-    def execution_parameters(self) -> SqlBindParameters:  # noqa: D
+    def bind_parameters(self) -> SqlBindParameters:  # noqa: D
         return SqlBindParameters()
 
     def __repr__(self) -> str:  # noqa: D
@@ -1573,7 +1573,7 @@ class SqlGenerateUuidExpression(SqlExpressionNode):
         return False
 
     @property
-    def execution_parameters(self) -> SqlBindParameters:  # noqa: D
+    def bind_parameters(self) -> SqlBindParameters:  # noqa: D
         return SqlBindParameters()
 
     def __repr__(self) -> str:  # noqa: D

@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 from typing import Sequence, List
 
+from metricflow.specs.column_assoc import ColumnAssociation
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.plan_conversion.sql_expression_builders import make_coalesced_expr
-from metricflow.specs import (
+from metricflow.specs.specs import (
     InstanceSpecSetTransform,
     InstanceSpecSet,
     ColumnAssociationResolver,
@@ -35,7 +38,7 @@ class CreateSelectCoalescedColumnsForLinkableSpecs(InstanceSpecSetTransform[Sele
 
         dimension_columns: List[SqlSelectColumn] = []
         time_dimension_columns: List[SqlSelectColumn] = []
-        identifier_columns: List[SqlSelectColumn] = []
+        entity_columns: List[SqlSelectColumn] = []
 
         for dimension_spec in spec_set.dimension_specs:
             column_name = self._column_association_resolver.resolve_dimension_spec(dimension_spec).column_name
@@ -55,12 +58,10 @@ class CreateSelectCoalescedColumnsForLinkableSpecs(InstanceSpecSetTransform[Sele
                 )
             )
 
-        for identifier_spec in spec_set.identifier_specs:
-            column_associations = self._column_association_resolver.resolve_identifier_spec(identifier_spec)
-            assert len(column_associations) == 1, "Composite identifiers not supported"
-            column_name = column_associations[0].column_name
+        for entity_spec in spec_set.entity_specs:
+            column_name = self._column_association_resolver.resolve_entity_spec(entity_spec).column_name
 
-            identifier_columns.append(
+            entity_columns.append(
                 SqlSelectColumn(
                     expr=make_coalesced_expr(self._table_aliases, column_name),
                     column_alias=column_name,
@@ -70,7 +71,7 @@ class CreateSelectCoalescedColumnsForLinkableSpecs(InstanceSpecSetTransform[Sele
         return SelectColumnSet(
             dimension_columns=dimension_columns,
             time_dimension_columns=time_dimension_columns,
-            identifier_columns=identifier_columns,
+            entity_columns=entity_columns,
         )
 
 
@@ -83,5 +84,33 @@ class SelectOnlyLinkableSpecs(InstanceSpecSetTransform[InstanceSpecSet]):
             measure_specs=(),
             dimension_specs=spec_set.dimension_specs,
             time_dimension_specs=spec_set.time_dimension_specs,
-            identifier_specs=spec_set.identifier_specs,
+            entity_specs=spec_set.entity_specs,
         )
+
+
+class CreateColumnAssociations(InstanceSpecSetTransform[Sequence[ColumnAssociation]]):
+    """Using the specs in the instance set, generate a list of the associated column associations.
+
+    Initial use case is to figure out names of the columns present in the SQL of a WhereFilter.
+    """
+
+    def __init__(self, column_association_resolver: ColumnAssociationResolver) -> None:  # noqa: D
+        self._column_association_resolver = column_association_resolver
+
+    def transform(self, spec_set: InstanceSpecSet) -> Sequence[ColumnAssociation]:  # noqa: D
+        column_associations: List[ColumnAssociation] = []
+        for measure_spec in spec_set.measure_specs:
+            column_associations.append(self._column_association_resolver.resolve_measure_spec(measure_spec))
+        for dimension_spec in spec_set.dimension_specs:
+            column_associations.append(self._column_association_resolver.resolve_dimension_spec(dimension_spec))
+        for time_dimension_spec in spec_set.time_dimension_specs:
+            column_associations.append(
+                self._column_association_resolver.resolve_time_dimension_spec(time_dimension_spec)
+            )
+        for entity_spec in spec_set.entity_specs:
+            column_associations.append(self._column_association_resolver.resolve_entity_spec(entity_spec))
+        for metric_spec in spec_set.metric_specs:
+            column_associations.append(self._column_association_resolver.resolve_metric_spec(metric_spec))
+        for metadata_spec in spec_set.metadata_specs:
+            column_associations.append(self._column_association_resolver.resolve_metadata_spec(metadata_spec))
+        return column_associations

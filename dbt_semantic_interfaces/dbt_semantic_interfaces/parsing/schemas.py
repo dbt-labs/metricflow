@@ -9,11 +9,8 @@ TRANSFORM_OBJECT_NAME_PATTERN = "(?!.*__).*^[a-z][a-z0-9_]*[a-z0-9]$"
 metric_types_enum_values = ["MEASURE_PROXY", "RATIO", "EXPR", "CUMULATIVE", "DERIVED"]
 metric_types_enum_values += [x.lower() for x in metric_types_enum_values]
 
-mutability_type_values = ["IMMUTABLE", "APPEND_ONLY", "FULL_MUTATION", "DS_APPEND_ONLY"]
-mutability_type_values += [x.lower() for x in mutability_type_values]
-
-identifier_type_enum_values = ["PRIMARY", "UNIQUE", "FOREIGN", "NATURAL"]
-identifier_type_enum_values += [x.lower() for x in identifier_type_enum_values]
+entity_type_enum_values = ["PRIMARY", "UNIQUE", "FOREIGN", "NATURAL"]
+entity_type_enum_values += [x.lower() for x in entity_type_enum_values]
 
 aggregation_type_values = [
     "SUM",
@@ -48,7 +45,7 @@ metric_input_measure_schema = {
             "type": "object",
             "properties": {
                 "name": {"type": "string"},
-                "constraint": {"type": "string"},
+                "filter": {"type": "string"},
                 "alias": {"type": "string"},
             },
             "additionalProperties": False,
@@ -61,7 +58,7 @@ metric_input_schema = {
     "type": "object",
     "properties": {
         "name": {"type": "string"},
-        "constraint": {"type": "string"},
+        "filter": {"type": "string"},
         "alias": {"type": "string"},
         "offset_window": {"type": "string"},
         "offset_to_grain": {"type": "string"},
@@ -91,33 +88,18 @@ metric_type_params_schema = {
     "additionalProperties": False,
 }
 
-composite_sub_identifier_schema = {
-    "$id": "composite_sub_identifier_schema",
-    "type": "object",
-    "properties": {
-        "name": {"type": "string"},
-        "expr": {"type": ["string", "boolean"]},
-        "ref": {"type": "string"},
-    },
-    "additionalProperties": False,
-}
-
-identifier_schema = {
-    "$id": "identifier_schema",
+entity_schema = {
+    "$id": "entity_schema",
     "type": "object",
     "properties": {
         "name": {
             "type": "string",
             "pattern": TRANSFORM_OBJECT_NAME_PATTERN,
         },
-        "type": {"enum": identifier_type_enum_values},
+        "type": {"enum": entity_type_enum_values},
         "role": {"type": "string"},
         "expr": {"type": ["string", "boolean"]},
         "entity": {"type": "string"},
-        "identifiers": {
-            "type": "array",
-            "items": {"$ref": "composite_sub_identifier_schema"},
-        },
     },
     "additionalProperties": False,
     "required": ["name", "type"],
@@ -138,7 +120,6 @@ dimension_type_params_schema = {
     "type": "object",
     "properties": {
         "is_primary": {"type": "boolean"},
-        "time_format": {"type": "string"},
         "time_granularity": {"enum": time_granularity_values},
         "validity_params": {"$ref": "validity_params_schema"},
     },
@@ -206,6 +187,7 @@ dimension_schema = {
             "type": "string",
             "pattern": TRANSFORM_OBJECT_NAME_PATTERN,
         },
+        "description": {"type": "string"},
         "type": {"enum": dimension_type_values},
         "is_partition": {"type": "boolean"},
         "expr": {"type": ["string", "boolean"]},
@@ -223,30 +205,6 @@ dimension_schema = {
     "required": ["name", "type"],
 }
 
-mutability_type_params_schema = {
-    "$id": "mutability_type_params_schema",
-    "type": "object",
-    "properties": {
-        "min": {"type": "string"},
-        "max": {"type": "string"},
-        "update_cron": {"type": "string"},
-        "along": {"type": "string"},
-    },
-    "additionalProperties": False,
-}
-
-mutability_schema = {
-    "$id": "mutability_schema",
-    "type": "object",
-    "properties": {
-        "type": {"enum": mutability_type_values},
-        "type_params": {"$ref": "mutability_type_params_schema"},
-    },
-    "additionalProperties": False,
-    "required": ["type"],
-}
-
-
 # Top level object schemas
 metric_schema = {
     "$id": "metric",
@@ -258,29 +216,38 @@ metric_schema = {
         },
         "type": {"enum": metric_types_enum_values},
         "type_params": {"$ref": "metric_type_params"},
-        "constraint": {"type": "string"},
-        "where_constraint": {"type": "string"},
+        "filter": {"type": "string"},
         "description": {"type": "string"},
     },
     "additionalProperties": False,
     "required": ["name", "type", "type_params"],
 }
 
-data_source_schema = {
-    "$id": "data_source",
+node_relation_schema = {
+    "$id": "node_relation_schema",
+    "type": "object",
+    "properties": {
+        "alias": {"type": "string"},
+        "schema_name": {"type": "string"},
+        "database": {"type": "string"},
+        "relation_name": {"type": "string"},
+    },
+    "additionalProperties": False,
+    "required": ["alias", "schema_name"],
+}
+
+semantic_model_schema = {
+    "$id": "semantic_model",
     "type": "object",
     "properties": {
         "name": {
             "type": "string",
             "pattern": TRANSFORM_OBJECT_NAME_PATTERN,
         },
-        "sql_table": {"type": "string"},
-        "sql_query": {"type": "string"},
-        "dbt_model": {"type": "string"},
-        "identifiers": {"type": "array", "items": {"$ref": "identifier_schema"}},
+        "node_relation": {"$ref": "node_relation_schema"},
+        "entities": {"type": "array", "items": {"$ref": "entity_schema"}},
         "measures": {"type": "array", "items": {"$ref": "measure_schema"}},
         "dimensions": {"type": "array", "items": {"$ref": "dimension_schema"}},
-        "mutability": {"$ref": "mutability_schema"},
         "description": {"type": "string"},
     },
     "additionalProperties": False,
@@ -308,26 +275,24 @@ derived_group_by_element_schema = {
 schema_store = {
     # Top level schemas
     metric_schema["$id"]: metric_schema,
-    data_source_schema["$id"]: data_source_schema,
+    semantic_model_schema["$id"]: semantic_model_schema,
     derived_group_by_element_schema["$id"]: derived_group_by_element_schema,
     # Sub-object schemas
     metric_input_measure_schema["$id"]: metric_input_measure_schema,
     metric_type_params_schema["$id"]: metric_type_params_schema,
-    identifier_schema["$id"]: identifier_schema,
+    entity_schema["$id"]: entity_schema,
     measure_schema["$id"]: measure_schema,
     dimension_schema["$id"]: dimension_schema,
     validity_params_schema["$id"]: validity_params_schema,
     dimension_type_params_schema["$id"]: dimension_type_params_schema,
     aggregation_type_params_schema["$id"]: aggregation_type_params_schema,
-    mutability_schema["$id"]: mutability_schema,
-    mutability_type_params_schema["$id"]: mutability_type_params_schema,
-    composite_sub_identifier_schema["$id"]: composite_sub_identifier_schema,
     non_additive_dimension_schema["$id"]: non_additive_dimension_schema,
     metric_input_schema["$id"]: metric_input_schema,
+    node_relation_schema["$id"]: node_relation_schema,
 }
 
 
 resolver = RefResolver.from_schema(schema=metric_schema, store=schema_store)
-data_source_validator = SchemaValidator(data_source_schema, resolver=resolver)
+semantic_model_validator = SchemaValidator(semantic_model_schema, resolver=resolver)
 derived_group_by_element_validator = SchemaValidator(derived_group_by_element_schema, resolver=resolver)
 metric_validator = SchemaValidator(metric_schema, resolver=resolver)

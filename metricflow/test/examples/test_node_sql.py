@@ -2,19 +2,19 @@ import logging
 
 import pytest
 
-from dbt_semantic_interfaces.references import DataSourceReference
+from dbt_semantic_interfaces.references import SemanticModelReference
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, FilterElementsNode, MetricTimeDimensionTransformNode
-from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
-from metricflow.model.semantic_model import SemanticModel
-from metricflow.object_utils import pformat_big_objects
+from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
+from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.specs import TimeDimensionSpec, TimeDimensionReference, InstanceSpecSet
+from metricflow.specs.specs import TimeDimensionSpec, TimeDimensionReference, InstanceSpecSet
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
@@ -25,33 +25,33 @@ logger = logging.getLogger(__name__)
 @pytest.mark.skip("Example for developers.")
 def test_view_sql_generated_at_a_node(
     sql_client: SqlClient,
-    simple_semantic_model: SemanticModel,
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
     time_spine_source: TimeSpineSource,
 ) -> None:
     """Example that shows how to view generated SQL for nodes in a dataflow plan."""
-    bookings_data_source = simple_semantic_model.data_source_semantics.get_by_reference(
-        DataSourceReference(data_source_name="bookings_source")
+    bookings_semantic_model = simple_semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
+        SemanticModelReference(semantic_model_name="bookings_source")
     )
-    assert bookings_data_source
+    assert bookings_semantic_model
     column_association_resolver = DefaultColumnAssociationResolver(
-        semantic_model=simple_semantic_model,
+        semantic_manifest_lookup=simple_semantic_manifest_lookup,
     )
-    to_data_set_converter = DataSourceToDataSetConverter(column_association_resolver)
+    to_data_set_converter = SemanticModelToDataSetConverter(column_association_resolver)
 
     to_sql_plan_converter = DataflowToSqlQueryPlanConverter[SqlDataSet](
-        column_association_resolver=DefaultColumnAssociationResolver(simple_semantic_model),
-        semantic_model=simple_semantic_model,
+        column_association_resolver=DefaultColumnAssociationResolver(simple_semantic_manifest_lookup),
+        semantic_manifest_lookup=simple_semantic_manifest_lookup,
         time_spine_source=time_spine_source,
     )
     sql_renderer: SqlQueryPlanRenderer = sql_client.sql_engine_attributes.sql_query_plan_renderer
     node_output_resolver = DataflowPlanNodeOutputDataSetResolver[SqlDataSet](
         column_association_resolver=column_association_resolver,
-        semantic_model=simple_semantic_model,
+        semantic_manifest_lookup=simple_semantic_manifest_lookup,
         time_spine_source=time_spine_source,
     )
 
     # Show SQL and spec set at a source node.
-    bookings_source_data_set = to_data_set_converter.create_sql_source_data_set(bookings_data_source)
+    bookings_source_data_set = to_data_set_converter.create_sql_source_data_set(bookings_semantic_model)
     read_source_node = ReadSqlSourceNode[SqlDataSet](bookings_source_data_set)
     sql_plan_at_read_node = to_sql_plan_converter.convert_to_sql_query_plan(
         sql_engine_attributes=sql_client.sql_engine_attributes,
@@ -74,9 +74,7 @@ def test_view_sql_generated_at_a_node(
         parent_node=metric_time_node,
         include_specs=InstanceSpecSet(
             time_dimension_specs=(
-                TimeDimensionSpec(
-                    element_name="metric_time", identifier_links=(), time_granularity=TimeGranularity.DAY
-                ),
+                TimeDimensionSpec(element_name="metric_time", entity_links=(), time_granularity=TimeGranularity.DAY),
             ),
         ),
     )

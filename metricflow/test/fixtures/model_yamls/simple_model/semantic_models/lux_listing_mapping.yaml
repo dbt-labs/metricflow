@@ -1,0 +1,16 @@
+---
+semantic_model:
+  name: lux_listing_mapping
+  description: lux_listing_mapping
+
+  node_relation:
+    schema_name: $source_schema
+    alias: dim_lux_listing_id_mapping
+
+  entities:
+    - name: listing
+      type: primary
+      expr: listing_id
+    - name: lux_listing
+      type: foreign
+      expr: lux_listing_id

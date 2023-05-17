@@ -41,7 +41,7 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
         """
         return SqlExpressionRenderResult(
             sql=group_by_column.column_alias,
-            execution_parameters=group_by_column.expr.execution_parameters,
+            bind_parameters=group_by_column.expr.bind_parameters,
         )
 
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
@@ -53,14 +53,14 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
         """
         if node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS:
             arg_rendered = self.render_sql_expr(node.order_by_arg)
-            params = arg_rendered.execution_parameters
+            params = arg_rendered.bind_parameters
             percentile = node.percentile_args.percentile
 
             fraction = Fraction(percentile).limit_denominator()
 
             return SqlExpressionRenderResult(
                 sql=f"APPROX_QUANTILES({arg_rendered.sql}, {fraction.denominator})[OFFSET({fraction.numerator})]",
-                execution_parameters=params,
+                bind_parameters=params,
             )
         raise RuntimeError(
             "Only approximate continous percentile aggregations are supported for BigQuery. Set "
@@ -72,7 +72,7 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
         arg_rendered = self.render_sql_expr(node.arg)
         return SqlExpressionRenderResult(
             sql=f"CAST({arg_rendered.sql} AS DATETIME)",
-            execution_parameters=arg_rendered.execution_parameters,
+            bind_parameters=arg_rendered.bind_parameters,
         )
 
     def visit_date_trunc_expr(self, node: SqlDateTruncExpression) -> SqlExpressionRenderResult:
@@ -85,7 +85,7 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
 
         return SqlExpressionRenderResult(
             sql=f"DATE_TRUNC({arg_rendered.sql}, {prefix}{node.time_granularity.value})",
-            execution_parameters=arg_rendered.execution_parameters,
+            bind_parameters=arg_rendered.bind_parameters,
         )
 
     def visit_time_delta_expr(self, node: SqlTimeDeltaExpression) -> SqlExpressionRenderResult:  # noqa: D
@@ -96,18 +96,18 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
                 granularity.value = "ISO" + granularity.value.upper()
             return SqlExpressionRenderResult(
                 sql=f"DATE_TRUNC({column.sql}, {granularity.value})",
-                execution_parameters=column.execution_parameters,
+                bind_parameters=column.bind_parameters,
             )
 
         return SqlExpressionRenderResult(
             sql=f"DATE_SUB(CAST({column.sql} AS DATETIME), INTERVAL {node.count} {node.granularity.value})",
-            execution_parameters=column.execution_parameters,
+            bind_parameters=column.bind_parameters,
         )
 
     def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> SqlExpressionRenderResult:  # noqa: D
         return SqlExpressionRenderResult(
             sql="GENERATE_UUID()",
-            execution_parameters=SqlBindParameters(),
+            bind_parameters=SqlBindParameters(),
         )
 
 

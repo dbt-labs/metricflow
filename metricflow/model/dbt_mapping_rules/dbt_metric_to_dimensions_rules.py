@@ -2,16 +2,19 @@ import traceback
 from typing import Dict, List, Optional, Tuple
 
 from dbt_metadata_client.dbt_metadata_api_schema import CatalogColumn, MetricNode, MetricFilter
+
+from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
     DbtMappingRule,
     MappedObjects,
     assert_metric_model_name,
 )
-from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
-from metricflow.model.validations.validator_helpers import ModelValidationResults, ValidationIssue, ValidationError
-from dbt_semantic_interfaces.objects.constraints.where import WhereClauseConstraint
-
+from dbt_semantic_interfaces.validations.validator_helpers import (
+    ModelValidationResults,
+    ValidationIssue,
+    ValidationError,
+)
 
 DBT_COLUMN_TYPES_TO_DIMENSION_TYPES: Dict[str, DimensionType] = {
     "DATE": DimensionType.TIME,
@@ -48,7 +51,7 @@ def dimension_for_dimension_in_columns(dimension_name: str, columns: List[Catalo
 
 
 class DbtDimensionsToDimensions(DbtMappingRule):
-    """Rule for mapping dbt metric dimensions to data source dimensions"""
+    """Rule for mapping dbt metric dimensions to semantic model dimensions"""
 
     @staticmethod
     def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
@@ -79,13 +82,13 @@ class DbtDimensionsToDimensions(DbtMappingRule):
 
 
 class DbtTimestampToDimension(DbtMappingRule):
-    """Rule for mapping dbt metric timestamps to data source dimensions"""
+    """Rule for mapping dbt metric timestamps to semantic model dimensions"""
 
     @staticmethod
     def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
         issues: List[ValidationIssue] = []
         for metric in dbt_metrics:
-            # Creating dimensions only matters if there is a data source (model) to attach them too
+            # Creating dimensions only matters if there is a semantic model (model) to attach them too
             if metric.model:
                 try:
                     assert_metric_model_name(metric=metric)
@@ -107,7 +110,7 @@ class DbtTimestampToDimension(DbtMappingRule):
 
 
 class DbtFiltersToDimensions(DbtMappingRule):
-    """Rule for mapping dbt metric filters to data source dimensions
+    """Rule for mapping dbt metric filters to semantic model dimensions
 
     To get the dimensions from a dbt metric's filters we:
     1. build each filter into an SQL clause
@@ -125,13 +128,11 @@ class DbtFiltersToDimensions(DbtMappingRule):
                     assert_metric_model_name(metric=metric)
                     filters: List[MetricFilter] = metric.filters
                     for filter in filters:
-                        # build the MetricFlow where clause for the filter
-                        where_clause = f"{filter.field} {filter.operator} {filter.value}"
-                        mf_where_clause_obj = WhereClauseConstraint.parse(s=where_clause)
-                        for linkable_name in mf_where_clause_obj.linkable_names:
+                        # TODO: Check for correctness - can there be dimensions in filter.value?
+                        for linkable_name in (filter.field,):
                             # Attempt to build a dimension for the linkable name
                             found_dimension = dimension_for_dimension_in_columns(
-                                dimension_name=linkable_name, columns=metric.model.columns
+                                dimension_name=filter.field, columns=metric.model.columns
                             )
                             if found_dimension is not None:
                                 objects.dimensions[metric.model.name][found_dimension.name] = found_dimension.dict()

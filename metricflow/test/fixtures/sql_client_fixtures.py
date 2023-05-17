@@ -28,7 +28,10 @@ def async_sql_client(mf_test_session_state: MetricFlowTestSessionState) -> Gener
 
     logger.info(f"Dropping schema '{mf_test_session_state.mf_system_schema}'")
     sql_client.drop_schema(mf_test_session_state.mf_system_schema, cascade=True)
-    if mf_test_session_state.mf_system_schema != mf_test_session_state.mf_source_schema:
+    if (
+        mf_test_session_state.mf_system_schema != mf_test_session_state.mf_source_schema
+        and not mf_test_session_state.use_persistent_source_schema
+    ):
         logger.info(f"Dropping schema '{mf_test_session_state.mf_source_schema}'")
         sql_client.drop_schema(mf_test_session_state.mf_source_schema, cascade=True)
 

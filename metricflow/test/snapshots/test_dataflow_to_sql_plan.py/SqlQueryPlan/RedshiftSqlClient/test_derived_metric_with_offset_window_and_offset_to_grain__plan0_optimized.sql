@@ -21,17 +21,14 @@ FROM (
         metric_time
         , SUM(bookings) AS month_start_bookings
       FROM (
-        -- Read Elements From Data Source 'bookings_source'
+        -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
         -- Pass Only Elements:
         --   ['bookings', 'metric_time']
         SELECT
           ds AS metric_time
           , 1 AS bookings
-        FROM (
-          -- User Defined SQL Query
-          SELECT * FROM ***************************.fct_bookings
-        ) bookings_source_src_10001
+        FROM ***************************.fct_bookings bookings_source_src_10001
       ) subq_19
       GROUP BY
         metric_time
@@ -52,17 +49,14 @@ FROM (
         metric_time
         , SUM(bookings) AS bookings_1_month_ago
       FROM (
-        -- Read Elements From Data Source 'bookings_source'
+        -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
         -- Pass Only Elements:
         --   ['bookings', 'metric_time']
         SELECT
           ds AS metric_time
           , 1 AS bookings
-        FROM (
-          -- User Defined SQL Query
-          SELECT * FROM ***************************.fct_bookings
-        ) bookings_source_src_10001
+        FROM ***************************.fct_bookings bookings_source_src_10001
       ) subq_27
       GROUP BY
         metric_time

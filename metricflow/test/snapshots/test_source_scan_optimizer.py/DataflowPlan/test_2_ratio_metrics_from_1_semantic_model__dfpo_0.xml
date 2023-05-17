@@ -1,0 +1,63 @@
+<DataflowPlan>
+    <WriteToResultDataframeNode>
+        <!-- description = Write to Dataframe -->
+        <!-- node_id = wrd_1 -->
+        <ComputeMetricsNode>
+            <!-- description = Compute Metrics via Expressions -->
+            <!-- node_id = cm_4 -->
+            <!-- metric_spec =                              -->
+            <!--   {'class': 'MetricSpec',                  -->
+            <!--    'element_name': 'bookings_per_booker',  -->
+            <!--    'constraint': None,                     -->
+            <!--    'alias': None,                          -->
+            <!--    'offset_window': None,                  -->
+            <!--    'offset_to_grain': None}                -->
+            <!-- metric_spec =                              -->
+            <!--   {'class': 'MetricSpec',                  -->
+            <!--    'element_name': 'bookings_per_dollar',  -->
+            <!--    'constraint': None,                     -->
+            <!--    'alias': None,                          -->
+            <!--    'offset_window': None,                  -->
+            <!--    'offset_to_grain': None}                -->
+            <AggregateMeasuresNode>
+                <!-- description = Aggregate Measures -->
+                <!-- node_id = am_4 -->
+                <FilterElementsNode>
+                    <!-- description =                                                -->
+                    <!--   Pass Only Elements:                                        -->
+                    <!--     ['bookings', 'bookers', 'booking_value', 'metric_time']  -->
+                    <!-- node_id = pfe_4 -->
+                    <!-- include_spec =                           -->
+                    <!--   {'class': 'MeasureSpec',               -->
+                    <!--    'element_name': 'bookings',           -->
+                    <!--    'non_additive_dimension_spec': None}  -->
+                    <!-- include_spec =                           -->
+                    <!--   {'class': 'MeasureSpec',               -->
+                    <!--    'element_name': 'bookers',            -->
+                    <!--    'non_additive_dimension_spec': None}  -->
+                    <!-- include_spec =                           -->
+                    <!--   {'class': 'MeasureSpec',               -->
+                    <!--    'element_name': 'booking_value',      -->
+                    <!--    'non_additive_dimension_spec': None}  -->
+                    <!-- include_spec =                               -->
+                    <!--   {'class': 'TimeDimensionSpec',             -->
+                    <!--    'element_name': 'metric_time',            -->
+                    <!--    'entity_links': (),                       -->
+                    <!--    'time_granularity': TimeGranularity.DAY}  -->
+                    <MetricTimeDimensionTransformNode>
+                        <!-- description = Metric Time Dimension 'ds' -->
+                        <!-- node_id = sma_2 -->
+                        <!-- aggregation_time_dimension = ds -->
+                        <ReadSqlSourceNode>
+                            <!-- description =                                                                                    -->
+                            <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->
+                            <!-- node_id = rss_2 -->
+                            <!-- data_set =                                                                             -->
+                            <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->
+                        </ReadSqlSourceNode>
+                    </MetricTimeDimensionTransformNode>
+                </FilterElementsNode>
+            </AggregateMeasuresNode>
+        </ComputeMetricsNode>
+    </WriteToResultDataframeNode>
+</DataflowPlan>

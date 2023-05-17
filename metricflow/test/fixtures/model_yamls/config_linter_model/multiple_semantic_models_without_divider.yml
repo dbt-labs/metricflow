@@ -1,0 +1,40 @@
+semantic_model:
+  name: foo
+  description: bar buzz bazz
+  node_relation:
+    schema_name: $source_schema
+    alias: fct_animals
+  dimensions:
+    - name: ds
+      type: time
+      type_params:
+        is_primary: True
+        time_granularity: day
+    - name: is_dog
+      type: categorical
+      is_partition: True
+  measures:
+    - name: count_dogs
+      agg: sum
+      expr: 1
+      create_metric: True
+semantic_model:
+  name: foo
+  description: bar buzz bazz
+  node_relation:
+    schema_name: $source_schema
+    alias: fct_animals
+  dimensions:
+    - name: ds
+      type: time
+      type_params:
+        is_primary: True
+        time_granularity: day
+    - name: is_dog
+      type: categorical
+      is_partition: True
+  measures:
+    - name: count_dogs
+      agg: sum
+      expr: 1
+      create_metric: True

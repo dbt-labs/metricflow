@@ -7,22 +7,22 @@ from typing import Tuple, List, Dict, Sequence, Set, Optional
 
 import pandas as pd
 
-from metricflow.constraints.time_constraint import TimeRangeConstraint
+from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import BaseOutput
-from metricflow.dataset.data_source_adapter import DataSourceDataSet
+from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from dbt_semantic_interfaces.objects.metric import MetricType
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import (
     TimeDimensionReference,
     MetricModelReference,
     MeasureReference,
     MetricReference,
-    IdentifierReference,
+    EntityReference,
 )
-from metricflow.model.semantic_model import SemanticModel
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.query.query_exceptions import InvalidQueryException
-from metricflow.specs import (
+from metricflow.specs.specs import (
     TimeDimensionSpec,
     DEFAULT_TIME_GRANULARITY,
 )
@@ -45,7 +45,7 @@ class PartialTimeDimensionSpec:
     """
 
     element_name: str
-    identifier_links: Tuple[IdentifierReference, ...]
+    entity_links: Tuple[EntityReference, ...]
 
 
 @dataclass(frozen=True)
@@ -69,13 +69,13 @@ class TimeGranularitySolver:
 
     def __init__(  # noqa: D
         self,
-        semantic_model: SemanticModel,
-        source_nodes: Sequence[BaseOutput[DataSourceDataSet]],
-        node_output_resolver: DataflowPlanNodeOutputDataSetResolver[DataSourceDataSet],
+        semantic_manifest_lookup: SemanticManifestLookup,
+        source_nodes: Sequence[BaseOutput[SemanticModelDataSet]],
+        node_output_resolver: DataflowPlanNodeOutputDataSetResolver[SemanticModelDataSet],
     ) -> None:
-        self._semantic_model = semantic_model
+        self._semantic_manifest_lookup = semantic_manifest_lookup
         self._metric_reference_to_measure_reference = TimeGranularitySolver._measures_for_metric(
-            self._semantic_model.user_configured_model
+            self._semantic_manifest_lookup.semantic_manifest
         )
 
         self._local_time_dimension_granularities: Dict[
@@ -86,7 +86,7 @@ class TimeGranularitySolver:
             output_data_set = node_output_resolver.get_output_data_set(source_node)
             for time_dimension_instance in output_data_set.instance_set.time_dimension_instances:
                 time_dimension_spec = time_dimension_instance.spec
-                if len(time_dimension_spec.identifier_links) == 0:
+                if len(time_dimension_spec.entity_links) == 0:
                     for measure_instance in output_data_set.instance_set.measure_instances:
                         self._local_time_dimension_granularities[
                             LocalTimeDimensionGranularityKey(
@@ -96,7 +96,7 @@ class TimeGranularitySolver:
                         ].add(time_dimension_spec.time_granularity)
 
     @staticmethod
-    def _measures_for_metric(model: UserConfiguredModel) -> Dict[MetricModelReference, List[MeasureReference]]:
+    def _measures_for_metric(model: SemanticManifest) -> Dict[MetricModelReference, List[MeasureReference]]:
         """Given a model, return a dict that maps the name of the metric to the names of the measures used"""
         metric_reference_to_measure_references: Dict[MetricModelReference, List[MeasureReference]] = {}
         for metric in model.metrics:
@@ -114,10 +114,10 @@ class TimeGranularitySolver:
         For example, let's say we're querying for two metrics that are based on 'bookings' and 'bookings_monthly'
         respectively.
 
-        The 'bookings' measure defined is in the 'fct_bookings' data source. 'fct_bookings' has a local time dimension
+        The 'bookings' measure defined is in the 'fct_bookings' semantic model. 'fct_bookings' has a local time dimension
         named 'ds' with granularity DAY.
 
-        The 'monthly_bookings' measure is in defined in the 'fct_bookings_monthly' data source. 'fct_bookings_monthly'
+        The 'monthly_bookings' measure is in defined in the 'fct_bookings_monthly' semantic model. 'fct_bookings_monthly'
         has a local time dimension named 'ds' with granularity MONTH.
 
         Then this would return [DAY, MONTH].
@@ -153,7 +153,7 @@ class TimeGranularitySolver:
         """
         for time_dimension_spec in time_dimension_specs:
             # Validate local time dimensions.
-            if time_dimension_spec.identifier_links == ():
+            if time_dimension_spec.entity_links == ():
                 _, min_granularity_for_querying = self.local_dimension_granularity_range(
                     metric_references=metric_references,
                     local_time_dimension_reference=time_dimension_spec.reference,
@@ -167,7 +167,7 @@ class TimeGranularitySolver:
                 # If there is a cumulative metric, granularity changes aren't supported. We need to check the granularity
                 # specified in the configs for the cumulative metric alone, since `min_granularity_for_querying` may not be supported.
                 for metric_reference in metric_references:
-                    metric = self._semantic_model.metric_semantics.get_metric(metric_reference)
+                    metric = self._semantic_manifest_lookup.metric_lookup.get_metric(metric_reference)
                     if metric.type == MetricType.CUMULATIVE:
                         _, only_queryable_granularity = self.local_dimension_granularity_range(
                             metric_references=[metric_reference],
@@ -195,7 +195,7 @@ class TimeGranularitySolver:
         replacement_dict: OrderedDict[PartialTimeDimensionSpec, TimeDimensionSpec] = OrderedDict()
         for partial_time_dimension_spec in partial_time_dimension_specs:
             # Handle local time dimensions
-            if partial_time_dimension_spec.identifier_links == ():
+            if partial_time_dimension_spec.entity_links == ():
                 _, min_time_granularity_for_querying = self.local_dimension_granularity_range(
                     metric_references=metric_references,
                     local_time_dimension_reference=TimeDimensionReference(
@@ -214,13 +214,13 @@ class TimeGranularitySolver:
                         )
                     replacement_dict[partial_time_dimension_spec] = TimeDimensionSpec(
                         element_name=partial_time_dimension_spec.element_name,
-                        identifier_links=(),
+                        entity_links=(),
                         time_granularity=time_granularity,
                     )
                 else:
                     replacement_dict[partial_time_dimension_spec] = TimeDimensionSpec(
                         element_name=partial_time_dimension_spec.element_name,
-                        identifier_links=(),
+                        entity_links=(),
                         time_granularity=min_time_granularity_for_querying,
                     )
             # Handle joined time dimensions.
@@ -228,7 +228,7 @@ class TimeGranularitySolver:
                 # TODO: For joined time dimensions, also compute the minimum granularity for querying.
                 replacement_dict[partial_time_dimension_spec] = TimeDimensionSpec(
                     element_name=partial_time_dimension_spec.element_name,
-                    identifier_links=partial_time_dimension_spec.identifier_links,
+                    entity_links=partial_time_dimension_spec.entity_links,
                     time_granularity=DEFAULT_TIME_GRANULARITY,
                 )
         return replacement_dict

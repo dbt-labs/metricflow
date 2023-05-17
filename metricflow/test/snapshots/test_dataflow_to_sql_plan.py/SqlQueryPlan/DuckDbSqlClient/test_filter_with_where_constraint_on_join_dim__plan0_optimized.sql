@@ -15,7 +15,7 @@ FROM (
     , listings_latest_src_10004.country AS listing__country_latest
     , subq_13.bookings AS bookings
   FROM (
-    -- Read Elements From Data Source 'bookings_source'
+    -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
     -- Pass Only Elements:
     --   ['bookings', 'is_instant', 'listing']
@@ -23,10 +23,7 @@ FROM (
       listing_id AS listing
       , is_instant
       , 1 AS bookings
-    FROM (
-      -- User Defined SQL Query
-      SELECT * FROM ***************************.fct_bookings
-    ) bookings_source_src_10001
+    FROM ***************************.fct_bookings bookings_source_src_10001
   ) subq_13
   LEFT OUTER JOIN
     ***************************.dim_listings_latest listings_latest_src_10004

@@ -6,8 +6,12 @@ import time
 from dataclasses import dataclass
 from typing import DefaultDict, List, TypeVar, Optional, Generic, Dict, Tuple, Sequence, Set, Union
 
+from dbt_semantic_interfaces.objects.metric import MetricType, MetricTimeWindow
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.references import TimeDimensionReference
-from metricflow.constraints.time_constraint import TimeRangeConstraint
+from metricflow.assert_one_arg import assert_exactly_one_arg_set
+from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.dag.id_generation import IdGeneratorRegistry, DATAFLOW_PLAN_PREFIX
 from metricflow.dataflow.builder.costing import DefaultCostFunction, DataflowPlanNodeCostFunction
 from metricflow.dataflow.builder.measure_additiveness import group_measure_specs_by_additiveness
@@ -42,33 +46,29 @@ from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOp
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
-from dbt_semantic_interfaces.objects.metric import MetricType, MetricTimeWindow
-from metricflow.model.semantic_model import SemanticModel
-from metricflow.object_utils import pformat_big_objects
-from metricflow.assert_one_arg import assert_exactly_one_arg_set
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.node_processor import PreDimensionJoinNodeProcessor
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.time_spine import TimeSpineSource
-from metricflow.specs import (
+from metricflow.specs.specs import (
     MetricSpec,
     MetricInputMeasureSpec,
     LinkableInstanceSpec,
     MetricFlowQuerySpec,
     MeasureSpec,
     TimeDimensionSpec,
-    IdentifierSpec,
+    EntitySpec,
     DimensionSpec,
     OrderBySpec,
     NonAdditiveDimensionSpec,
-    SpecWhereClauseConstraint,
     LinkableSpecSet,
     ColumnAssociationResolver,
-    LinklessIdentifierSpec,
+    LinklessEntitySpec,
     InstanceSpecSet,
+    WhereFilterSpec,
 )
 from metricflow.sql.sql_plan import SqlJoinType
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -95,7 +95,7 @@ class MeasureSpecProperties:
     """Input dataclass for grouping properties of a sequence of MeasureSpecs."""
 
     measure_specs: Sequence[MeasureSpec]
-    data_source_name: str
+    semantic_model_name: str
     agg_time_dimension: TimeDimensionReference
     non_additive_dimension_spec: Optional[NonAdditiveDimensionSpec] = None
 
@@ -106,25 +106,30 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
     def __init__(  # noqa: D
         self,
         source_nodes: Sequence[BaseOutput[SqlDataSetT]],
-        semantic_model: SemanticModel,
+        semantic_manifest_lookup: SemanticManifestLookup,
         time_spine_source: TimeSpineSource,
         cost_function: DataflowPlanNodeCostFunction = DefaultCostFunction[SqlDataSetT](),
         node_output_resolver: Optional[DataflowPlanNodeOutputDataSetResolver[SqlDataSetT]] = None,
         column_association_resolver: Optional[ColumnAssociationResolver] = None,
     ) -> None:
-        self._data_source_semantics = semantic_model.data_source_semantics
-        self._metric_semantics = semantic_model.metric_semantics
+        self._semantic_model_lookup = semantic_manifest_lookup.semantic_model_lookup
+        self._metric_lookup = semantic_manifest_lookup.metric_lookup
         self._metric_time_dimension_reference = DataSet.metric_time_dimension_reference()
         self._cost_function = cost_function
         self._source_nodes = source_nodes
+        self._column_association_resolver = (
+            DefaultColumnAssociationResolver(semantic_manifest_lookup)
+            if not column_association_resolver
+            else column_association_resolver
+        )
         self._node_data_set_resolver = (
             DataflowPlanNodeOutputDataSetResolver[SqlDataSetT](
                 column_association_resolver=(
-                    DefaultColumnAssociationResolver(semantic_model)
+                    DefaultColumnAssociationResolver(semantic_manifest_lookup)
                     if not column_association_resolver
                     else column_association_resolver
                 ),
-                semantic_model=semantic_model,
+                semantic_manifest_lookup=semantic_manifest_lookup,
                 time_spine_source=time_spine_source,
             )
             if not node_output_resolver
@@ -168,7 +173,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         self,
         metric_specs: Sequence[MetricSpec],
         queried_linkable_specs: LinkableSpecSet,
-        where_constraint: Optional[SpecWhereClauseConstraint] = None,
+        where_constraint: Optional[WhereFilterSpec] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         combine_metrics_join_type: SqlJoinType = SqlJoinType.FULL_OUTER,
     ) -> BaseOutput[SqlDataSetT]:
@@ -176,7 +181,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
 
         Args:
             metric_specs: Specs for metrics to compute.
-            queried_linkable_specs: Dimensions/identifiers that were queried for.
+            queried_linkable_specs: Dimensions/entities that were queried for.
             where_constraint: Where constraint used to compute the metric.
             time_range_constraint: Time range constraint used to compute the metric.
             combine_metrics_join_type: The join used when combining the computed metrics.
@@ -185,10 +190,13 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         for metric_spec in metric_specs:
             logger.info(f"Generating compute metrics node for {metric_spec}")
             metric_reference = metric_spec.as_reference
-            metric = self._metric_semantics.get_metric(metric_reference)
+            metric = self._metric_lookup.get_metric(metric_reference)
 
             if metric.type == MetricType.DERIVED:
-                metric_input_specs = self._metric_semantics.metric_input_specs_for_metric(metric_reference)
+                metric_input_specs = self._metric_lookup.metric_input_specs_for_metric(
+                    metric_reference=metric_reference,
+                    column_association_resolver=self._column_association_resolver,
+                )
                 logger.info(
                     f"For derived metric: {metric_spec}, needed metrics are:\n"
                     f"{pformat_big_objects(metric_input_specs=metric_input_specs)}"
@@ -205,7 +213,10 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                     metric_specs=[metric_spec],
                 )
             else:
-                metric_input_measure_specs = self._metric_semantics.measures_for_metric(metric_reference)
+                metric_input_measure_specs = self._metric_lookup.measures_for_metric(
+                    metric_reference=metric_reference,
+                    column_association_resolver=self._column_association_resolver,
+                )
 
                 logger.info(
                     f"For {metric_spec}, needed measures are:\n"
@@ -258,7 +269,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         metric_specs: Sequence[MetricSpec],
         dimension_spec: Optional[DimensionSpec] = None,
         time_dimension_spec: Optional[TimeDimensionSpec] = None,
-        identifier_spec: Optional[IdentifierSpec] = None,
+        entity_spec: Optional[EntitySpec] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         limit: Optional[int] = None,
     ) -> DataflowPlan[SqlDataSetT]:
@@ -267,18 +278,18 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         e.g. distinct listing__country_latest for bookings by listing__country_latest
         """
         assert_exactly_one_arg_set(
-            dimension_spec=dimension_spec, time_dimension_spec=time_dimension_spec, identifier_spec=identifier_spec
+            dimension_spec=dimension_spec, time_dimension_spec=time_dimension_spec, entity_spec=entity_spec
         )
 
         # Doing this to keep the type checker happy, but assert_exactly_one_arg_set should ensure this.
-        linkable_spec: Optional[LinkableInstanceSpec] = dimension_spec or time_dimension_spec or identifier_spec
+        linkable_spec: Optional[LinkableInstanceSpec] = dimension_spec or time_dimension_spec or entity_spec
         assert linkable_spec
 
         query_spec = MetricFlowQuerySpec(
             metric_specs=tuple(metric_specs),
             dimension_specs=(dimension_spec,) if dimension_spec else (),
             time_dimension_specs=(time_dimension_spec,) if time_dimension_spec else (),
-            identifier_specs=(identifier_spec,) if identifier_spec else (),
+            entity_specs=(entity_spec,) if entity_spec else (),
             time_range_constraint=time_range_constraint,
         )
         metrics_output_node = self._build_metrics_output_node(
@@ -299,7 +310,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 OrderBySpec(
                     dimension_spec=dimension_spec,
                     time_dimension_spec=time_dimension_spec,
-                    identifier_spec=identifier_spec,
+                    entity_spec=entity_spec,
                     descending=False,
                 ),
             ),
@@ -346,19 +357,19 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
     @staticmethod
     def _contains_multihop_linkables(linkable_specs: Sequence[LinkableInstanceSpec]) -> bool:
         """Returns true if any of the linkable specs requires a multi-hop join to realize."""
-        return any(len(x.identifier_links) > 1 for x in linkable_specs)
+        return any(len(x.entity_links) > 1 for x in linkable_specs)
 
-    def _get_data_source_names_for_measures(self, measure_names: Sequence[MeasureSpec]) -> Set[str]:
-        """Return the names of the data sources needed to compute the input measures
+    def _get_semantic_model_names_for_measures(self, measure_names: Sequence[MeasureSpec]) -> Set[str]:
+        """Return the names of the semantic models needed to compute the input measures
 
-        This is a temporary method for use in assertion boundaries while we implement support for multiple data sources
+        This is a temporary method for use in assertion boundaries while we implement support for multiple semantic models
         """
-        data_source_names: Set[str] = set()
+        semantic_model_names: Set[str] = set()
         for measure_name in measure_names:
-            data_source_names = data_source_names.union(
-                {d.name for d in self._data_source_semantics.get_data_sources_for_measure(measure_name.as_reference)}
+            semantic_model_names = semantic_model_names.union(
+                {d.name for d in self._semantic_model_lookup.get_semantic_models_for_measure(measure_name.as_reference)}
             )
-        return data_source_names
+        return semantic_model_names
 
     def _sort_by_suitability(self, nodes: Sequence[BaseOutput[SqlDataSetT]]) -> Sequence[BaseOutput[SqlDataSetT]]:
         """Sort nodes by the cost, then by the number of linkable specs.
@@ -412,28 +423,28 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         """Ensures that the group of MeasureSpecs has the same non_additive_dimension_spec and agg_time_dimension"""
         if len(measure_specs) == 0:
             raise ValueError("Cannot build MeasureParametersForRecipe when given an empty sequence of measure_specs.")
-        data_sources = self._get_data_source_names_for_measures(measure_specs)
-        if len(data_sources) > 1:
+        semantic_models = self._get_semantic_model_names_for_measures(measure_specs)
+        if len(semantic_models) > 1:
             raise ValueError(
                 f"Cannot find common properties for measures {measure_specs} coming from multiple "
-                f"data sources: {data_sources}. This suggests the measure_specs were not correctly filtered."
+                f"semantic models: {semantic_models}. This suggests the measure_specs were not correctly filtered."
             )
 
-        agg_time_dimension = agg_time_dimension = self._data_source_semantics.get_agg_time_dimension_for_measure(
+        agg_time_dimension = agg_time_dimension = self._semantic_model_lookup.get_agg_time_dimension_for_measure(
             measure_specs[0].as_reference
         )
         non_additive_dimension_spec = measure_specs[0].non_additive_dimension_spec
         for measure_spec in measure_specs:
             if non_additive_dimension_spec != measure_spec.non_additive_dimension_spec:
                 raise ValueError(f"measure_specs {measure_specs} do not have the same non_additive_dimension_spec.")
-            measure_agg_time_dimension = self._data_source_semantics.get_agg_time_dimension_for_measure(
+            measure_agg_time_dimension = self._semantic_model_lookup.get_agg_time_dimension_for_measure(
                 measure_spec.as_reference
             )
             if measure_agg_time_dimension != agg_time_dimension:
                 raise ValueError(f"measure_specs {measure_specs} do not have the same agg_time_dimension.")
         return MeasureSpecProperties(
             measure_specs=measure_specs,
-            data_source_name=data_sources.pop(),
+            semantic_model_name=semantic_models.pop(),
             agg_time_dimension=agg_time_dimension,
             non_additive_dimension_spec=non_additive_dimension_spec,
         )
@@ -447,11 +458,11 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         """Find a recipe for getting measure_specs along with the linkable specs.
 
         Prior to calling this method we should always be checking that all input measure specs come from
-        the same base data source, otherwise the internal conditions here will be impossible to satisfy
+        the same base semantic model, otherwise the internal conditions here will be impossible to satisfy
         """
         measure_specs = measure_spec_properties.measure_specs
         node_processor = PreDimensionJoinNodeProcessor(
-            data_source_semantics=self._data_source_semantics,
+            semantic_model_lookup=self._semantic_model_lookup,
             node_data_set_resolver=self._node_data_set_resolver,
         )
 
@@ -493,7 +504,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         logger.info(f"Processing nodes took: {time.time()-start_time:.2f}s")
 
         node_evaluator = NodeEvaluatorForLinkableInstances(
-            data_source_semantics=self._data_source_semantics,
+            semantic_model_lookup=self._semantic_model_lookup,
             nodes_available_for_joins=self._sort_by_suitability(nodes_available_for_joins),
             node_data_set_resolver=self._node_data_set_resolver,
         )
@@ -561,8 +572,8 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             )
 
             # Nodes containing the linkable instances will be joined to the node containing the measure, so these
-            # identifiers will need to be present in the measure node.
-            required_local_identifier_specs = tuple(x.join_on_identifier for x in evaluation.join_recipes)
+            # entities will need to be present in the measure node.
+            required_local_entity_specs = tuple(x.join_on_entity for x in evaluation.join_recipes)
             # Same thing with partitions.
             required_local_dimension_specs = tuple(
                 y.start_node_dimension_spec for x in evaluation.join_recipes for y in x.join_on_partition_dimensions
@@ -577,7 +588,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 measure_node=node_with_lowest_cost,
                 required_local_linkable_specs=(
                     evaluation.local_linkable_specs
-                    + required_local_identifier_specs
+                    + required_local_entity_specs
                     + required_local_dimension_specs
                     + required_local_time_dimension_specs
                 ),
@@ -603,7 +614,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         self,
         metric_input_measure_specs: Sequence[MetricInputMeasureSpec],
         queried_linkable_specs: LinkableSpecSet,
-        where_constraint: Optional[SpecWhereClauseConstraint] = None,
+        where_constraint: Optional[WhereFilterSpec] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         cumulative: Optional[bool] = False,
         cumulative_window: Optional[MetricTimeWindow] = None,
@@ -611,29 +622,31 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
     ) -> BaseOutput[SqlDataSetT]:
         """Returns a node where the measures are aggregated by the linkable specs and constrained appropriately.
 
-        This might be a node representing a single aggregation over one data source, or a node representing
-        a composite set of aggregations originating from multiple data sources, and joined into a single
+        This might be a node representing a single aggregation over one semantic model, or a node representing
+        a composite set of aggregations originating from multiple semantic models, and joined into a single
         aggregated set of measures.
         """
         output_nodes: List[BaseOutput[SqlDataSetT]] = []
-        data_sources_and_constraints_to_measures: DefaultDict[
-            tuple[str, Optional[SpecWhereClauseConstraint]], List[MetricInputMeasureSpec]
+        semantic_models_and_constraints_to_measures: DefaultDict[
+            tuple[str, Optional[WhereFilterSpec]], List[MetricInputMeasureSpec]
         ] = collections.defaultdict(list)
         for input_spec in metric_input_measure_specs:
-            data_source_names = [
+            semantic_model_names = [
                 dsource.name
-                for dsource in self._data_source_semantics.get_data_sources_for_measure(
+                for dsource in self._semantic_model_lookup.get_semantic_models_for_measure(
                     measure_reference=input_spec.measure_spec.as_reference
                 )
             ]
             assert (
-                len(data_source_names) == 1
-            ), f"Validation should enforce one data source per measure, but found {data_source_names} for {input_spec}!"
-            data_sources_and_constraints_to_measures[(data_source_names[0], input_spec.constraint)].append(input_spec)
+                len(semantic_model_names) == 1
+            ), f"Validation should enforce one semantic model per measure, but found {semantic_model_names} for {input_spec}!"
+            semantic_models_and_constraints_to_measures[(semantic_model_names[0], input_spec.constraint)].append(
+                input_spec
+            )
 
-        for (data_source, measure_constraint), measures in data_sources_and_constraints_to_measures.items():
+        for (semantic_model, measure_constraint), measures in semantic_models_and_constraints_to_measures.items():
             logger.info(
-                f"Building aggregated measures for {data_source}. "
+                f"Building aggregated measures for {semantic_model}. "
                 f" Input measures: {measures} with constraints: {measure_constraint}"
             )
             if measure_constraint is None:
@@ -655,7 +668,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 if non_additive_spec is not None:
                     non_additive_message = f" with non-additive dimension spec: {non_additive_spec}"
 
-                logger.info(f"Building aggregated measures for {data_source}{non_additive_message}")
+                logger.info(f"Building aggregated measures for {semantic_model}{non_additive_message}")
                 input_specs = tuple(input_specs_by_measure_spec[measure_spec] for measure_spec in measure_specs)
                 output_nodes.append(
                     self._build_aggregated_measures_from_measure_source_node(
@@ -676,7 +689,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 parent_node=JoinAggregatedMeasuresByGroupByColumnsNode(parent_nodes=output_nodes),
                 include_specs=InstanceSpecSet.merge(
                     (
-                        queried_linkable_specs.as_instance_set,
+                        queried_linkable_specs.as_spec_set,
                         InstanceSpecSet(
                             measure_specs=tuple(x.post_aggregation_spec for x in metric_input_measure_specs)
                         ),
@@ -688,7 +701,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         self,
         metric_input_measure_specs: Sequence[MetricInputMeasureSpec],
         queried_linkable_specs: LinkableSpecSet,
-        where_constraint: Optional[SpecWhereClauseConstraint] = None,
+        where_constraint: Optional[WhereFilterSpec] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         cumulative: Optional[bool] = False,
         cumulative_window: Optional[MetricTimeWindow] = None,
@@ -782,13 +795,12 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             # Figure out what elements to filter from the joined node.
 
             # Sanity check - all linkable specs should have a link, or else why would we be joining them.
-            assert all([len(x.identifier_links) > 0 for x in join_recipe.satisfiable_linkable_specs])
+            assert all([len(x.entity_links) > 0 for x in join_recipe.satisfiable_linkable_specs])
 
-            # If we're joining something in, then we need the associated identifier, partitions, and time dimension
+            # If we're joining something in, then we need the associated entity, partitions, and time dimension
             # specs defining the validity window (if necessary)
             include_specs: List[LinkableInstanceSpec] = [
-                LinklessIdentifierSpec.from_reference(x.identifier_links[0])
-                for x in join_recipe.satisfiable_linkable_specs
+                LinklessEntitySpec.from_reference(x.entity_links[0]) for x in join_recipe.satisfiable_linkable_specs
             ]
             include_specs.extend([x.node_to_join_dimension_spec for x in join_recipe.join_on_partition_dimensions])
             include_specs.extend(
@@ -802,11 +814,11 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                     ]
                 )
 
-            # satisfiable_linkable_specs describes what can be satisfied after the join, so remove the identifier
+            # satisfiable_linkable_specs describes what can be satisfied after the join, so remove the entity
             # link when filtering before the join.
-            # e.g. if the node is used to satisfy "user_id__country", then the node must have the identifier
+            # e.g. if the node is used to satisfy "user_id__country", then the node must have the entity
             # "user_id" and the "country" dimension so that it can be joined to the measure node.
-            include_specs.extend([x.without_first_identifier_link for x in join_recipe.satisfiable_linkable_specs])
+            include_specs.extend([x.without_first_entity_link for x in join_recipe.satisfiable_linkable_specs])
             filtered_node_to_join = FilterElementsNode[SqlDataSetT](
                 parent_node=join_recipe.node_to_join,
                 include_specs=InstanceSpecSet.create_from_linkable_specs(include_specs),
@@ -814,7 +826,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             join_targets.append(
                 JoinDescription(
                     join_node=filtered_node_to_join,
-                    join_on_identifier=join_recipe.join_on_identifier,
+                    join_on_entity=join_recipe.join_on_entity,
                     join_on_partition_dimensions=join_recipe.join_on_partition_dimensions,
                     join_on_partition_time_dimensions=join_recipe.join_on_partition_time_dimensions,
                     validity_window=join_recipe.validity_window,
@@ -831,7 +843,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             specs_to_keep_after_join = InstanceSpecSet.merge(
                 (
                     InstanceSpecSet(measure_specs=measure_specs),
-                    required_linkable_specs.as_instance_set,
+                    required_linkable_specs.as_spec_set,
                 )
             )
 
@@ -872,11 +884,11 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             )
             time_dimension_spec = TimeDimensionSpec.from_name(non_additive_dimension_spec.name)
             window_groupings = tuple(
-                LinklessIdentifierSpec.from_element_name(name) for name in non_additive_dimension_spec.window_groupings
+                LinklessEntitySpec.from_element_name(name) for name in non_additive_dimension_spec.window_groupings
             )
             pre_aggregate_node = SemiAdditiveJoinNode[SqlDataSetT](
                 parent_node=pre_aggregate_node,
-                identifier_specs=window_groupings,
+                entity_specs=window_groupings,
                 time_dimension_spec=time_dimension_spec,
                 agg_by_function=non_additive_dimension_spec.window_choice,
                 queried_time_dimension_spec=queried_time_dimension_spec,
@@ -891,7 +903,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             pre_aggregate_node = FilterElementsNode[SqlDataSetT](
                 parent_node=pre_aggregate_node,
                 include_specs=InstanceSpecSet.merge(
-                    (InstanceSpecSet(measure_specs=measure_specs), queried_linkable_specs.as_instance_set)
+                    (InstanceSpecSet(measure_specs=measure_specs), queried_linkable_specs.as_spec_set)
                 ),
             )
         return AggregateMeasuresNode[SqlDataSetT](

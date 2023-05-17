@@ -6,7 +6,7 @@ from typing_extensions import TypeAlias
 
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode, ModelNode
 from dbt_semantic_interfaces.objects.metric import MetricType
-from metricflow.model.validations.validator_helpers import ModelValidationResults
+from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationResults
 
 
 TransformedObjectsValueType: TypeAlias = Any  # type: ignore[misc]
@@ -16,19 +16,19 @@ TransformedObjectsValueType: TypeAlias = Any  # type: ignore[misc]
 class MappedObjects:
     """Model elements, and sub elements, mapped by element name path"""
 
-    data_sources: DefaultDict[str, Dict[str, TransformedObjectsValueType]] = field(
+    semantic_models: DefaultDict[str, Dict[str, TransformedObjectsValueType]] = field(
         default_factory=lambda: defaultdict(dict)
     )
     metrics: DefaultDict[str, Dict[str, TransformedObjectsValueType]] = field(default_factory=lambda: defaultdict(dict))
-    # access path is ["data_source_name"]["dimension_name"] -> dict dimension representation
+    # access path is ["semantic_model_name"]["dimension_name"] -> dict dimension representation
     dimensions: DefaultDict[str, DefaultDict[str, Dict[str, TransformedObjectsValueType]]] = field(
         default_factory=lambda: defaultdict(lambda: defaultdict(dict))
     )
-    # access path is ["data_source_name"]["identifier_name"] -> dict identifier representation
-    identifiers: DefaultDict[str, DefaultDict[str, Dict[str, TransformedObjectsValueType]]] = field(
+    # access path is ["semantic_model_name"]["entity_name"] -> dict entity representation
+    entities: DefaultDict[str, DefaultDict[str, Dict[str, TransformedObjectsValueType]]] = field(
         default_factory=lambda: defaultdict(lambda: defaultdict(dict))
     )
-    # access path is ["data_source_name"]["measure_name"] -> dict measure representation
+    # access path is ["semantic_model_name"]["measure_name"] -> dict measure representation
     measures: DefaultDict[str, DefaultDict[str, Dict[str, TransformedObjectsValueType]]] = field(
         default_factory=lambda: defaultdict(lambda: defaultdict(dict))
     )

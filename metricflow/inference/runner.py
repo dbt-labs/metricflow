@@ -114,7 +114,7 @@ class InferenceRunner:
         """
 
         logger.warning(
-            "Data Source Inference is still in Beta. "
+            "Semantic Model Inference is still in Beta. "
             "As such, you should not expect it to be 100% stable or be free of bugs. Any public CLI or Python interfaces may change without prior notice."
             " If you find any bugs or feel like something is not behaving as it should, feel free to open an issue on the Metricflow Github repo."
         )

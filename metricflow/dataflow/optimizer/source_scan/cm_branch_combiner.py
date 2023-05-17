@@ -27,7 +27,7 @@ from metricflow.dataflow.dataflow_plan import (
     JoinToTimeSpineNode,
 )
 from metricflow.dataflow.optimizer.source_scan.matching_linkable_specs import MatchingLinkableSpecsTransform
-from metricflow.specs import InstanceSpecSet
+from metricflow.specs.specs import InstanceSpecSet
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +65,7 @@ class ComputeMetricsBranchCombiner(
         <ComputeMetricsNode metrics=["bookings"]
             <AggregateMeasuresNode>
                 <FilterElementsNode include_specs=["bookings"]>
-                    <ReadSqlSourceNode data_source="bookings_source"/>
+                    <ReadSqlSourceNode semantic_model="bookings_source"/>
                 </>
             </>
         </>
@@ -73,7 +73,7 @@ class ComputeMetricsBranchCombiner(
         <ComputeMetricsNode metrics=["booking_value"]
             <AggregateMeasuresNode>
                 <FilterElementsNode include_specs=["booking_value"]>
-                    <ReadSqlSourceNode data_source="bookings_source"/>
+                    <ReadSqlSourceNode semantic_model="bookings_source"/>
                 </>
             </>
         </>
@@ -83,7 +83,7 @@ class ComputeMetricsBranchCombiner(
     <ComputeMetricsNode metrics=["bookings", "booking_value"]
         <AggregateMeasuresNode>
             <FilterElementsNode include_specs=["bookings", "booking_value"]>
-                <ReadSqlSourceNode data_source="bookings_source"/>
+                <ReadSqlSourceNode semantic_model="bookings_source"/>
             </>
         </>
     </>
@@ -94,7 +94,7 @@ class ComputeMetricsBranchCombiner(
         <ComputeMetricsNode metrics=["bookings"]
             <AggregateMeasuresNode>
                 <FilterElementsNode include_specs=["bookings", "is_instant"]>
-                    <ReadSqlSourceNode data_source="bookings_source"/>
+                    <ReadSqlSourceNode semantic_model="bookings_source"/>
                 </>
             </>
         </>
@@ -102,7 +102,7 @@ class ComputeMetricsBranchCombiner(
         <ComputeMetricsNode metrics=["booking_value"]
             <AggregateMeasuresNode>
                 <FilterElementsNode include_specs=["booking_value"]>
-                    <ReadSqlSourceNode data_source="bookings_source"/>
+                    <ReadSqlSourceNode semantic_model="bookings_source"/>
                 </>
             </>
         </>

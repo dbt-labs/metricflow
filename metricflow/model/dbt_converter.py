@@ -9,10 +9,10 @@ from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
     DbtMappingResults,
     MappedObjects,
 )
-from metricflow.model.dbt_mapping_rules.dbt_metric_model_to_data_source_rules import (
-    DbtMapToDataSourceName,
-    DbtMapToDataSourceDescription,
-    DbtMapDataSourceSqlTable,
+from metricflow.model.dbt_mapping_rules.dbt_metric_model_to_semantic_model_rules import (
+    DbtMapToSemanticModelName,
+    DbtMapToSemanticModelDescription,
+    DbtMapSemanticModelNodeRelation,
 )
 from metricflow.model.dbt_mapping_rules.dbt_metric_to_metrics_rules import (
     DbtToMetricName,
@@ -33,20 +33,24 @@ from metricflow.model.dbt_mapping_rules.dbt_metric_to_measure import (
     DbtToMeasureAgg,
     DbtToMeasureAggTimeDimension,
 )
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.metric import Metric
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.parsing.dir_to_model import ModelBuildResult
-from metricflow.model.validations.validator_helpers import ModelValidationResults, ValidationError, ValidationIssue
+from dbt_semantic_interfaces.validations.validator_helpers import (
+    ModelValidationResults,
+    ValidationError,
+    ValidationIssue,
+)
 
 logger = logging.getLogger(__name__)
 
 DEFAULT_RULES: FrozenSet[DbtMappingRule] = frozenset(
     [
-        # Build data sources
-        DbtMapToDataSourceName(),
-        DbtMapToDataSourceDescription(),
-        DbtMapDataSourceSqlTable(),
+        # Build semantic models
+        DbtMapToSemanticModelName(),
+        DbtMapToSemanticModelDescription(),
+        DbtMapSemanticModelNodeRelation(),
         # Build Metrics
         DbtToMetricName(),
         DbtToMetricDescription(),
@@ -82,22 +86,22 @@ class DbtConverter:
     def __init__(
         self,
         rules: Collection[DbtMappingRule] = DEFAULT_RULES,
-        data_source_class: Type[DataSource] = DataSource,
+        semantic_model_class: Type[SemanticModel] = SemanticModel,
         metric_class: Type[Metric] = Metric,
     ) -> None:
         """Initializer for DbtConverter class
 
         Args:
             rules: A collection of DbtMappingRules which get saved as a FrozenSet (immutable and unordered). Defaults to DEFAULT_RULES.
-            data_source_class: DataSource class to parse the mapped data sources to. Defaults to MetricFlow DataSource class.
+            semantic_model_class: SemanticModel class to parse the mapped semantic models to. Defaults to MetricFlow SemanticModel class.
             metric_class: Metric class to parse the mapped metrics to. Defaults to MetricFlow Metric class.
         """
         self._unordered_rules = frozenset(rules)
-        self.data_source_class = data_source_class
+        self.semantic_model_class = semantic_model_class
         self.metric_class = metric_class
 
     def _map_dbt_to_metricflow(self, dbt_metrics: Tuple[MetricNode, ...]) -> DbtMappingResults:
-        """Using a series of rules transforms dbt metrics into a mapped dict representing UserConfiguredModel objects"""
+        """Using a series of rules transforms dbt metrics into a mapped dict representing SemanticManifest objects"""
         mapped_objects = MappedObjects()
         validation_results = ModelValidationResults()
 
@@ -108,28 +112,28 @@ class DbtConverter:
         return DbtMappingResults(mapped_objects=mapped_objects, validation_results=validation_results)
 
     def _build_metricflow_model(self, mapped_objects: MappedObjects) -> ModelBuildResult:
-        """Takes in a map of dicts representing UserConfiguredModel objects, and builds a UserConfiguredModel"""
+        """Takes in a map of dicts representing SemanticManifest objects, and builds a SemanticManifest"""
         # we don't want to modify the passed in objects, so we decopy them
         copied_objects = deepcopy(mapped_objects)
 
-        # Move dimensions, identifiers, and measures on to their respective data sources
-        for data_source_name, dimensions_map in copied_objects.dimensions.items():
-            copied_objects.data_sources[data_source_name]["dimensions"] = list(dimensions_map.values())
-        for data_source_name, identifiers_map in copied_objects.identifiers.items():
-            copied_objects.data_sources[data_source_name]["identifiers"] = list(identifiers_map.values())
-        for data_source_name, measure_map in copied_objects.measures.items():
-            copied_objects.data_sources[data_source_name]["measures"] = list(measure_map.values())
+        # Move dimensions, entities, and measures on to their respective semantic models
+        for semantic_model_name, dimensions_map in copied_objects.dimensions.items():
+            copied_objects.semantic_models[semantic_model_name]["dimensions"] = list(dimensions_map.values())
+        for semantic_model_name, entities_map in copied_objects.entities.items():
+            copied_objects.semantic_models[semantic_model_name]["entities"] = list(entities_map.values())
+        for semantic_model_name, measure_map in copied_objects.measures.items():
+            copied_objects.semantic_models[semantic_model_name]["measures"] = list(measure_map.values())
 
         issues: List[ValidationIssue] = []
 
-        data_sources: List[Type[DataSource]] = []
-        for data_source_dict in copied_objects.data_sources.values():
+        semantic_models: List[Type[SemanticModel]] = []
+        for semantic_model_dict in copied_objects.semantic_models.values():
             try:
-                data_sources.append(self.data_source_class.parse_obj(data_source_dict))
+                semantic_models.append(self.semantic_model_class.parse_obj(semantic_model_dict))
             except Exception as e:
                 issues.append(
                     ValidationError(
-                        message=f"Failed to parse dict of data source {data_source_dict.get('name')} to object",
+                        message=f"Failed to parse dict of semantic model {semantic_model_dict.get('name')} to object",
                         extra_detail="".join(traceback.format_tb(e.__traceback__)),
                     )
                 )
@@ -147,17 +151,17 @@ class DbtConverter:
                 )
 
         return ModelBuildResult(
-            model=UserConfiguredModel(data_sources=data_sources, metrics=metrics),
+            model=SemanticManifest(semantic_models=semantic_models, metrics=metrics),
             issues=ModelValidationResults.from_issues_sequence(issues=issues),
         )
 
     def convert(self, dbt_metrics: Tuple[MetricNode, ...]) -> ModelBuildResult:
-        """Builds a UserConfiguredModel from dbt MetricNodes"""
+        """Builds a SemanticManifest from dbt MetricNodes"""
         mapping_result = self._map_dbt_to_metricflow(dbt_metrics=dbt_metrics)
 
         if mapping_result.validation_results.has_blocking_issues:
             return ModelBuildResult(
-                model=UserConfiguredModel(data_sources=[], metrics=[]), issues=mapping_result.validation_results
+                model=SemanticManifest(semantic_models=[], metrics=[]), issues=mapping_result.validation_results
             )
 
         build_result = self._build_metricflow_model(mapped_objects=mapping_result.mapped_objects)

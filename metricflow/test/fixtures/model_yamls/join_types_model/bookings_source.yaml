@@ -1,9 +1,11 @@
 ---
-data_source:
+semantic_model:
   name: bookings_source
   description: bookings_source
 
-  sql_table: $fct_bookings_for_joins_table
+  node_relation:
+    schema_name: $source_schema
+    alias: fct_bookings_for_joins
 
   measures:
     - name: bookings
@@ -18,11 +20,7 @@ data_source:
         is_primary: True
         time_granularity: day
 
-  identifiers:
+  entities:
     - name: listing
       type: foreign
       expr: listing_id
-
-
-  mutability:
-    type: immutable

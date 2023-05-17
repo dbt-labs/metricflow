@@ -18,18 +18,17 @@
                 <WhereConstraintNode>
                     <!-- description = Constrain Output with WHERE -->
                     <!-- node_id = wcc_0 -->
-                    <!-- where_condition =                                                                                     -->
-                    <!--   {'class': 'SpecWhereClauseConstraint',                                                              -->
-                    <!--    'where_condition': "listing__country_latest = 'us'",                                               -->
-                    <!--    'linkable_names': ('listing__country_latest',),                                                    -->
-                    <!--    'linkable_spec_set': {'class': 'LinkableSpecSet',                                                  -->
-                    <!--                          'dimension_specs': ({'class': 'DimensionSpec',                               -->
-                    <!--                                               'element_name': 'country_latest',                       -->
-                    <!--                                               'identifier_links': ({'class': 'IdentifierReference',   -->
-                    <!--                                                                     'element_name': 'listing'},)},),  -->
-                    <!--                          'time_dimension_specs': (),                                                  -->
-                    <!--                          'identifier_specs': ()},                                                     -->
-                    <!--    'execution_parameters': {'class': 'SqlBindParameters', 'param_items': ()}}                         -->
+                    <!-- where_condition =                                                                                 -->
+                    <!--   {'class': 'WhereFilterSpec',                                                                    -->
+                    <!--    'where_sql': "listing__country_latest = 'us'",                                                 -->
+                    <!--    'bind_parameters': {'class': 'SqlBindParameters', 'param_items': ()},                          -->
+                    <!--    'linkable_spec_set': {'class': 'LinkableSpecSet',                                              -->
+                    <!--                          'dimension_specs': ({'class': 'DimensionSpec',                           -->
+                    <!--                                               'element_name': 'country_latest',                   -->
+                    <!--                                               'entity_links': ({'class': 'EntityReference',       -->
+                    <!--                                                                 'element_name': 'listing'},)},),  -->
+                    <!--                          'time_dimension_specs': (),                                              -->
+                    <!--                          'entity_specs': ()}}                                                     -->
                     <FilterElementsNode>
                         <!-- description =                                -->
                         <!--   Pass Only Elements:                        -->
@@ -39,23 +38,22 @@
                         <!--   {'class': 'MeasureSpec',               -->
                         <!--    'element_name': 'bookings',           -->
                         <!--    'non_additive_dimension_spec': None}  -->
-                        <!-- include_spec =                                            -->
-                        <!--   {'class': 'DimensionSpec',                              -->
-                        <!--    'element_name': 'country_latest',                      -->
-                        <!--    'identifier_links': ({'class': 'IdentifierReference',  -->
-                        <!--                          'element_name': 'listing'},)}    -->
+                        <!-- include_spec =                                                                  -->
+                        <!--   {'class': 'DimensionSpec',                                                    -->
+                        <!--    'element_name': 'country_latest',                                            -->
+                        <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'listing'},)}  -->
                         <JoinToBaseOutputNode>
                             <!-- description = Join Standard Outputs -->
                             <!-- node_id = jso_0 -->
-                            <!-- join0_for_node_id_pfe_1 =                                     -->
-                            <!--   {'class': 'JoinDescription',                                -->
-                            <!--    'join_node': FilterElementsNode(node_id=pfe_1),            -->
-                            <!--    'join_on_identifier': {'class': 'LinklessIdentifierSpec',  -->
-                            <!--                           'element_name': 'listing',          -->
-                            <!--                           'identifier_links': ()},            -->
-                            <!--    'join_on_partition_dimensions': (),                        -->
-                            <!--    'join_on_partition_time_dimensions': (),                   -->
-                            <!--    'validity_window': None}                                   -->
+                            <!-- join0_for_node_id_pfe_1 =                             -->
+                            <!--   {'class': 'JoinDescription',                        -->
+                            <!--    'join_node': FilterElementsNode(node_id=pfe_1),    -->
+                            <!--    'join_on_entity': {'class': 'LinklessEntitySpec',  -->
+                            <!--                       'element_name': 'listing',      -->
+                            <!--                       'entity_links': ()},            -->
+                            <!--    'join_on_partition_dimensions': (),                -->
+                            <!--    'join_on_partition_time_dimensions': (),           -->
+                            <!--    'validity_window': None}                           -->
                             <FilterElementsNode>
                                 <!-- description =                -->
                                 <!--   Pass Only Elements:        -->
@@ -65,20 +63,17 @@
                                 <!--   {'class': 'MeasureSpec',               -->
                                 <!--    'element_name': 'bookings',           -->
                                 <!--    'non_additive_dimension_spec': None}  -->
-                                <!-- include_spec =                         -->
-                                <!--   {'class': 'LinklessIdentifierSpec',  -->
-                                <!--    'element_name': 'listing',          -->
-                                <!--    'identifier_links': ()}             -->
+                                <!-- include_spec = LinklessEntitySpec(element_name='listing', entity_links=()) -->
                                 <MetricTimeDimensionTransformNode>
                                     <!-- description = Metric Time Dimension 'ds' -->
                                     <!-- node_id = sma_10001 -->
                                     <!-- aggregation_time_dimension = ds -->
                                     <ReadSqlSourceNode>
-                                        <!-- description =                                                                           -->
-                                        <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                                        <!-- description =                                                                                    -->
+                                        <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->
                                         <!-- node_id = rss_10011 -->
-                                        <!-- data_set =                                                                    -->
-                                        <!--   DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                                        <!-- data_set =                                                                             -->
+                                        <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->
                                     </ReadSqlSourceNode>
                                 </MetricTimeDimensionTransformNode>
                             </FilterElementsNode>
@@ -87,24 +82,19 @@
                                 <!--   Pass Only Elements:              -->
                                 <!--     ['country_latest', 'listing']  -->
                                 <!-- node_id = pfe_1 -->
-                                <!-- include_spec =                        -->
-                                <!--   {'class': 'DimensionSpec',          -->
-                                <!--    'element_name': 'country_latest',  -->
-                                <!--    'identifier_links': ()}            -->
-                                <!-- include_spec =                         -->
-                                <!--   {'class': 'LinklessIdentifierSpec',  -->
-                                <!--    'element_name': 'listing',          -->
-                                <!--    'identifier_links': ()}             -->
+                                <!-- include_spec =                                                                      -->
+                                <!--   {'class': 'DimensionSpec', 'element_name': 'country_latest', 'entity_links': ()}  -->
+                                <!-- include_spec = LinklessEntitySpec(element_name='listing', entity_links=()) -->
                                 <MetricTimeDimensionTransformNode>
                                     <!-- description = Metric Time Dimension 'ds' -->
                                     <!-- node_id = sma_10004 -->
                                     <!-- aggregation_time_dimension = ds -->
                                     <ReadSqlSourceNode>
-                                        <!-- description =                                                                           -->
-                                        <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='listings_latest'))  -->
+                                        <!-- description =                                                                                    -->
+                                        <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->
                                         <!-- node_id = rss_10014 -->
-                                        <!-- data_set =                                                                    -->
-                                        <!--   DataSourceDataSet(DataSourceReference(data_source_name='listings_latest'))  -->
+                                        <!-- data_set =                                                                             -->
+                                        <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->
                                     </ReadSqlSourceNode>
                                 </MetricTimeDimensionTransformNode>
                             </FilterElementsNode>

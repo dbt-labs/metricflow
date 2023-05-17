@@ -32,18 +32,18 @@
                         <!-- include_spec =                               -->
                         <!--   {'class': 'TimeDimensionSpec',             -->
                         <!--    'element_name': 'metric_time',            -->
-                        <!--    'identifier_links': (),                   -->
+                        <!--    'entity_links': (),                       -->
                         <!--    'time_granularity': TimeGranularity.DAY}  -->
                         <MetricTimeDimensionTransformNode>
                             <!-- description = Metric Time Dimension 'ds' -->
                             <!-- node_id = sma_0 -->
                             <!-- aggregation_time_dimension = ds -->
                             <ReadSqlSourceNode>
-                                <!-- description =                                                                           -->
-                                <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                                <!-- description =                                                                                    -->
+                                <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->
                                 <!-- node_id = rss_0 -->
-                                <!-- data_set =                                                                    -->
-                                <!--   DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                                <!-- data_set =                                                                             -->
+                                <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->
                             </ReadSqlSourceNode>
                         </MetricTimeDimensionTransformNode>
                     </FilterElementsNode>
@@ -95,18 +95,18 @@
                             <!-- include_spec =                               -->
                             <!--   {'class': 'TimeDimensionSpec',             -->
                             <!--    'element_name': 'metric_time',            -->
-                            <!--    'identifier_links': (),                   -->
+                            <!--    'entity_links': (),                       -->
                             <!--    'time_granularity': TimeGranularity.DAY}  -->
                             <MetricTimeDimensionTransformNode>
                                 <!-- description = Metric Time Dimension 'ds' -->
                                 <!-- node_id = sma_3 -->
                                 <!-- aggregation_time_dimension = ds -->
                                 <ReadSqlSourceNode>
-                                    <!-- description =                                                                           -->
-                                    <!--   Read From DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                                    <!-- description =                                                                                    -->
+                                    <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->
                                     <!-- node_id = rss_3 -->
-                                    <!-- data_set =                                                                    -->
-                                    <!--   DataSourceDataSet(DataSourceReference(data_source_name='bookings_source'))  -->
+                                    <!-- data_set =                                                                             -->
+                                    <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->
                                 </ReadSqlSourceNode>
                             </MetricTimeDimensionTransformNode>
                         </FilterElementsNode>

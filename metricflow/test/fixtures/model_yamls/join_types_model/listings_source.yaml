@@ -1,18 +1,17 @@
 ---
-data_source:
+semantic_model:
   name: listings_source
   description: listings_source
 
-  sql_table: $dim_listings_for_joins_table
+  node_relation:
+    schema_name: $source_schema
+    alias: dim_listings_for_joins
 
   dimensions:
     - name: country
       type: categorical
 
-  identifiers:
+  entities:
     - name: listing
       type: primary
       expr: listing_id
-
-  mutability:
-    type: immutable

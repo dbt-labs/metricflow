@@ -1,19 +1,19 @@
 from _pytest.fixtures import FixtureRequest
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.dataset.data_source_adapter import DataSourceDataSet
-from metricflow.model.semantic_model import SemanticModel
+from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_execution import DataflowToExecutionPlanConverter
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.async_sql_client import AsyncSqlClient
-from metricflow.specs import (
+from metricflow.specs.specs import (
     MetricFlowQuerySpec,
     MetricSpec,
     DimensionSpec,
     TimeDimensionSpec,
-    IdentifierReference,
+    EntityReference,
 )
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
@@ -21,14 +21,14 @@ from metricflow.test.plan_utils import assert_execution_plan_text_equal
 
 
 def make_execution_plan_converter(  # noqa: D
-    semantic_model: SemanticModel,
+    semantic_manifest_lookup: SemanticManifestLookup,
     sql_client: AsyncSqlClient,
     time_spine_source: TimeSpineSource,
 ) -> DataflowToExecutionPlanConverter:
-    return DataflowToExecutionPlanConverter[DataSourceDataSet](
-        sql_plan_converter=DataflowToSqlQueryPlanConverter[DataSourceDataSet](
-            column_association_resolver=DefaultColumnAssociationResolver(semantic_model),
-            semantic_model=semantic_model,
+    return DataflowToExecutionPlanConverter[SemanticModelDataSet](
+        sql_plan_converter=DataflowToSqlQueryPlanConverter[SemanticModelDataSet](
+            column_association_resolver=DefaultColumnAssociationResolver(semantic_manifest_lookup),
+            semantic_manifest_lookup=semantic_manifest_lookup,
             time_spine_source=time_spine_source,
         ),
         sql_plan_renderer=DefaultSqlQueryPlanRenderer(),
@@ -39,8 +39,8 @@ def make_execution_plan_converter(  # noqa: D
 def test_joined_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
-    simple_semantic_model: SemanticModel,
+    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
     async_sql_client: AsyncSqlClient,
     time_spine_source: TimeSpineSource,
 ) -> None:
@@ -50,18 +50,18 @@ def test_joined_plan(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
-                    identifier_links=(),
+                    entity_links=(),
                 ),
                 DimensionSpec(
                     element_name="country_latest",
-                    identifier_links=(IdentifierReference("listing"),),
+                    entity_links=(EntityReference("listing"),),
                 ),
             ),
         )
     )
 
     to_execution_plan_converter = make_execution_plan_converter(
-        simple_semantic_model, async_sql_client, time_spine_source
+        simple_semantic_manifest_lookup, async_sql_client, time_spine_source
     )
 
     execution_plan = to_execution_plan_converter.convert_to_execution_plan(dataflow_plan)
@@ -78,8 +78,8 @@ def test_small_combined_metrics_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     async_sql_client: AsyncSqlClient,
-    dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
-    simple_semantic_model: SemanticModel,
+    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
     time_spine_source: TimeSpineSource,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -91,14 +91,14 @@ def test_small_combined_metrics_plan(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
-                    identifier_links=(),
+                    entity_links=(),
                 ),
             ),
         )
     )
 
     to_execution_plan_converter = make_execution_plan_converter(
-        semantic_model=simple_semantic_model,
+        semantic_manifest_lookup=simple_semantic_manifest_lookup,
         sql_client=async_sql_client,
         time_spine_source=time_spine_source,
     )
@@ -116,8 +116,8 @@ def test_combined_metrics_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     async_sql_client: AsyncSqlClient,
-    dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
-    simple_semantic_model: SemanticModel,
+    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
     time_spine_source: TimeSpineSource,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -130,15 +130,15 @@ def test_combined_metrics_plan(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
-                    identifier_links=(),
+                    entity_links=(),
                 ),
             ),
-            time_dimension_specs=(TimeDimensionSpec(element_name="ds", identifier_links=()),),
+            time_dimension_specs=(TimeDimensionSpec(element_name="ds", entity_links=()),),
         )
     )
 
     to_execution_plan_converter = make_execution_plan_converter(
-        semantic_model=simple_semantic_model,
+        semantic_manifest_lookup=simple_semantic_manifest_lookup,
         sql_client=async_sql_client,
         time_spine_source=time_spine_source,
     )
@@ -155,8 +155,8 @@ def test_combined_metrics_plan(  # noqa: D
 def test_multihop_joined_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    multihop_dataflow_plan_builder: DataflowPlanBuilder[DataSourceDataSet],
-    multi_hop_join_semantic_model: SemanticModel,
+    multihop_dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
     async_sql_client: AsyncSqlClient,
     time_spine_source: TimeSpineSource,
 ) -> None:
@@ -167,9 +167,9 @@ def test_multihop_joined_plan(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="customer_name",
-                    identifier_links=(
-                        IdentifierReference(element_name="account_id"),
-                        IdentifierReference(element_name="customer_id"),
+                    entity_links=(
+                        EntityReference(element_name="account_id"),
+                        EntityReference(element_name="customer_id"),
                     ),
                 ),
             ),
@@ -177,9 +177,9 @@ def test_multihop_joined_plan(  # noqa: D
     )
 
     to_execution_plan_converter = DataflowToExecutionPlanConverter(
-        sql_plan_converter=DataflowToSqlQueryPlanConverter[DataSourceDataSet](
-            column_association_resolver=DefaultColumnAssociationResolver(multi_hop_join_semantic_model),
-            semantic_model=multi_hop_join_semantic_model,
+        sql_plan_converter=DataflowToSqlQueryPlanConverter[SemanticModelDataSet](
+            column_association_resolver=DefaultColumnAssociationResolver(multi_hop_join_semantic_manifest_lookup),
+            semantic_manifest_lookup=multi_hop_join_semantic_manifest_lookup,
             time_spine_source=time_spine_source,
         ),
         sql_plan_renderer=DefaultSqlQueryPlanRenderer(),

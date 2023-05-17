@@ -5,8 +5,8 @@ from typing import Sequence
 
 from dbt_semantic_interfaces.references import TimeDimensionReference
 from metricflow.instances import InstanceSet, TimeDimensionInstance
-from metricflow.model.validations.unique_valid_name import MetricFlowReservedKeywords
-from metricflow.specs import TimeDimensionSpec
+from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
+from metricflow.specs.specs import TimeDimensionSpec
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 
@@ -52,7 +52,7 @@ class DataSet:
         """Spec that corresponds to DataSet.metric_time_dimension_reference"""
         return TimeDimensionSpec(
             element_name=DataSet.metric_time_dimension_reference().element_name,
-            identifier_links=(),
+            entity_links=(),
             time_granularity=time_granularity,
         )
 

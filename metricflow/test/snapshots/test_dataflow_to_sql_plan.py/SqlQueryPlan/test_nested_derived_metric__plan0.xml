@@ -360,7 +360,7 @@
                                     <!-- from_source = SqlSelectStatementNode(node_id=ss_10001) -->
                                     <!-- where = None -->
                                     <SqlSelectStatementNode>
-                                        <!-- description = Read Elements From Data Source 'bookings_source' -->
+                                        <!-- description = Read Elements From Semantic Model 'bookings_source' -->
                                         <!-- node_id = ss_10001 -->
                                         <!-- col0 =                                                         -->
                                         <!--   {'class': 'SqlSelectColumn',                                 -->
@@ -574,12 +574,13 @@
                                         <!--   {'class': 'SqlSelectColumn',                                -->
                                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10059),    -->
                                         <!--    'column_alias': 'create_a_cycle_in_the_join_graph__host'}  -->
-                                        <!-- from_source = SqlSelectQueryFromClauseNode(node_id=tfc_10001) -->
+                                        <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10001) -->
                                         <!-- where = None -->
-                                        <SqlSelectQueryFromClauseNode>
-                                            <!-- description = Read From a Select Query -->
+                                        <SqlTableFromClauseNode>
+                                            <!-- description = Read from ***************************.fct_bookings -->
                                             <!-- node_id = tfc_10001 -->
-                                        </SqlSelectQueryFromClauseNode>
+                                            <!-- table_id = ***************************.fct_bookings -->
+                                        </SqlTableFromClauseNode>
                                     </SqlSelectStatementNode>
                                 </SqlSelectStatementNode>
                             </SqlSelectStatementNode>
@@ -864,7 +865,7 @@
                                     <!-- from_source = SqlSelectStatementNode(node_id=ss_10001) -->
                                     <!-- where = None -->
                                     <SqlSelectStatementNode>
-                                        <!-- description = Read Elements From Data Source 'bookings_source' -->
+                                        <!-- description = Read Elements From Semantic Model 'bookings_source' -->
                                         <!-- node_id = ss_10001 -->
                                         <!-- col0 =                                                         -->
                                         <!--   {'class': 'SqlSelectColumn',                                 -->
@@ -1078,12 +1079,13 @@
                                         <!--   {'class': 'SqlSelectColumn',                                -->
                                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10059),    -->
                                         <!--    'column_alias': 'create_a_cycle_in_the_join_graph__host'}  -->
-                                        <!-- from_source = SqlSelectQueryFromClauseNode(node_id=tfc_10001) -->
+                                        <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10001) -->
                                         <!-- where = None -->
-                                        <SqlSelectQueryFromClauseNode>
-                                            <!-- description = Read From a Select Query -->
+                                        <SqlTableFromClauseNode>
+                                            <!-- description = Read from ***************************.fct_bookings -->
                                             <!-- node_id = tfc_10001 -->
-                                        </SqlSelectQueryFromClauseNode>
+                                            <!-- table_id = ***************************.fct_bookings -->
+                                        </SqlTableFromClauseNode>
                                     </SqlSelectStatementNode>
                                 </SqlSelectStatementNode>
                             </SqlSelectStatementNode>
@@ -1370,7 +1372,7 @@
                             <!-- from_source = SqlSelectStatementNode(node_id=ss_10001) -->
                             <!-- where = None -->
                             <SqlSelectStatementNode>
-                                <!-- description = Read Elements From Data Source 'bookings_source' -->
+                                <!-- description = Read Elements From Semantic Model 'bookings_source' -->
                                 <!-- node_id = ss_10001 -->
                                 <!-- col0 =                                                         -->
                                 <!--   {'class': 'SqlSelectColumn',                                 -->
@@ -1584,12 +1586,13 @@
                                 <!--   {'class': 'SqlSelectColumn',                                -->
                                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10059),    -->
                                 <!--    'column_alias': 'create_a_cycle_in_the_join_graph__host'}  -->
-                                <!-- from_source = SqlSelectQueryFromClauseNode(node_id=tfc_10001) -->
+                                <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10001) -->
                                 <!-- where = None -->
-                                <SqlSelectQueryFromClauseNode>
-                                    <!-- description = Read From a Select Query -->
+                                <SqlTableFromClauseNode>
+                                    <!-- description = Read from ***************************.fct_bookings -->
                                     <!-- node_id = tfc_10001 -->
-                                </SqlSelectQueryFromClauseNode>
+                                    <!-- table_id = ***************************.fct_bookings -->
+                                </SqlTableFromClauseNode>
                             </SqlSelectStatementNode>
                         </SqlSelectStatementNode>
                     </SqlSelectStatementNode>
@@ -1874,7 +1877,7 @@
                             <!-- from_source = SqlSelectStatementNode(node_id=ss_10001) -->
                             <!-- where = None -->
                             <SqlSelectStatementNode>
-                                <!-- description = Read Elements From Data Source 'bookings_source' -->
+                                <!-- description = Read Elements From Semantic Model 'bookings_source' -->
                                 <!-- node_id = ss_10001 -->
                                 <!-- col0 =                                                         -->
                                 <!--   {'class': 'SqlSelectColumn',                                 -->
@@ -2088,12 +2091,13 @@
                                 <!--   {'class': 'SqlSelectColumn',                                -->
                                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10059),    -->
                                 <!--    'column_alias': 'create_a_cycle_in_the_join_graph__host'}  -->
-                                <!-- from_source = SqlSelectQueryFromClauseNode(node_id=tfc_10001) -->
+                                <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10001) -->
                                 <!-- where = None -->
-                                <SqlSelectQueryFromClauseNode>
-                                    <!-- description = Read From a Select Query -->
+                                <SqlTableFromClauseNode>
+                                    <!-- description = Read from ***************************.fct_bookings -->
                                     <!-- node_id = tfc_10001 -->
-                                </SqlSelectQueryFromClauseNode>
+                                    <!-- table_id = ***************************.fct_bookings -->
+                                </SqlTableFromClauseNode>
                             </SqlSelectStatementNode>
                         </SqlSelectStatementNode>
                     </SqlSelectStatementNode>

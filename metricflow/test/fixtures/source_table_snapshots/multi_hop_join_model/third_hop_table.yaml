@@ -1,0 +1,13 @@
+table_snapshot:
+  table_name: third_hop_table
+  column_definitions:
+    - name: customer_third_hop_id
+      type: STRING
+    - name: value
+      type: STRING
+  rows:
+    - ["another_id0", "citadel"]
+    - ["another_id1", "virtu"]
+    - ["another_id2", "two sigma"]
+    - ["another_id3", "jump"]
+

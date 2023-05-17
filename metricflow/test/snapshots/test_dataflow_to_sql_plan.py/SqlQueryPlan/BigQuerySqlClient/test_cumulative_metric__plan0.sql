@@ -29,7 +29,7 @@ FROM (
         , subq_0.user
         , subq_0.txn_revenue
       FROM (
-        -- Read Elements From Data Source 'revenue'
+        -- Read Elements From Semantic Model 'revenue'
         SELECT
           revenue_src_10006.revenue AS txn_revenue
           , revenue_src_10006.created_at AS ds
@@ -38,10 +38,7 @@ FROM (
           , DATE_TRUNC(revenue_src_10006.created_at, quarter) AS ds__quarter
           , DATE_TRUNC(revenue_src_10006.created_at, isoyear) AS ds__year
           , revenue_src_10006.user_id AS user
-        FROM (
-          -- User Defined SQL Query
-          SELECT * FROM ***************************.fct_revenue
-        ) revenue_src_10006
+        FROM ***************************.fct_revenue revenue_src_10006
       ) subq_0
     ) subq_1
   ) subq_3

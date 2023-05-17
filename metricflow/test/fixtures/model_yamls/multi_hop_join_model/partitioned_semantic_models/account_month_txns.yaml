@@ -1,0 +1,32 @@
+---
+semantic_model:
+  name: account_month_txns
+  description: account_month_txns
+
+  node_relation:
+    schema_name: $source_schema
+    alias: account_month_txns
+
+  measures:
+    - name: txn_count
+      agg: sum
+      create_metric: true
+
+  dimensions:
+    - name: ds_partitioned
+      type: time
+      type_params:
+        is_primary: false
+        time_granularity: day
+      is_partition: true
+    - name: ds
+      type: time
+      type_params:
+        is_primary: true
+        time_granularity: day
+    - name: account_month
+      type: categorical
+
+  entities:
+    - name: account_id
+      type: primary

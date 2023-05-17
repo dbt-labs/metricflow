@@ -36,9 +36,9 @@ def make_schema_replacement_function(system_schema: str, source_schema: str) -> 
 
 
 def replace_dataset_id_hash(text: str) -> str:
-    """Replaces data set ID hashes for primed data sources.
+    """Replaces data set ID hashes for primed semantic models.
 
-    The data set ID hash changes from run to run because it's based on the DW schema in the data source, which changes
+    The data set ID hash changes from run to run because it's based on the DW schema in the semantic model, which changes
     run to run.
     """
     pattern = re.compile(r"'[a-zA-Z0-9_]+__[a-zA-Z0-9_]+__(?P<hash>[a-zA-Z0-9_]+)'")

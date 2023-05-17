@@ -17,72 +17,6 @@
             },
             "type": "object"
         },
-        "composite_sub_identifier_schema": {
-            "$id": "composite_sub_identifier_schema",
-            "additionalProperties": false,
-            "properties": {
-                "expr": {
-                    "type": [
-                        "string",
-                        "boolean"
-                    ]
-                },
-                "name": {
-                    "type": "string"
-                },
-                "ref": {
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
-        "data_source": {
-            "$id": "data_source",
-            "additionalProperties": false,
-            "properties": {
-                "dbt_model": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "dimensions": {
-                    "items": {
-                        "$ref": "#/definitions/dimension_schema"
-                    },
-                    "type": "array"
-                },
-                "identifiers": {
-                    "items": {
-                        "$ref": "#/definitions/identifier_schema"
-                    },
-                    "type": "array"
-                },
-                "measures": {
-                    "items": {
-                        "$ref": "#/definitions/measure_schema"
-                    },
-                    "type": "array"
-                },
-                "mutability": {
-                    "$ref": "#/definitions/mutability_schema"
-                },
-                "name": {
-                    "pattern": "(?!.*__).*^[a-z][a-z0-9_]*[a-z0-9]$",
-                    "type": "string"
-                },
-                "sql_query": {
-                    "type": "string"
-                },
-                "sql_table": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "name"
-            ],
-            "type": "object"
-        },
         "derived_group_by_element_schema": {
             "$id": "derived_group_by_element_schema",
             "additionalProperties": false,
@@ -126,6 +60,9 @@
                 }
             ],
             "properties": {
+                "description": {
+                    "type": "string"
+                },
                 "expr": {
                     "type": [
                         "string",
@@ -164,9 +101,6 @@
                 "is_primary": {
                     "type": "boolean"
                 },
-                "time_format": {
-                    "type": "string"
-                },
                 "time_granularity": {
                     "enum": [
                         "DAY",
@@ -190,8 +124,8 @@
             ],
             "type": "object"
         },
-        "identifier_schema": {
-            "$id": "identifier_schema",
+        "entity_schema": {
+            "$id": "entity_schema",
             "additionalProperties": false,
             "properties": {
                 "entity": {
@@ -202,12 +136,6 @@
                         "string",
                         "boolean"
                     ]
-                },
-                "identifiers": {
-                    "items": {
-                        "$ref": "#/definitions/composite_sub_identifier_schema"
-                    },
-                    "type": "array"
                 },
                 "name": {
                     "pattern": "(?!.*__).*^[a-z][a-z0-9_]*[a-z0-9]$",
@@ -317,10 +245,10 @@
             "$id": "metric",
             "additionalProperties": false,
             "properties": {
-                "constraint": {
+                "description": {
                     "type": "string"
                 },
-                "description": {
+                "filter": {
                     "type": "string"
                 },
                 "name": {
@@ -343,9 +271,6 @@
                 },
                 "type_params": {
                     "$ref": "#/definitions/metric_type_params"
-                },
-                "where_constraint": {
-                    "type": "string"
                 }
             },
             "required": [
@@ -367,7 +292,7 @@
                         "alias": {
                             "type": "string"
                         },
-                        "constraint": {
+                        "filter": {
                             "type": "string"
                         },
                         "name": {
@@ -385,7 +310,7 @@
                 "alias": {
                     "type": "string"
                 },
-                "constraint": {
+                "filter": {
                     "type": "string"
                 },
                 "name": {
@@ -440,48 +365,27 @@
             },
             "type": "object"
         },
-        "mutability_schema": {
-            "$id": "mutability_schema",
+        "node_relation_schema": {
+            "$id": "node_relation_schema",
             "additionalProperties": false,
             "properties": {
-                "type": {
-                    "enum": [
-                        "IMMUTABLE",
-                        "APPEND_ONLY",
-                        "FULL_MUTATION",
-                        "DS_APPEND_ONLY",
-                        "immutable",
-                        "append_only",
-                        "full_mutation",
-                        "ds_append_only"
-                    ]
+                "alias": {
+                    "type": "string"
                 },
-                "type_params": {
-                    "$ref": "#/definitions/mutability_type_params_schema"
+                "database": {
+                    "type": "string"
+                },
+                "relation_name": {
+                    "type": "string"
+                },
+                "schema_name": {
+                    "type": "string"
                 }
             },
             "required": [
-                "type"
+                "alias",
+                "schema_name"
             ],
-            "type": "object"
-        },
-        "mutability_type_params_schema": {
-            "$id": "mutability_type_params_schema",
-            "additionalProperties": false,
-            "properties": {
-                "along": {
-                    "type": "string"
-                },
-                "max": {
-                    "type": "string"
-                },
-                "min": {
-                    "type": "string"
-                },
-                "update_cron": {
-                    "type": "string"
-                }
-            },
             "type": "object"
         },
         "non_additive_dimension_schema": {
@@ -511,6 +415,44 @@
             ],
             "type": "object"
         },
+        "semantic_model": {
+            "$id": "semantic_model",
+            "additionalProperties": false,
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "dimensions": {
+                    "items": {
+                        "$ref": "#/definitions/dimension_schema"
+                    },
+                    "type": "array"
+                },
+                "entities": {
+                    "items": {
+                        "$ref": "#/definitions/entity_schema"
+                    },
+                    "type": "array"
+                },
+                "measures": {
+                    "items": {
+                        "$ref": "#/definitions/measure_schema"
+                    },
+                    "type": "array"
+                },
+                "name": {
+                    "pattern": "(?!.*__).*^[a-z][a-z0-9_]*[a-z0-9]$",
+                    "type": "string"
+                },
+                "node_relation": {
+                    "$ref": "#/definitions/node_relation_schema"
+                }
+            },
+            "required": [
+                "name"
+            ],
+            "type": "object"
+        },
         "validity_params_schema": {
             "$id": "validity_params_schema",
             "additionalProperties": false,
@@ -526,14 +468,14 @@
         }
     },
     "properties": {
-        "data_source": {
-            "$ref": "#/definitions/data_source"
-        },
         "derived_identifier": {
             "$ref": "#/definitions/derived_group_by_element_schema"
         },
         "metric": {
             "$ref": "#/definitions/metric"
+        },
+        "semantic_model": {
+            "$ref": "#/definitions/semantic_model"
         }
     },
     "title": "MetricFlow file schema",

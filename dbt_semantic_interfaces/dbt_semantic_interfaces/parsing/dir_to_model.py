@@ -10,20 +10,20 @@ from jsonschema import exceptions
 
 from dbt_semantic_interfaces.errors import ParsingException
 from dbt_semantic_interfaces.model_transformer import ModelTransformer
-from dbt_semantic_interfaces.objects.common import Version, YamlConfigFile
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.metric import Metric
+from dbt_semantic_interfaces.parsing.objects import Version, YamlConfigFile
 from dbt_semantic_interfaces.parsing.schemas import (
     metric_validator,
-    data_source_validator,
+    semantic_model_validator,
 )
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.parsing.yaml_loader import (
     ParsingContext,
     YamlConfigLoader,
     PARSING_CONTEXT_KEY,
 )
-from metricflow.model.validations.validator_helpers import (
+from dbt_semantic_interfaces.validations.validator_helpers import (
     FileContext,
     ModelValidationException,
     ModelValidationResults,
@@ -35,13 +35,13 @@ logger = logging.getLogger(__name__)
 
 VERSION_KEY = "mf_config_schema"
 METRIC_TYPE = "metric"
-DATA_SOURCE_TYPE = "data_source"
-DOCUMENT_TYPES = [METRIC_TYPE, DATA_SOURCE_TYPE]
+SEMANTIC_MODEL_TYPE = "semantic_model"
+DOCUMENT_TYPES = [METRIC_TYPE, SEMANTIC_MODEL_TYPE]
 
 
 @dataclass(frozen=True)
 class ModelBuildResult:  # noqa: D
-    model: UserConfiguredModel
+    model: SemanticManifest
     # Issues found in the model.
     issues: ModelValidationResults = ModelValidationResults()
 
@@ -55,7 +55,7 @@ class FileParsingResult:
         issues: Issues found when trying to parse the file
     """
 
-    elements: List[Union[DataSource, Metric]]
+    elements: List[Union[SemanticModel, Metric]]
     issues: List[ValidationIssue]
 
 
@@ -104,7 +104,7 @@ def parse_directory_of_yaml_files_to_model(
     apply_transformations: Optional[bool] = True,
     raise_issues_as_exceptions: bool = True,
 ) -> ModelBuildResult:
-    """Parse files in the given directory to a UserConfiguredModel.
+    """Parse files in the given directory to a SemanticManifest.
 
     Strings in the file following the Python string template format are replaced according to the template_mapping dict.
     """
@@ -123,7 +123,7 @@ def parse_yaml_file_paths_to_model(
     apply_transformations: Optional[bool] = True,
     raise_issues_as_exceptions: bool = True,
 ) -> ModelBuildResult:
-    """Parse files the given list of file paths to a UserConfiguredModel.
+    """Parse files the given list of file paths to a SemanticManifest.
 
     Strings in the files following the Python string template format are replaced according to the template_mapping dict.
     """
@@ -139,8 +139,8 @@ def parse_yaml_file_paths_to_model(
         except UnicodeDecodeError as e:
             # We could alternatively return this as a validation issue, but this
             # exception is hit *before* building the model. Currently the
-            # ModelBuildResult guarantees a UserConfiguredModel. We could make
-            # UserConfiguredModel optional on ModelBuildResult, but this has
+            # ModelBuildResult guarantees a SemanticManifest. We could make
+            # SemanticManifest optional on ModelBuildResult, but this has
             # undesirable consequences.
             raise Exception(
                 f"The content of file `{file_path}` doesn't match the encoding of the file."
@@ -188,31 +188,34 @@ def parse_yaml_files_to_validation_ready_model(
 
 def parse_yaml_files_to_model(
     files: List[YamlConfigFile],
-    data_source_class: Type[DataSource] = DataSource,
+    semantic_model_class: Type[SemanticModel] = SemanticModel,
     metric_class: Type[Metric] = Metric,
 ) -> ModelBuildResult:
-    """Builds UserConfiguredModel from list of config files (as strings).
+    """Builds SemanticManifest from list of config files (as strings).
 
     Persistent storage connection may be passed to write parsed objects=
     to storage and populate object metadata
 
     Note: this function does not finalize the model
     """
-    data_sources = []
+    semantic_models = []
     metrics = []
-    valid_object_classes = [data_source_class.__name__, metric_class.__name__]
+    valid_object_classes = [semantic_model_class.__name__, metric_class.__name__]
     issues: List[ValidationIssue] = []
 
-    for config_file in files:
+    # Sort the file path so that tests run with consistency. e.g. node IDs are generated sequentially, and the order
+    # of node creation is based on the order of semantic models. If a snapshot includes a node ID, then inconsistent
+    # IDs will cause snapshot match failures.
+    for config_file in sorted(files, key=lambda file: file.filepath):
         parsing_result = parse_config_yaml(  # parse config file
             config_file,
-            data_source_class=data_source_class,
+            semantic_model_class=semantic_model_class,
             metric_class=metric_class,
         )
         file_issues = parsing_result.issues
         for obj in parsing_result.elements:
-            if isinstance(obj, data_source_class):
-                data_sources.append(obj)
+            if isinstance(obj, semantic_model_class):
+                semantic_models.append(obj)
             elif isinstance(obj, metric_class):
                 metrics.append(obj)
             else:
@@ -226,8 +229,8 @@ def parse_yaml_files_to_model(
         issues += file_issues
 
     return ModelBuildResult(
-        model=UserConfiguredModel(
-            data_sources=data_sources,
+        model=SemanticManifest(
+            semantic_models=semantic_models,
             metrics=metrics,
         ),
         issues=ModelValidationResults.from_issues_sequence(issues),
@@ -236,11 +239,11 @@ def parse_yaml_files_to_model(
 
 def parse_config_yaml(
     config_yaml: YamlConfigFile,
-    data_source_class: Type[DataSource] = DataSource,
+    semantic_model_class: Type[SemanticModel] = SemanticModel,
     metric_class: Type[Metric] = Metric,
 ) -> FileParsingResult:
     """Parses transform config file passed as string - Returns list of model objects"""
-    results: List[Union[DataSource, Metric]] = []
+    results: List[Union[SemanticModel, Metric]] = []
     ctx: Optional[ParsingContext] = None
     issues: List[ValidationIssue] = []
     try:
@@ -303,9 +306,9 @@ def parse_config_yaml(
                 if document_type == METRIC_TYPE:
                     metric_validator.validate(config_document[document_type])
                     results.append(metric_class.parse_obj(object_cfg))
-                elif document_type == DATA_SOURCE_TYPE:
-                    data_source_validator.validate(config_document[document_type])
-                    results.append(data_source_class.parse_obj(object_cfg))
+                elif document_type == SEMANTIC_MODEL_TYPE:
+                    semantic_model_validator.validate(config_document[document_type])
+                    results.append(semantic_model_class.parse_obj(object_cfg))
                 else:
                     issues.append(
                         ValidationError(

@@ -1,15 +1,15 @@
-from dbt_semantic_interfaces.objects.data_source import DataSource
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension
-from dbt_semantic_interfaces.objects.elements.identifier import Identifier
+from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.metric import Metric
 
 from dbt_semantic_interfaces.references import (
-    DataSourceReference,
+    SemanticModelReference,
     DimensionReference,
     MeasureReference,
     MetricReference,
-    IdentifierReference,
+    EntityReference,
 )
 
 
@@ -24,16 +24,16 @@ class ObjectToReference:
     """
 
     @staticmethod
-    def from_data_source(data_source: DataSource) -> DataSourceReference:  # noqa: D
-        return DataSourceReference(data_source_name=data_source.name)
+    def from_semantic_model(semantic_model: SemanticModel) -> SemanticModelReference:  # noqa: D
+        return SemanticModelReference(semantic_model_name=semantic_model.name)
 
     @staticmethod
     def from_measure(measure: Measure) -> MeasureReference:  # noqa: D
         return MeasureReference(element_name=measure.name)
 
     @staticmethod
-    def from_identifier(identifier: Identifier) -> IdentifierReference:  # noqa: D
-        return IdentifierReference(element_name=identifier.name)
+    def from_entity(entity: Entity) -> EntityReference:  # noqa: D
+        return EntityReference(element_name=entity.name)
 
     @staticmethod
     def from_metric(metric: Metric) -> MetricReference:  # noqa: D

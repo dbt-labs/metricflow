@@ -1,0 +1,15 @@
+table_snapshot:
+  table_name: customer_other_data
+  column_definitions:
+    - name: customer_id
+      type: STRING
+    - name: country
+      type: STRING
+    - name: customer_third_hop_id
+      type: STRING
+  rows:
+    - ["0", "turkmenistan", "another_id0"]
+    - ["1", "paraguay", "another_id1"]
+    - ["2", "myanmar", "another_id2"]
+    - ["3", "djibouti", "another_id3"]
+

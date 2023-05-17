@@ -1,23 +1,22 @@
 import logging
-from typing import Optional, Tuple
+from typing import Optional
 
 from metricflow.aggregation_properties import AggregationState
-from metricflow.column_assoc import (
+from metricflow.specs.column_assoc import (
     SingleColumnCorrelationKey,
     ColumnAssociation,
-    CompositeColumnCorrelationKey,
 )
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
-from metricflow.specs import (
+from metricflow.specs.specs import (
     MetadataSpec,
     MetricSpec,
     MeasureSpec,
     DimensionSpec,
     TimeDimensionSpec,
-    IdentifierSpec,
+    EntitySpec,
     ColumnAssociationResolver,
 )
-from metricflow.model.semantic_model import SemanticModel
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
@@ -26,8 +25,8 @@ logger = logging.getLogger(__name__)
 class DefaultColumnAssociationResolver(ColumnAssociationResolver):
     """Implements the ColumnAssociationResolver."""
 
-    def __init__(self, semantic_model: SemanticModel) -> None:  # noqa: D
-        self._semantic_model = semantic_model
+    def __init__(self, semantic_manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D
+        self._semantic_manifest_lookup = semantic_manifest_lookup
 
     def resolve_metric_spec(self, metric_spec: MetricSpec) -> ColumnAssociation:  # noqa: D
         return ColumnAssociation(
@@ -44,7 +43,7 @@ class DefaultColumnAssociationResolver(ColumnAssociationResolver):
     def resolve_dimension_spec(self, dimension_spec: DimensionSpec) -> ColumnAssociation:  # noqa: D
         return ColumnAssociation(
             column_name=StructuredLinkableSpecName(
-                identifier_link_names=tuple(x.element_name for x in dimension_spec.identifier_links),
+                entity_link_names=tuple(x.element_name for x in dimension_spec.entity_links),
                 element_name=dimension_spec.element_name,
             ).qualified_name,
             single_column_correlation_key=SingleColumnCorrelationKey(),
@@ -55,12 +54,12 @@ class DefaultColumnAssociationResolver(ColumnAssociationResolver):
     ) -> ColumnAssociation:
         if time_dimension_spec.time_granularity == TimeGranularity.DAY:
             column_name = StructuredLinkableSpecName(
-                identifier_link_names=tuple(x.element_name for x in time_dimension_spec.identifier_links),
+                entity_link_names=tuple(x.element_name for x in time_dimension_spec.entity_links),
                 element_name=time_dimension_spec.element_name,
             ).qualified_name
         else:
             column_name = StructuredLinkableSpecName(
-                identifier_link_names=tuple(x.element_name for x in time_dimension_spec.identifier_links),
+                entity_link_names=tuple(x.element_name for x in time_dimension_spec.entity_links),
                 element_name=time_dimension_spec.element_name,
                 time_granularity=time_dimension_spec.time_granularity,
             ).qualified_name
@@ -70,45 +69,13 @@ class DefaultColumnAssociationResolver(ColumnAssociationResolver):
             single_column_correlation_key=SingleColumnCorrelationKey(),
         )
 
-    def resolve_identifier_spec(self, identifier_spec: IdentifierSpec) -> Tuple[ColumnAssociation, ...]:  # noqa: D
-        sub_id_references = []
-        for data_source in self._semantic_model.user_configured_model.data_sources:
-            for identifier in data_source.identifiers:
-                if identifier.reference.element_name == identifier_spec.element_name:
-                    sub_id_references = [sub_id.reference for sub_id in identifier.identifiers]
-                    break
-
-        # composite identifier case
-        if len(sub_id_references) != 0:
-            column_associations: Tuple[ColumnAssociation, ...] = ()
-            for sub_id_reference in sub_id_references:
-                if sub_id_reference is not None:
-                    sub_id_name = f"{identifier_spec.element_name}___{sub_id_reference.element_name}"
-                    sub_identifier = StructuredLinkableSpecName(
-                        identifier_link_names=tuple(x.element_name for x in identifier_spec.identifier_links),
-                        element_name=sub_id_name,
-                    ).qualified_name
-                    column_associations += (
-                        ColumnAssociation(
-                            column_name=sub_identifier,
-                            composite_column_correlation_key=CompositeColumnCorrelationKey(
-                                sub_identifier=StructuredLinkableSpecName(
-                                    identifier_link_names=(),
-                                    element_name=sub_id_name,
-                                ).qualified_name
-                            ),
-                        ),
-                    )
-            return column_associations
-
-        return (
-            ColumnAssociation(
-                column_name=StructuredLinkableSpecName(
-                    identifier_link_names=tuple(x.element_name for x in identifier_spec.identifier_links),
-                    element_name=identifier_spec.element_name,
-                ).qualified_name,
-                single_column_correlation_key=SingleColumnCorrelationKey(),
-            ),
+    def resolve_entity_spec(self, entity_spec: EntitySpec) -> ColumnAssociation:  # noqa: D
+        return ColumnAssociation(
+            column_name=StructuredLinkableSpecName(
+                entity_link_names=tuple(x.element_name for x in entity_spec.entity_links),
+                element_name=entity_spec.element_name,
+            ).qualified_name,
+            single_column_correlation_key=SingleColumnCorrelationKey(),
         )
 
     def resolve_metadata_spec(self, metadata_spec: MetadataSpec) -> ColumnAssociation:  # noqa: D

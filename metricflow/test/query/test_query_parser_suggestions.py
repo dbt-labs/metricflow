@@ -6,8 +6,8 @@ import textwrap
 
 import pytest
 
+from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from metricflow.errors.errors import UnableToSatisfyQueryError
-from dbt_semantic_interfaces.objects.common import YamlConfigFile
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.test.fixtures.model_fixtures import query_parser_from_yaml
 
@@ -16,12 +16,12 @@ logger = logging.getLogger(__name__)
 
 EXTENDED_BOOKINGS_YAML = textwrap.dedent(
     """\
-    data_source:
+    semantic_model:
       name: bookings_source
 
-      sql_query: |
-        -- User Defined SQL Query
-        SELECT * FROM bookings_source_table
+      node_relation:
+        schema_name: some_schema
+        alias: bookings_source_table
 
       measures:
         - name: bookings
@@ -69,7 +69,7 @@ EXTENDED_BOOKINGS_YAML = textwrap.dedent(
             is_primary: True
             time_granularity: day
 
-      identifiers:
+      entities:
         - name: listing
           type: foreign
           expr: listing_id
@@ -78,11 +78,13 @@ EXTENDED_BOOKINGS_YAML = textwrap.dedent(
 
 LISTINGS_YAML = textwrap.dedent(
     """\
-    data_source:
+    semantic_model:
       name: listings_latest
       description: listings_latest
 
-      sql_table: schema.table
+      node_relation:
+        schema_name: schema
+        alias: table
 
       measures:
         - name: listings
@@ -107,16 +109,13 @@ LISTINGS_YAML = textwrap.dedent(
           type: categorical
           expr: capacity
 
-      identifiers:
+      entities:
         - name: listing
           type: primary
           expr: listing_id
         - name: user
           type: foreign
           expr: user_id
-
-      mutability:
-        type: immutable
     """
 )
 

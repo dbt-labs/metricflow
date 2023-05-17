@@ -52,7 +52,7 @@ class ConfigFileRenderer(InferenceRenderer):
     def _fixme(self, comment: str) -> str:
         return f"FIXME: {comment}"
 
-    def _render_id_columns(self, results: List[InferenceResult]) -> List[CommentedMap]:
+    def _render_entity_columns(self, results: List[InferenceResult]) -> List[CommentedMap]:
         type_map = {
             InferenceSignalType.ID.PRIMARY: "primary",
             InferenceSignalType.ID.FOREIGN: "foreign",
@@ -119,10 +119,15 @@ class ConfigFileRenderer(InferenceRenderer):
     def _get_configuration_data_for_table(self, table: SqlTable, results: List[InferenceResult]) -> Dict:
         data = CommentedMap(
             {
-                "data_source": {
+                "semantic_model": {
                     "name": table.table_name,
-                    "sql_table": table.sql,
-                    "identifiers": self._render_id_columns(results),
+                    "node_relation": {
+                        "alias": table.table_name,
+                        "schema_name": table.schema_name,
+                        "database": table.db_name,
+                        "relation_name": table.sql,
+                    },
+                    "entities": self._render_entity_columns(results),
                     "dimensions": self._render_dimension_columns(results),
                     "measures": [],
                 }
@@ -133,7 +138,7 @@ class ConfigFileRenderer(InferenceRenderer):
             results
         )
         data.yaml_set_comment_before_after_key(
-            key="data_source",
+            key="semantic_model",
             before="\n".join(header_comments),
         )
 

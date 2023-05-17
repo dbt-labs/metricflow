@@ -5,20 +5,18 @@ from dbt_semantic_interfaces.parsing.schema_validator import SchemaValidator
 
 from dbt_semantic_interfaces.parsing.schemas import (
     metric_schema,
-    data_source_schema,
+    node_relation_schema,
+    semantic_model_schema,
     derived_group_by_element_schema,
     metric_input_schema,
     metric_input_measure_schema,
     metric_type_params_schema,
-    identifier_schema,
+    entity_schema,
     measure_schema,
     dimension_schema,
     validity_params_schema,
     dimension_type_params_schema,
     aggregation_type_params_schema,
-    mutability_schema,
-    mutability_type_params_schema,
-    composite_sub_identifier_schema,
     non_additive_dimension_schema,
 )
 
@@ -78,41 +76,39 @@ locked_metadata_schema = {
 }
 
 
-# Add transform metadata fields to top level objects (metric, data source, derived identifier)
+# Add transform metadata fields to top level objects (metric, semantic model, derived entity)
 add_transform_metadata_fields_to_spec(dimension_schema)
 add_transform_metadata_fields_to_spec(measure_schema)
-add_transform_metadata_fields_to_spec(identifier_schema)
+add_transform_metadata_fields_to_spec(entity_schema)
 
 add_transform_metadata_fields_to_spec(metric_schema)
 add_locked_metadata_to_spec(metric_schema)
 
-add_transform_metadata_fields_to_spec(data_source_schema)
+add_transform_metadata_fields_to_spec(semantic_model_schema)
 add_transform_metadata_fields_to_spec(derived_group_by_element_schema)
 
 
 schema_store = {
     # Top level schemas
     metric_schema["$id"]: metric_schema,
-    data_source_schema["$id"]: data_source_schema,
+    semantic_model_schema["$id"]: semantic_model_schema,
     derived_group_by_element_schema["$id"]: derived_group_by_element_schema,
     # Sub-object schemas
     metric_input_measure_schema["$id"]: metric_input_measure_schema,
     metric_type_params_schema["$id"]: metric_type_params_schema,
     locked_metadata_schema["$id"]: locked_metadata_schema,
-    identifier_schema["$id"]: identifier_schema,
+    entity_schema["$id"]: entity_schema,
     measure_schema["$id"]: measure_schema,
     dimension_schema["$id"]: dimension_schema,
     validity_params_schema["$id"]: validity_params_schema,
     dimension_type_params_schema["$id"]: dimension_type_params_schema,
     aggregation_type_params_schema["$id"]: aggregation_type_params_schema,
-    mutability_schema["$id"]: mutability_schema,
-    mutability_type_params_schema["$id"]: mutability_type_params_schema,
-    composite_sub_identifier_schema["$id"]: composite_sub_identifier_schema,
     non_additive_dimension_schema["$id"]: non_additive_dimension_schema,
     metric_input_schema["$id"]: metric_input_schema,
+    node_relation_schema["$id"]: node_relation_schema,
 }
 
 resolver = RefResolver.from_schema(schema=metric_schema, store=schema_store)
-data_source_validator = SchemaValidator(data_source_schema, resolver=resolver)
+semantic_model_validator = SchemaValidator(semantic_model_schema, resolver=resolver)
 derived_group_by_element_validator = SchemaValidator(derived_group_by_element_schema, resolver=resolver)
 metric_validator = SchemaValidator(metric_schema, resolver=resolver)

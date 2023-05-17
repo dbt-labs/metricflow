@@ -14,7 +14,7 @@ integration_test:
 ---
 integration_test:
   name: single_data_source_expr_metric
-  description: Tests querying an expression metric sourced from multiple measures, but one data source
+  description: Tests querying an expression metric sourced from multiple measures, but one semantic model
   model: SIMPLE_MODEL
   metrics: ["booking_fees_per_booker"]
   group_bys: ["metric_time"]
@@ -27,7 +27,7 @@ integration_test:
 ---
 integration_test:
   name: expr_metric
-  description: Tests querying an expression metric sourced from multiple measures, but one data source
+  description: Tests querying an expression metric sourced from multiple measures, but one semantic model
   model: SIMPLE_MODEL
   metrics: ["views_times_booking_value"]
   group_bys: ["metric_time"]
@@ -57,7 +57,7 @@ integration_test:
   model: SIMPLE_MODEL
   metrics: ["instant_booking_value"]
   group_bys: ["metric_time"]
-  where_constraint: "is_instant"
+  where_filter: "{{ render_dimension_template('is_instant') }}"
   check_query: |
     SELECT
       SUM(booking_value) AS instant_booking_value
@@ -141,7 +141,7 @@ integration_test:
   model: SIMPLE_MODEL
   metrics: ["lux_listings"]
   group_bys: ["listing__country_latest"]
-  where_constraint: "listing__country_latest = 'us'"
+  where_filter: "{{ render_dimension_template('country_latest', entity_path=['listing']) }} = 'us'"
   check_query: |
     SELECT
       SUM(1) AS lux_listings
@@ -158,7 +158,7 @@ integration_test:
   model: SIMPLE_MODEL
   metrics: ["instant_booking_value"]
   group_bys: ["metric_time"]
-  where_constraint: "listing__is_lux_latest"
+  where_filter: "{{ render_dimension_template('is_lux_latest', entity_path=['listing']) }}"
   check_query: |
     SELECT
       SUM(b.booking_value) AS instant_booking_value
@@ -246,7 +246,7 @@ integration_test:
   model: SIMPLE_MODEL
   metrics: ["bookers"]
   group_bys: ["metric_time"]
-  where_constraint: "is_instant"
+  where_filter: "{{ render_dimension_template('is_instant') }}"
   check_query: |
     SELECT
       COUNT(DISTINCT guest_id) AS bookers
@@ -258,7 +258,7 @@ integration_test:
 ---
 integration_test:
   name: ratio_single_data_source
-  description: Test ratio metric from a single data source.
+  description: Test ratio metric from a single semantic model.
   model: SIMPLE_MODEL
   metrics: ["bookings_per_booker"]
   group_bys: ["metric_time"]
@@ -271,7 +271,7 @@ integration_test:
 ---
 integration_test:
   name: ratio
-  description: Test ratio metric from multiple data source.
+  description: Test ratio metric from multiple semantic model.
   model: SIMPLE_MODEL
   metrics: ["bookings_per_view"]
   group_bys: ["metric_time"]

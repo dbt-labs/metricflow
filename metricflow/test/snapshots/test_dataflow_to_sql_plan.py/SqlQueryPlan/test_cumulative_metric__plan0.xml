@@ -98,7 +98,7 @@
                     <!-- from_source = SqlSelectStatementNode(node_id=ss_10006) -->
                     <!-- where = None -->
                     <SqlSelectStatementNode>
-                        <!-- description = Read Elements From Data Source 'revenue' -->
+                        <!-- description = Read Elements From Semantic Model 'revenue' -->
                         <!-- node_id = ss_10006 -->
                         <!-- col0 =                                                      -->
                         <!--   {'class': 'SqlSelectColumn',                              -->
@@ -128,12 +128,13 @@
                         <!--   {'class': 'SqlSelectColumn',                              -->
                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10132),  -->
                         <!--    'column_alias': 'user'}                                  -->
-                        <!-- from_source = SqlSelectQueryFromClauseNode(node_id=tfc_10002) -->
+                        <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10006) -->
                         <!-- where = None -->
-                        <SqlSelectQueryFromClauseNode>
-                            <!-- description = Read From a Select Query -->
-                            <!-- node_id = tfc_10002 -->
-                        </SqlSelectQueryFromClauseNode>
+                        <SqlTableFromClauseNode>
+                            <!-- description = Read from ***************************.fct_revenue -->
+                            <!-- node_id = tfc_10006 -->
+                            <!-- table_id = ***************************.fct_revenue -->
+                        </SqlTableFromClauseNode>
                     </SqlSelectStatementNode>
                 </SqlSelectStatementNode>
             </SqlSelectStatementNode>

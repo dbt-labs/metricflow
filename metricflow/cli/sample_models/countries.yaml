@@ -1,15 +1,15 @@
-data_source:
+semantic_model:
   name: countries
   description: Regions mapped to countries.
   owners:
     - support@transformdata.io
-  identifiers:
+  entities:
     - name: country
       type: primary
   dimensions:
     - name: region
       description: The region associated with the country.
       type: categorical
-  sql_table: $countries_table
-  mutability:
-    type: immutable
+  node_relation:
+    alias: $countries_table
+    schema_name: $system_schema

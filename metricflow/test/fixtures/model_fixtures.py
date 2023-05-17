@@ -8,46 +8,48 @@ from typing import List, Dict, Sequence
 
 import pytest
 
-from metricflow.dataflow.builder.source_node import SourceNodeBuilder
-from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, BaseOutput
-from metricflow.dataset.convert_data_source import DataSourceToDataSetConverter
 from dbt_semantic_interfaces.model_transformer import ModelTransformer
-from metricflow.model.model_validator import ModelValidator
-from dbt_semantic_interfaces.objects.data_source import DataSource
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.parsing.dir_to_model import (
     parse_directory_of_yaml_files_to_model,
     parse_yaml_files_to_validation_ready_model,
 )
-from metricflow.model.semantic_model import SemanticModel
-from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
-from metricflow.dataset.data_source_adapter import DataSourceDataSet
-from metricflow.test.fixtures.id_fixtures import IdNumberSpace, patch_id_generators_helper
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
-from dbt_semantic_interfaces.objects.common import YamlConfigFile
+from metricflow.dataflow.builder.source_node import SourceNodeBuilder
+from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, BaseOutput
+from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
+from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
+from dbt_semantic_interfaces.model_validator import ModelValidator
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.query.query_parser import MetricFlowQueryParser
+from metricflow.test.fixtures.id_fixtures import IdNumberSpace, patch_id_generators_helper
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 
 logger = logging.getLogger(__name__)
 
 
 def _data_set_to_read_nodes(
-    data_sets: OrderedDict[str, DataSourceDataSet]
-) -> OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]]:
-    """Return a mapping from the name of the data source to the dataflow plan node that reads from it."""
-    return_dict: OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]] = OrderedDict()
-    for data_source_name, data_set in data_sets.items():
-        return_dict[data_source_name] = ReadSqlSourceNode[DataSourceDataSet](data_set)
-        logger.debug(f"For data source {data_source_name}, creating node_id {return_dict[data_source_name].node_id}")
+    data_sets: OrderedDict[str, SemanticModelDataSet]
+) -> OrderedDict[str, ReadSqlSourceNode[SemanticModelDataSet]]:
+    """Return a mapping from the name of the semantic model to the dataflow plan node that reads from it."""
+    return_dict: OrderedDict[str, ReadSqlSourceNode[SemanticModelDataSet]] = OrderedDict()
+    for semantic_model_name, data_set in data_sets.items():
+        return_dict[semantic_model_name] = ReadSqlSourceNode[SemanticModelDataSet](data_set)
+        logger.debug(
+            f"For semantic model {semantic_model_name}, creating node_id {return_dict[semantic_model_name].node_id}"
+        )
 
     return return_dict
 
 
 def _data_set_to_source_nodes(
-    semantic_model: SemanticModel, data_sets: OrderedDict[str, DataSourceDataSet]
-) -> Sequence[BaseOutput[DataSourceDataSet]]:
-    source_node_builder = SourceNodeBuilder(semantic_model)
+    semantic_manifest_lookup: SemanticManifestLookup, data_sets: OrderedDict[str, SemanticModelDataSet]
+) -> Sequence[BaseOutput[SemanticModelDataSet]]:
+    source_node_builder = SourceNodeBuilder(semantic_manifest_lookup)
     return source_node_builder.create_from_data_sets(list(data_sets.values()))
 
 
@@ -55,15 +57,16 @@ def query_parser_from_yaml(
     yaml_contents: List[YamlConfigFile], time_spine_source: TimeSpineSource
 ) -> MetricFlowQueryParser:
     """Given yaml files, return a query parser using default source nodes, resolvers and time spine source"""
-    semantic_model = SemanticModel(parse_yaml_files_to_validation_ready_model(yaml_contents).model)
-    ModelValidator().checked_validations(semantic_model.user_configured_model)
-    source_nodes = _data_set_to_source_nodes(semantic_model, create_data_sets(semantic_model))
+    semantic_manifest_lookup = SemanticManifestLookup(parse_yaml_files_to_validation_ready_model(yaml_contents).model)
+    ModelValidator().checked_validations(semantic_manifest_lookup.semantic_manifest)
+    source_nodes = _data_set_to_source_nodes(semantic_manifest_lookup, create_data_sets(semantic_manifest_lookup))
     return MetricFlowQueryParser(
-        model=semantic_model,
+        model=semantic_manifest_lookup,
+        column_association_resolver=DefaultColumnAssociationResolver(semantic_manifest_lookup),
         source_nodes=source_nodes,
         node_output_resolver=DataflowPlanNodeOutputDataSetResolver(
-            column_association_resolver=DefaultColumnAssociationResolver(semantic_model),
-            semantic_model=semantic_model,
+            column_association_resolver=DefaultColumnAssociationResolver(semantic_manifest_lookup),
+            semantic_manifest_lookup=semantic_manifest_lookup,
             time_spine_source=time_spine_source,
         ),
     )
@@ -73,27 +76,23 @@ def query_parser_from_yaml(
 class ConsistentIdObjectRepository:
     """Stores all objects that should have consistent IDs in tests."""
 
-    simple_model_data_sets: OrderedDict[str, DataSourceDataSet]
-    simple_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]]
-    simple_model_source_nodes: Sequence[BaseOutput[DataSourceDataSet]]
+    simple_model_data_sets: OrderedDict[str, SemanticModelDataSet]
+    simple_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[SemanticModelDataSet]]
+    simple_model_source_nodes: Sequence[BaseOutput[SemanticModelDataSet]]
 
-    multihop_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]]
-    multihop_model_source_nodes: Sequence[BaseOutput[DataSourceDataSet]]
+    multihop_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[SemanticModelDataSet]]
+    multihop_model_source_nodes: Sequence[BaseOutput[SemanticModelDataSet]]
 
-    composite_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]]
-    composite_model_source_nodes: Sequence[BaseOutput[DataSourceDataSet]]
-
-    scd_model_data_sets: OrderedDict[str, DataSourceDataSet]
-    scd_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[DataSourceDataSet]]
-    scd_model_source_nodes: Sequence[BaseOutput[DataSourceDataSet]]
+    scd_model_data_sets: OrderedDict[str, SemanticModelDataSet]
+    scd_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[SemanticModelDataSet]]
+    scd_model_source_nodes: Sequence[BaseOutput[SemanticModelDataSet]]
 
 
 @pytest.fixture(scope="session")
 def consistent_id_object_repository(
-    simple_semantic_model: SemanticModel,
-    multi_hop_join_semantic_model: SemanticModel,
-    composite_identifier_semantic_model: SemanticModel,
-    scd_semantic_model: SemanticModel,
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
+    multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
+    scd_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> ConsistentIdObjectRepository:  # noqa: D
     """Create objects that have incremental numeric IDs with a consistent value.
 
@@ -102,45 +101,44 @@ def consistent_id_object_repository(
     """
 
     with patch_id_generators_helper(start_value=IdNumberSpace.CONSISTENT_ID_REPOSITORY):
-        sm_data_sets = create_data_sets(simple_semantic_model)
-        multihop_data_sets = create_data_sets(multi_hop_join_semantic_model)
-        composite_data_sets = create_data_sets(composite_identifier_semantic_model)
-        scd_data_sets = create_data_sets(scd_semantic_model)
+        sm_data_sets = create_data_sets(simple_semantic_manifest_lookup)
+        multihop_data_sets = create_data_sets(multi_hop_join_semantic_manifest_lookup)
+        scd_data_sets = create_data_sets(scd_semantic_manifest_lookup)
 
         return ConsistentIdObjectRepository(
             simple_model_data_sets=sm_data_sets,
             simple_model_read_nodes=_data_set_to_read_nodes(sm_data_sets),
-            simple_model_source_nodes=_data_set_to_source_nodes(simple_semantic_model, sm_data_sets),
+            simple_model_source_nodes=_data_set_to_source_nodes(simple_semantic_manifest_lookup, sm_data_sets),
             multihop_model_read_nodes=_data_set_to_read_nodes(multihop_data_sets),
-            multihop_model_source_nodes=_data_set_to_source_nodes(multi_hop_join_semantic_model, multihop_data_sets),
-            composite_model_read_nodes=_data_set_to_read_nodes(composite_data_sets),
-            composite_model_source_nodes=_data_set_to_source_nodes(
-                composite_identifier_semantic_model, composite_data_sets
+            multihop_model_source_nodes=_data_set_to_source_nodes(
+                multi_hop_join_semantic_manifest_lookup, multihop_data_sets
             ),
             scd_model_data_sets=scd_data_sets,
             scd_model_read_nodes=_data_set_to_read_nodes(scd_data_sets),
             scd_model_source_nodes=_data_set_to_source_nodes(
-                semantic_model=scd_semantic_model, data_sets=scd_data_sets
+                semantic_manifest_lookup=scd_semantic_manifest_lookup, data_sets=scd_data_sets
             ),
         )
 
 
-def create_data_sets(multihop_semantic_model: SemanticModel) -> OrderedDict[str, DataSourceDataSet]:
-    """Convert the DataSources in the model to SqlDataSets.
+def create_data_sets(
+    multihop_semantic_manifest_lookup: SemanticManifestLookup,
+) -> OrderedDict[str, SemanticModelDataSet]:
+    """Convert the SemanticModels in the model to SqlDataSets.
 
-    Key is the name of the data source, value is the associated data set.
+    Key is the name of the semantic model, value is the associated data set.
     """
     # Use ordered dict and sort by name to get consistency when running tests.
     data_sets = OrderedDict()
-    data_sources: List[DataSource] = multihop_semantic_model.user_configured_model.data_sources
-    data_sources.sort(key=lambda x: x.name)
+    semantic_models: List[SemanticModel] = multihop_semantic_manifest_lookup.semantic_manifest.semantic_models
+    semantic_models.sort(key=lambda x: x.name)
 
-    converter = DataSourceToDataSetConverter(
-        column_association_resolver=DefaultColumnAssociationResolver(multihop_semantic_model)
+    converter = SemanticModelToDataSetConverter(
+        column_association_resolver=DefaultColumnAssociationResolver(multihop_semantic_manifest_lookup)
     )
 
-    for data_source in data_sources:
-        data_sets[data_source.name] = converter.create_sql_source_data_set(data_source)
+    for semantic_model in semantic_models:
+        data_sets[semantic_model.name] = converter.create_sql_source_data_set(semantic_model)
 
     return data_sets
 
@@ -148,102 +146,47 @@ def create_data_sets(multihop_semantic_model: SemanticModel) -> OrderedDict[str,
 @pytest.fixture(scope="session")
 def template_mapping(mf_test_session_state: MetricFlowTestSessionState) -> Dict[str, str]:
     """Mapping for template variables in the model YAML files."""
-    schema = mf_test_session_state.mf_source_schema
-    return {
-        "bookings_source_query": f"SELECT * FROM {schema}.fct_bookings_dt ",
-        "bookings_source_table": f"{schema}.fct_bookings",
-        "views_source_table": f"{schema}.fct_views",
-        "listings_latest_table": f"{schema}.dim_listings_latest",
-        "listings_table": f"{schema}.dim_listings",
-        "listings_latest": f"{schema}.dim_listings_latest_table",
-        "dim_listings_latest_table": f"{schema}.dim_listings_latest",
-        "users_latest_table": f"{schema}.dim_users_latest",
-        "dim_users_table": f"{schema}.dim_users",
-        "fct_id_verifications_table": f"{schema}.fct_id_verifications",
-        "fct_revenue_table": f"{schema}.fct_revenue",
-        "dim_lux_listing_id_mapping_table": f"{schema}.dim_lux_listing_id_mapping",
-        "dim_lux_listings_table": f"{schema}.dim_lux_listings",
-        "thorium_table": f"{schema}.thorium",
-        "osmium_table": f"{schema}.osmium",
-        "dysprosium_table": f"{schema}.dysprosium",
-        "dim_companies_table": f"{schema}.dim_companies",
-        "source_schema": schema,
-        "accounts_source_table": f"{schema}.fct_accounts",
-        "primary_accounts_table": f"{schema}.dim_primary_accounts",
-    }
+    return {"source_schema": mf_test_session_state.mf_source_schema}
 
 
 @pytest.fixture(scope="session")
-def simple_semantic_model_non_ds(template_mapping: Dict[str, str]) -> SemanticModel:  # noqa: D
+def simple_semantic_manifest_lookup_non_ds(template_mapping: Dict[str, str]) -> SemanticManifestLookup:  # noqa: D
     model_build_result = parse_directory_of_yaml_files_to_model(
-        os.path.join(os.path.dirname(__file__), "model_yamls/non_ds_model"), template_mapping=template_mapping
+        os.path.join(os.path.dirname(__file__), "model_yamls/non_sm_model"), template_mapping=template_mapping
     )
-    return SemanticModel(model_build_result.model)
+    return SemanticManifestLookup(model_build_result.model)
 
 
 @pytest.fixture(scope="session")
-def simple_semantic_model(template_mapping: Dict[str, str]) -> SemanticModel:  # noqa: D
+def simple_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> SemanticManifestLookup:  # noqa: D
     model_build_result = parse_directory_of_yaml_files_to_model(
         os.path.join(os.path.dirname(__file__), "model_yamls/simple_model"), template_mapping=template_mapping
     )
-    return SemanticModel(model_build_result.model)
+    return SemanticManifestLookup(model_build_result.model)
 
 
 @pytest.fixture(scope="session")
-def composite_identifier_semantic_model(  # noqa: D
-    template_mapping: Dict[str, str], mf_test_session_state: MetricFlowTestSessionState
-) -> SemanticModel:
-    schema = mf_test_session_state.mf_source_schema
-    template_mapping = {
-        "fct_messages_table": f"{schema}.fct_messages",
-        "fct_users_table": f"{schema}.fct_users",
-        "fct_users_more_table": f"{schema}.fct_users_more",
-    }
+def multi_hop_join_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> SemanticManifestLookup:  # noqa: D
     model_build_result = parse_directory_of_yaml_files_to_model(
-        os.path.join(os.path.dirname(__file__), "model_yamls/composite_identifier_model"),
+        os.path.join(os.path.dirname(__file__), "model_yamls/multi_hop_join_model/partitioned_semantic_models"),
         template_mapping=template_mapping,
     )
-    return SemanticModel(model_build_result.model)
+    return SemanticManifestLookup(model_build_result.model)
 
 
 @pytest.fixture(scope="session")
-def multi_hop_join_semantic_model(mf_test_session_state: MetricFlowTestSessionState) -> SemanticModel:  # noqa: D
-    schema = mf_test_session_state.mf_source_schema
-    template_mapping = {
-        "account_month_txns": f"{schema}.account_month_txns",
-        "customer_table": f"{schema}.customer_table",
-        "third_hop_table": f"{schema}.third_hop_table",
-        "customer_other_data": f"{schema}.customer_other_data",
-        "bridge_table": f"{schema}.bridge_table",
-    }
+def unpartitioned_multi_hop_join_semantic_manifest_lookup(  # noqa: D
+    template_mapping: Dict[str, str]
+) -> SemanticManifestLookup:
     model_build_result = parse_directory_of_yaml_files_to_model(
-        os.path.join(os.path.dirname(__file__), "model_yamls/multi_hop_join_model/partitioned_data_sources"),
+        os.path.join(os.path.dirname(__file__), "model_yamls/multi_hop_join_model/unpartitioned_semantic_models"),
         template_mapping=template_mapping,
     )
-    return SemanticModel(model_build_result.model)
+    return SemanticManifestLookup(model_build_result.model)
 
 
 @pytest.fixture(scope="session")
-def unpartitioned_multi_hop_join_semantic_model(  # noqa: D
-    mf_test_session_state: MetricFlowTestSessionState,
-) -> SemanticModel:
-    schema = mf_test_session_state.mf_source_schema
-    template_mapping = {
-        "account_month_txns": f"{schema}.account_month_txns",
-        "customer_table": f"{schema}.customer_table",
-        "third_hop_table": f"{schema}.third_hop_table",
-        "customer_other_data": f"{schema}.customer_other_data",
-        "bridge_table": f"{schema}.bridge_table",
-    }
-    model_build_result = parse_directory_of_yaml_files_to_model(
-        os.path.join(os.path.dirname(__file__), "model_yamls/multi_hop_join_model/unpartitioned_data_sources"),
-        template_mapping=template_mapping,
-    )
-    return SemanticModel(model_build_result.model)
-
-
-@pytest.fixture(scope="session")
-def simple_user_configured_model(template_mapping: Dict[str, str]) -> UserConfiguredModel:
+def simple_semantic_manifest(template_mapping: Dict[str, str]) -> SemanticManifest:
     """Model used for many tests."""
 
     model_build_result = parse_directory_of_yaml_files_to_model(
@@ -253,7 +196,7 @@ def simple_user_configured_model(template_mapping: Dict[str, str]) -> UserConfig
 
 
 @pytest.fixture(scope="session")
-def simple_model__with_primary_transforms(template_mapping: Dict[str, str]) -> UserConfiguredModel:
+def simple_model__with_primary_transforms(template_mapping: Dict[str, str]) -> SemanticManifest:
     """Model used for tests pre-transformations."""
 
     model_build_result = parse_directory_of_yaml_files_to_model(
@@ -268,31 +211,25 @@ def simple_model__with_primary_transforms(template_mapping: Dict[str, str]) -> U
 
 
 @pytest.fixture(scope="session")
-def extended_date_semantic_model(mf_test_session_state: MetricFlowTestSessionState) -> SemanticModel:  # noqa: D
-    schema = mf_test_session_state.mf_source_schema
-    template_mapping = {
-        "fct_bookings_extended_table": f"{schema}.fct_bookings_extended",
-        "fct_bookings_extended_monthly_table": f"{schema}.fct_bookings_extended_monthly",
-        "dim_listings_extended_table": f"{schema}.dim_listings_extended",
-    }
+def extended_date_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> SemanticManifestLookup:  # noqa: D
     model_build_result = parse_directory_of_yaml_files_to_model(
         os.path.join(os.path.dirname(__file__), "model_yamls/extended_date_model"),
         template_mapping=template_mapping,
     )
-    return SemanticModel(model_build_result.model)
+    return SemanticManifestLookup(model_build_result.model)
 
 
 @pytest.fixture(scope="session")
-def scd_semantic_model(template_mapping: Dict[str, str]) -> SemanticModel:
+def scd_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> SemanticManifestLookup:
     """Initialize semantic model for SCD tests"""
     model_build_result = parse_directory_of_yaml_files_to_model(
         os.path.join(os.path.dirname(__file__), "model_yamls/scd_model"), template_mapping=template_mapping
     )
-    return SemanticModel(model_build_result.model)
+    return SemanticManifestLookup(model_build_result.model)
 
 
 @pytest.fixture(scope="session")
-def data_warehouse_validation_model(template_mapping: Dict[str, str]) -> UserConfiguredModel:
+def data_warehouse_validation_model(template_mapping: Dict[str, str]) -> SemanticManifest:
     """Model used for data warehouse validation tests"""
 
     model_build_result = parse_directory_of_yaml_files_to_model(

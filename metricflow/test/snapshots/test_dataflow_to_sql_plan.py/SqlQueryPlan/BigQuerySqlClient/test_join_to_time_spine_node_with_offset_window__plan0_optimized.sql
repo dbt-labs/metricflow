@@ -17,7 +17,7 @@ INNER JOIN (
     , listing
     , booking_value * 0.05 AS booking_fees
   FROM (
-    -- Read Elements From Data Source 'bookings_source'
+    -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
     -- Pass Only Elements:
     --   ['booking_value', 'metric_time', 'listing']
@@ -26,10 +26,7 @@ INNER JOIN (
       ds AS metric_time
       , listing_id AS listing
       , SUM(booking_value) AS booking_value
-    FROM (
-      -- User Defined SQL Query
-      SELECT * FROM ***************************.fct_bookings
-    ) bookings_source_src_10001
+    FROM ***************************.fct_bookings bookings_source_src_10001
     GROUP BY
       metric_time
       , listing

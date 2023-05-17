@@ -6,15 +6,15 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import List, TypeVar, Generic, Tuple
 
-from dbt_semantic_interfaces.references import DataSourceElementReference, MetricModelReference
+from dbt_semantic_interfaces.references import SemanticModelElementReference, MetricModelReference
 from metricflow.aggregation_properties import AggregationState
-from metricflow.column_assoc import ColumnAssociation
-from metricflow.dataclass_serialization import SerializableDataclass
-from metricflow.specs import (
+from metricflow.specs.column_assoc import ColumnAssociation
+from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
+from metricflow.specs.specs import (
     MetadataSpec,
     MeasureSpec,
     DimensionSpec,
-    IdentifierSpec,
+    EntitySpec,
     MetricSpec,
     InstanceSpec,
     TimeDimensionSpec,
@@ -38,8 +38,7 @@ class MdoInstance(ABC, Generic[SpecT]):
     granularity.
     """
 
-    # The columns associated with this instance. Some instances may have multiple columns associated with it, e.g.
-    # composite identifiers.
+    # The columns associated with this instance.
     associated_columns: Tuple[ColumnAssociation, ...]
     # The spec that describes this instance.
     spec: SpecT
@@ -55,13 +54,13 @@ class MdoInstance(ABC, Generic[SpecT]):
 
 
 @dataclass(frozen=True)
-class DataSourceElementInstance(SerializableDataclass):  # noqa: D
-    # This instance is derived from something defined in a data source.
-    defined_from: Tuple[DataSourceElementReference, ...]
+class SemanticModelElementInstance(SerializableDataclass):  # noqa: D
+    # This instance is derived from something defined in a semantic model.
+    defined_from: Tuple[SemanticModelElementReference, ...]
 
     @property
-    def origin_data_source_reference(self) -> DataSourceElementReference:
-        """Property to grab the element reference pointing to the origin data source for this element instance
+    def origin_semantic_model_reference(self) -> SemanticModelElementReference:
+        """Property to grab the element reference pointing to the origin semantic model for this element instance
 
         By convention this is the zeroth element in the Tuple. At this time these tuples are always of exactly
         length 1, so the simple assertions here work.
@@ -70,8 +69,8 @@ class DataSourceElementInstance(SerializableDataclass):  # noqa: D
         """
         if len(self.defined_from) != 1:
             raise ValueError(
-                f"DataSourceElementInstances should have exactly one entry in the `defined_from` property, because "
-                f"otherwise there is no way to ensure that the first element is always the origin data source! Found "
+                f"SemanticModelElementInstances should have exactly one entry in the `defined_from` property, because "
+                f"otherwise there is no way to ensure that the first element is always the origin semantic model! Found "
                 f"{len(self.defined_from)} elements in this particular instance: {self.defined_from}."
             )
 
@@ -79,28 +78,28 @@ class DataSourceElementInstance(SerializableDataclass):  # noqa: D
 
 
 @dataclass(frozen=True)
-class MeasureInstance(MdoInstance[MeasureSpec], DataSourceElementInstance):  # noqa: D
+class MeasureInstance(MdoInstance[MeasureSpec], SemanticModelElementInstance):  # noqa: D
     associated_columns: Tuple[ColumnAssociation, ...]
     spec: MeasureSpec
     aggregation_state: AggregationState
 
 
 @dataclass(frozen=True)
-class DimensionInstance(MdoInstance[DimensionSpec], DataSourceElementInstance):  # noqa: D
+class DimensionInstance(MdoInstance[DimensionSpec], SemanticModelElementInstance):  # noqa: D
     associated_columns: Tuple[ColumnAssociation, ...]
     spec: DimensionSpec
 
 
 @dataclass(frozen=True)
-class TimeDimensionInstance(MdoInstance[TimeDimensionSpec], DataSourceElementInstance):  # noqa: D
+class TimeDimensionInstance(MdoInstance[TimeDimensionSpec], SemanticModelElementInstance):  # noqa: D
     associated_columns: Tuple[ColumnAssociation, ...]
     spec: TimeDimensionSpec
 
 
 @dataclass(frozen=True)
-class IdentifierInstance(MdoInstance[IdentifierSpec], DataSourceElementInstance):  # noqa: D
+class EntityInstance(MdoInstance[EntitySpec], SemanticModelElementInstance):  # noqa: D
     associated_columns: Tuple[ColumnAssociation, ...]
-    spec: IdentifierSpec
+    spec: EntitySpec
 
 
 @dataclass(frozen=True)
@@ -143,7 +142,7 @@ class InstanceSet(SerializableDataclass):
     measure_instances: Tuple[MeasureInstance, ...] = ()
     dimension_instances: Tuple[DimensionInstance, ...] = ()
     time_dimension_instances: Tuple[TimeDimensionInstance, ...] = ()
-    identifier_instances: Tuple[IdentifierInstance, ...] = ()
+    entity_instances: Tuple[EntityInstance, ...] = ()
     metric_instances: Tuple[MetricInstance, ...] = ()
     metadata_instances: Tuple[MetadataInstance, ...] = ()
 
@@ -159,7 +158,7 @@ class InstanceSet(SerializableDataclass):
         measure_instances: List[MeasureInstance] = []
         dimension_instances: List[DimensionInstance] = []
         time_dimension_instances: List[TimeDimensionInstance] = []
-        identifier_instances: List[IdentifierInstance] = []
+        entity_instances: List[EntityInstance] = []
         metric_instances: List[MetricInstance] = []
         metadata_instances: List[MetadataInstance] = []
 
@@ -173,9 +172,9 @@ class InstanceSet(SerializableDataclass):
             for time_dimension_instance in instance_set.time_dimension_instances:
                 if time_dimension_instance.spec not in {x.spec for x in time_dimension_instances}:
                     time_dimension_instances.append(time_dimension_instance)
-            for identifier_instance in instance_set.identifier_instances:
-                if identifier_instance.spec not in {x.spec for x in identifier_instances}:
-                    identifier_instances.append(identifier_instance)
+            for entity_instance in instance_set.entity_instances:
+                if entity_instance.spec not in {x.spec for x in entity_instances}:
+                    entity_instances.append(entity_instance)
             for metric_instance in instance_set.metric_instances:
                 if metric_instance.spec not in {x.spec for x in metric_instances}:
                     metric_instances.append(metric_instance)
@@ -187,7 +186,7 @@ class InstanceSet(SerializableDataclass):
             measure_instances=tuple(measure_instances),
             dimension_instances=tuple(dimension_instances),
             time_dimension_instances=tuple(time_dimension_instances),
-            identifier_instances=tuple(identifier_instances),
+            entity_instances=tuple(entity_instances),
             metric_instances=tuple(metric_instances),
             metadata_instances=tuple(metadata_instances),
         )
@@ -198,7 +197,7 @@ class InstanceSet(SerializableDataclass):
             measure_specs=tuple(x.spec for x in self.measure_instances),
             dimension_specs=tuple(x.spec for x in self.dimension_instances),
             time_dimension_specs=tuple(x.spec for x in self.time_dimension_instances),
-            identifier_specs=tuple(x.spec for x in self.identifier_instances),
+            entity_specs=tuple(x.spec for x in self.entity_instances),
             metric_specs=tuple(x.spec for x in self.metric_instances),
             metadata_specs=tuple(x.spec for x in self.metadata_instances),
         )

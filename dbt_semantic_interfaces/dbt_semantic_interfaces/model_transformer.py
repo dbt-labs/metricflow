@@ -3,13 +3,20 @@ import logging
 
 from typing import Sequence, Tuple
 
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from dbt_semantic_interfaces.transformations.add_input_metric_measures import AddInputMetricMeasuresRule
-from dbt_semantic_interfaces.transformations.agg_time_dimension import SetMeasureAggregationTimeDimensionRule
-from dbt_semantic_interfaces.transformations.boolean_measure import BooleanMeasureAggregationRule
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
+from dbt_semantic_interfaces.transformations.add_input_metric_measures import (
+    AddInputMetricMeasuresRule,
+)
+from dbt_semantic_interfaces.transformations.agg_time_dimension import (
+    SetMeasureAggregationTimeDimensionRule,
+)
+from dbt_semantic_interfaces.transformations.boolean_measure import (
+    BooleanMeasureAggregationRule,
+)
 from dbt_semantic_interfaces.transformations.convert_count import ConvertCountToSumRule
-from dbt_semantic_interfaces.transformations.convert_median import ConvertMedianToPercentileRule
-from dbt_semantic_interfaces.transformations.identifiers import CompositeIdentifierExpressionRule
+from dbt_semantic_interfaces.transformations.convert_median import (
+    ConvertMedianToPercentileRule,
+)
 from dbt_semantic_interfaces.transformations.names import LowerCaseNamesRule
 from dbt_semantic_interfaces.transformations.proxy_measure import CreateProxyMeasureRule
 from dbt_semantic_interfaces.transformations.transform_rule import ModelTransformRule
@@ -31,7 +38,6 @@ class ModelTransformer:
     SECONDARY_RULES: Sequence[ModelTransformRule] = (
         CreateProxyMeasureRule(),
         BooleanMeasureAggregationRule(),
-        CompositeIdentifierExpressionRule(),
         ConvertCountToSumRule(),
         ConvertMedianToPercentileRule(),
         AddInputMetricMeasuresRule(),
@@ -44,9 +50,9 @@ class ModelTransformer:
 
     @staticmethod
     def transform(
-        model: UserConfiguredModel,
+        model: SemanticManifest,
         ordered_rule_sequences: Tuple[Sequence[ModelTransformRule], ...] = DEFAULT_RULES,
-    ) -> UserConfiguredModel:
+    ) -> SemanticManifest:
         """Copies the passed in model, applies the rules to the new model, and then returns that model
 
         It's important to note that some rules need to happen before or after other rules. Thus rules
@@ -64,8 +70,8 @@ class ModelTransformer:
 
     @staticmethod
     def pre_validation_transform_model(
-        model: UserConfiguredModel, rules: Sequence[ModelTransformRule] = PRIMARY_RULES
-    ) -> UserConfiguredModel:
+        model: SemanticManifest, rules: Sequence[ModelTransformRule] = PRIMARY_RULES
+    ) -> SemanticManifest:
         """Transform a model according to configured rules before validations are run."""
         logger.warning(
             "DEPRECATION: `ModelTransformer.pre_validation_transform_model` is deprecated. Please use `ModelTransformer.transform` instead."
@@ -75,8 +81,9 @@ class ModelTransformer:
 
     @staticmethod
     def post_validation_transform_model(
-        model: UserConfiguredModel, rules: Sequence[ModelTransformRule] = SECONDARY_RULES
-    ) -> UserConfiguredModel:
+        model: SemanticManifest,
+        rules: Sequence[ModelTransformRule] = SECONDARY_RULES,
+    ) -> SemanticManifest:
         """Transform a model according to configured rules after validations are run."""
         logger.warning(
             "DEPRECATION: `ModelTransformer.post_validation_transform_model` is deprecated. Please use `ModelTransformer.transform` instead."

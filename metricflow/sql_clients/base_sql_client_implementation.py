@@ -13,7 +13,7 @@ import pandas as pd
 
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.logging.formatting import indent_log_line
-from metricflow.object_utils import pformat_big_objects
+from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from metricflow.random_id import random_id
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.protocols.sql_client import (
@@ -237,9 +237,9 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
     def close(self) -> None:  # noqa: D
         pass
 
-    def render_execution_param_key(self, execution_param_key: str) -> str:
+    def render_bind_parameter_key(self, bind_parameter_key: str) -> str:
         """Wrap execution parameter key with syntax accepted by engine."""
-        return f":{execution_param_key}"
+        return f":{bind_parameter_key}"
 
     def async_query(  # noqa: D
         self,

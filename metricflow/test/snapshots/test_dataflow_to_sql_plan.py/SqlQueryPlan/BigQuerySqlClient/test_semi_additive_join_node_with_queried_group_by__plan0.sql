@@ -11,7 +11,7 @@ SELECT
   , subq_0.total_account_balance_first_day AS total_account_balance_first_day
   , subq_0.current_account_balance_by_user AS current_account_balance_by_user
 FROM (
-  -- Read Elements From Data Source 'accounts_source'
+  -- Read Elements From Semantic Model 'accounts_source'
   SELECT
     accounts_source_src_10000.account_balance
     , accounts_source_src_10000.account_balance AS total_account_balance_first_day
@@ -23,10 +23,7 @@ FROM (
     , DATE_TRUNC(accounts_source_src_10000.ds, isoyear) AS ds__year
     , accounts_source_src_10000.account_type
     , accounts_source_src_10000.user_id AS user
-  FROM (
-    -- User Defined SQL Query
-    SELECT * FROM ***************************.fct_accounts
-  ) accounts_source_src_10000
+  FROM ***************************.fct_accounts accounts_source_src_10000
 ) subq_0
 INNER JOIN (
   -- Filter row on MIN(ds)
@@ -34,7 +31,7 @@ INNER JOIN (
     subq_1.ds__week
     , MIN(subq_1.ds) AS ds__complete
   FROM (
-    -- Read Elements From Data Source 'accounts_source'
+    -- Read Elements From Semantic Model 'accounts_source'
     SELECT
       accounts_source_src_10000.account_balance
       , accounts_source_src_10000.account_balance AS total_account_balance_first_day
@@ -46,10 +43,7 @@ INNER JOIN (
       , DATE_TRUNC(accounts_source_src_10000.ds, isoyear) AS ds__year
       , accounts_source_src_10000.account_type
       , accounts_source_src_10000.user_id AS user
-    FROM (
-      -- User Defined SQL Query
-      SELECT * FROM ***************************.fct_accounts
-    ) accounts_source_src_10000
+    FROM ***************************.fct_accounts accounts_source_src_10000
   ) subq_1
   GROUP BY
     ds__week

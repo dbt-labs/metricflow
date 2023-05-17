@@ -9,7 +9,7 @@ from dateutil import parser
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowQueryRequest
 from dbt_semantic_interfaces.objects.elements.measure import MeasureAggregationParameters
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from metricflow.model.semantic_model import SemanticModel
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import (
     DefaultColumnAssociationResolver,
 )
@@ -34,7 +34,7 @@ from metricflow.test.integration.configured_test_case import (
     RequiredDwEngineFeatures,
     CONFIGURED_INTEGRATION_TESTS_REPOSITORY,
 )
-from metricflow.test.test_utils import as_datetime
+from dbt_semantic_interfaces.test_utils import as_datetime
 from metricflow.test.time.configurable_time_source import (
     ConfigurableTimeSource,
 )
@@ -134,6 +134,34 @@ class CheckQueryHelpers:
         """Return the name of the double data type for the relevant SQL engine"""
         return self._sql_client.sql_engine_attributes.double_data_type_name
 
+    def render_dimension_template(self, dimension_name: str, entity_path: Sequence[str] = ()) -> str:
+        """Renders a template that can be used to retrieve a dimension.
+
+        For example:
+
+         "{{ render_dimension_template('country_latest', entity_path=['listing']) }}"
+
+         ->
+
+         "{{ dimension('country_latest', entity_path=['listing'] }}"
+
+         This is needed as the where_filter field in the definition files are rendered twice through Jinja - once
+         by the test framework, and again by MF.
+        """
+        return f"{{{{ dimension('{dimension_name}', entity_path={repr(entity_path)}) }}}}"
+
+    def render_entity_template(self, entity_name: str, entity_path: Sequence[str] = ()) -> str:
+        """Similar to render_dimension_template() but for entities."""
+        return f"{{{{ entity('{entity_name}', entity_path={repr(entity_path)}) }}}}"
+
+    def render_time_dimension_template(
+        self, time_dimension_name: str, time_granularity: str, entity_path: Sequence[str] = ()
+    ) -> str:
+        """Similar to render_dimension_template() but for time dimensions."""
+        return (
+            f"{{{{ time_dimension('{time_dimension_name}', '{time_granularity}', entity_path={repr(entity_path)}) }}}}"
+        )
+
 
 def filter_not_supported_features(
     sql_client: SqlClient, required_features: Tuple[RequiredDwEngineFeatures, ...]
@@ -172,19 +200,14 @@ def filter_not_supported_features(
 def test_case(
     name: str,
     mf_test_session_state: MetricFlowTestSessionState,
-    simple_semantic_model: SemanticModel,
-    simple_semantic_model_non_ds: SemanticModel,
-    composite_identifier_semantic_model: SemanticModel,
-    unpartitioned_multi_hop_join_semantic_model: SemanticModel,
-    multi_hop_join_semantic_model: SemanticModel,
-    extended_date_semantic_model: SemanticModel,
-    scd_semantic_model: SemanticModel,
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
+    simple_semantic_manifest_lookup_non_ds: SemanticManifestLookup,
+    unpartitioned_multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
+    multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
+    extended_date_semantic_manifest_lookup: SemanticManifestLookup,
+    scd_semantic_manifest_lookup: SemanticManifestLookup,
     async_sql_client: AsyncSqlClient,
-    create_simple_model_tables: bool,
-    create_message_source_tables: bool,
-    create_bridge_table: bool,
-    create_extended_date_model_tables: bool,
-    create_scd_model_tables: bool,
+    create_source_tables: bool,
     time_spine_source: TimeSpineSource,
 ) -> None:
     """Runs all integration tests configured in the test case YAML directory."""
@@ -195,30 +218,28 @@ def test_case(
     if missing_required_features:
         pytest.skip(f"DW does not support {missing_required_features}")
 
-    semantic_model: Optional[SemanticModel] = None
+    semantic_manifest_lookup: Optional[SemanticManifestLookup] = None
     if case.model is IntegrationTestModel.SIMPLE_MODEL:
-        semantic_model = simple_semantic_model
+        semantic_manifest_lookup = simple_semantic_manifest_lookup
     elif case.model is IntegrationTestModel.SIMPLE_MODEL_NON_DS:
-        semantic_model = simple_semantic_model_non_ds
-    elif case.model is IntegrationTestModel.COMPOSITE_IDENTIFIER_MODEL:
-        semantic_model = composite_identifier_semantic_model
+        semantic_manifest_lookup = simple_semantic_manifest_lookup_non_ds
     elif case.model is IntegrationTestModel.UNPARTITIONED_MULTI_HOP_JOIN_MODEL:
-        semantic_model = unpartitioned_multi_hop_join_semantic_model
+        semantic_manifest_lookup = unpartitioned_multi_hop_join_semantic_manifest_lookup
     elif case.model is IntegrationTestModel.PARTITIONED_MULTI_HOP_JOIN_MODEL:
-        semantic_model = multi_hop_join_semantic_model
+        semantic_manifest_lookup = multi_hop_join_semantic_manifest_lookup
     elif case.model is IntegrationTestModel.EXTENDED_DATE_MODEL:
-        semantic_model = extended_date_semantic_model
+        semantic_manifest_lookup = extended_date_semantic_manifest_lookup
     elif case.model is IntegrationTestModel.SCD_MODEL:
-        semantic_model = scd_semantic_model
+        semantic_manifest_lookup = scd_semantic_manifest_lookup
     else:
         assert_values_exhausted(case.model)
 
-    assert semantic_model
+    assert semantic_manifest_lookup
 
     engine = MetricFlowEngine(
-        semantic_model=semantic_model,
+        semantic_manifest_lookup=semantic_manifest_lookup,
         sql_client=async_sql_client,
-        column_association_resolver=DefaultColumnAssociationResolver(semantic_model),
+        column_association_resolver=DefaultColumnAssociationResolver(semantic_manifest_lookup),
         time_source=ConfigurableTimeSource(as_datetime("2021-01-04")),
         time_spine_source=time_spine_source,
         system_schema=mf_test_session_state.mf_system_schema,
@@ -233,7 +254,7 @@ def test_case(
             limit=case.limit,
             time_constraint_start=parser.parse(case.time_constraint[0]) if case.time_constraint else None,
             time_constraint_end=parser.parse(case.time_constraint[1]) if case.time_constraint else None,
-            where_constraint=jinja2.Template(case.where_constraint, undefined=jinja2.StrictUndefined,).render(
+            where_constraint=jinja2.Template(case.where_filter, undefined=jinja2.StrictUndefined,).render(
                 source_schema=mf_test_session_state.mf_source_schema,
                 render_time_constraint=check_query_helpers.render_time_constraint,
                 TimeGranularity=TimeGranularity,
@@ -242,8 +263,11 @@ def test_case(
                 render_percentile_expr=check_query_helpers.render_percentile_expr,
                 mf_time_spine_source=time_spine_source.spine_table.sql,
                 double_data_type_name=check_query_helpers.double_data_type_name,
+                render_dimension_template=check_query_helpers.render_dimension_template,
+                render_entity_template=check_query_helpers.render_entity_template,
+                render_time_dimension_template=check_query_helpers.render_time_dimension_template,
             )
-            if case.where_constraint
+            if case.where_filter
             else None,
             order_by_names=case.order_bys,
         )

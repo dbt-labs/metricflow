@@ -11,11 +11,11 @@ from metricflow.inference.rule.rules import ColumnMatcherRule, LowCardinalityRat
 
 
 # -------------
-# IDENTIFIERS
+# ENTITIES
 # -------------
 
 
-class AnyIdentifierByNameRule(ColumnMatcherRule):
+class AnyEntityByNameRule(ColumnMatcherRule):
     """Inference rule that checks for columns ending with `id`.
 
     We searched for words ending with "id" just to assess the chance of this resulting in a
@@ -37,8 +37,8 @@ class AnyIdentifierByNameRule(ColumnMatcherRule):
         return props.column.column_name.lower().endswith("id")
 
 
-class PrimaryIdentifierByNameRule(ColumnMatcherRule):
-    """Inference rule that matches primary identifiers by their names.
+class PrimaryEntityByNameRule(ColumnMatcherRule):
+    """Inference rule that matches primary entities by their names.
 
     It will match columns such as `db.schema.mytable.mytable_id`,
     `db.schema.mytable.mytableid` and `db.schema.mytable.id`.
@@ -61,8 +61,8 @@ class PrimaryIdentifierByNameRule(ColumnMatcherRule):
         return col_lower == f"{table_lower}_id" or col_lower == f"{table_lower}id"
 
 
-class UniqueIdentifierByDistinctCountRule(ColumnMatcherRule):
-    """Inference rule that matches unique identifiers by their COUNT DISTINCT.
+class UniqueEntityByDistinctCountRule(ColumnMatcherRule):
+    """Inference rule that matches unique entities by their COUNT DISTINCT.
 
     It will always produce a ID.UNIQUE complementary signal with VERY_HIGH confidence.
     """
@@ -76,7 +76,7 @@ class UniqueIdentifierByDistinctCountRule(ColumnMatcherRule):
         return props.distinct_row_count == props.row_count
 
 
-class ForeignIdentifierByCardinalityRatioRule(LowCardinalityRatioRule):
+class ForeignEntityByCardinalityRatioRule(LowCardinalityRatioRule):
     """Inference rule that checks for low cardinality columns.
 
     It will always produce ID.FOREIGN with MEDIUM confidence (complementary).
@@ -258,10 +258,10 @@ class MeasureByIntegerTypeRule(ColumnMatcherRule):
 
 
 DEFAULT_RULESET = [
-    AnyIdentifierByNameRule(),
-    PrimaryIdentifierByNameRule(),
-    UniqueIdentifierByDistinctCountRule(),
-    ForeignIdentifierByCardinalityRatioRule(0.6),
+    AnyEntityByNameRule(),
+    PrimaryEntityByNameRule(),
+    UniqueEntityByDistinctCountRule(),
+    ForeignEntityByCardinalityRatioRule(0.6),
     TimeDimensionByTimeTypeRule(),
     PrimaryTimeDimensionByNameRule(),
     PrimaryTimeDimensionIfOnlyTimeRule(),

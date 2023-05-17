@@ -30,7 +30,7 @@ FROM (
         , subq_19.bookings AS bookings
         , subq_19.average_booking_value AS average_booking_value
       FROM (
-        -- Read Elements From Data Source 'bookings_source'
+        -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
         -- Pass Only Elements:
         --   ['average_booking_value', 'bookings', 'metric_time', 'listing']
@@ -39,10 +39,7 @@ FROM (
           , listing_id AS listing
           , 1 AS bookings
           , booking_value AS average_booking_value
-        FROM (
-          -- User Defined SQL Query
-          SELECT * FROM ***************************.fct_bookings
-        ) bookings_source_src_10001
+        FROM ***************************.fct_bookings bookings_source_src_10001
       ) subq_19
       LEFT OUTER JOIN
         ***************************.dim_listings_latest listings_latest_src_10004
@@ -54,7 +51,7 @@ FROM (
       metric_time
   ) subq_27
   INNER JOIN (
-    -- Read Elements From Data Source 'bookings_source'
+    -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
     -- Pass Only Elements:
     --   ['booking_value', 'metric_time']
@@ -62,10 +59,7 @@ FROM (
     SELECT
       ds AS metric_time
       , SUM(booking_value) AS booking_value
-    FROM (
-      -- User Defined SQL Query
-      SELECT * FROM ***************************.fct_bookings
-    ) bookings_source_src_10001
+    FROM ***************************.fct_bookings bookings_source_src_10001
     GROUP BY
       metric_time
   ) subq_31

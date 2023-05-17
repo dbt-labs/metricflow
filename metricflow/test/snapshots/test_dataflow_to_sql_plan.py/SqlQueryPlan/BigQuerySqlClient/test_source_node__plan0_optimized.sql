@@ -1,4 +1,4 @@
--- Read Elements From Data Source 'bookings_source'
+-- Read Elements From Semantic Model 'bookings_source'
 SELECT
   1 AS bookings
   , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
@@ -53,7 +53,4 @@ SELECT
   , listing_id AS create_a_cycle_in_the_join_graph__listing
   , guest_id AS create_a_cycle_in_the_join_graph__guest
   , host_id AS create_a_cycle_in_the_join_graph__host
-FROM (
-  -- User Defined SQL Query
-  SELECT * FROM ***************************.fct_bookings
-) bookings_source_src_10001
+FROM ***************************.fct_bookings bookings_source_src_10001

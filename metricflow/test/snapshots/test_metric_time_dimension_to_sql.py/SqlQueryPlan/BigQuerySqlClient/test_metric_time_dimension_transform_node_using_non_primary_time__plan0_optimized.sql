@@ -1,4 +1,4 @@
--- Read Elements From Data Source 'bookings_source'
+-- Read Elements From Semantic Model 'bookings_source'
 -- Metric Time Dimension 'booking_paid_at'
 SELECT
   ds
@@ -46,7 +46,4 @@ SELECT
   , is_instant
   , is_instant AS create_a_cycle_in_the_join_graph__is_instant
   , booking_value AS booking_payments
-FROM (
-  -- User Defined SQL Query
-  SELECT * FROM ***************************.fct_bookings
-) bookings_source_src_10001
+FROM ***************************.fct_bookings bookings_source_src_10001

@@ -8,29 +8,29 @@ from click.testing import CliRunner, Result
 
 from metricflow.cli.cli_context import CLIContext
 from metricflow.engine.metricflow_engine import MetricFlowEngine
-from dbt_semantic_interfaces.objects.user_configured_model import UserConfiguredModel
-from metricflow.model.semantic_model import SemanticModel
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
-from metricflow.test.test_utils import as_datetime
+from dbt_semantic_interfaces.test_utils import as_datetime
 from metricflow.test.time.configurable_time_source import ConfigurableTimeSource
 
 
 @pytest.fixture
 def cli_context(  # noqa: D
     async_sql_client: AsyncSqlClient,
-    simple_user_configured_model: UserConfiguredModel,
+    simple_semantic_manifest: SemanticManifest,
     time_spine_source: TimeSpineSource,
     mf_test_session_state: MetricFlowTestSessionState,
-    create_simple_model_tables: bool,
+    create_source_tables: bool,
 ) -> CLIContext:
-    semantic_model = SemanticModel(simple_user_configured_model)
+    semantic_manifest_lookup = SemanticManifestLookup(simple_semantic_manifest)
     mf_engine = MetricFlowEngine(
-        semantic_model=semantic_model,
+        semantic_manifest_lookup=semantic_manifest_lookup,
         sql_client=async_sql_client,
-        column_association_resolver=DefaultColumnAssociationResolver(semantic_model=semantic_model),
+        column_association_resolver=DefaultColumnAssociationResolver(semantic_manifest_lookup=semantic_manifest_lookup),
         time_source=ConfigurableTimeSource(as_datetime("2020-01-01")),
         time_spine_source=time_spine_source,
         system_schema=mf_test_session_state.mf_system_schema,
@@ -38,8 +38,8 @@ def cli_context(  # noqa: D
     context = CLIContext()
     context._mf = mf_engine
     context._sql_client = async_sql_client
-    context._user_configured_model = simple_user_configured_model
-    context._semantic_model = semantic_model
+    context._semantic_manifest = simple_semantic_manifest
+    context._semantic_manifest_lookup = semantic_manifest_lookup
     context._mf_system_schema = mf_test_session_state.mf_system_schema
     return context
 

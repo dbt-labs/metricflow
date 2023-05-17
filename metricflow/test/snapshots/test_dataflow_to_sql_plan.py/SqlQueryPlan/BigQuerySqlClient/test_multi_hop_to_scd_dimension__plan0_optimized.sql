@@ -8,7 +8,7 @@ SELECT
   , subq_18.lux_listing__is_confirmed_lux AS listing__lux_listing__is_confirmed_lux
   , SUM(subq_13.bookings) AS bookings
 FROM (
-  -- Read Elements From Data Source 'bookings_source'
+  -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements:
   --   ['bookings', 'metric_time', 'listing']
@@ -16,7 +16,7 @@ FROM (
     ds AS metric_time
     , listing_id AS listing
     , 1 AS bookings
-  FROM ***************************.fct_bookings bookings_source_src_10018
+  FROM ***************************.fct_bookings bookings_source_src_10015
 ) subq_13
 LEFT OUTER JOIN (
   -- Join Standard Outputs
@@ -26,15 +26,15 @@ LEFT OUTER JOIN (
   --    'lux_listing__window_end',
   --    'listing']
   SELECT
-    lux_listings_src_10022.valid_from AS lux_listing__window_start
-    , lux_listings_src_10022.valid_to AS lux_listing__window_end
-    , lux_listing_mapping_src_10021.listing_id AS listing
-    , lux_listings_src_10022.is_confirmed_lux AS lux_listing__is_confirmed_lux
-  FROM ***************************.dim_lux_listing_id_mapping lux_listing_mapping_src_10021
+    lux_listings_src_10019.valid_from AS lux_listing__window_start
+    , lux_listings_src_10019.valid_to AS lux_listing__window_end
+    , lux_listing_mapping_src_10018.listing_id AS listing
+    , lux_listings_src_10019.is_confirmed_lux AS lux_listing__is_confirmed_lux
+  FROM ***************************.dim_lux_listing_id_mapping lux_listing_mapping_src_10018
   LEFT OUTER JOIN
-    ***************************.dim_lux_listings lux_listings_src_10022
+    ***************************.dim_lux_listings lux_listings_src_10019
   ON
-    lux_listing_mapping_src_10021.lux_listing_id = lux_listings_src_10022.lux_listing_id
+    lux_listing_mapping_src_10018.lux_listing_id = lux_listings_src_10019.lux_listing_id
 ) subq_18
 ON
   (

@@ -8,7 +8,7 @@ SELECT
   , subq_18.user__home_state_latest AS listing__user__home_state_latest
   , SUM(subq_13.bookings) AS bookings
 FROM (
-  -- Read Elements From Data Source 'bookings_source'
+  -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements:
   --   ['bookings', 'metric_time', 'listing']
@@ -16,22 +16,22 @@ FROM (
     ds AS metric_time
     , listing_id AS listing
     , 1 AS bookings
-  FROM ***************************.fct_bookings bookings_source_src_10018
+  FROM ***************************.fct_bookings bookings_source_src_10015
 ) subq_13
 LEFT OUTER JOIN (
   -- Join Standard Outputs
   -- Pass Only Elements:
   --   ['user__home_state_latest', 'window_start', 'window_end', 'listing']
   SELECT
-    listings_src_10020.active_from AS window_start
-    , listings_src_10020.active_to AS window_end
-    , listings_src_10020.listing_id AS listing
-    , users_latest_src_10024.home_state_latest AS user__home_state_latest
-  FROM ***************************.dim_listings listings_src_10020
+    listings_src_10017.active_from AS window_start
+    , listings_src_10017.active_to AS window_end
+    , listings_src_10017.listing_id AS listing
+    , users_latest_src_10021.home_state_latest AS user__home_state_latest
+  FROM ***************************.dim_listings listings_src_10017
   LEFT OUTER JOIN
-    ***************************.dim_users_latest users_latest_src_10024
+    ***************************.dim_users_latest users_latest_src_10021
   ON
-    listings_src_10020.user_id = users_latest_src_10024.user_id
+    listings_src_10017.user_id = users_latest_src_10021.user_id
 ) subq_18
 ON
   (

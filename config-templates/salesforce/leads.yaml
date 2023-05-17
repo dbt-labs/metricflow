@@ -1,11 +1,11 @@
-data_source:
+semantic_model:
   name: salesforce_lead
   owners:
     - support@transformdata.io
-  sql_table: salesforce.lead ### Update to your leads schema.table
-  mutability: 
-    type: immutable
-  identifiers:
+  node_relation:  ### Update to your lead schema.table
+    alias: lead
+    schema_name: salesforce
+  entities:
     - name: lead
       type: primary
       expr: id
