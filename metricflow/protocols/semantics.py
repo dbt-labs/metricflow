@@ -102,7 +102,7 @@ class SemanticModelAccessor(ABC):
 
     @abstractmethod
     def get_by_reference(self, semantic_model_reference: SemanticModelReference) -> Optional[SemanticModel]:
-        """Retrieve the semantic model model object matching the input semantic model reference, if any"""
+        """Retrieve the semantic model object matching the input semantic model reference, if any"""
         raise NotImplementedError
 
     @property
