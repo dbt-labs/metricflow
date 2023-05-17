@@ -4,9 +4,9 @@ import pytest
 
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import EntityReference, MeasureReference, MetricReference
-from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.metric_lookup import MetricLookup
+from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 
 logger = logging.getLogger(__name__)
 
@@ -195,3 +195,50 @@ def test_get_semantic_models_for_entity(semantic_model_lookup: SemanticModelLook
     entity_reference = EntityReference(element_name="user")
     linked_semantic_models = semantic_model_lookup.get_semantic_models_for_entity(entity_reference=entity_reference)
     assert len(linked_semantic_models) == 8
+
+
+def test_linkable_set(metric_lookup: MetricLookup) -> None:  # noqa: D
+    linkable_set = metric_lookup.linkable_set_for_metrics(
+        (MetricReference(element_name="views"),),
+        without_any_property=frozenset({LinkableElementProperties.DERIVED_TIME_GRANULARITY}),
+    )
+
+    result_to_compare = sorted(
+        tuple(
+            (
+                # Checking a limited set of fields as the result is large due to the paths in the object.
+                linkable_dimension.entity_links,
+                linkable_dimension.element_name,
+                linkable_dimension.semantic_model_origin.semantic_model_name,
+            )
+            for linkable_dimensions in linkable_set.path_key_to_linkable_dimensions.values()
+            for linkable_dimension in linkable_dimensions
+        )
+    )
+
+    assert result_to_compare == [
+        ((), "ds", "views_source"),
+        ((), "ds_partitioned", "views_source"),
+        (("create_a_cycle_in_the_join_graph",), "booking_paid_at", "bookings_source"),
+        (("create_a_cycle_in_the_join_graph",), "is_instant", "bookings_source"),
+        (("create_a_cycle_in_the_join_graph", "listing"), "capacity_latest", "listings_latest"),
+        (("create_a_cycle_in_the_join_graph", "listing"), "country_latest", "listings_latest"),
+        (("create_a_cycle_in_the_join_graph", "listing"), "created_at", "listings_latest"),
+        (("create_a_cycle_in_the_join_graph", "listing"), "ds", "listings_latest"),
+        (("create_a_cycle_in_the_join_graph", "listing"), "is_lux_latest", "listings_latest"),
+        (("listing",), "capacity_latest", "listings_latest"),
+        (("listing",), "country_latest", "listings_latest"),
+        (("listing",), "created_at", "listings_latest"),
+        (("listing",), "ds", "listings_latest"),
+        (("listing",), "is_lux_latest", "listings_latest"),
+        (("listing", "user"), "company_name", "companies"),
+        (("listing", "user"), "created_at", "users_ds_source"),
+        (("listing", "user"), "ds_partitioned", "users_ds_source"),
+        (("listing", "user"), "home_state", "users_ds_source"),
+        (("listing", "user"), "home_state_latest", "users_latest"),
+        (("user",), "company_name", "companies"),
+        (("user",), "created_at", "users_ds_source"),
+        (("user",), "ds_partitioned", "users_ds_source"),
+        (("user",), "home_state", "users_ds_source"),
+        (("user",), "home_state_latest", "users_latest"),
+    ]

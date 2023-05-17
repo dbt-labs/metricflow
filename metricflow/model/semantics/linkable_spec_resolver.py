@@ -1,20 +1,20 @@
 from __future__ import annotations
 
 import logging
-import more_itertools
 import time
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Tuple, Sequence, Dict, List, Optional, FrozenSet
+from typing import Tuple, Sequence, Dict, List, Optional, FrozenSet, Set
 
-from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType, Dimension
 from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
+from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.references import SemanticModelReference, MeasureReference, MetricReference
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from metricflow.protocols.semantics import SemanticModelAccessor
 from metricflow.specs.specs import (
     DEFAULT_TIME_GRANULARITY,
@@ -24,7 +24,6 @@ from metricflow.specs.specs import (
     EntitySpec,
     EntityReference,
 )
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -42,8 +41,11 @@ class JoinPathKey:
 class LinkableDimension:
     """Describes how a dimension can be realized by joining based on entity links."""
 
+    # The semantic model where this dimension was defined.
+    semantic_model_origin: SemanticModelReference
     element_name: str
     entity_links: Tuple[str, ...]
+    join_path: Tuple[SemanticModelJoinPathElement, ...]
     properties: FrozenSet[LinkableElementProperties]
     time_granularity: Optional[TimeGranularity] = None
 
@@ -55,15 +57,6 @@ class LinkableDimension:
             time_granularity=self.time_granularity,
         )
 
-    @property
-    def after_intersection(self) -> LinkableDimension:  # noqa: D
-        return LinkableDimension(
-            element_name=self.element_name,
-            entity_links=self.entity_links,
-            properties=frozenset({LinkableElementProperties.INTERSECTED}),
-            time_granularity=self.time_granularity,
-        )
-
 
 @dataclass(frozen=True)
 class LinkableEntity:
@@ -72,125 +65,106 @@ class LinkableEntity:
     element_name: str
     properties: FrozenSet[LinkableElementProperties]
     entity_links: Tuple[str, ...]
+    join_path: Tuple[SemanticModelJoinPathElement, ...]
 
     @property
     def path_key(self) -> JoinPathKey:  # noqa: D
         return JoinPathKey(element_name=self.element_name, entity_links=self.entity_links, time_granularity=None)
 
-    @property
-    def after_intersection(self) -> LinkableEntity:  # noqa: D
-        return LinkableEntity(
-            element_name=self.element_name,
-            entity_links=self.entity_links,
-            properties=frozenset({LinkableElementProperties.INTERSECTED}),
-        )
-
 
 @dataclass(frozen=True)
 class LinkableElementSet:
-    """Container class for storing all linkable elements for a metric."""
+    """Container class for storing all linkable elements for a metric.
 
-    linkable_dimensions: Tuple[LinkableDimension, ...]
-    linkable_entities: Tuple[LinkableEntity, ...]
+    TODO: There are similarities with LinkableSpecSet - consider consolidation.
+    """
 
-    # Ambiguous elements are ones where there are multiple join paths through different semantic models that can be taken
-    # to get the element. This currently represents an error when defining semantic models.
-    ambiguous_linkable_dimensions: Tuple[LinkableDimension, ...]
-    ambiguous_linkable_entities: Tuple[LinkableEntity, ...]
+    # Dictionaries that map the path key to context on the dimension
+    #
+    # For example:
+    # {
+    #   "listing__country_latest": (
+    #     LinkableDimension(
+    #       element_name="country_latest",
+    #       entity_links=("listing",),
+    #       semantic_model_origin="listings_latest_source",
+    #   )
+    # }
+    path_key_to_linkable_dimensions: Dict[JoinPathKey, Tuple[LinkableDimension, ...]]
+    path_key_to_linkable_entities: Dict[JoinPathKey, Tuple[LinkableEntity, ...]]
 
     @staticmethod
-    def merge(linkable_element_sets: Sequence[LinkableElementSet]) -> LinkableElementSet:
-        """Combine multiple sets together.
+    def merge_by_path_key(linkable_element_sets: Sequence[LinkableElementSet]) -> LinkableElementSet:
+        """Combine multiple sets together by the path key.
 
         If there are elements with the same join key, those elements will be categorized as ambiguous.
         """
-        key_to_linkable_dimension: Dict[JoinPathKey, List[LinkableDimension]] = defaultdict(list)
-        key_to_linkable_entity: Dict[JoinPathKey, List[LinkableEntity]] = defaultdict(list)
+        key_to_linkable_dimensions: Dict[JoinPathKey, List[LinkableDimension]] = defaultdict(list)
+        key_to_linkable_entities: Dict[JoinPathKey, List[LinkableEntity]] = defaultdict(list)
 
         for linkable_element_set in linkable_element_sets:
-            for linkable_dimension in linkable_element_set.linkable_dimensions:
-                key_to_linkable_dimension[linkable_dimension.path_key].append(linkable_dimension)
-            for linkable_entity in linkable_element_set.linkable_entities:
-                key_to_linkable_entity[linkable_entity.path_key].append(linkable_entity)
+            for path_key, linkable_dimensions in linkable_element_set.path_key_to_linkable_dimensions.items():
+                key_to_linkable_dimensions[path_key].extend(linkable_dimensions)
+            for path_key, linkable_entities in linkable_element_set.path_key_to_linkable_entities.items():
+                key_to_linkable_entities[path_key].extend(linkable_entities)
 
-        linkable_dimensions = []
-        linkable_entities = []
-
-        ambiguous_linkable_dimensions = list(
-            tuple(more_itertools.flatten([x.ambiguous_linkable_dimensions for x in linkable_element_sets]))
-        )
-        ambiguous_linkable_entities = list(
-            tuple(more_itertools.flatten([x.ambiguous_linkable_entities for x in linkable_element_sets]))
-        )
-
-        for _, grouped_linkable_dimensions in key_to_linkable_dimension.items():
-            for linkable_dimension in grouped_linkable_dimensions:
-                if len(grouped_linkable_dimensions) == 1:
-                    linkable_dimensions.append(linkable_dimension)
-                else:
-                    ambiguous_linkable_dimensions.append(linkable_dimension)
-
-        for _, grouped_linkable_entity in key_to_linkable_entity.items():
-            for linkable_entity in grouped_linkable_entity:
-                if len(grouped_linkable_entity) == 1:
-                    linkable_entities.append(linkable_entity)
-                else:
-                    ambiguous_linkable_entities.append(linkable_entity)
-
+        # Convert the dictionaries to use tuples instead of lists.
         return LinkableElementSet(
-            linkable_dimensions=tuple(linkable_dimensions),
-            linkable_entities=tuple(linkable_entities),
-            ambiguous_linkable_dimensions=tuple(ambiguous_linkable_dimensions),
-            ambiguous_linkable_entities=tuple(ambiguous_linkable_entities),
+            path_key_to_linkable_dimensions={
+                path_key: tuple(dimensions) for path_key, dimensions in key_to_linkable_dimensions.items()
+            },
+            path_key_to_linkable_entities={
+                path_key: tuple(entities) for path_key, entities in key_to_linkable_entities.items()
+            },
         )
 
     @staticmethod
-    def intersection(linkable_element_sets: Sequence[LinkableElementSet]) -> LinkableElementSet:
-        """Find the intersection of all elements in the sets."""
+    def intersection_by_path_key(linkable_element_sets: Sequence[LinkableElementSet]) -> LinkableElementSet:
+        """Find the intersection of all elements in the sets by path key.
+
+        This is useful to figure out the common dimensions that are possible to query with multiple metrics. You would
+        find the LinakbleSpecSet for each metric in the query, then do an intersection of the sets.
+        """
         if len(linkable_element_sets) == 0:
             return LinkableElementSet(
-                linkable_dimensions=(),
-                linkable_entities=(),
-                ambiguous_linkable_dimensions=(),
-                ambiguous_linkable_entities=(),
+                path_key_to_linkable_dimensions={},
+                path_key_to_linkable_entities={},
             )
 
-        # Need to find an easier syntax for finding the common items from multiple LinkableElementSets.
-        common_linkable_dimensions = (
-            set.intersection(
-                *[set([y.after_intersection for y in x.linkable_dimensions]) for x in linkable_element_sets]
-            )
-            if len(linkable_element_sets) > 0
-            else set()
+        # Find path keys that are common to all LinkableElementSets.
+        common_linkable_dimension_path_keys: Set[JoinPathKey] = set.intersection(
+            *[
+                set(linkable_element_set.path_key_to_linkable_dimensions.keys())
+                for linkable_element_set in linkable_element_sets
+            ]
         )
 
-        common_linkable_entities = (
-            set.intersection(*[set([y.after_intersection for y in x.linkable_entities]) for x in linkable_element_sets])
-            if len(linkable_element_sets) > 0
-            else set()
+        common_linkable_entity_path_keys: Set[JoinPathKey] = set.intersection(
+            *[
+                set(linkable_element_set.path_key_to_linkable_entities.keys())
+                for linkable_element_set in linkable_element_sets
+            ]
         )
 
-        common_ambiguous_linkable_dimensions = (
-            set.intersection(
-                *[set([y.after_intersection for y in x.ambiguous_linkable_dimensions]) for x in linkable_element_sets]
-            )
-            if len(linkable_element_sets) > 0
-            else set()
-        )
+        # Create a new LinkableElementSet that only includes items where the path key is common to all sets.
+        join_path_to_linkable_dimensions: Dict[JoinPathKey, List[LinkableDimension]] = defaultdict(list)
+        join_path_to_linkable_entities: Dict[JoinPathKey, List[LinkableEntity]] = defaultdict(list)
 
-        common_ambiguous_linkable_entities = (
-            set.intersection(
-                *[set([y.after_intersection for y in x.ambiguous_linkable_entities]) for x in linkable_element_sets]
-            )
-            if len(linkable_element_sets) > 0
-            else set()
-        )
+        for linkable_element_set in linkable_element_sets:
+            for path_key, linkable_dimensions in linkable_element_set.path_key_to_linkable_dimensions.items():
+                if path_key in common_linkable_dimension_path_keys:
+                    join_path_to_linkable_dimensions[path_key].extend(linkable_dimensions)
+            for path_key, linkable_entities in linkable_element_set.path_key_to_linkable_entities.items():
+                if path_key in common_linkable_entity_path_keys:
+                    join_path_to_linkable_entities[path_key].extend(linkable_entities)
 
         return LinkableElementSet(
-            linkable_dimensions=tuple(common_linkable_dimensions),
-            linkable_entities=tuple(common_linkable_entities),
-            ambiguous_linkable_dimensions=tuple(common_ambiguous_linkable_dimensions),
-            ambiguous_linkable_entities=tuple(common_ambiguous_linkable_entities),
+            path_key_to_linkable_dimensions={
+                path_key: tuple(dimensions) for path_key, dimensions in join_path_to_linkable_dimensions.items()
+            },
+            path_key_to_linkable_entities={
+                path_key: tuple(entities) for path_key, entities in join_path_to_linkable_entities.items()
+            },
         )
 
     def filter(
@@ -201,35 +175,33 @@ class LinkableElementSet:
         First, only elements with at least one property in the "with_any_of" set are retained. Then, any elements with
         a property in "without_any_of" set are removed.
         """
-        linkable_dimensions = tuple(
-            x
-            for x in self.linkable_dimensions
-            if len(x.properties.intersection(with_any_of)) > 0 and len(x.properties.intersection(without_any_of)) == 0
-        )
 
-        linkable_entities = tuple(
-            x
-            for x in self.linkable_entities
-            if len(x.properties.intersection(with_any_of)) > 0 and len(x.properties.intersection(without_any_of)) == 0
-        )
+        key_to_linkable_dimensions: Dict[JoinPathKey, Tuple[LinkableDimension, ...]] = {}
+        key_to_linkable_entities: Dict[JoinPathKey, Tuple[LinkableEntity, ...]] = {}
 
-        ambiguous_linkable_dimensions = tuple(
-            x
-            for x in self.ambiguous_linkable_dimensions
-            if len(x.properties.intersection(with_any_of)) > 0 and len(x.properties.intersection(without_any_of)) == 0
-        )
+        for path_key, linkable_dimensions in self.path_key_to_linkable_dimensions.items():
+            filtered_linkable_dimensions = tuple(
+                linkable_dimension
+                for linkable_dimension in linkable_dimensions
+                if len(linkable_dimension.properties.intersection(with_any_of)) > 0
+                and len(linkable_dimension.properties.intersection(without_any_of)) == 0
+            )
+            if len(filtered_linkable_dimensions) > 0:
+                key_to_linkable_dimensions[path_key] = filtered_linkable_dimensions
 
-        ambiguous_linkable_entities = tuple(
-            x
-            for x in self.ambiguous_linkable_entities
-            if len(x.properties.intersection(with_any_of)) > 0 and len(x.properties.intersection(without_any_of)) == 0
-        )
+        for path_key, linkable_entities in self.path_key_to_linkable_entities.items():
+            filtered_linkable_entities = tuple(
+                linkable_entity
+                for linkable_entity in linkable_entities
+                if len(linkable_entity.properties.intersection(with_any_of)) > 0
+                and len(linkable_entity.properties.intersection(without_any_of)) == 0
+            )
+            if len(filtered_linkable_entities) > 0:
+                key_to_linkable_entities[path_key] = filtered_linkable_entities
 
         return LinkableElementSet(
-            linkable_dimensions=linkable_dimensions,
-            linkable_entities=linkable_entities,
-            ambiguous_linkable_dimensions=ambiguous_linkable_dimensions,
-            ambiguous_linkable_entities=ambiguous_linkable_entities,
+            path_key_to_linkable_dimensions=key_to_linkable_dimensions,
+            path_key_to_linkable_entities=key_to_linkable_entities,
         )
 
     @property
@@ -237,28 +209,44 @@ class LinkableElementSet:
         return LinkableSpecSet(
             dimension_specs=tuple(
                 DimensionSpec(
-                    element_name=x.element_name,
-                    entity_links=tuple(EntityReference(element_name=x) for x in x.entity_links),
+                    element_name=path_key.element_name,
+                    entity_links=tuple(EntityReference(element_name=x) for x in path_key.entity_links),
                 )
-                for x in self.linkable_dimensions
-                if not x.time_granularity
+                for path_key in self.path_key_to_linkable_dimensions.keys()
+                if not path_key.time_granularity
             ),
             time_dimension_specs=tuple(
                 TimeDimensionSpec(
-                    element_name=x.element_name,
-                    entity_links=tuple(EntityReference(element_name=x) for x in x.entity_links),
-                    time_granularity=x.time_granularity,
+                    element_name=path_key.element_name,
+                    entity_links=tuple(EntityReference(element_name=x) for x in path_key.entity_links),
+                    time_granularity=path_key.time_granularity,
                 )
-                for x in self.linkable_dimensions
-                if x.time_granularity
+                for path_key in self.path_key_to_linkable_dimensions.keys()
+                if path_key.time_granularity
             ),
             entity_specs=tuple(
                 EntitySpec(
-                    element_name=x.element_name,
-                    entity_links=tuple(EntityReference(element_name=x) for x in x.entity_links),
+                    element_name=path_key.element_name,
+                    entity_links=tuple(EntityReference(element_name=x) for x in path_key.entity_links),
                 )
-                for x in self.linkable_entities
+                for path_key in self.path_key_to_linkable_entities
             ),
+        )
+
+    @property
+    def only_unique_path_keys(self) -> LinkableElementSet:
+        """Returns a set that only includes path keys that map to a single element."""
+        return LinkableElementSet(
+            path_key_to_linkable_dimensions={
+                path_key: linkable_dimensions
+                for path_key, linkable_dimensions in self.path_key_to_linkable_dimensions.items()
+                if len(linkable_dimensions) <= 1
+            },
+            path_key_to_linkable_entities={
+                path_key: linkable_entities
+                for path_key, linkable_entities in self.path_key_to_linkable_entities.items()
+                if len(linkable_entities) <= 1
+            },
         )
 
 
@@ -266,12 +254,16 @@ class LinkableElementSet:
 class SemanticModelJoinPathElement:
     """Describes joining a semantic model by the given entity."""
 
-    semantic_model: SemanticModel
+    semantic_model_reference: SemanticModelReference
     join_on_entity: str
 
 
 def _generate_linkable_time_dimensions(
-    dimension: Dimension, entity_links: Tuple[str, ...], with_properties: FrozenSet[LinkableElementProperties]
+    semantic_model_origin: SemanticModelReference,
+    dimension: Dimension,
+    entity_links: Tuple[str, ...],
+    join_path: Sequence[SemanticModelJoinPathElement],
+    with_properties: FrozenSet[LinkableElementProperties],
 ) -> Sequence[LinkableDimension]:
     """Generates different versions of the given dimension, but at other valid time granularities."""
     linkable_dimensions = []
@@ -288,8 +280,10 @@ def _generate_linkable_time_dimensions(
 
         linkable_dimensions.append(
             LinkableDimension(
+                semantic_model_origin=semantic_model_origin,
                 element_name=dimension.reference.element_name,
                 entity_links=entity_links,
+                join_path=tuple(join_path),
                 time_granularity=time_granularity,
                 properties=frozenset(properties),
             )
@@ -311,31 +305,38 @@ class SemanticModelJoinPath:
 
     path_elements: Tuple[SemanticModelJoinPathElement, ...]
 
-    def create_linkable_element_set(self, with_properties: FrozenSet[LinkableElementProperties]) -> LinkableElementSet:
+    def create_linkable_element_set(
+        self, semantic_model_accessor: SemanticModelAccessor, with_properties: FrozenSet[LinkableElementProperties]
+    ) -> LinkableElementSet:
         """Given the current path, generate the respective linkable elements from the last semantic model in the path."""
         entity_links = tuple(x.join_on_entity for x in self.path_elements)
 
         assert len(self.path_elements) > 0
-        semantic_model = self.path_elements[-1].semantic_model
+        semantic_model = semantic_model_accessor.get_by_reference(self.path_elements[-1].semantic_model_reference)
+        assert semantic_model
 
-        linkable_dimensions = []
-        linkable_entities = []
+        linkable_dimensions: List[LinkableDimension] = []
+        linkable_entities: List[LinkableEntity] = []
 
         for dimension in semantic_model.dimensions:
             dimension_type = dimension.type
             if dimension_type == DimensionType.CATEGORICAL:
                 linkable_dimensions.append(
                     LinkableDimension(
+                        semantic_model_origin=semantic_model.reference,
                         element_name=dimension.reference.element_name,
                         entity_links=entity_links,
+                        join_path=self.path_elements,
                         properties=with_properties,
                     )
                 )
             elif dimension_type == DimensionType.TIME:
                 linkable_dimensions.extend(
                     _generate_linkable_time_dimensions(
+                        semantic_model_origin=semantic_model.reference,
                         dimension=dimension,
                         entity_links=entity_links,
+                        join_path=(),
                         with_properties=with_properties,
                     )
                 )
@@ -349,22 +350,25 @@ class SemanticModelJoinPath:
                     LinkableEntity(
                         element_name=entity.reference.element_name,
                         entity_links=entity_links,
+                        join_path=self.path_elements,
                         properties=with_properties.union({LinkableElementProperties.ENTITY}),
                     )
                 )
 
         return LinkableElementSet(
-            linkable_dimensions=tuple(linkable_dimensions),
-            linkable_entities=tuple(linkable_entities),
-            ambiguous_linkable_dimensions=(),
-            ambiguous_linkable_entities=(),
+            path_key_to_linkable_dimensions={
+                linkable_dimension.path_key: (linkable_dimension,) for linkable_dimension in linkable_dimensions
+            },
+            path_key_to_linkable_entities={
+                linkable_entity.path_key: (linkable_entity,) for linkable_entity in linkable_entities
+            },
         )
 
     @property
-    def last_semantic_model(self) -> SemanticModel:
+    def last_semantic_model_reference(self) -> SemanticModelReference:
         """The last semantic model that would be joined in this path."""
         assert len(self.path_elements) > 0
-        return self.path_elements[-1].semantic_model
+        return self.path_elements[-1].semantic_model_reference
 
 
 class ValidLinkableSpecResolver:
@@ -387,6 +391,7 @@ class ValidLinkableSpecResolver:
             max_entity_links: the maximum number of joins to do when computing valid elements.
         """
         self._semantic_manifest = semantic_manifest
+        self._semantic_model_lookup = semantic_model_lookup
         # Sort semantic models by name for consistency in building derived objects.
         self._semantic_models = sorted(self._semantic_manifest.semantic_models, key=lambda x: x.name)
         self._join_evaluator = SemanticModelJoinEvaluator(semantic_model_lookup)
@@ -438,16 +443,20 @@ class ValidLinkableSpecResolver:
             if dimension_type == DimensionType.CATEGORICAL:
                 linkable_dimensions.append(
                     LinkableDimension(
+                        semantic_model_origin=semantic_model.reference,
                         element_name=dimension.reference.element_name,
                         entity_links=(),
+                        join_path=(),
                         properties=frozenset({LinkableElementProperties.LOCAL}),
                     )
                 )
             elif dimension_type == DimensionType.TIME:
                 linkable_dimensions.extend(
                     _generate_linkable_time_dimensions(
+                        semantic_model_origin=semantic_model.reference,
                         dimension=dimension,
                         entity_links=(),
+                        join_path=(),
                         with_properties=frozenset({LinkableElementProperties.LOCAL}),
                     )
                 )
@@ -460,6 +469,7 @@ class ValidLinkableSpecResolver:
                 LinkableEntity(
                     element_name=entity.reference.element_name,
                     entity_links=(),
+                    join_path=(),
                     properties=frozenset({LinkableElementProperties.LOCAL, LinkableElementProperties.ENTITY}),
                 )
             )
@@ -471,18 +481,23 @@ class ValidLinkableSpecResolver:
                     properties = {LinkableElementProperties.LOCAL, LinkableElementProperties.LOCAL_LINKED}
                     additional_linkable_dimensions.append(
                         LinkableDimension(
+                            semantic_model_origin=semantic_model.reference,
                             element_name=linkable_dimension.element_name,
                             entity_links=(entity.reference.element_name,),
+                            join_path=(),
                             time_granularity=linkable_dimension.time_granularity,
                             properties=frozenset(linkable_dimension.properties.union(properties)),
                         )
                     )
 
         return LinkableElementSet(
-            linkable_dimensions=tuple(linkable_dimensions + additional_linkable_dimensions),
-            linkable_entities=tuple(linkable_entities),
-            ambiguous_linkable_dimensions=(),
-            ambiguous_linkable_entities=(),
+            path_key_to_linkable_dimensions={
+                linkable_dimension.path_key: (linkable_dimension,)
+                for linkable_dimension in tuple(linkable_dimensions + additional_linkable_dimensions)
+            },
+            path_key_to_linkable_entities={
+                linkabe_entity.path_key: (linkabe_entity,) for linkabe_entity in tuple(linkable_entities)
+            },
         )
 
     def _get_semantic_models_with_joinable_entity(
@@ -523,15 +538,19 @@ class ValidLinkableSpecResolver:
                     SemanticModelJoinPath(
                         path_elements=(
                             SemanticModelJoinPathElement(
-                                semantic_model=semantic_model, join_on_entity=entity.reference.element_name
+                                semantic_model_reference=semantic_model.reference,
+                                join_on_entity=entity.reference.element_name,
                             ),
                         )
                     )
                 )
-        all_linkable_elements = LinkableElementSet.merge(
+        all_linkable_elements = LinkableElementSet.merge_by_path_key(
             [local_linkable_elements]
             + [
-                x.create_linkable_element_set(with_properties=frozenset({LinkableElementProperties.JOINED}))
+                x.create_linkable_element_set(
+                    semantic_model_accessor=self._semantic_model_lookup,
+                    with_properties=frozenset({LinkableElementProperties.JOINED}),
+                )
                 for x in join_paths
             ]
         )
@@ -550,13 +569,14 @@ class ValidLinkableSpecResolver:
             if len(new_join_paths) == 0:
                 return all_linkable_elements
 
-            all_linkable_elements = LinkableElementSet.merge(
+            all_linkable_elements = LinkableElementSet.merge_by_path_key(
                 [all_linkable_elements]
                 + [
                     x.create_linkable_element_set(
+                        semantic_model_accessor=self._semantic_model_lookup,
                         with_properties=frozenset(
                             {LinkableElementProperties.JOINED, LinkableElementProperties.MULTI_HOP}
-                        )
+                        ),
                     )
                     for x in new_join_paths
                 ]
@@ -576,18 +596,28 @@ class ValidLinkableSpecResolver:
             element_sets = self._metric_to_linkable_element_sets.get(metric_reference.element_name)
             if not element_sets:
                 raise ValueError(f"Unknown metric: {metric_reference} in element set")
-            metric_result = LinkableElementSet.intersection(
-                [x.filter(with_any_of=with_any_of, without_any_of=without_any_of) for x in element_sets]
+
+            # Using .only_unique_path_keys to exclude ambiguous elements where there are multiple join paths to get
+            # a dimension / entity.
+            metric_result = LinkableElementSet.intersection_by_path_key(
+                [
+                    element_set.only_unique_path_keys.filter(with_any_of=with_any_of, without_any_of=without_any_of)
+                    for element_set in element_sets
+                ]
             )
             linkable_element_sets.append(metric_result)
 
-        return LinkableElementSet.intersection(linkable_element_sets)
+        intersection_set = LinkableElementSet.intersection_by_path_key(linkable_element_sets)
+        return intersection_set
 
     def _find_next_possible_paths(
         self, measure_semantic_model: SemanticModel, current_join_path: SemanticModelJoinPath
     ) -> Sequence[SemanticModelJoinPath]:
         """Generate the set of possible paths that are 1 semantic model join longer that the "current_join_path"."""
-        last_semantic_model_in_path = current_join_path.last_semantic_model
+        last_semantic_model_in_path = self._semantic_model_lookup.get_by_reference(
+            current_join_path.last_semantic_model_reference
+        )
+        assert last_semantic_model_in_path
         new_join_paths = []
 
         for entity in last_semantic_model_in_path.entities:
@@ -604,13 +634,20 @@ class ValidLinkableSpecResolver:
             for semantic_model in semantic_models_that_can_be_joined:
                 # Don't create cycles in the join path by repeating a semantic model in the path.
                 if semantic_model.name == measure_semantic_model.name or any(
-                    tuple(x.semantic_model.name == semantic_model.name for x in current_join_path.path_elements)
+                    tuple(
+                        path_element.semantic_model_reference == semantic_model.reference
+                        for path_element in current_join_path.path_elements
+                    )
                 ):
                     continue
 
                 new_join_path = SemanticModelJoinPath(
                     path_elements=current_join_path.path_elements
-                    + (SemanticModelJoinPathElement(semantic_model=semantic_model, join_on_entity=entity_name),)
+                    + (
+                        SemanticModelJoinPathElement(
+                            semantic_model_reference=semantic_model.reference, join_on_entity=entity_name
+                        ),
+                    )
                 )
                 new_join_paths.append(new_join_path)
 

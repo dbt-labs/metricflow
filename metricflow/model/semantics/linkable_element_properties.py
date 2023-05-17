@@ -23,8 +23,6 @@ class LinkableElementProperties(Enum):
     DERIVED_TIME_GRANULARITY = "derived_time_granularity"
     # Refers to an entity, not a dimension.
     ENTITY = "entity"
-    # After an intersection operation.
-    INTERSECTED = "intersected"
 
     @staticmethod
     def all_properties() -> FrozenSet[LinkableElementProperties]:  # noqa: D
