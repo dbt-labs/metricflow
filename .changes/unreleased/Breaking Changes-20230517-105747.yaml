@@ -1,0 +1,6 @@
+kind: Breaking Changes
+body: Renaming measure proxy metrics to simple metrics
+time: 2023-05-17T10:57:47.654235-05:00
+custom:
+  Author: callum-mcdata
+  Issue: "0"
