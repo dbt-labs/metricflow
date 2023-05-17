@@ -63,12 +63,12 @@ def assert_essential_metric_properties(metric: MetricNode) -> None:
 
 
 CALC_METHOD_TO_METRIC_TYPE: Dict[str, MetricType] = {
-    "count": MetricType.MEASURE_PROXY,
-    "count_distinct": MetricType.MEASURE_PROXY,
-    "sum": MetricType.MEASURE_PROXY,
-    "average": MetricType.MEASURE_PROXY,
-    "min": MetricType.MEASURE_PROXY,
-    "max": MetricType.MEASURE_PROXY,
+    "count": MetricType.SIMPLE,
+    "count_distinct": MetricType.SIMPLE,
+    "sum": MetricType.SIMPLE,
+    "average": MetricType.SIMPLE,
+    "min": MetricType.SIMPLE,
+    "max": MetricType.SIMPLE,
     "derived": MetricType.DERIVED,
 }
 

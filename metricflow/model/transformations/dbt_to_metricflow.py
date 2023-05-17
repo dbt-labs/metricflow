@@ -251,7 +251,7 @@ class DbtManifestTransformer:
         return Metric(
             name=dbt_metric.name,
             description=dbt_metric.description,
-            type=MetricType.MEASURE_PROXY,
+            type=MetricType.SIMPLE,
             type_params=MetricTypeParams(
                 measure=MetricInputMeasure(name=dbt_metric.name),
             ),

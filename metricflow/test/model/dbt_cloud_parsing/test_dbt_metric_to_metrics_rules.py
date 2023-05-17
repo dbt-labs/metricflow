@@ -165,7 +165,7 @@ def test_dbt_to_derived_metric_type_params_requires_depends_on(dbt_metrics: Tupl
     ), f"DbtToDerivedMetricTypeParams didn't raise blocking issues when it should have: {issues.to_pretty_json()}"
 
 
-def test_dbt_to_measure_proxy_metric_type_params(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
+def test_dbt_to_simple_metric_type_params(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
     objects = MappedObjects()
     issues = DbtToMeasureProxyMetricTypeParams().run(dbt_metrics=dbt_metrics, objects=objects)
     assert (
@@ -187,7 +187,7 @@ def test_dbt_to_measure_proxy_metric_type_params(dbt_metrics: Tuple[MetricNode, 
             ), f"DbtToMeasureProxyMetricTypeParams created a metric type params for the non derived metirc `{dbt_metric.name}`"
 
 
-def test_dbt_to_measure_proxy_metric_type_params_requires_name(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
+def test_dbt_to_simple_metric_type_params_requires_name(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D
     objects = MappedObjects()
     for dbt_metric in dbt_metrics:
         metric_type = get_and_assert_calc_method_mapping(dbt_metric=dbt_metric)

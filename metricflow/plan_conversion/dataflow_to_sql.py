@@ -671,7 +671,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                         )
                     ),
                 )
-            elif metric.type is MetricType.MEASURE_PROXY:
+            elif metric.type is MetricType.SIMPLE:
                 if len(metric.input_measures) > 0:
                     assert (
                         len(metric.input_measures) == 1

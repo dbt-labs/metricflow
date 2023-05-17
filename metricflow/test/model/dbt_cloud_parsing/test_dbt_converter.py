@@ -39,9 +39,9 @@ def test_for_breaking_model_changes(dbt_metrics: Tuple[MetricNode, ...]) -> None
             mf_metric.type is not None
         ), f"Metric `{mf_metric.name}` created from dbt metric `{dbt_metric.name}` is missing a `type`"
         assert mf_metric.type in [
-            MetricType.MEASURE_PROXY,
+            MetricType.SIMPLE,
             MetricType.DERIVED,
-        ], f"Metric `{mf_metric.name}` created from dbt metric `{dbt_metric.name}` is a type other than `MEASURE_PROXY` or `DERIVED`"
+        ], f"Metric `{mf_metric.name}` created from dbt metric `{dbt_metric.name}` is a type other than `SIMPLE` or `DERIVED`"
         assert (
             mf_metric.type_params is not None
         ), f"Metric `{mf_metric.name}` created from dbt metric `{dbt_metric.name}` is missing `type_params`"

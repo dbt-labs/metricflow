@@ -88,9 +88,9 @@ class DbtToMeasureProxyMetricTypeParams(DbtMappingRule):
         for metric in dbt_metrics:
             try:
                 assert_essential_metric_properties(metric=metric)
-                # We only do this for MEASURE_PROXY metrics
+                # We only do this for SIMPLE metrics
                 metric_type = get_and_assert_calc_method_mapping(dbt_metric=metric)
-                if metric_type == MetricType.MEASURE_PROXY:
+                if metric_type == MetricType.SIMPLE:
                     objects.metrics[metric.name]["type_params"] = MetricTypeParams(
                         measure=MetricInputMeasure(name=metric.name)
                     ).dict()
