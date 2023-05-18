@@ -1,0 +1,7 @@
+kind: Under the Hood
+body: Push mypy to run using local environment packages in pre-commit. Developers
+  should always use a clean virtual environment to ensure consistency with CI.
+time: 2023-05-18T11:50:00.89499-07:00
+custom:
+  Author: tlento
+  Issue: 530 536

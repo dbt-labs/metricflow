@@ -45,7 +45,7 @@ rudder-sdk-python = "^1.0.3"
 duckdb-engine = "^0.1.8"
 duckdb = "0.3.4"
 click = ">=7.1.2"
-GitPython = ">=3.1.27,<3.1.31" 
+GitPython = ">=3.1.27,<3.1.31"
 databricks-sql-connector = "2.0.3"
 dbt-snowflake = {version="1.4.2", optional=true}
 dbt-redshift = {version="1.4.0", optional=true}
@@ -57,9 +57,15 @@ pyopenssl = "^23.0.0" # This is a pinned transitive dependencies that was done t
 pytest-xdist = "^3.2.1"
 
 [tool.poetry.dev-dependencies]
+dbt-core = "1.4.0"
 pytest-mock = "^3.7.0"
 pytest = "^7.1.1"
 pre-commit = "^2.18.0"
+mypy = "0.942"
+types-python-dateutil = "*"
+types-jsonschema = "*"
+types-PyYAML = "*"
+
 
 [tool.poetry.extras]
 dbt-snowflake = ["dbt-snowflake"]
