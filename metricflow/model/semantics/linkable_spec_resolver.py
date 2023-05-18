@@ -149,23 +149,34 @@ class LinkableElementSet:
         )
 
         # Create a new LinkableElementSet that only includes items where the path key is common to all sets.
-        join_path_to_linkable_dimensions: Dict[ElementPathKey, List[LinkableDimension]] = defaultdict(list)
-        join_path_to_linkable_entities: Dict[ElementPathKey, List[LinkableEntity]] = defaultdict(list)
+        join_path_to_linkable_dimensions: Dict[ElementPathKey, Set[LinkableDimension]] = defaultdict(set)
+        join_path_to_linkable_entities: Dict[ElementPathKey, Set[LinkableEntity]] = defaultdict(set)
 
         for linkable_element_set in linkable_element_sets:
             for path_key, linkable_dimensions in linkable_element_set.path_key_to_linkable_dimensions.items():
                 if path_key in common_linkable_dimension_path_keys:
-                    join_path_to_linkable_dimensions[path_key].extend(linkable_dimensions)
+                    join_path_to_linkable_dimensions[path_key].update(linkable_dimensions)
             for path_key, linkable_entities in linkable_element_set.path_key_to_linkable_entities.items():
                 if path_key in common_linkable_entity_path_keys:
-                    join_path_to_linkable_entities[path_key].extend(linkable_entities)
+                    join_path_to_linkable_entities[path_key].update(linkable_entities)
 
         return LinkableElementSet(
             path_key_to_linkable_dimensions={
-                path_key: tuple(dimensions) for path_key, dimensions in join_path_to_linkable_dimensions.items()
+                path_key: tuple(
+                    sorted(
+                        dimensions,
+                        key=lambda linkable_dimension: linkable_dimension.semantic_model_origin.semantic_model_name,
+                    )
+                )
+                for path_key, dimensions in join_path_to_linkable_dimensions.items()
             },
             path_key_to_linkable_entities={
-                path_key: tuple(entities) for path_key, entities in join_path_to_linkable_entities.items()
+                path_key: tuple(
+                    sorted(
+                        entities, key=lambda linkable_entity: linkable_entity.semantic_model_origin.semantic_model_name
+                    )
+                )
+                for path_key, entities in join_path_to_linkable_entities.items()
             },
         )
 
