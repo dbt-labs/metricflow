@@ -62,6 +62,8 @@ class LinkableDimension:
 class LinkableEntity:
     """Describes how an entity can be realized by joining based on entity links."""
 
+    # The semantic model where this entity was defined.
+    semantic_model_origin: SemanticModelReference
     element_name: str
     properties: FrozenSet[LinkableElementProperties]
     entity_links: Tuple[str, ...]
@@ -348,6 +350,7 @@ class SemanticModelJoinPath:
             if entity.reference.element_name != entity_links[-1]:
                 linkable_entities.append(
                     LinkableEntity(
+                        semantic_model_origin=semantic_model.reference,
                         element_name=entity.reference.element_name,
                         entity_links=entity_links,
                         join_path=self.path_elements,
@@ -467,6 +470,7 @@ class ValidLinkableSpecResolver:
         for entity in semantic_model.entities:
             linkable_entities.append(
                 LinkableEntity(
+                    semantic_model_origin=semantic_model.reference,
                     element_name=entity.reference.element_name,
                     entity_links=(),
                     join_path=(),
