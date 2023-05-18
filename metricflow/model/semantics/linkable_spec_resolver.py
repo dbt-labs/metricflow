@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
-class JoinPathKey:
+class ElementPathKey:
     """A key that can uniquely identify an element and the joins used to realize the element."""
 
     element_name: str
@@ -50,8 +50,8 @@ class LinkableDimension:
     time_granularity: Optional[TimeGranularity] = None
 
     @property
-    def path_key(self) -> JoinPathKey:  # noqa: D
-        return JoinPathKey(
+    def path_key(self) -> ElementPathKey:  # noqa: D
+        return ElementPathKey(
             element_name=self.element_name,
             entity_links=self.entity_links,
             time_granularity=self.time_granularity,
@@ -68,8 +68,8 @@ class LinkableEntity:
     join_path: Tuple[SemanticModelJoinPathElement, ...]
 
     @property
-    def path_key(self) -> JoinPathKey:  # noqa: D
-        return JoinPathKey(element_name=self.element_name, entity_links=self.entity_links, time_granularity=None)
+    def path_key(self) -> ElementPathKey:  # noqa: D
+        return ElementPathKey(element_name=self.element_name, entity_links=self.entity_links, time_granularity=None)
 
 
 @dataclass(frozen=True)
@@ -90,8 +90,8 @@ class LinkableElementSet:
     #       semantic_model_origin="listings_latest_source",
     #   )
     # }
-    path_key_to_linkable_dimensions: Dict[JoinPathKey, Tuple[LinkableDimension, ...]]
-    path_key_to_linkable_entities: Dict[JoinPathKey, Tuple[LinkableEntity, ...]]
+    path_key_to_linkable_dimensions: Dict[ElementPathKey, Tuple[LinkableDimension, ...]]
+    path_key_to_linkable_entities: Dict[ElementPathKey, Tuple[LinkableEntity, ...]]
 
     @staticmethod
     def merge_by_path_key(linkable_element_sets: Sequence[LinkableElementSet]) -> LinkableElementSet:
@@ -99,8 +99,8 @@ class LinkableElementSet:
 
         If there are elements with the same join key, those elements will be categorized as ambiguous.
         """
-        key_to_linkable_dimensions: Dict[JoinPathKey, List[LinkableDimension]] = defaultdict(list)
-        key_to_linkable_entities: Dict[JoinPathKey, List[LinkableEntity]] = defaultdict(list)
+        key_to_linkable_dimensions: Dict[ElementPathKey, List[LinkableDimension]] = defaultdict(list)
+        key_to_linkable_entities: Dict[ElementPathKey, List[LinkableEntity]] = defaultdict(list)
 
         for linkable_element_set in linkable_element_sets:
             for path_key, linkable_dimensions in linkable_element_set.path_key_to_linkable_dimensions.items():
@@ -132,14 +132,14 @@ class LinkableElementSet:
             )
 
         # Find path keys that are common to all LinkableElementSets.
-        common_linkable_dimension_path_keys: Set[JoinPathKey] = set.intersection(
+        common_linkable_dimension_path_keys: Set[ElementPathKey] = set.intersection(
             *[
                 set(linkable_element_set.path_key_to_linkable_dimensions.keys())
                 for linkable_element_set in linkable_element_sets
             ]
         )
 
-        common_linkable_entity_path_keys: Set[JoinPathKey] = set.intersection(
+        common_linkable_entity_path_keys: Set[ElementPathKey] = set.intersection(
             *[
                 set(linkable_element_set.path_key_to_linkable_entities.keys())
                 for linkable_element_set in linkable_element_sets
@@ -147,8 +147,8 @@ class LinkableElementSet:
         )
 
         # Create a new LinkableElementSet that only includes items where the path key is common to all sets.
-        join_path_to_linkable_dimensions: Dict[JoinPathKey, List[LinkableDimension]] = defaultdict(list)
-        join_path_to_linkable_entities: Dict[JoinPathKey, List[LinkableEntity]] = defaultdict(list)
+        join_path_to_linkable_dimensions: Dict[ElementPathKey, List[LinkableDimension]] = defaultdict(list)
+        join_path_to_linkable_entities: Dict[ElementPathKey, List[LinkableEntity]] = defaultdict(list)
 
         for linkable_element_set in linkable_element_sets:
             for path_key, linkable_dimensions in linkable_element_set.path_key_to_linkable_dimensions.items():
@@ -176,8 +176,8 @@ class LinkableElementSet:
         a property in "without_any_of" set are removed.
         """
 
-        key_to_linkable_dimensions: Dict[JoinPathKey, Tuple[LinkableDimension, ...]] = {}
-        key_to_linkable_entities: Dict[JoinPathKey, Tuple[LinkableEntity, ...]] = {}
+        key_to_linkable_dimensions: Dict[ElementPathKey, Tuple[LinkableDimension, ...]] = {}
+        key_to_linkable_entities: Dict[ElementPathKey, Tuple[LinkableEntity, ...]] = {}
 
         for path_key, linkable_dimensions in self.path_key_to_linkable_dimensions.items():
             filtered_linkable_dimensions = tuple(
