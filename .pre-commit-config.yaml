@@ -13,23 +13,10 @@ repos:
 
   - repo: https://github.com/pre-commit/mirrors-mypy # configured via mypy.ini
     rev: v0.942
-    hooks: # passing args: [] ensures we do not silently ignore imports (default) and instead explicitly configure in mypy.ini
+    hooks:
       - id: mypy
         name: mypy_metricflow
         args: [--show-error-codes]
         verbose: true
-        additional_dependencies:
-          [
-            dbt-core==1.4.0,
-            more-itertools,
-            pytest,
-            rapidfuzz,
-            "sqlalchemy<2.0",
-            sqlalchemy2-stubs,
-            types-attrs,
-            types-jinja2,
-            types-jsonschema,
-            types-python-dateutil,
-            types-PyYAML,
-            types-tabulate,
-          ]
+        # Keep mypy environment packages consistent with the local environment.
+        language: system
