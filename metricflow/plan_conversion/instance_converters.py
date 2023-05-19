@@ -310,7 +310,7 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
         us from processing a dataset composed of a join between two SCD semantic models. This restriction is in
         place as a temporary simplification - if there is need for this feature we can enable it.
         """
-        semantic_model_to_window: Dict[str, ValidityWindowJoinDescription] = {}
+        semantic_model_to_window: Dict[SemanticModelReference, ValidityWindowJoinDescription] = {}
         instances_by_semantic_model = bucket(
             instance_set.time_dimension_instances, lambda x: x.origin_semantic_model_reference.semantic_model_reference
         )
@@ -464,7 +464,6 @@ class FilterLinkableInstancesWithLeadingLink(InstanceSetTransform[InstanceSet]):
         )
 
     def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D
-
         # Normal to not filter anything if the instance set has no instances with links.
         filtered_dimension_instances = tuple(x for x in instance_set.dimension_instances if self._should_pass(x.spec))
         filtered_time_dimension_instances = tuple(
