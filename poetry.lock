@@ -504,14 +504,14 @@ dbt-postgres = ">=1.4.0,<1.5.0"
 
 [[package]]
 name = "dbt-semantic-interfaces"
-version = "0.1.0.dev0"
+version = "0.1.0.dev1"
 description = "The shared semantic layer definitions that dbt-core and MetricFlow use"
 category = "main"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "dbt_semantic_interfaces-0.1.0.dev0-py3-none-any.whl", hash = "sha256:75d36ce02f57dca0873259bf9b4189faaa0d5fc71311d88842d82144e0a3c418"},
-    {file = "dbt_semantic_interfaces-0.1.0.dev0.tar.gz", hash = "sha256:50d9ef32e9173890f7b315b55f530eec9efba1ee17fd6206723d6ba72d10b47e"},
+    {file = "dbt_semantic_interfaces-0.1.0.dev1-py3-none-any.whl", hash = "sha256:92461ce068e2ba579ec3ee089c163a90d0d538e9935b31e918d9307ec2726630"},
+    {file = "dbt_semantic_interfaces-0.1.0.dev1.tar.gz", hash = "sha256:20006c8801e4456a1ec61e750eefd1352198de7e8fa6b6825a63ae974fbee8bf"},
 ]
 
 [package.dependencies]
@@ -3593,4 +3593,4 @@ dbt-snowflake = ["dbt-snowflake"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.10"
-content-hash = "9c3c5f62de71c14bdfb1fa0bded1cb9355d43f93368fdeb57d26229fb369fca1"
+content-hash = "a051ca80aa105ab560fb9c14d9e954bf69bec12104fd49988d16437d9b371106"

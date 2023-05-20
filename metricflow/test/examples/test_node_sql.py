@@ -17,7 +17,7 @@ from metricflow.protocols.sql_client import SqlClient
 from metricflow.specs.specs import TimeDimensionSpec, TimeDimensionReference, InstanceSpecSet
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 

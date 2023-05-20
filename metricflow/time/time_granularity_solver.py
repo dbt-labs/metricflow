@@ -32,7 +32,7 @@ from metricflow.time.time_granularity import (
     adjust_to_start_of_period,
     adjust_to_end_of_period,
 )
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 

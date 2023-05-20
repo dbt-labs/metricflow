@@ -7,7 +7,7 @@ from dbt_semantic_interfaces.references import TimeDimensionReference
 from metricflow.instances import InstanceSet, TimeDimensionInstance
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 from metricflow.specs.specs import TimeDimensionSpec
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 
 logger = logging.getLogger(__name__)
