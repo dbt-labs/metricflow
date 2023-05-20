@@ -18,7 +18,7 @@ from typing import List, Optional, Sequence, Tuple, TypeVar, Generic, Any
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.objects.metric import MetricTimeWindow
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.references import (
     DimensionReference,
     MeasureReference,

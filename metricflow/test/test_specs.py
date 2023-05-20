@@ -14,7 +14,7 @@ from metricflow.specs.specs import (
     LinklessEntitySpec,
     EntityReference,
 )
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 
 @pytest.fixture

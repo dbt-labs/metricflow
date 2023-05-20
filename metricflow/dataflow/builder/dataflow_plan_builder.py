@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from typing import DefaultDict, List, TypeVar, Optional, Generic, Dict, Tuple, Sequence, Set, Union
 
 from dbt_semantic_interfaces.objects.metric import MetricType, MetricTimeWindow
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.references import TimeDimensionReference
 from metricflow.assert_one_arg import assert_exactly_one_arg_set

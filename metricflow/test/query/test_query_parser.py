@@ -3,7 +3,7 @@ import textwrap
 
 import pytest
 
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.errors.errors import UnableToSatisfyQueryError

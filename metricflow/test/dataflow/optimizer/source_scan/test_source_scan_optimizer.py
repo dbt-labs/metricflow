@@ -6,7 +6,7 @@ from typing import Generic
 from _pytest.fixtures import FixtureRequest
 
 from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan import (
     SourceDataSetT,

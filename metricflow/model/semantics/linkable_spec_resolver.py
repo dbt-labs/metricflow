@@ -10,7 +10,7 @@ from dbt_semantic_interfaces.objects.elements.dimension import DimensionType, Di
 from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.references import SemanticModelReference, MeasureReference, MetricReference
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties

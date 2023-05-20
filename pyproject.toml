@@ -12,7 +12,7 @@ repository = "https://github.com/transform-data/metricflow"
 python = ">=3.8,<3.10"
 typing_extensions = ">=4.0.0"
 
-dbt_semantic_interfaces = "0.1.0.dev0"
+dbt_semantic_interfaces = "0.1.0.dev1"
 
 croniter = "^1.3.4"
 pycron = "^3.0.0"
