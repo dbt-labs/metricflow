@@ -662,7 +662,7 @@ def validate_configs(
     parsing_spinner.start()
 
     if cfg.dbt_cloud_configs is not None:
-        from dbt_semantic_interfaces.parsing.dbt_cloud_to_model import model_build_result_for_dbt_cloud_job
+        from metricflow.model.parsing.dbt_cloud_to_model import model_build_result_for_dbt_cloud_job
 
         parsing_result = model_build_result_for_dbt_cloud_job(
             auth=cfg.dbt_cloud_configs.auth, job_id=cfg.dbt_cloud_configs.job_id

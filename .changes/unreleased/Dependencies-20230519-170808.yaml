@@ -1,0 +1,7 @@
+kind: Dependencies
+body: Switches MetricFlow SemanticManifest  dependencies from the local dbt semantic
+  interfaces package to the initial dev release
+time: 2023-05-19T17:08:08.425889-07:00
+custom:
+  Author: tlento
+  PR: "540"
