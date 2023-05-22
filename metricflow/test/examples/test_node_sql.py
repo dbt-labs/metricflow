@@ -9,7 +9,7 @@ from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, FilterElementsN
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
-from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
+from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.time_spine import TimeSpineSource
@@ -33,13 +33,13 @@ def test_view_sql_generated_at_a_node(
         SemanticModelReference(semantic_model_name="bookings_source")
     )
     assert bookings_semantic_model
-    column_association_resolver = DefaultColumnAssociationResolver(
+    column_association_resolver = DunderColumnAssociationResolver(
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
     )
     to_data_set_converter = SemanticModelToDataSetConverter(column_association_resolver)
 
     to_sql_plan_converter = DataflowToSqlQueryPlanConverter[SqlDataSet](
-        column_association_resolver=DefaultColumnAssociationResolver(simple_semantic_manifest_lookup),
+        column_association_resolver=DunderColumnAssociationResolver(simple_semantic_manifest_lookup),
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
         time_spine_source=time_spine_source,
     )

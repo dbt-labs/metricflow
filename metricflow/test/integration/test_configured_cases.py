@@ -11,7 +11,7 @@ from dbt_semantic_interfaces.objects.elements.measure import MeasureAggregationP
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import (
-    DefaultColumnAssociationResolver,
+    DunderColumnAssociationResolver,
 )
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.async_sql_client import AsyncSqlClient
@@ -239,7 +239,7 @@ def test_case(
     engine = MetricFlowEngine(
         semantic_manifest_lookup=semantic_manifest_lookup,
         sql_client=async_sql_client,
-        column_association_resolver=DefaultColumnAssociationResolver(semantic_manifest_lookup),
+        column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup),
         time_source=ConfigurableTimeSource(as_datetime("2021-01-04")),
         time_spine_source=time_spine_source,
         system_schema=mf_test_session_state.mf_system_schema,
