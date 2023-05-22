@@ -2,13 +2,12 @@ from __future__ import annotations
 
 from typing import Sequence, List
 
-from metricflow.specs.column_assoc import ColumnAssociation
+from metricflow.specs.column_assoc import ColumnAssociation, ColumnAssociationResolver
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.plan_conversion.sql_expression_builders import make_coalesced_expr
 from metricflow.specs.specs import (
     InstanceSpecSetTransform,
     InstanceSpecSet,
-    ColumnAssociationResolver,
 )
 from metricflow.sql.sql_plan import SqlSelectColumn
 

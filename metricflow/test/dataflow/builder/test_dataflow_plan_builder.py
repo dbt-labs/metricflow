@@ -15,8 +15,8 @@ from metricflow.specs.specs import (
     MetricSpec,
     DimensionSpec,
     EntityReference,
-    ColumnAssociationResolver,
 )
+from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     OrderBySpec,
 )

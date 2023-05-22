@@ -15,8 +15,8 @@ from metricflow.specs.specs import (
     LinkableInstanceSpec,
     MetricInputMeasureSpec,
     MeasureSpec,
-    ColumnAssociationResolver,
 )
+from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.where_filter_transform import ConvertToWhereSpec
 
 logger = logging.getLogger(__name__)

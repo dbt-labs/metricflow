@@ -33,8 +33,8 @@ from metricflow.specs.specs import (
     MetricInputMeasureSpec,
     MetricSpec,
     NonAdditiveDimensionSpec,
-    ColumnAssociationResolver,
 )
+from metricflow.specs.column_assoc import ColumnAssociationResolver
 
 
 class SemanticModelAccessor(ABC):

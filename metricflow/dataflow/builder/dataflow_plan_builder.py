@@ -63,11 +63,11 @@ from metricflow.specs.specs import (
     OrderBySpec,
     NonAdditiveDimensionSpec,
     LinkableSpecSet,
-    ColumnAssociationResolver,
     LinklessEntitySpec,
     InstanceSpecSet,
     WhereFilterSpec,
 )
+from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.sql.sql_plan import SqlJoinType
 
 logger = logging.getLogger(__name__)

@@ -13,7 +13,7 @@ from dbt_semantic_interfaces.objects.filters.call_parameter_sets import (
 from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter, WhereFilterTransform
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.references import DimensionReference, EntityReference, TimeDimensionReference
-from metricflow.specs.specs import ColumnAssociationResolver
+from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     DimensionSpec,
     TimeDimensionSpec,

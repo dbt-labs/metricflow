@@ -39,8 +39,8 @@ from metricflow.specs.specs import (
     EntityReference,
     MetricFlowQuerySpec,
     MetricSpec,
-    ColumnAssociationResolver,
 )
+from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.where_filter_transform import ConvertToWhereSpec
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState

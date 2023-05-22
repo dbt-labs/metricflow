@@ -9,7 +9,7 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource, TimeSpineTableBuilder
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.specs.specs import ColumnAssociationResolver
+from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.fixtures.sql_client_fixtures import sql_client  # noqa: F401, F403

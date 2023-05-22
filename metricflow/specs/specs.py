@@ -32,7 +32,6 @@ from metricflow.aggregation_properties import AggregationState
 from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
-from metricflow.specs.column_assoc import ColumnAssociation
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_column_type import SqlColumnType
 from metricflow.visitor import VisitorOutputT
@@ -44,28 +43,6 @@ def hash_items(items: Sequence[SqlColumnType]) -> str:
     for item in items:
         hash_builder.update(str(item).encode("utf-8"))
     return hash_builder.hexdigest()
-
-
-class ColumnAssociationResolver(ABC):
-    """Get the default column associations for an element instance.
-
-    This is used for naming columns in an SQL query consistently. For example, dimensions with links are
-    named like <entity link>__<dimension name> e.g. user_id__country, and time dimensions at a different time
-    granularity are named <time dimension>__<time granularity> e.g. ds__month. Having a central place to name them will
-    make it easier to change this later on. Names generated need to be unique within a query.
-
-    It's also important to maintain this format because customers write constraints in SQL assuming this. This
-    allows us to stick the constraint in as WHERE clauses without having to parse the constraint SQL.
-
-    TODO: Updates are needed for time granularity in time dimensions, ToT for metrics.
-
-    The resolve* methods should return the column associations / column names that it should use in queries for the given
-    spec.
-    """
-
-    @abstractmethod
-    def resolve_spec(self, spec: InstanceSpec) -> ColumnAssociation:  # noqa: D
-        raise NotImplementedError
 
 
 class InstanceSpecVisitor(Generic[VisitorOutputT], ABC):
