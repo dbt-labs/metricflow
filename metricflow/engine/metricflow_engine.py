@@ -38,7 +38,7 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from metricflow.random_id import random_id
-from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
+from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_execution import DataflowToExecutionPlanConverter
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.time_spine import TimeSpineSource, TimeSpineTableBuilder
@@ -293,7 +293,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         self._semantic_manifest_lookup = semantic_manifest_lookup
         self._sql_client = sql_client
         self._column_association_resolver = column_association_resolver or (
-            DefaultColumnAssociationResolver(semantic_manifest_lookup)
+            DunderColumnAssociationResolver(semantic_manifest_lookup)
         )
         self._time_source = time_source
         self._time_spine_source = time_spine_source or TimeSpineSource(schema_name=system_schema)
@@ -314,7 +314,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         source_nodes = source_node_builder.create_from_data_sets(self._source_data_sets)
 
         node_output_resolver = DataflowPlanNodeOutputDataSetResolver[SemanticModelDataSet](
-            column_association_resolver=DefaultColumnAssociationResolver(semantic_manifest_lookup),
+            column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup),
             semantic_manifest_lookup=semantic_manifest_lookup,
             time_spine_source=self._time_spine_source,
         )

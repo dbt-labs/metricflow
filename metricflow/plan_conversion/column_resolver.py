@@ -23,8 +23,8 @@ from metricflow.specs.specs import (
 logger = logging.getLogger(__name__)
 
 
-class DefaultColumnAssociationResolverVisitor(InstanceSpecVisitor[ColumnAssociation]):
-    """Visitor helper class for DefaultColumnAssociationResolver."""
+class DunderColumnAssociationResolverVisitor(InstanceSpecVisitor[ColumnAssociation]):
+    """Visitor helper class for DefaultColumnAssociationResolver2."""
 
     def __init__(self, semantic_manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D
         self._semantic_manifest_lookup = semantic_manifest_lookup
@@ -89,7 +89,7 @@ class DefaultColumnAssociationResolverVisitor(InstanceSpecVisitor[ColumnAssociat
         )
 
 
-class DefaultColumnAssociationResolver(ColumnAssociationResolver):
+class DunderColumnAssociationResolver(ColumnAssociationResolver):
     """Uses a double underscore to map specs to column names.
 
     For example:
@@ -102,7 +102,7 @@ class DefaultColumnAssociationResolver(ColumnAssociationResolver):
     """
 
     def __init__(self, semantic_manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D
-        self._visitor_helper = DefaultColumnAssociationResolverVisitor(semantic_manifest_lookup)
+        self._visitor_helper = DunderColumnAssociationResolverVisitor(semantic_manifest_lookup)
 
     def resolve_spec(self, spec: InstanceSpec) -> ColumnAssociation:  # noqa: D
         return spec.accept(self._visitor_helper)

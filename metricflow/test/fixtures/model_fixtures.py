@@ -23,7 +23,7 @@ from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConv
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from dbt_semantic_interfaces.model_validator import ModelValidator
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
+from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.test.fixtures.id_fixtures import IdNumberSpace, patch_id_generators_helper
@@ -62,10 +62,10 @@ def query_parser_from_yaml(
     source_nodes = _data_set_to_source_nodes(semantic_manifest_lookup, create_data_sets(semantic_manifest_lookup))
     return MetricFlowQueryParser(
         model=semantic_manifest_lookup,
-        column_association_resolver=DefaultColumnAssociationResolver(semantic_manifest_lookup),
+        column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup),
         source_nodes=source_nodes,
         node_output_resolver=DataflowPlanNodeOutputDataSetResolver(
-            column_association_resolver=DefaultColumnAssociationResolver(semantic_manifest_lookup),
+            column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup),
             semantic_manifest_lookup=semantic_manifest_lookup,
             time_spine_source=time_spine_source,
         ),
@@ -134,7 +134,7 @@ def create_data_sets(
     semantic_models.sort(key=lambda x: x.name)
 
     converter = SemanticModelToDataSetConverter(
-        column_association_resolver=DefaultColumnAssociationResolver(multihop_semantic_manifest_lookup)
+        column_association_resolver=DunderColumnAssociationResolver(multihop_semantic_manifest_lookup)
     )
 
     for semantic_model in semantic_models:

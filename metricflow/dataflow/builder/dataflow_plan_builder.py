@@ -47,7 +47,7 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
+from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.node_processor import PreDimensionJoinNodeProcessor
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.time_spine import TimeSpineSource
@@ -118,14 +118,14 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         self._cost_function = cost_function
         self._source_nodes = source_nodes
         self._column_association_resolver = (
-            DefaultColumnAssociationResolver(semantic_manifest_lookup)
+            DunderColumnAssociationResolver(semantic_manifest_lookup)
             if not column_association_resolver
             else column_association_resolver
         )
         self._node_data_set_resolver = (
             DataflowPlanNodeOutputDataSetResolver[SqlDataSetT](
                 column_association_resolver=(
-                    DefaultColumnAssociationResolver(semantic_manifest_lookup)
+                    DunderColumnAssociationResolver(semantic_manifest_lookup)
                     if not column_association_resolver
                     else column_association_resolver
                 ),

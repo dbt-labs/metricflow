@@ -38,7 +38,7 @@ from dbt_semantic_interfaces.validations.validator_helpers import (
     ValidationIssue,
     ValidationWarning,
 )
-from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
+from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.async_sql_client import AsyncSqlClient
@@ -66,17 +66,17 @@ class QueryRenderingTools:
         self.source_node_builder = SourceNodeBuilder(semantic_manifest_lookup=self.semantic_manifest_lookup)
         self.time_spine_source = TimeSpineSource(schema_name=system_schema)
         self.converter = SemanticModelToDataSetConverter(
-            column_association_resolver=DefaultColumnAssociationResolver(
+            column_association_resolver=DunderColumnAssociationResolver(
                 semantic_manifest_lookup=self.semantic_manifest_lookup
             )
         )
         self.plan_converter = DataflowToSqlQueryPlanConverter(
-            column_association_resolver=DefaultColumnAssociationResolver(self.semantic_manifest_lookup),
+            column_association_resolver=DunderColumnAssociationResolver(self.semantic_manifest_lookup),
             semantic_manifest_lookup=self.semantic_manifest_lookup,
             time_spine_source=self.time_spine_source,
         )
         self.node_resolver = DataflowPlanNodeOutputDataSetResolver[SemanticModelDataSet](
-            column_association_resolver=DefaultColumnAssociationResolver(self.semantic_manifest_lookup),
+            column_association_resolver=DunderColumnAssociationResolver(self.semantic_manifest_lookup),
             semantic_manifest_lookup=self.semantic_manifest_lookup,
             time_spine_source=self.time_spine_source,
         )

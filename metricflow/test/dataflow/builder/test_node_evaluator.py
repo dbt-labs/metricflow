@@ -15,7 +15,7 @@ from metricflow.dataflow.dataflow_plan import BaseOutput, ValidityWindowJoinDesc
 from metricflow.dataset.dataset import DataSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
-from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
+from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.node_processor import PreDimensionJoinNodeProcessor
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.specs.specs import (
@@ -41,7 +41,7 @@ def node_evaluator(
 ) -> NodeEvaluatorForLinkableInstances:  # noqa: D
     """Return a node evaluator using the nodes in semantic_model_name_to_nodes"""
     node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
-        column_association_resolver=DefaultColumnAssociationResolver(simple_semantic_manifest_lookup),
+        column_association_resolver=DunderColumnAssociationResolver(simple_semantic_manifest_lookup),
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
         time_spine_source=time_spine_source,
     )
@@ -64,7 +64,7 @@ def make_multihop_node_evaluator(
 ) -> NodeEvaluatorForLinkableInstances:  # noqa: D
     """Return a node evaluator using the nodes in multihop_semantic_model_name_to_nodes"""
     node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
-        column_association_resolver=DefaultColumnAssociationResolver(semantic_manifest_lookup_with_multihop_links),
+        column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup_with_multihop_links),
         semantic_manifest_lookup=semantic_manifest_lookup_with_multihop_links,
         time_spine_source=time_spine_source,
     )
@@ -467,7 +467,7 @@ def test_node_evaluator_with_scd_target(
     """Tests the case where the joined node is an SCD with a validity window filter"""
 
     node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
-        column_association_resolver=DefaultColumnAssociationResolver(scd_semantic_manifest_lookup),
+        column_association_resolver=DunderColumnAssociationResolver(scd_semantic_manifest_lookup),
         semantic_manifest_lookup=scd_semantic_manifest_lookup,
         time_spine_source=time_spine_source,
     )

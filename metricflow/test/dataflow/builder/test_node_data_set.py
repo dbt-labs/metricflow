@@ -11,7 +11,7 @@ from metricflow.instances import (
     MeasureInstance,
 )
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
+from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.specs.specs import (
@@ -37,7 +37,7 @@ def test_no_parent_node_data_set(
 ) -> None:
     """Tests getting the data set from a single node."""
     resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
-        column_association_resolver=DefaultColumnAssociationResolver(simple_semantic_manifest_lookup),
+        column_association_resolver=DunderColumnAssociationResolver(simple_semantic_manifest_lookup),
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
         time_spine_source=time_spine_source,
     )
@@ -95,7 +95,7 @@ def test_joined_node_data_set(
 ) -> None:
     """Tests getting the data set from a dataflow plan with a join."""
     resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
-        column_association_resolver=DefaultColumnAssociationResolver(simple_semantic_manifest_lookup),
+        column_association_resolver=DunderColumnAssociationResolver(simple_semantic_manifest_lookup),
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
         time_spine_source=time_spine_source,
     )

@@ -4,7 +4,7 @@ import pytest
 
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
+from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.protocols.sql_client import SqlClient
@@ -35,7 +35,7 @@ def it_helpers(  # noqa: D
         mf_engine=MetricFlowEngine(
             semantic_manifest_lookup=simple_semantic_manifest_lookup,
             sql_client=async_sql_client,
-            column_association_resolver=DefaultColumnAssociationResolver(
+            column_association_resolver=DunderColumnAssociationResolver(
                 semantic_manifest_lookup=simple_semantic_manifest_lookup
             ),
             time_source=ConfigurableTimeSource(as_datetime("2020-01-01")),
