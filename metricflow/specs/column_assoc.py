@@ -16,7 +16,7 @@ class SingleColumnCorrelationKey(ColumnCorrelationKey, SerializableDataclass):
     """Key to use when there's only 1 column association in an instance."""
 
     # Pydantic throws an error during serialization if a dataclass has no fields.
-    __PYDANTIC_BUG_WORKAROUND: bool = True
+    PYDANTIC_BUG_WORKAROUND: bool = True
 
     def __eq__(self, other: Any) -> bool:  # type: ignore[misc] # noqa: D
         return isinstance(other, SingleColumnCorrelationKey)
