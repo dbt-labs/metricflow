@@ -7,6 +7,7 @@ from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.specs.column_assoc import (
     SingleColumnCorrelationKey,
     ColumnAssociation,
+    ColumnAssociationResolver,
 )
 from metricflow.specs.specs import (
     MetadataSpec,
@@ -17,7 +18,6 @@ from metricflow.specs.specs import (
     EntitySpec,
     InstanceSpecVisitor,
     InstanceSpec,
-    ColumnAssociationResolver,
 )
 
 logger = logging.getLogger(__name__)

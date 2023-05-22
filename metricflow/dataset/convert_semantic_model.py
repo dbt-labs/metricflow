@@ -24,10 +24,10 @@ from metricflow.specs.specs import (
     TimeDimensionSpec,
     DimensionSpec,
     EntitySpec,
-    ColumnAssociationResolver,
     DEFAULT_TIME_GRANULARITY,
     EntityReference,
 )
+from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.sql.sql_exprs import (
     SqlStringExpression,
     SqlDateTruncExpression,

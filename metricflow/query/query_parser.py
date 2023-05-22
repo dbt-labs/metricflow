@@ -35,9 +35,9 @@ from metricflow.specs.specs import (
     LinkableInstanceSpec,
     OrderBySpec,
     LinkableSpecSet,
-    ColumnAssociationResolver,
     WhereFilterSpec,
 )
+from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.where_filter_transform import ConvertToWhereSpec
 from metricflow.time.time_granularity_solver import (
     TimeGranularitySolver,

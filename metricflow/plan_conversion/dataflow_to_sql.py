@@ -7,7 +7,7 @@ from typing import Generic, List, Optional, Sequence, TypeVar, Union
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.references import MetricModelReference
 from metricflow.aggregation_properties import AggregationState
-from metricflow.specs.column_assoc import ColumnAssociation, SingleColumnCorrelationKey
+from metricflow.specs.column_assoc import ColumnAssociation, SingleColumnCorrelationKey, ColumnAssociationResolver
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.dag.id_generation import IdGeneratorRegistry
 from metricflow.dataflow.dataflow_plan import (
@@ -72,7 +72,6 @@ from metricflow.plan_conversion.sql_join_builder import (
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlEngineAttributes, SqlEngine
 from metricflow.specs.specs import (
-    ColumnAssociationResolver,
     MetricSpec,
     TimeDimensionSpec,
     MeasureSpec,

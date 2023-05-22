@@ -6,7 +6,7 @@ from metricflow.dataflow.dataflow_plan import (
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.time_spine import TimeSpineSource
-from metricflow.specs.specs import ColumnAssociationResolver
+from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 
 SourceDataSetT = TypeVar("SourceDataSetT", bound=SqlDataSet)

@@ -32,13 +32,13 @@ from metricflow.specs.specs import (
     InstanceSpec,
     EntitySpec,
     DimensionSpec,
-    ColumnAssociationResolver,
     TimeDimensionSpec,
     LinklessEntitySpec,
     LinkableInstanceSpec,
     EntityReference,
     InstanceSpecSet,
 )
+from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.sql.sql_exprs import (
     SqlColumnReferenceExpression,
     SqlColumnReference,
