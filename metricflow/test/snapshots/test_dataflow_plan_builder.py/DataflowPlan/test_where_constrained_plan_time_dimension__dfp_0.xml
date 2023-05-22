@@ -28,17 +28,18 @@
                     <WhereConstraintNode>
                         <!-- description = Constrain Output with WHERE -->
                         <!-- node_id = wcc_0 -->
-                        <!-- where_condition =                                                                               -->
-                        <!--   {'class': 'WhereFilterSpec',                                                                  -->
-                        <!--    'where_sql': "metric_time >= '2020-01-01'",                                                  -->
-                        <!--    'bind_parameters': {'class': 'SqlBindParameters', 'param_items': ()},                        -->
-                        <!--    'linkable_spec_set': {'class': 'LinkableSpecSet',                                            -->
-                        <!--                          'dimension_specs': (),                                                 -->
-                        <!--                          'time_dimension_specs': ({'class': 'TimeDimensionSpec',                -->
-                        <!--                                                    'element_name': 'metric_time',               -->
-                        <!--                                                    'entity_links': (),                          -->
-                        <!--                                                    'time_granularity': TimeGranularity.DAY},),  -->
-                        <!--                          'entity_specs': ()}}                                                   -->
+                        <!-- where_condition =                                                                            -->
+                        <!--   {'class': 'WhereFilterSpec',                                                               -->
+                        <!--    'where_sql': "metric_time >= '2020-01-01'",                                               -->
+                        <!--    'bind_parameters': {'class': 'SqlBindParameters', 'param_items': ()},                     -->
+                        <!--    'linkable_spec_set': {'class': 'LinkableSpecSet',                                         -->
+                        <!--                          'dimension_specs': (),                                              -->
+                        <!--                          'time_dimension_specs': ({'class': 'TimeDimensionSpec',             -->
+                        <!--                                                    'element_name': 'metric_time',            -->
+                        <!--                                                    'entity_links': (),                       -->
+                        <!--                                                    'time_granularity': TimeGranularity.DAY,  -->
+                        <!--                                                    'aggregation_state': None},),             -->
+                        <!--                          'entity_specs': ()}}                                                -->
                         <FilterElementsNode>
                             <!-- description =                                  -->
                             <!--   Pass Only Elements:                          -->
@@ -53,7 +54,8 @@
                             <!--   {'class': 'TimeDimensionSpec',             -->
                             <!--    'element_name': 'metric_time',            -->
                             <!--    'entity_links': (),                       -->
-                            <!--    'time_granularity': TimeGranularity.DAY}  -->
+                            <!--    'time_granularity': TimeGranularity.DAY,  -->
+                            <!--    'aggregation_state': None}                -->
                             <MetricTimeDimensionTransformNode>
                                 <!-- description = Metric Time Dimension 'ds' -->
                                 <!-- node_id = sma_10001 -->
