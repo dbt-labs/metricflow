@@ -5,16 +5,17 @@
         <OrderByLimitNode>
             <!-- description = Order By ['metric_time', 'bookings'] -->
             <!-- node_id = obl_0 -->
-            <!-- order_by_spec =                                                       -->
-            <!--   {'class': 'OrderBySpec',                                            -->
-            <!--    'descending': False,                                               -->
-            <!--    'metric_spec': None,                                               -->
-            <!--    'dimension_spec': None,                                            -->
-            <!--    'time_dimension_spec': {'class': 'TimeDimensionSpec',              -->
-            <!--                            'element_name': 'metric_time',             -->
-            <!--                            'entity_links': (),                        -->
-            <!--                            'time_granularity': TimeGranularity.DAY},  -->
-            <!--    'entity_spec': None}                                               -->
+            <!-- order_by_spec =                                                      -->
+            <!--   {'class': 'OrderBySpec',                                           -->
+            <!--    'descending': False,                                              -->
+            <!--    'metric_spec': None,                                              -->
+            <!--    'dimension_spec': None,                                           -->
+            <!--    'time_dimension_spec': {'class': 'TimeDimensionSpec',             -->
+            <!--                            'element_name': 'metric_time',            -->
+            <!--                            'entity_links': (),                       -->
+            <!--                            'time_granularity': TimeGranularity.DAY,  -->
+            <!--                            'aggregation_state': None},               -->
+            <!--    'entity_spec': None}                                              -->
             <!-- order_by_spec =                                 -->
             <!--   {'class': 'OrderBySpec',                      -->
             <!--    'descending': True,                          -->
@@ -54,7 +55,8 @@
                         <!--   {'class': 'TimeDimensionSpec',             -->
                         <!--    'element_name': 'metric_time',            -->
                         <!--    'entity_links': (),                       -->
-                        <!--    'time_granularity': TimeGranularity.DAY}  -->
+                        <!--    'time_granularity': TimeGranularity.DAY,  -->
+                        <!--    'aggregation_state': None}                -->
                         <MetricTimeDimensionTransformNode>
                             <!-- description = Metric Time Dimension 'ds' -->
                             <!-- node_id = sma_10001 -->

@@ -29,7 +29,8 @@
                 <!--   {'class': 'TimeDimensionSpec',             -->
                 <!--    'element_name': 'metric_time',            -->
                 <!--    'entity_links': (),                       -->
-                <!--    'time_granularity': TimeGranularity.DAY}  -->
+                <!--    'time_granularity': TimeGranularity.DAY,  -->
+                <!--    'aggregation_state': None}                -->
                 <JoinAggregatedMeasuresByGroupByColumnsNode>
                     <!-- description = Join Aggregated Measures with Standard Outputs -->
                     <!-- node_id = jamgc_0 -->
@@ -50,7 +51,8 @@
                             <!--   {'class': 'TimeDimensionSpec',             -->
                             <!--    'element_name': 'metric_time',            -->
                             <!--    'entity_links': (),                       -->
-                            <!--    'time_granularity': TimeGranularity.DAY}  -->
+                            <!--    'time_granularity': TimeGranularity.DAY,  -->
+                            <!--    'aggregation_state': None}                -->
                             <WhereConstraintNode>
                                 <!-- description = Constrain Output with WHERE -->
                                 <!-- node_id = wcc_0 -->
@@ -78,7 +80,8 @@
                                     <!--   {'class': 'TimeDimensionSpec',             -->
                                     <!--    'element_name': 'metric_time',            -->
                                     <!--    'entity_links': (),                       -->
-                                    <!--    'time_granularity': TimeGranularity.DAY}  -->
+                                    <!--    'time_granularity': TimeGranularity.DAY,  -->
+                                    <!--    'aggregation_state': None}                -->
                                     <MetricTimeDimensionTransformNode>
                                         <!-- description = Metric Time Dimension 'ds' -->
                                         <!-- node_id = sma_10001 -->
@@ -111,7 +114,8 @@
                             <!--   {'class': 'TimeDimensionSpec',             -->
                             <!--    'element_name': 'metric_time',            -->
                             <!--    'entity_links': (),                       -->
-                            <!--    'time_granularity': TimeGranularity.DAY}  -->
+                            <!--    'time_granularity': TimeGranularity.DAY,  -->
+                            <!--    'aggregation_state': None}                -->
                             <MetricTimeDimensionTransformNode>
                                 <!-- description = Metric Time Dimension 'ds' -->
                                 <!-- node_id = sma_10001 -->
