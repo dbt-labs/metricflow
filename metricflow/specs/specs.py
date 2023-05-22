@@ -505,17 +505,6 @@ class FilterSpec(SerializableDataclass):  # noqa: D
 
 
 @dataclass(frozen=True)
-class OutputColumnNameOverride(SerializableDataclass):
-    """Describes how we should name the output column for a time dimension instead of the default.
-
-    Note: This is used temporarily to maintain compatibility with the old framework.
-    """
-
-    time_dimension_spec: TimeDimensionSpec
-    output_column_name: str
-
-
-@dataclass(frozen=True)
 class LinkableSpecSet(SerializableDataclass):
     """Groups linkable specs."""
 
