@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import logging
+import warnings
 from dataclasses import dataclass
 
 import _pytest.config
@@ -11,6 +12,8 @@ from _pytest.fixtures import FixtureRequest
 
 from metricflow.configuration.env_var import EnvironmentVariable
 from metricflow.random_id import random_id
+from metricflow.sql_clients.common_client import SqlDialect
+from metricflow.sql_clients.sql_utils import dialect_from_url
 from metricflow.test.table_snapshot.table_snapshots import SqlTableSnapshotHash, SqlTableSnapshotRepository
 
 logger = logging.getLogger(__name__)
@@ -140,6 +143,33 @@ def mf_test_session_state(  # noqa: D
             request.config.getoption(USE_PERSISTENT_SOURCE_SCHEMA_CLI_FLAG, default=False)
         ),
     )
+
+
+@pytest.fixture(scope="session", autouse=True)
+def warn_user_about_slow_tests_without_parallelism(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+) -> None:
+    worker_count_env_var = EnvironmentVariable("PYTEST_XDIST_WORKER_COUNT", "1")
+    num_workers = worker_count_env_var.get_int()
+    num_items = len(request.session.items)
+    dialect = dialect_from_url(mf_test_session_state.sql_engine_url)
+
+    # If already running in parallel or if there's not many test items, no need to print the warning. Picking 10/30 as
+    # the thresholds, but not much thought has been put into it.
+    if num_workers > 1 or num_items < 10:
+        return
+
+    # Since DuckDB / Postgres is fast, use 30 as the threshold.
+    if (dialect is SqlDialect.DUCKDB or dialect is SqlDialect.POSTGRESQL) and num_items < 30:
+        return
+
+    if num_items > 10:
+        warnings.warn(
+            f"This test session with {dialect.name} and {num_items} item(s) is running with {num_workers} worker(s). "
+            f'Consider using the pytest-xdist option "-n <number of workers>" to parallelize execution and speed '
+            f"up the session."
+        )
 
 
 @pytest.fixture(scope="session", autouse=True)
