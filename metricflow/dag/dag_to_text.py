@@ -33,7 +33,6 @@ class MetricFlowDagToText(DagNodeVisitor[str]):
         # Generate the descriptions for the node
         node_fields = []
         for displayed_property in node.displayed_properties:
-
             if len(str(displayed_property.value)) > self.MAX_WIDTH or "\n" in str(displayed_property.value):
                 value_str_split = pformat_big_objects(displayed_property.value).split("\n")
                 max_value_str_length = max([len(x) for x in value_str_split])

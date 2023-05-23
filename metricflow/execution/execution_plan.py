@@ -101,7 +101,6 @@ class SelectSqlQueryToDataFrameTask(ExecutionPlanTask):
         extra_sql_tags: SqlJsonTag = SqlJsonTag(),
         parent_nodes: Optional[List[ExecutionPlanTask]] = None,
     ) -> None:
-
         self._sql_client = sql_client
         self._sql_query = sql_query
         self._bind_parameters = bind_parameters

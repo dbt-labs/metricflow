@@ -483,7 +483,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
     ) -> List[str]:
-
         # Run query
         query_result = self.query(
             MetricFlowQueryRequest.create_with_random_request_id(

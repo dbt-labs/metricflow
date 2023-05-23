@@ -63,7 +63,6 @@ class SequentialPlanExecutor(ExecutionPlanExecutor):
             result = current_task.execute()
             results.add_result(current_task.task_id, result)
         finally:
-
             if result:
                 runtime = f"{result.end_time - result.start_time:.2f}s"
                 if result.errors:
