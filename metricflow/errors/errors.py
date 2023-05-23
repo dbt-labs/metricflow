@@ -1,5 +1,5 @@
 import textwrap
-from typing import Dict
+from typing import Dict, Optional
 
 
 class CustomerFacingSemanticException(Exception):
@@ -9,7 +9,7 @@ class CustomerFacingSemanticException(Exception):
 
 
 class UnableToSatisfyQueryError(CustomerFacingSemanticException):  # noqa:D
-    def __init__(self, error_name: str, context: Dict[str, str] = None) -> None:  # noqa:D
+    def __init__(self, error_name: str, context: Optional[Dict[str, str]] = None) -> None:  # noqa:D
         """Context will be printed as list of items when this is converted to a string."""
         self.error_name = error_name
         self._context = context

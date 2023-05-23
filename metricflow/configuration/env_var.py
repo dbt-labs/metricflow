@@ -5,7 +5,7 @@ from typing import Optional
 class EnvironmentVariable:
     """Represents an environment variable and provides a way to retrieve the associated value."""
 
-    def __init__(self, name: str, default_value: str = None):
+    def __init__(self, name: str, default_value: Optional[str] = None):
         """Constructor.
 
         Args:

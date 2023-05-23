@@ -1,20 +1,20 @@
 from __future__ import annotations
 
-from typing import Sequence
+from typing import Sequence, Optional
 
 import click
 import pytest
 from click.testing import CliRunner, Result
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
+from dbt_semantic_interfaces.test_utils import as_datetime
 
 from metricflow.cli.cli_context import CLIContext
 from metricflow.engine.metricflow_engine import MetricFlowEngine
-from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
-from dbt_semantic_interfaces.test_utils import as_datetime
 from metricflow.test.time.configurable_time_source import ConfigurableTimeSource
 
 
@@ -51,7 +51,7 @@ class MetricFlowCliRunner(CliRunner):
         self.cli_context = cli_context
         super().__init__()
 
-    def run(self, cli: click.BaseCommand, args: Sequence[str] = None) -> Result:  # noqa: D
+    def run(self, cli: click.BaseCommand, args: Optional[Sequence[str]] = None) -> Result:  # noqa: D
         return super().invoke(cli, args, obj=self.cli_context)
 
 

@@ -101,7 +101,7 @@ def make_sql_client_from_config(handler: YamlFileHandler) -> AsyncSqlClient:
 
         if path_to_creds:
             # Load json credential (Only for service accounts auth)
-            if not pathlib.Path(path_to_creds).exists:
+            if not pathlib.Path(path_to_creds).exists():
                 raise ValueError(f"`{path_to_creds}` does not exist.")
             with open(path_to_creds, "r") as cred_file:
                 creds = cred_file.read()
