@@ -1,0 +1,29 @@
+name: Run MetricFlow Tests
+description: Runs MetricFlow using the specified Python version and engine settings.
+
+inputs:
+  python-version:
+    description: "Version of Python to use for testing."
+    required: true
+  MF_SQL_ENGINE_URL:
+    description: "URL for configuring SQL engine connection."
+    required: false
+    default: "duckdb://"
+  MF_SQL_ENGINE_PASSWORD:
+    description: "Password for configuring the SQL engine connection."
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+  - name: Setup Python ${{ inputs.python-version }} Environment
+    uses: ./.github/actions/setup-python-env
+    with:
+      python-version: "${{ inputs.python-version }}"
+  - name: Run Tests
+    shell: bash
+    run: make test
+    env:
+      MF_SQL_ENGINE_URL: ${{ secrets.MF_REDSHIFT_URL }}
+      MF_SQL_ENGINE_PASSWORD: ${{ secrets.MF_REDSHIFT_PWD }}
