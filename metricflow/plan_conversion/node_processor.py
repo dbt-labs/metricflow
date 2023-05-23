@@ -98,7 +98,6 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
         """Adds a time range constraint node to the input nodes."""
         processed_nodes: List[BaseOutput[SqlDataSetT]] = []
         for source_node in source_nodes:
-
             # Constrain the time range if specified.
             if time_range_constraint:
                 node_output_data_set = self._node_data_set_resolver.get_output_data_set(source_node)

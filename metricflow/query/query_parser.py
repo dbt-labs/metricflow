@@ -537,7 +537,10 @@ class MetricFlowQueryParser:
         return False
 
     def _metrics_have_same_time_granularities(self, metric_references: Sequence[MetricReference]) -> bool:
-        (min_granularity, max_granularity,) = self._time_granularity_solver.local_dimension_granularity_range(
+        (
+            min_granularity,
+            max_granularity,
+        ) = self._time_granularity_solver.local_dimension_granularity_range(
             metric_references=metric_references,
             local_time_dimension_reference=self._metric_time_dimension_reference,
         )

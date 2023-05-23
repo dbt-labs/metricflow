@@ -120,7 +120,6 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
         stmt: str,
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
     ) -> None:
-
         start = time.time()
         logger.info(BaseSqlClientImplementation._format_run_query_log_message(stmt, sql_bind_parameters))
         self._engine_specific_execute_implementation(stmt, sql_bind_parameters)

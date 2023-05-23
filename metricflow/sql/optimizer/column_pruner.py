@@ -198,7 +198,6 @@ class SqlColumnPrunerOptimizer(SqlQueryPlanOptimizer):
     """Removes unnecessary columns in the SELECT clauses."""
 
     def optimize(self, node: SqlQueryPlanNode) -> SqlQueryPlanNode:  # noqa: D
-
         # Can't prune columns without knowing the structure of the query.
         if not node.as_select_node:
             return node

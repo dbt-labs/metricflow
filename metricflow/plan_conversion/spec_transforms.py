@@ -34,7 +34,6 @@ class CreateSelectCoalescedColumnsForLinkableSpecs(InstanceSpecSetTransform[Sele
         self._table_aliases = table_aliases
 
     def transform(self, spec_set: InstanceSpecSet) -> SelectColumnSet:  # noqa: D
-
         dimension_columns: List[SqlSelectColumn] = []
         time_dimension_columns: List[SqlSelectColumn] = []
         entity_columns: List[SqlSelectColumn] = []

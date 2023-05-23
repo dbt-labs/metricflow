@@ -474,7 +474,6 @@ class MetricInputMeasureSpec(SerializableDataclass):
 
 @dataclass(frozen=True)
 class OrderBySpec(SerializableDataclass):  # noqa: D
-
     descending: bool
     metric_spec: Optional[MetricSpec] = None
     dimension_spec: Optional[DimensionSpec] = None

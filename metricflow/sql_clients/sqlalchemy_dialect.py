@@ -60,7 +60,6 @@ class SqlAlchemySqlClient(BaseSqlClientImplementation, ABC):
         driver: Optional[str] = None,
         query: Optional[Mapping[str, Union[str, Sequence[str]]]] = None,
     ) -> sqlalchemy.engine.Engine:
-
         connect_url = SqlAlchemySqlClient.build_engine_url(
             dialect=dialect,
             driver=driver,

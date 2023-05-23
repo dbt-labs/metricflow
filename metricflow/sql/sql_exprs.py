@@ -443,7 +443,6 @@ class SqlColumnReferenceExpression(SqlExpressionNode):
         column_replacements: Optional[SqlColumnReplacements] = None,
         should_render_table_alias: Optional[bool] = None,
     ) -> SqlExpressionNode:
-
         # TODO: Hack to work around the fact our test data set contains "user", which is a reserved keyword.
         # We should migrate "user" -> "user_id" in the test set.
         # This will force "user" to be rendered as "table_alias.user"
