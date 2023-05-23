@@ -75,8 +75,8 @@ def test_list_dimensions(mf_client: MetricFlowClient) -> None:  # noqa: D
     assert isinstance(dimensions[0], Dimension)
 
     dimensions = mf_client.list_dimensions(["bookings", "revenue"])
-    assert len(dimensions) == 1
-    assert dimensions[0].name == "ds"
+    assert len(dimensions) == 2
+    assert [dim.name for dim in dimensions] == ["ds", "ds"]
 
 
 def test_get_dimension_values(mf_client: MetricFlowClient) -> None:  # noqa: D
