@@ -203,7 +203,7 @@ class SqlSelectStatementNode(SqlQueryPlanNode):
     def order_bys(self) -> Tuple[SqlOrderByDescription, ...]:  # noqa: D
         return self._order_bys
 
-    def accept(self, visitor: SqlQueryPlanNodeVisitor) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlQueryPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_select_statement_node(self)
 
     @property

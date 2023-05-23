@@ -110,7 +110,7 @@ def assert_plan_snapshot_text_equal(
     plan_snapshot_text: str,
     plan_snapshot_file_extension: str = ".xml",
     exclude_line_regex: Optional[str] = None,
-    incomparable_strings_replacement_function: Callable[[str], str] = None,
+    incomparable_strings_replacement_function: Optional[Callable[[str], str]] = None,
     additional_sub_directories_for_snapshots: Tuple[str, ...] = (),
 ) -> None:
     """Checks if the given plan text is equal to the one that's saved for comparison.
@@ -143,7 +143,7 @@ def assert_snapshot_text_equal(
     snapshot_text: str,
     snapshot_file_extension: str,
     exclude_line_regex: Optional[str] = None,
-    incomparable_strings_replacement_function: Callable[[str], str] = None,
+    incomparable_strings_replacement_function: Optional[Callable[[str], str]] = None,
     additional_sub_directories_for_snapshots: Tuple[str, ...] = (),
 ) -> None:
     """Similar to assert_plan_snapshot_text_equal(), but with more controls on how the snapshot paths are generated."""
@@ -157,7 +157,7 @@ def assert_snapshot_text_equal(
         + snapshot_file_extension
     )
 
-    if incomparable_strings_replacement_function:
+    if incomparable_strings_replacement_function is not None:
         snapshot_text = incomparable_strings_replacement_function(snapshot_text)
 
     # If we are in overwrite mode, make a new plan:
