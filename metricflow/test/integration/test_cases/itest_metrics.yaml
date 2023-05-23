@@ -782,7 +782,7 @@ integration_test:
       ) d
       ON {{ render_date_trunc("c.ds", TimeGranularity.MONTH) }} = d.metric_time
     ) b
-    ON a.metric_time = b.metric_time    
+    ON a.metric_time = b.metric_time
 ---
 integration_test:
   name: derived_metric_offset_with_one_metric_input
@@ -838,13 +838,13 @@ integration_test:
 integration_test:
   name: nested_derived_metric_with_input_metric_with_constraint
   description: |
-    Tests a nested derived metric where the input metric is a derived metric 
+    Tests a nested derived metric where the input metric is a derived metric
     where the input_metric has a metric constraint
   model: SIMPLE_MODEL
   metrics: ["booking_value_sub_instant_add_10"]
   group_bys: ["metric_time"]
   check_query: |
-    SELECT 
+    SELECT
       c.booking_value_sub_instant + 10 AS booking_value_sub_instant_add_10
       , c.metric_time
     FROM (

@@ -1,11 +1,11 @@
-semantic_model: 
-  name: transactions 
+semantic_model:
+  name: transactions
   description: |
     Each row represents one transaction. There
-    will be a new row for any cancellations or alterations. 
-    There is a transaction, order, and customer id for 
-    every transaction. There is only one transaction id per 
-    transaction, but there can be many rows per order id and 
+    will be a new row for any cancellations or alterations.
+    There is a transaction, order, and customer id for
+    every transaction. There is only one transaction id per
+    transaction, but there can be many rows per order id and
     customer id. The `ds` or date is reflected in UTC.
   entities:
     - name: transaction
@@ -29,7 +29,7 @@ semantic_model:
       agg: SUM
       create_metric: true
     - name: quick_buy_amount_usd
-      description: The total USD value of the transactions that were 
+      description: The total USD value of the transactions that were
                    purchased using the "quick buy" button.
       expr: CASE WHEN transaction_type_name = 'quick-buy' THEN transaction_amount_usd ELSE 0 END
       agg: SUM
@@ -40,12 +40,12 @@ semantic_model:
       agg: SUM_BOOLEAN
       create_metric: true
     - name: cancellations_usd
-      description: The total USD value of the transactions that were 
+      description: The total USD value of the transactions that were
                    cancelled.
       expr: CASE WHEN transaction_type_name = 'cancellation' THEN transaction_amount_usd ELSE 0 END
       agg: SUM
     - name: alterations_usd
-      description: The total USD value of the transactions that were 
+      description: The total USD value of the transactions that were
                    altered.
       expr: CASE WHEN transaction_type_name = 'alteration' THEN transaction_amount_usd ELSE 0 END
       agg: SUM
@@ -65,18 +65,18 @@ semantic_model:
     - name: quick_buy_transaction
       type: categorical
       expr: |
-        CASE 
+        CASE
           WHEN transaction_type_name = 'quick-buy' THEN 'Quick Buy'
-          ELSE 'Not Quick Buy' 
+          ELSE 'Not Quick Buy'
         END
   node_relation:
     alias: $transactions_table
     schema_name: $system_schema
 
 ---
-metric: 
+metric:
   name: cancellations
-  type: measure_proxy 
+  type: measure_proxy
   type_params:
     measure: cancellations_usd
 ---
@@ -89,7 +89,7 @@ metric:
 ---
 metric:
   name: revenue_usd
-  type: expr 
+  type: expr
   type_params:
     expr: transaction_amount_usd - cancellations_usd + alterations_usd
     measures:
@@ -99,7 +99,7 @@ metric:
 ---
 metric:
   name: cancellations_mx
-  type: measure_proxy 
+  type: measure_proxy
   type_params:
     measure: cancellations_usd
   filter: |
@@ -107,7 +107,7 @@ metric:
 ---
 metric:
   name: transaction_usd_na
-  type: measure_proxy 
+  type: measure_proxy
   type_params:
     measure: transaction_amount_usd
   filter: |
@@ -115,7 +115,7 @@ metric:
 ---
 metric:
   name: transaction_usd_l7d_mx
-  type: cumulative 
+  type: cumulative
   type_params:
     measures:
       - transaction_amount_usd
@@ -123,7 +123,7 @@ metric:
   filter: |
     {{ dimension('country', entity_path=['customer']) }} = 'MX'
 ---
-metric: 
+metric:
   name: transaction_usd_mtd
   type: cumulative
   type_params:
@@ -133,9 +133,9 @@ metric:
 ---
 metric:
   name: transaction_usd_na_l7d
-  type: cumulative 
+  type: cumulative
   type_params:
-    measures: 
+    measures:
       - transaction_amount_usd
     window: 7 days
   filter: |

@@ -131,7 +131,7 @@ def test_nonexistent_metric(time_spine_source: TimeSpineSource) -> None:  # noqa
         textwrap.dedent(
             """\
             Unable To Satisfy Query Error: Unknown metric: 'booking'
-        
+
             Suggestions for 'booking':
                 ['bookings',
                  'booking_value',
@@ -156,7 +156,7 @@ def test_non_existent_group_by(time_spine_source: TimeSpineSource) -> None:  # n
         textwrap.dedent(
             """\
             Unable To Satisfy Query Error: Unknown element name 'is_instan' in dimension name 'is_instan'
-            
+
             Suggestions for 'is_instan':
                 ['is_instant']
             """
@@ -180,7 +180,7 @@ def test_invalid_group_by(time_spine_source: TimeSpineSource) -> None:  # noqa: 
             Unable To Satisfy Query Error: Dimensions ['capacity_latest'] cannot be resolved for metrics \
 ['bookings']. The invalid dimension may not exist, require an ambiguous join (e.g. a join path that can be satisfied \
 in multiple ways), or require a fanout join.
-            
+
             Suggestions for invalid dimension 'capacity_latest':
                 ['listing__capacity_latest', 'listing__country_latest']
             """
