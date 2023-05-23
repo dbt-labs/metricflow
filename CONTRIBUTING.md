@@ -21,27 +21,22 @@ Welcome to the MetricFlow developer community, we're thrilled to have you aboard
         - This is only required if you are developing with Postgres.
         - Follow the [instructions from Docker](https://docs.docker.com/get-docker/)
 3. [Create a fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) of the [MetricFlow repo](https://github.com/dbt-labs/metricflow) and [clone it locally](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository).
-4. Activate a [Python virtual environment](https://docs.python.org/3/library/venv.html). While this is not required, it is *strongly* encouraged.
-    - We provide `make venv` and `make remove_venv` helpers for creating/deleting standard Python virtual envs. You may pass `VENV_NAME=your_custom_name` to override the default `venv` location.
-    - [conda](https://docs.conda.io/en/latest/) users may prefer [conda's environment management](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) instead.
-5. Install [Poetry](https://python-poetry.org/docs/) via `pip install poetry` - this is the tool we use to manage our build dependencies. Note, due to [an issue with poetry configurations using virtualenvs.create.false](https://github.com/python-poetry/poetry/issues/6459) some environments (e.g., Ubuntu) may experience dependency resolution problems with poetry 1.2.0, in which case you should make sure you have a virtual env set up prior to installation. If you really must use the global machine env you may be able to work around the problem by using `pip install poetry==1.1.15`.
-6. Run `make install` to get all of your dependencies loaded and ready for development
-    - This includes useful dev tools, including pre-commit for linting.
-    - You may run `pre-commit install` if you would like the linters to run prior to all local git commits
-7. OPTIONAL: install dbt dependencies. Developers working on dbt integrations will need to install these in order to work on those integrations and run the relevant tests. Any of the following commands should be sufficient for development purposes:
-    - `poetry install -E "dbt-postgres dbt-cloud"`
-    - `poetry install -E "dbt-redshift dbt-cloud"`
-    - `poetry install -E "dbt-snowflake dbt-cloud"`
-    - `poetry install -E "dbt-bigquery dbt-cloud"`
+4. Install [Hatch](https://github.com/pypa/hatch) via `make install-hatch` - this is the tool we use to manage our build
+dependencies.
 
 ## Start testing and development
 
-You're ready to start! Note all `make` and `poetry` commands should be run from your repository root unless otherwise indicated.
+You're ready to start! Note all `make` and `hatch` commands should be run from your repository root unless otherwise indicated.
+
+`pyproject.yaml` includes a definition for a Hatch environment named `dev_env` that is similar to a virtual environment
+and allows packages to be installed in isolation.
+
+When running any one of the hatch commands, the environment is automatically set up for you.
 
 1. Run some tests to make sure things happen:
     - Run the full test suite: `make test`
-    - Run a subset of tests based on path: `poetry run pytest metricflow/test/plan_conversion`
-    - Run a subset of tests based on test name substring: `poetry run pytest -k "query" metricflow/test`
+    - Run a subset of tests based on path: `hatch run dev_env:pytest metricflow/test/plan_conversion`
+    - Run a subset of tests based on test name substring: `hatch run dev_env:pytest -k "query" metricflow/test`
 2. Now you may wish to break some tests. Make some local changes and run the relevant tests again and see if you broke them!
     - Working with integration tests
         - These tests are driven by a set of test configs in [metricflow/test/integration/test_cases](metricflow/test/integration/test_cases/). They compare the output of a MetricFlow query against the output of a similar SQL query.
@@ -49,11 +44,11 @@ You're ready to start! Note all `make` and `poetry` commands should be run from 
             - Modify this file if you are looking to test boundary cases involving things like repeated rows of data.
         - Let's break a test!
             - Change a SQL query inside of [metricflow/test/integration/test_cases/itest_simple.yaml](metricflow/test/integration/test_cases/itest_simple.yaml)
-            - Run the test case: `poetry run pytest -k "itest_simple.yaml" metricflow/test/integration`. Did it fail?
+            - Run the test case: `hatch run dev_env:pytest -k "itest_simple.yaml" metricflow/test/integration`. Did it fail?
     - Working with module and component tests
         - These are generally laid out in a similar hierarchy to the main package.
         - Let's try them out:
-            - Run the [dataflow plan to sql plan conversion tests](metricflow/test/plan_conversion/test_dataflow_to_sql_plan.py): `poetry run pytest metricflow/test/plan_conversion/test_dataflow_to_sql_plan.py`.
+            - Run the [dataflow plan to sql plan conversion tests](metricflow/test/plan_conversion/test_dataflow_to_sql_plan.py): `hatch run dev_env:pytest metricflow/test/plan_conversion/test_dataflow_to_sql_plan.py`.
             - Modify something in the [dataflow to sql plan converter logic](metricflow/plan_conversion/dataflow_to_sql.py). I like to throw exceptions just to make sure things blow up.
             - Run the test again. Did anything break?
     - Remember to clean up when you're done playing with the tests!
@@ -66,11 +61,11 @@ You're ready to start! Note all `make` and `poetry` commands should be run from 
     - By default, without `MF_SQL_ENGINE_URL` and `MF_SQL_ENGINE_PASSWORD` set, your tests will run against SQLite.
 4. Run the linters with `make lint` at any time, but especially before submitting a PR. We use:
     - `Black` for formatting
-    - `Flake8` for general Python linting
+    - `Ruff` for general Python linting
     - `MyPy` for typechecking
 5. To see how your changes work with more interactive queries, use your repo-local CLI.
-    - Run `poetry run mf --help`
-    - Follow the CLI help from there, just remember your local CLI is always `poetry run mf <COMMAND>`!
+    - Run `hatch run dev_env:mf --help`
+    - Follow the CLI help from there, just remember your local CLI is always `hatch run dev_env:run mf <COMMAND>`!
 
 ## Adding or modifying a CHANGELOG Entry!
 
