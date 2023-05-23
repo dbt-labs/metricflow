@@ -451,19 +451,28 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         return self._create_execution_plan(mf_request)
 
     def simple_dimensions_for_metrics(self, metric_names: List[str]) -> List[Dimension]:  # noqa: D
-        return [
-            self._semantic_manifest_lookup.semantic_model_lookup.get_dimension(DimensionReference(dim.element_name))
-            for dim in self._semantic_manifest_lookup.metric_lookup.element_specs_for_metrics(
-                metric_references=[MetricReference(element_name=mname) for mname in metric_names],
-                without_any_property=frozenset(
-                    {
-                        LinkableElementProperties.ENTITY,
-                        LinkableElementProperties.DERIVED_TIME_GRANULARITY,
-                        LinkableElementProperties.LOCAL_LINKED,
-                    }
-                ),
-            )
-        ]
+        linkable_dimension_tuples = self._semantic_manifest_lookup.metric_lookup.linkable_set_for_metrics(
+            metric_references=[MetricReference(element_name=mname) for mname in metric_names],
+            without_any_property=frozenset(
+                {
+                    LinkableElementProperties.ENTITY,
+                    LinkableElementProperties.DERIVED_TIME_GRANULARITY,
+                    LinkableElementProperties.LOCAL_LINKED,
+                }
+            ),
+        ).path_key_to_linkable_dimensions.values()
+
+        dimensions: List[Dimension] = []
+        for linkable_dimension_tuple in linkable_dimension_tuples:
+            for linkable_dimension in linkable_dimension_tuple:
+                semantic_model = self._semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
+                    linkable_dimension.semantic_model_origin
+                )
+                assert semantic_model
+                dimensions.append(
+                    semantic_model.get_dimension(DimensionReference(element_name=linkable_dimension.element_name))
+                )
+        return dimensions
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def list_metrics(self) -> List[Metric]:  # noqa: D
