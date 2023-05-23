@@ -1,22 +1,40 @@
+files: ^metricflow/
 repos:
-  - repo: https://github.com/psf/black
-    rev: 22.3.0
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
     hooks:
-      - id: black
-        verbose: true
-  - repo: https://github.com/PyCQA/flake8
-    rev: 3.8.3
-    hooks:
-      - id: flake8
-        additional_dependencies: [flake8-docstrings==1.5.0]
-        verbose: true
+    - id: check-json
+    - id: trailing-whitespace
+      exclude_types:
+        - "markdown"
+    - id: end-of-file-fixer
+    - id: check-case-conflict
 
-  - repo: https://github.com/pre-commit/mirrors-mypy # configured via mypy.ini
-    rev: v0.942
+  # Faster version of flake8 / isort / etc.
+  # Uses ruff.toml for configuration.
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: 'v0.0.260'
+    hooks:
+    - id: ruff
+      verbose: true
+      args: [--fix, --exit-non-zero-on-fix]
+
+  - repo: https://github.com/psf/black
+    rev: 23.3.0
+    hooks:
+    - id: black
+      verbose: true
+      args: ["--line-length", "120"]
+
+  # Uses mypy.ini for configuration.
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    # Note: with "language: system", this version is unrelated to what's run.
+    rev: v1.3.0
     hooks:
       - id: mypy
-        name: mypy_metricflow
         args: [--show-error-codes]
         verbose: true
-        # Keep mypy environment packages consistent with the local environment.
+        # "system" means that the current environment will be used to run the hook, not the environment installed by
+        # pre-commit. This is set for mypy to use the specified package dependencies in Hatch (assuming pre-commit is
+        # run with hatch run ...).
         language: system
