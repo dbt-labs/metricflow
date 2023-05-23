@@ -38,11 +38,11 @@ def dw_backed_warehouse_validation_model(
     return data_warehouse_validation_model
 
 
-def test_build_semantic_model_tasks(
+def test_build_semantic_model_tasks(  # noqa:D
     mf_test_session_state: MetricFlowTestSessionState,
     data_warehouse_validation_model: SemanticManifest,
     async_sql_client: AsyncSqlClient,
-) -> None:  # noqa:D
+) -> None:
     tasks = DataWarehouseTaskBuilder.gen_semantic_model_tasks(
         model=data_warehouse_validation_model,
         sql_client=async_sql_client,

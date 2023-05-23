@@ -1,4 +1,4 @@
-"""This module aims to help figure out the answer to the following scenario:
+"""This module aims to help figure out the answer to the following scenario.
 
 I have a node containing a measure that's needed for a metric, and I also have a list of dimensions that I need for that
 measure.
