@@ -8,8 +8,8 @@ import time
 import traceback
 import uuid
 from hashlib import sha256
-from typing import Callable, Optional, Any
-from typing import List
+from typing import Callable, List, Optional, TypeVar
+from typing_extensions import ParamSpec
 
 from metricflow.configuration.config_handler import ConfigHandler
 from metricflow.configuration.constants import CONFIG_EMAIL
@@ -121,7 +121,11 @@ class TelemetryReporter:
                 )
 
 
-def log_call(telemetry_reporter: TelemetryReporter, module_name: str) -> Callable[..., Any]:  # type: ignore[misc]
+P = ParamSpec("P")
+R = TypeVar("R")
+
+
+def log_call(telemetry_reporter: TelemetryReporter, module_name: str) -> Callable[[Callable[P, R]], Callable[P, R]]:
     """Decorator to make it easier to log telemetry for function calls.
 
     Using module_name instead of introspection since it seems more robust.
@@ -134,9 +138,9 @@ def log_call(telemetry_reporter: TelemetryReporter, module_name: str) -> Callabl
 
     """
 
-    def decorator(func: Callable) -> Callable:
+    def decorator(func: Callable[P, R]) -> Callable[P, R]:
         @functools.wraps(func)
-        def wrapped(*args, **kwargs) -> Callable:  # type: ignore
+        def wrapped(*args: P.args, **kwargs: P.kwargs) -> R:
             # Not every Callable has a __name__
             function_name = getattr(func, "__name__", repr(func))
             invocation_id = f"call_{random_id()}"

@@ -1,0 +1,6 @@
+kind: Fixes
+body: Fix broken type signature for log_call decorator
+time: 2023-05-23T16:41:25.095233-07:00
+custom:
+  Author: tlento
+  Issue: None
