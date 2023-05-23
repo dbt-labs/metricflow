@@ -5,15 +5,22 @@ inputs:
   python-version:
     description: "Version of Python to use for testing."
     required: true
-  MF_SQL_ENGINE_URL:
+  mf_sql_engine_url:
     description: "URL for configuring SQL engine connection."
     required: false
     default: "duckdb://"
-  MF_SQL_ENGINE_PASSWORD:
+  mf_sql_engine_password:
     description: "Password for configuring the SQL engine connection."
     required: false
     default: ""
-
+  parallelism:
+    description: "How many tests to run in parallel. auto = # of cores."
+    required: false
+    default: "auto"
+  make-target:
+    description: "The target to use for the make command."
+    required: false
+    default: "test"
 runs:
   using: "composite"
   steps:
@@ -23,7 +30,8 @@ runs:
       python-version: "${{ inputs.python-version }}"
   - name: Run Tests
     shell: bash
-    run: make test
+    run: make -e PARALLELISM=${{ inputs.parallelism }} ${{ inputs.make-target }}
     env:
-      MF_SQL_ENGINE_URL: ${{ secrets.MF_REDSHIFT_URL }}
-      MF_SQL_ENGINE_PASSWORD: ${{ secrets.MF_REDSHIFT_PWD }}
+      MF_SQL_ENGINE_URL: ${{ inputs.mf_sql_engine_url }}
+      MF_SQL_ENGINE_PASSWORD: ${{ inputs.mf_sql_engine_password }}
+      METRICFLOW_CLIENT_EMAIL: ci-tester@gmail.com
