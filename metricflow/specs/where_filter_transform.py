@@ -64,7 +64,6 @@ class ConvertToWhereSpec(WhereFilterTransform[WhereFilterSpec]):
         )
 
     def transform(self, where_filter: WhereFilter) -> WhereFilterSpec:  # noqa: D
-
         dimension_specs = []
         time_dimension_specs = []
         entity_specs = []

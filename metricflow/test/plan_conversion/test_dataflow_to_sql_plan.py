@@ -206,7 +206,9 @@ def test_filter_with_where_constraint_node(  # noqa: D
     )  # need to include ds_spec because where constraint operates on ds
     where_constraint_node = WhereConstraintNode[SemanticModelDataSet](
         parent_node=filter_node,
-        where_constraint=WhereFilter(where_sql_template="{{ time_dimension('ds', 'day') }} = '2020-01-01'",).transform(
+        where_constraint=WhereFilter(
+            where_sql_template="{{ time_dimension('ds', 'day') }} = '2020-01-01'",
+        ).transform(
             ConvertToWhereSpec(
                 column_association_resolver=column_association_resolver,
             )

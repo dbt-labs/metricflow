@@ -558,7 +558,6 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         logger.info(f"Found {len(node_to_evaluation)} candidate measure nodes.")
 
         if len(node_to_evaluation) > 0:
-
             cost_function = DefaultCostFunction[SqlDataSetT]()
 
             node_with_lowest_cost = min(node_to_evaluation, key=cost_function.calculate_cost)

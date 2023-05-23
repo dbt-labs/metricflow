@@ -182,7 +182,6 @@ def test_order_by_granularity_conversion(time_spine_source: TimeSpineSource) -> 
 
 
 def test_order_by_granularity_no_conversion(time_spine_source: TimeSpineSource) -> None:  # noqa: D
-
     bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=BOOKINGS_YAML)
 
     query_parser = query_parser_from_yaml([bookings_yaml_file], time_spine_source)

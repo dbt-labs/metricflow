@@ -58,7 +58,6 @@ class DataflowToExecutionPlanConverter(Generic[SqlDataSetT], SinkNodeVisitor[Sql
         node: Union[BaseOutput[SourceDataSetT], ComputedMetricsOutput[SourceDataSetT]],
         output_table: Optional[SqlTable] = None,
     ) -> ExecutionPlan:
-
         sql_plan = self._sql_plan_converter.convert_to_sql_query_plan(
             sql_engine_attributes=self._sql_client.sql_engine_attributes,
             sql_query_plan_id=IdGeneratorRegistry.for_class(SqlQueryPlan).create_id(SQL_QUERY_PLAN_PREFIX),
