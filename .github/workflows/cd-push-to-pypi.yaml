@@ -5,23 +5,25 @@ on:
     tags:
       - "*"
 
+env:
+  PYTHON_VERSION: "3.8"
+
 jobs:
-  poetry-publish:
+  pypi-publish:
     runs-on: ubuntu-latest
     environment: Pypi Publish
     steps:
-      - uses: actions/checkout@v3
+      - name: Check-out the repo
+        uses: actions/checkout@v3
 
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v4
+      - name: Setup Python ${{ env.PYTHON_VERSION }} Environment
+        uses: ./.github/actions/setup-python-env
         with:
-          python-version: "3.9"
+          python-version: "${{ env.PYTHON_VERSION }}"
 
-      - name: Install Poetry
-        run: pip install poetry
+      - name: Hatch Publish
+        run: hatch publish
+        env:
+          HATCH_INDEX_USER: transform_data
+          HATCH_INDEX_AUTH: ${{ secrets.PYPI_PASSWORD }}
 
-      - name: Install dependencies
-        run: make install
-
-      - name: Poetry Publish
-        run: poetry build && poetry publish -u transform_data -p ${{ secrets.PYPI_PASSWORD }}

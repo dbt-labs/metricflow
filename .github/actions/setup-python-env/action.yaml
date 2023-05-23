@@ -5,7 +5,7 @@ inputs:
   python-version:
     description: "Version of Python to use for testing"
     required: false
-    default: '3.8'
+    default: "3.8"
 
 runs:
   using: "composite"
@@ -14,23 +14,29 @@ runs:
   - name: Set Linux Release Environment Variable
     shell: bash
     run: echo "LINUX_RELEASE=$(lsb_release -rs)" >> $GITHUB_ENV
-  - name: Set up Python 3.9
+  - name: Set up Python ${{ inputs.python_version }}
     uses: actions/setup-python@v4
     with:
-      python-version: "3.9"
+      python-version: "${{ inputs.python-version }}"
 
   # Cache the dependencies installed by Hatch so that we don't need to reinstall them on every run.
   - uses: actions/cache@v3
     with:
+      # Save pip cache.
+      # Save Hatch environments.
+      # Save the package cache for Hatch.
+      # Save pre-commit environments.
       path: |
         ${{ env.pythonLocation }}
-        # Save Hatch environments.
+        ~/.cache/pip
         ~/.local/share/hatch
-        # Save the package cache for Hatch.
         ~/.cache/hatch
-        # Save pre-commit environments.
         ~/.cache/pre-commit
-      key: ${{ env.pythonLocation }}-${{ hashFiles('pyproject.toml') }}-${{ env.LINUX_RELEASE }}-000
+      key: >
+        ${{ env.pythonLocation }}
+        --${{ hashFiles('pyproject.toml') }}
+        --${{ hashFiles('.pre-commit-config.yaml') }}
+        --${{ env.LINUX_RELEASE }}
 
   - name: Install Hatch
     shell: bash

@@ -17,27 +17,19 @@ jobs:
   pre-commit:
     name: Run Pre-Commit Linting Hooks
     runs-on: ubuntu-latest
+    env:
+      python-version: "3.8"
     steps:
+
       - name: Check-out the repo
         uses: actions/checkout@v3
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v4
+
+      - name: Setup Python ${{ env.python-version }} Environment
+        uses: ./.github/actions/setup-python-env
         with:
-          python-version: "3.9"
-
-      - uses: actions/cache@v3
-        with:
-          # cache the python dependencies and precommit-created virtual envs
-          path: |
-            ${{ env.pythonLocation }}
-            ~/.cache/pypoetry
-          key: ${{ env.pythonLocation }}-${{ hashFiles('.pre-commit-config.yaml', '.github/workflows/ci-linting.yaml', 'mypy.ini', 'poetry.lock') }}-ubuntu-latest-22.04
-
-      - name: Install Poetry
-        run: pip install poetry
-
-      - name: Install deps
-        run: cd metricflow && poetry install
+          python-version: "${{ env.python-version }}"
 
       - name: Run Linter
-        run: poetry run pre-commit run --show-diff-on-failure --color=always --all-files || (cat /home/runner/.cache/pre-commit/pre-commit.log && false)
+        run: >
+          hatch -v run dev-env:pre-commit run --show-diff-on-failure --color=always --all-files
+          || (cat /home/runner/.cache/pre-commit/pre-commit.log && false)
