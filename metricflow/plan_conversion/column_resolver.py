@@ -3,7 +3,7 @@ import logging
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
+from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName, DUNDER
 from metricflow.specs.column_assoc import (
     SingleColumnCorrelationKey,
     ColumnAssociation,
@@ -66,7 +66,7 @@ class DunderColumnAssociationResolverVisitor(InstanceSpecVisitor[ColumnAssociati
         return ColumnAssociation(
             column_name=column_name
             + (
-                f"__{time_dimension_spec.aggregation_state.value.lower()}"
+                f"{DUNDER}{time_dimension_spec.aggregation_state.value.lower()}"
                 if time_dimension_spec.aggregation_state
                 else ""
             ),
