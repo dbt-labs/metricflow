@@ -7,4 +7,3 @@ table_snapshot:
       type: TIME
   rows:
     - ["True", "2022-06-01"]
-
