@@ -3,7 +3,7 @@ from _pytest.fixtures import FixtureRequest
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
+from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_execution import DataflowToExecutionPlanConverter
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.time_spine import TimeSpineSource
@@ -27,7 +27,7 @@ def make_execution_plan_converter(  # noqa: D
 ) -> DataflowToExecutionPlanConverter:
     return DataflowToExecutionPlanConverter[SemanticModelDataSet](
         sql_plan_converter=DataflowToSqlQueryPlanConverter[SemanticModelDataSet](
-            column_association_resolver=DefaultColumnAssociationResolver(semantic_manifest_lookup),
+            column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup),
             semantic_manifest_lookup=semantic_manifest_lookup,
             time_spine_source=time_spine_source,
         ),
@@ -178,7 +178,7 @@ def test_multihop_joined_plan(  # noqa: D
 
     to_execution_plan_converter = DataflowToExecutionPlanConverter(
         sql_plan_converter=DataflowToSqlQueryPlanConverter[SemanticModelDataSet](
-            column_association_resolver=DefaultColumnAssociationResolver(multi_hop_join_semantic_manifest_lookup),
+            column_association_resolver=DunderColumnAssociationResolver(multi_hop_join_semantic_manifest_lookup),
             semantic_manifest_lookup=multi_hop_join_semantic_manifest_lookup,
             time_spine_source=time_spine_source,
         ),

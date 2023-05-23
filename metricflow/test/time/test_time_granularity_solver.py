@@ -9,11 +9,11 @@ from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConv
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.dataset.dataset import DataSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
+from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from dbt_semantic_interfaces.references import MetricReference
 from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_MONTH, MTD_SPEC_YEAR, MTD_REFERENCE
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow.time.time_granularity_solver import (
     TimeGranularitySolver,
     PartialTimeDimensionSpec,
@@ -26,7 +26,7 @@ def time_granularity_solver(  # noqa: D
     extended_date_semantic_manifest_lookup: SemanticManifestLookup,
     time_spine_source: TimeSpineSource,
 ) -> TimeGranularitySolver:
-    column_association_resolver = DefaultColumnAssociationResolver(extended_date_semantic_manifest_lookup)
+    column_association_resolver = DunderColumnAssociationResolver(extended_date_semantic_manifest_lookup)
     node_output_resolver = DataflowPlanNodeOutputDataSetResolver[SemanticModelDataSet](
         column_association_resolver=column_association_resolver,
         semantic_manifest_lookup=extended_date_semantic_manifest_lookup,

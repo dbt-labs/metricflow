@@ -32,7 +32,8 @@
                     <!--   {'class': 'TimeDimensionSpec',             -->
                     <!--    'element_name': 'metric_time',            -->
                     <!--    'entity_links': (),                       -->
-                    <!--    'time_granularity': TimeGranularity.DAY}  -->
+                    <!--    'time_granularity': TimeGranularity.DAY,  -->
+                    <!--    'aggregation_state': None}                -->
                     <JoinToBaseOutputNode>
                         <!-- description = Join Standard Outputs -->
                         <!-- node_id = jso_0 -->
@@ -58,7 +59,8 @@
                             <!--   {'class': 'TimeDimensionSpec',             -->
                             <!--    'element_name': 'metric_time',            -->
                             <!--    'entity_links': (),                       -->
-                            <!--    'time_granularity': TimeGranularity.DAY}  -->
+                            <!--    'time_granularity': TimeGranularity.DAY,  -->
+                            <!--    'aggregation_state': None}                -->
                             <!-- include_spec = LinklessEntitySpec(element_name='listing', entity_links=()) -->
                             <MetricTimeDimensionTransformNode>
                                 <!-- description = Metric Time Dimension 'ds' -->

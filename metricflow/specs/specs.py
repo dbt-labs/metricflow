@@ -16,14 +16,7 @@ from dataclasses import dataclass
 from hashlib import sha1
 from typing import List, Optional, Sequence, Tuple, TypeVar, Generic, Any
 
-from dbt_semantic_interfaces.objects.where_filter.filter_renderer import (
-    DimensionCallParameterSet,
-    TimeDimensionCallParameterSet,
-    EntityCallParameterSet,
-    FilterFunctionCallRenderer,
-    FilterRenderer,
-)
-from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
+from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.objects.metric import MetricTimeWindow
 from dbt_semantic_interfaces.references import (
     DimensionReference,
@@ -32,16 +25,16 @@ from dbt_semantic_interfaces.references import (
     TimeDimensionReference,
     EntityReference,
 )
+from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+
 from metricflow.aggregation_properties import AggregationState
-from metricflow.aggregation_properties import AggregationType
 from metricflow.assert_one_arg import assert_exactly_one_arg_set
-from metricflow.specs.column_assoc import ColumnAssociation
 from metricflow.filters.time_constraint import TimeRangeConstraint
-from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_column_type import SqlColumnType
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from metricflow.visitor import VisitorOutputT
 
 
 def hash_items(items: Sequence[SqlColumnType]) -> str:
@@ -52,48 +45,32 @@ def hash_items(items: Sequence[SqlColumnType]) -> str:
     return hash_builder.hexdigest()
 
 
-class ColumnAssociationResolver(ABC):
-    """Get the default column associations for an element instance.
-
-    This is used for naming columns in an SQL query consistently. For example, dimensions with links are
-    named like <entity link>__<dimension name> e.g. user_id__country, and time dimensions at a different time
-    granularity are named <time dimension>__<time granularity> e.g. ds__month. Having a central place to name them will
-    make it easier to change this later on. Names generated need to be unique within a query.
-
-    It's also important to maintain this format because customers write constraints in SQL assuming this. This
-    allows us to stick the constraint in as WHERE clauses without having to parse the constraint SQL.
-
-    TODO: Updates are needed for time granularity in time dimensions, ToT for metrics.
-
-    The resolve* methods should return the column associations / column names that it should use in queries for the given
-    spec.
-    """
+class InstanceSpecVisitor(Generic[VisitorOutputT], ABC):
+    """Visitor for the InstanceSpec classes."""
 
     @abstractmethod
-    def resolve_metric_spec(self, metric_spec: MetricSpec) -> ColumnAssociation:  # noqa: D
-        pass
+    def visit_measure_spec(self, measure_spec: MeasureSpec) -> VisitorOutputT:  # noqa: D
+        raise NotImplementedError
 
     @abstractmethod
-    def resolve_measure_spec(self, measure_spec: MeasureSpec) -> ColumnAssociation:  # noqa: D
-        pass
+    def visit_dimension_spec(self, dimension_spec: DimensionSpec) -> VisitorOutputT:  # noqa: D
+        raise NotImplementedError
 
     @abstractmethod
-    def resolve_dimension_spec(self, dimension_spec: DimensionSpec) -> ColumnAssociation:  # noqa: D
-        pass
+    def visit_time_dimension_spec(self, time_dimension_spec: TimeDimensionSpec) -> VisitorOutputT:  # noqa: D
+        raise NotImplementedError
 
     @abstractmethod
-    def resolve_time_dimension_spec(  # noqa: D
-        self, time_dimension_spec: TimeDimensionSpec, aggregation_state: Optional[AggregationState] = None
-    ) -> ColumnAssociation:
-        pass
+    def visit_entity_spec(self, entity_spec: EntitySpec) -> VisitorOutputT:  # noqa: D
+        raise NotImplementedError
 
     @abstractmethod
-    def resolve_entity_spec(self, entity_spec: EntitySpec) -> ColumnAssociation:  # noqa: D
-        pass
+    def visit_metric_spec(self, metric_spec: MetricSpec) -> VisitorOutputT:  # noqa: D
+        raise NotImplementedError
 
     @abstractmethod
-    def resolve_metadata_spec(self, metadata_spec: MetadataSpec) -> ColumnAssociation:  # noqa: D
-        pass
+    def visit_metadata_spec(self, metadata_spec: MetadataSpec) -> VisitorOutputT:  # noqa: D
+        raise NotImplementedError
 
 
 @dataclass(frozen=True)
@@ -109,14 +86,6 @@ class InstanceSpec(SerializableDataclass):
     """Name of the dimension or entity in the semantic model."""
     element_name: str
 
-    def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:
-        """Figures out what columns in an SQL query that this spec should be associated with given the resolver.
-
-        Debating whether this should be an abstract method, or whether it could just live in the different specs to
-        allow for different signatures.
-        """
-        raise NotImplementedError()
-
     @staticmethod
     def merge(*specs: Sequence[InstanceSpec]) -> List[InstanceSpec]:
         """Merge all specs into a single list."""
@@ -130,6 +99,10 @@ class InstanceSpec(SerializableDataclass):
         """Return the qualified name of this spec. e.g. "user_id__country"."""
         raise NotImplementedError()
 
+    def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:
+        """See Visitable."""
+        raise NotImplementedError()
+
 
 SelfTypeT = TypeVar("SelfTypeT", bound="LinkableInstanceSpec")
 
@@ -140,9 +113,6 @@ class MetadataSpec(InstanceSpec):
 
     element_name: str
 
-    def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
-        return (resolver.resolve_metadata_spec(self),)
-
     @property
     def qualified_name(self) -> str:  # noqa: D
         return self.element_name
@@ -150,6 +120,9 @@ class MetadataSpec(InstanceSpec):
     @staticmethod
     def from_name(name: str) -> MetadataSpec:  # noqa: D
         return MetadataSpec(element_name=name)
+
+    def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+        return visitor.visit_metadata_spec(self)
 
 
 @dataclass(frozen=True)
@@ -196,9 +169,6 @@ class LinkableInstanceSpec(InstanceSpec, ABC):
 
 @dataclass(frozen=True)
 class EntitySpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
-    def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
-        return (resolver.resolve_entity_spec(self),)
-
     @property
     def without_first_entity_link(self) -> EntitySpec:  # noqa: D
         assert len(self.entity_links) > 0, f"Spec does not have any entity links: {self}"
@@ -240,6 +210,9 @@ class EntitySpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
     def as_linkable_spec_set(self) -> LinkableSpecSet:  # noqa: D
         return LinkableSpecSet(entity_specs=(self,))
 
+    def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+        return visitor.visit_entity_spec(self)
+
 
 @dataclass(frozen=True)
 class LinklessEntitySpec(EntitySpec, SerializableDataclass):
@@ -271,9 +244,6 @@ class DimensionSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
     element_name: str
     entity_links: Tuple[EntityReference, ...]
 
-    def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
-        return (resolver.resolve_dimension_spec(self),)
-
     @property
     def without_first_entity_link(self) -> DimensionSpec:  # noqa: D
         assert len(self.entity_links) > 0, f"Spec does not have any entity links: {self}"
@@ -304,6 +274,9 @@ class DimensionSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
     def as_linkable_spec_set(self) -> LinkableSpecSet:  # noqa: D
         return LinkableSpecSet(dimension_specs=(self,))
 
+    def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+        return visitor.visit_dimension_spec(self)
+
 
 DEFAULT_TIME_GRANULARITY = TimeGranularity.DAY
 
@@ -312,8 +285,8 @@ DEFAULT_TIME_GRANULARITY = TimeGranularity.DAY
 class TimeDimensionSpec(DimensionSpec):  # noqa: D
     time_granularity: TimeGranularity = DEFAULT_TIME_GRANULARITY
 
-    def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
-        return (resolver.resolve_time_dimension_spec(self),)
+    # Used for semi-additive joins. Some more thought is needed, but this may be useful in InstanceSpec.
+    aggregation_state: Optional[AggregationState] = None
 
     @property
     def without_first_entity_link(self) -> TimeDimensionSpec:  # noqa: D
@@ -357,6 +330,17 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
     def as_linkable_spec_set(self) -> LinkableSpecSet:  # noqa: D
         return LinkableSpecSet(time_dimension_specs=(self,))
 
+    def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+        return visitor.visit_time_dimension_spec(self)
+
+    def with_aggregation_state(self, aggregation_state: AggregationState) -> TimeDimensionSpec:  # noqa: D
+        return TimeDimensionSpec(
+            element_name=self.element_name,
+            entity_links=self.entity_links,
+            time_granularity=self.time_granularity,
+            aggregation_state=aggregation_state,
+        )
+
 
 @dataclass(frozen=True)
 class NonAdditiveDimensionSpec(SerializableDataclass):
@@ -398,9 +382,6 @@ class MeasureSpec(InstanceSpec):  # noqa: D
     element_name: str
     non_additive_dimension_spec: Optional[NonAdditiveDimensionSpec] = None
 
-    def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
-        return (resolver.resolve_measure_spec(self),)
-
     @staticmethod
     def from_name(name: str) -> MeasureSpec:
         """Construct from a name e.g. listing__ds__month."""
@@ -419,6 +400,9 @@ class MeasureSpec(InstanceSpec):  # noqa: D
     def as_reference(self) -> MeasureReference:  # noqa: D
         return MeasureReference(element_name=self.element_name)
 
+    def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+        return visitor.visit_measure_spec(self)
+
 
 @dataclass(frozen=True)
 class MetricSpec(InstanceSpec):  # noqa: D
@@ -432,9 +416,6 @@ class MetricSpec(InstanceSpec):  # noqa: D
     @staticmethod
     def from_element_name(element_name: str) -> MetricSpec:  # noqa: D
         return MetricSpec(element_name=element_name)
-
-    def column_associations(self, resolver: ColumnAssociationResolver) -> Tuple[ColumnAssociation, ...]:  # noqa: D
-        return (resolver.resolve_metric_spec(self),)
 
     @property
     def qualified_name(self) -> str:  # noqa: D
@@ -456,6 +437,9 @@ class MetricSpec(InstanceSpec):  # noqa: D
             element_name=self.alias or self.element_name,
             constraint=self.constraint,
         )
+
+    def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+        return visitor.visit_metric_spec(self)
 
 
 @dataclass(frozen=True)
@@ -518,17 +502,6 @@ class OrderBySpec(SerializableDataclass):  # noqa: D
 class FilterSpec(SerializableDataclass):  # noqa: D
     expr: str
     elements: Tuple[InstanceSpec, ...]
-
-
-@dataclass(frozen=True)
-class OutputColumnNameOverride(SerializableDataclass):
-    """Describes how we should name the output column for a time dimension instead of the default.
-
-    Note: This is used temporarily to maintain compatibility with the old framework.
-    """
-
-    time_dimension_spec: TimeDimensionSpec
-    output_column_name: str
 
 
 @dataclass(frozen=True)
@@ -725,28 +698,6 @@ class WhereFilterResolutionException(Exception):  # noqa: D
     pass
 
 
-def convert_to_dimension_spec(parameter_set: DimensionCallParameterSet) -> DimensionSpec:  # noqa: D
-    return DimensionSpec(
-        element_name=parameter_set.dimension_reference.element_name,
-        entity_links=parameter_set.entity_path,
-    )
-
-
-def convert_to_time_dimension_spec(parameter_set: TimeDimensionCallParameterSet) -> TimeDimensionSpec:  # noqa: D
-    return TimeDimensionSpec(
-        element_name=parameter_set.time_dimension_reference.element_name,
-        entity_links=parameter_set.entity_path,
-        time_granularity=parameter_set.time_granularity,
-    )
-
-
-def convert_to_entity_spec(parameter_set: EntityCallParameterSet) -> EntitySpec:  # noqa: D
-    return EntitySpec(
-        element_name=parameter_set.entity_reference.element_name,
-        entity_links=parameter_set.entity_path,
-    )
-
-
 @dataclass(frozen=True)
 class WhereFilterSpec(SerializableDataclass):
     """Similar to the WhereFilter, but with the where_sql_template rendered and used elements extracted.
@@ -775,56 +726,6 @@ class WhereFilterSpec(SerializableDataclass):
     where_sql: str
     bind_parameters: SqlBindParameters
     linkable_spec_set: LinkableSpecSet
-
-    @staticmethod
-    def create_from_where_filter(  # noqa: D
-        where_filter: WhereFilter,
-        column_association_resolver: ColumnAssociationResolver,
-        bind_parameters: SqlBindParameters = SqlBindParameters(),
-    ) -> WhereFilterSpec:
-        class _CallRenderer(FilterFunctionCallRenderer):  # noqa: D
-            def render_dimension_call(self, dimension_call_parameter_set: DimensionCallParameterSet) -> str:  # noqa: D
-                return column_association_resolver.resolve_dimension_spec(
-                    convert_to_dimension_spec(dimension_call_parameter_set)
-                ).column_name
-
-            def render_time_dimension_call(  # noqa: D
-                self, time_dimension_call_parameter_set: TimeDimensionCallParameterSet
-            ) -> str:
-                return column_association_resolver.resolve_time_dimension_spec(
-                    convert_to_time_dimension_spec(time_dimension_call_parameter_set)
-                ).column_name
-
-            def render_entity_call(self, entity_call_parameter_set: EntityCallParameterSet) -> str:  # noqa: D
-                return column_association_resolver.resolve_entity_spec(
-                    convert_to_entity_spec(entity_call_parameter_set)
-                ).column_name
-
-        where_sql = FilterRenderer.render(
-            templated_filter_sql=where_filter.where_sql_template,
-            call_renderer=_CallRenderer(),
-        )
-
-        parameter_sets = where_filter.call_parameter_sets
-        return WhereFilterSpec(
-            where_sql=where_sql,
-            bind_parameters=bind_parameters,
-            # dict.fromkeys() does a dedupe while preserving order.
-            linkable_spec_set=LinkableSpecSet(
-                dimension_specs=tuple(
-                    convert_to_dimension_spec(parameter_set)
-                    for parameter_set in dict.fromkeys(parameter_sets.dimension_call_parameter_sets)
-                ),
-                time_dimension_specs=tuple(
-                    convert_to_time_dimension_spec(parameter_set)
-                    for parameter_set in dict.fromkeys(parameter_sets.time_dimension_call_parameter_sets)
-                ),
-                entity_specs=tuple(
-                    convert_to_entity_spec(parameter_set)
-                    for parameter_set in dict.fromkeys(parameter_sets.entity_call_parameter_sets)
-                ),
-            ),
-        )
 
     def combine(self, other: WhereFilterSpec) -> WhereFilterSpec:  # noqa: D
         return WhereFilterSpec(

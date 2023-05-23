@@ -1,5 +1,5 @@
 from metricflow.dataflow.builder.measure_additiveness import group_measure_specs_by_additiveness
-from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
+from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from metricflow.specs.specs import MeasureSpec, NonAdditiveDimensionSpec
 
 

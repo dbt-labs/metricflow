@@ -1,0 +1,7 @@
+kind: Under the Hood
+body: Improves typechecking coverage by updgrading to MyPy 0.942 and removing blanket
+  ignore all imports setting
+time: 2023-05-17T16:40:28.603649-07:00
+custom:
+  Author: tlento
+  Issue: "536"

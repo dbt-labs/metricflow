@@ -10,7 +10,7 @@ from metricflow.cli.cli_context import CLIContext
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
+from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
@@ -30,7 +30,7 @@ def cli_context(  # noqa: D
     mf_engine = MetricFlowEngine(
         semantic_manifest_lookup=semantic_manifest_lookup,
         sql_client=async_sql_client,
-        column_association_resolver=DefaultColumnAssociationResolver(semantic_manifest_lookup=semantic_manifest_lookup),
+        column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup=semantic_manifest_lookup),
         time_source=ConfigurableTimeSource(as_datetime("2020-01-01")),
         time_spine_source=time_spine_source,
         system_schema=mf_test_session_state.mf_system_schema,

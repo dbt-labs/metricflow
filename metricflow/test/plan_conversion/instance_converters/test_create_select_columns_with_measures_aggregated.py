@@ -1,6 +1,6 @@
 from metricflow.instances import InstanceSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
+from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.instance_converters import (
     CreateSelectColumnsWithMeasuresAggregated,
     FilterElements,
@@ -39,7 +39,7 @@ def test_sum_aggregation(
 
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
-        DefaultColumnAssociationResolver(simple_semantic_manifest_lookup),
+        DunderColumnAssociationResolver(simple_semantic_manifest_lookup),
         simple_semantic_manifest_lookup.semantic_model_lookup,
         (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="booking_value")),),
     ).transform(instance_set=instance_set)
@@ -61,7 +61,7 @@ def test_sum_boolean_aggregation(
 
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
-        DefaultColumnAssociationResolver(simple_semantic_manifest_lookup),
+        DunderColumnAssociationResolver(simple_semantic_manifest_lookup),
         simple_semantic_manifest_lookup.semantic_model_lookup,
         (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="instant_bookings")),),
     ).transform(instance_set=instance_set)
@@ -84,7 +84,7 @@ def test_avg_aggregation(
 
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
-        DefaultColumnAssociationResolver(simple_semantic_manifest_lookup),
+        DunderColumnAssociationResolver(simple_semantic_manifest_lookup),
         simple_semantic_manifest_lookup.semantic_model_lookup,
         (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="average_booking_value")),),
     ).transform(instance_set=instance_set)
@@ -106,7 +106,7 @@ def test_count_distinct_aggregation(
 
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
-        DefaultColumnAssociationResolver(simple_semantic_manifest_lookup),
+        DunderColumnAssociationResolver(simple_semantic_manifest_lookup),
         simple_semantic_manifest_lookup.semantic_model_lookup,
         (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="bookers")),),
     ).transform(instance_set=instance_set)
@@ -128,7 +128,7 @@ def test_max_aggregation(
 
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
-        DefaultColumnAssociationResolver(simple_semantic_manifest_lookup),
+        DunderColumnAssociationResolver(simple_semantic_manifest_lookup),
         simple_semantic_manifest_lookup.semantic_model_lookup,
         (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="largest_listing")),),
     ).transform(instance_set=instance_set)
@@ -150,7 +150,7 @@ def test_min_aggregation(
 
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
-        DefaultColumnAssociationResolver(simple_semantic_manifest_lookup),
+        DunderColumnAssociationResolver(simple_semantic_manifest_lookup),
         simple_semantic_manifest_lookup.semantic_model_lookup,
         (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="smallest_listing")),),
     ).transform(instance_set=instance_set)
@@ -172,7 +172,7 @@ def test_aliased_sum(
 
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
-        DefaultColumnAssociationResolver(simple_semantic_manifest_lookup),
+        DunderColumnAssociationResolver(simple_semantic_manifest_lookup),
         simple_semantic_manifest_lookup.semantic_model_lookup,
         (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="booking_value"), alias="bvalue"),),
     ).transform(instance_set=instance_set)
@@ -195,7 +195,7 @@ def test_percentile_aggregation(
 
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
-        DefaultColumnAssociationResolver(simple_semantic_manifest_lookup),
+        DunderColumnAssociationResolver(simple_semantic_manifest_lookup),
         simple_semantic_manifest_lookup.semantic_model_lookup,
         (MetricInputMeasureSpec(measure_spec=MeasureSpec(element_name="booking_value_p99")),),
     ).transform(instance_set=instance_set)

@@ -4,7 +4,7 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 
 from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.dataset.dataset import DataSet
@@ -15,12 +15,12 @@ from metricflow.specs.specs import (
     MetricSpec,
     DimensionSpec,
     EntityReference,
-    ColumnAssociationResolver,
-    WhereFilterSpec,
 )
+from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     OrderBySpec,
 )
+from metricflow.specs.where_filter_transform import ConvertToWhereSpec
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.plan_utils import assert_plan_snapshot_text_equal
@@ -346,11 +346,12 @@ def test_where_constrained_plan(  # noqa: D
                     entity_links=(),
                 ),
             ),
-            where_constraint=WhereFilterSpec.create_from_where_filter(
-                where_filter=WhereFilter(
-                    where_sql_template="{{ dimension('country_latest', entity_path=['listing']) }} = 'us'",
-                ),
-                column_association_resolver=column_association_resolver,
+            where_constraint=WhereFilter(
+                where_sql_template="{{ dimension('country_latest', entity_path=['listing']) }} = 'us'",
+            ).transform(
+                ConvertToWhereSpec(
+                    column_association_resolver=column_association_resolver,
+                )
             ),
         )
     )
@@ -385,11 +386,12 @@ def test_where_constrained_plan_time_dimension(  # noqa: D
                     entity_links=(),
                 ),
             ),
-            where_constraint=WhereFilterSpec.create_from_where_filter(
-                where_filter=WhereFilter(
-                    where_sql_template="{{ time_dimension('metric_time', 'day') }} >= '2020-01-01'",
-                ),
-                column_association_resolver=column_association_resolver,
+            where_constraint=WhereFilter(
+                where_sql_template="{{ time_dimension('metric_time', 'day') }} >= '2020-01-01'",
+            ).transform(
+                ConvertToWhereSpec(
+                    column_association_resolver=column_association_resolver,
+                )
             ),
         )
     )
@@ -424,11 +426,12 @@ def test_where_constrained_with_common_linkable_plan(  # noqa: D
                     entity_links=(EntityReference(element_name="listing"),),
                 ),
             ),
-            where_constraint=WhereFilterSpec.create_from_where_filter(
-                where_filter=WhereFilter(
-                    where_sql_template="{{ dimension('country_latest', entity_path=['listing']) }} = 'us'",
-                ),
-                column_association_resolver=column_association_resolver,
+            where_constraint=WhereFilter(
+                where_sql_template="{{ dimension('country_latest', entity_path=['listing']) }} = 'us'",
+            ).transform(
+                ConvertToWhereSpec(
+                    column_association_resolver=column_association_resolver,
+                )
             ),
         )
     )

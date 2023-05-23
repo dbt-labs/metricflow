@@ -6,7 +6,7 @@ from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import MetricReference
 from metricflow.errors.errors import MetricNotFoundError, DuplicateMetricError, NonExistentMeasureError
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
-from metricflow.model.semantics.linkable_spec_resolver import ValidLinkableSpecResolver
+from metricflow.model.semantics.linkable_spec_resolver import ValidLinkableSpecResolver, LinkableElementSet
 from metricflow.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.protocols.semantics import MetricAccessor
@@ -15,9 +15,9 @@ from metricflow.specs.specs import (
     LinkableInstanceSpec,
     MetricInputMeasureSpec,
     MeasureSpec,
-    ColumnAssociationResolver,
-    WhereFilterSpec,
 )
+from metricflow.specs.column_assoc import ColumnAssociationResolver
+from metricflow.specs.where_filter_transform import ConvertToWhereSpec
 
 logger = logging.getLogger(__name__)
 
@@ -54,6 +54,19 @@ class MetricLookup(MetricAccessor):  # noqa: D
         ).as_spec_set
 
         return sorted(all_linkable_specs.as_tuple, key=lambda x: x.qualified_name)
+
+    def linkable_set_for_metrics(
+        self,
+        metric_references: Sequence[MetricReference],
+        with_any_property: FrozenSet[LinkableElementProperties] = LinkableElementProperties.all_properties(),
+        without_any_property: FrozenSet[LinkableElementProperties] = frozenset(),
+    ) -> LinkableElementSet:
+        """Similar to element_specs_for_metrics(), but as a set with more context."""
+        return self._linkable_spec_resolver.get_linkable_elements_for_metrics(
+            metric_references=metric_references,
+            with_any_of=with_any_property,
+            without_any_of=without_any_property,
+        )
 
     def get_metrics(self, metric_references: Sequence[MetricReference]) -> Sequence[Metric]:  # noqa: D
         res = []
@@ -105,9 +118,10 @@ class MetricLookup(MetricAccessor):  # noqa: D
             )
             spec = MetricInputMeasureSpec(
                 measure_spec=measure_spec,
-                constraint=WhereFilterSpec.create_from_where_filter(
-                    where_filter=input_measure.filter,
-                    column_association_resolver=column_association_resolver,
+                constraint=input_measure.filter.transform(
+                    ConvertToWhereSpec(
+                        column_association_resolver=column_association_resolver,
+                    )
                 )
                 if input_measure.filter is not None
                 else None,
@@ -143,9 +157,10 @@ class MetricLookup(MetricAccessor):  # noqa: D
 
             # This is the constraint parameter added to the input metric in the derived metric definition
             combined_filter = (
-                WhereFilterSpec.create_from_where_filter(
-                    where_filter=input_metric.filter,
-                    column_association_resolver=column_association_resolver,
+                input_metric.filter.transform(
+                    ConvertToWhereSpec(
+                        column_association_resolver=column_association_resolver,
+                    )
                 )
                 if input_metric.filter is not None
                 else None
@@ -153,9 +168,10 @@ class MetricLookup(MetricAccessor):  # noqa: D
 
             # This is the constraint parameter included in the original input metric definition
             if original_metric_obj.filter:
-                original_metric_filter = WhereFilterSpec.create_from_where_filter(
-                    where_filter=original_metric_obj.filter,
-                    column_association_resolver=column_association_resolver,
+                original_metric_filter = original_metric_obj.filter.transform(
+                    ConvertToWhereSpec(
+                        column_association_resolver=column_association_resolver,
+                    )
                 )
                 combined_filter = (
                     combined_filter.combine(original_metric_filter) if combined_filter else original_metric_filter

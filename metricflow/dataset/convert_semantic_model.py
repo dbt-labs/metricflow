@@ -24,10 +24,10 @@ from metricflow.specs.specs import (
     TimeDimensionSpec,
     DimensionSpec,
     EntitySpec,
-    ColumnAssociationResolver,
     DEFAULT_TIME_GRANULARITY,
     EntityReference,
 )
+from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.sql.sql_exprs import (
     SqlStringExpression,
     SqlDateTruncExpression,
@@ -41,7 +41,7 @@ from metricflow.sql.sql_plan import (
     SqlSelectColumn,
     SqlQueryPlanNode,
 )
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -81,10 +81,8 @@ class SemanticModelToDataSetConverter:
             element_name=dimension.reference.element_name,
             entity_links=entity_links,
         )
-        column_associations = dimension_spec.column_associations(self._column_association_resolver)
-
         return DimensionInstance(
-            associated_columns=column_associations,
+            associated_columns=(self._column_association_resolver.resolve_spec(dimension_spec),),
             spec=dimension_spec,
             defined_from=(
                 SemanticModelElementReference(
@@ -108,10 +106,8 @@ class SemanticModelToDataSetConverter:
             time_granularity=time_granularity,
         )
 
-        column_associations = time_dimension_spec.column_associations(self._column_association_resolver)
-
         return TimeDimensionInstance(
-            associated_columns=column_associations,
+            associated_columns=(self._column_association_resolver.resolve_spec(time_dimension_spec),),
             spec=time_dimension_spec,
             defined_from=(
                 SemanticModelElementReference(
@@ -132,10 +128,8 @@ class SemanticModelToDataSetConverter:
             element_name=entity.reference.element_name,
             entity_links=entity_links,
         )
-        column_associations = entity_spec.column_associations(self._column_association_resolver)
-
         return EntityInstance(
-            associated_columns=column_associations,
+            associated_columns=(self._column_association_resolver.resolve_spec(entity_spec),),
             spec=entity_spec,
             defined_from=(
                 SemanticModelElementReference(
@@ -185,7 +179,7 @@ class SemanticModelToDataSetConverter:
         for measure in measures or []:
             measure_spec = MeasureConverter.convert_to_measure_spec(measure=measure)
             measure_instance = MeasureInstance(
-                associated_columns=measure_spec.column_associations(self._column_association_resolver),
+                associated_columns=(self._column_association_resolver.resolve_spec(measure_spec),),
                 spec=measure_spec,
                 defined_from=(
                     SemanticModelElementReference(

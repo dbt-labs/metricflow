@@ -10,9 +10,9 @@ from typing import List, TypeVar, Generic, Optional, Sequence, Tuple, Union, Typ
 
 import jinja2
 
-from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
+from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.objects.metric import MetricTimeWindow
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.references import TimeDimensionReference
 from metricflow.filters.time_constraint import TimeRangeConstraint

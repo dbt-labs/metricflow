@@ -6,7 +6,7 @@ from typing import Generic
 from _pytest.fixtures import FixtureRequest
 
 from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan import (
     SourceDataSetT,
@@ -39,9 +39,9 @@ from metricflow.specs.specs import (
     EntityReference,
     MetricFlowQuerySpec,
     MetricSpec,
-    ColumnAssociationResolver,
-    WhereFilterSpec,
 )
+from metricflow.specs.column_assoc import ColumnAssociationResolver
+from metricflow.specs.where_filter_transform import ConvertToWhereSpec
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.plan_utils import assert_plan_snapshot_text_equal
@@ -243,9 +243,10 @@ def test_constrained_metric_not_combined(  # noqa: D
                 MetricSpec(element_name="booking_value"),
                 MetricSpec(
                     element_name="instant_booking_value",
-                    constraint=WhereFilterSpec.create_from_where_filter(
-                        where_filter=WhereFilter(where_sql_template="{{ dimension('is_instant') }} "),
-                        column_association_resolver=column_association_resolver,
+                    constraint=WhereFilter(where_sql_template="{{ dimension('is_instant') }} ").transform(
+                        ConvertToWhereSpec(
+                            column_association_resolver=column_association_resolver,
+                        )
                     ),
                 ),
             ),

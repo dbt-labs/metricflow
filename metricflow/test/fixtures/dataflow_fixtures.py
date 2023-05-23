@@ -6,10 +6,10 @@ from metricflow.dataflow.builder.costing import DefaultCostFunction
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
+from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource, TimeSpineTableBuilder
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.specs.specs import ColumnAssociationResolver
+from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.fixtures.sql_client_fixtures import sql_client  # noqa: F401, F403
@@ -25,7 +25,7 @@ Using 'session' scope can result in other 'session' scope fixtures causing ID co
 def column_association_resolver(  # noqa: D
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> ColumnAssociationResolver:
-    return DefaultColumnAssociationResolver(simple_semantic_manifest_lookup)
+    return DunderColumnAssociationResolver(simple_semantic_manifest_lookup)
 
 
 @pytest.fixture
@@ -62,7 +62,7 @@ def multihop_dataflow_plan_builder(  # noqa: D
 def scd_column_association_resolver(  # noqa: D
     scd_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> ColumnAssociationResolver:
-    return DefaultColumnAssociationResolver(scd_semantic_manifest_lookup)
+    return DunderColumnAssociationResolver(scd_semantic_manifest_lookup)
 
 
 @pytest.fixture

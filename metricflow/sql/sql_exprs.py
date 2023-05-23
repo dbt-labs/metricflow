@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import List, Generic, Mapping, Sequence, Optional, Tuple, Dict
 
-from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
+from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from metricflow.dag.mf_dag import DagNode, DisplayedProperty, NodeId
 from metricflow.dag.id_generation import (
     SQL_EXPR_COLUMN_REFERENCE_ID_PREFIX,
@@ -31,7 +31,7 @@ from dbt_semantic_interfaces.objects.elements.measure import MeasureAggregationP
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.visitor import Visitable, VisitorOutputT
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 
 class SqlExpressionNode(DagNode, Generic[VisitorOutputT], Visitable, ABC):
@@ -705,11 +705,7 @@ class SqlFunction(Enum):
                 f"Unhandled aggregation type {aggregation_type} - this should have been transformed to PERCENTILE "
                 "during model parsing."
             )
-        elif (
-            aggregation_type is AggregationType.SUM_BOOLEAN
-            or aggregation_type is AggregationType.BOOLEAN
-            or aggregation_type is AggregationType.COUNT
-        ):
+        elif aggregation_type is AggregationType.SUM_BOOLEAN or aggregation_type is AggregationType.COUNT:
             raise RuntimeError(
                 f"Unhandled aggregation type {aggregation_type} - this should have been transformed to SUM "
                 "during model parsing."

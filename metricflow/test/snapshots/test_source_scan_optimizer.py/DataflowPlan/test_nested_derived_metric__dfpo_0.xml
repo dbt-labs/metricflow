@@ -63,7 +63,8 @@
                                 <!--   {'class': 'TimeDimensionSpec',             -->
                                 <!--    'element_name': 'metric_time',            -->
                                 <!--    'entity_links': (),                       -->
-                                <!--    'time_granularity': TimeGranularity.DAY}  -->
+                                <!--    'time_granularity': TimeGranularity.DAY,  -->
+                                <!--    'aggregation_state': None}                -->
                                 <MetricTimeDimensionTransformNode>
                                     <!-- description = Metric Time Dimension 'ds' -->
                                     <!-- node_id = sma_2 -->
@@ -117,7 +118,8 @@
                             <!--   {'class': 'TimeDimensionSpec',             -->
                             <!--    'element_name': 'metric_time',            -->
                             <!--    'entity_links': (),                       -->
-                            <!--    'time_granularity': TimeGranularity.DAY}  -->
+                            <!--    'time_granularity': TimeGranularity.DAY,  -->
+                            <!--    'aggregation_state': None}                -->
                             <MetricTimeDimensionTransformNode>
                                 <!-- description = Metric Time Dimension 'ds' -->
                                 <!-- node_id = sma_5 -->

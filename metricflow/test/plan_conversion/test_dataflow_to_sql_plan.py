@@ -3,12 +3,12 @@ from typing import List
 import pytest
 from _pytest.fixtures import FixtureRequest
 
-from dbt_semantic_interfaces.objects.aggregation_type import AggregationType
 from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
 from dbt_semantic_interfaces.objects.metric import MetricTimeWindow
-from dbt_semantic_interfaces.objects.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.references import TimeDimensionReference, EntityReference
-from metricflow.filters.time_constraint import TimeRangeConstraint
+from dbt_semantic_interfaces.test_utils import as_datetime
+from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan import (
     DataflowPlan,
@@ -29,8 +29,9 @@ from metricflow.dataflow.dataflow_plan import (
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.dataset.dataset import DataSet
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
+from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.plan_conversion.column_resolver import DefaultColumnAssociationResolver
+from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
@@ -45,9 +46,9 @@ from metricflow.specs.specs import (
     OrderBySpec,
     TimeDimensionSpec,
     InstanceSpecSet,
-    ColumnAssociationResolver,
-    WhereFilterSpec,
 )
+from metricflow.specs.column_assoc import ColumnAssociationResolver
+from metricflow.specs.where_filter_transform import ConvertToWhereSpec
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
@@ -55,7 +56,6 @@ from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.plan_utils import assert_plan_snapshot_text_equal
 from metricflow.test.sql.compare_sql_plan import assert_rendered_sql_from_plan_equal
 from metricflow.test.sql.compare_sql_plan import assert_sql_plan_text_equal
-from dbt_semantic_interfaces.test_utils import as_datetime
 from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY
 
 
@@ -65,7 +65,7 @@ def multihop_dataflow_to_sql_converter(  # noqa: D
     time_spine_source: TimeSpineSource,
 ) -> DataflowToSqlQueryPlanConverter[SemanticModelDataSet]:
     return DataflowToSqlQueryPlanConverter[SemanticModelDataSet](
-        column_association_resolver=DefaultColumnAssociationResolver(multi_hop_join_semantic_manifest_lookup),
+        column_association_resolver=DunderColumnAssociationResolver(multi_hop_join_semantic_manifest_lookup),
         semantic_manifest_lookup=multi_hop_join_semantic_manifest_lookup,
         time_spine_source=time_spine_source,
     )
@@ -77,7 +77,7 @@ def scd_dataflow_to_sql_converter(  # noqa: D
     time_spine_source: TimeSpineSource,
 ) -> DataflowToSqlQueryPlanConverter[SemanticModelDataSet]:
     return DataflowToSqlQueryPlanConverter[SemanticModelDataSet](
-        column_association_resolver=DefaultColumnAssociationResolver(scd_semantic_manifest_lookup),
+        column_association_resolver=DunderColumnAssociationResolver(scd_semantic_manifest_lookup),
         semantic_manifest_lookup=scd_semantic_manifest_lookup,
         time_spine_source=time_spine_source,
     )
@@ -205,11 +205,10 @@ def test_filter_with_where_constraint_node(  # noqa: D
     )  # need to include ds_spec because where constraint operates on ds
     where_constraint_node = WhereConstraintNode[SemanticModelDataSet](
         parent_node=filter_node,
-        where_constraint=WhereFilterSpec.create_from_where_filter(
-            where_filter=WhereFilter(
-                where_sql_template="{{ time_dimension('ds', 'day') }} = '2020-01-01'",
-            ),
-            column_association_resolver=column_association_resolver,
+        where_constraint=WhereFilter(where_sql_template="{{ time_dimension('ds', 'day') }} = '2020-01-01'",).transform(
+            ConvertToWhereSpec(
+                column_association_resolver=column_association_resolver,
+            )
         ),
     )
 
@@ -941,11 +940,12 @@ def test_filter_with_where_constraint_on_join_dim(
                     entity_links=(),
                 ),
             ),
-            where_constraint=WhereFilterSpec.create_from_where_filter(
-                where_filter=WhereFilter(
-                    where_sql_template="{{ dimension('country_latest', entity_path=['listing']) }} = 'us'",
-                ),
-                column_association_resolver=column_association_resolver,
+            where_constraint=WhereFilter(
+                where_sql_template="{{ dimension('country_latest', entity_path=['listing']) }} = 'us'",
+            ).transform(
+                ConvertToWhereSpec(
+                    column_association_resolver=column_association_resolver,
+                )
             ),
         )
     )
@@ -1530,11 +1530,12 @@ def test_join_to_scd_dimension(
             metric_specs=(
                 MetricSpec(
                     element_name="family_bookings",
-                    constraint=WhereFilterSpec.create_from_where_filter(
-                        where_filter=WhereFilter(
-                            where_sql_template="{{ dimension('capacity', entity_path=['listing']) }} > 2",
-                        ),
-                        column_association_resolver=scd_column_association_resolver,
+                    constraint=WhereFilter(
+                        where_sql_template="{{ dimension('capacity', entity_path=['listing']) }} > 2",
+                    ).transform(
+                        ConvertToWhereSpec(
+                            column_association_resolver=scd_column_association_resolver,
+                        )
                     ),
                 ),
             ),
