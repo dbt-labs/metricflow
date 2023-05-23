@@ -34,7 +34,7 @@ from metricflow.visitor import Visitable, VisitorOutputT
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 
-class SqlExpressionNode(DagNode, Generic[VisitorOutputT], Visitable, ABC):
+class SqlExpressionNode(DagNode, Visitable, ABC):
     """An SQL expression like my_table.my_column, CONCAT(a, b) or 1 + 1 that evaluates to a value."""
 
     def __init__(self, node_id: NodeId, parent_nodes: List[SqlExpressionNode]) -> None:  # noqa: D
@@ -57,7 +57,7 @@ class SqlExpressionNode(DagNode, Generic[VisitorOutputT], Visitable, ABC):
         pass
 
     @abstractmethod
-    def accept(self, visitor: SqlExpressionNodeVisitor) -> VisitorOutputT:
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:
         """Called when a visitor needs to visit this node."""
         pass
 
@@ -272,7 +272,7 @@ class SqlStringExpression(SqlExpressionNode):
     def id_prefix(cls) -> str:  # noqa: D
         return SQL_EXPR_STRING_ID_PREFIX
 
-    def accept(self, visitor: SqlExpressionNodeVisitor) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_string_expr(self)
 
     @property
@@ -324,6 +324,7 @@ class SqlStringExpression(SqlExpressionNode):
             and self.bind_parameters == other.bind_parameters
         )
 
+    @property
     def as_string_expression(self) -> Optional[SqlStringExpression]:
         """If this is a string expression, return self."""
         return self
@@ -340,7 +341,7 @@ class SqlStringLiteralExpression(SqlExpressionNode):
     def id_prefix(cls) -> str:  # noqa: D
         return SQL_EXPR_STRING_LITERAL_PREFIX
 
-    def accept(self, visitor: SqlExpressionNodeVisitor) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_string_literal_expr(self)
 
     @property
@@ -413,7 +414,7 @@ class SqlColumnReferenceExpression(SqlExpressionNode):
     def id_prefix(cls) -> str:  # noqa: D
         return SQL_EXPR_COLUMN_REFERENCE_ID_PREFIX
 
-    def accept(self, visitor: SqlExpressionNodeVisitor) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_column_reference_expr(self)
 
     @property
@@ -575,7 +576,7 @@ class SqlComparisonExpression(SqlExpressionNode):
     def id_prefix(cls) -> str:  # noqa: D
         return SQL_EXPR_COMPARISON_ID_PREFIX
 
-    def accept(self, visitor: SqlExpressionNodeVisitor) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_comparison_expr(self)
 
     @property
@@ -727,7 +728,7 @@ class SqlFunctionExpression(SqlExpressionNode):
     def build_expression_from_aggregation_type(
         aggregation_type: AggregationType,
         sql_column_expression: SqlColumnReferenceExpression,
-        agg_params: MeasureAggregationParameters = None,
+        agg_params: Optional[MeasureAggregationParameters] = None,
     ) -> SqlFunctionExpression:
         """Returns sql function expression depending on aggregation type."""
 
@@ -773,7 +774,7 @@ class SqlAggregateFunctionExpression(SqlFunctionExpression):
     def requires_parenthesis(self) -> bool:  # noqa: D
         return False
 
-    def accept(self, visitor: SqlExpressionNodeVisitor) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_function_expr(self)
 
     @property
@@ -904,7 +905,7 @@ class SqlPercentileExpression(SqlFunctionExpression):
     def percentile_args(self) -> SqlPercentileExpressionArgument:  # noqa: D
         return self._percentile_args
 
-    def accept(self, visitor: SqlExpressionNodeVisitor) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_percentile_expr(self)
 
     @property
@@ -1018,7 +1019,7 @@ class SqlWindowFunctionExpression(SqlFunctionExpression):
     def requires_parenthesis(self) -> bool:  # noqa: D
         return False
 
-    def accept(self, visitor: SqlExpressionNodeVisitor) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_window_function_expr(self)
 
     @property
@@ -1111,7 +1112,7 @@ class SqlNullExpression(SqlExpressionNode):
     def requires_parenthesis(self) -> bool:  # noqa: D
         return False
 
-    def accept(self, visitor: SqlExpressionNodeVisitor) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_null_expr(self)
 
     @property
@@ -1158,7 +1159,7 @@ class SqlLogicalExpression(SqlExpressionNode):
     def requires_parenthesis(self) -> bool:  # noqa: D
         return True
 
-    def accept(self, visitor: SqlExpressionNodeVisitor) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_logical_expr(self)
 
     @property
@@ -1210,7 +1211,7 @@ class SqlIsNullExpression(SqlExpressionNode):
     def requires_parenthesis(self) -> bool:  # noqa: D
         return True
 
-    def accept(self, visitor: SqlExpressionNodeVisitor) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_is_null_expr(self)
 
     @property
@@ -1262,7 +1263,7 @@ class SqlTimeDeltaExpression(SqlExpressionNode):
     def requires_parenthesis(self) -> bool:  # noqa: D
         return False
 
-    def accept(self, visitor: SqlExpressionNodeVisitor) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_time_delta_expr(self)
 
     @property
@@ -1380,7 +1381,7 @@ class SqlDateTruncExpression(SqlExpressionNode):
     def requires_parenthesis(self) -> bool:  # noqa: D
         return False
 
-    def accept(self, visitor: SqlExpressionNodeVisitor) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_date_trunc_expr(self)
 
     @property
@@ -1445,7 +1446,7 @@ class SqlRatioComputationExpression(SqlExpressionNode):
     def requires_parenthesis(self) -> bool:  # noqa: D
         return False
 
-    def accept(self, visitor: SqlExpressionNodeVisitor) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_ratio_computation_expr(self)
 
     @property
@@ -1553,7 +1554,7 @@ class SqlGenerateUuidExpression(SqlExpressionNode):
     def id_prefix(cls) -> str:  # noqa: D
         return SQL_EXPR_GENERATE_UUID_PREFIX
 
-    def accept(self, visitor: SqlExpressionNodeVisitor) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_generate_uuid_expr(self)
 
     @property

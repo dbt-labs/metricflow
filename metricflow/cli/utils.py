@@ -222,7 +222,7 @@ def exception_handler(func: Callable[..., Any]) -> Callable[..., Any]:  # type: 
     """Decorator to handle exceptions."""
 
     @wraps(func)
-    def wrapper(*args, **kwargs):  # type: ignore
+    def wrapper(*args: Any, **kwargs: Any) -> Any:  # type: ignore[misc]
         try:
             func(*args, **kwargs)
         except Exception as e:
