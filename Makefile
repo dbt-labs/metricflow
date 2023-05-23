@@ -2,49 +2,40 @@
 # Local Env/Dev Setup
 #
 
-# Python venv helpers
-VENV_NAME?=venv
+# Controls the number of parallel workers running tests. Try "make -e PARALLELISM=4 test".
+PARALLELISM = "auto"
 
-.PHONY: venv
-venv:
-	python3 -m venv $(VENV_NAME) && echo "To activate your new virtual environment, run:\nsource $(VENV_NAME)/bin/activate"
-
-.PHONY: remove_venv
-remove_venv:
-	rm -rf $(VENV_NAME) && echo "If $(VENV_NAME) was active when you ran this command you will need to run deactivate"
-
-# Install metricflow for development work.
-.PHONY: install
-install:
-	poetry install
+# Install Hatch package / project manager
+.PHONY: install-hatch
+install-hatch:
+	pip3 install hatch
 
 # Testing and linting
+.PHONY: test-core
+test:
+	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) metricflow/test --ignore metricflow/test/model/dbt_cloud_parsing/
+
+# Test that depend on dbt-related packages.
+.PHONY: test-dbt-associated
+test-dbt-associated:
+	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) metricflow/test/model/dbt_cloud_parsing/
+
 .PHONY: test
 test:
-	poetry run pytest metricflow/test/ --ignore metricflow/test/model/dbt_cloud_parsing
-
-.PHONY: test-dbt
-test-dbt:
-	poetry run pytest metricflow/test/model/dbt_cloud_parsing
-
-.PHONY: test-all
-test-all:
-	poetry run pytest metricflow/test
+	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) metricflow/test/
 
 .PHONY: test-postgresql
 test-postgresql:
-	MF_SQL_ENGINE_URL="postgresql://metricflow@localhost:5432/metricflow" MF_SQL_ENGINE_PASSWORD="metricflowing" poetry run pytest metricflow/test/
+	MF_SQL_ENGINE_URL="postgresql://metricflow@localhost:5432/metricflow" \
+	MF_SQL_ENGINE_PASSWORD="metricflowing" \
+	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) metricflow/test/
 
 .PHONY: lint
 lint:
-	pre-commit run --all-files
+	hatch -v run dev-env:pre-commit run --all-files
 
 # Running data warehouses locally
 .PHONY: postgresql postgres
 postgresql postgres:
 	make -C local-data-warehouses postgresql
 
-# Install metricflow for development work.
-.PHONY: json_schema
-json_schema:
-	python3 dbt_semantic_interfaces/dbt_semantic_interfaces/parsing/explicit_schema.py
