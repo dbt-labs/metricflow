@@ -1,7 +1,11 @@
-from dataclasses import dataclass
+from __future__ import annotations
+
 import logging
+from dataclasses import dataclass
 from logging.handlers import TimedRotatingFileHandler
 from typing import Dict, Optional
+
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 
 from metricflow.configuration.config_handler import ConfigHandler
 from metricflow.configuration.constants import (
@@ -14,8 +18,7 @@ from metricflow.configuration.constants import (
 )
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.engine.utils import build_semantic_manifest_from_config, build_semantic_manifest_from_dbt_config
-from metricflow.errors.errors import SqlClientCreationException, MetricFlowInitException
-from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
+from metricflow.errors.errors import MetricFlowInitException, SqlClientCreationException
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.sql_clients.sql_utils import make_sql_client_from_config
@@ -25,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class DbtCloudConfigs:
-    """Data class for easier handling of dbt cloud config values"""
+    """Data class for easier handling of dbt cloud config values."""
 
     auth: str
     job_id: str

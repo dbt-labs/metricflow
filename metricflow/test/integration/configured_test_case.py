@@ -4,10 +4,9 @@ import logging
 import os
 from collections import OrderedDict
 from enum import Enum
-from typing import Sequence, Tuple, Optional
+from typing import Optional, Sequence, Tuple
 
 import yaml
-
 from dbt_semantic_interfaces.objects.base import FrozenBaseModel
 
 logger = logging.getLogger(__name__)

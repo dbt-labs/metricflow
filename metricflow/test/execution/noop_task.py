@@ -1,13 +1,15 @@
+from __future__ import annotations
+
 import logging
 import time
-from typing import Sequence, Optional
+from typing import Optional, Sequence
 
 from metricflow.dag.id_generation import EXEC_NODE_NOOP
 from metricflow.execution.execution_plan import (
     ExecutionPlanTask,
-    TaskExecutionResult,
-    TaskExecutionError,
     SqlQuery,
+    TaskExecutionError,
+    TaskExecutionResult,
 )
 
 logger = logging.getLogger(__name__)

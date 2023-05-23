@@ -1,8 +1,10 @@
-import pytest
+from __future__ import annotations
+
 import click
+import pytest
 from click.testing import CliRunner
 
-from metricflow.cli.custom_click_types import SequenceParamType, MutuallyExclusiveOption
+from metricflow.cli.custom_click_types import MutuallyExclusiveOption, SequenceParamType
 
 
 def test_check_min_length() -> None:
@@ -48,7 +50,7 @@ def test_use_separator() -> None:
 
 
 def test_mutually_exclusive_option() -> None:
-    """Make sure `MutuallyExclusiveOption` works"""
+    """Make sure `MutuallyExclusiveOption` works."""
 
     @click.command()
     @click.option(

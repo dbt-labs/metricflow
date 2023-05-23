@@ -6,14 +6,13 @@ from collections import OrderedDict
 from dataclasses import dataclass
 from enum import Enum
 from operator import itemgetter
-from typing import Optional, Sequence, Dict, Any
+from typing import Any, Dict, Optional, Sequence
 
 import pandas as pd
+from dbt_semantic_interfaces.objects.base import FrozenBaseModel
 from pydantic import Field
 
-from dbt_semantic_interfaces.objects.base import FrozenBaseModel
 from metricflow.assert_one_arg import assert_exactly_one_arg_set
-
 
 logger = logging.getLogger(__name__)
 
@@ -96,7 +95,7 @@ class SqlRequestTagSet(FrozenBaseModel):
 
 @dataclass(frozen=True)
 class SqlRequestTag:
-    """A key / value that can be used ot label requests to the SQL engine"""
+    """A key / value that can be used ot label requests to the SQL engine."""
 
     key: str
     value: str
@@ -116,7 +115,7 @@ JsonDict = Dict[str, Any]  # type: ignore [misc]
 
 
 class SqlJsonTag:
-    """Immutable object that represents a JSON object to be used for tagging SQL requests"""
+    """Immutable object that represents a JSON object to be used for tagging SQL requests."""
 
     def __init__(self, json_dict: Optional[JsonDict] = None) -> None:  # noqa: D
         self._json_dict = OrderedDict(json_dict or {})

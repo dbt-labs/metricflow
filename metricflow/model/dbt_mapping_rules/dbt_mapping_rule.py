@@ -1,20 +1,21 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from dataclasses import dataclass, field
-from typing import Any, Tuple, DefaultDict, Dict
-from typing_extensions import TypeAlias
+from typing import Any, DefaultDict, Dict, Tuple
 
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode, ModelNode
 from dbt_semantic_interfaces.objects.metric import MetricType
 from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationResults
-
+from typing_extensions import TypeAlias
 
 TransformedObjectsValueType: TypeAlias = Any  # type: ignore[misc]
 
 
 @dataclass
 class MappedObjects:
-    """Model elements, and sub elements, mapped by element name path"""
+    """Model elements, and sub elements, mapped by element name path."""
 
     semantic_models: DefaultDict[str, Dict[str, TransformedObjectsValueType]] = field(
         default_factory=lambda: defaultdict(dict)
@@ -41,7 +42,7 @@ class DbtMappingResults:  # noqa: D
 
 
 def assert_metric_model_name(metric: MetricNode) -> None:
-    """Asserts that a metric has a model and that model has a name
+    """Asserts that a metric has a model and that model has a name.
 
     We abstracted this into a function, because it is a common pattern
     in DbtMappingRules.
@@ -53,7 +54,7 @@ def assert_metric_model_name(metric: MetricNode) -> None:
 
 
 def assert_essential_metric_properties(metric: MetricNode) -> None:
-    """Asserts that a dbt metric has the essential properties commonly needed when building metrics
+    """Asserts that a dbt metric has the essential properties commonly needed when building metrics.
 
     We abstracted this into a function, because it is a common pattern
     in DbtMappingRules.
@@ -74,7 +75,7 @@ CALC_METHOD_TO_METRIC_TYPE: Dict[str, MetricType] = {
 
 
 def get_and_assert_calc_method_mapping(dbt_metric: MetricNode) -> MetricType:
-    """Helper method for getting the metric type for a dbt metric's calcuation_method
+    """Helper method for getting the metric type for a dbt metric's calcuation_method.
 
     Anytime we want to map from a dbt metric's calculation_method to a MetricFlow
     metric type, we need to assert that the mapping exists. This is because dbt
@@ -100,5 +101,5 @@ class DbtMappingRule(ABC):
     @staticmethod
     @abstractmethod
     def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:
-        """Take in a MappedObjects object, update it in place given the metrics as determined by the rule. Return any issues"""
+        """Take in a MappedObjects object, update it in place given the metrics as determined by the rule. Return any issues."""
         pass

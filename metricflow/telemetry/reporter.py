@@ -1,32 +1,33 @@
+from __future__ import annotations
+
 import datetime
 import functools
 import logging
-import platform
 import os
+import platform
 import sys
 import time
 import traceback
 import uuid
 from hashlib import sha256
-from typing import Callable, Optional, Any
-from typing import List
+from typing import Any, Callable, List, Optional
 
 from metricflow.configuration.config_handler import ConfigHandler
 from metricflow.configuration.constants import CONFIG_EMAIL
 from metricflow.random_id import random_id
 from metricflow.telemetry.handlers.handlers import (
-    ToMemoryTelemetryHandler,
-    TelemetryHandler,
     RudderstackTelemetryHandler,
+    TelemetryHandler,
+    ToMemoryTelemetryHandler,
 )
 from metricflow.telemetry.handlers.python_log import PythonLoggerTelemetryHandler
-from metricflow.telemetry.models import TelemetryLevel, FunctionStartEvent, FunctionEndEvent
+from metricflow.telemetry.models import FunctionEndEvent, FunctionStartEvent, TelemetryLevel
 
 logger = logging.getLogger(__name__)
 
 
 class TelemetryReporter:
-    """Reports telemetry for improving product experience"""
+    """Reports telemetry for improving product experience."""
 
     # Session ID to use when requesting a non-uniquely identifiable ID.
     FULLY_ANONYMOUS_CLIENT_ID = "anonymous"
@@ -68,7 +69,7 @@ class TelemetryReporter:
         self._handlers.append(RudderstackTelemetryHandler())
 
     def add_test_handler(self) -> None:
-        """See test_handler"""
+        """See test_handler."""
         self._handlers.append(self._test_handler)
 
     @property

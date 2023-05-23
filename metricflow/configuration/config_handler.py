@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import pathlib
 
@@ -16,13 +18,13 @@ class ConfigHandler(YamlFileHandler):
 
     @property
     def dir_path(self) -> str:
-        """Retrieve MetricFlow config directory from $MF_CONFIG_DIR, default config dir is ~/.metricflow"""
+        """Retrieve MetricFlow config directory from $MF_CONFIG_DIR, default config dir is ~/.metricflow."""
         config_dir_env = os.getenv(CONFIG_PATH_KEY)
         return config_dir_env if config_dir_env else f"{str(pathlib.Path.home())}/.metricflow"
 
     @property
     def file_path(self) -> str:
-        """Config file can be found at <config_dir>/config.yml"""
+        """Config file can be found at <config_dir>/config.yml."""
         return os.path.join(self.dir_path, "config.yml")
 
     @property

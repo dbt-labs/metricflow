@@ -4,11 +4,11 @@ import logging
 from typing import Sequence
 
 from dbt_semantic_interfaces.references import TimeDimensionReference
-from metricflow.instances import InstanceSet, TimeDimensionInstance
-from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
-from metricflow.specs.specs import TimeDimensionSpec
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 
+from metricflow.instances import InstanceSet, TimeDimensionInstance
+from metricflow.specs.specs import TimeDimensionSpec
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +26,7 @@ class DataSet:
 
     @property
     def metric_time_dimension_instances(self) -> Sequence[TimeDimensionInstance]:
-        """Extracts all metric time TimeDimensionInstances from the InstanceSet associated with this DataSet"""
+        """Extracts all metric time TimeDimensionInstances from the InstanceSet associated with this DataSet."""
         return tuple(
             time_dimension_instance
             for time_dimension_instance in self.instance_set.time_dimension_instances
@@ -35,7 +35,7 @@ class DataSet:
 
     @staticmethod
     def metric_time_dimension_reference() -> TimeDimensionReference:
-        """Returns a special reference that means 'the aggregation time dimension for all measures in the data set'
+        """Returns a special reference that means 'the aggregation time dimension for all measures in the data set'.
 
         Or to put in another way, if metrics for those measures were plotted together on a graph, this is the name of
         the time dimension for the x-axis.
@@ -49,7 +49,7 @@ class DataSet:
 
     @staticmethod
     def metric_time_dimension_spec(time_granularity: TimeGranularity) -> TimeDimensionSpec:
-        """Spec that corresponds to DataSet.metric_time_dimension_reference"""
+        """Spec that corresponds to DataSet.metric_time_dimension_reference."""
         return TimeDimensionSpec(
             element_name=DataSet.metric_time_dimension_reference().element_name,
             entity_links=(),

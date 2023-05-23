@@ -6,7 +6,6 @@ from typing import List, Optional, Sequence, Tuple, TypeVar
 from metricflow.dataflow.dataflow_plan import JoinDescription, JoinOverTimeRangeNode, JoinToTimeSpineNode
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.sql_expression_builders import make_coalesced_expr
-from metricflow.sql.sql_plan import SqlExpressionNode, SqlJoinDescription, SqlJoinType, SqlSelectStatementNode
 from metricflow.sql.sql_exprs import (
     SqlColumnReference,
     SqlColumnReferenceExpression,
@@ -18,6 +17,7 @@ from metricflow.sql.sql_exprs import (
     SqlLogicalOperator,
     SqlTimeDeltaExpression,
 )
+from metricflow.sql.sql_plan import SqlExpressionNode, SqlJoinDescription, SqlJoinType, SqlSelectStatementNode
 
 SqlDataSetT = TypeVar("SqlDataSetT", bound=SqlDataSet)
 
@@ -41,7 +41,7 @@ class ColumnEqualityDescription:
 
 @dataclass(frozen=True)
 class AnnotatedSqlDataSet:
-    """Class to bind a DataSet to transient properties associated with it at a given point in the SqlQueryPlan"""
+    """Class to bind a DataSet to transient properties associated with it at a given point in the SqlQueryPlan."""
 
     data_set: SqlDataSet
     alias: str
@@ -49,7 +49,7 @@ class AnnotatedSqlDataSet:
 
     @property
     def metric_time_column_name(self) -> str:
-        """Direct accessor for the optional metric time name, only safe to call when we know that value is set"""
+        """Direct accessor for the optional metric time name, only safe to call when we know that value is set."""
         assert (
             self._metric_time_column_name
         ), "Expected a valid metric time dimension name to be associated with this dataset, but did not get one!"
@@ -57,7 +57,7 @@ class AnnotatedSqlDataSet:
 
 
 class SqlQueryPlanJoinBuilder:
-    """Helper class for constructing various join components in a SqlQueryPlan"""
+    """Helper class for constructing various join components in a SqlQueryPlan."""
 
     @staticmethod
     def make_column_equality_sql_join_description(
@@ -144,12 +144,11 @@ class SqlQueryPlanJoinBuilder:
         right_data_set: AnnotatedSqlDataSet,
         join_description: JoinDescription,
     ) -> SqlJoinDescription:
-        """Make a join description to link two base output DataSets by matching entities
+        """Make a join description to link two base output DataSets by matching entities.
 
         In addition to the entity equality condition, this will ensure datasets are joined on all partition
         columns and account for validity windows, if those are defined in one of the datasets.
         """
-
         join_on_entity = join_description.join_on_entity
 
         # Figure out which columns in the "left" data set correspond to the entity that we want to join on.
@@ -220,7 +219,7 @@ class SqlQueryPlanJoinBuilder:
         right_data_set: AnnotatedSqlDataSet,
         join_description: JoinDescription,
     ) -> Tuple[SqlExpressionNode, ...]:
-        """Build a time window join condition if the join description includes a validity window description
+        """Build a time window join condition if the join description includes a validity window description.
 
         When the validity window is set, it means we are dealing with a dataset representing an SCD Type II
         style semantic model, with a start and end boundary on the window. A base output join against such data
@@ -315,7 +314,7 @@ class SqlQueryPlanJoinBuilder:
         column_names: Sequence[str],
         table_aliases_for_coalesce: Sequence[str],
     ) -> SqlJoinDescription:
-        """Creates the sql join description for combining two separate metrics output datasets
+        """Creates the sql join description for combining two separate metrics output datasets.
 
         These might be combined in service of producing complete output for end user consumption, in which
         case the join type will be FULL OUTER in order to ensure all rows are included. In this case, the
@@ -394,7 +393,6 @@ class SqlQueryPlanJoinBuilder:
 
         The latter scenario consolidates the rows keyed by 'c' into a single entry.
         """
-
         return SqlComparisonExpression(
             left_expr=make_coalesced_expr(table_aliases_in_coalesce, column_alias),
             comparison=SqlComparison.EQUALS,
@@ -412,12 +410,11 @@ class SqlQueryPlanJoinBuilder:
         metric_data_set: AnnotatedSqlDataSet,
         time_spine_data_set: AnnotatedSqlDataSet,
     ) -> SqlJoinDescription:
-        """Make a join description to connect a cumulative metric input to a time spine dataset
+        """Make a join description to connect a cumulative metric input to a time spine dataset.
 
         Cumulative metrics must be joined against a time spine in a backward-looking fashion, with
         a range determined by a time window (delta against metric_time) and optional cumulative grain.
         """
-
         # Build an expression like "a.ds <= b.ds AND a.ds >= b.ds - <window>
         # If no window is present we join across all time -> "a.ds <= b.ds"
         metric_time_column_expr = SqlColumnReferenceExpression(

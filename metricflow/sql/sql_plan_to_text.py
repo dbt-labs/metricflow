@@ -1,4 +1,5 @@
 """Functions to convert a SQL query plan into a text representation."""
+from __future__ import annotations
 
 import textwrap
 
@@ -7,14 +8,13 @@ from jinja2 import StrictUndefined
 
 from metricflow.dag.dag_to_text import MetricFlowDagToText
 from metricflow.sql.sql_plan import (
-    SqlQueryPlanNode,
     SqlQueryPlan,
+    SqlQueryPlanNode,
 )
 
 
 def sql_query_plan_node_as_text(root_node: SqlQueryPlanNode) -> str:
     """Recursively convert the tree represented by the root node into a string."""
-
     return MetricFlowDagToText().to_text(root_node)
 
 

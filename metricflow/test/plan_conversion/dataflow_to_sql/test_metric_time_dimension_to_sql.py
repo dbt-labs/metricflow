@@ -1,11 +1,13 @@
+from __future__ import annotations
+
 from _pytest.fixtures import FixtureRequest
+from dbt_semantic_interfaces.references import TimeDimensionReference
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan import MetricTimeDimensionTransformNode
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
-from dbt_semantic_interfaces.references import TimeDimensionReference
 from metricflow.specs.specs import MetricFlowQuerySpec, MetricSpec
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState

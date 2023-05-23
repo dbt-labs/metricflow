@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 import difflib
 import logging
 import os
 import re
 import webbrowser
-from typing import TypeVar, Optional, Tuple, List, Callable
+from typing import Callable, List, Optional, Tuple, TypeVar
 
 from _pytest.fixtures import FixtureRequest
 

@@ -1,18 +1,20 @@
+from __future__ import annotations
+
 import datetime
 import logging
 import threading
-from typing import Set, Union, Sequence
+from typing import Sequence, Set, Union
 
 import pandas as pd
 import pytest
+from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from sqlalchemy.exc import ProgrammingError
 
 from metricflow.dataflow.sql_table import SqlTable
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from metricflow.sql.sql_column_type import SqlColumnType
-from metricflow.random_id import random_id
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
+from metricflow.random_id import random_id
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.sql.sql_column_type import SqlColumnType
 from metricflow.sql_clients.sql_utils import make_df
 from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
@@ -167,7 +169,7 @@ def test_dry_run_of_bad_query_raises_exception(sql_client: SqlClient) -> None:  
 
 
 def _issue_sleep_query(sql_client: SqlClient, sleep_time: int) -> None:
-    """Issue a query that sleeps for a given number of seconds"""
+    """Issue a query that sleeps for a given number of seconds."""
     engine_type = sql_client.sql_engine_attributes.sql_engine_type
     if engine_type is SqlEngine.SNOWFLAKE:
         sql_client.execute(f"CALL system$wait({sleep_time}, 'SECONDS')")
@@ -184,7 +186,7 @@ def _issue_sleep_query(sql_client: SqlClient, sleep_time: int) -> None:
 
 
 def _supports_sleep_query(sql_client: SqlClient) -> bool:
-    """Returns true if the given SQL client is supported by _issue_sleep_query()"""
+    """Returns true if the given SQL client is supported by _issue_sleep_query()."""
     engine_type = sql_client.sql_engine_attributes.sql_engine_type
     if engine_type is SqlEngine.SNOWFLAKE:
         return True

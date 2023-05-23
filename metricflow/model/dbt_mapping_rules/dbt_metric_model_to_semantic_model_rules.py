@@ -1,22 +1,25 @@
+from __future__ import annotations
+
 import traceback
 from typing import List, Tuple
 
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode
 from dbt_semantic_interfaces.objects.semantic_model import NodeRelation
+from dbt_semantic_interfaces.validations.validator_helpers import (
+    ModelValidationResults,
+    ValidationError,
+    ValidationIssue,
+)
+
 from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
     DbtMappingRule,
     MappedObjects,
     assert_metric_model_name,
 )
-from dbt_semantic_interfaces.validations.validator_helpers import (
-    ModelValidationResults,
-    ValidationIssue,
-    ValidationError,
-)
 
 
 class DbtMapToSemanticModelName(DbtMappingRule):
-    """Rule for mapping dbt metric model names to semantic model names"""
+    """Rule for mapping dbt metric model names to semantic model names."""
 
     @staticmethod
     def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
@@ -37,7 +40,7 @@ class DbtMapToSemanticModelName(DbtMappingRule):
 
 
 class DbtMapToSemanticModelDescription(DbtMappingRule):
-    """Rule for mapping dbt metric model descriptions to semantic model descriptions"""
+    """Rule for mapping dbt metric model descriptions to semantic model descriptions."""
 
     @staticmethod
     def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
@@ -60,7 +63,7 @@ class DbtMapToSemanticModelDescription(DbtMappingRule):
 
 
 class DbtMapSemanticModelNodeRelation(DbtMappingRule):
-    """Rule for mapping dbt metric models to semantic model node relations"""
+    """Rule for mapping dbt metric models to semantic model node relations."""
 
     @staticmethod
     def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D

@@ -1,30 +1,32 @@
+from __future__ import annotations
+
 from typing import List
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-
 from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
 from dbt_semantic_interfaces.objects.metric import MetricTimeWindow
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-from dbt_semantic_interfaces.references import TimeDimensionReference, EntityReference
+from dbt_semantic_interfaces.references import EntityReference, TimeDimensionReference
 from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan import (
-    DataflowPlan,
-    WriteToResultDataframeNode,
-    FilterElementsNode,
     AggregateMeasuresNode,
+    BaseOutput,
+    ComputeMetricsNode,
+    ConstrainTimeRangeNode,
+    DataflowPlan,
+    FilterElementsNode,
     JoinDescription,
     JoinToBaseOutputNode,
-    ComputeMetricsNode,
-    WhereConstraintNode,
-    OrderByLimitNode,
-    ConstrainTimeRangeNode,
-    BaseOutput,
-    MetricTimeDimensionTransformNode,
-    SemiAdditiveJoinNode,
     JoinToTimeSpineNode,
+    MetricTimeDimensionTransformNode,
+    OrderByLimitNode,
+    SemiAdditiveJoinNode,
+    WhereConstraintNode,
+    WriteToResultDataframeNode,
 )
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.dataset.dataset import DataSet
@@ -35,27 +37,26 @@ from metricflow.plan_conversion.column_resolver import DunderColumnAssociationRe
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     DimensionSpec,
+    InstanceSpecSet,
+    LinklessEntitySpec,
     MeasureSpec,
+    MetricFlowQuerySpec,
     MetricInputMeasureSpec,
     MetricSpec,
-    LinklessEntitySpec,
-    MetricFlowQuerySpec,
     NonAdditiveDimensionSpec,
     OrderBySpec,
     TimeDimensionSpec,
-    InstanceSpecSet,
 )
-from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.where_filter_transform import ConvertToWhereSpec
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.plan_utils import assert_plan_snapshot_text_equal
-from metricflow.test.sql.compare_sql_plan import assert_rendered_sql_from_plan_equal
-from metricflow.test.sql.compare_sql_plan import assert_sql_plan_text_equal
+from metricflow.test.sql.compare_sql_plan import assert_rendered_sql_from_plan_equal, assert_sql_plan_text_equal
 from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY
 
 
@@ -166,7 +167,7 @@ def test_filter_node(  # noqa: D
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
-    """Tests converting a dataflow plan to a SQL query plan where there is a leaf pass filter node"""
+    """Tests converting a dataflow plan to a SQL query plan where there is a leaf pass filter node."""
     measure_spec = MeasureSpec(
         element_name="bookings",
     )
@@ -192,7 +193,7 @@ def test_filter_with_where_constraint_node(  # noqa: D
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
-    """Tests converting a dataflow plan to a SQL query plan where there is a leaf pass filter node"""
+    """Tests converting a dataflow plan to a SQL query plan where there is a leaf pass filter node."""
     measure_spec = MeasureSpec(
         element_name="bookings",
     )
@@ -228,7 +229,7 @@ def test_measure_aggregation_node(  # noqa: D
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
-    """Tests converting a dataflow plan to a SQL query plan where there is a leaf measure aggregation node
+    """Tests converting a dataflow plan to a SQL query plan where there is a leaf measure aggregation node.
 
     Covers SUM, AVERAGE, SUM_BOOLEAN (transformed to SUM upstream), and COUNT_DISTINCT agg types
     """
@@ -451,7 +452,7 @@ def test_compute_metrics_node_simple_expr(
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
-    """Tests the compute metrics node for expr type metrics sourced from a single measure"""
+    """Tests the compute metrics node for expr type metrics sourced from a single measure."""
     measure_spec = MeasureSpec(
         element_name="booking_value",
     )
@@ -725,7 +726,7 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
-    """Tests the compute metrics node for ratio type metrics sourced from a single semantic model"""
+    """Tests the compute metrics node for ratio type metrics sourced from a single semantic model."""
     numerator_spec = MeasureSpec(
         element_name="bookings",
     )
@@ -792,7 +793,7 @@ def test_compute_metrics_node_ratio_from_multiple_semantic_models(
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
     sql_client: SqlClient,
 ) -> None:
-    """Tests the compute metrics node for ratio type metrics
+    """Tests the compute metrics node for ratio type metrics.
 
     This test exercises the functionality provided in JoinAggregatedMeasuresByGroupByColumnsNode for
     merging multiple measures into a single input source for final metrics computation.
@@ -967,7 +968,6 @@ def test_constrain_time_range_node(
     sql_client: SqlClient,
 ) -> None:
     """Tests converting the ConstrainTimeRangeNode to SQL."""
-
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     filtered_measure_node = FilterElementsNode(
         parent_node=measure_source_node,
@@ -1524,7 +1524,7 @@ def test_join_to_scd_dimension(
     scd_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
     sql_client: SqlClient,
 ) -> None:
-    """Tests conversion of a plan using a dimension with a validity window inside a measure constraint"""
+    """Tests conversion of a plan using a dimension with a validity window inside a measure constraint."""
     dataflow_plan = scd_dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(
@@ -1559,7 +1559,7 @@ def test_multi_hop_through_scd_dimension(
     scd_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
     sql_client: SqlClient,
 ) -> None:
-    """Tests conversion of a plan using a dimension that is reached through an SCD table"""
+    """Tests conversion of a plan using a dimension that is reached through an SCD table."""
     dataflow_plan = scd_dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings"),),
@@ -1584,7 +1584,7 @@ def test_multi_hop_to_scd_dimension(
     scd_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
     sql_client: SqlClient,
 ) -> None:
-    """Tests conversion of a plan using an SCD dimension that is reached through another table"""
+    """Tests conversion of a plan using an SCD dimension that is reached through another table."""
     dataflow_plan = scd_dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings"),),

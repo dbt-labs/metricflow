@@ -1,13 +1,15 @@
-from typing import Dict, TypeVar, Generic
+from __future__ import annotations
+
+from typing import Dict, Generic, TypeVar
 
 from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
 )
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 
 SourceDataSetT = TypeVar("SourceDataSetT", bound=SqlDataSet)
 
@@ -70,7 +72,6 @@ class DataflowPlanNodeOutputDataSetResolver(Generic[SourceDataSetT], DataflowToS
 
     def get_output_data_set(self, node: DataflowPlanNode[SourceDataSetT]) -> SqlDataSet:  # noqa: D
         """Cached since this will be called repeatedly during the computation of multiple metrics."""
-
         if node not in self._node_to_output_data_set:
             self._node_to_output_data_set[node] = node.accept(self)
 

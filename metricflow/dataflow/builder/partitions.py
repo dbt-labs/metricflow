@@ -2,15 +2,15 @@ from __future__ import annotations
 
 from collections import OrderedDict
 from dataclasses import dataclass
-from typing import Tuple, Sequence, List
+from typing import List, Sequence, Tuple
 
 from metricflow.dataset.dataset import DataSet
 from metricflow.protocols.semantics import SemanticModelAccessor
 from metricflow.specs.specs import (
     DimensionSpec,
-    TimeDimensionSpec,
     InstanceSpecSet,
     PartitionSpecSet,
+    TimeDimensionSpec,
 )
 
 

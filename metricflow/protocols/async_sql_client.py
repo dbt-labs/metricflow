@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Protocol, Sequence, Optional, Callable
+from typing import Callable, Optional, Protocol, Sequence
 
 from metricflow.protocols.sql_client import SqlClient, SqlIsolationLevel
-from metricflow.protocols.sql_request import SqlRequestId, SqlRequestResult, SqlJsonTag
+from metricflow.protocols.sql_request import SqlJsonTag, SqlRequestId, SqlRequestResult
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.async_request import CombinedSqlTags
 
@@ -24,7 +24,7 @@ class AsyncSqlClient(SqlClient, Protocol):
 
     @abstractmethod
     def async_request_result(self, request_id: SqlRequestId) -> SqlRequestResult:
-        """Wait until a async query has finished, and then return the result"""
+        """Wait until a async query has finished, and then return the result."""
         raise NotImplementedError
 
     @abstractmethod

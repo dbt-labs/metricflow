@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from metricflow.execution.execution_plan import ExecutionPlan
 from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.test.execution.noop_task import NoOpExecutionPlanTask

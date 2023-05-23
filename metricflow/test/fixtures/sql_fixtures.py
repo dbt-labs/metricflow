@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer, DefaultSqlQueryPlanRenderer
+from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer, SqlQueryPlanRenderer
 
 
 @pytest.fixture

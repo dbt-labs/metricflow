@@ -4,23 +4,23 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import List, TypeVar, Generic, Tuple
+from typing import Generic, List, Tuple, TypeVar
 
-from dbt_semantic_interfaces.references import SemanticModelElementReference, MetricModelReference
+from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
+from dbt_semantic_interfaces.references import MetricModelReference, SemanticModelElementReference
+
 from metricflow.aggregation_properties import AggregationState
 from metricflow.specs.column_assoc import ColumnAssociation
-from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from metricflow.specs.specs import (
-    MetadataSpec,
-    MeasureSpec,
     DimensionSpec,
     EntitySpec,
-    MetricSpec,
     InstanceSpec,
-    TimeDimensionSpec,
     InstanceSpecSet,
+    MeasureSpec,
+    MetadataSpec,
+    MetricSpec,
+    TimeDimensionSpec,
 )
-
 
 # Type for the specification used in the instance.
 SpecT = TypeVar("SpecT", bound=InstanceSpec)
@@ -60,7 +60,7 @@ class SemanticModelElementInstance(SerializableDataclass):  # noqa: D
 
     @property
     def origin_semantic_model_reference(self) -> SemanticModelElementReference:
-        """Property to grab the element reference pointing to the origin semantic model for this element instance
+        """Property to grab the element reference pointing to the origin semantic model for this element instance.
 
         By convention this is the zeroth element in the Tuple. At this time these tuples are always of exactly
         length 1, so the simple assertions here work.

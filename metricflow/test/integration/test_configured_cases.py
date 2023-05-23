@@ -1,14 +1,18 @@
+from __future__ import annotations
+
 import datetime
 import logging
-from typing import List, Optional, Tuple, Sequence
+from typing import List, Optional, Sequence, Tuple
 
 import jinja2
 import pytest
 from dateutil import parser
+from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
+from dbt_semantic_interfaces.objects.elements.measure import MeasureAggregationParameters
+from dbt_semantic_interfaces.test_utils import as_datetime
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowQueryRequest
-from dbt_semantic_interfaces.objects.elements.measure import MeasureAggregationParameters
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import (
     DunderColumnAssociationResolver,
@@ -17,24 +21,22 @@ from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_exprs import (
+    SqlCastToTimestampExpression,
+    SqlColumnReference,
+    SqlColumnReferenceExpression,
+    SqlDateTruncExpression,
     SqlPercentileExpression,
     SqlPercentileExpressionArgument,
-    SqlTimeDeltaExpression,
-    SqlColumnReferenceExpression,
-    SqlColumnReference,
-    SqlDateTruncExpression,
-    SqlCastToTimestampExpression,
     SqlStringExpression,
+    SqlTimeDeltaExpression,
 )
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.integration.configured_test_case import (
+    CONFIGURED_INTEGRATION_TESTS_REPOSITORY,
     IntegrationTestModel,
     RequiredDwEngineFeatures,
-    CONFIGURED_INTEGRATION_TESTS_REPOSITORY,
 )
-from dbt_semantic_interfaces.test_utils import as_datetime
 from metricflow.test.time.configurable_time_source import (
     ConfigurableTimeSource,
 )
@@ -55,7 +57,6 @@ class CheckQueryHelpers:
         stop_time: str,
     ) -> str:
         """Render an expression like "ds >='2020-01-01' AND ds < '2020-01-02'" for start_time = stop_time = '2020-01-01'."""
-
         start_expr = self.cast_to_ts(f"{start_time}")
         time_format = "%Y-%m-%d"
         stop_time_plus_one_day = (
@@ -82,7 +83,7 @@ class CheckQueryHelpers:
         count: int,
         granularity: TimeGranularity,
     ) -> str:
-        """Renders a date subtract expression"""
+        """Renders a date subtract expression."""
         expr = SqlTimeDeltaExpression(
             arg=SqlColumnReferenceExpression(SqlColumnReference(table_alias, column_alias)),
             count=count,
@@ -109,7 +110,6 @@ class CheckQueryHelpers:
         self, expr: str, percentile: float, use_discrete_percentile: bool, use_approximate_percentile: bool
     ) -> str:
         """Return the percentile call that can be used for computing a percentile aggregation."""
-
         percentile_args = SqlPercentileExpressionArgument.from_aggregation_parameters(
             MeasureAggregationParameters(
                 percentile=percentile,
@@ -131,7 +131,7 @@ class CheckQueryHelpers:
 
     @property
     def double_data_type_name(self) -> str:
-        """Return the name of the double data type for the relevant SQL engine"""
+        """Return the name of the double data type for the relevant SQL engine."""
         return self._sql_client.sql_engine_attributes.double_data_type_name
 
     def render_dimension_template(self, dimension_name: str, entity_path: Sequence[str] = ()) -> str:

@@ -1,25 +1,27 @@
+from __future__ import annotations
+
 import pytest
 from _pytest.fixtures import FixtureRequest
 
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.sql.optimizer.rewriting_sub_query_reducer import SqlRewritingSubQueryReducer
 from metricflow.sql.sql_exprs import (
-    SqlColumnReferenceExpression,
-    SqlColumnReference,
-    SqlComparisonExpression,
-    SqlComparison,
-    SqlStringLiteralExpression,
     SqlAggregateFunctionExpression,
+    SqlColumnReference,
+    SqlColumnReferenceExpression,
+    SqlComparison,
+    SqlComparisonExpression,
     SqlFunction,
     SqlStringExpression,
+    SqlStringLiteralExpression,
 )
 from metricflow.sql.sql_plan import (
-    SqlSelectStatementNode,
-    SqlSelectColumn,
-    SqlTableFromClauseNode,
-    SqlOrderByDescription,
     SqlJoinDescription,
     SqlJoinType,
+    SqlOrderByDescription,
+    SqlSelectColumn,
+    SqlSelectStatementNode,
+    SqlTableFromClauseNode,
 )
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.sql.compare_sql_plan import assert_default_rendered_sql_equal
@@ -173,7 +175,7 @@ def test_reduce_sub_query(
     mf_test_session_state: MetricFlowTestSessionState,
     base_select_statement: SqlSelectStatementNode,
 ) -> None:
-    """Tests a case where an outer query should be reduced into its inner query with merged LIMIT expressions"""
+    """Tests a case where an outer query should be reduced into its inner query with merged LIMIT expressions."""
     assert_default_rendered_sql_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
@@ -344,7 +346,7 @@ def test_reduce_join(
     mf_test_session_state: MetricFlowTestSessionState,
     join_select_statement: SqlSelectStatementNode,
 ) -> None:
-    """Tests a case where reducing occurs on a JOIN"""
+    """Tests a case where reducing occurs on a JOIN."""
     assert_default_rendered_sql_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
@@ -517,7 +519,7 @@ def test_colliding_alias(
     mf_test_session_state: MetricFlowTestSessionState,
     colliding_select_statement: SqlSelectStatementNode,
 ) -> None:
-    """Tests a case where reducing occurs on a JOIN"""
+    """Tests a case where reducing occurs on a JOIN."""
     assert_default_rendered_sql_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
@@ -752,7 +754,7 @@ def test_reduce_all_join_sources(
     mf_test_session_state: MetricFlowTestSessionState,
     reduce_all_join_select_statement: SqlSelectStatementNode,
 ) -> None:
-    """Tests a case where reducing occurs all all sources on a JOIN"""
+    """Tests a case where reducing occurs all all sources on a JOIN."""
     assert_default_rendered_sql_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
@@ -895,7 +897,7 @@ def test_reducing_join_statement(
     mf_test_session_state: MetricFlowTestSessionState,
     reducing_join_statement: SqlSelectStatementNode,
 ) -> None:
-    """Tests a case where a join query should not reduced an aggregate"""
+    """Tests a case where a join query should not reduced an aggregate."""
     assert_default_rendered_sql_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
@@ -1038,7 +1040,7 @@ def test_reducing_join_left_node_statement(
     mf_test_session_state: MetricFlowTestSessionState,
     reducing_join_left_node_statement: SqlSelectStatementNode,
 ) -> None:
-    """Tests a case where a join query should not reduced an aggregate"""
+    """Tests a case where a join query should not reduced an aggregate."""
     assert_default_rendered_sql_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,

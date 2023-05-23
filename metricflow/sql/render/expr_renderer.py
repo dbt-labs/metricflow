@@ -8,32 +8,32 @@ from dataclasses import dataclass
 from typing import List
 
 import jinja2
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_exprs import (
-    SqlExpressionNodeVisitor,
+    SqlAggregateFunctionExpression,
+    SqlBetweenExpression,
+    SqlCastToTimestampExpression,
+    SqlColumnAliasReferenceExpression,
     SqlColumnReferenceExpression,
-    SqlPercentileExpression,
-    SqlStringExpression,
     SqlComparisonExpression,
+    SqlDateTruncExpression,
     SqlExpressionNode,
+    SqlExpressionNodeVisitor,
     SqlFunction,
     SqlGenerateUuidExpression,
-    SqlAggregateFunctionExpression,
-    SqlNullExpression,
-    SqlLogicalExpression,
-    SqlStringLiteralExpression,
     SqlIsNullExpression,
-    SqlCastToTimestampExpression,
-    SqlDateTruncExpression,
-    SqlTimeDeltaExpression,
+    SqlLogicalExpression,
+    SqlNullExpression,
+    SqlPercentileExpression,
     SqlRatioComputationExpression,
-    SqlColumnAliasReferenceExpression,
-    SqlBetweenExpression,
+    SqlStringExpression,
+    SqlStringLiteralExpression,
+    SqlTimeDeltaExpression,
     SqlWindowFunctionExpression,
 )
 from metricflow.sql.sql_plan import SqlSelectColumn
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +47,7 @@ class SqlExpressionRenderResult:
 
 
 class SqlExpressionRenderer(SqlExpressionNodeVisitor[SqlExpressionRenderResult], ABC):
-    """Renders SqlExpressions into strings"""
+    """Renders SqlExpressions into strings."""
 
     def render_sql_expr(self, sql_expr: SqlExpressionNode) -> SqlExpressionRenderResult:
         """Render the given expression to a string."""
@@ -63,7 +63,7 @@ class SqlExpressionRenderer(SqlExpressionNodeVisitor[SqlExpressionRenderResult],
 
     @property
     def double_data_type(self) -> str:
-        """Property for the double data type, for engine-specific type casting
+        """Property for the double data type, for engine-specific type casting.
 
         TODO: Eliminate this in favor of some kind of engine properties struct
         """
@@ -74,11 +74,11 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
     """Renders the SQL query plan assuming ANSI SQL."""
 
     def visit_string_expr(self, node: SqlStringExpression) -> SqlExpressionRenderResult:  # noqa: D
-        """Renders an arbitrary string expression like 1+1=2"""
+        """Renders an arbitrary string expression like 1+1=2."""
         return SqlExpressionRenderResult(sql=node.sql_expr, bind_parameters=node.bind_parameters)
 
     def visit_column_reference_expr(self, node: SqlColumnReferenceExpression) -> SqlExpressionRenderResult:  # noqa: D
-        """Render a reference to a column in a table like my_table.my_col"""
+        """Render a reference to a column in a table like my_table.my_col."""
         return SqlExpressionRenderResult(
             sql=(
                 f"{node.col_ref.table_alias}.{node.col_ref.column_name}"
@@ -98,7 +98,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         )
 
     def visit_comparison_expr(self, node: SqlComparisonExpression) -> SqlExpressionRenderResult:
-        """Render a comparison expression like 1 = 2"""
+        """Render a comparison expression like 1 = 2."""
         combined_params = SqlBindParameters()
 
         left_expr_rendered = self.render_sql_expr(node.left_expr)
@@ -120,7 +120,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         )
 
     def visit_function_expr(self, node: SqlAggregateFunctionExpression) -> SqlExpressionRenderResult:  # noqa: D
-        """Render a function call like CONCAT(a, b)"""
+        """Render a function call like CONCAT(a, b)."""
         args_rendered = [self.render_sql_expr(x) for x in node.sql_function_args]
         combined_params = SqlBindParameters()
         for arg_rendered in args_rendered:
@@ -135,7 +135,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         )
 
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
-        """Render a percentile expression"""
+        """Render a percentile expression."""
         raise RuntimeError(
             "Default expression render has no percentile implementation - an engine-specific renderer should be implemented."
         )
@@ -255,7 +255,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         )
 
     def visit_ratio_computation_expr(self, node: SqlRatioComputationExpression) -> SqlExpressionRenderResult:
-        """Render the ratio computation for a ratio metric
+        """Render the ratio computation for a ratio metric.
 
         This requires both a type cast to a floating point type (default to DOUBLE, engine-permitting) and
         the requisite division between numerator and denominator

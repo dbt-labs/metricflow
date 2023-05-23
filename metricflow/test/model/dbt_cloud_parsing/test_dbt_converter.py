@@ -1,14 +1,17 @@
+from __future__ import annotations
+
 from typing import Tuple
 
 import pytest
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode
-from metricflow.model.dbt_converter import DbtConverter
 from dbt_semantic_interfaces.objects.metric import MetricType
+
+from metricflow.model.dbt_converter import DbtConverter
 
 
 @pytest.mark.skip("dbt model conversion no longer needed.")
 def test_for_breaking_model_changes(dbt_metrics: Tuple[MetricNode, ...]) -> None:
-    """This is intended to be a comprehensive test such that if the MetricFlow model changes in a breaking way, this should break
+    """This is intended to be a comprehensive test such that if the MetricFlow model changes in a breaking way, this should break.
 
     This test is fairly brittle. That is intentional. The dbt mapping rules map dbt metric
     and model attributes to MetricFlow Model Element attributes. If the MetricFlow model
@@ -16,7 +19,6 @@ def test_for_breaking_model_changes(dbt_metrics: Tuple[MetricNode, ...]) -> None
     need to be aware so we appropriate update/create dbt mapping rules accordingly. This
     test detects when that is needed.
     """
-
     dbt_convert_result = DbtConverter().convert(dbt_metrics=dbt_metrics)
     assert (
         not dbt_convert_result.issues.has_blocking_issues

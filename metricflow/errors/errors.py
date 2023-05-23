@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 import textwrap
 from typing import Dict, Optional
 
 
 class CustomerFacingSemanticException(Exception):
-    """Class of Exceptions that make it to the customer's eyeballs"""
+    """Class of Exceptions that make it to the customer's eyeballs."""
 
     pass
 
@@ -44,13 +46,13 @@ class InvalidSemanticModelError(SemanticException):  # noqa:D
 
 
 class ExecutionException(Exception):
-    """Raised if there are any errors while executing the execution plan"""
+    """Raised if there are any errors while executing the execution plan."""
 
     pass
 
 
 class SqlClientCreationException(Exception):
-    """Exception to represent errors related to the SqlClient"""
+    """Exception to represent errors related to the SqlClient."""
 
     def __init__(self) -> None:  # noqa: D
         super().__init__(
@@ -59,7 +61,7 @@ class SqlClientCreationException(Exception):
 
 
 class MetricFlowInitException(Exception):
-    """Exception to represent errors related to the MetricFlow creation"""
+    """Exception to represent errors related to the MetricFlow creation."""
 
     def __init__(self) -> None:  # noqa: D
         super().__init__(
@@ -68,7 +70,7 @@ class MetricFlowInitException(Exception):
 
 
 class ModelCreationException(Exception):
-    """Exception to represent errors related to the building a model"""
+    """Exception to represent errors related to the building a model."""
 
     def __init__(self) -> None:  # noqa: D
         super().__init__(

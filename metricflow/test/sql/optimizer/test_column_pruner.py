@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 from _pytest.fixtures import FixtureRequest
 
@@ -5,20 +7,20 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.sql.optimizer.column_pruner import SqlColumnPrunerOptimizer
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer, SqlQueryPlanRenderer
 from metricflow.sql.sql_exprs import (
-    SqlStringExpression,
-    SqlColumnReferenceExpression,
     SqlColumnReference,
-    SqlComparisonExpression,
+    SqlColumnReferenceExpression,
     SqlComparison,
+    SqlComparisonExpression,
     SqlIsNullExpression,
+    SqlStringExpression,
 )
 from metricflow.sql.sql_plan import (
-    SqlSelectColumn,
-    SqlTableFromClauseNode,
-    SqlSelectStatementNode,
     SqlJoinDescription,
     SqlJoinType,
     SqlQueryPlanNode,
+    SqlSelectColumn,
+    SqlSelectStatementNode,
+    SqlTableFromClauseNode,
 )
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.sql.compare_sql_plan import assert_default_rendered_sql_equal
@@ -212,7 +214,7 @@ def test_no_pruning(
     column_pruner: SqlColumnPrunerOptimizer,
     base_select_statement: SqlSelectStatementNode,
 ) -> None:
-    """Tests a case where no pruning should occur"""
+    """Tests a case where no pruning should occur."""
     assert_default_rendered_sql_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
@@ -234,8 +236,7 @@ def test_prune_from_source(
     column_pruner: SqlColumnPrunerOptimizer,
     base_select_statement: SqlSelectStatementNode,
 ) -> None:
-    """Tests a case where columns should be pruned from the FROM clause"""
-
+    """Tests a case where columns should be pruned from the FROM clause."""
     select_statement_with_some_from_source_column_removed = SqlSelectStatementNode(
         description="test0",
         select_columns=(
@@ -294,8 +295,7 @@ def test_prune_joined_source(
     column_pruner: SqlColumnPrunerOptimizer,
     base_select_statement: SqlSelectStatementNode,
 ) -> None:
-    """Tests a case where columns should be pruned from the JOIN clause"""
-
+    """Tests a case where columns should be pruned from the JOIN clause."""
     select_statement_with_some_joined_source_column_removed = SqlSelectStatementNode(
         description="test0",
         select_columns=(
@@ -355,7 +355,6 @@ def test_dont_prune_if_in_where(
     base_select_statement: SqlSelectStatementNode,
 ) -> None:
     """Tests that columns aren't pruned from parent sources if columns are used in a where."""
-
     select_statement_with_other_exprs = SqlSelectStatementNode(
         description="test0",
         select_columns=(
@@ -399,7 +398,6 @@ def test_dont_prune_with_str_expr(
     base_select_statement: SqlSelectStatementNode,
 ) -> None:
     """Tests that columns aren't pruned from parent sources if there's a string expression in the select."""
-
     select_statement_with_other_exprs = SqlSelectStatementNode(
         description="test0",
         select_columns=(
@@ -439,7 +437,6 @@ def test_prune_with_str_expr(
     base_select_statement: SqlSelectStatementNode,
 ) -> None:
     """Tests that columns are from parent sources if there's a string expression in the select with known cols."""
-
     select_statement_with_other_exprs = SqlSelectStatementNode(
         description="test0",
         select_columns=(
@@ -610,8 +607,7 @@ def test_prune_str_expr(
     column_pruner: SqlColumnPrunerOptimizer,
     string_select_statement: SqlSelectStatementNode,
 ) -> None:
-    """Tests a case where a string expr in a node results in the parent being pruned properly"""
-
+    """Tests a case where a string expr in a node results in the parent being pruned properly."""
     assert_default_rendered_sql_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
@@ -740,7 +736,6 @@ def test_prune_grandparents(
     grandparent_pruning_select_statement: SqlQueryPlanNode,
 ) -> None:
     """Tests a case where a string expr in a node prevents the parent from being pruned, but prunes grandparents."""
-
     assert_default_rendered_sql_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
@@ -886,7 +881,6 @@ def test_prune_grandparents_in_join_query(
     join_grandparent_pruning_select_statement: SqlSelectStatementNode,
 ) -> None:
     """Tests pruning grandparents of a join query."""
-
     assert_default_rendered_sql_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,

@@ -1,19 +1,22 @@
+from __future__ import annotations
+
 import traceback
 from typing import Dict, List, Tuple
 
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode
+from dbt_semantic_interfaces.objects.metric import MetricType
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
+from dbt_semantic_interfaces.validations.validator_helpers import (
+    ModelValidationResults,
+    ValidationError,
+    ValidationIssue,
+)
+
 from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
     DbtMappingRule,
     MappedObjects,
     assert_essential_metric_properties,
     get_and_assert_calc_method_mapping,
-)
-from dbt_semantic_interfaces.objects.metric import MetricType
-from dbt_semantic_interfaces.validations.validator_helpers import (
-    ModelValidationResults,
-    ValidationIssue,
-    ValidationError,
 )
 
 CALC_METHOD_TO_MEASURE_TYPE: Dict[str, AggregationType] = {
@@ -28,7 +31,7 @@ CALC_METHOD_TO_MEASURE_TYPE: Dict[str, AggregationType] = {
 
 
 class DbtToMeasureName(DbtMappingRule):
-    """Rule for mapping non-derived dbt metric names to semantic model measure names"""
+    """Rule for mapping non-derived dbt metric names to semantic model measure names."""
 
     @staticmethod
     def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
@@ -49,7 +52,7 @@ class DbtToMeasureName(DbtMappingRule):
 
 
 class DbtToMeasureAgg(DbtMappingRule):
-    """Rule for mapping non-derived dbt metric calculation method to semantic model measure agg"""
+    """Rule for mapping non-derived dbt metric calculation method to semantic model measure agg."""
 
     @staticmethod
     def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
@@ -72,7 +75,7 @@ class DbtToMeasureAgg(DbtMappingRule):
 
 
 class DbtToMeasureExpr(DbtMappingRule):
-    """Rule for mapping non-derived dbt metric expression to semantic model measure expression"""
+    """Rule for mapping non-derived dbt metric expression to semantic model measure expression."""
 
     @staticmethod
     def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
@@ -94,7 +97,7 @@ class DbtToMeasureExpr(DbtMappingRule):
 
 
 class DbtToMeasureAggTimeDimension(DbtMappingRule):
-    """Rule for mapping non-derived dbt metric timestamp to semantic model measure agg_time_dimension"""
+    """Rule for mapping non-derived dbt metric timestamp to semantic model measure agg_time_dimension."""
 
     @staticmethod
     def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D

@@ -1,12 +1,14 @@
-import pytest
+from __future__ import annotations
+
 from typing import Any, Dict, List, Tuple
 
+import pytest
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode
 
 
 @pytest.fixture
 def dbt_cats_model() -> Dict[str, Any]:  # type: ignore[misc]
-    """A simple dbt ModelNode in dict form"""
+    """A simple dbt ModelNode in dict form."""
     return {
         "name": "cats",
         "description": "So many cats, all the cats",
@@ -40,7 +42,7 @@ def dbt_cats_model() -> Dict[str, Any]:  # type: ignore[misc]
 
 @pytest.fixture
 def num_domesticated_cats_metric(dbt_cats_model: Dict[str, Any]) -> Dict[str, Any]:  # type: ignore[misc]
-    """A dbt `count` type MetricNode with a simple filter"""
+    """A dbt `count` type MetricNode with a simple filter."""
     return {
         "name": "num_domesticated_cats",
         "description": "The number of domesticated breeds",
@@ -55,7 +57,7 @@ def num_domesticated_cats_metric(dbt_cats_model: Dict[str, Any]) -> Dict[str, An
 
 @pytest.fixture
 def num_cats_with_max_age_close_to_average_age_metric(dbt_cats_model: Dict[str, Any]) -> Dict[str, Any]:  # type: ignore[misc]
-    """A dbt `count` type MetricNode with a complex-ish filter"""
+    """A dbt `count` type MetricNode with a complex-ish filter."""
     return {
         "name": "num_cats_with_max_age_close_to_average_age",
         "description": "The number of cat breeds where the difference between the max_age and average_age is less than or equal to 2",
@@ -74,8 +76,7 @@ def dbt_json_metrics(  # type: ignore[misc]
     num_domesticated_cats_metric: Dict[str, Any],
     num_cats_with_max_age_close_to_average_age_metric: Dict[str, Any],
 ) -> List[Dict[str, Any]]:
-    """A list of JSON-ish dbt metrics"""
-
+    """A list of JSON-ish dbt metrics."""
     return [
         num_domesticated_cats_metric,
         num_cats_with_max_age_close_to_average_age_metric,
@@ -148,6 +149,6 @@ def dbt_json_metrics(  # type: ignore[misc]
 
 @pytest.fixture
 def dbt_metrics(dbt_json_metrics: List[Dict[str, Any]]) -> Tuple[MetricNode, ...]:  # type: ignore[misc]
-    """A list of dbt MetricNodes"""
+    """A list of dbt MetricNodes."""
     metric_nodes: Tuple[MetricNode, ...] = tuple(MetricNode(json_data=metric_json) for metric_json in dbt_json_metrics)
     return metric_nodes

@@ -1,15 +1,17 @@
+from __future__ import annotations
+
 import datetime
 import logging
 from dataclasses import dataclass
 
 import _pytest.config
 import pytest
-from _pytest.fixtures import FixtureRequest
 import sqlalchemy.util
+from _pytest.fixtures import FixtureRequest
 
 from metricflow.configuration.env_var import EnvironmentVariable
 from metricflow.random_id import random_id
-from metricflow.test.table_snapshot.table_snapshots import SqlTableSnapshotRepository, SqlTableSnapshotHash
+from metricflow.test.table_snapshot.table_snapshots import SqlTableSnapshotHash, SqlTableSnapshotRepository
 
 logger = logging.getLogger(__name__)
 
@@ -143,6 +145,5 @@ def mf_test_session_state(  # noqa: D
 @pytest.fixture(scope="session", autouse=True)
 def disable_sql_alchemy_deprecation_warning() -> None:
     """Since MF is tied to using SQLAlchemy 1.x.x due to the Snowflake connector, silence 2.0 deprecation warnings."""
-
     # Seeing 'error: Module has no attribute "SILENCE_UBER_WARNING"' in the type checker, but this seems to work.
     sqlalchemy.util.deprecations.SILENCE_UBER_WARNING = True  # type:ignore

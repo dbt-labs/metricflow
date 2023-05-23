@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
+
 from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
     SqlExpressionRenderer,
@@ -6,7 +9,7 @@ from metricflow.sql.render.expr_renderer import (
 )
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql.sql_exprs import SqlPercentileExpression, SqlGenerateUuidExpression, SqlPercentileFunctionType
+from metricflow.sql.sql_exprs import SqlGenerateUuidExpression, SqlPercentileExpression, SqlPercentileFunctionType
 
 
 class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
@@ -14,7 +17,7 @@ class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
 
     @property
     def double_data_type(self) -> str:
-        """Custom double data type for the Redshift engine"""
+        """Custom double data type for the Redshift engine."""
         return "DOUBLE PRECISION"
 
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:

@@ -2,29 +2,29 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Generic, Optional, List, Sequence
+from typing import Generic, List, Optional, Sequence
 
 from metricflow.dataflow.dataflow_plan import (
-    SourceDataSetT,
-    DataflowPlanNodeVisitor,
-    MetricTimeDimensionTransformNode,
-    SemiAdditiveJoinNode,
-    JoinOverTimeRangeNode,
-    ConstrainTimeRangeNode,
-    CombineMetricsNode,
-    FilterElementsNode,
-    WriteToResultTableNode,
-    WriteToResultDataframeNode,
-    WhereConstraintNode,
-    OrderByLimitNode,
-    ComputeMetricsNode,
     AggregateMeasuresNode,
-    JoinAggregatedMeasuresByGroupByColumnsNode,
-    JoinToBaseOutputNode,
-    ReadSqlSourceNode,
     BaseOutput,
+    CombineMetricsNode,
+    ComputeMetricsNode,
+    ConstrainTimeRangeNode,
     DataflowPlanNode,
+    DataflowPlanNodeVisitor,
+    FilterElementsNode,
+    JoinAggregatedMeasuresByGroupByColumnsNode,
+    JoinOverTimeRangeNode,
+    JoinToBaseOutputNode,
     JoinToTimeSpineNode,
+    MetricTimeDimensionTransformNode,
+    OrderByLimitNode,
+    ReadSqlSourceNode,
+    SemiAdditiveJoinNode,
+    SourceDataSetT,
+    WhereConstraintNode,
+    WriteToResultDataframeNode,
+    WriteToResultTableNode,
 )
 from metricflow.dataflow.optimizer.source_scan.matching_linkable_specs import MatchingLinkableSpecsTransform
 from metricflow.specs.specs import InstanceSpecSet

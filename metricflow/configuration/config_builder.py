@@ -1,12 +1,15 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
+from typing import List, Optional, TextIO
+
 from ruamel.yaml import YAML
 from ruamel.yaml.comments import CommentedMap
-from typing import List, Optional, TextIO
 
 
 @dataclass(frozen=True)
 class ConfigKey:
-    """Dataclass to represent a yaml key"""
+    """Dataclass to represent a yaml key."""
 
     key: str
     value: str = ""

@@ -1,7 +1,9 @@
-import os
-import yaml
+from __future__ import annotations
 
+import os
 from typing import Dict, Optional
+
+import yaml
 
 
 class YamlFileHandler:

@@ -1,12 +1,13 @@
 """Functions to help generate a text representation of a dataflow plan."""
+from __future__ import annotations
 
 import logging
 import textwrap
 
 import jinja2
-
-from metricflow.dag.mf_dag import DagNodeVisitor, DagNode
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
+
+from metricflow.dag.mf_dag import DagNode, DagNodeVisitor
 
 logger = logging.getLogger(__name__)
 

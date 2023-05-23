@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 
 import pytest
+from dbt_semantic_interfaces.test_utils import as_datetime
 
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
@@ -9,7 +12,6 @@ from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
-from dbt_semantic_interfaces.test_utils import as_datetime
 from metricflow.test.time.configurable_time_source import ConfigurableTimeSource
 
 

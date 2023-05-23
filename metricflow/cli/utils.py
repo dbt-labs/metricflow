@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime as dt
 import logging
 import os.path
@@ -9,14 +11,19 @@ from typing import Any, Callable, List, Optional, Tuple
 import click
 from dateutil.parser import parse
 
-from metricflow.cli.cli_context import CLIContext
 import metricflow.cli.custom_click_types as click_custom
+from metricflow.cli.cli_context import CLIContext
 from metricflow.configuration.config_builder import ConfigKey
 from metricflow.configuration.constants import (
+    CONFIG_DBT_CLOUD_JOB_ID,
+    CONFIG_DBT_CLOUD_SERVICE_TOKEN,
+    CONFIG_DBT_REPO,
+    CONFIG_DWH_ACCESS_TOKEN,
     CONFIG_DWH_CREDS_PATH,
     CONFIG_DWH_DB,
     CONFIG_DWH_DIALECT,
     CONFIG_DWH_HOST,
+    CONFIG_DWH_HTTP_PATH,
     CONFIG_DWH_PASSWORD,
     CONFIG_DWH_PORT,
     CONFIG_DWH_PROJECT_ID,
@@ -25,11 +32,6 @@ from metricflow.configuration.constants import (
     CONFIG_DWH_WAREHOUSE,
     CONFIG_EMAIL,
     CONFIG_MODEL_PATH,
-    CONFIG_DWH_HTTP_PATH,
-    CONFIG_DWH_ACCESS_TOKEN,
-    CONFIG_DBT_REPO,
-    CONFIG_DBT_CLOUD_JOB_ID,
-    CONFIG_DBT_CLOUD_SERVICE_TOKEN,
 )
 from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.sql_clients.common_client import SqlDialect
@@ -133,7 +135,7 @@ def get_data_warehouse_config_link(handler: YamlFileHandler) -> str:
 
 # Click Options
 def query_options(function: Callable) -> Callable:
-    """Common options for a query"""
+    """Common options for a query."""
     function = click.option(
         "--order",
         type=click_custom.SequenceParamType(),

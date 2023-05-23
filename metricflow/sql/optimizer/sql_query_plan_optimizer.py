@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 
 from metricflow.sql.sql_plan import SqlQueryPlanNode

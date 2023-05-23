@@ -3,11 +3,12 @@ from __future__ import annotations
 import datetime
 from collections import OrderedDict
 from dataclasses import dataclass
-from typing import Any, Optional, Tuple, Mapping
+from typing import Any, Mapping, Optional, Tuple
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
-from metricflow.sql.sql_column_type import SqlColumnType
+
 from metricflow.assert_one_arg import assert_exactly_one_arg_set
+from metricflow.sql.sql_column_type import SqlColumnType
 
 
 @dataclass(frozen=True)
@@ -50,7 +51,6 @@ class SqlBindParameterValue(SerializableDataclass):
     @staticmethod
     def create_from_sql_column_type(value: SqlColumnType) -> SqlBindParameterValue:
         """Convenience method for creating these values. Frowning on the use of isinstance()."""
-
         if isinstance(value, str):
             return SqlBindParameterValue(str_value=value)
         elif isinstance(value, int):
@@ -84,7 +84,7 @@ class SqlBindParameters(SerializableDataclass):
     param_items: Tuple[SqlBindParameter, ...] = ()
 
     def combine(self, additional_params: SqlBindParameters) -> SqlBindParameters:
-        """Create a new set of bind parameters that includes parameters from this and additional_params"""
+        """Create a new set of bind parameters that includes parameters from this and additional_params."""
         if len(self.param_items) == 0:
             return additional_params
 

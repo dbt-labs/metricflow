@@ -7,34 +7,32 @@ import threading
 import urllib.parse
 from collections import OrderedDict
 from contextlib import contextmanager
-from typing import ClassVar, Optional, Dict, Iterator, List, Tuple, Any, Set, Sequence, Callable
+from typing import Any, Callable, ClassVar, Dict, Iterator, List, Optional, Sequence, Set, Tuple
 
 import pandas as pd
 import sqlalchemy
 from sqlalchemy.exc import ProgrammingError
 
-from metricflow.sql.render.snowflake import SnowflakeSqlQueryPlanRenderer
-from metricflow.protocols.sql_client import SqlEngine, SqlIsolationLevel
-from metricflow.protocols.sql_client import SqlEngineAttributes
+from metricflow.protocols.sql_client import SqlEngine, SqlEngineAttributes, SqlIsolationLevel
 from metricflow.protocols.sql_request import (
-    SqlRequestTagSet,
-    JsonDict,
-    MF_SYSTEM_TAGS_KEY,
     MF_EXTRA_TAGS_KEY,
+    MF_SYSTEM_TAGS_KEY,
+    JsonDict,
     SqlJsonTag,
+    SqlRequestTagSet,
 )
+from metricflow.sql.render.snowflake import SnowflakeSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql_clients.async_request import SqlStatementCommentMetadata, CombinedSqlTags
-from metricflow.sql_clients.common_client import SqlDialect, not_empty, check_isolation_level
+from metricflow.sql_clients.async_request import CombinedSqlTags, SqlStatementCommentMetadata
+from metricflow.sql_clients.common_client import SqlDialect, check_isolation_level, not_empty
 from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
-
 
 logger = logging.getLogger(__name__)
 
 
 class SnowflakeEngineAttributes:
-    """Engine-specific attributes for the Snowflake query engine
+    """Engine-specific attributes for the Snowflake query engine.
 
     This is an implementation of the SqlEngineAttributes protocol for Snowflake
     """
@@ -169,7 +167,7 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
 
     @property
     def sql_engine_attributes(self) -> SqlEngineAttributes:
-        """Collection of attributes and features specific to the Snowflake SQL engine"""
+        """Collection of attributes and features specific to the Snowflake SQL engine."""
         return SnowflakeEngineAttributes()
 
     @contextmanager

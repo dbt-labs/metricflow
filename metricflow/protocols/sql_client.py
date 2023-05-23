@@ -58,7 +58,7 @@ class SqlClient(Protocol):
         select_query: str,
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
     ) -> None:
-        """Method for creating a table from the provided select query
+        """Method for creating a table from the provided select query.
 
         Args:
             sql_table: The SqlTable metadata of the table to create
@@ -74,7 +74,7 @@ class SqlClient(Protocol):
         df: DataFrame,
         chunk_size: Optional[int] = None,
     ) -> None:
-        """Creates a table and populates it with the contents of the dataframe
+        """Creates a table and populates it with the contents of the dataframe.
 
         Args:
             sql_table: The SqlTable metadata of the table to create
@@ -89,7 +89,7 @@ class SqlClient(Protocol):
         stmt: str,
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
     ) -> DataFrame:
-        """Base query method, upon execution will run a query that returns a pandas DataFrame"""
+        """Base query method, upon execution will run a query that returns a pandas DataFrame."""
         raise NotImplementedError
 
     @abstractmethod
@@ -107,27 +107,27 @@ class SqlClient(Protocol):
         stmt: str,
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
     ) -> None:
-        """Base dry_run method"""
+        """Base dry_run method."""
         raise NotImplementedError
 
     @abstractmethod
     def list_tables(self, schema_name: str) -> Sequence[str]:
-        """List the tables in the given schema"""
+        """List the tables in the given schema."""
         raise NotImplementedError
 
     @abstractmethod
     def table_exists(self, sql_table: SqlTable) -> bool:
-        """Determines whether or not the given table exists in the data warehouse"""
+        """Determines whether or not the given table exists in the data warehouse."""
         raise NotImplementedError
 
     @abstractmethod
     def drop_table(self, sql_table: SqlTable) -> None:
-        """Drop the given table from the data warehouse"""
+        """Drop the given table from the data warehouse."""
         raise NotImplementedError
 
     @abstractmethod
     def create_schema(self, schema_name: str) -> None:
-        """Create the given schema if it doesn't already exist"""
+        """Create the given schema if it doesn't already exist."""
         raise NotImplementedError
 
     @abstractmethod
@@ -137,7 +137,7 @@ class SqlClient(Protocol):
 
     @abstractmethod
     def health_checks(self, schema_name: str) -> Dict[str, Dict[str, str]]:
-        """Run health checks against the underlying Data Warehouse
+        """Run health checks against the underlying Data Warehouse.
 
         TODO: Consider restructuring this so the health checks are separate from the SqlClient
         TODO: Re-evaluate the return type to see if there's a more structured option available
@@ -169,7 +169,7 @@ class SqlClient(Protocol):
 
 
 class SqlEngineAttributes(Protocol):
-    """Base interface for SQL engine-specific attributes and features
+    """Base interface for SQL engine-specific attributes and features.
 
     These include items like support for language features (e.g., FULL OUTER JOIN support), dialect differences
     (e.g., DOUBLE type name), and things of that nature.

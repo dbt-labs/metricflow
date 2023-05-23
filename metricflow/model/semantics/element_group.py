@@ -1,5 +1,6 @@
-import collections
+from __future__ import annotations
 
+import collections
 from typing import Dict, Generic, List, TypeVar
 
 ElementX = TypeVar("ElementX")

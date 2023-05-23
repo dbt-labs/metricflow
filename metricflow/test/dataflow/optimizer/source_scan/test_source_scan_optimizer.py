@@ -4,43 +4,43 @@ import logging
 from typing import Generic
 
 from _pytest.fixtures import FixtureRequest
-
 from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan import (
-    SourceDataSetT,
-    DataflowPlanNodeVisitor,
-    MetricTimeDimensionTransformNode,
-    SemiAdditiveJoinNode,
-    JoinOverTimeRangeNode,
-    ConstrainTimeRangeNode,
-    CombineMetricsNode,
-    FilterElementsNode,
-    WriteToResultTableNode,
-    WriteToResultDataframeNode,
-    WhereConstraintNode,
-    OrderByLimitNode,
-    ComputeMetricsNode,
     AggregateMeasuresNode,
-    JoinAggregatedMeasuresByGroupByColumnsNode,
-    JoinToBaseOutputNode,
-    ReadSqlSourceNode,
-    DataflowPlanNode,
+    CombineMetricsNode,
+    ComputeMetricsNode,
+    ConstrainTimeRangeNode,
     DataflowPlan,
+    DataflowPlanNode,
+    DataflowPlanNodeVisitor,
+    FilterElementsNode,
+    JoinAggregatedMeasuresByGroupByColumnsNode,
+    JoinOverTimeRangeNode,
+    JoinToBaseOutputNode,
     JoinToTimeSpineNode,
+    MetricTimeDimensionTransformNode,
+    OrderByLimitNode,
+    ReadSqlSourceNode,
+    SemiAdditiveJoinNode,
+    SourceDataSetT,
+    WhereConstraintNode,
+    WriteToResultDataframeNode,
+    WriteToResultTableNode,
 )
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import SourceScanOptimizer
 from metricflow.dataset.dataset import DataSet
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
+from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     DimensionSpec,
     EntityReference,
     MetricFlowQuerySpec,
     MetricSpec,
 )
-from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.where_filter_transform import ConvertToWhereSpec
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
@@ -186,7 +186,6 @@ def test_2_metrics_from_2_semantic_models(  # noqa: D
     dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
 ) -> None:
     """Tests that 2 metrics from the 2 semantic models results in 2 scans."""
-
     check_optimization(
         request=request,
         mf_test_session_state=mf_test_session_state,
@@ -206,7 +205,6 @@ def test_3_metrics_from_2_semantic_models(  # noqa: D
     dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
 ) -> None:
     """Tests that 3 metrics from the 2 semantic models results in 2 scans."""
-
     check_optimization(
         request=request,
         mf_test_session_state=mf_test_session_state,

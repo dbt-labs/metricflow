@@ -6,10 +6,10 @@ from dataclasses import dataclass
 from typing import Optional
 
 import pandas as pd
-
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
-from metricflow.time.time_granularity import offset_period
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+
+from metricflow.time.time_granularity import offset_period
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +52,7 @@ class TimeRangeConstraint(SerializableDataclass):
 
     @staticmethod
     def empty_time() -> TimeRangeConstraint:
-        """Return the range representing no time"""
+        """Return the range representing no time."""
         return TimeRangeConstraint(
             start_time=TimeRangeConstraint.ALL_TIME_BEGIN(),
             end_time=TimeRangeConstraint.ALL_TIME_BEGIN(),
@@ -63,7 +63,7 @@ class TimeRangeConstraint(SerializableDataclass):
         time_granularity: TimeGranularity,
         time_unit_count: int,
     ) -> TimeRangeConstraint:
-        """Moves the start of the time constraint back by 1 window
+        """Moves the start of the time constraint back by 1 window.
 
         if the metric is weekly-active-users (ie window = 1 week) it moves time_constraint.start one week earlier
         """

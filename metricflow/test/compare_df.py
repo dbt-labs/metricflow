@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 import logging
 import math
-import pandas as pd
 from typing import SupportsFloat
+
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 

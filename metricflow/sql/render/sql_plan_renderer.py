@@ -4,7 +4,7 @@ import logging
 import textwrap
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import List, Optional, Tuple, Sequence
+from typing import List, Optional, Sequence, Tuple
 
 from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
@@ -13,14 +13,14 @@ from metricflow.sql.render.expr_renderer import (
 )
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_plan import (
-    SqlQueryPlanNodeVisitor,
-    SqlTableFromClauseNode,
-    SqlSelectStatementNode,
-    SqlQueryPlanNode,
-    SqlQueryPlan,
-    SqlSelectQueryFromClauseNode,
-    SqlSelectColumn,
     SqlJoinDescription,
+    SqlQueryPlan,
+    SqlQueryPlanNode,
+    SqlQueryPlanNodeVisitor,
+    SqlSelectColumn,
+    SqlSelectQueryFromClauseNode,
+    SqlSelectStatementNode,
+    SqlTableFromClauseNode,
 )
 
 logger = logging.getLogger(__name__)
@@ -61,7 +61,7 @@ class StringJoinDescription:
 
 
 class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
-    """Renders an SQL plan following ANSI SQL"""
+    """Renders an SQL plan following ANSI SQL."""
 
     # The renderer that is used to render the SQL expressions.
     EXPR_RENDERER = DefaultSqlExpressionRenderer()

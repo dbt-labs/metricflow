@@ -1,7 +1,10 @@
+from __future__ import annotations
+
+from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationResults
+
 from metricflow.api.metricflow_client import MetricFlowClient
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.engine.models import Dimension, Metric
-from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationResults
 from metricflow.random_id import random_id
 
 

@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
-from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
+
 from metricflow.model.semantics.metric_lookup import MetricLookup
-from metricflow.protocols.semantics import SemanticModelAccessor, MetricAccessor
+from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
+from metricflow.protocols.semantics import MetricAccessor, SemanticModelAccessor
 
 
 class SemanticManifestLookup:

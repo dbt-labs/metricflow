@@ -1,4 +1,8 @@
+from __future__ import annotations
+
 from fractions import Fraction
+
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
@@ -16,7 +20,6 @@ from metricflow.sql.sql_exprs import (
     SqlTimeDeltaExpression,
 )
 from metricflow.sql.sql_plan import SqlSelectColumn
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 
 class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
@@ -24,11 +27,11 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
 
     @property
     def double_data_type(self) -> str:
-        """Custom double data type for BigQuery engine"""
+        """Custom double data type for BigQuery engine."""
         return "FLOAT64"
 
     def render_group_by_expr(self, group_by_column: SqlSelectColumn) -> SqlExpressionRenderResult:
-        """Custom rendering of group by column expressions
+        """Custom rendering of group by column expressions.
 
         BigQuery requires group bys to be referenced by alias, rather than duplicating the expression from the SELECT
 
@@ -76,7 +79,7 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
         )
 
     def visit_date_trunc_expr(self, node: SqlDateTruncExpression) -> SqlExpressionRenderResult:
-        """Render DATE_TRUNC for BigQuery, which takes the opposite argument order from Snowflake and Redshift"""
+        """Render DATE_TRUNC for BigQuery, which takes the opposite argument order from Snowflake and Redshift."""
         arg_rendered = self.render_sql_expr(node.arg)
 
         prefix = ""

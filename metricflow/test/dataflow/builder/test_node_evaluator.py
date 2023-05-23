@@ -1,32 +1,34 @@
+from __future__ import annotations
+
 import logging
 from typing import Sequence
 
 import pytest
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.node_evaluator import (
-    NodeEvaluatorForLinkableInstances,
-    LinkableInstanceSatisfiabilityEvaluation,
     JoinLinkableInstancesRecipe,
+    LinkableInstanceSatisfiabilityEvaluation,
+    NodeEvaluatorForLinkableInstances,
 )
 from metricflow.dataflow.builder.partitions import PartitionTimeDimensionJoinDescription
 from metricflow.dataflow.dataflow_plan import BaseOutput, ValidityWindowJoinDescription
 from metricflow.dataset.dataset import DataSet
-from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.node_processor import PreDimensionJoinNodeProcessor
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.specs.specs import (
     DimensionSpec,
+    EntityReference,
     EntitySpec,
+    LinkableInstanceSpec,
     LinklessEntitySpec,
     TimeDimensionSpec,
-    LinkableInstanceSpec,
-    EntityReference,
 )
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 
 logger = logging.getLogger(__name__)
@@ -39,7 +41,7 @@ def node_evaluator(
     dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
     time_spine_source: TimeSpineSource,
 ) -> NodeEvaluatorForLinkableInstances:  # noqa: D
-    """Return a node evaluator using the nodes in semantic_model_name_to_nodes"""
+    """Return a node evaluator using the nodes in semantic_model_name_to_nodes."""
     node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
         column_association_resolver=DunderColumnAssociationResolver(simple_semantic_manifest_lookup),
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
@@ -62,7 +64,7 @@ def make_multihop_node_evaluator(
     desired_linkable_specs: Sequence[LinkableInstanceSpec],
     time_spine_source: TimeSpineSource,
 ) -> NodeEvaluatorForLinkableInstances:  # noqa: D
-    """Return a node evaluator using the nodes in multihop_semantic_model_name_to_nodes"""
+    """Return a node evaluator using the nodes in multihop_semantic_model_name_to_nodes."""
     node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
         column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup_with_multihop_links),
         semantic_manifest_lookup=semantic_manifest_lookup_with_multihop_links,
@@ -464,8 +466,7 @@ def test_node_evaluator_with_scd_target(
     scd_semantic_manifest_lookup: SemanticManifestLookup,
     time_spine_source: TimeSpineSource,
 ) -> None:
-    """Tests the case where the joined node is an SCD with a validity window filter"""
-
+    """Tests the case where the joined node is an SCD with a validity window filter."""
     node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
         column_association_resolver=DunderColumnAssociationResolver(scd_semantic_manifest_lookup),
         semantic_manifest_lookup=scd_semantic_manifest_lookup,
@@ -526,7 +527,7 @@ def test_node_evaluator_with_multi_hop_scd_target(
     scd_semantic_manifest_lookup: SemanticManifestLookup,
     time_spine_source: TimeSpineSource,
 ) -> None:
-    """Tests the case where the joined node is an SCD reached through another node
+    """Tests the case where the joined node is an SCD reached through another node.
 
     The validity window should have an entity link, the validity window join is mediated by an intervening
     node, and so we need to refer to that column via the link prefix.
@@ -589,7 +590,7 @@ def test_node_evaluator_with_multi_hop_through_scd(
     scd_semantic_manifest_lookup: SemanticManifestLookup,
     time_spine_source: TimeSpineSource,
 ) -> None:
-    """Tests the case where the joined node is reached via an SCD
+    """Tests the case where the joined node is reached via an SCD.
 
     The validity window should NOT have any entity links, as the validity window join is not mediated by an
     intervening node and therefore the column name does not use the link prefix.
@@ -648,7 +649,7 @@ def test_node_evaluator_with_invalid_multi_hop_scd(
     scd_semantic_manifest_lookup: SemanticManifestLookup,
     time_spine_source: TimeSpineSource,
 ) -> None:
-    """Tests the case where the joined node is reached via an illegal SCD <-> SCD join
+    """Tests the case where the joined node is reached via an illegal SCD <-> SCD join.
 
     This will return an empty result because the linkable spec is not joinable in this model.
     """

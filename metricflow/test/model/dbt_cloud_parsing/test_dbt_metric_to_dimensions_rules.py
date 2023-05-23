@@ -1,20 +1,23 @@
+from __future__ import annotations
+
 from typing import Any, Dict, Tuple
 
 import pytest
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode
-from metricflow.model.dbt_converter import DbtConverter
-from metricflow.model.dbt_mapping_rules.dbt_metric_to_dimensions_rules import (
-    DbtDimensionsToDimensions,
-    DbtTimestampToDimension,
-    DbtFiltersToDimensions,
-)
-from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
-    MappedObjects,
-    DbtMappingRule,
-    get_and_assert_calc_method_mapping,
-)
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.metric import MetricType
+
+from metricflow.model.dbt_converter import DbtConverter
+from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
+    DbtMappingRule,
+    MappedObjects,
+    get_and_assert_calc_method_mapping,
+)
+from metricflow.model.dbt_mapping_rules.dbt_metric_to_dimensions_rules import (
+    DbtDimensionsToDimensions,
+    DbtFiltersToDimensions,
+    DbtTimestampToDimension,
+)
 
 
 def test_dbt_metric_to_dimensions_rules_skip_derived_metrics(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D

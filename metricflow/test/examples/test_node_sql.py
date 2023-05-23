@@ -1,23 +1,24 @@
+from __future__ import annotations
+
 import logging
 
 import pytest
-
+from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.references import SemanticModelReference
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
-from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, FilterElementsNode, MetricTimeDimensionTransformNode
+from metricflow.dataflow.dataflow_plan import FilterElementsNode, MetricTimeDimensionTransformNode, ReadSqlSourceNode
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.specs.specs import TimeDimensionSpec, TimeDimensionReference, InstanceSpecSet
+from metricflow.specs.specs import InstanceSpecSet, TimeDimensionReference, TimeDimensionSpec
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 

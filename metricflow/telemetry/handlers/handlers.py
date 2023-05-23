@@ -1,11 +1,13 @@
+from __future__ import annotations
+
 import logging
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import List, Optional, Sequence, Dict, Any
+from typing import Any, Dict, List, Optional, Sequence
 
 from rudder_analytics.client import Client as RudderstackClient
 
-from metricflow.telemetry.models import FunctionStartEvent, FunctionEndEvent, TelemetryPayload
+from metricflow.telemetry.models import FunctionEndEvent, FunctionStartEvent, TelemetryPayload
 
 PayloadType = Dict[Any, Any]  # type: ignore
 logger = logging.getLogger(__name__)
@@ -92,7 +94,7 @@ class ToMemoryTelemetryHandler(TelemetryHandler):
         function_start_event: Optional[FunctionStartEvent] = None,
         function_end_event: Optional[FunctionEndEvent] = None,
     ) -> bool:
-        """Log an event to telemetry"""
+        """Log an event to telemetry."""
         payload = TelemetryPayload(
             client_id=client_id,
             function_start_events=(function_start_event,) if function_start_event else (),

@@ -1,9 +1,9 @@
 from __future__ import annotations
-from abc import ABC, abstractmethod
-from collections import defaultdict
+
 import contextlib
 import logging
-
+from abc import ABC, abstractmethod
+from collections import defaultdict
 from typing import Iterator, List
 
 import more_itertools
@@ -11,10 +11,9 @@ import more_itertools
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.inference.context.base import InferenceContextProvider
 from metricflow.inference.context.data_warehouse import DataWarehouseInferenceContextProvider
+from metricflow.inference.renderer.base import InferenceRenderer
 from metricflow.inference.rule.base import InferenceRule
 from metricflow.inference.solver.base import InferenceSolver
-from metricflow.inference.renderer.base import InferenceRenderer
-
 
 logger = logging.getLogger(__file__)
 
@@ -112,7 +111,6 @@ class InferenceRunner:
         renderers: the renderers that will write inference results as meaningful output
         progress_reporter: `InferenceProgressReporter` to report progress
         """
-
         logger.warning(
             "Semantic Model Inference is still in Beta. "
             "As such, you should not expect it to be 100% stable or be free of bugs. Any public CLI or Python interfaces may change without prior notice."
@@ -136,7 +134,6 @@ class InferenceRunner:
 
     def run(self) -> None:
         """Runs inference with the given configs."""
-
         # FIXME: currently we only accept DataWarehouseContextProvider
         provider: DataWarehouseInferenceContextProvider = self.context_providers[0]  # type: ignore
 

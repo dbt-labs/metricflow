@@ -2,21 +2,21 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import ClassVar, Optional, Dict, Callable
-from typing import Sequence
+from typing import Callable, ClassVar, Dict, Optional, Sequence
 
 import google.oauth2.service_account
 import sqlalchemy
 from google.cloud.bigquery import Client, QueryJob
 
-from metricflow.protocols.sql_client import SqlEngine, SqlIsolationLevel
 from metricflow.protocols.sql_client import (
+    SqlEngine,
     SqlEngineAttributes,
+    SqlIsolationLevel,
 )
 from metricflow.sql.render.big_query import BigQuerySqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql_clients.async_request import SqlStatementCommentMetadata, CombinedSqlTags
+from metricflow.sql_clients.async_request import CombinedSqlTags, SqlStatementCommentMetadata
 from metricflow.sql_clients.common_client import SqlDialect
 from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
 
@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 class BigQueryEngineAttributes:
-    """Engine-specific attributes for the BigQuery query engine
+    """Engine-specific attributes for the BigQuery query engine.
 
     This is an implementation of the SqlEngineAttributes protocol for BigQuery
     """
@@ -56,7 +56,7 @@ class BigQueryEngineAttributes:
 
 
 class BigQuerySqlClient(SqlAlchemySqlClient):
-    """BigQuery implementation of SQL client"""
+    """BigQuery implementation of SQL client."""
 
     @staticmethod
     def from_connection_details(url: str, password: Optional[str] = None) -> BigQuerySqlClient:  # noqa: D
@@ -87,7 +87,7 @@ class BigQuerySqlClient(SqlAlchemySqlClient):
         super().__init__(engine=bq_engine)
 
     def _engine_specific_dry_run_implementation(self, stmt: str, bind_params: SqlBindParameters) -> None:
-        """Overrides base `_engine_specific_dry_run_implementation` function for BigQuery specifics"""
+        """Overrides base `_engine_specific_dry_run_implementation` function for BigQuery specifics."""
         _engine = self._create_bq_engine(
             query_field_values={"dry_run": "true"}, project_id=self._project_id, password=self._password
         )
@@ -98,7 +98,7 @@ class BigQuerySqlClient(SqlAlchemySqlClient):
     def _create_bq_engine(
         project_id: str = "", password: Optional[str] = None, query_field_values: Optional[Dict[str, str]] = None
     ) -> sqlalchemy.engine.Engine:
-        """Create the connection engine in SqlAlchemy to connect to BQ
+        """Create the connection engine in SqlAlchemy to connect to BQ.
 
         There are 2 methods of creating the BigQuery Engine,
         1. Using a service account JSON credential which will load into the credentials_info (Recommended for production use).
@@ -126,7 +126,7 @@ class BigQuerySqlClient(SqlAlchemySqlClient):
 
     @property
     def sql_engine_attributes(self) -> SqlEngineAttributes:
-        """Collection of attributes and features specific to the BigQuery SQL engine"""
+        """Collection of attributes and features specific to the BigQuery SQL engine."""
         return BigQueryEngineAttributes()
 
     def list_tables(self, schema_name: str) -> Sequence[str]:  # noqa: D
