@@ -1,107 +1,126 @@
-[tool.poetry]
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
 name = "metricflow"
 version = "0.200.0.dev0"
 description = "Translates a simple metric definition into reusable SQL and executes it against the SQL engine of your choice."
-authors = ["Transform <hello@transformdata.io>"]
-license = "AGPL-3.0-or-later"
 readme = "README.md"
-homepage = "https://transform.co/metricflow"
-repository = "https://github.com/transform-data/metricflow"
+requires-python = ">=3.8,<3.10"
+license = "AGPL-3.0-or-later"
+keywords = []
+authors = [
+    {name = "Transform", email = "hello@transformdata.io"}
+]
 
-[tool.poetry.dependencies]
-python = ">=3.8,<3.10"
-typing_extensions = ">=4.0.0"
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = [
+  "GitPython>=3.1.27,<3.1.31",
+  "Jinja2>=2.11.3",
+  "MarkupSafe==2.0.1",
+  "PyYAML~=6.0",
+  "SQLAlchemy~=1.4.42",
+  "click>=7.1.2",
+  "croniter~=1.3.4",
+  "databricks-sql-connector==2.0.3",
+  "dbt_semantic_interfaces==0.1.0.dev1",
+  "duckdb-engine~=0.1.8",
+  "duckdb==0.3.4",
+  "google-auth~=2.13.0",
+  "google-cloud-bigquery~=3.4.2",
+  "graphviz==0.18.2",
+  "halo~=0.0.31",
+  "jsonschema==3.2.0",
+  "mo-sql-parsing~=9.328.23003",
+  "more-itertools==8.10.0",
+  "numpy>=1.22.2",
+  "pandas~=1.3.0",
+  "psycopg2~=2.9.3",
+  "pycron~=3.0.0",
+  "pydantic~=1.9.0",
+  "python-dateutil==2.8.2",
+  "rapidfuzz==3.0.0",
+  "requests~=2.27.1",
+  "ruamel.yaml~=0.17.21",
+  "rudder-sdk-python~=1.0.3",
+  "snowflake-connector-python>=2.7.8",
+  "snowflake-sqlalchemy~=1.4.3",
+  "sqlalchemy-bigquery~=1.6.1",
+  "sqlalchemy-redshift==0.8.1",
+  "sqlalchemy2-stubs~=0.0.2a21",
+  "tabulate==0.8.9",
+  "typing_extensions>=4.0.0",
+  "update-checker~=0.18.0",
+  # Below are pinned transitive dependencies that was done to patch a vulnerability"
+  "cryptography~=39.0.1",
+  "pyopenssl~=23.0.0",
+]
 
-dbt_semantic_interfaces = "0.1.0.dev1"
+[project.urls]
+Documentation = "https://transform.co/metricflow"
+"Source Code" = "https://github.com/transform-data/metricflow"
 
-croniter = "^1.3.4"
-pycron = "^3.0.0"
-pydantic = "^1.9.0"
-rapidfuzz= "3.0.0"
-jsonschema = "3.2.0"
-SQLAlchemy = "^1.4.42"
-snowflake-sqlalchemy = "^1.4.3"
-sqlalchemy-redshift = "0.8.1"
-numpy = ">=1.22.2"
-pandas = "^1.3.0"
-Jinja2 = ">=2.11.3"
-PyYAML = "^6.0"
-snowflake-connector-python = ">=2.7.8"
-mo-sql-parsing = "^9.328.23003"
-tabulate = "0.8.9"
-more-itertools = "8.10.0"
-graphviz = "0.18.2"
-sqlalchemy2-stubs = "^0.0.2-alpha.21"
-sqlalchemy-bigquery = "^1.4.3"
-python-dateutil = "2.8.2"
-requests = "^2.27.1"
-MarkupSafe = "2.0.1"
-psycopg2 = "^2.9.3"
-google-auth = "^2.13.0"
-google-cloud-bigquery = "^3.4.2"
-halo = "^0.0.31"
-update-checker = "^0.18.0"
-"ruamel.yaml" = "^0.17.21"
-rudder-sdk-python = "^1.0.3"
-duckdb-engine = "^0.1.8"
-duckdb = "0.3.4"
-click = ">=7.1.2"
-GitPython = ">=3.1.27,<3.1.31"
-databricks-sql-connector = "2.0.3"
-dbt-snowflake = {version="1.4.2", optional=true}
-dbt-redshift = {version="1.4.0", optional=true}
-dbt-postgres = {version="1.4.0", optional=true}
-dbt-bigquery = {version="1.4.3", optional=true}
-dbt-metadata-client = {version="^0.1.0", optional=true}
-cryptography = "^39.0.1" # This is a pinned transitive dependencies that was done to patch a vulnerability
-pyopenssl = "^23.0.0" # This is a pinned transitive dependencies that was done to patch a vulnerability
-pytest-xdist = "^3.2.1"
-mypy = "^1.3.0"
-
-[tool.poetry.dev-dependencies]
-dbt-core = "1.4.0"
-pytest-mock = "^3.7.0"
-pytest = "^7.1.1"
-pre-commit = "^2.18.0"
-mypy = "1.3.0"
-types-python-dateutil = "*"
-types-jsonschema = "*"
-types-PyYAML = "*"
-
-
-[tool.poetry.extras]
-dbt-snowflake = ["dbt-snowflake"]
-dbt-redshift = ["dbt-redshift"]
-dbt-postgres = ["dbt-postgres"]
-dbt-bigquery = ["dbt-bigquery"]
-dbt-cloud = ["dbt-metadata-client"]
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.scripts]
+[project.scripts]
 mf = 'metricflow.cli.main:cli'
 
-[tool.black]
-line-length = 120
-target-version = ['py36', 'py37', 'py38']
-force-exclude = '''
-(
-  /(
-      \.eggs         # exclude a few common directories in the
-    | \.git          # root of the project
-    | \.hg
-    | \.mypy_cache
-    | \.tox
-    | \.venv
-    | _build
-    | buck-out
-    | build
-    | dist
-  )/
-)
-'''
+[project.optional-dependencies]
+dbt-snowflake = [
+  "dbt-snowflake==1.4.2"
+]
+dbt-redshift = [
+  "dbt-redshift==1.4.0"
+]
+dbt-postgres = [
+  "dbt-postgres==1.4.0"
+]
+dbt-bigquery = [
+  "dbt-bigquery==1.4.3"
+]
+dbt-metadata-client = [
+  "dbt-metadata-client~=0.1.0"
+]
+dev-packages = [
+  "dbt-core==1.4.0",
+  "mypy~=1.3.0",
+  "pre-commit~=3.2.2",
+  "pytest-mock~=3.7.0",
+  "pytest-xdist~=3.2.1",
+  "pytest~=7.1.1",
+  "types-PyYAML",
+  "types-jsonschema",
+  "types-python-dateutil",
+]
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+  "/.github",
+  "/.changes",
+  ".changie.yaml",
+  ".gitignore",
+  ".pre-commit-config.yaml",
+  "CONTRIBUTING.md",
+  "MAKEFILE",
+  "/tests",
+]
+
+[tool.hatch.envs.dev-env]
+description = "Environment for development."
+features = [
+  "dbt-redshift",
+  "dbt-snowflake",
+  "dbt-bigquery",
+  "dbt-metadata-client",
+  "dbt-postgres",
+  "dev-packages",
+]
 
 # Many deprecation warnings come from 3rd-party libraries and make the
 # output of pytest noisy. Since no action is going to be taken, hide those
