@@ -50,6 +50,10 @@ As a developer, you can also use MetricFlow's interfaces to construct APIs for i
 
 To get up and running with your own metrics, you should rely on MetricFlow’s documentation available at [MetricFlow docs](https://docs.transform.co/docs/metricflow/guides/introduction).
 
+## Licensing
+
+MetricFlow is distributed under a Business Source License (BUSL-1.1). For details on our additional use grant, change license, and change date please refer to our [licensing agreement](https://github.com/dbt-labs/metricflow/blob/main/LICENSE).
+
 ## Getting Started
 
 ### Install MetricFlow
