@@ -1,4 +1,6 @@
-"""This module aims to help figure out the answer to the following scenario.
+"""Determines whether we can compute a valid join for the given inputs.
+
+For example:
 
 I have a node containing a measure that's needed for a metric, and I also have a list of dimensions that I need for that
 measure.
