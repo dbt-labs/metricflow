@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from abc import ABC
 from dataclasses import dataclass
-from typing import Optional, List
 from enum import Enum
+from typing import List, Optional
 
 from metricflow.dataflow.sql_column import SqlColumn
 

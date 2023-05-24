@@ -1,8 +1,10 @@
 from __future__ import annotations
+
 from typing import Optional
 
-from metricflow.dataflow.sql_table import SqlTable
 from dbt_semantic_interfaces.objects.base import FrozenBaseModel
+
+from metricflow.dataflow.sql_table import SqlTable
 
 
 class SqlColumn(FrozenBaseModel):

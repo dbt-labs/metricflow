@@ -1,62 +1,63 @@
+from __future__ import annotations
+
 import contextlib
+import datetime as dt
 import logging
+import os
+import pathlib
 import signal
 import sys
-
-import click
-import datetime as dt
-import jinja2
-import os
-import pandas as pd
-import pathlib
 import textwrap
 import time
-
-from halo import Halo
 from importlib.metadata import version as pkg_version
-from packaging.version import parse
 from typing import Callable, Iterator, List, Optional
+
+import click
+import jinja2
+import pandas as pd
+from dbt_semantic_interfaces.model_validator import ModelValidator
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
+from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationResults
+from halo import Halo
+from packaging.version import parse
 from update_checker import UpdateChecker
 
-from metricflow.cli import PACKAGE_NAME
-from metricflow.cli.constants import DEFAULT_RESULT_DECIMAL_PLACES, MAX_LIST_OBJECT_ELEMENTS
-from metricflow.cli.cli_context import CLIContext
 import metricflow.cli.custom_click_types as click_custom
+from metricflow.cli import PACKAGE_NAME
+from metricflow.cli.cli_context import CLIContext
+from metricflow.cli.constants import DEFAULT_RESULT_DECIMAL_PLACES, MAX_LIST_OBJECT_ELEMENTS
 from metricflow.cli.tutorial import create_sample_data, gen_sample_model_configs, remove_sample_tables
 from metricflow.cli.utils import (
+    MF_BIGQUERY_KEYS,
+    MF_CONFIG_KEYS,
+    MF_DATABRICKS_KEYS,
+    MF_POSTGRESQL_KEYS,
+    MF_REDSHIFT_KEYS,
+    MF_SNOWFLAKE_KEYS,
     exception_handler,
     generate_duckdb_demo_keys,
     get_data_warehouse_config_link,
     query_options,
     start_end_time_options,
-    MF_BIGQUERY_KEYS,
-    MF_CONFIG_KEYS,
-    MF_REDSHIFT_KEYS,
-    MF_SNOWFLAKE_KEYS,
-    MF_POSTGRESQL_KEYS,
-    MF_DATABRICKS_KEYS,
 )
 from metricflow.configuration.config_builder import YamlTemplateBuilder
-from metricflow.dataflow.sql_table import SqlTable
+from metricflow.dag.dag_visualization import display_dag_as_svg
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
-from metricflow.engine.metricflow_engine import MetricFlowQueryRequest, MetricFlowExplainResult, MetricFlowQueryResult
+from metricflow.dataflow.sql_table import SqlTable
+from metricflow.engine.metricflow_engine import MetricFlowExplainResult, MetricFlowQueryRequest, MetricFlowQueryResult
+from metricflow.engine.utils import model_build_result_from_config
 from metricflow.inference.context.snowflake import SnowflakeInferenceContextProvider
 from metricflow.inference.models import InferenceSignalConfidence
-from metricflow.inference.rule.defaults import DEFAULT_RULESET
-from metricflow.inference.renderer.stream import StreamInferenceRenderer
 from metricflow.inference.renderer.config_file import ConfigFileRenderer
-from metricflow.inference.solver.weighted_tree import WeightedTypeTreeInferenceSolver
+from metricflow.inference.renderer.stream import StreamInferenceRenderer
+from metricflow.inference.rule.defaults import DEFAULT_RULESET
 from metricflow.inference.runner import InferenceProgressReporter, InferenceRunner
+from metricflow.inference.solver.weighted_tree import WeightedTypeTreeInferenceSolver
 from metricflow.model.data_warehouse_model_validator import DataWarehouseModelValidator
-from dbt_semantic_interfaces.model_validator import ModelValidator
-from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from metricflow.protocols.sql_client import SqlEngine
-from metricflow.engine.utils import model_build_result_from_config
-from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationResults
 from metricflow.sql_clients.common_client import SqlDialect
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
-from metricflow.dag.dag_visualization import display_dag_as_svg
 
 logger = logging.getLogger(__name__)
 
@@ -124,7 +125,6 @@ def version() -> None:
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def setup(cfg: CLIContext, restart: bool) -> None:
     """Setup MetricFlow."""
-
     click.echo(
         textwrap.dedent(
             """\
@@ -194,7 +194,6 @@ def setup(cfg: CLIContext, restart: bool) -> None:
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool, drop_tables: bool) -> None:
     """Run user through a tutorial."""
-
     # This text is also located in the projects top-level README.md
     help_msg = textwrap.dedent(
         """\
@@ -431,7 +430,6 @@ def list_metrics(cfg: CLIContext, show_all_dims: bool = False, search: Optional[
 
     Automatically truncates long lists of dimensions, pass --show-all-dims to see all.
     """
-
     spinner = Halo(text="🔍 Looking for all available metrics...", spinner="dots")
     spinner.start()
 
@@ -578,8 +576,7 @@ def _run_dw_validations(
     model: SemanticManifest,
     timeout: Optional[int],
 ) -> ModelValidationResults:
-    """Helper handles the calling of data warehouse issue generating functions"""
-
+    """Helper handles the calling of data warehouse issue generating functions."""
     spinner = Halo(text=f"Validating {validation_type} against data warehouse...", spinner="dots")
     spinner.start()
 
@@ -596,8 +593,7 @@ def _run_dw_validations(
 def _data_warehouse_validations_runner(
     dw_validator: DataWarehouseModelValidator, model: SemanticManifest, timeout: Optional[int]
 ) -> ModelValidationResults:
-    """Helper which calls the individual data warehouse validations to run and prints collected issues"""
-
+    """Helper which calls the individual data warehouse validations to run and prints collected issues."""
     semantic_model_results = _run_dw_validations(
         dw_validator.validate_semantic_models, model=model, validation_type="semantic models", timeout=timeout
     )
@@ -827,7 +823,6 @@ def infer(
     overwrite: bool,
 ) -> None:
     """Infer semantic model configurations from warehouse information."""
-
     click.echo(
         click.style("‼️ Warning: Semantic Model Inference is still in Beta 🧪. ", fg="red", bold=True)
         + "As such, you should not expect it to be 100% stable or be free of bugs. Any public CLI or Python interfaces may change without prior notice."

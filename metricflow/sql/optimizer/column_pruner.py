@@ -2,20 +2,20 @@ from __future__ import annotations
 
 import logging
 from collections import defaultdict
-from typing import Tuple, List, Set, Dict
+from typing import Dict, List, Set, Tuple
 
 from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
 from metricflow.sql.sql_exprs import (
     SqlExpressionTreeLineage,
 )
 from metricflow.sql.sql_plan import (
+    SqlJoinDescription,
     SqlQueryPlanNode,
     SqlQueryPlanNodeVisitor,
-    SqlTableFromClauseNode,
-    SqlSelectStatementNode,
-    SqlJoinDescription,
-    SqlSelectQueryFromClauseNode,
     SqlSelectColumn,
+    SqlSelectQueryFromClauseNode,
+    SqlSelectStatementNode,
+    SqlTableFromClauseNode,
 )
 
 logger = logging.getLogger(__name__)
@@ -37,7 +37,6 @@ class SqlColumnPrunerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
             required_column_aliases: the columns aliases that should not be pruned from the SELECT statements that this
             visits.
         """
-
         self._required_column_aliases = required_column_aliases
 
     def _search_for_expressions(

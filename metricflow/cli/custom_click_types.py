@@ -1,6 +1,8 @@
 """This module contains custom helper click types."""
+from __future__ import annotations
 
-from typing import Any, Callable, Dict, Generic, List, Optional, Sequence, TypeVar, Tuple
+from typing import Any, Callable, Dict, Generic, List, Optional, Sequence, Tuple, TypeVar
+
 import click
 
 T = TypeVar("T")
@@ -110,7 +112,6 @@ class MutuallyExclusiveOption(click.Option):
 
         mutually_exclusive: A list of strings that indicate incompatible options.
         """
-
         self.mutually_exclusive = frozenset(kwargs.pop("mutually_exclusive", []))
         if len(self.mutually_exclusive) > 0:
             exclude_str = ",".join(self.mutually_exclusive)

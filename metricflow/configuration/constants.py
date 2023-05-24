@@ -1,4 +1,5 @@
 """File containing constants used by Configurations."""
+from __future__ import annotations
 
 CONFIG_PATH_KEY = "MF_CONFIG_DIR"
 CONFIG_DWH_DIALECT = "dwh_dialect"

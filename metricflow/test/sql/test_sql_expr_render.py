@@ -1,32 +1,34 @@
+from __future__ import annotations
+
 import logging
 import textwrap
 
 import pytest
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.sql.render.expr_renderer import DefaultSqlExpressionRenderer
 from metricflow.sql.sql_exprs import (
-    SqlStringExpression,
-    SqlColumnReferenceExpression,
-    SqlColumnReference,
-    SqlComparisonExpression,
-    SqlComparison,
     SqlAggregateFunctionExpression,
+    SqlBetweenExpression,
+    SqlCastToTimestampExpression,
+    SqlColumnReference,
+    SqlColumnReferenceExpression,
+    SqlColumnReplacements,
+    SqlComparison,
+    SqlComparisonExpression,
+    SqlDateTruncExpression,
     SqlFunction,
-    SqlNullExpression,
+    SqlIsNullExpression,
     SqlLogicalExpression,
     SqlLogicalOperator,
-    SqlStringLiteralExpression,
-    SqlIsNullExpression,
-    SqlDateTruncExpression,
+    SqlNullExpression,
     SqlRatioComputationExpression,
-    SqlColumnReplacements,
-    SqlCastToTimestampExpression,
-    SqlBetweenExpression,
-    SqlWindowFunctionExpression,
+    SqlStringExpression,
+    SqlStringLiteralExpression,
     SqlWindowFunction,
+    SqlWindowFunctionExpression,
     SqlWindowOrderByArgument,
 )
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -87,7 +89,7 @@ def test_function_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> N
 
 
 def test_distinct_agg_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:
-    """Distinct aggregation functions require the insertion of the DISTINCT keyword in the rendered function expr"""
+    """Distinct aggregation functions require the insertion of the DISTINCT keyword in the rendered function expr."""
     actual = default_expr_renderer.render_sql_expr(
         SqlAggregateFunctionExpression(
             sql_function=SqlFunction.COUNT_DISTINCT,

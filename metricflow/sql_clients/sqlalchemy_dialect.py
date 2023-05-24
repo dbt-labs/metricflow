@@ -4,7 +4,7 @@ import logging
 import time
 from abc import ABC
 from contextlib import contextmanager
-from typing import Iterator, Optional, Mapping, Union, Sequence, Set, Callable
+from typing import Callable, Iterator, Mapping, Optional, Sequence, Set, Union
 
 import pandas as pd
 import sqlalchemy
@@ -12,7 +12,7 @@ from sqlalchemy import inspect
 
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlIsolationLevel
-from metricflow.protocols.sql_request import SqlRequestTagSet, SqlJsonTag
+from metricflow.protocols.sql_request import SqlJsonTag, SqlRequestTagSet
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.async_request import CombinedSqlTags
 from metricflow.sql_clients.base_sql_client_implementation import BaseSqlClientImplementation

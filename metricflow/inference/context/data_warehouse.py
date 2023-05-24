@@ -1,14 +1,16 @@
-from abc import ABC, abstractmethod
+from __future__ import annotations
+
 import contextlib
+from abc import ABC, abstractmethod
 from dataclasses import InitVar, dataclass, field
 from datetime import date, datetime
 from enum import Enum
-from typing import Callable, ContextManager, Dict, Iterator, List, Optional, TypeVar, Generic
+from typing import Callable, ContextManager, Dict, Generic, Iterator, List, Optional, TypeVar
 
 from metricflow.dataflow.sql_column import SqlColumn
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.protocols.sql_client import SqlClient
 from metricflow.inference.context.base import InferenceContext, InferenceContextProvider
+from metricflow.protocols.sql_client import SqlClient
 
 T = TypeVar("T", str, int, float, date, datetime)
 
@@ -45,7 +47,7 @@ class ColumnProperties(Generic[T]):
 
     @property
     def is_empty(self) -> bool:
-        """Whether the column has any rows"""
+        """Whether the column has any rows."""
         return self.row_count == 0
 
 

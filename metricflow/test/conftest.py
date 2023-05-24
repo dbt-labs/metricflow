@@ -1,4 +1,6 @@
 # These imports are required to properly set up pytest fixtures.
+from __future__ import annotations
+
 from metricflow.test.fixtures.cli_fixtures import *  # noqa: F401, F403
 from metricflow.test.fixtures.dataflow_fixtures import *  # noqa: F401, F403
 from metricflow.test.fixtures.id_fixtures import *  # noqa: F401, F403

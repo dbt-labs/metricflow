@@ -1,22 +1,24 @@
+from __future__ import annotations
+
 import logging
 import textwrap
 
 import pytest
-
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
-from metricflow.filters.time_constraint import TimeRangeConstraint
+from dbt_semantic_interfaces.test_utils import as_datetime
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+
 from metricflow.errors.errors import UnableToSatisfyQueryError
+from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.specs.specs import (
-    MetricSpec,
     DimensionSpec,
-    TimeDimensionSpec,
     EntitySpec,
+    MetricSpec,
     OrderBySpec,
+    TimeDimensionSpec,
 )
 from metricflow.test.fixtures.model_fixtures import query_parser_from_yaml
-from dbt_semantic_interfaces.test_utils import as_datetime
 from metricflow.test.time.metric_time_dimension import MTD
 from metricflow.time.time_granularity_solver import RequestTimeGranularityException
 
@@ -159,7 +161,6 @@ def test_order_by_granularity_conversion(time_spine_source: TimeSpineSource) -> 
     In the case where the primary time dimension is specified in the order by without a granularity suffix, the order
     by spec returned by the parser should have a granularity appropriate for the queried metrics.
     """
-
     # "bookings" has a granularity of DAY, "revenue" has a granularity of MONTH
     bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=BOOKINGS_YAML)
     revenue_yaml_file = YamlConfigFile(filepath="inline_for_test_2", contents=REVENUE_YAML)
@@ -261,7 +262,6 @@ def test_parse_and_validate_where_constraint_metric_time(time_spine_source: Time
 
 def test_parse_and_validate_metric_constraint_dims(time_spine_source: TimeSpineSource) -> None:
     """Test that the returned time constraint in the query spec is adjusted to match the granularity of the query."""
-
     revenue_yaml_file = YamlConfigFile(filepath="inline_for_test_2", contents=REVENUE_YAML)
     query_parser = query_parser_from_yaml([revenue_yaml_file], time_spine_source)
 
@@ -277,7 +277,6 @@ def test_parse_and_validate_metric_constraint_dims(time_spine_source: TimeSpineS
 
 def test_derived_metric_query_parsing(time_spine_source: TimeSpineSource) -> None:
     """Test derived metric inputs are properly validated."""
-
     bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=BOOKINGS_YAML)
     metrics_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=METRICS_YAML)
     revenue_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=REVENUE_YAML)

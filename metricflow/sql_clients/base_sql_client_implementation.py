@@ -5,24 +5,23 @@ import textwrap
 import threading
 import time
 from abc import ABC, abstractmethod
-from typing import Any, Tuple, Sequence
-from typing import Optional, List, Dict
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 import jinja2
 import pandas as pd
+from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.logging.formatting import indent_log_line
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
-from metricflow.random_id import random_id
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.protocols.sql_client import (
     SqlEngineAttributes,
+    SqlIsolationLevel,
 )
-from metricflow.protocols.sql_client import SqlIsolationLevel
-from metricflow.protocols.sql_request import SqlRequestId, SqlRequestResult, SqlRequestTagSet, SqlJsonTag
+from metricflow.protocols.sql_request import SqlJsonTag, SqlRequestId, SqlRequestResult, SqlRequestTagSet
+from metricflow.random_id import random_id
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql_clients.async_request import SqlStatementCommentMetadata, CombinedSqlTags
+from metricflow.sql_clients.async_request import CombinedSqlTags, SqlStatementCommentMetadata
 from metricflow.sql_clients.common_client import check_isolation_level
 
 logger = logging.getLogger(__name__)
@@ -60,7 +59,7 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
         ]
 
     def health_checks(self, schema_name: str) -> Dict[str, Dict[str, str]]:
-        """Perform health checks"""
+        """Perform health checks."""
         checks_to_run = self.generate_health_check_tests(schema_name)
         results: Dict[str, Dict[str, str]] = {}
 
@@ -100,14 +99,13 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
         stmt: str,
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
     ) -> pd.DataFrame:
-        """Query statement; result expected to be data which will be returned as a DataFrame
+        """Query statement; result expected to be data which will be returned as a DataFrame.
 
         Args:
             stmt: The SQL query statement to run. This should produce output via a SELECT
             sql_bind_parameters: The parameter replacement mapping for filling in
                 concrete values for SQL query parameters.
         """
-
         start = time.time()
         logger.info(BaseSqlClientImplementation._format_run_query_log_message(stmt, sql_bind_parameters))
         df = self._engine_specific_query_implementation(stmt, sql_bind_parameters)
@@ -188,7 +186,7 @@ class BaseSqlClientImplementation(ABC, AsyncSqlClient):
 
     @abstractmethod
     def _engine_specific_dry_run_implementation(self, stmt: str, bind_params: SqlBindParameters) -> None:
-        """Sub-classes should implement this to check a query will run successfully without actually running the query"""
+        """Sub-classes should implement this to check a query will run successfully without actually running the query."""
         pass
 
     @abstractmethod

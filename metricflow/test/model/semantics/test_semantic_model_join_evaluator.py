@@ -1,25 +1,27 @@
+from __future__ import annotations
+
 from typing import Dict, Sequence
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.objects.elements.entity import EntityType
-from dbt_semantic_interfaces.references import SemanticModelReference, EntityReference
+from dbt_semantic_interfaces.references import EntityReference, SemanticModelReference
+
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.model.semantics.semantic_model_join_evaluator import (
+    SemanticModelEntityJoin,
     SemanticModelEntityJoinType,
     SemanticModelJoinEvaluator,
     SemanticModelLink,
-    SemanticModelEntityJoin,
 )
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 
 
 def _get_join_types_for_entity_type(entity_type: EntityType) -> Sequence[SemanticModelEntityJoinType]:
-    """Exhaustively evaluate entity types and return a sequence of all possible join type pairs
+    """Exhaustively evaluate entity types and return a sequence of all possible join type pairs.
 
     The exhaustive conditional statically enforces that every entity type is handled on the left.
     The complete set of matching join types ensures that all pairs are used.
     """
-
     if (
         entity_type is EntityType.FOREIGN
         or entity_type is EntityType.PRIMARY
@@ -36,7 +38,7 @@ def _get_join_types_for_entity_type(entity_type: EntityType) -> Sequence[Semanti
 
 
 def test_join_type_coverage() -> None:
-    """Ensures all entity type pairs are handled somewhere in the valid/invalid join mapping sets
+    """Ensures all entity type pairs are handled somewhere in the valid/invalid join mapping sets.
 
     This will prevent surprise RuntimeErrors in production by raising static exceptions for unhandled entity types
     and triggering a test failure for types which are handled in a non-exhaustive fashion
@@ -55,7 +57,7 @@ def test_join_type_coverage() -> None:
 def __get_simple_model_user_semantic_model_references_by_type(
     semantic_manifest_lookup: SemanticManifestLookup,
 ) -> Dict[EntityType, SemanticModelReference]:
-    """Helper to get a set of semantic models with the `user` identifier organized by identifier type"""
+    """Helper to get a set of semantic models with the `user` identifier organized by identifier type."""
     foreign_user_semantic_model = semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
         SemanticModelReference("listings_latest")
     )
@@ -80,7 +82,7 @@ def __get_simple_model_user_semantic_model_references_by_type(
 def test_distinct_target_semantic_model_join_validation(
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
-    """Tests semantic model join validation to a PRIMARY or UNIQUE entity
+    """Tests semantic model join validation to a PRIMARY or UNIQUE entity.
 
     PRIMARY and UNIQUE entity targets should be valid for any join at the semantic model level because they both
     represent entity columns with distinct value sets, and as such there is no risk of inadvertent fanout joins.
@@ -139,7 +141,7 @@ def test_distinct_target_semantic_model_join_validation(
 
 
 def test_foreign_target_semantic_model_join_validation(simple_semantic_manifest_lookup: SemanticManifestLookup) -> None:
-    """Tests semantic model join validation to FOREIGN entity types
+    """Tests semantic model join validation to FOREIGN entity types.
 
     These should all fail by default, as fanout joins are not supported
     """
@@ -181,7 +183,7 @@ def test_foreign_target_semantic_model_join_validation(simple_semantic_manifest_
 def test_semantic_model_join_validation_on_missing_entity(
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
-    """Tests semantic model join validation where the entity is missing from one or both semantic models"""
+    """Tests semantic model join validation where the entity is missing from one or both semantic models."""
     primary_listing_semantic_model = simple_semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
         SemanticModelReference("listings_latest")
     )
@@ -209,7 +211,7 @@ def test_distinct_target_instance_set_join_validation(
     consistent_id_object_repository: ConsistentIdObjectRepository,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
-    """Tests instance set join validation to a PRIMARY or UNIQUE entity"""
+    """Tests instance set join validation to a PRIMARY or UNIQUE entity."""
     foreign_user_instance_set = consistent_id_object_repository.simple_model_data_sets["listings_latest"].instance_set
     primary_user_instance_set = consistent_id_object_repository.simple_model_data_sets["users_latest"].instance_set
     unique_user_instance_set = consistent_id_object_repository.simple_model_data_sets["companies"].instance_set
@@ -267,7 +269,7 @@ def test_foreign_target_instance_set_join_validation(
     consistent_id_object_repository: ConsistentIdObjectRepository,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
-    """Tests semantic model join validation to FOREIGN entity types"""
+    """Tests semantic model join validation to FOREIGN entity types."""
     foreign_user_instance_set = consistent_id_object_repository.simple_model_data_sets["listings_latest"].instance_set
     primary_user_instance_set = consistent_id_object_repository.simple_model_data_sets["users_latest"].instance_set
     unique_user_instance_set = consistent_id_object_repository.simple_model_data_sets["companies"].instance_set
@@ -396,7 +398,7 @@ def test_get_joinable_semantic_models_multi_hop(  # noqa: D
 
 
 def test_natural_entity_semantic_model_validation(scd_semantic_manifest_lookup: SemanticManifestLookup) -> None:
-    """Tests semantic model validation for NATURAL target entity types
+    """Tests semantic model validation for NATURAL target entity types.
 
     These tests rely on the scd_semantic_manifest_lookup, which makes extensive use of NATURAL key types.
     """
@@ -481,7 +483,7 @@ def test_natural_entity_semantic_model_validation(scd_semantic_manifest_lookup: 
 def test_natural_entity_instance_set_validation(
     consistent_id_object_repository: ConsistentIdObjectRepository, scd_semantic_manifest_lookup: SemanticManifestLookup
 ) -> None:
-    """Tests instance set validation for NATURAL target entity types
+    """Tests instance set validation for NATURAL target entity types.
 
     These tests rely on the scd_semantic_manifest_lookup, which makes extensive use of NATURAL key types.
     """

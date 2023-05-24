@@ -4,24 +4,24 @@ import logging
 import os
 from collections import OrderedDict
 from dataclasses import dataclass
-from typing import List, Dict, Sequence
+from typing import Dict, List, Sequence
 
 import pytest
-
 from dbt_semantic_interfaces.model_transformer import ModelTransformer
-from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
+from dbt_semantic_interfaces.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.parsing.dir_to_model import (
     parse_directory_of_yaml_files_to_model,
     parse_yaml_files_to_validation_ready_model,
 )
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
+
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
-from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, BaseOutput
+from metricflow.dataflow.dataflow_plan import BaseOutput, ReadSqlSourceNode
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
-from dbt_semantic_interfaces.model_validator import ModelValidator
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
@@ -56,7 +56,7 @@ def _data_set_to_source_nodes(
 def query_parser_from_yaml(
     yaml_contents: List[YamlConfigFile], time_spine_source: TimeSpineSource
 ) -> MetricFlowQueryParser:
-    """Given yaml files, return a query parser using default source nodes, resolvers and time spine source"""
+    """Given yaml files, return a query parser using default source nodes, resolvers and time spine source."""
     semantic_manifest_lookup = SemanticManifestLookup(parse_yaml_files_to_validation_ready_model(yaml_contents).model)
     ModelValidator().checked_validations(semantic_manifest_lookup.semantic_manifest)
     source_nodes = _data_set_to_source_nodes(semantic_manifest_lookup, create_data_sets(semantic_manifest_lookup))
@@ -99,7 +99,6 @@ def consistent_id_object_repository(
     This should use IDs with a high enough value so that when other tests run with ID generators set to 0 at the start
     of the test and create objects, there is no overlap in the IDs.
     """
-
     with patch_id_generators_helper(start_value=IdNumberSpace.CONSISTENT_ID_REPOSITORY):
         sm_data_sets = create_data_sets(simple_semantic_manifest_lookup)
         multihop_data_sets = create_data_sets(multi_hop_join_semantic_manifest_lookup)
@@ -188,7 +187,6 @@ def unpartitioned_multi_hop_join_semantic_manifest_lookup(  # noqa: D
 @pytest.fixture(scope="session")
 def simple_semantic_manifest(template_mapping: Dict[str, str]) -> SemanticManifest:
     """Model used for many tests."""
-
     model_build_result = parse_directory_of_yaml_files_to_model(
         os.path.join(os.path.dirname(__file__), "model_yamls/simple_model"), template_mapping=template_mapping
     )
@@ -198,7 +196,6 @@ def simple_semantic_manifest(template_mapping: Dict[str, str]) -> SemanticManife
 @pytest.fixture(scope="session")
 def simple_model__with_primary_transforms(template_mapping: Dict[str, str]) -> SemanticManifest:
     """Model used for tests pre-transformations."""
-
     model_build_result = parse_directory_of_yaml_files_to_model(
         os.path.join(os.path.dirname(__file__), "model_yamls/simple_model"),
         template_mapping=template_mapping,
@@ -221,7 +218,7 @@ def extended_date_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> 
 
 @pytest.fixture(scope="session")
 def scd_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> SemanticManifestLookup:
-    """Initialize semantic model for SCD tests"""
+    """Initialize semantic model for SCD tests."""
     model_build_result = parse_directory_of_yaml_files_to_model(
         os.path.join(os.path.dirname(__file__), "model_yamls/scd_model"), template_mapping=template_mapping
     )
@@ -230,8 +227,7 @@ def scd_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> SemanticMa
 
 @pytest.fixture(scope="session")
 def data_warehouse_validation_model(template_mapping: Dict[str, str]) -> SemanticManifest:
-    """Model used for data warehouse validation tests"""
-
+    """Model used for data warehouse validation tests."""
     model_build_result = parse_directory_of_yaml_files_to_model(
         os.path.join(os.path.dirname(__file__), "model_yamls/data_warehouse_validation_model"),
         template_mapping=template_mapping,

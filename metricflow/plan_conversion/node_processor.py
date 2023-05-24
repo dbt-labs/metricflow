@@ -1,25 +1,27 @@
+from __future__ import annotations
+
 import logging
 from dataclasses import dataclass
-from typing import Generic, Sequence, List, TypeVar, Optional, Set
+from typing import Generic, List, Optional, Sequence, Set, TypeVar
 
-from dbt_semantic_interfaces.references import TimeDimensionReference, EntityReference
+from dbt_semantic_interfaces.pretty_print import pformat_big_objects
+from dbt_semantic_interfaces.references import EntityReference, TimeDimensionReference
 
-from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.partitions import PartitionJoinResolver
 from metricflow.dataflow.dataflow_plan import (
-    ConstrainTimeRangeNode,
     BaseOutput,
-    JoinToBaseOutputNode,
+    ConstrainTimeRangeNode,
     FilterElementsNode,
     JoinDescription,
+    JoinToBaseOutputNode,
 )
-from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator, MAX_JOIN_HOPS
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
+from metricflow.filters.time_constraint import TimeRangeConstraint
+from metricflow.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS, SemanticModelJoinEvaluator
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.protocols.semantics import SemanticModelAccessor
 from metricflow.specs.spec_set_transforms import ToElementNameSet
-from metricflow.specs.specs import LinkableInstanceSpec, LinklessEntitySpec, InstanceSpecSet
+from metricflow.specs.specs import InstanceSpecSet, LinkableInstanceSpec, LinklessEntitySpec
 
 SqlDataSetT = TypeVar("SqlDataSetT", bound=SqlDataSet)
 
@@ -156,8 +158,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
         desired_linkable_spec: LinkableInstanceSpec,
         nodes: Sequence[BaseOutput[SqlDataSetT]],
     ) -> Sequence[MultiHopJoinCandidate]:
-        """Assemble nodes representing all possible one-hop joins"""
-
+        """Assemble nodes representing all possible one-hop joins."""
         if len(desired_linkable_spec.entity_links) > MAX_JOIN_HOPS:
             raise NotImplementedError(
                 f"Multi-hop joins with more than {MAX_JOIN_HOPS} entity links not yet supported. "
@@ -282,8 +283,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
     def add_multi_hop_joins(
         self, desired_linkable_specs: Sequence[LinkableInstanceSpec], nodes: Sequence[BaseOutput[SqlDataSetT]]
     ) -> Sequence[BaseOutput[SqlDataSetT]]:
-        """Assemble nodes representing all possible one-hop joins"""
-
+        """Assemble nodes representing all possible one-hop joins."""
         all_multi_hop_join_candidates: List[MultiHopJoinCandidate[SqlDataSetT]] = []
         lineage_for_all_multi_hop_join_candidates: Set[MultiHopJoinCandidateLineage[SqlDataSetT]] = set()
 

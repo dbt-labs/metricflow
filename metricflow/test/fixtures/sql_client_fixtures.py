@@ -1,11 +1,13 @@
-import logging
+from __future__ import annotations
 
-import pytest
+import logging
 from typing import Generator
 
+import pytest
+
 from metricflow.protocols.async_sql_client import AsyncSqlClient
-from metricflow.sql_clients.sql_utils import make_sql_client
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.sql_clients.sql_utils import make_sql_client
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 
 logger = logging.getLogger(__name__)

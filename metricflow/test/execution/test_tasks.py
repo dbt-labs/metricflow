@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.execution.execution_plan import (
     ExecutionPlan,
@@ -5,8 +7,8 @@ from metricflow.execution.execution_plan import (
     SelectSqlQueryToTableTask,
 )
 from metricflow.execution.executor import SequentialPlanExecutor
-from metricflow.random_id import random_id
 from metricflow.protocols.async_sql_client import AsyncSqlClient
+from metricflow.random_id import random_id
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.sql_utils import make_df
 from metricflow.test.compare_df import assert_dataframes_equal

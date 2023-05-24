@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 
 from _pytest.fixtures import FixtureRequest
@@ -13,7 +15,6 @@ def display_graph_if_requested(
     dag_graph: DagGraphT,
 ) -> None:
     """Create and display the plan as an SVG, if requested to do so."""
-
     if not mf_test_session_state.display_plans:
         return
 

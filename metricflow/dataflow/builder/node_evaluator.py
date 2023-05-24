@@ -17,7 +17,9 @@ from __future__ import annotations
 import itertools
 import logging
 from dataclasses import dataclass
-from typing import Generic, List, Optional, Sequence, TypeVar, Tuple
+from typing import Generic, List, Optional, Sequence, Tuple, TypeVar
+
+from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.partitions import PartitionJoinResolver
@@ -30,10 +32,8 @@ from metricflow.dataflow.dataflow_plan import (
 )
 from metricflow.instances import InstanceSet
 from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
-from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
-
+from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.protocols.semantics import SemanticModelAccessor
 from metricflow.specs.specs import (
     LinkableInstanceSpec,
@@ -116,7 +116,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
         nodes_available_for_joins: Sequence[BaseOutput[SourceDataSetT]],
         node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver[SourceDataSetT],
     ) -> None:
-        """Constructor
+        """Constructor.
 
         Args:
             semantic_model_lookup: Needed to resolve partition dimensions.

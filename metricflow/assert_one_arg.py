@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+
 def assert_exactly_one_arg_set(**kwargs) -> None:  # type: ignore
     """Throws an assertion error if 0 or more than 1 argument is not None."""
     num_set = 0

@@ -1,6 +1,10 @@
-from _pytest.fixtures import FixtureRequest
+from __future__ import annotations
+
 from typing import List
+
 import pytest
+from _pytest.fixtures import FixtureRequest
+
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_exprs import (
@@ -14,11 +18,11 @@ from metricflow.sql.sql_exprs import (
     SqlStringLiteralExpression,
 )
 from metricflow.sql.sql_plan import (
-    SqlSelectColumn,
-    SqlTableFromClauseNode,
-    SqlSelectStatementNode,
-    SqlOrderByDescription,
     SqlJoinDescription,
+    SqlOrderByDescription,
+    SqlSelectColumn,
+    SqlSelectStatementNode,
+    SqlTableFromClauseNode,
 )
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.sql.compare_sql_plan import assert_rendered_sql_equal
@@ -30,7 +34,6 @@ def test_cast_to_timestamp(
     sql_client: SqlClient,
 ) -> None:
     """Tests rendering of the cast to timestamp expression in a query."""
-
     select_columns = [
         SqlSelectColumn(
             expr=SqlCastToTimestampExpression(
@@ -73,7 +76,6 @@ def test_generate_uuid(
     sql_client: SqlClient,
 ) -> None:
     """Tests rendering of the generate uuid expression in a query."""
-
     select_columns = [
         SqlSelectColumn(
             expr=SqlGenerateUuidExpression(),

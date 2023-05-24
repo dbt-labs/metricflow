@@ -11,28 +11,28 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, Sequence, Generic
+from typing import Any, Generic, Sequence
 
 from metricflow.dataflow.dataflow_plan import (
+    AggregateMeasuresNode,
+    CombineMetricsNode,
+    ComputeMetricsNode,
+    ConstrainTimeRangeNode,
     DataflowPlanNode,
-    SourceDataSetT,
     DataflowPlanNodeVisitor,
     FilterElementsNode,
-    WriteToResultDataframeNode,
-    OrderByLimitNode,
-    ComputeMetricsNode,
-    AggregateMeasuresNode,
     JoinAggregatedMeasuresByGroupByColumnsNode,
     JoinOverTimeRangeNode,
     JoinToBaseOutputNode,
-    ReadSqlSourceNode,
-    WhereConstraintNode,
-    CombineMetricsNode,
-    ConstrainTimeRangeNode,
-    WriteToResultTableNode,
-    SemiAdditiveJoinNode,
-    MetricTimeDimensionTransformNode,
     JoinToTimeSpineNode,
+    MetricTimeDimensionTransformNode,
+    OrderByLimitNode,
+    ReadSqlSourceNode,
+    SemiAdditiveJoinNode,
+    SourceDataSetT,
+    WhereConstraintNode,
+    WriteToResultDataframeNode,
+    WriteToResultTableNode,
 )
 
 
@@ -54,7 +54,7 @@ class DataflowPlanNodeCost(ABC):
 
 @dataclass(frozen=True)
 class DefaultCost(DataflowPlanNodeCost):
-    """Simple cost model where the cost is the number joins * 10 + the number of aggregations"""
+    """Simple cost model where the cost is the number joins * 10 + the number of aggregations."""
 
     num_joins: int = 0
     num_aggregations: int = 0

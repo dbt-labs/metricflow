@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from _pytest.fixtures import FixtureRequest
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
@@ -9,11 +11,11 @@ from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanCon
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.specs.specs import (
+    DimensionSpec,
+    EntityReference,
     MetricFlowQuerySpec,
     MetricSpec,
-    DimensionSpec,
     TimeDimensionSpec,
-    EntityReference,
 )
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState

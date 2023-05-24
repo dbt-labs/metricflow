@@ -1,18 +1,20 @@
+from __future__ import annotations
+
 import datetime as dt
+from typing import Optional
 
 from dateutil.parser import parse
-from typing import Optional
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
+from dbt_semantic_interfaces.parsing.dir_to_model import ModelBuildResult, parse_directory_of_yaml_files_to_model
 
 from metricflow.configuration.constants import CONFIG_MODEL_PATH
 from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.errors.errors import ModelCreationException
-from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.parsing.dir_to_model import ModelBuildResult, parse_directory_of_yaml_files_to_model
 from metricflow.sql_clients.common_client import not_empty
 
 
 def path_to_models(handler: YamlFileHandler) -> str:
-    """Given a YamlFileHandler, return the path to the YAML model config files"""
+    """Given a YamlFileHandler, return the path to the YAML model config files."""
     return not_empty(handler.get_value(CONFIG_MODEL_PATH), CONFIG_MODEL_PATH, handler.url)
 
 
@@ -81,7 +83,7 @@ def build_semantic_manifest_from_dbt_config(
 
 
 def build_semantic_manifest_from_dbt_cloud(job_id: str, service_token: str) -> SemanticManifest:
-    """Given dbt cloud params, create a SemanticManifest"""
+    """Given dbt cloud params, create a SemanticManifest."""
     from metricflow.model.parsing.dbt_cloud_to_model import model_build_result_for_dbt_cloud_job
 
     return model_build_result_for_dbt_cloud_job(auth=service_token, job_id=job_id).model

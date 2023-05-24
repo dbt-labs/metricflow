@@ -1,4 +1,6 @@
-from typing import Sequence, List
+from __future__ import annotations
+
+from typing import List, Sequence
 
 from metricflow.dataflow.dataflow_plan import (
     BaseOutput,

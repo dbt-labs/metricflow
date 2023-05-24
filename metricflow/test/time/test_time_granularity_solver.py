@@ -1,23 +1,25 @@
+from __future__ import annotations
+
 import datetime
 
 import pytest
+from dbt_semantic_interfaces.references import MetricReference
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
-from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
-from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.dataset.dataset import DataSet
+from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
+from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
-from dbt_semantic_interfaces.references import MetricReference
-from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_MONTH, MTD_SPEC_YEAR, MTD_REFERENCE
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from metricflow.test.time.metric_time_dimension import MTD_REFERENCE, MTD_SPEC_DAY, MTD_SPEC_MONTH, MTD_SPEC_YEAR
 from metricflow.time.time_granularity_solver import (
-    TimeGranularitySolver,
     PartialTimeDimensionSpec,
     RequestTimeGranularityException,
+    TimeGranularitySolver,
 )
 
 
@@ -217,7 +219,7 @@ def test_adjusted_time_constraint(time_granularity_solver: TimeGranularitySolver
 def test_adjusted_time_constraint_for_week_granularity(
     time_granularity_solver: TimeGranularitySolver,
 ) -> None:
-    """Tests the time range adjustment behavior for weekly granularities"""
+    """Tests the time range adjustment behavior for weekly granularities."""
     assert time_granularity_solver.adjust_time_range_to_granularity(
         time_range_constraint=TimeRangeConstraint(
             start_time=datetime.datetime(2020, 1, 8),
@@ -233,7 +235,7 @@ def test_adjusted_time_constraint_for_week_granularity(
 def test_adjusted_time_constraint_at_boundaries(
     time_granularity_solver: TimeGranularitySolver,
 ) -> None:
-    """Tests the time range adjustment behavior at the min / max boundaries"""
+    """Tests the time range adjustment behavior at the min / max boundaries."""
     assert (
         time_granularity_solver.adjust_time_range_to_granularity(
             time_range_constraint=TimeRangeConstraint(

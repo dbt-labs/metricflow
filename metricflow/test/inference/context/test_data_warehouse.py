@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 from metricflow.dataflow.sql_column import SqlColumn
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.inference.context.data_warehouse import (
     ColumnProperties,
-    InferenceColumnType,
     DataWarehouseInferenceContext,
+    InferenceColumnType,
     TableProperties,
 )
 

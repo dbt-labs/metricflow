@@ -53,7 +53,7 @@ class StructuredLinkableSpecName:
 
     @property
     def qualified_name(self) -> str:
-        """Return the full name form. e.g. ds or listing__ds__month"""
+        """Return the full name form. e.g. ds or listing__ds__month."""
         items = list(self.entity_link_names) + [self.element_name]
         if self.time_granularity and self.time_granularity != TimeGranularity.DAY:
             items.append(self.time_granularity.value)
@@ -61,17 +61,17 @@ class StructuredLinkableSpecName:
 
     @property
     def qualified_name_without_granularity(self) -> str:
-        """Return the name without the time granularity. e.g. listing__ds__month -> listing__ds"""
+        """Return the name without the time granularity. e.g. listing__ds__month -> listing__ds."""
         return DUNDER.join(list(self.entity_link_names) + [self.element_name])
 
     @property
     def qualified_name_without_entity(self) -> str:
-        """Return the name without the entity. e.g. listing__ds__month -> ds__month"""
+        """Return the name without the entity. e.g. listing__ds__month -> ds__month."""
         return DUNDER.join([self.element_name] + ([self.time_granularity.value] if self.time_granularity else []))
 
     @property
     def entity_prefix(self) -> Optional[str]:
-        """Return the entity prefix. e.g. listing__ds__month -> listing"""
+        """Return the entity prefix. e.g. listing__ds__month -> listing."""
         if len(self.entity_link_names) > 0:
             return DUNDER.join(self.entity_link_names)
 

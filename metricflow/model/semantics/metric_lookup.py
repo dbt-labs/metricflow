@@ -1,22 +1,25 @@
+from __future__ import annotations
+
 import logging
-from typing import Dict, List, FrozenSet, Sequence
+from typing import Dict, FrozenSet, List, Sequence
 
 from dbt_semantic_interfaces.objects.metric import Metric, MetricType
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import MetricReference
-from metricflow.errors.errors import MetricNotFoundError, DuplicateMetricError, NonExistentMeasureError
+
+from metricflow.errors.errors import DuplicateMetricError, MetricNotFoundError, NonExistentMeasureError
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
-from metricflow.model.semantics.linkable_spec_resolver import ValidLinkableSpecResolver, LinkableElementSet
+from metricflow.model.semantics.linkable_spec_resolver import LinkableElementSet, ValidLinkableSpecResolver
 from metricflow.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.protocols.semantics import MetricAccessor
-from metricflow.specs.specs import (
-    MetricSpec,
-    LinkableInstanceSpec,
-    MetricInputMeasureSpec,
-    MeasureSpec,
-)
 from metricflow.specs.column_assoc import ColumnAssociationResolver
+from metricflow.specs.specs import (
+    LinkableInstanceSpec,
+    MeasureSpec,
+    MetricInputMeasureSpec,
+    MetricSpec,
+)
 from metricflow.specs.where_filter_transform import ConvertToWhereSpec
 
 logger = logging.getLogger(__name__)
@@ -45,8 +48,7 @@ class MetricLookup(MetricAccessor):  # noqa: D
         with_any_property: FrozenSet[LinkableElementProperties] = LinkableElementProperties.all_properties(),
         without_any_property: FrozenSet[LinkableElementProperties] = frozenset(),
     ) -> Sequence[LinkableInstanceSpec]:
-        """Dimensions common to all metrics requested (intersection)"""
-
+        """Dimensions common to all metrics requested (intersection)."""
         all_linkable_specs = self._linkable_spec_resolver.get_linkable_elements_for_metrics(
             metric_references=metric_references,
             with_any_of=with_any_property,
@@ -89,7 +91,7 @@ class MetricLookup(MetricAccessor):  # noqa: D
         return self._metrics[metric_reference]
 
     def add_metric(self, metric: Metric) -> None:
-        """Add metric, validating presence of required measures"""
+        """Add metric, validating presence of required measures."""
         metric_reference = MetricReference(element_name=metric.name)
         if metric_reference in self._metrics:
             raise DuplicateMetricError(f"Metric `{metric.name}` has already been registered")

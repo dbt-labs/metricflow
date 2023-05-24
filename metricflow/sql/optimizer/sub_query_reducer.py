@@ -1,23 +1,25 @@
+from __future__ import annotations
+
 import logging
 from typing import List, Optional
 
 from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
-from metricflow.sql.sql_exprs import SqlColumnReferenceExpression, SqlColumnReference
+from metricflow.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression
 from metricflow.sql.sql_plan import (
+    SqlJoinDescription,
+    SqlOrderByDescription,
     SqlQueryPlanNode,
     SqlQueryPlanNodeVisitor,
     SqlSelectQueryFromClauseNode,
-    SqlTableFromClauseNode,
     SqlSelectStatementNode,
-    SqlOrderByDescription,
-    SqlJoinDescription,
+    SqlTableFromClauseNode,
 )
 
 logger = logging.getLogger(__name__)
 
 
 class SqlSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
-    """Visits the SQL query plan to simplify sub-queries. On each visit, return a simplfied node"""
+    """Visits the SQL query plan to simplify sub-queries. On each visit, return a simplfied node."""
 
     def _reduce_parents(
         self,
@@ -51,7 +53,6 @@ class SqlSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
         checks for obvious cases where reducing can't happen, but there are cases where reducing is possible, but this
         returns false for ease of reasoning.
         """
-
         # If this node has multiple parents (i.e. a join), then this can't be collapsed.
         is_join = len(node.join_descs) > 0
         has_multiple_parent_nodes = len(node.parent_nodes) > 1

@@ -4,21 +4,21 @@ import logging
 from typing import Sequence
 
 import jinja2
-
 from dbt_semantic_interfaces.objects.filters.call_parameter_sets import (
     DimensionCallParameterSet,
-    TimeDimensionCallParameterSet,
     EntityCallParameterSet,
+    TimeDimensionCallParameterSet,
 )
 from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter, WhereFilterTransform
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.references import DimensionReference, EntityReference, TimeDimensionReference
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     DimensionSpec,
-    TimeDimensionSpec,
     EntitySpec,
     LinkableSpecSet,
+    TimeDimensionSpec,
     WhereFilterSpec,
 )
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
@@ -70,7 +70,7 @@ class ConvertToWhereSpec(WhereFilterTransform[WhereFilterSpec]):
         entity_specs = []
 
         def _dimension_call(dimension_name: str, entity_path: Sequence[str] = ()) -> str:
-            """Gets called by Jinja when rendering {{ dimension(...) }}"""
+            """Gets called by Jinja when rendering {{ dimension(...) }}."""
             dimension_spec = ConvertToWhereSpec._convert_to_dimension_spec(
                 DimensionCallParameterSet(
                     dimension_reference=DimensionReference(element_name=dimension_name),
@@ -83,7 +83,7 @@ class ConvertToWhereSpec(WhereFilterTransform[WhereFilterSpec]):
         def _time_dimension_call(
             time_dimension_name: str, time_granularity_name: str, entity_path: Sequence[str] = ()
         ) -> str:
-            """Gets called by Jinja when rendering {{ time_dimension(...) }}"""
+            """Gets called by Jinja when rendering {{ time_dimension(...) }}."""
             time_dimension_spec = ConvertToWhereSpec._convert_to_time_dimension_spec(
                 TimeDimensionCallParameterSet(
                     time_dimension_reference=TimeDimensionReference(element_name=time_dimension_name),

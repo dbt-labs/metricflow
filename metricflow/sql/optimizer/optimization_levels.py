@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from enum import Enum
 from typing import Sequence
 
@@ -19,13 +21,13 @@ class SqlQueryOptimizationLevel(Enum):
 
 
 class SqlQueryOptimizerConfiguration:
-    """Defines the different optimizers that should be used at each level"""
+    """Defines the different optimizers that should be used at each level."""
 
     @staticmethod
     def optimizers_for_level(
         level: SqlQueryOptimizationLevel, use_column_alias_in_group_by: bool
     ) -> Sequence[SqlQueryPlanOptimizer]:
-        """Return the optimizers that should be applied (in order) for each level"""
+        """Return the optimizers that should be applied (in order) for each level."""
         if level is SqlQueryOptimizationLevel.O0:
             return ()
         elif level is SqlQueryOptimizationLevel.O1:

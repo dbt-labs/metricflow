@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import defaultdict
 from typing import Callable, Dict, List, Optional
 
@@ -10,7 +12,6 @@ from metricflow.inference.models import (
     InferenceSignalType,
 )
 from metricflow.inference.solver.base import InferenceSolver
-
 
 NodeWeighterFunction = Callable[[InferenceSignalConfidence], int]
 
@@ -94,7 +95,7 @@ class WeightedTypeTreeInferenceSolver(InferenceSolver):
         return output_weights
 
     def _get_cumulative_weights(self, signals: List[InferenceSignal]) -> Dict[InferenceSignalNode, int]:
-        """Get the cumulative weights dict for a list of signals"""
+        """Get the cumulative weights dict for a list of signals."""
         signals_by_type: Dict[InferenceSignalNode, List[InferenceSignal]] = defaultdict(list)
         for signal in signals:
             signals_by_type[signal.type_node].append(signal)

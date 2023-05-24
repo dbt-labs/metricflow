@@ -1,47 +1,50 @@
+from __future__ import annotations
+
 import logging
 import re
 from dataclasses import dataclass
-from typing import Optional, List, Tuple, Sequence
+from typing import List, Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.references import SemanticModelReference, SemanticModelElementReference
+from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
+from dbt_semantic_interfaces.objects.elements.entity import Entity
+from dbt_semantic_interfaces.objects.elements.measure import Measure
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
+from dbt_semantic_interfaces.references import SemanticModelElementReference, SemanticModelReference
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+
 from metricflow.aggregation_properties import AggregationState
 from metricflow.dag.id_generation import IdGeneratorRegistry
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.instances import (
-    MeasureInstance,
     DimensionInstance,
-    TimeDimensionInstance,
     EntityInstance,
     InstanceSet,
+    MeasureInstance,
+    TimeDimensionInstance,
 )
-from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
-from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
-from dbt_semantic_interfaces.objects.elements.entity import Entity
-from dbt_semantic_interfaces.objects.elements.measure import Measure
 from metricflow.model.spec_converters import MeasureConverter
-from metricflow.specs.specs import (
-    TimeDimensionSpec,
-    DimensionSpec,
-    EntitySpec,
-    DEFAULT_TIME_GRANULARITY,
-    EntityReference,
-)
 from metricflow.specs.column_assoc import ColumnAssociationResolver
+from metricflow.specs.specs import (
+    DEFAULT_TIME_GRANULARITY,
+    DimensionSpec,
+    EntityReference,
+    EntitySpec,
+    TimeDimensionSpec,
+)
 from metricflow.sql.sql_exprs import (
-    SqlStringExpression,
-    SqlDateTruncExpression,
-    SqlColumnReferenceExpression,
     SqlColumnReference,
+    SqlColumnReferenceExpression,
+    SqlDateTruncExpression,
     SqlExpressionNode,
+    SqlStringExpression,
 )
 from metricflow.sql.sql_plan import (
-    SqlTableFromClauseNode,
-    SqlSelectStatementNode,
-    SqlSelectColumn,
     SqlQueryPlanNode,
+    SqlSelectColumn,
+    SqlSelectStatementNode,
+    SqlTableFromClauseNode,
 )
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -325,7 +328,6 @@ class SemanticModelToDataSetConverter:
 
     def create_sql_source_data_set(self, semantic_model: SemanticModel) -> SemanticModelDataSet:
         """Create an SQL source data set from a semantic model in the model."""
-
         # Gather all instances and columns from all semantic models.
         all_measure_instances: List[MeasureInstance] = []
         all_dimension_instances: List[DimensionInstance] = []

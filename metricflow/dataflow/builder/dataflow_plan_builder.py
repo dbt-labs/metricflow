@@ -4,22 +4,22 @@ import collections
 import logging
 import time
 from dataclasses import dataclass
-from typing import DefaultDict, List, TypeVar, Optional, Generic, Dict, Tuple, Sequence, Set, Union
+from typing import DefaultDict, Dict, Generic, List, Optional, Sequence, Set, Tuple, TypeVar, Union
 
-from dbt_semantic_interfaces.objects.metric import MetricType, MetricTimeWindow
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.objects.metric import MetricTimeWindow, MetricType
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.references import TimeDimensionReference
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+
 from metricflow.assert_one_arg import assert_exactly_one_arg_set
-from metricflow.filters.time_constraint import TimeRangeConstraint
-from metricflow.dag.id_generation import IdGeneratorRegistry, DATAFLOW_PLAN_PREFIX
-from metricflow.dataflow.builder.costing import DefaultCostFunction, DataflowPlanNodeCostFunction
+from metricflow.dag.id_generation import DATAFLOW_PLAN_PREFIX, IdGeneratorRegistry
+from metricflow.dataflow.builder.costing import DataflowPlanNodeCostFunction, DefaultCostFunction
 from metricflow.dataflow.builder.measure_additiveness import group_measure_specs_by_additiveness
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.node_evaluator import (
-    NodeEvaluatorForLinkableInstances,
     JoinLinkableInstancesRecipe,
     LinkableInstanceSatisfiabilityEvaluation,
+    NodeEvaluatorForLinkableInstances,
 )
 from metricflow.dataflow.dataflow_plan import (
     AggregateMeasuresNode,
@@ -33,41 +33,42 @@ from metricflow.dataflow.dataflow_plan import (
     JoinDescription,
     JoinOverTimeRangeNode,
     JoinToBaseOutputNode,
+    JoinToTimeSpineNode,
     OrderByLimitNode,
+    SemiAdditiveJoinNode,
+    SinkOutput,
     WhereConstraintNode,
     WriteToResultDataframeNode,
     WriteToResultTableNode,
-    SemiAdditiveJoinNode,
-    SinkOutput,
-    JoinToTimeSpineNode,
 )
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_dag_as_text
 from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOptimizer
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
+from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.node_processor import PreDimensionJoinNodeProcessor
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.time_spine import TimeSpineSource
+from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
-    MetricSpec,
-    MetricInputMeasureSpec,
-    LinkableInstanceSpec,
-    MetricFlowQuerySpec,
-    MeasureSpec,
-    TimeDimensionSpec,
-    EntitySpec,
     DimensionSpec,
-    OrderBySpec,
-    NonAdditiveDimensionSpec,
+    EntitySpec,
+    InstanceSpecSet,
+    LinkableInstanceSpec,
     LinkableSpecSet,
     LinklessEntitySpec,
-    InstanceSpecSet,
+    MeasureSpec,
+    MetricFlowQuerySpec,
+    MetricInputMeasureSpec,
+    MetricSpec,
+    NonAdditiveDimensionSpec,
+    OrderBySpec,
+    TimeDimensionSpec,
     WhereFilterSpec,
 )
-from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.sql.sql_plan import SqlJoinType
 
 logger = logging.getLogger(__name__)
@@ -142,7 +143,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         output_sql_table: Optional[SqlTable] = None,
         optimizers: Sequence[DataflowPlanOptimizer[SqlDataSetT]] = (),
     ) -> DataflowPlan[SqlDataSetT]:
-        """Generate a plan for reading the results of a query with the given spec into a dataframe or table"""
+        """Generate a plan for reading the results of a query with the given spec into a dataframe or table."""
         metrics_output_node = self._build_metrics_output_node(
             metric_specs=query_spec.metric_specs,
             queried_linkable_specs=query_spec.linkable_specs,
@@ -360,7 +361,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         return any(len(x.entity_links) > 1 for x in linkable_specs)
 
     def _get_semantic_model_names_for_measures(self, measure_names: Sequence[MeasureSpec]) -> Set[str]:
-        """Return the names of the semantic models needed to compute the input measures
+        """Return the names of the semantic models needed to compute the input measures.
 
         This is a temporary method for use in assertion boundaries while we implement support for multiple semantic models
         """
@@ -403,7 +404,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         linkable_specs: Sequence[LinkableInstanceSpec],
         non_additive_dimension_spec: NonAdditiveDimensionSpec,
     ) -> Optional[TimeDimensionSpec]:
-        """Finds the TimeDimensionSpec matching the non_additive_dimension_spec, if any"""
+        """Finds the TimeDimensionSpec matching the non_additive_dimension_spec, if any."""
         queried_time_dimension_spec: Optional[LinkableInstanceSpec] = None
         for linkable_spec in linkable_specs:
             dimension_name_match = linkable_spec.element_name == non_additive_dimension_spec.name
@@ -420,7 +421,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         return queried_time_dimension_spec
 
     def _build_measure_spec_properties(self, measure_specs: Sequence[MeasureSpec]) -> MeasureSpecProperties:
-        """Ensures that the group of MeasureSpecs has the same non_additive_dimension_spec and agg_time_dimension"""
+        """Ensures that the group of MeasureSpecs has the same non_additive_dimension_spec and agg_time_dimension."""
         if len(measure_specs) == 0:
             raise ValueError("Cannot build MeasureParametersForRecipe when given an empty sequence of measure_specs.")
         semantic_models = self._get_semantic_model_names_for_measures(measure_specs)
@@ -604,7 +605,6 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         aggregated_measures_node: Union[AggregateMeasuresNode[SqlDataSetT], BaseOutput[SqlDataSetT]],
     ) -> ComputeMetricsNode[SqlDataSetT]:
         """Builds a ComputeMetricsNode from aggregated measures."""
-
         return ComputeMetricsNode[SqlDataSetT](
             parent_node=aggregated_measures_node,
             metric_specs=[metric_spec],

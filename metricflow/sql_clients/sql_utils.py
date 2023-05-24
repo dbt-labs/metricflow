@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pathlib
 from typing import Any, List, Optional, Set
 
@@ -6,17 +8,17 @@ import pandas as pd
 from sqlalchemy.engine import make_url
 
 from metricflow.configuration.constants import (
+    CONFIG_DWH_ACCESS_TOKEN,
     CONFIG_DWH_CREDS_PATH,
     CONFIG_DWH_DB,
     CONFIG_DWH_DIALECT,
     CONFIG_DWH_HOST,
+    CONFIG_DWH_HTTP_PATH,
     CONFIG_DWH_PASSWORD,
     CONFIG_DWH_PORT,
     CONFIG_DWH_PROJECT_ID,
     CONFIG_DWH_USER,
     CONFIG_DWH_WAREHOUSE,
-    CONFIG_DWH_ACCESS_TOKEN,
-    CONFIG_DWH_HTTP_PATH,
 )
 from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.protocols.async_sql_client import AsyncSqlClient
@@ -88,7 +90,6 @@ def make_sql_client(url: str, password: str) -> AsyncSqlClient:
 
 def make_sql_client_from_config(handler: YamlFileHandler) -> AsyncSqlClient:
     """Construct a SqlClient given a yaml file config."""
-
     url = handler.url
     dialect = not_empty(handler.get_value(CONFIG_DWH_DIALECT), CONFIG_DWH_DIALECT, url).lower()
     if dialect == SqlDialect.BIGQUERY.value:

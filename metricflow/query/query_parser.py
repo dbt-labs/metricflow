@@ -4,12 +4,11 @@ import datetime
 import logging
 import time
 from dataclasses import dataclass
-from typing import List, Optional, Tuple, Dict, Sequence
+from typing import Dict, List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
 from dbt_semantic_interfaces.objects.metric import MetricType
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.references import (
     DimensionReference,
@@ -17,6 +16,8 @@ from dbt_semantic_interfaces.references import (
     MetricReference,
     TimeDimensionReference,
 )
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import BaseOutput
 from metricflow.dataset.dataset import DataSet
@@ -26,23 +27,23 @@ from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.query.query_exceptions import InvalidQueryException
+from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
-    MetricFlowQuerySpec,
-    MetricSpec,
     DimensionSpec,
-    TimeDimensionSpec,
     EntitySpec,
     LinkableInstanceSpec,
-    OrderBySpec,
     LinkableSpecSet,
+    MetricFlowQuerySpec,
+    MetricSpec,
+    OrderBySpec,
+    TimeDimensionSpec,
     WhereFilterSpec,
 )
-from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.where_filter_transform import ConvertToWhereSpec
 from metricflow.time.time_granularity_solver import (
-    TimeGranularitySolver,
     PartialTimeDimensionSpec,
     RequestTimeGranularityException,
+    TimeGranularitySolver,
 )
 
 logging.captureWarnings(True)
@@ -253,7 +254,7 @@ class MetricFlowQueryParser:
     def _construct_metric_specs_for_query(
         self, metric_references: Tuple[MetricReference, ...]
     ) -> Tuple[MetricSpec, ...]:
-        """Populate MetricSpecs
+        """Populate MetricSpecs.
 
         Construct MetricSpecs in the preaggregated state to pass into the DataflowPlanBuilder.
 
@@ -472,7 +473,6 @@ class MetricFlowQueryParser:
         linkable_specs: LinkableSpecSet,
     ) -> None:
         """Checks that the order by specs references an item in the query."""
-
         # TODO: this is a workaround
         # Need to figure out whether we should clean up OrderBySpec or if we have to actually pass a fully resolved MetricSpec here
         metric_specs = [MetricSpec.from_reference(metric_reference) for metric_reference in metric_references]
@@ -566,7 +566,6 @@ class MetricFlowQueryParser:
         self, metric_names: Sequence[str], traverse_metric_inputs: bool = True
     ) -> Tuple[MetricReference, ...]:
         """Converts metric names into metric names. An exception is thrown if the name is invalid."""
-
         # The config must be lower-case, so we lower case for case-insensitivity against query inputs from the user.
         metric_names = [x.lower() for x in metric_names]
 
@@ -599,7 +598,6 @@ class MetricFlowQueryParser:
         self, qualified_linkable_names: Sequence[str], metric_references: Sequence[MetricReference]
     ) -> QueryTimeLinkableSpecSet:
         """Convert the linkable spec names into the respective specification objects."""
-
         qualified_linkable_names = [x.lower() for x in qualified_linkable_names]
 
         dimension_specs = []
@@ -664,7 +662,7 @@ class MetricFlowQueryParser:
         time_dimension_specs: Tuple[TimeDimensionSpec, ...],
         entity_specs: Tuple[EntitySpec, ...],
     ) -> List[LinkableInstanceSpec]:
-        """Checks that each requested linkable instance can be retrieved for the given metric"""
+        """Checks that each requested linkable instance can be retrieved for the given metric."""
         invalid_linkable_specs: List[LinkableInstanceSpec] = []
         # TODO: distinguish between dimensions that invalid via typo vs ambiguous join path
         valid_linkable_specs = self._metric_lookup.element_specs_for_metrics(metric_references=list(metric_references))

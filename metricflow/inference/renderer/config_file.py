@@ -1,11 +1,13 @@
-from collections import defaultdict
+from __future__ import annotations
+
 import os
+from collections import defaultdict
 from pathlib import Path
-from typing import Dict, Literal, Union, List, TypedDict
-from typing_extensions import NotRequired
+from typing import Dict, List, Literal, TypedDict, Union
 
 from ruamel.yaml import YAML
 from ruamel.yaml.comments import CommentedMap
+from typing_extensions import NotRequired
 
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.inference.models import InferenceResult, InferenceSignalType
@@ -26,7 +28,7 @@ class RenderedColumnConfig(TypedDict):  # noqa: D
 
 
 class ConfigFileRenderer(InferenceRenderer):
-    """Writes inference results to a set of config files"""
+    """Writes inference results to a set of config files."""
 
     UNKNOWN_FIELD_VALUE = "FIXME"
 

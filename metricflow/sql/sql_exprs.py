@@ -3,35 +3,36 @@
 from __future__ import annotations
 
 import itertools
-import more_itertools
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from typing import List, Generic, Mapping, Sequence, Optional, Tuple, Dict
+from typing import Dict, Generic, List, Mapping, Optional, Sequence, Tuple
 
+import more_itertools
+from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
+from dbt_semantic_interfaces.objects.elements.measure import MeasureAggregationParameters
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
-from metricflow.dag.mf_dag import DagNode, DisplayedProperty, NodeId
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+
 from metricflow.dag.id_generation import (
-    SQL_EXPR_COLUMN_REFERENCE_ID_PREFIX,
-    SQL_EXPR_FUNCTION_ID_PREFIX,
-    SQL_EXPR_PERCENTILE_ID_PREFIX,
-    SQL_EXPR_STRING_ID_PREFIX,
-    SQL_EXPR_COMPARISON_ID_PREFIX,
-    SQL_EXPR_GENERATE_UUID_PREFIX,
-    SQL_EXPR_NULL_PREFIX,
-    SQL_EXPR_LOGICAL_OPERATOR_PREFIX,
-    SQL_EXPR_STRING_LITERAL_PREFIX,
-    SQL_EXPR_IS_NULL_PREFIX,
-    SQL_EXPR_DATE_TRUNC,
-    SQL_EXPR_RATIO_COMPUTATION,
     SQL_EXPR_BETWEEN_PREFIX,
+    SQL_EXPR_COLUMN_REFERENCE_ID_PREFIX,
+    SQL_EXPR_COMPARISON_ID_PREFIX,
+    SQL_EXPR_DATE_TRUNC,
+    SQL_EXPR_FUNCTION_ID_PREFIX,
+    SQL_EXPR_GENERATE_UUID_PREFIX,
+    SQL_EXPR_IS_NULL_PREFIX,
+    SQL_EXPR_LOGICAL_OPERATOR_PREFIX,
+    SQL_EXPR_NULL_PREFIX,
+    SQL_EXPR_PERCENTILE_ID_PREFIX,
+    SQL_EXPR_RATIO_COMPUTATION,
+    SQL_EXPR_STRING_ID_PREFIX,
+    SQL_EXPR_STRING_LITERAL_PREFIX,
     SQL_EXPR_WINDOW_FUNCTION_ID_PREFIX,
 )
-from dbt_semantic_interfaces.objects.elements.measure import MeasureAggregationParameters
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow.dag.mf_dag import DagNode, DisplayedProperty, NodeId
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.visitor import Visitable, VisitorOutputT
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 
 class SqlExpressionNode(DagNode, Visitable, ABC):
@@ -101,7 +102,7 @@ class SqlExpressionNode(DagNode, Visitable, ABC):
     @property
     @abstractmethod
     def lineage(self) -> SqlExpressionTreeLineage:
-        """Returns all nodes in the paths from this node to the root nodes"""
+        """Returns all nodes in the paths from this node to the root nodes."""
         pass
 
     def _parents_match(self, other: SqlExpressionNode) -> bool:  # noqa: D
@@ -631,7 +632,7 @@ class SqlComparisonExpression(SqlExpressionNode):
 
 
 class SqlFunction(Enum):
-    """Names of known SQL functions like SUM() in SELECT SUM(...)
+    """Names of known SQL functions like SUM() in SELECT SUM(...).
 
     Values are the SQL string to be used in rendering.
     """
@@ -650,7 +651,7 @@ class SqlFunction(Enum):
 
     @staticmethod
     def distinct_aggregation_functions() -> Sequence[SqlFunction]:
-        """Returns a tuple containg all currently-supported DISTINCT type aggregation functions
+        """Returns a tuple containg all currently-supported DISTINCT type aggregation functions.
 
         This is not a property because properties don't play nicely with static/class methods.
         """
@@ -670,7 +671,6 @@ class SqlFunction(Enum):
     @staticmethod
     def is_aggregation(function_type: SqlFunction) -> bool:
         """Returns true if the given function is an aggregation function."""
-
         return function_type in (
             SqlFunction.AVERAGE,
             SqlFunction.COUNT_DISTINCT,
@@ -681,7 +681,7 @@ class SqlFunction(Enum):
 
     @staticmethod
     def from_aggregation_type(aggregation_type: AggregationType) -> SqlFunction:
-        """Converter method to get the SqlFunction value corresponding to the given AggregationType
+        """Converter method to get the SqlFunction value corresponding to the given AggregationType.
 
         Make sure to leave the else: block in place, as this enforces an exhaustive switch through the
         AggregationType enumeration values.
@@ -731,7 +731,6 @@ class SqlFunctionExpression(SqlExpressionNode):
         agg_params: Optional[MeasureAggregationParameters] = None,
     ) -> SqlFunctionExpression:
         """Returns sql function expression depending on aggregation type."""
-
         if aggregation_type is AggregationType.PERCENTILE:
             assert agg_params is not None, "Agg_params is none, which should have been caught in validation"
             return SqlPercentileExpression(
@@ -843,7 +842,7 @@ UseApproximatePercentile = bool
 
 @dataclass(frozen=True)
 class SqlPercentileExpressionArgument:
-    """Dataclass for holding percentile arguments"""
+    """Dataclass for holding percentile arguments."""
 
     percentile: float
     function_type: SqlPercentileFunctionType
@@ -950,7 +949,7 @@ class SqlPercentileExpression(SqlFunctionExpression):
 
 
 class SqlWindowFunction(Enum):
-    """Names of known SQL window functions like SUM(), RANK(), ROW_NUMBER()
+    """Names of known SQL window functions like SUM(), RANK(), ROW_NUMBER().
 
     Values are the SQL string to be used in rendering.
     """
@@ -969,7 +968,7 @@ class SqlWindowOrderByArgument:
 
     @property
     def suffix(self) -> str:
-        """Helper to build suffix to append to {expr}{suffix}"""
+        """Helper to build suffix to append to {expr}{suffix}."""
         result = []
         if self.descending is not None:
             result.append("DESC" if self.descending else "ASC")
@@ -979,7 +978,7 @@ class SqlWindowOrderByArgument:
 
 
 class SqlWindowFunctionExpression(SqlFunctionExpression):
-    """A window function expression like SUM(foo) OVER bar"""
+    """A window function expression like SUM(foo) OVER bar."""
 
     def __init__(
         self,
@@ -1240,7 +1239,7 @@ class SqlIsNullExpression(SqlExpressionNode):
 
 
 class SqlTimeDeltaExpression(SqlExpressionNode):
-    """create time delta between eg `DATE_SUB(ds, 2, month)`"""
+    """create time delta between eg `DATE_SUB(ds, 2, month)`."""
 
     def __init__(  # noqa: D
         self,
@@ -1316,7 +1315,7 @@ class SqlTimeDeltaExpression(SqlExpressionNode):
 
 
 class SqlCastToTimestampExpression(SqlExpressionNode):
-    """Cast to the timestamp type like CAST('2020-01-01' AS TIMESTAMP)"""
+    """Cast to the timestamp type like CAST('2020-01-01' AS TIMESTAMP)."""
 
     def __init__(self, arg: SqlExpressionNode) -> None:  # noqa: D
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[arg])
@@ -1361,7 +1360,7 @@ class SqlCastToTimestampExpression(SqlExpressionNode):
 
 
 class SqlDateTruncExpression(SqlExpressionNode):
-    """Apply a date trunc to a column like CAST('2020-01-01' AS TIMESTAMP)"""
+    """Apply a date trunc to a column like CAST('2020-01-01' AS TIMESTAMP)."""
 
     def __init__(self, time_granularity: TimeGranularity, arg: SqlExpressionNode) -> None:
         """Constructor.
@@ -1419,7 +1418,7 @@ class SqlDateTruncExpression(SqlExpressionNode):
 
 
 class SqlRatioComputationExpression(SqlExpressionNode):
-    """Node for expressing Ratio metrics to allow for appropriate casting to float/double in each engine
+    """Node for expressing Ratio metrics to allow for appropriate casting to float/double in each engine.
 
     In future we might wish to break this up into a set of nodes, e.g., SqlCastExpression and SqlMathExpression
     or even add CAST to SqlFunctionExpression. However, at this time the only mathematical operation we encode
@@ -1428,7 +1427,7 @@ class SqlRatioComputationExpression(SqlExpressionNode):
     """
 
     def __init__(self, numerator: SqlExpressionNode, denominator: SqlExpressionNode) -> None:
-        """Initialize this node for computing a ratio. Expression renderers should handle the casting
+        """Initialize this node for computing a ratio. Expression renderers should handle the casting.
 
         Args:
             numerator: the expression for the numerator in the ratio
@@ -1484,7 +1483,7 @@ class SqlRatioComputationExpression(SqlExpressionNode):
 
 
 class SqlBetweenExpression(SqlExpressionNode):
-    """A BETWEEN clause like `column BETWEEN val1 AND val2`"""
+    """A BETWEEN clause like `column BETWEEN val1 AND val2`."""
 
     def __init__(  # noqa: D
         self, column_arg: SqlExpressionNode, start_expr: SqlExpressionNode, end_expr: SqlExpressionNode

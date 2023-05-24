@@ -1,5 +1,15 @@
+from __future__ import annotations
+
 from datetime import datetime
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
+from dbt_semantic_interfaces.model_validator import ModelValidator
+from dbt_semantic_interfaces.validations.validator_helpers import (
+    ModelValidationResults,
+    ValidationError,
+    ValidationFutureError,
+    ValidationWarning,
+)
 
 from metricflow.cli.cli_context import CLIContext
 from metricflow.cli.main import (
@@ -10,13 +20,6 @@ from metricflow.cli.main import (
     query,
     validate_configs,
     version,
-)
-from dbt_semantic_interfaces.model_validator import ModelValidator
-from dbt_semantic_interfaces.validations.validator_helpers import (
-    ModelValidationResults,
-    ValidationError,
-    ValidationFutureError,
-    ValidationWarning,
 )
 from metricflow.test.fixtures.cli_fixtures import MetricFlowCliRunner
 

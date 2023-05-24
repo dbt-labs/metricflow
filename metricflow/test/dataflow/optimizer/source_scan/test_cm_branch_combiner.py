@@ -2,20 +2,20 @@ from __future__ import annotations
 
 from _pytest.fixtures import FixtureRequest
 
-from metricflow.dag.id_generation import IdGeneratorRegistry, OPTIMIZED_DATAFLOW_PLAN_PREFIX
+from metricflow.dag.id_generation import OPTIMIZED_DATAFLOW_PLAN_PREFIX, IdGeneratorRegistry
 from metricflow.dataflow.dataflow_plan import (
-    DataflowPlan,
-    WriteToResultDataframeNode,
     BaseOutput,
-    SourceDataSetT,
+    DataflowPlan,
     FilterElementsNode,
+    SourceDataSetT,
+    WriteToResultDataframeNode,
 )
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.dataflow.optimizer.source_scan.cm_branch_combiner import (
     ComputeMetricsBranchCombiner,
     ComputeMetricsBranchCombinerResult,
 )
-from metricflow.specs.specs import MeasureSpec, InstanceSpecSet
+from metricflow.specs.specs import InstanceSpecSet, MeasureSpec
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
@@ -35,7 +35,6 @@ def test_read_sql_source_combination(  # noqa: D
     consistent_id_object_repository: ConsistentIdObjectRepository,
 ) -> None:
     """Tests combining a single node."""
-
     source0 = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     source1 = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     combiner = ComputeMetricsBranchCombiner(source0)
@@ -64,7 +63,6 @@ def test_filter_combination(  # noqa: D
     consistent_id_object_repository: ConsistentIdObjectRepository,
 ) -> None:
     """Tests combining a single node."""
-
     source0 = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     filter0 = FilterElementsNode(
         parent_node=source0, include_specs=InstanceSpecSet(measure_specs=(MeasureSpec(element_name="bookings"),))

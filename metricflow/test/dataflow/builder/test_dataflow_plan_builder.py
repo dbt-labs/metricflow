@@ -1,23 +1,23 @@
+from __future__ import annotations
+
 import logging
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-
 from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.dataset.dataset import DataSet
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
-from metricflow.specs.specs import (
-    MetricFlowQuerySpec,
-    MetricSpec,
-    DimensionSpec,
-    EntityReference,
-)
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
+    DimensionSpec,
+    EntityReference,
+    MetricFlowQuerySpec,
+    MetricSpec,
     OrderBySpec,
 )
 from metricflow.specs.where_filter_transform import ConvertToWhereSpec
@@ -201,7 +201,7 @@ def test_expr_metrics_plan(
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
 ) -> None:
-    """Tests a plan to retrieve expr metric types"""
+    """Tests a plan to retrieve expr metric types."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="booking_fees"),),
@@ -234,7 +234,7 @@ def test_single_semantic_model_ratio_metrics_plan(
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
 ) -> None:
-    """Tests a plan to retrieve a ratio where both measures come from one semantic model"""
+    """Tests a plan to retrieve a ratio where both measures come from one semantic model."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings_per_booker"),),
@@ -267,7 +267,7 @@ def test_multi_semantic_model_ratio_metrics_plan(
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
 ) -> None:
-    """Tests a plan to retrieve a ratio where both measures come from one semantic model"""
+    """Tests a plan to retrieve a ratio where both measures come from one semantic model."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings_per_view"),),

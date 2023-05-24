@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 from abc import ABC
 from enum import Enum, IntEnum
-from typing import Tuple, Optional
+from typing import Optional, Tuple
 
 from dbt_semantic_interfaces.objects.base import FrozenBaseModel
 
@@ -11,7 +11,7 @@ EVENT_SCHEMA = "v1.0"
 
 
 class TelemetryLevel(IntEnum):
-    """Determines the level of a telemetry event"""
+    """Determines the level of a telemetry event."""
 
     USAGE = 10
     ERROR = 20

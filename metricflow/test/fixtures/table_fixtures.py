@@ -1,12 +1,14 @@
+from __future__ import annotations
+
 import logging
 import os
 from pathlib import Path
 
 import pandas as pd
 import pytest
+from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 
 from metricflow.dataflow.sql_table import SqlTable
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.table_snapshot.table_snapshots import (

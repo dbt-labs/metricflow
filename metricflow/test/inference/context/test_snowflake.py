@@ -1,15 +1,17 @@
+from __future__ import annotations
+
 import json
 from unittest.mock import MagicMock
 
 import pandas as pd
 
-from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataflow.sql_column import SqlColumn
+from metricflow.dataflow.sql_table import SqlTable
 from metricflow.inference.context.data_warehouse import (
-    TableProperties,
     ColumnProperties,
-    InferenceColumnType,
     DataWarehouseInferenceContext,
+    InferenceColumnType,
+    TableProperties,
 )
 from metricflow.inference.context.snowflake import SnowflakeInferenceContextProvider
 

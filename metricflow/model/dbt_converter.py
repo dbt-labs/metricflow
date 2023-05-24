@@ -1,46 +1,49 @@
-from copy import deepcopy
+from __future__ import annotations
+
 import logging
 import traceback
+from copy import deepcopy
 from typing import Collection, FrozenSet, List, Tuple, Type
 
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode
-from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
-    DbtMappingRule,
-    DbtMappingResults,
-    MappedObjects,
-)
-from metricflow.model.dbt_mapping_rules.dbt_metric_model_to_semantic_model_rules import (
-    DbtMapToSemanticModelName,
-    DbtMapToSemanticModelDescription,
-    DbtMapSemanticModelNodeRelation,
-)
-from metricflow.model.dbt_mapping_rules.dbt_metric_to_metrics_rules import (
-    DbtToMetricName,
-    DbtToMetricDescription,
-    DbtToMetricType,
-    DbtToMeasureProxyMetricTypeParams,
-    DbtToMetricConstraint,
-    DbtToDerivedMetricTypeParams,
-)
-from metricflow.model.dbt_mapping_rules.dbt_metric_to_dimensions_rules import (
-    DbtDimensionsToDimensions,
-    DbtTimestampToDimension,
-    DbtFiltersToDimensions,
-)
-from metricflow.model.dbt_mapping_rules.dbt_metric_to_measure import (
-    DbtToMeasureName,
-    DbtToMeasureExpr,
-    DbtToMeasureAgg,
-    DbtToMeasureAggTimeDimension,
-)
-from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.metric import Metric
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.parsing.dir_to_model import ModelBuildResult
 from dbt_semantic_interfaces.validations.validator_helpers import (
     ModelValidationResults,
     ValidationError,
     ValidationIssue,
+)
+
+from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
+    DbtMappingResults,
+    DbtMappingRule,
+    MappedObjects,
+)
+from metricflow.model.dbt_mapping_rules.dbt_metric_model_to_semantic_model_rules import (
+    DbtMapSemanticModelNodeRelation,
+    DbtMapToSemanticModelDescription,
+    DbtMapToSemanticModelName,
+)
+from metricflow.model.dbt_mapping_rules.dbt_metric_to_dimensions_rules import (
+    DbtDimensionsToDimensions,
+    DbtFiltersToDimensions,
+    DbtTimestampToDimension,
+)
+from metricflow.model.dbt_mapping_rules.dbt_metric_to_measure import (
+    DbtToMeasureAgg,
+    DbtToMeasureAggTimeDimension,
+    DbtToMeasureExpr,
+    DbtToMeasureName,
+)
+from metricflow.model.dbt_mapping_rules.dbt_metric_to_metrics_rules import (
+    DbtToDerivedMetricTypeParams,
+    DbtToMeasureProxyMetricTypeParams,
+    DbtToMetricConstraint,
+    DbtToMetricDescription,
+    DbtToMetricName,
+    DbtToMetricType,
 )
 
 logger = logging.getLogger(__name__)
@@ -72,7 +75,7 @@ DEFAULT_RULES: FrozenSet[DbtMappingRule] = frozenset(
 
 
 class DbtConverter:
-    """Handles converting a list of dbt MetricNodes into a MetricFlow Model
+    """Handles converting a list of dbt MetricNodes into a MetricFlow Model.
 
     A DbtConverter is a tool for converting dbt metrics into a MetricFlow Model.
     It does so by operating DbtMappingRules which map dbt node properties to
@@ -89,7 +92,7 @@ class DbtConverter:
         semantic_model_class: Type[SemanticModel] = SemanticModel,
         metric_class: Type[Metric] = Metric,
     ) -> None:
-        """Initializer for DbtConverter class
+        """Initializer for DbtConverter class.
 
         Args:
             rules: A collection of DbtMappingRules which get saved as a FrozenSet (immutable and unordered). Defaults to DEFAULT_RULES.
@@ -101,7 +104,7 @@ class DbtConverter:
         self.metric_class = metric_class
 
     def _map_dbt_to_metricflow(self, dbt_metrics: Tuple[MetricNode, ...]) -> DbtMappingResults:
-        """Using a series of rules transforms dbt metrics into a mapped dict representing SemanticManifest objects"""
+        """Using a series of rules transforms dbt metrics into a mapped dict representing SemanticManifest objects."""
         mapped_objects = MappedObjects()
         validation_results = ModelValidationResults()
 
@@ -112,7 +115,7 @@ class DbtConverter:
         return DbtMappingResults(mapped_objects=mapped_objects, validation_results=validation_results)
 
     def _build_metricflow_model(self, mapped_objects: MappedObjects) -> ModelBuildResult:
-        """Takes in a map of dicts representing SemanticManifest objects, and builds a SemanticManifest"""
+        """Takes in a map of dicts representing SemanticManifest objects, and builds a SemanticManifest."""
         # we don't want to modify the passed in objects, so we decopy them
         copied_objects = deepcopy(mapped_objects)
 
@@ -156,7 +159,7 @@ class DbtConverter:
         )
 
     def convert(self, dbt_metrics: Tuple[MetricNode, ...]) -> ModelBuildResult:
-        """Builds a SemanticManifest from dbt MetricNodes"""
+        """Builds a SemanticManifest from dbt MetricNodes."""
         mapping_result = self._map_dbt_to_metricflow(dbt_metrics=dbt_metrics)
 
         if mapping_result.validation_results.has_blocking_issues:

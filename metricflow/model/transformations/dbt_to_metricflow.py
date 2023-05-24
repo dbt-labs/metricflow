@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import traceback
 from collections import defaultdict
 from dataclasses import dataclass
@@ -5,20 +7,20 @@ from operator import xor
 from typing import DefaultDict, Dict, List, Optional, Set
 
 from dbt.contracts.graph.manifest import Manifest as DbtManifest
-from dbt.contracts.graph.nodes import Metric as DbtMetric, ModelNode as DbtModelNode
+from dbt.contracts.graph.nodes import Metric as DbtMetric
+from dbt.contracts.graph.nodes import ModelNode as DbtModelNode
 from dbt.contracts.graph.unparsed import MetricFilter as DbtMetricFilter
 from dbt.exceptions import ref_invalid_args
-
-from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
 from dbt_semantic_interfaces.objects.metric import Metric, MetricInputMeasure, MetricType, MetricTypeParams
-from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.parsing.dir_to_model import ModelBuildResult
+from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.validations.validator_helpers import (
     ModelValidationResults,
     ValidationError,
@@ -44,7 +46,7 @@ CALC_METHOD_TO_MEASURE_TYPE: Dict[str, AggregationType] = {
 
 
 class DbtManifestTransformer:
-    """The DbtManifestTransform is a class used to transform dbt Manifests into MetricFlow SemanticManifests
+    """The DbtManifestTransform is a class used to transform dbt Manifests into MetricFlow SemanticManifests.
 
     This helps keep track of state objects while transforming the Manifest into a
     SemanticManifest, ensuring like dbt Node elements are rendered only once and
@@ -63,7 +65,7 @@ class DbtManifestTransformer:
 
     @property
     def time_dimension_stats(self) -> Dict[str, List[str]]:
-        """The stats on time dimensions from the dbt Manifest
+        """The stats on time dimensions from the dbt Manifest.
 
         The time dimension stats are returned as a dictionary where in the keys
         are the names of the time dimension, and the value associated with each
@@ -78,7 +80,7 @@ class DbtManifestTransformer:
         return self._time_dimension_stats
 
     def resolve_metric_model(self, dbt_metric: DbtMetric) -> DbtModelNode:
-        """Returns a DbtModelNode based on the `DbtMetric.model`
+        """Returns a DbtModelNode based on the `DbtMetric.model`.
 
         `DbtMetric.model` string values should either be a model name, or a
         dbt [ref] (https://docs.getdbt.com/reference/dbt-jinja-functions/ref)
@@ -132,12 +134,11 @@ class DbtManifestTransformer:
 
     @classmethod
     def db_table_from_model_node(cls, node: DbtModelNode) -> str:
-        """Get the '.' joined database table name of a DbtModelNode"""
+        """Get the '.' joined database table name of a DbtModelNode."""
         return f"{node.database}.{node.schema}.{node.name}"
 
     def _build_dimension(self, name: str, dbt_metric: DbtMetric) -> Dimension:
-        """Helper for `build_dimenions which builds either a categorical or time dimension"""
-
+        """Helper for `build_dimenions which builds either a categorical or time dimension."""
         if name in self.time_dimension_stats.keys():
             return Dimension(
                 name=name,
@@ -153,7 +154,7 @@ class DbtManifestTransformer:
             )
 
     def build_dimensions(self, dbt_metric: DbtMetric) -> List[Dimension]:
-        """Given a DbtMetric, builds all the associated MetricFlow dimensions"""
+        """Given a DbtMetric, builds all the associated MetricFlow dimensions."""
         dimensions = []
 
         # Build dimensions specifically from DbtMetric.dimensions list
@@ -178,7 +179,7 @@ class DbtManifestTransformer:
         return dimensions
 
     def build_measure(self, dbt_metric: DbtMetric) -> Measure:
-        """Attemps to build a measure for a given DbtMetric
+        """Attemps to build a measure for a given DbtMetric.
 
         Raises:
             RuntimeError: A measure can't be built for `derived` dbt metrics
@@ -194,7 +195,7 @@ class DbtManifestTransformer:
         )
 
     def build_semantic_model_for_metric(self, dbt_metric: DbtMetric) -> SemanticModel:
-        """Attemps to build a semantic model for a given DbtMetric
+        """Attemps to build a semantic model for a given DbtMetric.
 
         Raises:
             RuntimeError: A semantic model can't be built for `derived` dbt metrics
@@ -214,7 +215,7 @@ class DbtManifestTransformer:
 
     @classmethod
     def build_where_stmt_from_filters(cls, filters: List[DbtMetricFilter]) -> str:
-        """Builds an SQL 'where' statement from the passed in filters
+        """Builds an SQL 'where' statement from the passed in filters.
 
         Each dbt filter has a field, an operator, and a value. With these dbt
         forms the individual statment '{field} {operator} {value}' and joins
@@ -229,7 +230,7 @@ class DbtManifestTransformer:
         return " AND ".join(clauses)
 
     def build_proxy_metric(self, dbt_metric: DbtMetric) -> Metric:
-        """Attempt to build a proxy metric for the given DbtMetric
+        """Attempt to build a proxy metric for the given DbtMetric.
 
         For DbtMetrics which have a calculation method != 'derived',
         we have separately created a measure of the appropriate type.
@@ -259,14 +260,14 @@ class DbtManifestTransformer:
         )
 
     def dbt_metric_to_metricflow_elements(self, dbt_metric: DbtMetric) -> TransformedDbtMetric:
-        """Builds a MetricFlow semantic model and proxy metric for the given DbtMetric"""
+        """Builds a MetricFlow semantic model and proxy metric for the given DbtMetric."""
         semantic_model = self.build_semantic_model_for_metric(dbt_metric)
         proxy_metric = self.build_proxy_metric(dbt_metric)
         return TransformedDbtMetric(semantic_model=semantic_model, metric=proxy_metric)
 
     @classmethod
     def deduplicate_semantic_models(cls, semantic_models: List[SemanticModel]) -> SemanticModel:
-        """Attempts to deduplicate a list of semantic models into a single semantic model
+        """Attempts to deduplicate a list of semantic models into a single semantic model.
 
         Because each DbtMetric (which isn't `derived`) creates a semantic model,
         and many DbtMetric can create the same semantic model with differring
@@ -276,7 +277,6 @@ class DbtManifestTransformer:
         that dimensions/measures/identifers with the same name have the same
         attributes.
         """
-
         if len(semantic_models) == 1:
             return semantic_models[0]
 
@@ -331,7 +331,7 @@ class DbtManifestTransformer:
 
     @classmethod
     def collect_time_dimension_stats(cls, dbt_metrics: List[DbtMetric]) -> Dict[str, List[str]]:
-        """Compiles stats on time dimensions for a given list of DbtMetrics
+        """Compiles stats on time dimensions for a given list of DbtMetrics.
 
         Arguably this is probably a fairly black magic function. This function
         determines which time dimensions are primary for which `DbtMetric.model`
@@ -367,7 +367,7 @@ class DbtManifestTransformer:
         return time_dimensions
 
     def build_semantic_manifest(self) -> ModelBuildResult:
-        """Builds a SemanticManifest from the manifest of the instance
+        """Builds a SemanticManifest from the manifest of the instance.
 
         Note:
             TODO: This currently skips DbtMetric that are `derived`. Once MetricFlow

@@ -1,5 +1,7 @@
-from metricflow.dataflow.sql_table import SqlTable
+from __future__ import annotations
+
 from metricflow.dataflow.sql_column import SqlColumn
+from metricflow.dataflow.sql_table import SqlTable
 
 
 def test_sql_column() -> None:  # noqa: D
