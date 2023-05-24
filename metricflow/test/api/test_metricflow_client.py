@@ -1,7 +1,8 @@
 from metricflow.api.metricflow_client import MetricFlowClient
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.engine.models import Dimension, Metric
+from metricflow.engine.models import Metric
 from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationResults
+from dbt_semantic_interfaces.objects.elements.dimension import Dimension
 from metricflow.random_id import random_id
 
 
@@ -74,8 +75,8 @@ def test_list_dimensions(mf_client: MetricFlowClient) -> None:  # noqa: D
     assert isinstance(dimensions[0], Dimension)
 
     dimensions = mf_client.list_dimensions(["bookings", "revenue"])
-    assert len(dimensions) == 1
-    assert dimensions[0].name == "ds"
+    assert len(dimensions) == 2
+    assert [dim.name for dim in dimensions] == ["ds", "ds"]
 
 
 def test_get_dimension_values(mf_client: MetricFlowClient) -> None:  # noqa: D
