@@ -22,8 +22,7 @@ jobs:
           python-version: "${{ env.PYTHON_VERSION }}"
 
       - name: Hatch Publish
-        run: hatch publish
+        run: hatch build && hatch publish
         env:
           HATCH_INDEX_USER: transform_data
           HATCH_INDEX_AUTH: ${{ secrets.PYPI_PASSWORD }}
-
