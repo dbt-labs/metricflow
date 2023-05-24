@@ -5,13 +5,13 @@ import textwrap
 import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import List, Sequence, Optional, Tuple
+from typing import List, Optional, Sequence, Tuple
 
 import jinja2
 import pandas as pd
 
 from metricflow.dag.id_generation import EXEC_NODE_READ_SQL_QUERY, EXEC_NODE_WRITE_TO_TABLE
-from metricflow.dag.mf_dag import DagNode, MetricFlowDag, NodeId, DisplayedProperty
+from metricflow.dag.mf_dag import DagNode, DisplayedProperty, MetricFlowDag, NodeId
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.protocols.sql_request import SqlJsonTag
@@ -50,7 +50,7 @@ class ExecutionPlanTask(DagNode, Visitable, ABC):
 
     @property
     def task_id(self) -> NodeId:
-        """Alias for node ID since the nodes represent a task"""
+        """Alias for node ID since the nodes represent a task."""
         return self.node_id
 
     @property

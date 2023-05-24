@@ -6,32 +6,31 @@ import logging
 import textwrap
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import List, TypeVar, Generic, Optional, Sequence, Tuple, Union, Type
+from typing import Generic, List, Optional, Sequence, Tuple, Type, TypeVar, Union
 
 import jinja2
-
-from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.objects.metric import MetricTimeWindow
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.references import TimeDimensionReference
-from metricflow.filters.time_constraint import TimeRangeConstraint
+from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+
 from metricflow.dag.id_generation import (
     DATAFLOW_NODE_AGGREGATE_MEASURES_ID_PREFIX,
-    DATAFLOW_NODE_SEMI_ADDITIVE_JOIN_ID_PREFIX,
+    DATAFLOW_NODE_COMBINE_METRICS_ID_PREFIX,
     DATAFLOW_NODE_COMPUTE_METRICS_ID_PREFIX,
+    DATAFLOW_NODE_CONSTRAIN_TIME_RANGE_ID_PREFIX,
     DATAFLOW_NODE_JOIN_AGGREGATED_MEASURES_BY_GROUPBY_COLUMNS_PREFIX,
     DATAFLOW_NODE_JOIN_SELF_OVER_TIME_RANGE_ID_PREFIX,
     DATAFLOW_NODE_JOIN_TO_STANDARD_OUTPUT_ID_PREFIX,
+    DATAFLOW_NODE_JOIN_TO_TIME_SPINE_ID_PREFIX,
     DATAFLOW_NODE_ORDER_BY_LIMIT_ID_PREFIX,
     DATAFLOW_NODE_PASS_FILTER_ELEMENTS_ID_PREFIX,
     DATAFLOW_NODE_READ_SQL_SOURCE_ID_PREFIX,
+    DATAFLOW_NODE_SEMI_ADDITIVE_JOIN_ID_PREFIX,
+    DATAFLOW_NODE_SET_MEASURE_AGGREGATION_TIME,
     DATAFLOW_NODE_WHERE_CONSTRAINT_ID_PREFIX,
     DATAFLOW_NODE_WRITE_TO_RESULT_DATAFRAME_ID_PREFIX,
-    DATAFLOW_NODE_COMBINE_METRICS_ID_PREFIX,
-    DATAFLOW_NODE_CONSTRAIN_TIME_RANGE_ID_PREFIX,
-    DATAFLOW_NODE_SET_MEASURE_AGGREGATION_TIME,
-    DATAFLOW_NODE_JOIN_TO_TIME_SPINE_ID_PREFIX,
 )
 from metricflow.dag.mf_dag import DagNode, DisplayedProperty, MetricFlowDag, NodeId
 from metricflow.dataflow.builder.partitions import (
@@ -40,13 +39,14 @@ from metricflow.dataflow.builder.partitions import (
 )
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.dataset import DataSet
+from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.specs.specs import (
-    MetricInputMeasureSpec,
-    OrderBySpec,
-    MetricSpec,
-    LinklessEntitySpec,
-    TimeDimensionSpec,
     InstanceSpecSet,
+    LinklessEntitySpec,
+    MetricInputMeasureSpec,
+    MetricSpec,
+    OrderBySpec,
+    TimeDimensionSpec,
     WhereFilterSpec,
 )
 from metricflow.sql.sql_plan import SqlJoinType
@@ -96,7 +96,7 @@ class DataflowPlanNode(Generic[SourceDataSetT], DagNode, Visitable, ABC):
 
     @abstractmethod
     def with_new_parents(self: NodeSelfT, new_parent_nodes: Sequence[BaseOutput[SourceDataSetT]]) -> NodeSelfT:
-        """Creates a node with the same behavior as this node, but with a different set of parents
+        """Creates a node with the same behavior as this node, but with a different set of parents.
 
         typing.Self would be useful here, but not available in Python 3.8.
         """
@@ -255,7 +255,7 @@ class ReadSqlSourceNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT]):
 
 @dataclass(frozen=True)
 class ValidityWindowJoinDescription:
-    """Encapsulates details about join constraints around validity windows"""
+    """Encapsulates details about join constraints around validity windows."""
 
     window_start_dimension: TimeDimensionSpec
     window_end_dimension: TimeDimensionSpec
@@ -465,7 +465,7 @@ class AggregateMeasuresNode(Generic[SourceDataSetT], AggregatedMeasuresOutput[So
     """
 
     def __init__(self, parent_node: BaseOutput, metric_input_measure_specs: Tuple[MetricInputMeasureSpec, ...]) -> None:
-        """Initializer for AggregateMeasuresNode
+        """Initializer for AggregateMeasuresNode.
 
         The input measure specs are required for downstream nodes to be aware of any input measures with
         user-provided aliases, such as we might encounter with constrained and unconstrained versions of the
@@ -892,7 +892,7 @@ class OrderByLimitNode(Generic[SourceDataSetT], ComputedMetricsOutput[SourceData
 
     @property
     def limit(self) -> Optional[int]:
-        """The number of rows to limit by"""
+        """The number of rows to limit by."""
         return self._limit
 
     def accept(self, visitor: DataflowPlanNodeVisitor[SourceDataSetT, VisitorOutputT]) -> VisitorOutputT:  # noqa: D
@@ -1232,7 +1232,7 @@ class WhereConstraintNode(AggregatedMeasuresOutput[SourceDataSetT]):
 
 
 class CombineMetricsNode(Generic[SourceDataSetT], ComputedMetricsOutput[SourceDataSetT]):
-    """Combines metrics from different nodes into a single output"""
+    """Combines metrics from different nodes into a single output."""
 
     def __init__(  # noqa: D
         self,
@@ -1255,7 +1255,7 @@ class CombineMetricsNode(Generic[SourceDataSetT], ComputedMetricsOutput[SourceDa
 
     @property
     def displayed_properties(self) -> List[DisplayedProperty]:
-        """Prints details about the join types and how the node will behave"""
+        """Prints details about the join types and how the node will behave."""
         custom_properties = [DisplayedProperty("join type", self.join_type)]
         if self.join_type is SqlJoinType.FULL_OUTER:
             custom_properties.append(

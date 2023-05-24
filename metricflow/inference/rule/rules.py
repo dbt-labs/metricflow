@@ -1,18 +1,18 @@
 from __future__ import annotations
-from abc import abstractmethod
 
+from abc import abstractmethod
 from typing import Callable, List, TypeVar
 
 from metricflow.inference.context.data_warehouse import (
     ColumnProperties,
     DataWarehouseInferenceContext,
 )
-from metricflow.inference.rule.base import InferenceRule
 from metricflow.inference.models import (
     InferenceSignal,
     InferenceSignalConfidence,
     InferenceSignalNode,
 )
+from metricflow.inference.rule.base import InferenceRule
 
 T = TypeVar("T", bound="ColumnMatcherRule")
 
@@ -42,7 +42,7 @@ class ColumnMatcherRule(InferenceRule):
 
     @abstractmethod
     def match_column(self, props: ColumnProperties) -> bool:
-        """A function to determine whether `ColumnProperties` matches. If it does, produce the signal"""
+        """A function to determine whether `ColumnProperties` matches. If it does, produce the signal."""
         raise NotImplementedError
 
     def process(self, warehouse: DataWarehouseInferenceContext) -> List[InferenceSignal]:  # type: ignore

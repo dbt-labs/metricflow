@@ -1,28 +1,29 @@
-from typing import Dict, Any
+from __future__ import annotations
 
-from jsonschema import RefResolver
+from typing import Any, Dict
+
 from dbt_semantic_interfaces.parsing.schema_validator import SchemaValidator
-
 from dbt_semantic_interfaces.parsing.schemas import (
-    metric_schema,
-    node_relation_schema,
-    semantic_model_schema,
+    aggregation_type_params_schema,
     derived_group_by_element_schema,
-    metric_input_schema,
-    metric_input_measure_schema,
-    metric_type_params_schema,
+    dimension_schema,
+    dimension_type_params_schema,
     entity_schema,
     measure_schema,
-    dimension_schema,
-    validity_params_schema,
-    dimension_type_params_schema,
-    aggregation_type_params_schema,
+    metric_input_measure_schema,
+    metric_input_schema,
+    metric_schema,
+    metric_type_params_schema,
+    node_relation_schema,
     non_additive_dimension_schema,
+    semantic_model_schema,
+    validity_params_schema,
 )
+from jsonschema import RefResolver
 
 
 def add_transform_metadata_fields_to_spec(spec: Dict[str, Any]) -> None:  # type: ignore[misc]
-    """Adds transform metadata fields a spec"""
+    """Adds transform metadata fields a spec."""
     properties = spec["properties"]
     transform_metadata_fields = {
         "description": {"type": "string"},
@@ -42,7 +43,7 @@ def add_transform_metadata_fields_to_spec(spec: Dict[str, Any]) -> None:  # type
 
 
 def add_locked_metadata_to_spec(spec: Dict[str, Any]) -> None:  # type: ignore[misc]
-    """Adds locked metadata field to a spec"""
+    """Adds locked metadata field to a spec."""
     properties = spec["properties"]
     transform_metadata_fields = {
         "locked_metadata": {"$ref": "locked_metadata"},

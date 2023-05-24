@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from metricflow.dataflow.sql_column import SqlColumn
 from metricflow.inference.models import InferenceSignal, InferenceSignalConfidence, InferenceSignalType
 from metricflow.inference.solver.weighted_tree import WeightedTypeTreeInferenceSolver
@@ -40,7 +42,7 @@ def test_follow_signal_path() -> None:
 
 
 def test_complementary_signal_with_parent_trail() -> None:
-    """Test that the solver will follow the weight trail and take complementary signals into account if parent has weight"""
+    """Test that the solver will follow the weight trail and take complementary signals into account if parent has weight."""
     signals = [
         InferenceSignal(
             column=column,
@@ -72,7 +74,7 @@ def test_complementary_signal_with_parent_trail() -> None:
 
 
 def test_complementary_signals_without_parent_signal() -> None:
-    """Test that the solver won't follow the weight trail and take complementary signals into account if parent has no weight"""
+    """Test that the solver won't follow the weight trail and take complementary signals into account if parent has no weight."""
     signals = [
         InferenceSignal(
             column=column,

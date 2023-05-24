@@ -4,8 +4,7 @@ from datetime import date
 from typing import Union
 
 import pandas as pd
-
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted, ExtendedEnum
+from dbt_semantic_interfaces.enum_extension import ExtendedEnum, assert_values_exhausted
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 
@@ -134,7 +133,7 @@ def match_start_or_end_of_period(
 
 
 class ISOWeekDay(ExtendedEnum):
-    """Day of week values per ISO standard"""
+    """Day of week values per ISO standard."""
 
     MONDAY = 1
     TUESDAY = 2
@@ -146,22 +145,22 @@ class ISOWeekDay(ExtendedEnum):
 
     @staticmethod
     def from_pandas_timestamp(timestamp: pd.Timestamp) -> ISOWeekDay:
-        """Factory for streamlining conversion from a Pandas Timestamp to an ISOWeekDay"""
+        """Factory for streamlining conversion from a Pandas Timestamp to an ISOWeekDay."""
         return ISOWeekDay(timestamp.isoweekday())
 
     @property
     def is_week_start(self) -> bool:
-        """Return comparison of instance value against ISO standard start of week (Monday)"""
+        """Return comparison of instance value against ISO standard start of week (Monday)."""
         return self is ISOWeekDay.MONDAY
 
     @property
     def is_week_end(self) -> bool:
-        """Return comparison of instance value against ISO standard end of week (Sunday)"""
+        """Return comparison of instance value against ISO standard end of week (Sunday)."""
         return self is ISOWeekDay.SUNDAY
 
     @property
     def pandas_value(self) -> int:
-        """Returns the pandas int value representation of the ISOWeekDay"""
+        """Returns the pandas int value representation of the ISOWeekDay."""
         return self.value - 1
 
 

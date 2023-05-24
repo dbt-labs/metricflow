@@ -1,19 +1,22 @@
+from __future__ import annotations
+
 from typing import Tuple
 
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode
+from dbt_semantic_interfaces.objects.metric import MetricType
+
+from metricflow.model.dbt_converter import DbtConverter
+from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
+    DbtMappingRule,
+    MappedObjects,
+    get_and_assert_calc_method_mapping,
+)
 from metricflow.model.dbt_mapping_rules.dbt_metric_to_measure import (
-    DbtToMeasureName,
     DbtToMeasureAgg,
     DbtToMeasureAggTimeDimension,
     DbtToMeasureExpr,
+    DbtToMeasureName,
 )
-from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
-    MappedObjects,
-    DbtMappingRule,
-    get_and_assert_calc_method_mapping,
-)
-from metricflow.model.dbt_converter import DbtConverter
-from dbt_semantic_interfaces.objects.metric import MetricType
 
 
 def test_dbt_metric_to_measure_rules_skip_derived_metrics(dbt_metrics: Tuple[MetricNode, ...]) -> None:  # noqa: D

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import textwrap
 
 import jinja2
@@ -7,7 +9,7 @@ from metricflow.execution.execution_plan import ExecutionPlan
 
 
 def execution_plan_to_text(execution_plan: ExecutionPlan) -> str:
-    """Convert the execution plan to a text form that's like XML"""
+    """Convert the execution plan to a text form that's like XML."""
     if len(execution_plan.sink_nodes) != 1:
         raise RuntimeError("Currently, only 1 sink node is supported in the execution plan.")
 

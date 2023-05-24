@@ -1,21 +1,23 @@
+from __future__ import annotations
+
 import os
 from pathlib import Path
 
 import pandas as pd
 import pytest
+from dbt_semantic_interfaces.test_utils import as_datetime
 
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.random_id import random_id
 from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.table_snapshot.table_snapshots import (
-    SqlTableSnapshot,
     SqlTableColumnDefinition,
     SqlTableColumnType,
-    SqlTableSnapshotRestorer,
+    SqlTableSnapshot,
     SqlTableSnapshotRepository,
+    SqlTableSnapshotRestorer,
 )
-from dbt_semantic_interfaces.test_utils import as_datetime
 
 
 @pytest.fixture
@@ -41,7 +43,6 @@ def table_snapshot() -> SqlTableSnapshot:  # noqa: D
 
 def test_as_df(table_snapshot: SqlTableSnapshot) -> None:
     """Check that SqlTableSnapshot.as_df works as expected."""
-
     assert_dataframes_equal(
         actual=table_snapshot.as_df,
         expected=pd.DataFrame(

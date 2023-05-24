@@ -14,16 +14,16 @@ import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from hashlib import sha1
-from typing import List, Optional, Sequence, Tuple, TypeVar, Generic, Any
+from typing import Any, Generic, List, Optional, Sequence, Tuple, TypeVar
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.objects.metric import MetricTimeWindow
 from dbt_semantic_interfaces.references import (
     DimensionReference,
+    EntityReference,
     MeasureReference,
     MetricReference,
     TimeDimensionReference,
-    EntityReference,
 )
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
@@ -139,12 +139,12 @@ class LinkableInstanceSpec(InstanceSpec, ABC):
 
     @property
     def without_first_entity_link(self: SelfTypeT) -> SelfTypeT:
-        """e.g. user_id__device_id__platform -> device_id__platform"""
+        """e.g. user_id__device_id__platform -> device_id__platform."""
         raise NotImplementedError()
 
     @property
     def without_entity_links(self: SelfTypeT) -> SelfTypeT:  # noqa: D
-        """e.g. user_id__device_id__platform -> platform"""
+        """e.g. user_id__device_id__platform -> platform."""
         raise NotImplementedError()
 
     @staticmethod
@@ -180,7 +180,7 @@ class EntitySpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
 
     @property
     def as_linkless_prefix(self) -> Tuple[EntityReference, ...]:
-        """Creates tuple of linkless entities that could be included in the entity_links of another spec
+        """Creates tuple of linkless entities that could be included in the entity_links of another spec.
 
         eg as a prefix to a DimensionSpec's entity links to when a join is occurring via this entity
         """
@@ -344,7 +344,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
 
 @dataclass(frozen=True)
 class NonAdditiveDimensionSpec(SerializableDataclass):
-    """Spec representing non-additive dimension parameters for use within a MeasureSpec
+    """Spec representing non-additive dimension parameters for use within a MeasureSpec.
 
     This is sourced from the NonAdditiveDimensionParameters model object, which provides the parsed parameter set,
     while the spec contains the information needed for dataflow plan operations
@@ -389,7 +389,7 @@ class MeasureSpec(InstanceSpec):  # noqa: D
 
     @staticmethod
     def from_reference(reference: MeasureReference) -> MeasureSpec:
-        """Initialize from a measure reference instance"""
+        """Initialize from a measure reference instance."""
         return MeasureSpec(element_name=reference.element_name)
 
     @property
@@ -427,7 +427,7 @@ class MetricSpec(InstanceSpec):  # noqa: D
 
     @staticmethod
     def from_reference(reference: MetricReference) -> MetricSpec:
-        """Initialize from a metric reference instance"""
+        """Initialize from a metric reference instance."""
         return MetricSpec(element_name=reference.element_name)
 
     @property
@@ -462,7 +462,7 @@ class MetricInputMeasureSpec(SerializableDataclass):
 
     @property
     def post_aggregation_spec(self) -> MeasureSpec:
-        """Return a MeasureSpec instance representing the post-aggregation spec state for the underlying measure"""
+        """Return a MeasureSpec instance representing the post-aggregation spec state for the underlying measure."""
         if self.alias:
             return MeasureSpec(
                 element_name=self.alias,
@@ -519,7 +519,6 @@ class LinkableSpecSet(SerializableDataclass):
     @staticmethod
     def merge(spec_sets: Sequence[LinkableSpecSet]) -> LinkableSpecSet:
         """Merges and dedupes the linkable specs."""
-
         dimension_specs: List[DimensionSpec] = []
         time_dimension_specs: List[TimeDimensionSpec] = []
         entity_specs: List[EntitySpec] = []
@@ -598,7 +597,7 @@ class InstanceSpecSetTransform(Generic[TransformOutputT], ABC):
 
 @dataclass(frozen=True)
 class InstanceSpecSet(SerializableDataclass):
-    """Consolidates all specs used in an instance set"""
+    """Consolidates all specs used in an instance set."""
 
     metric_specs: Tuple[MetricSpec, ...] = ()
     measure_specs: Tuple[MeasureSpec, ...] = ()

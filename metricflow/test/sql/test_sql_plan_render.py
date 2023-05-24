@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import logging
 from typing import List
+
 import pytest
 from _pytest.fixtures import FixtureRequest
 
@@ -7,21 +10,21 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer, SqlQueryPlanRenderer
 from metricflow.sql.sql_exprs import (
-    SqlStringExpression,
-    SqlColumnReferenceExpression,
-    SqlColumnReference,
-    SqlComparisonExpression,
-    SqlComparison,
     SqlAggregateFunctionExpression,
+    SqlColumnReference,
+    SqlColumnReferenceExpression,
+    SqlComparison,
+    SqlComparisonExpression,
     SqlFunction,
+    SqlStringExpression,
 )
 from metricflow.sql.sql_plan import (
-    SqlTableFromClauseNode,
-    SqlSelectStatementNode,
-    SqlSelectColumn,
     SqlJoinDescription,
-    SqlOrderByDescription,
     SqlJoinType,
+    SqlOrderByDescription,
+    SqlSelectColumn,
+    SqlSelectStatementNode,
+    SqlTableFromClauseNode,
 )
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.sql.compare_sql_plan import assert_rendered_sql_equal
@@ -40,7 +43,6 @@ def test_component_rendering(
     sql_client: SqlClient,
 ) -> None:
     """Checks that all components of SELECT query are rendered for the 0, 1, >1 component count cases."""
-
     # Test single SELECT column
     select_columns = [
         SqlSelectColumn(

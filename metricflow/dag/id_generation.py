@@ -1,9 +1,10 @@
 """Prefixes to use when generating IDs. Listed here to avoid conflicts."""
 
 # Nodes in a DAG have IDs of the form "prefix_number". These are the prefixes used for the different node types.
+from __future__ import annotations
+
 import logging
 import threading
-
 from typing import Dict, Type
 
 DATAFLOW_NODE_AGGREGATE_MEASURES_ID_PREFIX = "am"
@@ -59,12 +60,12 @@ class IdGenerator:
     """Helps generate unique ID strings."""
 
     def __init__(self, start_value: int = 0) -> None:  # noqa: D
-        """Identifiers of the form (prefix + number) e.g. my_node_1"""
+        """Identifiers of the form (prefix + number) e.g. my_node_1."""
         self._next_id = start_value
         self._lock = threading.Lock()
 
     def create_id(self, prefix: str) -> str:
-        """Create a unique ID string that can be used for naming nodes (or others) using the form <prefix>_<number>"""
+        """Create a unique ID string that can be used for naming nodes (or others) using the form <prefix>_<number>."""
         with self._lock:
             new_id = f"{prefix}_{self._next_id}"
             self._next_id += 1
@@ -83,8 +84,7 @@ class IdGeneratorRegistry:
 
     @classmethod
     def for_class(cls, class_type: Type) -> IdGenerator:
-        """Return an ID generator for the given class"""
-
+        """Return an ID generator for the given class."""
         with cls._state_lock:
             class_name = ".".join([class_type.__module__, class_type.__name__])
             if class_name not in cls._class_name_to_id_generator:

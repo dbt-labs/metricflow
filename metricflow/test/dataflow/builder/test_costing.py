@@ -1,20 +1,22 @@
+from __future__ import annotations
+
 import logging
 
-from metricflow.dataflow.builder.costing import DefaultCostFunction, DefaultCost
+from metricflow.dataflow.builder.costing import DefaultCost, DefaultCostFunction
 from metricflow.dataflow.dataflow_plan import (
-    FilterElementsNode,
     AggregateMeasuresNode,
-    JoinToBaseOutputNode,
+    FilterElementsNode,
     JoinDescription,
+    JoinToBaseOutputNode,
 )
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.specs.specs import (
-    MeasureSpec,
-    EntitySpec,
     DimensionSpec,
-    LinklessEntitySpec,
-    MetricInputMeasureSpec,
+    EntitySpec,
     InstanceSpecSet,
+    LinklessEntitySpec,
+    MeasureSpec,
+    MetricInputMeasureSpec,
 )
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 

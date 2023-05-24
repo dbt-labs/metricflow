@@ -1,31 +1,33 @@
+from __future__ import annotations
+
 import logging
 from dataclasses import dataclass
 from typing import Generic, List, Optional, Sequence
 
-from metricflow.dag.id_generation import IdGeneratorRegistry, OPTIMIZED_DATAFLOW_PLAN_PREFIX
+from metricflow.dag.id_generation import OPTIMIZED_DATAFLOW_PLAN_PREFIX, IdGeneratorRegistry
 from metricflow.dataflow.dataflow_plan import (
-    SourceDataSetT,
-    DataflowPlanNodeVisitor,
-    BaseOutput,
-    ReadSqlSourceNode,
-    JoinToBaseOutputNode,
-    JoinAggregatedMeasuresByGroupByColumnsNode,
     AggregateMeasuresNode,
+    BaseOutput,
+    CombineMetricsNode,
     ComputeMetricsNode,
+    ConstrainTimeRangeNode,
+    DataflowPlan,
+    DataflowPlanNode,
+    DataflowPlanNodeVisitor,
+    FilterElementsNode,
+    JoinAggregatedMeasuresByGroupByColumnsNode,
+    JoinOverTimeRangeNode,
+    JoinToBaseOutputNode,
+    JoinToTimeSpineNode,
+    MetricTimeDimensionTransformNode,
     OrderByLimitNode,
+    ReadSqlSourceNode,
+    SemiAdditiveJoinNode,
+    SinkOutput,
+    SourceDataSetT,
     WhereConstraintNode,
     WriteToResultDataframeNode,
     WriteToResultTableNode,
-    FilterElementsNode,
-    CombineMetricsNode,
-    SinkOutput,
-    ConstrainTimeRangeNode,
-    JoinOverTimeRangeNode,
-    SemiAdditiveJoinNode,
-    MetricTimeDimensionTransformNode,
-    DataflowPlan,
-    DataflowPlanNode,
-    JoinToTimeSpineNode,
 )
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_dag_as_text
 from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOptimizer
@@ -55,7 +57,7 @@ class OptimizeBranchResult(Generic[SourceDataSetT]):  # noqa: D
 
 @dataclass(frozen=True)
 class BranchCombinationResult(Generic[SourceDataSetT]):
-    """Holds the results of combining a branch (right_branch) with one of the branches in a list (left_branch)"""
+    """Holds the results of combining a branch (right_branch) with one of the branches in a list (left_branch)."""
 
     left_branch: BaseOutput[SourceDataSetT]
     right_branch: BaseOutput[SourceDataSetT]

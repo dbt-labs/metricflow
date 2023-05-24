@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from enum import Enum
 
-from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
+from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 
 
 def is_expansive(agg_type: AggregationType) -> bool:
-    """Expansive ≝ Op( X ∪ Y ∪ ...) = Op( Op(X) ∪ Op(Y) ∪ ...)
+    """Expansive ≝ Op( X ∪ Y ∪ ...) = Op( Op(X) ∪ Op(Y) ∪ ...).
 
     NOTE: COUNT is only expansive because it's transformed into a SUM agg during model transformation
     """

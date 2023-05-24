@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import datetime
+
 from metricflow.time.time_source import TimeSource
 
 

@@ -1,14 +1,15 @@
+from __future__ import annotations
+
 from typing import List
 
 from metricflow.inference.context.data_warehouse import (
     ColumnProperties,
-    InferenceColumnType,
     DataWarehouseInferenceContext,
+    InferenceColumnType,
 )
-from metricflow.inference.models import InferenceSignalConfidence, InferenceSignalType, InferenceSignal
+from metricflow.inference.models import InferenceSignal, InferenceSignalConfidence, InferenceSignalType
 from metricflow.inference.rule.base import InferenceRule
 from metricflow.inference.rule.rules import ColumnMatcherRule, LowCardinalityRatioRule
-
 
 # -------------
 # ENTITIES
@@ -108,7 +109,7 @@ class TimeDimensionByTimeTypeRule(ColumnMatcherRule):
 
 
 class PrimaryTimeDimensionByNameRule(ColumnMatcherRule):
-    """Inference rule that checks if the column name is one of `ds` or `created_at`
+    """Inference rule that checks if the column name is one of `ds` or `created_at`.
 
     It will always produce DIMENSION.PRIMARY_TIME with VERY_HIGH confidence.
     """
@@ -163,7 +164,7 @@ class CategoricalDimensionByBooleanTypeRule(ColumnMatcherRule):
 
 
 class CategoricalDimensionByStringTypeAndLowCardinalityRule(LowCardinalityRatioRule):
-    """Inference rule that checks for string typed columns with cardinality below the specified threshold
+    """Inference rule that checks for string typed columns with cardinality below the specified threshold.
 
     It will always produce DIMENSION.CATEGORICAL with HIGH confidence
     """
@@ -174,8 +175,7 @@ class CategoricalDimensionByStringTypeAndLowCardinalityRule(LowCardinalityRatioR
     match_reason = "Column type is STRING and cardinality ratio is below 0.4"
 
     def match_column(self, props: ColumnProperties) -> bool:
-        """This is a bit of a hack for composing rules by invoking one directly here"""
-
+        """This is a bit of a hack for composing rules by invoking one directly here."""
         if props.type != InferenceColumnType.STRING:
             return False
         return super().match_column(props=props)

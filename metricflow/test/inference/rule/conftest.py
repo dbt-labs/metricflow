@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 
 from metricflow.dataflow.sql_column import SqlColumn
@@ -12,7 +14,7 @@ from metricflow.inference.context.data_warehouse import (
 
 @pytest.fixture
 def warehouse_ctx() -> DataWarehouseInferenceContext:
-    """A dummy DataWarehouseInferenceContext to be used as a fixture"""
+    """A dummy DataWarehouseInferenceContext to be used as a fixture."""
     return DataWarehouseInferenceContext(
         table_props=[
             TableProperties(

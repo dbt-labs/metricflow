@@ -1,23 +1,25 @@
+from __future__ import annotations
+
 import logging
 
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName, DUNDER
+from metricflow.naming.linkable_spec_name import DUNDER, StructuredLinkableSpecName
 from metricflow.specs.column_assoc import (
-    SingleColumnCorrelationKey,
     ColumnAssociation,
     ColumnAssociationResolver,
+    SingleColumnCorrelationKey,
 )
 from metricflow.specs.specs import (
+    DimensionSpec,
+    EntitySpec,
+    InstanceSpec,
+    InstanceSpecVisitor,
+    MeasureSpec,
     MetadataSpec,
     MetricSpec,
-    MeasureSpec,
-    DimensionSpec,
     TimeDimensionSpec,
-    EntitySpec,
-    InstanceSpecVisitor,
-    InstanceSpec,
 )
 
 logger = logging.getLogger(__name__)

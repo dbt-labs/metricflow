@@ -1,4 +1,8 @@
+from __future__ import annotations
+
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+
 from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
     SqlExpressionRenderer,
@@ -12,7 +16,6 @@ from metricflow.sql.sql_exprs import (
     SqlPercentileFunctionType,
     SqlTimeDeltaExpression,
 )
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 
 class PostgresSqlExpressionRenderer(DefaultSqlExpressionRenderer):
@@ -20,7 +23,7 @@ class PostgresSqlExpressionRenderer(DefaultSqlExpressionRenderer):
 
     @property
     def double_data_type(self) -> str:
-        """Custom double data type for the PostgreSQL engine"""
+        """Custom double data type for the PostgreSQL engine."""
         return "DOUBLE PRECISION"
 
     def visit_time_delta_expr(self, node: SqlTimeDeltaExpression) -> SqlExpressionRenderResult:  # noqa: D

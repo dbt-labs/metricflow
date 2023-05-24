@@ -7,7 +7,7 @@ import logging
 import textwrap
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, List, Sequence, TypeVar, Generic
+from typing import Any, Generic, List, Sequence, TypeVar
 
 import jinja2
 
@@ -39,7 +39,7 @@ class NodeId:
 
 
 class DagNodeVisitor(Generic[VisitorOutputT], ABC):
-    """An object that can be used to visit the nodes of a DAG graph"""
+    """An object that can be used to visit the nodes of a DAG graph."""
 
     @abstractmethod
     def visit_node(self, node: DagNode) -> VisitorOutputT:  # noqa: D

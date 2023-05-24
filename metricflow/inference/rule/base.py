@@ -1,9 +1,10 @@
 from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from typing import List
 
-from metricflow.inference.models import InferenceSignal
 from metricflow.inference.context.data_warehouse import DataWarehouseInferenceContext
+from metricflow.inference.models import InferenceSignal
 
 
 class InferenceRule(ABC):

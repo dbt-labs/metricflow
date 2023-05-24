@@ -1,13 +1,13 @@
-"""These tests rely on the pytest tmp_path factory fixture"""
+"""These tests rely on the pytest tmp_path factory fixture."""
+from __future__ import annotations
 
 import os
 from pathlib import Path
 
 import pytest
-from metricflow.dataflow.sql_column import SqlColumn
-
 from ruamel.yaml import YAML
 
+from metricflow.dataflow.sql_column import SqlColumn
 from metricflow.inference.models import InferenceResult, InferenceSignalType
 from metricflow.inference.renderer.config_file import ConfigFileRenderer
 

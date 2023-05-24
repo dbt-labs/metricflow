@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+import metricflow.inference.rule.defaults as defaults
 from metricflow.dataflow.sql_column import SqlColumn
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.inference.context.data_warehouse import (
@@ -7,7 +10,6 @@ from metricflow.inference.context.data_warehouse import (
     TableProperties,
 )
 from metricflow.inference.models import InferenceSignalType
-import metricflow.inference.rule.defaults as defaults
 
 
 def get_column_properties(column_str: str, type: InferenceColumnType, unique: bool) -> ColumnProperties:  # noqa: D
@@ -167,13 +169,12 @@ def test_categorical_dimension_by_string_type_matcher() -> None:  # noqa: D
 
 
 def test_categorical_dimension_by_string__and_cardinality_type_matcher() -> None:  # noqa: D
-    """Tests the composite of string type and cardinality below supplied threshold
+    """Tests the composite of string type and cardinality below supplied threshold.
 
     Since the helper cardinality ratio is always either 1 or 0.9, the cardinality thresholds are set to either above
     0.9 (for checks which should match) or below 0.9 (for checks which should not match, or where the match does
     not matter)
     """
-
     assert defaults.CategoricalDimensionByStringTypeAndLowCardinalityRule(0.99).match_column(
         get_column_properties("db.schema.table.low_cardinality_string_col", InferenceColumnType.STRING, unique=False)
     )

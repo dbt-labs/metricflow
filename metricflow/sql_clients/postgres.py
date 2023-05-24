@@ -1,15 +1,16 @@
+from __future__ import annotations
+
 import logging
 import textwrap
-from typing import ClassVar, Mapping, Optional, Sequence, Union, Callable
+from typing import Callable, ClassVar, Mapping, Optional, Sequence, Union
 
 import sqlalchemy
 
-from metricflow.protocols.sql_client import SqlEngine, SqlIsolationLevel
-from metricflow.protocols.sql_client import SqlEngineAttributes
+from metricflow.protocols.sql_client import SqlEngine, SqlEngineAttributes, SqlIsolationLevel
 from metricflow.protocols.sql_request import SqlRequestTagSet
 from metricflow.sql.render.postgres import PostgresSQLSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
-from metricflow.sql_clients.async_request import SqlStatementCommentMetadata, CombinedSqlTags
+from metricflow.sql_clients.async_request import CombinedSqlTags, SqlStatementCommentMetadata
 from metricflow.sql_clients.common_client import SqlDialect, not_empty
 from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
 
@@ -17,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 class PostgresEngineAttributes:
-    """Engine-specific attributes for the Postgres query engine
+    """Engine-specific attributes for the Postgres query engine.
 
     This is an implementation of the SqlEngineAttributes protocol for Postgres
     """
@@ -93,7 +94,7 @@ class PostgresSqlClient(SqlAlchemySqlClient):
 
     @property
     def sql_engine_attributes(self) -> SqlEngineAttributes:
-        """Collection of attributes and features specific to the Postgres SQL engine"""
+        """Collection of attributes and features specific to the Postgres SQL engine."""
         return PostgresEngineAttributes()
 
     def cancel_submitted_queries(self) -> None:  # noqa: D

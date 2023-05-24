@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 from metricflow.dataflow.sql_column import SqlColumn
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.inference.context.data_warehouse import (
-    DataWarehouseInferenceContext,
     ColumnProperties,
+    DataWarehouseInferenceContext,
     InferenceColumnType,
     TableProperties,
 )
@@ -11,7 +13,7 @@ from metricflow.inference.rule.rules import ColumnMatcherRule, LowCardinalityRat
 
 
 def create_context_with_counts(rows: int, distinct: int, nulls: int) -> DataWarehouseInferenceContext:
-    """Get a `DataWarehouseInferenceContext` with the designated counts"""
+    """Get a `DataWarehouseInferenceContext` with the designated counts."""
     return DataWarehouseInferenceContext(
         table_props=[
             TableProperties(

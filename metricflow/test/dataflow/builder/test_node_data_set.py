@@ -1,10 +1,13 @@
+from __future__ import annotations
+
 import logging
 
 from dbt_semantic_interfaces.references import SemanticModelElementReference
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+
 from metricflow.aggregation_properties import AggregationState
-from metricflow.specs.column_assoc import ColumnAssociation, SingleColumnCorrelationKey
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
-from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode, JoinToBaseOutputNode, JoinDescription
+from metricflow.dataflow.dataflow_plan import JoinDescription, JoinToBaseOutputNode, ReadSqlSourceNode
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.instances import (
     InstanceSet,
@@ -14,18 +17,18 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.time_spine import TimeSpineSource
+from metricflow.specs.column_assoc import ColumnAssociation, SingleColumnCorrelationKey
 from metricflow.specs.specs import (
+    DimensionSpec,
+    EntityReference,
     EntitySpec,
+    InstanceSpecSet,
+    LinklessEntitySpec,
     MeasureSpec,
     TimeDimensionSpec,
-    LinklessEntitySpec,
-    DimensionSpec,
-    InstanceSpecSet,
-    EntityReference,
 )
-from metricflow.sql.sql_exprs import SqlColumnReferenceExpression, SqlColumnReference
-from metricflow.sql.sql_plan import SqlSelectStatementNode, SqlSelectColumn, SqlTableFromClauseNode
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from metricflow.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression
+from metricflow.sql.sql_plan import SqlSelectColumn, SqlSelectStatementNode, SqlTableFromClauseNode
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 
 logger = logging.getLogger(__name__)

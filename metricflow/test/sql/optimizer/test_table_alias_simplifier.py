@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 from _pytest.fixtures import FixtureRequest
 
@@ -5,17 +7,17 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.sql.optimizer.table_alias_simplifier import SqlTableAliasSimplifier
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer, SqlQueryPlanRenderer
 from metricflow.sql.sql_exprs import (
-    SqlColumnReferenceExpression,
     SqlColumnReference,
-    SqlComparisonExpression,
+    SqlColumnReferenceExpression,
     SqlComparison,
+    SqlComparisonExpression,
 )
 from metricflow.sql.sql_plan import (
-    SqlSelectColumn,
-    SqlTableFromClauseNode,
-    SqlSelectStatementNode,
     SqlJoinDescription,
     SqlJoinType,
+    SqlSelectColumn,
+    SqlSelectStatementNode,
+    SqlTableFromClauseNode,
 )
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.sql.compare_sql_plan import assert_default_rendered_sql_equal
@@ -152,7 +154,7 @@ def test_table_alias_simplification(
     mf_test_session_state: MetricFlowTestSessionState,
     base_select_statement: SqlSelectStatementNode,
 ) -> None:
-    """Tests a case where no pruning should occur"""
+    """Tests a case where no pruning should occur."""
     assert_default_rendered_sql_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,

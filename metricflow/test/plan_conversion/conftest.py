@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet

@@ -4,12 +4,13 @@ import datetime
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Optional, List, Sequence
+from typing import List, Optional, Sequence
 
 import pandas as pd
-
-from dbt_semantic_interfaces.references import MetricReference, DimensionReference
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension
+from dbt_semantic_interfaces.pretty_print import pformat_big_objects
+from dbt_semantic_interfaces.references import DimensionReference, MetricReference
+
 from metricflow.configuration.constants import (
     CONFIG_DBT_CLOUD_JOB_ID,
     CONFIG_DBT_CLOUD_SERVICE_TOKEN,
@@ -37,16 +38,15 @@ from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.logging.formatting import indent_log_line
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
-from metricflow.random_id import random_id
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_execution import DataflowToExecutionPlanConverter
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.time_spine import TimeSpineSource, TimeSpineTableBuilder
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.query.query_parser import MetricFlowQueryParser
-from metricflow.specs.specs import MetricFlowQuerySpec
+from metricflow.random_id import random_id
 from metricflow.specs.column_assoc import ColumnAssociationResolver
+from metricflow.specs.specs import MetricFlowQuerySpec
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql_clients.common_client import not_empty
 from metricflow.sql_clients.sql_utils import make_sql_client_from_config
@@ -168,7 +168,7 @@ class MetricFlowExplainResult:
 
 
 class AbstractMetricFlowEngine(ABC):
-    """Query interface for clients"""
+    """Query interface for clients."""
 
     @abstractmethod
     def query(
@@ -282,7 +282,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         column_association_resolver: Optional[ColumnAssociationResolver] = None,
         time_spine_source: Optional[TimeSpineSource] = None,
     ) -> None:
-        """Initializer for MetricFlowEngine
+        """Initializer for MetricFlowEngine.
 
         For direct calls to construct MetricFlowEngine, do not pass the following parameters,
         - time_source
@@ -290,7 +290,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         - time_spine_source
         These parameters are mainly there to be overridden during tests.
         """
-
         self._semantic_manifest_lookup = semantic_manifest_lookup
         self._sql_client = sql_client
         self._column_association_resolver = column_association_resolver or (

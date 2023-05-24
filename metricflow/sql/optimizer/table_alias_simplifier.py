@@ -1,15 +1,17 @@
+from __future__ import annotations
+
 import logging
 
 from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
 from metricflow.sql.sql_plan import (
+    SqlJoinDescription,
+    SqlOrderByDescription,
     SqlQueryPlanNode,
     SqlQueryPlanNodeVisitor,
-    SqlSelectQueryFromClauseNode,
-    SqlTableFromClauseNode,
-    SqlSelectStatementNode,
-    SqlOrderByDescription,
-    SqlJoinDescription,
     SqlSelectColumn,
+    SqlSelectQueryFromClauseNode,
+    SqlSelectStatementNode,
+    SqlTableFromClauseNode,
 )
 
 logger = logging.getLogger(__name__)

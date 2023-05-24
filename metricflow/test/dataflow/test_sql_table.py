@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 
 from metricflow.dataflow.sql_table import SqlTable

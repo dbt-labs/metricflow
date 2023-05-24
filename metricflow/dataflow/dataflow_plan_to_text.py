@@ -1,4 +1,5 @@
 """Functions to help generate a text representation of a dataflow plan."""
+from __future__ import annotations
 
 import logging
 import textwrap
@@ -7,8 +8,8 @@ import jinja2
 
 from metricflow.dag.dag_to_text import MetricFlowDagToText
 from metricflow.dataflow.dataflow_plan import (
-    DataflowPlanNode,
     DataflowPlan,
+    DataflowPlanNode,
 )
 
 logger = logging.getLogger(__name__)
@@ -19,7 +20,6 @@ def dataflow_dag_as_text(root_node: DataflowPlanNode) -> str:
 
     The text representation is similar to XML.
     """
-
     return MetricFlowDagToText().to_text(root_node)
 
 
@@ -28,7 +28,6 @@ def dataflow_plan_as_text(dataflow_plan: DataflowPlan) -> str:
 
     The text representation is similar to XML.
     """
-
     # Convert each of the components that are associated with the sink nodes to a text representation.
     component_from_sink_nodes_as_text = []
     for sink_node in dataflow_plan.sink_nodes:

@@ -1,24 +1,26 @@
+from __future__ import annotations
+
 from copy import deepcopy
 from typing import Tuple
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-
-from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
-from metricflow.model.data_warehouse_model_validator import (
-    DataWarehouseModelValidator,
-    DataWarehouseTaskBuilder,
-    DataWarehouseValidationTask,
-)
 from dbt_semantic_interfaces.model_transformer import ModelTransformer
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
 from dbt_semantic_interfaces.objects.elements.entity import Entity, EntityType
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
+from dbt_semantic_interfaces.test_utils import semantic_model_with_guaranteed_meta
+from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
+
+from metricflow.model.data_warehouse_model_validator import (
+    DataWarehouseModelValidator,
+    DataWarehouseTaskBuilder,
+    DataWarehouseValidationTask,
+)
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
-from dbt_semantic_interfaces.test_utils import semantic_model_with_guaranteed_meta
 from metricflow.test.plan_utils import assert_snapshot_text_equal, make_schema_replacement_function
 
 
@@ -27,7 +29,7 @@ def dw_backed_warehouse_validation_model(
     create_source_tables: None,
     data_warehouse_validation_model: SemanticManifest,
 ) -> SemanticManifest:
-    """Model-generating fixture to ensure the underlying tables are created for querying
+    """Model-generating fixture to ensure the underlying tables are created for querying.
 
     Without an explicit invocation of the create_data_warehouse_validation_model_tables fixture the
     tables used by the data_warehouse_validation_model are not guaranteed to exist. This fixture

@@ -4,102 +4,103 @@ import logging
 from collections import OrderedDict
 from typing import Generic, List, Optional, Sequence, TypeVar, Union
 
-from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
+from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
+from dbt_semantic_interfaces.objects.metric import MetricType
 from dbt_semantic_interfaces.references import MetricModelReference
+from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
+
 from metricflow.aggregation_properties import AggregationState
-from metricflow.specs.column_assoc import ColumnAssociation, SingleColumnCorrelationKey, ColumnAssociationResolver
-from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.dag.id_generation import IdGeneratorRegistry
 from metricflow.dataflow.dataflow_plan import (
+    AggregateMeasuresNode,
+    BaseOutput,
+    CombineMetricsNode,
+    ComputedMetricsOutput,
+    ComputeMetricsNode,
+    ConstrainTimeRangeNode,
     DataflowPlanNodeVisitor,
     FilterElementsNode,
-    WriteToResultDataframeNode,
-    OrderByLimitNode,
-    ComputeMetricsNode,
-    AggregateMeasuresNode,
     JoinAggregatedMeasuresByGroupByColumnsNode,
-    JoinToBaseOutputNode,
-    ReadSqlSourceNode,
-    BaseOutput,
-    ComputedMetricsOutput,
-    WhereConstraintNode,
-    CombineMetricsNode,
-    SourceDataSetT,
-    ConstrainTimeRangeNode,
-    WriteToResultTableNode,
     JoinOverTimeRangeNode,
-    SemiAdditiveJoinNode,
-    MetricTimeDimensionTransformNode,
+    JoinToBaseOutputNode,
     JoinToTimeSpineNode,
+    MetricTimeDimensionTransformNode,
+    OrderByLimitNode,
+    ReadSqlSourceNode,
+    SemiAdditiveJoinNode,
+    SourceDataSetT,
+    WhereConstraintNode,
+    WriteToResultDataframeNode,
+    WriteToResultTableNode,
 )
 from metricflow.dataset.dataset import DataSet
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.instances import (
     InstanceSet,
     MetricInstance,
     TimeDimensionInstance,
 )
-from dbt_semantic_interfaces.objects.metric import MetricType
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.instance_converters import (
-    AliasAggregatedMeasures,
-    RemoveMeasures,
-    RemoveMetrics,
-    AddMetrics,
-    CreateSelectColumnsForInstances,
-    CreateSelectColumnsWithMeasuresAggregated,
-    create_select_columns_for_instance_sets,
     AddLinkToLinkableElements,
-    FilterElements,
+    AddMetrics,
+    AliasAggregatedMeasures,
     ChangeAssociatedColumns,
     ChangeMeasureAggregationState,
+    CreateSelectColumnsForInstances,
+    CreateSelectColumnsWithMeasuresAggregated,
+    FilterElements,
     FilterLinkableInstancesWithLeadingLink,
+    RemoveMeasures,
+    RemoveMetrics,
+    create_select_columns_for_instance_sets,
 )
 from metricflow.plan_conversion.select_column_gen import (
     SelectColumnSet,
 )
 from metricflow.plan_conversion.spec_transforms import (
+    CreateColumnAssociations,
     CreateSelectCoalescedColumnsForLinkableSpecs,
     SelectOnlyLinkableSpecs,
-    CreateColumnAssociations,
 )
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.sql_join_builder import (
+    AnnotatedSqlDataSet,
     ColumnEqualityDescription,
     SqlQueryPlanJoinBuilder,
-    AnnotatedSqlDataSet,
 )
 from metricflow.plan_conversion.time_spine import TimeSpineSource
-from metricflow.protocols.sql_client import SqlEngineAttributes, SqlEngine
+from metricflow.protocols.sql_client import SqlEngine, SqlEngineAttributes
+from metricflow.specs.column_assoc import ColumnAssociation, ColumnAssociationResolver, SingleColumnCorrelationKey
 from metricflow.specs.specs import (
+    MeasureSpec,
     MetricSpec,
     TimeDimensionSpec,
-    MeasureSpec,
 )
 from metricflow.sql.optimizer.optimization_levels import (
     SqlQueryOptimizationLevel,
     SqlQueryOptimizerConfiguration,
 )
 from metricflow.sql.sql_exprs import (
-    SqlExpressionNode,
-    SqlColumnReferenceExpression,
-    SqlColumnReference,
-    SqlStringExpression,
-    SqlCastToTimestampExpression,
-    SqlRatioComputationExpression,
-    SqlDateTruncExpression,
-    SqlStringLiteralExpression,
     SqlBetweenExpression,
+    SqlCastToTimestampExpression,
+    SqlColumnReference,
+    SqlColumnReferenceExpression,
+    SqlDateTruncExpression,
+    SqlExpressionNode,
     SqlFunctionExpression,
+    SqlRatioComputationExpression,
+    SqlStringExpression,
+    SqlStringLiteralExpression,
 )
 from metricflow.sql.sql_plan import (
-    SqlQueryPlan,
-    SqlSelectStatementNode,
     SqlJoinDescription,
-    SqlSelectColumn,
-    SqlOrderByDescription,
     SqlJoinType,
+    SqlOrderByDescription,
+    SqlQueryPlan,
     SqlQueryPlanNode,
+    SqlSelectColumn,
+    SqlSelectStatementNode,
     SqlTableFromClauseNode,
 )
 from metricflow.time.time_constants import ISO8601_PYTHON_FORMAT
@@ -114,7 +115,7 @@ SqlDataSetT = TypeVar("SqlDataSetT", bound=SqlDataSet)
 def _make_time_range_comparison_expr(
     table_alias: str, column_alias: str, time_range_constraint: TimeRangeConstraint
 ) -> SqlExpressionNode:
-    """Build an expression like "ds BETWEEN CAST('2020-01-01' AS TIMESTAMP) AND CAST('2020-01-02' AS TIMESTAMP)"""
+    """Build an expression like "ds BETWEEN CAST('2020-01-01' AS TIMESTAMP) AND CAST('2020-01-02' AS TIMESTAMP)."""
     # TODO: Update when adding < day granularity support.
     return SqlBetweenExpression(
         column_arg=SqlColumnReferenceExpression(
@@ -273,7 +274,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         )
 
     def visit_join_over_time_range_node(self, node: JoinOverTimeRangeNode[SqlDataSetT]) -> SqlDataSet:
-        """Generate time range join SQL"""
+        """Generate time range join SQL."""
         table_alias_to_instance_set: OrderedDict[str, InstanceSet] = OrderedDict()
 
         input_data_set = node.parent_node.accept(self)
@@ -372,7 +373,6 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
     def visit_join_to_base_output_node(self, node: JoinToBaseOutputNode[SqlDataSetT]) -> SqlDataSet:
         """Generates the query that realizes the behavior of the JoinToStandardOutputNode."""
-
         # Keep a mapping between the table aliases that would be used in the query and the MDO instances in that source.
         # e.g. when building "FROM from_table a JOIN right_table b", the value for key "a" would be the instances in
         # "from_table"
@@ -823,7 +823,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         )
 
     def visit_where_constraint_node(self, node: WhereConstraintNode) -> SqlDataSet:
-        """Adds where clause to SQL statement from parent node"""
+        """Adds where clause to SQL statement from parent node."""
         from_data_set: SqlDataSet = node.parent_node.accept(self)
         output_instance_set = from_data_set.instance_set
         from_data_set_alias = self._next_unique_table_alias()
@@ -896,7 +896,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         return select_columns
 
     def visit_combine_metrics_node(self, node: CombineMetricsNode[SqlDataSetT]) -> SqlDataSet:
-        """Join computed metric datasets together to return a single dataset containing all metrics
+        """Join computed metric datasets together to return a single dataset containing all metrics.
 
         This node may exist in one of two situations: when metrics need to be combined in order to produce a single
         dataset with all required inputs for a derived metric (in which case the join type is INNER), or when
@@ -1008,7 +1008,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         )
 
     def visit_constrain_time_range_node(self, node: ConstrainTimeRangeNode[SourceDataSetT]) -> SqlDataSet:
-        """Convert ConstrainTimeRangeNode to a SqlDataSet by building the time constraint comparison
+        """Convert ConstrainTimeRangeNode to a SqlDataSet by building the time constraint comparison.
 
         Use the smallest time granularity to build the comparison since that's what was used in the semantic model
         definition and it wouldn't have a DATE_TRUNC() in the expression. We want to build this:
@@ -1017,7 +1017,6 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
         instead of this: DATE_TRUNC('month', ds) >= '2020-01-01' AND DATE_TRUNC('month', ds <= '2020-02-01')
         """
-
         from_data_set: SqlDataSet = node.parent_node.accept(self)
         from_data_set_alias = self._next_unique_table_alias()
 
@@ -1068,7 +1067,6 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4,
     ) -> SqlQueryPlan:
         """Create an SQL query plan that represents the computation up to the given dataflow plan node."""
-
         sql_select_node: SqlQueryPlanNode = dataflow_plan_node.accept(self).sql_select_node
 
         # TODO: Make this a more generally accessible attribute instead of checking against the
@@ -1174,7 +1172,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         )
 
     def visit_semi_additive_join_node(self, node: SemiAdditiveJoinNode) -> SqlDataSet:
-        """Implements the behaviour of SemiAdditiveJoinNode
+        """Implements the behaviour of SemiAdditiveJoinNode.
 
         This node will get the build a data set row filtered by the aggregate function on the
         specified dimension that is non-additive. Then that dataset would be joined with the input data

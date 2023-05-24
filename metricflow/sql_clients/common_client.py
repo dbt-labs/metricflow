@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 from typing import Optional, TypeVar
 
 from dbt_semantic_interfaces.enum_extension import ExtendedEnum
+
 from metricflow.protocols.sql_client import SqlClient, SqlIsolationLevel
 
 

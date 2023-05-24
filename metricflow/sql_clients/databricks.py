@@ -2,19 +2,18 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import Optional, ClassVar, Dict, Sequence, Callable
+from typing import Callable, ClassVar, Dict, Optional, Sequence
 
 import pandas as pd
 import sqlalchemy
 from databricks import sql
 
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.protocols.sql_client import SqlEngineAttributes, SqlEngine, SqlIsolationLevel
-from metricflow.protocols.sql_request import SqlRequestTagSet, SqlJsonTag
+from metricflow.protocols.sql_client import SqlEngine, SqlEngineAttributes, SqlIsolationLevel
+from metricflow.protocols.sql_request import SqlJsonTag, SqlRequestTagSet
 from metricflow.sql.render.databricks import DatabricksSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql.sql_bind_parameters import SqlColumnType
+from metricflow.sql.sql_bind_parameters import SqlBindParameters, SqlColumnType
 from metricflow.sql_clients.async_request import CombinedSqlTags
 from metricflow.sql_clients.base_sql_client_implementation import BaseSqlClientImplementation
 from metricflow.sql_clients.common_client import SqlDialect, check_isolation_level

@@ -6,13 +6,13 @@ import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional, List, Generic, Sequence, Tuple
+from typing import Generic, List, Optional, Sequence, Tuple
 
-from metricflow.dag.mf_dag import DagNode, DisplayedProperty, MetricFlowDag, NodeId
 from metricflow.dag.id_generation import (
     SQL_PLAN_SELECT_STATEMENT_ID_PREFIX,
     SQL_PLAN_TABLE_FROM_CLAUSE_ID_PREFIX,
 )
+from metricflow.dag.mf_dag import DagNode, DisplayedProperty, MetricFlowDag, NodeId
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.sql.sql_exprs import SqlExpressionNode
 from metricflow.visitor import VisitorOutputT
@@ -50,7 +50,7 @@ class SqlQueryPlanNode(DagNode, ABC):
     @property
     @abstractmethod
     def is_table(self) -> bool:
-        """Returns whether this node resolves to a table (vs. a query)"""
+        """Returns whether this node resolves to a table (vs. a query)."""
         pass
 
     @property

@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import logging
 import threading
-from typing import ClassVar, Optional, Sequence, Callable
+from typing import Callable, ClassVar, Optional, Sequence
 
 import pandas as pd
 import sqlalchemy
@@ -8,9 +10,8 @@ from sqlalchemy import inspect
 from sqlalchemy.pool import StaticPool
 
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.protocols.sql_client import SqlEngine, SqlIsolationLevel
-from metricflow.protocols.sql_client import SqlEngineAttributes
-from metricflow.protocols.sql_request import SqlRequestTagSet, SqlJsonTag
+from metricflow.protocols.sql_client import SqlEngine, SqlEngineAttributes, SqlIsolationLevel
+from metricflow.protocols.sql_request import SqlJsonTag, SqlRequestTagSet
 from metricflow.sql.render.duckdb_renderer import DuckDbSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
@@ -22,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 class DuckDbEngineAttributes:
-    """Engine-specific attributes for the DuckDb query engine"""
+    """Engine-specific attributes for the DuckDb query engine."""
 
     sql_engine_type: ClassVar[SqlEngine] = SqlEngine.DUCKDB
 
@@ -79,7 +80,7 @@ class DuckDbSqlClient(SqlAlchemySqlClient):
 
     @property
     def sql_engine_attributes(self) -> SqlEngineAttributes:
-        """Collection of attributes and features specific to the Snowflake SQL engine"""
+        """Collection of attributes and features specific to the Snowflake SQL engine."""
         return DuckDbEngineAttributes()
 
     def cancel_submitted_queries(self) -> None:  # noqa: D

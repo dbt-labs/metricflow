@@ -1,5 +1,6 @@
-import collections
+from __future__ import annotations
 
+import collections
 from dataclasses import dataclass
 from typing import Dict, Optional, Sequence, Tuple
 
@@ -8,14 +9,14 @@ from metricflow.specs.specs import MeasureSpec, NonAdditiveDimensionSpec
 
 @dataclass(frozen=True)
 class GroupedMeasureSpecsByAdditiveness:
-    """Results after grouping measures by their additive properties"""
+    """Results after grouping measures by their additive properties."""
 
     grouped_semi_additive_measures: Sequence[Tuple[MeasureSpec, ...]]
     additive_measures: Tuple[MeasureSpec, ...]
 
     @property
     def measures_by_additiveness(self) -> Dict[Optional[NonAdditiveDimensionSpec], Tuple[MeasureSpec, ...]]:
-        """Returns a mapping from additiveness spec to a tuple of measure specs
+        """Returns a mapping from additiveness spec to a tuple of measure specs.
 
         This is useful if you wish to consume the tuples of MeasureSpecs in a single pass without having to
         divide calls up by the existence of an additiveness specification
@@ -34,7 +35,7 @@ class GroupedMeasureSpecsByAdditiveness:
 
 
 def group_measure_specs_by_additiveness(measure_specs: Sequence[MeasureSpec]) -> GroupedMeasureSpecsByAdditiveness:
-    """Bucket the provided measure specs by
+    """Bucket the provided measure specs by.
 
     - Additive Measures
     - Semi-additive measures containing the same non-additive dimension attributes

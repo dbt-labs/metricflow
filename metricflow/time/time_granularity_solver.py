@@ -1,38 +1,38 @@
 from __future__ import annotations
 
 import logging
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict, defaultdict
 from dataclasses import dataclass
-from typing import Tuple, List, Dict, Sequence, Set, Optional
+from typing import Dict, List, Optional, Sequence, Set, Tuple
 
 import pandas as pd
-
-from metricflow.filters.time_constraint import TimeRangeConstraint
-from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
-from metricflow.dataflow.dataflow_plan import BaseOutput
-from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from dbt_semantic_interfaces.objects.metric import MetricType
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import (
-    TimeDimensionReference,
-    MetricModelReference,
-    MeasureReference,
-    MetricReference,
     EntityReference,
+    MeasureReference,
+    MetricModelReference,
+    MetricReference,
+    TimeDimensionReference,
 )
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+
+from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
+from metricflow.dataflow.dataflow_plan import BaseOutput
+from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
+from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.specs.specs import (
-    TimeDimensionSpec,
     DEFAULT_TIME_GRANULARITY,
+    TimeDimensionSpec,
 )
 from metricflow.time.time_granularity import (
-    is_period_start,
-    is_period_end,
-    adjust_to_start_of_period,
     adjust_to_end_of_period,
+    adjust_to_start_of_period,
+    is_period_end,
+    is_period_start,
 )
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -97,7 +97,7 @@ class TimeGranularitySolver:
 
     @staticmethod
     def _measures_for_metric(model: SemanticManifest) -> Dict[MetricModelReference, List[MeasureReference]]:
-        """Given a model, return a dict that maps the name of the metric to the names of the measures used"""
+        """Given a model, return a dict that maps the name of the metric to the names of the measures used."""
         metric_reference_to_measure_references: Dict[MetricModelReference, List[MeasureReference]] = {}
         for metric in model.metrics:
             metric_reference_to_measure_references[MetricModelReference(metric_name=metric.name)] = [

@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from typing import Optional, Tuple, Union
 
 from dbt_semantic_interfaces.objects.base import FrozenBaseModel, PydanticCustomInputParser, PydanticParseableValueType
@@ -13,7 +14,7 @@ class SqlTable(PydanticCustomInputParser, FrozenBaseModel):
 
     @classmethod
     def _from_yaml_value(cls, input: PydanticParseableValueType) -> SqlTable:
-        """Parses a SqlTable from string input found in a user-provided model specification
+        """Parses a SqlTable from string input found in a user-provided model specification.
 
         Raises a ValueError on any non-string input, as all user-provided specifications of table entities
         should be strings conforming to the expectations defined in the from_string method.
@@ -47,7 +48,7 @@ class SqlTable(PydanticCustomInputParser, FrozenBaseModel):
 
     @property
     def parts_tuple(self) -> Union[Tuple[str, str], Tuple[str, str, str]]:
-        """Return a tuple of the sql table parts"""
+        """Return a tuple of the sql table parts."""
         if self.db_name:
             return (self.db_name, self.schema_name, self.table_name)
         else:

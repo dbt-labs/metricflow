@@ -7,12 +7,12 @@ from dataclasses import dataclass
 from typing import List, Tuple
 
 import pandas as pd
-
-from metricflow.protocols.sql_client import SqlClient
-from metricflow.filters.time_constraint import TimeRangeConstraint
-from metricflow.dataflow.sql_table import SqlTable
-from metricflow.time.time_constants import ISO8601_PYTHON_FORMAT
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+
+from metricflow.dataflow.sql_table import SqlTable
+from metricflow.filters.time_constraint import TimeRangeConstraint
+from metricflow.protocols.sql_client import SqlClient
+from metricflow.time.time_constants import ISO8601_PYTHON_FORMAT
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ class TimeSpineSource:
 
     @property
     def spine_table(self) -> SqlTable:
-        """Table containing all dates"""
+        """Table containing all dates."""
         return SqlTable(schema_name=self.schema_name, table_name=self.table_name)
 
 

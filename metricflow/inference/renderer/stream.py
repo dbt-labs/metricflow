@@ -1,10 +1,10 @@
 from __future__ import annotations
-from collections import defaultdict
 
 import sys
+from collections import defaultdict
 from typing import Dict, List, TextIO
-from metricflow.dataflow.sql_table import SqlTable
 
+from metricflow.dataflow.sql_table import SqlTable
 from metricflow.inference.models import InferenceResult
 from metricflow.inference.renderer.base import InferenceRenderer
 

@@ -7,17 +7,17 @@ from collections import OrderedDict
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Tuple, Sequence, List, Union, Optional
+from typing import List, Optional, Sequence, Tuple, Union
 
 import dateutil.parser
 import pandas as pd
 import yaml
-
-from dbt_semantic_interfaces.objects.base import FrozenBaseModel
-from metricflow.dataflow.sql_table import SqlTable
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from metricflow.specs.specs import hash_items
+from dbt_semantic_interfaces.objects.base import FrozenBaseModel
+
+from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.specs.specs import hash_items
 
 logger = logging.getLogger(__name__)
 
@@ -91,7 +91,7 @@ class SqlTableSnapshot(FrozenBaseModel):
 
     @property
     def as_df(self) -> pd.DataFrame:  # noqa: D
-        """Return this snapshot as represented by an equivalent dataframe"""
+        """Return this snapshot as represented by an equivalent dataframe."""
         # In the YAML files, all values are strings, but they need to be converted to defined type so that it can be
         # properly represented in a dataframe
 

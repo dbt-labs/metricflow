@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 # Python formatting string to use for converting datetime to ISO8601

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from metricflow.instances import InstanceSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
@@ -6,10 +8,10 @@ from metricflow.plan_conversion.instance_converters import (
     FilterElements,
 )
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
-from metricflow.specs.specs import MeasureSpec, MetricInputMeasureSpec, InstanceSpecSet
+from metricflow.specs.specs import InstanceSpecSet, MeasureSpec, MetricInputMeasureSpec
 from metricflow.sql.sql_exprs import (
-    SqlFunction,
     SqlAggregateFunctionExpression,
+    SqlFunction,
     SqlPercentileExpression,
 )
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
@@ -20,7 +22,7 @@ __SOURCE_TABLE_ALIAS = "a"
 def __get_filtered_measure_instance_set(
     semantic_model_name: str, measure_name: str, object_repo: ConsistentIdObjectRepository
 ) -> InstanceSet:
-    """Gets an InstanceSet consisting of only the measure instance matching the given name and semantic model"""
+    """Gets an InstanceSet consisting of only the measure instance matching the given name and semantic model."""
     dataset = object_repo.simple_model_data_sets[semantic_model_name]
     instance_set = dataset.instance_set
     include_specs = tuple(
@@ -33,7 +35,7 @@ def test_sum_aggregation(
     consistent_id_object_repository: ConsistentIdObjectRepository,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
-    """Checks for function expression handling for booking_value, a SUM type metric in the simple model"""
+    """Checks for function expression handling for booking_value, a SUM type metric in the simple model."""
     measure_name = "booking_value"
     instance_set = __get_filtered_measure_instance_set("bookings_source", measure_name, consistent_id_object_repository)
 
@@ -55,7 +57,7 @@ def test_sum_boolean_aggregation(
     consistent_id_object_repository: ConsistentIdObjectRepository,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
-    """Checks for function expression handling for instant_bookings, a SUM_BOOLEAN type metric in the simple model"""
+    """Checks for function expression handling for instant_bookings, a SUM_BOOLEAN type metric in the simple model."""
     measure_name = "instant_bookings"
     instance_set = __get_filtered_measure_instance_set("bookings_source", measure_name, consistent_id_object_repository)
 
@@ -78,7 +80,7 @@ def test_avg_aggregation(
     consistent_id_object_repository: ConsistentIdObjectRepository,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
-    """Checks for function expression handling for average_booking_value, an AVG type metric in the simple model"""
+    """Checks for function expression handling for average_booking_value, an AVG type metric in the simple model."""
     measure_name = "average_booking_value"
     instance_set = __get_filtered_measure_instance_set("bookings_source", measure_name, consistent_id_object_repository)
 
@@ -100,7 +102,7 @@ def test_count_distinct_aggregation(
     consistent_id_object_repository: ConsistentIdObjectRepository,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
-    """Checks for function expression handling for bookers, a COUNT_DISTINCT type metric in the simple model"""
+    """Checks for function expression handling for bookers, a COUNT_DISTINCT type metric in the simple model."""
     measure_name = "bookers"
     instance_set = __get_filtered_measure_instance_set("bookings_source", measure_name, consistent_id_object_repository)
 
@@ -122,7 +124,7 @@ def test_max_aggregation(
     consistent_id_object_repository: ConsistentIdObjectRepository,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
-    """Checks for function expression handling for largest_listing, a MAX type metric in the simple model"""
+    """Checks for function expression handling for largest_listing, a MAX type metric in the simple model."""
     measure_name = "largest_listing"
     instance_set = __get_filtered_measure_instance_set("listings_latest", measure_name, consistent_id_object_repository)
 
@@ -144,7 +146,7 @@ def test_min_aggregation(
     consistent_id_object_repository: ConsistentIdObjectRepository,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
-    """Checks for function expression handling for smallest_listing, a MIN type metric in the simple model"""
+    """Checks for function expression handling for smallest_listing, a MIN type metric in the simple model."""
     measure_name = "smallest_listing"
     instance_set = __get_filtered_measure_instance_set("listings_latest", measure_name, consistent_id_object_repository)
 
@@ -166,7 +168,7 @@ def test_aliased_sum(
     consistent_id_object_repository: ConsistentIdObjectRepository,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
-    """Checks for function expression handling for booking_value, a SUM type metric in the simple model, with an alias"""
+    """Checks for function expression handling for booking_value, a SUM type metric in the simple model, with an alias."""
     measure_name = "booking_value"
     instance_set = __get_filtered_measure_instance_set("bookings_source", measure_name, consistent_id_object_repository)
 
@@ -189,7 +191,7 @@ def test_percentile_aggregation(
     consistent_id_object_repository: ConsistentIdObjectRepository,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
-    """Checks for function expression handling for booking_value, a percentile type metric in the simple model"""
+    """Checks for function expression handling for booking_value, a percentile type metric in the simple model."""
     measure_name = "booking_value_p99"
     instance_set = __get_filtered_measure_instance_set("bookings_source", measure_name, consistent_id_object_repository)
 

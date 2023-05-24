@@ -3,12 +3,12 @@ from __future__ import annotations
 import json
 import logging
 from dataclasses import dataclass, field
-from typing import Optional, List
-
-from pydantic import ValidationError
+from typing import List, Optional
 
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
-from metricflow.protocols.sql_request import SqlRequestTagSet, SqlJsonTag
+from pydantic import ValidationError
+
+from metricflow.protocols.sql_request import SqlJsonTag, SqlRequestTagSet
 
 logger = logging.getLogger(__name__)
 

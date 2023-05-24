@@ -1,20 +1,22 @@
+from __future__ import annotations
+
 from typing import Sequence
 
 import pytest
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.specs.specs import (
     DimensionSpec,
+    EntityReference,
     EntitySpec,
     InstanceSpec,
-    LinkableInstanceSpec,
-    TimeDimensionSpec,
     InstanceSpecSet,
-    MetricSpec,
-    MeasureSpec,
+    LinkableInstanceSpec,
     LinklessEntitySpec,
-    EntityReference,
+    MeasureSpec,
+    MetricSpec,
+    TimeDimensionSpec,
 )
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 
 @pytest.fixture
@@ -46,7 +48,7 @@ def entity_spec() -> EntitySpec:  # noqa: D
 
 
 def test_merge_specs(dimension_spec: DimensionSpec, entity_spec: EntitySpec) -> None:
-    """Tests InstanceSpec.merge()"""
+    """Tests InstanceSpec.merge()."""
     assert InstanceSpec.merge([dimension_spec], [entity_spec]) == [dimension_spec, entity_spec]
 
 
@@ -174,7 +176,7 @@ def test_spec_set_all_specs(spec_set: InstanceSpecSet) -> None:  # noqa: D
 
 
 def test_linkless_entity() -> None:  # noqa: D
-    """Check that equals and hash works as expected for the LinklessEntitySpec / EntitySpec"""
+    """Check that equals and hash works as expected for the LinklessEntitySpec / EntitySpec."""
     entity_spec = EntitySpec(element_name="user_id", entity_links=())
     linkless_entity_spec = LinklessEntitySpec.from_element_name("user_id")
 

@@ -1,15 +1,16 @@
-from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
+from __future__ import annotations
+
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension
 from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.metric import Metric
-
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.references import (
-    SemanticModelReference,
     DimensionReference,
+    EntityReference,
     MeasureReference,
     MetricReference,
-    EntityReference,
+    SemanticModelReference,
 )
 
 

@@ -1,19 +1,21 @@
+from __future__ import annotations
+
 import traceback
 from typing import Dict, List, Optional, Tuple
 
-from dbt_metadata_client.dbt_metadata_api_schema import CatalogColumn, MetricNode, MetricFilter
-
+from dbt_metadata_client.dbt_metadata_api_schema import CatalogColumn, MetricFilter, MetricNode
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.validations.validator_helpers import (
+    ModelValidationResults,
+    ValidationError,
+    ValidationIssue,
+)
+
 from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
     DbtMappingRule,
     MappedObjects,
     assert_metric_model_name,
-)
-from dbt_semantic_interfaces.validations.validator_helpers import (
-    ModelValidationResults,
-    ValidationIssue,
-    ValidationError,
 )
 
 DBT_COLUMN_TYPES_TO_DIMENSION_TYPES: Dict[str, DimensionType] = {
@@ -28,7 +30,7 @@ DBT_COLUMN_TYPES_TO_DIMENSION_TYPES: Dict[str, DimensionType] = {
 
 
 def dimension_for_dimension_in_columns(dimension_name: str, columns: List[CatalogColumn]) -> Optional[Dimension]:
-    """This function tries to build the dimension for a given dimension name in relation to the list of dbt CatalogColumns"""
+    """This function tries to build the dimension for a given dimension name in relation to the list of dbt CatalogColumns."""
     # We uppercase the name because dbt stores the column names upper'd
     uppered_name = dimension_name.upper()
 
@@ -51,7 +53,7 @@ def dimension_for_dimension_in_columns(dimension_name: str, columns: List[Catalo
 
 
 class DbtDimensionsToDimensions(DbtMappingRule):
-    """Rule for mapping dbt metric dimensions to semantic model dimensions"""
+    """Rule for mapping dbt metric dimensions to semantic model dimensions."""
 
     @staticmethod
     def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
@@ -82,7 +84,7 @@ class DbtDimensionsToDimensions(DbtMappingRule):
 
 
 class DbtTimestampToDimension(DbtMappingRule):
-    """Rule for mapping dbt metric timestamps to semantic model dimensions"""
+    """Rule for mapping dbt metric timestamps to semantic model dimensions."""
 
     @staticmethod
     def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
@@ -110,7 +112,7 @@ class DbtTimestampToDimension(DbtMappingRule):
 
 
 class DbtFiltersToDimensions(DbtMappingRule):
-    """Rule for mapping dbt metric filters to semantic model dimensions
+    """Rule for mapping dbt metric filters to semantic model dimensions.
 
     To get the dimensions from a dbt metric's filters we:
     1. build each filter into an SQL clause

@@ -1,16 +1,18 @@
-from typing import Sequence, List
+from __future__ import annotations
+
+from typing import List, Sequence
 
 import more_itertools
-
 from dbt_semantic_interfaces.references import SemanticModelReference
-from metricflow.specs.column_assoc import ColumnAssociation
+
 from metricflow.dataset.dataset import DataSet
 from metricflow.instances import (
     InstanceSet,
-    SemanticModelElementInstance,
     InstanceSetTransform,
+    SemanticModelElementInstance,
 )
-from metricflow.specs.specs import DimensionSpec, TimeDimensionSpec, EntitySpec
+from metricflow.specs.column_assoc import ColumnAssociation
+from metricflow.specs.specs import DimensionSpec, EntitySpec, TimeDimensionSpec
 from metricflow.sql.sql_plan import (
     SqlSelectStatementNode,
 )
@@ -31,7 +33,7 @@ class SqlDataSet(DataSet):
 
     @property
     def sql_select_node(self) -> SqlSelectStatementNode:
-        """Return a SELECT node that can be used to read data from the given SQL table or SQL query"""
+        """Return a SELECT node that can be used to read data from the given SQL table or SQL query."""
         return self._sql_select_node
 
     def column_associations_for_entity(
@@ -110,7 +112,7 @@ class SqlDataSet(DataSet):
 
     @property
     def groupable_column_associations(self) -> Sequence[ColumnAssociation]:
-        """Return a flattened iterable with all groupable column associations for the current data set"""
+        """Return a flattened iterable with all groupable column associations for the current data set."""
         instances = (
             self.instance_set.entity_instances
             + self.instance_set.dimension_instances

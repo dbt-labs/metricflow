@@ -1,16 +1,19 @@
+from __future__ import annotations
+
 import json
+
 from metricflow.dataflow.sql_column import SqlColumn
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.inference.context.data_warehouse import (
-    TableProperties,
     ColumnProperties,
-    InferenceColumnType,
     DataWarehouseInferenceContextProvider,
+    InferenceColumnType,
+    TableProperties,
 )
 
 
 class SnowflakeInferenceContextProvider(DataWarehouseInferenceContextProvider):
-    """The snowflake implementation for a DataWarehouseInferenceContextProvider"""
+    """The snowflake implementation for a DataWarehouseInferenceContextProvider."""
 
     COUNT_DISTINCT_SUFFIX = "countdistinct"
     COUNT_NULL_SUFFIX = "countnull"

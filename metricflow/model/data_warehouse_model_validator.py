@@ -1,55 +1,56 @@
 from __future__ import annotations
-from copy import deepcopy
 
 import collections
+import traceback
+from copy import deepcopy
 from dataclasses import dataclass, field
 from functools import partial
 from math import floor
 from time import perf_counter
-import traceback
 from typing import Callable, DefaultDict, Dict, List, Optional, Sequence, Tuple, TypeVar
-from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
-from metricflow.dataflow.builder.source_node import SourceNodeBuilder
-from metricflow.dataflow.dataflow_plan import BaseOutput, FilterElementsNode
-from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
-from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 
-from metricflow.dataset.dataset import DataSet
-from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
-from dbt_semantic_interfaces.references import (
-    SemanticModelElementReference,
-    SemanticModelReference,
-    MetricModelReference,
-)
-from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
 from dbt_semantic_interfaces.objects.metric import Metric
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
-from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
+from dbt_semantic_interfaces.references import (
+    MetricModelReference,
+    SemanticModelElementReference,
+    SemanticModelReference,
+)
 from dbt_semantic_interfaces.validations.validator_helpers import (
-    SemanticModelContext,
-    SemanticModelElementContext,
-    SemanticModelElementType,
     FileContext,
     MetricContext,
     ModelValidationResults,
+    SemanticModelContext,
+    SemanticModelElementContext,
+    SemanticModelElementType,
     ValidationContext,
     ValidationError,
     ValidationIssue,
     ValidationWarning,
 )
+
+from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
+from metricflow.dataflow.builder.source_node import SourceNodeBuilder
+from metricflow.dataflow.dataflow_plan import BaseOutput, FilterElementsNode
+from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
+from metricflow.dataset.dataset import DataSet
+from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
+from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.specs.specs import DimensionSpec, LinkableInstanceSpec, MeasureSpec, InstanceSpecSet
+from metricflow.specs.specs import DimensionSpec, InstanceSpecSet, LinkableInstanceSpec, MeasureSpec
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 
 
 @dataclass
 class QueryRenderingTools:
-    """General tools that data warehosue validations use for rendering the validation queries
+    """General tools that data warehosue validations use for rendering the validation queries.
 
     This is necessary for the validation steps that generate raw partial queries against the individual semantic models
     (e.g., selecting a single dimension column).
@@ -84,7 +85,7 @@ class QueryRenderingTools:
 
 @dataclass
 class DataWarehouseValidationTask:
-    """Dataclass for defining a task to be used in the DataWarehouseModelValidator"""
+    """Dataclass for defining a task to be used in the DataWarehouseModelValidator."""
 
     query_and_params_callable: Callable[[], Tuple[str, SqlBindParameters]]
     error_message: str
@@ -96,18 +97,18 @@ LinkableInstanceSpecT = TypeVar("LinkableInstanceSpecT", bound=LinkableInstanceS
 
 
 class DataWarehouseTaskBuilder:
-    """Task builder for standard data warehouse validation tasks"""
+    """Task builder for standard data warehouse validation tasks."""
 
     @staticmethod
     def _remove_entity_link_specs(specs: Tuple[LinkableInstanceSpecT, ...]) -> Tuple[LinkableInstanceSpecT, ...]:
-        """For the purposes of data warehouse validation, specs with entity_links are unnecesary"""
+        """For the purposes of data warehouse validation, specs with entity_links are unnecesary."""
         return tuple(spec for spec in specs if not spec.entity_links)
 
     @staticmethod
     def _semantic_model_nodes(
         render_tools: QueryRenderingTools, semantic_model: SemanticModel
     ) -> Sequence[BaseOutput[SemanticModelDataSet]]:
-        """Builds and returns the SemanticModelDataSet node for the given semantic model"""
+        """Builds and returns the SemanticModelDataSet node for the given semantic model."""
         semantic_model_lookup = render_tools.semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
             SemanticModelReference(semantic_model_name=semantic_model.name)
         )
@@ -124,7 +125,7 @@ class DataWarehouseTaskBuilder:
     def renderize(
         sql_client: SqlClient, plan_converter: DataflowToSqlQueryPlanConverter, plan_id: str, nodes: FilterElementsNode
     ) -> Tuple[str, SqlBindParameters]:
-        """Generates a sql query plan and returns the rendered sql and bind_parameters"""
+        """Generates a sql query plan and returns the rendered sql and bind_parameters."""
         sql_plan = plan_converter.convert_to_sql_query_plan(
             sql_engine_attributes=sql_client.sql_engine_attributes,
             sql_query_plan_id=plan_id,
@@ -138,8 +139,7 @@ class DataWarehouseTaskBuilder:
     def gen_semantic_model_tasks(
         cls, model: SemanticManifest, sql_client: SqlClient, system_schema: str
     ) -> List[DataWarehouseValidationTask]:
-        """Generates a list of tasks for validating the semantic models of the model"""
-
+        """Generates a list of tasks for validating the semantic models of the model."""
         # we need a dimension to query that we know exists (i.e. the dimension
         # is guaranteed to not cause a problem) on each semantic model.
         # Additionally, we don't want to modify the original model, so we
@@ -183,7 +183,7 @@ class DataWarehouseTaskBuilder:
     def gen_dimension_tasks(
         cls, model: SemanticManifest, sql_client: SqlClient, system_schema: str
     ) -> List[DataWarehouseValidationTask]:
-        """Generates a list of tasks for validating the dimensions of the model
+        """Generates a list of tasks for validating the dimensions of the model.
 
         The high level tasks returned are "short cut" queries which try to
         query all the dimensions for a given semantic model. If that query fails,
@@ -191,7 +191,6 @@ class DataWarehouseTaskBuilder:
         query fails, there are subtasks which query the individual dimensions
         on the semantic model to identify which have issues.
         """
-
         render_tools = QueryRenderingTools(model=model, system_schema=system_schema)
 
         tasks: List[DataWarehouseValidationTask] = []
@@ -283,7 +282,7 @@ class DataWarehouseTaskBuilder:
     def gen_entity_tasks(
         cls, model: SemanticManifest, sql_client: SqlClient, system_schema: str
     ) -> List[DataWarehouseValidationTask]:
-        """Generates a list of tasks for validating the entities of the model
+        """Generates a list of tasks for validating the entities of the model.
 
         The high level tasks returned are "short cut" queries which try to
         query all the entities for a given semantic model. If that query fails,
@@ -291,7 +290,6 @@ class DataWarehouseTaskBuilder:
         query fails, there are subtasks which query the individual entities
         on the semantic model to identify which have issues.
         """
-
         render_tools = QueryRenderingTools(model=model, system_schema=system_schema)
 
         tasks: List[DataWarehouseValidationTask] = []
@@ -358,7 +356,7 @@ class DataWarehouseTaskBuilder:
     def gen_measure_tasks(
         cls, model: SemanticManifest, sql_client: SqlClient, system_schema: str
     ) -> List[DataWarehouseValidationTask]:
-        """Generates a list of tasks for validating the measures of the model
+        """Generates a list of tasks for validating the measures of the model.
 
         The high level tasks returned are "short cut" queries which try to
         query all the measures for a given semantic model. If that query fails,
@@ -366,7 +364,6 @@ class DataWarehouseTaskBuilder:
         query fails, there are subtasks which query the individual measures
         on the semantic model to identify which have issues.
         """
-
         render_tools = QueryRenderingTools(model=model, system_schema=system_schema)
 
         tasks: List[DataWarehouseValidationTask] = []
@@ -457,7 +454,7 @@ class DataWarehouseTaskBuilder:
     def gen_metric_tasks(
         cls, model: SemanticManifest, sql_client: AsyncSqlClient, system_schema: str
     ) -> List[DataWarehouseValidationTask]:
-        """Generates a list of tasks for validating the metrics of the model"""
+        """Generates a list of tasks for validating the metrics of the model."""
         mf_engine = MetricFlowEngine(
             semantic_manifest_lookup=SemanticManifestLookup(semantic_manifest=model),
             sql_client=sql_client,
@@ -483,7 +480,7 @@ class DataWarehouseTaskBuilder:
 
 
 class DataWarehouseModelValidator:
-    """A Validator for checking specific tasks for the model against the Data Warehouse
+    """A Validator for checking specific tasks for the model against the Data Warehouse.
 
     Data Warehouse Validations are validations that are done against the data
     warehouse based on the model configured by the user. Their purpose is to
@@ -498,7 +495,7 @@ class DataWarehouseModelValidator:
     def run_tasks(
         self, tasks: List[DataWarehouseValidationTask], timeout: Optional[int] = None
     ) -> ModelValidationResults:
-        """Runs the list of tasks as queries agains the data warehouse, returning any found issues
+        """Runs the list of tasks as queries agains the data warehouse, returning any found issues.
 
         Args:
             tasks: A list of tasks to run against the data warehouse
@@ -507,7 +504,6 @@ class DataWarehouseModelValidator:
         Returns:
             A list of validation issues discovered when running the passed in tasks against the data warehosue
         """
-
         # Used for keeping track if we go past the max time
         start_time = perf_counter()
 
@@ -542,7 +538,7 @@ class DataWarehouseModelValidator:
     def validate_semantic_models(
         self, model: SemanticManifest, timeout: Optional[int] = None
     ) -> ModelValidationResults:
-        """Generates a list of tasks for validating the semantic models of the model and then runs them
+        """Generates a list of tasks for validating the semantic models of the model and then runs them.
 
         Args:
             model: Model which to run data warehouse validations on
@@ -557,7 +553,7 @@ class DataWarehouseModelValidator:
         return self.run_tasks(tasks=tasks, timeout=timeout)
 
     def validate_dimensions(self, model: SemanticManifest, timeout: Optional[int] = None) -> ModelValidationResults:
-        """Generates a list of tasks for validating the dimensions of the model and then runs them
+        """Generates a list of tasks for validating the dimensions of the model and then runs them.
 
         Args:
             model: Model which to run data warehouse validations on
@@ -572,7 +568,7 @@ class DataWarehouseModelValidator:
         return self.run_tasks(tasks=tasks, timeout=timeout)
 
     def validate_entities(self, model: SemanticManifest, timeout: Optional[int] = None) -> ModelValidationResults:
-        """Generates a list of tasks for validating the entities of the model and then runs them
+        """Generates a list of tasks for validating the entities of the model and then runs them.
 
         Args:
             model: Model which to run data warehouse validations on
@@ -587,7 +583,7 @@ class DataWarehouseModelValidator:
         return self.run_tasks(tasks=tasks, timeout=timeout)
 
     def validate_measures(self, model: SemanticManifest, timeout: Optional[int] = None) -> ModelValidationResults:
-        """Generates a list of tasks for validating the measures of the model and then runs them
+        """Generates a list of tasks for validating the measures of the model and then runs them.
 
         Args:
             model: Model which to run data warehouse validations on
@@ -602,7 +598,7 @@ class DataWarehouseModelValidator:
         return self.run_tasks(tasks=tasks, timeout=timeout)
 
     def validate_metrics(self, model: SemanticManifest, timeout: Optional[int] = None) -> ModelValidationResults:
-        """Generates a list of tasks for validating the metrics of the model and then runs them
+        """Generates a list of tasks for validating the metrics of the model and then runs them.
 
         Args:
             model: Model which to run data warehouse validations on
@@ -611,7 +607,6 @@ class DataWarehouseModelValidator:
         Returns:
             A list of validation issues. If there are no validation issues, an empty list is returned.
         """
-
         tasks = DataWarehouseTaskBuilder.gen_metric_tasks(
             model=model, sql_client=self._sql_client, system_schema=self._sql_schema
         )

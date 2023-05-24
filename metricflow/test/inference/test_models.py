@@ -1,9 +1,10 @@
+from __future__ import annotations
+
 from metricflow.inference.models import InferenceSignalType
 
 
 def test_inference_type_node_conflict() -> None:
     """Make sure the inference signal type hierarchy is correctly configured."""
-
     # IDENTIFIER
     assert InferenceSignalType.ID.UNKNOWN.is_subtype_of(InferenceSignalType.UNKNOWN)
     assert not InferenceSignalType.ID.UNKNOWN.is_subtype_of(InferenceSignalType.DIMENSION.UNKNOWN)

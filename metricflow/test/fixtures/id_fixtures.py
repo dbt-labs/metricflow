@@ -1,6 +1,9 @@
-from contextlib import contextmanager, ExitStack
-from unittest.mock import patch
+from __future__ import annotations
+
+from contextlib import ExitStack, contextmanager
 from typing import Generator
+from unittest.mock import patch
+
 import pytest
 
 from metricflow.dag.id_generation import IdGeneratorRegistry
@@ -22,7 +25,6 @@ def patch_id_generators() -> Generator[None, None, None]:
     Plan outputs contain IDs, so if the IDs are not consistent from run to run, there will be diffs in the actual vs.
     expected outputs during a test.
     """
-
     with patch_id_generators_helper(start_value=IdNumberSpace.TEST_START):
         yield None
 

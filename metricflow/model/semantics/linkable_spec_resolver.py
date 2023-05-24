@@ -4,25 +4,26 @@ import logging
 import time
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Tuple, Sequence, Dict, List, Optional, FrozenSet, Set
+from typing import Dict, FrozenSet, List, Optional, Sequence, Set, Tuple
 
-from dbt_semantic_interfaces.objects.elements.dimension import DimensionType, Dimension
+from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
 from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
-from dbt_semantic_interfaces.references import SemanticModelReference, MeasureReference, MetricReference
+from dbt_semantic_interfaces.references import MeasureReference, MetricReference, SemanticModelReference
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
 from metricflow.protocols.semantics import SemanticModelAccessor
 from metricflow.specs.specs import (
     DEFAULT_TIME_GRANULARITY,
-    LinkableSpecSet,
     DimensionSpec,
-    TimeDimensionSpec,
-    EntitySpec,
     EntityReference,
+    EntitySpec,
+    LinkableSpecSet,
+    TimeDimensionSpec,
 )
 
 logger = logging.getLogger(__name__)
@@ -188,7 +189,6 @@ class LinkableElementSet:
         First, only elements with at least one property in the "with_any_of" set are retained. Then, any elements with
         a property in "without_any_of" set are removed.
         """
-
         key_to_linkable_dimensions: Dict[ElementPathKey, Tuple[LinkableDimension, ...]] = {}
         key_to_linkable_entities: Dict[ElementPathKey, Tuple[LinkableEntity, ...]] = {}
 

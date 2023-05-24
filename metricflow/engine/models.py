@@ -3,10 +3,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Optional
 
-from dbt_semantic_interfaces.objects.metric import MetricType, MetricTypeParams, Metric as SemanticManifestMetric
+from dbt_semantic_interfaces.objects.elements.dimension import Dimension
 from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
 from dbt_semantic_interfaces.objects.metadata import Metadata
-from dbt_semantic_interfaces.objects.elements.dimension import Dimension
+from dbt_semantic_interfaces.objects.metric import Metric as SemanticManifestMetric
+from dbt_semantic_interfaces.objects.metric import MetricType, MetricTypeParams
 
 
 @dataclass(frozen=True)

@@ -1,21 +1,23 @@
+from __future__ import annotations
+
 import logging
 from typing import Generic, Optional, Union
 
-from metricflow.dag.id_generation import IdGeneratorRegistry, SQL_QUERY_PLAN_PREFIX, EXEC_PLAN_PREFIX
+from metricflow.dag.id_generation import EXEC_PLAN_PREFIX, SQL_QUERY_PLAN_PREFIX, IdGeneratorRegistry
 from metricflow.dataflow.dataflow_plan import (
-    SourceDataSetT,
-    WriteToResultDataframeNode,
+    BaseOutput,
+    ComputedMetricsOutput,
     DataflowPlan,
     SinkNodeVisitor,
+    SourceDataSetT,
+    WriteToResultDataframeNode,
     WriteToResultTableNode,
-    ComputedMetricsOutput,
-    BaseOutput,
 )
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.execution.execution_plan import (
     ExecutionPlan,
-    SelectSqlQueryToDataFrameTask,
     ExecutionPlanTask,
+    SelectSqlQueryToDataFrameTask,
     SelectSqlQueryToTableTask,
 )
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter, SqlDataSetT
@@ -29,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 
 class DataflowToExecutionPlanConverter(Generic[SqlDataSetT], SinkNodeVisitor[SqlDataSetT, ExecutionPlan]):
-    """Converts a dataflow plan to an execution plan"""
+    """Converts a dataflow plan to an execution plan."""
 
     def __init__(
         self,
@@ -103,6 +105,5 @@ class DataflowToExecutionPlanConverter(Generic[SqlDataSetT], SinkNodeVisitor[Sql
 
     def convert_to_execution_plan(self, dataflow_plan: DataflowPlan) -> ExecutionPlan:
         """Convert the dataflow plan to an execution plan."""
-
         assert len(dataflow_plan.sink_output_nodes) == 1, "Only 1 sink node in the plan is currently supported."
         return dataflow_plan.sink_output_nodes[0].accept_sink_node_visitor(self)

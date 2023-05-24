@@ -1,5 +1,8 @@
-from metricflow.dataset.dataset import DataSet
+from __future__ import annotations
+
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+
+from metricflow.dataset.dataset import DataSet
 
 # Shortcuts for referring to the metric time dimension.
 MTD = DataSet.metric_time_dimension_name()

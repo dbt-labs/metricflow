@@ -1,23 +1,26 @@
+from __future__ import annotations
+
 import traceback
 from typing import List, Tuple
 
 from dbt_metadata_client.dbt_metadata_api_schema import MetricFilter, MetricNode
+from dbt_semantic_interfaces.objects.metric import MetricInput, MetricInputMeasure, MetricType, MetricTypeParams
+from dbt_semantic_interfaces.validations.validator_helpers import (
+    ModelValidationResults,
+    ValidationError,
+    ValidationIssue,
+)
+
 from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
     DbtMappingRule,
     MappedObjects,
     assert_essential_metric_properties,
     get_and_assert_calc_method_mapping,
 )
-from dbt_semantic_interfaces.objects.metric import MetricInputMeasure, MetricInput, MetricType, MetricTypeParams
-from dbt_semantic_interfaces.validations.validator_helpers import (
-    ModelValidationResults,
-    ValidationIssue,
-    ValidationError,
-)
 
 
 class DbtToMetricName(DbtMappingRule):
-    """Rule for mapping dbt metric names to metric names"""
+    """Rule for mapping dbt metric names to metric names."""
 
     @staticmethod
     def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
@@ -36,7 +39,7 @@ class DbtToMetricName(DbtMappingRule):
 
 
 class DbtToMetricDescription(DbtMappingRule):
-    """Rule for mapping dbt metric descriptions to metric descriptions"""
+    """Rule for mapping dbt metric descriptions to metric descriptions."""
 
     @staticmethod
     def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
@@ -57,7 +60,7 @@ class DbtToMetricDescription(DbtMappingRule):
 
 
 class DbtToMetricType(DbtMappingRule):
-    """Rule for mapping dbt metric calculation_methods to metric types"""
+    """Rule for mapping dbt metric calculation_methods to metric types."""
 
     @staticmethod
     def run(dbt_metrics: Tuple[MetricNode, ...], objects: MappedObjects) -> ModelValidationResults:  # noqa: D
@@ -77,7 +80,7 @@ class DbtToMetricType(DbtMappingRule):
 
 
 class DbtToMeasureProxyMetricTypeParams(DbtMappingRule):
-    """Rule for mapping non-derived dbt metric names to metric measure inputs
+    """Rule for mapping non-derived dbt metric names to metric measure inputs.
 
     WARNING: This will clobber any other type_params for the metric
     """
@@ -104,7 +107,7 @@ class DbtToMeasureProxyMetricTypeParams(DbtMappingRule):
 
 
 class DbtToDerivedMetricTypeParams(DbtMappingRule):
-    """Rule for mapping derived dbt metric depends_on & expression to metric expression and metric inputs
+    """Rule for mapping derived dbt metric depends_on & expression to metric expression and metric inputs.
 
     WARNING: This will clobber any other type_params for the metric
     TODO: We need to take another step to modify the dbt expression to an appropriate MetricFlow expression
@@ -140,7 +143,7 @@ class DbtToDerivedMetricTypeParams(DbtMappingRule):
 
 
 class DbtToMetricConstraint(DbtMappingRule):
-    """Rule for mapping dbt metric filters to metric constraint
+    """Rule for mapping dbt metric filters to metric constraint.
 
     With this rule we just build the SQL where constraint from the filters as
     we'd define it in the YAML definition of a MetricFlow metric. This makes it

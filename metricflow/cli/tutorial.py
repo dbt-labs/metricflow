@@ -1,12 +1,14 @@
-import pandas as pd
+from __future__ import annotations
+
 import os
 from string import Template
 from typing import Dict
 
+import pandas as pd
+
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql_clients.sql_utils import make_df
-
 
 COUNTRIES = [("US", "NA"), ("MX", "NA"), ("CA", "NA"), ("BR", "SA"), ("GR", "EU"), ("FR", "EU")]
 TRANSACTION_TYPE = ["cancellation", "alteration", "quick-buy", "buy"]
@@ -111,7 +113,6 @@ def build_dataframe(sql_client: SqlClient) -> Dict[str, pd.DataFrame]:
 
 def create_sample_data(sql_client: SqlClient, system_schema: str) -> bool:
     """Create tables with sample data into data warehouse."""
-
     if any(
         [
             sql_client.table_exists(SqlTable.from_string(f"{system_schema}.{CUSTOMERS_TABLE}")),
@@ -138,7 +139,6 @@ def remove_sample_tables(sql_client: SqlClient, system_schema: str) -> None:
 
 def gen_sample_model_configs(dir_path: str, system_schema: str) -> None:
     """Generates the sample model configs to a specified directory."""
-
     with open(CUSTOMERS_YAML_FILE) as f:
         contents = Template(f.read()).substitute(
             {"customers_table": f"{CUSTOMERS_TABLE}", "system_schema": system_schema}

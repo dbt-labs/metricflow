@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pandas import DataFrame
 
 from metricflow.filters.time_constraint import TimeRangeConstraint

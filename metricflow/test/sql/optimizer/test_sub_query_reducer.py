@@ -1,21 +1,23 @@
+from __future__ import annotations
+
 import pytest
 from _pytest.fixtures import FixtureRequest
 
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.sql.optimizer.sub_query_reducer import SqlSubQueryReducer
 from metricflow.sql.sql_exprs import (
-    SqlColumnReferenceExpression,
     SqlColumnReference,
-    SqlComparisonExpression,
+    SqlColumnReferenceExpression,
     SqlComparison,
+    SqlComparisonExpression,
 )
 from metricflow.sql.sql_plan import (
-    SqlSelectStatementNode,
-    SqlSelectColumn,
-    SqlTableFromClauseNode,
-    SqlOrderByDescription,
     SqlJoinDescription,
     SqlJoinType,
+    SqlOrderByDescription,
+    SqlSelectColumn,
+    SqlSelectStatementNode,
+    SqlTableFromClauseNode,
 )
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.sql.compare_sql_plan import assert_default_rendered_sql_equal
@@ -134,7 +136,7 @@ def test_reduce_sub_query(
     mf_test_session_state: MetricFlowTestSessionState,
     base_select_statement: SqlSelectStatementNode,
 ) -> None:
-    """Tests a case where an outer query should be reduced into its inner query with merged LIMIT expressions"""
+    """Tests a case where an outer query should be reduced into its inner query with merged LIMIT expressions."""
     assert_default_rendered_sql_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
@@ -249,7 +251,6 @@ def test_rewrite_order_by_with_a_join_in_parent(
     rewrite_order_by_statement: SqlSelectStatementNode,
 ) -> None:
     """Tests rewriting an order by when the parent has a join."""
-
     assert_default_rendered_sql_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,

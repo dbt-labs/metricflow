@@ -1,16 +1,17 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Dict, Optional
+from typing import Dict, List, Optional
 
 from dbt_semantic_interfaces.objects.elements.entity import EntityType
-from dbt_semantic_interfaces.references import (
-    SemanticModelReference,
-    SemanticModelElementReference,
-    EntityReference,
-)
-from metricflow.instances import EntityInstance, InstanceSet
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
+from dbt_semantic_interfaces.references import (
+    EntityReference,
+    SemanticModelElementReference,
+    SemanticModelReference,
+)
+
+from metricflow.instances import EntityInstance, InstanceSet
 from metricflow.protocols.semantics import SemanticModelAccessor
 
 MAX_JOIN_HOPS = 2

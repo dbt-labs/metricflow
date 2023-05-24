@@ -1,34 +1,37 @@
+from __future__ import annotations
+
 import logging
 from collections import defaultdict
 from copy import deepcopy
-from typing import Dict, List, Optional, Set, Sequence
+from typing import Dict, List, Optional, Sequence, Set
 
-from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension
 from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
+from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.references import (
-    SemanticModelReference,
-    SemanticModelElementReference,
-    MeasureReference,
-    TimeDimensionReference,
     DimensionReference,
-    LinkableElementReference,
     EntityReference,
+    LinkableElementReference,
+    MeasureReference,
+    SemanticModelElementReference,
+    SemanticModelReference,
+    TimeDimensionReference,
 )
+from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
+
 from metricflow.errors.errors import InvalidSemanticModelError
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.spec_converters import MeasureConverter
 from metricflow.protocols.semantics import SemanticModelAccessor
-from metricflow.specs.specs import NonAdditiveDimensionSpec, MeasureSpec
+from metricflow.specs.specs import MeasureSpec, NonAdditiveDimensionSpec
 
 logger = logging.getLogger(__name__)
 
 
 class SemanticModelLookup(SemanticModelAccessor):
-    """Tracks semantic information for semantic model held in a set of SemanticModelContainers
+    """Tracks semantic information for semantic model held in a set of SemanticModelContainers.
 
     This implements both the SemanticModelAccessors protocol, the interface type we use throughout the codebase.
     That interface prevents unwanted calls to methods for adding semantic models to the container.
@@ -63,7 +66,7 @@ class SemanticModelLookup(SemanticModelAccessor):
         return tuple(self._dimension_index.keys())
 
     def get_dimension(self, dimension_reference: DimensionReference) -> Dimension:
-        """Retrieves a full dimension object by name"""
+        """Retrieves a full dimension object by name."""
         for dimension_source in self._dimension_index[dimension_reference]:
             dimension = dimension_source.get_dimension(dimension_reference)
             # find the semantic model that has the requested dimension by the requested entity
@@ -75,7 +78,7 @@ class SemanticModelLookup(SemanticModelAccessor):
         )
 
     def get_time_dimension(self, time_dimension_reference: TimeDimensionReference) -> Dimension:
-        """Retrieves a full dimension object by name"""
+        """Retrieves a full dimension object by name."""
         dimension_reference = time_dimension_reference.dimension_reference()
 
         if dimension_reference not in self._dimension_index:
@@ -196,6 +199,6 @@ class SemanticModelLookup(SemanticModelAccessor):
         return self._semantic_model_to_aggregation_time_dimensions[semantic_model_reference]
 
     def get_semantic_models_for_entity(self, entity_reference: EntityReference) -> Set[SemanticModel]:
-        """Return all semantic models associated with an entity reference"""
+        """Return all semantic models associated with an entity reference."""
         entity = self._entity_ref_to_entity[entity_reference]
         return set(self._entity_index[entity])

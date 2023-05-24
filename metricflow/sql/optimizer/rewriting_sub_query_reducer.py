@@ -2,27 +2,27 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import List, Optional, Tuple, Sequence
+from typing import List, Optional, Sequence, Tuple
 
 from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
 from metricflow.sql.sql_exprs import (
+    SqlColumnAliasReferenceExpression,
     SqlColumnReference,
-    SqlExpressionTreeLineage,
-    SqlExpressionNode,
     SqlColumnReplacements,
+    SqlExpressionNode,
+    SqlExpressionTreeLineage,
     SqlLogicalExpression,
     SqlLogicalOperator,
-    SqlColumnAliasReferenceExpression,
 )
 from metricflow.sql.sql_plan import (
+    SqlJoinDescription,
+    SqlOrderByDescription,
     SqlQueryPlanNode,
     SqlQueryPlanNodeVisitor,
-    SqlSelectQueryFromClauseNode,
-    SqlTableFromClauseNode,
-    SqlSelectStatementNode,
-    SqlOrderByDescription,
-    SqlJoinDescription,
     SqlSelectColumn,
+    SqlSelectQueryFromClauseNode,
+    SqlSelectStatementNode,
+    SqlTableFromClauseNode,
 )
 
 logger = logging.getLogger(__name__)
@@ -70,7 +70,7 @@ class RewritableSqlClauses:
 
     @property
     def contains_ambiguous_exprs(self) -> bool:
-        """Returns true if any of the clauses have ambiguous expressions that will be difficult to re-write"""
+        """Returns true if any of the clauses have ambiguous expressions that will be difficult to re-write."""
         return any(
             [x.expr.lineage.contains_ambiguous_exprs for x in self.select_columns]
             + [x.lineage.contains_ambiguous_exprs for x in self.wheres]
@@ -198,7 +198,6 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
         Reducing this node means eliminating the SELECT of this node and merging it with the parent SELECT. This
         checks for the cases where we are able to reduce.
         """
-
         # If this node has multiple parents (i.e. a join) that are complex, then this can't be collapsed.
         is_join = len(node.join_descs) > 0
         has_multiple_parent_nodes = len(node.parent_nodes) > 1
@@ -396,7 +395,6 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
         ON bookings_src.listing_id = dim_listings_src.listing_id
         GROUP BY bookings_src.ds
         """
-
         # Check that there aren't any duplicates in source aliases, or else there would be a collision when reduced.
         # This check is conservative as it checks for duplicates in this node and parent nodes, but depending on
         # on which sources get reduced, there may not be a collision.
