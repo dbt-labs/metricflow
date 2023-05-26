@@ -23,15 +23,13 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-  "GitPython>=3.1.27,<3.1.31",
   "Jinja2>=2.11.3",
   "MarkupSafe==2.0.1",
   "PyYAML~=6.0",
   "SQLAlchemy~=1.4.42",
   "click>=7.1.2",
-  "croniter~=1.3.4",
   "databricks-sql-connector==2.0.3",
-  "dbt_semantic_interfaces==0.1.0.dev1",
+  "dbt-semantic-interfaces==0.1.0.dev1",
   "duckdb-engine~=0.1.8",
   "duckdb==0.3.4",
   "google-auth~=2.13.0",
@@ -44,7 +42,6 @@ dependencies = [
   "numpy>=1.22.2",
   "pandas~=1.3.0",
   "psycopg2~=2.9.3",
-  "pycron~=3.0.0",
   "pydantic~=1.9.0",
   "python-dateutil==2.8.2",
   "rapidfuzz==3.0.0",
@@ -56,7 +53,7 @@ dependencies = [
   "sqlalchemy-bigquery~=1.6.1",
   "sqlalchemy-redshift==0.8.1",
   "sqlalchemy2-stubs~=0.0.2a21",
-  "tabulate==0.8.9",
+  "tabulate~=0.8.9",
   "typing_extensions>=4.0.0",
   "update-checker~=0.18.0",
   # Below are pinned transitive dependencies that was done to patch a vulnerability"
