@@ -7,10 +7,9 @@ from dataclasses import dataclass
 from typing import List, Optional, Sequence
 
 import pandas as pd
-from dbt_semantic_interfaces.objects.elements.dimension import Dimension
+
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.references import DimensionReference, MetricReference
-
 from metricflow.configuration.constants import (
     CONFIG_DBT_CLOUD_JOB_ID,
     CONFIG_DBT_CLOUD_SERVICE_TOKEN,
@@ -21,25 +20,36 @@ from metricflow.configuration.constants import (
 )
 from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
+from metricflow.dataflow.builder.node_data_set import (
+    DataflowPlanNodeOutputDataSetResolver,
+)
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import DataflowPlan
-from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import SourceScanOptimizer
+from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import (
+    SourceScanOptimizer,
+)
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
-from metricflow.engine.models import Metric
+from metricflow.engine.models import Dimension, Metric
 from metricflow.engine.time_source import ServerTimeSource
-from metricflow.engine.utils import build_semantic_manifest_from_config, build_semantic_manifest_from_dbt_cloud
+from metricflow.engine.utils import (
+    build_semantic_manifest_from_config,
+    build_semantic_manifest_from_dbt_cloud,
+)
 from metricflow.errors.errors import ExecutionException
 from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
 from metricflow.execution.execution_plan_to_text import execution_plan_to_text
 from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.logging.formatting import indent_log_line
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
+from metricflow.model.semantics.linkable_element_properties import (
+    LinkableElementProperties,
+)
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
-from metricflow.plan_conversion.dataflow_to_execution import DataflowToExecutionPlanConverter
+from metricflow.plan_conversion.dataflow_to_execution import (
+    DataflowToExecutionPlanConverter,
+)
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.time_spine import TimeSpineSource, TimeSpineTableBuilder
 from metricflow.protocols.async_sql_client import AsyncSqlClient
@@ -161,7 +171,10 @@ class MetricFlowExplainResult:
         sql_query = self.rendered_sql
         return SqlQuery(
             sql_query="\n".join(
-                filter(lambda line: not line.strip().startswith("--"), sql_query.sql_query.split("\n"))
+                filter(
+                    lambda line: not line.strip().startswith("--"),
+                    sql_query.sql_query.split("\n"),
+                )
             ),
             bind_parameters=sql_query.bind_parameters,
         )
@@ -450,26 +463,36 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         return self._create_execution_plan(mf_request)
 
     def simple_dimensions_for_metrics(self, metric_names: List[str]) -> List[Dimension]:  # noqa: D
-        linkable_dimension_tuples = self._semantic_manifest_lookup.metric_lookup.linkable_set_for_metrics(
-            metric_references=[MetricReference(element_name=mname) for mname in metric_names],
-            without_any_property=frozenset(
-                {
-                    LinkableElementProperties.ENTITY,
-                    LinkableElementProperties.DERIVED_TIME_GRANULARITY,
-                    LinkableElementProperties.LOCAL_LINKED,
-                }
-            ),
-        ).path_key_to_linkable_dimensions.values()
+        path_key_to_linkable_dimensions = (
+            self._semantic_manifest_lookup.metric_lookup.linkable_set_for_metrics(
+                metric_references=[MetricReference(element_name=mname) for mname in metric_names],
+                without_any_property=frozenset(
+                    {
+                        LinkableElementProperties.ENTITY,
+                        LinkableElementProperties.DERIVED_TIME_GRANULARITY,
+                        LinkableElementProperties.LOCAL_LINKED,
+                    }
+                ),
+            )
+        ).path_key_to_linkable_dimensions
 
         dimensions: List[Dimension] = []
-        for linkable_dimension_tuple in linkable_dimension_tuples:
-            for linkable_dimension in linkable_dimension_tuple:
+        for (
+            path_key,
+            linkable_dimensions_tuple,
+        ) in path_key_to_linkable_dimensions.items():
+            for linkable_dimension in linkable_dimensions_tuple:
                 semantic_model = self._semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
                     linkable_dimension.semantic_model_origin
                 )
                 assert semantic_model
                 dimensions.append(
-                    semantic_model.get_dimension(DimensionReference(element_name=linkable_dimension.element_name))
+                    Dimension.from_pydantic(
+                        pydantic_dimension=semantic_model.get_dimension(
+                            DimensionReference(element_name=linkable_dimension.element_name)
+                        ),
+                        path_key=path_key,
+                    )
                 )
         return dimensions
 
@@ -478,7 +501,10 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         metric_references = self._semantic_manifest_lookup.metric_lookup.metric_references
         metrics = self._semantic_manifest_lookup.metric_lookup.get_metrics(metric_references)
         return [
-            Metric.from_pydantic(pydantic_metric=metric, dimensions=self.simple_dimensions_for_metrics([metric.name]))
+            Metric.from_pydantic(
+                pydantic_metric=metric,
+                dimensions=self.simple_dimensions_for_metrics([metric.name]),
+            )
             for metric in metrics
         ]
 
